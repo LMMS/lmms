@@ -26,8 +26,6 @@
 #ifndef _INSTRUMENT_TRACK_H
 #define _INSTRUMENT_TRACK_H
 
-#include <QtGui/QPushButton>
-
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
@@ -385,13 +383,11 @@ private:
 	InstrumentTrackView * m_itv;
 
 	// widgets on the top of an instrument-track-window
-	tabWidget * m_generalSettingsWidget;
 	QLineEdit * m_nameLineEdit;
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
 	lcdSpinBox * m_effectChannelNumber;
-	QPushButton * m_saveSettingsBtn;
 
 
 	// tab-widget with all children

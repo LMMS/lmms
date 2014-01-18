@@ -1253,68 +1253,71 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
-	m_generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ),
-									this );
-	m_generalSettingsWidget->setFixedHeight( 90 );
+	tabWidget* generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ), this );
 
-	// setup line-edit for changing channel-name
-	m_nameLineEdit = new QLineEdit( m_generalSettingsWidget );
-	m_nameLineEdit->setFont( pointSize<8>(
-						m_nameLineEdit->font() ) );
-	m_nameLineEdit->setGeometry( 10, 16, 230, 18 );
+	QVBoxLayout* generalSettingsLayout = new QVBoxLayout( generalSettingsWidget );
+
+	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
+	generalSettingsLayout->setSpacing( 6 );
+
+	// setup line edit for changing instrument track name
+	m_nameLineEdit = new QLineEdit;
+	m_nameLineEdit->setFont( pointSize<8>( m_nameLineEdit->font() ) );
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( textChanged( const QString & ) ) );
 
+	generalSettingsLayout->addWidget( m_nameLineEdit );
 
-	// setup volume-knob
-	m_volumeKnob = new knob( knobBright_26, m_generalSettingsWidget,
-						tr( "Instrument volume" ) );
+	QHBoxLayout* basicControlsLayout = new QHBoxLayout;
+	basicControlsLayout->setSpacing( 3 );
+
+	// set up volume knob
+	m_volumeKnob = new knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
-	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
+	basicControlsLayout->addWidget( m_volumeKnob );
 
-	// setup panning-knob
-	m_panningKnob = new knob( knobBright_26, m_generalSettingsWidget,
-							tr( "Panning" ) );
-	m_panningKnob->move( m_volumeKnob->x() +
-					m_volumeKnob->width() + 16, 44 );
+	// set up panning knob
+	m_panningKnob = new knob( knobBright_26, NULL, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 
+	basicControlsLayout->addWidget( m_panningKnob );
+	basicControlsLayout->addStretch();
 
-	m_pitchKnob = new knob( knobBright_26, m_generalSettingsWidget,
-							tr( "Pitch" ) );
-	m_pitchKnob->move( m_panningKnob->x() +
-					m_panningKnob->width() + 16, 44 );
+	// set up pitch knob
+	m_pitchKnob = new knob( knobBright_26, NULL, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
+	basicControlsLayout->addWidget( m_pitchKnob );
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new fxLineLcdSpinBox( 2, m_generalSettingsWidget,
-						tr( "FX channel" ) );
+	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
-	m_effectChannelNumber->move( m_pitchKnob->x() +
-					m_pitchKnob->width() + 16, 44 );
 
-	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
-							"project_save" ), "",
-						m_generalSettingsWidget );
-	m_saveSettingsBtn->setGeometry( m_effectChannelNumber->x() +
-					m_effectChannelNumber->width() + 20, 44,
-					32, 32 );
-	connect( m_saveSettingsBtn, SIGNAL( clicked() ), this,
-					SLOT( saveSettingsBtnClicked() ) );
-	toolTip::add( m_saveSettingsBtn, 
-		tr( "Save current channel settings in a preset-file" ) );
-	m_saveSettingsBtn->setWhatsThis(
+	basicControlsLayout->addWidget( m_effectChannelNumber );
+
+	basicControlsLayout->addStretch();
+
+
+	QPushButton* saveSettingsBtn = new QPushButton( embed::getIconPixmap( "project_save" ), QString() );
+
+	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
+
+	toolTip::add( saveSettingsBtn, tr( "Save current channel settings in a preset-file" ) );
+	saveSettingsBtn->setWhatsThis(
 		tr( "Click here, if you want to save current channel settings "
 			"in a preset-file. Later you can load this preset by "
 			"double-clicking it in the preset-browser." ) );
+
+	basicControlsLayout->addWidget( saveSettingsBtn );
+
+	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
 	m_tabWidget = new tabWidget( "", this );
@@ -1323,16 +1326,14 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// create tab-widgets
 	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
-	QWidget * instrument_functions = new QWidget( m_tabWidget );
-	m_chordView = new ChordCreatorView( &m_track->m_chordCreator,
-							instrument_functions );
-	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator,
-							instrument_functions );
+	QWidget* instrumentFunctions = new QWidget( m_tabWidget );
+	m_chordView = new ChordCreatorView( &m_track->m_chordCreator, instrumentFunctions );
+	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator, instrumentFunctions );
 	m_midiView = new InstrumentMidiIOView( m_tabWidget );
-	m_effectView = new EffectRackView( m_track->m_audioPort.effects(),
-								m_tabWidget );
+	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
+
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
-	m_tabWidget->addTab( instrument_functions, tr( "FUNC" ), 2 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), 2 );
 	m_tabWidget->addTab( m_effectView, tr( "FX" ), 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
 
@@ -1340,7 +1341,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_pianoView = new PianoView( this );
 	m_pianoView->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
 
-	vlayout->addWidget( m_generalSettingsWidget );
+	vlayout->addWidget( generalSettingsWidget );
 	vlayout->addWidget( m_tabWidget );
 	vlayout->addWidget( m_pianoView );
 
@@ -1352,8 +1353,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = 
-			engine::mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
