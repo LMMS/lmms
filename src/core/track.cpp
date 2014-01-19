@@ -713,13 +713,10 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_action == Resize )
 	{
-		midiTime t = qMax( midiTime::ticksPerTact(),
-				static_cast<int>( _me->x() *
-					midiTime::ticksPerTact() / ppt ) );
-		if( ! ( _me->modifiers() & Qt::ControlModifier )
-		   && _me->button() == Qt::NoButton )
+		midiTime t = qMax( midiTime::ticksPerTact() / 16, static_cast<int>( _me->x() * midiTime::ticksPerTact() / ppt ) );
+		if( ! ( _me->modifiers() & Qt::ControlModifier ) && _me->button() == Qt::NoButton )
 		{
-			t = t.toNearestTact();
+			t = qMax<int>( midiTime::ticksPerTact(), t.toNearestTact() );
 		}
 		m_tco->changeLength( t );
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
