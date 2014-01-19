@@ -43,7 +43,8 @@
 lcdSpinBox::lcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
-	m_origMousePos()
+	m_origMousePos(),
+	m_displayOffset( 0 )
 {
 }
 
@@ -53,7 +54,8 @@ lcdSpinBox::lcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 lcdSpinBox::lcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
-	m_origMousePos()
+	m_origMousePos(),
+	m_displayOffset( 0 )
 {
 }
 
@@ -67,7 +69,7 @@ lcdSpinBox::~lcdSpinBox()
 
 void lcdSpinBox::update()
 {
-	setValue( model()->value() );
+	setValue( model()->value() + m_displayOffset );
 
 	QWidget::update();
 }

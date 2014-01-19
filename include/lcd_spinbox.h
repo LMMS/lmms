@@ -46,6 +46,19 @@ public:
 		update();
 	}
 
+	/*! Sets an offset which is always added to value of model so we can
+	    display values in a user-friendly way if they internally start at 0 */
+	void setDisplayOffset( int offset )
+	{
+		m_displayOffset = offset;
+	}
+
+	/*! \brief Returns internal offset for displaying values */
+	int displayOffset() const
+	{
+		return m_displayOffset;
+	}
+
 
 public slots:
 	virtual void update();
@@ -60,6 +73,7 @@ protected:
 
 private:
 	QPoint m_origMousePos;
+	int m_displayOffset;
 
 
 signals:
