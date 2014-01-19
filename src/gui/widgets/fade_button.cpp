@@ -99,10 +99,10 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 
 	int w = rect().right();
 	int h = rect().bottom();
-	p.setPen( QColor( 37, 39, 46 ) );
+	p.setPen( m_normalColor.darker(130) );
 	p.drawLine( w, 1, w, h );
 	p.drawLine( 1, h, w, h );
-	p.setPen( QColor( 145, 147, 154 ) );
+	p.setPen( m_normalColor.lighter(130) );
 	p.drawLine( 0, 0, 0, h-1 );
 	p.drawLine( 0, 0, w, 0 );
 }

@@ -290,7 +290,7 @@ void fader::paintEvent( QPaintEvent * ev)
 
 	if( m_persistentPeak_L > 0.05 )
 	{
-		painter.fillRect( QRect( 2, persistentPeak_L, 4, 1 ), (m_persistentPeak_L < 1.0 )? QColor( 0, 200, 0) : QColor( 200, 0, 0));
+		painter.fillRect( QRect( 2, persistentPeak_L, 4, 1 ), (m_persistentPeak_L < 1.0 )? QColor( 74, 253, 133) : QColor( 255, 100, 100));
 	}
 
 	int peak_R = calculateDisplayPeak( m_fPeakValue_R - m_fMinPeak );
@@ -299,11 +299,11 @@ void fader::paintEvent( QPaintEvent * ev)
 
 	if( m_persistentPeak_R > 0.05 )
 	{
-		painter.fillRect( QRect( 16, persistentPeak_R, 4, 1 ), (m_persistentPeak_R < 1.0 )? QColor( 0, 200, 0) : QColor( 200, 0, 0));
+		painter.fillRect( QRect( 16, persistentPeak_R, 4, 1 ), (m_persistentPeak_R < 1.0 )? QColor( 74, 253, 133) : QColor( 255, 100, 100));
 	}
 
 	// knob
-	painter.drawPixmap( 4, knobPosY() - m_knob.height(), m_knob );
+	painter.drawPixmap( 0, knobPosY() - m_knob.height(), m_knob );
 }
 
 

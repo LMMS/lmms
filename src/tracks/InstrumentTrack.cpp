@@ -1007,8 +1007,10 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiInputAction->setText( tr( "Input" ) );
 	m_midiOutputAction->setText( tr( "Output" ) );
 
-	m_activityIndicator = new fadeButton( QColor( 56, 60, 72 ),
-						QColor( 64, 255, 16 ),
+	m_activityIndicator = new fadeButton( QApplication::palette().color( QPalette::Active,
+							QPalette::Background),
+						QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );
