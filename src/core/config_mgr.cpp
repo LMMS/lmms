@@ -63,7 +63,7 @@ configManager::configManager() :
 	m_pluginDir( qApp->applicationDirPath()
 			+ QDir::separator() + "plugins" + QDir::separator() ),
 #else
-	m_pluginDir( QString( PLUGIN_DIR ) ),
+	m_pluginDir( qApp->applicationDirPath() + '/' + PLUGIN_DIR ),
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() )
@@ -347,7 +347,7 @@ void configManager::loadConfigFile()
 #ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
-		m_ladDir = QString( LIB_DIR ) + "/ladspa/";
+		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/ladspa/";
 #endif
 	}
 
