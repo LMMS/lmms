@@ -43,15 +43,15 @@ class EffectRackView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectRackView( EffectChain * _model, QWidget * _parent = NULL );
+	EffectRackView( EffectChain* model, QWidget* parent = NULL );
 	virtual ~EffectRackView();
 
 
 public slots:
 	void clearViews();
-	void moveUp( EffectView * _view );
-	void moveDown( EffectView * _view );
-	void deletePlugin( EffectView * _view );
+	void moveUp( EffectView* view );
+	void moveDown( EffectView* view );
+	void deletePlugin( EffectView* view );
 
 
 private slots:
@@ -62,12 +62,12 @@ private slots:
 private:
 	virtual void modelChanged();
 
-	inline EffectChain * fxChain()
+	inline EffectChain* fxChain()
 	{
 		return castModel<EffectChain>();
 	}
 
-	inline const EffectChain * fxChain() const
+	inline const EffectChain* fxChain() const
 	{
 		return castModel<EffectChain>();
 	}
@@ -75,9 +75,8 @@ private:
 
 	QVector<EffectView *> m_effectViews;
 
-	QVBoxLayout * m_mainLayout;
-	groupBox * m_effectsGroupBox;
-	QScrollArea * m_scrollArea;
+	groupBox* m_effectsGroupBox;
+	QScrollArea* m_scrollArea;
 
 	int m_lastY;
 
