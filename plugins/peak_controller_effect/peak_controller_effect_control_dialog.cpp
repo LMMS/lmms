@@ -44,7 +44,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 288, 110 );
+	setFixedSize( 170, 150 );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
 	tl->addSpacing( 25 );
@@ -85,7 +85,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	l->addStretch(); // expand, so other widgets have minimum width
 	tl->addLayout( l );
 
-	l = new QHBoxLayout; // = 2nd hbox
+	QVBoxLayout * l2 = new QVBoxLayout; // = 2nd vbox
 
 	m_muteLed = new ledCheckBox( "Mute Effect", this );
 	m_muteLed->setModel( &_controls->m_muteModel );
@@ -98,11 +98,11 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 	tl->addSpacing( 5 );
 
-	l->addWidget( m_muteLed );
-	l->addWidget( m_absLed );
-	l->addWidget( m_muteOutputLed );
-	l->addStretch(); // expand, so other widgets have minimum width
-	tl->addLayout( l );
+	l2->addWidget( m_muteLed );
+	l2->addWidget( m_absLed );
+	l2->addWidget( m_muteOutputLed );
+	l2->addStretch(); // expand, so other widgets have minimum height
+	tl->addLayout( l2 );
 
 	setLayout( tl );
 }

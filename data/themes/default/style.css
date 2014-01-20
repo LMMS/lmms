@@ -155,6 +155,58 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 }
 
 
+
+automatableSlider::groove:vertical {
+	background: rgba(0,0,0, 128);
+	border: 1px inset rgba(100,100,100, 64);
+	border-radius: 2px;
+	width: 2px;
+	margin: 2px 2px;
+}
+
+automatableSlider::handle:vertical {
+	background: none;
+	border-image: url(resources:main_slider.png);
+	width: 26px;
+	height: 10px;
+	border-radius: 2px;
+	margin: -4px -12px -2px;
+}
+
+EffectRackView QScrollArea, EffectRackView QVBoxLayout  {
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0, 64);
+    background: #49515b;
+}
+
+EffectSelectDialog QScrollArea {
+	background: #5b6571;
+}
+
+ControllerRackView QScrollArea, ControllerRackView QVBoxLayout {
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0, 64);
+    background: #49515b;
+}
+
+EffectControlDialog QGroupBox {
+	background: #49515b;
+	margin-top: 1ex;
+	padding: 10px 2px 1px;
+	border-radius: 4px;
+	border: 1px solid rgba(0,0,0, 64);
+}
+
+EffectControlDialog QGroupBox::title {
+	subcontrol-origin: margin;
+	subcontrol-position: top left;
+	background: #7b838d;
+	color: white;
+	border-radius: 2px;
+	border: 1px solid rgba(0,0,0, 64);
+	padding: 2px 1px;
+}
+
 QWidget#mainToolbar {
 	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
 }
