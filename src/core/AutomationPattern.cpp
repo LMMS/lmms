@@ -102,10 +102,10 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 	if( addIt )
 	{
-		// been empty before?
-		if( m_objects.isEmpty() && hasAutomation() == false )
+		// been empty before and model's current value is not its init value?
+		if( m_objects.isEmpty() && hasAutomation() == false && _obj->isAtInitValue() == false )
 		{
-			// then initialize default value
+			// then initialize first value
 			putValue( 0, _obj->value<float>(), false );
 		}
 
