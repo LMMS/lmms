@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.cpp - some implementations of AutomatableModel-class
  *
- * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -169,7 +169,14 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 		}
 	}
 
-	setInitValue( _this.attribute( _name ).toFloat() );
+	if( _this.hasAttribute( _name ) )
+	{
+		setInitValue( _this.attribute( _name ).toFloat() );
+	}
+	else
+	{
+		reset();
+	}
 }
 
 
