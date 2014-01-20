@@ -1,7 +1,7 @@
 /*
  * mmp.cpp - implementation of class multimediaProject
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -30,6 +30,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
 #include <QtGui/QMessageBox>
 
@@ -179,27 +180,25 @@ void multimediaProject::write( QTextStream & _strm )
 
 
 
-bool multimediaProject::writeFile( const QString & _fn )
+bool multimediaProject::writeFile( const QString& filename )
 {
-	QString fn = nameWithExtension( _fn );
-	QFile outfile( fn );
+	const QString fullName = nameWithExtension( filename );
+	const QString fullNameTemp = fullName + ".new";
+	const QString fullNameBak = fullName + ".bak";
+
+	QFile outfile( fullNameTemp );
+
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
 		QMessageBox::critical( NULL,
-				songEditor::tr( "Could not write file" ),
-					songEditor::tr( "Could not write file "
-							"%1. You probably are "
-							"not permitted to "
-							"write to this file.\n"
-							"Please make sure you "
-							"have write-access to "
-							"the file and try "
-							"again."
-						).arg( fn ) );
+			songEditor::tr( "Could not write file" ),
+			songEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
+							"write to this file. Please make sure you have write-access to "
+							"the file and try again." ).arg( fullName ) );
 		return false;
 	}
 
-	if( fn.section( '.', -1 ) == "mmpz" )
+	if( fullName.section( '.', -1 ) == "mmpz" )
 	{
 		QString xml;
 		QTextStream ts( &xml );
@@ -211,9 +210,23 @@ bool multimediaProject::writeFile( const QString & _fn )
 		QTextStream ts( &outfile );
 		write( ts );
 	}
+
 	outfile.close();
 
-	return true;
+	// make sure the file has been written correctly
+	if( QFileInfo( outfile.fileName() ).size() > 0 )
+	{
+		// remove old backup file
+		QFile::remove( fullNameBak );
+		// move current file to backup file
+		QFile::rename( fullName, fullNameBak );
+		// move temporary file to current file
+		QFile::rename( fullNameTemp, fullName );
+
+		return true;
+	}
+
+	return false;
 }
 
 
