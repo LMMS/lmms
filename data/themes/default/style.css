@@ -200,7 +200,7 @@ EffectControlDialog QGroupBox {
 EffectControlDialog QGroupBox::title {
 	subcontrol-origin: margin;
 	subcontrol-position: top left;
-	background: #5b6571;
+	background: #7b838d;
 	color: white;
 	border-radius: 2px;
 	border: 1px solid rgba(0,0,0, 64);
