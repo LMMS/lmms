@@ -135,6 +135,11 @@ public:
 		return castValue<T>( m_initValue );
 	}
 
+	bool isAtInitValue() const
+	{
+		return m_value == m_initValue;
+	}
+
 	template<class T>
 	inline T minValue() const
 	{
