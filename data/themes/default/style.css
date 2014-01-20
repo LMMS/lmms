@@ -173,11 +173,6 @@ automatableSlider::handle:vertical {
 	margin: -4px -12px -2px;
 }
 
-EffectRackView QScrollArea, EffectRackView QVBoxLayout  {
-    border-radius: 2px;
-    border: 1px solid rgba(0,0,0, 64);
-    background: #49515b;
-}
 
 EffectSelectDialog QScrollArea {
 	background: #5b6571;
