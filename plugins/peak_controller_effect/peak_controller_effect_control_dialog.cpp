@@ -44,14 +44,12 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 170, 150 );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
-	tl->addSpacing( 25 );
-	tl->addStretch();
+	tl->setContentsMargins( 5, 30, 8, 8 );
 
 	QHBoxLayout * l = new QHBoxLayout;
-
+	l->setSpacing( 4 );
 	m_baseKnob = new knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->setModel( &_controls->m_baseModel );
@@ -95,8 +93,6 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 	m_muteOutputLed = new ledCheckBox( "Mute Output", this );
 	m_muteOutputLed->setModel( &_controls->m_muteOutputModel );
-
-	tl->addSpacing( 5 );
 
 	l2->addWidget( m_muteLed );
 	l2->addWidget( m_absLed );
