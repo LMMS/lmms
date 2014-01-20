@@ -449,31 +449,29 @@ trackContentObjectView * AutomationPattern::createView( trackView * _tv )
 
 bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 {
-	TrackContainer::TrackList l = engine::getSong()->tracks() +
-				engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList l;
+	l += engine::getSong()->tracks();
+	l += engine::getBBTrackContainer()->tracks();
 	l += engine::getSong()->globalAutomationTrack();
-	for( TrackContainer::TrackList::const_iterator it = l.begin();
-							it != l.end(); ++it )
+
+	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		if( ( *it )->type() == track::AutomationTrack ||
 			( *it )->type() == track::HiddenAutomationTrack )
 		{
 			const track::tcoVector & v = ( *it )->getTCOs();
-			for( track::tcoVector::const_iterator j = v.begin();
-							j != v.end(); ++j )
+			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
-				const AutomationPattern * a =
-								dynamic_cast<const AutomationPattern *>( *j );
+				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>( *j );
 				if( a && a->hasAutomation() )
 				{
-	for( objectVector::const_iterator k = a->m_objects.begin();
-					k != a->m_objects.end(); ++k )
-	{
-		if( *k == _m )
-		{
-			return true;
-		}
-	}
+					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					{
+						if( *k == _m )
+						{
+							return true;
+						}
+					}
 				}
 			}
 		}
