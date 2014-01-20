@@ -49,8 +49,8 @@
 class AutoDetectMidiController : public MidiController
 {
 public:
-	AutoDetectMidiController( Model * _parent ) :
-		MidiController( _parent ),
+	AutoDetectMidiController( Model* parent ) :
+		MidiController( parent ),
 		m_detectedMidiChannel( 0 ),
 		m_detectedMidiController( 0 )
 	{
@@ -63,17 +63,14 @@ public:
 	}
 
 
-	virtual void processInEvent( const midiEvent & _me,
-					const midiTime & _time )
+	virtual void processInEvent( const midiEvent& event, const midiTime& time )
 	{
-		if( _me.m_type == MidiControlChange &&
-			( m_midiPort.inputChannel() == _me.m_channel + 1 ||
-				m_midiPort.inputChannel() == 0 ) )
+		if( event.m_type == MidiControlChange &&
+			( m_midiPort.inputChannel() == event.m_channel + 1 || m_midiPort.inputChannel() == 0 ) )
 		{
-			m_detectedMidiChannel = _me.m_channel + 1;
-			m_detectedMidiController = ( _me.m_data.m_bytes[0] & 0x7F ) + 1;
-			m_detectedMidiPort =
-				engine::mixer()->midiClient()->sourcePortName( _me );
+			m_detectedMidiChannel = event.m_channel + 1;
+			m_detectedMidiController = ( event.m_data.m_bytes[0] & 0x7F ) + 1;
+			m_detectedMidiPort = engine::mixer()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();
 		}
@@ -82,9 +79,9 @@ public:
 
 	// Would be a nice copy ctor, but too hard to add copy ctor because
 	// model has none.
-	MidiController * copyToMidiController( Model * _parent )
+	MidiController* copyToMidiController( Model* parent )
 	{
-		MidiController * c = new MidiController( _parent );
+		MidiController* c = new MidiController( parent );
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
@@ -98,12 +95,12 @@ public:
 	{
 		m_midiPort.setInputChannel( m_detectedMidiChannel );
 		m_midiPort.setInputController( m_detectedMidiController );
-		MidiPort::Map map = m_midiPort.readablePorts();
-		for( MidiPort::Map::Iterator it = map.begin(); it != map.end(); ++it )
+
+		const MidiPort::Map& map = m_midiPort.readablePorts();
+		for( MidiPort::Map::ConstIterator it = map.begin(); it != map.end(); ++it )
 		{
 			m_midiPort.subscribeReadablePort( it.key(),
-									m_detectedMidiPort.isEmpty() ||
-										( it.key() == m_detectedMidiPort ) );
+									m_detectedMidiPort.isEmpty() || ( it.key() == m_detectedMidiPort ) );
 		}
 	}
 
@@ -243,31 +240,25 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	ControllerConnection * cc = NULL;
 	if( m_targetModel )
 	{
-		cc = m_targetModel->getControllerConnection();
+		cc = m_targetModel->controllerConnection();
 
-		if( cc && cc->getController()->type() != 
-				Controller::DummyController && engine::getSong() )
+		if( cc && cc->getController()->type() != Controller::DummyController && engine::getSong() )
 		{
-			if ( cc->getController()->type() == 
-					Controller::MidiController )
+			if ( cc->getController()->type() == Controller::MidiController )
 			{
 				m_midiGroupBox->model()->setValue( true );
 				// ensure controller is created
 				midiToggled();
 			
-				MidiController * cont = 
-					(MidiController*)( cc->getController() );
-				m_midiChannelSpinBox->model()->setValue(
-						cont->m_midiPort.inputChannel() );
-				m_midiControllerSpinBox->model()->setValue(
-						cont->m_midiPort.inputController() );
+				MidiController * cont = (MidiController*)( cc->getController() );
+				m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
+				m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
 
 				m_midiController->subscribeReadablePorts( static_cast<MidiController*>( cc->getController() )->m_midiPort.readablePorts() );
 			}
 			else
 			{
-				int idx = engine::getSong()->controllers().indexOf(
-						cc->getController() );
+				int idx = engine::getSong()->controllers().indexOf( cc->getController() );
 
 				if( idx >= 0 )
 				{
@@ -293,8 +284,7 @@ ControllerConnectionDialog::~ControllerConnectionDialog()
 {
 	delete m_readablePorts;
 
-	if( m_midiController )
-		delete m_midiController;
+	delete m_midiController;
 }
 
 
@@ -308,8 +298,7 @@ void ControllerConnectionDialog::selectController()
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
 			MidiController * mc;
-			mc = m_midiController->copyToMidiController(
-					engine::getSong() );
+			mc = m_midiController->copyToMidiController( engine::getSong() );
 	
 			/*
 			if( m_targetModel->getTrack() && 
@@ -367,24 +356,21 @@ void ControllerConnectionDialog::midiToggled()
 			m_midiController = new AutoDetectMidiController( engine::getSong() );
 
 			MidiPort::Map map = m_midiController->m_midiPort.readablePorts();
-			for( MidiPort::Map::Iterator it = map.begin();
-							it != map.end(); ++it )
+			for( MidiPort::Map::Iterator it = map.begin(); it != map.end(); ++it )
 			{
 				it.value() = true;
 			}
 			m_midiController->subscribeReadablePorts( map );
 
-			m_midiChannelSpinBox->setModel( 
-					&m_midiController->m_midiPort.m_inputChannelModel );
-			m_midiControllerSpinBox->setModel( 
-					&m_midiController->m_midiPort.m_inputControllerModel );
+			m_midiChannelSpinBox->setModel( &m_midiController->m_midiPort.m_inputChannelModel );
+			m_midiControllerSpinBox->setModel( &m_midiController->m_midiPort.m_inputControllerModel );
+
 			if( m_readablePorts )
 			{
 				m_readablePorts->setModel( &m_midiController->m_midiPort );
 			}
 
-			connect( m_midiController, SIGNAL( valueChanged() ), 
-				this, SLOT( midiValueChanged() ) );
+			connect( m_midiController, SIGNAL( valueChanged() ), this, SLOT( midiValueChanged() ) );
 		}
 	}
 	m_midiAutoDetect.setValue( enabled );

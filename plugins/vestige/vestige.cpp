@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-instruments
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -135,8 +135,7 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings( _this, paramStr );
 
-			if( !( knobFModel[ i ]->isAutomated() ||
-						knobFModel[ i ]->getControllerConnection() ) )
+			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
 			{
 				knobFModel[ i ]->setValue( ( s_dumpValues.at( 2 )).toFloat() );
 				knobFModel[ i ]->setInitValue( ( s_dumpValues.at( 2 )).toFloat() );
@@ -190,7 +189,7 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			char paramStr[35];
 			for( int i = 0; i < paramCount; i++ )
 			{
-				if (knobFModel[i]->isAutomated() || knobFModel[i]->getControllerConnection()) {
+				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
 					sprintf( paramStr, "param%d", i);
 					knobFModel[i]->saveSettings( _doc, _this, paramStr );
 				}
@@ -200,7 +199,7 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 				me.setAttribute( "value", knobFModel[i]->value() );
 				_this.appendChild( me );
 
-				ControllerConnection * m_controllerConnection = knobFModel[i]->getControllerConnection();
+				ControllerConnection * m_controllerConnection = knobFModel[i]->controllerConnection();
 				if (m_controllerConnection) {
 					QDomElement controller_element;
 					QDomNode node = _this.namedItem( "connection" );
@@ -1016,8 +1015,7 @@ void manageVestigeInstrumentView::syncPlugin( void )
 	{
 		// only not automated knobs are synced from VST
 		// those auto-setted values are not jurnaled, tracked for undo / redo
-		if( !( m_vi->knobFModel[ i ]->isAutomated() || 
-					m_vi->knobFModel[ i ]->getControllerConnection() ) )
+		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
 			sprintf( paramStr, "param%d", i );
     			s_dumpValues = dump[ paramStr ].split( ":" );
@@ -1038,8 +1036,7 @@ void manageVestigeInstrumentView::displayAutomatedOnly( void )
 	for( int i = 0; i< m_vi->paramCount; i++ )
 	{
 
-		if( !( m_vi->knobFModel[ i ]->isAutomated() ||
-					m_vi->knobFModel[ i ]->getControllerConnection() ) )
+		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
 			if( m_vi->vstKnobs[ i ]->isVisible() == true  && isAuto )
 			{

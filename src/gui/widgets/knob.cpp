@@ -1,7 +1,7 @@
 /*
  * knob.cpp - powerful knob-widget
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -635,9 +635,8 @@ void knob::enterValue()
 
 void knob::friendlyUpdate()
 {
-	if( model()->getControllerConnection() == NULL ||
-		model()->getControllerConnection()->getController()->
-						frequentUpdates() == false ||
+	if( model()->controllerConnection() == NULL ||
+		model()->controllerConnection()->getController()->frequentUpdates() == false ||
 				Controller::runningFrames() % (256*4) == 0 )
 	{
 		update();

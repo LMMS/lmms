@@ -102,9 +102,9 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 	}
 
 	QString controllerTxt;
-	if( model->getControllerConnection() )
+	if( model->controllerConnection() )
 	{
-		Controller* cont = model->getControllerConnection()->getController();
+		Controller* cont = model->controllerConnection()->getController();
 		if( cont )
 		{
 			controllerTxt = AutomatableModel::tr( "Connected to %1" ).arg( cont->name() );
@@ -185,9 +185,9 @@ void AutomatableModelViewSlots::execConnectionDialog()
 		if( d.chosenController() )
 		{
 			// Update
-			if( m->getControllerConnection() )
+			if( m->controllerConnection() )
 			{
-				m->getControllerConnection()->setController( d.chosenController() );
+				m->controllerConnection()->setController( d.chosenController() );
 			}
 			// New
 			else
@@ -212,9 +212,9 @@ void AutomatableModelViewSlots::removeConnection()
 {
 	AutomatableModel* m = m_amv->modelUntyped();
 
-	if( m->getControllerConnection() )
+	if( m->controllerConnection() )
 	{
-		delete m->getControllerConnection();
+		delete m->controllerConnection();
 		m->setControllerConnection( NULL );
 	}
 }

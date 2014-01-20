@@ -203,7 +203,7 @@ bool Controller::hasModel( const Model * m )
 				return true;
 			}
 
-			ControllerConnection * cc = am->getControllerConnection();
+			ControllerConnection * cc = am->controllerConnection();
 			if( cc != NULL )
 			{
 				if( cc->getController()->hasModel( m ) )
