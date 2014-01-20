@@ -360,7 +360,7 @@ void knob::drawKnob( QPainter * _p )
 		case knobGreen_17:
 		{
 			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText, 2 ) );
+							QPalette::BrightText), 2 ) );
 			p.drawLine( calculateLine( mid, radius ) );
 			break;
 		}
