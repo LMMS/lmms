@@ -1532,7 +1532,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		int len_ticks = 4;
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
-		p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+		p.setPen( QColor( 0xCF, 0xD9, 0xFF ) );
 
 		while( it+1 != time_map.end() )
 		{
@@ -1603,7 +1603,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		QFont f = p.font();
 		f.setBold( TRUE );
 		p.setFont( pointSize<14>( f ) );
-		p.setPen( QColor( 0, 255, 0 ) );
+		p.setPen( QColor( 74, 253, 133 ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
 				grid_height - 40, Qt::TextWordWrap,
@@ -1722,7 +1722,7 @@ void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
 			rect_height = (int)( _level * m_y_delta );
 		}
 
-		QColor current_color( 0xFF, 0xB0, 0x00 );
+		QColor current_color( 0x9F, 0xAF, 0xFF );
 		if( _is_selected == TRUE )
 		{
 			current_color.setRgb( 0x00, 0x40, 0xC0 );

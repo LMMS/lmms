@@ -805,9 +805,12 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	const int base_key = ( m_piano != NULL ) ?
 		m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
-	g.setColorAt( 0, QColor( 0, 96, 0 ) );
-	g.setColorAt( 0.1, QColor( 64, 255, 64 ) );
-	g.setColorAt( 1, QColor( 0, 96, 0 ) );
+	g.setColorAt( 0, QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ).darker(220) );
+	g.setColorAt( 0.1, QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ) );
+	g.setColorAt( 1, QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ) );
 	if( KEY_ORDER[base_key % KeysPerOctave] == Piano::WhiteKey )
 	{
 		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,

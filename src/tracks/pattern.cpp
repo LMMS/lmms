@@ -1112,9 +1112,9 @@ void patternView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
 							QColor( 96, 96, 96 );
-	lingrad.setColorAt( 0, c );
-	lingrad.setColorAt( 0.5, Qt::black );
-	lingrad.setColorAt( 1, c );
+	lingrad.setColorAt( 0, QColor( 16, 16, 16 ) );
+	lingrad.setColorAt( 0.5, c );
+	lingrad.setColorAt( 1, QColor( 16, 16, 16 ) );
 	p.setBrush( lingrad );
 	p.setPen( QColor( 0, 0, 0 ) );
 	//p.drawRect( 0, 0, width() - 1, height() - 1 );
@@ -1172,11 +1172,11 @@ void patternView::paintEvent( QPaintEvent * )
 				}
 				else if( m_pat->m_frozenPattern != NULL )
 				{
-					p.setPen( QColor( 0x00, 0xE0, 0xFF ) );
+					p.setPen( QColor( 0x70, 0xFF, 0xFF ) );
 				}
 				else
 				{
-					p.setPen( QColor( 0xFF, 0xB0, 0x00 ) );
+					p.setPen( QColor( 0x77, 0xC7, 0xD8 ) );
 				}
 
 				for( NoteVector::Iterator it =
@@ -1287,7 +1287,7 @@ void patternView::paintEvent( QPaintEvent * )
 	else if( m_pat->m_frozenPattern != NULL )
 	{
 		p.setBrush( QBrush() );
-		p.setPen( QColor( 0, 224, 255 ) );
+		p.setPen( QColor( 0x70, 255, 255 ) );
 		p.drawRect( 0, 0, width()-1, height() - 1 );
 		p.drawPixmap( 3, height() - s_frozen->height() - 4, *s_frozen );
 	}

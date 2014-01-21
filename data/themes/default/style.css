@@ -178,12 +178,6 @@ EffectSelectDialog QScrollArea {
 	background: #5b6571;
 }
 
-ControllerRackView QScrollArea, ControllerRackView QVBoxLayout {
-    border-radius: 2px;
-    border: 1px solid rgba(0,0,0, 64);
-    background: #49515b;
-}
-
 EffectControlDialog QGroupBox {
 	background: #49515b;
 	margin-top: 1ex;
