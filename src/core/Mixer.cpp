@@ -1008,20 +1008,6 @@ AudioDevice * Mixer::tryAudioDevices()
 #endif
 
 
-#ifdef LMMS_HAVE_PORTAUDIO
-	if( dev_name == AudioPortAudio::name() || dev_name == "" )
-	{
-		dev = new AudioPortAudio( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioPortAudio::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
 #ifdef LMMS_HAVE_PULSEAUDIO
 	if( dev_name == AudioPulseAudio::name() || dev_name == "" )
 	{
@@ -1076,6 +1062,21 @@ AudioDevice * Mixer::tryAudioDevices()
 		delete dev;
 	}
 #endif
+
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	if( dev_name == AudioPortAudio::name() || dev_name == "" )
+	{
+		dev = new AudioPortAudio( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioPortAudio::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
 
 	// add more device-classes here...
 	//dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful, this );
