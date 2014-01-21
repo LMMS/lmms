@@ -106,7 +106,7 @@ const int RESIZE_AREA_WIDTH = 4;
 const int NE_LINE_WIDTH = 3;
 
 // key where to start
-const int INITIAL_START_KEY = Key_C + Octave_3 * KeysPerOctave;
+const int INITIAL_START_KEY = Key_C + Octave_4 * KeysPerOctave;
 
 // number of each note to provide in quantization and note lengths
 const int NUM_EVEN_LENGTHS = 6;
