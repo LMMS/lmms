@@ -199,9 +199,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
 							QColor( 96, 96, 96 );
-	lingrad.setColorAt( 0, c );
-	lingrad.setColorAt( 0.5, Qt::black );
-	lingrad.setColorAt( 1, c );
+	lingrad.setColorAt( 0, QColor(16, 16, 16) );
+	lingrad.setColorAt( 0.5, c );
+	lingrad.setColorAt( 1, QColor(16, 16, 16) );
 	p.setBrush( lingrad );
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
@@ -235,8 +235,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
-	const QColor cl = QColor( 255, 224, 0 );
-	const QColor cd = QColor( 229, 158, 0 );
+	const QColor cl = QColor( 0xCF, 0xDA, 0xFF );
+	const QColor cd = QColor( 0x99, 0xAF, 0xFF );
 
 	lin2grad.setColorAt( 1, cl );
 	lin2grad.setColorAt( 0, cd );

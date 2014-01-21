@@ -844,10 +844,9 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 			( (float)( PanningRight - _n->getPanning() ) ) / 
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	const QColor defaultNoteColor( 0x00, 0xAA, 0x00 );
+	const QColor defaultNoteColor( 0x4A, 0xFD, 0x85 );
 	QColor col = defaultNoteColor;
 	
-	col = QColor( 0x00, 0xAA, 0x00 );
 	if( _n->length() < 0 )
 	{
 		//step note
@@ -915,7 +914,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 								int _y )
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
-	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+	_p.setPen( QColor( 0x99, 0xAF, 0xFF ) );
 
 	int old_x = 0;
 	int old_y = 0;
@@ -3130,7 +3129,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		QFont f = p.font();
 		f.setBold( true );
 		p.setFont( pointSize<14>( f ) );
-		p.setPen( QColor( 0, 255, 0 ) );
+		p.setPen( QColor( 0x4A, 0xFD, 0x85 ) );
 		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
 				tr( "Please open a pattern by double-clicking "
 								"on it!" ) );

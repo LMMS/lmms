@@ -425,7 +425,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 				static_cast<int>( 128 - 32 * gray_amount ) ),
 									2 ) );
 
-	const QColor end_points_color( 0xFF, 0xBF, 0x22 );
+	const QColor end_points_color( 0x99, 0xAF, 0xFF );
 	const QColor end_points_bg_color( 0, 0, 2 );
 
 	const int y_base = ENV_GRAPH_Y + s_envGraph->height() - 3;
@@ -541,7 +541,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 		old_y = cur_y;
 	}
 
-	p.setPen( QColor( 255, 192, 0 ) );
+	p.setPen( QColor( 201, 201, 225 ) );
 	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
 						m_lfoSpeedKnob->value<float>() *
 								1000.0f );
