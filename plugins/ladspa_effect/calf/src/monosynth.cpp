@@ -231,7 +231,6 @@ bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int
             return false;
         for (int i = 0; i < points; i++)
         {
-            typedef complex<double> cfloat;
             double freq = 20.0 * pow (20000.0 / 20.0, i * 1.0 / points);
             
             const dsp::biquad_d1_lerp<float> &f = subindex ? filter2 : filter;
@@ -410,7 +409,16 @@ void monosynth_audio_module::delayed_note_on()
     envelope1.advance();
     envelope2.advance();
     queue_note_on = -1;
-    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
+    float modsrc[modsrc_count] = {
+        1,
+        velocity,
+        inertia_pressure.get_last(),
+        modwheel_value,
+        (float)envelope1.value,
+        (float)envelope2.value,
+        (float)(0.5+0.5*lfo1.last),
+        (float)(0.5+0.5*lfo2.last)
+    };
     calculate_modmatrix(moddest, moddest_count, modsrc);
     set_frequency();
     lookup_waveforms();
@@ -445,7 +453,16 @@ void monosynth_audio_module::calculate_step()
         envelope2.advance();
         lfo1.get();
         lfo2.get();
-        float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
+        float modsrc[modsrc_count] = {
+            1,
+            velocity,
+            inertia_pressure.get_last(),
+            modwheel_value,
+            (float)envelope1.value,
+            (float)envelope2.value,
+            (float)(0.5+0.5*lfo1.last),
+            (float)(0.5+0.5*lfo2.last)
+        };
         calculate_modmatrix(moddest, moddest_count, modsrc);
         last_stretch1 = (int32_t)(65536 * dsp::clip(*params[par_stretch1] + 0.01f * moddest[moddest_o1stretch], 1.f, 16.f));
         return;
@@ -480,7 +497,16 @@ void monosynth_audio_module::calculate_step()
     
     // mod matrix
     // this should be optimized heavily; I think I'll do it when MIDI in Ardour 3 gets stable :>
-    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get(), modwheel_value, env1, env2, 0.5+0.5*lfov1, 0.5+0.5*lfov2};
+    float modsrc[modsrc_count] = {
+        1,
+        velocity,
+        inertia_pressure.get(),
+        modwheel_value,
+        (float)env1,
+        (float)env2,
+        (float)(0.5+0.5*lfov1),
+        (float)(0.5+0.5*lfov2)
+    };
     calculate_modmatrix(moddest, moddest_count, modsrc);
     
     set_frequency();

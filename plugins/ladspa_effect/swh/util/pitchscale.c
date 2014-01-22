@@ -54,7 +54,7 @@ void pitch_scale(sbuffers *buffers, const double pitchScale, const long
 	Transform.  Author: (c)1999 Stephan M. Sprenger <sms@dspdimension.com>
 */
 	double magn, phase, tmp;
-	double freqPerBin, expct, fadeZoneLen;
+	double freqPerBin, expct;
         long i,k, qpd, index, inFifoLatency, stepSize,
 	  fftFrameSize2;
 	double phaseArr[MAX_FRAME_LENGTH];
@@ -88,7 +88,6 @@ void pitch_scale(sbuffers *buffers, const double pitchScale, const long
 	}
 
 	/* set up some handy variables */
-	fadeZoneLen = fftFrameLength/2;
 	fftFrameSize2 = fftFrameLength/2;
 	stepSize = fftFrameLength/osamp;
 	freqPerBin = sampleRate*2.0/(double)fftFrameLength;

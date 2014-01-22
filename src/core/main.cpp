@@ -65,7 +65,6 @@
 #include "mmp.h"
 #include "song.h"
 
-#warning TODO: move somewhere else
 static inline QString baseName( const QString & _file )
 {
 	return( QFileInfo( _file ).absolutePath() + "/" +

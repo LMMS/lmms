@@ -72,7 +72,7 @@ load_plugin_data(LADSPA_Handle Instance) {
 
 	Reverb * ptr = (Reverb *)Instance;
 	unsigned long m;
-	int i;
+	unsigned int i;
 
 
 	m = LIMIT(*(ptr->mode),0,NUM_MODES-1);
@@ -193,7 +193,7 @@ void
 comp_coeffs(LADSPA_Handle Instance) {
 
 	Reverb * ptr = (Reverb *)Instance;
-	int i;
+	unsigned int i;
 	
 
 	if (*(ptr->mode) != ptr->old_mode)
@@ -414,7 +414,7 @@ run_Reverb(LADSPA_Handle Instance,
 	Reverb * ptr = (Reverb *)Instance;
 
 	unsigned long sample_index;
-	int i;
+	unsigned int i;
 
 	LADSPA_Data decay = LIMIT(*(ptr->decay),0.0f,10000.0f);
 	LADSPA_Data drylevel = db2lin(LIMIT(*(ptr->drylevel),-70.0f,10.0f));
@@ -533,7 +533,7 @@ run_adding_gain_Reverb(LADSPA_Handle Instance,
 	Reverb * ptr = (Reverb *)Instance;
 
 	unsigned long sample_index;
-	int i;
+	unsigned int i;
 
 	LADSPA_Data decay = LIMIT(*(ptr->decay),0.0f,10000.0f);
 	LADSPA_Data drylevel = db2lin(LIMIT(*(ptr->drylevel),-70.0f,10.0f));

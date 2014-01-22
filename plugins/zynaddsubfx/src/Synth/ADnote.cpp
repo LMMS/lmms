@@ -664,12 +664,6 @@ void ADnote::ADlegatonote(REALTYPE freq,
             if(partparams->VoicePar[nvoice].PextFMoscil != -1)
                 vc = partparams->VoicePar[nvoice].PextFMoscil;
 
-            REALTYPE tmp = 1.0;
-            if((partparams->VoicePar[vc].FMSmp->Padaptiveharmonics != 0)
-               || (NoteVoicePar[nvoice].FMEnabled == MORPH)
-               || (NoteVoicePar[nvoice].FMEnabled == RING_MOD))
-                tmp = getFMvoicebasefreq(nvoice);
-            ;
             if(!partparams->GlobalPar.Hrandgrouping)
                 partparams->VoicePar[vc].FMSmp->newrandseed(rand());
 

@@ -133,7 +133,7 @@ void
 activate_Echo(LADSPA_Handle Instance) {
 
 	Echo * ptr = (Echo *)Instance;
-	int i;
+	unsigned int i;
 	
 	ptr->mpx_out_L = 0;
 	ptr->mpx_out_R = 0;

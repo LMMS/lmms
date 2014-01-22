@@ -71,8 +71,6 @@ void Unison::set_bandwidth(REALTYPE bandwidth) {
         bandwidth = 1200.0;
 
     printf("bandwidth %g\n", bandwidth);
-#warning \
-    : todo: if bandwidth is too small the audio will be self canceled (because of the sign change of the outputs)
     unison_bandwidth_cents = bandwidth;
     update_parameters();
 }
@@ -99,8 +97,6 @@ void Unison::update_parameters() {
                                * (max_speed - 1.0) * SAMPLE_RATE / base_freq;
     printf("unison_amplitude_samples %g\n", unison_amplitude_samples);
 
-#warning \
-    todo: test if unison_amplitude_samples is to big and reallocate bigger memory
     if(unison_amplitude_samples >= max_delay - 1)
         unison_amplitude_samples = max_delay - 2;
 
@@ -167,10 +163,6 @@ void Unison::update_unison_data() {
             step = -step;
         }
         REALTYPE vibratto_val = (pos - 0.333333333 * pos * pos * pos) * 1.5; //make the vibratto lfo smoother
-#warning \
-        I will use relative amplitude, so the delay might be bigger than the whole buffer
-#warning \
-        I have to enlarge (reallocate) the buffer to make place for the whole delay
         REALTYPE newval = 1.0 + 0.5
                           * (vibratto_val
                              + 1.0) * unison_amplitude_samples

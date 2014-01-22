@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 9 "notch_iir_1894.xml"
 
 #include "config.h"
 #include "util/iir.h"
@@ -80,7 +79,6 @@ static void activateNotch_iir(LADSPA_Handle instance) {
 	long sample_rate = plugin_data->sample_rate;
 	iir_stage_t*second = plugin_data->second;
 	float ufc = plugin_data->ufc;
-#line 36 "notch_iir_1894.xml"
 	
 	ufc = (*(plugin_data->center) - *(plugin_data->width)*0.5f)/(float)sample_rate;
 	lfc = (*(plugin_data->center) + *(plugin_data->width)*0.5f)/(float)sample_rate;
@@ -101,7 +99,6 @@ static void activateNotch_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupNotch_iir(LADSPA_Handle instance) {
-#line 47 "notch_iir_1894.xml"
 	Notch_iir *plugin_data = (Notch_iir *)instance;
 	free_iirf_t(plugin_data->iirf1, plugin_data->first);
 	free_iirf_t(plugin_data->iirf2, plugin_data->second);
@@ -148,7 +145,6 @@ static LADSPA_Handle instantiateNotch_iir(
 	iir_stage_t*second = NULL;
 	float ufc;
 
-#line 23 "notch_iir_1894.xml"
 	sample_rate = s_rate;
 	ufc = lfc = 0.0f;
 
@@ -196,7 +192,6 @@ static void runNotch_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	iir_stage_t* second = plugin_data->second;
 	float ufc = plugin_data->ufc;
 
-#line 27 "notch_iir_1894.xml"
 	ufc = (center - width*0.5f)/(float)sample_rate;
 	lfc = (center + width*0.5f)/(float)sample_rate;
 	chebyshev(iirf1, first,  2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS,  ufc, 0.5f);
@@ -218,7 +213,6 @@ static void setRunAddingGainNotch_iir(LADSPA_Handle instance, LADSPA_Data gain) 
 
 static void runAddingNotch_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Notch_iir *plugin_data = (Notch_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Center Frequency (Hz) (float value) */
 	const LADSPA_Data center = *(plugin_data->center);
@@ -242,7 +236,6 @@ static void runAddingNotch_iir(LADSPA_Handle instance, unsigned long sample_coun
 	iir_stage_t* second = plugin_data->second;
 	float ufc = plugin_data->ufc;
 
-#line 27 "notch_iir_1894.xml"
 	ufc = (center - width*0.5f)/(float)sample_rate;
 	lfc = (center + width*0.5f)/(float)sample_rate;
 	chebyshev(iirf1, first,  2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS,  ufc, 0.5f);

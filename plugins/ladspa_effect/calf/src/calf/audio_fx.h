@@ -574,9 +574,9 @@ public:
     uint32_t srate;
     float att; // a coefficient the output is multiplied with
     float att_max; // a memory for the highest attenuation - used for display
-    unsigned int pos; // where we are actually in our sample buffer
-    unsigned int buffer_size;
-    unsigned int overall_buffer_size;
+    int pos; // where we are actually in our sample buffer
+    int buffer_size;
+    int overall_buffer_size;
     bool is_active;
     bool debug;
     bool auto_release;

@@ -167,9 +167,12 @@ void PresetsStore::copypreset(XMLwrapper *xml, char *type, string name)
 bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 {
     npreset--;
-    if(npreset >= presets.size())
+    if(npreset < 0)
         return false;
-    string filename = presets[npreset].file;
+    unsigned int unsigned_npreset = npreset;
+    if(unsigned_npreset >= presets.size())
+        return false;
+    string filename = presets[unsigned_npreset].file;
     if(filename.empty())
         return false;
     bool result    = (xml->loadXMLfile(filename) >= 0);
@@ -179,9 +182,12 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 void PresetsStore::deletepreset(int npreset)
 {
     npreset--;
-    if(npreset >= presets.size())
+    if(npreset < 0)
         return;
-    string filename = presets[npreset].file;
+    unsigned int unsigned_npreset = npreset;
+    if(unsigned_npreset >= presets.size())
+        return;
+    string filename = presets[unsigned_npreset].file;
     if(filename.empty())
         return;
     remove(filename.c_str());

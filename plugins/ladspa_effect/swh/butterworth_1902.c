@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 9 "butterworth_1902.xml"
 
 #include "config.h"
 #include "util/iir.h"
@@ -111,7 +110,6 @@ static void activateBwxover_iir(LADSPA_Handle instance) {
 	iir_stage_t*gt = plugin_data->gt;
 	iirf_t*iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
-#line 31 "butterworth_1902.xml"
 	
 	gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
 	iirf = init_iirf_t(gt);
@@ -125,7 +123,6 @@ static void activateBwxover_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupBwxover_iir(LADSPA_Handle instance) {
-#line 39 "butterworth_1902.xml"
 	Bwxover_iir *plugin_data = (Bwxover_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);
 	free_iir_stage(plugin_data->gt);
@@ -166,7 +163,6 @@ static LADSPA_Handle instantiateBwxover_iir(
 	iirf_t*iirf = NULL;
 	long sample_rate;
 
-#line 22 "butterworth_1902.xml"
 	sample_rate = s_rate;
 
 	plugin_data->gt = gt;
@@ -205,7 +201,6 @@ static void runBwxover_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "butterworth_1902.xml"
 	butterworth_stage(gt, 0, cutoff, resonance, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, lpoutput, sample_count,0);
 	buffer_sub(input, lpoutput, hpoutput, sample_count);
@@ -224,7 +219,6 @@ static void setRunAddingGainBwxover_iir(LADSPA_Handle instance, LADSPA_Data gain
 
 static void runAddingBwxover_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Bwxover_iir *plugin_data = (Bwxover_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Cutoff Frequency (Hz) (float value) */
 	const LADSPA_Data cutoff = *(plugin_data->cutoff);
@@ -244,7 +238,6 @@ static void runAddingBwxover_iir(LADSPA_Handle instance, unsigned long sample_co
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "butterworth_1902.xml"
 	butterworth_stage(gt, 0, cutoff, resonance, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, lpoutput, sample_count,0);
 	buffer_sub(input, lpoutput, hpoutput, sample_count);
@@ -255,7 +248,6 @@ static void activateButtlow_iir(LADSPA_Handle instance) {
 	iir_stage_t*gt = plugin_data->gt;
 	iirf_t*iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
-#line 31 "butterworth_1902.xml"
 	
 	gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
 	iirf = init_iirf_t(gt);
@@ -269,7 +261,6 @@ static void activateButtlow_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupButtlow_iir(LADSPA_Handle instance) {
-#line 39 "butterworth_1902.xml"
 	Buttlow_iir *plugin_data = (Buttlow_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);
 	free_iir_stage(plugin_data->gt);
@@ -307,7 +298,6 @@ static LADSPA_Handle instantiateButtlow_iir(
 	iirf_t*iirf = NULL;
 	long sample_rate;
 
-#line 22 "butterworth_1902.xml"
 	sample_rate = s_rate;
 
 	plugin_data->gt = gt;
@@ -343,7 +333,6 @@ static void runButtlow_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "butterworth_1902.xml"
 	butterworth_stage(gt, 0, cutoff, resonance, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
@@ -361,7 +350,6 @@ static void setRunAddingGainButtlow_iir(LADSPA_Handle instance, LADSPA_Data gain
 
 static void runAddingButtlow_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Buttlow_iir *plugin_data = (Buttlow_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Cutoff Frequency (Hz) (float value) */
 	const LADSPA_Data cutoff = *(plugin_data->cutoff);
@@ -378,7 +366,6 @@ static void runAddingButtlow_iir(LADSPA_Handle instance, unsigned long sample_co
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "butterworth_1902.xml"
 	butterworth_stage(gt, 0, cutoff, resonance, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
@@ -388,7 +375,6 @@ static void activateButthigh_iir(LADSPA_Handle instance) {
 	iir_stage_t*gt = plugin_data->gt;
 	iirf_t*iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
-#line 31 "butterworth_1902.xml"
 	
 	gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
 	iirf = init_iirf_t(gt);
@@ -402,7 +388,6 @@ static void activateButthigh_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupButthigh_iir(LADSPA_Handle instance) {
-#line 39 "butterworth_1902.xml"
 	Butthigh_iir *plugin_data = (Butthigh_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);
 	free_iir_stage(plugin_data->gt);
@@ -440,7 +425,6 @@ static LADSPA_Handle instantiateButthigh_iir(
 	iirf_t*iirf = NULL;
 	long sample_rate;
 
-#line 22 "butterworth_1902.xml"
 	sample_rate = s_rate;
 
 	plugin_data->gt = gt;
@@ -476,7 +460,6 @@ static void runButthigh_iir(LADSPA_Handle instance, unsigned long sample_count) 
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "butterworth_1902.xml"
 	butterworth_stage(gt, 1, cutoff, resonance, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
@@ -494,7 +477,6 @@ static void setRunAddingGainButthigh_iir(LADSPA_Handle instance, LADSPA_Data gai
 
 static void runAddingButthigh_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Butthigh_iir *plugin_data = (Butthigh_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Cutoff Frequency (Hz) (float value) */
 	const LADSPA_Data cutoff = *(plugin_data->cutoff);
@@ -511,7 +493,6 @@ static void runAddingButthigh_iir(LADSPA_Handle instance, unsigned long sample_c
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "butterworth_1902.xml"
 	butterworth_stage(gt, 1, cutoff, resonance, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
