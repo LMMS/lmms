@@ -2,7 +2,7 @@
  * Instrument.h - declaration of class Instrument, which provides a
  *                standard interface for all instrument plugins
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -116,8 +116,6 @@ public:
 									InstrumentTrack * _instrument_track );
 
 	virtual bool isFromTrack( const track * _track ) const;
-
-	bool isMuted() const;
 
 
 protected:

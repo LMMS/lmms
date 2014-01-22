@@ -238,7 +238,7 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 	// 
 	int key;
 	static int lastvoice=0;
-	if( _me.m_type == MidiNoteOn && !isMuted() ) {
+	if( _me.m_type == MidiNoteOn ) {
 		// to get us in line with MIDI
 		key = _me.key() +12;
 		for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {

@@ -96,14 +96,6 @@ bool Instrument::isFromTrack( const track * _track ) const
 
 
 
-bool Instrument::isMuted() const
-{
-	return m_instrumentTrack->isMuted();
-}
-
-
-
-
 void Instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();

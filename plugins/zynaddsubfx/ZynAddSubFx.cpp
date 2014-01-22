@@ -1,7 +1,7 @@
 /*
  * ZynAddSubFx.cpp - ZynAddSubxFX-embedding plugin
  *
- * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -343,14 +343,9 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
 												const midiTime & _time )
 {
-	// do not send NoteOn events if muted
-	if( _me.type() == MidiNoteOn && isMuted() )
-	{
-		return true;
-	}
 	// do not forward external MIDI Control Change events if the according
 	// LED is not checked
-	else if( _me.type() == MidiControlChange &&
+	if( _me.type() == MidiControlChange &&
 				_me.sourcePort() != this &&
 				m_forwardMidiCcModel.value() == false )
 	{

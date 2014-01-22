@@ -313,15 +313,13 @@ void vestigeInstrument::play( sampleFrame * _buf )
 bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time )
 {
-	if( !isMuted() )
+	m_pluginMutex.lock();
+	if( m_plugin != NULL )
 	{
-		m_pluginMutex.lock();
-		if( m_plugin != NULL )
-		{
-			m_plugin->processMidiEvent( _me, _time );
-		}
-		m_pluginMutex.unlock();
+		m_plugin->processMidiEvent( _me, _time );
 	}
+	m_pluginMutex.unlock();
+
 	return true;
 }
 
