@@ -1271,7 +1271,7 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.setPen( QColor( 32, 240, 32 ) );
+		p.setPen( QColor( 32, 240, 101 ) );
 	}
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )

@@ -300,12 +300,12 @@ QTreeView {
 /* Plugins */
 
 TripleOscillatorView knob {
-	color: rgb(1, 114, 216);
+	color: rgb(1, 32, 64);
 	qproperty-outerColor: rgb(0, 0, 0);
-	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 6.5;
-	qproperty-centerPointX: 13.5;
-	qproperty-centerPointY: 13.5;
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 13.0;
+	qproperty-centerPointY: 14.0;
 	qproperty-lineWidth: 2;
 }
 
