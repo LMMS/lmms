@@ -1,7 +1,7 @@
 /*
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -54,9 +54,7 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
 
 	setFont( pointSize<7>( font() ) );
-	setFixedSize( m_ledOffPixmap->width() + 4 +
-					QFontMetrics( font() ).width( text() ),
-			m_ledOffPixmap->height() );
+	setFixedSize( m_ledOffPixmap->width() + 5 + QFontMetrics( font() ).width( text() ), m_ledOffPixmap->height() );
 }
 
 
@@ -86,9 +84,9 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 	}
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
+	p.drawText( m_ledOffPixmap->width() + 4, 11, text() );
 	p.setPen( QColor( 255, 255, 255 ) );
-	p.drawText( m_ledOffPixmap->width() + 2, 9, text() );
+	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
 }
 
 
