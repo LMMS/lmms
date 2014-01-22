@@ -109,9 +109,13 @@ private:
 	fpp_t frameCount;
 	short *renderbuffer;
 	int voiceNote[9];
-	int heldNotes[128];
+	// 0 - no note, >0 - note on velocity
+	int velocities[128];
 	// These include both octave and Fnumber
 	int fnums[128];
+	// in cents, range defaults to +/-100 cents (should this be changeable?)
+	int pitchbend;
+	#define BEND_CENTS 100
 
 	int Hz2fnum(float Hz);
 	static QMutex emulatorMutex;

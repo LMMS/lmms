@@ -23,9 +23,8 @@
  */
 
 // TODO: 
-// - Pitch bend
 // - Velocity (and aftertouch) sensitivity
-//   - in FM mode: OP2 level, add mode: OP1 and OP2 levels
+//   * in FM mode: OP2 level, add mode: OP1 and OP2 levels
 // - .sbi (or similar) file loading into models
 // - RT safety = get rid of mutex = make emulator code thread-safe
 
@@ -163,12 +162,14 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	frameCount = engine::mixer()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
-	// Some kind of sane default
+	// Some kind of sane defaults
+	pitchbend = 0;
 	tuneEqual(69, 440);
 
 	for(int i=1; i<9; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 	}
+
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
@@ -239,18 +240,12 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 				      const midiTime & _time )
 {
 	emulatorMutex.lock();
-	// Real dummy version... Should at least add: 
-	// - smarter voice allocation:
-	//   - reuse same note, now we have round robin-ish
-	//   - what to do when voices run out and so on...
-	// - mono mode 
-	// 
-	int key, vel;
+	int key, vel, tmp_pb;
 	static int lastvoice=0;
 	switch(_me.m_type) {
         case MidiNoteOn:
                 if( !isMuted() ) {
-                        // to get us in line with MIDI
+                        // to get us in line with MIDI(?)
                         key = _me.key() +12;
                         vel = _me.velocity();
                         for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {
@@ -258,6 +253,7 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
                                         theEmulator->write(0xA0+i, fnums[key] & 0xff);
                                         theEmulator->write(0xB0+i, 32 + ((fnums[key] & 0x1f00) >> 8) );
                                         voiceNote[i] = key;
+					velocities[key] = vel;
                                         lastvoice=i;
                                         break;
                                 }
@@ -273,13 +269,30 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
                                 voiceNote[i] = OPL2_VOICE_FREE;
                         }
                 }
+		velocities[key] = 0;
                 break;
         case MidiKeyPressure:
                 key = _me.key() +12;
                 vel = _me.velocity();
+		if( velocities[key] != 0) {
+			velocities[key] = vel;
+		}
                 break;
         case MidiPitchBend:
-                printf("TODO: Pitch bend\n");
+		// Update fnumber table
+		tmp_pb = (2*BEND_CENTS)*((float)_me.m_data.m_param[0]/16383)-BEND_CENTS;
+		if( tmp_pb != pitchbend ) {
+			pitchbend = tmp_pb;
+			tuneEqual(69, 440.0);
+		}
+		// Update pitch of sounding notes
+		for( int i=0; i<9; ++i ) {
+			if( voiceNote[i] != OPL2_VOICE_FREE ) {
+				theEmulator->write(0xA0+i, fnums[voiceNote[i] ] & 0xff);
+				theEmulator->write(0xB0+i, 32 + ((fnums[voiceNote[i]] & 0x1f00) >> 8) );
+			}
+                }
+                // printf("Pitch bend: %d\n", pitchbend);
                 break;
         default:
                 printf("Midi event type %d\n",_me.m_type);
@@ -411,8 +424,9 @@ void opl2instrument::loadPatch(unsigned char inst[14]) {
 }
 
 void opl2instrument::tuneEqual(int center, float Hz) {
+	float tmp;
 	for(int n=0; n<128; ++n) {
-		float tmp = Hz*pow(2, (n-center)/12.0);
+		tmp = Hz*pow( 2, ( n - center ) / 12.0 + pitchbend / 1200.0 );
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
