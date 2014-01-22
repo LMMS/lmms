@@ -24,6 +24,7 @@
 
 
 #include <QtXml/QDomElement>
+#include <QtCore/QList>
 #include <QtCore/QUrl>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
@@ -681,26 +682,47 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 
 
+QFileDialog* MainWindow::newFileDialog( const QString& caption, const QString& directory, const QString& filter )
+{
+	QFileDialog* fd = new QFileDialog( this, caption, directory, filter);
+#if QT_VERSION >= 0x040806
+	fd->setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
+
+	QList<QUrl> urls = fd->sidebarUrls();
+	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::DesktopLocation ) );
+	// Find downloads directory
+	QDir downloadDir( QDir::homePath() + "/Downloads" );
+	if (! downloadDir.exists())
+		downloadDir = QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ) + "/Downloads";
+	if (downloadDir.exists())
+		urls << QUrl::fromLocalFile( downloadDir.absolutePath() );
+	fd->setSidebarUrls(urls);
+
+	return fd;
+}
+
+
+
 
 void MainWindow::openProject( void )
 {
 	if( mayChangeProject() )
 	{
-		QFileDialog ofd( this, tr( "Open project" ), "",
+		QFileDialog* ofd = newFileDialog( tr( "Open project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
-#if QT_VERSION >= 0x040806
-		ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-		ofd.setDirectory( configManager::inst()->userProjectsDir() );
-		ofd.setFileMode( QFileDialog::ExistingFiles );
-		if( ofd.exec () == QDialog::Accepted &&
-						!ofd.selectedFiles().isEmpty() )
+
+		ofd->setDirectory( configManager::inst()->userProjectsDir() );
+		ofd->setFileMode( QFileDialog::ExistingFiles );
+		if( ofd->exec () == QDialog::Accepted &&
+						!ofd->selectedFiles().isEmpty() )
 		{
 			setCursor( Qt::WaitCursor );
 			engine::getSong()->loadProject(
-						ofd.selectedFiles()[0] );
+						ofd->selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
+		delete ofd;
 	}
 }
 
@@ -751,32 +773,31 @@ bool MainWindow::saveProject( void )
 
 bool MainWindow::saveProjectAs( void )
 {
-	QFileDialog sfd( this, tr( "Save project" ), "",
+	QFileDialog* sfd = newFileDialog( tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
-#if QT_VERSION >= 0x040806
-	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-	sfd.setAcceptMode( QFileDialog::AcceptSave );
-	sfd.setFileMode( QFileDialog::AnyFile );
+	sfd->setAcceptMode( QFileDialog::AcceptSave );
+	sfd->setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{
-		sfd.setDirectory( QFileInfo( f ).absolutePath() );
-		sfd.selectFile( QFileInfo( f ).fileName() );
+		sfd->setDirectory( QFileInfo( f ).absolutePath() );
+		sfd->selectFile( QFileInfo( f ).fileName() );
 	}
 	else
 	{
-		sfd.setDirectory( configManager::inst()->userProjectsDir() );
+		sfd->setDirectory( configManager::inst()->userProjectsDir() );
 	}
 
-	if( sfd.exec () == QFileDialog::Accepted &&
-		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	if( sfd->exec () == QFileDialog::Accepted &&
+		!sfd->selectedFiles().isEmpty() && sfd->selectedFiles()[0] != "" )
 	{
 		engine::getSong()->guiSaveProjectAs(
-						sfd.selectedFiles()[0] );
+						sfd->selectedFiles()[0] );
+		delete sfd;
 		return( TRUE );
 	}
+	delete sfd;
 	return( FALSE );
 }
 

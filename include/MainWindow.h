@@ -36,6 +36,7 @@ class QAction;
 class QDomElement;
 class QGridLayout;
 class QMdiArea;
+class QFileDialog;
 
 class configManager;
 class PluginView;
@@ -99,6 +100,7 @@ public slots:
 	}
 	void createNewProject( void );
 	void createNewProjectFromTemplate( QAction * _idx );
+	QFileDialog* newFileDialog( const QString & caption = QString(), const QString & directory = QString(), const QString & filter = QString() );
 	void openProject( void );
 	bool saveProject( void );
 	bool saveProjectAs( void );
