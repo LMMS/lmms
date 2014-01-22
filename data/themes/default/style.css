@@ -89,9 +89,126 @@ pianoRoll {
 	background-color: rgb(0, 0, 0);
 }
 
-/*TrackContainerView QWidget{
-	background-color: #5b6571;
-}*/
+/* scrollbar: trough */
+
+QScrollBar:horizontal {
+    border: 1px solid #131313;
+    background: rgb( 50,50,50 );
+    height: 14px;
+    margin: 0px 13px;
+}
+QScrollBar:vertical {
+    border: 1px solid #131313;
+    background: rgb( 50,50,50 );
+    width: 14px;
+    margin: 13px 0px;
+}
+
+/* scrollbar: trough clicky things */
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar::add-page:horizontal:pressed, QScrollBar::sub-page:horizontal:pressed,
+QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
+    background: rgba(0,0,0,50);
+}
+
+/* scrollbar: handles (sliders) */
+
+QScrollBar::handle:horizontal {
+    background: qlineargradient(spread:reflect,
+                     x1:0.5, y1:0, x2:0.5, y2:1,
+                     stop:0 #747474, stop:0.5 #c9c9c9, stop:1 #808080);
+    border: 1px outset #888;
+    border-radius: 2px;
+    min-width: 24px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: qlineargradient(spread:reflect,
+                     x1:0.5, y1:0, x2:0.5, y2:1,
+                     stop:0 #747474, stop:0.5 #f0f0f0, stop:1 #808080);
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background: qlineargradient(spread:reflect,
+                     x1:0.5, y1:0, x2:0.5, y2:1,
+                     stop:0 #747474, stop:1 #c9c9c9);
+}
+
+QScrollBar::handle:vertical {
+    background: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #747474, stop:0.5 #c9c9c9, stop:1 #808080);
+    border: 1px outset #888;
+    border-radius: 2px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #747474, stop:0.5 #f0f0f0, stop:1 #808080);
+}
+
+QScrollBar::handle:vertical:pressed {
+    background: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #747474, stop:1 #c9c9c9);
+}
+
+QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
+	background: #747474;
+	border-radius: 1px;
+	border: 1px solid rgba(0,0,0,32);
+}
+
+/* arrow buttons */
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #c9c9c9, stop:1 #969696 );
+    border-radius: 1px;
+    border: 1px solid #131313;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:horizontal 	{  	subcontrol-position: right; width: 12px;}
+QScrollBar::sub-line:horizontal 	{ 	subcontrol-position: left; width: 12px;}
+QScrollBar::add-line:vertical 		{ 	subcontrol-position: bottom; height: 12px;}
+QScrollBar::sub-line:vertical 		{ 	subcontrol-position: top; height: 12px;}
+
+QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
+}
+
+QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
+}
+
+QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
+	background: #747474;
+}
+
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal,
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    border: none;
+    background-color: none;
+    width: 5px;
+    height: 5px;
+}
+
+QScrollBar::left-arrow:horizontal { background-image: url(resources:sbarrow_left.png);}
+QScrollBar::right-arrow:horizontal { background-image: url(resources:sbarrow_right.png);}
+QScrollBar::up-arrow:vertical { background-image: url(resources:sbarrow_up.png);}
+QScrollBar::down-arrow:vertical { background-image: url(resources:sbarrow_down.png);}
+QScrollBar::left-arrow:horizontal:disabled { background-image: url(resources:sbarrow_left_d.png);}
+QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sbarrow_right_d.png);}
+QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
+QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
+
 
 TrackContainerView QFrame{
 	background-color: #49515b;
@@ -105,25 +222,6 @@ trackOperationsWidget > QPushButton {
 	background: none;
 	border:none;
 }
-/*
-trackOperationsWidget > QPushButton:hover {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(224, 224, 224, 255), stop:1 rgba(201, 201, 201, 255));
-	border: 1px solid rgba(0,0,0,255);
-	color: black;
-}
-
-trackOperationsWidget > QPushButton:pressed {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #747474, stop:0.5 #c9c9c9, stop:1 #c0c0c0 );
-	border: 1px solid rgba(0,0,0,255);
-	color: black;
-}
-
-trackOperationsWidget > QPushButton:flat {
-	background-color: #c9c9c9;
-	border-radius: 2px;
-	border: none;
-}
-*/
 
 trackOperationsWidget > QPushButton::menu-indicator {
 	image: url(resources:trackop.png);
