@@ -389,7 +389,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob = new organicKnob( this );
 	m_fx1Knob->move( 15, 201 );
 	m_fx1Knob->setFixedSize( 37, 47 );
-	m_fx1Knob->setHintText( tr( "Distortion:" ) + " ", "%" );
+	m_fx1Knob->setHintText( tr( "Distortion:" ) + " ", QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
 
 	// setup volume-knob
@@ -450,8 +450,7 @@ void organicInstrumentView::modelChanged()
 		// setup waveform-knob
 		knob * oscKnob = new organicKnob( this );
 		oscKnob->move( x + i * colWidth, y );
-		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg(
-					i + 1 ) + " ", "%" );
+		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ) + " ", QString() );
 										
 		// setup volume-knob
 		knob * volKnob = new knob( knobStyled, this );
