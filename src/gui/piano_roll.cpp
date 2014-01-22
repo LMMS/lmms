@@ -844,7 +844,7 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 			( (float)( PanningRight - _n->getPanning() ) ) / 
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	const QColor defaultNoteColor( 0x4A, 0xFD, 0x85 );
+	const QColor defaultNoteColor( 0x77, 0xC7, 0xD8 );
 	QColor col = defaultNoteColor;
 	
 	if( _n->length() < 0 )
@@ -2680,7 +2680,7 @@ static void printNoteHeights(QPainter& p, int bottom, int width, int startKey)
 	};
 
 	p.setFont( pointSize<KEY_LINE_HEIGHT-4>( p.font() ) );
-	p.setPen( QColor( 255, 255, 0 ) );
+	p.setPen( QColor( 255, 255, 255 ) );
 	for( int y = bottom, key = startKey; y > PR_TOP_MARGIN;
 			y -= KEY_LINE_HEIGHT, key++)
 	{
@@ -2924,7 +2924,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	QFont f = p.font();
 	f.setBold( false );
 	p.setFont( pointSize<10>( f ) );
-	p.setPen( QColor( 255, 255, 0 ) );
+	p.setPen( QColor( 255, 255, 255) );
 	p.drawText( QRect( 0, keyAreaBottom(), 
 					  WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ),
 			   Qt::AlignCenter | Qt::TextWordWrap,
@@ -3072,7 +3072,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			int editHandleTop = 0;
 			if( m_noteEditMode == NoteEditVolume )
 			{
-				QColor color = QColor::fromHsv( 120, 221, 
+				QColor color = QColor::fromHsv( 140, 221, 
 						qMin(255, 60 + ( *it )->getVolume() ) );
 				if( ( *it )->selected() )
 				{
@@ -3091,7 +3091,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				QColor color( 0xFF, 0xB0, 0x00 );
+				QColor color( 0x99, 0xAF, 0xFF );
 				if( ( *it )->selected() )
 				{
 					color.setRgb( 0x00, 0x40, 0xC0 );
@@ -3119,7 +3119,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 		}
 		
-		p.setPen( QPen( QColor( 0xEA, 0xA1, 0x00 ),
+		p.setPen( QPen( QColor( 0x99, 0xAF, 0xFF ),
 				NE_LINE_WIDTH+2 ) );
 		p.drawPoints( editHandles );
 		

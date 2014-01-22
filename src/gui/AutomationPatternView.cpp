@@ -280,7 +280,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.setPen( QColor( 0, 64, 255 ) );
+		p.setPen( QColor( 0, 180, 60 ) );
 	}
 
 	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
