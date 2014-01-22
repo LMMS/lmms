@@ -3,7 +3,7 @@
  *                      of ladspa plugins
  *
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
- * Copyright (c) 2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,6 +24,7 @@
  *
  */
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -44,7 +45,7 @@ ladspaManager::ladspaManager()
 
 	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );
 #ifndef LMMS_BUILD_WIN32
-	ladspaDirectories.push_back( QString( LIB_DIR ) + "ladspa" );
+	ladspaDirectories.push_back( qApp->applicationDirPath() + '/' + LIB_DIR + "ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );
@@ -181,12 +182,12 @@ void ladspaManager::addPlugins(
 
 
 
-Uint16 ladspaManager::getPluginInputs( 
+uint16_t ladspaManager::getPluginInputs( 
 		const LADSPA_Descriptor * _descriptor )
 {
-	Uint16 inputs = 0;
+	uint16_t inputs = 0;
 	
-	for( Uint16 port = 0; port < _descriptor->PortCount; port++ )
+	for( uint16_t port = 0; port < _descriptor->PortCount; port++ )
 	{
 		if( LADSPA_IS_PORT_INPUT( 
 				_descriptor->PortDescriptors[port] ) &&
@@ -207,12 +208,12 @@ Uint16 ladspaManager::getPluginInputs(
 
 
 
-Uint16 ladspaManager::getPluginOutputs( 
+uint16_t ladspaManager::getPluginOutputs( 
 		const LADSPA_Descriptor * _descriptor )
 {
-	Uint16 outputs = 0;
+	uint16_t outputs = 0;
 	
-	for( Uint16 port = 0; port < _descriptor->PortCount; port++ )
+	for( uint16_t port = 0; port < _descriptor->PortCount; port++ )
 	{
 		if( LADSPA_IS_PORT_OUTPUT( 
 				_descriptor->PortDescriptors[port] ) &&
@@ -383,7 +384,7 @@ QString ladspaManager::getCopyright( const ladspa_key_t & _plugin )
 
 
 
-Uint32 ladspaManager::getPortCount( const ladspa_key_t & _plugin )
+uint32_t ladspaManager::getPortCount( const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -404,7 +405,7 @@ Uint32 ladspaManager::getPortCount( const ladspa_key_t & _plugin )
 
 
 bool ladspaManager::isPortInput( const ladspa_key_t & _plugin, 
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		&& _port < getPortCount( _plugin ) )
@@ -428,7 +429,7 @@ bool ladspaManager::isPortInput( const ladspa_key_t & _plugin,
 
 
 bool ladspaManager::isPortOutput( const ladspa_key_t & _plugin, 
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -452,7 +453,7 @@ bool ladspaManager::isPortOutput( const ladspa_key_t & _plugin,
 
 
 bool ladspaManager::isPortAudio( const ladspa_key_t & _plugin,
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -476,7 +477,7 @@ bool ladspaManager::isPortAudio( const ladspa_key_t & _plugin,
 
 
 bool ladspaManager::isPortControl( const ladspa_key_t & _plugin, 
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -501,7 +502,7 @@ bool ladspaManager::isPortControl( const ladspa_key_t & _plugin,
 
 bool ladspaManager::areHintsSampleRateDependent(
 						const ladspa_key_t & _plugin, 
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -525,7 +526,7 @@ bool ladspaManager::areHintsSampleRateDependent(
 
 
 float ladspaManager::getLowerBound( const ladspa_key_t & _plugin,
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -555,7 +556,7 @@ float ladspaManager::getLowerBound( const ladspa_key_t & _plugin,
 
 
 
-float ladspaManager::getUpperBound( const ladspa_key_t & _plugin,									Uint32 _port )
+float ladspaManager::getUpperBound( const ladspa_key_t & _plugin,									uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -586,7 +587,7 @@ float ladspaManager::getUpperBound( const ladspa_key_t & _plugin,									Uint32
 
 
 bool ladspaManager::isPortToggled( const ladspa_key_t & _plugin, 
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -610,7 +611,7 @@ bool ladspaManager::isPortToggled( const ladspa_key_t & _plugin,
 
 
 float ladspaManager::getDefaultSetting( const ladspa_key_t & _plugin, 
-							Uint32 _port )
+							uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -697,7 +698,7 @@ float ladspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 
 
 bool ladspaManager::isLogarithmic( const ladspa_key_t & _plugin,
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -721,7 +722,7 @@ bool ladspaManager::isLogarithmic( const ladspa_key_t & _plugin,
 
 
 bool ladspaManager::isInteger( const ladspa_key_t & _plugin,
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -745,7 +746,7 @@ bool ladspaManager::isInteger( const ladspa_key_t & _plugin,
 
 
 QString ladspaManager::getPortName( const ladspa_key_t & _plugin,
-								Uint32 _port )
+								uint32_t _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) &&
 					_port < getPortCount( _plugin ) )
@@ -811,7 +812,7 @@ const LADSPA_Descriptor * ladspaManager::getDescriptor(
 
 LADSPA_Handle ladspaManager::instantiate( 
 					const ladspa_key_t & _plugin, 
-							Uint32 _sample_rate )
+							uint32_t _sample_rate )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -834,7 +835,7 @@ LADSPA_Handle ladspaManager::instantiate(
 
 bool ladspaManager::connectPort( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance, 
-						Uint32 _port,
+						uint32_t _port,
 						LADSPA_Data * _data_location )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -882,7 +883,7 @@ bool ladspaManager::activate( const ladspa_key_t & _plugin,
 
 bool ladspaManager::run( const ladspa_key_t & _plugin,
 							LADSPA_Handle _instance,
-							Uint32 _sample_count )
+							uint32_t _sample_count )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -905,7 +906,7 @@ bool ladspaManager::run( const ladspa_key_t & _plugin,
 
 bool ladspaManager::runAdding( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance,
-						Uint32 _sample_count )
+						uint32_t _sample_count )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{

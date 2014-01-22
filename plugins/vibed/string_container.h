@@ -35,44 +35,44 @@ class stringContainer
 public:
 	stringContainer(const float _pitch, 
 			const sample_rate_t _sample_rate,
-			const Uint32 _buffer_length,
-			const Uint8 _strings = 9 );
+			const int _buffer_length,
+			const int _strings = 9 );
 	
-	void addString(	Uint8 _harm,
+	void addString(	int _harm,
 			const float _pick,
 			const float _pickup,
 			const float * _impluse,
 			const float _randomize,
 			const float _string_loss,
 			const float _detune,
-			const Uint8 _oversample,
+			const int _oversample,
 			const bool _state,
-			const Uint8 _id );
+			const int _id );
 	
-	inline bool exists( Uint8 _id )
+	bool exists( int _id ) const
 	{
-		return( m_exists[_id] );
+		return m_exists[_id];
 	}
 	
-	inline ~stringContainer()
+	~stringContainer()
 	{
-		Uint32 strings = m_strings.count();
-		for( Uint32 i = 0; i < strings; i++ )
+		int strings = m_strings.count();
+		for( int i = 0; i < strings; i++ )
 		{
 			delete m_strings[i];
 		}
 	}
 	
-	inline float getStringSample( Uint8 _string )
+	float getStringSample( int _string )
 	{
-		return( m_strings[_string]->nextSample() );
+		return m_strings[_string]->nextSample();
 	}
 	
 private:
 	QVector<vibratingString *> m_strings;
 	const float m_pitch;
 	const sample_rate_t m_sampleRate;
-	const Uint32 m_bufferLength;
+	const int m_bufferLength;
 	QVector<bool> m_exists;
 } ;
 

@@ -466,9 +466,8 @@ inline float GET_INC(float freq) {
 	return freq/engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 }
 
-int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
+int lb302Synth::process(sampleFrame *outbuf, const int size)
 {
-	unsigned int i;
 	float w;
 	float samp;
 
@@ -500,7 +499,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
 
-	for(i=0;i<size;i++) {
+	for(int i=0;i<size;i++) {
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
@@ -804,34 +803,34 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_vcfCutKnob = new knob( knobBright_26, this );
 	m_vcfCutKnob->move( 75, 130 );
 	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ) + " ", "" );
-	m_vcfCutKnob->setLabel( tr("CUT") );
+	m_vcfCutKnob->setLabel( "" );
 
 	m_vcfResKnob = new knob( knobBright_26, this );
 	m_vcfResKnob->move( 120, 130 );
 	m_vcfResKnob->setHintText( tr( "Resonance:" ) + " ", "" );
-	m_vcfResKnob->setLabel( tr("RES") );
+	m_vcfResKnob->setLabel( "" );
 
 	m_vcfModKnob = new knob( knobBright_26, this );
 	m_vcfModKnob->move( 165, 130 );
 	m_vcfModKnob->setHintText( tr( "Env Mod:" ) + " ", "" );
-	m_vcfModKnob->setLabel( tr("ENV MOD") );
+	m_vcfModKnob->setLabel( "" );
 
 	m_vcfDecKnob = new knob( knobBright_26, this );
 	m_vcfDecKnob->move( 210, 130 );
 	m_vcfDecKnob->setHintText( tr( "Decay:" ) + " ", "" );
-	m_vcfDecKnob->setLabel( tr("DEC") );
+	m_vcfDecKnob->setLabel( "" );
 
-	m_slideToggle = new ledCheckBox( "Slide", this );
+	m_slideToggle = new ledCheckBox( "", this );
 	m_slideToggle->move( 10, 180 );
 
-	m_accentToggle = new ledCheckBox( "Accent", this );
+	m_accentToggle = new ledCheckBox( "", this );
 	m_accentToggle->move( 10, 200 );
 	m_accentToggle->setDisabled(true);
 
-	m_deadToggle = new ledCheckBox( "Dead", this );
+	m_deadToggle = new ledCheckBox( "", this );
 	m_deadToggle->move( 10, 220 );
 
-	m_db24Toggle = new ledCheckBox( "24dB/oct", this );
+	m_db24Toggle = new ledCheckBox( "", this );
 	m_db24Toggle->setWhatsThis( 
 			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 	m_db24Toggle->move( 10, 150);
@@ -840,12 +839,12 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_slideDecKnob = new knob( knobBright_26, this );
 	m_slideDecKnob->move( 210, 75 );
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ) + " ", "" );
-	m_slideDecKnob->setLabel( tr( "SLIDE"));
+	m_slideDecKnob->setLabel( "");
 
 	m_distKnob = new knob( knobBright_26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ) + " ", "" );
-	m_distKnob->setLabel( tr( "DIST"));
+	m_distKnob->setLabel( tr( ""));
 
 
 	// Shapes

@@ -55,13 +55,12 @@ bbTrackContainer::~bbTrackContainer()
 
 
 bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
-							f_cnt_t _offset,
-							Sint16 _tco_num )
+								f_cnt_t _offset, int _tco_num )
 {
 	bool played_a_note = false;
 	if( lengthOfBB( _tco_num ) <= 0 )
 	{
-		return( false );
+		return false;
 	}
 
 	_start = _start % ( lengthOfBB( _tco_num ) * midiTime::ticksPerTact() );
@@ -75,7 +74,7 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 		}
 	}
 
-	return( played_a_note );
+	return played_a_note;
 }
 
 
@@ -109,7 +108,7 @@ tact_t bbTrackContainer::lengthOfBB( int _bb )
 					( *it )->getTCO( _bb )->length() );
 	}
 
-	return( max_length.nextFullTact() );
+	return max_length.nextFullTact();
 }
 
 
@@ -117,7 +116,7 @@ tact_t bbTrackContainer::lengthOfBB( int _bb )
 
 int bbTrackContainer::numOfBBs() const
 {
-	return( engine::getSong()->countTracks( track::BBTrack ) );
+	return engine::getSong()->countTracks( track::BBTrack );
 }
 
 

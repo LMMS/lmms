@@ -71,7 +71,7 @@ vibed::vibed( InstrumentTrack * _instrumentTrack ) :
 	nineButtonSelectorModel * harmonic;
 	graphModel * graphTmp;
 
-	for( Uint8 harm = 0; harm < 9; harm++ )
+	for( int harm = 0; harm < 9; harm++ )
 	{
 		knob = new FloatModel( DefaultVolume, MinVolume, MaxVolume,
 				1.0f, this, tr( "String %1 volume" ).arg( harm+1 ) );
@@ -142,7 +142,7 @@ void vibed::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	// Save plugin version
 	_this.setAttribute( "version", "0.1" );
 	
-	for( Uint8 i = 0; i < 9; i++ )
+	for( int i = 0; i < 9; i++ )
 	{
 		name = "active" + QString::number( i );
 		_this.setAttribute( name, QString::number(
@@ -199,7 +199,7 @@ void vibed::loadSettings( const QDomElement & _this )
 
 	QString name;
 
-	for( Uint8 i = 0; i < 9; i++ )
+	for( int i = 0; i < 9; i++ )
 	{
 		name = "active" + QString::number( i );
 		m_powerButtons[i]->setValue( _this.attribute( name ).toInt() );
@@ -280,7 +280,7 @@ void vibed::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 				engine::mixer()->processingSampleRate(),
 						__sampleLength );
 		
-		for( Uint8 i = 0; i < 9; ++i )
+		for( int i = 0; i < 9; ++i )
 		{
 			if( m_powerButtons[i]->value() )
 			{
@@ -309,18 +309,14 @@ void vibed::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 	{
 		_working_buffer[i][0] = 0.0f;
 		_working_buffer[i][1] = 0.0f;
-		Uint8 s = 0;
-		for( Uint8 string = 0; string < 9; ++string )
+		int s = 0;
+		for( int string = 0; string < 9; ++string )
 		{
 			if( ps->exists( string ) )
 			{
 				// pan: 0 -> left, 1 -> right
-				const float pan = (
-					m_panKnobs[string]->value() + 1 ) /
-									2.0f;
-				const sample_t sample =
-						ps->getStringSample( s ) *
-					m_volumeKnobs[string]->value() / 100.0f;
+				const float pan = ( m_panKnobs[string]->value() + 1 ) / 2.0f;
+				const sample_t sample = ps->getStringSample( s ) * m_volumeKnobs[string]->value() / 100.0f;
 				_working_buffer[i][0] += ( 1.0f - pan ) * sample;
 				_working_buffer[i][1] += pan * sample;
 				s++;
@@ -547,8 +543,8 @@ vibedView::vibedView( Instrument * _instrument,
 "vibrating strings.  The LED in the lower right corner of the "
 "waveform editor indicates whether the selected string is active." ) );
 
-	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
-			this, SLOT( showString( Uint8 ) ) );
+	connect( m_stringSelector, SIGNAL( nineButtonSelection( int ) ),
+			this, SLOT( showString( int ) ) );
 
 	showString( 0 );
 
@@ -668,7 +664,7 @@ void vibedView::modelChanged()
 
 
 
-void vibedView::showString( Uint8 _string )
+void vibedView::showString( int _string )
 {
 	vibed * v = castModel<vibed>();
 	

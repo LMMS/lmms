@@ -287,7 +287,7 @@ void bitInvader::playNote( notePlayHandle * _n,
 	for( fpp_t frame = 0; frame < frames; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample();
-		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			_working_buffer[frame][chnl] = cur;
 		}

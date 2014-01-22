@@ -34,8 +34,7 @@
 
 
 notePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
-	m_detuning( detuning ),
-	m_value( m_detuning->automationPattern()->valueAt( 0 ) )
+	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {
 }
 
@@ -503,12 +502,11 @@ void notePlayHandle::updateFrequency()
 
 
 
-void notePlayHandle::processMidiTime( const midiTime & _time )
+void notePlayHandle::processMidiTime( const midiTime& time )
 {
-	if( _time >= songGlobalParentOffset()+pos() )
+	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{
-		const float v = detuning()->automationPattern()->
-						valueAt( _time - songGlobalParentOffset() - pos() );
+		const float v = detuning()->automationPattern()->valueAt( time - songGlobalParentOffset() - pos() );
 		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
 			m_baseDetuning->setValue( v );

@@ -1,7 +1,7 @@
 /*
  * RemoteVstPlugin.cpp - LMMS VST Support Layer (RemotePlugin client)
  *
- * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -297,7 +297,7 @@ private:
 
 	AEffect * m_plugin;
 	HWND m_window;
-	Sint32 m_windowID;
+	intptr_t m_windowID;
 	int m_windowWidth;
 	int m_windowHeight;
 
@@ -689,7 +689,7 @@ void RemoteVstPlugin::initEditor()
 	UpdateWindow( m_window );
 
 #ifdef LMMS_BUILD_LINUX
-	m_windowID = (Sint32) GetProp( m_window, "__wine_x11_whole_window" );
+	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
 #endif
 }
 

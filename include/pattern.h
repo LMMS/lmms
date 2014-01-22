@@ -125,9 +125,6 @@ public:
 	bool empty();
 
 
-	void addSteps( int _n );
-	void removeSteps( int _n );
-
 	virtual trackContentObjectView * createView( trackView * _tv );
 
 
@@ -140,6 +137,8 @@ protected:
 
 
 protected slots:
+	void addSteps();
+	void removeSteps();
 	void clear();
 	void freeze();
 	void unfreeze();
@@ -164,6 +163,7 @@ private:
 
 	friend class patternView;
 	friend class patternFreezeThread;
+	friend class bbEditor;
 
 } ;
 
@@ -186,9 +186,6 @@ protected slots:
 
 	void resetName();
 	void changeName();
-
-	void addSteps( QAction * _item );
-	void removeSteps( QAction * _item );
 
 
 protected:

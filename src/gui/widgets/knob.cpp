@@ -1,7 +1,7 @@
 /*
  * knob.cpp - powerful knob-widget
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -328,18 +328,22 @@ void knob::drawKnob( QPainter * _p )
 				width() / 2 - m_knobPixmap->width() / 2 ), 0,
 				*m_knobPixmap );
 
-	p.setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
+//	p.setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
 	p.setRenderHint( QPainter::Antialiasing );
 
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
 		{
-			p.drawLine( calculateLine( mid, radius ) );
+			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
+							QPalette::WindowText ), 2 ) );
+			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobBright_26:
 		{
+			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
+							QPalette::WindowText ), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
@@ -355,7 +359,8 @@ void knob::drawKnob( QPainter * _p )
 		}
 		case knobGreen_17:
 		{
-			p.setPen( QPen( QColor( 0, 200, 0 ), 2 ) );
+			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText), 2 ) );
 			p.drawLine( calculateLine( mid, radius ) );
 			break;
 		}
@@ -635,9 +640,8 @@ void knob::enterValue()
 
 void knob::friendlyUpdate()
 {
-	if( model()->getControllerConnection() == NULL ||
-		model()->getControllerConnection()->getController()->
-						frequentUpdates() == false ||
+	if( model()->controllerConnection() == NULL ||
+		model()->controllerConnection()->getController()->frequentUpdates() == false ||
 				Controller::runningFrames() % (256*4) == 0 )
 	{
 		update();

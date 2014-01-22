@@ -73,10 +73,10 @@ enum ladspaPluginType
 typedef struct ladspaManagerStorage
 {
 	LADSPA_Descriptor_Function descriptorFunction;
-	Uint32 index;
+	uint32_t index;
 	ladspaPluginType type;
-	Uint16 inputChannels;
-	Uint16 outputChannels;
+	uint16_t inputChannels;
+	uint16_t outputChannels;
 } ladspaManagerDescription;
 
 
@@ -123,20 +123,20 @@ public:
 
   	/* This indicates the number of ports (input AND output) present on
 	the plugin. */
-	Uint32  getPortCount( const ladspa_key_t & _plugin );
+	uint32_t  getPortCount( const ladspa_key_t & _plugin );
 
 
 	/* Indicates that the port is an input. */
-	bool  isPortInput( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isPortInput( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates that the port is an output. */
-	bool  isPortOutput( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isPortOutput( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates that the port is an audio. */
-	bool  isPortAudio( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isPortAudio( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates that the port is an control. */
-	bool  isPortControl( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isPortControl( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates that any bounds specified should be interpreted as 
 	multiples of the sample rate. For instance, a frequency range from 
@@ -145,42 +145,42 @@ public:
 	Hosts that support bounds at all must support this hint to retain
 	meaning. */
 	bool  areHintsSampleRateDependent( const ladspa_key_t & _plugin, 
-								Uint32 _port );
+								uint32_t _port );
 
   	/* Returns the lower boundary value for the given port. If
 	no lower bound is provided by the plug-in, returns -999e-99. When
 	areHintsSampleRateDependent() is also true then this value should be
 	multiplied by the relevant sample rate. */
-	float  getLowerBound( const ladspa_key_t & _plugin, Uint32 _port );
+	float  getLowerBound( const ladspa_key_t & _plugin, uint32_t _port );
 
   	/* Returns the upper boundary value for the given port. If
 	no upper bound is provided by the plug-in, returns -999e-99. When
 	areHintsSampleRateDependent() is also true then this value should be
 	multiplied by the relevant sample rate. */
-	float  getUpperBound( const ladspa_key_t & _plugin, Uint32 _port );
+	float  getUpperBound( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates whether the given port should be considered 0 or 1
 	boolean switch. */
-	bool  isPortToggled( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isPortToggled( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Retrieves any default setting hints offered by the plug-in for
 	the given port. */
-	float  getDefaultSetting( const ladspa_key_t & _plugin, Uint32 _port );
+	float  getDefaultSetting( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates that it is likely that the user will find it more
 	intuitive to view values using a logarithmic scale. This is
 	particularly useful for frequencies and gains. */
-	bool  isLogarithmic( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isLogarithmic( const ladspa_key_t & _plugin, uint32_t _port );
 
 	/* Indicates that a user interface would probably wish to provide a 
 	stepped control taking only integer values. Any bounds set should be 
 	slightly wider than the actual integer range required to avoid floating
 	point rounding errors. For instance, the integer set {0,1,2,3} might 
 	be described as [-0.1, 3.1]. */
-	bool  isInteger( const ladspa_key_t & _plugin, Uint32 _port );
+	bool  isInteger( const ladspa_key_t & _plugin, uint32_t _port );
 	
 	/* Returns the name of the port. */
-	QString  getPortName( const ladspa_key_t & _plugin, Uint32 _port );
+	QString  getPortName( const ladspa_key_t & _plugin, uint32_t _port );
 	
 	
 	/* This may be used by the plugin developer to pass any custom
@@ -206,7 +206,7 @@ public:
 	
 	/* Returns a handle to an instantiation of the given plug-in. */
 	LADSPA_Handle  instantiate( const ladspa_key_t & _plugin, 
-						Uint32 _sample_rate );
+						uint32_t _sample_rate );
 	
   	/* This method calls a function pointer that connects a port on an
 	instantiated plugin to a memory location at which a block of data
@@ -227,7 +227,7 @@ public:
 	run() or runAdding() is called. */
 	bool  connectPort( const ladspa_key_t & _plugin, 
 					LADSPA_Handle _instance, 
-					Uint32 _port,
+					uint32_t _port,
 					LADSPA_Data * _data_location );
 	
   	/* This method calls a function pointer that initialises a plugin
@@ -264,7 +264,7 @@ public:
 	activate() has been called again. */
 	bool  run( const ladspa_key_t & _plugin, 
 					LADSPA_Handle _instance,
-					Uint32 _sample_count );
+					uint32_t _sample_count );
 
 	/* This method calls a function pointer that runs an instance of a
 	plugin for a block. This has identical behaviour to run() except
@@ -281,7 +281,7 @@ public:
 	the function setRunAddingGain() must be provided also. */
 	bool  runAdding( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance,
-						Uint32 _sample_count );
+						uint32_t _sample_count );
 
   	/* This method calls a function pointer that sets the output gain for
 	use when runAdding() is called (see above). If this function is
@@ -325,8 +325,8 @@ public:
 private:
 	void  addPlugins( LADSPA_Descriptor_Function _descriptor_func,
 						const QString & _file );
-	Uint16  getPluginInputs( const LADSPA_Descriptor * _descriptor );
-	Uint16  getPluginOutputs( const LADSPA_Descriptor * _descriptor );
+	uint16_t  getPluginInputs( const LADSPA_Descriptor * _descriptor );
+	uint16_t  getPluginOutputs( const LADSPA_Descriptor * _descriptor );
 	
 	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
 						ladspaManagerMapType;

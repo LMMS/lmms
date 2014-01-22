@@ -2,7 +2,7 @@
  * AudioFileDevice.cpp - base-class for audio-device-classes which write
  *                       their output into a file
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -75,15 +75,13 @@ AudioFileDevice::~AudioFileDevice()
 
 
 
-Sint32 AudioFileDevice::writeData( const void * _data, Sint32 _len )
+int AudioFileDevice::writeData( const void* data, int len )
 {
 	if( m_outputFile.isOpen() )
 	{
-		return m_outputFile.write( (const char *) _data, _len );
+		return m_outputFile.write( (const char *) data, len );
 	}
+
 	return -1;
 }
-
-
-
 

@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.cpp - some implementations of AutomatableModel-class
  *
- * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,33 +29,28 @@
 #include "ControllerConnection.h"
 
 
-float AutomatableModel::__copiedValue = 0;
+float AutomatableModel::s_copiedValue = 0;
 
 
 
 
-AutomatableModel::AutomatableModel( DataType _type,
-						const float _val,
-						const float _min,
-						const float _max,
-						const float _step,
-						::Model * _parent,
-						const QString & _display_name,
-						bool _default_constructed ) :
-	Model( _parent, _display_name, _default_constructed ),
-	m_dataType( _type ),
-	m_value( _val ),
-	m_initValue( _val ),
-	m_minValue( _min ),
-	m_maxValue( _max ),
-	m_step( _step ),
-	m_range( _max - _min ),
+AutomatableModel::AutomatableModel( DataType type,
+						const float val, const float min, const float max, const float step,
+						Model* parent, const QString & displayName, bool defaultConstructed ) :
+	Model( parent, displayName, defaultConstructed ),
+	m_dataType( type ),
+	m_value( val ),
+	m_initValue( val ),
+	m_minValue( min ),
+	m_maxValue( max ),
+	m_step( step ),
+	m_range( max - min ),
 	m_journalEntryReady( false ),
 	m_setValueDepth( 0 ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
 {
-	setInitValue( _val );
+	setInitValue( val );
 }
 
 
@@ -88,55 +83,54 @@ bool AutomatableModel::isAutomated() const
 
 
 
-void AutomatableModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
+void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
 	if( isAutomated() )
 	{
-		QDomElement me = _doc.createElement( _name );
+		QDomElement me = doc.createElement( name );
 		me.setAttribute( "id", id() );
 		me.setAttribute( "value", m_value );
-		_this.appendChild( me );
+		element.appendChild( me );
 	}
 	else
 	{
-		_this.setAttribute( _name, m_value );
+		element.setAttribute( name, m_value );
 	}
 
 	if( m_controllerConnection )
 	{
-		QDomElement controller_element;
-		QDomNode node = _this.namedItem( "connection" );
+		QDomElement controllerElement;
+		QDomNode node = element.namedItem( "connection" );
 		if( node.isElement() )
 		{
-			controller_element = node.toElement();
+			controllerElement = node.toElement();
 		}
 		else
 		{
-			controller_element = _doc.createElement( "connection" );
-			_this.appendChild( controller_element );
+			controllerElement = doc.createElement( "connection" );
+			element.appendChild( controllerElement );
 		}
-		QDomElement element = _doc.createElement( _name );
-		m_controllerConnection->saveSettings( _doc, element );
-		controller_element.appendChild( element );
+
+		QDomElement element = doc.createElement( name );
+		m_controllerConnection->saveSettings( doc, element );
+
+		controllerElement.appendChild( element );
 	}
 }
 
 
 
 
-void AutomatableModel::loadSettings( const QDomElement & _this,
-						const QString & _name )
+void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
 	// compat code
-	QDomNode node = _this.namedItem( AutomationPattern::classNodeName() );
+	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
 	if( node.isElement() )
 	{
-		node = node.namedItem( _name );
+		node = node.namedItem( name );
 		if( node.isElement() )
 		{
-			AutomationPattern * p = AutomationPattern::
-						globalAutomationPattern( this );
+			AutomationPattern * p = AutomationPattern::globalAutomationPattern( this );
 			p->loadSettings( node.toElement() );
 			setValue( p->valueAt( 0 ) );
 			// in older projects we sometimes have odd automations
@@ -149,7 +143,7 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 		}
 	}
 
-	node = _this.namedItem( _name );
+	node = element.namedItem( name );
 	if( node.isElement() )
 	{
 		changeID( node.toElement().attribute( "id" ).toInt() );
@@ -157,10 +151,10 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 		return;
 	}
 
-	node = _this.namedItem( "connection" );
+	node = element.namedItem( "connection" );
 	if( node.isElement() )
 	{
-		node = node.namedItem( _name );
+		node = node.namedItem( name );
 		if( node.isElement() )
 		{
 			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
@@ -169,35 +163,37 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 		}
 	}
 
-	setInitValue( _this.attribute( _name ).toFloat() );
+	if( element.hasAttribute( name ) )
+	{
+		setInitValue( element.attribute( name ).toFloat() );
+	}
+	else
+	{
+		reset();
+	}
 }
 
 
 
 
-void AutomatableModel::setValue( const float _value )
+void AutomatableModel::setValue( const float value )
 {
 	++m_setValueDepth;
 	const float old_val = m_value;
 
-	m_value = fittedValue( _value );
+	m_value = fittedValue( value );
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
 		addJournalEntry( JournalEntry( 0, m_value - old_val ) );
 
 		// notify linked models
-		for( AutoModelVector::Iterator it =
-		 			m_linkedModels.begin();
-				it != m_linkedModels.end(); ++it )
+		for( AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it )
 		{
-			if( (*it)->m_setValueDepth < 1 &&
-				(*it)->fittedValue( _value ) !=
-							 (*it)->m_value )
+			if( (*it)->m_setValueDepth < 1 && (*it)->fittedValue( value ) != (*it)->m_value )
 			{
-				bool journalling = (*it)->testAndSetJournalling(
-							isJournalling() );
-				(*it)->setValue( _value );
+				bool journalling = (*it)->testAndSetJournalling( isJournalling() );
+				(*it)->setValue( value );
 				(*it)->setJournalling( journalling );
 			}
 		}
@@ -213,13 +209,13 @@ void AutomatableModel::setValue( const float _value )
 
 
 
-void AutomatableModel::setAutomatedValue( const float _value )
+void AutomatableModel::setAutomatedValue( const float value )
 {
 	++m_setValueDepth;
-	const float old_val = m_value;
+	const float oldValue = m_value;
 
-	m_value = fittedValue( _value );
-	if( old_val != m_value )
+	m_value = fittedValue( value );
+	if( oldValue != m_value )
 	{
 		// notify linked models
 		for( AutoModelVector::Iterator it = m_linkedModels.begin();
@@ -240,19 +236,20 @@ void AutomatableModel::setAutomatedValue( const float _value )
 
 
 
-void AutomatableModel::setRange( const float _min, const float _max,
-							const float _step )
+void AutomatableModel::setRange( const float min, const float max,
+							const float step )
 {
-        if( ( m_maxValue != _max ) || ( m_minValue != _min ) )
+	if( ( m_maxValue != max ) || ( m_minValue != min ) )
 	{
-		m_minValue = _min;
-		m_maxValue = _max;
+		m_minValue = min;
+		m_maxValue = max;
 		if( m_minValue > m_maxValue )
 		{
 			qSwap<float>( m_minValue, m_maxValue );
 		}
 		m_range = m_maxValue - m_minValue;
-		setStep( _step );
+
+		setStep( step );
 
 		// re-adjust value
 		setInitValue( value<float>() );
@@ -264,11 +261,11 @@ void AutomatableModel::setRange( const float _min, const float _max,
 
 
 
-void AutomatableModel::setStep( const float _step )
+void AutomatableModel::setStep( const float step )
 {
-	if( m_step != _step )
+	if( m_step != step )
 	{
-		m_step = _step;
+		m_step = step;
 		emit propertiesChanged();
 	}
 }
@@ -276,63 +273,61 @@ void AutomatableModel::setStep( const float _step )
 
 
 
-float AutomatableModel::fittedValue( float _value ) const
+float AutomatableModel::fittedValue( float value ) const
 {
-	_value = tLimit<float>( _value, m_minValue, m_maxValue );
+	value = tLimit<float>( value, m_minValue, m_maxValue );
 
 	if( m_step != 0 )
 	{
-		_value = roundf( _value / m_step ) * m_step;
+		value = roundf( value / m_step ) * m_step;
 	}
 	else
 	{
-		_value = m_minValue;
+		value = m_minValue;
 	}
 
 	// correct rounding error at the border
-	if( qAbs<float>( _value - m_maxValue ) <
-			typeInfo<float>::minEps() * qAbs<float>( m_step ) )
+	if( qAbs<float>( value - m_maxValue ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
 	{
-		_value = m_maxValue;
+		value = m_maxValue;
 	}
 
 	// correct rounding error if value = 0
-	if( qAbs<float>( _value ) < typeInfo<float>::minEps() *
-							qAbs<float>( m_step ) )
+	if( qAbs<float>( value ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
 	{
-		_value = 0;
+		value = 0;
 	}
 
-	if( _value < m_minValue )
+	if( value < m_minValue )
 	{
 		return m_minValue;
 	}
-	else if( _value > m_maxValue )
+	else if( value > m_maxValue )
 	{
 		return m_maxValue;
 	}
 
-	return _value;
+	return value;
 }
 
 
 
 
 
-void AutomatableModel::redoStep( JournalEntry & _je )
+void AutomatableModel::redoStep( JournalEntry& je )
 {
 	bool journalling = testAndSetJournalling( false );
-	setValue( value<float>() + (float) _je.data().toDouble() );
+	setValue( value<float>() + (float) je.data().toDouble() );
 	setJournalling( journalling );
 }
 
 
 
 
-void AutomatableModel::undoStep( JournalEntry & _je )
+void AutomatableModel::undoStep( JournalEntry& je )
 {
-	JournalEntry je( _je.actionID(), -_je.data().toDouble() );
-	redoStep( je );
+	JournalEntry inv( je.actionID(), -je.data().toDouble() );
+	redoStep( inv );
 }
 
 
@@ -355,8 +350,7 @@ void AutomatableModel::addJournalEntryFromOldToCurVal()
 		restoreJournallingState();
 		if( value<float>() != m_oldValue )
 		{
-			addJournalEntry( JournalEntry( 0, value<float>() -
-								m_oldValue ) );
+			addJournalEntry( JournalEntry( 0, value<float>() - m_oldValue ) );
 		}
 		m_journalEntryReady = false;
 	}
@@ -365,16 +359,16 @@ void AutomatableModel::addJournalEntryFromOldToCurVal()
 
 
 
-void AutomatableModel::linkModel( AutomatableModel * _model )
+void AutomatableModel::linkModel( AutomatableModel* model )
 {
-	if( !m_linkedModels.contains( _model ) )
+	if( !m_linkedModels.contains( model ) )
 	{
-		m_linkedModels.push_back( _model );
+		m_linkedModels.push_back( model );
 		m_hasLinkedModels = true;
-		if( !_model->m_hasLinkedModels )
+
+		if( !model->hasLinkedModels() )
 		{
-			QObject::connect( this, SIGNAL( dataChanged() ),
-					_model, SIGNAL( dataChanged() ) );
+			QObject::connect( this, SIGNAL( dataChanged() ), model, SIGNAL( dataChanged() ) );
 		}
 	}
 }
@@ -382,10 +376,9 @@ void AutomatableModel::linkModel( AutomatableModel * _model )
 
 
 
-void AutomatableModel::unlinkModel( AutomatableModel * _model )
+void AutomatableModel::unlinkModel( AutomatableModel* model )
 {
-	AutoModelVector::Iterator it =
-		qFind( m_linkedModels.begin(), m_linkedModels.end(), _model );
+	AutoModelVector::Iterator it = qFind( m_linkedModels.begin(), m_linkedModels.end(), model );
 	if( it != m_linkedModels.end() )
 	{
 		m_linkedModels.erase( it );
@@ -398,21 +391,19 @@ void AutomatableModel::unlinkModel( AutomatableModel * _model )
 
 
 
-void AutomatableModel::linkModels( AutomatableModel * _model1,
-						AutomatableModel * _model2 )
+void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	_model1->linkModel( _model2 );
-	_model2->linkModel( _model1 );
+	model1->linkModel( model2 );
+	model2->linkModel( model1 );
 }
 
 
 
 
-void AutomatableModel::unlinkModels( AutomatableModel * _model1,
-						AutomatableModel * _model2 )
+void AutomatableModel::unlinkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	_model1->unlinkModel( _model2 );
-	_model2->unlinkModel( _model1 );
+	model1->unlinkModel( model2 );
+	model2->unlinkModel( model1 );
 }
 
 
@@ -431,41 +422,37 @@ void AutomatableModel::unlinkAllModels()
 
 
 
-void AutomatableModel::setControllerConnection( ControllerConnection * _c )
+void AutomatableModel::setControllerConnection( ControllerConnection* c )
 {
-	m_controllerConnection = _c;
-	if( _c )
+	m_controllerConnection = c;
+	if( c )
 	{
-		QObject::connect( m_controllerConnection,
-						SIGNAL( valueChanged() ),
-					this, SIGNAL( dataChanged() ) );
-		QObject::connect( m_controllerConnection,
-						SIGNAL( destroyed() ),
-				this, SLOT( unlinkControllerConnection() ) );
+		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ), this, SIGNAL( dataChanged() ) );
+		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
 		emit dataChanged();
 	}
 }
 
 
 
-float AutomatableModel::controllerValue( int _frameOffset ) const
+float AutomatableModel::controllerValue( int frameOffset ) const
 {
 	if( m_controllerConnection )
 	{
-		const float v = m_minValue +
-			( m_range * m_controllerConnection->currentValue(
-							_frameOffset ) );
+		const float v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 		if( typeInfo<float>::isEqual( m_step, 1 ) )
 		{
 			return qRound( v );
 		}
 		return v;
 	}
-	AutomatableModel * lm = m_linkedModels.first();
-	if( lm->m_controllerConnection )
+
+	AutomatableModel* lm = m_linkedModels.first();
+	if( lm->controllerConnection() )
 	{
-		return lm->controllerValue( _frameOffset );
+		return lm->controllerValue( frameOffset );
 	}
+
 	return lm->m_value;
 }
 
@@ -485,13 +472,13 @@ void AutomatableModel::unlinkControllerConnection()
 
 
 
-void AutomatableModel::setInitValue( const float _value )
+void AutomatableModel::setInitValue( const float value )
 {
-	m_initValue = fittedValue( _value );
+	m_initValue = fittedValue( value );
 	bool journalling = testAndSetJournalling( false );
-	setValue( _value );
+	setValue( value );
 	setJournalling( journalling );
-	emit initValueChanged( _value );
+	emit initValueChanged( value );
 }
 
 
@@ -507,7 +494,7 @@ void AutomatableModel::reset()
 
 void AutomatableModel::copyValue()
 {
-	__copiedValue = value<float>();
+	s_copiedValue = value<float>();
 }
 
 
@@ -515,7 +502,7 @@ void AutomatableModel::copyValue()
 
 void AutomatableModel::pasteValue()	
 {
-	setValue( __copiedValue );
+	setValue( copiedValue() );
 }
 
 

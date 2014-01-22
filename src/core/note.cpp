@@ -56,10 +56,6 @@ note::note( const midiTime & _length, const midiTime & _pos,
 	{
 		m_detuning = sharedObject::ref( _detuning );
 	}
-	else
-	{
-		createDetuning();
-	}
 	//restoreJournallingState();
 }
 
@@ -83,10 +79,6 @@ note::note( const note & _note ) :
 	if( _note.m_detuning )
 	{
 		m_detuning = sharedObject::ref( _note.m_detuning );
-	}
-	else
-	{
-		createDetuning();
 	}
 }
 
@@ -192,7 +184,8 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pan", m_panning );
 	_this.setAttribute( "len", m_length );
 	_this.setAttribute( "pos", m_pos );
-	if( m_length > 0 )
+
+	if( m_detuning && m_length )
 	{
 		m_detuning->saveSettings( _doc, _this );
 	}
@@ -203,15 +196,16 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void note::loadSettings( const QDomElement & _this )
 {
-	const int old_key = _this.attribute( "tone" ).toInt() +
-			_this.attribute( "oct" ).toInt() * KeysPerOctave;
-	m_key = qMax( old_key, _this.attribute( "key" ).toInt() );
+	const int oldKey = _this.attribute( "tone" ).toInt() + _this.attribute( "oct" ).toInt() * KeysPerOctave;
+	m_key = qMax( oldKey, _this.attribute( "key" ).toInt() );
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
+
 	if( _this.hasChildNodes() )
 	{
+		createDetuning();
 		m_detuning->loadSettings( _this );
 	}
 }
@@ -261,6 +255,7 @@ void note::redoStep( journalEntry & _je )
 
 void note::editDetuningPattern()
 {
+	createDetuning();
 	m_detuning->automationPattern()->openInAutomationEditor();
 }
 
@@ -269,11 +264,13 @@ void note::editDetuningPattern()
 
 void note::createDetuning()
 {
-	m_detuning = new DetuningHelper;
-	(void) m_detuning->automationPattern();
-	m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
-	m_detuning->automationPattern()->setProgressionType(
-		AutomationPattern::LinearProgression );
+	if( m_detuning == NULL )
+	{
+		m_detuning = new DetuningHelper;
+		(void) m_detuning->automationPattern();
+		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
+		m_detuning->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
+	}
 }
 
 

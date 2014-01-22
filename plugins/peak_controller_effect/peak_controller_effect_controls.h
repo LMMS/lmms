@@ -66,6 +66,9 @@ private:
 	FloatModel m_attackModel;
 	FloatModel m_decayModel;
 	BoolModel m_muteModel;
+	BoolModel m_absModel;
+	FloatModel m_amountMultModel;
+	BoolModel m_muteOutputModel;
 
 	friend class PeakControllerEffectControlDialog;
 	friend class PeakControllerEffect;

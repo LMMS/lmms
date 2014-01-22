@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.h - declaration of class AutomatableModel
  *
- * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,9 +39,9 @@
 				return (type) modelname->value();				\
 			}													\
 		public slots:											\
-			inline void setfunc( const type _val )				\
+			inline void setfunc( const type val )				\
 			{													\
-				modelname->setValue( _val );					\
+				modelname->setValue( val );						\
 			}
 
 #define mapPropertyFromModel(type,getfunc,setfunc,modelname)	\
@@ -51,9 +51,9 @@
 				return (type) modelname.value();				\
 			}													\
 		public slots:											\
-			inline void setfunc( const type _val )				\
+			inline void setfunc( const type val )				\
 			{													\
-				modelname.setValue( (float) _val );				\
+				modelname.setValue( (float) val );				\
 			}
 
 
@@ -74,66 +74,70 @@ public:
 		Bool
 	} ;
 
-	AutomatableModel( DataType _type,
-				const float _val = 0,
-				const float _min = 0,
-				const float _max = 0,
-				const float _step = 0,
-				::Model * _parent = NULL,
-				const QString & _display_name = QString(),
-				bool _default_constructed = false );
+	AutomatableModel( DataType type,
+						const float val = 0,
+						const float min = 0,
+						const float max = 0,
+						const float step = 0,
+						Model* parent = NULL,
+						const QString& display_name = QString(),
+						bool default_constructed = false );
 
 	virtual ~AutomatableModel();
 
 
-	static inline float copiedValue()
+	static float copiedValue()
 	{
-		return __copiedValue;
+		return s_copiedValue;
 	}
 
 	bool isAutomated() const;
 
-	inline ControllerConnection * getControllerConnection() const
+	inline ControllerConnection* controllerConnection() const
 	{
 		return m_controllerConnection;
 	}
 
 
-	void setControllerConnection( ControllerConnection * _c );
+	void setControllerConnection( ControllerConnection* c );
 
 
 	template<class T>
-	static inline T castValue( const float _v )
+	static inline T castValue( const float v )
 	{
-		return (T)( _v );
+		return (T)( v );
 	}
 
 	template<bool>
-	static inline bool castValue( const float _v )
+	static inline bool castValue( const float v )
 	{
-		return ( qRound( _v ) != 0 );
+		return ( qRound( v ) != 0 );
 	}
 
 
 	template<class T>
-	inline T value( int _frameOffset = 0 ) const
+	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( m_hasLinkedModels ||
-					m_controllerConnection != NULL ) )
+		if( unlikely( m_hasLinkedModels || m_controllerConnection != NULL ) )
 		{
-			return castValue<T>( controllerValue( _frameOffset ) );
+			return castValue<T>( controllerValue( frameOffset ) );
 		}
 
 		return castValue<T>( m_value );
 	}
 
-	float controllerValue( int _frameOffset ) const;
+	float controllerValue( int frameOffset ) const;
 
 
 	template<class T>
 	inline T initValue() const
 	{
 		return castValue<T>( m_initValue );
+	}
+
+	bool isAtInitValue() const
+	{
+		return m_value == m_initValue;
 	}
 
 	template<class T>
@@ -155,14 +159,14 @@ public:
 	}
 
 
-	void setInitValue( const float _value );
+	void setInitValue( const float value );
 
-	void setAutomatedValue( const float _value );
-	void setValue( const float _value );
+	void setAutomatedValue( const float value );
+	void setValue( const float value );
 
-	inline void incValue( int _steps )
+	inline void incValue( int steps )
 	{
-		setValue( m_value + _steps * m_step );
+		setValue( m_value + steps * m_step );
 	}
 
 	inline float range() const
@@ -170,24 +174,19 @@ public:
 		return m_range;
 	}
 
-	void setRange( const float _min, const float _max,
-							const float _step = 1 );
+	void setRange( const float min, const float max, const float step = 1 );
 
-	void setStep( const float _step );
+	void setStep( const float step );
 
-	static void linkModels( AutomatableModel * _m1,
-						AutomatableModel * _m2 );
-	static void unlinkModels( AutomatableModel * _m1,
-						AutomatableModel * _m2 );
+	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
+	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
 	void unlinkAllModels();
 
-	virtual void saveSettings( QDomDocument & _doc,
-					QDomElement & _this,
-				const QString & _name = QString( "value" ) );
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element,
+								const QString& name = QString( "value" ) );
 
-	virtual void loadSettings( const QDomElement & _this,
-				const QString & _name = QString( "value" ) );
+	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) );
 
 	virtual QString nodeName() const
 	{
@@ -199,13 +198,13 @@ public:
 	void addJournalEntryFromOldToCurVal();
 
 
-	QString displayValue( const float _val ) const
+	QString displayValue( const float val ) const
 	{
 		switch( m_dataType )
 		{
-			case Float: return QString::number( castValue<float>( _val ) );
-			case Integer: return QString::number( castValue<int>( _val ) );
-			case Bool: return QString::number( castValue<bool>( _val ) );
+			case Float: return QString::number( castValue<float>( val ) );
+			case Integer: return QString::number( castValue<int>( val ) );
+			case Bool: return QString::number( castValue<bool>( val ) );
 		}
 		return "0";
 	}
@@ -224,15 +223,15 @@ public slots:
 
 
 protected:
-	virtual void redoStep( JournalEntry & _je );
-	virtual void undoStep( JournalEntry & _je );
+	virtual void redoStep( JournalEntry& je );
+	virtual void undoStep( JournalEntry& je );
 
-	float fittedValue( float _value ) const;
+	float fittedValue( float value ) const;
 
 
 private:
-	void linkModel( AutomatableModel * _model );
-	void unlinkModel( AutomatableModel * _model );
+	void linkModel( AutomatableModel* model );
+	void unlinkModel( AutomatableModel* model );
 
 
 	DataType m_dataType;
@@ -253,15 +252,15 @@ private:
 	bool m_hasLinkedModels;
 
 
-	ControllerConnection * m_controllerConnection;
+	ControllerConnection* m_controllerConnection;
 
 
-	static float __copiedValue;
+	static float s_copiedValue;
 
 
 signals:
-	void initValueChanged( float _val );
-	void destroyed( jo_id_t _id );
+	void initValueChanged( float val );
+	void destroyed( jo_id_t id );
 
 } ;
 
@@ -270,9 +269,9 @@ signals:
 
 
 #define defaultTypedMethods(type)								\
-	inline type value( int _frameOffset = 0 ) const				\
+	inline type value( int frameOffset = 0 ) const				\
 	{															\
-		return AutomatableModel::value<type>( _frameOffset );	\
+		return AutomatableModel::value<type>( frameOffset );	\
 	}															\
 																\
 	inline type initValue() const								\
@@ -296,12 +295,11 @@ signals:
 class FloatModel : public AutomatableModel
 {
 public:
-	FloatModel( float _val = 0, float _min = 0, float _max = 0,
-			float _step = 0, ::Model * _parent = NULL,
-			const QString & _display_name  = QString(),
-			bool _default_constructed = false ) :
-		AutomatableModel( Float, _val, _min, _max, _step,
-				_parent, _display_name, _default_constructed )
+	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
+				Model * parent = NULL,
+				const QString& displayName = QString(),
+				bool defaultConstructed = false ) :
+		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
 
@@ -313,12 +311,11 @@ public:
 class IntModel : public AutomatableModel
 {
 public:
-	IntModel( int _val = 0, int _min = 0, int _max = 0,
-			::Model * _parent = NULL,
-			const QString & _display_name  = QString(),
-			bool _default_constructed = false ) :
-		AutomatableModel( Integer, _val, _min, _max, 1,
-				_parent, _display_name, _default_constructed )
+	IntModel( int val = 0, int min = 0, int max = 0,
+				Model* parent = NULL,
+				const QString& displayName = QString(),
+				bool defaultConstructed = false ) :
+		AutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
 	{
 	}
 
@@ -330,11 +327,11 @@ public:
 class BoolModel : public AutomatableModel
 {
 public:
-	BoolModel( const bool _val = false, ::Model * _parent = NULL,
-				const QString & _display_name  = QString(),
-				bool _default_constructed = false ) : 
-		AutomatableModel( Bool, _val, false, true, 1,
-				_parent, _display_name, _default_constructed )
+	BoolModel( const bool val = false,
+				Model* parent = NULL,
+				const QString& displayName = QString(),
+				bool defaultConstructed = false ) :
+		AutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
 	{
 	}
 

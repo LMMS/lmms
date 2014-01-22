@@ -49,10 +49,24 @@ public:
 
 	virtual float defaultValue() const = 0;
 
-	inline bool hasAutomation() const
+	bool hasAutomation() const
 	{
-		return m_autoPattern != NULL &&
-			m_autoPattern->getTimeMap().isEmpty() == false;
+		if( m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false )
+		{
+			// prevent saving inline automation if there's just one value which equals value
+			// of model which is going to be saved anyways
+			if( isAtInitValue() &&
+				m_autoPattern->getTimeMap().size() == 1 &&
+				m_autoPattern->getTimeMap().keys().first() == 0 &&
+				m_autoPattern->getTimeMap().values().first() == value() )
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	AutomationPattern * automationPattern()

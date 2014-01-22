@@ -106,6 +106,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
+	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
@@ -119,6 +120,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePitch() ) );
 
+	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
+				this, SLOT( updatePitchRange() ) );
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -585,6 +588,15 @@ void InstrumentTrack::updatePitch()
 
 
 
+void InstrumentTrack::updatePitchRange()
+{
+	const int r = m_pitchRangeModel.value();
+	m_pitchModel.setRange( -100 * r, 100 * r );
+}
+
+
+
+
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
 	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
@@ -603,10 +615,8 @@ void InstrumentTrack::removeMidiPortNode( multimediaProject & _mmp )
 
 
 
-bool InstrumentTrack::play( const midiTime & _start,
-					const fpp_t _frames,
-					const f_cnt_t _offset,
-							Sint16 _tco_num )
+bool InstrumentTrack::play( const midiTime & _start, const fpp_t _frames,
+							const f_cnt_t _offset, int _tco_num )
 {
 	const float frames_per_tick = engine::framesPerTick();
 
@@ -758,6 +768,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
 	m_pitchModel.saveSettings( _doc, _this, "pitch" );
+	m_pitchRangeModel.saveSettings( _doc, _this, "pitchrange" );
 
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
 	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
@@ -802,6 +813,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 
 	m_pitchModel.loadSettings( _this, "pitch" );
+	m_pitchRangeModel.loadSettings( _this, "pitchrange" );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
 
 	if( _this.hasAttribute( "baseoct" ) )
@@ -995,8 +1007,10 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiInputAction->setText( tr( "Input" ) );
 	m_midiOutputAction->setText( tr( "Output" ) );
 
-	m_activityIndicator = new fadeButton( QColor( 56, 60, 72 ),
-						QColor( 64, 255, 16 ),
+	m_activityIndicator = new fadeButton( QApplication::palette().color( QPalette::Active,
+							QPalette::Background),
+						QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );
@@ -1255,68 +1269,79 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
-	m_generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ),
-									this );
-	m_generalSettingsWidget->setFixedHeight( 90 );
+	tabWidget* generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ), this );
 
-	// setup line-edit for changing channel-name
-	m_nameLineEdit = new QLineEdit( m_generalSettingsWidget );
-	m_nameLineEdit->setFont( pointSize<8>(
-						m_nameLineEdit->font() ) );
-	m_nameLineEdit->setGeometry( 10, 16, 230, 18 );
+	QVBoxLayout* generalSettingsLayout = new QVBoxLayout( generalSettingsWidget );
+
+	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
+	generalSettingsLayout->setSpacing( 6 );
+
+	// setup line edit for changing instrument track name
+	m_nameLineEdit = new QLineEdit;
+	m_nameLineEdit->setFont( pointSize<8>( m_nameLineEdit->font() ) );
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( textChanged( const QString & ) ) );
 
+	generalSettingsLayout->addWidget( m_nameLineEdit );
 
-	// setup volume-knob
-	m_volumeKnob = new knob( knobBright_26, m_generalSettingsWidget,
-						tr( "Instrument volume" ) );
+	QHBoxLayout* basicControlsLayout = new QHBoxLayout;
+	basicControlsLayout->setSpacing( 3 );
+
+	// set up volume knob
+	m_volumeKnob = new knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
-	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
+	basicControlsLayout->addWidget( m_volumeKnob );
 
-	// setup panning-knob
-	m_panningKnob = new knob( knobBright_26, m_generalSettingsWidget,
-							tr( "Panning" ) );
-	m_panningKnob->move( m_volumeKnob->x() +
-					m_volumeKnob->width() + 16, 44 );
+	// set up panning knob
+	m_panningKnob = new knob( knobBright_26, NULL, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 
+	basicControlsLayout->addWidget( m_panningKnob );
+	basicControlsLayout->addStretch();
 
-	m_pitchKnob = new knob( knobBright_26, m_generalSettingsWidget,
-							tr( "Pitch" ) );
-	m_pitchKnob->move( m_panningKnob->x() +
-					m_panningKnob->width() + 16, 44 );
+	// set up pitch knob
+	m_pitchKnob = new knob( knobBright_26, NULL, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
+	basicControlsLayout->addWidget( m_pitchKnob );
+
+	// set up pitch range knob
+	m_pitchRangeSpinBox= new lcdSpinBox( 2, NULL, tr( "Pitch range (semitones)" ) );
+	m_pitchRangeSpinBox->setLabel( tr( "RANGE" ) );
+
+	basicControlsLayout->addWidget( m_pitchRangeSpinBox );
+	basicControlsLayout->addStretch();
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new fxLineLcdSpinBox( 2, m_generalSettingsWidget,
-						tr( "FX channel" ) );
+	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
-	m_effectChannelNumber->move( m_pitchKnob->x() +
-					m_pitchKnob->width() + 16, 44 );
 
-	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
-							"project_save" ), "",
-						m_generalSettingsWidget );
-	m_saveSettingsBtn->setGeometry( m_effectChannelNumber->x() +
-					m_effectChannelNumber->width() + 20, 44,
-					32, 32 );
-	connect( m_saveSettingsBtn, SIGNAL( clicked() ), this,
-					SLOT( saveSettingsBtnClicked() ) );
-	toolTip::add( m_saveSettingsBtn, 
-		tr( "Save current channel settings in a preset-file" ) );
-	m_saveSettingsBtn->setWhatsThis(
+	basicControlsLayout->addWidget( m_effectChannelNumber );
+
+	basicControlsLayout->addStretch();
+
+
+	QPushButton* saveSettingsBtn = new QPushButton( embed::getIconPixmap( "project_save" ), QString() );
+	saveSettingsBtn->setMinimumSize( 32, 32 );
+
+	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
+
+	toolTip::add( saveSettingsBtn, tr( "Save current channel settings in a preset-file" ) );
+	saveSettingsBtn->setWhatsThis(
 		tr( "Click here, if you want to save current channel settings "
 			"in a preset-file. Later you can load this preset by "
 			"double-clicking it in the preset-browser." ) );
+
+	basicControlsLayout->addWidget( saveSettingsBtn );
+
+	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
 	m_tabWidget = new tabWidget( "", this );
@@ -1325,16 +1350,14 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// create tab-widgets
 	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
-	QWidget * instrument_functions = new QWidget( m_tabWidget );
-	m_chordView = new ChordCreatorView( &m_track->m_chordCreator,
-							instrument_functions );
-	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator,
-							instrument_functions );
+	QWidget* instrumentFunctions = new QWidget( m_tabWidget );
+	m_chordView = new ChordCreatorView( &m_track->m_chordCreator, instrumentFunctions );
+	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator, instrumentFunctions );
 	m_midiView = new InstrumentMidiIOView( m_tabWidget );
-	m_effectView = new EffectRackView( m_track->m_audioPort.effects(),
-								m_tabWidget );
+	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
+
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
-	m_tabWidget->addTab( instrument_functions, tr( "FUNC" ), 2 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), 2 );
 	m_tabWidget->addTab( m_effectView, tr( "FX" ), 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
 
@@ -1342,7 +1365,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_pianoView = new PianoView( this );
 	m_pianoView->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
 
-	vlayout->addWidget( m_generalSettingsWidget );
+	vlayout->addWidget( generalSettingsWidget );
 	vlayout->addWidget( m_tabWidget );
 	vlayout->addWidget( m_pianoView );
 
@@ -1354,8 +1377,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = 
-			engine::mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1418,6 +1440,7 @@ void InstrumentTrackWindow::modelChanged()
 	if( m_track->instrument() && m_track->instrument()->isBendable() )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
+		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
 		m_pitchKnob->show();
 	}
 	else

@@ -2,7 +2,7 @@
  * LadspaBase.h - basic declarations concerning LADSPA
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,8 +55,8 @@ typedef struct PortDescription
 {
 	QString name;
 	ch_cnt_t proc;
-	Uint16 port_id;
-	Uint16 control_id;
+	uint16_t port_id;
+	uint16_t control_id;
 	buffer_rate_t rate;
 	buffer_data_t data_type;
 	float scale;

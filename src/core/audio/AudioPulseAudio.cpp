@@ -1,7 +1,7 @@
 /*
  * AudioPulseAudio.cpp - device-class which implements PulseAudio-output
  *
- * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -249,7 +249,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	const fpp_t fpp = mixer()->framesPerPeriod();
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
-	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() * sizeof(Sint16) );
+	int_sample_t* pcmbuf = (int_sample_t *)pa_xmalloc( fpp * channels() * sizeof(int_sample_t) );
 
 	size_t fd = 0;
 	while( fd < length/4 && m_quit == false )

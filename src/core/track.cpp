@@ -73,12 +73,12 @@
 
 /*! The width of the resize grip in pixels
  */
-const Sint16 RESIZE_GRIP_WIDTH = 4;
+const int RESIZE_GRIP_WIDTH = 4;
 
 /*! The size of the track buttons in pixels
  */
-const Uint16 TRACK_OP_BTN_WIDTH = 20;
-const Uint16 TRACK_OP_BTN_HEIGHT = 14;
+const int TRACK_OP_BTN_WIDTH = 20;
+const int TRACK_OP_BTN_HEIGHT = 14;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
@@ -713,13 +713,10 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_action == Resize )
 	{
-		midiTime t = qMax( midiTime::ticksPerTact(),
-				static_cast<int>( _me->x() *
-					midiTime::ticksPerTact() / ppt ) );
-		if( ! ( _me->modifiers() & Qt::ControlModifier )
-		   && _me->button() == Qt::NoButton )
+		midiTime t = qMax( midiTime::ticksPerTact() / 16, static_cast<int>( _me->x() * midiTime::ticksPerTact() / ppt ) );
+		if( ! ( _me->modifiers() & Qt::ControlModifier ) && _me->button() == Qt::NoButton )
 		{
-			t = t.toNearestTact();
+			t = qMax<int>( midiTime::ticksPerTact(), t.toNearestTact() );
 		}
 		m_tco->changeLength( t );
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
@@ -1657,7 +1654,7 @@ void track::clone()
 
 /*! \brief Save this track's settings to file
  *
- *  We save the track type and its muted state, then append the track-
+ *  We save the track type and its muted state and solo state, then append the track-
  *  specific settings.  Then we iterate through the trackContentObjects
  *  and save all their states in turn.
  *
@@ -1675,6 +1672,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", type() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "muted", isMuted() );
+	_this.setAttribute( "solo", isSolo() );
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
 		_this.setAttribute( "height", m_height );
@@ -1705,7 +1703,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 /*! \brief Load the settings from a file
  *
- *  We load the track's type and muted state, then clear out our
+ *  We load the track's type and muted state and solo state, then clear out our
  *  current trackContentObject.
  *
  *  Then we step through the QDomElement's children and load the
@@ -1727,6 +1725,7 @@ void track::loadSettings( const QDomElement & _this )
 			_this.firstChild().toElement().attribute( "name" ) );
 
 	setMuted( _this.attribute( "muted" ).toInt() );
+	setSolo( _this.attribute( "solo" ).toInt() );
 
 	if( m_simpleSerializingMode )
 	{

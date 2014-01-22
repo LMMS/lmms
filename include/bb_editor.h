@@ -56,6 +56,8 @@ public slots:
 	void stop();
 	void updatePosition();
 	void addAutomationTrack();
+	void addSteps();
+	void removeSteps();
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );

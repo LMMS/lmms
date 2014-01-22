@@ -1,0 +1,6 @@
+language: cpp
+compiler: gcc
+before_install: sudo apt-get update
+install: (sudo apt-get install libqt4-dev libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libasound2-dev libjack-dev libsdl-dev libsamplerate0-dev libstk0-dev libfluidsynth-dev portaudio19-dev) && (sudo apt-get install wine-dev libc6-dev-amd64 || true)
+before_script: mkdir build && cd build
+script: cmake .. && make -j8

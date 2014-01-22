@@ -186,21 +186,18 @@ void audioFileProcessor::loadFile( const QString & _file )
 
 QString audioFileProcessor::nodeName( void ) const
 {
-	return( audiofileprocessor_plugin_descriptor.name );
+	return audiofileprocessor_plugin_descriptor.name;
 }
 
 
 
 
-Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
+int audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
-			engine::mixer()->processingSampleRate() /
-					engine::mixer()->baseSampleRate();
+			engine::mixer()->processingSampleRate() / engine::mixer()->baseSampleRate();
 
-	return( static_cast<Uint32>( floorf( ( m_sampleBuffer.endFrame() -
-						m_sampleBuffer.startFrame() ) *
-							freq_factor ) ) );
+	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
 
 
@@ -208,7 +205,7 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 
 PluginView * audioFileProcessor::instantiateView( QWidget * _parent )
 {
-	return( new AudioFileProcessorView( this, _parent ) );
+	return new AudioFileProcessorView( this, _parent );
 }
 
 

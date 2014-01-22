@@ -50,8 +50,8 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					QPixmap _button7_off,
 					QPixmap _button8_on,
 					QPixmap _button8_off,
-					Uint8 _default,
-					Uint32 _x, Uint32 _y,
+					int _default,
+					int _x, int _y,
 					QWidget * _parent ):
 	QWidget( _parent ),
 	IntModelView( new nineButtonSelectorModel(0, 8, _default, NULL, 
@@ -148,7 +148,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 
 nineButtonSelector::~ nineButtonSelector()
 {
-	for( Uint8 i = 0; i < 9; i++ )
+	for( int i = 0; i < 9; i++ )
 	{
 		delete m_buttons[i];
 	}
@@ -231,13 +231,13 @@ void nineButtonSelector::modelChanged()
 	updateButton( model()->value() );
 }
 
-void nineButtonSelector::setSelected( Uint8 _new_button )
+void nineButtonSelector::setSelected( int _new_button )
 {
 	model()->setValue(_new_button);
 	updateButton( _new_button );
 }
 
-void nineButtonSelector::updateButton( Uint8 _new_button )
+void nineButtonSelector::updateButton( int _new_button )
 {
 	m_lastBtn->setChecked( false );
 	m_lastBtn->update();

@@ -232,7 +232,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 						m_stickModel.value(),
 						m_vibratoFreqModel.value(),
 						p,
-						(Uint8) m_spreadModel.value(),
+						(uint8_t) m_spreadModel.value(),
 				engine::mixer()->processingSampleRate() );
 		}
 		else if( p == 9 )
@@ -245,7 +245,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 						m_crossfadeModel.value(),
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
-						(Uint8) m_spreadModel.value(),
+						(uint8_t) m_spreadModel.value(),
 				engine::mixer()->processingSampleRate() );
 		}
 		else
@@ -258,7 +258,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 						p - 10,
 						m_strikeModel.value() * 128.0,
 						m_velocityModel.value(),
-						(Uint8) m_spreadModel.value(),
+						(uint8_t) m_spreadModel.value(),
 				engine::mixer()->processingSampleRate() );
 		}
 		m.unlock();
@@ -522,7 +522,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control8,
 				const StkFloat _control11,
 				const int _control16,
-				const Uint8 _delay,
+				const uint8_t _delay,
 				const sample_rate_t _sample_rate )
 {
 	try
@@ -551,7 +551,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
-	for( Uint16 i = 0; i < 256; i++ )
+	for( int i = 0; i < 256; i++ )
 	{
 		m_delay[i] = 0.0;
 	}
@@ -569,7 +569,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control4,
 				const StkFloat _control11,
 				const StkFloat _control128,
-				const Uint8 _delay,
+				const uint8_t _delay,
 				const sample_rate_t _sample_rate )
 {
 	try
@@ -596,7 +596,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
-	for( Uint16 i = 0; i < 256; i++ )
+	for( int i = 0; i < 256; i++ )
 	{
 		m_delay[i] = 0.0;
 	}
@@ -614,7 +614,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const int _control16,
 				const StkFloat _control64,
 				const StkFloat _control128,
-				const Uint8 _delay,
+				const uint8_t _delay,
 				const sample_rate_t _sample_rate )
 {
 	try
@@ -643,7 +643,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
-	for( Uint16 i = 0; i < 256; i++ )
+	for( int i = 0; i < 256; i++ )
 	{
 		m_delay[i] = 0.0;
 	}

@@ -2,7 +2,7 @@
  * patman.cpp - a GUS-compatible patch instrument plugin
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -564,7 +564,7 @@ void PatmanView::openFile( void )
 void PatmanView::updateFilename( void )
 {
  	m_displayFilename = "";
-	Uint16 idx = m_pi->m_patchFile.length();
+	int idx = m_pi->m_patchFile.length();
 
 	QFontMetrics fm( pointSize<8>( font() ) );
 

@@ -1,7 +1,7 @@
 /*
  * LadspaControl.h - model for controlling a LADSPA port
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -72,8 +72,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent,
 								const QString & _name );
-	virtual void loadSettings( const QDomElement & _this, 
-								const QString & _name );
+	virtual void loadSettings( const QDomElement & _this, const QString & _name );
 	inline virtual QString nodeName() const
 	{
 		return "port";
@@ -81,8 +80,8 @@ public:
 
 
 signals:
-	void changed( Uint16 _port, LADSPA_Data _value );
-	void linkChanged( Uint16 _port, bool _state );
+	void changed( int _port, LADSPA_Data _value );
+	void linkChanged( int _port, bool _state );
 
 
 protected slots:

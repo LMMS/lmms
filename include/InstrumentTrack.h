@@ -26,8 +26,6 @@
 #ifndef _INSTRUMENT_TRACK_H
 #define _INSTRUMENT_TRACK_H
 
-#include <QtGui/QPushButton>
-
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
@@ -120,8 +118,7 @@ public:
 
 	// play everything in given frame-range - creates note-play-handles
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
-					const f_cnt_t _frame_base,
-							Sint16 _tco_num = -1 );
+						const f_cnt_t _frame_base, int _tco_num = -1 );
 	// create new view for me
 	virtual trackView * createView( TrackContainerView* tcv );
 
@@ -188,6 +185,11 @@ public:
 		return &m_panningModel;
 	}
 
+	IntModel* pitchRangeModel()
+	{
+		return &m_pitchRangeModel;
+	}
+
 	IntModel * effectChannelModel()
 	{
 		return &m_effectChannelModel;
@@ -212,6 +214,7 @@ protected:
 protected slots:
 	void updateBaseNote();
 	void updatePitch();
+	void updatePitchRange();
 
 
 private:
@@ -229,6 +232,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	FloatModel m_pitchModel;
+	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 
 
@@ -386,13 +390,12 @@ private:
 	InstrumentTrackView * m_itv;
 
 	// widgets on the top of an instrument-track-window
-	tabWidget * m_generalSettingsWidget;
 	QLineEdit * m_nameLineEdit;
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
+	lcdSpinBox* m_pitchRangeSpinBox;
 	lcdSpinBox * m_effectChannelNumber;
-	QPushButton * m_saveSettingsBtn;
 
 
 	// tab-widget with all children

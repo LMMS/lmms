@@ -360,7 +360,7 @@ Mixer::Mixer() :
 
 	m_workingBuf = (sampleFrame*) aligned_malloc( m_framesPerPeriod *
 							sizeof( sampleFrame ) );
-	for( Uint8 i = 0; i < 3; i++ )
+	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = (surroundSampleFrame*)
 			aligned_malloc( m_framesPerPeriod *
@@ -412,7 +412,7 @@ Mixer::~Mixer()
 	delete m_audioDev;
 	delete m_midiClient;
 
-	for( Uint8 i = 0; i < 3; i++ )
+	for( int i = 0; i < 3; i++ )
 	{
 		aligned_free( m_bufferPool[i] );
 	}
@@ -1008,20 +1008,6 @@ AudioDevice * Mixer::tryAudioDevices()
 #endif
 
 
-#ifdef LMMS_HAVE_PORTAUDIO
-	if( dev_name == AudioPortAudio::name() || dev_name == "" )
-	{
-		dev = new AudioPortAudio( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioPortAudio::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
 #ifdef LMMS_HAVE_PULSEAUDIO
 	if( dev_name == AudioPulseAudio::name() || dev_name == "" )
 	{
@@ -1076,6 +1062,21 @@ AudioDevice * Mixer::tryAudioDevices()
 		delete dev;
 	}
 #endif
+
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	if( dev_name == AudioPortAudio::name() || dev_name == "" )
+	{
+		dev = new AudioPortAudio( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioPortAudio::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
 
 	// add more device-classes here...
 	//dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful, this );

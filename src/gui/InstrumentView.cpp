@@ -1,7 +1,7 @@
 /*
  * InstrumentView.cpp - base-class for views of all Instruments
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -21,6 +21,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
+#include <QtGui/QIcon>
 
 #include "InstrumentView.h"
 #include "embed.h"
@@ -56,10 +58,8 @@ void InstrumentView::setModel( Model * _model, bool )
 	if( dynamic_cast<Instrument *>( _model ) != NULL )
 	{
 		ModelView::setModel( _model );
-		instrumentTrackWindow()->setWindowIcon(
-				model()->descriptor()->logo->pixmap() );
-		connect( model(), SIGNAL( destroyed( QObject * ) ),
-					this, SLOT( close() ) );
+		instrumentTrackWindow()->setWindowIcon( model()->descriptor()->logo->pixmap() );
+		connect( model(), SIGNAL( destroyed( QObject * ) ), this, SLOT( close() ) );
 	}
 }
 

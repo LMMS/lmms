@@ -69,7 +69,7 @@ private:
 	QScrollArea * m_scrollArea;
 	QPushButton * m_addButton;
 	
-	Uint32 m_lastY;
+	int m_lastY;
 
 } ;
 

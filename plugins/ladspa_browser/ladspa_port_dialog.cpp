@@ -46,7 +46,7 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 	vlayout->setSpacing( 0 );
 	vlayout->setMargin( 0 );
 
-	Uint16 pc = manager->getPortCount( _key );
+	int pc = manager->getPortCount( _key );
 
 	QTableWidget * settings = new QTableWidget( pc, 7, this );
 
@@ -60,31 +60,23 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 	ports.append( tr( "SR Dependent" ) );
 	settings->setHorizontalHeaderLabels( ports );
 
-	for( Uint16 row = 0; row < pc; row++ )
+	for( int row = 0; row < pc; row++ )
 	{
-		for( Uint8 col = 0; col < 7; ++col )
+		for( int col = 0; col < 7; ++col )
 		{
 			QTableWidgetItem * item = new QTableWidgetItem;
 			item->setFlags( 0 );
 			settings->setItem( row, col, item );
 		}
 
-		Uint8 col = 0;
-		settings->item( row, col++ )->setText( manager->getPortName(
-								_key, row ) );
+		int col = 0;
+		settings->item( row, col++ )->setText( manager->getPortName( _key, row ) );
 
-		settings->item( row, col++ )->setText(
-			manager->isPortAudio( _key, row ) ?
-					tr( "Audio" ) : tr( "Control" ) );
+		settings->item( row, col++ )->setText( manager->isPortAudio( _key, row ) ?  tr( "Audio" ) : tr( "Control" ) );
 
-		settings->item( row, col++ )->setText(
-			manager->isPortInput( _key, row ) ?
-					tr( "Input" ) : tr( "Output" ) );
+		settings->item( row, col++ )->setText( manager->isPortInput( _key, row ) ?  tr( "Input" ) : tr( "Output" ) );
 
-		settings->item( row, col++ )->setText(
-			manager->isPortToggled( _key, row ) ? tr( "Toggled" ) :
-			manager->isInteger( _key, row ) ? tr( "Integer" ) :
-								tr( "Float" ) );
+		settings->item( row, col++ )->setText( manager->isPortToggled( _key, row ) ? tr( "Toggled" ) : manager->isInteger( _key, row ) ? tr( "Integer" ) : tr( "Float" ) );
 
 		float min = manager->getLowerBound( _key, row );
 		float max = manager->getUpperBound( _key, row );

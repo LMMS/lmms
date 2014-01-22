@@ -233,7 +233,6 @@ private:
 
 
 	private:
-		DetuningHelper * m_detuning;
 		float m_value;
 
 	} ;

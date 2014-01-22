@@ -1,7 +1,7 @@
 /*
  * LadspaControls.h - model for LADSPA plugin controls
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -62,7 +62,7 @@ public:
 
 protected slots:
 	void updateLinkStatesFromGlobal();
-	void linkPort( Uint16 _port, bool _state );
+	void linkPort( int _port, bool _state );
 
 
 private:

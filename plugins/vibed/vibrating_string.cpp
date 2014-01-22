@@ -34,9 +34,9 @@ vibratingString::vibratingString(	float _pitch,
 					float _pick,
 					float _pickup,
 					float * _impulse, 
-					Uint32 _len,
+					int _len,
 					sample_rate_t _sample_rate,
-					Uint8 _oversample,
+					int _oversample,
 					float _randomize,
 					float _string_loss,
 					float _detune,
@@ -64,7 +64,7 @@ vibratingString::vibratingString(	float _pitch,
 	else
  	{
 		m_impulse = new float[_len];
-		for( Uint32 i = 0; i < _len; i++ )
+		for( int i = 0; i < _len; i++ )
 		{
 			m_impulse[i] = _impulse[i];
 		}

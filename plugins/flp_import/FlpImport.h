@@ -69,7 +69,7 @@ private:
 		return( value );
 	}
 
-	inline Sint32 read32LE()
+	inline int32_t read32LE()
 	{
 		int value = readByte();
 		value |= readByte() << 8;
@@ -77,14 +77,14 @@ private:
 		value |= readByte() << 24;
 		return( value );
 	}
-	inline Sint32 read16LE()
+	inline int32_t read16LE()
 	{
 		int value = readByte();
 		value |= readByte() << 8;
 		return( value );
 	}
 
-	inline Sint32 readID()
+	inline int32_t readID()
 	{
 		return( read32LE() );
 	}

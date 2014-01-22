@@ -1,7 +1,7 @@
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -113,7 +113,7 @@ void bbTCO::loadSettings( const QDomElement & _this )
 
 trackContentObjectView * bbTCO::createView( trackView * _tv )
 {
-	return( new bbTCOView( this, _tv ) );
+	return new bbTCOView( this, _tv );
 }
 
 
@@ -342,27 +342,24 @@ bbTrack::~bbTrack()
 
 // play _frames frames of given TCO within starting with _start
 bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
-				const f_cnt_t _offset, Sint16 _tco_num )
+					const f_cnt_t _offset, int _tco_num )
 {
 	if( isMuted() )
 	{
-		return( false );
+		return false;
 	}
 
 	if( _tco_num >= 0 )
 	{
-		return( engine::getBBTrackContainer()->play( _start, _frames,
-							_offset,
-							s_infoMap[this] ) );
+		return engine::getBBTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
 	}
 
 	tcoVector tcos;
-	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames /
-						engine::framesPerTick() ) );
+	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames / engine::framesPerTick() ) );
 
 	if( tcos.size() == 0 )
 	{
-		return( false );
+		return false;
 	}
 
 	midiTime lastPosition;
@@ -379,13 +376,9 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 
 	if( _start - lastPosition < lastLen )
 	{
-		return( engine::getBBTrackContainer()->play( _start -
-								lastPosition,
-							_frames,
-							_offset,
-							s_infoMap[this] ) );
+		return engine::getBBTrackContainer()->play( _start - lastPosition, _frames, _offset, s_infoMap[this] );
 	}
-	return( false );
+	return false;
 }
 
 
@@ -408,11 +401,10 @@ trackContentObject * bbTrack::createTCO( const midiTime & _pos )
 	getTCOsInRange( tcos, 0, _pos );
 	if( tcos.size() > 0 && dynamic_cast<bbTCO *>( tcos.back() ) != NULL )
 	{
-		return( new bbTCO( this, 
-			dynamic_cast<bbTCO *>( tcos.back() )->color() ) );
+		return new bbTCO( this, dynamic_cast<bbTCO *>( tcos.back() )->color() );
 		
 	}
-	return( new bbTCO( this ) );
+	return new bbTCO( this );
 }
 
 
@@ -497,10 +489,10 @@ bbTrack * bbTrack::findBBTrack( int _bb_num )
 	{
 		if( it.value() == _bb_num )
 		{
-			return( it.key() );
+			return it.key();
 		}
 	}
-	return( NULL );
+	return NULL;
 }
 
 
@@ -510,9 +502,9 @@ int bbTrack::numOfBBTrack( track * _track )
 {
 	if( dynamic_cast<bbTrack *>( _track ) != NULL )
 	{
-		return( s_infoMap[dynamic_cast<bbTrack *>( _track )] );
+		return s_infoMap[dynamic_cast<bbTrack *>( _track )];
 	}
-	return( 0 );
+	return 0;
 }
 
 
@@ -571,7 +563,7 @@ bbTrackView::~bbTrackView()
 bool bbTrackView::close()
 {
 	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
-	return( trackView::close() );
+	return trackView::close();
 }
 
 

@@ -844,10 +844,9 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 			( (float)( PanningRight - _n->getPanning() ) ) / 
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	const QColor defaultNoteColor( 0x00, 0xAA, 0x00 );
+	const QColor defaultNoteColor( 0x4A, 0xFD, 0x85 );
 	QColor col = defaultNoteColor;
 	
-	col = QColor( 0x00, 0xAA, 0x00 );
 	if( _n->length() < 0 )
 	{
 		//step note
@@ -915,7 +914,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 								int _y )
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
-	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+	_p.setPen( QColor( 0x99, 0xAF, 0xFF ) );
 
 	int old_x = 0;
 	int old_y = 0;
@@ -923,7 +922,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
-		Sint32 pos_ticks = it.key();
+		int pos_ticks = it.key();
 		if( pos_ticks > _n->length() )
 		{
 			break;
@@ -1969,7 +1968,7 @@ void pianoRoll::computeSelectedNotes(bool shift)
 				( *it )->setSelected( false );
 			}
 			
-			Sint32 len_ticks = ( *it )->length();
+			int len_ticks = ( *it )->length();
 
 			if( len_ticks == 0 )
 			{
@@ -1982,7 +1981,7 @@ void pianoRoll::computeSelectedNotes(bool shift)
 
 			const int key = ( *it )->key() - m_startKey + 1;
 
-			Sint32 pos_ticks = ( *it )->pos();
+			int pos_ticks = ( *it )->pos();
 
 			// if the selection even barely overlaps the note
 			if( key > sel_key_start &&
@@ -3032,7 +3031,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		for( NoteVector::ConstIterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
-			Sint32 len_ticks = ( *it )->length();
+			int len_ticks = ( *it )->length();
 
 			if( len_ticks == 0 )
 			{
@@ -3045,7 +3044,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 			const int key = ( *it )->key() - m_startKey + 1;
 
-			Sint32 pos_ticks = ( *it )->pos();
+			int pos_ticks = ( *it )->pos();
 
 			int note_width = len_ticks * m_ppt /
 						midiTime::ticksPerTact();
@@ -3130,7 +3129,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		QFont f = p.font();
 		f.setBold( true );
 		p.setFont( pointSize<14>( f ) );
-		p.setPen( QColor( 0, 255, 0 ) );
+		p.setPen( QColor( 0x4A, 0xFD, 0x85 ) );
 		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
 				tr( "Please open a pattern by double-clicking "
 								"on it!" ) );
@@ -3523,16 +3522,15 @@ void pianoRoll::selectAll()
 	// if first_time = true, we HAVE to set the vars for select
 	bool first_time = true;
 
-	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
-									++it )
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
 	{
-		Uint32 len_ticks = ( *it )->length();
+		int len_ticks = ( *it )->length();
 
 		if( len_ticks > 0 )
 		{
 			const int key = ( *it )->key();
 
-			Uint32 pos_ticks = ( *it )->pos();
+			int pos_ticks = ( *it )->pos();
 			if( key <= m_selectStartKey || first_time )
 			{
 				// if we move start-key down, we have to add 

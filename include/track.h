@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> necessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -64,8 +64,8 @@ const int TRACK_OP_WIDTH_COMPACT = 60;
  * Tracks can be resized by shift-dragging anywhere inside the track
  * display.  This sets the minimum size in pixels for a track.
  */
-const Uint16 MINIMAL_TRACK_HEIGHT = 8;
-const Uint16 DEFAULT_TRACK_HEIGHT = 32;
+const int MINIMAL_TRACK_HEIGHT = 8;
+const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 1;
 
@@ -74,6 +74,7 @@ class trackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
+	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	trackContentObject( track * _track );
 	virtual ~trackContentObject();
@@ -154,6 +155,7 @@ private:
 	midiTime m_length;
 
 	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 
 
 	friend class trackContentObjectView;
@@ -224,7 +226,7 @@ private:
 	trackView * m_trackView;
 	Actions m_action;
 	bool m_autoResize;
-	Sint16 m_initialMouseX;
+	int m_initialMouseX;
 
 	textFloat * m_hint;
 
@@ -349,6 +351,7 @@ class EXPORT track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
+	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	typedef QVector<trackContentObject *> tcoVector;
 
@@ -380,8 +383,7 @@ public:
 	}
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
-				const f_cnt_t _frame_base,
-						Sint16 _tco_num = -1 ) = 0;
+						const f_cnt_t _frame_base, int _tco_num = -1 ) = 0;
 
 
 	virtual trackView * createView( TrackContainerView * _view ) = 0;

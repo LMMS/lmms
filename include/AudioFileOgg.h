@@ -2,7 +2,7 @@
  * AudioFileOgg.h - Audio-device which encodes wave-stream and writes it
  *                  into an OGG-file. This is used for song-export.
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -75,7 +75,7 @@ private:
 
 	bool startEncoding();
 	void finishEncoding();
-	inline Sint32 writePage();
+	inline int writePage();
 
 
 	bool m_ok;
@@ -86,7 +86,7 @@ private:
 	bitrate_t m_minBitrate;
 	bitrate_t m_maxBitrate;
 
-	Uint32 m_serialNo;
+	uint32_t m_serialNo;
 
 	vorbis_comment * m_comments;
 

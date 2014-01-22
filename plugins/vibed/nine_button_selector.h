@@ -51,17 +51,17 @@ public:
 				QPixmap _button7_off,
 				QPixmap _button8_on,
 				QPixmap _button8_off,
-				Uint8 _default,
-				Uint32 _x, Uint32 _y,
+				int _default,
+				int _x, int _y,
 				QWidget * _parent);
 	virtual ~nineButtonSelector();
 	
-//	inline Uint8 getSelected() { 
+//	inline int getSelected() { 
 //		return( castModel<nineButtonSelectorModel>()->value() );
 //	};
 
 protected:
-	void setSelected( Uint8 _new_button );
+	void setSelected( int _new_button );
 	
 public slots:
 	void button0Clicked();
@@ -77,11 +77,11 @@ public slots:
 	void displayHelp();
 	
 signals:
-	void nineButtonSelection( Uint8 );
+	void nineButtonSelection( int );
 	
 private:
 	virtual void modelChanged();
-	void updateButton( Uint8 );
+	void updateButton( int );
 
 	QList<pixmapButton *> m_buttons;
 	pixmapButton * m_button;

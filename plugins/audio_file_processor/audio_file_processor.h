@@ -56,11 +56,11 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual Uint32 getBeatLen( notePlayHandle * _n ) const;
+	virtual int getBeatLen( notePlayHandle * _n ) const;
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
-		return( 128 );
+		return 128;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );

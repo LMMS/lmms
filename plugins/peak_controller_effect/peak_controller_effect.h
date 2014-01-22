@@ -55,6 +55,7 @@ private:
 
 	float m_lastSample;
 	float m_lastRMS;
+	bool m_lastRMSavail;
 
 	Controller * m_autoController;
 

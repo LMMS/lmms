@@ -1,7 +1,7 @@
 /*
  * MidiAlsaSeq.cpp - ALSA sequencer client
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -174,8 +174,7 @@ void MidiAlsaSeq::processOutEvent( const midiEvent & _me,
 	snd_seq_ev_set_source( &ev, ( m_portIDs[p][1] != -1 ) ?
 					m_portIDs[p][1] : m_portIDs[p][0] );
 	snd_seq_ev_set_subs( &ev );
-	snd_seq_ev_schedule_tick( &ev, m_queueID, 1,
-						static_cast<Sint32>( _time ) );
+	snd_seq_ev_schedule_tick( &ev, m_queueID, 1, static_cast<int>( _time ) );
 	ev.queue =  m_queueID;
 	switch( _me.m_type )
 	{

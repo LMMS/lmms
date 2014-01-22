@@ -1,7 +1,7 @@
 /*
  * VstEffectControls.cpp - controls for VST effect plugins
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -88,7 +88,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 			knobFModel[i]->loadSettings( _this, paramStr );
 
 			if( !( knobFModel[ i ]->isAutomated() ||
-						knobFModel[ i ]->getControllerConnection() ) )
+						knobFModel[ i ]->controllerConnection() ) )
 			{
 				knobFModel[ i ]->setValue( (s_dumpValues.at( 2 ) ).toFloat() );
 				knobFModel[ i ]->setInitValue( (s_dumpValues.at( 2 ) ).toFloat() );
@@ -133,7 +133,7 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			char paramStr[35];
 			for( int i = 0; i < paramCount; i++ )
 			{
-				if (knobFModel[i]->isAutomated() || knobFModel[i]->getControllerConnection()) {
+				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
 					sprintf( paramStr, "param%d", i);
 					knobFModel[i]->saveSettings( _doc, _this, paramStr );
 				}
@@ -443,7 +443,7 @@ void manageVSTEffectView::syncPlugin( void )
 		// only not automated knobs are synced from VST
 		// those auto-setted values are not jurnaled, tracked for undo / redo
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
-					m_vi2->knobFModel[ i ]->getControllerConnection() ) )
+					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
 			sprintf( paramStr, "param%d", i );
     			s_dumpValues = dump[ paramStr ].split( ":" );
@@ -464,7 +464,7 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 	{
 
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
-					m_vi2->knobFModel[ i ]->getControllerConnection() ) )
+					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
 			if( m_vi2->vstKnobs[ i ]->isVisible() == true  && isAuto )
 			{

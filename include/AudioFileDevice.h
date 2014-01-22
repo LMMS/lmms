@@ -2,7 +2,7 @@
  * AudioFileDevice.h - base-class for audio-device-classes which write 
  *                     their output into a file
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,7 +51,7 @@ public:
 
 
 protected:
-	Sint32 writeData( const void * _data, Sint32 _len );
+	int writeData( const void* data, int len );
 
 	inline bool useVBR() const
 	{

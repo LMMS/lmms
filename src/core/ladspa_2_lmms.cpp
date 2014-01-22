@@ -111,8 +111,8 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 	}
 	if( name.length() > 40 )
 	{
-		Uint8 i = 40;
-		while( name[i] != ' ' && i != 0 )
+		int i = 40;
+		while( name[i] != ' ' && i > 0 )
 		{
 			i--;
 		}
@@ -123,6 +123,6 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 		name = "LADSPA Plugin";
 	}
 	
-	return( name );	
+	return name;
 }
 

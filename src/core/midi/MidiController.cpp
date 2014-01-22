@@ -76,7 +76,7 @@ void MidiController::updateName()
 void MidiController::processInEvent( const midiEvent & _me,
 						const midiTime & _time )
 {
-	Uint8 controllerNum;
+	unsigned char controllerNum;
 	switch( _me.m_type )
 	{
 		case MidiControlChange:
@@ -86,7 +86,7 @@ void MidiController::processInEvent( const midiEvent & _me,
 					( m_midiPort.inputChannel() == _me.m_channel + 1 ||
 					  m_midiPort.inputChannel() == 0 ) )
 			{
-				Uint8 val = _me.m_data.m_bytes[2] & 0x7F;
+				unsigned char val = _me.m_data.m_bytes[2] & 0x7F;
 				m_lastValue = (float)( val ) / 127.0f;
 				emit valueChanged();
 			}
