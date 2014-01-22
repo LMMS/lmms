@@ -373,7 +373,7 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	}
 	if( m_tco->isRecord() )
 	{
-		p.setFont( pointSize<6>( p.font() ) );
+		p.setFont( pointSize<7>( p.font() ) );
 		p.setPen( QColor( 224, 0, 0 ) );
 		p.drawText( 9, p.fontMetrics().height() - 1, "Rec" );
 		p.setBrush( QBrush( QColor( 224, 0, 0 ) ) );
@@ -526,11 +526,11 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	if( configManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
-		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT-2*24, 4 );
+		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT-2*24, 2 );
 	}
 	else
 	{
-		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 4 );
+		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 2 );
 	}
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();

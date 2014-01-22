@@ -443,7 +443,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_clientName->setGeometry( 10, 20, 160, 20 );
 
 	QLabel * cn_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
-	cn_lbl->setFont( pointSize<6>( cn_lbl->font() ) );
+	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
 	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );	

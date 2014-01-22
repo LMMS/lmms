@@ -1,7 +1,7 @@
 /*
  * tab_widget.cpp - tabwidget for LMMS
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,7 +39,7 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	m_activeTab( 0 ),
 	m_caption( _caption )
 {
-	setFont( pointSize<7>( font() ) );
+	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
@@ -62,7 +62,7 @@ tabWidget::~tabWidget()
 
 void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 {
-	setFont( pointSize<7>( font() ) );
+	setFont( pointSize<8>( font() ) );
 	widgetDesc d = { _w, _name, fontMetrics().width( _name ) + 10 } ;
 	if( _idx < 0/* || m_widgets.contains( _idx ) == true*/ )
 	{
@@ -72,7 +72,7 @@ void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 	}
 	m_widgets[_idx] = d;
 	_w->setFixedSize( width() - 4, height() - 14 );
-	_w->move( 2, 12 );
+	_w->move( 2, 13 );
 	_w->hide();
 
 	if( m_widgets.contains( m_activeTab ) )
@@ -144,7 +144,7 @@ void tabWidget::resizeEvent( QResizeEvent * )
 
 void tabWidget::paintEvent( QPaintEvent * _pe )
 {
-	setFont( pointSize<7>( font() ) );
+	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
 
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
@@ -168,13 +168,13 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
-	p.fillRect( 2, 2, width() - 4, 9 + add, g );
-	p.drawLine( 2, 11 + add, width() - 3, 11 + add );
+	p.fillRect( 2, 2, width() - 4, 10 + add, g );
+	p.drawLine( 2, 12 + add, width() - 3, 12 + add );
 
 	if( !big_tab_captions )
 	{
 		p.setPen( QColor( 255, 255, 255 ) );
-		p.drawText( 5, 10, m_caption );
+		p.drawText( 5, 11, m_caption );
 	}
 
 	int cx = ( big_tab_captions ? 4 : 14 ) +
@@ -183,12 +183,12 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 	QColor cap_col( 160, 160, 160 );
 	if( big_tab_captions )
 	{
-		p.setFont( pointSize<7>( p.font() ) );
+		p.setFont( pointSize<8>( p.font() ) );
 		cap_col = QColor( 224, 224, 224 );
 	}
 	else
 	{
-		p.setFont( pointSize<6>( p.font() ) );
+		p.setFont( pointSize<7>( p.font() ) );
 	}
 	p.setPen( cap_col );
 
@@ -199,9 +199,9 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 		if( it.key() == m_activeTab )
 		{
 			p.setPen( QColor( 32, 48, 64 ) );
-			p.fillRect( cx, 2, ( *it ).nwidth - 6, 9, cap_col );
+			p.fillRect( cx, 2, ( *it ).nwidth - 6, 10, cap_col );
 		}
-		p.drawText( cx + 3, 9 + add, ( *it ).name );
+		p.drawText( cx + 3, 10 + add, ( *it ).name );
 		p.setPen( cap_col );
 		cx += ( *it ).nwidth;
 	}

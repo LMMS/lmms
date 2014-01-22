@@ -49,6 +49,11 @@ public:
 		return m_led;
 	}
 
+	int titleBarHeight() const
+	{
+		return m_titleBarHeight;
+	}
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -60,6 +65,7 @@ private:
 
 	pixmapButton * m_led;
 	QString m_caption;
+	const int m_titleBarHeight;
 
 } ;
 

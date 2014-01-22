@@ -106,8 +106,7 @@ void knob::setLabel( const QString & _txt )
 	if( m_knobPixmap )
 	{
 		setFixedSize( qMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSizeF( font(), 6
-							) ).width( m_label ) ),
+					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
 						m_knobPixmap->height() + 10 );
 	}
 	update();
@@ -529,7 +528,7 @@ void knob::paintEvent( QPaintEvent * _me )
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6 ) );
+		p.setFont( pointSizeF( p.font(), 6.5 ) );
 /*		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( width() / 2 -
 			p.fontMetrics().width( m_label ) / 2 + 1,

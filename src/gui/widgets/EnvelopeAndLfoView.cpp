@@ -274,7 +274,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 
 
 	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
-	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
+	m_x100Cb->setFont( pointSizeF( m_x100Cb->font(), 6.5 ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 	m_x100Cb->setWhatsThis(
 		tr( "Click here if the frequency of this LFO should be "
@@ -285,8 +285,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
 			this );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
-	m_controlEnvAmountCb->setFont( pointSize<6>(
-					m_controlEnvAmountCb->font() ) );
+	m_controlEnvAmountCb->setFont( pointSizeF( m_controlEnvAmountCb->font(), 6.5 ) );
 	m_controlEnvAmountCb ->setWhatsThis(
 		tr( "Click here to make the envelope-amount controlled by this "
 								"LFO." ) );
@@ -406,9 +405,6 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 	p.setRenderHint( QPainter::Antialiasing );
-
-	// set smaller font
-	p.setFont( pointSize<6>( p.font() ) );
 
 	// draw envelope-graph
 	p.drawPixmap( ENV_GRAPH_X, ENV_GRAPH_Y, *s_envGraph );

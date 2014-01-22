@@ -959,7 +959,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
-	m_volumeKnob->move( widgetWidth-2*24, 4 );
+	m_volumeKnob->move( widgetWidth-2*24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
@@ -968,7 +968,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
-	m_panningKnob->move( widgetWidth-24, 4 );
+	m_panningKnob->move( widgetWidth-24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
@@ -1278,7 +1278,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont( pointSize<8>( m_nameLineEdit->font() ) );
+	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( textChanged( const QString & ) ) );
 

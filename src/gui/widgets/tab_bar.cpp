@@ -1,7 +1,7 @@
 /*
  * tab_bar.cpp - implementation of tab-bar
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -96,7 +96,7 @@ tabButton * tabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	// widgets have the same size and only the one on the top is visible
 	_w->setFixedSize( _w->parentWidget()->size() );
 
-	b->setFont( pointSize<7>( b->font() ) );
+	b->setFont( pointSize<8>( b->font() ) );
 
 	return( b );
 }
