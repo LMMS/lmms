@@ -1321,7 +1321,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
-	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
+	m_effectChannelNumber->setLabel( tr( "FX" ) );
 
 	basicControlsLayout->addWidget( m_effectChannelNumber );
 
