@@ -28,7 +28,6 @@
 #include <QtCore/QQueue>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
-#include <QtGui/QFileDialog>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QLineEdit>
@@ -38,6 +37,7 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 
+#include "FileDialog.h"
 #include "InstrumentTrack.h"
 #include "AudioPort.h"
 #include "AutomationPattern.h"
@@ -1462,7 +1462,7 @@ void InstrumentTrackWindow::modelChanged()
 
 void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
-	QFileDialog sfd( this, tr( "Save preset" ), "",
+	FileDialog sfd( this, tr( "Save preset" ), "",
 				tr( "XML preset file (*.xpf)" ) );
 
 	QString preset_root = configManager::inst()->userPresetsDir();
@@ -1475,9 +1475,9 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		QDir( preset_root ).mkdir( m_track->instrumentName() );
 	}
 
-	sfd.setAcceptMode( QFileDialog::AcceptSave );
+	sfd.setAcceptMode( FileDialog::AcceptSave );
 	sfd.setDirectory( preset_root + m_track->instrumentName() );
-	sfd.setFileMode( QFileDialog::AnyFile );
+	sfd.setFileMode( FileDialog::AnyFile );
 	if( sfd.exec () == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != ""
 	)

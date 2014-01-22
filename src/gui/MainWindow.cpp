@@ -689,7 +689,7 @@ void MainWindow::openProject( void )
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
 
 		ofd.setDirectory( configManager::inst()->userProjectsDir() );
-		ofd.setFileMode( QFileDialog::ExistingFiles );
+		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
@@ -764,7 +764,7 @@ bool MainWindow::saveProjectAs( void )
 		sfd.setDirectory( configManager::inst()->userProjectsDir() );
 	}
 
-	if( sfd.exec () == QFileDialog::Accepted &&
+	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		engine::getSong()->guiSaveProjectAs(
