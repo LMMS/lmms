@@ -95,10 +95,9 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 
 
 	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox );
-	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
+	m_filterCutKnob->setLabel( tr( "FREQ" ) );
 	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
-								tr( "Hz" ) );
+	m_filterCutKnob->setHintText( tr( "cutoff frequency:" ) + " ", " " + tr( "Hz" ) );
 	m_filterCutKnob->setWhatsThis(
 		tr( "Use this knob for setting the cutoff frequency for the "
 			"selected filter. The cutoff frequency specifies the "
