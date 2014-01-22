@@ -68,7 +68,6 @@ private:
 	BoolModel m_muteModel;
 	BoolModel m_absModel;
 	FloatModel m_amountMultModel;
-	BoolModel m_muteOutputModel;
 
 	friend class PeakControllerEffectControlDialog;
 	friend class PeakControllerEffect;
