@@ -186,7 +186,7 @@ get_table_gain(int mode, LADSPA_Data level) {
 	LADSPA_Data y1 = -80.0f;
 	LADSPA_Data x2 = 0.0f;
 	LADSPA_Data y2 = 0.0f;
-	int i = 0;
+	unsigned int i = 0;
 
 	if (level <= -80.0f)
 		return get_table_gain(mode, -79.9f);

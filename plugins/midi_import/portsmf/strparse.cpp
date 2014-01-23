@@ -51,7 +51,7 @@ void String_parse::get_nonspace_quoted(string &field)
 char *escape_chars[] = { (char *) "\\n", (char *)"\\t", (char *)"\\\\", (char *)"\\r", (char *) "\\\""};
 
 
-void string_escape(string &result, char *str, char *quote)
+void string_escape(string &result, char *str, const char *quote)
 {
     int length = (int) strlen(str);
     if (quote[0]) {

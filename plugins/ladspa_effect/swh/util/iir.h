@@ -133,7 +133,7 @@ static inline void butterworth_stage(iir_stage_t *gt, int mode, float f, float r
 
 /* process function */
 static inline void iir_process_buffer(iirf_t* iirf, iir_stage_t* gt, const float *indata, float *outdata, const long numSampsToProcess, int add) {
-	unsigned long pos;
+	long pos;
 	int i,nb,nt,j,z,ipos,opos;
 
 	if(gt->nstages==0) {
@@ -223,7 +223,7 @@ static inline void iir_process_buffer(iirf_t* iirf, iir_stage_t* gt, const float
 /* process function for 3a and 2b coeffs */
 static inline void iir_process_buffer_1s_5(iirf_t* iirf, iir_stage_t* gt, const float *indata, 
 					   float *outdata, const long numSampsToProcess, int add) {
-	unsigned long pos;	
+	long pos;
 
 	if (add==0) 
 		for(pos=0; pos<numSampsToProcess; pos++) {
@@ -260,7 +260,7 @@ static inline void iir_process_buffer_1s_5(iirf_t* iirf, iir_stage_t* gt, const 
 
 /* process function */
 static inline void iir_process_buffer_ns_5(iirf_t* iirf, iir_stage_t* gt, const float *indata, float *outdata, const long numSampsToProcess, int add) {
-	unsigned long pos;
+	long pos;
 	int i;
 
 	if (add==0) 

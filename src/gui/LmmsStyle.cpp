@@ -195,26 +195,6 @@ void drawPath( QPainter *p, const QPainterPath &path,
 }
 
 
-
-static QString getCacheKey( const QString & _key,
-		const QStyleOption * _option, const QSize & _size )
-{
-	QString tmp;
-	const QStyleOptionComplex *complexOption =
-			qstyleoption_cast<const QStyleOptionComplex *> ( _option );
-	tmp.sprintf( "%s,%d,%d,%d,%lld,%dx%d",
-			_key.toLatin1().constData(),
-			uint( _option->state ),
-			complexOption ? uint( complexOption->activeSubControls ) : uint( 0 ),
-			_option->direction,
-			_option->palette.cacheKey(),
-			_size.width(),
-			_size.height() );
-	return tmp;
-}
-
-
-
 LmmsStyle::LmmsStyle() :
 	QPlastiqueStyle()
 {

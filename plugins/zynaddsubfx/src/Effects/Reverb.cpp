@@ -396,7 +396,6 @@ void Reverb::settype(unsigned char Ptype)
         bandwidth = new Unison(SOUND_BUFFER_SIZE / 4 + 1, 2.0);
         bandwidth->set_size(50);
         bandwidth->set_base_frequency(1.0);
-#warning sa schimb size-ul
     }
 }
 

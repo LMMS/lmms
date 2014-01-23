@@ -192,7 +192,7 @@ void Alg_parameters::insert_atom(Alg_parameters **list, char *name, char *s)
 }
 
 
-Alg_parameters *Alg_parameters::remove_key(Alg_parameters **list, char *name)
+Alg_parameters *Alg_parameters::remove_key(Alg_parameters **list, const char *name)
 {
     while (*list) {
         if (STREQL((*list)->parm.attr_name(), name)) {

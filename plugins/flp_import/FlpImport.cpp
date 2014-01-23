@@ -224,6 +224,9 @@ enum FLP_Events
 	FLP_Text_ChanGroupName	= FLP_Text + 39,
 	FLP_Text_PlayListItems	= FLP_Text + 41,
 
+	FLP_Event_EffectParams = 225,
+	FLP_Event_PlaylistItems = 233,
+
 	FLP_CmdCount
 
 } ;
@@ -1330,7 +1333,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 			// case 216: pi[2] /= p.versionSpecificFactor
 			// case 229: pi[1] /= p.versionSpecificFactor
 
-			case 225:
+			case FLP_Event_EffectParams:
 			{
 				enum FLP_EffectParams
 				{
@@ -1361,7 +1364,7 @@ qDebug( "FX-ch: %d  param: %x  value:%x\n", ch, param, val );
 				break;
 			}
 
-			case 233:	// playlist items
+			case FLP_Event_PlaylistItems:	// playlist items
 			{
 				const int bpi = 28;
 				const int imax = text_len / bpi;

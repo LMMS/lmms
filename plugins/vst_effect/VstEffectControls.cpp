@@ -357,7 +357,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	bool isVstKnobs = true, isKnobFModel = true;
+	bool isVstKnobs = true;
 
 
 	if (m_vi->vstKnobs == NULL) {
@@ -366,7 +366,6 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	}
 	if (m_vi->knobFModel == NULL) {
 		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
-		isKnobFModel = false;
 	}
 
 	char paramStr[35];

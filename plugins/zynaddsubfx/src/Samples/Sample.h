@@ -58,7 +58,7 @@ class Sample
         const REALTYPE *c_buf() const {return buffer;}
 
         /**Change the size of the sample*/
-        void resize(unsigned int nsize);
+        void resize(int nsize);
 
         /**Appends another Sample to this Sample*/
         void append(const Sample &smp);

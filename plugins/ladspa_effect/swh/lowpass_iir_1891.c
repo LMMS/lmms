@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 9 "lowpass_iir_1891.xml"
 
 #include "config.h"
 #include "util/iir.h"
@@ -71,7 +70,6 @@ static void activateLowpass_iir(LADSPA_Handle instance) {
 	iir_stage_t*gt = plugin_data->gt;
 	iirf_t*iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
-#line 33 "lowpass_iir_1891.xml"
 	
 	gt = init_iir_stage(IIR_STAGE_LOWPASS,10,3,2);
 	iirf = init_iirf_t(gt);
@@ -84,7 +82,6 @@ static void activateLowpass_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupLowpass_iir(LADSPA_Handle instance) {
-#line 40 "lowpass_iir_1891.xml"
 	Lowpass_iir *plugin_data = (Lowpass_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);
 	free_iir_stage(plugin_data->gt);
@@ -122,7 +119,6 @@ static LADSPA_Handle instantiateLowpass_iir(
 	iirf_t*iirf = NULL;
 	long sample_rate;
 
-#line 25 "lowpass_iir_1891.xml"
 	sample_rate = s_rate;
 
 	plugin_data->gt = gt;
@@ -158,7 +154,6 @@ static void runLowpass_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 28 "lowpass_iir_1891.xml"
 	chebyshev(iirf, gt, 2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS, cutoff/(float)sample_rate, 0.5f);
 	iir_process_buffer_ns_5(iirf, gt, input, output, sample_count,RUN_ADDING);
 }
@@ -176,7 +171,6 @@ static void setRunAddingGainLowpass_iir(LADSPA_Handle instance, LADSPA_Data gain
 
 static void runAddingLowpass_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Lowpass_iir *plugin_data = (Lowpass_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Cutoff Frequency (float value) */
 	const LADSPA_Data cutoff = *(plugin_data->cutoff);
@@ -193,7 +187,6 @@ static void runAddingLowpass_iir(LADSPA_Handle instance, unsigned long sample_co
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 28 "lowpass_iir_1891.xml"
 	chebyshev(iirf, gt, 2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS, cutoff/(float)sample_rate, 0.5f);
 	iir_process_buffer_ns_5(iirf, gt, input, output, sample_count,RUN_ADDING);
 }

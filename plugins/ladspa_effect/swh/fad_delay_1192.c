@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 8 "fad_delay_1192.xml"
 
 #include "ladspa-util.h"
 
@@ -79,8 +78,7 @@ static void activateFadDelay(LADSPA_Handle instance) {
 	int last_phase = plugin_data->last_phase;
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
-#line 35 "fad_delay_1192.xml"
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < buffer_size; i++) {
 	        buffer[i] = 0;
@@ -100,7 +98,6 @@ static void activateFadDelay(LADSPA_Handle instance) {
 }
 
 static void cleanupFadDelay(LADSPA_Handle instance) {
-#line 47 "fad_delay_1192.xml"
 	FadDelay *plugin_data = (FadDelay *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -141,7 +138,6 @@ static LADSPA_Handle instantiateFadDelay(
 	float phase;
 	long sample_rate;
 
-#line 21 "fad_delay_1192.xml"
 	unsigned int min_bs;
 
 	sample_rate = s_rate;
@@ -195,8 +191,7 @@ static void runFadDelay(LADSPA_Handle instance, unsigned long sample_count) {
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 51 "fad_delay_1192.xml"
-	long int pos;
+	unsigned long int pos;
 	float increment = (float)buffer_size / ((float)sample_rate *
 	                                        f_max(fabs(delay), 0.01));
 	float lin_int, lin_inc;
@@ -267,8 +262,7 @@ static void runAddingFadDelay(LADSPA_Handle instance, unsigned long sample_count
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 51 "fad_delay_1192.xml"
-	long int pos;
+	unsigned long int pos;
 	float increment = (float)buffer_size / ((float)sample_rate *
 	                                        f_max(fabs(delay), 0.01));
 	float lin_int, lin_inc;

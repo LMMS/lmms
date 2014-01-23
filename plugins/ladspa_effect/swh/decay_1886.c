@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 10 "decay_1886.xml"
 
 #include "ladspa-util.h"
 
@@ -73,7 +72,6 @@ static void activateDecay(LADSPA_Handle instance) {
 	LADSPA_Data last_decay_time = plugin_data->last_decay_time;
 	LADSPA_Data sample_rate = plugin_data->sample_rate;
 	LADSPA_Data y = plugin_data->y;
-#line 28 "decay_1886.xml"
 	b = 0.f;
 	y = 0.f;
 	last_decay_time = 0.f;
@@ -114,13 +112,12 @@ static LADSPA_Handle instantiateDecay(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
 	Decay *plugin_data = (Decay *)malloc(sizeof(Decay));
-	LADSPA_Data b;
-	char first_time;
-	LADSPA_Data last_decay_time;
-	LADSPA_Data sample_rate;
-	LADSPA_Data y;
+	LADSPA_Data b = 0;
+	char first_time = 0;
+	LADSPA_Data last_decay_time = 0;
+	LADSPA_Data sample_rate = 0;
+	LADSPA_Data y = 0;
 
-#line 24 "decay_1886.xml"
 	sample_rate = s_rate;
 
 	plugin_data->b = b;
@@ -157,8 +154,7 @@ static void runDecay(LADSPA_Handle instance, unsigned long sample_count) {
 	LADSPA_Data sample_rate = plugin_data->sample_rate;
 	LADSPA_Data y = plugin_data->y;
 
-#line 35 "decay_1886.xml"
-	int i;
+	unsigned int i;
 
 	if (first_time) {
 	  plugin_data->last_decay_time = decay_time;
@@ -219,8 +215,7 @@ static void runAddingDecay(LADSPA_Handle instance, unsigned long sample_count) {
 	LADSPA_Data sample_rate = plugin_data->sample_rate;
 	LADSPA_Data y = plugin_data->y;
 
-#line 35 "decay_1886.xml"
-	int i;
+	unsigned int i;
 
 	if (first_time) {
 	  plugin_data->last_decay_time = decay_time;

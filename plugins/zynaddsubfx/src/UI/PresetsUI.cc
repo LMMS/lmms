@@ -263,7 +263,7 @@ void PresetsUI::rescan() {
   pastebrowse->clear();
   p->rescanforpresets();
   
-  for (int i=0;i<presetsstore.presets.size();i++){
+  for (unsigned int i=0;i<presetsstore.presets.size();i++){
      std::string name=presetsstore.presets[i].name;
      if(name.empty())
          continue;

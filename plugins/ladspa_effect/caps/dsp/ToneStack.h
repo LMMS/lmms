@@ -232,9 +232,6 @@ class ToneStackLT
 		void setparams
 			(double R1, double R2, double R3, double R4,
 							double C1, double C2, double C3) {
-				int blah[4];
-				int *bp;
-				bp = blah;
 		}
 
 		void updatecoefs (sample_t ** ports)

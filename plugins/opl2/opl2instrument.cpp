@@ -135,10 +135,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	vib_depth_mdl(false, this, tr( "Vibrato Depth" )   ),
 	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
 {
-	unsigned char defaultPreset[] = 
-		{0xa0, 0x61, 0x01, 0x00, 0x11, 0xec, 0xc5, 
-		 0x13, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
-
 	// Connect the plugin to the mixer...
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::mixer()->addPlayHandle( iph );
@@ -153,8 +149,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
 
-	//loadPatch(midi_fm_instruments[0]);
-	// loadPatch(defaultPreset);
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff

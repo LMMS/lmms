@@ -25,7 +25,6 @@
 
 using namespace std;
 
-#warning TODO Think about renaming Sample to Frame
 /**\TODO start using pointer math here as these will be Frequency called
  * functions throughout the code*/
 Sample::Sample(const Sample &smp)
@@ -114,7 +113,7 @@ inline float linearEstimate(float ya, float yb, float xt, int xa = 0, int xb = 1
     return (yb-ya) * (xt-xa)/(xb-xa) + ya;
 }
 
-void Sample::resize(unsigned int nsize)
+void Sample::resize(int nsize)
 {
     if(bufferSize == nsize)
         return;
