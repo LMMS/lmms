@@ -395,6 +395,11 @@ QTreeView {
 	alternate-background-color: #747474;
 }
 
+TrackContainerView QLabel
+{
+	background: none;
+}
+
 /* Plugins */
 
 TripleOscillatorView knob {
