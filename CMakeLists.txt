@@ -332,7 +332,7 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmms.rc.in ${CMAKE_BINARY_DIR}/lmms.rc)
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in ${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc)
 
 # set compiler flags
-SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
+SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-strict-overflow")
 SET(CMAKE_C_FLAGS "-O2 -g ${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
