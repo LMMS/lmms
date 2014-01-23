@@ -101,10 +101,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_sustainPedalPressed( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
-        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
-        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
-							this, tr( "Panning" ) ),
+	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
+	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
@@ -114,6 +112,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_chordCreator( this ),
 	m_piano( this )
 {
+	m_pitchModel.setCenterValue( 0 );
+	m_panningModel.setCenterValue( DefaultPanning );
+
 	m_baseNoteModel.setInitValue( DefaultKey );
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
