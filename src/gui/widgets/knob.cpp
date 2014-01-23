@@ -326,6 +326,12 @@ void knob::drawKnob( QPainter * _p )
 
 	const int centerAngle = angleFromValue( model()->centerValue(), model()->minValue(), model()->maxValue(), m_totalAngle );
 
+	const int arcLineWidth = 2;
+	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
+
+	p.setPen( QPen( QColor( 255, 255, 255, 70 ), 2 ) );
+	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
+
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
@@ -339,7 +345,6 @@ void knob::drawKnob( QPainter * _p )
 		{
 			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
-			p.drawArc( 1, 1, width()-1-2*1, width()-1-2*1, (90-centerAngle)*16, -16*(m_angle-centerAngle) );//45*16-16*m_angle, 45*16 );
 			break;
 		}
 		case knobDark_28:
@@ -360,7 +365,11 @@ void knob::drawKnob( QPainter * _p )
 			break;
 		}
 	}
+
+	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
+
 	p.end();
+
 	_p->drawImage( 0, 0, m_cache );
 }
 
