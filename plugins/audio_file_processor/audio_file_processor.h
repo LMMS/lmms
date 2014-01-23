@@ -74,6 +74,7 @@ private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
 	void loopPointChanged();
+	void stutterModelChanged();
 
 
 signals:
@@ -90,6 +91,9 @@ private:
 	FloatModel m_endPointModel;
 	BoolModel m_reverseModel;
 	BoolModel m_loopModel;
+	BoolModel m_stutterModel;
+
+	f_cnt_t m_nextPlayStartPoint;
 
 	friend class AudioFileProcessorView;
 
@@ -131,6 +135,7 @@ private:
 	pixmapButton * m_openAudioFileButton;
 	pixmapButton * m_reverseButton;
 	pixmapButton * m_loopButton;
+	pixmapButton * m_stutterButton;
 
 } ;
 
