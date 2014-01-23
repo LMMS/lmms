@@ -387,41 +387,17 @@ int main( int argc, char * * argv )
 		// init style and palette
 		QApplication::setStyle( new LmmsStyle() );
 
-		// init splash screen - this is a bit difficult as we have a
-		// semi-transparent splash-image therefore we first need to grab
-		// the screen, paint the splash onto it and then set a mask
-		// which covers all pixels which are not fully transparent in
-		// splash-image - otherwise we get nasty edges etc.
-		const QPixmap splash = embed::getIconPixmap( "splash" );
-    		const QPoint pt = QApplication::desktop()->
-#ifdef LMMS_BUILD_LINUX
-			availableGeometry().
-#else
-			screenGeometry().
-#endif
-					center() - splash.rect().center();
-		QPixmap pm = QPixmap::grabWindow(
-					QApplication::desktop()->winId(),
-					pt.x(), pt.y(),
-					splash.width(), splash.height() );
-		QPainter p( &pm );
-		p.drawPixmap( 0, 0, splash );
-		p.end();
-
-		QSplashScreen * ss = new QSplashScreen( pm );
-		ss->setAttribute( Qt::WA_PaintOnScreen, true );
-		ss->setMask( splash.alphaChannel().createMaskFromColor(
-							QColor( 0, 0, 0 ) ) );
-		if( !QProcess::systemEnvironment().contains( "NOSPLASH=1" ) )
-		{
-			ss->show();
-		}
+		// show splash screen
+		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
+		splashScreen.show();
+		splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
+									Qt::AlignRight | Qt::AlignBottom, Qt::white );
 		qApp->processEvents();
 
 		// init central engine which handles all components of LMMS
 		engine::init();
 
-		delete ss;
+		splashScreen.hide();
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
