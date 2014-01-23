@@ -132,6 +132,11 @@ private:
 	void setPosition( const QPoint & _p );
 	bool updateAngle();
 
+	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
+	{
+		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
+	}
+
 	inline float pageSize() const
 	{
 		return( qMax<float>( ( model()->maxValue() -
