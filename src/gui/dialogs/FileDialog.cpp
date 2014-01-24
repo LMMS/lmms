@@ -22,16 +22,13 @@
  *
  */
 
-
 #include <QtCore/QList>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QListView>
 
+#include "config_mgr.h"
 #include "FileDialog.h"
-
-
-
 
 
 FileDialog::FileDialog( QWidget *parent, const QString &caption,
@@ -51,8 +48,14 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 		downloadDir = QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ) + "/Downloads";
 	if ( downloadDir.exists() )
 		urls << QUrl::fromLocalFile( downloadDir.absolutePath() );
+
+	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::MusicLocation ) );
+	urls << QUrl::fromLocalFile( configManager::inst()->workingDir() );
+
 	setSidebarUrls(urls);
 }
+
+
 
 void FileDialog::clearSelection()
 {
