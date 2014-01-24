@@ -48,7 +48,7 @@
 
 #ifndef __ALLEGRO__
 #define __ALLEGRO__
-#include <assert.h>
+#include "debug.h"
 
 #include "lmmsconfig.h"
 
