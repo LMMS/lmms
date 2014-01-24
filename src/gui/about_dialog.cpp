@@ -79,7 +79,19 @@ aboutDialog::aboutDialog() :
 	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
 
 	licenseLabel->setPlainText( embed::getText( "COPYING" ) );
+
+	QString contText = embed::getText( "CONTRIBUTORS" );
+	if ( contText.length() >= 2 )
+	{
+		QWidget *widget = new QWidget();
+		QVBoxLayout *layout = new QVBoxLayout();
+		QTextEdit *contWidget = new QTextEdit();
+		contWidget->setReadOnly(true);
+		contWidget->setText( contText );
+
+		layout->addWidget( new QLabel( tr("Contributors ordered by number of commits:"), this ) );
+		layout->addWidget( contWidget );
+		widget->setLayout( layout );
+		tabWidget->insertTab( 2, widget, tr("Involved") );
+	}
 }
-
-
-
