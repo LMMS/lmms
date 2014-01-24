@@ -30,7 +30,6 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
 
@@ -60,6 +59,8 @@
 #include "engine.h"
 #include "interpolation.h"
 #include "templates.h"
+
+#include "FileDialog.h"
 
 
 SampleBuffer::SampleBuffer( const QString & _audio_file,
@@ -829,10 +830,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 QString SampleBuffer::openAudioFile() const
 {
-	QFileDialog ofd( NULL, tr( "Open audio file" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
+	FileDialog ofd( NULL, tr( "Open audio file" ) );
 
 	QString dir;
 	if( !m_audioFile.isEmpty() )
@@ -855,7 +853,7 @@ QString SampleBuffer::openAudioFile() const
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	// set filters
 	QStringList types;

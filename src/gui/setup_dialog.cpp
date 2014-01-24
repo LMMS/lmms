@@ -23,7 +23,6 @@
  */
 
 #include <QtGui/QComboBox>
-#include <QtGui/QFileDialog>
 #include <QtGui/QImageReader>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
@@ -46,6 +45,7 @@
 #include "tooltip.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
+#include "FileDialog.h"
 
 
 // platform-specific audio-interface-classes
@@ -1056,13 +1056,8 @@ void setupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 
 void setupDialog::openWorkingDir()
 {
-	QString new_dir = QFileDialog::getExistingDirectory( this,
-					tr( "Choose LMMS working directory" ),
-							m_workingDir
-#if QT_VERSION >= 0x040806
-							, QFileDialog::DontUseCustomDirectoryIcons
-#endif
-					 );
+	QString new_dir = FileDialog::getExistingDirectory( this,
+					tr( "Choose LMMS working directory" ), m_workingDir );
 	if( new_dir != QString::null )
 	{
 		m_wdLineEdit->setText( new_dir );
@@ -1082,7 +1077,7 @@ void setupDialog::setWorkingDir( const QString & _wd )
 
 void setupDialog::openVSTDir()
 {
-	QString new_dir = QFileDialog::getExistingDirectory( this,
+	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose your VST-plugin directory" ),
 							m_vstDir );
 	if( new_dir != QString::null )
@@ -1104,7 +1099,7 @@ void setupDialog::setVSTDir( const QString & _vd )
 
 void setupDialog::openArtworkDir()
 {
-	QString new_dir = QFileDialog::getExistingDirectory( this,
+	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose artwork-theme directory" ),
 							m_artworkDir );
 	if( new_dir != QString::null )
@@ -1126,7 +1121,7 @@ void setupDialog::setArtworkDir( const QString & _ad )
 
 void setupDialog::openFLDir()
 {
-	QString new_dir = QFileDialog::getExistingDirectory( this,
+	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose FL Studio installation directory" ),
 							m_flDir );
 	if( new_dir != QString::null )
@@ -1140,7 +1135,7 @@ void setupDialog::openFLDir()
 
 void setupDialog::openLADSPADir()
 {
-	QString new_dir = QFileDialog::getExistingDirectory( this,
+	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose LADSPA plugin directory" ),
 							m_ladDir );
 	if( new_dir != QString::null )
@@ -1163,7 +1158,7 @@ void setupDialog::openLADSPADir()
 void setupDialog::openSTKDir()
 {
 #ifdef LMMS_HAVE_STK
-	QString new_dir = QFileDialog::getExistingDirectory( this,
+	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose STK rawwave directory" ),
 							m_stkDir );
 	if( new_dir != QString::null )
@@ -1179,7 +1174,7 @@ void setupDialog::openSTKDir()
 void setupDialog::openDefaultSoundfont()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QString new_file = QFileDialog::getOpenFileName( this,
+	QString new_file = FileDialog::getOpenFileName( this,
 				tr( "Choose default SoundFont" ), m_defaultSoundfont, 
 				"SoundFont2 Files (*.sf2)" );
 	
@@ -1212,7 +1207,7 @@ void setupDialog::openBackgroundArtwork()
 	QString dir = ( m_backgroundArtwork.isEmpty() ) ?
 		m_artworkDir :
 		m_backgroundArtwork;
-	QString new_file = QFileDialog::getOpenFileName( this,
+	QString new_file = FileDialog::getOpenFileName( this,
 			tr( "Choose background artwork" ), dir, 
 			"Image Files (" + fileTypes + ")" );
 	

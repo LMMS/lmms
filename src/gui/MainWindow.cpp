@@ -28,7 +28,6 @@
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMenuBar>
@@ -62,6 +61,8 @@
 #include "ProjectJournal.h"
 #include "AutomationEditor.h"
 #include "templates.h"
+#include "FileDialog.h"
+#include "VersionedSaveDialog.h"
 
 
 
@@ -242,6 +243,10 @@ void MainWindow::finalize( void )
 					this, SLOT( saveProject() ),
 					Qt::CTRL + Qt::Key_S );
 
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as new &version" ),
+					this, SLOT( saveProjectAsNewVersion() ),
+					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
@@ -681,18 +686,15 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 
 
-
 void MainWindow::openProject( void )
 {
 	if( mayChangeProject() )
 	{
-		QFileDialog ofd( this, tr( "Open project" ), "",
+		FileDialog ofd( this, tr( "Open project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
-#if QT_VERSION >= 0x040806
-		ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
+
 		ofd.setDirectory( configManager::inst()->userProjectsDir() );
-		ofd.setFileMode( QFileDialog::ExistingFiles );
+		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
@@ -751,14 +753,9 @@ bool MainWindow::saveProject( void )
 
 bool MainWindow::saveProjectAs( void )
 {
-	QFileDialog sfd( this, tr( "Save project" ), "",
+	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
-#if QT_VERSION >= 0x040806
-	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-	sfd.setAcceptMode( QFileDialog::AcceptSave );
-	sfd.setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{
@@ -770,7 +767,7 @@ bool MainWindow::saveProjectAs( void )
 		sfd.setDirectory( configManager::inst()->userProjectsDir() );
 	}
 
-	if( sfd.exec () == QFileDialog::Accepted &&
+	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		engine::getSong()->guiSaveProjectAs(
@@ -778,6 +775,24 @@ bool MainWindow::saveProjectAs( void )
 		return( TRUE );
 	}
 	return( FALSE );
+}
+
+
+
+
+bool MainWindow::saveProjectAsNewVersion( void )
+{
+	QString fileName = engine::getSong()->projectFileName();
+	if( fileName == "" )
+	{
+		return saveProjectAs();
+	}
+	else
+	{
+		VersionedSaveDialog::changeFileNameVersion( fileName, true );
+		engine::getSong()->guiSaveProjectAs( fileName );
+		return true;
+	}
 }
 
 

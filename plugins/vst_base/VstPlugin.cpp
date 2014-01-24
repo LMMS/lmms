@@ -24,7 +24,6 @@
 
 #include "VstPlugin.h"
 
-#include <QtGui/QFileDialog>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
@@ -49,6 +48,7 @@
 #include "MainWindow.h"
 #include "song.h"
 #include "templates.h"
+#include "FileDialog.h"
 #include <QtGui/QLayout>
 
 
@@ -510,12 +510,9 @@ bool VstPlugin::processMessage( const message & _m )
 void VstPlugin::openPreset( )
 {
 
-	QFileDialog ofd( NULL, tr( "Open Preset" ), "",
+	FileDialog ofd( NULL, tr( "Open Preset" ), "",
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted &&
 					!ofd.selectedFiles().isEmpty() )
 	{
@@ -571,19 +568,16 @@ void VstPlugin::savePreset( )
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
 
-	QFileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
+	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 
-#if QT_VERSION >= 0x040806
-	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
 	if( p_name != "" ) // remember last directory
 	{
 		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
 	}
 
-	sfd.setAcceptMode( QFileDialog::AcceptSave );
-	sfd.setFileMode( QFileDialog::AnyFile );
+	sfd.setAcceptMode( FileDialog::AcceptSave );
+	sfd.setFileMode( FileDialog::AnyFile );
 	if( sfd.exec () == QDialog::Accepted &&
 				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{

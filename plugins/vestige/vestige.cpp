@@ -25,7 +25,6 @@
 #include "vestige.h"
 
 #include <QtGui/QDropEvent>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
@@ -43,6 +42,7 @@
 #include "string_pair_drag.h"
 #include "text_float.h"
 #include "tooltip.h"
+#include "FileDialog.h"
 
 #include "embed.cpp"
 
@@ -613,10 +613,7 @@ void VestigeInstrumentView::modelChanged()
 
 void VestigeInstrumentView::openPlugin()
 {
-	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
+	FileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
 	QString dir;
 	if( m_vi->m_pluginDLL != "" )
@@ -629,7 +626,7 @@ void VestigeInstrumentView::openPlugin()
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	// set filters
 	QStringList types;
