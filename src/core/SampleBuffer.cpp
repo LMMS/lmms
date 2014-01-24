@@ -894,6 +894,23 @@ QString SampleBuffer::openAudioFile() const
 }
 
 
+
+
+QString SampleBuffer::openAndSetAudioFile()
+{
+	QString fileName = this->openAudioFile();
+
+	if(!fileName.isEmpty())
+	{
+		this->setAudioFile( fileName );
+	}
+
+	return fileName;
+}
+
+
+
+
 #undef LMMS_HAVE_FLAC_STREAM_ENCODER_H	/* not yet... */
 #undef LMMS_HAVE_FLAC_STREAM_DECODER_H
 

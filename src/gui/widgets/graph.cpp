@@ -482,6 +482,25 @@ void graphModel::setWaveToNoise()
 	emit samplesChanged( 0, length() - 1 );
 };
 
+QString graphModel::setWaveToUser()
+{
+	SampleBuffer * sampleBuffer = new SampleBuffer;
+	QString fileName = sampleBuffer->openAndSetAudioFile();
+	if( fileName.isEmpty() == false )
+	{
+		for( int i = 0; i < length(); i++ )
+		{
+			m_samples[i] = sampleBuffer->userWaveSample(
+					i / static_cast<float>( length() ) );
+		}
+	}
+
+	sharedObject::unref( sampleBuffer );
+
+	emit samplesChanged( 0, length() - 1 );
+	return fileName;
+};
+
 
 
 void graphModel::smooth()
