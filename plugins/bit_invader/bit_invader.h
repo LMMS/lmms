@@ -99,7 +99,7 @@ private:
 	BoolModel m_interpolation;
 	BoolModel m_normalize;
 	
-	float normalizeFactor;
+	float m_normalizeFactor;
 	
 	oscillator * m_osc;
 
@@ -136,13 +136,13 @@ private:
 	virtual void modelChanged();
 
 	knob * m_sampleLengthKnob;
-	pixmapButton * sinWaveBtn;
-	pixmapButton * triangleWaveBtn;
-	pixmapButton * sqrWaveBtn;
-	pixmapButton * sawWaveBtn;
-	pixmapButton * whiteNoiseWaveBtn;
-	pixmapButton * smoothBtn;
-	pixmapButton * usrWaveBtn;
+	pixmapButton * m_sinWaveBtn;
+	pixmapButton * m_triangleWaveBtn;
+	pixmapButton * m_sqrWaveBtn;
+	pixmapButton * m_sawWaveBtn;
+	pixmapButton * m_whiteNoiseWaveBtn;
+	pixmapButton * m_smoothBtn;
+	pixmapButton * m_usrWaveBtn;
 
 	static QPixmap * s_artwork;
 

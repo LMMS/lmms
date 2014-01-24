@@ -172,7 +172,8 @@ public:
 		return m_data;
 	}
 
-	QString openAudioFile() const;
+    QString openAudioFile() const;
+    QString openAndSetAudioFile();
 
 	QString & toBase64( QString & _dst ) const;
 

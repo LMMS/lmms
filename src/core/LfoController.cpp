@@ -49,7 +49,8 @@ LfoController::LfoController( Model * _parent ) :
 	m_duration( 1000 ),
 	m_phaseCorrection( 0 ),
 	m_phaseOffset( 0 ),
-	m_sampleFunction( &Oscillator::sinSample )
+	m_sampleFunction( &Oscillator::sinSample ),
+	m_userDefSampleBuffer( new SampleBuffer )
 {
 
 	connect( &m_waveModel, SIGNAL( dataChanged() ),
@@ -61,6 +62,7 @@ LfoController::LfoController( Model * _parent ) :
 
 LfoController::~LfoController()
 {
+	sharedObject::unref( m_userDefSampleBuffer );
 	m_baseModel.disconnect( this );
 	m_speedModel.disconnect( this );
 	m_amountModel.disconnect( this );
@@ -164,7 +166,9 @@ float LfoController::value( int _offset )
 
 	// 44100 frames/sec
 	return m_baseModel.value() + ( m_amountModel.value() * 
-			m_sampleFunction(sampleFrame) 
+				( m_sampleFunction != NULL ?
+					m_sampleFunction(sampleFrame):
+					m_userDefSampleBuffer->userWaveSample(sampleFrame) )
 			/ 2.0f );
 }
 
@@ -195,6 +199,14 @@ void LfoController::updateSampleFunction()
 			break;
 		case Oscillator::WhiteNoise:
 			m_sampleFunction = &Oscillator::noiseSample;
+			break;
+		case Oscillator::UserDefinedWave:
+			m_sampleFunction = NULL;
+			/*TODO: If C++11 is allowed, should change the type of
+			 m_sampleFunction be std::function<sample_t(const float)>
+			 and use the line below:
+			*/
+			//m_sampleFunction = &(m_userDefSampleBuffer->userWaveSample)
 			break;
 	}
 }
