@@ -40,7 +40,8 @@
 groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
 	BoolModelView( NULL, this ),
-	m_caption( _caption )
+	m_caption( _caption ),
+	m_titleBarHeight( 11 )
 {
 	updatePixmap();
 
@@ -112,15 +113,15 @@ void groupBox::updatePixmap()
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
 	// draw groupbox-titlebar
-	QLinearGradient g( 0, 0, 0, 9 );
+	QLinearGradient g( 0, 0, 0, m_titleBarHeight );
 	g.setColorAt( 0, bg_color.darker( 250 ) );
 	g.setColorAt( 0.1, bg_color.lighter( 120 ) );
 	g.setColorAt( 1, bg_color.darker( 250 ) );
-	p.fillRect( 2, 2, width() - 4, 9, g );
+	p.fillRect( 2, 2, width() - 4, m_titleBarHeight, g );
 
 	// draw line below titlebar
 	p.setPen( bg_color.dark( 400 ) );
-	p.drawLine( 1, 11, width() - 3, 11 );
+	p.drawLine( 1, m_titleBarHeight + 1, width() - 3, m_titleBarHeight + 1 );
 
 	// black inner rect
 	p.drawRect( 1, 1, width() - 3, height() - 3 );
@@ -128,8 +129,8 @@ void groupBox::updatePixmap()
 
 	//p.setPen( QColor( 255, 255, 255 ) );
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont( pointSize<7>( font() ) );
-	p.drawText( 22, 10, m_caption );
+	p.setFont( pointSize<8>( font() ) );
+	p.drawText( 22, m_titleBarHeight, m_caption );
 
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( pm ) );

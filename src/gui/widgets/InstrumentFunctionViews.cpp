@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctionViews.cpp - view for instrument-functions-tab
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -164,14 +164,14 @@ ArpeggiatorView::ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent ) :
 
 	m_arpDirectionLbl = new QLabel( tr( "Direction:" ), m_arpGroupBox );
 	m_arpDirectionLbl->setGeometry( 10, 60, 64, 10 );
-	m_arpDirectionLbl->setFont( pointSize<7>( m_arpDirectionLbl->font() ) );
+	m_arpDirectionLbl->setFont( pointSize<8>( m_arpDirectionLbl->font() ) );
 
 	m_arpDirectionComboBox->setGeometry( 10, 74, 140, 22 );
 
 
 	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
 	mode_lbl->setGeometry( 10, 110, 64, 10 );
-	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
+	mode_lbl->setFont( pointSize<8>( mode_lbl->font() ) );
 
 	m_arpModeComboBox->setGeometry( 10, 124, 128, 22 );
 }

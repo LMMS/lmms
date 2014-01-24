@@ -52,7 +52,6 @@ protected:
 
 	ledCheckBox * m_absLed;
 	knob * m_amountMultKnob;
-	ledCheckBox * m_muteOutputLed;
 
 } ;
 

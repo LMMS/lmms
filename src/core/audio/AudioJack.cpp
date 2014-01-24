@@ -1,7 +1,7 @@
 /*
- * AudioJack.cpp - support for JACK-transport
+ * AudioJack.cpp - support for JACK transport
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -344,8 +344,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
-	const Uint32 frames = qMin<Uint32>( _nframes,
-						mixer()->framesPerPeriod() );
+	const int frames = qMin<int>( _nframes, mixer()->framesPerPeriod() );
 	for( jackPortMap::iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
@@ -359,7 +358,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 			(jack_default_audio_sample_t *) jack_port_get_buffer(
 							it.data().ports[ch],
 								_nframes );
-			for( Uint32 frame = 0; frame < frames; ++frame )
+			for( int frame = 0; frame < frames; ++frame )
 			{
 				buf[frame] = it.key()->firstBuffer()[frame][ch];
 			}
@@ -444,7 +443,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_clientName->setGeometry( 10, 20, 160, 20 );
 
 	QLabel * cn_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
-	cn_lbl->setFont( pointSize<6>( cn_lbl->font() ) );
+	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
 	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );	

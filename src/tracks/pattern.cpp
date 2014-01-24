@@ -1264,14 +1264,14 @@ void patternView::paintEvent( QPaintEvent * )
 		}
 	}
 
-	p.setFont( pointSize<7>( p.font() ) );
+	p.setFont( pointSize<8>( p.font() ) );
 	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
 	}
 	else
 	{
-		p.setPen( QColor( 32, 240, 32 ) );
+		p.setPen( QColor( 32, 240, 101 ) );
 	}
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )

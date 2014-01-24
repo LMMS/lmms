@@ -56,7 +56,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_baseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
 
 	m_amountKnob = new knob( knobBright_26, this );
-	m_amountKnob->setLabel( tr( "AMT" ) );
+	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 
@@ -66,12 +66,12 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) + " ", "" );
 
 	m_attackKnob = new knob( knobBright_26, this );
-	m_attackKnob->setLabel( tr( "ATTCK" ) );
+	m_attackKnob->setLabel( tr( "ATCK" ) );
 	m_attackKnob->setModel( &_controls->m_attackModel );
 	m_attackKnob->setHintText( tr( "Attack:" ) + " ", "" );
 
 	m_decayKnob = new knob( knobBright_26, this );
-	m_decayKnob->setLabel( tr( "DECAY" ) );
+	m_decayKnob->setLabel( tr( "DCAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release:" ) + " ", "" );
 
@@ -88,15 +88,11 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_muteLed = new ledCheckBox( "Mute Effect", this );
 	m_muteLed->setModel( &_controls->m_muteModel );
 
-	m_absLed = new ledCheckBox( "Abs Value", this );
+	m_absLed = new ledCheckBox( "Absolute Value", this );
 	m_absLed->setModel( &_controls->m_absModel );
-
-	m_muteOutputLed = new ledCheckBox( "Mute Output", this );
-	m_muteOutputLed->setModel( &_controls->m_muteOutputModel );
 
 	l2->addWidget( m_muteLed );
 	l2->addWidget( m_absLed );
-	l2->addWidget( m_muteOutputLed );
 	l2->addStretch(); // expand, so other widgets have minimum height
 	tl->addLayout( l2 );
 

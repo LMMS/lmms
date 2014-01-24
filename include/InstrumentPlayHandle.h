@@ -1,7 +1,7 @@
 /*
  * InstrumentPlayHandle.h - play-handle for driving an instrument
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,10 +45,7 @@ public:
 
 	virtual void play( sampleFrame * _working_buffer )
 	{
-		if( !m_instrument->isMuted() )
-		{
-			m_instrument->play( _working_buffer );
-		}
+		m_instrument->play( _working_buffer );
 	}
 
 	virtual bool done() const

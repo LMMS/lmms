@@ -208,7 +208,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	p.setPen( col.dark() );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
-	p.setFont( pointSize<7>( p.font() ) );
+	p.setFont( pointSize<8>( p.font() ) );
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawText( 2, p.fontMetrics().height() - 1, m_bbTCO->name() );
 

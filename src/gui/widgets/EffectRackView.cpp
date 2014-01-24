@@ -47,7 +47,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	QVBoxLayout* effectsLayout = new QVBoxLayout( m_effectsGroupBox );
 	effectsLayout->setSpacing( 0 );
-	effectsLayout->setContentsMargins( 2, 12, 2, 2 );
+	effectsLayout->setContentsMargins( 2, m_effectsGroupBox->titleBarHeight() + 2, 2, 2 );
 
 	m_scrollArea = new QScrollArea;
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );

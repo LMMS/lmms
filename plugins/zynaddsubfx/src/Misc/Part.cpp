@@ -1076,7 +1076,7 @@ void Part::setPpanning(char Ppanning_)
  */
 void Part::setkititemstatus(int kititem, int Penabled_)
 {
-    if((kititem == 0) && (kititem >= NUM_KIT_ITEMS))
+    if((kititem == 0) || (kititem >= NUM_KIT_ITEMS))
         return;                                        //nonexistent kit item and the first kit item is always enabled
     kit[kititem].Penabled = Penabled_;
 

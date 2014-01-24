@@ -2,7 +2,7 @@
  * EffectView.cpp - view-component for an effect
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -92,7 +92,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
 									this );
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<7>( f ) );
+		ctls_btn->setFont( pointSize<8>( f ) );
 		ctls_btn->setGeometry( 140, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL( clicked() ),
 					this, SLOT( editControls() ) );

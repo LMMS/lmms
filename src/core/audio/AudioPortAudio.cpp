@@ -395,14 +395,14 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
 	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
-	backend_lbl->setFont( pointSize<6>( backend_lbl->font() ) );
+	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new comboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
+	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
 /*	lcdSpinBoxModel * m = new lcdSpinBoxModel(  );

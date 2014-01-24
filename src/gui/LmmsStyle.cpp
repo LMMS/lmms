@@ -232,7 +232,7 @@ QPalette LmmsStyle::standardPalette( void ) const
 {
 
 	QPalette pal = QPlastiqueStyle::standardPalette();
-	
+
 /*	sane defaults in case fetching from stylesheet fails*/
 
 	pal.setColor( QPalette::Background, QColor( 91, 101, 113 ) );
@@ -245,17 +245,17 @@ QPalette LmmsStyle::standardPalette( void ) const
 	pal.setColor( QPalette::BrightText, QColor( 74, 253, 133 ) );
 	pal.setColor( QPalette::Highlight, QColor( 100, 100, 100 ) );
 	pal.setColor( QPalette::HighlightedText, QColor( 255, 255, 255 ) );
-	
+
 /* fetch from stylesheet using regexp */
 
 	QStringList paletteData = qApp->styleSheet().split( '\n' ).filter( QRegExp( "^palette:*" ) );
 	foreach( QString s, paletteData )
 	{
-		if (s.contains(":background"))	 			{ pal.setColor( QPalette::Background, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
+		if (s.contains(":background"))	 			{ pal.setColor( QPalette::Background, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":windowtext"))		{ pal.setColor( QPalette::WindowText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":base")) 				{ pal.setColor( QPalette::Base, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
-		else if (s.contains(":buttontext")) 		{ pal.setColor( QPalette::ButtonText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
-		else if (s.contains(":brighttext")) 		{ pal.setColor( QPalette::BrightText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
+		else if (s.contains(":buttontext")) 		{ pal.setColor( QPalette::ButtonText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains(":brighttext")) 		{ pal.setColor( QPalette::BrightText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":text")) 				{ pal.setColor( QPalette::Text, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":button")) 			{ pal.setColor( QPalette::Button, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":shadow")) 			{ pal.setColor( QPalette::Shadow, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
@@ -268,7 +268,7 @@ QPalette LmmsStyle::standardPalette( void ) const
 
 
 
-
+/*
 void LmmsStyle::drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const
 {
 
@@ -294,7 +294,7 @@ void LmmsStyle::drawControl( ControlElement element, const QStyleOption* option,
 				cache.fill( QColor( 48, 48, 48 ) );
 				QColor sliderColor;
 				QColor blurColor;
-				hoverColors(sunken, hover, 
+				hoverColors(sunken, hover,
 						scrollBar->activeSubControls & SC_ScrollBarAddLine && isEnabled,
 						sliderColor, blurColor);
 
@@ -455,7 +455,7 @@ void LmmsStyle::drawControl( ControlElement element, const QStyleOption* option,
 	}
 }
 
-
+*/
 
 void LmmsStyle::drawComplexControl( ComplexControl control,
 					const QStyleOptionComplex * option,
@@ -482,12 +482,12 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 			return;
 		}
 	}
-	else if( control == CC_ScrollBar )
+/*	else if( control == CC_ScrollBar )
 	{
-		QColor background = QColor( 48, 48, 48 );
-		painter->fillRect( option->rect, background );
+		painter->fillRect( option->rect, QApplication::palette().color( QPalette::Active,
+							QPalette::Background ) );
 
-	}
+	}*/
 	QPlastiqueStyle::drawComplexControl( control, option, painter, widget );
 }
 
@@ -633,7 +633,7 @@ int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 }
 
 // QStyle::SH_TitleBar_NoBorder
-
+/*
 QSize LmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const
 {
 	if( type == CT_ScrollBar )
@@ -655,8 +655,8 @@ QSize LmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option
 
 	return QPlastiqueStyle::sizeFromContents( type, option, size, widget );
 }
-
-
+*/
+/*
 QRect LmmsStyle::subControlRect( ComplexControl control, const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
 {
 	QRect rect = QPlastiqueStyle::subControlRect( control, option, subControl, widget );
@@ -797,7 +797,7 @@ QRect LmmsStyle::subControlRect( ComplexControl control, const QStyleOptionCompl
 
 	return rect;
 }
-
+*/
 
 
 

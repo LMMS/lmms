@@ -61,9 +61,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_label( "" ),
 	m_knobPixmap( NULL ),
 	m_volumeKnob( false ),
-	m_mouseOffset( 0.0f ),
 	m_buttonPressed( false ),
-	m_magneticDecay( 0 ),
 	m_angle( -10 ),
 	m_outerColor( NULL )
 {
@@ -108,8 +106,7 @@ void knob::setLabel( const QString & _txt )
 	if( m_knobPixmap )
 	{
 		setFixedSize( qMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSizeF( font(), 6
-							) ).width( m_label ) ),
+					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
 						m_knobPixmap->height() + 10 );
 	}
 	update();
@@ -369,16 +366,15 @@ void knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
-
-
-
 float knob::getValue( const QPoint & _p )
 {
+	const float SMOOTH_FACTOR = 0.125f;
+	int yDist = (_p.y() - m_origMousePos.y()) * SMOOTH_FACTOR;
 	if( engine::mainWindow()->isShiftPressed() )
 	{
-		return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
+		return m_origValue - (yDist * model()->step<float>());
 	}
-	return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
+	return m_origValue - (yDist * pageSize());
 }
 
 
@@ -447,6 +443,8 @@ void knob::mousePressEvent( QMouseEvent * _me )
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
+		m_mouseOffset = QPoint(0, 0);
+		m_origValue = model()->value();
 
 		emit sliderPressed();
 
@@ -475,9 +473,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 
 void knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_buttonPressed == true && _me->pos() != m_origMousePos )
+	if( m_buttonPressed && _me->pos() != m_origMousePos )
 	{
-		setPosition( _me->pos() );
+		m_mouseOffset += _me->pos() - m_origMousePos;
+		setPosition( m_mouseOffset );
 		emit sliderMoved( model()->value() );
 		QCursor::setPos( mapToGlobal( m_origMousePos ) );
 	}
@@ -494,7 +493,6 @@ void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 
 	m_buttonPressed = false;
 
-	m_mouseOffset = 0;
 	emit sliderReleased();
 
 	QApplication::restoreOverrideCursor();
@@ -530,7 +528,7 @@ void knob::paintEvent( QPaintEvent * _me )
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6 ) );
+		p.setFont( pointSizeF( p.font(), 6.5 ) );
 /*		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( width() / 2 -
 			p.fontMetrics().width( m_label ) / 2 + 1,
@@ -564,31 +562,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::setPosition( const QPoint & _p )
 {
-	const float current = model()->value();
-	const float next = current - getValue( _p );
-
-	if( model()->initValue() == current )
-	{
-		if( ++m_magneticDecay > 20 )
-		{
-			m_magneticDecay = 0;
-			model()->setValue( next );
-		}
-
-		return;
-	}
-
-	const bool current_sign = model()->initValue() - current < 0;
-	const bool next_sign = model()->initValue() - next < 0;
-
-	if( current_sign != next_sign )
-	{
-		model()->setValue( model()->initValue() );
-	}
-	else
-	{
-		model()->setValue( next );
-	}
+	model()->setValue( getValue(_p) );
 }
 
 

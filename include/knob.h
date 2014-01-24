@@ -148,11 +148,10 @@ private:
 	QPixmap * m_knobPixmap;
 	BoolModel m_volumeKnob;
 
-	float m_mouseOffset;
+	QPoint m_mouseOffset;
 	QPoint m_origMousePos;
+	float m_origValue;
 	bool m_buttonPressed;
-
-	int m_magneticDecay;
 
 	float m_totalAngle;
 	int m_angle;

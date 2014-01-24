@@ -265,55 +265,59 @@ void timeLine::paintEvent( QPaintEvent * )
 
 
 
-void timeLine::mousePressEvent( QMouseEvent * _me )
+void timeLine::mousePressEvent( QMouseEvent* event )
 {
-	if( _me->x() < m_xOffset )
+	if( event->x() < m_xOffset )
 	{
 		return;
 	}
-	if( _me->button() == Qt::LeftButton )
+	if( event->button() == Qt::LeftButton )
 	{
 		m_action = MovePositionMarker;
-		if( _me->x() - m_xOffset < s_posMarkerPixmap->width() )
+		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
 		{
-			m_moveXOff = _me->x() - m_xOffset;
+			m_moveXOff = event->x() - m_xOffset;
 		}
 		else
 		{
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
 	}
-	else
+	else if( event->button() == Qt::RightButton )
 	{
-		const midiTime t = m_begin + static_cast<int>( _me->x() * midiTime::ticksPerTact() / m_ppt );
-		m_action = MoveLoopBegin;
+		const midiTime t = m_begin + static_cast<int>( event->x() * midiTime::ticksPerTact() / m_ppt );
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
-		if( _me->button() == Qt::RightButton )
+		if( event->modifiers() & Qt::ShiftModifier )
+		{
+			m_action = MoveLoopBegin;
+		}
+		else
 		{
 			m_action = MoveLoopEnd;
 		}
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
+
 	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = textFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> to disable magnetic "
-							"loop-points." ),
+					tr( "Press <Ctrl> to disable magnetic loop points." ),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
-	mouseMoveEvent( _me );
+
+	mouseMoveEvent( event );
 }
 
 
 
 
-void timeLine::mouseMoveEvent( QMouseEvent * _me )
+void timeLine::mouseMoveEvent( QMouseEvent* event )
 {
-	const midiTime t = m_begin + static_cast<int>( qMax( _me->x() - m_xOffset - m_moveXOff, 0 ) * midiTime::ticksPerTact() / m_ppt );
+	const midiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * midiTime::ticksPerTact() / m_ppt );
 
 	switch( m_action )
 	{
@@ -328,7 +332,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 		case MoveLoopEnd:
 		{
 			const int i = m_action - MoveLoopBegin;
-			if( _me->modifiers() & Qt::ControlModifier )
+			if( event->modifiers() & Qt::ControlModifier )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;
@@ -361,7 +365,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void timeLine::mouseReleaseEvent( QMouseEvent * _me )
+void timeLine::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = NULL;

@@ -244,21 +244,19 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 	static int lastvoice=0;
 	switch(_me.m_type) {
         case MidiNoteOn:
-                if( !isMuted() ) {
-                        // to get us in line with MIDI(?)
-                        key = _me.key() +12;
-                        vel = _me.velocity();
-                        for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {
-                                if( voiceNote[i] == OPL2_VOICE_FREE ) {
-                                        theEmulator->write(0xA0+i, fnums[key] & 0xff);
-                                        theEmulator->write(0xB0+i, 32 + ((fnums[key] & 0x1f00) >> 8) );
-                                        voiceNote[i] = key;
-					velocities[key] = vel;
-                                        lastvoice=i;
-                                        break;
-                                }
-                        }
-                }
+		// to get us in line with MIDI(?)
+		key = _me.key() +12;
+		vel = _me.velocity();
+		for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {
+			if( voiceNote[i] == OPL2_VOICE_FREE ) {
+				theEmulator->write(0xA0+i, fnums[key] & 0xff);
+				theEmulator->write(0xB0+i, 32 + ((fnums[key] & 0x1f00) >> 8) );
+				voiceNote[i] = key;
+				velocities[key] = vel;
+				lastvoice=i;
+				break;
+			}
+		}
                 break;
         case MidiNoteOff:
                 key = _me.key() +12; 

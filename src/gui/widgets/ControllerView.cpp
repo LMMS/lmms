@@ -56,7 +56,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
 	
 	QFont f = ctls_btn->font();
-	ctls_btn->setFont( pointSize<7>( f ) );
+	ctls_btn->setFont( pointSize<8>( f ) );
 	ctls_btn->setGeometry( 140, 2, 50, 14 );
 	connect( ctls_btn, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );

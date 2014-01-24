@@ -140,7 +140,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	if( height() > 24 || m_mouseOver )
 	{
 		f.setBold( false );
-		p.setFont( pointSize<7>( f ) );
+		p.setFont( pointSize<8>( f ) );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
 							Qt::TextWordWrap,

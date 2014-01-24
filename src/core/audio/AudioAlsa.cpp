@@ -499,7 +499,7 @@ AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device->setGeometry( 10, 20, 160, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
+	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
 	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );

@@ -273,14 +273,14 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.resetMatrix();
-	p.setFont( pointSize<7>( p.font() ) );
+	p.setFont( pointSize<8>( p.font() ) );
 	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
 	}
 	else
 	{
-		p.setPen( QColor( 0, 64, 255 ) );
+		p.setPen( QColor( 0, 180, 60 ) );
 	}
 
 	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
