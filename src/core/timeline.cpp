@@ -312,7 +312,7 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 	{
 		delete m_hint;
 		m_hint = textFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift>+<Right click> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
+					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 
