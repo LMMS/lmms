@@ -188,7 +188,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 					SIGNAL( doubleClicked() ),
 			this, SLOT( askUserDefWave() ) );
 	toolTip::add( m_userWaveBtn,
-				tr( "Click here for a user-defined shape." ) );
+				tr( "Click here for a user-defined shape.\nDouble click to pick a file." ) );
 	
 	m_waveBtnGrp = new automatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sin_wave_btn );
