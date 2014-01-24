@@ -243,6 +243,10 @@ void MainWindow::finalize( void )
 					this, SLOT( saveProject() ),
 					Qt::CTRL + Qt::Key_S );
 
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as new &version" ),
+					this, SLOT( saveProjectAsNewVersion() ),
+					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
@@ -771,6 +775,24 @@ bool MainWindow::saveProjectAs( void )
 		return( TRUE );
 	}
 	return( FALSE );
+}
+
+
+
+
+bool MainWindow::saveProjectAsNewVersion( void )
+{
+	QString fileName = engine::getSong()->projectFileName();
+	if( fileName == "" )
+	{
+		return saveProjectAs();
+	}
+	else
+	{
+		VersionedSaveDialog::changeFileNameVersion( fileName, true );
+		engine::getSong()->guiSaveProjectAs( fileName );
+		return true;
+	}
 }
 
 
