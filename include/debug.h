@@ -31,10 +31,12 @@
 // set whether debug-stuff (like messages on the console, asserts and other
 // additional range-checkings) should be compiled
 
-/*#ifdef LMMS_DEBUG*/
-#include <assert.h>
+#ifdef LMMS_DEBUG
+	#include <assert.h>
+#else
+	#define assert(x) ((void)(x))
+#endif
 #include <cstdio>
-/*#endif*/
 
 
 #endif
