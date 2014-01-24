@@ -1,5 +1,7 @@
 /*
- * FileDialog.h - declaration of class FileDialog
+ * VersionedSaveDialog.h - declaration of class VersionedSaveDialog, a file save
+ * dialog that provides buttons to increment or decrement a version which is
+ * appended to the file name. (e.g. "MyProject-01.mmpz")
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
@@ -23,20 +25,29 @@
  */
 
 
-#ifndef FILEDIALOG_H
-#define FILEDIALOG_H
+#ifndef VERSIONEDSAVEDIALOG_H
+#define VERSIONEDSAVEDIALOG_H
 
-#include <QtGui/QFileDialog>
+#include "FileDialog.h"
 
-class FileDialog : public QFileDialog
+class QLineEdit;
+
+
+class VersionedSaveDialog : public FileDialog
 {
 	Q_OBJECT
 public:
-	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
-						const QString &directory = QString(),
-						const QString &filter = QString() );
+	explicit VersionedSaveDialog( QWidget *parent = 0,
+								  const QString &caption = QString(),
+								  const QString &directory = QString(),
+								  const QString &filter = QString() );
 
-	void clearSelection();
+	// Returns true if file name was changed, returns false if it wasn't
+	static bool changeFileNameVersion( QString &fileName, bool increment );
+
+public slots:
+	void incrementVersion();
+	void decrementVersion();
 };
 
-#endif // FILEDIALOG_HPP
+#endif // VERSIONEDSAVEDIALOG_H

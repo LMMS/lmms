@@ -26,6 +26,7 @@
 #include <QtCore/QList>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QListView>
 
 #include "FileDialog.h"
 
@@ -51,6 +52,13 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	if ( downloadDir.exists() )
 		urls << QUrl::fromLocalFile( downloadDir.absolutePath() );
 	setSidebarUrls(urls);
+}
+
+void FileDialog::clearSelection()
+{
+	static QListView *view = findChild<QListView*>();
+	Q_ASSERT( view );
+	view->clearSelection();
 }
 
 

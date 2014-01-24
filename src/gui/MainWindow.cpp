@@ -62,6 +62,7 @@
 #include "AutomationEditor.h"
 #include "templates.h"
 #include "FileDialog.h"
+#include "VersionedSaveDialog.h"
 
 
 
@@ -748,11 +749,9 @@ bool MainWindow::saveProject( void )
 
 bool MainWindow::saveProjectAs( void )
 {
-	FileDialog sfd( this, tr( "Save project" ), "",
+	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
-	sfd.setAcceptMode( QFileDialog::AcceptSave );
-	sfd.setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{
