@@ -54,7 +54,6 @@
 
 #include "opl.h"
 #include "temuopl.h"
-#include "kemuopl.h"
 
 #include "embed.cpp"
 #include "math.h"
