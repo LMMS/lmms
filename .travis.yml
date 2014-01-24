@@ -3,4 +3,4 @@ compiler: gcc
 before_install: sudo apt-get update
 install: sudo apt-get install libqt4-dev libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libasound2-dev libjack-dev libsdl-dev libsamplerate0-dev libstk0-dev libfluidsynth-dev portaudio19-dev wine-dev g++-multilib
 before_script: mkdir build && cd build
-script: cmake .. && make -j8
+script: cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j8
