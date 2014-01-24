@@ -116,9 +116,6 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 		tr( "Click here to stop playing of current "
 							"beat/bassline." ) );
 
-	QLabel * l = new QLabel( m_toolBar );
-	l->setPixmap( embed::getIconPixmap( "drum" ) );
-
 	m_bbComboBox = new comboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
@@ -134,7 +131,6 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 	tb_layout->addStretch();
 	tb_layout->addWidget( remove_bar );
 	tb_layout->addWidget( add_bar );
-	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
 
 	engine::mainWindow()->workspace()->addSubWindow( this );

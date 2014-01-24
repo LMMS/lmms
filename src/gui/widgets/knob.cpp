@@ -328,8 +328,11 @@ void knob::drawKnob( QPainter * _p )
 
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
-
-	p.setPen( QPen( QColor( 255, 255, 255, 70 ), 2 ) );
+	
+	QColor col = QApplication::palette().color( QPalette::Active, QPalette::WindowText );
+	col.setAlpha( 70 );
+	
+	p.setPen( QPen( col, 2 ) );
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
 	switch( m_knobNum )
