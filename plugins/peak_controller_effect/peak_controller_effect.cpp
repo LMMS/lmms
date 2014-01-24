@@ -81,6 +81,7 @@ PeakControllerEffect::~PeakControllerEffect()
 	if( idx >= 0 )
 	{
 		PeakController::s_effects.remove( idx );
+		engine::getSong()->removeController( m_autoController );
 	}
 }
 

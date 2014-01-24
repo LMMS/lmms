@@ -89,11 +89,23 @@ public:
 		m_dataMutex.unlock();
 	}
 
+	bool isPreviewing()
+	{
+		bool ret = m_dataMutex.tryLock();
+		if( ret == true )
+		{
+			m_dataMutex.unlock();
+		}
+		return ret;
+	}
+
 
 private:
 	InstrumentTrack * m_previewInstrumentTrack;
 	notePlayHandle * m_previewNote;
 	QMutex m_dataMutex;
+
+	friend presetPreviewPlayHandle;
 
 } ;
 
@@ -240,5 +252,19 @@ ConstNotePlayHandleList presetPreviewPlayHandle::nphsOfInstrumentTrack(
 	s_previewTC->unlockData();
 	return cnphv;
 }
+
+
+
+
+bool presetPreviewPlayHandle::isPreviewing()
+{
+	bool ret = s_previewTC->m_dataMutex.tryLock();
+	if( ret == true )
+	{
+		s_previewTC->m_dataMutex.unlock();
+	}
+	return ret;
+}
+
 
 
