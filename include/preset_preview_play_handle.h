@@ -51,6 +51,8 @@ public:
 	static ConstNotePlayHandleList nphsOfInstrumentTrack(
 						const InstrumentTrack * _ct );
 
+	static bool isPreviewing();
+
 
 private:
 	static previewTrackContainer * s_previewTC;
