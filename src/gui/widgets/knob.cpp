@@ -255,11 +255,7 @@ bool knob::updateAngle()
 	int angle = 0;
 	if( model() && model()->maxValue() != model()->minValue() )
 	{
-		float a = ( model()->value() - 0.5 * ( model()->minValue() +
-						model()->maxValue() ) ) /
-				( model()->maxValue() - model()->minValue() ) *
-								m_totalAngle;
-		angle = static_cast<int>( a ) % 360;
+		angle = angleFromValue( model()->value(), model()->minValue(), model()->maxValue(), m_totalAngle );
 	}
 	if( qAbs( angle - m_angle ) > 3 )
 	{
@@ -328,6 +324,17 @@ void knob::drawKnob( QPainter * _p )
 //	p.setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
 	p.setRenderHint( QPainter::Antialiasing );
 
+	const int centerAngle = angleFromValue( model()->centerValue(), model()->minValue(), model()->maxValue(), m_totalAngle );
+
+	const int arcLineWidth = 2;
+	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
+	
+	QColor col = QApplication::palette().color( QPalette::Active, QPalette::WindowText );
+	col.setAlpha( 70 );
+	
+	p.setPen( QPen( col, 2 ) );
+	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
+
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
@@ -339,8 +346,7 @@ void knob::drawKnob( QPainter * _p )
 		}
 		case knobBright_26:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
@@ -362,7 +368,11 @@ void knob::drawKnob( QPainter * _p )
 			break;
 		}
 	}
+
+	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
+
 	p.end();
+
 	_p->drawImage( 0, 0, m_cache );
 }
 

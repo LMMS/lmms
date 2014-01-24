@@ -634,7 +634,6 @@ static bool get_graph(Fx &fx, int subindex, float *data, int points, float res =
 {
     for (int i = 0; i < points; i++)
     {
-        typedef std::complex<double> cfloat;
         double freq = 20.0 * pow (20000.0 / 20.0, i * 1.0 / points);
         data[i] = dB_grid(fx.freq_gain(subindex, freq, fx.srate), res, ofs);
     }

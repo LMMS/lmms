@@ -178,6 +178,16 @@ public:
 
 	void setStep( const float step );
 
+	float centerValue() const
+	{
+		return m_centerValue;
+	}
+
+	void setCenterValue( const float centerVal )
+	{
+		m_centerValue = centerVal;
+	}
+
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -241,6 +251,7 @@ private:
 	float m_maxValue;
 	float m_step;
 	float m_range;
+	float m_centerValue;
 
 	// most objects will need this temporarily (until sampleExact is
 	// standard)

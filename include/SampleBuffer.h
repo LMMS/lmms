@@ -52,6 +52,17 @@ public:
 		handleState( bool _varying_pitch = false );
 		virtual ~handleState();
 
+		inline const f_cnt_t frameIndex() const
+		{
+			return m_frameIndex;
+		}
+
+		inline void setFrameIndex( f_cnt_t _index )
+		{
+			m_frameIndex = _index;
+		}
+
+
 
 	private:
 		f_cnt_t m_frameIndex;

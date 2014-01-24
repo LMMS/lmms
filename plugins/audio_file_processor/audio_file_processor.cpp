@@ -75,7 +75,9 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
 	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
-	m_loopModel( false, this, tr( "Loop") )
+	m_loopModel( false, this, tr( "Loop") ),
+	m_stutterModel( false, this, tr( "Stutter" ) ),
+	m_nextPlayStartPoint( 0 )
 {
 	connect( &m_reverseModel, SIGNAL( dataChanged() ),
 				this, SLOT( reverseModelChanged() ) );
@@ -85,6 +87,8 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
+	connect( &m_stutterModel, SIGNAL( dataChanged() ),
+	    		this, SLOT( stutterModelChanged() ) );
 }
 
 
@@ -102,9 +106,25 @@ void audioFileProcessor::playNote( notePlayHandle * _n,
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
+	// Magic key - a frequency < 20 (say, the bottom piano note if using
+	// a A4 base tuning) restarts the start point. The note is not actually
+	// played.
+	if( m_stutterModel.value() == true && _n->frequency() < 20.0 )
+	{
+		m_nextPlayStartPoint = m_sampleBuffer.startFrame();
+		return;
+	}
+
 	if( !_n->m_pluginData )
 	{
+		if( m_stutterModel.value() == true && m_nextPlayStartPoint >= m_sampleBuffer.endFrame() )
+		{
+			// Restart playing the note if in stutter mode, not in loop mode,
+			// and we're at the end of the sample.
+			m_nextPlayStartPoint = m_sampleBuffer.startFrame();
+		}
 		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
+		((handleState *)_n->m_pluginData)->setFrameIndex(m_nextPlayStartPoint);
 	}
 
 	if( m_sampleBuffer.play( _working_buffer,
@@ -115,11 +135,24 @@ void audioFileProcessor::playNote( notePlayHandle * _n,
 		applyRelease( _working_buffer, _n );
 		instrumentTrack()->processAudioBuffer( _working_buffer,
 								frames,_n );
-		emit isPlaying( _n->totalFramesPlayed() * _n->frequency() / m_sampleBuffer.frequency() );
+		int framesPosition;
+		if( m_stutterModel.value() == true )
+		{
+			framesPosition = m_nextPlayStartPoint;
+		}
+		else
+		{
+			framesPosition = _n->totalFramesPlayed() * _n->frequency() / m_sampleBuffer.frequency();
+		}
+		emit isPlaying( framesPosition );
 	}
 	else
 	{
 		emit isPlaying( 0 );
+	}
+	if( m_stutterModel.value() == true )
+	{
+		m_nextPlayStartPoint = ((handleState *)_n->m_pluginData)->frameIndex();
 	}
 }
 
@@ -246,6 +279,12 @@ void audioFileProcessor::ampModelChanged( void )
 }
 
 
+void audioFileProcessor::stutterModelChanged()
+{
+	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
+}
+
+
 
 
 void audioFileProcessor::loopPointChanged( void )
@@ -254,6 +293,7 @@ void audioFileProcessor::loopPointChanged( void )
 						( m_sampleBuffer.frames()-1 ) );
 	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
+	m_nextPlayStartPoint = f1;
 	m_sampleBuffer.setStartFrame( qMin<f_cnt_t>( f1, f2 ) );
 	m_sampleBuffer.setEndFrame( qMax<f_cnt_t>( f1, f2 ) );
 	emit dataChanged();
@@ -295,7 +335,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_reverseButton = new pixmapButton( this );
 	m_reverseButton->setCheckable( TRUE );
-	m_reverseButton->move( 184, 124 );
+	m_reverseButton->move( 174, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_on" ) );
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -308,7 +348,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_loopButton = new pixmapButton( this );
 	m_loopButton->setCheckable( TRUE );
-	m_loopButton->move( 220, 124 );
+	m_loopButton->move( 200, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -321,6 +361,23 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"end-points of a sample until the whole note is played. "
 			"This is useful for things like string and choir "
 			"samples." ) );
+
+	m_stutterButton = new pixmapButton( this );
+	m_stutterButton->setCheckable( true );
+	m_stutterButton->move( 226, 124 );
+	m_stutterButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"stutter_on" ) );
+	m_stutterButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"stutter_off" ) );
+	toolTip::add( m_stutterButton,
+		tr( "Continue sample playback across notes" ) );
+	m_stutterButton->setWhatsThis(
+		tr( "Enabling this option makes the sample continue playing "
+			"across different notes - if you change pitch, or the note "
+			"length stops before the end of the sample, then the next "
+			"note played will continue where it left off. To reset the "
+			"playback to the start of the sample, insert a note at the bottom "
+			"of the keyboard (< 20 Hz)") );
 
 	m_ampKnob = new knob( knobStyled, this );
 	m_ampKnob->setVolumeKnob( TRUE );
@@ -501,6 +558,7 @@ void AudioFileProcessorView::modelChanged( void )
 	m_endKnob->setModel( &a->m_endPointModel );
 	m_reverseButton->setModel( &a->m_reverseModel );
 	m_loopButton->setModel( &a->m_loopModel );
+	m_stutterButton->setModel( &a->m_stutterModel );
 	sampleUpdated();
 }
 

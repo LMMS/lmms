@@ -145,7 +145,7 @@ public:
     static void insert_integer(Alg_parameters **list, char *name, long i);
     static void insert_logical(Alg_parameters **list, char *name, bool l);
     static void insert_atom(Alg_parameters **list, char *name, char *s);
-    static Alg_parameters *remove_key(Alg_parameters **list, char *name);
+    static Alg_parameters *remove_key(Alg_parameters **list, const char *name);
     // find an attribute/value pair
     Alg_parameter_ptr find(Alg_attribute *attr);
 } *Alg_parameters_ptr;

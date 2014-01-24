@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 10 "revdelay_1605.xml"
 
 #include "ladspa-util.h"
 #include <stdio.h>
@@ -86,7 +85,6 @@ static void activateRevdelay(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
-#line 38 "revdelay_1605.xml"
 	unsigned int size;
 
 	size = sample_rate * 5 * 2; /* 5 second maximum */
@@ -107,7 +105,6 @@ static void activateRevdelay(LADSPA_Handle instance) {
 }
 
 static void cleanupRevdelay(LADSPA_Handle instance) {
-#line 51 "revdelay_1605.xml"
 	Revdelay *plugin_data = (Revdelay *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -156,7 +153,6 @@ static LADSPA_Handle instantiateRevdelay(
 	unsigned int sample_rate;
 	long write_phase;
 
-#line 30 "revdelay_1605.xml"
 	sample_rate = s_rate;
 	buffer_size = 0;
 	delay_samples = 0;
@@ -211,7 +207,6 @@ static void runRevdelay(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 55 "revdelay_1605.xml"
 	int i;
 	unsigned long delay2;
 	float dry = DB_CO(dry_level);
@@ -263,7 +258,7 @@ static void runRevdelay(LADSPA_Handle instance, unsigned long sample_count) {
 
 	  for (i=0; i<sample_count; i++) {
 	    long read_phase, idelay_samples;
-	    LADSPA_Data frac, read;
+	    LADSPA_Data read;
 	    LADSPA_Data insamp;
 	    insamp = in[i];
 
@@ -273,7 +268,6 @@ static void runRevdelay(LADSPA_Handle instance, unsigned long sample_count) {
 
 	    read_phase = delay2 - write_phase;
 	    idelay_samples = (long)delay_samples;
-	    frac = delay_samples - idelay_samples;
 	    read = wet * buffer[read_phase]   + (dry * insamp);
 
 	    if ((write_phase % idelay_samples) < xfade_samp) {
@@ -341,7 +335,6 @@ static void runAddingRevdelay(LADSPA_Handle instance, unsigned long sample_count
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 55 "revdelay_1605.xml"
 	int i;
 	unsigned long delay2;
 	float dry = DB_CO(dry_level);
@@ -393,7 +386,7 @@ static void runAddingRevdelay(LADSPA_Handle instance, unsigned long sample_count
 
 	  for (i=0; i<sample_count; i++) {
 	    long read_phase, idelay_samples;
-	    LADSPA_Data frac, read;
+	    LADSPA_Data read;
 	    LADSPA_Data insamp;
 	    insamp = in[i];
 
@@ -403,7 +396,6 @@ static void runAddingRevdelay(LADSPA_Handle instance, unsigned long sample_count
 
 	    read_phase = delay2 - write_phase;
 	    idelay_samples = (long)delay_samples;
-	    frac = delay_samples - idelay_samples;
 	    read = wet * buffer[read_phase]   + (dry * insamp);
 
 	    if ((write_phase % idelay_samples) < xfade_samp) {

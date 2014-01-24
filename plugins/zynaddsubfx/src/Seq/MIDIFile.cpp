@@ -50,7 +50,9 @@ int MIDIFile::loadfile(const char *filename)
 
     char header[4];
     ZERO(header, 4);
-    fread(header, 4, 1, file);
+    if (fread(header, 4, 1, file) != 1) {
+        return -1;
+    }
 
     //test to see if this a midi file
     if((header[0] != 'M') || (header[1] != 'T') || (header[2] != 'h')
@@ -66,7 +68,10 @@ int MIDIFile::loadfile(const char *filename)
 
     midifile = new unsigned char[midifilesize];
     ZERO(midifile, midifilesize);
-    fread(midifile, midifilesize, 1, file);
+    if (fread(midifile, midifilesize, 1, file) != 1) {
+        clearmidifile();
+        return -1;
+    }
     fclose(file);
 
 //    for (int i=0;i<midifilesize;i++) printf("%2x ",midifile[i]);

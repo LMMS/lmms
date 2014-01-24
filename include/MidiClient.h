@@ -140,7 +140,7 @@ protected:
 
 
 
-const int RAW_MIDI_PARSE_BUF_SIZE = 16;
+const uint32_t RAW_MIDI_PARSE_BUF_SIZE = 16;
 
 
 class MidiClientRaw : public MidiClient

@@ -1,7 +1,7 @@
 /*
  * EnvelopeAndLfoParameters.cpp - class EnvelopeAndLfoParameters
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -116,6 +116,9 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_lfoAmountIsZero( false ),
 	m_lfoShapeData( NULL )
 {
+	m_amountModel.setCenterValue( 0 );
+	m_lfoAmountModel.setCenterValue( 0 );
+
 	if( s_lfoInstances == NULL )
 	{
 		s_lfoInstances = new LfoInstances();

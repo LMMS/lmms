@@ -25,8 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 10 "allpass_1895.xml"
-
 #include "ladspa-util.h"
 
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
@@ -155,7 +153,6 @@ static void activateAllpass_n(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
-#line 48 "allpass_1895.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -187,7 +184,6 @@ static void activateAllpass_n(LADSPA_Handle instance) {
 }
 
 static void cleanupAllpass_n(LADSPA_Handle instance) {
-#line 70 "allpass_1895.xml"
 	Allpass_n *plugin_data = (Allpass_n *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -224,15 +220,14 @@ static LADSPA_Handle instantiateAllpass_n(
  unsigned long s_rate) {
 	Allpass_n *plugin_data = (Allpass_n *)malloc(sizeof(Allpass_n));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask;
-	LADSPA_Data delay_samples;
-	LADSPA_Data feedback;
-	LADSPA_Data last_decay_time;
-	LADSPA_Data last_delay_time;
-	unsigned int sample_rate;
-	long write_phase;
+	unsigned int buffer_mask = 0;
+	LADSPA_Data delay_samples = 0;
+	LADSPA_Data feedback = 0;
+	LADSPA_Data last_decay_time = 0;
+	LADSPA_Data last_delay_time = 0;
+	unsigned int sample_rate = 0;
+	long write_phase = 0;
 
-#line 44 "allpass_1895.xml"
 	sample_rate = s_rate;
 
 	plugin_data->buffer = buffer;
@@ -281,8 +276,7 @@ static void runAllpass_n(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 74 "allpass_1895.xml"
-	int i;
+	unsigned int i;
 
 	ignore(max_delay);
 
@@ -423,8 +417,7 @@ static void runAddingAllpass_n(LADSPA_Handle instance, unsigned long sample_coun
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 74 "allpass_1895.xml"
-	int i;
+	unsigned int i;
 
 	ignore(max_delay);
 
@@ -537,7 +530,6 @@ static void activateAllpass_l(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
-#line 48 "allpass_1895.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -569,7 +561,6 @@ static void activateAllpass_l(LADSPA_Handle instance) {
 }
 
 static void cleanupAllpass_l(LADSPA_Handle instance) {
-#line 70 "allpass_1895.xml"
 	Allpass_l *plugin_data = (Allpass_l *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -606,15 +597,14 @@ static LADSPA_Handle instantiateAllpass_l(
  unsigned long s_rate) {
 	Allpass_l *plugin_data = (Allpass_l *)malloc(sizeof(Allpass_l));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask;
-	LADSPA_Data delay_samples;
-	LADSPA_Data feedback;
-	LADSPA_Data last_decay_time;
-	LADSPA_Data last_delay_time;
-	unsigned int sample_rate;
-	long write_phase;
+	unsigned int buffer_mask = 0;
+	LADSPA_Data delay_samples = 0;
+	LADSPA_Data feedback = 0;
+	LADSPA_Data last_decay_time = 0;
+	LADSPA_Data last_delay_time = 0;
+	unsigned int sample_rate = 0;
+	long write_phase = 0;
 
-#line 44 "allpass_1895.xml"
 	sample_rate = s_rate;
 
 	plugin_data->buffer = buffer;
@@ -646,9 +636,6 @@ static void runAllpass_l(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
-	/* Max Delay (s) (float value) */
-	const LADSPA_Data max_delay = *(plugin_data->max_delay);
-
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -663,8 +650,7 @@ static void runAllpass_l(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 74 "allpass_1895.xml"
-	int i;
+	unsigned int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -743,9 +729,6 @@ static void runAddingAllpass_l(LADSPA_Handle instance, unsigned long sample_coun
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
-	/* Max Delay (s) (float value) */
-	const LADSPA_Data max_delay = *(plugin_data->max_delay);
-
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -760,8 +743,7 @@ static void runAddingAllpass_l(LADSPA_Handle instance, unsigned long sample_coun
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 74 "allpass_1895.xml"
-	int i;
+	unsigned int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -829,7 +811,6 @@ static void activateAllpass_c(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
-#line 48 "allpass_1895.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -861,7 +842,6 @@ static void activateAllpass_c(LADSPA_Handle instance) {
 }
 
 static void cleanupAllpass_c(LADSPA_Handle instance) {
-#line 70 "allpass_1895.xml"
 	Allpass_c *plugin_data = (Allpass_c *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -898,15 +878,14 @@ static LADSPA_Handle instantiateAllpass_c(
  unsigned long s_rate) {
 	Allpass_c *plugin_data = (Allpass_c *)malloc(sizeof(Allpass_c));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask;
-	LADSPA_Data delay_samples;
-	LADSPA_Data feedback;
-	LADSPA_Data last_decay_time;
-	LADSPA_Data last_delay_time;
-	unsigned int sample_rate;
-	long write_phase;
+	unsigned int buffer_mask = 0;
+	LADSPA_Data delay_samples = 0;
+	LADSPA_Data feedback = 0;
+	LADSPA_Data last_decay_time = 0;
+	LADSPA_Data last_delay_time = 0;
+	unsigned int sample_rate = 0;
+	long write_phase = 0;
 
-#line 44 "allpass_1895.xml"
 	sample_rate = s_rate;
 
 	plugin_data->buffer = buffer;
@@ -938,9 +917,6 @@ static void runAllpass_c(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
-	/* Max Delay (s) (float value) */
-	const LADSPA_Data max_delay = *(plugin_data->max_delay);
-
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -955,8 +931,7 @@ static void runAllpass_c(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 74 "allpass_1895.xml"
-	int i;
+	unsigned int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -1038,9 +1013,6 @@ static void runAddingAllpass_c(LADSPA_Handle instance, unsigned long sample_coun
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
-	/* Max Delay (s) (float value) */
-	const LADSPA_Data max_delay = *(plugin_data->max_delay);
-
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -1055,8 +1027,7 @@ static void runAddingAllpass_c(LADSPA_Handle instance, unsigned long sample_coun
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-#line 74 "allpass_1895.xml"
-	int i;
+	unsigned int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;

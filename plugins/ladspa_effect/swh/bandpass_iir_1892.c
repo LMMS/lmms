@@ -25,7 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 9 "bandpass_iir_1892.xml"
 
 #include "config.h"
 #include "util/iir.h"
@@ -80,7 +79,6 @@ static void activateBandpass_iir(LADSPA_Handle instance) {
 	long sample_rate = plugin_data->sample_rate;
 	iir_stage_t*second = plugin_data->second;
 	float ufc = plugin_data->ufc;
-#line 36 "bandpass_iir_1892.xml"
 	
 	ufc = (*(plugin_data->center) + *(plugin_data->width)*0.5f)/(float)sample_rate;
 	lfc = (*(plugin_data->center) - *(plugin_data->width)*0.5f)/(float)sample_rate;
@@ -102,7 +100,6 @@ static void activateBandpass_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupBandpass_iir(LADSPA_Handle instance) {
-#line 48 "bandpass_iir_1892.xml"
 	Bandpass_iir *plugin_data = (Bandpass_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);                  
 	free_iir_stage(plugin_data->first);
@@ -144,12 +141,11 @@ static LADSPA_Handle instantiateBandpass_iir(
 	iir_stage_t*first = NULL;
 	iir_stage_t*gt = NULL;
 	iirf_t*iirf = NULL;
-	float lfc;
-	long sample_rate;
+	float lfc = 0;
+	long sample_rate = 0;
 	iir_stage_t*second = NULL;
-	float ufc;
+	float ufc = 0;
 
-#line 24 "bandpass_iir_1892.xml"
 	sample_rate = s_rate;
 
 	plugin_data->first = first;
@@ -196,7 +192,6 @@ static void runBandpass_iir(LADSPA_Handle instance, unsigned long sample_count) 
 	iir_stage_t* second = plugin_data->second;
 	float ufc = plugin_data->ufc;
 
-#line 27 "bandpass_iir_1892.xml"
 	ufc = (center + width*0.5f)/(float)sample_rate;
 	lfc = (center - width*0.5f)/(float)sample_rate;
 	combine_iir_stages(IIR_STAGE_BANDPASS, gt, first, second,
@@ -218,7 +213,6 @@ static void setRunAddingGainBandpass_iir(LADSPA_Handle instance, LADSPA_Data gai
 
 static void runAddingBandpass_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Bandpass_iir *plugin_data = (Bandpass_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Center Frequency (Hz) (float value) */
 	const LADSPA_Data center = *(plugin_data->center);
@@ -242,7 +236,6 @@ static void runAddingBandpass_iir(LADSPA_Handle instance, unsigned long sample_c
 	iir_stage_t* second = plugin_data->second;
 	float ufc = plugin_data->ufc;
 
-#line 27 "bandpass_iir_1892.xml"
 	ufc = (center + width*0.5f)/(float)sample_rate;
 	lfc = (center - width*0.5f)/(float)sample_rate;
 	combine_iir_stages(IIR_STAGE_BANDPASS, gt, first, second,

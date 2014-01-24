@@ -25,8 +25,6 @@ void _init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
-#line 9 "bandpass_a_iir_1893.xml"
-
 #include "config.h"
 #include "util/iir.h"
 
@@ -70,7 +68,6 @@ static void activateBandpass_a_iir(LADSPA_Handle instance) {
 	iir_stage_t*gt = plugin_data->gt;
 	iirf_t*iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
-#line 30 "bandpass_a_iir_1893.xml"
 	
 	gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
 	iirf = init_iirf_t(gt);
@@ -82,7 +79,6 @@ static void activateBandpass_a_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupBandpass_a_iir(LADSPA_Handle instance) {
-#line 36 "bandpass_a_iir_1893.xml"
 	Bandpass_a_iir *plugin_data = (Bandpass_a_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);
 	free_iir_stage(plugin_data->gt);
@@ -120,7 +116,6 @@ static LADSPA_Handle instantiateBandpass_a_iir(
 	iirf_t*iirf = NULL;
 	long sample_rate;
 
-#line 22 "bandpass_a_iir_1893.xml"
 	sample_rate = s_rate;
 
 	plugin_data->gt = gt;
@@ -156,7 +151,6 @@ static void runBandpass_a_iir(LADSPA_Handle instance, unsigned long sample_count
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "bandpass_a_iir_1893.xml"
 	calc_2polebandpass(iirf, gt, center, width, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
@@ -174,7 +168,6 @@ static void setRunAddingGainBandpass_a_iir(LADSPA_Handle instance, LADSPA_Data g
 
 static void runAddingBandpass_a_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Bandpass_a_iir *plugin_data = (Bandpass_a_iir *)instance;
-	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Center Frequency (Hz) (float value) */
 	const LADSPA_Data center = *(plugin_data->center);
@@ -191,7 +184,6 @@ static void runAddingBandpass_a_iir(LADSPA_Handle instance, unsigned long sample
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 25 "bandpass_a_iir_1893.xml"
 	calc_2polebandpass(iirf, gt, center, width, sample_rate);
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
