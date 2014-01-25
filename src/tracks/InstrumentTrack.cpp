@@ -237,8 +237,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			{
 				if( m_notes[event.key()] == NULL )
 				{
-					m_piano.setKeyState( event.key(), true );
-
 					// create temporary note
 					note n;
 					n.setKey( event.key() );
