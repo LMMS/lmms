@@ -1,6 +1,7 @@
 /*
  * sfxr.cpp - port of sfxr to LMMS
- * The original readme file of sfxr can be found in readme.txt in this directory.
+ * Originally written by Tomas Pettersson. For the original license,
+ * please read readme.txt in this directory
  *
  * Copyright (c) 2014 Wong Cho Ching
  * 
@@ -38,10 +39,8 @@ float frnd(float range)
 
 #include "sfxr.h"
 #include "engine.h"
-#include "graph.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "led_checkbox.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
@@ -71,71 +70,250 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 }
 
 
-SfxrSynth::SfxrSynth( float * _shape, int _length, notePlayHandle * _nph, bool _interpolation,
-				float _factor, const sample_rate_t _sample_rate ) :
-	sample_index( 0 ),
-	sample_realindex( 0 ),
-	nph( _nph ),
-	sample_length( _length ),
-	sample_rate( _sample_rate ),
-	interpolation( _interpolation)
+
+
+SfxrSynth::SfxrSynth( const sfxrInstrument * s ):
+	s(s),
+	playing_sample( true )
 {
-	sample_shape = new float[sample_length];
-	for (int i=0; i < _length; ++i)
-	{
-		sample_shape[i] = _shape[i] * _factor;
-	}
+    resetSample( false );
 }
+
+
 
 
 SfxrSynth::~SfxrSynth()
 {
-	delete[] sample_shape;
+
 }
 
 
-sample_t SfxrSynth::nextStringSample()
+
+
+void SfxrSynth::resetSample( bool restart )
 {
-	float sample_step =
-		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
-
-
-	// check overflow
-	while (sample_realindex >= sample_length) {
-		sample_realindex -= sample_length;
+	if(!restart)
+	{
+		phase=0;
 	}
+	fperiod=100.0/(s->m_startFreqModel.value()*s->m_startFreqModel.value()+0.001);
+	period=(int)fperiod;
+	fmaxperiod=100.0/(s->m_minFreqModel.value()*s->m_minFreqModel.value()+0.001);
+	fslide=1.0-pow((double)s->m_slideModel.value(), 3.0)*0.01;
+	fdslide=-pow((double)s->m_dSlideModel.value(), 3.0)*0.000001;
+	square_duty=0.5f-s->m_sqrDutyModel.value()*0.5f;
+	square_slide=-s->m_sqrSweepModel.value()*0.00005f;
+	if(s->m_changeAmtModel.value()>=0.0f)
+		arp_mod=1.0-pow((double)s->m_changeAmtModel.value(), 2.0)*0.9;
+	else
+		arp_mod=1.0+pow((double)s->m_changeAmtModel.value(), 2.0)*10.0;
+	arp_time=0;
+	arp_limit=(int)(pow(1.0f-s->m_changeSpeedModel.value(), 2.0f)*20000+32);
+	if(s->m_changeSpeedModel.value()==1.0f)
+		arp_limit=0;
+	if(!restart)
+	{
+		// reset filter
+		fltp=0.0f;
+		fltdp=0.0f;
+		fltw=pow(s->m_lpFilCutModel.value(), 3.0f)*0.1f;
+		fltw_d=1.0f+s->m_lpFilCutSweepModel.value()*0.0001f;
+		fltdmp=5.0f/(1.0f+pow(s->m_lpFilResoModel.value(), 2.0f)*20.0f)*(0.01f+fltw);
+		if(fltdmp>0.8f) fltdmp=0.8f;
+		fltphp=0.0f;
+		flthp=pow(s->m_hpFilCutModel.value(), 2.0f)*0.1f;
+		flthp_d=1.0+s->m_hpFilCutSweepModel.value()*0.0003f;
+		// reset vibrato
+		vib_phase=0.0f;
+		vib_speed=pow(s->m_vibSpeedModel.value(), 2.0f)*0.01f;
+		vib_amp=s->m_vibDepthModel.value()*0.5f;
+		// reset envelope
+		env_vol=0.0f;
+		env_stage=0;
+		env_time=0;
+		env_length[0]=(int)(s->m_attModel.value()*s->m_attModel.value()*100000.0f);
+		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*100000.0f);
+		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*100000.0f);
 
-	sample_t sample;
+		fphase=pow(s->m_phaserOffsetModel.value(), 2.0f)*1020.0f;
+		if(s->m_phaserOffsetModel.value()<0.0f) fphase=-fphase;
+		fdphase=pow(s->m_phaserSweepModel.value(), 2.0f)*1.0f;
+		if(s->m_phaserSweepModel.value()<0.0f) fdphase=-fdphase;
+		iphase=abs((int)fphase);
+		ipp=0;
+		for(int i=0;i<1024;i++)
+			phaser_buffer[i]=0.0f;
 
-	if (interpolation) {
+		for(int i=0;i<32;i++)
+			noise_buffer[i]=frnd(2.0f)-1.0f;
 
-		// find position in shape
-		int a = static_cast<int>(sample_realindex);
-		int b;
-		if (a < (sample_length-1)) {
-			b = static_cast<int>(sample_realindex+1);
-		} else {
-			b = 0;
+		rep_time=0;
+		rep_limit=(int)(pow(1.0f-s->m_repeatSpeedModel.value(), 2.0f)*20000+32);
+		if(s->m_repeatSpeedModel.value()==0.0f)
+			rep_limit=0;
+    }
+}
+
+
+
+
+void SfxrSynth::update( sampleFrame * buffer, const fpp_t frameNum )
+{
+	for(int i=0;i<frameNum;i++)
+	{
+        if(!playing_sample)
+        {
+            for( ch_cnt_t j=0; j < DEFAULT_CHANNELS; j++ )
+            {
+                buffer[i][j]=0.0f;
+            }
+        }
+
+		rep_time++;
+		if(rep_limit!=0 && rep_time>=rep_limit)
+		{
+			rep_limit=0;
+			resetSample(true);
 		}
 
-		// Nachkommaanteil
-		float frac = sample_realindex - static_cast<int>(sample_realindex);
+		// frequency envelopes/arpeggios
+		arp_time++;
+		if(arp_limit!=0 && arp_time>=arp_limit)
+		{
+			arp_limit=0;
+			fperiod*=arp_mod;
+		}
+		fslide+=fdslide;
+		fperiod*=fslide;
+		if(fperiod>fmaxperiod)
+		{
+			fperiod=fmaxperiod;
+			if(s->m_minFreqModel.value()>0.0f)
+				playing_sample=false;
+		}
+		float rfperiod=fperiod;
+		if(vib_amp>0.0f)
+		{
+			vib_phase+=vib_speed;
+			rfperiod=fperiod*(1.0+sin(vib_phase)*vib_amp);
+		}
+		period=(int)rfperiod;
+		if(period<8) period=8;
+		square_duty+=square_slide;
+		if(square_duty<0.0f) square_duty=0.0f;
+		if(square_duty>0.5f) square_duty=0.5f;
+		// volume envelope
+		env_time++;
+		if(env_time>env_length[env_stage])
+		{
+			env_time=0;
+			env_stage++;
+			if(env_stage==3)
+				playing_sample=false;
+		}
+		if(env_stage==0)
+			env_vol=(float)env_time/env_length[0];
+		if(env_stage==1)
+			env_vol=1.0f+pow(1.0f-(float)env_time/env_length[1], 1.0f)*2.0f*s->m_susModel.value();
+		if(env_stage==2)
+			env_vol=1.0f-(float)env_time/env_length[2];
 
-		sample = sample_shape[a]*(1-frac) + sample_shape[b]*(frac);
+		// phaser step
+		fphase+=fdphase;
+		iphase=abs((int)fphase);
+		if(iphase>1023) iphase=1023;
 
-	} else {
-		// No interpolation
-		sample_index = static_cast<int>(sample_realindex);
-		sample = sample_shape[sample_index];
+		if(flthp_d!=0.0f)
+		{
+			flthp*=flthp_d;
+			if(flthp<0.00001f) flthp=0.00001f;
+			if(flthp>0.1f) flthp=0.1f;
+		}
+
+		float ssample=0.0f;
+		for(int si=0;si<8;si++) // 8x supersampling
+		{
+			float sample=0.0f;
+			phase++;
+			if(phase>=period)
+			{
+//				phase=0;
+				phase%=period;
+				if(s->m_waveFormModel.value()==3)
+					for(int i=0;i<32;i++)
+						noise_buffer[i]=frnd(2.0f)-1.0f;
+			}
+			// base waveform
+			float fp=(float)phase/period;
+			switch(s->m_waveFormModel.value())
+			{
+			case 0: // square
+				if(fp<square_duty)
+					sample=0.5f;
+				else
+					sample=-0.5f;
+				break;
+			case 1: // sawtooth
+				sample=1.0f-fp*2;
+				break;
+			case 2: // sine
+				sample=(float)sin(fp*2*PI);
+				break;
+			case 3: // noise
+				sample=noise_buffer[phase*32/period];
+				break;
+			}
+			// lp filter
+			float pp=fltp;
+			fltw*=fltw_d;
+			if(fltw<0.0f) fltw=0.0f;
+			if(fltw>0.1f) fltw=0.1f;
+			if(s->m_lpFilCutModel.value()!=1.0f)
+			{
+				fltdp+=(sample-fltp)*fltw;
+				fltdp-=fltdp*fltdmp;
+			}
+			else
+			{
+				fltp=sample;
+				fltdp=0.0f;
+			}
+			fltp+=fltdp;
+			// hp filter
+			fltphp+=fltp-pp;
+			fltphp-=fltphp*flthp;
+			sample=fltphp;
+			// phaser
+			phaser_buffer[ipp&1023]=sample;
+			sample+=phaser_buffer[(ipp-iphase+1024)&1023];
+			ipp=(ipp+1)&1023;
+			// final accumulation and envelope application
+			ssample+=sample*env_vol;
+		}
+		//ssample=ssample/8*master_vol;
+
+		//ssample*=2.0f*sound_vol;
+		ssample*=0.05f;
+
+		if(buffer!=NULL)
+		{
+			if(ssample>1.0f) ssample=1.0f;
+			if(ssample<-1.0f) ssample=-1.0f;
+			for( ch_cnt_t j=0; j < DEFAULT_CHANNELS; j++ )
+			{
+				buffer[i][j]=ssample;
+			}
+		}
 	}
-
-	// progress in shape
-	sample_realindex += sample_step;
-
-	return sample;
 }
 
 
+
+
+bool SfxrSynth::isPlaying() const
+{
+	return playing_sample;
+}
 
 
 sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
@@ -170,14 +348,6 @@ sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_hpFilCutSweepModel(0.0f, this),
 	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave Form" ) )
 {
-	//TODO
-	/*
-	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) ) );
-
-	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( samplesChanged( int, int ) ) );
-	*/
 }
 
 
@@ -267,16 +437,6 @@ void sfxrInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void sfxrInstrument::samplesChanged( int _begin, int _end )
-{
-	//TODO
-	//normalize();
-	//engine::getSongEditor()->setModified();
-}
-
-
-
-
 QString sfxrInstrument::nodeName() const
 {
 	return( sfxr_plugin_descriptor.name );
@@ -285,54 +445,23 @@ QString sfxrInstrument::nodeName() const
 
 
 
-f_cnt_t sfxrInstrument::desiredReleaseFrames() const
+void sfxrInstrument::playNote(notePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	//TODO: check whether this disables
-	return 0;
-}
-
-
-
-void sfxrInstrument::playNote( notePlayHandle * _n,
-						sampleFrame * _working_buffer )
-{
-	//TODO
-	/*if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	m_synthMutex.lock();
+    fpp_t frameNum = _n->framesLeftForCurrentPeriod();
+	if ( _n->totalFramesPlayed() == 0 )
 	{
-	
-		float factor;
-		if( !m_normalize.value() )
-		{
-			factor = 1.0f;
-		}
-		else
-		{
-			factor = m_normalizeFactor;
-		}
-
-		_n->m_pluginData = new SfxrSynth(
-					const_cast<float*>( m_graph.samples() ),
-					m_graph.length(),
-					_n,
-					m_interpolation.value(), factor,
-				engine::mixer()->processingSampleRate() );
+		_n->m_pluginData = new SfxrSynth( this );
+	}
+	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
+	{
+		_n->noteOff();
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	static_cast<SfxrSynth*>(_n->m_pluginData)->update( _working_buffer, frameNum );
+	m_synthMutex.unlock();
 
-	SfxrSynth * ps = static_cast<SfxrSynth *>( _n->m_pluginData );
-	for( fpp_t frame = 0; frame < frames; ++frame )
-	{
-		const sample_t cur = ps->nextStringSample();
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			_working_buffer[frame][chnl] = cur;
-		}
-	}
-
-	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );*/
+	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, NULL );
 }
 
 
@@ -356,6 +485,7 @@ PluginView * sfxrInstrument::instantiateView( QWidget * _parent )
 
 void sfxrInstrument::resetModels()
 {
+
 	m_attModel.reset();
 	m_holdModel.reset();
 	m_susModel.reset();
@@ -463,7 +593,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	createKnob(m_changeSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*1, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Change Speed");
 
 	createKnob(m_sqrDutyKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Duty(Square wave only)");
-	createKnob(m_sqrSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Sweep(Square wave only)");
+    createKnob(m_sqrSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Sweep(Square wave only)");
 
 	createKnob(m_repeatSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*3, "Repeat Speed");
 
@@ -485,9 +615,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	m_waveBtnGroup->addButton(m_sqrWaveBtn);
 	m_waveBtnGroup->addButton(m_sawWaveBtn);
 	m_waveBtnGroup->addButton(m_sinWaveBtn);
-	m_waveBtnGroup->addButton(m_noiseWaveBtn);
-	connect( m_waveBtnGroup, SIGNAL ( dataChanged() ),
-			 this, SLOT ( waveFormChanged() ) );
+    m_waveBtnGroup->addButton(m_noiseWaveBtn);
 
 
 	createButtonLocalGraphic(m_pickupBtn,		GENERATOR_BASE_X+GENERATOR_BUTTON_WIDTH*0, GENERATOR_BASE_Y, "Generate pick up/coin sfx", "pickup");
@@ -510,10 +638,6 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	createButtonLocalGraphic(m_mutateBtn,		MUTA_BUTTON_X, MUTA_BUTTON_Y, "Mutate sfx", "mutate");
 	connect( m_randomizeBtn, SIGNAL ( clicked() ), this, SLOT ( randomize() ) );
 	connect( m_mutateBtn, SIGNAL ( clicked() ), this, SLOT ( mutate() ) );
-
-	//TODO: for each generator button:
-	/*connect( m_pickupBtn, SIGNAL ( dataChanged() ),
-			 this, SLOT ( pickupClicked() ) );*/
 
 
 }
@@ -541,7 +665,7 @@ void sfxrInstrumentView::modelChanged()
 	m_changeSpeedKnob->setModel( &s->m_changeSpeedModel );
 
 	m_sqrDutyKnob->setModel( &s->m_sqrDutyModel );
-	m_sqrSpeedKnob->setModel( &s->m_sqrSweepModel );
+    m_sqrSweepKnob->setModel( &s->m_sqrSweepModel );
 
 	m_repeatSpeedKnob->setModel( &s->m_repeatSpeedModel );
 
@@ -560,32 +684,20 @@ void sfxrInstrumentView::modelChanged()
 
 
 
-void sfxrInstrumentView::waveFormChanged()
-{
-	//TODO: do we even need this slot?
-	/*
-	m_graph->model()->setWaveToNoise();
-	engine::getSong()->setModified();
-	*/
-}
-
-
-
-
 void sfxrInstrumentView::genPickup()
 {
 	sfxrInstrument * s = castModel<sfxrInstrument>();
 	s->resetModels();
-	s->m_startFreqModel.setValue(	0.4f+frnd(0.5f)	);
-	s->m_attModel.setValue(			0.0f			);
-	s->m_holdModel.setValue(			frnd(0.1f)		);
-	s->m_decModel.setValue(			0.1f+frnd(0.4f)	);
-	s->m_susModel.setValue(			0.3f+frnd(0.3f)	);
+	s->m_startFreqModel.setValue( 0.4f+frnd(0.5f) );
+	s->m_attModel.setValue( 0.0f );
+	s->m_holdModel.setValue( frnd(0.1f) );
+	s->m_decModel.setValue( 0.1f+frnd(0.4f) );
+	s->m_susModel.setValue( 0.3f+frnd(0.3f) );
 
 	if(rnd(1))
 	{
-		s->m_changeAmtModel.setValue( 0.5f+frnd(0.2f) );
-		s->m_changeSpeedModel.setValue( 0.2f+frnd(0.4f) );
+		s->m_changeSpeedModel.setValue( 0.5f+frnd(0.2f) );
+		s->m_changeAmtModel.setValue( 0.2f+frnd(0.4f) );
 	}
 }
 
@@ -599,9 +711,9 @@ void sfxrInstrumentView::genLaser()
 
 	s->m_waveFormModel.setValue( rnd(2) );
 	if(s->m_waveFormModel.value()==2 && rnd(1))
-		s->m_waveFormModel.setValue(rnd(1));
+		s->m_waveFormModel.setValue( rnd(1) );
 
-	s->m_startFreqModel.setValue(	0.5f+frnd(0.5f)	);
+	s->m_startFreqModel.setValue( 0.5f+frnd(0.5f) );
 	s->m_minFreqModel.setValue(	s->m_startFreqModel.value()-0.2f-frnd(0.6f)	);
 
 	if(s->m_minFreqModel.value()<0.2f)
@@ -615,7 +727,7 @@ void sfxrInstrumentView::genLaser()
 	{
 		s->m_startFreqModel.setValue( 0.3f+frnd(0.6f) );
 		s->m_minFreqModel.setValue( frnd(0.1f) );
-		s->m_slideModel.setValue(  -0.35f-frnd(0.3f) );
+		s->m_slideModel.setValue( -0.35f-frnd(0.3f) );
 	}
 
 	if(rnd(1))
@@ -747,9 +859,13 @@ void sfxrInstrumentView::genHit()
 
 	s->m_waveFormModel.setValue( rnd(2) );
 	if(s->m_waveFormModel.value()==2)
+	{
 		s->m_waveFormModel.setValue( 3 );
+	}
 	if(s->m_waveFormModel.value()==0)
+	{
 		s->m_sqrDutyModel.setValue( frnd(0.6f) );
+	}
 
 	s->m_startFreqModel.setValue( 0.2f+frnd(0.6f) );
 	s->m_slideModel.setValue( -0.3f-frnd(0.4f) );
@@ -785,12 +901,12 @@ void sfxrInstrumentView::genJump()
 	{
 		s->m_hpFilCutModel.setValue( frnd(0.3f) );
 	}
-
 	if(rnd(1))
 	{
 
 		s->m_lpFilCutModel.setValue( 1.0f-frnd(0.6f) );
 	}
+
 }
 
 

@@ -1,6 +1,7 @@
 /*
  * sfxr.h - declaration of classes of the LMMS sfxr plugin
- * The original readme file of sfxr can be found in readme.txt in this directory.
+ * Originally written by Tomas Pettersson. For the original license,
+ * please read readme.txt in this directory
  *
  * Copyright (c) 2014 Wong Cho Ching
  * 
@@ -60,28 +61,64 @@ const int KNOB_BLOCK_SIZE_X = 40;
 const int KNOB_BLOCK_SIZE_Y = 40;
 
 
+
+
+class sfxrInstrument;
+
+
+
 class SfxrSynth
 {
 public:
-	SfxrSynth( float * sample, int length, notePlayHandle * _nph,
-			bool _interpolation, float factor,
-			const sample_rate_t _sample_rate );
+	SfxrSynth( const sfxrInstrument * s );
 	virtual ~SfxrSynth();
 
-	sample_t nextStringSample();
+	void resetSample( bool restart );
+	void update( sampleFrame * buffer, const fpp_t frameNum );
 
+	bool isPlaying() const;
 
 private:
-	int sample_index;
-	float sample_realindex;
-	float* sample_shape;
-	notePlayHandle* nph;
-	const int sample_length;
-	const sample_rate_t sample_rate;
+	const sfxrInstrument * s;
+	bool playing_sample;
+	int phase;
+	double fperiod;
+	double fmaxperiod;
+	double fslide;
+	double fdslide;
+	int period;
+	float square_duty;
+	float square_slide;
+	int env_stage;
+	int env_time;
+	int env_length[3];
+	float env_vol;
+	float fphase;
+	float fdphase;
+	int iphase;
+	float phaser_buffer[1024];
+	int ipp;
+	float noise_buffer[32];
+	float fltp;
+	float fltdp;
+	float fltw;
+	float fltw_d;
+	float fltdmp;
+	float fltphp;
+	float flthp;
+	float flthp_d;
+	float vib_phase;
+	float vib_speed;
+	float vib_amp;
+	int rep_time;
+	int rep_limit;
+	int arp_time;
+	int arp_limit;
+	double arp_mod;
 
-	bool interpolation;
+} ;
 
-};
+
 
 /**
  * @brief A class that simplify the constructor of FloatModel, with value [0,1]
@@ -92,6 +129,15 @@ public:
 	SfxrZeroToOneFloatModel(float val, Model * parent):
 		FloatModel( val, 0.0, 1.0, 0.001, parent)
 	{
+	}
+	/* purpose: prevent the initial value of the model from being changed */
+	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) )
+	{
+		float oldInitValue = initValue();
+		FloatModel::loadSettings(element, name);
+		float oldValue = value();
+		setInitValue(oldInitValue);
+		setValue(oldValue);
 	}
 };
 
@@ -105,6 +151,15 @@ public:
 		FloatModel( val, -1.0, 1.0, 0.001, parent)
 	{
 	}
+	/* purpose: prevent the initial value of the model from being changed */
+	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) )
+	{
+		float oldInitValue = initValue();
+		FloatModel::loadSettings(element, name);
+		float oldValue = value();
+		setInitValue(oldInitValue);
+		setValue(oldValue);
+	}
 };
 
 class sfxrInstrument : public Instrument
@@ -114,10 +169,8 @@ public:
 	sfxrInstrument(InstrumentTrack * _instrument_track );
 	virtual ~sfxrInstrument();
 
-	virtual void playNote( notePlayHandle * _n,
-						sampleFrame * _working_buffer );
+	virtual void playNote( notePlayHandle * _n, sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
-
 
 	virtual void saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
@@ -125,17 +178,13 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
-
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 	void resetModels();
 
-protected slots:
-	void samplesChanged( int, int );
-
 
 private:
+	QMutex m_synthMutex;
 	SfxrZeroToOneFloatModel m_attModel;
 	SfxrZeroToOneFloatModel m_holdModel;
 	SfxrZeroToOneFloatModel m_susModel;
@@ -168,6 +217,7 @@ private:
 	IntModel m_waveFormModel;
 
 	friend class sfxrInstrumentView;
+	friend class SfxrSynth;
 };
 
 
@@ -182,7 +232,6 @@ public:
 	virtual ~sfxrInstrumentView() {};
 
 protected slots:
-	void waveFormChanged();
 	void genPickup();
 	void genLaser();
 	void genExplosion();
@@ -212,7 +261,7 @@ private:
 	knob * m_changeSpeedKnob; //Change Speed
 
 	knob * m_sqrDutyKnob; //Squre Duty
-	knob * m_sqrSpeedKnob; //Squre Sweep
+    knob * m_sqrSweepKnob; //Squre Sweep
 
 	knob * m_repeatSpeedKnob; //Repeat Speed
 
