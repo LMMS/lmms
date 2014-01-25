@@ -116,6 +116,7 @@ typedef struct {
 } RotSpkr;
 
 
+void cleanup_RotSpkr(LADSPA_Handle Instance);
 
 /* Construct a new plugin instance. */
 LADSPA_Handle
@@ -124,7 +125,7 @@ instantiate_RotSpkr(const LADSPA_Descriptor * Descriptor,
 
 	LADSPA_Handle * ptr;
 
-	if ((ptr = malloc(sizeof(RotSpkr))) != NULL) {
+	if ((ptr = calloc(1, sizeof(RotSpkr))) != NULL) {
 		RotSpkr* rotSpeak = (RotSpkr*)ptr;
 		rotSpeak->sample_rate = sample_rate;
 		rotSpeak->run_adding_gain = 1.0;
@@ -132,14 +133,13 @@ instantiate_RotSpkr(const LADSPA_Descriptor * Descriptor,
 		if ((rotSpeak->ringbuffer_h_L =
 		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
 		{
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
-		if ((((RotSpkr *)ptr)->ringbuffer_h_R =
+		if ((rotSpeak->ringbuffer_h_R =
 		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		rotSpeak->buflen_h_L = ceil(0.3f * sample_rate / M_PI);
@@ -150,18 +150,13 @@ instantiate_RotSpkr(const LADSPA_Descriptor * Descriptor,
 		if ((rotSpeak->ringbuffer_b_L =
 		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		if ((rotSpeak->ringbuffer_b_R =
 		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		rotSpeak->buflen_b_L = ceil(0.3f * sample_rate / M_PI);
@@ -171,80 +166,42 @@ instantiate_RotSpkr(const LADSPA_Descriptor * Descriptor,
 
 		if ((rotSpeak->eq_filter_L = calloc(1, sizeof(biquad))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(rotSpeak->ringbuffer_b_R);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		if ((rotSpeak->lp_filter_L = calloc(1, sizeof(biquad))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(rotSpeak->ringbuffer_b_R);
-			free(rotSpeak->eq_filter_L);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		if ((rotSpeak->hp_filter_L = calloc(1, sizeof(biquad))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(rotSpeak->ringbuffer_b_R);
-			free(rotSpeak->eq_filter_L);
-			free(rotSpeak->lp_filter_L);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 
 		if ((rotSpeak->eq_filter_R = calloc(1, sizeof(biquad))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(rotSpeak->ringbuffer_b_R);
-			free(rotSpeak->eq_filter_L);
-			free(rotSpeak->lp_filter_L);
-			free(rotSpeak->hp_filter_L);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		if ((rotSpeak->lp_filter_R = calloc(1, sizeof(biquad))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(rotSpeak->ringbuffer_b_R);
-			free(rotSpeak->eq_filter_L);
-			free(rotSpeak->lp_filter_L);
-			free(rotSpeak->hp_filter_L);
-			free(rotSpeak->eq_filter_R);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
 		}
 		if ((rotSpeak->hp_filter_R = calloc(1, sizeof(biquad))) == NULL)
 		{
-			free(rotSpeak->ringbuffer_h_L);
-			free(rotSpeak->ringbuffer_h_R);
-			free(rotSpeak->ringbuffer_b_L);
-			free(rotSpeak->ringbuffer_b_R);
-			free(rotSpeak->eq_filter_L);
-			free(rotSpeak->lp_filter_L);
-			free(rotSpeak->hp_filter_L);
-			free(rotSpeak->eq_filter_R);
-			free(rotSpeak->lp_filter_R);
-			free(ptr);
+			cleanup_RotSpkr((LADSPA_Handle)rotSpeak);
 			return NULL;
-}
+		}
 
 		return ptr;
 	}
 
 	return NULL;
 }
+
 
 void
 activate_RotSpkr(LADSPA_Handle Instance) {
@@ -627,23 +584,38 @@ run_adding_RotSpkr(LADSPA_Handle Instance,
 
 
 
-/* Throw away an RotSpkr effect instance. */
-void 
+/*
+   Throw away an RotSpkr effect instance.
+   This function should be called only when RotSpkr was allocated with calloc.
+ */
+void
 cleanup_RotSpkr(LADSPA_Handle Instance) {
 
-        RotSpkr * ptr = (RotSpkr *)Instance;
-
-	free(ptr->ringbuffer_h_L);
-	free(ptr->ringbuffer_h_R);
-	free(ptr->ringbuffer_b_L);
-	free(ptr->ringbuffer_b_R);
-	free(ptr->eq_filter_L);
-	free(ptr->eq_filter_R);
-	free(ptr->lp_filter_L);
-	free(ptr->lp_filter_R);
-	free(ptr->hp_filter_L);
-	free(ptr->hp_filter_R);
-	free(Instance);
+	RotSpkr * ptr = (RotSpkr *)Instance;
+	if (!ptr)
+		return;
+	if (ptr->ringbuffer_h_L)
+		free(ptr->ringbuffer_h_L);
+	if (ptr->ringbuffer_h_R)
+		free(ptr->ringbuffer_h_R);
+	if (ptr->ringbuffer_b_L)
+		free(ptr->ringbuffer_b_L);
+	if (ptr->ringbuffer_b_R)
+		free(ptr->ringbuffer_b_R);
+	if (ptr->eq_filter_L)
+		free(ptr->eq_filter_L);
+	if (ptr->eq_filter_R)
+		free(ptr->eq_filter_R);
+	if (ptr->lp_filter_L)
+		free(ptr->lp_filter_L);
+	if (ptr->lp_filter_R)
+		free(ptr->lp_filter_R);
+	if (ptr->hp_filter_L)
+		free(ptr->hp_filter_L);
+	if (ptr->hp_filter_R)
+		free(ptr->hp_filter_R);
+	if (Instance)
+		free(Instance);
 }
 
 
