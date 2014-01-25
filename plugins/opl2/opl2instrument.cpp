@@ -1,7 +1,7 @@
 /*
  * OPL2 FM synth
  *
- * Copyright (c) 2013 Raine M. Ekman <raine/at/iki/fi>
+ * Copyright (c) 2014 Raine M. Ekman <raine/at/iki/fi>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,10 +23,10 @@
  */
 
 // TODO: 
-// - Pitch bend
-// - Velocity (and aftertouch) sensitivity
-//   - in FM mode: OP2 level, add mode: OP1 and OP2 levels
+// - Better voice allocation: long releases get cut short :(
 // - .sbi (or similar) file loading into models
+// - RT safety = get rid of mutex = make emulator code thread-safe
+
 // - Extras:
 //   - double release: first release is in effect until noteoff (heard if percussive sound),
 //     second is switched in just before key bit cleared (is this useful???)
@@ -53,7 +53,6 @@
 
 #include "opl.h"
 #include "temuopl.h"
-#include "kemuopl.h"
 
 #include "embed.cpp"
 #include "math.h"
@@ -91,6 +90,9 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 // I'd much rather do without a mutex, but it looks like
 // the emulator code isn't really ready for threads
 QMutex opl2instrument::emulatorMutex;
+
+// Weird ordering of voice parameters
+const unsigned int adlib_opadd[9] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &OPL2_plugin_descriptor ),
@@ -139,10 +141,11 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::mixer()->addPlayHandle( iph );
 
+	// Voices are laid out in a funny way...
+	// adlib_opadd = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+
 	// Create an emulator - samplerate, 16 bit, mono
-	// CTemuopl is the better one, CKemuopl kinda sucks (some sounds silent, pitch goes flat after a while)
 	emulatorMutex.lock();
-	// theEmulator = new CKemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
@@ -155,12 +158,15 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	frameCount = engine::mixer()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
-	// Some kind of sane default
+	// Some kind of sane defaults
+	pitchbend = 0;
 	tuneEqual(69, 440);
 
 	for(int i=1; i<9; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
+		voiceLRU[i] = i;
 	}
+
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
@@ -207,8 +213,15 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( trem_depth_mdl );
 }
 
+opl2instrument::~opl2instrument() {
+	delete theEmulator;
+	engine::mixer()->removePlayHandles( instrumentTrack() );
+	delete [] renderbuffer;
+}
+
 // Samplerate changes when choosing oversampling, so this is more or less mandatory
 void opl2instrument::reloadEmulator() {
+	delete theEmulator;
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
@@ -216,50 +229,135 @@ void opl2instrument::reloadEmulator() {
 	emulatorMutex.unlock();
 	for(int i=1; i<9; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
+		voiceLRU[i] = i;
 	}
 	updatePatch();
+}
+
+// This shall only be called from code protected by the holy Mutex!
+void opl2instrument::setVoiceVelocity(int voice, int vel) {
+	int vel_adjusted;
+	// Velocity calculation, some kind of approximation
+	// Only calculate for operator 1 if in adding mode, don't want to change timbre
+	if( fm_mdl.value() == false ) {
+		vel_adjusted = 63 - ( op1_lvl_mdl.value() * vel/127.0) ;
+	} else {
+		vel_adjusted = 63 - op1_lvl_mdl.value();
+	}
+	theEmulator->write(0x40+adlib_opadd[voice], 
+			   ( (int)op1_scale_mdl.value() & 0x03 << 6) +
+			   ( vel_adjusted & 0x3f ) );
+	
+
+	vel_adjusted = 63 - ( op2_lvl_mdl.value() * vel/127.0 );
+	// vel_adjusted = 63 - op2_lvl_mdl.value();
+	theEmulator->write(0x43+adlib_opadd[voice], 
+			   ( (int)op2_scale_mdl.value() & 0x03 << 6) +
+			   ( vel_adjusted & 0x3f ) );
+	// printf("vel %d for voice %d (%f)\n",vel_adjusted,voice,op2_lvl_mdl.value() );
+}
+
+// Pop least recently used voice - why does it sometimes lose a voice (mostly 0)?
+int opl2instrument::popVoice() {
+	int tmp = voiceLRU[0];
+	for( int i=0; i<8; ++i) {
+		voiceLRU[i] = voiceLRU[i+1];
+	}
+	voiceLRU[8] = OPL2_NO_VOICE;
+	/* printf("pop: %d %d %d %d %d %d %d %d %d \n", 
+	       voiceLRU[0],voiceLRU[1],voiceLRU[2],
+	       voiceLRU[3],voiceLRU[4],voiceLRU[5],
+	       voiceLRU[6],voiceLRU[7],voiceLRU[8]); */
+	return tmp;
+}
+
+int opl2instrument::pushVoice(int v) {
+	int i;
+	for(i=8; i>0; --i) {
+		if( voiceLRU[i-1] != OPL2_NO_VOICE ) {
+			break;
+		}
+	}
+	voiceLRU[i] = v;
+	/*printf("%d %d %d %d %d %d %d %d %d \n", 
+	       voiceLRU[0],voiceLRU[1],voiceLRU[2],
+	       voiceLRU[3],voiceLRU[4],voiceLRU[5],
+	       voiceLRU[6],voiceLRU[7],voiceLRU[8]); */
+	return i;
 }
 
 bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 				      const midiTime & _time )
 {
 	emulatorMutex.lock();
-	// Real dummy version... Should at least add: 
-	// - smarter voice allocation:
-	//   - reuse same note, now we have round robin-ish
-	//   - what to do when voices run out and so on...
-	// - mono mode 
-	// 
-	int key;
-	static int lastvoice=0;
-	if( _me.m_type == MidiNoteOn ) {
-		// to get us in line with MIDI
+	int key, vel, voice, tmp_pb;
+
+	switch(_me.m_type) {
+        case MidiNoteOn:
+		// to get us in line with MIDI(?)
 		key = _me.key() +12;
-		for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {
-			if( voiceNote[i] == OPL2_VOICE_FREE ) {
-				theEmulator->write(0xA0+i, fnums[key] & 0xff);
-				theEmulator->write(0xB0+i, 32 + ((fnums[key] & 0x1f00) >> 8) );
-				// printf("%d: %d %d\n", key, (fnums[key] & 0x1c00) >> 10, fnums[key] & 0x3ff);
-				voiceNote[i] = key;
-				// printf("Voice %d on\n",i);
-				lastvoice=i;
-				break;
+		vel = _me.velocity();
+		
+		voice = popVoice();
+		if( voice != OPL2_NO_VOICE ) {
+			// Turn voice on, NB! the frequencies are straight by voice number, 
+			// not by the adlib_opadd table!
+			theEmulator->write(0xA0+voice, fnums[key] & 0xff);
+			theEmulator->write(0xB0+voice, 32 + ((fnums[key] & 0x1f00) >> 8) );
+			setVoiceVelocity(voice, vel);
+			voiceNote[voice] = key;
+			velocities[key] = vel;
+			// printf("%d %d\n",voice,vel);			
+		}
+                break;
+        case MidiNoteOff:
+                key = _me.key() +12; 
+                for(voice=0; voice<9; ++voice) {
+                        if( voiceNote[voice] == key ) {
+                                theEmulator->write(0xA0+voice, fnums[key] & 0xff);
+                                theEmulator->write(0xB0+voice, (fnums[key] & 0x1f00) >> 8 );
+                                voiceNote[voice] = OPL2_VOICE_FREE;
+				pushVoice(voice);
+                        }
+                }
+		velocities[key] = 0;
+                break;
+        case MidiKeyPressure:
+                key = _me.key() +12;
+                vel = _me.velocity();
+		if( velocities[key] != 0) {
+			velocities[key] = vel;
+		}
+		for(voice=0; voice<9; ++voice) {
+			if(voiceNote[voice] == key) {
+				setVoiceVelocity(voice, vel);
 			}
 		}
-	} else 	if( _me.m_type == MidiNoteOff ) {
-		key = _me.key() +12;
-		for(int i=0; i<9; ++i) {
-			if( voiceNote[i] == key ) {
-				theEmulator->write(0xA0+i, fnums[key] & 0xff);
-				theEmulator->write(0xB0+i, (fnums[key] & 0x1f00) >> 8 );
-				voiceNote[i] = OPL2_VOICE_FREE;
-			}
+                break;
+        case MidiPitchBend:
+		// Update fnumber table
+		// Pitchbend should be in the range 0...16383 but the new range knob gets it wrong. 
+		// tmp_pb = (2*BEND_CENTS)*((float)_me.m_data.m_param[0]/16383)-BEND_CENTS;
+
+		// Something like 100 cents = 8192, but offset by 8192 so the +/-100 cents range goes from 0...16383?
+		tmp_pb = ( _me.m_data.m_param[0]-8192 ) * BEND_CENTS / 8192;
+		
+		printf("Pitch bend: %d -> %d cents\n",_me.m_data.m_param[0],tmp_pb);
+		if( tmp_pb != pitchbend ) {
+			pitchbend = tmp_pb;
+			tuneEqual(69, 440.0);
 		}
-	} else {
-		printf("Midi event type %d\n",_me.m_type);
-		// 224 - pitch wheel
-		// 160 - aftertouch?
-	}
+		// Update pitch of sounding notes
+		for( int v=0; v<9; ++v ) {
+			if( voiceNote[v] != OPL2_VOICE_FREE ) {
+				theEmulator->write(0xA0+v, fnums[voiceNote[v] ] & 0xff);
+				theEmulator->write(0xB0+v, 32 + ((fnums[voiceNote[v]] & 0x1f00) >> 8) );
+			}
+                }
+                break;
+        default:
+                printf("Midi event type %d\n",_me.m_type);
+        }
 	emulatorMutex.unlock();
 	return true;
 }
@@ -332,7 +430,6 @@ void opl2instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void opl2instrument::loadSettings( const QDomElement & _this )
 {
-	printf("loadSettings!\n");
 	op1_a_mdl.loadSettings( _this, "op1_a" );
 	op1_d_mdl.loadSettings( _this, "op1_d" );
 	op1_s_mdl.loadSettings( _this, "op1_s" );
@@ -366,19 +463,14 @@ void opl2instrument::loadSettings( const QDomElement & _this )
 
 }
 
-// Load a preset in binary form
+// Load a patch into the emulator
 void opl2instrument::loadPatch(unsigned char inst[14]) {
-	const unsigned int adlib_opadd[] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
-	// Set all voices
-	printf("%02x %02x %02x %02x %02x ",inst[0],inst[1],inst[2],inst[3],inst[4]);
-	printf("%02x %02x %02x %02x %02x %02x\n",inst[5],inst[6],inst[7],inst[8],inst[9],inst[10]);
-
 	emulatorMutex.lock();
 	for(int v=0; v<9; ++v) {
 		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
 		theEmulator->write(0x23+adlib_opadd[v],inst[1]); // op2
-		theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level
-		theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
+		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by noteon/aftertouch code
+		// theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
 		theEmulator->write(0x60+adlib_opadd[v],inst[4]); // op1 A/D
 		theEmulator->write(0x63+adlib_opadd[v],inst[5]); // op2
 		theEmulator->write(0x80+adlib_opadd[v],inst[6]); // op1 S/R
@@ -391,10 +483,10 @@ void opl2instrument::loadPatch(unsigned char inst[14]) {
 }
 
 void opl2instrument::tuneEqual(int center, float Hz) {
+	float tmp;
 	for(int n=0; n<128; ++n) {
-		float tmp = Hz*pow(2, (n-center)/12.0);
+		tmp = Hz*pow( 2, ( n - center ) / 12.0 + pitchbend / 1200.0 );
 		fnums[n] = Hz2fnum( tmp );
-		//printf("%d: %d %d %f\n", n, (fnums[n] & 0x1c00) >> 10, fnums[n] & 0x3ff,tmp);
 	}
 }
 
@@ -412,7 +504,6 @@ int opl2instrument::Hz2fnum(float Hz) {
 // Load one of the default patches
 void opl2instrument::loadGMPatch() {
 	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
-	// printf("loadGMPatch: %d ", m_patchModel.value());
 	loadPatch(inst);
 }
 
@@ -423,7 +514,6 @@ void opl2instrument::loadGMPatch() {
 
 // Update patch from the models to the chip emulation
 void opl2instrument::updatePatch() {
-	printf("updatePatch()\n");
 	unsigned char *inst = midi_fm_instruments[0];
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
@@ -456,10 +546,16 @@ void opl2instrument::updatePatch() {
 	inst[12] = 0;
 	inst[13] = 0;
 
-	// Not part of the patch per se
+	// Not part of the per-voice patch info
 	theEmulator->write(0xBD, (trem_depth_mdl.value() ? 128 : 0 ) +
 			   (vib_depth_mdl.value() ? 64 : 0 ));
 
+	// have to do this, as the level knobs might've changed
+	for( int voice = 0; voice < 9 ; ++voice) {
+		if(voiceNote[voice]!=OPL2_VOICE_FREE) {
+			setVoiceVelocity(voice, velocities[voiceNote[voice]] );
+		}
+	}
 	loadPatch(inst);
 }
 
@@ -552,9 +648,9 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
         pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
                                                                 "artwork" ) );
         setPalette( pal );
-
-
-
+}
+opl2instrumentView::~opl2instrumentView() {
+	// Nobody else seems to delete their knobs and buttons?
 }
 
 void opl2instrumentView::modelChanged()
@@ -603,5 +699,6 @@ void opl2instrumentView::modelChanged()
 	trem_depth_btn->setModel( &m->trem_depth_mdl );
 
 }
+
 
 #include "moc_opl2instrument.cxx"
