@@ -472,6 +472,14 @@ sf2InstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
+sfxrInstrumentView knob {
+	color: #b06319;
+	qproperty-outerColor: rgb(194, 177, 145);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 10;
+	qproperty-lineWidth: 2;
+}
+
 opl2instrumentView knob {
 	color: rgb(128,128,128);
 	qproperty-outerColor: rgb(255,255,255);
