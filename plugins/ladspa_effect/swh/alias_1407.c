@@ -19,10 +19,10 @@
 
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
-int bIsFirstTime = 1; 
+int bIsFirstTime = 1;
 void _init(); // forward declaration
 #else
-#define _WINDOWS_DLL_EXPORT_ 
+#define _WINDOWS_DLL_EXPORT_
 #endif
 
 

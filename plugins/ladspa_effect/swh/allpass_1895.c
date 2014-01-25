@@ -19,10 +19,10 @@
 
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
-int bIsFirstTime = 1; 
+int bIsFirstTime = 1;
 void _init(); // forward declaration
 #else
-#define _WINDOWS_DLL_EXPORT_ 
+#define _WINDOWS_DLL_EXPORT_
 #endif
 
 #include "ladspa-util.h"
@@ -154,17 +154,17 @@ static void activateAllpass_n(LADSPA_Handle instance) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 	unsigned int minsize, size;
-    
+
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
 	  minsize = sample_rate * *plugin_data->max_delay;
 	else if (plugin_data->delay_time)
 	  minsize = sample_rate * *plugin_data->delay_time;
 	else
 	  minsize = sample_rate; /* 1 second default */
-    
+
 	size = 1;
 	while (size < minsize) size <<= 1;
-    
+
 	/* calloc sets the buffer to zero. */
 	buffer = calloc(size, sizeof(LADSPA_Data));
 	if (buffer)
@@ -286,7 +286,7 @@ static void runAllpass_n(LADSPA_Handle instance, unsigned long sample_count) {
 	  plugin_data->delay_samples = delay_samples = CALC_DELAY (delay_time);
 	  plugin_data->feedback = feedback = calc_feedback (delay_time, decay_time);
 	}
-	
+
 	if (delay_time == last_delay_time) {
 	  long read_phase = write_phase - (long)delay_samples;
 	  LADSPA_Data *readptr = buffer + (read_phase & buffer_mask);
