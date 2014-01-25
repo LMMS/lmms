@@ -2,7 +2,7 @@
  * TempoSyncKnob.h - adds bpm to ms conversion for knob class
  *
  * Copyright (c) 2005-2008 Danny McRae <khjklujn/at/yahoo.com>
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,8 +38,7 @@ class EXPORT TempoSyncKnob : public knob
 {
 	Q_OBJECT
 public:
-	TempoSyncKnob( int _knob_num, QWidget * _parent,
-					const QString & _name = QString() );
+	TempoSyncKnob( int knobNum, QWidget* parent = NULL, const QString& name = QString() );
 	virtual ~TempoSyncKnob();
 
 	const QString & syncDescription();
