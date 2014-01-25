@@ -64,8 +64,8 @@ public:
 	void init();
 
 
-	virtual midiTime length() const;
-	midiTime beatPatternLength() const;
+	virtual MidiTime length() const;
+	MidiTime beatPatternLength() const;
 
 	// note management
 	note * addNote( const note & _new_note, const bool _quant_pos = true );

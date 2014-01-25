@@ -31,7 +31,7 @@
 #include <QtGui/QWidget>
 
 #include "lmms_basics.h"
-#include "midi_time.h"
+#include "MidiTime.h"
 #include "rubberband.h"
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
@@ -101,24 +101,24 @@ public:
 	}
 
 
-	inline const midiTime & startPosition() const
+	inline const MidiTime & startPosition() const
 	{
 		return m_startPosition;
 	}
 
-	inline midiTime endPosition() const
+	inline MidiTime endPosition() const
 	{
 		const int sp = m_startPosition;
 		return sp + m_length;
 	}
 
-	inline const midiTime & length() const
+	inline const MidiTime & length() const
 	{
 		return m_length;
 	}
 
-	virtual void movePosition( const midiTime & _pos );
-	virtual void changeLength( const midiTime & _length );
+	virtual void movePosition( const MidiTime & _pos );
+	virtual void changeLength( const MidiTime & _length );
 
 	virtual trackContentObjectView * createView( trackView * _tv ) = 0;
 
@@ -151,8 +151,8 @@ private:
 	track * m_track;
 	QString m_name;
 
-	midiTime m_startPosition;
-	midiTime m_length;
+	MidiTime m_startPosition;
+	MidiTime m_length;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
@@ -230,7 +230,7 @@ private:
 
 	textFloat * m_hint;
 
-	midiTime m_oldTime;// used for undo/redo while mouse-button is pressed
+	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
 } ;
 
@@ -258,11 +258,11 @@ public:
 		}
 	}
 
-	midiTime endPosition( const midiTime & _pos_start );
+	MidiTime endPosition( const MidiTime & _pos_start );
 
 public slots:
 	void update();
-	void changePosition( const midiTime & _new_pos = midiTime( -1 ) );
+	void changePosition( const MidiTime & _new_pos = MidiTime( -1 ) );
 
 
 protected:
@@ -289,7 +289,7 @@ private:
 	} ;
 
 	track * getTrack();
-	midiTime getPosition( int _mouse_x );
+	MidiTime getPosition( int _mouse_x );
 
 	trackView * m_trackView;
 
@@ -382,12 +382,12 @@ public:
 		return m_type;
 	}
 
-	virtual bool play( const midiTime & _start, const fpp_t _frames,
+	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) = 0;
 
 
 	virtual trackView * createView( TrackContainerView * _view ) = 0;
-	virtual trackContentObject * createTCO( const midiTime & _pos ) = 0;
+	virtual trackContentObject * createTCO( const MidiTime & _pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 						QDomElement & _parent ) = 0;
@@ -415,13 +415,13 @@ public:
 	{
 		return( m_trackContentObjects );
 	}
-	void getTCOsInRange( tcoVector & _tco_v, const midiTime & _start,
-							const midiTime & _end );
+	void getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
+							const MidiTime & _end );
 	void swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
 
 
-	void insertTact( const midiTime & _pos );
-	void removeTact( const midiTime & _pos );
+	void insertTact( const MidiTime & _pos );
+	void removeTact( const MidiTime & _pos );
 
 	tact_t length() const;
 

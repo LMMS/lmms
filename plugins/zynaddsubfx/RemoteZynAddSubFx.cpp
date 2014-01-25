@@ -1,7 +1,7 @@
 /*
  * RemoteZynAddSubFx.cpp - ZynAddSubFx-embedding plugin
  *
- * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -126,10 +126,9 @@ public:
 	}
 
 	// all functions are called while m_master->mutex is held
-	virtual void processMidiEvent( const midiEvent & _e,
-									const f_cnt_t /* _offset */ )
+	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t /* _offset */ )
 	{
-		LocalZynAddSubFx::processMidiEvent( _e );
+		LocalZynAddSubFx::processMidiEvent( event );
 	}
 
 

@@ -76,7 +76,7 @@
 #include <sys/shm.h>
 #endif
 
-tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
+tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
 
@@ -256,7 +256,7 @@ void song::setTempo()
 
 void song::setTimeSignature()
 {
-	midiTime::setTicksPerTact( ticksPerTact() );
+	MidiTime::setTicksPerTact( ticksPerTact() );
 	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
 	emit dataChanged();
 	m_oldTicksPerTact = ticksPerTact();
@@ -494,7 +494,7 @@ void song::processNextBuffer()
 #endif
 
 			// did we play a whole tact?
-			if( ticks >= midiTime::ticksPerTact() )
+			if( ticks >= MidiTime::ticksPerTact() )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
@@ -525,7 +525,7 @@ void song::processNextBuffer()
 					// then start from beginning and keep
 					// offset
 					ticks = ticks % ( max_tact *
-						midiTime::ticksPerTact() );
+						MidiTime::ticksPerTact() );
 #ifdef VST_SNC_LATENCY
 					m_SncVSTplug->ppqPos = ( ( ticks + 0 )
 						/ (float)48 )

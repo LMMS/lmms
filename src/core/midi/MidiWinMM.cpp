@@ -57,8 +57,8 @@ MidiWinMM::~MidiWinMM()
 
 
 
-void MidiWinMM::processOutEvent( const midiEvent & _me,
-						const midiTime & _time,
+void MidiWinMM::processOutEvent( const MidiEvent & _me,
+						const MidiTime & _time,
 						const MidiPort * _port )
 {
 	const DWORD shortMsg = ( _me.m_type + _me.channel() ) +
@@ -137,7 +137,7 @@ void MidiWinMM::removePort( MidiPort * _port )
 
 
 
-QString MidiWinMM::sourcePortName( const midiEvent & _event ) const
+QString MidiWinMM::sourcePortName( const MidiEvent & _event ) const
 {
 	if( _event.sourcePort() )
 	{
@@ -232,22 +232,22 @@ void MidiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 			case MidiNoteOff:
 			case MidiKeyPressure:
 				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1 - KeysPerOctave,
-								par2 & 0xff, &_hm ), midiTime() );
+					MidiEvent( cmdtype, chan, par1 - KeysPerOctave,
+								par2 & 0xff, &_hm ), MidiTime() );
 				break;
 
 			case MidiControlChange:
 			case MidiProgramChange:
 			case MidiChannelPressure:
 				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1, par2 & 0xff, &_hm ),
-								midiTime() );
+					MidiEvent( cmdtype, chan, par1, par2 & 0xff, &_hm ),
+								MidiTime() );
 				break;
 
 			case MidiPitchBend:
 				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1 + par2*128, 0, &_hm ),
-								midiTime() );
+					MidiEvent( cmdtype, chan, par1 + par2*128, 0, &_hm ),
+								MidiTime() );
 				break;
 
 			default:

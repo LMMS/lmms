@@ -29,7 +29,7 @@
 #include <QtCore/QPair>
 #include <QtCore/QVector>
 
-#include "midi.h"
+#include "MidiEvent.h"
 #include "ImportFilter.h"
 
 
@@ -117,8 +117,8 @@ private:
 	}
 
 
-	typedef QVector<QPair<int, midiEvent> > eventVector;
-	eventVector m_events;
+	typedef QVector<QPair<int, MidiEvent> > EventVector;
+	EventVector m_events;
 	int m_timingDivision;
 
 } ;

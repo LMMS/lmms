@@ -99,11 +99,11 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					pixelsPerTact(),
 					m_s->m_playPos[song::Mode_PlaySong],
 					m_currentPosition, this );
-	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 				m_s->m_playPos[song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const midiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
-			this, SLOT( updatePosition( const midiTime & ) ) );
+			SLOT( updatePosition( const MidiTime & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
+			this, SLOT( updatePosition( const MidiTime & ) ) );
 
 	m_positionLine = new positionLine( this );
 
@@ -419,7 +419,7 @@ void songEditor::setHighQuality( bool _hq )
 void songEditor::scrolled( int _new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = midiTime( _new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = MidiTime( _new_pos, 0 ) );
 }
 
 
@@ -503,7 +503,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_s->currentTick() - midiTime::ticksPerTact();
+		tick_t t = m_s->currentTick() - MidiTime::ticksPerTact();
 		if( t >= 0 )
 		{
 			m_s->setPlayPos( t, song::Mode_PlaySong );
@@ -511,7 +511,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_s->currentTick() + midiTime::ticksPerTact();
+		tick_t t = m_s->currentTick() + MidiTime::ticksPerTact();
 		if( t < MaxSongLength )
 		{
 			m_s->setPlayPos( t, song::Mode_PlaySong );
@@ -706,7 +706,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 }
 
 
-void songEditor::updatePosition( const midiTime & _t )
+void songEditor::updatePosition( const MidiTime & _t )
 {
 	int widgetWidth, trackOpWidth;
 	if( configManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -727,15 +727,15 @@ void songEditor::updatePosition( const midiTime & _t )
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- 32;	// rough estimation for width of right scrollbar
-		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
+		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{
 			animateScroll( m_leftRightScroll, _t.getTact(), m_smoothScroll );
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = qMax(
-				(int)( _t - w * midiTime::ticksPerTact() /
+			MidiTime t = qMax(
+				(int)( _t - w * MidiTime::ticksPerTact() /
 							pixelsPerTact() ),
 									0 );
 			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );

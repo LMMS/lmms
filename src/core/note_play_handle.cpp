@@ -29,6 +29,7 @@
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
+#include "MidiEvent.h"
 #include "MidiPort.h"
 #include "song.h"
 
@@ -48,7 +49,8 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 						const f_cnt_t _frames,
 						const note & _n,
 						notePlayHandle *parent,
-						const bool _part_of_arp ) :
+						const bool _part_of_arp,
+						int MidiEventChannel ) :
 	playHandle( NotePlayHandle, _offset ),
 	note( _n.length(), _n.pos(), _n.key(),
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
@@ -73,7 +75,8 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
-	m_songGlobalParentOffset( 0 )
+	m_songGlobalParentOffset( 0 ),
+	m_midiChannel( MidiEventChannel >= 0 ? MidiEventChannel : instrumentTrack()->midiPort()->realOutputChannel() )
 {
 	if( isTopNote() )
 	{
@@ -103,12 +106,10 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 
 	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
-		// send MIDI-note-on-event
-		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
-			m_instrumentTrack->midiPort()->realOutputChannel(),
-			midiKey(), midiVelocity() ),
-				midiTime::fromFrames( offset(),
-						engine::framesPerTick() ) );
+		// send MidiNoteOn event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity() ),
+			MidiTime::fromFrames( offset(), engine::framesPerTick() ) );
 	}
 }
 
@@ -151,10 +152,21 @@ notePlayHandle::~notePlayHandle()
 void notePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
-	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
-			m_instrumentTrack->midiPort()->realOutputChannel(),
-						midiKey(), midiVelocity() ), 0 );
-	
+
+	m_instrumentTrack->processOutEvent( MidiEvent( MidiKeyPressure, midiChannel(), midiKey(), midiVelocity() ) );
+}
+
+
+
+
+void notePlayHandle::setPanning( const panning_t panning )
+{
+	note::setPanning( panning );
+
+	MidiEvent event( MidiMetaEvent, midiChannel(), midiKey(), panningToMidi( panning ) );
+	event.setMetaEvent( MidiNotePanning );
+
+	m_instrumentTrack->processOutEvent( event );
 }
 
 
@@ -341,12 +353,10 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
-		// send MIDI-note-off-event
-		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
-			m_instrumentTrack->midiPort()->realOutputChannel(),
-								midiKey(), 0 ),
-			midiTime::fromFrames( m_framesBeforeRelease,
-						engine::framesPerTick() ) );
+		// send MidiNoteOff event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ) );
 	}
 
 	m_released = true;
@@ -501,7 +511,7 @@ void notePlayHandle::updateFrequency()
 
 
 
-void notePlayHandle::processMidiTime( const midiTime& time )
+void notePlayHandle::processMidiTime( const MidiTime& time )
 {
 	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{

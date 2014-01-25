@@ -63,13 +63,13 @@ public:
 	}
 
 
-	virtual void processInEvent( const midiEvent& event, const midiTime& time )
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time )
 	{
-		if( event.m_type == MidiControlChange &&
-			( m_midiPort.inputChannel() == event.m_channel + 1 || m_midiPort.inputChannel() == 0 ) )
+		if( event.type() == MidiControlChange &&
+			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
 		{
-			m_detectedMidiChannel = event.m_channel + 1;
-			m_detectedMidiController = ( event.m_data.m_bytes[0] & 0x7F ) + 1;
+			m_detectedMidiChannel = event.channel() + 1;
+			m_detectedMidiController = event.controllerNumber() + 1;
 			m_detectedMidiPort = engine::mixer()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();

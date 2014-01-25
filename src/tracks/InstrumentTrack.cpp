@@ -202,15 +202,15 @@ void InstrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 
 
-midiEvent InstrumentTrack::applyMasterKey( const midiEvent & _me )
+MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 {
-	midiEvent copy( _me );
-	switch( _me.m_type )
+	MidiEvent copy( event );
+	switch( event.type() )
 	{
 		case MidiNoteOn:
 		case MidiNoteOff:
 		case MidiKeyPressure:
-			copy.key() = masterKey( _me.key() );
+			copy.setKey( masterKey( event.key() ) );
 			break;
 		default:
 			break;
@@ -221,109 +221,92 @@ midiEvent InstrumentTrack::applyMasterKey( const midiEvent & _me )
 
 
 
-void InstrumentTrack::processInEvent( const midiEvent & _me,
-							const midiTime & _time )
+void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time )
 {
 	engine::mixer()->lock();
 
-	// in the special case this event comes from a MIDI port, the instrument
-	// is MIDI based (VST plugin, Sf2Player etc.) and the user did not set
-	// a dedicated MIDI output channel, directly pass the MIDI event to the
-	// instrument plugin
-	if( _me.isFromMidiPort() && m_instrument->isMidiBased()/* &&
-			midiPort()->realOutputChannel() < 0 */ )
-	{
-		m_instrument->handleMidiEvent( _me, _time );
-		engine::mixer()->unlock();
-		return;
-	}
+	bool eventHandled = false;
 
-	switch( _me.m_type )
+	switch( event.type() )
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
 		// events to instrument as notePlayHandle will send them on its
 		// own
-		case MidiNoteOn: 
-			if( _me.velocity() > 0 )
+		case MidiNoteOn:
+			if( event.velocity() > 0 )
 			{
-				if( m_notes[_me.key()] == NULL )
+				if( m_notes[event.key()] == NULL )
 				{
-					if( !configManager::inst()->value( "ui",
-						"manualchannelpiano" ).toInt() )
+					if( !configManager::inst()->value( "ui", "manualchannelpiano" ).toInt() )
 					{
-						m_piano.setKeyState(
-							_me.key(), true );
+						m_piano.setKeyState( event.key(), true );
 					}
 					// create temporary note
 					note n;
-					n.setKey( _me.key() );
-					n.setVolume( _me.getVolume() );
+					n.setKey( event.key() );
+					n.setVolume( event.volume() );
 
 					// create (timed) note-play-handle
-					notePlayHandle * nph = new
-						notePlayHandle( this,
-							_time.frames(
-						engine::framesPerTick() ),
-						typeInfo<f_cnt_t>::max() / 2,
-									n );
-					if( engine::mixer()->addPlayHandle(
-									nph ) )
+					notePlayHandle* nph = new notePlayHandle( this, time.frames( engine::framesPerTick() ), typeInfo<f_cnt_t>::max() / 2,
+																n, NULL, false, event.channel() );
+					if( engine::mixer()->addPlayHandle( nph ) )
 					{
-						m_notes[_me.key()] = nph;
+						m_notes[event.key()] = nph;
 					}
 
 					emit noteOn( n );
+
+					eventHandled = true;
+
 				}
 				break;
 			}
 
 		case MidiNoteOff:
 		{
-			notePlayHandle * n = m_notes[_me.key()];
-			if( n != NULL )
+			notePlayHandle* nph = m_notes[event.key()];
+			if( nph != NULL )
 			{
 				// create dummy-note which has the same length
 				// as the played note for sending it later
 				// to all slots connected to signal noteOff()
 				// this is for example needed by piano-roll for
 				// recording notes into a pattern
-				note done_note(
-					midiTime( static_cast<f_cnt_t>(
-						n->totalFramesPlayed() /
-						engine::framesPerTick() ) ),
-							0,
-							n->key(),
-							n->getVolume(),
-							n->getPanning() );
+				note n( MidiTime( static_cast<f_cnt_t>( nph->totalFramesPlayed() / engine::framesPerTick() ) ),
+							0, nph->key(), nph->getVolume(), nph->getPanning() );
 
-				n->noteOff();
-				m_notes[_me.key()] = NULL;
+				emit noteOff( n );
 
-				emit noteOff( done_note );
+				// now do actual note off and remove internal reference to NotePlayHandle (which itself will
+				// be deleted later automatically)
+				nph->noteOff();
+				m_notes[event.key()] = NULL;
+
+				eventHandled = true;
 			}
 			break;
 		}
 
 		case MidiKeyPressure:
-			if( m_notes[_me.key()] != NULL )
+			if( m_notes[event.key()] != NULL )
 			{
-				m_notes[_me.key()]->setVolume( _me.getVolume() );
+				eventHandled = true;
+				// setVolume() calls processOutEvent() with MidiKeyPressure so the
+				// attached instrument will receive the event as well
+				m_notes[event.key()]->setVolume( event.volume() );
 			}
 			break;
 
 		case MidiPitchBend:
-			// updatePitch() is connected to
-			// m_pitchModel::dataChanged() which will send out
+			// updatePitch() is connected to m_pitchModel::dataChanged() which will send out
 			// MidiPitchBend events
-			m_pitchModel.setValue( m_pitchModel.minValue() +
-					_me.m_data.m_param[0] *
-						m_pitchModel.range() / 16384 );
+			m_pitchModel.setValue( m_pitchModel.minValue() + event.pitchBend() * m_pitchModel.range() / 16384 );
 			break;
 
 		case MidiControlChange:
-			if( _me.controllerNumber() == MidiControllerSustain )
+			if( event.controllerNumber() == MidiControllerSustain )
 			{
-				if( _me.controllerValue() > MidiMaxControllerValue/2 )
+				if( event.controllerValue() > MidiMaxControllerValue/2 )
 				{
 					m_sustainPedalPressed = true;
 				}
@@ -332,120 +315,99 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 					m_sustainPedalPressed = false;
 				}
 			}
-			if( _me.controllerNumber() == MidiControllerAllSoundOff ||
-			    _me.controllerNumber() == MidiControllerAllNotesOff ||
-			    _me.controllerNumber() == MidiControllerOmniOn ||
-			    _me.controllerNumber() == MidiControllerOmniOff ||
-			    _me.controllerNumber() == MidiControllerMonoOn ||
-			    _me.controllerNumber() == MidiControllerPolyOn )
+			if( event.controllerNumber() == MidiControllerAllSoundOff ||
+			    event.controllerNumber() == MidiControllerAllNotesOff ||
+			    event.controllerNumber() == MidiControllerOmniOn ||
+			    event.controllerNumber() == MidiControllerOmniOff ||
+			    event.controllerNumber() == MidiControllerMonoOn ||
+			    event.controllerNumber() == MidiControllerPolyOn )
 			{
 				silenceAllNotes();
 			}
-			m_instrument->handleMidiEvent( _me, _time );
 			break;
 
-		case MidiProgramChange:
-			m_instrument->handleMidiEvent( _me, _time );
-			break;
-		
 		case MidiMetaEvent:
 			// handle special cases such as note panning
-			switch( _me.m_metaEvent )
+			switch( event.metaEvent() )
 			{
 				case MidiNotePanning:
-					if( m_notes[_me.key()] != NULL )
+					if( m_notes[event.key()] != NULL )
 					{
-		m_notes[_me.key()]->setPanning( _me.getPanning() );
+						eventHandled = true;
+						m_notes[event.key()]->setPanning( event.panning() );
 					}
 					break;
 				default:
-					printf( "instrument-track: unhandled "
-						    "MIDI meta event: %i\n",
-							_me.m_metaEvent );
+					qWarning( "InstrumentTrack: unhandled MIDI meta event: %i", event.metaEvent() );
 					break;
 			}
 			break;
 			
 		default:
-			if( !m_instrument->handleMidiEvent( _me, _time ) )
-			{
-				printf( "instrument-track: unhandled "
-					"MIDI event %d\n", _me.m_type );
-			}
 			break;
 	}
+
+	if( eventHandled == false && instrument()->handleMidiEvent( event, time ) == false )
+	{
+		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
+	}
+
 	engine::mixer()->unlock();
 }
 
 
 
 
-void InstrumentTrack::processOutEvent( const midiEvent & _me,
-							const midiTime & _time )
+void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time )
 {
 	int k;
 
-	switch( _me.m_type )
+	switch( event.type() )
 	{
 		case MidiNoteOn:
-			if( !configManager::inst()->value( "ui",
-						"manualchannelpiano" ).toInt() )
+			if( !configManager::inst()->value( "ui", "manualchannelpiano" ).toInt() )
 			{
-				m_piano.setKeyState( _me.key(), true );
+				m_piano.setKeyState( event.key(), true );
 			}
-			if( !configManager::inst()->value( "ui",
-				"disablechannelactivityindicators" ).toInt() )
+			if( !configManager::inst()->value( "ui", "disablechannelactivityindicators" ).toInt() )
 			{
-				if( m_notes[_me.key()] == NULL )
+				if( m_notes[event.key()] == NULL )
 				{
 					emit newNote();
 				}
 			}
-			k = masterKey( _me.key() );
+			k = masterKey( event.key() );
 			if( k >= 0 && k < NumKeys )
 			{
 				if( m_runningMidiNotes[k] > 0 )
 				{
-					m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ),
-									_time );
+					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ), time );
 				}
 				++m_runningMidiNotes[k];
-				m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOn, midiPort()->realOutputChannel(), k,
-						_me.velocity() ), _time );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), k, event.velocity() ), time );
 			}
 			break;
 
 		case MidiNoteOff:
-			if( !configManager::inst()->value( "ui",
-						"manualchannelpiano" ).toInt() )
+			if( !configManager::inst()->value( "ui", "manualchannelpiano" ).toInt() )
 			{
-				m_piano.setKeyState( _me.key(), false );
+				m_piano.setKeyState( event.key(), false );
 			}
-			k = masterKey( _me.key() );
-			if( k >= 0 && k < NumKeys &&
-						--m_runningMidiNotes[k] <= 0 )
+			k = masterKey( event.key() );
+			if( k >= 0 && k < NumKeys && --m_runningMidiNotes[k] <= 0 )
 			{
 				m_runningMidiNotes[k] = qMax( 0, m_runningMidiNotes[k] );
-				m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ),
-									_time );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ), time );
 			}
 			break;
 
 		default:
-			if( m_instrument != NULL )
-			{
-				m_instrument->handleMidiEvent(
-							applyMasterKey( _me ),
-									_time );
-			}
+			m_instrument->handleMidiEvent( applyMasterKey( event ), time );
 			break;
 	}
 
 	// if appropriate, midi-port does futher routing
-	m_midiPort.processOutEvent( _me, _time );
+	m_midiPort.processOutEvent( event, time );
 }
 
 
@@ -525,7 +487,7 @@ void InstrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 	// Notes deleted when keys still pressed
 	if( m_notes[_n->key()] == _n )
 	{
-		note done_note( midiTime( static_cast<f_cnt_t>(
+		note done_note( MidiTime( static_cast<f_cnt_t>(
 						_n->totalFramesPlayed() /
 						engine::framesPerTick() ) ),
 					0, _n->key(),
@@ -581,9 +543,7 @@ void InstrumentTrack::updateBaseNote()
 void InstrumentTrack::updatePitch()
 {
 	updateBaseNote();
-	processOutEvent( midiEvent( MidiPitchBend,
-					midiPort()->realOutputChannel(),
-					midiPitch() ), 0 );
+	processOutEvent( MidiEvent( MidiPitchBend, midiPort()->realOutputChannel(), midiPitch() ), 0 );
 }
 
 
@@ -616,7 +576,7 @@ void InstrumentTrack::removeMidiPortNode( multimediaProject & _mmp )
 
 
 
-bool InstrumentTrack::play( const midiTime & _start, const fpp_t _frames,
+bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 							const f_cnt_t _offset, int _tco_num )
 {
 	const float frames_per_tick = engine::framesPerTick();
@@ -657,7 +617,7 @@ bool InstrumentTrack::play( const midiTime & _start, const fpp_t _frames,
 		{
 			continue;
 		}
-		midiTime cur_start = _start;
+		MidiTime cur_start = _start;
 		if( _tco_num < 0 )
 		{
 			cur_start -= p->startPosition();
@@ -747,7 +707,7 @@ bool InstrumentTrack::play( const midiTime & _start, const fpp_t _frames,
 
 
 
-trackContentObject * InstrumentTrack::createTCO( const midiTime & )
+trackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 {
 	return new pattern( this );
 }
@@ -1182,8 +1142,8 @@ void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 void InstrumentTrackView::activityIndicatorPressed()
 {
 	model()->processInEvent(
-			midiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
-								midiTime() );
+			MidiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
+								MidiTime() );
 }
 
 
@@ -1191,8 +1151,8 @@ void InstrumentTrackView::activityIndicatorPressed()
 
 void InstrumentTrackView::activityIndicatorReleased()
 {
-	model()->processInEvent( midiEvent( MidiNoteOff, 0, DefaultKey, 0 ),
-								midiTime() );
+	model()->processInEvent( MidiEvent( MidiNoteOff, 0, DefaultKey, 0 ),
+								MidiTime() );
 }
 
 

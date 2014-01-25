@@ -286,17 +286,16 @@ int opl2instrument::pushVoice(int v) {
 	return i;
 }
 
-bool opl2instrument::handleMidiEvent( const midiEvent & _me,
-				      const midiTime & _time )
+bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
 
-	switch(_me.m_type) {
+	switch(event.type()) {
         case MidiNoteOn:
 		// to get us in line with MIDI(?)
-		key = _me.key() +12;
-		vel = _me.velocity();
+		key = event.key() +12;
+		vel = event.velocity();
 		
 		voice = popVoice();
 		if( voice != OPL2_NO_VOICE ) {
@@ -311,7 +310,7 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 		}
                 break;
         case MidiNoteOff:
-                key = _me.key() +12; 
+                key = event.key() +12; 
                 for(voice=0; voice<9; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
@@ -323,8 +322,8 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 		velocities[key] = 0;
                 break;
         case MidiKeyPressure:
-                key = _me.key() +12;
-                vel = _me.velocity();
+                key = event.key() +12;
+                vel = event.velocity();
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
 		}
@@ -337,12 +336,12 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
         case MidiPitchBend:
 		// Update fnumber table
 		// Pitchbend should be in the range 0...16383 but the new range knob gets it wrong. 
-		// tmp_pb = (2*BEND_CENTS)*((float)_me.m_data.m_param[0]/16383)-BEND_CENTS;
+		// tmp_pb = (2*BEND_CENTS)*((float)event.m_data.m_param[0]/16383)-BEND_CENTS;
 
 		// Something like 100 cents = 8192, but offset by 8192 so the +/-100 cents range goes from 0...16383?
-		tmp_pb = ( _me.m_data.m_param[0]-8192 ) * BEND_CENTS / 8192;
+		tmp_pb = ( event.pitchBend()-8192 ) * BEND_CENTS / 8192;
 		
-		printf("Pitch bend: %d -> %d cents\n",_me.m_data.m_param[0],tmp_pb);
+		printf("Pitch bend: %d -> %d cents\n",event.pitchBend(),tmp_pb);
 		if( tmp_pb != pitchbend ) {
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
@@ -356,7 +355,7 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
                 }
                 break;
         default:
-                printf("Midi event type %d\n",_me.m_type);
+                printf("Midi event type %d\n",event.type());
         }
 	emulatorMutex.unlock();
 	return true;

@@ -1,7 +1,7 @@
 /*
  * LocalZynAddSubFx.h - local implementation of ZynAddSubFx plugin
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,6 +25,7 @@
 #ifndef _LOCAL_ZYNADDSUBFX_H
 #define _LOCAL_ZYNADDSUBFX_H
 
+#include "MidiEvent.h"
 #include "note.h"
 
 class Master;
@@ -48,7 +49,7 @@ public:
 	void setPresetDir( const std::string & _dir );
 	void setLmmsWorkingDir( const std::string & _dir );
 
-	void processMidiEvent( const midiEvent & _e );
+	void processMidiEvent( const MidiEvent& event );
 
 	void processAudio( sampleFrame * _out );
 

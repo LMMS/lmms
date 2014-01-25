@@ -55,7 +55,7 @@ bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	if( t > 0 )
 	{
 		saveJournallingState( false );
-		changeLength( midiTime( t, 0 ) );
+		changeLength( MidiTime( t, 0 ) );
 		restoreJournallingState();
 	}
 }
@@ -192,7 +192,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
 				bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
-	if( m_bbTCO->length() > midiTime::ticksPerTact() && t > 0 )
+	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerTact() );
 								x < width()-2;
@@ -341,7 +341,7 @@ bbTrack::~bbTrack()
 
 
 // play _frames frames of given TCO within starting with _start
-bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
+bool bbTrack::play( const MidiTime & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	if( isMuted() )
@@ -362,8 +362,8 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 		return false;
 	}
 
-	midiTime lastPosition;
-	midiTime lastLen;
+	MidiTime lastPosition;
+	MidiTime lastLen;
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
@@ -392,7 +392,7 @@ trackView * bbTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * bbTrack::createTCO( const midiTime & _pos )
+trackContentObject * bbTrack::createTCO( const MidiTime & _pos )
 {
 	// if we're creating a new bbTCO, we colorize it according to the
 	// previous bbTCO, so we have to get all TCOs from 0 to _pos and

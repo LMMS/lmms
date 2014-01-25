@@ -45,7 +45,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_tension( "1.0" ),
 	m_progressionType( DiscreteProgression )
 {
-	changeLength( midiTime( 1, 0 ) );
+	changeLength( MidiTime( 1, 0 ) );
 }
 
 
@@ -166,7 +166,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 
 
 //TODO: Improve this
-midiTime AutomationPattern::length() const
+MidiTime AutomationPattern::length() const
 {
 	tick_t max_length = 0;
 
@@ -175,19 +175,19 @@ midiTime AutomationPattern::length() const
 	{
 		max_length = qMax<tick_t>( max_length, it.key() );
 	}
-	return midiTime( qMax( midiTime( max_length ).getTact() + 1, 1 ), 0 );
+	return MidiTime( qMax( MidiTime( max_length ).getTact() + 1, 1 ), 0 );
 }
 
 
 
 
-midiTime AutomationPattern::putValue( const midiTime & _time,
+MidiTime AutomationPattern::putValue( const MidiTime & _time,
 							const float _value,
 							const bool _quant_pos )
 {
 	cleanObjects();
 
-	midiTime newTime = _quant_pos && engine::automationEditor() ?
+	MidiTime newTime = _quant_pos && engine::automationEditor() ?
 		note::quantized( _time,
 			engine::automationEditor()->quantization() ) :
 		_time;
@@ -215,7 +215,7 @@ midiTime AutomationPattern::putValue( const midiTime & _time,
 
 
 
-void AutomationPattern::removeValue( const midiTime & _time )
+void AutomationPattern::removeValue( const MidiTime & _time )
 {
 	cleanObjects();
 
@@ -240,7 +240,7 @@ void AutomationPattern::removeValue( const midiTime & _time )
 
 
 
-float AutomationPattern::valueAt( const midiTime & _time ) const
+float AutomationPattern::valueAt( const MidiTime & _time ) const
 {
 	if( m_timeMap.isEmpty() )
 	{
@@ -306,7 +306,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 
 
-float *AutomationPattern::valuesAfter( const midiTime & _time ) const
+float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 {
 	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
@@ -417,7 +417,7 @@ const QString AutomationPattern::name() const
 
 
 
-void AutomationPattern::processMidiTime( const midiTime & _time )
+void AutomationPattern::processMidiTime( const MidiTime & _time )
 {
 	if( _time >= 0 && hasAutomation() )
 	{

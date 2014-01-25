@@ -43,11 +43,11 @@ public:
 	MidiController( Model * _parent );
 	virtual ~MidiController();
 
-	virtual void processInEvent( const midiEvent & _me,
-					const midiTime & _time );
+	virtual void processInEvent( const MidiEvent & _me,
+					const MidiTime & _time );
 
-	virtual void processOutEvent( const midiEvent& _me,
-					const midiTime & _time)
+	virtual void processOutEvent( const MidiEvent& _me,
+					const MidiTime & _time)
 	{
 		// No output yet
 	}

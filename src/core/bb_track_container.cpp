@@ -54,7 +54,7 @@ bbTrackContainer::~bbTrackContainer()
 
 
 
-bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
+bool bbTrackContainer::play( MidiTime _start, fpp_t _frames,
 								f_cnt_t _offset, int _tco_num )
 {
 	bool played_a_note = false;
@@ -63,7 +63,7 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 		return false;
 	}
 
-	_start = _start % ( lengthOfBB( _tco_num ) * midiTime::ticksPerTact() );
+	_start = _start % ( lengthOfBB( _tco_num ) * MidiTime::ticksPerTact() );
 
 	TrackList tl = tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -99,7 +99,7 @@ void bbTrackContainer::updateAfterTrackAdd()
 
 tact_t bbTrackContainer::lengthOfBB( int _bb )
 {
-	midiTime max_length = midiTime::ticksPerTact();
+	MidiTime max_length = MidiTime::ticksPerTact();
 
 	const TrackList & tl = tracks();
 	for( TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
@@ -172,7 +172,7 @@ void bbTrackContainer::fixIncorrectPositions()
 	{
 		for( int i = 0; i < numOfBBs(); ++i )
 		{
-			( *it )->getTCO( i )->movePosition( midiTime( i, 0 ) );
+			( *it )->getTCO( i )->movePosition( MidiTime( i, 0 ) );
 		}
 	}
 }
@@ -252,10 +252,10 @@ void bbTrackContainer::createTCOsForBB( int _bb )
 	{
 		while( tl[i]->numOfTCOs() < _bb + 1 )
 		{
-			midiTime position = midiTime( tl[i]->numOfTCOs(), 0 );
+			MidiTime position = MidiTime( tl[i]->numOfTCOs(), 0 );
 			trackContentObject * tco = tl[i]->createTCO( position );
 			tco->movePosition( position );
-			tco->changeLength( midiTime( 1, 0 ) );
+			tco->changeLength( MidiTime( 1, 0 ) );
 		}
 	}
 }

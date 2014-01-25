@@ -35,8 +35,8 @@
 // forward-declarations
 class InstrumentTrack;
 class InstrumentView;
-class midiEvent;
-class midiTime;
+class MidiEvent;
+class MidiTime;
 class notePlayHandle;
 class track;
 
@@ -99,7 +99,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const midiEvent &, const midiTime & )
+	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime() )
 	{
 		return false;
 	}

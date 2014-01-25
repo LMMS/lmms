@@ -1,8 +1,8 @@
 /*
- * MidiPort.h - abstraction of MIDI ports which are part of LMMS's MIDI-
+ * MidiPort.h - abstraction of MIDI ports which are part of LMMS' MIDI
  *              sequencing system
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,16 +28,17 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QtCore/QMap>
 
-#include "midi.h"
+#include "Midi.h"
+#include "MidiTime.h"
 #include "AutomatableModel.h"
 
 
 class MidiClient;
+class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
-class midiTime;
 
 
 // class for abstraction of MIDI-port
@@ -104,8 +105,8 @@ public:
 		return outputChannel() - 1;
 	}
 
-	void processInEvent( const midiEvent & _me, const midiTime & _time );
-	void processOutEvent( const midiEvent & _me, const midiTime & _time );
+	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

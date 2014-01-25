@@ -50,8 +50,7 @@ public:
 
 	inline virtual bool isMidiBased() const { return true; }
 
-	virtual bool handleMidiEvent( const midiEvent & _me,
-			      const midiTime & _time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
 	virtual void play( sampleFrame * _working_buffer );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this );

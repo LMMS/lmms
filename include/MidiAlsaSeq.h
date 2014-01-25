@@ -62,8 +62,8 @@ public:
 
 
 
-	virtual void processOutEvent( const midiEvent & _me,
-						const midiTime & _time,
+	virtual void processOutEvent( const MidiEvent & _me,
+						const MidiTime & _time,
 						const MidiPort * _port );
 
 	virtual void applyPortMode( MidiPort * _port );
@@ -84,7 +84,7 @@ public:
 	}
 
 	// return name of port which specified MIDI event came from
-	virtual QString sourcePortName( const midiEvent & ) const;
+	virtual QString sourcePortName( const MidiEvent & ) const;
 
 	// (un)subscribe given MidiPort to/from destination-port 
 	virtual void subscribeReadablePort( MidiPort * _port,

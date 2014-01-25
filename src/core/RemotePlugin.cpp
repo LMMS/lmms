@@ -1,7 +1,7 @@
 /*
  * RemotePlugin.cpp - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -281,14 +281,14 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 
 
 
-void RemotePlugin::processMidiEvent( const midiEvent & _e,
+void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 							const f_cnt_t _offset )
 {
 	message m( IdMidiEvent );
-	m.addInt( _e.m_type );
-	m.addInt( _e.m_channel );
-	m.addInt( _e.m_data.m_param[0] );
-	m.addInt( _e.m_data.m_param[1] );
+	m.addInt( _e.type() );
+	m.addInt( _e.channel() );
+	m.addInt( _e.param( 0 ) );
+	m.addInt( _e.param( 1 ) );
 	m.addInt( _offset );
 	lock();
 	sendMessage( m );

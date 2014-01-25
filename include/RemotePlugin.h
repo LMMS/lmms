@@ -1,7 +1,7 @@
 /*
  * RemotePlugin.h - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,7 @@
 #define _REMOTE_PLUGIN_H
 
 #include "export.h"
-#include "midi.h"
+#include "MidiEvent.h"
 #include "VST_sync_shm.h"
 
 #include <vector>
@@ -724,7 +724,7 @@ public:
 
 	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
 
-	void processMidiEvent( const midiEvent &, const f_cnt_t _offset );
+	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
 	void updateSampleRate( sample_rate_t _sr )
 	{
@@ -820,8 +820,7 @@ public:
 	virtual void process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf ) = 0;
 
-	virtual void processMidiEvent( const midiEvent &,
-						const f_cnt_t /* _offset */ )
+	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
 	}
 
@@ -1120,7 +1119,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 		case IdMidiEvent:
 			processMidiEvent(
-				midiEvent( static_cast<MidiEventTypes>(
+				MidiEvent( static_cast<MidiEventTypes>(
 							_m.getInt( 0 ) ),
 						_m.getInt( 1 ),
 						_m.getInt( 2 ),
