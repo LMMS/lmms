@@ -356,38 +356,39 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time )
 {
-	int k;
+	const MidiEvent transposedEvent = applyMasterKey( event );
+	const int key = transposedEvent.key();
 
 	switch( event.type() )
 	{
 		case MidiNoteOn:
-			m_piano.setKeyState( event.key(), true );
-			k = masterKey( event.key() );
-			if( k >= 0 && k < NumKeys )
+			m_piano.setKeyState( event.key(), true );	// event.key() = original key
+
+			if( key >= 0 && key < NumKeys )
 			{
-				if( m_runningMidiNotes[k] > 0 )
+				if( m_runningMidiNotes[key] > 0 )
 				{
-					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ), time );
+					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time );
 				}
-				++m_runningMidiNotes[k];
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), k, event.velocity() ), time );
+				++m_runningMidiNotes[key];
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time );
 
 				emit newNote();
 			}
 			break;
 
 		case MidiNoteOff:
-			m_piano.setKeyState( event.key(), false );
-			k = masterKey( event.key() );
-			if( k >= 0 && k < NumKeys && --m_runningMidiNotes[k] <= 0 )
+			m_piano.setKeyState( event.key(), false );	// event.key() = original key
+
+			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
 			{
-				m_runningMidiNotes[k] = qMax( 0, m_runningMidiNotes[k] );
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ), time );
+				m_runningMidiNotes[key] = qMax( 0, m_runningMidiNotes[key] );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time );
 			}
 			break;
 
 		default:
-			m_instrument->handleMidiEvent( applyMasterKey( event ), time );
+			m_instrument->handleMidiEvent( transposedEvent, time );
 			break;
 	}
 
