@@ -104,6 +104,11 @@ QScrollBar:vertical {
     margin: 13px 0px;
 }
 
+visualizationWidget, cpuloadWidget {
+	background: none;
+	border: none;
+}
+
 /* scrollbar: trough clicky things */
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
