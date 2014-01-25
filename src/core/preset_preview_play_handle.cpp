@@ -105,7 +105,7 @@ private:
 	notePlayHandle * m_previewNote;
 	QMutex m_dataMutex;
 
-	friend presetPreviewPlayHandle;
+	friend class presetPreviewPlayHandle;
 
 } ;
 
