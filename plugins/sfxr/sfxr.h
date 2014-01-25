@@ -1,8 +1,7 @@
 /*
- * bit_invader.h - declaration of class bitInvader and bSynth which
- *                         are a wavetable synthesizer
+ * sfxr.h - declaration of classes of the LMMS sfxr plugin
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2014 Wong Cho Ching
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,17 +23,15 @@
  */
 
 
-#ifndef _BIT_INVADER_H
-#define _BIT_INVADER_H
+#ifndef _SFXR_H
+#define _SFXR_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "graph.h"
 #include "knob.h"
 #include "pixmap_button.h"
 #include "led_checkbox.h"
 
-class oscillator;
 class bitInvaderView;
 
 class bSynth
@@ -100,8 +97,6 @@ private:
 	BoolModel m_normalize;
 	
 	float m_normalizeFactor;
-	
-	oscillator * m_osc;
 
 	friend class bitInvaderView;
 } ;

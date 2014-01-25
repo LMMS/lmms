@@ -1,7 +1,7 @@
 /*
- * bit_invader.cpp - instrument which uses a usereditable wavetable
+ * sfxr.cpp - port of sfxr to LMMS
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2014 Wong Cho Ching
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,14 +25,13 @@
 
 #include <QtXml/QDomElement>
 
-#include "bit_invader.h"
+#include "sfxr.h"
 #include "engine.h"
 #include "graph.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "led_checkbox.h"
 #include "note_play_handle.h"
-#include "Oscillator.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
 #include "templates.h"
@@ -47,10 +46,10 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"BitInvader",
+	"sfxr",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Customizable wavetable synthesizer" ),
-	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
+				"LMMS port of sfxr" ),
+	"Wong Cho Ching",
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
