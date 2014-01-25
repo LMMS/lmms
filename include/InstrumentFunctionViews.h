@@ -35,23 +35,23 @@ class groupBox;
 class knob;
 class TempoSyncKnob;
 
-class Arpeggiator;
-class ChordCreator;
+class InstrumentFunctionArpeggio;
+class InstrumentFunctionNoteStacking;
 
 
 
-class ChordCreatorView : public QWidget, public ModelView
+class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	ChordCreatorView( ChordCreator* cc, QWidget* parent = NULL );
-	virtual ~ChordCreatorView();
+	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = NULL );
+	virtual ~InstrumentFunctionNoteStackingView();
 
 
 private:
 	virtual void modelChanged();
 
-	ChordCreator * m_cc;
+	InstrumentFunctionNoteStacking * m_cc;
 
 	groupBox * m_chordsGroupBox;
 	comboBox * m_chordsComboBox;
@@ -63,18 +63,18 @@ private:
 
 
 
-class ArpeggiatorView : public QWidget, public ModelView
+class InstrumentFunctionArpeggioView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	ArpeggiatorView( Arpeggiator* arp, QWidget* parent = NULL );
-	virtual ~ArpeggiatorView();
+	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = NULL );
+	virtual ~InstrumentFunctionArpeggioView();
 
 
 private:
 	virtual void modelChanged();
 
-	Arpeggiator * m_a;
+	InstrumentFunctionArpeggio * m_a;
 	groupBox * m_arpGroupBox;
 	comboBox * m_arpComboBox;
 	knob * m_arpRangeKnob;

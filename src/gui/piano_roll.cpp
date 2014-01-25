@@ -520,7 +520,7 @@ pianoRoll::pianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 
-	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
 	// setup scale-stuff
 	QLabel * scale_lbl = new QLabel( m_toolBar );
@@ -644,7 +644,7 @@ void pianoRoll::changeNoteEditMode( int i )
 void pianoRoll::markSemiTone( int i )
 {
 	const int key = getKey( mapFromGlobal( m_semiToneMarkerMenu->pos() ).y() );
-	const ChordCreator::Chord * chord = 0;
+	const InstrumentFunctionNoteStacking::Chord * chord = 0;
 
 	switch( static_cast<semiToneMarkerAction>( i ) )
 	{
@@ -665,13 +665,13 @@ void pianoRoll::markSemiTone( int i )
 			break;
 		}
 		case stmaMarkCurrentScale:
-			chord = & ChordCreator::ChordTable::getInstance()
+			chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
 					.getScaleByName( m_scaleModel.currentText() );
 		case stmaMarkCurrentChord:
 		{
 			if( ! chord )
 			{
-				chord = & ChordCreator::ChordTable::getInstance()
+				chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
 						.getChordByName( m_chordModel.currentText() );
 			}
 
@@ -1602,7 +1602,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_pattern->addNote( new_note );
 
-					const ChordCreator::Chord & chord = ChordCreator::ChordTable::getInstance()
+					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
 						.getChordByName( m_chordModel.currentText() );
 
 					if( ! chord.isEmpty() )
@@ -3855,10 +3855,10 @@ int pianoRoll::quantization() const
 
 void pianoRoll::updateSemiToneMarkerMenu()
 {
-	const ChordCreator::Chord & scale = ChordCreator::ChordTable::getInstance()
+	const InstrumentFunctionNoteStacking::Chord & scale = InstrumentFunctionNoteStacking::ChordTable::getInstance()
 					.getScaleByName( m_scaleModel.currentText() );
 
-	const ChordCreator::Chord & chord = ChordCreator::ChordTable::getInstance()
+	const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
 					.getChordByName( m_chordModel.currentText() );
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );

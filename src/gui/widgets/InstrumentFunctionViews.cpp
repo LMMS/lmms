@@ -38,7 +38,7 @@
 #include "tooltip.h"
 
 
-ChordCreatorView::ChordCreatorView( ChordCreator* cc, QWidget* parent ) :
+InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_cc( cc ),
@@ -74,7 +74,7 @@ ChordCreatorView::ChordCreatorView( ChordCreator* cc, QWidget* parent ) :
 
 
 
-ChordCreatorView::~ChordCreatorView()
+InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
 {
 	delete m_chordsGroupBox;
 }
@@ -82,9 +82,9 @@ ChordCreatorView::~ChordCreatorView()
 
 
 
-void ChordCreatorView::modelChanged()
+void InstrumentFunctionNoteStackingView::modelChanged()
 {
-	m_cc = castModel<ChordCreator>();
+	m_cc = castModel<InstrumentFunctionNoteStacking>();
 	m_chordsGroupBox->setModel( &m_cc->m_chordsEnabledModel );
 	m_chordsComboBox->setModel( &m_cc->m_chordsModel );
 	m_chordRangeKnob->setModel( &m_cc->m_chordRangeModel );
@@ -96,7 +96,7 @@ void ChordCreatorView::modelChanged()
 
 
 
-ArpeggiatorView::ArpeggiatorView( Arpeggiator* arp, QWidget* parent ) :
+InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_a( arp ),
@@ -180,7 +180,7 @@ ArpeggiatorView::ArpeggiatorView( Arpeggiator* arp, QWidget* parent ) :
 
 
 
-ArpeggiatorView::~ArpeggiatorView()
+InstrumentFunctionArpeggioView::~InstrumentFunctionArpeggioView()
 {
 	delete m_arpGroupBox;
 }
@@ -188,9 +188,9 @@ ArpeggiatorView::~ArpeggiatorView()
 
 
 
-void ArpeggiatorView::modelChanged()
+void InstrumentFunctionArpeggioView::modelChanged()
 {
-	m_a = castModel<Arpeggiator>();
+	m_a = castModel<InstrumentFunctionArpeggio>();
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );

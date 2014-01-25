@@ -108,8 +108,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
-	m_arpeggiator( this ),
-	m_chordCreator( this ),
+	m_arpeggio( this ),
+	m_noteStacking( this ),
 	m_piano( this )
 {
 	m_pitchModel.setCenterValue( 0 );
@@ -490,8 +490,8 @@ void InstrumentTrack::playNote( notePlayHandle * _n,
 {
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
-	m_chordCreator.processNote( _n );
-	m_arpeggiator.processNote( _n );
+	m_noteStacking.processNote( _n );
+	m_arpeggio.processNote( _n );
 
 	if( !_n->isArpeggioBaseNote() && m_instrument != NULL )
 	{
@@ -782,8 +782,8 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 		_this.appendChild( i );
 	}
 	m_soundShaping.saveState( _doc, _this );
-	m_chordCreator.saveState( _doc, _this );
-	m_arpeggiator.saveState( _doc, _this );
+	m_noteStacking.saveState( _doc, _this );
+	m_arpeggio.saveState( _doc, _this );
 	m_midiPort.saveState( _doc, _this );
 	m_audioPort.effects()->saveState( _doc, _this );
 }
@@ -842,13 +842,13 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_soundShaping.restoreState( node.toElement() );
 			}
-			else if( m_chordCreator.nodeName() == node.nodeName() )
+			else if( m_noteStacking.nodeName() == node.nodeName() )
 			{
-				m_chordCreator.restoreState( node.toElement() );
+				m_noteStacking.restoreState( node.toElement() );
 			}
-			else if( m_arpeggiator.nodeName() == node.nodeName() )
+			else if( m_arpeggio.nodeName() == node.nodeName() )
 			{
-				m_arpeggiator.restoreState( node.toElement() );
+				m_arpeggio.restoreState( node.toElement() );
 			}
 			else if( m_midiPort.nodeName() == node.nodeName() )
 			{
@@ -1356,11 +1356,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QWidget* instrumentFunctions = new QWidget( m_tabWidget );
 	QVBoxLayout* instrumentFunctionsLayout = new QVBoxLayout( instrumentFunctions );
 	instrumentFunctionsLayout->setMargin( 5 );
-	m_chordView = new ChordCreatorView( &m_track->m_chordCreator );
-	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator );
+	m_noteStackingView = new InstrumentFunctionNoteStackingView( &m_track->m_noteStacking );
+	m_arpeggioView = new InstrumentFunctionArpeggioView( &m_track->m_arpeggio );
 
-	instrumentFunctionsLayout->addWidget( m_chordView );
-	instrumentFunctionsLayout->addWidget( m_arpView );
+	instrumentFunctionsLayout->addWidget( m_noteStackingView );
+	instrumentFunctionsLayout->addWidget( m_arpeggioView );
 	instrumentFunctionsLayout->addStretch();
 
 	// MIDI tab
@@ -1463,8 +1463,8 @@ void InstrumentTrackWindow::modelChanged()
 	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );
-	m_chordView->setModel( &m_track->m_chordCreator );
-	m_arpView->setModel( &m_track->m_arpeggiator );
+	m_noteStackingView->setModel( &m_track->m_noteStacking );
+	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	updateName();

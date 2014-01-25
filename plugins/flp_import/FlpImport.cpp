@@ -1,5 +1,5 @@
 /*
- * flp_import.cpp - support for importing FLP-files
+ * FlpImport.cpp - support for importing FLP-files
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -464,7 +464,7 @@ struct FL_Channel : public FL_Plugin
 		filterCut( 10000 ),
 		filterRes( 0.1 ),
 		filterEnabled( false ),
-		arpDir( Arpeggiator::ArpDirUp ),
+		arpDir( InstrumentFunctionArpeggio::ArpDirUp ),
 		arpRange( 0 ),
 		selectedArp( 0 ),
 		arpTime( 100 ),
@@ -603,14 +603,14 @@ bool FlpImport::tryImport( TrackContainer* tc )
 		basicFilters<>::NumFilters+basicFilters<>::LowPass
 	} ;
 
-	const Arpeggiator::ArpDirections mappedArpDir[] =
+	const InstrumentFunctionArpeggio::ArpDirections mappedArpDir[] =
 	{
-		Arpeggiator::ArpDirUp,
-		Arpeggiator::ArpDirUp,
-		Arpeggiator::ArpDirDown,
-		Arpeggiator::ArpDirUpAndDown,
-		Arpeggiator::ArpDirUpAndDown,
-		Arpeggiator::ArpDirRandom
+		InstrumentFunctionArpeggio::ArpDirUp,
+		InstrumentFunctionArpeggio::ArpDirUp,
+		InstrumentFunctionArpeggio::ArpDirDown,
+		InstrumentFunctionArpeggio::ArpDirUpAndDown,
+		InstrumentFunctionArpeggio::ArpDirUpAndDown,
+		InstrumentFunctionArpeggio::ArpDirRandom
 	} ;
 
 	QMap<QString, int> mappedPluginTypes;
@@ -1519,7 +1519,7 @@ else
 			}
 		}
 
-		Arpeggiator * arp = &t->m_arpeggiator;
+		InstrumentFunctionArpeggio * arp = &t->m_arpeggio;
 		arp->m_arpDirectionModel.setValue( it->arpDir );
 		arp->m_arpRangeModel.setValue( it->arpRange );
 		arp->m_arpModel.setValue( it->selectedArp );
