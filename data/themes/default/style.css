@@ -104,6 +104,15 @@ QScrollBar:vertical {
     margin: 13px 0px;
 }
 
+visualizationWidget  {
+	background: none;
+	border: none;
+}
+
+cpuloadWidget {
+	border: none;
+	background: url(resources:cpuload_bg.png);
+}
 /* scrollbar: trough clicky things */
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
@@ -469,6 +478,14 @@ sf2InstrumentView knob {
 	qproperty-outerRadius: 9.2;
 	qproperty-centerPointX: 15.5;
 	qproperty-centerPointY: 15.42;
+	qproperty-lineWidth: 2;
+}
+
+sfxrInstrumentView knob {
+	color: #b06319;
+	qproperty-outerColor: rgb(194, 177, 145);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 10;
 	qproperty-lineWidth: 2;
 }
 

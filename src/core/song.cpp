@@ -201,7 +201,7 @@ song::~song()
 		}
 		if( m_SncVSTplug != NULL )
 		{
-			delete m_SncVSTplug;
+			free( m_SncVSTplug );
 			m_SncVSTplug = NULL;
 		}
 	}

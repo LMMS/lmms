@@ -45,6 +45,7 @@ cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
 	setFixedSize( m_background.width(), m_background.height() );
 
 	m_temp = QPixmap( width(), height() );
+	
 
 	connect( &m_updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updateCpuLoad() ) );
@@ -66,7 +67,8 @@ void cpuloadWidget::paintEvent( QPaintEvent *  )
 	if( m_changed == true )
 	{
 		m_changed = false;
-
+		
+		m_temp.fill( QColor(0,0,0,0) );
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );
 
