@@ -125,120 +125,120 @@ instantiate_RotSpkr(const LADSPA_Descriptor * Descriptor,
 	LADSPA_Handle * ptr;
 
 	if ((ptr = malloc(sizeof(RotSpkr))) != NULL) {
-                RotSpkr* rotSpeak = (RotSpkr*)ptr;
+		RotSpkr* rotSpeak = (RotSpkr*)ptr;
 		rotSpeak->sample_rate = sample_rate;
 		rotSpeak->run_adding_gain = 1.0;
 
-                if ((rotSpeak->ringbuffer_h_L =
-                     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
-                {
-                        free(ptr);
-                        return NULL;
-                }
-                if ((((RotSpkr *)ptr)->ringbuffer_h_R =
-                     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(ptr);
-                        return NULL;
-                }
-                rotSpeak->buflen_h_L = ceil(0.3f * sample_rate / M_PI);
-                rotSpeak->buflen_h_R = ceil(0.3f * sample_rate / M_PI);
-                rotSpeak->pos_h_L = 0;
-                rotSpeak->pos_h_R = 0;
+		if ((rotSpeak->ringbuffer_h_L =
+		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
+		{
+			free(ptr);
+			return NULL;
+		}
+		if ((((RotSpkr *)ptr)->ringbuffer_h_R =
+		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(ptr);
+			return NULL;
+		}
+		rotSpeak->buflen_h_L = ceil(0.3f * sample_rate / M_PI);
+		rotSpeak->buflen_h_R = ceil(0.3f * sample_rate / M_PI);
+		rotSpeak->pos_h_L = 0;
+		rotSpeak->pos_h_R = 0;
 
-                if ((rotSpeak->ringbuffer_b_L =
-                     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(ptr);
-                        return NULL;
-                }
-                if ((rotSpeak->ringbuffer_b_R =
-                     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(ptr);
-                        return NULL;
-                }
-                rotSpeak->buflen_b_L = ceil(0.3f * sample_rate / M_PI);
-                rotSpeak->buflen_b_R = ceil(0.3f * sample_rate / M_PI);
-                rotSpeak->pos_b_L = 0;
-                rotSpeak->pos_b_R = 0;
+		if ((rotSpeak->ringbuffer_b_L =
+		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(ptr);
+			return NULL;
+		}
+		if ((rotSpeak->ringbuffer_b_R =
+		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(ptr);
+			return NULL;
+		}
+		rotSpeak->buflen_b_L = ceil(0.3f * sample_rate / M_PI);
+		rotSpeak->buflen_b_R = ceil(0.3f * sample_rate / M_PI);
+		rotSpeak->pos_b_L = 0;
+		rotSpeak->pos_b_R = 0;
 
 		if ((rotSpeak->eq_filter_L = calloc(1, sizeof(biquad))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(rotSpeak->ringbuffer_b_R);
-                        free(ptr);
-                        return NULL;
-                }
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(rotSpeak->ringbuffer_b_R);
+			free(ptr);
+			return NULL;
+		}
 		if ((rotSpeak->lp_filter_L = calloc(1, sizeof(biquad))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(rotSpeak->ringbuffer_b_R);
-                        free(rotSpeak->eq_filter_L);
-                        free(ptr);
-                        return NULL;
-                }
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(rotSpeak->ringbuffer_b_R);
+			free(rotSpeak->eq_filter_L);
+			free(ptr);
+			return NULL;
+		}
 		if ((rotSpeak->hp_filter_L = calloc(1, sizeof(biquad))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(rotSpeak->ringbuffer_b_R);
-                        free(rotSpeak->eq_filter_L);
-                        free(rotSpeak->lp_filter_L);
-                        free(ptr);
-                        return NULL;
-                }
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(rotSpeak->ringbuffer_b_R);
+			free(rotSpeak->eq_filter_L);
+			free(rotSpeak->lp_filter_L);
+			free(ptr);
+			return NULL;
+		}
 
 		if ((rotSpeak->eq_filter_R = calloc(1, sizeof(biquad))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(rotSpeak->ringbuffer_b_R);
-                        free(rotSpeak->eq_filter_L);
-                        free(rotSpeak->lp_filter_L);
-                        free(rotSpeak->hp_filter_L);
-                        free(ptr);
-                        return NULL;
-                }
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(rotSpeak->ringbuffer_b_R);
+			free(rotSpeak->eq_filter_L);
+			free(rotSpeak->lp_filter_L);
+			free(rotSpeak->hp_filter_L);
+			free(ptr);
+			return NULL;
+		}
 		if ((rotSpeak->lp_filter_R = calloc(1, sizeof(biquad))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(rotSpeak->ringbuffer_b_R);
-                        free(rotSpeak->eq_filter_L);
-                        free(rotSpeak->lp_filter_L);
-                        free(rotSpeak->hp_filter_L);
-                        free(rotSpeak->eq_filter_R);
-                        free(ptr);
-                        return NULL;
-                }
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(rotSpeak->ringbuffer_b_R);
+			free(rotSpeak->eq_filter_L);
+			free(rotSpeak->lp_filter_L);
+			free(rotSpeak->hp_filter_L);
+			free(rotSpeak->eq_filter_R);
+			free(ptr);
+			return NULL;
+		}
 		if ((rotSpeak->hp_filter_R = calloc(1, sizeof(biquad))) == NULL)
-                {
-                        free(rotSpeak->ringbuffer_h_L);
-                        free(rotSpeak->ringbuffer_h_R);
-                        free(rotSpeak->ringbuffer_b_L);
-                        free(rotSpeak->ringbuffer_b_R);
-                        free(rotSpeak->eq_filter_L);
-                        free(rotSpeak->lp_filter_L);
-                        free(rotSpeak->hp_filter_L);
-                        free(rotSpeak->eq_filter_R);
-                        free(rotSpeak->lp_filter_R);
-                        free(ptr);
-                        return NULL;
-                }
+		{
+			free(rotSpeak->ringbuffer_h_L);
+			free(rotSpeak->ringbuffer_h_R);
+			free(rotSpeak->ringbuffer_b_L);
+			free(rotSpeak->ringbuffer_b_R);
+			free(rotSpeak->eq_filter_L);
+			free(rotSpeak->lp_filter_L);
+			free(rotSpeak->hp_filter_L);
+			free(rotSpeak->eq_filter_R);
+			free(rotSpeak->lp_filter_R);
+			free(ptr);
+			return NULL;
+}
 
 		return ptr;
 	}

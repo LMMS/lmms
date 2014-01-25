@@ -171,12 +171,12 @@ bool AudioFileOgg::startEncoding()
 		{
 			// clean up
 			finishEncoding();
-                        delete[] user_comments;
+			delete[] user_comments;
 			return false;
 		}
 	}
 
-        delete[] user_comments;
+	delete[] user_comments;
 	return true;
 }
 

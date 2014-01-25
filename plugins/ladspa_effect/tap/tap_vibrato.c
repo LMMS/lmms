@@ -89,7 +89,7 @@ LADSPA_Handle
 instantiate_Vibrato(const LADSPA_Descriptor * Descriptor,
 		    unsigned long             sample_rate) {
 
-        LADSPA_Handle * ptr;
+	LADSPA_Handle * ptr;
 
 	if ((ptr = malloc(sizeof(Vibrato))) != NULL) {
 		((Vibrato *)ptr)->sample_rate = sample_rate;
@@ -97,10 +97,10 @@ instantiate_Vibrato(const LADSPA_Descriptor * Descriptor,
 
 		if ((((Vibrato *)ptr)->ringbuffer =
 		     calloc(2 * PM_DEPTH, sizeof(LADSPA_Data))) == NULL)
-                {
-                        free(ptr);
+		{
+			free(ptr);
 			return NULL;
-                }
+		}
 		((Vibrato *)ptr)->buflen = ceil(0.2f * sample_rate / M_PI);
 		((Vibrato *)ptr)->pos = 0;
 
