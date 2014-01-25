@@ -9,7 +9,7 @@
 04 apr 03 -- fixed bug in add_track that caused infinite loop
 */
 
-#include "assert.h"
+#include "debug.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
@@ -727,8 +727,8 @@ void Alg_event_list::set_start_time(Alg_event *event, double t)
     // For Alg_track, change the time and move the event to the right place
     // For Alg_seq, find the track and do the update there
     
-    long index, i;
-    Alg_track_ptr track_ptr;
+	long index = 0, i;
+	Alg_track_ptr track_ptr = Alg_track_ptr();
     if (type == 'e') { // this is an Alg_event_list
         // make sure the owner has not changed its event set
         assert(events_owner && 
@@ -2283,6 +2283,7 @@ Alg_track_ptr Alg_seq::track(int i)
 }
 
 
+#pragma GCC diagnostic ignored "-Wreturn-type" // ok not to return a value here
 Alg_event_ptr &Alg_seq::operator[](int i) 
 {
     int ntracks = track_list.length();
@@ -2296,7 +2297,7 @@ Alg_event_ptr &Alg_seq::operator[](int i)
         }
         tr++;
     }
-    assert(false); // out of bounds
+	assert(false); // out of bounds
 }
 
 

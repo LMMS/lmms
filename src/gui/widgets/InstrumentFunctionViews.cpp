@@ -23,6 +23,7 @@
  */
 
 #include <QtGui/QLabel>
+#include <QtGui/QLayout>
 
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
@@ -37,50 +38,43 @@
 #include "tooltip.h"
 
 
-
-const int CHORDS_GROUPBOX_X = 4;
-const int CHORDS_GROUPBOX_Y = 5;
-const int CHORDS_GROUPBOX_WIDTH = 242;
-const int CHORDS_GROUPBOX_HEIGHT = 65;
-const int ARP_GROUPBOX_X = CHORDS_GROUPBOX_X;
-const int ARP_GROUPBOX_Y = 10 + CHORDS_GROUPBOX_Y + CHORDS_GROUPBOX_HEIGHT;
-const int ARP_GROUPBOX_WIDTH = CHORDS_GROUPBOX_WIDTH;
-const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
-
-
-
-ChordCreatorView::ChordCreatorView( ChordCreator * _cc, QWidget * _parent ) :
-	QWidget( _parent ),
+InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
+	QWidget( parent ),
 	ModelView( NULL, this ),
-	m_cc( _cc ),
-	m_chordsGroupBox( new groupBox( tr( "CHORDS" ), this ) ),
-	m_chordsComboBox( new comboBox( m_chordsGroupBox ) ),
-	m_chordRangeKnob( new knob( knobBright_26, m_chordsGroupBox ) )
+	m_cc( cc ),
+	m_chordsGroupBox( new groupBox( tr( "STACKING" ) ) ),
+	m_chordsComboBox( new comboBox() ),
+	m_chordRangeKnob( new knob( knobBright_26 ) )
 {
-	move( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y );
-	setFixedSize( 250, CHORDS_GROUPBOX_HEIGHT );
-	m_chordsGroupBox->setGeometry( 0, 0, CHORDS_GROUPBOX_WIDTH,
-						CHORDS_GROUPBOX_HEIGHT );
+	QHBoxLayout* topLayout = new QHBoxLayout( this );
+	topLayout->setMargin( 0 );
+	topLayout->addWidget( m_chordsGroupBox );
 
+	QGridLayout* mainLayout = new QGridLayout( m_chordsGroupBox );
+	mainLayout->setContentsMargins( 8, 18, 8, 8 );
+	mainLayout->setColumnStretch( 0, 1 );
+	mainLayout->setHorizontalSpacing( 20 );
+	mainLayout->setVerticalSpacing( 1 );
 
-	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
-
+	QLabel* chordLabel = new QLabel( tr( "Chord:" ) );
+	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
-	m_chordRangeKnob->move( 164, 24 );
-	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " +
-							tr( "octave(s)" ) );
+	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " + tr( "octave(s)" ) );
 	m_chordRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the chord range in octaves. "
 			"The selected chord will be played within specified "
 			"number of octaves." ) );
 
+	mainLayout->addWidget( chordLabel, 0, 0 );
+	mainLayout->addWidget( m_chordsComboBox, 1, 0 );
+	mainLayout->addWidget( m_chordRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
 }
 
 
 
 
-ChordCreatorView::~ChordCreatorView()
+InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
 {
 	delete m_chordsGroupBox;
 }
@@ -88,9 +82,9 @@ ChordCreatorView::~ChordCreatorView()
 
 
 
-void ChordCreatorView::modelChanged()
+void InstrumentFunctionNoteStackingView::modelChanged()
 {
-	m_cc = castModel<ChordCreator>();
+	m_cc = castModel<InstrumentFunctionNoteStacking>();
 	m_chordsGroupBox->setModel( &m_cc->m_chordsEnabledModel );
 	m_chordsComboBox->setModel( &m_cc->m_chordsModel );
 	m_chordRangeKnob->setModel( &m_cc->m_chordRangeModel );
@@ -102,22 +96,27 @@ void ChordCreatorView::modelChanged()
 
 
 
-ArpeggiatorView::ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent ) :
-	QWidget( _parent ),
+InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent ) :
+	QWidget( parent ),
 	ModelView( NULL, this ),
-	m_a( _arp ),
-	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ), this ) ),
-	m_arpComboBox( new comboBox( m_arpGroupBox) ),
-	m_arpRangeKnob( new knob( knobBright_26, m_arpGroupBox ) ),
-	m_arpTimeKnob( new TempoSyncKnob( knobBright_26, m_arpGroupBox ) ),
-	m_arpGateKnob( new knob( knobBright_26, m_arpGroupBox ) ),
-	m_arpDirectionComboBox( new comboBox( m_arpGroupBox ) ),
-	m_arpModeComboBox( new comboBox( m_arpGroupBox ) )
+	m_a( arp ),
+	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ) ) ),
+	m_arpComboBox( new comboBox() ),
+	m_arpRangeKnob( new knob( knobBright_26 ) ),
+	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
+	m_arpGateKnob( new knob( knobBright_26 ) ),
+	m_arpDirectionComboBox( new comboBox() ),
+	m_arpModeComboBox( new comboBox() )
 {
-	move( ARP_GROUPBOX_X, ARP_GROUPBOX_Y );
-	setFixedSize( 250, ARP_GROUPBOX_HEIGHT );
-	m_arpGroupBox->setGeometry( 0, 0, ARP_GROUPBOX_WIDTH,
-							ARP_GROUPBOX_HEIGHT );
+	QHBoxLayout* topLayout = new QHBoxLayout( this );
+	topLayout->setMargin( 0 );
+	topLayout->addWidget( m_arpGroupBox );
+
+	QGridLayout* mainLayout = new QGridLayout( m_arpGroupBox );
+	mainLayout->setContentsMargins( 8, 18, 8, 8 );
+	mainLayout->setColumnStretch( 0, 1 );
+	mainLayout->setHorizontalSpacing( 20 );
+	mainLayout->setVerticalSpacing( 1 );
 
 	m_arpGroupBox->setWhatsThis(
 		tr( "An arpeggio is a method playing (especially plucked) "
@@ -130,13 +129,8 @@ ArpeggiatorView::ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent ) :
 			"possible chords, you can select." ) );
 
 
-	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
-
-
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
-	m_arpRangeKnob->move( 164, 24 );
-	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " +
-							tr( "octave(s)" ) );
+	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " + tr( "octave(s)" ) );
 	m_arpRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
@@ -144,9 +138,7 @@ ArpeggiatorView::ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent ) :
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
-	m_arpTimeKnob->move( 164, 70 );
-	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " +
-								tr( "ms" ) );
+	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " + tr( "ms" ) );
 	m_arpTimeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio time in "
 			"milliseconds. The arpeggio time specifies how long "
@@ -154,7 +146,6 @@ ArpeggiatorView::ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent ) :
 
 
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
-	m_arpGateKnob->move( 204, 70 );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ) + " ", tr( "%" ) );
 	m_arpGateKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio gate. The "
@@ -162,24 +153,34 @@ ArpeggiatorView::ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent ) :
 			"arpeggio-tone that should be played. With this you "
 			"can make cool staccato arpeggios." ) );
 
-	m_arpDirectionLbl = new QLabel( tr( "Direction:" ), m_arpGroupBox );
-	m_arpDirectionLbl->setGeometry( 10, 60, 64, 10 );
-	m_arpDirectionLbl->setFont( pointSize<8>( m_arpDirectionLbl->font() ) );
+	QLabel* arpChordLabel = new QLabel( tr( "Chord:" ) );
+	arpChordLabel->setFont( pointSize<8>( arpChordLabel->font() ) );
 
-	m_arpDirectionComboBox->setGeometry( 10, 74, 140, 22 );
+	QLabel* arpDirectionLabel = new QLabel( tr( "Direction:" ) );
+	arpDirectionLabel->setFont( pointSize<8>( arpDirectionLabel->font() ) );
 
+	QLabel* arpModeLabel = new QLabel( tr( "Mode:" ) );
+	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
 
-	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
-	mode_lbl->setGeometry( 10, 110, 64, 10 );
-	mode_lbl->setFont( pointSize<8>( mode_lbl->font() ) );
+	mainLayout->addWidget( arpChordLabel, 0, 0 );
+	mainLayout->addWidget( m_arpComboBox, 1, 0 );
+	mainLayout->addWidget( arpDirectionLabel, 3, 0 );
+	mainLayout->addWidget( m_arpDirectionComboBox, 4, 0 );
+	mainLayout->addWidget( arpModeLabel, 6, 0 );
+	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
-	m_arpModeComboBox->setGeometry( 10, 124, 128, 22 );
+	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpTimeKnob, 3, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
+
+	mainLayout->setRowMinimumHeight( 2, 10 );
+	mainLayout->setRowMinimumHeight( 5, 10 );
 }
 
 
 
 
-ArpeggiatorView::~ArpeggiatorView()
+InstrumentFunctionArpeggioView::~InstrumentFunctionArpeggioView()
 {
 	delete m_arpGroupBox;
 }
@@ -187,9 +188,9 @@ ArpeggiatorView::~ArpeggiatorView()
 
 
 
-void ArpeggiatorView::modelChanged()
+void InstrumentFunctionArpeggioView::modelChanged()
 {
-	m_a = castModel<Arpeggiator>();
+	m_a = castModel<InstrumentFunctionArpeggio>();
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );

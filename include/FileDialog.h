@@ -1,8 +1,8 @@
 /*
- * debug.h - header file to be included for debugging purposes
+ * FileDialog.h - declaration of class FileDialog
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,20 +23,20 @@
  */
 
 
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef FILEDIALOG_H
+#define FILEDIALOG_H
 
-#include "lmmsconfig.h"
+#include <QtGui/QFileDialog>
 
-// set whether debug-stuff (like messages on the console, asserts and other
-// additional range-checkings) should be compiled
+class FileDialog : public QFileDialog
+{
+	Q_OBJECT
+public:
+	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
+						const QString &directory = QString(),
+						const QString &filter = QString() );
 
-#ifdef LMMS_DEBUG
-	#include <assert.h>
-#else
-	#define assert(x) ((void)(x))
-#endif
-#include <cstdio>
+	void clearSelection();
+};
 
-
-#endif
+#endif // FILEDIALOG_HPP

@@ -39,8 +39,8 @@
 
 class QLineEdit;
 template<class T> class QQueue;
-class ArpeggiatorView;
-class ChordCreatorView;
+class InstrumentFunctionArpeggioView;
+class InstrumentFunctionNoteStackingView;
 class EffectRackView;
 class InstrumentSoundShapingView;
 class fadeButton;
@@ -162,9 +162,9 @@ public:
 		return &m_piano;
 	}
 
-	bool isArpeggiatorEnabled() const
+	bool isArpeggioEnabled() const
 	{
-		return m_arpeggiator.m_arpEnabledModel.value();
+		return m_arpeggio.m_arpEnabledModel.value();
 	}
 
 	// simple helper for removing midiport-XML-node when loading presets
@@ -238,8 +238,8 @@ private:
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
-	Arpeggiator m_arpeggiator;
-	ChordCreator m_chordCreator;
+	InstrumentFunctionArpeggio m_arpeggio;
+	InstrumentFunctionNoteStacking m_noteStacking;
 
 	Piano m_piano;
 
@@ -402,8 +402,8 @@ private:
 	tabWidget * m_tabWidget;
 	PluginView * m_instrumentView;
 	InstrumentSoundShapingView * m_ssView;
-	ChordCreatorView * m_chordView;
-	ArpeggiatorView * m_arpView;
+	InstrumentFunctionNoteStackingView* m_noteStackingView;
+	InstrumentFunctionArpeggioView* m_arpeggioView;
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
 

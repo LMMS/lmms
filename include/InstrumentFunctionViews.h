@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctionViews.h - views for instrument-functions-tab
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,23 +35,23 @@ class groupBox;
 class knob;
 class TempoSyncKnob;
 
-class Arpeggiator;
-class ChordCreator;
+class InstrumentFunctionArpeggio;
+class InstrumentFunctionNoteStacking;
 
 
 
-class ChordCreatorView : public QWidget, public ModelView
+class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	ChordCreatorView( ChordCreator * _cc, QWidget * _parent );
-	virtual ~ChordCreatorView();
+	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = NULL );
+	virtual ~InstrumentFunctionNoteStackingView();
 
 
 private:
 	virtual void modelChanged();
 
-	ChordCreator * m_cc;
+	InstrumentFunctionNoteStacking * m_cc;
 
 	groupBox * m_chordsGroupBox;
 	comboBox * m_chordsComboBox;
@@ -63,25 +63,23 @@ private:
 
 
 
-class ArpeggiatorView : public QWidget, public ModelView
+class InstrumentFunctionArpeggioView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent );
-	virtual ~ArpeggiatorView();
+	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = NULL );
+	virtual ~InstrumentFunctionArpeggioView();
 
 
 private:
 	virtual void modelChanged();
 
-	Arpeggiator * m_a;
+	InstrumentFunctionArpeggio * m_a;
 	groupBox * m_arpGroupBox;
 	comboBox * m_arpComboBox;
 	knob * m_arpRangeKnob;
 	TempoSyncKnob * m_arpTimeKnob;
 	knob * m_arpGateKnob;
-
-	QLabel * m_arpDirectionLbl;
 
 	comboBox * m_arpDirectionComboBox;
 	comboBox * m_arpModeComboBox;

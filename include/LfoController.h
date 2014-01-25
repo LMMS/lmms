@@ -75,6 +75,8 @@ protected:
 	
 	sample_t (*m_sampleFunction)( const float );
 
+private:
+	SampleBuffer * m_userDefSampleBuffer;
 
 protected slots:
 	void updateSampleFunction();
@@ -106,6 +108,13 @@ protected:
 	pixmapButton * m_userLfoBtn;
 	automatableButtonGroup * m_waveBtnGrp;
 	automatableButtonGroup * m_multiplierBtnGrp;
+
+
+private:
+	pixmapButton * m_userWaveBtn;
+
+private slots:
+	void askUserDefWave();
 
 } ;
 

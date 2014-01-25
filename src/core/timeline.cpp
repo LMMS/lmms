@@ -301,11 +301,18 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
 
-	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
+	if( m_action == MoveLoopBegin )
 	{
 		delete m_hint;
 		m_hint = textFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> to disable magnetic loop points." ),
+					embed::getIconPixmap( "hint" ), 0 );
+	}
+	else if( m_action == MoveLoopEnd )
+	{
+		delete m_hint;
+		m_hint = textFloat::displayMessage( tr( "Hint" ),
+					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 

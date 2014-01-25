@@ -27,9 +27,9 @@
 #include <QtCore/QTextStream>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
-#include <QtGui/QFileDialog>
 #include <QtXml/QDomDocument>
 
+#include "FileDialog.h"
 #include "sf2_player.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
@@ -1044,11 +1044,8 @@ void sf2InstrumentView::showFileDialog()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 
-	QFileDialog ofd( NULL, tr( "Open SoundFont file" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	FileDialog ofd( NULL, tr( "Open SoundFont file" ) );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
 	types << tr( "SoundFont2 Files (*.sf2)" );

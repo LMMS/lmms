@@ -335,6 +335,7 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in ${CMAKE
 SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 SET(CMAKE_C_FLAGS "-O2 -g ${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
+set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
 
 
 # people simply updating git will still have this and mess up build with it
@@ -346,7 +347,18 @@ FILE(GLOB_RECURSE lmms_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 SET(lmms_MOC ${lmms_INCLUDES})
 
-SET(lmms_EMBEDDED_RESOURCES ${CMAKE_SOURCE_DIR}/AUTHORS ${CMAKE_SOURCE_DIR}/COPYING)
+# Get list of all committers from git history, ordered by number of commits
+FIND_PACKAGE(Git)
+IF(GIT_FOUND)
+	SET(CONTRIBUTORS ${CMAKE_BINARY_DIR}/CONTRIBUTORS)
+	EXECUTE_PROCESS(
+		COMMAND ${GIT_EXECUTABLE} shortlog -sne
+		COMMAND cut -c8-
+		OUTPUT_FILE ${CONTRIBUTORS}
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+ENDIF(GIT_FOUND)
+
+SET(lmms_EMBEDDED_RESOURCES ${CMAKE_SOURCE_DIR}/AUTHORS ${CMAKE_SOURCE_DIR}/COPYING ${CONTRIBUTORS})
 
 QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw)
 QT4_WRAP_UI(lmms_UI_out ${lmms_UI})

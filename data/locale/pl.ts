@@ -494,7 +494,7 @@ Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail:
     </message>
 </context>
 <context>
-    <name>ChordCreator</name>
+    <name>InstrumentFunctionNoteStacking</name>
     <message>
         <source>octave</source>
         <translation></translation>
@@ -861,7 +861,7 @@ Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail:
     </message>
 </context>
 <context>
-    <name>ChordCreatorView</name>
+    <name>InstrumentFunctionNoteStackingView</name>
     <message>
         <source>CHORDS</source>
         <translation>AKORDY</translation>

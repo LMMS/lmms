@@ -1,7 +1,7 @@
 /*
- * combobox.h - class comboBox, a very cool combo-box
+ * combobox.h - class ComboBox, a combo box view for models
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,31 +38,33 @@ class EXPORT comboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	comboBox( QWidget * _parent, const QString & _name = QString() );
+	comboBox( QWidget* parent = NULL, const QString& name = QString() );
 	virtual ~comboBox();
 
-	ComboBoxModel * model()
+	ComboBoxModel* model()
 	{
-		return( castModel<ComboBoxModel>() );
+		return castModel<ComboBoxModel>();
 	}
 
-	const ComboBoxModel * model() const
+	const ComboBoxModel* model() const
 	{
-		return( castModel<ComboBoxModel>() );
+		return castModel<ComboBoxModel>();
 	}
+
+	virtual QSize sizeHint() const;
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void contextMenuEvent( QContextMenuEvent* event );
+	virtual void mousePressEvent( QMouseEvent* event );
+	virtual void paintEvent( QPaintEvent* event );
+	virtual void wheelEvent( QWheelEvent* event );
 
 
 private:
-	static QPixmap * s_background;
-	static QPixmap * s_arrow;
-	static QPixmap * s_arrowSelected;
+	static QPixmap* s_background;
+	static QPixmap* s_arrow;
+	static QPixmap* s_arrowSelected;
 
 	QMenu m_menu;
 
@@ -70,7 +72,7 @@ private:
 
 
 private slots:
-	void setItem( QAction * _item );
+	void setItem( QAction* item );
 
 } ;
 

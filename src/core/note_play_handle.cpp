@@ -2,7 +2,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        rendering engine
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -101,7 +101,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	setFrames( _frames );
 
 
-	if( !isTopNote() || !instrumentTrack()->isArpeggiatorEnabled() )
+	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
 		// send MIDI-note-on-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
@@ -339,7 +339,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 
-	if( !isTopNote() || !instrumentTrack()->isArpeggiatorEnabled() )
+	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
 		// send MIDI-note-off-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
@@ -387,8 +387,7 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 bool notePlayHandle::isArpeggioBaseNote() const
 {
-	return isTopNote() && ( m_partOfArpeggio ||
-								m_instrumentTrack->isArpeggiatorEnabled() );
+	return isTopNote() && ( m_partOfArpeggio || m_instrumentTrack->isArpeggioEnabled() );
 }
 
 

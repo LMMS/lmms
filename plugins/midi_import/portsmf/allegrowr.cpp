@@ -1,6 +1,6 @@
 // allegrowr.cpp -- write sequence to an Allegro file (text)
 
-#include "assert.h"
+#include "debug.h"
 #include "stdlib.h"
 #include <iostream>
 #include <fstream>

@@ -25,7 +25,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
 #include <math.h>
@@ -47,6 +46,7 @@
 #include "ImportFilter.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "FileDialog.h"
 #include "MidiClient.h"
 #include "mmp.h"
 #include "note_play_handle.h"
@@ -1310,7 +1310,7 @@ bool song::guiSaveProjectAs( const QString & _file_name )
 
 void song::importProject()
 {
-	QFileDialog ofd( NULL, tr( "Import file" ),
+	FileDialog ofd( NULL, tr( "Import file" ),
 			configManager::inst()->userProjectsDir(),
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
@@ -1320,11 +1320,8 @@ void song::importProject()
 			" (*.h2song);;" +
 			tr("All file types") +
 			" (*.*)");
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
 
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{
 		ImportFilter::import( ofd.selectedFiles()[0], this );
@@ -1377,13 +1374,10 @@ void song::exportProject(bool multiExport)
 		return;
 	}
 
-	QFileDialog efd( engine::mainWindow() );
-#if QT_VERSION >= 0x040806
-	efd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
+	FileDialog efd( engine::mainWindow() );
 	if (multiExport)
 	{
-		efd.setFileMode( QFileDialog::Directory);
+		efd.setFileMode( FileDialog::Directory);
 		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
 		if( !m_fileName.isEmpty() )
 		{
@@ -1392,7 +1386,7 @@ void song::exportProject(bool multiExport)
 	}
 	else
 	{
-		efd.setFileMode( QFileDialog::AnyFile );
+		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
 		while( __fileEncodeDevices[idx].m_fileFormat !=
@@ -1417,7 +1411,7 @@ void song::exportProject(bool multiExport)
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
-	efd.setAcceptMode( QFileDialog::AcceptSave );
+	efd.setAcceptMode( FileDialog::AcceptSave );
 
 
 	if( efd.exec() == QDialog::Accepted &&

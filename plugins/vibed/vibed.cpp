@@ -728,9 +728,9 @@ void vibedView::noiseWaveClicked()
 
 void vibedView::usrWaveClicked()
 {
-	// TODO: load file
-	//m_graph->model()->setWaveToUser();
-	//engine::getSongEditor()->setModified();
+	QString fileName = m_graph->model()->setWaveToUser();
+	toolTip::add( m_usrWaveBtn, fileName );
+	engine::getSong()->setModified();
 }
 
 
