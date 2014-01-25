@@ -1,7 +1,7 @@
 /*
- * combobox.cpp - implementation of LMMS-combobox
+ * combobox.cpp - implementation of LMMS combobox
  *
- * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -86,6 +86,22 @@ comboBox::~comboBox()
 {
 }
 
+
+
+QSize comboBox::sizeHint() const
+{
+	int maxTextWidth = 0;
+	for( int i = 0; i < model()->size(); ++i )
+	{
+		int w = fontMetrics().width( model()->itemText( i ) );
+		if( w > maxTextWidth )
+		{
+			maxTextWidth = w;
+		}
+	}
+
+	return QSize( 32 + maxTextWidth, 22 );
+}
 
 
 
