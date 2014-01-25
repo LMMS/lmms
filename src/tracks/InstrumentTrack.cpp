@@ -1351,10 +1351,22 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// create tab-widgets
 	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
+
+	// FUNC tab
 	QWidget* instrumentFunctions = new QWidget( m_tabWidget );
-	m_chordView = new ChordCreatorView( &m_track->m_chordCreator, instrumentFunctions );
-	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator, instrumentFunctions );
+	QVBoxLayout* instrumentFunctionsLayout = new QVBoxLayout( instrumentFunctions );
+	instrumentFunctionsLayout->setMargin( 5 );
+	m_chordView = new ChordCreatorView( &m_track->m_chordCreator );
+	m_arpView= new ArpeggiatorView( &m_track->m_arpeggiator );
+
+	instrumentFunctionsLayout->addWidget( m_chordView );
+	instrumentFunctionsLayout->addWidget( m_arpView );
+	instrumentFunctionsLayout->addStretch();
+
+	// MIDI tab
 	m_midiView = new InstrumentMidiIOView( m_tabWidget );
+
+	// FX tab
 	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
 
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );

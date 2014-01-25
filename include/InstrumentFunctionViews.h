@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctionViews.h - views for instrument-functions-tab
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +44,7 @@ class ChordCreatorView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	ChordCreatorView( ChordCreator * _cc, QWidget * _parent );
+	ChordCreatorView( ChordCreator* cc, QWidget* parent = NULL );
 	virtual ~ChordCreatorView();
 
 
@@ -67,7 +67,7 @@ class ArpeggiatorView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	ArpeggiatorView( Arpeggiator * _arp, QWidget * _parent );
+	ArpeggiatorView( Arpeggiator* arp, QWidget* parent = NULL );
 	virtual ~ArpeggiatorView();
 
 
@@ -80,8 +80,6 @@ private:
 	knob * m_arpRangeKnob;
 	TempoSyncKnob * m_arpTimeKnob;
 	knob * m_arpGateKnob;
-
-	QLabel * m_arpDirectionLbl;
 
 	comboBox * m_arpDirectionComboBox;
 	comboBox * m_arpModeComboBox;
