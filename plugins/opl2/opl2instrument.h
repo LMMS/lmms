@@ -34,6 +34,9 @@
 #include "pixmap_button.h"
 
 #define OPL2_VOICE_FREE 255
+#define OPL2_NO_VOICE 255
+// The "normal" range for LMMS pitchbends
+#define BEND_CENTS 100
 
 class opl2instrument : public Instrument
 {
@@ -109,17 +112,25 @@ private:
 	fpp_t frameCount;
 	short *renderbuffer;
 	int voiceNote[9];
+	// Least recently used voices
+	int voiceLRU[9];
 	// 0 - no note, >0 - note on velocity
 	int velocities[128];
 	// These include both octave and Fnumber
 	int fnums[128];
 	// in cents, range defaults to +/-100 cents (should this be changeable?)
 	int pitchbend;
-	#define BEND_CENTS 100
+
+
+
+	int popVoice();
+	int pushVoice(int v);
 
 	int Hz2fnum(float Hz);
 	static QMutex emulatorMutex;
+	void setVoiceVelocity(int voice, int vel);
 };
+
 
 
 class opl2instrumentView : public InstrumentView
