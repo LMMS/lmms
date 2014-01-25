@@ -237,10 +237,8 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			{
 				if( m_notes[event.key()] == NULL )
 				{
-					if( !configManager::inst()->value( "ui", "manualchannelpiano" ).toInt() )
-					{
-						m_piano.setKeyState( event.key(), true );
-					}
+					m_piano.setKeyState( event.key(), true );
+
 					// create temporary note
 					note n;
 					n.setKey( event.key() );
@@ -365,10 +363,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 	switch( event.type() )
 	{
 		case MidiNoteOn:
-			if( !configManager::inst()->value( "ui", "manualchannelpiano" ).toInt() )
-			{
-				m_piano.setKeyState( event.key(), true );
-			}
+			m_piano.setKeyState( event.key(), true );
 			if( !configManager::inst()->value( "ui", "disablechannelactivityindicators" ).toInt() )
 			{
 				if( m_notes[event.key()] == NULL )
@@ -389,10 +384,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			break;
 
 		case MidiNoteOff:
-			if( !configManager::inst()->value( "ui", "manualchannelpiano" ).toInt() )
-			{
-				m_piano.setKeyState( event.key(), false );
-			}
+			m_piano.setKeyState( event.key(), false );
 			k = masterKey( event.key() );
 			if( k >= 0 && k < NumKeys && --m_runningMidiNotes[k] <= 0 )
 			{
