@@ -50,7 +50,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 						const note & _n,
 						notePlayHandle *parent,
 						const bool _part_of_arp,
-						int MidiEventChannel ) :
+						int midiEventChannel ) :
 	playHandle( NotePlayHandle, _offset ),
 	note( _n.length(), _n.pos(), _n.key(),
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
@@ -76,7 +76,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
 	m_songGlobalParentOffset( 0 ),
-	m_midiChannel( MidiEventChannel >= 0 ? MidiEventChannel : instrumentTrack()->midiPort()->realOutputChannel() )
+	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack()->midiPort()->realOutputChannel() )
 {
 	if( isTopNote() )
 	{

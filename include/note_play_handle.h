@@ -53,7 +53,7 @@ public:
 					const f_cnt_t _frames, const note & _n,
 					notePlayHandle * _parent = NULL,
 					const bool _part_of_arp = false,
-					int midiChannel = -1 );
+					int midiEventChannel = -1 );
 	virtual ~notePlayHandle();
 
 	virtual void setVolume( const volume_t volume = DefaultVolume );
