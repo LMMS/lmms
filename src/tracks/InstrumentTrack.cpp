@@ -364,13 +364,6 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 	{
 		case MidiNoteOn:
 			m_piano.setKeyState( event.key(), true );
-			if( !configManager::inst()->value( "ui", "disablechannelactivityindicators" ).toInt() )
-			{
-				if( m_notes[event.key()] == NULL )
-				{
-					emit newNote();
-				}
-			}
 			k = masterKey( event.key() );
 			if( k >= 0 && k < NumKeys )
 			{
@@ -380,6 +373,8 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				}
 				++m_runningMidiNotes[k];
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), k, event.velocity() ), time );
+
+				emit newNote();
 			}
 			break;
 

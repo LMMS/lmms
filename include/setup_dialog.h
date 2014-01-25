@@ -102,7 +102,6 @@ private slots:
 	void openDefaultSoundfont();
 	void openBackgroundArtwork();
 
-	void toggleDisableChActInd( bool _disabled );
 	void toggleSmoothScroll( bool _enabled );
 	void toggleAutoSave( bool _enabled );
 	void toggleOneInstrumentTrackWindow( bool _enabled );
@@ -153,7 +152,6 @@ private:
 #endif
 	QString m_backgroundArtwork;
 
-	bool m_disableChActInd;
 	bool m_smoothScroll;
 	bool m_enableAutoSave;
 	bool m_oneInstrumentTrackWindow;
