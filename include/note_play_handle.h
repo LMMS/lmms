@@ -48,12 +48,22 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
+	// specifies origin of NotePlayHandle
+	enum Origins
+	{
+		OriginPattern,		/*! playback of a note from a pattern */
+		OriginMidiInput,	/*! playback of a MIDI note input event */
+		OriginCount
+	};
+	typedef Origins Origin;
+
 	notePlayHandle( InstrumentTrack * _instrument_track,
 					const f_cnt_t _offset,
 					const f_cnt_t _frames, const note & _n,
 					notePlayHandle * _parent = NULL,
 					const bool _part_of_arp = false,
-					int midiEventChannel = -1 );
+					int midiEventChannel = -1,
+					Origin origin = OriginPattern );
 	virtual ~notePlayHandle();
 
 	virtual void setVolume( const volume_t volume = DefaultVolume );
@@ -281,6 +291,7 @@ private:
 	MidiTime m_songGlobalParentOffset;
 
 	const int m_midiChannel;
+	const Origin m_origin;
 
 } ;
 
