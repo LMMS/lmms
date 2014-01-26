@@ -6,8 +6,8 @@
 #ifndef GB_APU_H
 #define GB_APU_H
 
-typedef long     gb_time_t; // clock cycle count
-typedef unsigned gb_addr_t; // 16-bit address
+typedef int		gb_time_t; // clock cycle count
+typedef int		gb_addr_t; // 16-bit address
 
 #include "Gb_Oscs.h"
 
