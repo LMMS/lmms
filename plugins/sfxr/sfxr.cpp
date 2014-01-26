@@ -294,7 +294,7 @@ void SfxrSynth::update( sampleFrame * buffer, const fpp_t frameNum )
 		//ssample=ssample/8*master_vol;
 
 		//ssample*=2.0f*sound_vol;
-		ssample*=0.05f;
+		ssample*=0.025f;
 
 		if(buffer!=NULL)
 		{
@@ -446,7 +446,7 @@ QString sfxrInstrument::nodeName() const
 
 
 
-void sfxrInstrument::playNote(notePlayHandle * _n, sampleFrame * _working_buffer )
+void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	m_synthMutex.lock();
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
