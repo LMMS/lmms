@@ -356,6 +356,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time )
 {
+	// do nothing if we do not have an instrument instance (e.g. when loading settings)
+	if( m_instrument == NULL )
+	{
+		return;
+	}
+
 	const MidiEvent transposedEvent = applyMasterKey( event );
 	const int key = transposedEvent.key();
 
