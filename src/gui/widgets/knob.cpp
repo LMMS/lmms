@@ -379,7 +379,7 @@ void knob::drawKnob( QPainter * _p )
 float knob::getValue( const QPoint & _p )
 {
 	const float SMOOTH_FACTOR = 0.125f;
-	int yDist = (_p.y() - m_origMousePos.y()) * SMOOTH_FACTOR;
+	float yDist = (_p.y() - m_origMousePos.y()) * SMOOTH_FACTOR;
 	if( engine::mainWindow()->isShiftPressed() )
 	{
 		return m_origValue - (yDist * model()->step<float>());
