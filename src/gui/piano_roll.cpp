@@ -2229,15 +2229,14 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					if( m_noteEditMode == NoteEditVolume )
 					{
 						n->setVolume( vol );
-						m_pattern->instrumentTrack()->processInEvent(
-							MidiEvent( MidiKeyPressure, 0, n->key(), volumeToMidi( vol ) ), MidiTime() );
+						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, 0, n->key(), volumeToMidi( vol ) ) );
 					}
 					else if( m_noteEditMode == NoteEditPanning )
 					{
 						n->setPanning( pan );
 						MidiEvent evt( MidiMetaEvent, 0, n->key(), panningToMidi( pan ) );
 						evt.setMetaEvent( MidiNotePanning );
-						m_pattern->instrumentTrack()->processInEvent( evt, MidiTime() );
+						m_pattern->instrumentTrack()->processInEvent( evt );
 					}
 				}
 				else

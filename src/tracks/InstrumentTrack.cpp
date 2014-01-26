@@ -1127,9 +1127,7 @@ void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 
 void InstrumentTrackView::activityIndicatorPressed()
 {
-	model()->processInEvent(
-			MidiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
-								MidiTime() );
+	model()->processInEvent( MidiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ) );
 }
 
 
@@ -1137,8 +1135,7 @@ void InstrumentTrackView::activityIndicatorPressed()
 
 void InstrumentTrackView::activityIndicatorReleased()
 {
-	model()->processInEvent( MidiEvent( MidiNoteOff, 0, DefaultKey, 0 ),
-								MidiTime() );
+	model()->processInEvent( MidiEvent( MidiNoteOff, 0, DefaultKey, 0 ) );
 }
 
 
@@ -1149,8 +1146,7 @@ void InstrumentTrackView::midiInSelected()
 {
 	if( model() )
 	{
-		model()->m_midiPort.setReadable(
-					m_midiInputAction->isChecked() );
+		model()->m_midiPort.setReadable( m_midiInputAction->isChecked() );
 	}
 }
 
@@ -1161,8 +1157,7 @@ void InstrumentTrackView::midiOutSelected()
 {
 	if( model() )
 	{
-		model()->m_midiPort.setWritable(
-					m_midiOutputAction->isChecked() );
+		model()->m_midiPort.setWritable( m_midiOutputAction->isChecked() );
 	}
 }
 

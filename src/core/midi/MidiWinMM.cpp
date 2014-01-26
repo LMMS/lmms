@@ -1,7 +1,7 @@
 /*
  * MidiWinMM.cpp - WinMM MIDI client
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -231,28 +231,21 @@ void MidiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 			case MidiNoteOn:
 			case MidiNoteOff:
 			case MidiKeyPressure:
-				( *it )->processInEvent(
-					MidiEvent( cmdtype, chan, par1 - KeysPerOctave,
-								par2 & 0xff, &_hm ), MidiTime() );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 - KeysPerOctave, par2 & 0xff, &_hm ) );
 				break;
 
 			case MidiControlChange:
 			case MidiProgramChange:
 			case MidiChannelPressure:
-				( *it )->processInEvent(
-					MidiEvent( cmdtype, chan, par1, par2 & 0xff, &_hm ),
-								MidiTime() );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1, par2 & 0xff, &_hm ) );
 				break;
 
 			case MidiPitchBend:
-				( *it )->processInEvent(
-					MidiEvent( cmdtype, chan, par1 + par2*128, 0, &_hm ),
-								MidiTime() );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 + par2*128, 0, &_hm ) );
 				break;
 
 			default:
-				qWarning( "WinMM-MIDI: unhandled input "
-							"event %d\n", cmdtype );
+				qWarning( "WinMM-MIDI: unhandled input event %d\n", cmdtype );
 				break;
 		}
 	}
