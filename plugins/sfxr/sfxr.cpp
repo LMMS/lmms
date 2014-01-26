@@ -444,7 +444,7 @@ QString sfxrInstrument::nodeName() const
 
 
 
-#include <stdio.h>
+
 void sfxrInstrument::playNote(notePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	m_synthMutex.lock();
@@ -459,7 +459,6 @@ void sfxrInstrument::playNote(notePlayHandle * _n, sampleFrame * _working_buffer
 	}
 
 	fpp_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
-	printf("%i", pitchedFrameNum); fflush(stdout);
 	sampleFrame * pitchedBuffer = new sampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
 	for( fpp_t i=0; i<frameNum; i++ )
