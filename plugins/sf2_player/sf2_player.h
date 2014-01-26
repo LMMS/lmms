@@ -129,6 +129,7 @@ private:
 	int m_notesRunning[128];
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
+	int m_lastMidiPitchRange;
 	int m_channel;
 
 	lcdSpinBoxModel m_bankNum;
