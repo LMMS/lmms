@@ -119,4 +119,7 @@ const int MidiMaxNote = 127;
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;
 
+const int MidiMinPitchBend = 0;
+const int MidiMaxPitchBend = 16383;
+
 #endif
