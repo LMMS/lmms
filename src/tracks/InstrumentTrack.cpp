@@ -533,7 +533,8 @@ void InstrumentTrack::updateBaseNote()
 void InstrumentTrack::updatePitch()
 {
 	updateBaseNote();
-	processOutEvent( MidiEvent( MidiPitchBend, midiPort()->realOutputChannel(), midiPitch() ), 0 );
+
+	processOutEvent( MidiEvent( MidiPitchBend, midiPort()->realOutputChannel(), midiPitch() ) );
 }
 
 
