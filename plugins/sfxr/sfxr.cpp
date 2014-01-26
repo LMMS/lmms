@@ -299,7 +299,7 @@ void SfxrSynth::update( sampleFrame * buffer, const fpp_t frameNum )
 		{
 			if(ssample>1.0f) ssample=1.0f;
 			if(ssample<-1.0f) ssample=-1.0f;
-			for( ch_cnt_t j=0; j < DEFAULT_CHANNELS; j++ )
+			for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
 			{
 				buffer[i][j]=ssample;
 			}
@@ -444,7 +444,7 @@ QString sfxrInstrument::nodeName() const
 
 
 
-
+#include <stdio.h>
 void sfxrInstrument::playNote(notePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	m_synthMutex.lock();
@@ -458,7 +458,19 @@ void sfxrInstrument::playNote(notePlayHandle * _n, sampleFrame * _working_buffer
 		_n->noteOff();
 	}
 
-	static_cast<SfxrSynth*>(_n->m_pluginData)->update( _working_buffer, frameNum );
+	fpp_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
+	printf("%i", pitchedFrameNum); fflush(stdout);
+	sampleFrame * pitchedBuffer = new sampleFrame[pitchedFrameNum];
+	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
+	for( fpp_t i=0; i<frameNum; i++ )
+	{
+		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
+		{
+			_working_buffer[i][j] = pitchedBuffer[(int)(((double)pitchedFrameNum/frameNum)*i)][j];
+		}
+	}
+
+	delete[] pitchedBuffer;
 	m_synthMutex.unlock();
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, NULL );
