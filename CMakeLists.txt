@@ -303,9 +303,11 @@ IF(WANT_SYSTEM_SR)
 	PKG_CHECK_MODULES(SAMPLERATE samplerate>=0.1.8)
 	IF(SAMPLERATE_FOUND)
 		SET(LMMS_HAVE_SAMPLERATE TRUE)
+		SET(STATUS_SAMPLERATE "OK")
 	ENDIF(SAMPLERATE_FOUND)
 ENDIF(WANT_SYSTEM_SR)
 IF(NOT LMMS_HAVE_SAMPLERATE)
+	SET(STATUS_SAMPLERATE "bundled")
 	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate)
 	SET(CMAKE_CROSSCOMPILING_ORIG "${CMAKE_CROSSCOMPILING}")
 	SET(CMAKE_CROSSCOMPILING "")
@@ -569,8 +571,7 @@ MESSAGE("\n"
 "Installation Summary\n"
 "--------------------\n"
 "* Install Directory           : ${CMAKE_INSTALL_PREFIX}\n"
-#"* Build type                  : ${CMAKE_BUILD_TYPE}\n"
-"* Use system's libsamplerate  : ${LMMS_HAVE_SAMPLERATE}\n"
+"* libsamplerate               : ${STATUS_SAMPLERATE}\n"
 )
 
 MESSAGE(
