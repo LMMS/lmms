@@ -152,6 +152,14 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
 
+	//Initialize voice values
+	voiceNote[0] = 0;
+	voiceLRU[0] = 0;
+	for(int i=1; i<9; ++i) {
+		voiceNote[i] = OPL2_VOICE_FREE;
+		voiceLRU[i] = i;
+	}
+
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
@@ -161,11 +169,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	// Some kind of sane defaults
 	pitchbend = 0;
 	tuneEqual(69, 440);
-
-	for(int i=1; i<9; ++i) {
-		voiceNote[i] = OPL2_VOICE_FREE;
-		voiceLRU[i] = i;
-	}
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
