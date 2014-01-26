@@ -148,6 +148,13 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
+
+	//Initialize voice values
+	for(int i=0; i<9; ++i) {
+		voiceNote[i] = OPL2_VOICE_FREE;
+		voiceLRU[i] = i;
+	}
+
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
@@ -161,11 +168,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	// Some kind of sane defaults
 	pitchbend = 0;
 	tuneEqual(69, 440);
-
-	for(int i=1; i<9; ++i) {
-		voiceNote[i] = OPL2_VOICE_FREE;
-		voiceLRU[i] = i;
-	}
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
