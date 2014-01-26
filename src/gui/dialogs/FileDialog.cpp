@@ -59,7 +59,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 void FileDialog::clearSelection()
 {
-	static QListView *view = findChild<QListView*>();
+    QListView *view = findChild<QListView*>()
 	Q_ASSERT( view );
 	view->clearSelection();
 }
