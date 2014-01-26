@@ -87,6 +87,7 @@ enum MidiStandardControllers
 	MidiControllerBreathController = 2,
 	MidiControllerFootController = 4,
 	MidiControllerPortamentoTime = 5,
+	MidiControllerDataEntry = 6,
 	MidiControllerMainVolume = 7,
 	MidiControllerBalance = 8,
 	MidiControllerPan = 10,
@@ -97,6 +98,8 @@ enum MidiStandardControllers
 	MidiControllerSostenuto = 66,
 	MidiControllerSoftPedal = 67,
 	MidiControllerLegatoFootswitch = 68,
+	MidiControllerRegisteredParameterNumberLSB = 100,
+	MidiControllerRegisteredParameterNumberMSB = 101,
 	// Channel Mode Messages are controllers too...
 	MidiControllerAllSoundOff = 120,
 	MidiControllerResetAllControllers = 121,
@@ -107,6 +110,17 @@ enum MidiStandardControllers
 	MidiControllerMonoOn = 126,
 	MidiControllerPolyOn = 127,
 
+};
+
+enum MidiControllerRegisteredParameterNumbers
+{
+	MidiPitchBendSensitivityRPN = 0x0000,
+	MidiChannelFineTuningRPN = 0x0001,
+	MidiChannelCoarseTuningRPN = 0x0002,
+	MidiTuningProgramChangeRPN = 0x0003,
+	MidiTuningBankSelectRPN = 0x0004,
+	MidiModulationDepthRangeRPN = 0x0005,
+	MidiNullFunctionNumberRPN = 0x7F7F
 };
 
 const int MidiChannelCount = 16;
