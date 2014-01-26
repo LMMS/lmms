@@ -148,6 +148,9 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
+	// Enable waveform selection
+	theEmulator->write(0x01,0x20);
+	emulatorMutex.unlock();
 
 	//Initialize voice values
 	voiceNote[0] = 0;
@@ -156,10 +159,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
-
-	// Enable waveform selection
-	theEmulator->write(0x01,0x20);
-	emulatorMutex.unlock();
 
 	updatePatch();
 
