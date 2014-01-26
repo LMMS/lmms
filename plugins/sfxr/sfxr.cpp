@@ -23,7 +23,8 @@
  * Boston, MA 02110-1301 USA.
  */
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <time.h>
 
 #define rnd(n) (rand()%(n+1))
 
