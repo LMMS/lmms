@@ -720,51 +720,50 @@ trackView * InstrumentTrack::createView( TrackContainerView* tcv )
 
 
 
-void InstrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement & thisElement )
 {
-	m_volumeModel.saveSettings( _doc, _this, "vol" );
-	m_panningModel.saveSettings( _doc, _this, "pan" );
-	m_pitchModel.saveSettings( _doc, _this, "pitch" );
-	m_pitchRangeModel.saveSettings( _doc, _this, "pitchrange" );
+	m_volumeModel.saveSettings( doc, thisElement, "vol" );
+	m_panningModel.saveSettings( doc, thisElement, "pan" );
+	m_pitchModel.saveSettings( doc, thisElement, "pitch" );
+	m_pitchRangeModel.saveSettings( doc, thisElement, "pitchrange" );
 
-	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
-	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
+	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
+	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 
 	if( m_instrument != NULL )
 	{
-		QDomElement i = _doc.createElement( "instrument" );
+		QDomElement i = doc.createElement( "instrument" );
 		i.setAttribute( "name", m_instrument->descriptor()->name );
-		m_instrument->saveState( _doc, i );
-		_this.appendChild( i );
+		m_instrument->saveState( doc, i );
+		thisElement.appendChild( i );
 	}
-	m_soundShaping.saveState( _doc, _this );
-	m_noteStacking.saveState( _doc, _this );
-	m_arpeggio.saveState( _doc, _this );
-	m_midiPort.saveState( _doc, _this );
-	m_audioPort.effects()->saveState( _doc, _this );
+	m_soundShaping.saveState( doc, thisElement );
+	m_noteStacking.saveState( doc, thisElement );
+	m_arpeggio.saveState( doc, thisElement );
+	m_midiPort.saveState( doc, thisElement );
+	m_audioPort.effects()->saveState( doc, thisElement );
 }
 
 
 
 
-void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
 	silenceAllNotes();
 
 	engine::mixer()->lock();
 
-	m_volumeModel.loadSettings( _this, "vol" );
-	m_panningModel.loadSettings( _this, "pan" );
-	m_pitchModel.loadSettings( _this, "pitch" );
-	m_pitchRangeModel.loadSettings( _this, "pitchrange" );
-	m_effectChannelModel.loadSettings( _this, "fxch" );
-	m_baseNoteModel.loadSettings( _this, "basenote" );
+	m_volumeModel.loadSettings( thisElement, "vol" );
+	m_panningModel.loadSettings( thisElement, "pan" );
+	m_pitchModel.loadSettings( thisElement, "pitch" );
+	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
+	m_effectChannelModel.loadSettings( thisElement, "fxch" );
+	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
 
-	QDomNode node = _this.firstChild();
+	QDomNode node = thisElement.firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -793,11 +792,9 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				delete m_instrument;
 				m_instrument = NULL;
-				m_instrument = Instrument::instantiate(
-					node.toElement().attribute( "name" ),
-									this );
-				m_instrument->restoreState(
-						node.firstChildElement() );
+				m_instrument = Instrument::instantiate( node.toElement().attribute( "name" ), this );
+				m_instrument->restoreState( node.firstChildElement() );
+
 				emit instrumentChanged();
 			}
 		}
@@ -1326,13 +1323,14 @@ InstrumentTrackWindow::~InstrumentTrackWindow()
 
 
 
-void InstrumentTrackWindow::setInstrumentTrackView( InstrumentTrackView * _tv )
+void InstrumentTrackWindow::setInstrumentTrackView( InstrumentTrackView* view )
 {
-	if( m_itv && _tv )
+	if( m_itv && view )
 	{
 		m_itv->m_tlb->setChecked( false );
 	}
-	m_itv = _tv;
+
+	m_itv = view;
 }
 
 
@@ -1382,28 +1380,27 @@ void InstrumentTrackWindow::modelChanged()
 
 void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
-	FileDialog sfd( this, tr( "Save preset" ), "",
-				tr( "XML preset file (*.xpf)" ) );
+	FileDialog sfd( this, tr( "Save preset" ), "", tr( "XML preset file (*.xpf)" ) );
 
-	QString preset_root = configManager::inst()->userPresetsDir();
-	if( !QDir( preset_root ).exists() )
+	QString presetRoot = configManager::inst()->userPresetsDir();
+	if( !QDir( presetRoot ).exists() )
 	{
-		QDir().mkdir( preset_root );
+		QDir().mkdir( presetRoot );
 	}
-	if( !QDir( preset_root + m_track->instrumentName() ).exists() )
+	if( !QDir( presetRoot + m_track->instrumentName() ).exists() )
 	{
-		QDir( preset_root ).mkdir( m_track->instrumentName() );
+		QDir( presetRoot ).mkdir( m_track->instrumentName() );
 	}
 
 	sfd.setAcceptMode( FileDialog::AcceptSave );
-	sfd.setDirectory( preset_root + m_track->instrumentName() );
+	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
-	if( sfd.exec () == QDialog::Accepted &&
-		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != ""
-	)
+
+	if( sfd.exec() == QDialog::Accepted &&
+		!sfd.selectedFiles().isEmpty() &&
+		!sfd.selectedFiles().first().isEmpty() )
 	{
-		multimediaProject mmp(
-				multimediaProject::InstrumentTrackSettings );
+		multimediaProject mmp( multimediaProject::InstrumentTrackSettings );
 		m_track->setSimpleSerializing();
 		m_track->saveSettings( mmp, mmp.content() );
 		QString f = sfd.selectedFiles()[0];
@@ -1434,8 +1431,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 	delete m_instrumentView;
 	if( m_track->m_instrument != NULL )
 	{
-		m_instrumentView = m_track->m_instrument->createView(
-								m_tabWidget );
+		m_instrumentView = m_track->m_instrument->createView( m_tabWidget );
 		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), 0 );
 		m_tabWidget->setActiveTab( 0 );
 
@@ -1447,19 +1443,18 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 
 
-void InstrumentTrackWindow::textChanged( const QString & _new_name )
+void InstrumentTrackWindow::textChanged( const QString& newName )
 {
-	m_track->setName( _new_name );
+	m_track->setName( newName );
 	engine::getSong()->setModified();
 }
 
 
 
 
-void InstrumentTrackWindow::toggleVisibility( bool _on )
+void InstrumentTrackWindow::toggleVisibility( bool on )
 {
-
-	if( _on )
+	if( on )
 	{
 		show();
 		parentWidget()->show();
@@ -1474,9 +1469,10 @@ void InstrumentTrackWindow::toggleVisibility( bool _on )
 
 
 
-void InstrumentTrackWindow::closeEvent( QCloseEvent * _ce )
+void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
-	_ce->ignore();
+	event->ignore();
+
 	if( engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
@@ -1485,6 +1481,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
+
 	m_itv->m_tlb->setFocus();
 	m_itv->m_tlb->setChecked( false );
 }
@@ -1492,7 +1489,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent * _ce )
 
 
 
-void InstrumentTrackWindow::focusInEvent( QFocusEvent * )
+void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 {
 	m_pianoView->setFocus();
 }
@@ -1500,32 +1497,34 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent * )
 
 
 
-void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent * _dee )
+void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "instrument,presetfile,"
-							"pluginpresetfile" );
+	stringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
 }
 
 
 
 
-void InstrumentTrackWindow::dragEnterEvent( QDragEnterEvent * _dee )
+void InstrumentTrackWindow::dragEnterEvent( QDragEnterEvent* event )
 {
-	dragEnterEventGeneric( _dee );
+	dragEnterEventGeneric( event );
 }
 
 
 
 
-void InstrumentTrackWindow::dropEvent( QDropEvent * _de )
+void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = stringPairDrag::decodeKey( event );
+	QString value = stringPairDrag::decodeValue( event );
+
 	if( type == "instrument" )
 	{
 		m_track->loadInstrument( value );
+
 		engine::getSong()->setModified();
-		_de->accept();
+
+		event->accept();
 	}
 	else if( type == "presetfile" )
 	{
@@ -1533,40 +1532,43 @@ void InstrumentTrackWindow::dropEvent( QDropEvent * _de )
 		InstrumentTrack::removeMidiPortNode( mmp );
 		m_track->setSimpleSerializing();
 		m_track->loadSettings( mmp.content().toElement() );
+
 		engine::getSong()->setModified();
-		_de->accept();
+
+		event->accept();
 	}
 	else if( type == "pluginpresetfile" )
 	{
 		const QString ext = fileItem::extension( value );
 		Instrument * i = m_track->instrument();
+
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
-			i = m_track->loadInstrument(
-					engine::pluginFileHandling()[ext] );
+			i = m_track->loadInstrument( engine::pluginFileHandling()[ext] );
 		}
+
 		i->loadFile( value );
-		_de->accept();
+
+		event->accept();
 	}
 }
 
 
 
 
-void InstrumentTrackWindow::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void InstrumentTrackWindow::saveSettings( QDomDocument& doc, QDomElement & thisElement )
 {
-	_this.setAttribute( "tab", m_tabWidget->activeTab() );
-	MainWindow::saveWidgetState( this, _this );
+	thisElement.setAttribute( "tab", m_tabWidget->activeTab() );
+	MainWindow::saveWidgetState( this, thisElement );
 }
 
 
 
 
-void InstrumentTrackWindow::loadSettings( const QDomElement & _this )
+void InstrumentTrackWindow::loadSettings( const QDomElement& thisElement )
 {
-	m_tabWidget->setActiveTab( _this.attribute( "tab" ).toInt() );
-	MainWindow::restoreWidgetState( this, _this );
+	m_tabWidget->setActiveTab( thisElement.attribute( "tab" ).toInt() );
+	MainWindow::restoreWidgetState( this, thisElement );
 	if( isVisible() )
 	{
 		m_itv->m_tlb->setChecked( true );
