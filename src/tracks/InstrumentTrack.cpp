@@ -251,10 +251,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					}
 
 					emit noteOn( n );
-
-					eventHandled = true;
-
 				}
+
+				eventHandled = true;
 				break;
 			}
 
@@ -277,20 +276,19 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				// be deleted later automatically)
 				nph->noteOff();
 				m_notes[event.key()] = NULL;
-
-				eventHandled = true;
 			}
+			eventHandled = true;
 			break;
 		}
 
 		case MidiKeyPressure:
 			if( m_notes[event.key()] != NULL )
 			{
-				eventHandled = true;
 				// setVolume() calls processOutEvent() with MidiKeyPressure so the
 				// attached instrument will receive the event as well
 				m_notes[event.key()]->setVolume( event.volume() );
 			}
+			eventHandled = true;
 			break;
 
 		case MidiPitchBend:
