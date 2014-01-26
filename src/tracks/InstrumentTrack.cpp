@@ -755,37 +755,11 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	engine::mixer()->lock();
 
 	m_volumeModel.loadSettings( _this, "vol" );
-
-	// compat-hacks - move to mmp::upgrade
-	if( _this.hasAttribute( "surpos" ) || _this.hasAttribute( "surpos-x" )
-		|| !_this.firstChildElement( "automationpattern" ).
-				firstChildElement( "surpos-x" ).isNull() )
-	{
-		surroundAreaModel m( this, this );
-		m.loadSettings( _this, "surpos" );
-		m_panningModel.setValue( m.x() * 100 / SURROUND_AREA_SIZE );
-	}
-	else
-	{
-		m_panningModel.loadSettings( _this, "pan" );
-	}
-
+	m_panningModel.loadSettings( _this, "pan" );
 	m_pitchModel.loadSettings( _this, "pitch" );
 	m_pitchRangeModel.loadSettings( _this, "pitchrange" );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
-
-	if( _this.hasAttribute( "baseoct" ) )
-	{
-		// TODO: move this compat code to mmp.cpp -> upgrade()
-		m_baseNoteModel.setInitValue( _this.
-			attribute( "baseoct" ).toInt()
-				* KeysPerOctave
-				+ _this.attribute( "basetone" ).toInt() );
-	}
-	else
-	{
-		m_baseNoteModel.loadSettings( _this, "basenote" );
-	}
+	m_baseNoteModel.loadSettings( _this, "basenote" );
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -826,28 +800,9 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 						node.firstChildElement() );
 				emit instrumentChanged();
 			}
-			// compat code - if node-name doesn't match any known
-			// one, we assume that it is an instrument-plugin
-			// which we'll try to load
-			else if( AutomationPattern::classNodeName() != node.nodeName() &&
-					ControllerConnection::classNodeName() != node.nodeName() &&
-					!node.toElement().hasAttribute( "id" ) )
-			{
-				delete m_instrument;
-				m_instrument = NULL;
-				m_instrument = Instrument::instantiate(
-							node.nodeName(), this );
-				if( m_instrument->nodeName() ==
-							node.nodeName() )
-				{
-					m_instrument->restoreState(
-							node.toElement() );
-				}
-				emit instrumentChanged();
-			}
 		}
 		node = node.nextSibling();
-        }
+	}
 	engine::mixer()->unlock();
 }
 
