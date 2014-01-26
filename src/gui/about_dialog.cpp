@@ -67,7 +67,7 @@ aboutDialog::aboutDialog() :
 {
 	setupUi( this );
 
-	iconLabel->setPixmap( embed::getIconPixmap( "icon" ) );
+	iconLabel->setPixmap( embed::getIconPixmap( "icon", 64, 64 ) );
 
 	versionLabel->setText( versionLabel->text().
 					arg( LMMS_VERSION ).
