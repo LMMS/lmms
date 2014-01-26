@@ -150,7 +150,9 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	theEmulator->init();
 
 	//Initialize voice values
-	for(int i=0; i<9; ++i) {
+	voiceNote[0] = 0;
+	voiceLRU[0] = 0;
+	for(int i=1; i<9; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
