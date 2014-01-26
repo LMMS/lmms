@@ -101,7 +101,7 @@ public:
 	// MIDI-events
 	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime() )
 	{
-		return false;
+		return true;
 	}
 
 	virtual QString fullDisplayName() const;
