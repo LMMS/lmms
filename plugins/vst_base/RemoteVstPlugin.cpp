@@ -773,16 +773,15 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		// dispatcher-call, so we create static copies of the
 		// data and post them
 #define MIDI_EVENT_BUFFER_COUNT		1024
-		static char event_buf[sizeof( VstMidiEvent * ) *
-						MIDI_EVENT_BUFFER_COUNT +
-							sizeof( VstEvents )];
+		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MIDI_EVENT_BUFFER_COUNT];
 		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
-		VstEvents * events = (VstEvents *) event_buf;
+
+		VstEvents* events = (VstEvents *) eventsBuffer;
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
+
 		int idx = 0;
-		for( VstMidiEventList::iterator it = m_midiEvents.begin();
-					it != m_midiEvents.end(); ++it, ++idx )
+		for( VstMidiEventList::iterator it = m_midiEvents.begin(); it != m_midiEvents.end(); ++it, ++idx )
 		{
 			memcpy( &vme[idx], &*it, sizeof( VstMidiEvent ) );
 			events->events[idx] = (VstEvent *) &vme[idx];
