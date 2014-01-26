@@ -92,7 +92,7 @@ void MidiWinMM::applyPortMode( MidiPort* port )
 {
 	// make sure no subscriptions exist which are not possible with
 	// current port-mode
-	if( !port->inputEnabled() )
+	if( !port->isInputEnabled() )
 	{
 		for( SubMap::Iterator it = m_inputSubs.begin(); it != m_inputSubs.end(); ++it )
 		{
@@ -100,7 +100,7 @@ void MidiWinMM::applyPortMode( MidiPort* port )
 		}
 	}
 
-	if( !port->outputEnabled() )
+	if( !port->isOutputEnabled() )
 	{
 		for( SubMap::Iterator it = m_outputSubs.begin(); it != m_outputSubs.end(); ++it )
 		{
@@ -145,7 +145,7 @@ QString MidiWinMM::sourcePortName( const MidiEvent& event ) const
 
 void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool subscribe )
 {
-	if( subscribe && port->inputEnabled() == false )
+	if( subscribe && port->isInputEnabled() == false )
 	{
 		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
 		return;
@@ -163,7 +163,7 @@ void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool
 
 void MidiWinMM::subscribeWritablePort( MidiPort* port, const QString& dest, bool subscribe )
 {
-	if( subscribe && port->outputEnabled() == false )
+	if( subscribe && port->isOutputEnabled() == false )
 	{
 		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
 		return;
