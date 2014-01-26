@@ -105,6 +105,11 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 
 	setFrames( _frames );
 
+	// inform attached components about new MIDI note (used for recording in Piano Roll)
+	if( m_origin == OriginMidiInput )
+	{
+		m_instrumentTrack->midiNoteOn( *this );
+	}
 
 	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
@@ -121,6 +126,13 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 notePlayHandle::~notePlayHandle()
 {
 	noteOff( 0 );
+
+	// inform attached components about MIDI finished (used for recording in Piano Roll)
+	if( m_origin == OriginMidiInput )
+	{
+		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
+		m_instrumentTrack->midiNoteOff( *this );
+	}
 
 	if( isTopNote() )
 	{

@@ -204,8 +204,8 @@ public:
 signals:
 	void instrumentChanged();
 	void newNote();
-	void noteOn( const note & _n );
-	void noteOff( const note & _n );
+	void midiNoteOn( const note& );
+	void midiNoteOff( const note& );
 	void nameChanged();
 
 

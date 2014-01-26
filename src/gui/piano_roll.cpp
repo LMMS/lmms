@@ -765,15 +765,9 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	// of start-notes and so on...)
 	resizeEvent( NULL );
 
-	connect( m_pattern->instrumentTrack(),
-			SIGNAL( noteOn( const note & ) ),
-			this, SLOT( startRecordNote( const note & ) ) );
-	connect( m_pattern->instrumentTrack(),
-			SIGNAL( noteOff( const note & ) ),
-			this, SLOT( finishRecordNote( const note & ) ) );
-	connect( m_pattern->instrumentTrack()->pianoModel(),
-			SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
+	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const note& ) ), this, SLOT( startRecordNote( const note& ) ) );
+	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const note& ) ), this, SLOT( finishRecordNote( const note& ) ) );
+	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
 
 	setWindowTitle( tr( "Piano-Roll - %1" ).arg( m_pattern->name() ) );
 

@@ -237,20 +237,16 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			{
 				if( m_notes[event.key()] == NULL )
 				{
-					// create temporary note
-					note n;
-					n.setKey( event.key() );
-					n.setVolume( event.volume() );
-
 					// create (timed) note-play-handle
-					notePlayHandle* nph = new notePlayHandle( this, time.frames( engine::framesPerTick() ), typeInfo<f_cnt_t>::max() / 2,
-																n, NULL, false, event.channel() );
+					notePlayHandle* nph = new notePlayHandle( this, time.frames( engine::framesPerTick() ),
+																typeInfo<f_cnt_t>::max() / 2,
+																note( MidiTime(), MidiTime(), event.key(), event.volume() ),
+																NULL, false, event.channel(),
+																notePlayHandle::OriginMidiInput );
 					if( engine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = nph;
 					}
-
-					emit noteOn( n );
 				}
 
 				eventHandled = true;
@@ -258,28 +254,15 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			}
 
 		case MidiNoteOff:
-		{
-			notePlayHandle* nph = m_notes[event.key()];
-			if( nph != NULL )
+			if( m_notes[event.key()] != NULL )
 			{
-				// create dummy-note which has the same length
-				// as the played note for sending it later
-				// to all slots connected to signal noteOff()
-				// this is for example needed by piano-roll for
-				// recording notes into a pattern
-				note n( MidiTime( static_cast<f_cnt_t>( nph->totalFramesPlayed() / engine::framesPerTick() ) ),
-							0, nph->key(), nph->getVolume(), nph->getPanning() );
-
-				emit noteOff( n );
-
-				// now do actual note off and remove internal reference to NotePlayHandle (which itself will
+				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
-				nph->noteOff();
+				m_notes[event.key()]->noteOff();
 				m_notes[event.key()] = NULL;
 			}
 			eventHandled = true;
 			break;
-		}
 
 		case MidiKeyPressure:
 			if( m_notes[event.key()] != NULL )
@@ -467,24 +450,11 @@ QString InstrumentTrack::instrumentName() const
 
 
 
-void InstrumentTrack::deleteNotePluginData( notePlayHandle * _n )
+void InstrumentTrack::deleteNotePluginData( notePlayHandle* n )
 {
 	if( m_instrument != NULL )
 	{
-		m_instrument->deleteNotePluginData( _n );
-	}
-
-	// Notes deleted when keys still pressed
-	if( m_notes[_n->key()] == _n )
-	{
-		note done_note( MidiTime( static_cast<f_cnt_t>(
-						_n->totalFramesPlayed() /
-						engine::framesPerTick() ) ),
-					0, _n->key(),
-					_n->getVolume(), _n->getPanning() );
-		_n->noteOff();
-		m_notes[_n->key()] = NULL;
-		emit noteOff( done_note );
+		m_instrument->deleteNotePluginData( n );
 	}
 }
 
