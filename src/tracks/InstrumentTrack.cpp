@@ -543,7 +543,7 @@ void InstrumentTrack::updatePitch()
 void InstrumentTrack::updatePitchRange()
 {
 	const int r = m_pitchRangeModel.value();
-	m_pitchModel.setRange( -MinPitchDefault * r, MaxPitchDefault * r );
+	m_pitchModel.setRange( MinPitchDefault * r, MaxPitchDefault * r );
 
 	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(),
 								MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F ) );
