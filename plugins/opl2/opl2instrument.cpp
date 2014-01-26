@@ -168,6 +168,9 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	// Some kind of sane defaults
 	pitchbend = 0;
+	pitchBendRange = 100;
+	RPNcoarse = RPNfine = 255;
+
 	tuneEqual(69, 440);
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
@@ -257,7 +260,6 @@ void opl2instrument::setVoiceVelocity(int voice, int vel) {
 	theEmulator->write(0x43+adlib_opadd[voice], 
 			   ( (int)op2_scale_mdl.value() & 0x03 << 6) +
 			   ( vel_adjusted & 0x3f ) );
-	// printf("vel %d for voice %d (%f)\n",vel_adjusted,voice,op2_lvl_mdl.value() );
 }
 
 // Pop least recently used voice - why does it sometimes lose a voice (mostly 0)?
@@ -267,10 +269,6 @@ int opl2instrument::popVoice() {
 		voiceLRU[i] = voiceLRU[i+1];
 	}
 	voiceLRU[8] = OPL2_NO_VOICE;
-	/* printf("pop: %d %d %d %d %d %d %d %d %d \n", 
-	       voiceLRU[0],voiceLRU[1],voiceLRU[2],
-	       voiceLRU[3],voiceLRU[4],voiceLRU[5],
-	       voiceLRU[6],voiceLRU[7],voiceLRU[8]); */
 	return tmp;
 }
 
@@ -282,10 +280,6 @@ int opl2instrument::pushVoice(int v) {
 		}
 	}
 	voiceLRU[i] = v;
-	/*printf("%d %d %d %d %d %d %d %d %d \n", 
-	       voiceLRU[0],voiceLRU[1],voiceLRU[2],
-	       voiceLRU[3],voiceLRU[4],voiceLRU[5],
-	       voiceLRU[6],voiceLRU[7],voiceLRU[8]); */
 	return i;
 }
 
@@ -309,7 +303,6 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			setVoiceVelocity(voice, vel);
 			voiceNote[voice] = key;
 			velocities[key] = vel;
-			// printf("%d %d\n",voice,vel);			
 		}
                 break;
         case MidiNoteOff:
@@ -342,9 +335,8 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 		// tmp_pb = (2*BEND_CENTS)*((float)event.m_data.m_param[0]/16383)-BEND_CENTS;
 
 		// Something like 100 cents = 8192, but offset by 8192 so the +/-100 cents range goes from 0...16383?
-		tmp_pb = ( event.pitchBend()-8192 ) * BEND_CENTS / 8192;
+		tmp_pb = ( event.pitchBend()-8192 ) * pitchBendRange / 8192;
 		
-		printf("Pitch bend: %d -> %d cents\n",event.pitchBend(),tmp_pb);
 		if( tmp_pb != pitchbend ) {
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
@@ -357,6 +349,24 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			}
                 }
                 break;
+	case MidiControlChange:		
+		switch (event.controllerNumber()) {
+		case MidiControllerRegisteredParameterNumberLSB:
+			RPNfine = event.controllerValue();
+			break;
+		case MidiControllerRegisteredParameterNumberMSB:
+			RPNcoarse = event.controllerValue();
+			break;
+		case MidiControllerDataEntry:
+			if( (RPNcoarse << 8) + RPNfine == MidiPitchBendSensitivityRPN) {
+				pitchBendRange = event.controllerValue() * 100;
+			}
+			break;
+		default:
+			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
+			break;
+		}
+		break;
         default:
                 printf("Midi event type %d\n",event.type());
         }

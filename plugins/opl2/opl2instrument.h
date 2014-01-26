@@ -36,7 +36,7 @@
 #define OPL2_VOICE_FREE 255
 #define OPL2_NO_VOICE 255
 // The "normal" range for LMMS pitchbends
-#define BEND_CENTS 100
+#define DEFAULT_BEND_CENTS 100
 
 class opl2instrument : public Instrument
 {
@@ -119,8 +119,7 @@ private:
 	int fnums[128];
 	// in cents, range defaults to +/-100 cents (should this be changeable?)
 	int pitchbend;
-
-
+	int pitchBendRange;
 
 	int popVoice();
 	int pushVoice(int v);
@@ -128,6 +127,9 @@ private:
 	int Hz2fnum(float Hz);
 	static QMutex emulatorMutex;
 	void setVoiceVelocity(int voice, int vel);
+
+	// Pitch bend range comes through RPNs.
+	int RPNcoarse, RPNfine;
 };
 
 
