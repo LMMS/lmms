@@ -34,6 +34,7 @@
 #include "note_play_handle.h"
 #include "Piano.h"
 #include "PianoView.h"
+#include "Pitch.h"
 #include "track.h"
 
 
@@ -111,7 +112,13 @@ public:
 	// translate pitch to midi-pitch [0,16383]
 	int midiPitch() const
 	{
-		return (int)( ( m_pitchModel.value()+100 ) * 16383 ) / 200;
+		return static_cast<int>( ( ( m_pitchModel.value() + m_pitchModel.range()/2 ) * MidiMaxPitchBend ) / m_pitchModel.range() );
+	}
+
+	/*! \brief Returns current range for pitch bend in semitones */
+	int midiPitchRange() const
+	{
+		return m_pitchRangeModel.value();
 	}
 
 	// play everything in given frame-range - creates note-play-handles
