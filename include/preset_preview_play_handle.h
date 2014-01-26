@@ -2,7 +2,7 @@
  * preset_preview_play_handle.h - play-handle for playing a short preview-sound
  *                                of a preset or a file processed by a plugin
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +34,7 @@ class InstrumentTrack;
 class previewTrackContainer;
 
 
-class presetPreviewPlayHandle : public playHandle
+class EXPORT presetPreviewPlayHandle : public playHandle
 {
 public:
 	presetPreviewPlayHandle( const QString & _preset_file,
