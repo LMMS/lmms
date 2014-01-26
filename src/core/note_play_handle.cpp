@@ -305,9 +305,10 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 	// can set m_releaseFramesDone to m_releaseFramesToDo so that
 	// notePlayHandle::done() returns true and also this base-note is
 	// removed from mixer's active note vector
-	if( isArpeggioBaseNote() && m_subNotes.size() == 0 )
+	if( m_released && isArpeggioBaseNote() && m_subNotes.size() == 0 )
 	{
 		m_releaseFramesDone = m_releaseFramesToDo;
+		m_frames = 0;
 	}
 
 	// update internal data
