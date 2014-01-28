@@ -26,6 +26,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QMessageBox>
+#include <QApplication>
 
 #include <math.h>
 
@@ -649,8 +650,9 @@ void song::playSong()
 	m_paused = false;
 
 	savePos();
-
-	engine::updatePlayPauseIcons();
+	if(QApplication::type() != QApplication::Tty) {
+		engine::updatePlayPauseIcons();
+	}
 }
 
 
@@ -834,7 +836,9 @@ void song::stop()
 
 	m_playMode = Mode_None;
 
-	engine::updatePlayPauseIcons();
+	if(QApplication::type() != QApplication::Tty) {
+		engine::updatePlayPauseIcons();
+	}
 }
 
 
