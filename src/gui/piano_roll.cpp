@@ -331,6 +331,11 @@ pianoRoll::pianoRoll() :
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
+					
+	m_playButton->setObjectName( "playButton" );
+	m_stopButton->setObjectName( "stopButton" );
+	m_recordButton->setObjectName( "recordButton" );
+	m_recordAccompanyButton->setObjectName( "recordAccompanyButton" );
 
 	m_playButton->setWhatsThis(
 		tr( "Click here to play the current pattern. "

@@ -352,6 +352,7 @@ void knob::drawKnob( QPainter * _p )
 		}
 		case knobDark_28:
 		{
+			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
