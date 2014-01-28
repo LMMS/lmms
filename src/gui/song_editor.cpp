@@ -113,7 +113,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 				this, SLOT( adjustUiAfterProjectLoad() ) );
 
 
-	// add some essential widgets to global tool-bar 
+	// add some essential widgets to global tool-bar
 	QWidget * tb = engine::mainWindow()->toolBar();
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
@@ -153,7 +153,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	engine::mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
-	
+
 
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
@@ -239,7 +239,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(), 
+	pal.setBrush( m_toolBar->backgroundRole(),
 				embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 
@@ -255,19 +255,23 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
 					tr( "Play song (Space)" ),
 					this, SLOT( play() ), m_toolBar );
+	m_playButton->setObjectName( "playButton" );
 
 	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
 			tr( "Record samples from Audio-device" ),
 					this, SLOT( record() ), m_toolBar );
-	m_recordAccompanyButton = new toolButton( 
+	m_recordButton->setObjectName( "recordButton" );
+
+	m_recordAccompanyButton = new toolButton(
 			embed::getIconPixmap( "record_accompany" ),
 			tr( "Record samples from Audio-device while playing "
 							"song or BB track" ),
 				this, SLOT( recordAccompany() ), m_toolBar );
+	m_recordAccompanyButton->setObjectName( "recordAccompanyButton" );
 
 	// FIXME: disable record button while it is not implemented
 	m_recordButton->setDisabled( true );
-	
+
 	// disable record buttons if capturing is not supported
 	if( !engine::mixer()->audioDev()->supportsCapture() )
 	{
@@ -278,6 +282,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 					tr( "Stop song (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
+	m_stopButton->setObjectName( "stopButton" );
 
 	m_addBBTrackButton = new toolButton( embed::getIconPixmap(
 						"add_bb_track" ),
@@ -566,7 +571,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 					setPixelsPerTact( pixelsPerTact() );
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
-	} 
+	}
 	else if( engine::mainWindow()->isShiftPressed() == TRUE )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
@@ -720,7 +725,7 @@ void songEditor::updatePosition( const MidiTime & _t )
 		trackOpWidth = TRACK_OP_WIDTH;
 	}
 
-	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong 
+	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong
 		  && m_timeLine->autoScroll() == timeLine::AutoScrollEnabled) ||
 							m_scrollBack == true )
 	{

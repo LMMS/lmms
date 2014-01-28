@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2013 Paul Giblock <pgib/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -156,9 +156,13 @@ AutomationEditor::AutomationEditor() :
 				tr( "Play/pause current pattern (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
+
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
+
+	m_playButton->setObjectName( "playButton" );
+	m_stopButton->setObjectName( "stopButton" );
 
 	m_playButton->setWhatsThis(
 		tr( "Click here if you want to play the current pattern. "
@@ -277,7 +281,7 @@ AutomationEditor::AutomationEditor() :
 
 	connect( &m_tensionModel, SIGNAL( dataChanged() ),
 			this, SLOT( tensionChanged() ) );
-	
+
 	tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_discreteButton );
 	tool_button_group->addButton( m_linearButton );
@@ -524,7 +528,7 @@ void AutomationEditor::updateAfterPatternChange()
 	}
 
 	if( m_pattern->progressionType() ==
-				AutomationPattern::DiscreteProgression && 
+				AutomationPattern::DiscreteProgression &&
 				!m_discreteButton->isChecked() )
 	{
 		m_discreteButton->setChecked( true );
@@ -763,20 +767,20 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( _x0 < _x1) 
+	if( _x0 < _x1)
 	{
 		xstep = quantization();
 	}
-	else 
+	else
 	{
 		xstep = -( quantization() );
 	}
 
 	if( _y0 < _y1 )
 	{
-		ystep = 1; 
+		ystep = 1;
 	}
-	else 
+	else
 	{
 		ystep = -1;
 	}
@@ -878,7 +882,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				{
 					// then set new value
 					MidiTime value_pos( pos_ticks );
-		
+
 					MidiTime new_time =
 						m_pattern->putValue( value_pos,
 									level );
@@ -1577,7 +1581,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 								is_selected );
 			}
 			delete [] values;
-			
+
 			// Draw cross
 			int y = yCoordOfLevel( it.value() );
 			p.drawLine( x - 1, y, x + 1, y );
@@ -1803,7 +1807,7 @@ void AutomationEditor::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( _we->modifiers() & Qt::ShiftModifier 
+	else if( _we->modifiers() & Qt::ShiftModifier
 			|| _we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
@@ -2069,7 +2073,7 @@ void AutomationEditor::selectAll()
 		const float level = it.value();
 		if( level < m_selectStartLevel )
 		{
-			// if we move start-level down, we have to add 
+			// if we move start-level down, we have to add
 			// the difference between old and new start-level
 			// to m_selectedLevels, otherwise the selection
 			// is just moved down...
