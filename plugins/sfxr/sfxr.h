@@ -184,7 +184,6 @@ public:
 
 
 private:
-	QMutex m_synthMutex;
 	SfxrZeroToOneFloatModel m_attModel;
 	SfxrZeroToOneFloatModel m_holdModel;
 	SfxrZeroToOneFloatModel m_susModel;

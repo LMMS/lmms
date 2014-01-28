@@ -448,7 +448,6 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	m_synthMutex.lock();
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
 	if ( _n->totalFramesPlayed() == 0 )
 	{
@@ -457,6 +456,7 @@ void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffe
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
 		_n->noteOff();
+		return;
 	}
 
 	fpp_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
@@ -471,7 +471,6 @@ void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffe
 	}
 
 	delete[] pitchedBuffer;
-	m_synthMutex.unlock();
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, NULL );
 }
