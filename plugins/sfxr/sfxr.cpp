@@ -48,7 +48,8 @@ float frnd(float range)
 #include "templates.h"
 #include "tooltip.h"
 #include "song.h"
-#include "Midi.h"
+#include "MidiEvent.h"
+#include "MidiTime.h"
 
 #include "embed.cpp"
 
@@ -1064,7 +1065,7 @@ void sfxrInstrumentView::previewSound()
 	sfxrInstrument * s = castModel<sfxrInstrument>();
 	InstrumentTrack * it = s->m_instrumentTrack;
 	it->silenceAllNotes();
-	it->processInEvent( midiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ), midiTime() );
+	it->processInEvent( MidiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ), MidiTime() );
 }
 
 
