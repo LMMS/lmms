@@ -278,6 +278,8 @@ public slots:
 
 	void addBBTrack();
 
+	bool isLoadingProject();
+
 
 private slots:
 	void insertBar();

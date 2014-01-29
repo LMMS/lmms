@@ -30,6 +30,7 @@
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 #include "preset_preview_play_handle.h"
+#include "song.h"
 
 
 PeakControllerEffectControls::
@@ -67,7 +68,7 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	}
 	m_effect->m_effectId = effectId;
 
-	if( m_effect->m_autoController && presetPreviewPlayHandle::isPreviewing() == false )
+    if( m_effect->m_autoController && ( engine::getSong()->isLoadingProject() == true || presetPreviewPlayHandle::isPreviewing() == false ) )
 	{
 		delete m_effect->m_autoController;
 		m_effect->m_autoController = 0;
