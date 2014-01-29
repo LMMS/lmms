@@ -31,7 +31,6 @@
 
 #include "embed.cpp"
 
-
 extern "C"
 {
 
@@ -61,6 +60,7 @@ PeakControllerEffect::PeakControllerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
+	m_effectId( rand() ),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
 	m_lastRMS( -1 ),

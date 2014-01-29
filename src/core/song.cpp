@@ -1494,6 +1494,13 @@ void song::removeController( Controller * _controller )
 
 
 
+
+bool song::isLoadingProject()
+{
+	return m_loadingProject;
+}
+
+
 #include "moc_song.cxx"
 
 

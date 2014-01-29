@@ -258,12 +258,7 @@ ConstNotePlayHandleList presetPreviewPlayHandle::nphsOfInstrumentTrack(
 
 bool presetPreviewPlayHandle::isPreviewing()
 {
-	bool ret = s_previewTC->m_dataMutex.tryLock();
-	if( ret == true )
-	{
-		s_previewTC->m_dataMutex.unlock();
-	}
-	return ret;
+	return s_previewTC->isPreviewing();
 }
 
 

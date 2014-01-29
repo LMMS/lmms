@@ -37,7 +37,6 @@
 #include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 
-int PeakController::s_lastEffectId = 0;
 PeakControllerEffectVector PeakController::s_effects;
 
 

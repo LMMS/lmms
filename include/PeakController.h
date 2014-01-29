@@ -54,7 +54,6 @@ public:
 	virtual QString nodeName() const;
 
 	static PeakControllerEffectVector s_effects;
-	static int s_lastEffectId;
 
 
 public slots:

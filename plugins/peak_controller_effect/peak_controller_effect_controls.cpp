@@ -30,6 +30,7 @@
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 #include "preset_preview_play_handle.h"
+#include "song.h"
 
 
 PeakControllerEffectControls::
@@ -60,14 +61,23 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	m_absModel.loadSettings( _this, "abs" );
 	m_amountMultModel.loadSettings( _this, "amountmult" );
 
-	int effectId = _this.attribute( "effectId" ).toInt();
-	if( effectId > PeakController::s_lastEffectId )
+	/*If the peak controller effect is NOT loaded from project,
+	 * m_effectId stored is useless.
+	 * Reason to assign a random number to it:
+	 * If the user clone the instrument, and m_effectId is cloned, and
+	 * m_effectId is copied, then there would be two instruments
+	 * having the same id.
+	 */
+	if( engine::getSong()->isLoadingProject() == true )
 	{
-		PeakController::s_lastEffectId = effectId;
+		m_effect->m_effectId = _this.attribute( "effectId" ).toInt();
 	}
-	m_effect->m_effectId = effectId;
+	else
+	{
+		m_effect->m_effectId = rand();
+	}
 
-	if( m_effect->m_autoController && presetPreviewPlayHandle::isPreviewing() == false )
+    if( m_effect->m_autoController && ( engine::getSong()->isLoadingProject() == true || presetPreviewPlayHandle::isPreviewing() == false ) )
 	{
 		delete m_effect->m_autoController;
 		m_effect->m_autoController = 0;
