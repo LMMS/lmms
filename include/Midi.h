@@ -1,7 +1,7 @@
 /*
- * midi.h - constants, structs etc. concerning MIDI
+ * Midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,8 +26,6 @@
 #define _MIDI_H
 
 #include "lmms_basics.h"
-#include "panning_constants.h"
-#include <cstdlib>
 
 
 enum MidiEventTypes
@@ -60,7 +58,7 @@ enum MidiEventTypes
 	MidiMetaEvent = 0xFF
 } ;
 
-enum MidiMetaEvents
+enum MidiMetaEventTypes
 {
 	MidiMetaInvalid = 0x00,
 	MidiCopyright = 0x02,
@@ -79,6 +77,7 @@ enum MidiMetaEvents
 	MidiMetaCustom = 0x80,
 	MidiNotePanning
 } ;
+typedef MidiMetaEventTypes MidiMetaEventType;
 
 
 enum MidiStandardControllers
@@ -88,6 +87,7 @@ enum MidiStandardControllers
 	MidiControllerBreathController = 2,
 	MidiControllerFootController = 4,
 	MidiControllerPortamentoTime = 5,
+	MidiControllerDataEntry = 6,
 	MidiControllerMainVolume = 7,
 	MidiControllerBalance = 8,
 	MidiControllerPan = 10,
@@ -98,6 +98,8 @@ enum MidiStandardControllers
 	MidiControllerSostenuto = 66,
 	MidiControllerSoftPedal = 67,
 	MidiControllerLegatoFootswitch = 68,
+	MidiControllerRegisteredParameterNumberLSB = 100,
+	MidiControllerRegisteredParameterNumberMSB = 101,
 	// Channel Mode Messages are controllers too...
 	MidiControllerAllSoundOff = 120,
 	MidiControllerResetAllControllers = 121,
@@ -110,6 +112,17 @@ enum MidiStandardControllers
 
 };
 
+enum MidiControllerRegisteredParameterNumbers
+{
+	MidiPitchBendSensitivityRPN = 0x0000,
+	MidiChannelFineTuningRPN = 0x0001,
+	MidiChannelCoarseTuningRPN = 0x0002,
+	MidiTuningProgramChangeRPN = 0x0003,
+	MidiTuningBankSelectRPN = 0x0004,
+	MidiModulationDepthRangeRPN = 0x0005,
+	MidiNullFunctionNumberRPN = 0x7F7F
+};
+
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
 const int MidiProgramCount = 128;
@@ -120,139 +133,7 @@ const int MidiMaxNote = 127;
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;
 
-
-struct midiEvent
-{
-	midiEvent( MidiEventTypes _type = MidiActiveSensing,
-			int8_t _channel = 0,
-			int16_t _param1 = 0,
-			int16_t _param2 = 0,
-			const void * _sourcePort = NULL ) :
-		m_type( _type ),
-		m_metaEvent( MidiMetaInvalid ),
-		m_channel( _channel ),
-		m_sysExData( NULL ),
-		m_sourcePort( _sourcePort ),
-		m_fromMidiPort( false )
-	{
-		m_data.m_param[0] = _param1;
-		m_data.m_param[1] = _param2;
-	}
-
-	midiEvent( MidiEventTypes _type, const char * _sysex_data,
-							int _data_len ) :
-		m_type( _type ),
-		m_metaEvent( MidiMetaInvalid ),
-		m_channel( 0 ),
-		m_sysExData( _sysex_data ),
-		m_sourcePort( NULL ),
-		m_fromMidiPort( false )
-	{
-		m_data.m_sysExDataLen = _data_len;
-	}
-
-	midiEvent( const midiEvent & _copy ) :
-		m_type( _copy.m_type ),
-		m_metaEvent( _copy.m_metaEvent ),
-		m_channel( _copy.m_channel ),
-		m_data( _copy.m_data ),
-		m_sysExData( _copy.m_sysExData ),
-		m_sourcePort( _copy.m_sourcePort ),
-		m_fromMidiPort( _copy.m_fromMidiPort )
-	{
-	}
-
-	inline MidiEventTypes type() const
-	{
-		return m_type;
-	}
-
-	inline int channel() const
-	{
-		return m_channel;
-	}
-
-	inline int16_t key() const
-	{
-		return m_data.m_param[0];
-	}
-
-	inline int16_t & key()
-	{
-		return m_data.m_param[0];
-	}
-
-	inline uint8_t controllerNumber() const
-	{
-		return m_data.m_param[0];
-	}
-
-	inline uint8_t controllerValue() const
-	{
-		return m_data.m_param[1];
-	}
-
-	inline int16_t velocity() const
-	{
-		return m_data.m_param[1];
-	}
-
-	inline int16_t & velocity()
-	{
-		return m_data.m_param[1];
-	}
-
-	inline int16_t midiPanning() const
-	{
-		return m_data.m_param[1];
-	}
-
-	inline volume_t getVolume() const
-	{
-		return (volume_t)( velocity() * 100 / MidiMaxVelocity );
-	}
-
-	inline const void * sourcePort() const
-	{
-		return m_sourcePort;
-	}
-
-	inline panning_t getPanning() const
-	{
-		return (panning_t) ( PanningLeft +
-			( (float)( midiPanning() - MidiMinPanning ) ) / 
-			( (float)( MidiMaxPanning - MidiMinPanning ) ) *
-			( (float)( PanningRight - PanningLeft ) ) );
-	}
-
-	void setFromMidiPort( bool enabled )
-	{
-		m_fromMidiPort = enabled;
-	}
-
-	bool isFromMidiPort() const
-	{
-		return m_fromMidiPort;
-	}
-
-	MidiEventTypes m_type;		// MIDI event type
-	MidiMetaEvents m_metaEvent;	// Meta event (mostly unused)
-	int8_t m_channel;		// MIDI channel
-	union
-	{
-		int16_t m_param[2];	// first/second parameter (key/velocity)
-		uint8_t m_bytes[4];		// raw bytes
-		int32_t m_sysExDataLen;	// len of m_sysExData
-	} m_data;
-
-	const char * m_sysExData;
-	const void * m_sourcePort;
-
-
-private:
-	bool m_fromMidiPort;
-
-} ;
-
+const int MidiMinPitchBend = 0;
+const int MidiMaxPitchBend = 16383;
 
 #endif

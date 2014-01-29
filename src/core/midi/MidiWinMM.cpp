@@ -1,7 +1,7 @@
 /*
  * MidiWinMM.cpp - WinMM MIDI client
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,33 +57,28 @@ MidiWinMM::~MidiWinMM()
 
 
 
-void MidiWinMM::processOutEvent( const midiEvent & _me,
-						const midiTime & _time,
-						const MidiPort * _port )
+void MidiWinMM::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
 {
-	const DWORD shortMsg = ( _me.m_type + _me.channel() ) +
-				( ( _me.m_data.m_param[0] & 0xff ) << 8 ) +
-				( ( _me.m_data.m_param[1] & 0xff ) << 16 );
+	const DWORD shortMsg = ( event.type() + event.channel() ) +
+				( ( event.param( 0 ) & 0xff ) << 8 ) +
+				( ( event.param( 1 ) & 0xff ) << 16 );
 
-	QStringList out_devs;
-	for( SubMap::ConstIterator it = m_outputSubs.begin();
-						it != m_outputSubs.end(); ++it )
+	QStringList outDevs;
+	for( SubMap::ConstIterator it = m_outputSubs.begin(); it != m_outputSubs.end(); ++it )
 	{
-		for( MidiPortList::ConstIterator jt = it.value().begin();
-						jt != it.value().end(); ++jt )
+		for( MidiPortList::ConstIterator jt = it.value().begin(); jt != it.value().end(); ++jt )
 		{
-			if( *jt == _port )
+			if( *jt == port )
 			{
-				out_devs += it.key();
+				outDevs += it.key();
 				break;
 			}
 		}
 	}
 
-	for( QMap<HMIDIOUT, QString>::Iterator it = m_outputDevices.begin();
-					it != m_outputDevices.end(); ++it )
+	for( QMap<HMIDIOUT, QString>::Iterator it = m_outputDevices.begin(); it != m_outputDevices.end(); ++it )
 	{
-		if( out_devs.contains( *it ) )
+		if( outDevs.contains( *it ) )
 		{
 			midiOutShortMsg( it.key(), shortMsg );
 		}
@@ -93,25 +88,23 @@ void MidiWinMM::processOutEvent( const midiEvent & _me,
 
 
 
-void MidiWinMM::applyPortMode( MidiPort * _port )
+void MidiWinMM::applyPortMode( MidiPort* port )
 {
 	// make sure no subscriptions exist which are not possible with
 	// current port-mode
-	if( !_port->inputEnabled() )
+	if( !port->isInputEnabled() )
 	{
-		for( SubMap::Iterator it = m_inputSubs.begin();
-						it != m_inputSubs.end(); ++it )
+		for( SubMap::Iterator it = m_inputSubs.begin(); it != m_inputSubs.end(); ++it )
 		{
-			it.value().removeAll( _port );
+			it.value().removeAll( port );
 		}
 	}
 
-	if( !_port->outputEnabled() )
+	if( !port->isOutputEnabled() )
 	{
-		for( SubMap::Iterator it = m_outputSubs.begin();
-						it != m_outputSubs.end(); ++it )
+		for( SubMap::Iterator it = m_outputSubs.begin(); it != m_outputSubs.end(); ++it )
 		{
-			it.value().removeAll( _port );
+			it.value().removeAll( port );
 		}
 	}
 }
@@ -119,105 +112,97 @@ void MidiWinMM::applyPortMode( MidiPort * _port )
 
 
 
-void MidiWinMM::removePort( MidiPort * _port )
+void MidiWinMM::removePort( MidiPort* port )
 {
-	for( SubMap::Iterator it = m_inputSubs.begin();
-						it != m_inputSubs.end(); ++it )
+	for( SubMap::Iterator it = m_inputSubs.begin(); it != m_inputSubs.end(); ++it )
 	{
-		it.value().removeAll( _port );
+		it.value().removeAll( port );
 	}
-	for( SubMap::Iterator it = m_outputSubs.begin();
-						it != m_outputSubs.end(); ++it )
+
+	for( SubMap::Iterator it = m_outputSubs.begin(); it != m_outputSubs.end(); ++it )
 	{
-		it.value().removeAll( _port );
+		it.value().removeAll( port );
 	}
-	MidiClient::removePort( _port );
+
+	MidiClient::removePort( port );
 }
 
 
 
 
-QString MidiWinMM::sourcePortName( const midiEvent & _event ) const
+QString MidiWinMM::sourcePortName( const MidiEvent& event ) const
 {
-	if( _event.sourcePort() )
+	if( event.sourcePort() )
 	{
-		return m_inputDevices.value( *static_cast<const HMIDIIN *>(
-														_event.sourcePort() ) );
+		return m_inputDevices.value( *static_cast<const HMIDIIN *>( event.sourcePort() ) );
 	}
-	return MidiClient::sourcePortName( _event );
+
+	return MidiClient::sourcePortName( event );
 }
 
 
 
 
-void MidiWinMM::subscribeReadablePort( MidiPort * _port,
-						const QString & _dest,
-						bool _subscribe )
+void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool subscribe )
 {
-	if( _subscribe && _port->inputEnabled() == false )
+	if( subscribe && port->isInputEnabled() == false )
 	{
-		qWarning( "port %s can't be (un)subscribed!\n",
-				_port->displayName().toAscii().constData() );
+		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
 		return;
 	}
 
-	m_inputSubs[_dest].removeAll( _port );
-	if( _subscribe )
+	m_inputSubs[dest].removeAll( port );
+	if( subscribe )
 	{
-		m_inputSubs[_dest].push_back( _port );
+		m_inputSubs[dest].push_back( port );
 	}
 }
 
 
 
 
-void MidiWinMM::subscribeWritablePort( MidiPort * _port,
-						const QString & _dest,
-						bool _subscribe )
+void MidiWinMM::subscribeWritablePort( MidiPort* port, const QString& dest, bool subscribe )
 {
-	if( _subscribe && _port->outputEnabled() == false )
+	if( subscribe && port->isOutputEnabled() == false )
 	{
-		qWarning( "port %s can't be (un)subscribed!\n",
-				_port->displayName().toAscii().constData() );
+		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
 		return;
 	}
 
-	m_outputSubs[_dest].removeAll( _port );
-	if( _subscribe )
+	m_outputSubs[dest].removeAll( port );
+	if( subscribe )
 	{
-		m_outputSubs[_dest].push_back( _port );
+		m_outputSubs[dest].push_back( port );
 	}
 }
 
 
 
 
-void WINAPI CALLBACK MidiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
-					DWORD_PTR _param1, DWORD_PTR _param2 )
+void WINAPI CALLBACK MidiWinMM::inputCallback( HMIDIIN hm, UINT msg, DWORD_PTR inst, DWORD_PTR param1, DWORD_PTR param2 )
 {
-	if( _msg == MIM_DATA )
+	if( msg == MIM_DATA )
 	{
-		( (MidiWinMM *) _inst )->handleInputEvent( _hm, _param1 );
+		( (MidiWinMM *) inst )->handleInputEvent( hm, param1 );
 	}
 }
 
 
 
 
-void MidiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
+void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 {
-	const int cmd = _ev & 0xff;
+	const int cmd = ev & 0xff;
 	if( cmd == MidiActiveSensing )
 	{
 		return;
 	}
-	const int par1 = ( _ev >> 8 ) & 0xff;
-	const int par2 = _ev >> 16;
-	const MidiEventTypes cmdtype =
-				static_cast<MidiEventTypes>( cmd & 0xf0 );
+	const int par1 = ( ev >> 8 ) & 0xff;
+	const int par2 = ev >> 16;
+	const MidiEventTypes cmdtype = static_cast<MidiEventTypes>( cmd & 0xf0 );
 	const int chan = cmd & 0x0f;
 
-	const QString d = m_inputDevices.value( _hm );
+	const QString d = m_inputDevices.value( hm );
 	if( d.isEmpty() || !m_inputSubs.contains( d ) )
 	{
 		return;
@@ -231,28 +216,21 @@ void MidiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 			case MidiNoteOn:
 			case MidiNoteOff:
 			case MidiKeyPressure:
-				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1 - KeysPerOctave,
-								par2 & 0xff, &_hm ), midiTime() );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 - KeysPerOctave, par2 & 0xff, &hm ) );
 				break;
 
 			case MidiControlChange:
 			case MidiProgramChange:
 			case MidiChannelPressure:
-				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1, par2 & 0xff, &_hm ),
-								midiTime() );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1, par2 & 0xff, &hm ) );
 				break;
 
 			case MidiPitchBend:
-				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1 + par2*128, 0, &_hm ),
-								midiTime() );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 + par2*128, 0, &hm ) );
 				break;
 
 			default:
-				qWarning( "WinMM-MIDI: unhandled input "
-							"event %d\n", cmdtype );
+				qWarning( "MidiWinMM: unhandled input event %d\n", cmdtype );
 				break;
 		}
 	}
@@ -265,17 +243,9 @@ void MidiWinMM::updateDeviceList()
 {
 	closeDevices();
 	openDevices();
-//	if( m_readablePorts != readable_ports )
-	{
-//		m_readablePorts = readable_ports;
-		emit readablePortsChanged();
-	}
 
-//	if( m_writablePorts != writable_ports )
-	{
-//		m_writablePorts = writable_ports;
-		emit writablePortsChanged();
-	}
+	emit readablePortsChanged();
+	emit writablePortsChanged();
 }
 
 
@@ -339,8 +309,8 @@ void MidiWinMM::openDevices()
 
 
 
-MidiWinMM::setupWidget::setupWidget( QWidget * _parent ) :
-	MidiClient::setupWidget( MidiWinMM::name(), _parent )
+MidiWinMM::setupWidget::setupWidget( QWidget* parent ) :
+	MidiClient::setupWidget( MidiWinMM::name(), parent )
 {
 }
 

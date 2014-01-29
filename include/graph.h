@@ -151,7 +151,7 @@ public slots:
 	void setWaveToSaw();
 	void setWaveToSquare();
 	void setWaveToNoise();
-	//void setWaveToUser( );
+	QString setWaveToUser( );
 	
 	void smooth();
 	void normalize();

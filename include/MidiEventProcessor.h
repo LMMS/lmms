@@ -25,27 +25,25 @@
 #ifndef _MIDI_EVENT_PROCESSOR_H
 #define _MIDI_EVENT_PROCESSOR_H
 
-class midiEvent;
-class midiTime;
+#include "MidiEvent.h"
+#include "MidiTime.h"
 
 
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor
 {
 public:
-	inline MidiEventProcessor()
+	MidiEventProcessor()
 	{
 	}
 
-	virtual inline ~MidiEventProcessor()
+	virtual ~MidiEventProcessor()
 	{
 	}
 
 	// to be implemented by inheriting classes
-	virtual void processInEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
-	virtual void processOutEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() ) = 0;
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() ) = 0;
 
 } ;
 

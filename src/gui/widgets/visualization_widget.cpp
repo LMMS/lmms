@@ -141,7 +141,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 		// and set color according to that...
 		if( max_level * master_output < 0.9 )
 		{
-			p.setPen( QColor( 128, 224, 128 ) );
+			p.setPen( QColor( 71, 253, 133 ) );
 		}
 		else if( max_level * master_output < 1.0 )
 		{

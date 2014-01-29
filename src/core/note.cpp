@@ -35,7 +35,7 @@
 
 
 
-note::note( const midiTime & _length, const midiTime & _pos,
+note::note( const MidiTime & _length, const MidiTime & _pos,
 		int _key, volume_t _volume, panning_t _panning,
 						DetuningHelper * _detuning ) :
 	m_selected( false ),
@@ -96,7 +96,7 @@ note::~note()
 
 
 
-void note::setLength( const midiTime & _length )
+void note::setLength( const MidiTime & _length )
 {
 //	addJournalEntry( journalEntry( ChangeLength, m_length - _length ) );
 	m_length = _length;
@@ -105,7 +105,7 @@ void note::setLength( const midiTime & _length )
 
 
 
-void note::setPos( const midiTime & _pos )
+void note::setPos( const MidiTime & _pos )
 {
 //	addJournalEntry( journalEntry( ChangePosition, m_pos - _pos ) );
 	m_pos = _pos;
@@ -144,7 +144,7 @@ void note::setPanning( const panning_t _panning )
 
 
 
-midiTime note::quantized( const midiTime & _m, const int _q_grid )
+MidiTime note::quantized( const MidiTime & _m, const int _q_grid )
 {
 	float p = ( (float) _m / _q_grid );
 	if( p - floorf( p ) < 0.5f )

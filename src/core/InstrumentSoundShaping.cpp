@@ -326,7 +326,8 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 {
 	f_cnt_t ret_val = m_envLfoParameters[Volume]->isUsed() ?
 				m_envLfoParameters[Volume]->releaseFrames() : 0;
-	if( m_instrumentTrack->instrument()->desiredReleaseFrames() > ret_val )
+	if( m_instrumentTrack->instrument() &&
+		m_instrumentTrack->instrument()->desiredReleaseFrames() > ret_val )
 	{
 		ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
 	}

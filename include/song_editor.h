@@ -84,7 +84,7 @@ private slots:
 	void masterPitchReleased();
 
 	void updateScrollBar( int );
-	void updatePosition( const midiTime & _t );
+	void updatePosition( const MidiTime & _t );
 
 	void zoomingChanged();
 

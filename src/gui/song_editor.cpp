@@ -99,11 +99,11 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					pixelsPerTact(),
 					m_s->m_playPos[song::Mode_PlaySong],
 					m_currentPosition, this );
-	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 				m_s->m_playPos[song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const midiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
-			this, SLOT( updatePosition( const midiTime & ) ) );
+			SLOT( updatePosition( const MidiTime & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
+			this, SLOT( updatePosition( const MidiTime & ) ) );
 
 	m_positionLine = new positionLine( this );
 
@@ -113,7 +113,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 				this, SLOT( adjustUiAfterProjectLoad() ) );
 
 
-	// add some essential widgets to global tool-bar 
+	// add some essential widgets to global tool-bar
 	QWidget * tb = engine::mainWindow()->toolBar();
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
@@ -153,7 +153,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	engine::mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
-	
+
 
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
@@ -239,7 +239,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(), 
+	pal.setBrush( m_toolBar->backgroundRole(),
 				embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 
@@ -255,19 +255,23 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
 					tr( "Play song (Space)" ),
 					this, SLOT( play() ), m_toolBar );
+	m_playButton->setObjectName( "playButton" );
 
 	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
 			tr( "Record samples from Audio-device" ),
 					this, SLOT( record() ), m_toolBar );
-	m_recordAccompanyButton = new toolButton( 
+	m_recordButton->setObjectName( "recordButton" );
+
+	m_recordAccompanyButton = new toolButton(
 			embed::getIconPixmap( "record_accompany" ),
 			tr( "Record samples from Audio-device while playing "
 							"song or BB track" ),
 				this, SLOT( recordAccompany() ), m_toolBar );
+	m_recordAccompanyButton->setObjectName( "recordAccompanyButton" );
 
 	// FIXME: disable record button while it is not implemented
 	m_recordButton->setDisabled( true );
-	
+
 	// disable record buttons if capturing is not supported
 	if( !engine::mixer()->audioDev()->supportsCapture() )
 	{
@@ -278,6 +282,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 					tr( "Stop song (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
+	m_stopButton->setObjectName( "stopButton" );
 
 	m_addBBTrackButton = new toolButton( embed::getIconPixmap(
 						"add_bb_track" ),
@@ -419,7 +424,7 @@ void songEditor::setHighQuality( bool _hq )
 void songEditor::scrolled( int _new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = midiTime( _new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = MidiTime( _new_pos, 0 ) );
 }
 
 
@@ -503,7 +508,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_s->currentTick() - midiTime::ticksPerTact();
+		tick_t t = m_s->currentTick() - MidiTime::ticksPerTact();
 		if( t >= 0 )
 		{
 			m_s->setPlayPos( t, song::Mode_PlaySong );
@@ -511,7 +516,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_s->currentTick() + midiTime::ticksPerTact();
+		tick_t t = m_s->currentTick() + MidiTime::ticksPerTact();
 		if( t < MaxSongLength )
 		{
 			m_s->setPlayPos( t, song::Mode_PlaySong );
@@ -566,7 +571,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 					setPixelsPerTact( pixelsPerTact() );
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
-	} 
+	}
 	else if( engine::mainWindow()->isShiftPressed() == TRUE )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
@@ -706,7 +711,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 }
 
 
-void songEditor::updatePosition( const midiTime & _t )
+void songEditor::updatePosition( const MidiTime & _t )
 {
 	int widgetWidth, trackOpWidth;
 	if( configManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -720,22 +725,22 @@ void songEditor::updatePosition( const midiTime & _t )
 		trackOpWidth = TRACK_OP_WIDTH;
 	}
 
-	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong 
+	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong
 		  && m_timeLine->autoScroll() == timeLine::AutoScrollEnabled) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- 32;	// rough estimation for width of right scrollbar
-		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
+		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{
 			animateScroll( m_leftRightScroll, _t.getTact(), m_smoothScroll );
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = qMax(
-				(int)( _t - w * midiTime::ticksPerTact() /
+			MidiTime t = qMax(
+				(int)( _t - w * MidiTime::ticksPerTact() /
 							pixelsPerTact() ),
 									0 );
 			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );

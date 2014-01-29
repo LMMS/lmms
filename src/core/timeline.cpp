@@ -47,7 +47,7 @@ QPixmap * timeLine::s_loopPointPixmap = NULL;
 
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
-			song::playPos & _pos, const midiTime & _begin,
+			song::playPos & _pos, const MidiTime & _begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_autoScroll( AutoScrollEnabled ),
@@ -175,7 +175,7 @@ void timeLine::loadSettings( const QDomElement & _this )
 
 
 
-void timeLine::updatePosition( const midiTime & )
+void timeLine::updatePosition( const MidiTime & )
 {
 	const int new_x = markerX( m_pos );
 
@@ -238,7 +238,7 @@ void timeLine::paintEvent( QPaintEvent * )
 
 	tact_t tact_num = m_begin.getTact();
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
-			( ( static_cast<int>( m_begin * m_ppt ) / midiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
+			( ( static_cast<int>( m_begin * m_ppt ) / MidiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
 	p.setPen( QColor( 192, 192, 192 ) );
 	for( int i = 0; x + i * m_ppt < width(); ++i )
@@ -248,7 +248,7 @@ void timeLine::paintEvent( QPaintEvent * )
 		++tact_num;
 		if( ( tact_num - 1 ) %
 			qMax( 1, qRound( 1.0f / 3.0f *
-				midiTime::ticksPerTact() / m_ppt ) ) == 0 )
+				MidiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
 			const QString s = QString::number( tact_num );
 			p.drawText( cx + qRound( ( m_ppt - p.fontMetrics().
@@ -285,7 +285,7 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 	}
 	else if( event->button() == Qt::RightButton )
 	{
-		const midiTime t = m_begin + static_cast<int>( event->x() * midiTime::ticksPerTact() / m_ppt );
+		const MidiTime t = m_begin + static_cast<int>( event->x() * MidiTime::ticksPerTact() / m_ppt );
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
 			qSwap( m_loopPos[0], m_loopPos[1] );
@@ -301,11 +301,18 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
 
-	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
+	if( m_action == MoveLoopBegin )
 	{
 		delete m_hint;
 		m_hint = textFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> to disable magnetic loop points." ),
+					embed::getIconPixmap( "hint" ), 0 );
+	}
+	else if( m_action == MoveLoopEnd )
+	{
+		delete m_hint;
+		m_hint = textFloat::displayMessage( tr( "Hint" ),
+					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 
@@ -317,7 +324,7 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 
 void timeLine::mouseMoveEvent( QMouseEvent* event )
 {
-	const midiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * midiTime::ticksPerTact() / m_ppt );
+	const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
 
 	switch( m_action )
 	{
@@ -349,9 +356,9 @@ void timeLine::mouseMoveEvent( QMouseEvent* event )
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
 				if( m_action == MoveLoopBegin ) 
-					m_loopPos[0] -= midiTime::ticksPerTact();
+					m_loopPos[0] -= MidiTime::ticksPerTact();
 				else
-					m_loopPos[1] += midiTime::ticksPerTact();
+					m_loopPos[1] += MidiTime::ticksPerTact();
 			}
 			update();
 			break;

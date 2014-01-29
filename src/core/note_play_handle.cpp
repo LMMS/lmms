@@ -2,7 +2,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        rendering engine
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,6 +29,7 @@
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
+#include "MidiEvent.h"
 #include "MidiPort.h"
 #include "song.h"
 
@@ -48,7 +49,9 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 						const f_cnt_t _frames,
 						const note & _n,
 						notePlayHandle *parent,
-						const bool _part_of_arp ) :
+						const bool _part_of_arp,
+						int midiEventChannel,
+						Origin origin ) :
 	playHandle( NotePlayHandle, _offset ),
 	note( _n.length(), _n.pos(), _n.key(),
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
@@ -73,7 +76,9 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
-	m_songGlobalParentOffset( 0 )
+	m_songGlobalParentOffset( 0 ),
+	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack()->midiPort()->realOutputChannel() ),
+	m_origin( origin )
 {
 	if( isTopNote() )
 	{
@@ -100,15 +105,18 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 
 	setFrames( _frames );
 
-
-	if( !isTopNote() || !instrumentTrack()->isArpeggiatorEnabled() )
+	// inform attached components about new MIDI note (used for recording in Piano Roll)
+	if( m_origin == OriginMidiInput )
 	{
-		// send MIDI-note-on-event
-		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
-			m_instrumentTrack->midiPort()->realOutputChannel(),
-			midiKey(), midiVelocity() ),
-				midiTime::fromFrames( offset(),
-						engine::framesPerTick() ) );
+		m_instrumentTrack->midiNoteOn( *this );
+	}
+
+	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
+	{
+		// send MidiNoteOn event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity() ),
+			MidiTime::fromFrames( offset(), engine::framesPerTick() ) );
 	}
 }
 
@@ -118,6 +126,13 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 notePlayHandle::~notePlayHandle()
 {
 	noteOff( 0 );
+
+	// inform attached components about MIDI finished (used for recording in Piano Roll)
+	if( m_origin == OriginMidiInput )
+	{
+		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
+		m_instrumentTrack->midiNoteOff( *this );
+	}
 
 	if( isTopNote() )
 	{
@@ -151,10 +166,21 @@ notePlayHandle::~notePlayHandle()
 void notePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
-	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
-			m_instrumentTrack->midiPort()->realOutputChannel(),
-						midiKey(), midiVelocity() ), 0 );
-	
+
+	m_instrumentTrack->processOutEvent( MidiEvent( MidiKeyPressure, midiChannel(), midiKey(), midiVelocity() ) );
+}
+
+
+
+
+void notePlayHandle::setPanning( const panning_t panning )
+{
+	note::setPanning( panning );
+
+	MidiEvent event( MidiMetaEvent, midiChannel(), midiKey(), panningToMidi( panning ) );
+	event.setMetaEvent( MidiNotePanning );
+
+	m_instrumentTrack->processOutEvent( event );
 }
 
 
@@ -279,9 +305,10 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 	// can set m_releaseFramesDone to m_releaseFramesToDo so that
 	// notePlayHandle::done() returns true and also this base-note is
 	// removed from mixer's active note vector
-	if( isArpeggioBaseNote() && m_subNotes.size() == 0 )
+	if( m_released && isArpeggioBaseNote() && m_subNotes.size() == 0 )
 	{
 		m_releaseFramesDone = m_releaseFramesToDo;
+		m_frames = 0;
 	}
 
 	// update internal data
@@ -339,14 +366,12 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 
-	if( !isTopNote() || !instrumentTrack()->isArpeggiatorEnabled() )
+	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
-		// send MIDI-note-off-event
-		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
-			m_instrumentTrack->midiPort()->realOutputChannel(),
-								midiKey(), 0 ),
-			midiTime::fromFrames( m_framesBeforeRelease,
-						engine::framesPerTick() ) );
+		// send MidiNoteOff event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ) );
 	}
 
 	m_released = true;
@@ -387,8 +412,7 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 bool notePlayHandle::isArpeggioBaseNote() const
 {
-	return isTopNote() && ( m_partOfArpeggio ||
-								m_instrumentTrack->isArpeggiatorEnabled() );
+	return isTopNote() && ( m_partOfArpeggio || m_instrumentTrack->isArpeggioEnabled() );
 }
 
 
@@ -502,7 +526,7 @@ void notePlayHandle::updateFrequency()
 
 
 
-void notePlayHandle::processMidiTime( const midiTime& time )
+void notePlayHandle::processMidiTime( const MidiTime& time )
 {
 	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{

@@ -33,111 +33,111 @@
 
 
 
-ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
+InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
 {
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "octave" ), { 0, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major" ), { 0, 4, 7, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Majb5" ), { 0, 4, 6, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "minor" ), { 0, 3, 7, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "minb5" ), { 0, 3, 6, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "sus2" ), { 0, 2, 7, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "sus4" ), { 0, 5, 7, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "aug" ), { 0, 4, 8, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "augsus4" ), { 0, 5, 8, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "tri" ), { 0, 3, 6, 9, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Majb5" ), { 0, 4, 6, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "minor" ), { 0, 3, 7, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "minb5" ), { 0, 3, 6, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "sus2" ), { 0, 2, 7, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "sus4" ), { 0, 5, 7, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "aug" ), { 0, 4, 8, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "augsus4" ), { 0, 5, 8, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "tri" ), { 0, 3, 6, 9, -1 } },
 	
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "6" ), { 0, 4, 7, 9, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "6sus4" ), { 0, 5, 7, 9, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m6" ), { 0, 3, 7, 9, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m6add9" ), { 0, 3, 7, 9, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6" ), { 0, 4, 7, 9, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6sus4" ), { 0, 5, 7, 9, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m6" ), { 0, 3, 7, 9, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m6add9" ), { 0, 3, 7, 9, 14, -1 } },
 
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7" ), { 0, 4, 7, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7sus4" ), { 0, 5, 7, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5" ), { 0, 4, 8, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b5" ), { 0, 4, 6, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#9" ), { 0, 4, 7, 10, 15, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b9" ), { 0, 4, 7, 10, 13, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5#9" ), { 0, 4, 8, 10, 15, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5b9" ), { 0, 4, 8, 10, 13, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b5b9" ), { 0, 4, 6, 10, 13, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7add11" ), { 0, 4, 7, 10, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7add13" ), { 0, 4, 7, 10, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#11" ), { 0, 4, 7, 10, 18, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj7" ), { 0, 4, 7, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj7b5" ), { 0, 4, 6, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj7#5" ), { 0, 4, 8, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj7#11" ), { 0, 4, 7, 11, 18, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj7add13" ), { 0, 4, 7, 11, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m7" ), { 0, 3, 7, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m7b5" ), { 0, 3, 6, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m7b9" ), { 0, 3, 7, 10, 13, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m7add11" ), { 0, 3, 7, 10, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m7add13" ), { 0, 3, 7, 10, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m-Maj7" ), { 0, 3, 7, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m-Maj7add11" ), { 0, 3, 7, 11, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m-Maj7add13" ), { 0, 3, 7, 11, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7" ), { 0, 4, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7sus4" ), { 0, 5, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#5" ), { 0, 4, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7b5" ), { 0, 4, 6, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#9" ), { 0, 4, 7, 10, 15, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7b9" ), { 0, 4, 7, 10, 13, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#5#9" ), { 0, 4, 8, 10, 15, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#5b9" ), { 0, 4, 8, 10, 13, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7b5b9" ), { 0, 4, 6, 10, 13, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7add11" ), { 0, 4, 7, 10, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7add13" ), { 0, 4, 7, 10, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#11" ), { 0, 4, 7, 10, 18, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7" ), { 0, 4, 7, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7b5" ), { 0, 4, 6, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7#5" ), { 0, 4, 8, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7#11" ), { 0, 4, 7, 11, 18, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7add13" ), { 0, 4, 7, 11, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7" ), { 0, 3, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7b5" ), { 0, 3, 6, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7b9" ), { 0, 3, 7, 10, 13, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7add11" ), { 0, 3, 7, 10, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7add13" ), { 0, 3, 7, 10, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj7" ), { 0, 3, 7, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj7add11" ), { 0, 3, 7, 11, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj7add13" ), { 0, 3, 7, 11, 21, -1 } },
 
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "9" ), { 0, 4, 7, 10, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "9sus4" ), { 0, 5, 7, 10, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "add9" ), { 0, 4, 7, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "9#5" ), { 0, 4, 8, 10, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "9b5" ), { 0, 4, 6, 10, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "9#11" ), { 0, 4, 7, 10, 14, 18, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "9b13" ), { 0, 4, 7, 10, 14, 20, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj9" ), { 0, 4, 7, 11, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj9sus4" ), { 0, 5, 7, 11, 15, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj9#5" ), { 0, 4, 8, 11, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj9#11" ), { 0, 4, 7, 11, 14, 18, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m9" ), { 0, 3, 7, 10, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "madd9" ), { 0, 3, 7, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m9b5" ), { 0, 3, 6, 10, 14, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m9-Maj7" ), { 0, 3, 7, 11, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9" ), { 0, 4, 7, 10, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9sus4" ), { 0, 5, 7, 10, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "add9" ), { 0, 4, 7, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9#5" ), { 0, 4, 8, 10, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9b5" ), { 0, 4, 6, 10, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9#11" ), { 0, 4, 7, 10, 14, 18, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9b13" ), { 0, 4, 7, 10, 14, 20, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9" ), { 0, 4, 7, 11, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9sus4" ), { 0, 5, 7, 11, 15, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9#5" ), { 0, 4, 8, 11, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9#11" ), { 0, 4, 7, 11, 14, 18, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m9" ), { 0, 3, 7, 10, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "madd9" ), { 0, 3, 7, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m9b5" ), { 0, 3, 6, 10, 14, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m9-Maj7" ), { 0, 3, 7, 11, 14, -1 } },
 
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "11" ), { 0, 4, 7, 10, 14, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "11b9" ), { 0, 4, 7, 10, 13, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj11" ), { 0, 4, 7, 11, 14, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m11" ), { 0, 3, 7, 10, 14, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m-Maj11" ), { 0, 3, 7, 11, 14, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "11" ), { 0, 4, 7, 10, 14, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "11b9" ), { 0, 4, 7, 10, 13, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj11" ), { 0, 4, 7, 11, 14, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m11" ), { 0, 3, 7, 10, 14, 17, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj11" ), { 0, 3, 7, 11, 14, 17, -1 } },
 
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "13" ), { 0, 4, 7, 10, 14, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "13#9" ), { 0, 4, 7, 10, 15, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "13b9" ), { 0, 4, 7, 10, 13, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "13b5b9" ), { 0, 4, 6, 10, 13, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Maj13" ), { 0, 4, 7, 11, 14, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m13" ), { 0, 3, 7, 10, 14, 21, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "m-Maj13" ), { 0, 3, 7, 11, 14, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13" ), { 0, 4, 7, 10, 14, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13#9" ), { 0, 4, 7, 10, 15, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13b9" ), { 0, 4, 7, 10, 13, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13b5b9" ), { 0, 4, 6, 10, 13, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj13" ), { 0, 4, 7, 11, 14, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m13" ), { 0, 3, 7, 10, 14, 21, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj13" ), { 0, 3, 7, 11, 14, 21, -1 } },
 
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major" ), { 0, 2, 4, 5, 7, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Harmonic minor" ), { 0, 2, 3, 5, 7, 8, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Melodic minor" ), { 0, 2, 3, 5, 7, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Whole tone" ), { 0, 2, 4, 6, 8, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Diminished" ), { 0, 2, 3, 5, 6, 8, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major pentatonic" ), { 0, 2, 4, 7, 9, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Minor pentatonic" ), { 0, 3, 5, 7, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Jap in sen" ), { 0, 1, 5, 7, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Dominant bebop" ), { 0, 2, 4, 5, 7, 9, 10, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Blues" ), { 0, 3, 5, 6, 7, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Arabic" ), { 0, 1, 4, 5, 7, 8, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Enigmatic" ), { 0, 1, 4, 6, 8, 10, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Neopolitan" ), { 0, 1, 3, 5, 7, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Neopolitan minor" ), { 0, 1, 3, 5, 7, 8, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Hungarian minor" ), { 0, 2, 3, 6, 7, 8, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Locrian" ), { 0, 1, 3, 5, 6, 8, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 2, 4, 5, 7, 9, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Harmonic minor" ), { 0, 2, 3, 5, 7, 8, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Melodic minor" ), { 0, 2, 3, 5, 7, 9, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Whole tone" ), { 0, 2, 4, 6, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Diminished" ), { 0, 2, 3, 5, 6, 8, 9, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major pentatonic" ), { 0, 2, 4, 7, 9, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor pentatonic" ), { 0, 3, 5, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Jap in sen" ), { 0, 1, 5, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dominant bebop" ), { 0, 2, 4, 5, 7, 9, 10, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Blues" ), { 0, 3, 5, 6, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Arabic" ), { 0, 1, 4, 5, 7, 8, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Enigmatic" ), { 0, 1, 4, 6, 8, 10, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan" ), { 0, 1, 3, 5, 7, 9, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan minor" ), { 0, 1, 3, 5, 7, 8, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Hungarian minor" ), { 0, 2, 3, 6, 7, 8, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Locrian" ), { 0, 1, 3, 5, 6, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 } ;
 
 
 
 
-ChordCreator::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) :
-	m_name( ChordCreator::tr( n ) )
+InstrumentFunctionNoteStacking::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) :
+	m_name( InstrumentFunctionNoteStacking::tr( n ) )
 {
 	for( m_size = 0; m_size < MAX_CHORD_POLYPHONY; m_size++ )
 	{
@@ -153,7 +153,7 @@ ChordCreator::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) 
 
 
 
-bool ChordCreator::Chord::hasSemiTone( int8_t semi_tone ) const
+bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) const
 {
 	for( int i = 0; i < size(); ++i )
 	{
@@ -168,7 +168,7 @@ bool ChordCreator::Chord::hasSemiTone( int8_t semi_tone ) const
 
 
 
-ChordCreator::ChordTable::ChordTable() :
+InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 	QVector<Chord>()
 {
 	for( int i = 0;
@@ -182,7 +182,7 @@ ChordCreator::ChordTable::ChordTable() :
 
 
 
-const ChordCreator::Chord & ChordCreator::ChordTable::getByName( const QString & name, bool is_scale ) const
+const InstrumentFunctionNoteStacking::Chord & InstrumentFunctionNoteStacking::ChordTable::getByName( const QString & name, bool is_scale ) const
 {
 	for( int i = 0; i < size(); i++ )
 	{
@@ -197,7 +197,7 @@ const ChordCreator::Chord & ChordCreator::ChordTable::getByName( const QString &
 
 
 
-ChordCreator::ChordCreator( Model * _parent ) :
+InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent ) :
 	Model( _parent, tr( "Chords" ) ),
 	m_chordsEnabledModel( false, this ),
 	m_chordsModel( this, tr( "Chord type" ) ),
@@ -213,14 +213,14 @@ ChordCreator::ChordCreator( Model * _parent ) :
 
 
 
-ChordCreator::~ChordCreator()
+InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
 {
 }
 
 
 
 
-void ChordCreator::processNote( notePlayHandle * _n )
+void InstrumentFunctionNoteStacking::processNote( notePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
 	const ChordTable & chord_table = ChordTable::getInstance();
@@ -229,9 +229,7 @@ void ChordCreator::processNote( notePlayHandle * _n )
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if( ( ( _n->isTopNote() &&
-		_n->instrumentTrack()->isArpeggiatorEnabled() == false ) ||
-						_n->isPartOfArpeggio() ) &&
+	if( ( ( _n->isTopNote() && _n->instrumentTrack()->isArpeggioEnabled() == false ) || _n->isPartOfArpeggio() ) &&
 				_n->totalFramesPlayed() == 0 &&
 				m_chordsEnabledModel.value() == true )
 	{
@@ -282,7 +280,7 @@ void ChordCreator::processNote( notePlayHandle * _n )
 
 
 
-void ChordCreator::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void InstrumentFunctionNoteStacking::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	m_chordsEnabledModel.saveSettings( _doc, _this, "chord-enabled" );
 	m_chordsModel.saveSettings( _doc, _this, "chord" );
@@ -292,7 +290,7 @@ void ChordCreator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void ChordCreator::loadSettings( const QDomElement & _this )
+void InstrumentFunctionNoteStacking::loadSettings( const QDomElement & _this )
 {
 	m_chordsEnabledModel.loadSettings( _this, "chord-enabled" );
 	m_chordsModel.loadSettings( _this, "chord" );
@@ -305,7 +303,7 @@ void ChordCreator::loadSettings( const QDomElement & _this )
 
 
 
-Arpeggiator::Arpeggiator( Model * _parent ) :
+InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	Model( _parent, tr( "Arpeggio" ) ),
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
@@ -317,7 +315,7 @@ Arpeggiator::Arpeggiator( Model * _parent ) :
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
-	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	for( int i = 0; i < chord_table.size(); ++i )
 	{
 		m_arpModel.addItem( chord_table[i].getName() );
@@ -339,14 +337,14 @@ Arpeggiator::Arpeggiator( Model * _parent ) :
 
 
 
-Arpeggiator::~Arpeggiator()
+InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 {
 }
 
 
 
 
-void Arpeggiator::processNote( notePlayHandle * _n )
+void InstrumentFunctionArpeggio::processNote( notePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
 	if( _n->isTopNote() == false ||
@@ -375,7 +373,7 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 		}
 	}
 
-	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table[selected_arp].size();
 	const int range = (int)( cur_chord_size * m_arpRangeModel.value() );
 	const int total_range = range * cnphv.size();
@@ -479,7 +477,7 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 		}
 
 		// create new arp-note
-		note new_note( midiTime( 0 ), midiTime( 0 ),
+		note new_note( MidiTime( 0 ), MidiTime( 0 ),
 				sub_note_key,
 				(volume_t)
 					qRound( _n->getVolume() * vol_level ),
@@ -512,7 +510,7 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 
 
 
-void Arpeggiator::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	m_arpEnabledModel.saveSettings( _doc, _this, "arp-enabled" );
 	m_arpModel.saveSettings( _doc, _this, "arp" );
@@ -527,7 +525,7 @@ void Arpeggiator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void Arpeggiator::loadSettings( const QDomElement & _this )
+void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 {
 	m_arpEnabledModel.loadSettings( _this, "arp-enabled" );
 	m_arpModel.loadSettings( _this, "arp" );

@@ -33,7 +33,7 @@
 
 
 class AutomationTrack;
-class midiTime;
+class MidiTime;
 
 
 
@@ -72,12 +72,12 @@ public:
 	}
 	void setTension( QString _new_tension );
 
-	virtual midiTime length() const;
+	virtual MidiTime length() const;
 
-	midiTime putValue( const midiTime & _time, const float _value,
+	MidiTime putValue( const MidiTime & _time, const float _value,
 						const bool _quant_pos = true );
 
-	void removeValue( const midiTime & _time );
+	void removeValue( const MidiTime & _time );
 
 	inline const timeMap & getTimeMap() const
 	{
@@ -104,8 +104,8 @@ public:
 		return m_timeMap.isEmpty() == false;
 	}
 
-	float valueAt( const midiTime & _time ) const;
-	float *valuesAfter( const midiTime & _time ) const;
+	float valueAt( const MidiTime & _time ) const;
+	float *valuesAfter( const MidiTime & _time ) const;
 
 	const QString name() const;
 
@@ -123,7 +123,7 @@ public:
 		return classNodeName();
 	}
 
-	void processMidiTime( const midiTime & _time );
+	void processMidiTime( const MidiTime & _time );
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 

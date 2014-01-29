@@ -175,7 +175,7 @@ public:
 	// 04
 	void *reserved;
 	// 08
-	VstEvent * events[];
+	VstEvent* events[1];
 
 } ;
 

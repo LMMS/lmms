@@ -3,6 +3,7 @@
  *                  remote-control of AutomatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,8 +54,30 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	if( _type != DummyController && _type != MidiController )
 	{
 		s_controllers.append( this );
-		m_name = QString( tr( "Controller %1" ) )
-				.arg( s_controllers.size() );
+		// Determine which name to use
+		for ( uint i=s_controllers.size(); ; i++ )
+		{
+			QString new_name = QString( tr( "Controller %1" ) )
+					.arg( i );
+
+			// Check if name is already in use
+			bool name_used = false;
+			QVector<Controller *>::const_iterator it;
+			for ( it = s_controllers.constBegin();
+				  it != s_controllers.constEnd(); ++it )
+			{
+				if ( (*it)->name() == new_name )
+				{
+					name_used = true;
+					break;
+				}
+			}
+			if ( ! name_used )
+			{
+				m_name = new_name;
+				break;
+			}
+		}
 	}
 }
 

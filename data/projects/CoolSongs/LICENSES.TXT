@@ -13,10 +13,18 @@
 * Farbro-Tectonic.mmpz
   - CC (by)
   - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1327
+  
+* Greippi-ardudar.mmpz
+  - CC (by-sa)
+  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=4916
 
 * Impulslogik-Zen.mmpz
   - Artistic 2.0
   - http://lmms.sourceforge.net/lsp/index.php?action=show&file=581
+
+* MichaelKuhn-Mondscheinsonate.mmpz
+  - Artistic 2.0
+  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1581
 
 * Momo64-esp.mmpz
   - Artistic 2.0
@@ -53,6 +61,14 @@
 * TameAnderson-MakeMe.mmpz
   - Artistic 2.0
   - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1060
+
+* Thaledric-AwayFromBoobaloo.mmpz
+  - CC (by-nc-sa)
+  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1187
+  
+* unfa-Spoken.mmpz
+  - CC (by-nc)
+  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=4929
 
 * Zakarra-MainstreamMemory.mmpz
   - Artistic 2.0

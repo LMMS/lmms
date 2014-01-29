@@ -70,8 +70,7 @@ public:
 
 	virtual void play( sampleFrame * _working_buffer );
 
-	virtual bool handleMidiEvent( const midiEvent & _me,
-                                                const midiTime & _time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );

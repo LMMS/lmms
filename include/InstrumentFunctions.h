@@ -37,7 +37,7 @@ class notePlayHandle;
 
 
 
-class ChordCreator : public Model, public JournallingObject
+class InstrumentFunctionNoteStacking : public Model, public JournallingObject
 {
 	Q_OBJECT
 
@@ -48,8 +48,8 @@ private:
 	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
 
 public:
-	ChordCreator( Model * _parent );
-	virtual ~ChordCreator();
+	InstrumentFunctionNoteStacking( Model * _parent );
+	virtual ~InstrumentFunctionNoteStacking();
 
 	void processNote( notePlayHandle * _n );
 
@@ -149,14 +149,14 @@ private:
 	FloatModel m_chordRangeModel;
 
 
-	friend class ChordCreatorView;
+	friend class InstrumentFunctionNoteStackingView;
 
 } ;
 
 
 
 
-class Arpeggiator : public Model, public JournallingObject
+class InstrumentFunctionArpeggio : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -169,8 +169,8 @@ public:
 		NumArpDirections
 	} ;
 
-	Arpeggiator( Model * _parent );
-	virtual ~Arpeggiator();
+	InstrumentFunctionArpeggio( Model * _parent );
+	virtual ~InstrumentFunctionArpeggio();
 
 	void processNote( notePlayHandle * _n );
 
@@ -203,7 +203,7 @@ private:
 
 	friend class FlpImport;
 	friend class InstrumentTrack;
-	friend class ArpeggiatorView;
+	friend class InstrumentFunctionArpeggioView;
 
 } ;
 

@@ -2,7 +2,7 @@
  * volume.h - declaration of some constants and types, concerning the volume
  *            of a note
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,7 +29,7 @@
 #include "lmmsconfig.h"
 
 #include "lmms_basics.h"
-#include "midi.h"
+#include "Midi.h"
 
 const volume_t MinVolume = 0;
 const volume_t MaxVolume = 200;

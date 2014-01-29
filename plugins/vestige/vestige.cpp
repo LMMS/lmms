@@ -25,7 +25,6 @@
 #include "vestige.h"
 
 #include <QtGui/QDropEvent>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
@@ -43,6 +42,7 @@
 #include "string_pair_drag.h"
 #include "text_float.h"
 #include "tooltip.h"
+#include "FileDialog.h"
 
 #include "embed.cpp"
 
@@ -310,13 +310,12 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
-						const midiTime & _time )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->processMidiEvent( _me, _time );
+		m_plugin->processMidiEvent( event, time );
 	}
 	m_pluginMutex.unlock();
 
@@ -613,10 +612,7 @@ void VestigeInstrumentView::modelChanged()
 
 void VestigeInstrumentView::openPlugin()
 {
-	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
+	FileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
 	QString dir;
 	if( m_vi->m_pluginDLL != "" )
@@ -629,7 +625,7 @@ void VestigeInstrumentView::openPlugin()
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	// set filters
 	QStringList types;
@@ -782,8 +778,7 @@ void VestigeInstrumentView::noteOffAll( void )
 	{
 		for( int key = 0; key <= MidiMaxNote; ++key )
 		{
-			m_vi->m_plugin->processMidiEvent(
-				midiEvent( MidiNoteOff, 0, key, 0 ), 0 );
+			m_vi->m_plugin->processMidiEvent( MidiEvent( MidiNoteOff, 0, key, 0 ), 0 );
 		}
 	}
 	m_vi->m_pluginMutex.unlock();

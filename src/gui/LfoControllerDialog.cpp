@@ -178,15 +178,17 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	toolTip::add( white_noise_btn,
 				tr( "Click here for white-noise." ) );
 
-	pixmapButton * uwb = new pixmapButton( this, NULL );
-	uwb->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y + 15 );
-	uwb->setActiveGraphic( embed::getIconPixmap(
+	m_userWaveBtn = new pixmapButton( this, NULL );
+	m_userWaveBtn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y + 15 );
+	m_userWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"usr_wave_active" ) );
-	uwb->setInactiveGraphic( embed::getIconPixmap(
+	m_userWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
-	uwb->setEnabled( false );
-	toolTip::add( uwb, tr( "Click here for a user-defined "
-			"shape." ) );
+	connect( m_userWaveBtn,
+					SIGNAL( doubleClicked() ),
+			this, SLOT( askUserDefWave() ) );
+	toolTip::add( m_userWaveBtn,
+				tr( "Click here for a user-defined shape.\nDouble click to pick a file." ) );
 	
 	m_waveBtnGrp = new automatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sin_wave_btn );
@@ -196,7 +198,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_waveBtnGrp->addButton( moog_saw_wave_btn );
 	m_waveBtnGrp->addButton( exp_wave_btn );
 	m_waveBtnGrp->addButton( white_noise_btn );
-	m_waveBtnGrp->addButton( uwb );
+	m_waveBtnGrp->addButton( m_userWaveBtn );
 
 
 	pixmapButton * x1 = new pixmapButton( this, NULL );
@@ -240,7 +242,22 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 LfoControllerDialog::~LfoControllerDialog()
 {
+	m_userWaveBtn->disconnect( this );
 	//delete m_subWindow;
+}
+
+
+
+void LfoControllerDialog::askUserDefWave()
+{
+	SampleBuffer * sampleBuffer = dynamic_cast<LfoController*>(this->model())->
+									m_userDefSampleBuffer;
+	QString fileName = sampleBuffer->openAndSetAudioFile();
+	if( fileName.isEmpty() == false )
+	{
+		// TODO:
+		toolTip::add( m_userWaveBtn, sampleBuffer->audioFile() );
+	}
 }
 
 

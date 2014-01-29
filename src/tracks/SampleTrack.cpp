@@ -74,7 +74,7 @@ SampleTCO::~SampleTCO()
 
 
 
-void SampleTCO::changeLength( const midiTime & _length )
+void SampleTCO::changeLength( const MidiTime & _length )
 {
 	trackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
 }
@@ -128,7 +128,7 @@ void SampleTCO::updateLength( bpm_t )
 
 
 
-midiTime SampleTCO::sampleLength() const
+MidiTime SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / engine::framesPerTick() );
 }
@@ -406,7 +406,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const midiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _offset, int /*_tco_num*/ )
 {
 	m_audioPort.effects()->startRunning();
@@ -461,7 +461,7 @@ trackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * SampleTrack::createTCO( const midiTime & )
+trackContentObject * SampleTrack::createTCO( const MidiTime & )
 {
 	return new SampleTCO( this );
 }

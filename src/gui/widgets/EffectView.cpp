@@ -158,8 +158,11 @@ EffectView::~EffectView()
 
 	delete m_subWindow;
 #else
-	// otherwise on win32 build VST GUI can get lost
-	m_subWindow->hide();
+	if( m_subWindow )
+	{
+		// otherwise on win32 build VST GUI can get lost
+		m_subWindow->hide();
+	}
 #endif
 
 }

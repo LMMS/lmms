@@ -250,7 +250,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		if( it+1 == m_pat->getTimeMap().end() )
 		{
 			const float x1 = x_base + it.key() * ppt /
-						midiTime::ticksPerTact();
+						MidiTime::ticksPerTact();
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
 			p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
 								lin2grad );
@@ -262,9 +262,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		{
 			float value = values[i - it.key()];
 			const float x1 = x_base + i * ppt /
-						midiTime::ticksPerTact();
+						MidiTime::ticksPerTact();
 			const float x2 = x_base + (i+1) * ppt /
-						midiTime::ticksPerTact();
+						MidiTime::ticksPerTact();
 
 			p.fillRect( QRectF( x1, 0.0f, x2-x1, value ),
 								lin2grad );

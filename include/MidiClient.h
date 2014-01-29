@@ -29,7 +29,7 @@
 #include <QtCore/QVector>
 
 
-#include "midi.h"
+#include "MidiEvent.h"
 #include "MidiEventProcessor.h"
 #include "tab_widget.h"
 
@@ -45,8 +45,8 @@ public:
 	virtual ~MidiClient();
 
 	// to be implemented by sub-classes
-	virtual void processOutEvent( const midiEvent & _me,
-						const midiTime & _time,
+	virtual void processOutEvent( const MidiEvent & _me,
+						const MidiTime & _time,
 						const MidiPort * _port ) = 0;
 
 	// inheriting classes can re-implement this for being able to update
@@ -78,13 +78,13 @@ public:
 	}
 
 	// return name of port which specified MIDI event came from
-	virtual QString sourcePortName( const midiEvent & ) const
+	virtual QString sourcePortName( const MidiEvent & ) const
 	{
 		return QString();
 	}
 
 
-	// (un)subscribe given MidiPort to/from destination-port 
+	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe = true );
@@ -167,7 +167,7 @@ protected:
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	virtual void processOutEvent( const midiEvent& event, const midiTime& time, const MidiPort* port );
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port );
 
 	// small helper function returning length of a certain event - this
 	// is necessary for parsing raw-MIDI-data
@@ -188,7 +188,7 @@ private:
 					// event type include?
 		uint32_t m_buffer[RAW_MIDI_PARSE_BUF_SIZE];
 					// buffer for incoming data
-		midiEvent m_midiEvent;	// midi-event 
+		MidiEvent m_midiEvent;	// midi-event
 	} m_midiParseData;
 
 } ;

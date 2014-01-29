@@ -25,7 +25,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
 #include <math.h>
@@ -47,6 +46,7 @@
 #include "ImportFilter.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "FileDialog.h"
 #include "MidiClient.h"
 #include "mmp.h"
 #include "note_play_handle.h"
@@ -76,7 +76,7 @@
 #include <sys/shm.h>
 #endif
 
-tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
+tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
 
@@ -201,7 +201,7 @@ song::~song()
 		}
 		if( m_SncVSTplug != NULL )
 		{
-			delete m_SncVSTplug;
+			free( m_SncVSTplug );
 			m_SncVSTplug = NULL;
 		}
 	}
@@ -256,7 +256,7 @@ void song::setTempo()
 
 void song::setTimeSignature()
 {
-	midiTime::setTicksPerTact( ticksPerTact() );
+	MidiTime::setTicksPerTact( ticksPerTact() );
 	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
 	emit dataChanged();
 	m_oldTicksPerTact = ticksPerTact();
@@ -494,7 +494,7 @@ void song::processNextBuffer()
 #endif
 
 			// did we play a whole tact?
-			if( ticks >= midiTime::ticksPerTact() )
+			if( ticks >= MidiTime::ticksPerTact() )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
@@ -525,7 +525,7 @@ void song::processNextBuffer()
 					// then start from beginning and keep
 					// offset
 					ticks = ticks % ( max_tact *
-						midiTime::ticksPerTact() );
+						MidiTime::ticksPerTact() );
 #ifdef VST_SNC_LATENCY
 					m_SncVSTplug->ppqPos = ( ( ticks + 0 )
 						/ (float)48 )
@@ -1310,7 +1310,7 @@ bool song::guiSaveProjectAs( const QString & _file_name )
 
 void song::importProject()
 {
-	QFileDialog ofd( NULL, tr( "Import file" ),
+	FileDialog ofd( NULL, tr( "Import file" ),
 			configManager::inst()->userProjectsDir(),
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
@@ -1320,11 +1320,8 @@ void song::importProject()
 			" (*.h2song);;" +
 			tr("All file types") +
 			" (*.*)");
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
 
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{
 		ImportFilter::import( ofd.selectedFiles()[0], this );
@@ -1377,13 +1374,10 @@ void song::exportProject(bool multiExport)
 		return;
 	}
 
-	QFileDialog efd( engine::mainWindow() );
-#if QT_VERSION >= 0x040806
-	efd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
+	FileDialog efd( engine::mainWindow() );
 	if (multiExport)
 	{
-		efd.setFileMode( QFileDialog::Directory);
+		efd.setFileMode( FileDialog::Directory);
 		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
 		if( !m_fileName.isEmpty() )
 		{
@@ -1392,7 +1386,7 @@ void song::exportProject(bool multiExport)
 	}
 	else
 	{
-		efd.setFileMode( QFileDialog::AnyFile );
+		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
 		while( __fileEncodeDevices[idx].m_fileFormat !=
@@ -1417,7 +1411,7 @@ void song::exportProject(bool multiExport)
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
-	efd.setAcceptMode( QFileDialog::AcceptSave );
+	efd.setAcceptMode( FileDialog::AcceptSave );
 
 
 	if( efd.exec() == QDialog::Accepted &&

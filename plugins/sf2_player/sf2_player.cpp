@@ -27,9 +27,9 @@
 #include <QtCore/QTextStream>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
-#include <QtGui/QFileDialog>
 #include <QtXml/QDomDocument>
 
+#include "FileDialog.h"
 #include "sf2_player.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
@@ -87,7 +87,8 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
-	m_lastMidiPitch( 8192 ),
+	m_lastMidiPitch( -1 ),
+	m_lastMidiPitchRange( -1 ),
 	m_channel( 1 ),
 	m_bankNum( 0, 0, 999, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
@@ -679,10 +680,19 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
 	m_synthMutex.lock();
-	if( m_lastMidiPitch != instrumentTrack()->midiPitch() )
+
+	const int currentMidiPitch = instrumentTrack()->midiPitch();
+	if( m_lastMidiPitch != currentMidiPitch )
 	{
-		m_lastMidiPitch = instrumentTrack()->midiPitch();
+		m_lastMidiPitch = currentMidiPitch;
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
+	}
+
+	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
+	if( m_lastMidiPitchRange != currentMidiPitchRange )
+	{
+		m_lastMidiPitchRange = currentMidiPitchRange;
+		fluid_synth_pitch_wheel_sens( m_synth, m_channel, m_lastMidiPitchRange );
 	}
 
 	if( m_internalSampleRate < engine::mixer()->processingSampleRate() &&
@@ -1044,11 +1054,8 @@ void sf2InstrumentView::showFileDialog()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 
-	QFileDialog ofd( NULL, tr( "Open SoundFont file" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	FileDialog ofd( NULL, tr( "Open SoundFont file" ) );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
 	types << tr( "SoundFont2 Files (*.sf2)" );

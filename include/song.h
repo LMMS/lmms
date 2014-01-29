@@ -65,11 +65,11 @@ public:
 	} ;
 
 
-	class playPos : public midiTime
+	class playPos : public MidiTime
 	{
 	public:
 		playPos( const int _abs = 0 ) :
-			midiTime( _abs ),
+			MidiTime( _abs ),
 			m_timeLine( NULL ),
 			m_timeLineUpdate( true ),
 			m_currentFrame( 0.0f )

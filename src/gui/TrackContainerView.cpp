@@ -127,9 +127,9 @@ trackView * TrackContainerView::addTrackView( trackView * _tv )
 
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
-	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 				_tv->getTrackContentWidget(),
-				SLOT( changePosition( const midiTime & ) ) );
+				SLOT( changePosition( const MidiTime & ) ) );
 	realignTracks();
 	return( _tv );
 }

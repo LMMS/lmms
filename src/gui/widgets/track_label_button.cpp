@@ -58,7 +58,7 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 		setFixedSize( 160, 29 );
 	}
 
-	setIconSize( QSize( 32, 32 ) );
+	setIconSize( QSize( 24, 24 ) );
 	setText( " " );
 
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ),

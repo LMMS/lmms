@@ -25,7 +25,6 @@
 
 #include "patman.h"
 
-#include <QtGui/QFileDialog>
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QPainter>
 #include <QtXml/QDomElement>
@@ -39,6 +38,7 @@
 #include "song.h"
 #include "string_pair_drag.h"
 #include "tooltip.h"
+#include "FileDialog.h"
 
 #include "embed.cpp"
 
@@ -508,11 +508,8 @@ PatmanView::~PatmanView()
 
 void PatmanView::openFile( void )
 {
-	QFileDialog ofd( NULL, tr( "Open patch file" ) );
-#if QT_VERSION >= 0x040806
-	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	FileDialog ofd( NULL, tr( "Open patch file" ) );
+	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
 	types << tr( "Patch-Files (*.pat)" );

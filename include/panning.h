@@ -2,7 +2,7 @@
  * panning.h - declaration of some types, concerning the
  *             panning of a note
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,7 @@
 #include "volume.h"
 #include "templates.h"
 #include "panning_constants.h"
-#include "midi.h"
+#include "Midi.h"
 
 inline stereoVolumeVector panningToVolumeVector( panning_t _p,
 							float _scale = 1.0f )

@@ -3,7 +3,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
-#include "assert.h"
+#include "debug.h"
 #include <string>
 #include <fstream>
 #include "allegro.h"

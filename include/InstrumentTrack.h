@@ -34,13 +34,14 @@
 #include "note_play_handle.h"
 #include "Piano.h"
 #include "PianoView.h"
+#include "Pitch.h"
 #include "track.h"
 
 
 class QLineEdit;
 template<class T> class QQueue;
-class ArpeggiatorView;
-class ChordCreatorView;
+class InstrumentFunctionArpeggioView;
+class InstrumentFunctionNoteStackingView;
 class EffectRackView;
 class InstrumentSoundShapingView;
 class fadeButton;
@@ -69,12 +70,10 @@ public:
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
 							notePlayHandle * _n );
 
-	midiEvent applyMasterKey( const midiEvent & _me );
+	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	virtual void processInEvent( const midiEvent & _me,
-					const midiTime & _time );
-	virtual void processOutEvent( const midiEvent & _me,
-						const midiTime & _time );
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
 	// silence all running notes played by this track
 	void silenceAllNotes();
 
@@ -113,17 +112,23 @@ public:
 	// translate pitch to midi-pitch [0,16383]
 	int midiPitch() const
 	{
-		return (int)( ( m_pitchModel.value()+100 ) * 16383 ) / 200;
+		return static_cast<int>( ( ( m_pitchModel.value() + m_pitchModel.range()/2 ) * MidiMaxPitchBend ) / m_pitchModel.range() );
+	}
+
+	/*! \brief Returns current range for pitch bend in semitones */
+	int midiPitchRange() const
+	{
+		return m_pitchRangeModel.value();
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const midiTime & _start, const fpp_t _frames,
+	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 	// create new view for me
 	virtual trackView * createView( TrackContainerView* tcv );
 
 	// create new track-content-object = pattern
-	virtual trackContentObject * createTCO( const midiTime & _pos );
+	virtual trackContentObject * createTCO( const MidiTime & _pos );
 
 
 	// called by track
@@ -162,9 +167,9 @@ public:
 		return &m_piano;
 	}
 
-	bool isArpeggiatorEnabled() const
+	bool isArpeggioEnabled() const
 	{
-		return m_arpeggiator.m_arpEnabledModel.value();
+		return m_arpeggio.m_arpEnabledModel.value();
 	}
 
 	// simple helper for removing midiport-XML-node when loading presets
@@ -199,8 +204,8 @@ public:
 signals:
 	void instrumentChanged();
 	void newNote();
-	void noteOn( const note & _n );
-	void noteOff( const note & _n );
+	void midiNoteOn( const note& );
+	void midiNoteOff( const note& );
 	void nameChanged();
 
 
@@ -238,8 +243,8 @@ private:
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
-	Arpeggiator m_arpeggiator;
-	ChordCreator m_chordCreator;
+	InstrumentFunctionArpeggio m_arpeggio;
+	InstrumentFunctionNoteStacking m_noteStacking;
 
 	Piano m_piano;
 
@@ -402,8 +407,8 @@ private:
 	tabWidget * m_tabWidget;
 	PluginView * m_instrumentView;
 	InstrumentSoundShapingView * m_ssView;
-	ChordCreatorView * m_chordView;
-	ArpeggiatorView * m_arpView;
+	InstrumentFunctionNoteStackingView* m_noteStackingView;
+	InstrumentFunctionArpeggioView* m_arpeggioView;
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
 

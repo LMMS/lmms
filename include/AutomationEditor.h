@@ -31,7 +31,7 @@
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
-#include "midi_time.h"
+#include "MidiTime.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
 
@@ -127,7 +127,7 @@ protected slots:
 	void pasteValues();
 	void deleteSelectedValues();
 
-	void updatePosition( const midiTime & _t );
+	void updatePosition( const MidiTime & _t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -218,7 +218,7 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	midiTime m_currentPosition;
+	MidiTime m_currentPosition;
 
 	actions m_action;
 
@@ -258,7 +258,7 @@ private:
 
 signals:
 	void currentPatternChanged();
-	void positionChanged( const midiTime & );
+	void positionChanged( const MidiTime & );
 
 } ;
 

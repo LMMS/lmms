@@ -56,7 +56,7 @@ public:
 		return( m_scrollArea );
 	}
 
-	inline const midiTime & currentPosition() const
+	inline const MidiTime & currentPosition() const
 	{
 		return( m_currentPosition );
 	}
@@ -142,7 +142,7 @@ protected:
 	virtual void undoStep( JournalEntry & _je );
 	virtual void redoStep( JournalEntry & _je );
 
-	midiTime m_currentPosition;
+	MidiTime m_currentPosition;
 
 
 private:
@@ -180,7 +180,7 @@ private:
 
 
 signals:
-	void positionChanged( const midiTime & _pos );
+	void positionChanged( const MidiTime & _pos );
 
 
 } ;

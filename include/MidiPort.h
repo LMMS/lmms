@@ -1,8 +1,8 @@
 /*
- * MidiPort.h - abstraction of MIDI ports which are part of LMMS's MIDI-
+ * MidiPort.h - abstraction of MIDI ports which are part of LMMS' MIDI
  *              sequencing system
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,16 +28,17 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QtCore/QMap>
 
-#include "midi.h"
+#include "Midi.h"
+#include "MidiTime.h"
 #include "AutomatableModel.h"
 
 
 class MidiClient;
+class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
-class midiTime;
 
 
 // class for abstraction of MIDI-port
@@ -72,67 +73,66 @@ public:
 		Output,		// from MIDI-event-processor to MIDI-client
 		Duplex		// both directions
 	} ;
+	typedef Modes Mode;
 
-	MidiPort( const QString & _name,
-			MidiClient * _mc,
-			MidiEventProcessor * _mep,
-			Model * _parent = NULL,
-			Modes _mode = Disabled );
+	MidiPort( const QString& name,
+			MidiClient* client,
+			MidiEventProcessor* eventProcessor,
+			Model* parent = NULL,
+			Mode mode = Disabled );
 	virtual ~MidiPort();
 
-	void setName( const QString & _name );
+	void setName( const QString& name );
 
-	inline Modes mode() const
+	Mode mode() const
 	{
 		return m_mode;
 	}
 
-	void setMode( Modes _mode );
+	void setMode( Mode mode );
 
-	inline bool inputEnabled() const
+	bool isInputEnabled() const
 	{
 		return mode() == Input || mode() == Duplex;
 	}
 
-	inline bool outputEnabled() const
+	bool isOutputEnabled() const
 	{
 		return mode() == Output || mode() == Duplex;
 	}
 
-	inline int realOutputChannel() const
+	int realOutputChannel() const
 	{
 		return outputChannel() - 1;
 	}
 
-	void processInEvent( const midiEvent & _me, const midiTime & _time );
-	void processOutEvent( const midiEvent & _me, const midiTime & _time );
+	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument& doc, QDomElement& thisElement );
+	virtual void loadSettings( const QDomElement& thisElement );
 
 	virtual QString nodeName() const
 	{
 		return "midiport";
 	}
 
-	void subscribeReadablePort( const QString & _port,
-						bool _subscribe = true );
-	void subscribeWritablePort( const QString & _port,
-						bool _subscribe = true );
+	void subscribeReadablePort( const QString& port, bool subscribe = true );
+	void subscribeWritablePort( const QString& port, bool subscribe = true );
 
-	const Map & readablePorts() const
+	const Map& readablePorts() const
 	{
 		return m_readablePorts;
 	}
 
-	const Map & writablePorts() const
+	const Map& writablePorts() const
 	{
 		return m_writablePorts;
 	}
 
-	MidiPortMenu * m_readablePortsMenu;
-	MidiPortMenu * m_writablePortsMenu;
+	MidiPortMenu* m_readablePortsMenu;
+	MidiPortMenu* m_writablePortsMenu;
 
 
 public slots:
@@ -146,10 +146,10 @@ private slots:
 
 
 private:
-	MidiClient * m_midiClient;
-	MidiEventProcessor * m_midiEventProcessor;
+	MidiClient* m_midiClient;
+	MidiEventProcessor* m_midiEventProcessor;
 
-	Modes m_mode;
+	Mode m_mode;
 
 	IntModel m_inputChannelModel;
 	IntModel m_outputChannelModel;

@@ -157,10 +157,9 @@ void Sequencer::resettime(timestruct *t)
     t->abs = 0.0;
     t->rel = 0.0;
 
-    timeval tval;
-
     t->last = 0.0;
 #ifndef OS_WINDOWS
+    timeval tval;
     if(gettimeofday(&tval, NULL) == 0)
         t->last = tval.tv_sec + tval.tv_usec * 0.000001;
 #endif
@@ -168,9 +167,9 @@ void Sequencer::resettime(timestruct *t)
 
 void Sequencer::updatecounter(timestruct *t)
 {
-    timeval tval;
     double  current = 0.0;
 #ifndef OS_WINDOWS
+    timeval tval;
     if(gettimeofday(&tval, NULL) == 0)
         current = tval.tv_sec + tval.tv_usec * 0.000001;
 #endif

@@ -488,7 +488,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>ChordCreator</name>
+    <name>InstrumentFunctionNoteStacking</name>
     <message>
         <source>octave</source>
         <translation type="unfinished">octava</translation>
@@ -855,7 +855,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>ChordCreatorView</name>
+    <name>InstrumentFunctionNoteStackingView</name>
     <message>
         <source>CHORDS</source>
         <translation type="unfinished">ACORDS</translation>

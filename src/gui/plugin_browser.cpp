@@ -35,6 +35,13 @@
 #include "string_pair_drag.h"
 
 
+bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )
+{
+	return qstricmp( d1.displayName, d2.displayName ) < 0 ? true : false;
+}
+
+
+
 
 pluginBrowser::pluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument plugins" ),
@@ -61,6 +68,7 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 	view_layout->addWidget( hint );
 
 	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
+	qSort( m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore );
 
 	for( Plugin::DescriptorList::ConstIterator it = m_pluginDescriptors.begin();
 										it != m_pluginDescriptors.end(); ++it )

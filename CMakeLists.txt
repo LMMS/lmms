@@ -303,9 +303,11 @@ IF(WANT_SYSTEM_SR)
 	PKG_CHECK_MODULES(SAMPLERATE samplerate>=0.1.8)
 	IF(SAMPLERATE_FOUND)
 		SET(LMMS_HAVE_SAMPLERATE TRUE)
+		SET(STATUS_SAMPLERATE "OK")
 	ENDIF(SAMPLERATE_FOUND)
 ENDIF(WANT_SYSTEM_SR)
 IF(NOT LMMS_HAVE_SAMPLERATE)
+	SET(STATUS_SAMPLERATE "bundled")
 	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate)
 	SET(CMAKE_CROSSCOMPILING_ORIG "${CMAKE_CROSSCOMPILING}")
 	SET(CMAKE_CROSSCOMPILING "")
@@ -335,6 +337,7 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in ${CMAKE
 SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 SET(CMAKE_C_FLAGS "-O2 -g ${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
+set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
 
 
 # people simply updating git will still have this and mess up build with it
@@ -346,7 +349,19 @@ FILE(GLOB_RECURSE lmms_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 SET(lmms_MOC ${lmms_INCLUDES})
 
-SET(lmms_EMBEDDED_RESOURCES ${CMAKE_SOURCE_DIR}/AUTHORS ${CMAKE_SOURCE_DIR}/COPYING)
+# Get list of all committers from git history, ordered by number of commits
+FIND_PACKAGE(Git)
+IF(GIT_FOUND)
+	SET(CONTRIBUTORS ${CMAKE_BINARY_DIR}/CONTRIBUTORS)
+	EXECUTE_PROCESS(
+		COMMAND ${GIT_EXECUTABLE} shortlog -sne
+		COMMAND cut -c8-
+		OUTPUT_FILE ${CONTRIBUTORS}
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		TIMEOUT 1)
+ENDIF(GIT_FOUND)
+
+SET(lmms_EMBEDDED_RESOURCES ${CMAKE_SOURCE_DIR}/AUTHORS ${CMAKE_SOURCE_DIR}/COPYING ${CONTRIBUTORS})
 
 QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw)
 QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
@@ -512,39 +527,6 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND tar cjf lmms-${VERSION}.tar.bz2 ${TMP}
 			COMMAND rm -rf ${TMP})
 
-#
-# add win32-pkg-target (deprecated - use "package" target instead)
-#
-ADD_CUSTOM_TARGET(win32-pkg
-			COMMAND mkdir -p tmp/lmms/data
-			COMMAND mkdir -p tmp/lmms/plugins/ladspa/
-			COMMAND cp lmms.exe tmp/lmms
-			COMMAND find plugins/ -maxdepth 2 -name '*.dll'  -exec cp '{}' tmp/lmms/plugins/ "';'"
-			COMMAND rm tmp/lmms/plugins/caps.dll
-			COMMAND rm tmp/lmms/plugins/tap*.dll
-			COMMAND cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
-			COMMAND cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
-			COMMAND cd data && make DESTDIR=${CMAKE_BINARY_DIR}/tmp/lmms/ install
-			COMMAND mv tmp/lmms/opt/mingw32/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt
-			COMMAND cp /opt/mingw32/bin/QtCore4.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/QtGui4.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/QtXml4.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/libz.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/libsndfile-1.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/libvorbis*.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/libogg-0.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/libfluidsynth-1.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/libfftw3f-3.dll tmp/lmms
-			COMMAND cp /opt/mingw32/bin/SDL.dll tmp/lmms
-			COMMAND cp /opt/mingw32/i586-mingw32/bin/mingwm10.dll tmp/lmms
-			COMMAND cp -L ${CMAKE_SOURCE_DIR}/COPYING tmp/lmms/LICENSE.TXT
-			COMMAND cp -L ${CMAKE_SOURCE_DIR}/README tmp/lmms/README.TXT
-			COMMAND ${STRIP} tmp/lmms/lmms.exe tmp/lmms/plugins/*.dll tmp/lmms/plugins/ladspa/*.dll
-			COMMAND mv tmp/lmms tmp/lmms-${VERSION}
-			COMMAND cd tmp && zip -r -9 ../lmms-${VERSION}-bin-win32.zip lmms-${VERSION}/*
-			COMMAND rm -rf tmp
-)
-
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h lmms.1.gz")
 
@@ -557,8 +539,7 @@ MESSAGE("\n"
 "Installation Summary\n"
 "--------------------\n"
 "* Install Directory           : ${CMAKE_INSTALL_PREFIX}\n"
-#"* Build type                  : ${CMAKE_BUILD_TYPE}\n"
-"* Use system's libsamplerate  : ${LMMS_HAVE_SAMPLERATE}\n"
+"* libsamplerate               : ${STATUS_SAMPLERATE}\n"
 )
 
 MESSAGE(

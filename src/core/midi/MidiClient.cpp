@@ -25,7 +25,6 @@
 
 #include "MidiClient.h"
 #include "MidiPort.h"
-#include "templates.h"
 #include "note.h"
 
 
@@ -44,32 +43,32 @@ MidiClient::~MidiClient()
 
 
 
-void MidiClient::applyPortMode( MidiPort * )
+void MidiClient::applyPortMode( MidiPort* )
 {
 }
 
 
 
 
-void MidiClient::applyPortName( MidiPort * )
+void MidiClient::applyPortName( MidiPort* )
 {
 }
 
 
 
 
-void MidiClient::addPort( MidiPort * _port )
+void MidiClient::addPort( MidiPort* port )
 {
-	m_midiPorts.push_back( _port );
+	m_midiPorts.push_back( port );
 }
 
 
 
 
-void MidiClient::removePort( MidiPort * _port )
+void MidiClient::removePort( MidiPort* port )
 {
 	QVector<MidiPort *>::Iterator it =
-		qFind( m_midiPorts.begin(), m_midiPorts.end(), _port );
+		qFind( m_midiPorts.begin(), m_midiPorts.end(), port );
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );
@@ -79,14 +78,14 @@ void MidiClient::removePort( MidiPort * _port )
 
 
 
-void MidiClient::subscribeReadablePort( MidiPort *, const QString & , bool )
+void MidiClient::subscribeReadablePort( MidiPort*, const QString& , bool )
 {
 }
 
 
 
 
-void MidiClient::subscribeWritablePort( MidiPort * , const QString & , bool )
+void MidiClient::subscribeWritablePort( MidiPort* , const QString& , bool )
 {
 }
 
@@ -124,7 +123,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 	{
 		if( c == MidiSystemReset )
 		{
-			m_midiParseData.m_midiEvent.m_type = MidiSystemReset;
+			m_midiParseData.m_midiEvent.setType( MidiSystemReset );
 			m_midiParseData.m_status = 0;
 			processParsedEvent();
 		}
@@ -206,34 +205,30 @@ void MidiClientRaw::parseData( const unsigned char c )
 	 * We simply keep the status as it is, just reset the parameter counter.
 	 * If another status byte comes in, it will overwrite the status. 
 	 */
-	m_midiParseData.m_midiEvent.m_type = static_cast<MidiEventTypes>( m_midiParseData.m_status );
-	m_midiParseData.m_midiEvent.m_channel = m_midiParseData.m_channel;
+	m_midiParseData.m_midiEvent.setType( static_cast<MidiEventTypes>( m_midiParseData.m_status ) );
+	m_midiParseData.m_midiEvent.setChannel( m_midiParseData.m_channel );
 	m_midiParseData.m_bytes = 0; /* Related to running status! */
-	switch( m_midiParseData.m_midiEvent.m_type )
+	switch( m_midiParseData.m_midiEvent.type() )
 	{
 		case MidiNoteOff:
 		case MidiNoteOn:
 		case MidiKeyPressure:
 		case MidiProgramChange:
 		case MidiChannelPressure:
-			m_midiParseData.m_midiEvent.m_data.m_param[0] =
-				m_midiParseData.m_buffer[0] - KeysPerOctave;
-			m_midiParseData.m_midiEvent.m_data.m_param[1] =
-						m_midiParseData.m_buffer[1];
+			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] - KeysPerOctave );
+			m_midiParseData.m_midiEvent.setVelocity( m_midiParseData.m_buffer[1] );
 			break;
 
 		case MidiControlChange:
-			m_midiParseData.m_midiEvent.m_data.m_param[0] = m_midiParseData.m_buffer[0];
-			m_midiParseData.m_midiEvent.m_data.m_param[1] = m_midiParseData.m_buffer[1];
+			m_midiParseData.m_midiEvent.setControllerNumber( m_midiParseData.m_buffer[0] );
+			m_midiParseData.m_midiEvent.setControllerValue(  m_midiParseData.m_buffer[1] );
 			break;
 
 		case MidiPitchBend:
 			// Pitch-bend is transmitted with 14-bit precision.
 			// Note: '|' does here the same as '+' (no common bits),
 			// but might be faster
-			m_midiParseData.m_midiEvent.m_data.m_param[0] =
-				( ( m_midiParseData.m_buffer[1] * 128 ) |
-						m_midiParseData.m_buffer[0] );
+			m_midiParseData.m_midiEvent.setPitchBend( ( m_midiParseData.m_buffer[1] * 128 ) | m_midiParseData.m_buffer[0] );
 			break;
 
 		default: 
@@ -251,33 +246,29 @@ void MidiClientRaw::processParsedEvent()
 {
 	for( int i = 0; i < m_midiPorts.size(); ++i )
 	{
-		m_midiPorts[i]->processInEvent( m_midiParseData.m_midiEvent,
-							midiTime() );
+		m_midiPorts[i]->processInEvent( m_midiParseData.m_midiEvent );
 	}
 }
 
 
 
 
-void MidiClientRaw::processOutEvent( const midiEvent & _me,
-							const midiTime & ,
-							const MidiPort * _port )
+void MidiClientRaw::processOutEvent( const MidiEvent& event, const MidiTime & , const MidiPort* port )
 {
 	// TODO: also evaluate _time and queue event if necessary
-	switch( _me.m_type )
+	switch( event.type() )
 	{
 		case MidiNoteOn:
 		case MidiNoteOff:
 		case MidiKeyPressure:
-			sendByte( _me.m_type | _me.channel() );
-			sendByte( _me.m_data.m_param[0] + KeysPerOctave );
-			sendByte( tLimit( (int) _me.m_data.m_param[1],
-								0, 127 ) );
+			sendByte( event.type() | event.channel() );
+			sendByte( event.key() + KeysPerOctave );
+			sendByte( event.velocity() );
 			break;
 
 		default:
 			qWarning( "MidiClientRaw: unhandled MIDI-event %d\n",
-							(int) _me.m_type );
+							(int) event.type() );
 			break;
 	}
 }
