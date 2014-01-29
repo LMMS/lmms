@@ -402,7 +402,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 					expKnobVal( m_decayModel.value() *
 						m_sustainModel.value() ) );
 
-	m_sustainLevel = 1.0f - m_sustainModel.value();
+	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
 	if( m_amount >= 0 )
 	{

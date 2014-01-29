@@ -441,7 +441,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.drawLine( x1, y_base - avail_height, x2, y_base - avail_height );
 	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
 							end_points_bg_color );
-	p.fillRect( x1, y_base-1-avail_height, 2, 2, end_points_color );
+	p.fillRect( x1, y_base - 1 - avail_height, 2, 2, end_points_color );
 	x1 = x2;
 	x2 = x1 + static_cast<int>( ( m_decayKnob->value<float>() *
 						m_sustainKnob->value<float>() ) *
@@ -449,7 +449,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 
 	p.drawLine( x1, y_base-avail_height, x2, static_cast<int>( y_base -
 								avail_height +
-				m_sustainKnob->value<float>() * avail_height ) );
+				( 1 - m_sustainKnob->value<float>() ) * avail_height ) );
 	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
 							end_points_bg_color );
 	p.fillRect( x1, y_base - 1 - avail_height, 2, 2, end_points_color );
@@ -457,14 +457,14 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	x2 = x1 + static_cast<int>( m_releaseKnob->value<float>() * TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, static_cast<int>( y_base - avail_height +
-						m_sustainKnob->value<float>() *
+						( 1 - m_sustainKnob->value<float>() ) *
 						avail_height ), x2, y_base );
-	p.fillRect( x1-1, static_cast<int>( y_base - avail_height +
-						m_sustainKnob->value<float>() *
+	p.fillRect( x1 - 1, static_cast<int>( y_base - avail_height +
+						( 1 - m_sustainKnob->value<float>() ) *
 						avail_height ) - 2, 4, 4,
 							end_points_bg_color );
 	p.fillRect( x1, static_cast<int>( y_base - avail_height +
-						m_sustainKnob->value<float>() *
+						( 1 - m_sustainKnob->value<float>() ) *
 						avail_height ) - 1, 2, 2,
 							end_points_color );
 	p.fillRect( x2 - 1, y_base - 2, 4, 4, end_points_bg_color );
