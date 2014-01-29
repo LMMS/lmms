@@ -67,9 +67,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_partOfArpeggio( _part_of_arp ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
-#ifdef LMMS_SINGERBOT_SUPPORT
-	m_patternIndex( 0 ),
-#endif
 	m_origTempo( engine::getSong()->getTempo() ),
 	m_origBaseNote( instrumentTrack->baseNoteModel()->value() ),
 	m_frequency( 0 ),
@@ -95,9 +92,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		parent->m_partOfArpeggio = isPartOfArpeggio() && parent->isTopNote();
 
 		m_bbTrack = parent->m_bbTrack;
-#ifdef LMMS_SINGERBOT_SUPPORT
-		m_patternIndex = parent->m_patternIndex;
-#endif
 	}
 
 	updateFrequency();

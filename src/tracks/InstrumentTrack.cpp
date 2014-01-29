@@ -609,9 +609,6 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		const NoteVector & notes = p->notes();
 		// ...and set our index to zero
 		NoteVector::ConstIterator nit = notes.begin();
-#if LMMS_SINGERBOT_SUPPORT
-		int note_idx = 0;
-#endif
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
@@ -622,12 +619,6 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 			// skip notes which are posated before start-tact
 			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
-#if LMMS_SINGERBOT_SUPPORT
-				if( ( *nit )->length() != 0 )
-				{
-					++note_idx;
-				}
-#endif
 				++nit;
 			}
 		}
@@ -652,14 +643,8 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 				}
 
-#if LMMS_SINGERBOT_SUPPORT
-				notePlayHandle->setPatternIndex( note_idx );
-#endif
 				engine::mixer()->addPlayHandle( notePlayHandle );
 				played_a_note = true;
-#if LMMS_SINGERBOT_SUPPORT
-				++note_idx;
-#endif
 			}
 			++nit;
 		}

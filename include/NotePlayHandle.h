@@ -232,18 +232,6 @@ public:
 		return m_songGlobalParentOffset;
 	}
 
-#ifdef LMMS_SINGERBOT_SUPPORT
-	int patternIndex()
-	{
-		return m_patternIndex;
-	}
-
-	void setPatternIndex( int _i )
-	{
-		m_patternIndex = _i;
-	}
-#endif
-
 
 private:
 	class BaseDetuning
@@ -288,9 +276,6 @@ private:
 											// sub-note)
 	bool m_muted;							// indicates whether note is muted
 	track* m_bbTrack;						// related BB track
-#ifdef LMMS_SINGERBOT_SUPPORT
-	int m_patternIndex;						// position among relevant notes
-#endif
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
