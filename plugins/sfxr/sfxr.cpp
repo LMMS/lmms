@@ -321,7 +321,6 @@ bool SfxrSynth::isPlaying() const
 
 sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sfxr_plugin_descriptor ),
-	m_instrumentTrack(_instrument_track),
 	m_attModel(0.0f, this),
 	m_holdModel(0.3f, this),
 	m_susModel(0.0f, this),
@@ -1062,10 +1061,10 @@ void sfxrInstrumentView::mutate()
 
 void sfxrInstrumentView::previewSound()
 {
-	sfxrInstrument * s = castModel<sfxrInstrument>();
-	InstrumentTrack * it = s->m_instrumentTrack;
+	sfxrInstrument* s = castModel<sfxrInstrument>();
+	InstrumentTrack* it = s->instrumentTrack();
 	it->silenceAllNotes();
-	it->processInEvent( MidiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ), MidiTime() );
+	it->processInEvent( MidiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ) );
 }
 
 
@@ -1074,9 +1073,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model*, void* data )
 {
-	return( new sfxrInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return new sfxrInstrument( static_cast<InstrumentTrack *>( data ) );
 }
 
 
