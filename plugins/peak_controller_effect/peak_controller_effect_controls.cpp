@@ -61,8 +61,21 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	m_absModel.loadSettings( _this, "abs" );
 	m_amountMultModel.loadSettings( _this, "amountmult" );
 
-	int effectId = _this.attribute( "effectId" ).toInt();
-	m_effect->m_effectId = effectId;
+	/*If the peak controller effect is NOT loaded from project,
+	 * m_effectId stored is useless.
+	 * Reason to assign a random number to it:
+	 * If the user clone the instrument, and m_effectId is cloned, and
+	 * m_effectId is copied, then there would be two instruments
+	 * having the same id.
+	 */
+	if( engine::getSong()->isLoadingProject() == true )
+	{
+		m_effect->m_effectId = _this.attribute( "effectId" ).toInt();
+	}
+	else
+	{
+		m_effect->m_effectId = rand();
+	}
 
     if( m_effect->m_autoController && ( engine::getSong()->isLoadingProject() == true || presetPreviewPlayHandle::isPreviewing() == false ) )
 	{
