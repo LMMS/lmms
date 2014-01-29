@@ -48,7 +48,8 @@ float frnd(float range)
 #include "templates.h"
 #include "tooltip.h"
 #include "song.h"
-#include "midi.h"
+class midiEvent;
+class midiTime;
 
 #include "embed.cpp"
 
