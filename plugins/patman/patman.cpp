@@ -33,7 +33,7 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pixmap_button.h"
 #include "song.h"
 #include "string_pair_drag.h"
@@ -129,7 +129,7 @@ QString patmanInstrument::nodeName( void ) const
 
 
 
-void patmanInstrument::playNote( notePlayHandle * _n,
+void patmanInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( m_patchFile == "" )
@@ -160,7 +160,7 @@ void patmanInstrument::playNote( notePlayHandle * _n,
 
 
 
-void patmanInstrument::deleteNotePluginData( notePlayHandle * _n )
+void patmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
 	sharedObject::unref( hdata->sample );
@@ -384,7 +384,7 @@ void patmanInstrument::unloadCurrentPatch( void )
 
 
 
-void patmanInstrument::selectSample( notePlayHandle * _n )
+void patmanInstrument::selectSample( NotePlayHandle * _n )
 {
 	const float freq = _n->frequency();
 

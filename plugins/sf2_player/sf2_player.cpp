@@ -34,7 +34,7 @@
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "knob.h"
 #include "song.h"
 
@@ -570,7 +570,7 @@ void sf2Instrument::updateSampleRate()
 
 
 
-void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
+void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 {
 	const float LOG440 = 2.643452676f;
 
@@ -743,7 +743,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 
 
 
-void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
+void sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );

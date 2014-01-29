@@ -29,7 +29,7 @@
 #include "vibed.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "tooltip.h"
 #include "base64.h"
 #include "caption_menu.h"
@@ -272,7 +272,7 @@ QString vibed::nodeName() const
 
 
 
-void vibed::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
+void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -330,7 +330,7 @@ void vibed::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 
 
 
-void vibed::deleteNotePluginData( notePlayHandle * _n )
+void vibed::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<stringContainer *>( _n->m_pluginData );
 }

@@ -34,7 +34,7 @@
 #include "engine.h"
 #include "song.h"
 #include "InstrumentTrack.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "interpolation.h"
 #include "gui_templates.h"
 #include "tooltip.h"
@@ -101,7 +101,7 @@ audioFileProcessor::~audioFileProcessor()
 
 
 
-void audioFileProcessor::playNote( notePlayHandle * _n,
+void audioFileProcessor::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -159,7 +159,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n,
 
 
 
-void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
+void audioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete (handleState *)_n->m_pluginData;
 }
@@ -225,7 +225,7 @@ QString audioFileProcessor::nodeName( void ) const
 
 
 
-int audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
+int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
 			engine::mixer()->processingSampleRate() / engine::mixer()->baseSampleRate();

@@ -33,7 +33,7 @@
 
 
 class InstrumentTrack;
-class notePlayHandle;
+class NotePlayHandle;
 
 
 
@@ -51,7 +51,7 @@ public:
 	InstrumentFunctionNoteStacking( Model * _parent );
 	virtual ~InstrumentFunctionNoteStacking();
 
-	void processNote( notePlayHandle * _n );
+	void processNote( NotePlayHandle* n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -172,7 +172,7 @@ public:
 	InstrumentFunctionArpeggio( Model * _parent );
 	virtual ~InstrumentFunctionArpeggio();
 
-	void processNote( notePlayHandle * _n );
+	void processNote( NotePlayHandle* n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

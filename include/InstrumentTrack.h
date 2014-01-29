@@ -31,7 +31,7 @@
 #include "InstrumentSoundShaping.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "Piano.h"
 #include "PianoView.h"
 #include "Pitch.h"
@@ -52,7 +52,6 @@ class knob;
 class lcdSpinBox;
 class midiPortMenu;
 class multimediaProject;
-class notePlayHandle;
 class PluginView;
 class tabWidget;
 class trackLabelButton;
@@ -68,7 +67,7 @@ public:
 
 	// used by instrument
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
-							notePlayHandle * _n );
+							NotePlayHandle * _n );
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
@@ -82,12 +81,12 @@ public:
 		return m_sustainPedalPressed;
 	}
 
-	f_cnt_t beatLen( notePlayHandle * _n ) const;
+	f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
-	void playNote( notePlayHandle * _n, sampleFrame * _working_buffer );
+	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
 
 	QString instrumentName() const;
 	const Instrument *instrument() const
@@ -100,7 +99,7 @@ public:
 		return m_instrument;
 	}
 
-	void deleteNotePluginData( notePlayHandle * _n );
+	void deleteNotePluginData( NotePlayHandle * _n );
 
 	// name-stuff
 	virtual void setName( const QString & _new_name );
@@ -226,7 +225,7 @@ private:
 	AudioPort m_audioPort;
 	MidiPort m_midiPort;
 
-	notePlayHandle * m_notes[NumKeys];
+	NotePlayHandle* m_notes[NumKeys];
 	int m_runningMidiNotes[NumKeys];
 	bool m_sustainPedalPressed;
 
@@ -251,7 +250,7 @@ private:
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
-	friend class notePlayHandle;
+	friend class NotePlayHandle;
 	friend class FlpImport;
 
 } ;

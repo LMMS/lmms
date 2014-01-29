@@ -45,7 +45,7 @@ class QMenu;
 class QSignalMapper;
 
 class comboBox;
-class notePlayHandle;
+class NotePlayHandle;
 class pattern;
 class timeLine;
 class toolButton;

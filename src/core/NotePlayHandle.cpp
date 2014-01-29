@@ -1,6 +1,6 @@
 /*
- * note_play_handle.cpp - implementation of class notePlayHandle, part of
- *                        rendering engine
+ * NotePlayHandle.cpp - implementation of class NotePlayHandle which manages
+ *                      playback of a single note by an instrument
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,7 +23,7 @@
  *
  */
 
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "basic_filters.h"
 #include "config_mgr.h"
 #include "DetuningHelper.h"
@@ -34,7 +34,7 @@
 #include "song.h"
 
 
-notePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
+NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {
 }
@@ -44,20 +44,19 @@ notePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 
 
 
-notePlayHandle::notePlayHandle( InstrumentTrack * _it,
-						const f_cnt_t _offset,
-						const f_cnt_t _frames,
-						const note & _n,
-						notePlayHandle *parent,
-						const bool _part_of_arp,
-						int midiEventChannel,
-						Origin origin ) :
-	playHandle( NotePlayHandle, _offset ),
-	note( _n.length(), _n.pos(), _n.key(),
-			_n.getVolume(), _n.getPanning(), _n.detuning() ),
+NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
+								const f_cnt_t _offset,
+								const f_cnt_t _frames,
+								const note& n,
+								NotePlayHandle *parent,
+								const bool _part_of_arp,
+								int midiEventChannel,
+								Origin origin ) :
+	PlayHandle( TypeNotePlayHandle, _offset ),
+	note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
-	m_instrumentTrack( _it ),
+	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
 	m_totalFramesPlayed( 0 ), 
 	m_framesBeforeRelease( 0 ),
@@ -72,12 +71,12 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	m_patternIndex( 0 ),
 #endif
 	m_origTempo( engine::getSong()->getTempo() ),
-	m_origBaseNote( instrumentTrack()->baseNoteModel()->value() ),
+	m_origBaseNote( instrumentTrack->baseNoteModel()->value() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
 	m_songGlobalParentOffset( 0 ),
-	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack()->midiPort()->realOutputChannel() ),
+	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin )
 {
 	if( isTopNote() )
@@ -111,7 +110,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
+	if( !isTopNote() || !instrumentTrack->isArpeggioEnabled() )
 	{
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
@@ -123,7 +122,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 
 
 
-notePlayHandle::~notePlayHandle()
+NotePlayHandle::~NotePlayHandle()
 {
 	noteOff( 0 );
 
@@ -163,7 +162,7 @@ notePlayHandle::~notePlayHandle()
 
 
 
-void notePlayHandle::setVolume( const volume_t _volume )
+void NotePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
 
@@ -173,7 +172,7 @@ void notePlayHandle::setVolume( const volume_t _volume )
 
 
 
-void notePlayHandle::setPanning( const panning_t panning )
+void NotePlayHandle::setPanning( const panning_t panning )
 {
 	note::setPanning( panning );
 
@@ -186,7 +185,7 @@ void notePlayHandle::setPanning( const panning_t panning )
 
 
 
-int notePlayHandle::midiVelocity() const
+int NotePlayHandle::midiVelocity() const
 {
 	int vel = getVolume();
 	if( m_instrumentTrack->getVolume() < DefaultVolume )
@@ -199,7 +198,7 @@ int notePlayHandle::midiVelocity() const
 
 
 
-int notePlayHandle::midiKey() const
+int NotePlayHandle::midiKey() const
 {
 	return key() - m_origBaseNote + instrumentTrack()->baseNoteModel()->value();
 }
@@ -207,7 +206,7 @@ int notePlayHandle::midiKey() const
 
 
 
-void notePlayHandle::play( sampleFrame * _working_buffer )
+void NotePlayHandle::play( sampleFrame * _working_buffer )
 {
 	if( m_muted )
 	{
@@ -236,7 +235,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 		f_cnt_t todo = engine::mixer()->framesPerPeriod();
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
-		// because we do not allow notePlayHandle::done() to be true
+		// because we do not allow NotePlayHandle::isFinished() to be true
 		// until all sub-notes are completely played and no new ones
 		// are inserted by arpAndChordsTabWidget::processNote()
 		if( isArpeggioBaseNote() )
@@ -290,7 +289,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 						it != m_subNotes.end(); )
 	{
 		( *it )->play( _working_buffer );
-		if( ( *it )->done() )
+		if( ( *it )->isFinished() )
 		{
 			delete *it;
 			it = m_subNotes.erase( it );
@@ -303,7 +302,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 
 	// if this note is a base-note and there're no more sub-notes left we
 	// can set m_releaseFramesDone to m_releaseFramesToDo so that
-	// notePlayHandle::done() returns true and also this base-note is
+	// NotePlayHandle::isFinished() returns true and also this base-note is
 	// removed from mixer's active note vector
 	if( m_released && isArpeggioBaseNote() && m_subNotes.size() == 0 )
 	{
@@ -318,7 +317,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 
 
 
-f_cnt_t notePlayHandle::framesLeft() const
+f_cnt_t NotePlayHandle::framesLeft() const
 {
 	if( instrumentTrack()->isSustainPedalPressed() )
 	{
@@ -339,7 +338,15 @@ f_cnt_t notePlayHandle::framesLeft() const
 
 
 
-bool notePlayHandle::isFromTrack( const track * _track ) const
+fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
+{
+	return (fpp_t) qMin<f_cnt_t>( framesLeft(), engine::mixer()->framesPerPeriod() );
+}
+
+
+
+
+bool NotePlayHandle::isFromTrack( const track * _track ) const
 {
 	return m_instrumentTrack == _track || m_bbTrack == _track;
 }
@@ -347,7 +354,7 @@ bool notePlayHandle::isFromTrack( const track * _track ) const
 
 
 
-void notePlayHandle::noteOff( const f_cnt_t _s )
+void NotePlayHandle::noteOff( const f_cnt_t _s )
 {
 	if( m_released )
 	{
@@ -380,7 +387,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 
 
-f_cnt_t notePlayHandle::actualReleaseFramesToDo() const
+f_cnt_t NotePlayHandle::actualReleaseFramesToDo() const
 {
 	return m_instrumentTrack->m_soundShaping.releaseFrames(/*
 							isArpeggioBaseNote()*/ );
@@ -389,7 +396,7 @@ f_cnt_t notePlayHandle::actualReleaseFramesToDo() const
 
 
 
-void notePlayHandle::setFrames( const f_cnt_t _frames )
+void NotePlayHandle::setFrames( const f_cnt_t _frames )
 {
 	m_frames = _frames;
 	if( m_frames == 0 )
@@ -402,7 +409,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 
 
 
-float notePlayHandle::volumeLevel( const f_cnt_t _frame )
+float NotePlayHandle::volumeLevel( const f_cnt_t _frame )
 {
 	return m_instrumentTrack->m_soundShaping.volumeLevel( this, _frame );
 }
@@ -410,7 +417,7 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 
 
-bool notePlayHandle::isArpeggioBaseNote() const
+bool NotePlayHandle::isArpeggioBaseNote() const
 {
 	return isTopNote() && ( m_partOfArpeggio || m_instrumentTrack->isArpeggioEnabled() );
 }
@@ -418,7 +425,7 @@ bool notePlayHandle::isArpeggioBaseNote() const
 
 
 
-void notePlayHandle::mute()
+void NotePlayHandle::mute()
 {
 	// mute all sub-notes
 	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
@@ -432,7 +439,7 @@ void notePlayHandle::mute()
 
 
 
-int notePlayHandle::index() const
+int NotePlayHandle::index() const
 {
 	const PlayHandleList & playHandles =
 					engine::mixer()->playHandles();
@@ -440,11 +447,9 @@ int notePlayHandle::index() const
 	for( PlayHandleList::ConstIterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
-		const notePlayHandle * nph =
-				dynamic_cast<const notePlayHandle *>( *it );
-		if( nph == NULL ||
-			nph->m_instrumentTrack != m_instrumentTrack ||
-						nph->released() == true )
+		const NotePlayHandle * nph =
+				dynamic_cast<const NotePlayHandle *>( *it );
+		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() )
 		{
 			continue;
 		}
@@ -460,7 +465,7 @@ int notePlayHandle::index() const
 
 
 
-ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
+ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack(
 				const InstrumentTrack * _it, bool _all_ph )
 {
 	const PlayHandleList & playHandles = engine::mixer()->playHandles();
@@ -469,10 +474,9 @@ ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
 	for( PlayHandleList::ConstIterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
-		const notePlayHandle * nph =
-				dynamic_cast<const notePlayHandle *>( *it );
-		if( nph != NULL && nph->m_instrumentTrack == _it &&
-			( nph->released() == false || _all_ph == true ) )
+		const NotePlayHandle * nph =
+				dynamic_cast<const NotePlayHandle *>( *it );
+		if( nph != NULL && nph->m_instrumentTrack == _it && ( nph->isReleased() == false || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
 		}
@@ -483,7 +487,7 @@ ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
 
 
 
-bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
+bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 {
 	return length() == _nph.length() &&
 			pos() == _nph.pos() &&
@@ -504,7 +508,7 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 
 
 
-void notePlayHandle::updateFrequency()
+void NotePlayHandle::updateFrequency()
 {
 	const float pitch =
 		( key() -
@@ -526,7 +530,7 @@ void notePlayHandle::updateFrequency()
 
 
 
-void notePlayHandle::processMidiTime( const MidiTime& time )
+void NotePlayHandle::processMidiTime( const MidiTime& time )
 {
 	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{
@@ -542,7 +546,7 @@ void notePlayHandle::processMidiTime( const MidiTime& time )
 
 
 
-void notePlayHandle::resize( const bpm_t _new_tempo )
+void NotePlayHandle::resize( const bpm_t _new_tempo )
 {
 	double completed = m_totalFramesPlayed / (double) m_frames;
 	double new_frames = m_origFrames * m_origTempo / (double) _new_tempo;

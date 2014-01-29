@@ -36,7 +36,7 @@ class track;
 class AudioPort;
 
 
-class SamplePlayHandle : public playHandle
+class SamplePlayHandle : public PlayHandle
 {
 public:
 	SamplePlayHandle( const QString& sampleFile );
@@ -52,7 +52,7 @@ public:
 
 
 	virtual void play( sampleFrame * _working_buffer );
-	virtual bool done() const;
+	virtual bool isFinished() const;
 
 	virtual bool isFromTrack( const track * _track ) const;
 

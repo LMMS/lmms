@@ -30,7 +30,7 @@
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "SweepOscillator.h"
 
 #include "embed.cpp"
@@ -113,7 +113,7 @@ typedef effectLib::distortion DistFX;
 typedef SweepOscillator<effectLib::monoToStereoAdaptor<DistFX> > SweepOsc;
 
 
-void kickerInstrument::playNote( notePlayHandle * _n,
+void kickerInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const float decfr = m_decayModel.value() *
@@ -126,14 +126,14 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 					DistFX( m_distModel.value(),
 							m_gainModel.value() ) );
 	}
-	else if( tfp > decfr && !_n->released() )
+	else if( tfp > decfr && !_n->isReleased() )
 	{
 		_n->noteOff();
 	}
 
 	//const float freq = instrumentTrack()->frequency( _n ) / 2;
 	const float fdiff = m_endFreqModel.value() - m_startFreqModel.value();
-/*	const fpp_t frames = _n->released() ?
+/*	const fpp_t frames = _n->isReleased() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
 							_n->releaseFramesDone(),
 			engine::mixer()->framesPerAudioBuffer() ), 0 )
@@ -148,7 +148,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 	so->update( _working_buffer, frames, f1, f2,
 				engine::mixer()->processingSampleRate() );
 
-	if( _n->released() )
+	if( _n->isReleased() )
 	{
 		const float rfd = _n->releaseFramesDone();
 		const float drf = desiredReleaseFrames();
@@ -166,7 +166,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 
 
 
-void kickerInstrument::deleteNotePluginData( notePlayHandle * _n )
+void kickerInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<SweepOsc *>( _n->m_pluginData );
 }

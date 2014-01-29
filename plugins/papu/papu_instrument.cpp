@@ -31,9 +31,10 @@
 #include "papu_instrument.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
+#include "engine.h"
 #include "graph.h"
 
 #include "embed.cpp"
@@ -231,7 +232,7 @@ f_cnt_t papuInstrument::desiredReleaseFrames() const
 
 
 
-void papuInstrument::playNote( notePlayHandle * _n,
+void papuInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
@@ -409,7 +410,7 @@ void papuInstrument::playNote( notePlayHandle * _n,
 
 
 
-void papuInstrument::deleteNotePluginData( notePlayHandle * _n )
+void papuInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<Basic_Gb_Apu *>( _n->m_pluginData );
 }

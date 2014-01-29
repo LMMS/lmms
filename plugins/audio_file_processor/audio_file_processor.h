@@ -44,9 +44,9 @@ public:
 	audioFileProcessor( InstrumentTrack * _instrument_track );
 	virtual ~audioFileProcessor();
 
-	virtual void playNote( notePlayHandle * _n, 
+	virtual void playNote( NotePlayHandle * _n, 
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 	virtual void saveSettings( QDomDocument & _doc,
 						QDomElement & _parent );
@@ -56,7 +56,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual int getBeatLen( notePlayHandle * _n ) const;
+	virtual int getBeatLen( NotePlayHandle * _n ) const;
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{

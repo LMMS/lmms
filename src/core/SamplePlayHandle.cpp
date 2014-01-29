@@ -34,7 +34,7 @@
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	playHandle( playHandle::SamplePlayHandle ),
+	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
@@ -51,7 +51,7 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
-	playHandle( playHandle::SamplePlayHandle ),
+	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
@@ -68,7 +68,7 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 
 
 SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	playHandle( playHandle::SamplePlayHandle ),
+	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
@@ -85,7 +85,7 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 
 
 SamplePlayHandle::SamplePlayHandle( pattern * _pattern ) :
-	playHandle( playHandle::SamplePlayHandle ),
+	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( _pattern->frozenPattern() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
@@ -140,9 +140,9 @@ void SamplePlayHandle::play( sampleFrame * _working_buffer )
 
 
 
-bool SamplePlayHandle::done() const
+bool SamplePlayHandle::isFinished() const
 {
-	return( framesDone() >= totalFrames() && m_doneMayReturnTrue == true );
+	return framesDone() >= totalFrames() && m_doneMayReturnTrue == true;
 }
 
 
@@ -150,7 +150,7 @@ bool SamplePlayHandle::done() const
 
 bool SamplePlayHandle::isFromTrack( const track * _track ) const
 {
-	return( m_track == _track || m_bbTrack == _track );
+	return m_track == _track || m_bbTrack == _track;
 }
 
 
@@ -158,9 +158,7 @@ bool SamplePlayHandle::isFromTrack( const track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return( ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) *
-			( engine::mixer()->processingSampleRate() /
-				engine::mixer()->baseSampleRate() ) );
+	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( engine::mixer()->processingSampleRate() / engine::mixer()->baseSampleRate() );
 }
 
 

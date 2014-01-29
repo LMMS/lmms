@@ -39,7 +39,7 @@ class QLineEdit;
 class fileItem;
 class InstrumentTrack;
 class fileBrowserTreeWidget;
-class playHandle;
+class PlayHandle;
 class TrackContainer;
 
 
@@ -102,7 +102,7 @@ private:
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
-	playHandle * m_previewPlayHandle;
+	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
 
 	fileItem * m_contextMenuItem;

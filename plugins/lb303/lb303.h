@@ -40,7 +40,7 @@
 #include "Mixer.h"
 
 class lb303SynthView;
-class notePlayHandle;
+class NotePlayHandle;
 
 class lb303FilterKnobState
 {
@@ -140,9 +140,9 @@ public:
 	virtual ~lb303Synth();
 
 	virtual void play( sampleFrame * _working_buffer );
-	virtual void playNote( notePlayHandle * _n,
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

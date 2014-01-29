@@ -422,7 +422,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
 		if( !st->isMuted() )
 		{
-			playHandle * handle;
+			PlayHandle* handle;
 			if( st->isRecord() )
 			{
 				if( !engine::getSong()->isRecording() )

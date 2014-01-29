@@ -34,7 +34,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "pixmap_button.h"
 #include "templates.h"
@@ -709,7 +709,7 @@ void lb302Synth::initNote( lb302Note *n)
 }
 
 
-void lb302Synth::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
+void lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	//fpp_t framesPerPeriod = engine::mixer()->framesPerPeriod();
 
@@ -780,7 +780,7 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 
 
 
-void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
+void lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 {
 	//printf("GONE\n");
 	if( _n->unpitchedFrequency() == current_freq ) 

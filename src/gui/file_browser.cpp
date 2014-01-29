@@ -44,7 +44,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "mmp.h"
-#include "preset_preview_play_handle.h"
+#include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
 #include "song.h"
 #include "string_pair_drag.h"
@@ -439,10 +439,7 @@ void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 				( f->handling() == fileItem::LoadAsPreset ||
 				f->handling() == fileItem::LoadByPlugin ) )
 		{
-			m_previewPlayHandle =
-				new presetPreviewPlayHandle( f->fullName(),
-					f->handling() ==
-						fileItem::LoadByPlugin );
+			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == fileItem::LoadByPlugin );
 		}
 		if( m_previewPlayHandle != NULL )
 		{
@@ -517,8 +514,7 @@ void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 	{
 		// if there're samples shorter than 3 seconds, we don't
 		// stop them if the user releases mouse-button...
-		if( m_previewPlayHandle->type() ==
-						playHandle::SamplePlayHandle )
+		if( m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle )
 		{
 			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(
 							m_previewPlayHandle );

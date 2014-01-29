@@ -40,7 +40,7 @@
 
 class sf2InstrumentView;
 class sf2Font;
-class notePlayHandle;
+class NotePlayHandle;
 
 class patchesDialog;
 class QLabel;
@@ -58,9 +58,9 @@ public:
 
 	virtual void play( sampleFrame * _working_buffer );
 
-	virtual void playNote( notePlayHandle * _n,
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

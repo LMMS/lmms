@@ -50,7 +50,7 @@
 #include "FileDialog.h"
 #include "MidiClient.h"
 #include "mmp.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pattern.h"
 #include "piano_roll.h"
 #include "ProjectJournal.h"
@@ -232,8 +232,8 @@ void song::setTempo()
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
-		notePlayHandle * nph = dynamic_cast<notePlayHandle *>( *it );
-		if( nph && !nph->released() )
+		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( *it );
+		if( nph && !nph->isReleased() )
 		{
 			nph->resize( tempo );
 		}

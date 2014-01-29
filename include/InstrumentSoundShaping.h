@@ -31,7 +31,7 @@
 
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
-class notePlayHandle;
+class NotePlayHandle;
 
 
 class InstrumentSoundShaping : public Model, public JournallingObject
@@ -42,7 +42,7 @@ public:
 	virtual ~InstrumentSoundShaping();
 
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
-							notePlayHandle * _n );
+							NotePlayHandle * _n );
 
 	enum Targets
 	{
@@ -55,7 +55,7 @@ public:
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;
 
-	float volumeLevel( notePlayHandle * _n, const f_cnt_t _frame );
+	float volumeLevel( NotePlayHandle * _n, const f_cnt_t _frame );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

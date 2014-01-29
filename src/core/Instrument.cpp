@@ -25,8 +25,9 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "DummyInstrument.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "embed.h"
+#include "engine.h"
 
 
 Instrument::Instrument( InstrumentTrack * _instrument_track,
@@ -53,14 +54,14 @@ void Instrument::play( sampleFrame * )
 
 
 
-void Instrument::deleteNotePluginData( notePlayHandle * )
+void Instrument::deleteNotePluginData( NotePlayHandle * )
 {
 }
 
 
 
 
-f_cnt_t Instrument::beatLen( notePlayHandle * ) const
+f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
 {
 	return( 0 );
 }
@@ -96,7 +97,7 @@ bool Instrument::isFromTrack( const track * _track ) const
 
 
 
-void Instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
+void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const fpp_t fpp = engine::mixer()->framesPerPeriod();

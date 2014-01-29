@@ -169,8 +169,8 @@ public:
 	sfxrInstrument(InstrumentTrack * _instrument_track );
 	virtual ~sfxrInstrument();
 
-	virtual void playNote( notePlayHandle * _n, sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 	virtual void saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );

@@ -204,7 +204,7 @@ QString malletsInstrument::nodeName() const
 
 
 
-void malletsInstrument::playNote( notePlayHandle * _n,
+void malletsInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( m_filesMissing )
@@ -288,7 +288,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 
 
 
-void malletsInstrument::deleteNotePluginData( notePlayHandle * _n )
+void malletsInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<malletsSynth *>( _n->m_pluginData );
 }

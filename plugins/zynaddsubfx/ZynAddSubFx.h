@@ -39,7 +39,7 @@ class QPushButton;
 
 class LocalZynAddSubFx;
 class ZynAddSubFxView;
-class notePlayHandle;
+class NotePlayHandle;
 class knob;
 class ledCheckBox;
 

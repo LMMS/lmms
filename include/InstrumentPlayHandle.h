@@ -25,16 +25,16 @@
 #ifndef _INSTRUMENT_PLAY_HANDLE_H
 #define _INSTRUMENT_PLAY_HANDLE_H
 
-#include "play_handle.h"
+#include "PlayHandle.h"
 #include "Instrument.h"
 
 
-class InstrumentPlayHandle : public playHandle
+class InstrumentPlayHandle : public PlayHandle
 {
 public:
-	InstrumentPlayHandle( Instrument * _instrument ) :
-		playHandle( playHandle::InstrumentPlayHandle ),
-		m_instrument( _instrument )
+	InstrumentPlayHandle( Instrument* instrument ) :
+		PlayHandle( TypeInstrumentPlayHandle ),
+		m_instrument( instrument )
 	{
 	}
 
@@ -48,21 +48,20 @@ public:
 		m_instrument->play( _working_buffer );
 	}
 
-	virtual bool done() const
+	virtual bool isFinished() const
 	{
 		return false;
 	}
 
-	virtual bool isFromTrack( const track * _track ) const
+	virtual bool isFromTrack( const track* _track ) const
 	{
 		return m_instrument->isFromTrack( _track );
 	}
 
 
 private:
-	Instrument * m_instrument;
+	Instrument* m_instrument;
 
 } ;
-
 
 #endif

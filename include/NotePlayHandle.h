@@ -1,9 +1,9 @@
 /*
- * note_play_handle.h - declaration of class notePlayHandle which is needed
- *                      by LMMS-Play-Engine
+ * NotePlayHandle.h - declaration of class NotePlayHandle which manages
+ *                    playback of a single note by an instrument
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,26 +23,24 @@
  *
  */
 
-
-#ifndef _NOTE_PLAY_HANDLE_H
-#define _NOTE_PLAY_HANDLE_H
+#ifndef NOTE_PLAY_HANDLE_H
+#define NOTE_PLAY_HANDLE_H
 
 #include "lmmsconfig.h"
-#include "Mixer.h"
 #include "note.h"
-#include "engine.h"
+#include "PlayHandle.h"
 #include "track.h"
 
 
 class InstrumentTrack;
-class notePlayHandle;
+class NotePlayHandle;
 
 template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
-typedef QList<notePlayHandle *> NotePlayHandleList;
-typedef QList<const notePlayHandle *> ConstNotePlayHandleList;
+typedef QList<NotePlayHandle *> NotePlayHandleList;
+typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 
-class EXPORT notePlayHandle : public playHandle, public note
+class EXPORT NotePlayHandle : public PlayHandle, public note
 {
 public:
 	void * m_pluginData;
@@ -57,14 +55,15 @@ public:
 	};
 	typedef Origins Origin;
 
-	notePlayHandle( InstrumentTrack * _instrument_track,
-					const f_cnt_t _offset,
-					const f_cnt_t _frames, const note & _n,
-					notePlayHandle * _parent = NULL,
-					const bool _part_of_arp = false,
+	NotePlayHandle( InstrumentTrack* instrumentTrack,
+					const f_cnt_t offset,
+					const f_cnt_t frames,
+					const note& noteToPlay,
+					NotePlayHandle* parent = NULL,
+					const bool isPartOfArp = false,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
-	virtual ~notePlayHandle();
+	virtual ~NotePlayHandle();
 
 	virtual void setVolume( const volume_t volume = DefaultVolume );
 	virtual void setPanning( const panning_t panning = DefaultPanning );
@@ -76,144 +75,159 @@ public:
 		return m_midiChannel;
 	}
 
-	const float & frequency() const
+	const float& frequency() const
 	{
 		return m_frequency;
 	}
 
 	void updateFrequency();
 
-	// returns frequency without pitch-wheel influence
+	/*! Returns frequency without pitch wheel influence */
 	float unpitchedFrequency() const
 	{
 		return m_unpitchedFrequency;
 	}
 
-	virtual void play( sampleFrame * _working_buffer );
+	/*! Renders one chunk using the attached instrument into the buffer */
+	virtual void play( sampleFrame* buffer );
 
-	virtual inline bool done() const
+	/*! Returns whether playback of note is finished and thus handle can be deleted */
+	virtual bool isFinished() const
 	{
 		return m_released && framesLeft() <= 0;
 	}
 
+	/*! Returns number of frames left for playback */
 	f_cnt_t framesLeft() const;
 
-	inline fpp_t framesLeftForCurrentPeriod() const
-	{
-		return (fpp_t) qMin<f_cnt_t>( framesLeft(),
-										engine::mixer()->framesPerPeriod() );
-	}
+	/*! Returns how many frames have to be rendered in current period */
+	fpp_t framesLeftForCurrentPeriod() const;
 
+	/*! Returns whether the play handle plays on a certain track */
+	virtual bool isFromTrack( const track* _track ) const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	/*! Releases the note (and plays release frames */
+	void noteOff( const f_cnt_t offset = 0 );
 
-
-	void noteOff( const f_cnt_t _s = 0 );
-
-	inline f_cnt_t framesBeforeRelease() const
+	/*! Returns number of frames to be played until the note is going to be released */
+	f_cnt_t framesBeforeRelease() const
 	{
 		return m_framesBeforeRelease;
 	}
 
-	inline f_cnt_t releaseFramesDone() const
+	/*! Returns how many frames were played since release */
+	f_cnt_t releaseFramesDone() const
 	{
 		return m_releaseFramesDone;
 	}
 
+	/*! Returns the number of frames to be played after release according to
+	    the release times in the envelopes */
 	f_cnt_t actualReleaseFramesToDo() const;
 
-
-	// returns total numbers of frames to play
-	inline f_cnt_t frames() const
+	/*! Returns total numbers of frames to play (including release frames) */
+	f_cnt_t frames() const
 	{
 		return m_frames;
 	}
 
+	/*! Sets the total number of frames to play (including release frames) */
 	void setFrames( const f_cnt_t _frames );
 
-	// returns whether note was released
-	inline bool released() const
+	/*! Returns whether note was released */
+	bool isReleased() const
 	{
 		return m_released;
 	}
 
-	// returns total numbers of played frames
-	inline f_cnt_t totalFramesPlayed() const
+	/*! Returns total numbers of frames played so far */
+	f_cnt_t totalFramesPlayed() const
 	{
 		return m_totalFramesPlayed;
 	}
 
-	// returns volume-level at frame _frame (envelope/LFO)
-	float volumeLevel( const f_cnt_t _frame );
+	/*! Returns volume level at given frame (envelope/LFO) */
+	float volumeLevel( const f_cnt_t frame );
 
-	// returns instrument-track this note-play-handle plays
-	const InstrumentTrack *instrumentTrack() const
+	/*! Returns instrument track which is being played by this handle (const version) */
+	const InstrumentTrack* instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
-	InstrumentTrack *instrumentTrack()
+	/*! Returns instrument track which is being played by this handle */
+	InstrumentTrack* instrumentTrack()
 	{
 		return m_instrumentTrack;
 	}
 
-	// returns whether note is a top note, e.g. is not part of an arpeggio
-	// or a chord
-	inline bool isTopNote() const
+	/*! Returns whether note is a top note, e.g. is not part of an arpeggio or a chord */
+	bool isTopNote() const
 	{
 		return m_topNote;
 	}
 
-	inline bool isPartOfArpeggio() const
+	/*! Returns whether note is part of an arpeggio playback */
+	bool isPartOfArpeggio() const
 	{
 		return m_partOfArpeggio;
 	}
 
-	inline void setPartOfArpeggio( const bool _on )
+	/*! Sets whether note is part of an arpeggio playback */
+	void setPartOfArpeggio( const bool _on )
 	{
 		m_partOfArpeggio = _on;
 	}
 
-	// returns whether note is base-note for arpeggio
+	/*! Returns whether note is base note for arpeggio */
 	bool isArpeggioBaseNote() const;
 
-	inline bool isMuted() const
+	/*! Returns whether note is muted */
+	bool isMuted() const
 	{
 		return m_muted;
 	}
 
+	/*! Mutes playback of note */
 	void mute();
 
-	// returns index of note-play-handle in vector of note-play-handles 
-	// belonging to this instrument-track - used by arpeggiator
+	/*! Returns index of NotePlayHandle in vector of note-play-handles
+        belonging to this instrument track - used by arpeggiator */
 	int index() const;
 
-	// note-play-handles belonging to given channel, if _all_ph = true,
-	// also released note-play-handles are returned
-	static ConstNotePlayHandleList nphsOfInstrumentTrack(
-			const InstrumentTrack * _ct, bool _all_ph = false );
+	/*! returns list of note-play-handles belonging to given instrument track,
+	    if allPlayHandles = true, also released note-play-handles are returned */
+	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* track, bool allPlayHandles = false );
 
-	// return whether given note-play-handle is equal to *this
-	bool operator==( const notePlayHandle & _nph ) const;
+	/*! Returns whether given NotePlayHandle instance is equal to *this */
+	bool operator==( const NotePlayHandle & _nph ) const;
 
-	inline bool bbTrackMuted()
+	/*! Returns whether NotePlayHandle belongs to BB track and BB track is muted */
+	bool isBbTrackMuted()
 	{
 		return m_bbTrack && m_bbTrack->isMuted();
 	}
-	void setBBTrack( track * _bb_track )
+
+	/*! Sets attached BB track */
+	void setBBTrack( track* t )
 	{
-		m_bbTrack = _bb_track;
+		m_bbTrack = t;
 	}
 
-	void processMidiTime( const MidiTime & _time );
-	void resize( const bpm_t _new_tempo );
+	/*! Process note detuning automation */
+	void processMidiTime( const MidiTime& time );
 
-	void setSongGlobalParentOffset( const MidiTime &offset )
+	/*! Updates total length (m_frames) depending on a new tempo */
+	void resize( const bpm_t newTempo );
+
+	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
+	void setSongGlobalParentOffset( const MidiTime& offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
-	const MidiTime &songGlobalParentOffset() const
+	/*! Returns song-global offset */
+	const MidiTime& songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -235,7 +249,7 @@ private:
 	class BaseDetuning
 	{
 	public:
-		BaseDetuning( DetuningHelper *detuning );
+		BaseDetuning( DetuningHelper* detuning );
 
 		void setValue( float val )
 		{
@@ -253,7 +267,7 @@ private:
 
 	} ;
 
-	InstrumentTrack * m_instrumentTrack;	// needed for calling
+	InstrumentTrack* m_instrumentTrack;		// needed for calling
 											// InstrumentTrack::playNote
 	f_cnt_t m_frames;						// total frames to play
 	f_cnt_t m_totalFramesPlayed;			// total frame-counter - used for
@@ -273,7 +287,7 @@ private:
 											// an arpeggio (either base-note or
 											// sub-note)
 	bool m_muted;							// indicates whether note is muted
-	track * m_bbTrack;						// related BB track
+	track* m_bbTrack;						// related BB track
 #ifdef LMMS_SINGERBOT_SUPPORT
 	int m_patternIndex;						// position among relevant notes
 #endif
@@ -287,7 +301,7 @@ private:
 	float m_frequency;
 	float m_unpitchedFrequency;
 
-	BaseDetuning * m_baseDetuning;
+	BaseDetuning* m_baseDetuning;
 	MidiTime m_songGlobalParentOffset;
 
 	const int m_midiChannel;

@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	virtual void playNote( notePlayHandle *, bool, sampleFrame * )
+	virtual void playNote( NotePlayHandle *, bool, sampleFrame * )
 	{
 	}
 

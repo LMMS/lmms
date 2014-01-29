@@ -31,7 +31,7 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 
 
 
@@ -106,13 +106,13 @@ InstrumentSoundShaping::~InstrumentSoundShaping()
 
 
 
-float InstrumentSoundShaping::volumeLevel( notePlayHandle * _n,
+float InstrumentSoundShaping::volumeLevel( NotePlayHandle * _n,
 							const f_cnt_t _frame )
 {
 	f_cnt_t release_begin = _frame - _n->releaseFramesDone() +
 						_n->framesBeforeRelease();
 
-	if( _n->released() == false )
+	if( _n->isReleased() == false )
 	{
 		release_begin += engine::mixer()->framesPerPeriod();
 	}
@@ -129,13 +129,13 @@ float InstrumentSoundShaping::volumeLevel( notePlayHandle * _n,
 
 void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 							const fpp_t _frames,
-							notePlayHandle * _n )
+							NotePlayHandle * _n )
 {
 	const f_cnt_t total_frames = _n->totalFramesPlayed();
 	f_cnt_t release_begin = total_frames - _n->releaseFramesDone() +
 						_n->framesBeforeRelease();
 
-	if( _n->released() == false )
+	if( _n->isReleased() == false )
 	{
 		release_begin += engine::mixer()->framesPerPeriod();
 	}

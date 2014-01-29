@@ -28,8 +28,8 @@
 #include "embed.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
-#include "note_play_handle.h"
-#include "preset_preview_play_handle.h"
+#include "NotePlayHandle.h"
+#include "PresetPreviewPlayHandle.h"
 
 
 
@@ -220,7 +220,7 @@ InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
 
 
 
-void InstrumentFunctionNoteStacking::processNote( notePlayHandle * _n )
+void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
 	const ChordTable & chord_table = ChordTable::getInstance();
@@ -266,7 +266,7 @@ void InstrumentFunctionNoteStacking::processNote( notePlayHandle * _n )
 							_n->detuning() );
 				// create sub-note-play-handle, only note is
 				// different
-				new notePlayHandle( _n->instrumentTrack(),
+				new NotePlayHandle( _n->instrumentTrack(),
 							_n->offset(),
 							_n->frames(), note_copy,
 							_n );
@@ -344,13 +344,12 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 
 
 
-void InstrumentFunctionArpeggio::processNote( notePlayHandle * _n )
+void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
 	if( _n->isTopNote() == false ||
 			!m_arpEnabledModel.value() ||
-			( _n->released() && _n->releaseFramesDone() >=
-					_n->actualReleaseFramesToDo() ) )
+			( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
 	{
 		return;
 	}
@@ -358,13 +357,12 @@ void InstrumentFunctionArpeggio::processNote( notePlayHandle * _n )
 
 	const int selected_arp = m_arpModel.value();
 
-	ConstNotePlayHandleList cnphv = notePlayHandle::nphsOfInstrumentTrack(
+	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack(
 													_n->instrumentTrack() );
 	if( m_arpModeModel.value() != FreeMode && cnphv.size() == 0 )
 	{
 		// maybe we're playing only a preset-preview-note?
-		cnphv = presetPreviewPlayHandle::nphsOfInstrumentTrack(
-						_n->instrumentTrack() );
+		cnphv = PresetPreviewPlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
 		if( cnphv.size() == 0 )
 		{
 			// still nothing found here, so lets return
@@ -471,7 +469,7 @@ void InstrumentFunctionArpeggio::processNote( notePlayHandle * _n )
 		}
 
 		float vol_level = 1.0f;
-		if( _n->released() )
+		if( _n->isReleased() )
 		{
 			vol_level = _n->volumeLevel( cur_frame + gated_frames );
 		}
@@ -485,7 +483,7 @@ void InstrumentFunctionArpeggio::processNote( notePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		new notePlayHandle( _n->instrumentTrack(),
+		new NotePlayHandle( _n->instrumentTrack(),
 				( ( m_arpModeModel.value() != FreeMode ) ?
 						cnphv.first()->offset() :
 						_n->offset() ) +

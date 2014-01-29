@@ -52,9 +52,9 @@ public:
 	patmanInstrument( InstrumentTrack * _track );
 	virtual ~patmanInstrument();
 
-	virtual void playNote( notePlayHandle * _n,
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -103,7 +103,7 @@ private:
 	LoadErrors loadPatch( const QString & _filename );
 	void unloadCurrentPatch( void );
 
-	void selectSample( notePlayHandle * _n );
+	void selectSample( NotePlayHandle * _n );
 
 
 	friend class PatmanView;

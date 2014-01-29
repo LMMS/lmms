@@ -37,7 +37,7 @@ class InstrumentTrack;
 class InstrumentView;
 class MidiEvent;
 class MidiTime;
-class notePlayHandle;
+class NotePlayHandle;
 class track;
 
 
@@ -58,7 +58,7 @@ public:
 	virtual void play( sampleFrame * _working_buffer );
 
 	// to be implemented by actual plugin
-	virtual void playNote( notePlayHandle * /* _note_to_play */,
+	virtual void playNote( NotePlayHandle * /* _note_to_play */,
 					sampleFrame * /* _working_buf */ )
 	{
 	}
@@ -66,13 +66,13 @@ public:
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly
 	// (call of dtor if it's a class etc.)
-	virtual void deleteNotePluginData( notePlayHandle * _note_to_play );
+	virtual void deleteNotePluginData( NotePlayHandle * _note_to_play );
 
 	// Get number of sample-frames that should be used when playing beat
 	// (note with unspecified length)
 	// Per default this function returns 0. In this case, channel is using
 	// the length of the longest envelope (if one active).
-	virtual f_cnt_t beatLen( notePlayHandle * _n ) const;
+	virtual f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
 
 	// some instruments need a certain number of release-frames even
@@ -127,7 +127,7 @@ protected:
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
-	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
+	void applyRelease( sampleFrame * buf, const NotePlayHandle * _n );
 
 
 private:

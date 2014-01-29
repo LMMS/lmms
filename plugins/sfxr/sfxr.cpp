@@ -42,7 +42,7 @@ float frnd(float range)
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
 #include "templates.h"
@@ -448,7 +448,7 @@ QString sfxrInstrument::nodeName() const
 
 
 
-void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
+void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
@@ -480,7 +480,7 @@ void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffe
 
 
 
-void sfxrInstrument::deleteNotePluginData( notePlayHandle * _n )
+void sfxrInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<SfxrSynth *>( _n->m_pluginData );
 }

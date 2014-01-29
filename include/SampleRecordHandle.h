@@ -28,7 +28,6 @@
 
 #include <QtCore/QList>
 #include <QtCore/QPair>
-#include <qobject.h>
 
 #include "Mixer.h"
 #include "SampleBuffer.h"
@@ -39,14 +38,14 @@ class SampleTCO;
 class track;
 
 
-class SampleRecordHandle : public playHandle
+class SampleRecordHandle : public PlayHandle
 {
 public:
 	SampleRecordHandle( SampleTCO* tco );
 	virtual ~SampleRecordHandle();
 
 	virtual void play( sampleFrame * _working_buffer );
-	virtual bool done() const;
+	virtual bool isFinished() const;
 
 	virtual bool isFromTrack( const track * _track ) const;
 

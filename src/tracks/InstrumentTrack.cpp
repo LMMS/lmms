@@ -66,7 +66,7 @@
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
 #include "mmp.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pattern.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
@@ -152,10 +152,10 @@ InstrumentTrack::~InstrumentTrack()
 
 void InstrumentTrack::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames,
-							notePlayHandle * _n )
+							NotePlayHandle * _n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( _n && _n->bbTrackMuted() ) )
+	if( isMuted() || ( _n && _n->isBbTrackMuted() ) )
 	{
 		return;
 	}
@@ -230,7 +230,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 	switch( event.type() )
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
-		// events to instrument as notePlayHandle will send them on its
+		// events to instrument as NotePlayHandle will send them on its
 		// own
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
@@ -238,11 +238,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				if( m_notes[event.key()] == NULL )
 				{
 					// create (timed) note-play-handle
-					notePlayHandle* nph = new notePlayHandle( this, time.frames( engine::framesPerTick() ),
+					NotePlayHandle* nph = new NotePlayHandle( this, time.frames( engine::framesPerTick() ),
 																typeInfo<f_cnt_t>::max() / 2,
 																note( MidiTime(), MidiTime(), event.key(), event.volume() ),
 																NULL, false, event.channel(),
-																notePlayHandle::OriginMidiInput );
+																NotePlayHandle::OriginMidiInput );
 					if( engine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = nph;
@@ -404,7 +404,7 @@ void InstrumentTrack::silenceAllNotes()
 
 
 
-f_cnt_t InstrumentTrack::beatLen( notePlayHandle * _n ) const
+f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 {
 	if( m_instrument != NULL )
 	{
@@ -420,7 +420,7 @@ f_cnt_t InstrumentTrack::beatLen( notePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote( notePlayHandle * _n, 
+void InstrumentTrack::playNote( NotePlayHandle * _n, 
 						sampleFrame * _working_buffer )
 {
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
@@ -450,7 +450,7 @@ QString InstrumentTrack::instrumentName() const
 
 
 
-void InstrumentTrack::deleteNotePluginData( notePlayHandle* n )
+void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 {
 	if( m_instrument != NULL )
 	{
@@ -642,24 +642,20 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					cur_note->length().frames(
 							frames_per_tick );
 
-				notePlayHandle * note_play_handle =
-					new notePlayHandle( this, _offset,
-								note_frames,
-								*cur_note );
-				note_play_handle->setBBTrack( bb_track );
+				NotePlayHandle* notePlayHandle = new NotePlayHandle( this, _offset, note_frames, *cur_note );
+				notePlayHandle->setBBTrack( bb_track );
 				// are we playing global song?
 				if( _tco_num < 0 )
 				{
 					// then set song-global offset of pattern in order to
 					// properly perform the note detuning
-					note_play_handle->setSongGlobalParentOffset( p->startPosition() );
+					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 				}
 
 #if LMMS_SINGERBOT_SUPPORT
-				note_play_handle->setPatternIndex( note_idx );
+				notePlayHandle->setPatternIndex( note_idx );
 #endif
-				engine::mixer()->addPlayHandle(
-							note_play_handle );
+				engine::mixer()->addPlayHandle( notePlayHandle );
 				played_a_note = true;
 #if LMMS_SINGERBOT_SUPPORT
 				++note_idx;

@@ -27,11 +27,10 @@
 #include "Mixer.h"
 #include "FxMixer.h"
 #include "MixHelpers.h"
-#include "play_handle.h"
 #include "song.h"
 #include "templates.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "InstrumentTrack.h"
 #include "debug.h"
 #include "engine.h"
@@ -214,8 +213,7 @@ void MixerWorkerThread::processJobQueue()
 			switch( it->type )
 			{
 				case PlayHandle:
-					( (playHandle *) it->job )->
-							play( m_workingBuf );
+					( (::PlayHandle *) it->job )->play( m_workingBuf );
 					break;
 				case AudioPortEffects:
 					{
@@ -588,8 +586,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
-						m_playHandles.end(), *it_rem );
+		PlayHandleList::Iterator it = qFind( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
 		if( it != m_playHandles.end() )
 		{
@@ -618,9 +615,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 1: run and render all play handles
-	FILL_JOB_QUEUE(PlayHandleList,m_playHandles,
-					MixerWorkerThread::PlayHandle,
-					!( *it )->done());
+	FILL_JOB_QUEUE(PlayHandleList,m_playHandles,MixerWorkerThread::PlayHandle, !( *it )->isFinished());
 	START_JOBS();
 	WAIT_FOR_JOBS();
 
@@ -634,7 +629,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			++it;
 			continue;
 		}
-		if( ( *it )->done() )
+		if( ( *it )->isFinished() )
 		{
 			delete *it;
 			it = m_playHandles.erase( it );
@@ -689,12 +684,11 @@ void Mixer::clear()
 {
 	// TODO: m_midiClient->noteOffAll();
 	lock();
-	for( PlayHandleList::Iterator it = m_playHandles.begin();
-					it != m_playHandles.end(); ++it )
+	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
 		// we must not delete instrument-play-handles as they exist
 		// during the whole lifetime of an instrument
-		if( ( *it )->type() != playHandle::InstrumentPlayHandle )
+		if( ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle )
 		{
 			m_playHandlesToRemove.push_back( *it );
 		}
@@ -913,7 +907,7 @@ void Mixer::removeAudioPort( AudioPort * _port )
 
 
 
-void Mixer::removePlayHandle( playHandle * _ph )
+void Mixer::removePlayHandle( PlayHandle * _ph )
 {
 	lock();
 	// check thread affinity as we must not delete play-handles
@@ -966,10 +960,9 @@ bool Mixer::hasNotePlayHandles()
 {
 	lock();
 
-	for( PlayHandleList::Iterator it = m_playHandles.begin();
-			it != m_playHandles.end(); ++it )
+	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
-		if( (*it)->type() == playHandle::NotePlayHandle )
+		if( (*it)->type() == PlayHandle::TypeNotePlayHandle )
 		{
 			unlock();
 			return true;

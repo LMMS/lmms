@@ -41,7 +41,7 @@ class QPixmap;
 class QScrollBar;
 
 class comboBox;
-class notePlayHandle;
+class NotePlayHandle;
 class timeLine;
 class toolButton;
 

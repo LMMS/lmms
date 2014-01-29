@@ -33,7 +33,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "led_checkbox.h"
 
 // As of Stk 4.4 all classes and types have been moved to the namespace "stk".
@@ -137,9 +137,9 @@ public:
 	malletsInstrument( InstrumentTrack * _instrument_track );
 	virtual ~malletsInstrument();
 
-	virtual void playNote( notePlayHandle * _n,
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

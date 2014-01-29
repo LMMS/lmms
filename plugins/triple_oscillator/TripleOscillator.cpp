@@ -33,7 +33,7 @@
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pixmap_button.h"
 #include "SampleBuffer.h"
 #include "song_editor.h"
@@ -295,7 +295,7 @@ QString TripleOscillator::nodeName() const
 
 
 
-void TripleOscillator::playNote( notePlayHandle * _n,
+void TripleOscillator::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
@@ -371,7 +371,7 @@ void TripleOscillator::playNote( notePlayHandle * _n,
 
 
 
-void TripleOscillator::deleteNotePluginData( notePlayHandle * _n )
+void TripleOscillator::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
 						_n->m_pluginData )->oscLeft );

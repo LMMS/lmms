@@ -31,7 +31,7 @@
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "led_checkbox.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
@@ -61,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 }
 
 
-bSynth::bSynth( float * _shape, int _length, notePlayHandle * _nph, bool _interpolation,
+bSynth::bSynth( float * _shape, int _length, NotePlayHandle * _nph, bool _interpolation,
 				float _factor, const sample_rate_t _sample_rate ) :
 	sample_index( 0 ),
 	sample_realindex( 0 ),
@@ -257,7 +257,7 @@ QString bitInvader::nodeName() const
 
 
 
-void bitInvader::playNote( notePlayHandle * _n,
+void bitInvader::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
@@ -301,7 +301,7 @@ void bitInvader::playNote( notePlayHandle * _n,
 
 
 
-void bitInvader::deleteNotePluginData( notePlayHandle * _n )
+void bitInvader::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<bSynth *>( _n->m_pluginData );
 }

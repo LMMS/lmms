@@ -69,7 +69,7 @@ const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
 
-#include "play_handle.h"
+#include "PlayHandle.h"
 
 
 class MixerWorkerThread;
@@ -218,22 +218,24 @@ public:
 
 
 	// play-handle stuff
-	inline bool addPlayHandle( playHandle * _ph )
+	bool addPlayHandle( PlayHandle* handle )
 	{
 		if( criticalXRuns() == false )
 		{
 			lock();
-			m_playHandles.push_back( _ph );
+			m_playHandles.push_back( handle );
 			unlock();
 			return true;
 		}
-		delete _ph;
+
+		delete handle;
+
 		return false;
 	}
 
-	void removePlayHandle( playHandle * _ph );
+	void removePlayHandle( PlayHandle* handle );
 
-	inline PlayHandleList & playHandles()
+	inline PlayHandleList& playHandles()
 	{
 		return m_playHandles;
 	}

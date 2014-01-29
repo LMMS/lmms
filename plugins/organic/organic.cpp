@@ -33,7 +33,7 @@
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "pixmap_button.h"
 #include "templates.h"
@@ -182,7 +182,7 @@ QString organicInstrument::nodeName() const
 
 
 
-void organicInstrument::playNote( notePlayHandle * _n,
+void organicInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
@@ -281,7 +281,7 @@ void organicInstrument::playNote( notePlayHandle * _n,
 
 
 
-void organicInstrument::deleteNotePluginData( notePlayHandle * _n )
+void organicInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
 						_n->m_pluginData )->oscLeft );

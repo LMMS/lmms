@@ -34,7 +34,7 @@
 
 
 SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
-	playHandle( SamplePlayHandle ),
+	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
 	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
@@ -84,7 +84,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 
 
-bool SampleRecordHandle::done() const
+bool SampleRecordHandle::isFinished() const
 {
 	return false;
 }

@@ -3,7 +3,7 @@
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
- * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,7 +39,7 @@
 #include "Mixer.h"
 #include "pattern.h"
 #include "piano_roll.h"
-#include "preset_preview_play_handle.h"
+#include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
 #include "Plugin.h"
@@ -102,7 +102,7 @@ void engine::init( const bool _has_gui )
 		s_mainWindow->finalize();
 	}
 
-	presetPreviewPlayHandle::init();
+	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
 	s_mixer->startProcessing();
@@ -122,7 +122,7 @@ void engine::destroy()
 	deleteHelper( &s_automationEditor );
 	deleteHelper( &s_fxMixerView );
 
-	presetPreviewPlayHandle::cleanup();
+	PresetPreviewPlayHandle::cleanup();
 	InstrumentTrackView::cleanupWindowCache();
 
 	s_song->clearProject();

@@ -1,7 +1,7 @@
 /*
- * play_handle.h - base-class playHandle - core of rendering engine
+ * PlayHandle.h - base class PlayHandle - core of rendering engine
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PLAY_HANDLE_H
-#define _PLAY_HANDLE_H
+#ifndef PLAY_HANDLE_H
+#define PLAY_HANDLE_H
 
 #include <QtCore/QThread>
 #include <QtCore/QVector>
@@ -33,54 +33,56 @@
 class track;
 
 
-class playHandle
+class PlayHandle
 {
 public:
-	enum types
+	enum Types
 	{
-		NotePlayHandle,
-		InstrumentPlayHandle,
-		SamplePlayHandle,
-		PresetPreviewHandle
+		TypeNotePlayHandle,
+		TypeInstrumentPlayHandle,
+		TypeSamplePlayHandle,
+		TypePresetPreviewHandle,
+		TypeCount
 	} ;
+	typedef Types Type;
 
-	playHandle( const types _type, f_cnt_t _offset = 0 ) :
-		m_type( _type ),
-		m_offset( _offset ),
+	PlayHandle( const Type type, f_cnt_t offset = 0 ) :
+		m_type( type ),
+		m_offset( offset ),
 		m_affinity( QThread::currentThread() )
 	{
 	}
 
-	virtual inline ~playHandle()
+	virtual ~PlayHandle()
 	{
 	}
 
-	virtual inline bool affinityMatters( void ) const
+	virtual bool affinityMatters() const
 	{
 		return false;
 	}
 
-	const QThread * affinity( void ) const
+	const QThread* affinity() const
 	{
 		return m_affinity;
 	}
 
-	inline types type( void ) const
+	Type type() const
 	{
 		return m_type;
 	}
 
-	virtual void play( sampleFrame * _working_buffer ) = 0;
-	virtual bool done( void ) const = 0;
+	virtual void play( sampleFrame* buffer ) = 0;
+	virtual bool isFinished( void ) const = 0;
 
 	// returns how many frames this play-handle is aligned ahead, i.e.
 	// at which position it is inserted in the according buffer
-	inline f_cnt_t offset( void ) const
+	f_cnt_t offset() const
 	{
 		return m_offset;
 	}
 
-	inline void setOffset( f_cnt_t _offset )
+	void setOffset( f_cnt_t _offset )
 	{
 		m_offset = _offset;
 	}
@@ -90,15 +92,15 @@ public:
 
 
 private:
-	types m_type;
+	Type m_type;
 	f_cnt_t m_offset;
-	const QThread * m_affinity;
+	const QThread* m_affinity;
 
 } ;
 
 
-typedef QList<playHandle *> PlayHandleList;
-typedef QList<const playHandle *> ConstPlayHandleList;
+typedef QList<PlayHandle *> PlayHandleList;
+typedef QList<const PlayHandle *> ConstPlayHandleList;
 
 
 #endif

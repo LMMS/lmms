@@ -40,7 +40,7 @@ class bitInvaderView;
 class bSynth
 {
 public:
-	bSynth( float * sample, int length, notePlayHandle * _nph,
+	bSynth( float * sample, int length, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 
 			const sample_rate_t _sample_rate );
 	virtual ~bSynth();
@@ -52,7 +52,7 @@ private:
 	int sample_index;
 	float sample_realindex;
 	float* sample_shape;
-	notePlayHandle* nph;
+	NotePlayHandle* nph;
 	const int sample_length;
 	const sample_rate_t sample_rate;
 
@@ -67,9 +67,9 @@ public:
 	bitInvader(InstrumentTrack * _instrument_track );
 	virtual ~bitInvader();
 
-	virtual void playNote( notePlayHandle * _n,
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 
 	virtual void saveSettings( QDomDocument & _doc,

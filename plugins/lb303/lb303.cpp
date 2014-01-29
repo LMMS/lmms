@@ -36,7 +36,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "templates.h"
 #include "audio_port.h"
 
@@ -665,7 +665,7 @@ void lb303Synth::initNote( lb303Note *n)
 }
 
 
-void lb303Synth::playNote( notePlayHandle * _n,
+void lb303Synth::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( _n->arpBaseNote() )
@@ -719,7 +719,7 @@ void lb303Synth::play( sampleFrame * _working_buffer )
 
 
 
-void lb303Synth::deleteNotePluginData( notePlayHandle * _n )
+void lb303Synth::deleteNotePluginData( NotePlayHandle * _n )
 {
 	//printf("GONE\n");
 	if( _n->unpitchedFrequency() == current_freq ) 

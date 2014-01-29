@@ -1,9 +1,9 @@
 /*
- * preset_preview_play_handle.h - play-handle for playing a short preview-sound
- *                                of a preset or a file processed by a plugin
+ * PresetPreviewPlayHandle.h - a PlayHandle specialization for playback of a short
+ *                             preview of a preset or a file processed by a plugin
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,41 +23,37 @@
  *
  */
 
-
 #ifndef _PRESET_PREVIEW_PLAY_HANDLE_H
 #define _PRESET_PREVIEW_PLAY_HANDLE_H
 
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 
 
 class InstrumentTrack;
-class previewTrackContainer;
+class PreviewTrackContainer;
 
-
-class EXPORT presetPreviewPlayHandle : public playHandle
+class EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
-	presetPreviewPlayHandle( const QString & _preset_file,
-						bool _load_by_plugin = false );
-	virtual ~presetPreviewPlayHandle();
+	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false );
+	virtual ~PresetPreviewPlayHandle();
 
-	virtual void play( sampleFrame * _working_buffer );
-	virtual bool done( void ) const;
+	virtual void play( sampleFrame* buffer );
+	virtual bool isFinished() const;
 
 	virtual bool isFromTrack( const track * _track ) const;
 
-	static void init( void );
-	static void cleanup( void );
-	static ConstNotePlayHandleList nphsOfInstrumentTrack(
-						const InstrumentTrack * _ct );
+	static void init();
+	static void cleanup();
+	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* instrumentTrack );
 
 	static bool isPreviewing();
 
 
 private:
-	static previewTrackContainer * s_previewTC;
+	static PreviewTrackContainer* s_previewTC;
 
-	notePlayHandle * m_previewNote;
+	NotePlayHandle* m_previewNote;
 
 } ;
 

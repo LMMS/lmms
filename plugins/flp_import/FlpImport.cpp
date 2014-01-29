@@ -29,7 +29,7 @@
 #include <QtCore/QBuffer>
 
 #include "FlpImport.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "AutomationPattern.h"
 #include "basic_filters.h"
 #include "bb_track.h"

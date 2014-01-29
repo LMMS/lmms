@@ -34,7 +34,7 @@
 class QPixmap;
 
 class knob;
-class notePlayHandle;
+class NotePlayHandle;
 class pixmapButton;
 
 
@@ -81,9 +81,9 @@ public:
 	organicInstrument( InstrumentTrack * _instrument_track );
 	virtual ~organicInstrument();
 
-	virtual void playNote( notePlayHandle * _n,
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

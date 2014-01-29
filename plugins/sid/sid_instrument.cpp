@@ -35,7 +35,7 @@
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
-#include "note_play_handle.h"
+#include "NotePlayHandle.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
 
@@ -299,7 +299,7 @@ static int sid_fillbuffer(unsigned char* sidreg, cSID *sid, int tdelta, short *p
 
 
 
-void sidInstrument::playNote( notePlayHandle * _n,
+void sidInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
@@ -361,7 +361,7 @@ void sidInstrument::playNote( notePlayHandle * _n,
 		sidreg[base+2] = data16&0x00FF;
 		sidreg[base+3] = (data16>>8)&0x000F;
 		// control: wave form, (test), ringmod, sync, gate
-		data8 = _n->released()?0:1;
+		data8 = _n->isReleased()?0:1;
 		data8 += m_voice[i]->m_syncModel.value()?2:0;
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
 		data8 += m_voice[i]->m_testModel.value()?8:0;
@@ -440,7 +440,7 @@ void sidInstrument::playNote( notePlayHandle * _n,
 
 
 
-void sidInstrument::deleteNotePluginData( notePlayHandle * _n )
+void sidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<cSID *>( _n->m_pluginData );
 }
