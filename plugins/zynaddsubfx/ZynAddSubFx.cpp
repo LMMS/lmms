@@ -340,14 +340,13 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 
 
 
-bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
-												const midiTime & _time )
+bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
 {
 	// do not forward external MIDI Control Change events if the according
 	// LED is not checked
-	if( _me.type() == MidiControlChange &&
-				_me.sourcePort() != this &&
-				m_forwardMidiCcModel.value() == false )
+	if( event.type() == MidiControlChange &&
+		event.sourcePort() != this &&
+		m_forwardMidiCcModel.value() == false )
 	{
 		return true;
 	}
@@ -355,11 +354,11 @@ bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
 	m_pluginMutex.lock();
 	if( m_remotePlugin )
 	{
-		m_remotePlugin->processMidiEvent( _me, 0 );
+		m_remotePlugin->processMidiEvent( event, 0 );
 	}
 	else
 	{
-		m_plugin->processMidiEvent( _me );
+		m_plugin->processMidiEvent( event );
 	}
 	m_pluginMutex.unlock();
 
@@ -446,8 +445,7 @@ void ZynAddSubFxInstrument::initPlugin()
 
 void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float value )
 {
-	handleMidiEvent( midiEvent( MidiControlChange, instrumentTrack()->midiPort()->realOutputChannel(), midiCtl, (int) value, this ),
-						midiTime() );
+	handleMidiEvent( MidiEvent( MidiControlChange, instrumentTrack()->midiPort()->realOutputChannel(), midiCtl, (int) value, this ) );
 }
 
 

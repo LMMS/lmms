@@ -109,10 +109,10 @@ public:
 	bbTrack( TrackContainer* tc );
 	virtual ~bbTrack();
 
-	virtual bool play( const midiTime & _start, const fpp_t _frames,
+	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 	virtual trackView * createView( TrackContainerView* tcv );
-	virtual trackContentObject * createTCO( const midiTime & _pos );
+	virtual trackContentObject * createTCO( const MidiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );

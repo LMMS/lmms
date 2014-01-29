@@ -209,6 +209,8 @@ FxMixerView::FxMixerView() :
 
 		cv->m_rackView = new EffectRackView(
 				&m->m_fxChannels[i]->m_fxChain, this );
+		cv->m_rackView->setMinimumWidth( 244 );
+
 		m_fxRacksLayout->addWidget( cv->m_rackView );
 		if( i == 0 )
 		{

@@ -38,6 +38,7 @@
 
 #include "Piano.h"
 #include "InstrumentTrack.h"
+#include "MidiEvent.h"
 #include "MidiEventProcessor.h"
 
 
@@ -96,7 +97,7 @@ void Piano::handleKeyPress( int key, int midiVelocity )
 {
 	if( isValidKey( key ) )
 	{
-		m_midiEvProc->processInEvent( midiEvent( MidiNoteOn, 0, key, midiVelocity ), midiTime() );
+		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, 0, key, midiVelocity ) );
 		m_pressedKeys[key] = true;
 	}
 }
@@ -113,7 +114,7 @@ void Piano::handleKeyRelease( int key )
 {
 	if( isValidKey( key ) )
 	{
-		m_midiEvProc->processInEvent( midiEvent( MidiNoteOff, 0, key, 0 ), midiTime() );
+		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOff, 0, key, 0 ) );
 		m_pressedKeys[key] = false;
 	}
 }

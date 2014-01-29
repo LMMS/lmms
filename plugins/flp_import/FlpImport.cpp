@@ -1744,8 +1744,7 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		trackContentObject * tco =
-			bb_tracks[it->pattern]->createTCO( midiTime() );
+		trackContentObject * tco = bb_tracks[it->pattern]->createTCO( MidiTime() );
 		tco->movePosition( it->position );
 		if( it->length != DefaultTicksPerTact )
 		{

@@ -89,7 +89,7 @@ struct ERect
 
 
 #include "lmms_basics.h"
-#include "midi.h"
+#include "Midi.h"
 #include "communication.h"
 
 #include "VST_sync_shm.h"
@@ -132,8 +132,7 @@ public:
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
 
-	virtual void processMidiEvent( const midiEvent & _event,
-							const f_cnt_t _offset );
+	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
 
 	// set given sample-rate for plugin
 	virtual void updateSampleRate()
@@ -774,16 +773,15 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		// dispatcher-call, so we create static copies of the
 		// data and post them
 #define MIDI_EVENT_BUFFER_COUNT		1024
-		static char event_buf[sizeof( VstMidiEvent * ) *
-						MIDI_EVENT_BUFFER_COUNT +
-							sizeof( VstEvents )];
+		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MIDI_EVENT_BUFFER_COUNT];
 		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
-		VstEvents * events = (VstEvents *) event_buf;
+
+		VstEvents* events = (VstEvents *) eventsBuffer;
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
+
 		int idx = 0;
-		for( VstMidiEventList::iterator it = m_midiEvents.begin();
-					it != m_midiEvents.end(); ++it, ++idx )
+		for( VstMidiEventList::iterator it = m_midiEvents.begin(); it != m_midiEvents.end(); ++it, ++idx )
 		{
 			memcpy( &vme[idx], &*it, sizeof( VstMidiEvent ) );
 			events->events[idx] = (VstEvent *) &vme[idx];
@@ -831,36 +829,37 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 
 
 
-void RemoteVstPlugin::processMidiEvent( const midiEvent & _event,
-							const f_cnt_t _offset )
+void RemoteVstPlugin::processMidiEvent( const MidiEvent& event, const f_cnt_t offset )
 {
-	VstMidiEvent event;
+	VstMidiEvent vme;
 
-	event.type = kVstMidiType;
-	event.byteSize = 24;
-	event.deltaFrames = _offset;
-	event.flags = 0;
-	event.detune = 0;
-	event.noteLength = 0;
-	event.noteOffset = 0;
-	event.noteOffVelocity = 0;
-	event.reserved1 = 0;
-	event.reserved2 = 0;
-	event.midiData[0] = _event.m_type + _event.m_channel;
-	switch( _event.m_type )
+	vme.type = kVstMidiType;
+	vme.byteSize = 24;
+	vme.deltaFrames = offset;
+	vme.flags = 0;
+	vme.detune = 0;
+	vme.noteLength = 0;
+	vme.noteOffset = 0;
+	vme.noteOffVelocity = 0;
+	vme.reserved1 = 0;
+	vme.reserved2 = 0;
+	vme.midiData[0] = event.type() + event.channel();
+
+	switch( event.type() )
 	{
 		case MidiPitchBend:
-			event.midiData[1] = _event.m_data.m_param[0] & 0x7f;
-			event.midiData[2] = _event.m_data.m_param[0] >> 7;
+			vme.midiData[1] = event.param( 0 ) & 0x7f;
+			vme.midiData[2] = event.param( 1 ) >> 7;
 			break;
 		// TODO: handle more special cases
 		default:
-			event.midiData[1] = _event.key();
-			event.midiData[2] = _event.velocity();
+			vme.midiData[1] = event.key();
+			vme.midiData[2] = event.velocity();
 			break;
 	}
-	event.midiData[3] = 0;
-	m_midiEvents.push_back( event );
+	vme.midiData[3] = 0;
+
+	m_midiEvents.push_back( vme );
 }
 
 

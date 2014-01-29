@@ -28,7 +28,9 @@
 
 #include <QtGui/QFileDialog>
 
-class FileDialog : public QFileDialog
+#include "export.h"
+
+class EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:

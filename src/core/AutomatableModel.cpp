@@ -253,7 +253,7 @@ void AutomatableModel::setRange( const float min, const float max,
 		setStep( step );
 
 		// re-adjust value
-		setInitValue( value<float>() );
+		setValue( value<float>() );
 
 		emit propertiesChanged();
 	}

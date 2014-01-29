@@ -61,7 +61,7 @@ private:
 	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
-	midiTime m_minLength;
+	MidiTime m_minLength;
 
 	track * m_track;
 	bbTrack * m_bbTrack;

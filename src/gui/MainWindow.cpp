@@ -275,7 +275,7 @@ void MainWindow::finalize( void )
 
 	QMenu * edit_menu = new QMenu( this );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+/*	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
 					this, SLOT( undo() ),
 					Qt::CTRL + Qt::Key_Z );
@@ -283,7 +283,7 @@ void MainWindow::finalize( void )
 					tr( "Redo" ),
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_R );
-	edit_menu->addSeparator();
+	edit_menu->addSeparator();*/
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
@@ -412,7 +412,7 @@ void MainWindow::finalize( void )
 
 
 	toolButton * bb_editor_window = new toolButton(
-					embed::getIconPixmap( "bb_track" ),
+					embed::getIconPixmap( "bb_track_btn" ),
 					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),

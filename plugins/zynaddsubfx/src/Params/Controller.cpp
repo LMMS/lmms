@@ -35,7 +35,7 @@ Controller::~Controller()
 
 void Controller::defaults()
 {
-    setpitchwheelbendrange(200); //2 halftones
+    setpitchwheelbendrange(100); //2 halftones
     expression.receive    = 1;
     panning.depth         = 64;
     filtercutoff.depth    = 64;

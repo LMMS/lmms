@@ -50,7 +50,7 @@ AutomationTrack::~AutomationTrack()
 
 
 
-bool AutomationTrack::play( const midiTime & _start, const fpp_t _frames,
+bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
 	if( isMuted() )
@@ -77,7 +77,7 @@ bool AutomationTrack::play( const midiTime & _start, const fpp_t _frames,
 		{
 			continue;
 		}
-		midiTime cur_start = _start;
+		MidiTime cur_start = _start;
 		if( _tco_num < 0 )
 		{
 			cur_start -= p->startPosition();
@@ -98,7 +98,7 @@ trackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * AutomationTrack::createTCO( const midiTime & )
+trackContentObject * AutomationTrack::createTCO( const MidiTime & )
 {
 	return new AutomationPattern( this );
 }
@@ -168,11 +168,11 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			midiTime pos = midiTime( trackContainerView()->
+			MidiTime pos = MidiTime( trackContainerView()->
 							currentPosition() +
 				( _de->pos().x() -
 					getTrackContentWidget()->x() ) *
-						midiTime::ticksPerTact() /
+						MidiTime::ticksPerTact() /
 		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
 				.toNearestTact();
 

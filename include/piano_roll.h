@@ -135,8 +135,8 @@ protected slots:
 	void pasteNotes();
 	void deleteSelectedNotes();
 
-	void updatePosition( const midiTime & _t );
-	void updatePositionAccompany( const midiTime & _t );
+	void updatePosition( const MidiTime & _t );
+	void updatePositionAccompany( const MidiTime & _t );
 
 	void zoomingChanged();
 	void quantizeChanged();
@@ -203,9 +203,9 @@ private:
 	pianoRoll( const pianoRoll & );
 	virtual ~pianoRoll();
 
-	void autoScroll( const midiTime & _t );
+	void autoScroll( const MidiTime & _t );
 
-	midiTime newNoteLen() const;
+	MidiTime newNoteLen() const;
 	
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
@@ -276,7 +276,7 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	midiTime m_currentPosition;
+	MidiTime m_currentPosition;
 	bool m_recording;
 	QList<note> m_recordingNotes;
 
@@ -315,7 +315,7 @@ private:
 
 	// remember these values to use them 
 	// for the next note that is set
-	midiTime m_lenOfNewNotes;
+	MidiTime m_lenOfNewNotes;
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
 
@@ -345,7 +345,7 @@ private:
 
 
 signals:
-	void positionChanged( const midiTime & );
+	void positionChanged( const MidiTime & );
 
 } ;
 

@@ -1,7 +1,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -108,10 +108,6 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
 	m_backgroundArtwork( configManager::inst()->backgroundArtwork() ),
-	m_disableChActInd( configManager::inst()->value( "ui",
-				"disablechannelactivityindicators" ).toInt() ),
-	m_manualChPiano( configManager::inst()->value( "ui",
-					"manualchannelpiano" ).toInt() ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_enableAutoSave( configManager::inst()->value( "ui", "enableautosave" ).toInt() ),
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
@@ -513,28 +509,11 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 120 );
-
-	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
-				tr( "Disable channel activity indicators" ),
-								ui_fx_tw );
-	disable_ch_act_ind->move( 10, 20 );
-	disable_ch_act_ind->setChecked( m_disableChActInd );
-	connect( disable_ch_act_ind, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleDisableChActInd( bool ) ) );
-
-
-	ledCheckBox * manual_ch_piano = new ledCheckBox(
-			tr( "Only press keys on channel-piano manually" ),
-								ui_fx_tw );
-	manual_ch_piano->move( 10, 40 );
-	manual_ch_piano->setChecked( m_manualChPiano );
-	connect( manual_ch_piano, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleManualChPiano( bool ) ) );
+	ui_fx_tw->setFixedHeight( 80 );
 
 	ledCheckBox * smoothScroll = new ledCheckBox(
 			tr( "Smooth scroll in Song Editor" ), ui_fx_tw );
-	smoothScroll->move( 10, 60 );
+	smoothScroll->move( 10, 20 );
 	smoothScroll->setChecked( m_smoothScroll );
 	connect( smoothScroll, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSmoothScroll( bool ) ) );
@@ -542,7 +521,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 	ledCheckBox * autoSave = new ledCheckBox(
 			tr( "Enable auto save feature" ), ui_fx_tw );
-	autoSave->move( 10, 80 );
+	autoSave->move( 10, 40 );
 	autoSave->setChecked( m_enableAutoSave );
 	connect( autoSave, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAutoSave( bool ) ) );
@@ -551,7 +530,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * animAFP = new ledCheckBox(
 				tr( "Show playback cursor in AudioFileProcessor" ),
 								ui_fx_tw );
-	animAFP->move( 10, 100 );
+	animAFP->move( 10, 60 );
 	animAFP->setChecked( m_animateAFP );
 	connect( animAFP, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAnimateAFP( bool ) ) );
@@ -818,11 +797,6 @@ void setupDialog::accept()
 						QString::number( !m_MMPZ ) );
 	configManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
-	configManager::inst()->setValue( "ui",
-					"disablechannelactivityindicators",
-					QString::number( m_disableChActInd ) );
-	configManager::inst()->setValue( "ui", "manualchannelpiano",
-					QString::number( m_manualChPiano ) );
 	configManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
 	configManager::inst()->setValue( "ui", "enableautosave",
@@ -975,23 +949,6 @@ void setupDialog::toggleHQAudioDev( bool _enabled )
 {
 	m_hqAudioDev = _enabled;
 }
-
-
-
-
-void setupDialog::toggleDisableChActInd( bool _disabled )
-{
-	m_disableChActInd = _disabled;
-}
-
-
-
-
-void setupDialog::toggleManualChPiano( bool _enabled )
-{
-	m_manualChPiano = _enabled;
-}
-
 
 
 

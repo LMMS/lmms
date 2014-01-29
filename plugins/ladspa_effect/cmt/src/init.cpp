@@ -108,17 +108,25 @@ public:
     finalise_modules();
   }
 
-} g_oStartupShutdownHandler;
+} ;
   
 /*****************************************************************************/
 
+extern "C"
+{
+
 const LADSPA_Descriptor * 
 ladspa_descriptor(unsigned long Index) {
+
+	static StartupShutdownHandler handler;
+
   if (Index < g_lPluginCount)
     return g_ppsRegisteredDescriptors[Index];
   else
     return NULL;
 }
+
+};
 
 /*****************************************************************************/
 

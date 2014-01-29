@@ -61,7 +61,7 @@ public:
 
 
 	timeLine( int _xoff, int _yoff, float _ppt, song::playPos & _pos,
-				const midiTime & _begin, QWidget * _parent );
+				const MidiTime & _begin, QWidget * _parent );
 	virtual ~timeLine();
 
 	inline song::playPos & pos()
@@ -84,23 +84,23 @@ public:
 		return m_loopPoints == LoopPointsEnabled;
 	}
 
-	inline const midiTime & loopBegin() const
+	inline const MidiTime & loopBegin() const
 	{
 		return ( m_loopPos[0] < m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline const midiTime & loopEnd() const
+	inline const MidiTime & loopEnd() const
 	{
 		return ( m_loopPos[0] > m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline void savePos( const midiTime & _pos )
+	inline void savePos( const MidiTime & _pos )
 	{
 		m_savedPos = _pos;
 	}
-	inline const midiTime & savedPos() const
+	inline const MidiTime & savedPos() const
 	{
 		return m_savedPos;
 	}
@@ -121,18 +121,18 @@ public:
 		return "timeline";
 	}
 
-	inline int markerX( const midiTime & _t ) const
+	inline int markerX( const MidiTime & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppt / midiTime::ticksPerTact() );
+					m_ppt / MidiTime::ticksPerTact() );
 	}
 
 
 public slots:
-	void updatePosition( const midiTime & );
+	void updatePosition( const MidiTime & );
 	void updatePosition()
 	{
-		updatePosition( midiTime() );
+		updatePosition( MidiTime() );
 	}
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
@@ -162,10 +162,10 @@ private:
 	int m_posMarkerX;
 	float m_ppt;
 	song::playPos & m_pos;
-	const midiTime & m_begin;
-	midiTime m_loopPos[2];
+	const MidiTime & m_begin;
+	MidiTime m_loopPos[2];
 
-	midiTime m_savedPos;
+	MidiTime m_savedPos;
 
 
 	textFloat * m_hint;
@@ -183,7 +183,7 @@ private:
 
 
 signals:
-	void positionChanged( const midiTime & _t );
+	void positionChanged( const MidiTime & _t );
 	void loopPointStateLoaded( int _n );
 
 } ;

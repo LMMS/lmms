@@ -48,7 +48,9 @@ blo_h_tables *blo_h_tables_new(int table_size)
 	unsigned int h;
 	size_t all_tables_size = sizeof(float) * (table_size + BLO_TABLE_WR)
 		                        * (BLO_N_HARMONICS - 1) * 2;
+#ifndef WIN32
 	int shm_fd;
+#endif
 	char shm_path[128];
 
 	this = malloc(sizeof(blo_h_tables));

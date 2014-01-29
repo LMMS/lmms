@@ -38,6 +38,7 @@
 #include "pattern.h"
 #include "Instrument.h"
 #include "MainWindow.h"
+#include "MidiTime.h"
 #include "debug.h"
 #include "embed.h"
 #include "song.h"
@@ -152,7 +153,7 @@ public:
 	
 	AutomationTrack * at;
 	AutomationPattern * ap;
-	midiTime lastPos;
+	MidiTime lastPos;
 	
 	smfMidiCC & create( TrackContainer* tc )
 	{
@@ -172,11 +173,11 @@ public:
 	}
 
 
-	smfMidiCC & putValue( midiTime time, AutomatableModel * objModel, float value )
+	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value )
 	{
 		if( !ap || time > lastPos + DefaultTicksPerTact )
 		{
-			midiTime pPos = midiTime( time.getTact(), 0 );
+			MidiTime pPos = MidiTime( time.getTact(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
@@ -186,7 +187,7 @@ public:
 		lastPos = time;
 		time = time - ap->startPosition();
 		ap->putValue( time, value, false );
-		ap->changeLength( midiTime( time.getTact() + 1, 0 ) ); 
+		ap->changeLength( MidiTime( time.getTact() + 1, 0 ) ); 
 
 		return *this;
 	}
@@ -212,7 +213,7 @@ public:
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
-	midiTime lastEnd;
+	MidiTime lastEnd;
 	
 	smfMidiChannel * create( TrackContainer* tc )
 	{
@@ -247,7 +248,7 @@ public:
 	{
 		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
 		{
-			midiTime pPos = midiTime(n.pos().getTact(), 0 );
+			MidiTime pPos = MidiTime( n.pos().getTact(), 0 );
 			p = dynamic_cast<pattern *>( it->createTCO( 0 ) );
 			p->movePosition( pPos );
 		}

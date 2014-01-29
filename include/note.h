@@ -30,7 +30,7 @@
 
 #include "volume.h"
 #include "panning.h"
-#include "midi_time.h"
+#include "MidiTime.h"
 #include "SerializingObject.h"
 
 class DetuningHelper;
@@ -81,8 +81,8 @@ const float MaxDetuning = 4 * 12.0f;
 class EXPORT note : public SerializingObject
 {
 public:
-	note( const midiTime & _length = midiTime( 0 ),
-		const midiTime & _pos = midiTime( 0 ),
+	note( const MidiTime & _length = MidiTime( 0 ),
+		const MidiTime & _pos = MidiTime( 0 ),
 		int key = DefaultKey,
 		volume_t _volume = DefaultVolume,
 		panning_t _panning = DefaultPanning,
@@ -93,8 +93,8 @@ public:
 	// used by GUI
 	inline void setSelected( const bool _selected ){ m_selected = _selected; }
 	inline void setOldKey( const int _oldKey ){ m_oldKey = _oldKey; }
-	inline void setOldPos( const midiTime & _oldPos ){ m_oldPos = _oldPos; }
-	inline void setOldLength( const midiTime & _oldLength )
+	inline void setOldPos( const MidiTime & _oldPos ){ m_oldPos = _oldPos; }
+	inline void setOldLength( const MidiTime & _oldLength )
 	{
 		m_oldLength = _oldLength;
 	}
@@ -104,11 +104,11 @@ public:
 	}
 	
 	
-	void setLength( const midiTime & _length );
-	void setPos( const midiTime & _pos );
+	void setLength( const MidiTime & _length );
+	void setPos( const MidiTime & _pos );
 	void setKey( const int _key );
-	virtual void setVolume( const volume_t _volume = DefaultVolume );
-	void setPanning( const panning_t _panning = DefaultPanning );
+	virtual void setVolume( const volume_t volume = DefaultVolume );
+	virtual void setPanning( const panning_t panning = DefaultPanning );
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
 
@@ -129,12 +129,12 @@ public:
 		return m_oldKey;
 	}
 
-	inline midiTime oldPos() const
+	inline MidiTime oldPos() const
 	{
 		return m_oldPos;
 	}
 
-	inline midiTime oldLength() const
+	inline MidiTime oldLength() const
 	{
 		return m_oldLength;
 	}
@@ -144,23 +144,23 @@ public:
 		return m_isPlaying;
 	}
 
-	inline midiTime endPos() const
+	inline MidiTime endPos() const
 	{
 		const int l = length();
 		return pos() + l;
 	}
 
-	inline const midiTime & length() const
+	inline const MidiTime & length() const
 	{
 		return m_length;
 	}
 
-	inline const midiTime & pos() const
+	inline const MidiTime & pos() const
 	{
 		return m_pos;
 	}
 
-	inline midiTime pos( midiTime _base_pos ) const
+	inline MidiTime pos( MidiTime _base_pos ) const
 	{
 		const int bp = _base_pos;
 		return m_pos - bp;
@@ -191,7 +191,7 @@ public:
 		return classNodeName();
 	}
 
-	static midiTime quantized( const midiTime & _m, const int _q_grid );
+	static MidiTime quantized( const MidiTime & _m, const int _q_grid );
 
 	DetuningHelper * detuning() const
 	{
@@ -226,15 +226,15 @@ private:
 	// for piano roll editing
 	bool m_selected; 
 	int m_oldKey;
-	midiTime m_oldPos;
-	midiTime m_oldLength;
+	MidiTime m_oldPos;
+	MidiTime m_oldLength;
 	bool m_isPlaying;
 	
 	int m_key;
 	volume_t m_volume;
 	panning_t m_panning;
-	midiTime m_length;
-	midiTime m_pos;
+	MidiTime m_length;
+	MidiTime m_pos;
 	DetuningHelper * m_detuning;
 
 	void createDetuning();

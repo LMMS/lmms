@@ -310,13 +310,12 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
-						const midiTime & _time )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->processMidiEvent( _me, _time );
+		m_plugin->processMidiEvent( event, time );
 	}
 	m_pluginMutex.unlock();
 
@@ -779,8 +778,7 @@ void VestigeInstrumentView::noteOffAll( void )
 	{
 		for( int key = 0; key <= MidiMaxNote; ++key )
 		{
-			m_vi->m_plugin->processMidiEvent(
-				midiEvent( MidiNoteOff, 0, key, 0 ), 0 );
+			m_vi->m_plugin->processMidiEvent( MidiEvent( MidiNoteOff, 0, key, 0 ), 0 );
 		}
 	}
 	m_vi->m_pluginMutex.unlock();

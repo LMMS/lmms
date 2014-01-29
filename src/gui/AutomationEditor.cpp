@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2013 Paul Giblock <pgib/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -57,7 +57,6 @@
 #include "gui_templates.h"
 #include "timeline.h"
 #include "tooltip.h"
-#include "midi.h"
 #include "tool_button.h"
 #include "text_float.h"
 #include "combobox.h"
@@ -131,10 +130,10 @@ AutomationEditor::AutomationEditor() :
 				engine::getSong()->getPlayPos(
 					song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
-	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
-		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
-			this, SLOT( updatePosition( const midiTime & ) ) );
+	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
+		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
+			this, SLOT( updatePosition( const MidiTime & ) ) );
 
 
 	m_toolBar = new QWidget( this );
@@ -157,9 +156,13 @@ AutomationEditor::AutomationEditor() :
 				tr( "Play/pause current pattern (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
+
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
+
+	m_playButton->setObjectName( "playButton" );
+	m_stopButton->setObjectName( "stopButton" );
 
 	m_playButton->setWhatsThis(
 		tr( "Click here if you want to play the current pattern. "
@@ -278,7 +281,7 @@ AutomationEditor::AutomationEditor() :
 
 	connect( &m_tensionModel, SIGNAL( dataChanged() ),
 			this, SLOT( tensionChanged() ) );
-	
+
 	tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_discreteButton );
 	tool_button_group->addButton( m_linearButton );
@@ -525,7 +528,7 @@ void AutomationEditor::updateAfterPatternChange()
 	}
 
 	if( m_pattern->progressionType() ==
-				AutomationPattern::DiscreteProgression && 
+				AutomationPattern::DiscreteProgression &&
 				!m_discreteButton->isChecked() )
 	{
 		m_discreteButton->setChecked( true );
@@ -764,20 +767,20 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( _x0 < _x1) 
+	if( _x0 < _x1)
 	{
 		xstep = quantization();
 	}
-	else 
+	else
 	{
 		xstep = -( quantization() );
 	}
 
 	if( _y0 < _y1 )
 	{
-		ystep = 1; 
+		ystep = 1;
 	}
-	else 
+	else
 	{
 		ystep = -1;
 	}
@@ -789,8 +792,8 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 		x += xstep;
 		i += 1;
-		m_pattern->removeValue( midiTime( x ) );
-		m_pattern->putValue( midiTime( x ), y );
+		m_pattern->removeValue( MidiTime( x ) );
+		m_pattern->putValue( MidiTime( x ), y );
 	}
 }
 
@@ -843,7 +846,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 			// loop through whole time-map...
 			while( it != time_map.end() )
 			{
-				midiTime len = 4;
+				MidiTime len = 4;
 
 				// and check whether the user clicked on an
 				// existing value
@@ -878,9 +881,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				if( it == time_map.end() )
 				{
 					// then set new value
-					midiTime value_pos( pos_ticks );
-		
-					midiTime new_time =
+					MidiTime value_pos( pos_ticks );
+
+					MidiTime new_time =
 						m_pattern->putValue( value_pos,
 									level );
 
@@ -1020,8 +1023,8 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				// moved properly according to new starting-
 				// time in the time map of pattern
 				m_pattern->removeValue(
-						midiTime( pos_ticks ) );
-				m_pattern->putValue( midiTime( pos_ticks ),
+						MidiTime( pos_ticks ) );
+				m_pattern->putValue( MidiTime( pos_ticks ),
 								level );
 			}
 
@@ -1033,7 +1036,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				( _me->buttons() & Qt::LeftButton &&
 						m_editMode == ERASE ) )
 		{
-			m_pattern->removeValue( midiTime( pos_ticks ) );
+			m_pattern->removeValue( MidiTime( pos_ticks ) );
 		}
 		else if( _me->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
@@ -1216,7 +1219,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			for( timeMap::iterator it = m_selValuesForMove.begin();
 					it != m_selValuesForMove.end(); ++it )
 			{
-				midiTime new_value_pos;
+				MidiTime new_value_pos;
 				if( it.key() )
 				{
 					int value_tact =
@@ -1236,7 +1239,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 							DefaultTicksPerTact;
 					}
 					m_pattern->removeValue( it.key() );
-					new_value_pos = midiTime( value_tact,
+					new_value_pos = MidiTime( value_tact,
 							value_ticks );
 				}
 				new_selValuesForMove[
@@ -1578,7 +1581,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 								is_selected );
 			}
 			delete [] values;
-			
+
 			// Draw cross
 			int y = yCoordOfLevel( it.value() );
 			p.drawLine( x - 1, y, x + 1, y );
@@ -1804,7 +1807,7 @@ void AutomationEditor::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( _we->modifiers() & Qt::ShiftModifier 
+	else if( _we->modifiers() & Qt::ShiftModifier
 			|| _we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
@@ -2070,7 +2073,7 @@ void AutomationEditor::selectAll()
 		const float level = it.value();
 		if( level < m_selectStartLevel )
 		{
-			// if we move start-level down, we have to add 
+			// if we move start-level down, we have to add
 			// the difference between old and new start-level
 			// to m_selectedLevels, otherwise the selection
 			// is just moved down...
@@ -2242,7 +2245,7 @@ void AutomationEditor::deleteSelectedValues()
 
 
 
-void AutomationEditor::updatePosition( const midiTime & _t )
+void AutomationEditor::updatePosition( const MidiTime & _t )
 {
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
@@ -2257,7 +2260,7 @@ void AutomationEditor::updatePosition( const midiTime & _t )
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = qMax( _t - w * DefaultTicksPerTact *
+			MidiTime t = qMax( _t - w * DefaultTicksPerTact *
 					DefaultTicksPerTact / m_ppt, 0 );
 			m_leftRightScroll->setValue( t.getTact() *
 							DefaultTicksPerTact );

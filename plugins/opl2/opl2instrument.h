@@ -34,19 +34,23 @@
 #include "pixmap_button.h"
 
 #define OPL2_VOICE_FREE 255
+#define OPL2_NO_VOICE 255
+// The "normal" range for LMMS pitchbends
+#define DEFAULT_BEND_CENTS 100
 
 class opl2instrument : public Instrument
 {
 	Q_OBJECT
 public:
 	opl2instrument( InstrumentTrack * _instrument_track );
+	virtual ~opl2instrument();
+
 	virtual QString nodeName() const;
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 	inline virtual bool isMidiBased() const { return true; }
 
-	virtual bool handleMidiEvent( const midiEvent & _me,
-			      const midiTime & _time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
 	virtual void play( sampleFrame * _working_buffer );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this );
@@ -107,13 +111,27 @@ private:
 	fpp_t frameCount;
 	short *renderbuffer;
 	int voiceNote[9];
-	int heldNotes[128];
+	// Least recently used voices
+	int voiceLRU[9];
+	// 0 - no note, >0 - note on velocity
+	int velocities[128];
 	// These include both octave and Fnumber
 	int fnums[128];
+	// in cents, range defaults to +/-100 cents (should this be changeable?)
+	int pitchbend;
+	int pitchBendRange;
+
+	int popVoice();
+	int pushVoice(int v);
 
 	int Hz2fnum(float Hz);
 	static QMutex emulatorMutex;
+	void setVoiceVelocity(int voice, int vel);
+
+	// Pitch bend range comes through RPNs.
+	int RPNcoarse, RPNfine;
 };
+
 
 
 class opl2instrumentView : public InstrumentView
@@ -121,6 +139,7 @@ class opl2instrumentView : public InstrumentView
 	Q_OBJECT
 public:
         opl2instrumentView( Instrument * _instrument, QWidget * _parent );
+	virtual ~opl2instrumentView();
 	lcdSpinBox *m_patch;
 	void modelChanged();
 

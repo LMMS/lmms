@@ -1,7 +1,7 @@
 /*
  * LocalZynAddSubFx.cpp - local implementation of ZynAddSubFx plugin
  *
- * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -190,47 +190,43 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 
 
 
-void LocalZynAddSubFx::processMidiEvent( const midiEvent & _e )
+void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 {
 	// all functions are called while m_master->mutex is held
 	static NULLMidiIn midiIn;
 
-	switch( _e.m_type )
+	switch( event.type() )
 	{
 		case MidiNoteOn:
-			if( _e.velocity() > 0 )
+			if( event.velocity() > 0 )
 			{
-				if( _e.key() <= 0 || _e.key() >= 128 )
+				if( event.key() <= 0 || event.key() >= 128 )
 				{
 					break;
 				}
-				if( m_runningNotes[_e.key()] > 0 )
+				if( m_runningNotes[event.key()] > 0 )
 				{
-					m_master->NoteOff( _e.channel(), _e.key() );
+					m_master->NoteOff( event.channel(), event.key() );
 				}
-				++m_runningNotes[_e.key()];
-				m_master->NoteOn( _e.channel(), _e.key(), _e.velocity() );
+				++m_runningNotes[event.key()];
+				m_master->NoteOn( event.channel(), event.key(), event.velocity() );
 				break;
 			}
 		case MidiNoteOff:
-			if( _e.key() <= 0 || _e.key() >= 128 )
+			if( event.key() <= 0 || event.key() >= 128 )
 			{
 				break;
 			}
-			if( --m_runningNotes[_e.key()] <= 0 )
+			if( --m_runningNotes[event.key()] <= 0 )
 			{
-				m_master->NoteOff( _e.channel(), _e.key() );
+				m_master->NoteOff( event.channel(), event.key() );
 			}
 			break;
 		case MidiPitchBend:
-			m_master->SetController( _e.channel(), C_pitchwheel,
-						_e.m_data.m_param[0] +
-							_e.m_data.m_param[1]*128-8192 );
+			m_master->SetController( event.channel(), C_pitchwheel, event.pitchBend()-8192 );
 			break;
 		case MidiControlChange:
-			m_master->SetController( _e.channel(),
-						midiIn.getcontroller( _e.m_data.m_param[0] ),
-						_e.m_data.m_param[1] );
+			m_master->SetController( event.channel(), midiIn.getcontroller( event.controllerNumber() ), event.controllerValue() );
 			break;
 		default:
 			break;

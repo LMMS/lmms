@@ -477,7 +477,7 @@ void InstrumentFunctionArpeggio::processNote( notePlayHandle * _n )
 		}
 
 		// create new arp-note
-		note new_note( midiTime( 0 ), midiTime( 0 ),
+		note new_note( MidiTime( 0 ), MidiTime( 0 ),
 				sub_note_key,
 				(volume_t)
 					qRound( _n->getVolume() * vol_level ),

@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +34,6 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "midi.h"
 #include "note.h"
 #include "knob.h"
 
@@ -69,8 +68,7 @@ public:
 		return true;
 	}
 
-	virtual bool handleMidiEvent( const midiEvent & _me,
-						const midiTime & _time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 

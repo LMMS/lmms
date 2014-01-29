@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,17 +48,33 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
+	// specifies origin of NotePlayHandle
+	enum Origins
+	{
+		OriginPattern,		/*! playback of a note from a pattern */
+		OriginMidiInput,	/*! playback of a MIDI note input event */
+		OriginCount
+	};
+	typedef Origins Origin;
+
 	notePlayHandle( InstrumentTrack * _instrument_track,
 					const f_cnt_t _offset,
 					const f_cnt_t _frames, const note & _n,
 					notePlayHandle * _parent = NULL,
-					const bool _part_of_arp = false );
+					const bool _part_of_arp = false,
+					int midiEventChannel = -1,
+					Origin origin = OriginPattern );
 	virtual ~notePlayHandle();
 
-	virtual void setVolume( const volume_t _volume = DefaultVolume );
+	virtual void setVolume( const volume_t volume = DefaultVolume );
+	virtual void setPanning( const panning_t panning = DefaultPanning );
 
 	int midiVelocity() const;
 	int midiKey() const;
+	int midiChannel() const
+	{
+		return m_midiChannel;
+	}
 
 	const float & frequency() const
 	{
@@ -189,15 +205,15 @@ public:
 		m_bbTrack = _bb_track;
 	}
 
-	void processMidiTime( const midiTime & _time );
+	void processMidiTime( const MidiTime & _time );
 	void resize( const bpm_t _new_tempo );
 
-	void setSongGlobalParentOffset( const midiTime &offset )
+	void setSongGlobalParentOffset( const MidiTime &offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
-	const midiTime &songGlobalParentOffset() const
+	const MidiTime &songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -266,13 +282,16 @@ private:
 	bpm_t m_origTempo;						// original tempo
 	f_cnt_t m_origFrames;					// original m_frames
 
-	int m_origBaseNote;
+	const int m_origBaseNote;
 
 	float m_frequency;
 	float m_unpitchedFrequency;
 
 	BaseDetuning * m_baseDetuning;
-	midiTime m_songGlobalParentOffset;
+	MidiTime m_songGlobalParentOffset;
+
+	const int m_midiChannel;
+	const Origin m_origin;
 
 } ;
 
