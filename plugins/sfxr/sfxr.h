@@ -184,6 +184,7 @@ public:
 
 
 private:
+	InstrumentTrack * m_instrumentTrack;
 	SfxrZeroToOneFloatModel m_attModel;
 	SfxrZeroToOneFloatModel m_holdModel;
 	SfxrZeroToOneFloatModel m_susModel;
@@ -240,6 +241,8 @@ protected slots:
 	void genBlip();
 	void randomize();
 	void mutate();
+
+	void previewSound();
 
 private:
 	virtual void modelChanged();
