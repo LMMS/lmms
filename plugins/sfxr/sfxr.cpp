@@ -48,6 +48,7 @@ float frnd(float range)
 #include "templates.h"
 #include "tooltip.h"
 #include "song.h"
+#include "midi.h"
 
 #include "embed.cpp"
 
@@ -157,7 +158,7 @@ void SfxrSynth::resetSample( bool restart )
 
 
 
-
+#include <stdio.h>
 void SfxrSynth::update( sampleFrame * buffer, const fpp_t frameNum )
 {
 	for(int i=0;i<frameNum;i++)
@@ -450,7 +451,7 @@ QString sfxrInstrument::nodeName() const
 void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 {
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
-	if ( _n->totalFramesPlayed() == 0 )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new SfxrSynth( this );
 	}
@@ -467,7 +468,7 @@ void sfxrInstrument::playNote( notePlayHandle * _n, sampleFrame * _working_buffe
 	{
 		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
 		{
-			_working_buffer[i][j] = pitchedBuffer[(int)(((double)pitchedFrameNum/frameNum)*i)][j];
+			_working_buffer[i][j] = pitchedBuffer[i*pitchedFrameNum/frameNum][j];
 		}
 	}
 
@@ -1062,7 +1063,7 @@ void sfxrInstrumentView::previewSound()
 {
 	sfxrInstrument * s = castModel<sfxrInstrument>();
 	InstrumentTrack * it = s->m_instrumentTrack;
-	it->processInEvent( midiEvent( MidiNoteOff, 0, it->baseNoteModel()->value(), 0 ), midiTime() );
+	it->silenceAllNotes();
 	it->processInEvent( midiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ), midiTime() );
 }
 
