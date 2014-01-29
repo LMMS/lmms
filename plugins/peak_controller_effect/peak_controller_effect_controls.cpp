@@ -62,10 +62,6 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	m_amountMultModel.loadSettings( _this, "amountmult" );
 
 	int effectId = _this.attribute( "effectId" ).toInt();
-	if( effectId > PeakController::s_lastEffectId )
-	{
-		PeakController::s_lastEffectId = effectId;
-	}
 	m_effect->m_effectId = effectId;
 
     if( m_effect->m_autoController && ( engine::getSong()->isLoadingProject() == true || presetPreviewPlayHandle::isPreviewing() == false ) )
