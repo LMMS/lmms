@@ -158,7 +158,7 @@ void SfxrSynth::resetSample( bool restart )
 
 
 
-#include <stdio.h>
+
 void SfxrSynth::update( sampleFrame * buffer, const fpp_t frameNum )
 {
 	for(int i=0;i<frameNum;i++)
