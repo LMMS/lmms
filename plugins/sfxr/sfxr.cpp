@@ -319,6 +319,7 @@ bool SfxrSynth::isPlaying() const
 
 sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sfxr_plugin_descriptor ),
+	m_instrumentTrack(_instrument_track),
 	m_attModel(0.0f, this),
 	m_holdModel(0.3f, this),
 	m_susModel(0.0f, this),
@@ -650,6 +651,17 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	connect( m_randomizeBtn, SIGNAL ( clicked() ), this, SLOT ( randomize() ) );
 	connect( m_mutateBtn, SIGNAL ( clicked() ), this, SLOT ( mutate() ) );
 
+
+	//preview sound on generator/random/mutate button clicked
+	connect( m_pickupBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_laserBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_explosionBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_powerupBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_hitBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_jumpBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_blipBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_randomizeBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
+	connect( m_mutateBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 
 }
 
@@ -1043,6 +1055,16 @@ void sfxrInstrumentView::mutate()
 
 }
 
+
+
+
+void sfxrInstrumentView::previewSound()
+{
+	sfxrInstrument * s = castModel<sfxrInstrument>();
+	InstrumentTrack * it = s->m_instrumentTrack;
+	it->processInEvent( midiEvent( MidiNoteOff, 0, it->baseNoteModel()->value(), 0 ), midiTime() );
+	it->processInEvent( midiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ), midiTime() );
+}
 
 
 
