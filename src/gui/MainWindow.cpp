@@ -412,7 +412,7 @@ void MainWindow::finalize( void )
 
 
 	toolButton * bb_editor_window = new toolButton(
-					embed::getIconPixmap( "bb_track" ),
+					embed::getIconPixmap( "bb_track_btn" ),
 					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),

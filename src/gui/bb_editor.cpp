@@ -2,7 +2,7 @@
  * bb_editor.cpp - basic main-window for editing of beats and basslines
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -84,6 +84,9 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 			tr( "Stop playback of current beat/bassline (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
+
+	m_playButton->setObjectName( "playButton" );
+	m_stopButton->setObjectName( "stopButton" );
 
 	toolButton * add_bb_track = new toolButton(
 					embed::getIconPixmap( "add_bb_track" ),
