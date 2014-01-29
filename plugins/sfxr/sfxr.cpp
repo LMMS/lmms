@@ -595,6 +595,11 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	createKnob(m_susKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*2, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*0, "Sustain Punch");
 	createKnob(m_decKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*0, "Decay Time");
 
+	m_attKnob	->setObjectName( "envKnob" );
+	m_holdKnob	->setObjectName( "envKnob" );
+	m_susKnob	->setObjectName( "envKnob" );
+	m_decKnob	->setObjectName( "envKnob" );
+
 	createKnob(m_startFreqKnob,	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*1, "Start Frequency");
 	createKnob(m_minFreqKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*1, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*1, "Min Frequency");
 	createKnob(m_slideKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*2, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*1, "Slide");
@@ -602,16 +607,34 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	createKnob(m_vibDepthKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*1, "Vibrato Depth");
 	createKnob(m_vibSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*5, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*1, "Vibrato Speed");
 
+	m_startFreqKnob	->setObjectName( "freqKnob" );
+	m_minFreqKnob	->setObjectName( "freqKnob" );
+	m_slideKnob		->setObjectName( "freqKnob" );
+	m_dSlideKnob	->setObjectName( "freqKnob" );
+	m_vibDepthKnob	->setObjectName( "freqKnob" );
+	m_vibSpeedKnob	->setObjectName( "freqKnob" );
+	
 	createKnob(m_changeAmtKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Change Amount");
 	createKnob(m_changeSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*1, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Change Speed");
+
+	m_changeAmtKnob		->setObjectName( "changeKnob" );
+	m_changeSpeedKnob	->setObjectName( "changeKnob" );
 
 	createKnob(m_sqrDutyKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Duty(Square wave only)");
     createKnob(m_sqrSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Sweep(Square wave only)");
 
+	m_sqrDutyKnob	->setObjectName( "sqrKnob" );
+	m_sqrSweepKnob	->setObjectName( "sqrKnob" );
+
 	createKnob(m_repeatSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*3, "Repeat Speed");
 
-	createKnob(m_phaserOffsetKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*2, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*3, "Phaser Offset");
-	createKnob(m_phaserSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*3, "Phaser Sweep");
+	m_repeatSpeedKnob	->setObjectName( "repeatKnob" );
+
+	createKnob(m_phaserOffsetKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*3, "Phaser Offset");
+	createKnob(m_phaserSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*3, "Phaser Sweep");
+
+	m_phaserOffsetKnob	->setObjectName( "phaserKnob" );
+	m_phaserSweepKnob	->setObjectName( "phaserKnob" );
 
 	createKnob(m_lpFilCutKnob,		KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*4, "LP Filter Cutoff");
 	createKnob(m_lpFilCutSweepKnob, KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*1, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*4, "LP Filter Cutoff Sweep");
@@ -619,10 +642,16 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	createKnob(m_hpFilCutKnob,		KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*4, "HP Filter Cutoff");
 	createKnob(m_hpFilCutSweepKnob, KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*4, "HP Filter Cutoff Sweep");
 
-	createButton(m_sqrWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*0, WAVEFORM_BASE_Y, "Square Wave", "square_wave");
-	createButton(m_sawWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*1, WAVEFORM_BASE_Y, "Saw Wave", "saw_wave");
-	createButton(m_sinWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*2, WAVEFORM_BASE_Y, "Sine Wave", "sin_wave");
-	createButton(m_noiseWaveBtn,	KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*3, WAVEFORM_BASE_Y, "Noise", "white_noise_wave");
+	m_lpFilCutKnob		->setObjectName( "filterKnob" );
+	m_lpFilCutSweepKnob	->setObjectName( "filterKnob" );
+	m_lpFilResoKnob		->setObjectName( "filterKnob" );
+	m_hpFilCutKnob		->setObjectName( "filterKnob" );
+	m_hpFilCutSweepKnob	->setObjectName( "filterKnob" );
+
+	createButtonLocalGraphic(m_sqrWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*0, WAVEFORM_BASE_Y, "Square Wave", "sfxr_square_wave");
+	createButtonLocalGraphic(m_sawWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*1, WAVEFORM_BASE_Y, "Saw Wave", "sfxr_saw_wave");
+	createButtonLocalGraphic(m_sinWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*2, WAVEFORM_BASE_Y, "Sine Wave", "sfxr_sin_wave");
+	createButtonLocalGraphic(m_noiseWaveBtn,	KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*3, WAVEFORM_BASE_Y, "Noise", "sfxr_white_noise_wave");
 
 	m_waveBtnGroup = new automatableButtonGroup( this );
 	m_waveBtnGroup->addButton(m_sqrWaveBtn);
