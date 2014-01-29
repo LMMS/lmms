@@ -46,7 +46,7 @@ libdir=/usr/local/lib
 srcdir=.
 
 # compiler names
-CC="cc"
+CC="gcc"
 CXX="c++"
 
 # flags for C++ compiler:
