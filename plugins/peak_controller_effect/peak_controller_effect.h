@@ -33,10 +33,10 @@ class PeakControllerEffect : public Effect
 {
 public:
 	PeakControllerEffect( Model * parent, 
-	                      const Descriptor::SubPluginFeatures::Key * _key );
+						const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~PeakControllerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
-		                                          const fpp_t _frames );
+									const fpp_t _frames );
 
 	virtual EffectControls * controls()
 	{

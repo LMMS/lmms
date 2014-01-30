@@ -131,6 +131,8 @@ void EffectChain::removeEffect( Effect * _effect )
 	engine::mixer()->lock();
 	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
 	engine::mixer()->unlock();
+
+	emit dataChanged();
 }
 
 

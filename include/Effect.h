@@ -152,6 +152,11 @@ public:
 		return m_key;
 	}
 
+	EffectChain * getEffectChain() const
+	{
+		return m_parent;
+	}
+
 	virtual EffectControls * controls() = 0;
 
 	static Effect * instantiate( const QString & _plugin_name,
@@ -189,6 +194,7 @@ protected:
 
 
 private:
+	EffectChain * m_parent;
 	void resample( int _i, const sampleFrame * _src_buf,
 					sample_rate_t _src_sr,
 					sampleFrame * _dst_buf, sample_rate_t _dst_sr,

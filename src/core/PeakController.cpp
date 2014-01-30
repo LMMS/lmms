@@ -34,6 +34,7 @@
 #include "engine.h"
 #include "Mixer.h"
 #include "PeakController.h"
+#include "EffectChain.h"
 #include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 
@@ -57,7 +58,10 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	// disconnects
+	if( m_peakEffect != NULL && m_peakEffect->getEffectChain() != NULL )
+	{
+		m_peakEffect->getEffectChain()->removeEffect( m_peakEffect );
+	}
 }
 
 
@@ -76,7 +80,7 @@ float PeakController::value( int _offset )
 void PeakController::handleDestroyedEffect( )
 {
 	// possible race condition...
-	printf("disconnecting effect\n");
+	//printf("disconnecting effect\n");
 	disconnect( m_peakEffect );
 	m_peakEffect = NULL;
 	//deleteLater();

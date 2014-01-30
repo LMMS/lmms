@@ -39,6 +39,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Plugin( _desc, _parent ),
+	m_parent( NULL ),
 	m_key( _key ? *_key : Descriptor::SubPluginFeatures::Key()  ),
 	m_processors( 1 ),
 	m_okay( true ),
@@ -117,7 +118,9 @@ Effect * Effect::instantiate( const QString & _plugin_name,
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{
 		// everything ok, so return pointer
-		return dynamic_cast<Effect *>( p );
+		Effect * effect = dynamic_cast<Effect *>( p );
+		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
+		return effect;
 	}
 
 	// not quite... so delete plugin and return dummy effect

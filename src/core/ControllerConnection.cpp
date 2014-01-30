@@ -40,6 +40,7 @@ ControllerConnectionVector ControllerConnection::s_connections;
 
 
 ControllerConnection::ControllerConnection( Controller * _controller ) :
+	m_controller( NULL ),
 	m_controllerId( -1 ),
 	m_ownsController( false )
 {
@@ -71,6 +72,10 @@ ControllerConnection::ControllerConnection( int _controllerId ) :
 
 ControllerConnection::~ControllerConnection()
 {
+	if( m_controller && m_controller->type() != Controller::DummyController )
+	{
+		m_controller->removeConnection( this );
+	}
 	s_connections.remove( s_connections.indexOf( this ) );
 	if( m_ownsController )
 	{
@@ -93,6 +98,12 @@ void ControllerConnection::setController( Controller * _controller )
 	if( m_ownsController && m_controller )
 	{
 		delete m_controller;
+		m_controller = NULL;
+	}
+
+	if( m_controller && m_controller->type() != Controller::DummyController )
+	{
+		m_controller->removeConnection( this );
 	}
 
 	if( !_controller )
@@ -107,6 +118,7 @@ void ControllerConnection::setController( Controller * _controller )
 
 	if( _controller->type() != Controller::DummyController )
 	{
+		_controller->addConnection( this );
 		QObject::connect( _controller, SIGNAL( valueChanged() ),
 				this, SIGNAL( valueChanged() ) );
 	}
