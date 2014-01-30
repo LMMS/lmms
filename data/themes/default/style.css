@@ -360,13 +360,13 @@ QToolButton, toolButton {
 /* separate corner rounding for play and stop buttons! */
 
 toolButton#playButton {
-	border-top-left-radius: 8px 6px;
-	border-bottom-left-radius: 8px 6px;
+	border-top-left-radius: 5px 15px;
+	border-bottom-left-radius: 5px 15px;
 }
 
 toolButton#stopButton {
-	border-top-right-radius: 8px 6px;
-	border-bottom-right-radius: 8px 6px;	
+	border-top-right-radius: 5px 15px;
+	border-bottom-right-radius: 5px 15px;	
 }
 
 /* record and record-accompany can be styled with #recordButton and #recordAccompanyButton respectively */
@@ -454,10 +454,9 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 	font-size: 10px;
 }
 
-/* has no effect yet */
-/*timeLine {
+timeLine {
 	font-size: 8px;
-}*/
+}
 
 QTreeView {
 	alternate-background-color: #747474;
@@ -534,11 +533,46 @@ sf2InstrumentView knob {
 }
 
 sfxrInstrumentView knob {
-	color: #b06319;
+	color: #000;
 	qproperty-outerColor: rgb(194, 177, 145);
 	qproperty-innerRadius: 2;
-	qproperty-outerRadius: 10;
+	qproperty-outerRadius: 9;
 	qproperty-lineWidth: 2;
+}
+
+sfxrInstrumentView knob#envKnob {
+	color:	#263352;
+	qproperty-outerColor: #4b66a4;
+}
+
+sfxrInstrumentView knob#freqKnob {
+	color:	#1e4a22;
+	qproperty-outerColor: #3c9544;
+}
+
+sfxrInstrumentView knob#changeKnob {
+	color:	#591c1c;
+	qproperty-outerColor: #b23737;
+}
+
+sfxrInstrumentView knob#sqrKnob {
+	color:	#3b2714;
+	qproperty-outerColor: #724c27;
+}
+
+sfxrInstrumentView knob#repeatKnob {
+	color:	#292929;
+	qproperty-outerColor: #515151;
+}
+
+sfxrInstrumentView knob#phaserKnob {
+	color:	#144c4d;
+	qproperty-outerColor: #299899;
+}
+
+sfxrInstrumentView knob#filterKnob {
+	color:	#47224c;
+	qproperty-outerColor: #8e4397;
 }
 
 opl2instrumentView knob {
