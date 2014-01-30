@@ -58,9 +58,9 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	if( m_peakEffect != NULL && m_peakEffect->getEffectChain() != NULL )
+	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL )
 	{
-		m_peakEffect->getEffectChain()->removeEffect( m_peakEffect );
+		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
 }
 

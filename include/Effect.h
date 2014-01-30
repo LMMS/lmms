@@ -152,7 +152,7 @@ public:
 		return m_key;
 	}
 
-	EffectChain * getEffectChain() const
+	EffectChain * effectChain() const
 	{
 		return m_parent;
 	}
