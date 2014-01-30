@@ -30,6 +30,7 @@
 #include <QtGui/QScrollArea>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QMdiArea>
+#include <QMessageBox>
 
 #include "song.h"
 #include "embed.h"
@@ -117,8 +118,24 @@ void ControllerRackView::loadSettings( const QDomElement & _this )
 
 void ControllerRackView::deleteController( ControllerView * _view )
 {
-	
 	Controller * c = _view->getController();
+
+	int connectionCount = c->connectionCount();
+	if( connectionCount > 0 )
+	{
+		QMessageBox msgBox;
+		msgBox.setIcon( QMessageBox::Question );
+		msgBox.setWindowTitle( tr("Confirm Delete") );
+		msgBox.setText( tr("Confirm delete? There are existing connection(s) "
+				"associted with this controller. There is no way to undo.") );
+		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+		if( msgBox.exec() != QMessageBox::Ok )
+		{
+			return;
+		}
+	}
+
+
 	m_controllerViews.erase( qFind( m_controllerViews.begin(),
 				m_controllerViews.end(), _view ) );
 	delete _view;

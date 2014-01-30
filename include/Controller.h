@@ -33,7 +33,8 @@
 #include "JournallingObject.h"
 
 class ControllerDialog;
-class Controller; 
+class Controller;
+class ControllerConnection;
 
 typedef QVector<Controller *> ControllerVector;
 
@@ -118,6 +119,11 @@ public:
 	static void triggerFrameCounter();
 	static void resetFrameCounter();
 
+	//Accepts a ControllerConnection * as it may be used in the future.
+	void addConnection( ControllerConnection * );
+	void removeConnection( ControllerConnection * );
+	int connectionCount() const;
+
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
@@ -136,6 +142,7 @@ protected:
 
 	float m_currentValue;
 	bool  m_sampleExact;
+	int m_connectionCount;
 
 	QString m_name;
 	ControllerTypes m_type;

@@ -49,6 +49,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
+	m_connectionCount( 0 ),
 	m_type( _type )
 {
 	if( _type != DummyController && _type != MidiController )
@@ -275,6 +276,32 @@ ControllerDialog * Controller::createDialog( QWidget * _parent )
 
 	return d;
 }
+
+
+
+
+void Controller::addConnection( ControllerConnection * )
+{
+	m_connectionCount++;
+}
+
+
+
+
+void Controller::removeConnection( ControllerConnection * )
+{
+	m_connectionCount--;
+	Q_ASSERT( m_connectionCount >= 0 );
+}
+
+
+
+
+int Controller::connectionCount() const{
+	return m_connectionCount;
+}
+
+
 
 
 #include "moc_Controller.cxx"
