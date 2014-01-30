@@ -42,8 +42,9 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	trackContentObject( _auto_track ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
-	m_tension( "1.0" ),
-	m_progressionType( DiscreteProgression )
+	m_tension( 1.0 ),
+	m_progressionType( DiscreteProgression ),
+	m_dragging( false )
 {
 	changeLength( MidiTime( 1, 0 ) );
 }
@@ -142,7 +143,7 @@ void AutomationPattern::setTension( QString _new_tension )
 
 	if( ok && nt > -0.01 && nt < 1.01 )
 	{
-		m_tension = _new_tension;
+		m_tension = _new_tension.toFloat();
 	}
 }
 
@@ -215,13 +216,19 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 
 
 
-void AutomationPattern::removeValue( const MidiTime & _time )
+void AutomationPattern::removeValue( const MidiTime & _time,
+									 const bool _quant_pos )
 {
 	cleanObjects();
 
-	m_timeMap.remove( _time );
-	m_tangents.remove( _time );
-	timeMap::const_iterator it = m_timeMap.lowerBound( _time );
+	MidiTime newTime = _quant_pos && engine::automationEditor() ?
+		note::quantized( _time,
+			engine::automationEditor()->quantization() ) :
+		_time;
+
+	m_timeMap.remove( newTime );
+	m_tangents.remove( newTime );
+	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
 	if( it != m_timeMap.begin() )
 	{
 		it--;
@@ -235,6 +242,55 @@ void AutomationPattern::removeValue( const MidiTime & _time )
 	}
 
 	emit dataChanged();
+}
+
+
+
+
+/**
+ * @brief Set the position of the point that is being draged.
+ *        Calling this function will also automatically set m_dragging to true,
+ *        which applyDragValue() have to be called to m_dragging.
+ * @param the time(x position) of the point being dragged
+ * @param the value(y position) of the point being dragged
+ * @param true to snip x position
+ * @return
+ */
+MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _value,
+					   const bool _quant_pos )
+{
+	if( m_dragging == false )
+	{
+		MidiTime newTime = _quant_pos && engine::automationEditor() ?
+			note::quantized( _time,
+				engine::automationEditor()->quantization() ) :
+			_time;
+		this->removeValue( newTime );
+		m_oldTimeMap = m_timeMap;
+		m_dragging = true;
+	}
+
+	//Restore to the state before it the point were being dragged
+	m_timeMap = m_oldTimeMap;
+
+	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); it++ )
+	{
+		generateTangents(it, 3);
+	}
+
+	return this->putValue( _time, _value, _quant_pos );
+
+}
+
+
+
+
+/**
+ * @brief After the point is dragged, this function is called to apply the change.
+ */
+void AutomationPattern::applyDragValue()
+{
+	m_dragging = false;
 }
 
 
@@ -291,10 +347,8 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		// tangents _m1 and _m2
 		int numValues = ((v+1).key() - v.key());
 		float t = (float) offset / (float) numValues;
-		float m1 = (m_tangents[v.key()]) * numValues
-							* m_tension.toFloat();
-		float m2 = (m_tangents[(v+1).key()]) * numValues
-							* m_tension.toFloat();
+		float m1 = (m_tangents[v.key()]) * numValues * m_tension;
+		float m2 = (m_tangents[(v+1).key()]) * numValues * m_tension;
 
 		return ( 2*pow(t,3) - 3*pow(t,2) + 1 ) * v.value()
 				+ ( pow(t,3) - 2*pow(t,2) + t) * m1
@@ -334,7 +388,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", trackContentObject::length() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
-	_this.setAttribute( "tens", getTension() );
+	_this.setAttribute( "tens", QString::number( getTension() ) );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )

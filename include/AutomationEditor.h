@@ -34,6 +34,7 @@
 #include "MidiTime.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
+#include "knob.h"
 
 
 class QPainter;
@@ -103,7 +104,7 @@ protected:
 	void getSelectedValues( timeMap & _selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	void disableTensionComboBox();
+	void disableTensionKnob();
 
 protected slots:
 	void play();
@@ -188,9 +189,8 @@ private:
 	toolButton * m_discreteButton;
 	toolButton * m_linearButton;
 	toolButton * m_cubicHermiteButton;
-	comboBox * m_tensionComboBox;
-	ComboBoxModel m_tensionModel;
-	ComboBoxModel m_tensionDisabledModel;
+	knob * m_tensionKnob;
+	FloatModel * m_tensionModel;
 
 	toolButton * m_cutButton;
 	toolButton * m_copyButton;

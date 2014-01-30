@@ -200,7 +200,8 @@ AutomationEditor::AutomationEditor() :
 					m_toolBar );
 	m_eraseButton->setCheckable( TRUE );
 
-	m_selectButton = new toolButton( embed::getIconPixmap(
+	//TODO: m_selectButton and m_moveButton are broken.
+	/*m_selectButton = new toolButton( embed::getIconPixmap(
 							"edit_select" ),
 					tr( "Select mode (Shift+S)" ),
 					this, SLOT( selectButtonToggled() ),
@@ -211,13 +212,13 @@ AutomationEditor::AutomationEditor() :
 					tr( "Move selection mode (Shift+M)" ),
 					this, SLOT( moveButtonToggled() ),
 					m_toolBar );
-	m_moveButton->setCheckable( TRUE );
+	m_moveButton->setCheckable( TRUE );*/
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
 	tool_button_group->addButton( m_eraseButton );
-	tool_button_group->addButton( m_selectButton );
-	tool_button_group->addButton( m_moveButton );
+	//tool_button_group->addButton( m_selectButton );
+	//tool_button_group->addButton( m_moveButton );
 	tool_button_group->setExclusive( TRUE );
 
 	m_drawButton->setWhatsThis(
@@ -230,7 +231,7 @@ AutomationEditor::AutomationEditor() :
 		tr( "Click here and erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
-	m_selectButton->setWhatsThis(
+	/*m_selectButton->setWhatsThis(
 		tr( "Click here and select-mode will be activated. In this "
 			"mode you can select values. This is necessary "
 			"if you want to cut, copy, paste, delete, or move "
@@ -240,7 +241,7 @@ AutomationEditor::AutomationEditor() :
 		tr( "If you click here, move-mode will be activated. In this "
 			"mode you can move the values you selected in select-"
 			"mode. You can also press 'Shift+M' on your keyboard "
-			"to activate this mode." ) );
+			"to activate this mode." ) );*/
 
 	m_discreteButton = new toolButton( embed::getIconPixmap(
 						"progression_discrete" ),
@@ -266,21 +267,13 @@ AutomationEditor::AutomationEditor() :
 	m_cubicHermiteButton->setCheckable( true );
 
 	// setup tension-stuff
-	m_tensionComboBox = new comboBox( m_toolBar );
-	m_tensionComboBox->setFixedSize( 60, 22 );
+	m_tensionKnob = new knob( knobSmall_17, this, "Tension" );
+	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
+	connect( m_tensionModel, SIGNAL( dataChanged() ),
+				this, SLOT( tensionChanged() ) );
 
-	for( int i = 0; i < 4; ++i )
-	{
-		m_tensionModel.addItem( "0." + QString::number( 25 * i ) );
-	}
-	m_tensionModel.addItem( "1.0" );
-	m_tensionModel.setValue( m_tensionModel.findText( "1.0" ) );
-
-	m_tensionDisabledModel.addItem( "-----" );
-	disableTensionComboBox();
-
-	connect( &m_tensionModel, SIGNAL( dataChanged() ),
-			this, SLOT( tensionChanged() ) );
+	QLabel * tension_lbl = new QLabel( m_toolBar );
+	tension_lbl->setText( tr("Tension: ") );
 
 	tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_discreteButton );
@@ -397,14 +390,16 @@ AutomationEditor::AutomationEditor() :
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_drawButton );
 	tb_layout->addWidget( m_eraseButton );
-	tb_layout->addWidget( m_selectButton );
-	tb_layout->addWidget( m_moveButton );
+	//tb_layout->addWidget( m_selectButton );
+	//tb_layout->addWidget( m_moveButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_discreteButton );
 	tb_layout->addWidget( m_linearButton );
 	tb_layout->addWidget( m_cubicHermiteButton );
 	tb_layout->addSpacing( 5 );
-	tb_layout->addWidget( m_tensionComboBox );
+	tb_layout->addWidget( tension_lbl );
+	tb_layout->addSpacing( 5 );
+	tb_layout->addWidget( m_tensionKnob );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_cutButton );
 	tb_layout->addWidget( m_copyButton );
@@ -456,7 +451,7 @@ AutomationEditor::~AutomationEditor()
 {
 	m_zoomingXModel.disconnect();
 	m_zoomingYModel.disconnect();
-	m_tensionModel.disconnect();
+	m_tensionModel->disconnect();
 }
 
 
@@ -548,8 +543,6 @@ void AutomationEditor::updateAfterPatternChange()
 		m_cubicHermiteButton->setChecked( true );
 	}
 
-	m_tensionModel.setValue( m_tensionModel.findText(
-						m_pattern->getTension() ) );
 	m_minLevel = m_pattern->firstObject()->minValue<float>();
 	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
 	m_step = m_pattern->firstObject()->step<float>();
@@ -664,8 +657,8 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 				_ke->accept();
 			}
 			break;
-
-		case Qt::Key_A:
+		//TODO: m_selectButton and m_moveButton are broken.
+		/*case Qt::Key_A:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
 				m_selectButton->setChecked( TRUE );
@@ -673,7 +666,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 				update();
 				_ke->accept();
 			}
-			break;
+			break;*/
 
 		case Qt::Key_D:
 			if( _ke->modifiers() & Qt::ShiftModifier )
@@ -690,8 +683,8 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 				_ke->accept();
 			}
 			break;
-
-		case Qt::Key_S:
+		//TODO: m_selectButton and m_moveButton are broken.
+		/*case Qt::Key_S:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
 				m_selectButton->setChecked( TRUE );
@@ -705,7 +698,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 				m_moveButton->setChecked( TRUE );
 				_ke->accept();
 			}
-			break;
+			break;*/
 
 		case Qt::Key_Delete:
 			deleteSelectedValues();
@@ -800,14 +793,9 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 
 
-void AutomationEditor::disableTensionComboBox()
+void AutomationEditor::disableTensionKnob()
 {
-	m_tensionComboBox->setEnabled( false );
-	m_tensionComboBox->setModel( &m_tensionDisabledModel );
-	m_tensionComboBox->setToolTip(
-			tr( "Choose Cubic Hermite progression to enable" ) );
-	m_tensionComboBox->setWhatsThis(
-		tr( "Choose Cubic Hermite progression to enable" ) );
+	m_tensionKnob->setEnabled( false );
 }
 
 
@@ -884,7 +872,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 					MidiTime value_pos( pos_ticks );
 
 					MidiTime new_time =
-						m_pattern->putValue( value_pos,
+						m_pattern->setDragValue( value_pos,
 									level );
 
 					// reset it so that it can be used for
@@ -916,6 +904,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 					m_pattern->removeValue( it.key() );
 					engine::getSong()->setModified();
 				}
+				m_action = NONE;
 			}
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == SELECT )
@@ -966,17 +955,21 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 
 void AutomationEditor::mouseReleaseEvent( QMouseEvent * _me )
 {
-	m_action = NONE;
-
 	if( m_editMode == DRAW )
 	{
+		if( m_action == MOVE_VALUE )
+		{
+			m_pattern->applyDragValue();
+		}
 		QApplication::restoreOverrideCursor();
 	}
+
+	m_action = NONE;
 }
 
 
 
-
+#include <stdio.h>
 void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 {
 	QMutexLocker m( &m_patternMutex );
@@ -1016,15 +1009,14 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 				drawLine( m_drawLastTick, m_drawLastLevel,
 							pos_ticks, level );
+
 				m_drawLastTick = pos_ticks;
 				m_drawLastLevel = level;
 
 				// we moved the value so the value has to be
 				// moved properly according to new starting-
 				// time in the time map of pattern
-				m_pattern->removeValue(
-						MidiTime( pos_ticks ) );
-				m_pattern->putValue( MidiTime( pos_ticks ),
+				m_pattern->setDragValue( MidiTime( pos_ticks ),
 								level );
 			}
 
@@ -1992,7 +1984,7 @@ void AutomationEditor::discreteButtonToggled()
 	if ( validPattern() )
 	{
 		QMutexLocker m( &m_patternMutex );
-		disableTensionComboBox();
+		disableTensionKnob();
 		m_pattern->setProgressionType(
 				AutomationPattern::DiscreteProgression );
 		engine::getSong()->setModified();
@@ -2008,7 +2000,7 @@ void AutomationEditor::linearButtonToggled()
 	if ( validPattern() )
 	{
 		QMutexLocker m( &m_patternMutex );
-		disableTensionComboBox();
+		disableTensionKnob();
 		m_pattern->setProgressionType(
 					AutomationPattern::LinearProgression );
 		engine::getSong()->setModified();
@@ -2023,12 +2015,10 @@ void AutomationEditor::cubicHermiteButtonToggled()
 {
 	if ( validPattern() )
 	{
-		QMutexLocker m( &m_patternMutex );
-		m_tensionComboBox->setEnabled( true );
-		m_tensionComboBox->setModel( &m_tensionModel );
-		m_tensionComboBox->setToolTip(
-					tr( "Tension value for spline" ) );
-		m_tensionComboBox->setWhatsThis(
+		m_tensionKnob->setModel( m_tensionModel );
+		m_tensionKnob->setEnabled( true );
+		toolTip::add( m_tensionKnob, tr( "Tension value for spline" ) );
+		m_tensionKnob->setWhatsThis(
 			tr( "A higher tension value may make a smoother curve "
 				"but overshoot some values.  A low tension "
 				"value will cause the slope of the curve to "
@@ -2045,10 +2035,9 @@ void AutomationEditor::cubicHermiteButtonToggled()
 
 void AutomationEditor::tensionChanged()
 {
-	m_pattern->setTension( m_tensionModel.currentText() );
+	m_pattern->setTension( QString::number( m_tensionModel->value() ) );
 	update();
 }
-
 
 
 
