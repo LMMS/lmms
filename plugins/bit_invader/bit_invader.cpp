@@ -408,10 +408,9 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ) );
 	m_smoothBtn->move( 35, 200 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-						"smooth" ) );
+						"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-						"smooth" ) );
-	m_smoothBtn->setChecked( true );
+						"smooth_inactive" ) );
 	toolTip::add( m_smoothBtn,
 			tr( "Click here to smooth waveform." ) );
 
