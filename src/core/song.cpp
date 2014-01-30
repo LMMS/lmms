@@ -648,6 +648,7 @@ void song::playSong()
 	m_playMode = Mode_PlaySong;
 	m_playing = true;
 	m_paused = false;
+	Controller::resetFrameCounter();
 
 	savePos();
 	if(QApplication::type() != QApplication::Tty) {
