@@ -66,7 +66,7 @@ public:
 	}
 	void setProgressionType( ProgressionTypes _new_progression_type );
 
-	inline QString getTension() const
+	inline float getTension() const
 	{
 		return m_tension;
 	}
@@ -77,7 +77,19 @@ public:
 	MidiTime putValue( const MidiTime & _time, const float _value,
 						const bool _quant_pos = true );
 
-	void removeValue( const MidiTime & _time );
+	void removeValue( const MidiTime & _time,
+					  const bool _quant_pos = true );
+
+	MidiTime setDragValue( const MidiTime & _time, const float _value,
+						   const bool _quant_pos = true );
+
+	void applyDragValue();
+
+
+	bool isDragging() const
+	{
+		return m_dragging;
+	}
 
 	inline const timeMap & getTimeMap() const
 	{
@@ -149,10 +161,13 @@ private:
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
+	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	timeMap m_tangents;	// slope at each point for calculating spline
-	QString m_tension;
+	float m_tension;
 	bool m_hasAutomation;
 	ProgressionTypes m_progressionType;
+
+	bool m_dragging;
 
 
 	friend class AutomationPatternView;
