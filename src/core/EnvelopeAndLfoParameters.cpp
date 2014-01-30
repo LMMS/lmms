@@ -331,7 +331,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_attackModel.saveSettings( _doc, _parent, "att" );
 	m_holdModel.saveSettings( _doc, _parent, "hold" );
 	m_decayModel.saveSettings( _doc, _parent, "dec" );
-	m_sustainModel.saveSettings( _doc, _parent, "sus" );
+	m_sustainModel.saveSettings( _doc, _parent, "sustain" );
 	m_releaseModel.saveSettings( _doc, _parent, "rel" );
 	m_amountModel.saveSettings( _doc, _parent, "amt" );
 	m_lfoWaveModel.saveSettings( _doc, _parent, "lshp" );
@@ -353,7 +353,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	m_attackModel.loadSettings( _this, "att" );
 	m_holdModel.loadSettings( _this, "hold" );
 	m_decayModel.loadSettings( _this, "dec" );
-	m_sustainModel.loadSettings( _this, "sus" );
+	m_sustainModel.loadSettings( _this, "sustain" );
 	m_releaseModel.loadSettings( _this, "rel" );
 	m_amountModel.loadSettings( _this, "amt" );
 	m_lfoWaveModel.loadSettings( _this, "lshp" );
@@ -363,6 +363,16 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	m_lfoAmountModel.loadSettings( _this, "lamt" );
 	m_x100Model.loadSettings( _this, "x100" );
 	m_controlEnvAmountModel.loadSettings( _this, "ctlenvamt" );
+
+/*	 ### TODO:
+	Old reversed sustain kept for backward compatibility
+	with 4.15 file format*/
+
+	if( _this.hasAttribute( "sus" ) )
+	{	
+		m_sustainModel.loadSettings( _this, "sus" );
+		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
+	}
 
 	// ### TODO:
 /*	// Keep compatibility with version 2.1 file format
@@ -400,7 +410,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	const f_cnt_t decay_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_decayModel.value() *
-						m_sustainModel.value() ) );
+						( 1 - m_sustainModel.value() ) ) );
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -452,7 +462,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	}
 
 	add += hold_frames;
-	const float dfI = (1.0 / decay_frames)*(m_sustainLevel-1)*m_amount;
+	const float dfI = ( 1.0 / decay_frames ) * ( m_sustainLevel -1 ) * m_amount;
 	for( f_cnt_t i = 0; i < decay_frames; ++i )
 	{
 /*

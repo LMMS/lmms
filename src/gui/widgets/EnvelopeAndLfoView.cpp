@@ -444,7 +444,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.fillRect( x1, y_base - 1 - avail_height, 2, 2, end_points_color );
 	x1 = x2;
 	x2 = x1 + static_cast<int>( ( m_decayKnob->value<float>() *
-						m_sustainKnob->value<float>() ) *
+						( 1 - m_sustainKnob->value<float>() ) ) *
 							TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base-avail_height, x2, static_cast<int>( y_base -
