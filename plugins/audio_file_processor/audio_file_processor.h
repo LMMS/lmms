@@ -161,14 +161,14 @@ public:
 		end,
 	} ;
 
-	class knob : public ::knob
+	class afpKnob : public ::knob
 	{
 		const AudioFileProcessorWaveView * m_waveView;
-		const knob * m_relatedKnob;
+		const afpKnob * m_relatedKnob;
 
 
 	public:
-		knob( QWidget * _parent ) :
+		afpKnob( QWidget * _parent ) :
 			::knob( knobStyled, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
@@ -181,7 +181,7 @@ public:
 			m_waveView = _wv;
 		}
 
-		void setRelatedKnob( const knob * _knob )
+		void setRelatedKnob( const afpKnob * _knob )
 		{
 			m_relatedKnob = _knob;
 		}
@@ -230,8 +230,8 @@ private:
 	f_cnt_t m_to;
 	f_cnt_t m_last_from;
 	f_cnt_t m_last_to;
-	knob * m_startKnob;
-	knob * m_endKnob;
+	afpKnob * m_startKnob;
+	afpKnob * m_endKnob;
 	f_cnt_t m_startFrameX;
 	f_cnt_t m_endFrameX;
 	bool m_isDragging;
@@ -243,7 +243,7 @@ private:
 
 public:
 	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
-	void setKnobs( knob * _start, knob * _end );
+	void setKnobs( afpKnob * _start, afpKnob * _end );
 
 
 private:
