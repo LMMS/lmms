@@ -84,9 +84,9 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
 				this, SLOT( ampModelChanged() ) );
 	connect( &m_startPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( loopPointChanged() ) );
+				this, SLOT( startModelChanged() ) );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( loopPointChanged() ) );
+				this, SLOT( endModelChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 	    		this, SLOT( stutterModelChanged() ) );
 }
@@ -290,7 +290,7 @@ void audioFileProcessor::stutterModelChanged()
 
 
 
-void audioFileProcessor::loopPointChanged( void )
+void audioFileProcessor::loopPointChanged()
 {
 	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
@@ -300,6 +300,30 @@ void audioFileProcessor::loopPointChanged( void )
 	m_sampleBuffer.setStartFrame( qMin<f_cnt_t>( f1, f2 ) );
 	m_sampleBuffer.setEndFrame( qMax<f_cnt_t>( f1, f2 ) );
 	emit dataChanged();
+}
+
+
+
+
+void audioFileProcessor::startModelChanged()
+{
+	if( m_startPointModel.value() > m_endPointModel.value() )
+	{
+		m_startPointModel.setValue( m_endPointModel.value() );
+	}
+	loopPointChanged();
+}
+
+
+
+
+void audioFileProcessor::endModelChanged()
+{
+	if( m_endPointModel.value() < m_startPointModel.value() )
+	{
+		m_endPointModel.setValue( m_startPointModel.value() );
+	}
+	loopPointChanged();
 }
 
 
@@ -597,13 +621,6 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	setFixedSize( _w, _h );
 	setMouseTracking( true );
 
-	if( m_sampleBuffer.frames() > 1 )
-	{
-		const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
-		m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
-		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
-	}
-
 	update();
 }
 
@@ -748,10 +765,10 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 
 	p.setPen( QColor( 0xFF, 0xFF, 0x00 ) );
 	const QRect graph_rect( s_padding, s_padding, width() - 2 * s_padding, height() - 2 * s_padding );
-	const f_cnt_t frames = m_to - m_from;
-	m_startFrameX = graph_rect.x() + ( m_sampleBuffer.startFrame() - m_from ) *
+	const f_cnt_t frames = m_sampleBuffer.frames();
+	m_startFrameX = graph_rect.x() + ( m_sampleBuffer.startFrame() ) *
 						double( graph_rect.width() ) / frames;
-	m_endFrameX = graph_rect.x() + ( m_sampleBuffer.endFrame() - m_from ) *
+	m_endFrameX = graph_rect.x() + ( m_sampleBuffer.endFrame() ) *
 						double( graph_rect.width() ) / frames;
 
 	p.drawLine( m_startFrameX, graph_rect.y(),
@@ -871,7 +888,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_sampleBuffer.visualize(
 		p,
 		QRect( 0, 0, m_graph.width(), m_graph.height() ),
-		m_from, m_to
+		0, m_sampleBuffer.frames()
 	);
 }
 
