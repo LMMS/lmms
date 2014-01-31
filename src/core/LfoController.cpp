@@ -83,7 +83,7 @@ float LfoController::value( int _offset )
 	int frame = runningFrames() + _offset + m_phaseCorrection;
 
 	//If the song is playing, sync the value with the time of the song.
-	if( engine::getSong()->isPlaying() )
+	if( engine::getSong()->isPlaying() || engine::getSong()->isExporting() )
 	{
 		// The new duration in frames
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
