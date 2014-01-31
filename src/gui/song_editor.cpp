@@ -711,6 +711,8 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 }
 
 
+
+
 void songEditor::updatePosition( const MidiTime & _t )
 {
 	int widgetWidth, trackOpWidth;
