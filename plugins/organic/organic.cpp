@@ -397,7 +397,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_volKnob->setVolumeKnob( true );
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
-	m_volKnob->setHintText( tr( "Volume:" ).arg( 1 ) + " ", "%" );
+	m_volKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volKnob->setObjectName( "volKnob" );
 
 	// randomise
