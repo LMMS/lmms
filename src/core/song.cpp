@@ -284,27 +284,27 @@ void song::savePos()
 				if( tl != NULL )
 				{
 
-		switch( tl->behaviourAtStop() )
-		{
-			case timeLine::BackToZero:
-				m_playPos[m_playMode].setTicks( 0 );
-				m_elapsedMilliSeconds = 0;
-				break;
+					switch( tl->behaviourAtStop() )
+					{
+						case timeLine::BackToZero:
+							m_playPos[m_playMode].setTicks( 0 );
+							m_elapsedMilliSeconds = 0;
+							break;
 
-			case timeLine::BackToStart:
-				if( tl->savedPos() >= 0 )
-				{
-					m_playPos[m_playMode].setTicks(
-						tl->savedPos().getTicks() );
-					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
-					tl->savePos( -1 );
-				}
-				break;
+						case timeLine::BackToStart:
+							if( tl->savedPos() >= 0 )
+							{
+								m_playPos[m_playMode].setTicks(
+									tl->savedPos().getTicks() );
+								m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
+								tl->savePos( -1 );
+							}
+							break;
 
-			case timeLine::KeepStopPosition:
-			default:
-				break;
-		}
+						case timeLine::KeepStopPosition:
+						default:
+							break;
+					}
 
 				}
 				else
@@ -636,7 +636,7 @@ bool song::realTimeTask() const
 
 
 
-void song::playSong() 
+void song::playSong()
 {
 	m_recording = false;
 
@@ -648,7 +648,6 @@ void song::playSong()
 	m_playMode = Mode_PlaySong;
 	m_playing = true;
 	m_paused = false;
-	Controller::resetFrameCounter();
 
 	savePos();
 	if(QApplication::type() != QApplication::Tty) {

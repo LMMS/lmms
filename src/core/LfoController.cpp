@@ -78,17 +78,14 @@ LfoController::~LfoController()
 // definately be optimized.
 // The code should probably be integrated with the oscillator class. But I
 // don't know how to use oscillator because it is so confusing
-
 float LfoController::value( int _offset )
 {
 	int frame = runningFrames() + _offset + m_phaseCorrection;
 
-	// Recalculate speed each period
-	// Actually, _offset != only if HQ, and we may want to recalc in that case,
-	// so this statement may be unrequired
-	if (_offset == 0) {
-
-		// The new duration in frames 
+	//If the song is playing, sync the value with the time of the song.
+	if( engine::getSong()->isPlaying() )
+	{
+		// The new duration in frames
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
 		float newDurationF =
 				engine::mixer()->processingSampleRate() *
@@ -107,39 +104,17 @@ float LfoController::value( int _offset )
 			default:
 				break;
 		}
-		
+
 		m_phaseOffset = qRound(
-				m_phaseModel.value() * newDurationF / 360.0 );
+			m_phaseModel.value() * newDurationF / 360.0 );
+
+
 		int newDuration = static_cast<int>( newDurationF );
+		m_phaseCorrection = static_cast<int>(engine::getSong()->getTicks()*engine::framesPerTick())%newDuration
+								+ m_phaseOffset;
 
-		if (newDuration != m_duration) {
-			// frame offset
-			// (Samples - Samples) = Samples
-			float oldFramePhase = float(frame % m_duration);
-
-			// Phase between 0 and 1
-			// (Samples/Samples) = factor
-			float phase = oldFramePhase / m_duration;
-
-			// where we SHOULD be according to new frequency
-			// (factor*Samples) = Samples
-			int newFrameOffset = static_cast<int>( phase * newDuration );
-
-			// recalc
-			// (Samples - (Samples-Samples)) = Samples
-			
-			// Go back to beginning of last natural period
-			m_phaseCorrection = -(runningFrames()%newDuration);
-
-			// newFrameOffset has old phaseCorrection built-in
-			m_phaseCorrection += newFrameOffset;
-
-			// re-run the first calculation again
-			frame = runningFrames() + m_phaseCorrection;
-
-			m_duration = newDuration;
-			
-		}
+		// re-run the first calculation again
+		frame = m_phaseCorrection + _offset;
 	}
 
 	// speedModel  0..1   fast..slow  0ms..20000ms
