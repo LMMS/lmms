@@ -73,7 +73,8 @@ public slots:
 private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
-	void loopPointChanged();
+	void startModelChanged();
+	void endModelChanged();
 	void stutterModelChanged();
 
 
@@ -94,6 +95,8 @@ private:
 	BoolModel m_stutterModel;
 
 	f_cnt_t m_nextPlayStartPoint;
+
+	void loopPointChanged();
 
 	friend class AudioFileProcessorView;
 
@@ -207,6 +210,12 @@ public:
 public slots:
 	void update()
 	{
+		if( m_sampleBuffer.frames() > 1 )
+		{
+			const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
+			m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
+			m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
+		}
 		updateGraph();
 		QWidget::update();
 	}
