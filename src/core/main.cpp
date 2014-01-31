@@ -25,6 +25,7 @@
 
 #include "lmmsconfig.h"
 #include "lmmsversion.h"
+#include "versioninfo.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -130,21 +131,23 @@ int main( int argc, char * * argv )
 		if( QString( argv[i] ) == "--version" ||
 						QString( argv[i] ) == "-v" )
 		{
-			printf( "\nLinux MultiMedia Studio %s\n\n"
-	"Copyright (c) 2004-2013 LMMS developers.\n\n"
+			printf( "\nLinux MultiMedia Studio %s\n(%s %s, Qt %s, %s)\n\n"
+	"Copyright (c) 2004-2014 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
 	"version 2 of the License, or (at your option) any later version.\n\n"
-	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-								argv[0] );
+	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION, 
+				PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
+				argv[0] );
+
 			return( EXIT_SUCCESS );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
-	"Copyright (c) 2004-2013 LMMS developers.\n\n"
+	"Copyright (c) 2004-2014 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
 	"            [ -u <in> <out> ]\n"
 	"            [ -d <in> ]\n"
