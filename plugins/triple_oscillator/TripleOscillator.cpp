@@ -138,7 +138,7 @@ OscillatorObject::~OscillatorObject()
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	QString af = m_sampleBuffer->openAndSetAudioFile();
+	QString af = m_sampleBuffer->openAndSetWaveformFile();
 	if( af != "" )
 	{
 		// TODO:
