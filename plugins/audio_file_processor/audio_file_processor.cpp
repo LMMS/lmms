@@ -182,6 +182,8 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	m_ampModel.saveSettings( _doc, _this, "amp" );
 	m_startPointModel.saveSettings( _doc, _this, "sframe" );
 	m_endPointModel.saveSettings( _doc, _this, "eframe" );
+	m_stutterModel.saveSettings( _doc, _this, "stutter" );
+
 }
 
 
@@ -202,6 +204,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_ampModel.loadSettings( _this, "amp" );
 	m_startPointModel.loadSettings( _this, "sframe" );
 	m_endPointModel.loadSettings( _this, "eframe" );
+	m_stutterModel.loadSettings( _this, "stutter" );
 
 	loopPointChanged();
 }
