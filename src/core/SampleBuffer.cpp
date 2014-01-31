@@ -920,6 +920,10 @@ QString SampleBuffer::openAndSetWaveformFile()
 	if(!fileName.isEmpty())
 	{
 		this->setAudioFile( fileName );
+	} 
+	else 
+	{
+		m_audioFile = "";
 	}
 
 	return fileName;	
