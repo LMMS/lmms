@@ -37,7 +37,6 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
-#include <QtGui/QSplashScreen>
 
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
@@ -387,17 +386,8 @@ int main( int argc, char * * argv )
 		// init style and palette
 		QApplication::setStyle( new LmmsStyle() );
 
-		// show splash screen
-		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
-		splashScreen.show();
-		splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
-									Qt::AlignRight | Qt::AlignBottom, Qt::white );
-		qApp->processEvents();
-
 		// init central engine which handles all components of LMMS
 		engine::init();
-
-		splashScreen.hide();
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
