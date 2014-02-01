@@ -41,6 +41,7 @@
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
+int PeakController::m_loadCount;
 bool PeakController::m_buggedFile;
 
 
@@ -109,6 +110,10 @@ void PeakController::loadSettings( const QDomElement & _this )
 	Controller::loadSettings( _this );
 
 	int effectId = _this.attribute( "effectId" ).toInt();
+	if( m_buggedFile == true )
+	{
+		effectId = m_loadCount++;
+	}
 
 	PeakControllerEffectVector::Iterator i;
 	for( i = s_effects.begin(); i != s_effects.end(); ++i )
@@ -127,6 +132,7 @@ void PeakController::loadSettings( const QDomElement & _this )
 //Backward compatibility function for bug in <= 0.4.15
 void PeakController::initGetControllerBySetting()
 {
+	m_loadCount = 0;
 	m_getCount = 0;
 	m_buggedFile = false;
 }
