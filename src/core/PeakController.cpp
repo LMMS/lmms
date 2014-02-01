@@ -50,7 +50,7 @@ PeakController::PeakController( Model * _parent,
 	m_peakEffect( _peak_effect )
 {
 	if( m_peakEffect )
-    {
+	{
 		connect( m_peakEffect, SIGNAL( destroyed( ) ),
 			this, SLOT( handleDestroyedEffect( ) ) );
 	}
