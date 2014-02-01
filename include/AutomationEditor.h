@@ -153,7 +153,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 740;
+	static const int INITIAL_WIDTH = 860;
 	static const int INITIAL_HEIGHT = 480;
 
 	static const int SCROLLBAR_SIZE = 16;
@@ -249,6 +249,7 @@ private:
 	bool m_scrollBack;
 
 	void drawCross( QPainter & _p );
+	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 
 
