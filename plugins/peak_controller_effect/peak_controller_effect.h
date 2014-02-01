@@ -48,6 +48,11 @@ public:
 		return m_lastSample;
 	}
 
+	PeakController * controller()
+	{
+		return m_autoController;
+	}
+
 	int m_effectId;
 
 private:
@@ -57,7 +62,7 @@ private:
 	float m_lastRMS;
 	bool m_lastRMSavail;
 
-	Controller * m_autoController;
+	PeakController * m_autoController;
 
 	friend class PeakControllerEffectControls;
 
