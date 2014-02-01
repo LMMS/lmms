@@ -319,36 +319,38 @@ bool SfxrSynth::isPlaying() const
 }
 
 
+
+
 sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sfxr_plugin_descriptor ),
-	m_attModel(0.0f, this),
-	m_holdModel(0.3f, this),
-	m_susModel(0.0f, this),
-	m_decModel(0.4f, this),
+	m_attModel(0.0f, this, "Attack Time"),
+	m_holdModel(0.3f, this, "Sustain Time"),
+	m_susModel(0.0f, this, "Sustain Punch"),
+	m_decModel(0.4f, this, "Decay Time"),
 
-	m_startFreqModel(0.3f, this),
-	m_minFreqModel(0.0f, this),
-	m_slideModel(0.0f, this),
-	m_dSlideModel(0.0f, this),
-	m_vibDepthModel(0.0f, this),
-	m_vibSpeedModel(0.0f, this),
+	m_startFreqModel(0.3f, this, "Start Frequency"),
+	m_minFreqModel(0.0f, this, "Min Frequency"),
+	m_slideModel(0.0f, this, "Slide"),
+	m_dSlideModel(0.0f, this, "Delta Slide"),
+	m_vibDepthModel(0.0f, this, "Vibrato Depth"),
+	m_vibSpeedModel(0.0f, this, "Vibrato Speed"),
 
-	m_changeAmtModel(0.0f, this),
-	m_changeSpeedModel(0.0f, this),
+	m_changeAmtModel(0.0f, this, "Change Amount"),
+	m_changeSpeedModel(0.0f, this, "Change Speed"),
 
-	m_sqrDutyModel(0.0f, this),
-	m_sqrSweepModel(0.0f, this),
+	m_sqrDutyModel(0.0f, this, "Squre Duty"),
+	m_sqrSweepModel(0.0f, this, "Squre Sweep"),
 
-	m_repeatSpeedModel(0.0f, this),
+	m_repeatSpeedModel(0.0f, this, "Repeat Speed"),
 
-	m_phaserOffsetModel(0.0f, this),
-	m_phaserSweepModel(0.0f, this),
+	m_phaserOffsetModel(0.0f, this, "Phaser Offset"),
+	m_phaserSweepModel(0.0f, this, "Phaser Sweep"),
 
-	m_lpFilCutModel(1.0f, this),
-	m_lpFilCutSweepModel(0.0f, this),
-	m_lpFilResoModel(0.0f, this),
-	m_hpFilCutModel(0.0f, this),
-	m_hpFilCutSweepModel(0.0f, this),
+	m_lpFilCutModel(1.0f, this, "LP Filter Cutoff"),
+	m_lpFilCutSweepModel(0.0f, this, "LP Filter Cutoff Sweep"),
+	m_lpFilResoModel(0.0f, this, "LP Filter Resonance"),
+	m_hpFilCutModel(0.0f, this, "HP Filter Cutoff"),
+	m_hpFilCutSweepModel(0.0f, this, "HP Filter Cutoff Sweep"),
 	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave Form" ) )
 {
 }
@@ -551,7 +553,7 @@ public:
 
 
 
-#define createKnob(_knob, _x, _y, _name)\
+#define createKnob( _knob, _x, _y, _name )\
 	_knob = new sfxrKnob( this ); \
 	_knob->setHintText( tr( _name ":" ), "" ); \
 	_knob->move( _x, _y ); \
@@ -560,8 +562,8 @@ public:
 
 
 
-#define createButton(_button, _x, _y, _name, _resName)\
-	_button = new pixmapButton( this, tr( "Sine wave" ) );\
+#define createButton( _button, _x, _y, _name, _resName )\
+	_button = new pixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( embed::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( embed::getIconPixmap( _resName "_inactive" ) );\
@@ -570,8 +572,8 @@ public:
 
 
 
-#define createButtonLocalGraphic(_button, _x, _y, _name, _resName)\
-	_button = new pixmapButton( this, tr( "Sine wave" ) );\
+#define createButtonLocalGraphic( _button, _x, _y, _name, _resName )\
+	_button = new pixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_inactive" ) );\
