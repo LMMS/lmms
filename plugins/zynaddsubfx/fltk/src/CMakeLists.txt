@@ -252,7 +252,7 @@ endif(LIB_fontconfig)
 #######################################################################
 install(TARGETS fltk
    EXPORT fltk-install
-   DESTINATION ${PREFIX_LIB}
+   DESTINATION "${PREFIX_LIB}"
 )
 
 #######################################################################
@@ -323,7 +323,7 @@ endif(USE_X11)
 #######################################################################
 install(TARGETS fltk_SHARED
    EXPORT fltk-install
-   DESTINATION ${PREFIX_LIB}
+   DESTINATION "${PREFIX_LIB}"
 )
 
 #######################################################################
@@ -351,7 +351,7 @@ if(OPENGL_FOUND)
 
    install(TARGETS fltk_gl_SHARED
       EXPORT fltk-install
-      DESTINATION ${PREFIX_LIB}
+      DESTINATION "${PREFIX_LIB}"
    )
 endif(OPENGL_FOUND)
 
