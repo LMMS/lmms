@@ -42,11 +42,11 @@ enum SfxrWaves
 };
 
 const int WAVEFORM_BASE_X = 20;
-const int WAVEFORM_BASE_Y = 14;
+const int WAVEFORM_BASE_Y = 15;
 const int WAVEFORM_BUTTON_WIDTH = 16;
 
 const int GENERATOR_BASE_X = 110;
-const int GENERATOR_BASE_Y = 24;
+const int GENERATOR_BASE_Y = 25;
 const int GENERATOR_BUTTON_WIDTH = 16;
 
 const int RAND_BUTTON_X = 160;

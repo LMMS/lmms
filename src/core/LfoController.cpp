@@ -198,6 +198,7 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_phaseModel.saveSettings( _doc, _this, "phase" );
 	m_waveModel.saveSettings( _doc, _this, "wave" );
 	m_multiplierModel.saveSettings( _doc, _this, "multiplier" );
+	_this.setAttribute( "userwavefile" , m_userDefSampleBuffer->audioFile() );
 }
 
 
@@ -212,6 +213,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 	m_phaseModel.loadSettings( _this, "phase" );
 	m_waveModel.loadSettings( _this, "wave" );
 	m_multiplierModel.loadSettings( _this, "multiplier" );
+	m_userDefSampleBuffer->setAudioFile( _this.attribute("userwavefile" ) );
 
 	updateSampleFunction();
 }

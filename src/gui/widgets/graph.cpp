@@ -485,7 +485,7 @@ void graphModel::setWaveToNoise()
 QString graphModel::setWaveToUser()
 {
 	SampleBuffer * sampleBuffer = new SampleBuffer;
-	QString fileName = sampleBuffer->openAndSetAudioFile();
+	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
 		for( int i = 0; i < length(); i++ )

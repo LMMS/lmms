@@ -908,6 +908,27 @@ QString SampleBuffer::openAndSetAudioFile()
 }
 
 
+QString SampleBuffer::openAndSetWaveformFile()
+{
+	if( m_audioFile.isEmpty() )
+	{
+		m_audioFile = configManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
+	}
+	
+	QString fileName = this->openAudioFile();
+
+	if(!fileName.isEmpty())
+	{
+		this->setAudioFile( fileName );
+	} 
+	else 
+	{
+		m_audioFile = "";
+	}
+
+	return fileName;	
+}
+
 
 
 #undef LMMS_HAVE_FLAC_STREAM_ENCODER_H	/* not yet... */
