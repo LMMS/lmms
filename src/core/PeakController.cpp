@@ -28,6 +28,7 @@
 #include <QtXml/QDomElement>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
+#include <QMessageBox>
 
 
 #include "song.h"
@@ -39,6 +40,8 @@
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 
 PeakControllerEffectVector PeakController::s_effects;
+int PeakController::m_getCount;
+bool PeakController::m_buggedFile;
 
 
 PeakController::PeakController( Model * _parent, 
@@ -47,7 +50,7 @@ PeakController::PeakController( Model * _parent,
 	m_peakEffect( _peak_effect )
 {
 	if( m_peakEffect )
-	{
+    {
 		connect( m_peakEffect, SIGNAL( destroyed( ) ),
 			this, SLOT( handleDestroyedEffect( ) ) );
 	}
@@ -103,6 +106,8 @@ void PeakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void PeakController::loadSettings( const QDomElement & _this )
 {
+	Controller::loadSettings( _this );
+
 	int effectId = _this.attribute( "effectId" ).toInt();
 
 	PeakControllerEffectVector::Iterator i;
@@ -114,6 +119,75 @@ void PeakController::loadSettings( const QDomElement & _this )
 			return;
 		}
 	}
+}
+
+
+
+
+//Backward compatibility function for bug in <= 0.4.15
+void PeakController::initGetControllerBySetting()
+{
+	m_getCount = 0;
+	m_buggedFile = false;
+}
+
+
+
+
+PeakController * PeakController::getControllerBySetting(const QDomElement & _this )
+{
+	int effectId = _this.attribute( "effectId" ).toInt();
+
+	PeakControllerEffectVector::Iterator i;
+
+	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
+	//foundCount should always be 1 because m_effectId is initialized with rand()
+	int foundCount = 0;
+	if( m_buggedFile == false )
+	{
+		for( i = s_effects.begin(); i != s_effects.end(); ++i )
+		{
+			if( (*i)->m_effectId == effectId )
+			{
+				foundCount++;
+			}
+		}
+		if( foundCount >= 2 )
+		{
+			m_buggedFile = true;
+			int newEffectId = 0;
+			for( i = s_effects.begin(); i != s_effects.end(); ++i )
+			{
+				(*i)->m_effectId = newEffectId++;
+			}
+			QMessageBox msgBox;
+			msgBox.setIcon( QMessageBox::Information );
+			msgBox.setWindowTitle( tr("Peak Controller Bug") );
+			msgBox.setText( tr("Due to a bug in older version of LMMS, the peak "
+							   "controllers may not be connect properly. "
+							   "Please ensure that peak controllers are connected "
+							   "properly and re-save this file. "
+							   "Sorry for any inconvenience caused.") );
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.exec();
+		}
+	}
+
+	if( m_buggedFile == true )
+	{
+		effectId = m_getCount;
+	}
+	m_getCount++; //NB: m_getCount should be increased even m_buggedFile is false
+
+	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	{
+		if( (*i)->m_effectId == effectId )
+		{
+			return (*i)->controller();
+		}
+	}
+
+	return NULL;
 }
 
 
