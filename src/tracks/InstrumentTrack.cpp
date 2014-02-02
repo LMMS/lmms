@@ -1332,6 +1332,7 @@ void InstrumentTrackWindow::modelChanged()
 	{
 		m_pitchKnob->hide();
 		m_pitchKnob->setModel( NULL );
+		m_pitchRangeSpinBox->hide();
 	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );

@@ -28,6 +28,7 @@
 #include <QtXml/QDomElement>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
+#include <QMessageBox>
 
 
 #include "song.h"
@@ -37,8 +38,12 @@
 #include "EffectChain.h"
 #include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
+#include "PresetPreviewPlayHandle.h"
 
 PeakControllerEffectVector PeakController::s_effects;
+int PeakController::m_getCount;
+int PeakController::m_loadCount;
+bool PeakController::m_buggedFile;
 
 
 PeakController::PeakController( Model * _parent, 
@@ -58,7 +63,11 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL )
+	//EffectChain::loadSettings() appends effect to EffectChain::m_effects
+	//When it's previewing, EffectChain::loadSettings(<Controller Fx XML>) is not called
+	//Therefore, we shouldn't call removeEffect() as it is not even appended.
+	//NB: Most XML setting are loaded on preview, except controller fx.
+	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL && PresetPreviewPlayHandle::isPreviewing() == false )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
@@ -103,7 +112,13 @@ void PeakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void PeakController::loadSettings( const QDomElement & _this )
 {
+	Controller::loadSettings( _this );
+
 	int effectId = _this.attribute( "effectId" ).toInt();
+	if( m_buggedFile == true )
+	{
+		effectId = m_loadCount++;
+	}
 
 	PeakControllerEffectVector::Iterator i;
 	for( i = s_effects.begin(); i != s_effects.end(); ++i )
@@ -114,6 +129,76 @@ void PeakController::loadSettings( const QDomElement & _this )
 			return;
 		}
 	}
+}
+
+
+
+
+//Backward compatibility function for bug in <= 0.4.15
+void PeakController::initGetControllerBySetting()
+{
+	m_loadCount = 0;
+	m_getCount = 0;
+	m_buggedFile = false;
+}
+
+
+
+
+PeakController * PeakController::getControllerBySetting(const QDomElement & _this )
+{
+	int effectId = _this.attribute( "effectId" ).toInt();
+
+	PeakControllerEffectVector::Iterator i;
+
+	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
+	//foundCount should always be 1 because m_effectId is initialized with rand()
+	int foundCount = 0;
+	if( m_buggedFile == false )
+	{
+		for( i = s_effects.begin(); i != s_effects.end(); ++i )
+		{
+			if( (*i)->m_effectId == effectId )
+			{
+				foundCount++;
+			}
+		}
+		if( foundCount >= 2 )
+		{
+			m_buggedFile = true;
+			int newEffectId = 0;
+			for( i = s_effects.begin(); i != s_effects.end(); ++i )
+			{
+				(*i)->m_effectId = newEffectId++;
+			}
+			QMessageBox msgBox;
+			msgBox.setIcon( QMessageBox::Information );
+			msgBox.setWindowTitle( tr("Peak Controller Bug") );
+			msgBox.setText( tr("Due to a bug in older version of LMMS, the peak "
+							   "controllers may not be connect properly. "
+							   "Please ensure that peak controllers are connected "
+							   "properly and re-save this file. "
+							   "Sorry for any inconvenience caused.") );
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.exec();
+		}
+	}
+
+	if( m_buggedFile == true )
+	{
+		effectId = m_getCount;
+	}
+	m_getCount++; //NB: m_getCount should be increased even m_buggedFile is false
+
+	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	{
+		if( (*i)->m_effectId == effectId )
+		{
+			return (*i)->controller();
+		}
+	}
+
+	return NULL;
 }
 
 

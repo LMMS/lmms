@@ -61,6 +61,7 @@
 #include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
+#include "PeakController.h"
 
 #ifdef LMMS_BUILD_WIN32
 #ifndef USE_QT_SHMEM
@@ -1141,6 +1142,10 @@ void song::loadProject( const QString & _file_name )
 		m_globalAutomationTrack->restoreState( mmp.content().
 						firstChildElement( "track" ) );
 	}
+
+	//Backward compatibility for LMMS <= 0.4.15
+	PeakController::initGetControllerBySetting();
+
 	QDomNode node = mmp.content().firstChild();
 	while( !node.isNull() )
 	{
@@ -1354,7 +1359,16 @@ void song::restoreControllerStates( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		addController( Controller::create( node.toElement(), this ) );
+		Controller * c = Controller::create( node.toElement(), this );
+		Q_ASSERT( c != NULL );
+
+		/* For PeakController, addController() was called in
+		 * PeakControllerEffect::PeakControllerEffect().
+		 * This line removes the previously added controller for PeakController
+		 * without affecting the order of controllers in Controller Rack
+		 */
+		engine::getSong()->removeController( c );
+		addController( c );
 
 		node = node.nextSibling();
 	}

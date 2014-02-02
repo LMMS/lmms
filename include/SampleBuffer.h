@@ -174,7 +174,8 @@ public:
 
     QString openAudioFile() const;
     QString openAndSetAudioFile();
-
+	QString openAndSetWaveformFile();
+	
 	QString & toBase64( QString & _dst ) const;
 
 

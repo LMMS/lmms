@@ -66,6 +66,8 @@ private:
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
 
+	void scaleTimemapToFit( float oldMin, float oldMax );
+
 } ;
 
 

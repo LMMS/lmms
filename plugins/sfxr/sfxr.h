@@ -42,11 +42,11 @@ enum SfxrWaves
 };
 
 const int WAVEFORM_BASE_X = 20;
-const int WAVEFORM_BASE_Y = 14;
+const int WAVEFORM_BASE_Y = 15;
 const int WAVEFORM_BUTTON_WIDTH = 16;
 
 const int GENERATOR_BASE_X = 110;
-const int GENERATOR_BASE_Y = 24;
+const int GENERATOR_BASE_Y = 25;
 const int GENERATOR_BUTTON_WIDTH = 16;
 
 const int RAND_BUTTON_X = 160;
@@ -126,8 +126,8 @@ private:
 class SfxrZeroToOneFloatModel : public FloatModel
 {
 public:
-	SfxrZeroToOneFloatModel(float val, Model * parent):
-		FloatModel( val, 0.0, 1.0, 0.001, parent)
+	SfxrZeroToOneFloatModel( float val, Model * parent, const QString& displayName ):
+		FloatModel( val, 0.0, 1.0, 0.001, parent, displayName )
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
@@ -147,8 +147,8 @@ public:
 class SfxrNegPosOneFloatModel : public FloatModel
 {
 public:
-	SfxrNegPosOneFloatModel(float val, Model * parent):
-		FloatModel( val, -1.0, 1.0, 0.001, parent)
+	SfxrNegPosOneFloatModel(float val, Model * parent, const QString& displayName ):
+		FloatModel( val, -1.0, 1.0, 0.001, parent, displayName )
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */

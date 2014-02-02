@@ -53,6 +53,9 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName() const;
 
+	static void initGetControllerBySetting();
+	static PeakController * getControllerBySetting( const QDomElement & _this );
+
 	static PeakControllerEffectVector s_effects;
 
 
@@ -67,6 +70,12 @@ protected:
 	PeakControllerEffect * m_peakEffect;
 
 	friend class PeakControllerDialog;
+
+private:
+	//backward compatibility for <= 0.4.15
+	static int m_getCount;
+	static int m_loadCount;
+	static bool m_buggedFile;
 } ;
 
 
