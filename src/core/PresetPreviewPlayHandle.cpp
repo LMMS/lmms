@@ -88,8 +88,8 @@ public:
 
 	bool isPreviewing()
 	{
-		bool ret = m_dataMutex.tryLock();
-		if( ret == true )
+		bool ret = !m_dataMutex.tryLock();
+		if( ret == false )
 		{
 			m_dataMutex.unlock();
 		}
