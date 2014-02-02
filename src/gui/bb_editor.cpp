@@ -68,12 +68,12 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-			     + 2 * TCO_BORDER_WIDTH + 192 );
+			     + 2 * TCO_BORDER_WIDTH + 264 );
 	}
 	else
 	{
 		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-			     + 2 * TCO_BORDER_WIDTH + 192 );
+			     + 2 * TCO_BORDER_WIDTH + 264 );
 	}
 
 
