@@ -107,6 +107,9 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 				journallingObject( _a->data().toInt() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
+		float oldMin = m_pat->getMin();
+		float oldMax = m_pat->getMax();
+
 		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
 					m_pat->m_objects.end(),
 				dynamic_cast<AutomatableModel *>( j ) ) );
@@ -116,6 +119,13 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		if( engine::automationEditor() )
 		{
 			engine::automationEditor()->updateAfterPatternChange();
+		}
+
+		//if there is no more connection connected to the AutomationPattern
+		if( m_pat->m_objects.size() == 0 )
+		{
+			//scale the points to fit the new min. and max. value
+			this->scaleTimemapToFit( oldMin, oldMax );
 		}
 	}
 }
@@ -344,7 +354,8 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		if( m_pat->m_objects.size() == 1 )
 		{
 			//scale the points to fit the new min. and max. value
-			this->scaleTimemapToFit();
+			this->scaleTimemapToFit( AutomationPattern::DEFAULT_MIN_VALUE,
+									 AutomationPattern::DEFAULT_MAX_VALUE );
 		}
 	}
 	else
@@ -357,18 +368,17 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 
 
 /**
- * @brief With nothing connected, the automation points are in a small scale.
- * Without this function, if the user set the automation points before
- * connecting it to a model, his auto points would be lost because the scale is
- * changed. This function preserve the auto points over different scale when a
- * first model is connected.
+ * @brief Preserves the auto points over different scale
  */
-void AutomationPatternView::scaleTimemapToFit()
+void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 {
-	float oldMin = AutomationPattern::DEFAULT_MIN_VALUE;
-	float oldMax = AutomationPattern::DEFAULT_MAX_VALUE;
-	float newMin = m_pat->firstObject()->minValue<float>();
-	float newMax = m_pat->firstObject()->maxValue<float>();
+	float newMin = m_pat->getMin();
+	float newMax = m_pat->getMax();
+
+	if( oldMin == newMin && oldMax == newMax )
+	{
+		return;
+	}
 
 	for( AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
 		it != m_pat->m_timeMap.end(); ++it )
@@ -381,7 +391,7 @@ void AutomationPatternView::scaleTimemapToFit()
 		{
 			*it = oldMax;
 		}
-		*it = (*it)*(newMax-newMin)/(oldMax-oldMin)+newMin;
+		*it = (*it-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin;
 	}
 
 	m_pat->generateTangents();

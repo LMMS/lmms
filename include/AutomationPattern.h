@@ -111,6 +111,16 @@ public:
 		return m_tangents;
 	}
 
+	inline float getMin() const
+	{
+		return firstObject()->minValue<float>();
+	}
+
+	inline float getMax() const
+	{
+		return firstObject()->maxValue<float>();
+	}
+
 	inline bool hasAutomation() const
 	{
 		return m_timeMap.isEmpty() == false;
