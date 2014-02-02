@@ -111,6 +111,12 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 					m_pat->m_objects.end(),
 				dynamic_cast<AutomatableModel *>( j ) ) );
 		update();
+
+		//If automation editor is opened, update its display after disconnection
+		if( engine::automationEditor() )
+		{
+			engine::automationEditor()->updateAfterPatternChange();
+		}
 	}
 }
 
@@ -333,6 +339,13 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		{
 			engine::automationEditor()->setCurrentPattern( m_pat );
 		}
+
+		//This is the only model that's just added to AutomationPattern.
+		if( m_pat->m_objects.size() == 1 )
+		{
+			//scale the points to fit the new min. and max. value
+			this->scaleTimemapToFit();
+		}
 	}
 	else
 	{
@@ -340,6 +353,39 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 	}
 }
 
+
+
+
+/**
+ * @brief With nothing connected, the automation points are in a small scale.
+ * Without this function, if the user set the automation points before
+ * connecting it to a model, his auto points would be lost because the scale is
+ * changed. This function preserve the auto points over different scale when a
+ * first model is connected.
+ */
+void AutomationPatternView::scaleTimemapToFit()
+{
+	float oldMin = AutomationPattern::DEFAULT_MIN_VALUE;
+	float oldMax = AutomationPattern::DEFAULT_MAX_VALUE;
+	float newMin = m_pat->firstObject()->minValue<float>();
+	float newMax = m_pat->firstObject()->maxValue<float>();
+
+	for( AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
+		it != m_pat->m_timeMap.end(); ++it )
+	{
+		if( *it < oldMin )
+		{
+			*it = oldMin;
+		}
+		else if( *it > oldMax )
+		{
+			*it = oldMax;
+		}
+		*it = (*it)*(newMax-newMin)/(oldMax-oldMin)+newMin;
+	}
+
+	m_pat->generateTangents();
+}
 
 
 

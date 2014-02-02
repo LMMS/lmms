@@ -98,7 +98,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 		}
 	}
 
-	// the automation track is empty
+	// the automation track is unconnected and there is nothing in the track
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
@@ -155,7 +155,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 		return m;
 	}
 
-	static FloatModel _fm( 0, 0, 1, 0.001 );
+	static FloatModel _fm( 0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001 );
 	return &_fm;
 }
 
@@ -712,6 +712,8 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 		it++;
 	}
 }
+
+
 
 
 #include "moc_AutomationPattern.cxx"

@@ -169,6 +169,8 @@ private:
 
 	bool m_dragging;
 
+	static const float DEFAULT_MIN_VALUE = 0;
+	static const float DEFAULT_MAX_VALUE = 1;
 
 	friend class AutomationPatternView;
 
