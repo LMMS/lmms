@@ -1546,72 +1546,76 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	{
 		int len_ticks = 4;
 		timeMap & time_map = m_pattern->getTimeMap();
-		timeMap::iterator it = time_map.begin();
-		p.setPen( QColor( 0xCF, 0xD9, 0xFF ) );
 
-		while( it+1 != time_map.end() )
+		//Don't bother doing/rendering anything if there is no automation points
+		if( time_map.size() > 0 )
 		{
-			// skip this section if it occurs completely before the
-			// visible area
-			int next_x = xCoordOfTick( (it+1).key() );
-			if( next_x < 0 )
+			timeMap::iterator it = time_map.begin();
+			p.setPen( QColor( 0xCF, 0xD9, 0xFF ) );
+			while( it+1 != time_map.end() )
 			{
-				++it;
-				continue;
-			}
+				// skip this section if it occurs completely before the
+				// visible area
+				int next_x = xCoordOfTick( (it+1).key() );
+				if( next_x < 0 )
+				{
+					++it;
+					continue;
+				}
 
-			int x = xCoordOfTick( it.key() );
-			if( x > width() )
-			{
-				break;
-			}
+				int x = xCoordOfTick( it.key() );
+				if( x > width() )
+				{
+					break;
+				}
 
-			bool is_selected = FALSE;
-			// if we're in move-mode, we may only draw
-			// values in selected area, that have originally
-			// been selected and not values that are now in
-			// selection because the user moved it...
-			if( m_editMode == MOVE )
-			{
-				if( m_selValuesForMove.contains( it.key() ) )
+				bool is_selected = FALSE;
+				// if we're in move-mode, we may only draw
+				// values in selected area, that have originally
+				// been selected and not values that are now in
+				// selection because the user moved it...
+				if( m_editMode == MOVE )
+				{
+					if( m_selValuesForMove.contains( it.key() ) )
+					{
+						is_selected = TRUE;
+					}
+				}
+				else if( it.value() >= selLevel_start &&
+					it.value() <= selLevel_end &&
+					it.key() >= sel_pos_start &&
+					it.key() + len_ticks <= sel_pos_end )
 				{
 					is_selected = TRUE;
 				}
-			}
-			else if( it.value() >= selLevel_start &&
-				it.value() <= selLevel_end &&
-				it.key() >= sel_pos_start &&
-				it.key() + len_ticks <= sel_pos_end )
-			{
-				is_selected = TRUE;
+
+				float *values = m_pattern->valuesAfter( it.key() );
+				for( int i = 0; i < (it+1).key() - it.key(); i++ )
+				{
+					drawLevelTick( p, it.key() + i, values[i],
+									is_selected );
+				}
+				delete [] values;
+
+				// Draw circle
+				drawAutomationPoint(p, it);
+
+				++it;
 			}
 
-			float *values = m_pattern->valuesAfter( it.key() );
-			for( int i = 0; i < (it+1).key() - it.key(); i++ )
-			{
-				drawLevelTick( p, it.key() + i, values[i],
-								is_selected );
-			}
-			delete [] values;
+			Q_ASSERT( it == time_map.end()-1 );
 
-			// Draw circle
+			for( int i = it.key(), x = xCoordOfTick( i ); x <= width();
+							i++, x = xCoordOfTick( i ) )
+			{
+				// TODO: Find out if the section after the last control
+				// point is able to be selected and if so set this
+				// boolean correctly
+				drawLevelTick( p, i, it.value(), false );
+			}
+			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
-
-			++it;
 		}
-
-		Q_ASSERT( it == time_map.end()-1 );
-
-		for( int i = it.key(), x = xCoordOfTick( i ); x <= width();
-						i++, x = xCoordOfTick( i ) )
-		{
-			// TODO: Find out if the section after the last control
-			// point is able to be selected and if so set this
-			// boolean correctly
-			drawLevelTick( p, i, it.value(), false );
-		}
-		// Draw circle(the last one)
-		drawAutomationPoint(p, it);
 	}
 	else
 	{
