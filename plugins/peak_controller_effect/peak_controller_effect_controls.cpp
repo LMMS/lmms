@@ -78,7 +78,7 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 		m_effect->m_effectId = rand();
 	}
 
-	if( m_effect->m_autoController && PresetPreviewPlayHandle::isPreviewing() == false )
+	if( m_effect->m_autoController && PresetPreviewPlayHandle::isPreviewing() == true )
 	{
 		delete m_effect->m_autoController;
 		m_effect->m_autoController = 0;
