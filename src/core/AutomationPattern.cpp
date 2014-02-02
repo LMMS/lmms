@@ -84,8 +84,6 @@ AutomationPattern::~AutomationPattern()
 
 void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
-	bool addIt = true;
-
 	if( _search_dup )
 	{
 		for( objectVector::iterator it = m_objects.begin();
@@ -95,27 +93,26 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 			{
 				// Already exists
 				// TODO: Maybe let the user know in some non-annoying way
-				addIt = false;
-				break;
+				return;
 			}
 		}
 	}
 
-	if( addIt )
+	// the automation track is unconnected and there is nothing in the track
+	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
-		// been empty before and model's current value is not its init value?
-		if( m_objects.isEmpty() && hasAutomation() == false && _obj->isAtInitValue() == false )
-		{
-			// then initialize first value
-			putValue( 0, _obj->value<float>(), false );
-		}
-
-		m_objects += _obj;
-
-		connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
-				this, SLOT( objectDestroyed( jo_id_t ) ),
-							Qt::DirectConnection );
+		// then initialize first value
+		putValue( MidiTime(0), _obj->value<float>(), false );
 	}
+
+	m_objects += _obj;
+
+	connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
+			this, SLOT( objectDestroyed( jo_id_t ) ),
+						Qt::DirectConnection );
+
+	emit dataChanged();
+
 }
 
 
@@ -158,7 +155,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 		return m;
 	}
 
-	static FloatModel _fm( 0, 0, 1, 0.001 );
+	static FloatModel _fm( 0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001 );
 	return &_fm;
 }
 
@@ -584,18 +581,18 @@ void AutomationPattern::resolveAllIDs()
 				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 				if( a )
 				{
-	for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-					k != a->m_idsToResolve.end(); ++k )
-	{
-		JournallingObject * o = engine::projectJournal()->
-										journallingObject( *k );
-		if( o && dynamic_cast<AutomatableModel *>( o ) )
-		{
-			a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
-		}
-	}
-	a->m_idsToResolve.clear();
-	a->dataChanged();
+					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
+									k != a->m_idsToResolve.end(); ++k )
+					{
+						JournallingObject * o = engine::projectJournal()->
+														journallingObject( *k );
+						if( o && dynamic_cast<AutomatableModel *>( o ) )
+						{
+							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+						}
+					}
+					a->m_idsToResolve.clear();
+					a->dataChanged();
 				}
 			}
 		}
@@ -639,6 +636,20 @@ void AutomationPattern::objectDestroyed( jo_id_t _id )
 	// case we had to remove ourselves if we're the global automation
 	// pattern of the destroyed object
 	m_idsToResolve += _id;
+
+	for( objectVector::Iterator objIt = m_objects.begin();
+		objIt != m_objects.end(); objIt++ )
+	{
+		Q_ASSERT( !(*objIt).isNull() );
+		if( (*objIt)->id() == _id )
+		{
+			//Assign to objIt so that this loop work even break; is removed.
+			objIt = m_objects.erase( objIt );
+			break;
+		}
+	}
+
+	emit dataChanged();
 }
 
 
@@ -701,6 +712,8 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 		it++;
 	}
 }
+
+
 
 
 #include "moc_AutomationPattern.cxx"

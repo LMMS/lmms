@@ -111,6 +111,16 @@ public:
 		return m_tangents;
 	}
 
+	inline float getMin() const
+	{
+		return firstObject()->minValue<float>();
+	}
+
+	inline float getMax() const
+	{
+		return firstObject()->maxValue<float>();
+	}
+
 	inline bool hasAutomation() const
 	{
 		return m_timeMap.isEmpty() == false;
@@ -169,6 +179,8 @@ private:
 
 	bool m_dragging;
 
+	static const float DEFAULT_MIN_VALUE = 0;
+	static const float DEFAULT_MAX_VALUE = 1;
 
 	friend class AutomationPatternView;
 
