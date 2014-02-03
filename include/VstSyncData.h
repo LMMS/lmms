@@ -1,8 +1,9 @@
 /*
- * VST_sync_shm.h - type declarations needed for VST to lmms host sync
+ * VstSyncData.h - type declarations needed for VST to lmms host sync
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2013 Mike Choi <rdavidian71/at/gmail/dot/com>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,8 +23,8 @@
  *
  */
 
-#ifndef _VST_SYNC_SHM_H
-#define _VST_SYNC_SHM_H
+#ifndef VST_SYNC_DATA_H
+#define VST_SYNC_DATA_H
 
 // VST sync frequency (in ms), how often will be VST plugin synced
 // keep it power of two if possible (not used by now)
@@ -36,9 +37,11 @@
 #define VST_SNC_SHM_KEY_FILE "/dev/null"
 //#define VST_SNC_SHM_RND_KEY 3561653564469
 
-struct sncVST
+
+
+struct VstSyncData
 {
-	bool isPlayin;
+	bool isPlaying;
 	float ppqPos;
 	int timeSigNumer;
 	int timeSigDenom;

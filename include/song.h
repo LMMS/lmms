@@ -32,7 +32,7 @@
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
-#include "VST_sync_shm.h"
+#include "VstSyncController.h"
 
 class AutomationTrack;
 class pattern;
@@ -296,8 +296,6 @@ private slots:
 
 	void updateFramesPerTick();
 
-	void updateSampleRateSHM();
-
 
 
 private:
@@ -368,9 +366,8 @@ private:
 	} ;
 	QVector<Actions> m_actions;
 
-	int m_shmID;
-	sncVST * m_SncVSTplug;
-	QSharedMemory m_shmQtID;
+	VstSyncController m_vstSyncController;
+
 
 	friend class engine;
 	friend class songEditor;

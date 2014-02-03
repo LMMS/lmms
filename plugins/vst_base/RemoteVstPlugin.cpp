@@ -92,7 +92,7 @@ struct ERect
 #include "Midi.h"
 #include "communication.h"
 
-#include "VST_sync_shm.h"
+#include "VstSyncData.h"
 
 #ifdef LMMS_BUILD_WIN32
 #define USE_QT_SHMEM
@@ -325,7 +325,7 @@ private:
 	in * m_in;
 
 	int m_shmID;
-	sncVST * m_SncVSTplug;
+	VstSyncData* m_vstSyncData;
 
 } ;
 
@@ -351,7 +351,7 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_currentProgram( -1 ),
 	m_in( NULL ),
 	m_shmID( -1 ),
-	m_SncVSTplug( NULL )
+	m_vstSyncData( NULL )
 
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
@@ -372,29 +372,29 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 		}
 		else
 		{	// attach segment
-			m_SncVSTplug = (sncVST *)shmat(m_shmID, 0, 0);
-			if( m_SncVSTplug == (sncVST *)( -1 ) )
+			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
+			if( m_vstSyncData == (VstSyncData *)( -1 ) )
 			{
 				perror( "RemoteVstPlugin.cpp::shmat" );
 			}
 		}
 	}
 #else
-	m_SncVSTplug = RemotePluginClient::getQtVSTshm();
+	m_vstSyncData = RemotePluginClient::getQtVSTshm();
 #endif
-	if( m_SncVSTplug == NULL )
+	if( m_vstSyncData == NULL )
 	{
 		fprintf(stderr, "RemoteVstPlugin.cpp: "
 			"Failed to initialize shared memory for VST synchronization.\n"
 			" (VST-host synchronization will be disabled)\n");
-		m_SncVSTplug = (sncVST*) malloc( sizeof( sncVST ) );
-		m_SncVSTplug->isPlayin = true;
-		m_SncVSTplug->timeSigNumer = 4;
-		m_SncVSTplug->timeSigDenom = 4;
-		m_SncVSTplug->ppqPos = 0;
-		m_SncVSTplug->isCycle = false;
-		m_SncVSTplug->hasSHM = false;
-		m_SncVSTplug->m_sampleRate = sampleRate();
+		m_vstSyncData = (VstSyncData*) malloc( sizeof( VstSyncData ) );
+		m_vstSyncData->isPlaying = true;
+		m_vstSyncData->timeSigNumer = 4;
+		m_vstSyncData->timeSigDenom = 4;
+		m_vstSyncData->ppqPos = 0;
+		m_vstSyncData->isCycle = false;
+		m_vstSyncData->hasSHM = false;
+		m_vstSyncData->m_sampleRate = sampleRate();
 	}
 
 	m_in = ( in* ) new char[ sizeof( in ) ];
@@ -420,16 +420,16 @@ RemoteVstPlugin::~RemoteVstPlugin()
 {
 #ifndef USE_QT_SHMEM
 	// detach shared memory segment
-	if( shmdt( m_SncVSTplug ) == -1)
+	if( shmdt( m_vstSyncData ) == -1)
 	{
-		if( __plugin->m_SncVSTplug->hasSHM )
+		if( __plugin->m_vstSyncData->hasSHM )
 		{
 			perror( "~RemoteVstPlugin::shmdt" );
 		}
-		if( m_SncVSTplug != NULL )
+		if( m_vstSyncData != NULL )
 		{
-			delete m_SncVSTplug;
-			m_SncVSTplug = NULL;
+			delete m_vstSyncData;
+			m_vstSyncData = NULL;
 		}
 	}
 #endif
@@ -573,7 +573,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	updateInOutCount();
 
 	// some plugins have to set samplerate during init
-	if( m_SncVSTplug->hasSHM )
+	if( m_vstSyncData->hasSHM )
 	{
 		updateSampleRate();
 	}
@@ -1444,58 +1444,58 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// items may require extensive conversions
 
 			// Shared memory was initialised? - see song.cpp
-			//assert( __plugin->m_SncVSTplug != NULL );
+			//assert( __plugin->m_vstSyncData != NULL );
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 			_timeInfo.samplePos = __plugin->m_currentSamplePos;
-			_timeInfo.sampleRate = __plugin->m_SncVSTplug->hasSHM ?
-							__plugin->m_SncVSTplug->m_sampleRate :
+			_timeInfo.sampleRate = __plugin->m_vstSyncData->hasSHM ?
+							__plugin->m_vstSyncData->m_sampleRate :
 							__plugin->sampleRate();
 			_timeInfo.flags = 0;
-			_timeInfo.tempo = __plugin->m_SncVSTplug->hasSHM ?
-							__plugin->m_SncVSTplug->m_bpm :
+			_timeInfo.tempo = __plugin->m_vstSyncData->hasSHM ?
+							__plugin->m_vstSyncData->m_bpm :
 							__plugin->m_bpm;
-			_timeInfo.timeSigNumerator = __plugin->m_SncVSTplug->timeSigNumer;
-			_timeInfo.timeSigDenominator = __plugin->m_SncVSTplug->timeSigDenom;
+			_timeInfo.timeSigNumerator = __plugin->m_vstSyncData->timeSigNumer;
+			_timeInfo.timeSigDenominator = __plugin->m_vstSyncData->timeSigDenom;
 			_timeInfo.flags |= kVstTempoValid;
 			_timeInfo.flags |= kVstTimeSigValid;
 
-			if( __plugin->m_SncVSTplug->isCycle )
+			if( __plugin->m_vstSyncData->isCycle )
 			{
-				_timeInfo.cycleStartPos = __plugin->m_SncVSTplug->cycleStart;
-				_timeInfo.cycleEndPos = __plugin->m_SncVSTplug->cycleEnd;
+				_timeInfo.cycleStartPos = __plugin->m_vstSyncData->cycleStart;
+				_timeInfo.cycleEndPos = __plugin->m_vstSyncData->cycleEnd;
 				_timeInfo.flags |= kVstCyclePosValid;
 				_timeInfo.flags |= kVstTransportCycleActive;
 			}
 
-			if( __plugin->m_SncVSTplug->ppqPos != 
+			if( __plugin->m_vstSyncData->ppqPos != 
 							__plugin->m_in->m_Timestamp )
 			{
-				_timeInfo.ppqPos = __plugin->m_SncVSTplug->ppqPos;
+				_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
 				_timeInfo.flags |= kVstTransportChanged;
-				__plugin->m_in->lastppqPos = __plugin->m_SncVSTplug->ppqPos;
-				__plugin->m_in->m_Timestamp = __plugin->m_SncVSTplug->ppqPos;
+				__plugin->m_in->lastppqPos = __plugin->m_vstSyncData->ppqPos;
+				__plugin->m_in->m_Timestamp = __plugin->m_vstSyncData->ppqPos;
 			}
-			else if( __plugin->m_SncVSTplug->isPlayin )
+			else if( __plugin->m_vstSyncData->isPlaying )
 			{
 				__plugin->m_in->lastppqPos += (
-							__plugin->m_SncVSTplug->hasSHM ?
-							__plugin->m_SncVSTplug->m_bpm :
+							__plugin->m_vstSyncData->hasSHM ?
+							__plugin->m_vstSyncData->m_bpm :
 							__plugin->m_bpm ) / (float)10340;
 				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
 			}
-//			_timeInfo.ppqPos = __plugin->m_SncVSTplug->ppqPos;
+//			_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
 			_timeInfo.flags |= kVstPpqPosValid;
 
-			if( __plugin->m_SncVSTplug->isPlayin )
+			if( __plugin->m_vstSyncData->isPlaying )
 			{
 				_timeInfo.flags |= kVstTransportPlaying;
 			}
 			_timeInfo.barStartPos = ( (int) ( _timeInfo.ppqPos / 
-				( 4 *__plugin->m_SncVSTplug->timeSigNumer
-				/ (float) __plugin->m_SncVSTplug->timeSigDenom ) ) ) *
-				( 4 * __plugin->m_SncVSTplug->timeSigNumer
-				/ (float) __plugin->m_SncVSTplug->timeSigDenom );
+				( 4 *__plugin->m_vstSyncData->timeSigNumer
+				/ (float) __plugin->m_vstSyncData->timeSigDenom ) ) ) *
+				( 4 * __plugin->m_vstSyncData->timeSigNumer
+				/ (float) __plugin->m_vstSyncData->timeSigDenom );
 
 			_timeInfo.flags |= kVstBarsValid;
 
