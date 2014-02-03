@@ -88,6 +88,10 @@ VstSyncController::VstSyncController() :
 		}
 #endif
 	}
+	else
+	{
+		qWarning( "VST sync support disabled in your configuration" );
+	}
 
 	if( m_syncData == NULL )
 	{
