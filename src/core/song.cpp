@@ -420,8 +420,12 @@ void song::playSong()
 	m_playing = true;
 	m_paused = false;
 
+	m_vstSyncController.setPlaybackState( true );
+
 	savePos();
-	if(QApplication::type() != QApplication::Tty) {
+
+	if( QApplication::type() != QApplication::Tty )
+	{
 		engine::updatePlayPauseIcons();
 	}
 }
@@ -459,6 +463,8 @@ void song::playTrack( track * _trackToPlay )
 	m_playing = true;
 	m_paused = false;
 
+	m_vstSyncController.setPlaybackState( true );
+
 	savePos();
 
 	engine::updatePlayPauseIcons();
@@ -477,6 +483,8 @@ void song::playBB()
 	m_playMode = Mode_PlayBB;
 	m_playing = true;
 	m_paused = false;
+
+	m_vstSyncController.setPlaybackState( true );
 
 	savePos();
 
@@ -556,6 +564,8 @@ void song::togglePause()
 		m_paused = true;
 	}
 
+	m_vstSyncController.setPlaybackState( m_playing );
+
 	engine::updatePlayPauseIcons();
 }
 
@@ -582,8 +592,7 @@ void song::stop()
 			case timeLine::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
-					m_playPos[m_playMode].setTicks(
-						tl->savedPos().getTicks() );
+					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
 					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
 					tl->savePos( -1 );
 				}
@@ -601,6 +610,9 @@ void song::stop()
 	}
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );
+
+	m_vstSyncController.setPlaybackState( m_exporting );
+	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
 
 	// remove all note-play-handles that are active
 	engine::mixer()->clear();
