@@ -354,18 +354,6 @@ private:
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
-	enum Actions
-	{
-		ActionStop,
-		ActionPlaySong,
-		ActionPlayTrack,
-		ActionPlayBB,
-		ActionPlayPattern,
-		ActionPause,
-		ActionResumeFromPause
-	} ;
-	QVector<Actions> m_actions;
-
 	VstSyncController m_vstSyncController;
 
 
