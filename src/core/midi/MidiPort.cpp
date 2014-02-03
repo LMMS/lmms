@@ -123,7 +123,6 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			event.type() == MidiNoteOff ||
 			event.type() == MidiKeyPressure )
 		{
-			inEvent.setKey( inEvent.key() + KeysPerOctave );
 			if( inEvent.key() < 0 || inEvent.key() >= NumKeys )
 			{
 				return;
@@ -148,14 +147,6 @@ void MidiPort::processOutEvent( const MidiEvent& event, const MidiTime& time )
 	if( isOutputEnabled() && realOutputChannel() == event.channel() )
 	{
 		MidiEvent outEvent = event;
-
-		if( ( event.type() == MidiNoteOn || event.type() == MidiNoteOff ) &&
-			fixedOutputNote() >= 0 )
-		{
-			// Convert MIDI note number (from spinbox) -> LMMS note number
-			// that will be converted back when outputted.
-			outEvent.setKey( fixedOutputNote() - KeysPerOctave );
-		}
 
 		if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
 			( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
