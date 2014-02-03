@@ -27,7 +27,7 @@
 
 #include "export.h"
 #include "MidiEvent.h"
-#include "VST_sync_shm.h"
+#include "VstSyncData.h"
 
 #include <vector>
 #include <cstdio>
@@ -813,7 +813,7 @@ public:
 	RemotePluginClient( key_t _shm_in, key_t _shm_out );
 	virtual ~RemotePluginClient();
 #ifdef USE_QT_SHMEM
-	sncVST * getQtVSTshm();
+	VstSyncData * getQtVSTshm();
 #endif
 	virtual bool processMessage( const message & _m );
 
@@ -883,7 +883,7 @@ private:
 	QSharedMemory m_shmObj;
 	QSharedMemory m_shmQtID;
 #endif
-	sncVST * m_SncVSTplug;
+	VstSyncData * m_vstSyncData;
 	float * m_shm;
 
 	int m_inputCount;
@@ -1013,7 +1013,7 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	m_shmObj(),
 	m_shmQtID( "/usr/bin/lmms" ),
 #endif
-	m_SncVSTplug( NULL ),
+	m_vstSyncData( NULL ),
 	m_shm( NULL ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
@@ -1023,9 +1023,9 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 #ifdef USE_QT_SHMEM
 	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
 	{
-		m_SncVSTplug = (sncVST *) m_shmQtID.data();
-		m_bufferSize = m_SncVSTplug->m_bufferSize;
-		m_sampleRate = m_SncVSTplug->m_sampleRate;
+		m_vstSyncData = (VstSyncData *) m_shmQtID.data();
+		m_bufferSize = m_vstSyncData->m_bufferSize;
+		m_sampleRate = m_vstSyncData->m_sampleRate;
 		return;
 	}
 #else
@@ -1044,18 +1044,18 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 		}
 		else
 		{	// attach segment
-			m_SncVSTplug = (sncVST *)shmat(m_shmID, 0, 0);
-			if( m_SncVSTplug == (sncVST *)( -1 ) )
+			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
+			if( m_vstSyncData == (VstSyncData *)( -1 ) )
 			{
 				perror( "RemotePluginClient::shmat" );
 			}
 			else
 			{
-				m_bufferSize = m_SncVSTplug->m_bufferSize;
-				m_sampleRate = m_SncVSTplug->m_sampleRate;
+				m_bufferSize = m_vstSyncData->m_bufferSize;
+				m_sampleRate = m_vstSyncData->m_sampleRate;
 
 				// detach segment
-				if( shmdt(m_SncVSTplug) == -1 )
+				if( shmdt(m_vstSyncData) == -1 )
 				{
 					perror("RemotePluginClient::shmdt");
 				}
@@ -1087,9 +1087,9 @@ RemotePluginClient::~RemotePluginClient()
 
 
 #ifdef USE_QT_SHMEM
-sncVST * RemotePluginClient::getQtVSTshm()
+VstSyncData * RemotePluginClient::getQtVSTshm()
 {
-	return m_SncVSTplug;
+	return m_vstSyncData;
 }
 #endif
 

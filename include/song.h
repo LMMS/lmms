@@ -32,7 +32,7 @@
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
-#include "VST_sync_shm.h"
+#include "VstSyncController.h"
 
 class AutomationTrack;
 class pattern;
@@ -296,8 +296,6 @@ private slots:
 
 	void updateFramesPerTick();
 
-	void updateSampleRateSHM();
-
 
 
 private:
@@ -356,21 +354,8 @@ private:
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
-	enum Actions
-	{
-		ActionStop,
-		ActionPlaySong,
-		ActionPlayTrack,
-		ActionPlayBB,
-		ActionPlayPattern,
-		ActionPause,
-		ActionResumeFromPause
-	} ;
-	QVector<Actions> m_actions;
+	VstSyncController m_vstSyncController;
 
-	int m_shmID;
-	sncVST * m_SncVSTplug;
-	QSharedMemory m_shmQtID;
 
 	friend class engine;
 	friend class songEditor;
