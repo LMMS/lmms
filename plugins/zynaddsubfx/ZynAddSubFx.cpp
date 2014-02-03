@@ -34,7 +34,7 @@
 #include "engine.h"
 #include "knob.h"
 #include "led_checkbox.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
@@ -371,7 +371,7 @@ bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiT
 void ZynAddSubFxInstrument::reloadPlugin()
 {
 	// save state of current plugin instance
-	multimediaProject m( multimediaProject::InstrumentTrackSettings );
+	DataFile m( DataFile::InstrumentTrackSettings );
 	saveSettings( m, m.content() );
 
 	// init plugin (will delete current one and create a new instance)

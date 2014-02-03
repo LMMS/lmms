@@ -51,7 +51,7 @@ class InstrumentMidiIOView;
 class knob;
 class lcdSpinBox;
 class midiPortMenu;
-class multimediaProject;
+class DataFile;
 class PluginView;
 class tabWidget;
 class trackLabelButton;
@@ -172,7 +172,7 @@ public:
 	}
 
 	// simple helper for removing midiport-XML-node when loading presets
-	static void removeMidiPortNode( multimediaProject & _mmp );
+	static void removeMidiPortNode( DataFile& dataFile );
 
 	FloatModel * pitchModel()
 	{

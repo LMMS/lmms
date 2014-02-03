@@ -39,7 +39,7 @@
 #include "gui_templates.h"
 #include "tooltip.h"
 #include "string_pair_drag.h"
-#include "mmp.h"
+#include "DataFile.h"
 
 #include "embed.cpp"
 
@@ -515,9 +515,8 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
 	{
-		multimediaProject mmp( value.toUtf8() );
-		castModel<audioFileProcessor>()->setAudioFile( mmp.content().
-				firstChild().toElement().attribute( "src" ) );
+		DataFile dataFile( value.toUtf8() );
+		castModel<audioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
 		_de->accept();
 		return;
 	}

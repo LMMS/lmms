@@ -44,7 +44,6 @@
 #include "lcd_spinbox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
-#include "mmp.h"
 #include "text_float.h"
 #include "timeline.h"
 #include "tool_button.h"

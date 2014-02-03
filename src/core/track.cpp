@@ -59,7 +59,7 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "pixmap_button.h"
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
@@ -468,7 +468,7 @@ void trackContentObjectView::dragEnterEvent( QDragEnterEvent * _dee )
 /*! \brief Handle something being dropped on this trackContentObjectView.
  *
  *  When something has been dropped on this trackContentObjectView, and
- *  it's a track content object, then use an instance of our mmp reader
+ *  it's a track content object, then use an instance of our dataFile reader
  *  to take the xml of the track content object and turn it into something
  *  we can write over our current state.
  *
@@ -481,12 +481,12 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 	if( type == ( "tco_" + QString::number( m_tco->getTrack()->type() ) ) )
 	{
 		// value contains our XML-data so simply create a
-		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value.toUtf8() );
+		// DataFile which does the rest for us...
+		DataFile dataFile( value.toUtf8() );
 		// at least save position before getting to moved to somewhere
 		// the user doesn't expect...
 		MidiTime pos = m_tco->startPosition();
-		m_tco->restoreState( mmp.content().firstChild().toElement() );
+		m_tco->restoreState( dataFile.content().firstChild().toElement() );
  		m_tco->movePosition( pos );
 		AutomationPattern::resolveAllIDs();
 		_de->accept();
@@ -563,15 +563,15 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			_me->modifiers() & Qt::ControlModifier )
 	{
 		// start drag-action
-		multimediaProject mmp( multimediaProject::DragNDropData );
-		m_tco->saveState( mmp, mmp.content() );
+		DataFile dataFile( DataFile::DragNDropData );
+		m_tco->saveState( dataFile, dataFile.content() );
 		QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
 						128, 128,
 						Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
 		new stringPairDrag( QString( "tco_%1" ).arg(
 						m_tco->getTrack()->type() ),
-					mmp.toString(), thumbnail, this );
+					dataFile.toString(), thumbnail, this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
 		/*	engine::mainWindow()->isShiftPressed() == false &&*/
@@ -976,10 +976,10 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 	if( it != m_tcoViews.end() )
 	{
 /*		QMap<QString, QVariant> map;
-		multimediaProject mmp( multimediaProject::JournalData );
-		_tcov->getTrackContentObject()->saveState( mmp, mmp.content() );
+		DataFile dataFile( DataFile::JournalData );
+		_tcov->getTrackContentObject()->saveState( dataFile, dataFile.content() );
 		map["id"] = _tcov->getTrackContentObject()->id();
-		map["state"] = mmp.toString();
+		map["state"] = dataFile.toString();
 		addJournalEntry( JournalEntry( RemoveTrackContentObject,
 								map ) );*/
 
@@ -1127,11 +1127,11 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		trackContentObject * tco = getTrack()->createTCO( pos );
 
 		// value contains our XML-data so simply create a
-		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value.toUtf8() );
+		// DataFile which does the rest for us...
+		DataFile dataFile( value.toUtf8() );
 		// at least save position before getting moved to somewhere
 		// the user doesn't expect...
-		tco->restoreState( mmp.content().firstChild().toElement() );
+		tco->restoreState( dataFile.content().firstChild().toElement() );
 		tco->movePosition( pos );
 
 		AutomationPattern::resolveAllIDs();
@@ -1227,9 +1227,9 @@ void trackContentWidget::undoStep( JournalEntry & _je )
 			trackContentObject * tco =
 				dynamic_cast<trackContentObject *>(
 			engine::projectJournal()->journallingObject( map["id"].toInt() ) );
-			multimediaProject mmp( multimediaProject::JournalData );
-			tco->saveState( mmp, mmp.content() );
-			map["state"] = mmp.toString();
+			DataFile dataFile( DataFile::JournalData );
+			tco->saveState( dataFile, dataFile.content() );
+			map["state"] = dataFile.toString();
 			_je.data() = map;
 			tco->deleteLater();
 			break;
@@ -1238,10 +1238,10 @@ void trackContentWidget::undoStep( JournalEntry & _je )
 		case RemoveTrackContentObject:
 		{
 			trackContentObject * tco = getTrack()->createTCO( MidiTime( 0 ) );
-			multimediaProject mmp(
+			DataFile dataFile(
 				_je.data().toMap()["state"].
 					toString().toUtf8() );
-			tco->restoreState( mmp.content().firstChild().toElement() );
+			tco->restoreState( dataFile.content().firstChild().toElement() );
 			break;
 		}
 	}
@@ -1424,11 +1424,11 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 		_me->modifiers() & Qt::ControlModifier &&
 			m_trackView->getTrack()->type() != track::BBTrack )
 	{
-		multimediaProject mmp( multimediaProject::DragNDropData );
-		m_trackView->getTrack()->saveState( mmp, mmp.content() );
+		DataFile dataFile( DataFile::DragNDropData );
+		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
 		new stringPairDrag( QString( "track_%1" ).arg(
 					m_trackView->getTrack()->type() ),
-			mmp.toString(), QPixmap::grabWidget(
+			dataFile.toString(), QPixmap::grabWidget(
 				m_trackView->getTrackSettingsWidget() ),
 									this );
 	}
@@ -2307,10 +2307,10 @@ void trackView::dropEvent( QDropEvent * _de )
 	if( type == ( "track_" + QString::number( m_track->type() ) ) )
 	{
 		// value contains our XML-data so simply create a
-		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value.toUtf8() );
+		// DataFile which does the rest for us...
+		DataFile dataFile( value.toUtf8() );
 		engine::mixer()->lock();
-		m_track->restoreState( mmp.content().firstChild().toElement() );
+		m_track->restoreState( dataFile.content().firstChild().toElement() );
 		engine::mixer()->unlock();
 		_de->accept();
 	}

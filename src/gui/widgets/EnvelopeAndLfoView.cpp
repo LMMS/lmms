@@ -34,7 +34,7 @@
 #include "knob.h"
 #include "led_checkbox.h"
 #include "Mixer.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "Oscillator.h"
 #include "pixmap_button.h"
 #include "string_pair_drag.h"
@@ -389,10 +389,8 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
 	{
-		multimediaProject mmp( value.toUtf8() );
-		m_params->m_userWave.setAudioFile(
-				mmp.content().firstChild().toElement().
-							attribute( "src" ) );
+		DataFile dataFile( value.toUtf8() );
+		m_params->m_userWave.setAudioFile( dataFile.content().firstChild().toElement().  attribute( "src" ) );
 		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
 	}

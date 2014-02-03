@@ -2,7 +2,7 @@
  * LadspaEffect.cpp - class for processing LADSPA effects
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,7 @@
 #include <QtGui/QMessageBox>
 
 #include "LadspaEffect.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "AudioDevice.h"
 #include "config_mgr.h"
 #include "ladspa_2_lmms.h"
@@ -104,8 +104,8 @@ LadspaEffect::~LadspaEffect()
 
 void LadspaEffect::changeSampleRate()
 {
-	multimediaProject mmp( multimediaProject::EffectSettings );
-	m_controls->saveState( mmp, mmp.content() );
+	DataFile dataFile( DataFile::EffectSettings );
+	m_controls->saveState( dataFile, dataFile.content() );
 
 	LadspaControls * controls = m_controls;
 	m_controls = NULL;
@@ -118,7 +118,7 @@ void LadspaEffect::changeSampleRate()
 	controls->effectModelChanged( m_controls );
 	delete controls;
 
-	m_controls->restoreState( mmp.content().firstChild().toElement() );
+	m_controls->restoreState( dataFile.content().firstChild().toElement() );
 
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again

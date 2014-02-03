@@ -49,7 +49,7 @@
 #include "MainWindow.h"
 #include "FileDialog.h"
 #include "MidiClient.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
 #include "piano_roll.h"
@@ -898,10 +898,10 @@ void song::loadProject( const QString & _file_name )
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
 
-	multimediaProject mmp( m_fileName );
+	DataFile dataFile( m_fileName );
 	// if file could not be opened, head-node is null and we create
 	// new project
-	if( mmp.head().isNull() )
+	if( dataFile.head().isNull() )
 	{
 		createNewProject();
 		return;
@@ -910,10 +910,10 @@ void song::loadProject( const QString & _file_name )
 	engine::mixer()->lock();
 
 	// get the header information from the DOM
-	m_tempoModel.loadSettings( mmp.head(), "bpm" );
-	m_timeSigModel.loadSettings( mmp.head(), "timesig" );
-	m_masterVolumeModel.loadSettings( mmp.head(), "mastervol" );
-	m_masterPitchModel.loadSettings( mmp.head(), "masterpitch" );
+	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
+	m_timeSigModel.loadSettings( dataFile.head(), "timesig" );
+	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
+	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
 	if( m_playPos[Mode_PlaySong].m_timeLine )
 	{
@@ -921,16 +921,16 @@ void song::loadProject( const QString & _file_name )
 		m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
 	}
 
-	if( !mmp.content().firstChildElement( "track" ).isNull() )
+	if( !dataFile.content().firstChildElement( "track" ).isNull() )
 	{
-		m_globalAutomationTrack->restoreState( mmp.content().
+		m_globalAutomationTrack->restoreState( dataFile.content().
 						firstChildElement( "track" ) );
 	}
 
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
-	QDomNode node = mmp.content().firstChild();
+	QDomNode node = dataFile.content().firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -1022,31 +1022,31 @@ void song::loadProject( const QString & _file_name )
 // only save current song as _filename and do nothing else
 bool song::saveProjectFile( const QString & _filename )
 {
-	multimediaProject mmp( multimediaProject::SongProject );
+	DataFile dataFile( DataFile::SongProject );
 
-	m_tempoModel.saveSettings( mmp, mmp.head(), "bpm" );
-	m_timeSigModel.saveSettings( mmp, mmp.head(), "timesig" );
-	m_masterVolumeModel.saveSettings( mmp, mmp.head(), "mastervol" );
-	m_masterPitchModel.saveSettings( mmp, mmp.head(), "masterpitch" );
+	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );
+	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
+	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
+	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
 
-	saveState( mmp, mmp.content() );
+	saveState( dataFile, dataFile.content() );
 
-	m_globalAutomationTrack->saveState( mmp, mmp.content() );
-	engine::fxMixer()->saveState( mmp, mmp.content() );
+	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
+	engine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( engine::hasGUI() )
 	{
-		engine::getControllerRackView()->saveState( mmp, mmp.content() );
-		engine::getPianoRoll()->saveState( mmp, mmp.content() );
-		engine::automationEditor()->saveState( mmp, mmp.content() );
+		engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
+		engine::getPianoRoll()->saveState( dataFile, dataFile.content() );
+		engine::automationEditor()->saveState( dataFile, dataFile.content() );
 		engine::getProjectNotes()->
-			SerializingObject::saveState( mmp, mmp.content() );
+			SerializingObject::saveState( dataFile, dataFile.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState(
-							mmp, mmp.content() );
+							dataFile, dataFile.content() );
 	}
 
-	saveControllerStates( mmp, mmp.content() );
+	saveControllerStates( dataFile, dataFile.content() );
 
-    return mmp.writeFile( _filename );
+    return dataFile.writeFile( _filename );
 }
 
 
@@ -1054,8 +1054,8 @@ bool song::saveProjectFile( const QString & _filename )
 // save current song and update the gui
 bool song::guiSaveProject()
 {
-	multimediaProject mmp( multimediaProject::SongProject );
-	m_fileName = mmp.nameWithExtension( m_fileName );
+	DataFile dataFile( DataFile::SongProject );
+	m_fileName = dataFile.nameWithExtension( m_fileName );
 	if( saveProjectFile( m_fileName ) && engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),

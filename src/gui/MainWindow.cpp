@@ -686,12 +686,11 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 
 
-void MainWindow::openProject( void )
+void MainWindow::openProject()
 {
 	if( mayChangeProject() )
 	{
-		FileDialog ofd( this, tr( "Open project" ), "",
-			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
+		FileDialog ofd( this, tr( "Open project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
 
 		ofd.setDirectory( configManager::inst()->userProjectsDir() );
 		ofd.setFileMode( FileDialog::ExistingFiles );
@@ -754,8 +753,8 @@ bool MainWindow::saveProject( void )
 bool MainWindow::saveProjectAs( void )
 {
 	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
-			tr( "MultiMedia Project (*.mmp *.mmpz);;"
-				"MultiMedia Project Template (*.mpt)" ) );
+			tr( "LMMS Project (*.mmp *.mmpz);;"
+				"LMMS Project Template (*.mpt)" ) );
 	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{

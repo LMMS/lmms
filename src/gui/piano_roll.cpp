@@ -57,7 +57,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiEvent.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "pattern.h"
 #include "Piano.h"
 #include "pixmap_button.h"
@@ -3586,9 +3586,9 @@ void pianoRoll::getSelectedNotes( NoteVector & _selected_notes )
 
 void pianoRoll::copy_to_clipboard( const NoteVector & _notes ) const
 {
-	multimediaProject mmp( multimediaProject::ClipboardData );
-	QDomElement note_list = mmp.createElement( "note-list" );
-	mmp.content().appendChild( note_list );
+	DataFile dataFile( DataFile::ClipboardData );
+	QDomElement note_list = dataFile.createElement( "note-list" );
+	dataFile.content().appendChild( note_list );
 
 	MidiTime start_pos( _notes.front()->pos().getTact(), 0 );
 	for( NoteVector::ConstIterator it = _notes.begin(); it != _notes.end();
@@ -3596,11 +3596,11 @@ void pianoRoll::copy_to_clipboard( const NoteVector & _notes ) const
 	{
 		note clip_note( **it );
 		clip_note.setPos( clip_note.pos( start_pos ) );
-		clip_note.saveState( mmp, note_list );
+		clip_note.saveState( dataFile, note_list );
 	}
 
 	QMimeData * clip_content = new QMimeData;
-	clip_content->setData( Clipboard::mimeType(), mmp.toString().toUtf8() );
+	clip_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
 	QApplication::clipboard()->setMimeData( clip_content,
 							QClipboard::Clipboard );
 }
@@ -3667,10 +3667,9 @@ void pianoRoll::pasteNotes()
 
 	if( !value.isEmpty() )
 	{
-		multimediaProject mmp( value.toUtf8() );
+		DataFile dataFile( value.toUtf8() );
 
-		QDomNodeList list = mmp.elementsByTagName(
-							note::classNodeName() );
+		QDomNodeList list = dataFile.elementsByTagName( note::classNodeName() );
 		
 		// remove selection and select the newly pasted notes
 		clearSelectedNotes();

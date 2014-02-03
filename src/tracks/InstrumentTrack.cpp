@@ -65,7 +65,7 @@
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
 #include "PluginView.h"
@@ -534,9 +534,9 @@ int InstrumentTrack::masterKey( int _midi_key ) const
 
 
 
-void InstrumentTrack::removeMidiPortNode( multimediaProject & _mmp )
+void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 {
-	QDomNodeList n = _mmp.elementsByTagName( "midiport" );
+	QDomNodeList n = _dataFile.elementsByTagName( "midiport" );
 	n.item( 0 ).parentNode().removeChild( n.item( 0 ) );
 }
 
@@ -1368,11 +1368,11 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
-		multimediaProject mmp( multimediaProject::InstrumentTrackSettings );
+		DataFile dataFile( DataFile::InstrumentTrackSettings );
 		m_track->setSimpleSerializing();
-		m_track->saveSettings( mmp, mmp.content() );
+		m_track->saveSettings( dataFile, dataFile.content() );
 		QString f = sfd.selectedFiles()[0];
-		mmp.writeFile( f );
+		dataFile.writeFile( f );
 	}
 }
 
@@ -1496,10 +1496,10 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	}
 	else if( type == "presetfile" )
 	{
-		multimediaProject mmp( value );
-		InstrumentTrack::removeMidiPortNode( mmp );
+		DataFile dataFile( value );
+		InstrumentTrack::removeMidiPortNode( dataFile );
 		m_track->setSimpleSerializing();
-		m_track->loadSettings( mmp.content().toElement() );
+		m_track->loadSettings( dataFile.content().toElement() );
 
 		engine::getSong()->setModified();
 

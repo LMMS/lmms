@@ -40,7 +40,7 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "rubberband.h"
 #include "song.h"
 #include "string_pair_drag.h"
@@ -143,10 +143,10 @@ void TrackContainerView::removeTrackView( trackView * _tv )
 	if( index != -1 )
 	{
 /*		QMap<QString, QVariant> map;
-		multimediaProject mmp( multimediaProject::JournalData );
-		_tv->getTrack()->saveState( mmp, mmp.content() );
+		DataFile dataFile( DataFile::JournalData );
+		_tv->getTrack()->saveState( dataFile, dataFile.content() );
 		map["id"] = _tv->getTrack()->id();
-		map["state"] = mmp.toString();
+		map["state"] = dataFile.toString();
 		addJournalEntry( JournalEntry( RemoveTrack, map ) );*/
 
 		m_trackViews.removeAt( index );
@@ -321,9 +321,9 @@ void TrackContainerView::undoStep( JournalEntry & _je )
 			engine::projectJournal()->getJournallingObject(
 							map["id"].toInt() ) );
 			assert( t != NULL );
-			multimediaProject mmp( multimediaProject::JournalData );
-			t->saveState( mmp, mmp.content() );
-			map["state"] = mmp.toString();
+			DataFile dataFile( DataFile::JournalData );
+			t->saveState( dataFile, dataFile.content() );
+			map["state"] = dataFile.toString();
 			_je.data() = map;
 			t->deleteLater();
 			break;
@@ -331,9 +331,9 @@ void TrackContainerView::undoStep( JournalEntry & _je )
 
 		case RemoveTrack:
 		{
-			multimediaProject mmp(
+			DataFile dataFile(
 				_je.data().toMap()["state"].toString().utf8() );
-			track::create( mmp.content().firstChild().toElement(),
+			track::create( dataFile.content().firstChild().toElement(),
 									m_tc );
 			break;
 		}
@@ -405,12 +405,12 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "presetfile" )
 	{
-		multimediaProject mmp( value );
+		DataFile dataFile( value );
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
 		it->setSimpleSerializing();
-		it->loadSettings( mmp.content().toElement() );
+		it->loadSettings( dataFile.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
@@ -421,8 +421,8 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type.left( 6 ) == "track_" )
 	{
-		multimediaProject mmp( value.toUtf8() );
-		track::create( mmp.content().firstChild().toElement(), m_tc );
+		DataFile dataFile( value.toUtf8() );
+		track::create( dataFile.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
 	engine::mixer()->unlock();

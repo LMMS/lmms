@@ -43,7 +43,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
 #include "song.h"
@@ -566,10 +566,10 @@ void fileBrowserTreeWidget::handleFile( fileItem * f, InstrumentTrack * _it )
 
 		case fileItem::LoadAsPreset:
 		{
-			multimediaProject mmp( f->fullName() );
-			InstrumentTrack::removeMidiPortNode( mmp );
+			DataFile dataFile( f->fullName() );
+			InstrumentTrack::removeMidiPortNode( dataFile );
 			_it->setSimpleSerializing();
-			_it->loadSettings( mmp.content().toElement() );
+			_it->loadSettings( dataFile.content().toElement() );
 			break;
 		}
 

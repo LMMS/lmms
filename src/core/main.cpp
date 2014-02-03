@@ -62,7 +62,7 @@
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "song.h"
 
 static inline QString baseName( const QString & _file )
@@ -178,15 +178,15 @@ int main( int argc, char * * argv )
 		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
 						QString( argv[i] ) == "-u" ) )
 		{
-			multimediaProject mmp( QString( argv[i + 1] ) );
+			DataFile dataFile( QString( argv[i + 1] ) );
 			if (argc > i+2)
 			{
-				mmp.writeFile( argv[i + 2] );
+				dataFile.writeFile( argv[i + 2] );
 			}
 			else
 			{
 				QTextStream ts( stdout );
-				mmp.write( ts );
+				dataFile.write( ts );
 				fflush( stdout );
 			}
 			return( EXIT_SUCCESS );
@@ -404,7 +404,7 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.mmp");
+		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.dataFile");
 		if( QFileInfo(recoveryFile).exists() &&
 			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "

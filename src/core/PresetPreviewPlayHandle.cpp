@@ -31,7 +31,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MidiPort.h"
-#include "mmp.h"
+#include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
@@ -146,10 +146,10 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	}
 	else
 	{
-		multimediaProject mmp( _preset_file );
+		DataFile dataFile( _preset_file );
 		s_previewTC->previewInstrumentTrack()->
 			loadTrackSpecificSettings(
-				mmp.content().firstChild().toElement() );
+				dataFile.content().firstChild().toElement() );
 	}
 
 	engine::setSuppressMessages( false );

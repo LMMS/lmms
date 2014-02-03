@@ -1,9 +1,9 @@
 /*
- * mmp.cpp - implementation of class multimediaProject
+ * DataFile.cpp - implementation of class DataFile
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
  */
 
 
-#include "mmp.h"
+#include "DataFile.h"
 
 #include <math.h>
 
@@ -43,43 +43,39 @@
 
 
 
-multimediaProject::typeDescStruct
-		multimediaProject::s_types[multimediaProject::NumProjectTypes] =
+DataFile::typeDescStruct
+		DataFile::s_types[DataFile::TypeCount] =
 {
-	{ multimediaProject::UnknownType, "unknown" },
-	{ multimediaProject::SongProject, "song" },
-	{ multimediaProject::SongProjectTemplate, "songtemplate" },
-	{ multimediaProject::InstrumentTrackSettings,
-						"instrumenttracksettings" },
-	{ multimediaProject::DragNDropData, "dnddata" },
-	{ multimediaProject::ClipboardData, "clipboard-data" },
-	{ multimediaProject::JournalData, "journaldata" },
-	{ multimediaProject::EffectSettings, "effectsettings" },
-	{ multimediaProject::VideoProject, "videoproject" },
-	{ multimediaProject::BurnProject, "burnproject" },
-	{ multimediaProject::Playlist, "playlist" }
+	{ DataFile::UnknownType, "unknown" },
+	{ DataFile::SongProject, "song" },
+	{ DataFile::SongProjectTemplate, "songtemplate" },
+	{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
+	{ DataFile::DragNDropData, "dnddata" },
+	{ DataFile::ClipboardData, "clipboard-data" },
+	{ DataFile::JournalData, "journaldata" },
+	{ DataFile::EffectSettings, "effectsettings" }
 } ;
 
 
 
-multimediaProject::multimediaProject( ProjectTypes _project_type ) :
-	QDomDocument( "multimedia-project" ),
+DataFile::DataFile( Type type ) :
+	QDomDocument( "lmms-project" ),
 	m_content(),
 	m_head(),
-	m_type( _project_type )
+	m_type( type )
 {
 	appendChild( createProcessingInstruction("xml", "version=\"1.0\""));
-	QDomElement root = createElement( "multimedia-project" );
-	root.setAttribute( "version", MMP_VERSION_STRING );
-	root.setAttribute( "type", typeName( _project_type ) );
-	root.setAttribute( "creator", "Linux MultiMedia Studio (LMMS)" );
+	QDomElement root = createElement( "lmms-project" );
+	root.setAttribute( "version", LDF_VERSION_STRING );
+	root.setAttribute( "type", typeName( type ) );
+	root.setAttribute( "creator", "LMMS" );
 	root.setAttribute( "creatorversion", LMMS_VERSION );
 	appendChild( root );
 
 	m_head = createElement( "head" );
 	root.appendChild( m_head );
 
-	m_content = createElement( typeName( _project_type ) );
+	m_content = createElement( typeName( type ) );
 	root.appendChild( m_content );
 
 }
@@ -87,7 +83,7 @@ multimediaProject::multimediaProject( ProjectTypes _project_type ) :
 
 
 
-multimediaProject::multimediaProject( const QString & _fileName ) :
+DataFile::DataFile( const QString & _fileName ) :
 	QDomDocument(),
 	m_content(),
 	m_head()
@@ -111,7 +107,7 @@ multimediaProject::multimediaProject( const QString & _fileName ) :
 
 
 
-multimediaProject::multimediaProject( const QByteArray & _data ) :
+DataFile::DataFile( const QByteArray & _data ) :
 	QDomDocument(),
 	m_content(),
 	m_head()
@@ -122,14 +118,14 @@ multimediaProject::multimediaProject( const QByteArray & _data ) :
 
 
 
-multimediaProject::~multimediaProject()
+DataFile::~DataFile()
 {
 }
 
 
 
 
-QString multimediaProject::nameWithExtension( const QString & _fn ) const
+QString DataFile::nameWithExtension( const QString & _fn ) const
 {
 	switch( type() )
 	{
@@ -166,7 +162,7 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 
 
 
-void multimediaProject::write( QTextStream & _strm )
+void DataFile::write( QTextStream & _strm )
 {
 	if( type() == SongProject || type() == SongProjectTemplate
 					|| type() == InstrumentTrackSettings )
@@ -180,7 +176,7 @@ void multimediaProject::write( QTextStream & _strm )
 
 
 
-bool multimediaProject::writeFile( const QString& filename )
+bool DataFile::writeFile( const QString& filename )
 {
 	const QString fullName = nameWithExtension( filename );
 	const QString fullNameTemp = fullName + ".new";
@@ -232,39 +228,42 @@ bool multimediaProject::writeFile( const QString& filename )
 
 
 
-multimediaProject::ProjectTypes multimediaProject::type(
-						const QString & _type_name )
+DataFile::Type DataFile::type( const QString& typeName )
 {
-	for( int i = 0; i < NumProjectTypes; ++i )
+	for( int i = 0; i < TypeCount; ++i )
 	{
-		if( s_types[i].m_name == _type_name )
+		if( s_types[i].m_name == typeName )
 		{
-			return static_cast<multimediaProject::ProjectTypes>( i );
+			return static_cast<DataFile::Type>( i );
 		}
 	}
-	if( _type_name == "channelsettings" )
+
+	// compat code
+	if( typeName == "channelsettings" )
 	{
-		return multimediaProject::InstrumentTrackSettings;
+		return DataFile::InstrumentTrackSettings;
 	}
+
 	return UnknownType;
 }
 
 
 
 
-QString multimediaProject::typeName( ProjectTypes _project_type )
+QString DataFile::typeName( Type type )
 {
-	if( _project_type >= UnknownType && _project_type < NumProjectTypes )
+	if( type >= UnknownType && type < TypeCount )
 	{
-		return s_types[_project_type].m_name;
+		return s_types[type].m_name;
 	}
+
 	return s_types[UnknownType].m_name;
 }
 
 
 
 
-void multimediaProject::cleanMetaNodes( QDomElement _de )
+void DataFile::cleanMetaNodes( QDomElement _de )
 {
 	QDomNode node = _de.firstChild();
 	while( !node.isNull() )
@@ -290,7 +289,7 @@ void multimediaProject::cleanMetaNodes( QDomElement _de )
 
 
 
-void multimediaProject::upgrade()
+void DataFile::upgrade()
 {
 	projectVersion version =
 		documentElement().attribute( "creatorversion" ).
@@ -698,8 +697,7 @@ void multimediaProject::upgrade()
 
 
 
-void multimediaProject::loadData( const QByteArray & _data,
-					const QString & _sourceFile )
+void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 {
 	QString errorMsg;
 	int line = -1, col = -1;
