@@ -22,10 +22,6 @@
   - Artistic 2.0
   - http://lmms.sourceforge.net/lsp/index.php?action=show&file=581
 
-* MichaelKuhn-Mondscheinsonate.mmpz
-  - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1581
-
 * Momo64-esp.mmpz
   - Artistic 2.0
   - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1534
@@ -61,10 +57,6 @@
 * TameAnderson-MakeMe.mmpz
   - Artistic 2.0
   - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1060
-
-* Thaledric-AwayFromBoobaloo.mmpz
-  - CC (by-nc-sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1187
   
 * unfa-Spoken.mmpz
   - CC (by-nc)
