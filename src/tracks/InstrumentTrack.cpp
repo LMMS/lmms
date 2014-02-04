@@ -706,8 +706,8 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 
 	m_volumeModel.loadSettings( thisElement, "vol" );
 	m_panningModel.loadSettings( thisElement, "pan" );
-	m_pitchModel.loadSettings( thisElement, "pitch" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
+	m_pitchModel.loadSettings( thisElement, "pitch" );
 	m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 
