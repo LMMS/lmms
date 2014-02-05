@@ -797,6 +797,8 @@ void song::clearProject()
 	engine::projectJournal()->clearJournal();
 
 	engine::projectJournal()->setJournalling( true );
+
+	InstrumentTrackView::cleanupWindowCache();
 }
 
 
