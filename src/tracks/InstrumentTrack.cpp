@@ -100,6 +100,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 								this, this ),
 	m_notes(),
 	m_sustainPedalPressed( false ),
+	m_silentBuffersProcessed( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
@@ -165,8 +166,17 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// 99 of 100 cases so that test would be a waste of time.
 	if( n == NULL && MixHelpers::isSilent( buf, frames ) )
 	{
-		// skip further processing
-		return;
+		// at least pass one silent buffer to allow
+		if( m_silentBuffersProcessed )
+		{
+			// skip further processing
+			return;
+		}
+		m_silentBuffersProcessed = true;
+	}
+	else
+	{
+		m_silentBuffersProcessed = false;
 	}
 
 	// if effects "went to sleep" because there was no input, wake them up

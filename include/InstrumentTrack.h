@@ -229,6 +229,8 @@ private:
 	int m_runningMidiNotes[NumKeys];
 	bool m_sustainPedalPressed;
 
+	bool m_silentBuffersProcessed;
+
 	IntModel m_baseNoteModel;
 
 	NotePlayHandleList m_processHandles;
