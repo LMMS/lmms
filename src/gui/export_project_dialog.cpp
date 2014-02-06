@@ -40,7 +40,8 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	Ui::ExportProjectDialog(),
 	m_fileName( _file_name ),
 	m_fileExtension(),
-	m_multiExport(multi_export)
+	m_multiExport( multi_export ),
+	m_activeRenderer( NULL )
 {
 	setupUi( this );
 	setWindowTitle( tr( "Export project to %1" ).arg( 
