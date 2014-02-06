@@ -107,7 +107,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 {
 	if( m_fxChannels[_ch]->m_muteModel.value() == false &&
-		( m_fxChannels[_ch]->m_used || m_fxChannels[_ch]->m_stillRunning || _ch == 0 ) )
+		( m_fxChannels[_ch]->m_used || m_fxChannels[_ch]->m_stillRunning ) )
 	{
 		if( _buf == NULL )
 		{
