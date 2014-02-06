@@ -237,26 +237,6 @@ void EffectChain::startRunning()
 
 
 
-bool EffectChain::isRunning()
-{
-	if( m_enabledModel.value() == false )
-	{
-		return false;
-	}
-	
-	bool running = false;
-	
-	for( EffectList::Iterator it = m_effects.begin(); 
-				it != m_effects.end() || !running; it++ )
-	{
-		running = ( *it )->isRunning() && running;
-	}
-	return running;
-}
-
-
-
-
 void EffectChain::clear()
 {
 	emit aboutToClear();

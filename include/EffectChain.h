@@ -55,7 +55,6 @@ public:
 	void moveUp( Effect * _effect );
 	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise );
 	void startRunning();
-	bool isRunning();
 
 	void clear();
 
