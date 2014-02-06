@@ -38,10 +38,8 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
 	m_name( "unnamed port" ),
 	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL )
 {
-	engine::mixer()->clearAudioBuffer( m_firstBuffer,
-				engine::mixer()->framesPerPeriod() );
-	engine::mixer()->clearAudioBuffer( m_secondBuffer,
-				engine::mixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_firstBuffer, engine::mixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_secondBuffer, engine::mixer()->framesPerPeriod() );
 	engine::mixer()->addAudioPort( this );
 	setExtOutputEnabled( true );
 }
@@ -64,8 +62,7 @@ AudioPort::~AudioPort()
 void AudioPort::nextPeriod()
 {
 	m_firstBufferLock.lock();
-	engine::mixer()->clearAudioBuffer( m_firstBuffer,
-				engine::mixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_firstBuffer, engine::mixer()->framesPerPeriod() );
 	qSwap( m_firstBuffer, m_secondBuffer );
 
 	// this is how we decrease state of buffer-usage ;-)

@@ -144,9 +144,7 @@ public:
 
 	MixerWorkerThread( int _worker_num, Mixer* mixer ) :
 		QThread( mixer ),
-		m_workingBuf( (sampleFrame *) aligned_malloc(
-					mixer->framesPerPeriod() *
-						sizeof( sampleFrame ) ) ),
+		m_workingBuf( (sampleFrame *) aligned_malloc( mixer->framesPerPeriod() * sizeof( sampleFrame ) ) ),
 		m_workerNum( _worker_num ),
 		m_quit( false ),
 		m_mixer( mixer ),
@@ -221,8 +219,7 @@ void MixerWorkerThread::processJobQueue()
 	const bool me = a->processEffects();
 	if( me || a->m_bufferUsage != AudioPort::NoUsage )
 	{
-		engine::fxMixer()->mixToChannel( a->firstBuffer(),
-							a->nextFxChannel() );
+		engine::fxMixer()->mixToChannel( a->firstBuffer(), a->nextFxChannel() );
 		a->nextPeriod();
 	}
 					}

@@ -93,8 +93,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
 		sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
-		for( f_cnt_t f = 0; f < engine::mixer()->framesPerPeriod();
-									++f )
+		for( f_cnt_t f = 0; f < engine::mixer()->framesPerPeriod(); ++f )
 		{
 			buf[f][0] += _buf[f][0];
 			buf[f][1] += _buf[f][1];
@@ -110,9 +109,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 {
 	if( m_fxChannels[_ch]->m_muteModel.value() == false &&
-		( m_fxChannels[_ch]->m_used ||
-				m_fxChannels[_ch]->m_stillRunning ||
-								_ch == 0 ) )
+		( m_fxChannels[_ch]->m_used || m_fxChannels[_ch]->m_stillRunning || _ch == 0 ) )
 	{
 		if( _buf == NULL )
 		{
@@ -258,5 +255,3 @@ void FxMixer::loadSettings( const QDomElement & _this )
 	emit dataChanged();
 }
 
-
-#endif

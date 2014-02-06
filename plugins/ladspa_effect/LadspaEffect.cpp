@@ -233,14 +233,8 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					for( fpp_t frame = 0; 
 						frame < frames; ++frame )
 					{
-						_buf[frame][channel] = 
-							d * 
-							_buf[frame][channel] +
-							w *
-							pp->buffer[frame];
-						out_sum += 
-							_buf[frame][channel] *
-							_buf[frame][channel];
+						_buf[frame][channel] = d * _buf[frame][channel] + w * pp->buffer[frame];
+						out_sum += _buf[frame][channel] * _buf[frame][channel];
 					}
 					++channel;
 					break;
