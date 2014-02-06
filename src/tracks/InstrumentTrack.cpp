@@ -65,6 +65,7 @@
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
+#include "MixHelpers.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
@@ -150,13 +151,21 @@ InstrumentTrack::~InstrumentTrack()
 
 
 
-void InstrumentTrack::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames,
-							NotePlayHandle * _n )
+void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( _n && _n->isBbTrackMuted() ) )
+	if( isMuted() || ( n && n->isBbTrackMuted() ) )
 	{
+		return;
+	}
+
+	// Test for silent input data if instrument provides a single stream only (i.e. driven by InstrumentPlayHandle)
+	// We could do that in all other cases as well but the overhead for silence test is bigger than
+	// what we potentially save. While playing a note, a NotePlayHandle-driven instrument will produce sound in
+	// 99 of 100 cases so that test would be a waste of time.
+	if( n == NULL && MixHelpers::isSilent( buf, frames ) )
+	{
+		// skip further processing
 		return;
 	}
 
@@ -167,17 +176,16 @@ void InstrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	float v_scale = (float) getVolume() / DefaultVolume;
 
 	// instruments using instrument-play-handles will call this method
-	// without any knowledge about notes, so they pass NULL for _n, which
+	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
-	if( _n != NULL )
+	if( n )
 	{
-		m_soundShaping.processAudioBuffer( _buf, _frames, _n );
-		v_scale *= ( (float) _n->getVolume() / DefaultVolume );
+		m_soundShaping.processAudioBuffer( buf, frames, n );
+		v_scale *= ( (float) n->getVolume() / DefaultVolume );
 	}
 	else
 	{
-		if( getVolume() < DefaultVolume &&
-					m_instrument->isMidiBased() )
+		if( getVolume() < DefaultVolume && m_instrument->isMidiBased() )
 		{
 			v_scale = 1;
 		}
@@ -185,18 +193,20 @@ void InstrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	
+	int framesToMix = frames;
+	int offset = 0;
 	int panning = m_panningModel.value();
-	if( _n != NULL )
+
+	if( n )
 	{
-		panning += _n->getPanning();
+		framesToMix = qMin<f_cnt_t>( n->framesLeftForCurrentPeriod(), framesToMix );
+		offset = n->offset();
+
+		panning += n->getPanning();
 		panning = tLimit<int>( panning, PanningLeft, PanningRight );
 	}
-	engine::mixer()->bufferToPort( _buf, ( _n != NULL ) ?
-		qMin<f_cnt_t>(_n->framesLeftForCurrentPeriod(), _frames ) :
-								_frames,
-			( _n != NULL ) ? _n->offset() : 0,
-			panningToVolumeVector( panning,	v_scale ),
-								&m_audioPort );
+
+	engine::mixer()->bufferToPort( buf, framesToMix, offset, panningToVolumeVector( panning, v_scale ), &m_audioPort );
 }
 
 
