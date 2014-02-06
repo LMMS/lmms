@@ -70,7 +70,7 @@ void Unison::set_bandwidth(REALTYPE bandwidth) {
     if(bandwidth > 1200.0)
         bandwidth = 1200.0;
 
-    printf("bandwidth %g\n", bandwidth);
+    //printf("bandwidth %g\n", bandwidth);
     unison_bandwidth_cents = bandwidth;
     update_parameters();
 }
@@ -95,7 +95,7 @@ void Unison::update_parameters() {
     REALTYPE max_speed = pow(2.0, unison_bandwidth_cents / 1200.0);
     unison_amplitude_samples = 0.125
                                * (max_speed - 1.0) * SAMPLE_RATE / base_freq;
-    printf("unison_amplitude_samples %g\n", unison_amplitude_samples);
+    //printf("unison_amplitude_samples %g\n", unison_amplitude_samples);
 
     if(unison_amplitude_samples >= max_delay - 1)
         unison_amplitude_samples = max_delay - 2;
