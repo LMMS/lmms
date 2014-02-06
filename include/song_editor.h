@@ -56,7 +56,7 @@ class songEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	songEditor( song * _song, songEditor * & _engine_ptr );
+	songEditor( song * _song );
 	virtual ~songEditor();
 
 

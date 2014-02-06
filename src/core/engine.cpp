@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
@@ -91,7 +89,7 @@ void engine::init( const bool _has_gui )
 	if( s_hasGUI )
 	{
 		s_mainWindow = new MainWindow;
-		s_songEditor = new songEditor( s_song, s_songEditor );
+		s_songEditor = new songEditor( s_song );
 		s_fxMixerView = new FxMixerView;
 		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new projectNotes;
@@ -190,6 +188,3 @@ void engine::initPluginFileHandling()
 }
 
 
-
-
-#endif

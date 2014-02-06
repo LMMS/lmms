@@ -75,14 +75,12 @@ void positionLine::paintEvent( QPaintEvent * _pe )
 
 
 
-songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
+songEditor::songEditor( song * _song ) :
 	TrackContainerView( _song ),
 	m_s( _song ),
 	m_scrollBack( false ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() )
 {
-	_engine_ptr = this;
-
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
