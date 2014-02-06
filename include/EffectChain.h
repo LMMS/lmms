@@ -2,7 +2,7 @@
  * EffectChain.h - class for processing and effects chain
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,7 +53,7 @@ public:
 	void removeEffect( Effect * _effect );
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
-	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames );
+	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise );
 	void startRunning();
 	bool isRunning();
 

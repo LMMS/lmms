@@ -184,17 +184,21 @@ void EffectChain::moveUp( Effect * _effect )
 
 
 
-bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
+bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise )
 {
 	if( m_enabledModel.value() == false )
 	{
 		return false;
 	}
+
 	bool moreEffects = false;
-	for( EffectList::Iterator it = m_effects.begin(); 
-						it != m_effects.end(); ++it )
+	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
 	{
-		moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
+		if( hasInputNoise || ( *it )->isRunning() )
+		{
+			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
+		}
+
 #ifdef LMMS_DEBUG
 		for( int f = 0; f < _frames; ++f )
 		{
@@ -209,6 +213,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 		}
 #endif
 	}
+
 	return moreEffects;
 }
 

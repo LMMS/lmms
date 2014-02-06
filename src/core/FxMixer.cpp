@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * FxMixer.cpp - effect mixer for LMMS
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -118,8 +116,15 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 		const fpp_t f = engine::mixer()->framesPerPeriod();
 		if( !engine::getSong()->isFreezingPattern() )
 		{
-			m_fxChannels[_ch]->m_fxChain.startRunning();
-			m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f );
+			// only start effects if sound was mixed to this FX channel before
+			if( m_fxChannels[_ch]->m_used )
+			{
+				m_fxChannels[_ch]->m_fxChain.startRunning();
+			}
+
+			// process FX chain
+			m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f, m_fxChannels[_ch]->m_used );
+
 			float peakLeft = engine::mixer()->peakValueLeft( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
 			float peakRight = engine::mixer()->peakValueRight( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
 

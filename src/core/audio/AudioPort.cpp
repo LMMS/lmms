@@ -109,8 +109,8 @@ bool AudioPort::processEffects()
 	if( m_effects )
 	{
 		lockFirstBuffer();
-		bool more = m_effects->processAudioBuffer( m_firstBuffer,
-					engine::mixer()->framesPerPeriod() );
+		bool hasInputNoise = m_bufferUsage != NoUsage;
+		bool more = m_effects->processAudioBuffer( m_firstBuffer, engine::mixer()->framesPerPeriod(), hasInputNoise );
 		unlockFirstBuffer();
 		return more;
 	}
