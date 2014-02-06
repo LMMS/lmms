@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include "combobox.h"
 
@@ -91,7 +91,7 @@ comboBox::~comboBox()
 QSize comboBox::sizeHint() const
 {
 	int maxTextWidth = 0;
-	for( int i = 0; i < model()->size(); ++i )
+	for( int i = 0; model() && i < model()->size(); ++i )
 	{
 		int w = fontMetrics().width( model()->itemText( i ) );
 		if( w > maxTextWidth )
@@ -105,11 +105,11 @@ QSize comboBox::sizeHint() const
 
 
 
-void comboBox::contextMenuEvent( QContextMenuEvent * _me )
+void comboBox::contextMenuEvent( QContextMenuEvent * event )
 {
-	if( _me->x() <= width() - CB_ARROW_BTN_WIDTH )
+	if( model() == NULL || event->x() <= width() - CB_ARROW_BTN_WIDTH )
 	{
-		QWidget::contextMenuEvent( _me );
+		QWidget::contextMenuEvent( event );
 		return;
 	}
 
@@ -121,12 +121,16 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 
 
 
-void comboBox::mousePressEvent( QMouseEvent * _me )
+void comboBox::mousePressEvent( QMouseEvent* event )
 {
-	if( _me->button() == Qt::LeftButton &&
-			! ( _me->modifiers() & Qt::ControlModifier ) )
+	if( model() == NULL )
 	{
-		if( _me->x() > width() - CB_ARROW_BTN_WIDTH )
+		return;
+	}
+
+	if( event->button() == Qt::LeftButton && ! ( event->modifiers() & Qt::ControlModifier ) )
+	{
+		if( event->x() > width() - CB_ARROW_BTN_WIDTH )
 		{
 			m_pressed = true;
 			update();
@@ -134,43 +138,37 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 			m_menu.clear();
 			for( int i = 0; i < model()->size(); ++i )
 			{
-				QAction * a = m_menu.addAction(
-					model()->itemPixmap( i ) ?
-						model()->itemPixmap( i )->
-							pixmap() :
-								QPixmap(),
-						model()->itemText( i ) );
+				QAction * a = m_menu.addAction( model()->itemPixmap( i ) ? model()->itemPixmap( i )->pixmap() : QPixmap(),
+													model()->itemText( i ) );
 				a->setData( i );
 			}
 
 			QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
-			if( gpos.y() + m_menu.sizeHint().height() <
-						qApp->desktop()->height() )
+			if( gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height() )
 			{
 				m_menu.exec( gpos );
 			}
 			else
 			{
-				m_menu.exec( mapToGlobal(
-						QPoint( width(), 0 ) ) );
+				m_menu.exec( mapToGlobal( QPoint( width(), 0 ) ) );
 			}
 			m_pressed = false;
 			update();
 		}
-		else if( _me->button() == Qt::LeftButton )
+		else if( event->button() == Qt::LeftButton )
 		{
 			model()->setInitValue( model()->value() + 1 );
 			update();
 		}
 	}
-	else if( _me->button() == Qt::RightButton )
+	else if( event->button() == Qt::RightButton )
 	{
 		model()->setInitValue( model()->value() - 1 );
 		update();
 	}
 	else
 	{
-		IntModelView::mousePressEvent( _me );
+		IntModelView::mousePressEvent( event );
 	}
 }
 
@@ -182,7 +180,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 
 	p.fillRect( 2, 2, width()-2, height()-4, *s_background );
-	
+
 	QColor shadow = palette().shadow().color();
 	QColor highlight = palette().highlight().color();
 
@@ -191,12 +189,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 
 	// button-separator
 	p.setPen( shadow );
-	p.drawLine( width() - CB_ARROW_BTN_WIDTH - 1, 1, width() -
-					CB_ARROW_BTN_WIDTH - 1, height() - 3 );
+	p.drawLine( width() - CB_ARROW_BTN_WIDTH - 1, 1, width() - CB_ARROW_BTN_WIDTH - 1, height() - 3 );
 
 	p.setPen( highlight );
-	p.drawLine( width() - CB_ARROW_BTN_WIDTH, 1, width() -
-					CB_ARROW_BTN_WIDTH, height() - 3 );
+	p.drawLine( width() - CB_ARROW_BTN_WIDTH, 1, width() - CB_ARROW_BTN_WIDTH, height() - 3 );
 
 	// Border
 	QStyleOptionFrame opt;
@@ -206,24 +202,20 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
 	QPixmap * arrow = m_pressed ? s_arrowSelected : s_arrow;
-	
-	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 5, 4,
-						*arrow );
 
-	if( model()->size() > 0 )
+	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 5, 4, *arrow );
+
+	if( model() && model()->size() > 0 )
 	{
 		p.setFont( font() );
-		p.setClipRect( QRect( 4, 2, width() - CB_ARROW_BTN_WIDTH - 8,
-							height() - 2 ) );
-		QPixmap pm = model()->currentData() ?
-				model()->currentData()->pixmap() : QPixmap();
+		p.setClipRect( QRect( 4, 2, width() - CB_ARROW_BTN_WIDTH - 8, height() - 2 ) );
+		QPixmap pm = model()->currentData() ?  model()->currentData()->pixmap() : QPixmap();
 		int tx = 5;
 		if( !pm.isNull() )
 		{
 			if( pm.height() > 16 )
 			{
-				pm = pm.scaledToHeight( 16,
-						Qt::SmoothTransformation );
+				pm = pm.scaledToHeight( 16, Qt::SmoothTransformation );
 			}
 			p.drawPixmap( tx, 3, pm );
 			tx += pm.width() + 3;
@@ -239,20 +231,25 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 
 
 
-void comboBox::wheelEvent( QWheelEvent * _we )
+void comboBox::wheelEvent( QWheelEvent* event )
 {
-	model()->setInitValue( model()->value() +
-					( ( _we->delta() < 0 ) ? 1 : -1 ) );
-	update();
-	_we->accept();
+	if( model() )
+	{
+		model()->setInitValue( model()->value() + ( ( event->delta() < 0 ) ? 1 : -1 ) );
+		update();
+		event->accept();
+	}
 }
 
 
 
 
-void comboBox::setItem( QAction * _item )
+void comboBox::setItem( QAction* item )
 {
-	model()->setInitValue( _item->data().toInt() );
+	if( model() )
+	{
+		model()->setInitValue( item->data().toInt() );
+	}
 }
 
 
