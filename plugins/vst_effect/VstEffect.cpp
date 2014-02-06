@@ -1,7 +1,7 @@
 /*
  * VstEffect.cpp - class for handling VST effect plugins
  *
- * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -163,7 +163,7 @@ void VstEffect::openPlugin( const QString & _plugin )
 void VstEffect::closePlugin()
 {
 	m_pluginMutex.lock();
-	if( m_plugin->pluginWidget() != NULL )
+	if( m_plugin && m_plugin->pluginWidget() != NULL )
 	{
 		delete m_plugin->pluginWidget();
 	}
