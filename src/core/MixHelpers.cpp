@@ -22,6 +22,8 @@
  *
  */
 
+#include <math.h>
+
 #include "MixHelpers.h"
 
 
@@ -49,6 +51,22 @@ static inline void run( sampleFrame* dst, const sample_t* srcLeft, const sample_
 	}
 }
 
+
+
+bool isSilent( const sampleFrame* src, int frames )
+{
+	const float silenceThreshold = 0.0000001f;
+
+	for( int i = 0; i < frames; ++i )
+	{
+		if( fabsf( src[i][0] ) >= silenceThreshold || fabsf( src[i][1] ) >= silenceThreshold )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 
 struct AddOp

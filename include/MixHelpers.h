@@ -30,6 +30,8 @@
 namespace MixHelpers
 {
 
+bool isSilent( const sampleFrame* src, int frames );
+
 /*! \brief Add samples from src to dst */
 void add( sampleFrame* dst, const sampleFrame* src, int frames );
 
