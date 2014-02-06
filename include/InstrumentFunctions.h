@@ -42,7 +42,7 @@ class InstrumentFunctionNoteStacking : public Model, public JournallingObject
 	Q_OBJECT
 
 public:
-	static const int MAX_CHORD_POLYPHONY = 10;
+	static const int MAX_CHORD_POLYPHONY = 13;
 
 private:
 	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
