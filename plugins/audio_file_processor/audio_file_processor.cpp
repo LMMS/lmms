@@ -406,7 +406,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"playback to the start of the sample, insert a note at the bottom "
 			"of the keyboard (< 20 Hz)") );
 
-	m_ampKnob = new knob( knobStyled, this );
+	m_ampKnob = new knob( knobBright_26, this );
 	m_ampKnob->setVolumeKnob( TRUE );
 	m_ampKnob->move( 17, 108 );
 	m_ampKnob->setFixedSize( 37, 47 );
@@ -762,7 +762,7 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 
 	p.drawPixmap( s_padding, s_padding, m_graph );
 
-	p.setPen( QColor( 0xFF, 0xFF, 0x00 ) );
+	p.setPen( QColor( 0xFF, 0xFF, 0xFF ) );
 	const QRect graph_rect( s_padding, s_padding, width() - 2 * s_padding, height() - 2 * s_padding );
 	const f_cnt_t frames = m_sampleBuffer.frames();
 	m_startFrameX = graph_rect.x() + ( m_sampleBuffer.startFrame() ) *
@@ -784,7 +784,7 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 			graph_rect.y(),
 			m_endFrameX - m_startFrameX - 1,
 			graph_rect.height() + graph_rect.y(),
-			QColor( 255, 255, 0, 70 )
+			QColor( 95, 195, 255, 70 )
 		);
 
 		if( m_framesPlayed && m_animation)
@@ -804,7 +804,7 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 				graph_rect.height() + graph_rect.y(),
 				g
 			);
-			p.setPen( QColor( 0, 255, 255 ) );
+			p.setPen( QColor( 255, 255, 255 ) );
 			p.drawLine(
 				m_startFrameX + 1 + played_width_px,
 				graph_rect.y(),
@@ -816,13 +816,13 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 	}
 
 	QLinearGradient g( 0, 0, width() * 0.7, 0 );
-	const QColor c( 0, 0, 150, 180 );
+	const QColor c( 16, 111, 170, 180 );
 	g.setColorAt( 0, c );
 	g.setColorAt( 0.4, c );
 	g.setColorAt( 1,  Qt::transparent );
 	p.fillRect( s_padding, s_padding, m_graph.width(), 14, g );
 
-	p.setPen( QColor( 255, 255, 20 ) );
+	p.setPen( QColor( 255, 255, 255 ) );
 	p.setFont( pointSize<8>( font() ) );
 
 	QString length_text;
@@ -883,7 +883,7 @@ void AudioFileProcessorWaveView::updateGraph()
 
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
-	p.setPen( QColor( 64, 255, 160 ) );
+	p.setPen( QColor( 255, 255, 255 ) );
 	m_sampleBuffer.visualize(
 		p,
 		QRect( 0, 0, m_graph.width(), m_graph.height() ),
