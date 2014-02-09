@@ -171,22 +171,15 @@ void bbEditor::removeBBView( int _bb )
 
 
 
-void bbEditor::updatePlayPauseIcon()
+void bbEditor::setPauseIcon( bool pause )
 {
-	if( engine::getSong()->playMode() != song::Mode_PlayBB )
+	if( pause == true )
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		if( engine::getSong()->isPlaying() )
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		}
-		else
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	}
 }
 

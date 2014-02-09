@@ -427,22 +427,15 @@ void songEditor::scrolled( int _new_pos )
 
 
 
-void songEditor::updatePlayPauseIcon()
+void songEditor::setPauseIcon( bool pause )
 {
-	if( engine::getSong()->playMode() != song::Mode_PlaySong )
+	if( pause == true )
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		if( engine::getSong()->isPlaying() )
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		}
-		else
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	}
 }
 

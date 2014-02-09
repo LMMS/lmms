@@ -89,7 +89,7 @@ public:
 		return "pianoroll";
 	}
 
-	void updatePlayPauseIcon();
+	void setPauseIcon( bool pause );
 
 
 protected:

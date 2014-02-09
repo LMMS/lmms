@@ -48,7 +48,7 @@ public:
 
 	void removeBBView( int _bb );
 
-	void updatePlayPauseIcon();
+	void setPauseIcon( bool pause );
 
 
 public slots:

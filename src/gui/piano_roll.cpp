@@ -798,22 +798,15 @@ void pianoRoll::loadSettings( const QDomElement & _this )
 
 
 
-void pianoRoll::updatePlayPauseIcon()
+void pianoRoll::setPauseIcon( bool pause )
 {
-	if( engine::getSong()->playMode() != song::Mode_PlayPattern )
+	if( pause == true )
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		if( engine::getSong()->isPlaying() )
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		}
-		else
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	}
 }
 

@@ -59,11 +59,11 @@ public:
 	songEditor( song * _song );
 	virtual ~songEditor();
 
+	void setPauseIcon( bool pause );
+
 
 public slots:
 	void scrolled( int _new_pos );
-
-	void updatePlayPauseIcon();
 
 
 private slots:
