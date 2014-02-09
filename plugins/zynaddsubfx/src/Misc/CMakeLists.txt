@@ -1,4 +1,6 @@
-include_directories(${MXML_INCLUDE_DIR})
+if(NOT ("${MXML_INCLUDE_DIR}" STREQUAL ""))
+   include_directories("${MXML_INCLUDE_DIR}")
+endif()
 
 set(zynaddsubfx_misc_SRCS
 	Bank.cpp

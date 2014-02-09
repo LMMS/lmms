@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
 
 PROJECT(lmms)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 
 IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
@@ -84,7 +84,7 @@ CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
 CHECK_INCLUDE_FILES(process.h LMMS_HAVE_PROCESS_H)
 CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
-LIST(APPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
 # check for Qt4
 SET(QT_MIN_VERSION "4.3.0" COMPONENTS QtCore QtGui QtXml)
@@ -101,7 +101,7 @@ ENDIF(EXISTS "${QT_TRANSLATIONS_DIR}")
 IF(NOT WIN32)
 	STRING(REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
 ENDIF(NOT WIN32)
-INCLUDE(${QT_USE_FILE})
+INCLUDE("${QT_USE_FILE}")
 
 # check for libsndfile
 PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
@@ -161,7 +161,7 @@ IF(NOT LMMS_HAVE_SDL)
 	SET(SDL_INCLUDE_DIR "")
 ELSE(NOT LMMS_HAVE_SDL)
 	IF(NOT SDL_INCLUDE_DIR)
-		SET(SDL_INCLUDE_DIR ${CMAKE_FIND_ROOT_PATH}/include)
+		SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
 	ENDIF(NOT SDL_INCLUDE_DIR)
 ENDIF(NOT LMMS_HAVE_SDL)
 
@@ -308,30 +308,30 @@ IF(WANT_SYSTEM_SR)
 ENDIF(WANT_SYSTEM_SR)
 IF(NOT LMMS_HAVE_SAMPLERATE)
 	SET(STATUS_SAMPLERATE "bundled")
-	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate)
+	INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate")
 	SET(CMAKE_CROSSCOMPILING_ORIG "${CMAKE_CROSSCOMPILING}")
 	SET(CMAKE_CROSSCOMPILING "")
 	INCLUDE(ChecksForLibSamplerate)
 	SET(LIBSAMPLERATE_SOURCES 
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.c
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_sinc.c
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/high_qual_coeffs.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/mid_qual_coeffs.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/fastest_coeffs.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/common.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_config.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/float_cast.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_zoh.c
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_linear.c)
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.c"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_sinc.c"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/high_qual_coeffs.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/mid_qual_coeffs.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/fastest_coeffs.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/common.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_config.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/float_cast.h"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_zoh.c"
+		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_linear.c")
 	SET(CMAKE_CROSSCOMPILING "${CMAKE_CROSSCOMPILING_ORIG}")
 ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmmsconfig.h.in ${CMAKE_BINARY_DIR}/lmmsconfig.h)
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmmsversion.h.in ${CMAKE_BINARY_DIR}/lmmsversion.h)
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmms.rc.in ${CMAKE_BINARY_DIR}/lmms.rc)
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in ${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc)
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmmsconfig.h.in" "${CMAKE_BINARY_DIR}/lmmsconfig.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmmsversion.h.in" "${CMAKE_BINARY_DIR}/lmmsversion.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmms.rc.in" "${CMAKE_BINARY_DIR}/lmms.rc")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in" "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
 
 # set compiler flags
 SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
@@ -343,25 +343,25 @@ set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
 
-FILE(GLOB lmms_INCLUDES ${CMAKE_SOURCE_DIR}/include/*.h)
-FILE(GLOB lmms_UI ${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui ${CMAKE_SOURCE_DIR}/src/gui/Forms/*.ui)
-FILE(GLOB_RECURSE lmms_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
+FILE(GLOB lmms_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
+FILE(GLOB lmms_UI "${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui" "${CMAKE_SOURCE_DIR}/src/gui/Forms/*.ui")
+FILE(GLOB_RECURSE lmms_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 SET(lmms_MOC ${lmms_INCLUDES})
 
 # Get list of all committers from git history, ordered by number of commits
 FIND_PACKAGE(Git)
 IF(GIT_FOUND)
-	SET(CONTRIBUTORS ${CMAKE_BINARY_DIR}/CONTRIBUTORS)
+	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
 	EXECUTE_PROCESS(
-		COMMAND ${GIT_EXECUTABLE} shortlog -sne
+		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
 		COMMAND cut -c8-
-		OUTPUT_FILE ${CONTRIBUTORS}
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_FILE "${CONTRIBUTORS}"
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 		TIMEOUT 1)
 ENDIF(GIT_FOUND)
 
-SET(lmms_EMBEDDED_RESOURCES ${CMAKE_SOURCE_DIR}/AUTHORS ${CMAKE_SOURCE_DIR}/COPYING ${CONTRIBUTORS})
+SET(lmms_EMBEDDED_RESOURCES "${CMAKE_SOURCE_DIR}/AUTHORS" "${CMAKE_SOURCE_DIR}/COPYING" "${CONTRIBUTORS}")
 
 QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw)
 QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
@@ -370,29 +370,29 @@ QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
 # embedded resources stuff
 IF(WIN32 OR WIN64)
 	# compile buildtools native
-	SET(BIN2RES_CPP ${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp)
-	SET(BIN2RES ${CMAKE_BINARY_DIR}/bin2res)
-	ADD_CUSTOM_COMMAND(OUTPUT ${BIN2RES} COMMAND g++ ARGS ${BIN2RES_CPP} -o ${BIN2RES} DEPENDS ${BIN2RES_CPP})
+	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
+	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
+	ADD_CUSTOM_COMMAND(OUTPUT "${BIN2RES}" COMMAND g++ ARGS "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
 ELSE(WIN32 OR WIN64)
 	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
 	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
 ENDIF(WIN32 OR WIN64)
 
-SET(LMMS_ER_H ${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h)
+SET(LMMS_ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
 
 # we somehow have to make LMMS-binary depend on MOC-files
-ADD_FILE_DEPENDENCIES(${CMAKE_BINARY_DIR}/lmmsconfig.h ${lmms_MOC_out})
+ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h" ${lmms_MOC_out})
 
-ADD_CUSTOM_COMMAND(OUTPUT ${LMMS_ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${LMMS_ER_H} DEPENDS ${BIN2RES})
+ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND "${BIN2RES}" ARGS ${lmms_EMBEDDED_RESOURCES} > "\"${LMMS_ER_H}\"" DEPENDS "${BIN2RES}")
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
-	ADD_CUSTOM_COMMAND(OUTPUT ${WINRC}
-				COMMAND ${WINDRES}
-					-I${CMAKE_SOURCE_DIR}
-					-o${CMAKE_BINARY_DIR}/lmmsrc.obj
-					-i${CMAKE_BINARY_DIR}/lmms.rc
-				DEPENDS ${CMAKE_BINARY_DIR}/lmms.rc)
+	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
+				COMMAND "${WINDRES}"
+					"-I\"${CMAKE_SOURCE_DIR}\""
+					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
+					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
+				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
@@ -413,42 +413,62 @@ IF(LMMS_BUILD_WIN32)
 ENDIF()
 
 # Paths relative to lmms executable
-FILE(RELATIVE_PATH LIB_DIR_RELATIVE /${BIN_DIR} /${LIB_DIR})
-FILE(RELATIVE_PATH PLUGIN_DIR_RELATIVE /${BIN_DIR} /${PLUGIN_DIR})
+FILE(RELATIVE_PATH LIB_DIR_RELATIVE "/${BIN_DIR}" "/${LIB_DIR}")
+FILE(RELATIVE_PATH PLUGIN_DIR_RELATIVE "/${BIN_DIR}" "/${PLUGIN_DIR}")
 ADD_DEFINITIONS(-D'LIB_DIR="${LIB_DIR_RELATIVE}/"' -D'PLUGIN_DIR="${PLUGIN_DIR_RELATIVE}/"' ${PULSEAUDIO_DEFINITIONS} ${PORTAUDIO_DEFINITIONS})
+INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}"
+                    "${CMAKE_BINARY_DIR}/include"
+                    "${CMAKE_SOURCE_DIR}"
+                    "${CMAKE_SOURCE_DIR}/include"
+                    ${JACK_INCLUDE_DIRS}
+                    ${SAMPLERATE_INCLUDE_DIRS}
+                    ${SNDFILE_INCLUDE_DIRS})
 
-INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/include ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/include ${SDL_INCLUDE_DIR} ${PORTAUDIO_INCLUDE_DIR} ${PULSEAUDIO_INCLUDE_DIR} ${JACK_INCLUDE_DIRS} ${OGGVORBIS_INCLUDE_DIR} ${SAMPLERATE_INCLUDE_DIRS} ${SNDFILE_INCLUDE_DIRS})
+IF(NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${SDL_INCLUDE_DIR}")
+ENDIF()
 
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/lmms.1.gz COMMAND gzip -c ${CMAKE_SOURCE_DIR}/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz DEPENDS ${CMAKE_SOURCE_DIR}/lmms.1 COMMENT "Generating lmms.1.gz")
+IF(NOT ("${PORTAUDIO_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${PORTAUDIO_INCLUDE_DIR}")
+ENDIF()
 
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h lmmsversion.h ${WINRC} ${CMAKE_BINARY_DIR}/lmms.1.gz)
+IF(NOT ("${PULSEAUDIO_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${PULSEAUDIO_INCLUDE_DIR}")
+ENDIF()
+
+IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
+ENDIF()
+
+ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz" COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\"" DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1" COMMENT "Generating lmms.1.gz")
+ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} "${LMMS_ER_H}" ${lmms_UI_out} lmmsconfig.h lmmsversion.h "${WINRC}" "${CMAKE_BINARY_DIR}/lmms.1.gz")
 
 TARGET_LINK_LIBRARIES(lmms ${CMAKE_THREAD_LIBS_INIT} ${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PORTAUDIO_LIBRARIES} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES} ${EXTRA_LIBRARIES})
 
 IF(LMMS_BUILD_WIN32)
 
 	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
-	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND ${STRIP} ${CMAKE_BINARY_DIR}/lmms.exe)
+	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "\"${CMAKE_BINARY_DIR}/lmms.exe\"")
 
-	INSTALL(TARGETS lmms RUNTIME DESTINATION ${BIN_DIR})
+	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
 	INSTALL(FILES
-					${MINGW_PREFIX}/bin/QtCore4.dll
-					${MINGW_PREFIX}/bin/QtGui4.dll
-					${MINGW_PREFIX}/bin/QtXml4.dll
-					${MINGW_PREFIX}/bin/libsndfile-1.dll
-					${MINGW_PREFIX}/bin/libvorbis-0.dll
-					${MINGW_PREFIX}/bin/libvorbisenc-2.dll
-					${MINGW_PREFIX}/bin/libvorbisfile-3.dll
-					${MINGW_PREFIX}/bin/libogg-0.dll
-					${MINGW_PREFIX}/bin/libfluidsynth.dll
-					${MINGW_PREFIX}/bin/libfftw3f-3.dll
-					${MINGW_PREFIX}/bin/libFLAC-8.dll
-					${MINGW_PREFIX}/bin/libportaudio-2.dll
-					${MINGW_PREFIX}/bin/libpng15-15.dll
-					${MINGW_PREFIX}/bin/SDL.dll
-					${MINGW_PREFIX}/bin/libglib-2.0-0.dll
-					${MINGW_PREFIX}/bin/libgthread-2.0-0.dll
-					${MINGW_PREFIX}/bin/zlib1.dll
+					"${MINGW_PREFIX}/bin/QtCore4.dll"
+					"${MINGW_PREFIX}/bin/QtGui4.dll"
+					"${MINGW_PREFIX}/bin/QtXml4.dll"
+					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
+					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
+					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
+					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
+					"${MINGW_PREFIX}/bin/libogg-0.dll"
+					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
+					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
+					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
+					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
+					"${MINGW_PREFIX}/bin/libpng15-15.dll"
+					"${MINGW_PREFIX}/bin/SDL.dll"
+					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
+					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
+					"${MINGW_PREFIX}/bin/zlib1.dll"
 				DESTINATION .)
 
 ELSE(LMMS_BUILD_WIN32)
@@ -456,8 +476,8 @@ ELSE(LMMS_BUILD_WIN32)
 		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
 	ENDIF(NOT LMMS_BUILD_APPLE)
 
-	INSTALL(TARGETS lmms RUNTIME DESTINATION ${BIN_DIR})
-	INSTALL(FILES ${CMAKE_BINARY_DIR}/lmms.1.gz DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1/ PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+	INSTALL(FILES "${CMAKE_BINARY_DIR}/lmms.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
 
 ENDIF(LMMS_BUILD_WIN32)
 
@@ -471,39 +491,47 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target} COMMAND ${QT_LUPDATE_EXECUTABLE} -locations none -no-obsolete ${lmms_SOURCES} ${lmms_UI} `find ${CMAKE_SOURCE_DIR}/plugins/ -type f -name '*.cpp'` -ts ${_ts_file})
-	ADD_CUSTOM_TARGET(${_qm_target} COMMAND ${QT_LRELEASE_EXECUTABLE} ${_ts_file} -qm ${_qm_file})
+	ADD_CUSTOM_TARGET(${_ts_target} COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete ${lmms_SOURCES} ${lmms_UI} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp'` -ts "\"${_ts_file}\"")
+	ADD_CUSTOM_TARGET(${_qm_target} COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\"")
 	LIST(APPEND ts_targets "${_ts_target}")
 	LIST(APPEND qm_targets "${_qm_target}")
 ENDFOREACH(_ts_file ${lmms_LOCALES})
 
 ADD_CUSTOM_TARGET(update-locales)
 FOREACH(_item ${ts_targets})
-	ADD_DEPENDENCIES(update-locales ${_item})
+	ADD_DEPENDENCIES(update-locales "${_item}")
 ENDFOREACH(_item ${ts_targets})
 
 ADD_CUSTOM_TARGET(finalize-locales)
 FOREACH(_item ${qm_targets})
-	ADD_DEPENDENCIES(finalize-locales ${_item})
+	ADD_DEPENDENCIES(finalize-locales "${_item}")
 ENDFOREACH(_item ${qm_targets})
 
 
 # install headers
 
 IF(LMMS_BUILD_LINUX)
-INSTALL(FILES ${lmms_INCLUDES} ${CMAKE_BINARY_DIR}/lmmsconfig.h ${CMAKE_BINARY_DIR}/lmmsversion.h ${CMAKE_SOURCE_DIR}/src/gui/embed.cpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lmms/)
-IF(NOT LMMS_HAVE_SAMPLERATE)
-INSTALL(FILES ${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lmms/)
-ENDIF(NOT LMMS_HAVE_SAMPLERATE)
+	INSTALL(FILES ${lmms_INCLUDES}
+		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
+		"${CMAKE_BINARY_DIR}/lmmsversion.h"
+		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
+		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
+
+	IF(NOT LMMS_HAVE_SAMPLERATE)
+		INSTALL(FILES "${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h"
+			DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
+	ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 ENDIF(LMMS_BUILD_LINUX)
 
 # package ZynAddSubFX into win32 build
 IF(LMMS_BUILD_WIN32)
-IF(EXISTS ${CMAKE_SOURCE_DIR}/extras)
-ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/extras/data/presets)
-FILE(GLOB ZASF_BINARIES ${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll ${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe)
-INSTALL(FILES ${ZASF_BINARIES} DESTINATION ${PLUGIN_DIR})
-ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/extras)
+	IF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
+		ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/extras/data/presets")
+		FILE(GLOB ZASF_BINARIES
+			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll"
+			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe")
+		INSTALL(FILES "${ZASF_BINARIES}" DESTINATION "${PLUGIN_DIR}")
+	ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
 ENDIF(LMMS_BUILD_WIN32)
 
 #
@@ -519,13 +547,13 @@ ADD_CUSTOM_TARGET(distclean
 SET(TMP "lmms-${VERSION}")
 ADD_CUSTOM_TARGET(dist
 			COMMAND make clean
-			COMMAND rm -rf ${TMP}
-			COMMAND mkdir -p ${TMP}
-			COMMAND cp AUTHORS build_mingw32 build_mingw64 CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in lmmsconfig.h.in lmmsversion.h.in README TODO ${TMP}
-			COMMAND cp -r buildtools cmake data include plugins src ${TMP}
-			COMMAND rm -rf `find ${TMP} -name cmake_install.cmake` `find ${TMP} -name Makefile` `find ${TMP} -type d -name CMakeFiles` ${TMP}/CMakeCache.txt
-			COMMAND tar cjf lmms-${VERSION}.tar.bz2 ${TMP}
-			COMMAND rm -rf ${TMP})
+			COMMAND rm -rf "${TMP}"
+			COMMAND mkdir -p "${TMP}"
+			COMMAND cp AUTHORS build_mingw32 build_mingw64 CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in lmmsconfig.h.in lmmsversion.h.in README TODO "${TMP}"
+			COMMAND cp -r buildtools cmake data include plugins src "${TMP}"
+			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
+			COMMAND tar cjf lmms-${VERSION}.tar.bz2 "${TMP}"
+			COMMAND rm -rf "${TMP}")
 
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h lmms.1.gz")
@@ -595,8 +623,8 @@ INCLUDE(InstallRequiredSystemLibraries)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "LMMS - easy music production for everyone!")
 SET(CPACK_PACKAGE_VENDOR "LMMS Developers")
 IF(LMMS_BUILD_APPLE)
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/README ${CMAKE_BINARY_DIR}/README.txt COPYONLY)
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/COPYING ${CMAKE_BINARY_DIR}/COPYING.txt COPYONLY)
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/README" "${CMAKE_BINARY_DIR}/README.txt" COPYONLY)
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/COPYING" "${CMAKE_BINARY_DIR}/COPYING.txt" COPYONLY)
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_BINARY_DIR}/README.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/COPYING.txt")
 ELSE(LMMS_BUILD_APPLE)

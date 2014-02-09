@@ -39,41 +39,41 @@ set(FLTK_VERSION_PATCH "0")
 set(FLTK_VERSION "${FLTK_VERSION_MAJOR}.${FLTK_VERSION_MINOR}")
 set(FLTK_VERSION_FULL "${FLTK_VERSION}.${FLTK_VERSION_PATCH}")
 
-set(EXECUTABLE_OUTPUT_PATH ${FLTK_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${FLTK_BINARY_DIR}/lib)
-set(ARCHIVE_OUTPUT_PATH ${FLTK_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH "${FLTK_BINARY_DIR}/bin")
+set(LIBRARY_OUTPUT_PATH "${FLTK_BINARY_DIR}/lib")
+set(ARCHIVE_OUTPUT_PATH "${FLTK_BINARY_DIR}/lib")
 
 # Search for modules in the FLTK source dir first
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${FLTK_SOURCE_DIR}/CMake)
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${FLTK_SOURCE_DIR}/CMake")
 
-include_directories(${FLTK_SOURCE_DIR} ${FLTK_BINARY_DIR})
+include_directories("${FLTK_SOURCE_DIR}" "${FLTK_BINARY_DIR}")
 
 # If this is out-of-source build, then copy FL directory
-if(NOT ${FLTK_SOURCE_DIR} STREQUAL ${FLTK_BINARY_DIR})
-   file(GLOB FLTK_HEADER_FILES ${FLTK_SOURCE_DIR}/FL/*.[hHr])
+if(NOT "${FLTK_SOURCE_DIR}" STREQUAL "${FLTK_BINARY_DIR}")
+   file(GLOB FLTK_HEADER_FILES "${FLTK_SOURCE_DIR}/FL/*.[hHr]")
    foreach(file ${FLTK_HEADER_FILES})
-      GET_FILENAME_COMPONENT(name ${file} NAME)
-      CONFIGURE_file(${file} ${FLTK_BINARY_DIR}/FL/${name} COPYONLY)
+      GET_FILENAME_COMPONENT(name "${file}" NAME)
+      CONFIGURE_file("${file}" "${FLTK_BINARY_DIR}/FL/${name}" COPYONLY)
    endforeach(file)
-endif(NOT ${FLTK_SOURCE_DIR} STREQUAL ${FLTK_BINARY_DIR})
+endif(NOT "${FLTK_SOURCE_DIR}" STREQUAL "${FLTK_BINARY_DIR}")
 
 #######################################################################
 # platform dependent information
 #######################################################################
 # On unix create backward compatibility symlinks
 if(CMAKE_HOST_UNIX)
-   if(NOT EXISTS ${FLTK_BINARY_DIR}/Fl)
+   if(NOT EXISTS "${FLTK_BINARY_DIR}/Fl")
       EXECUTE_PROCESS(COMMAND ln -s FL Fl
-         WORKING_DIRECTORY ${FLTK_BINARY_DIR}
+         WORKING_DIRECTORY "${FLTK_BINARY_DIR}"
          )
-   endif(NOT EXISTS ${FLTK_BINARY_DIR}/Fl)
+   endif(NOT EXISTS "${FLTK_BINARY_DIR}/Fl")
 
-   file(GLOB FLTK_HEADER_FILES ${FLTK_BINARY_DIR}/FL/*.H)
+   file(GLOB FLTK_HEADER_FILES "${FLTK_BINARY_DIR}/FL/*.H")
    foreach(file ${FLTK_HEADER_FILES})
-      GET_FILENAME_COMPONENT(nameWE ${file} NAME_WE)
-      if(NOT EXISTS ${FLTK_BINARY_DIR}/FL/${nameWE}.h)
-         EXECUTE_PROCESS(COMMAND ln -s ${nameWE}.H ${nameWE}.h
-            WORKING_DIRECTORY ${FLTK_BINARY_DIR}/FL
+      GET_FILENAME_COMPONENT(nameWE "${file}" NAME_WE)
+      if(NOT EXISTS "${FLTK_BINARY_DIR}/FL/${nameWE}.h")
+         EXECUTE_PROCESS(COMMAND ln -s "${nameWE}.H" "${nameWE}.h"
+            WORKING_DIRECTORY "${FLTK_BINARY_DIR}/FL"
             )
       endif()
    endforeach(file)
@@ -167,7 +167,7 @@ mark_as_advanced(HAVE_SYS_STDTYPES_H HAVE_XDBE_H)
 # where to find freetype headers
 find_path(FREETYPE_PATH freetype/config/ftheader.h PATH_SUFFIXES freetype2)
 if(FREETYPE_PATH)
-   include_directories(${FREETYPE_PATH})
+   include_directories("${FREETYPE_PATH}")
 endif(FREETYPE_PATH)
 mark_as_advanced(FREETYPE_PATH)
 
@@ -223,8 +223,8 @@ if(HAVE_SCANDIR AND NOT HAVE_SCANDIR_POSIX)
    set(MSG "POSIX compatible scandir")
    message(STATUS "Looking for ${MSG}")
    try_compile(V
-      ${FLTK_BINARY_DIR}
-      ${FLTK_SOURCE_DIR}/CMake/posixScandir.cxx
+      "${FLTK_BINARY_DIR}"
+      "${FLTK_SOURCE_DIR}/CMake/posixScandir.cxx"
       )
    if(V)
       message(STATUS "${MSG} - found")
@@ -259,9 +259,9 @@ set(OPTION_PREFIX_BIN ""
    )
 
 if(OPTION_PREFIX_BIN)
-   set(PREFIX_BIN ${OPTION_PREFIX_BIN} CACHE INTERNAL "" FORCE)
+   set(PREFIX_BIN "${OPTION_PREFIX_BIN}" CACHE INTERNAL "" FORCE)
 else()
-   set(PREFIX_BIN ${CMAKE_INSTALL_PREFIX}/bin CACHE INTERNAL "" FORCE)
+   set(PREFIX_BIN "${CMAKE_INSTALL_PREFIX}/bin" CACHE INTERNAL "" FORCE)
 endif(OPTION_PREFIX_BIN)
 
 #######################################################################
@@ -271,9 +271,9 @@ set(OPTION_PREFIX_LIB ""
    )
 
 if(OPTION_PREFIX_LIB)
-   set(PREFIX_LIB ${OPTION_PREFIX_LIB} CACHE INTERNAL "" FORCE)
+   set(PREFIX_LIB "${OPTION_PREFIX_LIB}" CACHE INTERNAL "" FORCE)
 else()
-   set(PREFIX_LIB ${CMAKE_INSTALL_PREFIX}/lib CACHE INTERNAL "" FORCE)
+   set(PREFIX_LIB "${CMAKE_INSTALL_PREFIX}/lib" CACHE INTERNAL "" FORCE)
 endif(OPTION_PREFIX_LIB)
 
 #######################################################################
@@ -283,9 +283,9 @@ set(OPTION_PREFIX_INCLUDE ""
    )
 
 if(OPTION_PREFIX_INCLUDE)
-   set(PREFIX_INCLUDE ${OPTION_PREFIX_INCLUDE} CACHE INTERNAL "" FORCE)
+   set(PREFIX_INCLUDE "${OPTION_PREFIX_INCLUDE}" CACHE INTERNAL "" FORCE)
 else()
-   set(PREFIX_INCLUDE ${CMAKE_INSTALL_PREFIX}/include CACHE INTERNAL "" FORCE)
+   set(PREFIX_INCLUDE "${CMAKE_INSTALL_PREFIX}/include" CACHE INTERNAL "" FORCE)
 endif(OPTION_PREFIX_INCLUDE)
 
 #######################################################################
@@ -295,9 +295,9 @@ set(OPTION_PREFIX_DATA ""
    )
 
 if(OPTION_PREFIX_DATA)
-   set(PREFIX_DATA ${OPTION_PREFIX_DATA} CACHE INTERNAL "" FORCE)
+   set(PREFIX_DATA "${OPTION_PREFIX_DATA}" CACHE INTERNAL "" FORCE)
 else()
-   set(PREFIX_DATA ${CMAKE_INSTALL_PREFIX}/share/FLTK CACHE INTERNAL "" FORCE)
+   set(PREFIX_DATA "${CMAKE_INSTALL_PREFIX}/share/FLTK" CACHE INTERNAL "" FORCE)
 endif(OPTION_PREFIX_DATA)
 
 #######################################################################
@@ -307,9 +307,9 @@ set(OPTION_PREFIX_DOC ""
    )
 
 if(OPTION_PREFIX_DOC)
-   set(PREFIX_DOC ${OPTION_PREFIX_DOC} CACHE INTERNAL "" FORCE)
+   set(PREFIX_DOC "${OPTION_PREFIX_DOC}" CACHE INTERNAL "" FORCE)
 else()
-   set(PREFIX_DOC ${CMAKE_INSTALL_PREFIX}/share/doc/FLTK CACHE INTERNAL "" FORCE)
+   set(PREFIX_DOC "${CMAKE_INSTALL_PREFIX}/share/doc/FLTK" CACHE INTERNAL "" FORCE)
 endif(OPTION_PREFIX_DOC)
 
 #######################################################################
@@ -340,9 +340,9 @@ if(CMAKE_HOST_UNIX)
       )
 
    if(OPTION_PREFIX_MAN)
-      set(PREFIX_MAN ${OPTION_PREFIX_MAN} CACHE INTERNAL "" FORCE)
+      set(PREFIX_MAN "${OPTION_PREFIX_MAN}" CACHE INTERNAL "" FORCE)
    else()
-      set(PREFIX_MAN ${CMAKE_INSTALL_PREFIX}/man CACHE INTERNAL "" FORCE)
+      set(PREFIX_MAN "${CMAKE_INSTALL_PREFIX}/man" CACHE INTERNAL "" FORCE)
    endif(OPTION_PREFIX_MAN)
 
 endif(CMAKE_HOST_UNIX)
@@ -413,7 +413,7 @@ if(OPTION_USE_GL)
 endif(OPTION_USE_GL)
 
 if(OPENGL_FOUND)
-   set(CMAKE_REQUIRED_INCLUDES ${OPENGL_INCLUDE_DIR}/GL)
+   set(CMAKE_REQUIRED_INCLUDES "${OPENGL_INCLUDE_DIR}/GL")
    set(CMAKE_REQUIRED_LIBRARIES -lGLU -lGL)
    CHECK_FUNCTION_EXISTS(glXGetProcAddressARB HAVE_GLXGETPROCADDRESSARB)
    set(FLTK_GL_FOUND TRUE)
@@ -466,11 +466,11 @@ endif(OPTION_USE_SYSTEM_LIBJPEG AND LIB_jpeg)
 
 if(OPTION_USE_SYSTEM_LIBJPEG AND JPEG_FOUND)
    set(FLTK_JPEG_LIBRARIES ${JPEG_LIBRARIES})
-   include_directories(${JPEG_INCLUDE_DIR})
+   include_directories("${JPEG_INCLUDE_DIR}")
    set(FLTK_BUILTIN_JPEG_FOUND FALSE)
 else()
    set(FLTK_JPEG_LIBRARIES fltk_jpeg)
-   include_directories(${FLTK_SOURCE_DIR}/jpeg)
+   include_directories("${FLTK_SOURCE_DIR}/jpeg")
    set(FLTK_BUILTIN_JPEG_FOUND TRUE)
 endif(OPTION_USE_SYSTEM_LIBJPEG AND JPEG_FOUND)
 
@@ -493,8 +493,8 @@ if(OPTION_USE_SYSTEM_ZLIB AND ZLIB_FOUND)
    set(FLTK_BUILTIN_ZLIB_FOUND FALSE)
 else()
    set(FLTK_ZLIB_LIBRARIES fltk_z)
-   set(ZLIB_INCLUDE_DIR ${FLTK_SOURCE_DIR}/zlib)
-   include_directories(${FLTK_SOURCE_DIR}/zlib)
+   set(ZLIB_INCLUDE_DIR "${FLTK_SOURCE_DIR}/zlib")
+   include_directories("${ZLIB_INCLUDE_DIR}")
    set(FLTK_BUILTIN_ZLIB_FOUND TRUE)
 endif(OPTION_USE_SYSTEM_ZLIB AND ZLIB_FOUND)
 
@@ -513,7 +513,7 @@ endif(OPTION_USE_SYSTEM_LIBPNG AND LIB_png)
 
 if(OPTION_USE_SYSTEM_LIBPNG AND PNG_FOUND)
    set(FLTK_PNG_LIBRARIES ${PNG_LIBRARIES})
-   include_directories(${PNG_INCLUDE_DIR})
+   include_directories("${PNG_INCLUDE_DIR}")
    add_definitions(${PNG_DEFINITIONS})
    set(FLTK_BUILTIN_PNG_FOUND FALSE)
 else()
@@ -521,7 +521,7 @@ else()
    set(HAVE_PNG_H 1)
    set(HAVE_PNG_GET_VALID 1)
    set(HAVE_PNG_SET_TRNS_TO_ALPHA 1)
-   include_directories(${FLTK_SOURCE_DIR}/png)
+   include_directories("${FLTK_SOURCE_DIR}/png")
    set(FLTK_BUILTIN_PNG_FOUND TRUE)
 endif(OPTION_USE_SYSTEM_LIBPNG AND PNG_FOUND)
 
@@ -538,7 +538,7 @@ endif(X11_Xinerama_FOUND)
 
 if(OPTION_USE_XINERAMA)
    set(HAVE_XINERAMA X11_Xinerama_FOUND)
-   include_directories(${X11_Xinerama_INCLUDE_PATH})
+   include_directories("${X11_Xinerama_INCLUDE_PATH}")
    list(APPEND FLTK_LDLIBS -lXinerama)
    set(FLTK_XINERAMA_FOUND TRUE)
 else()
@@ -582,27 +582,27 @@ if(CMAKE_CROSSCOMPILING)
    )
    add_executable(fluid IMPORTED)
    set(FLTK_FLUID_EXECUTABLE fluid)
-   set(FLTK_FLUID_PATH ${FLUID_PATH})
+   set(FLTK_FLUID_PATH "${FLUID_PATH}")
    set_target_properties(fluid
-      PROPERTIES IMPORTED_LOCATION ${FLUID_PATH}
+      PROPERTIES IMPORTED_LOCATION "${FLUID_PATH}"
       )
 else()
    set(FLTK_FLUID_EXECUTABLE fluid)
-   set(FLTK_FLUID_PATH ${EXECUTABLE_OUTPUT_PATH}/${FLTK_FLUID_EXECUTABLE})
+   set(FLTK_FLUID_PATH "${EXECUTABLE_OUTPUT_PATH}/${FLTK_FLUID_EXECUTABLE}")
 endif(CMAKE_CROSSCOMPILING)
 
 add_subdirectory(src)
 
 # generate FLTKConfig.cmake
 string(REPLACE ";" " " EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-configure_file(${FLTK_SOURCE_DIR}/CMake/FLTKConfig.cmake.in
-   ${EXECUTABLE_OUTPUT_PATH}/FLTKConfig.cmake
+configure_file("${FLTK_SOURCE_DIR}/CMake/FLTKConfig.cmake.in"
+   "${EXECUTABLE_OUTPUT_PATH}/FLTKConfig.cmake"
    @ONLY
    )
 
 # generate UseFLTK.cmake
-configure_file(${FLTK_SOURCE_DIR}/CMake/UseFLTK.cmake.in
-   ${EXECUTABLE_OUTPUT_PATH}/UseFLTK.cmake
+configure_file("${FLTK_SOURCE_DIR}/CMake/UseFLTK.cmake.in"
+   "${EXECUTABLE_OUTPUT_PATH}/UseFLTK.cmake"
    @ONLY
    )
 
@@ -612,8 +612,8 @@ configure_file("${FLTK_SOURCE_DIR}/configh.cmake.in"
    )
 
 # generate fltk-config
-get_filename_component(CC ${CMAKE_C_COMPILER} NAME)
-get_filename_component(CXX ${CMAKE_CXX_COMPILER} NAME)
+get_filename_component(CC "${CMAKE_C_COMPILER}" NAME)
+get_filename_component(CXX "${CMAKE_CXX_COMPILER}" NAME)
 
 string(REPLACE ";" " " C_FLAGS "${FLTK_CFLAGS}")
 
@@ -622,12 +622,12 @@ if(X11_Xext_FOUND)
 endif(X11_Xext_FOUND)
 string(REPLACE ";" " " LD_LIBS "${FLTK_LDLIBS}")
 
-configure_file(${FLTK_SOURCE_DIR}/fltk-config.cmake.in
-   ${FLTK_BINARY_DIR}/fltk-config
+configure_file("${FLTK_SOURCE_DIR}/fltk-config.cmake.in"
+   "${FLTK_BINARY_DIR}/fltk-config"
    )
 if(UNIX)
    execute_process(COMMAND chmod 755 fltk-config
-      WORKING_DIRECTORY ${FLTK_BINARY_DIR}
+      WORKING_DIRECTORY "${FLTK_BINARY_DIR}"
    )
 endif(UNIX)
 
@@ -638,7 +638,7 @@ configure_file(
   @ONLY
    )
 add_custom_target(uninstall
-  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+  "${CMAKE_COMMAND}" -P "\"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake\""
   )
 
 #######################################################################
@@ -652,38 +652,33 @@ endif(OPTION_BUILD_EXAMPLES)
 # installation
 #######################################################################
 
-install(DIRECTORY ${FLTK_BINARY_DIR}/FL
-   DESTINATION ${PREFIX_INCLUDE} USE_SOURCE_PERMISSIONS
+install(DIRECTORY "${FLTK_BINARY_DIR}/FL"
+   DESTINATION "${PREFIX_INCLUDE}" USE_SOURCE_PERMISSIONS
    )
-
-install(DIRECTORY ${FLTK_BINARY_DIR}/Fl
-   DESTINATION ${PREFIX_INCLUDE} USE_SOURCE_PERMISSIONS
+install(DIRECTORY "${FLTK_BINARY_DIR}/Fl"
+   DESTINATION "${PREFIX_INCLUDE}" USE_SOURCE_PERMISSIONS
    )
-
-install(PROGRAMS ${FLTK_BINARY_DIR}/fltk-config
-   DESTINATION ${PREFIX_BIN}
+install(PROGRAMS "${FLTK_BINARY_DIR}/fltk-config"
+   DESTINATION "${PREFIX_BIN}"
    OPTIONAL
    )
-
 install(EXPORT fltk-install
-   DESTINATION ${PREFIX_CONFIG}
+   DESTINATION "${PREFIX_CONFIG}"
    FILE FLTKLibraries.cmake
    )
-
-install(FILES ${EXECUTABLE_OUTPUT_PATH}/FLTKConfig.cmake
-   DESTINATION ${PREFIX_CONFIG}
+install(FILES "${EXECUTABLE_OUTPUT_PATH}/FLTKConfig.cmake"
+   DESTINATION "${PREFIX_CONFIG}"
    )
-
-install(FILES ${EXECUTABLE_OUTPUT_PATH}/UseFLTK.cmake
-   DESTINATION ${PREFIX_CONFIG}
+install(FILES "${EXECUTABLE_OUTPUT_PATH}/UseFLTK.cmake"
+   DESTINATION "${PREFIX_CONFIG}"
    )
 
 if(CMAKE_HOST_UNIX)
    macro(INSTALL_MAN FILE LEVEL)
    install(FILES
-      ${FLTK_SOURCE_DIR}/documentation/src/${FILE}.man
-      DESTINATION ${PREFIX_MAN}/man${LEVEL}
-      RENAME ${FILE}.${LEVEL}
+      "${FLTK_SOURCE_DIR}/documentation/src/${FILE}.man"
+      DESTINATION "${PREFIX_MAN}/man${LEVEL}"
+      RENAME "${FILE}.${LEVEL}"
       )
    endmacro(INSTALL_MAN FILE LEVEL)
 

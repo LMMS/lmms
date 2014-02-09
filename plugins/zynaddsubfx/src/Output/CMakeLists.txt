@@ -11,7 +11,7 @@ if(AlsaMidiOutput)
 endif(AlsaMidiOutput)
 
 if(JackOutput)
-	include_directories(${JACK_INCLUDE_DIR})
+	include_directories("${JACK_INCLUDE_DIR}")
 	set(zynaddsubfx_output_SRCS
 		${zynaddsubfx_output_SRCS}
 		JACKaudiooutput.cpp)
@@ -19,7 +19,7 @@ if(JackOutput)
 endif(JackOutput)
 
 if(PortAudioOutput)
-	include_directories(${PORTAUDIO_INCLUDE_DIR})
+	include_directories("${PORTAUDIO_INCLUDE_DIR}")
 	set(zynaddsubfx_output_SRCS
 		${zynaddsubfx_output_SRCS}
 		PAaudiooutput.cpp)
