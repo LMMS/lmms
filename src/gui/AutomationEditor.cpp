@@ -1415,7 +1415,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		}
 		else
 		{
-			int y = grid_bottom;
+			int y;
 			int level = (int) m_bottomLevel;
 			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
@@ -1424,14 +1424,13 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			{
 				int inv_module = ( printable - module )
 								% printable;
-				y -= inv_module * m_y_delta;
 				level += inv_module;
 			}
-			for( ; y >= TOP_MARGIN && level <= m_topLevel;
-				y -= printable * m_y_delta, level += printable )
+			for( ; level <= m_topLevel; level += printable )
 			{
 				const QString & label = m_pattern->firstObject()
 							->displayValue( level );
+				y = yCoordOfLevel( level );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y - font_height + 1,
 					VALUES_WIDTH - 10, 2 * font_height,
@@ -1485,7 +1484,8 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			}
 		}
 
-
+		// TODO: move this horizontal line drawing code into the same loop as 
+		// the value ticks?
 		if( m_y_auto )
 		{
 			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
@@ -1503,11 +1503,11 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		}
 		else
 		{
-			for( float y = grid_bottom, level = m_bottomLevel;
-					y >= TOP_MARGIN && level <= m_topLevel;
-					y -= m_y_delta, ++level )
+			float y;
+			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
-				if( (int)level % 5 == 0 )
+				y =  yCoordOfLevel( (float)level );
+				if( level % 5 == 0 )
 				{
 					p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
 				}
