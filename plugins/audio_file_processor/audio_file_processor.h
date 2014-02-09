@@ -172,7 +172,7 @@ public:
 
 	public:
 		afpKnob( QWidget * _parent ) :
-			::knob( knobStyled, _parent ),
+			::knob( knobBright_26, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
