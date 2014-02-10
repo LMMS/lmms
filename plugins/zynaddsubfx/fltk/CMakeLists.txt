@@ -167,7 +167,7 @@ mark_as_advanced(HAVE_SYS_STDTYPES_H HAVE_XDBE_H)
 # where to find freetype headers
 find_path(FREETYPE_PATH freetype/config/ftheader.h PATH_SUFFIXES freetype2)
 if(FREETYPE_PATH)
-   include_directories("${FREETYPE_PATH}")
+   include_directories(${FREETYPE_PATH})
 endif(FREETYPE_PATH)
 mark_as_advanced(FREETYPE_PATH)
 
