@@ -1,7 +1,7 @@
 /*
  * waveshaper_controls.cpp - controls for waveshaper-effect
  *
- * Copyright  * (c) 2006-2008 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright  * (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -27,84 +27,103 @@
 #include <QtXml/QDomElement>
 
 #include "waveshaper_controls.h"
-#include "bass_booster.h"
+#include "waveshaper.h"
+#include "graph.h"
 
 
 
-bassBoosterControls::bassBoosterControls( bassBoosterEffect * _eff ) :
+waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
-	m_freqModel( 100.0f, 50.0f, 200.0f, 1.0f, this, tr( "Frequency" ) ),
-	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
-	m_ratioModel( 2.0f, 0.1f, 10.0f, 0.1f, this, tr( "Ratio" ) )
+	m_inputModel( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Input gain" ) ),
+	m_outputModel( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Output gain" ) ),
+	m_wavegraphModel( 0.0f, 1.0f, 100, this )
 {
-	connect( &m_freqModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeFrequency() ) );
+	connect( &m_inputModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeInput() ) );
 
-	connect( &m_gainModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeGain() ) );
+	connect( &m_outputModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeOutput() ) );
 
-	connect( &m_ratioModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeRatio() ) );
+	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
+			this, SLOT( samplesChanged( int, int ) ) );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
-			this, SLOT( changeFrequency() ) );
-	changeFrequency();
-	changeGain();
-	changeRatio();
+	changeInput();
+	changeOutput();
+	setDefaultShape();
+	
 }
 
 
 
 
-void bassBoosterControls::changeFrequency()
+void waveShaperControls::changeInput()
 {
-	const sample_t fac = engine::mixer()->processingSampleRate() /
-								44100.0f;
-	m_effect->m_bbFX.leftFX().setFrequency( m_freqModel.value() * fac );
-	m_effect->m_bbFX.rightFX().setFrequency( m_freqModel.value() * fac );
 }
 
 
 
 
-void bassBoosterControls::changeGain()
+void waveShaperControls::changeOutput()
 {
-	m_effect->m_bbFX.leftFX().setGain( m_gainModel.value() );
-	m_effect->m_bbFX.rightFX().setGain( m_gainModel.value() );
 }
 
 
 
 
-void bassBoosterControls::changeRatio()
-{
-	m_effect->m_bbFX.leftFX().setRatio( m_ratioModel.value() );
-	m_effect->m_bbFX.rightFX().setRatio( m_ratioModel.value() );
+void waveShaperControls::samplesChanged( int _begin, int _end)
+{	
 }
 
 
 
 
-void bassBoosterControls::loadSettings( const QDomElement & _this )
+void waveShaperControls::loadSettings( const QDomElement & _this )
 {
-	m_freqModel.setValue( _this.attribute( "freq" ).toFloat() );
-	m_gainModel.setValue( _this.attribute( "gain" ).toFloat() );
-	m_ratioModel.setValue( _this.attribute( "ratio" ).toFloat() );
+//load input, output knobs
+	m_inputModel.setValue( _this.attribute( "inputGain" ).toFloat() );
+	m_outputModel.setValue( _this.attribute( "outputGain" ).toFloat() );
+	
+//load waveshape
+	int size = 0;
+	char * dst = 0;
+	base64::decode( _this.attribute( "waveShape"), &dst, &size );
+	
+	m_wavegraphModel.setSamples( (float*) dst );
+	delete[] dst;
+
 }
 
 
 
 
-void bassBoosterControls::saveSettings( QDomDocument & _doc, 
+void waveShaperControls::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
-	_this.setAttribute( "freq", m_freqModel.value() );
-	_this.setAttribute( "gain", m_gainModel.value() );
-	_this.setAttribute( "ratio", m_ratioModel.value() );
+//save input, output knobs
+	_this.setAttribute( "inputGain", m_inputModel.value() );
+	_this.setAttribute( "outputGain", m_outputModel.value() );
+
+//save waveshape
+	QString sampleString;
+	base64::encode( (const char *)m_wavegraphModel.samples(),
+		m_wavegraphModel.length() * sizeof(float), sampleString );
+	_this.setAttribute( "waveShape", sampleString );
+
 }
 
 
+void waveShaperControls::setDefaultShape()
+{
+	float shp [100] = { };
+	for ( int i = 0; i<100; i++) 
+	{
+		shp[i] = ((float)i + 1.0f) / 100.0f;
+	}
+
+	m_wavegraphModel.setLength( 100 );
+	m_wavegraphModel.setSamples( (float*)&shp );
+}
 
 #include "moc_waveshaper_controls.cxx"
 

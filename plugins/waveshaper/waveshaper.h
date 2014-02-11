@@ -1,7 +1,7 @@
 /*
- * bass_booster.h - bass-booster-effect-plugin
+ * waveshaper.h - bass-booster-effect-plugin
  *
- * * Copyright  * (c) 2006-2008 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * * Copyright  * (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _BASS_BOOSTER_H
-#define _BASS_BOOSTER_H
+#ifndef _WAVESHAPER_H
+#define _WAVESHAPER_H
 
 #include "Effect.h"
 #include "effect_lib.h"
@@ -33,27 +33,26 @@
 
 
 
-class bassBoosterEffect : public Effect
+class waveShaperEffect : public Effect
 {
 public:
-	bassBoosterEffect( Model * _parent,
+	waveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~bassBoosterEffect();
+	virtual ~waveShaperEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 
 	virtual EffectControls * controls()
 	{
-		return( &m_bbControls );
+		return( &m_wsControls );
 	}
 
 
 private:
-	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost> m_bbFX;
+	
+	waveShaperControls m_wsControls;
 
-	bassBoosterControls m_bbControls;
-
-	friend class bassBoosterControls;
+	friend class waveShaperControls;
 
 } ;
 

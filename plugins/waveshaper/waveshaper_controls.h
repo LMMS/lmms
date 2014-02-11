@@ -1,7 +1,7 @@
 /*
  * waveshaper_controls.h - controls for waveshaper-effect
  *
- * Copyright  * (c) 2006-2008 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright  * (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -29,17 +29,17 @@
 #include "EffectControls.h"
 #include "waveshaper_control_dialog.h"
 #include "knob.h"
+#include "graph.h"
+
+class waveShaperEffect;
 
 
-class bassBoosterEffect;
-
-
-class bassBoosterControls : public EffectControls
+class waveShaperControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	bassBoosterControls( bassBoosterEffect * _eff );
-	virtual ~bassBoosterControls()
+	waveShaperControls( waveShaperEffect * _eff );
+	virtual ~waveShaperControls()
 	{
 	}
 
@@ -49,6 +49,8 @@ public:
 	{
 		return( "waveshapercontrols" );
 	}
+	
+	virtual void setDefaultShape();
 
 	virtual int controlCount()
 	{
@@ -57,23 +59,23 @@ public:
 
 	virtual EffectControlDialog * createView()
 	{
-		return( new bassBoosterControlDialog( this ) );
+		return( new waveShaperControlDialog( this ) );
 	}
 
 
 private slots:
-	void changeFrequency();
-	void changeGain();
-	void changeRatio();
-
+	void changeInput();
+	void changeOutput();
+	void samplesChanged( int, int );
 
 private:
-	bassBoosterEffect * m_effect;
-	FloatModel m_freqModel;
-	FloatModel m_gainModel;
-	FloatModel m_ratioModel;
+	waveShaperEffect * m_effect;
+	FloatModel m_inputModel;
+	FloatModel m_outputModel;
+	graphModel m_wavegraphModel;
 
-	friend class bassBoosterControlDialog;
+	friend class waveShaperControlDialog;
+	friend class waveShaperEffect;
 
 } ;
 
