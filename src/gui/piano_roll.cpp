@@ -471,7 +471,7 @@ pianoRoll::pianoRoll() :
 					this, SLOT( zoomingChanged() ) );
 	m_zoomingComboBox = new comboBox( m_toolBar );
 	m_zoomingComboBox->setModel( &m_zoomingModel );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->setFixedSize( 64, 22 );
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
@@ -490,7 +490,7 @@ pianoRoll::pianoRoll() :
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 80, 22 );
+	m_quantizeComboBox->setFixedSize( 64, 22 );
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
 					this, SLOT( quantizeChanged() ) );
 
@@ -571,23 +571,23 @@ pianoRoll::pianoRoll() :
 					this, SLOT( updateSemiToneMarkerMenu() ) );
 
 
-	tb_layout->addSpacing( 5 );
+	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_playButton );
 	tb_layout->addWidget( m_recordButton );
 	tb_layout->addWidget( m_recordAccompanyButton );
 	tb_layout->addWidget( m_stopButton );
-	tb_layout->addSpacing( 10 );
+	tb_layout->addSpacing( 7 );
 	tb_layout->addWidget( m_drawButton );
 	tb_layout->addWidget( m_eraseButton );
 	tb_layout->addWidget( m_selectButton );
 	tb_layout->addWidget( m_detuneButton );
-	tb_layout->addSpacing( 10 );
+	tb_layout->addSpacing( 7 );
 	tb_layout->addWidget( m_cutButton );
 	tb_layout->addWidget( m_copyButton );
 	tb_layout->addWidget( m_pasteButton );
-	tb_layout->addSpacing( 10 );
+	tb_layout->addSpacing( 7 );
 	m_timeLine->addToolButtons( m_toolBar );
-	tb_layout->addSpacing( 15 );
+	tb_layout->addSpacing( 7 );
 	tb_layout->addWidget( zoom_lbl );
 	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_zoomingComboBox );
