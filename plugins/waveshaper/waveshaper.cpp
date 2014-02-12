@@ -96,7 +96,7 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 		for ( i=0; i <= 1; ++i )
 		{
-			lookup = fabsf( s[i] ) * 100.0f;
+			lookup = fabsf( s[i] ) * 200.0f;
 			posneg = s[i] < 0 ? -1.0f : 1.0f;
 			
 			if ( lookup < 1 ) 
@@ -105,7 +105,7 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 				s[i] = frac * m_wsControls.m_wavegraphModel.samples()[0] * posneg;
 			}
 			else
-			if ( lookup < 100 )
+			if ( lookup < 200 )
 			{
 				frac = lookup - truncf(lookup);
 				s[i] = 
@@ -115,7 +115,7 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 			}
 			else 
 			{
-				s[i] *= m_wsControls.m_wavegraphModel.samples()[99];
+				s[i] *= m_wsControls.m_wavegraphModel.samples()[199];
 			}
 		}
 

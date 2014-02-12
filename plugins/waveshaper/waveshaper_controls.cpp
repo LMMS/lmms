@@ -37,7 +37,7 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Output gain" ) ),
-	m_wavegraphModel( 0.0f, 1.0f, 100, this )
+	m_wavegraphModel( 0.0f, 1.0f, 200, this )
 {
 	connect( &m_inputModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeInput() ) );
@@ -115,13 +115,13 @@ void waveShaperControls::saveSettings( QDomDocument & _doc,
 
 void waveShaperControls::setDefaultShape()
 {
-	float shp [100] = { };
-	for ( int i = 0; i<100; i++) 
+	float shp [200] = { };
+	for ( int i = 0; i<200; i++) 
 	{
-		shp[i] = ((float)i + 1.0f) / 100.0f;
+		shp[i] = ((float)i + 1.0f) / 200.0f;
 	}
 
-	m_wavegraphModel.setLength( 100 );
+	m_wavegraphModel.setLength( 200 );
 	m_wavegraphModel.setSamples( (float*)&shp );
 }
 

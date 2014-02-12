@@ -42,17 +42,32 @@ waveShaperControlDialog::waveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 120, 200 );
+	setFixedSize( 222, 300 );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
 	tl->addSpacing( 30 );
+	tl->addStrut( 204 );
 
-	graph * waveGraph = new graph( this, graph::LinearStyle );
+	graph * waveGraph = new graph( this, graph::NearestStyle, 204, 204 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
+	
+	
 	waveGraph -> setAutoFillBackground( true );
 	
-	tl -> addWidget( waveGraph );
+	pal = QPalette();
+	pal.setBrush( backgroundRole(), 
+			PLUGIN_NAME::getIconPixmap("wavegraph") );
+	waveGraph->setPalette( pal );
+	waveGraph->setGraphColor( QColor( 170, 255, 255 ) );
 
+//	waveGraph -> setMinimumSize( 204, 204);
+//	waveGraph -> resize( 204, 204);
+	
+	waveGraph -> setMaximumSize( 204, 204 );
+	
+	tl -> setSizeConstraint( QLayout::SetNoConstraint );
+	tl -> addWidget( waveGraph );
+	
 	QHBoxLayout * l = new QHBoxLayout;
 
 	knob * inputKnob = new knob( knobBright_26, this);
