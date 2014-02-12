@@ -34,7 +34,8 @@
 #include "engine.h"
 
 
-graph::graph( QWidget * _parent, graphStyle _style ) :
+graph::graph( QWidget * _parent, graphStyle _style, int _width,
+		int _height ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
 	ModelView( new graphModel( -1.0, 1.0, 128, NULL, true ), this ),
@@ -43,7 +44,7 @@ graph::graph( QWidget * _parent, graphStyle _style ) :
 	m_mouseDown = false;
 	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
 
-	resize( 132, 104 );
+	resize( _width, _height );
 	setAcceptDrops( true );
 	setCursor( Qt::CrossCursor );
 
@@ -76,7 +77,7 @@ void graph::setGraphColor( QColor _graphcol )
 /*
 void graph::loadSampleFromFile( const QString & _filename )
 {
-	
+
 	int i;
 
 	// zero sample_shape
@@ -84,7 +85,7 @@ void graph::loadSampleFromFile( const QString & _filename )
 	{
 		samplePointer[i] = 0;
 	}
-	
+
 	// load user shape
 	sampleBuffer buffer( _filename );
 
@@ -107,33 +108,37 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 	int x = _me->x();
 	int y = _me->y();
 
-	static bool skip = false;
+/*	static bool skip = false;
 
 	if( skip )
 	{
 		skip = false;
 		return;
 	}
-
+*/
 	// avoid mouse leaps
 	int diff = x - m_lastCursorX;
 
-	if( diff >= 1 )
+/*	if( diff >= 1 )
 	{
-		x = qMin( width() - 2, m_lastCursorX + 1);
+		x = qMin( width() - 3, m_lastCursorX + 1 );
 	}
-	else if( diff <= 1 )
+	else if( diff <= -1 )
 	{
 		x = qMax( 2, m_lastCursorX - 1 );
+	}*/
+
+	x = qMax( 2, qMin( x, width()-3 ) );	
+	y = qMax( 2, qMin( y, height()-3 ) );
+
+	if( qAbs( diff ) > 1 )
+	{ 		
+		drawLineAt( x, y, m_lastCursorX ); 		
 	}
 	else
 	{
-		x = m_lastCursorX;
+		changeSampleAt( x, y );
 	}
-
-	y = qMax( 2, qMin( y, height()-3 ) );
-
-	changeSampleAt( x, y );
 
 	// update mouse
 	if( diff != 0 )
@@ -145,7 +150,7 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 		QCursor::setPos( pt.x(), pt.y() );
 	}
 
-	skip = true;
+//	skip = true;
 }
 
 
@@ -154,25 +159,73 @@ void graph::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		// toggle mouse state
-		m_mouseDown = true;
+		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
+		{
+			// get position
+			int x = _me->x();
+			int y = _me->y();
 
-		// get position
-		int x = _me->x();
-		int y = _me->y();
+			changeSampleAt( x, y );
 
-		changeSampleAt( x, y );
+			// toggle mouse state
+			m_mouseDown = true;
+			setCursor( Qt::BlankCursor );
+			m_lastCursorX = x;
+		}
+		else
+		{
+			//when shift-clicking, draw a line from last position to current
+			//position
+			int x = _me->x();
+			int y = _me->y();
 
-		// toggle mouse state
-		m_mouseDown = true;
-		setCursor( Qt::BlankCursor );
-		m_lastCursorX = x;
+			drawLineAt( x, y, m_lastCursorX );
+
+			m_mouseDown = true;
+			setCursor( Qt::BlankCursor );
+			m_lastCursorX = x;
+		}
+
 	}
 }
 
+void graph::drawLineAt( int _x, int _y, int _lastx )
+{
+	float minVal = model()->minValue();
+	float maxVal = model()->maxValue();
+	if ( width() <= 4 )
+	{
+		return;
+	}
 
+	float xscale = static_cast<float>( model()->length() ) /
+					( width()-4 );
 
-void graph::changeSampleAt(int _x, int _y)
+	//consider border
+	_x -= 2;
+	_y -= 2;
+	_lastx -= 2;
+	
+	_lastx = qMax( 0, qMin( _lastx, width()-5 ) );
+
+	float range = minVal - maxVal;
+	float val = ( _y*range/( height()-4 ) ) + maxVal;
+	float lastval = model() -> m_samples[ (int)( _lastx * xscale ) ];
+
+	// calculate line drawing variables
+	int linelen = qAbs( _x - _lastx ) + 1;
+	int xstep = _x > _lastx ? -1 : 1;
+	float ystep = ( lastval - val ) / linelen;
+
+	// draw a line
+	for ( int i = 0; i < linelen; i++ )
+	{
+		int x = (_x + (i * xstep));		// get x value
+		model()->setSampleAt( (int)( x * xscale ), val + (i * ystep));
+	}
+}
+
+void graph::changeSampleAt( int _x, int _y )
 {
 	float minVal = model()->minValue();
 	float maxVal = model()->maxValue();
@@ -208,7 +261,7 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 		setCursor( Qt::CrossCursor );
 		update();
 	}
-}	
+}
 
 
 
@@ -221,7 +274,7 @@ void graph::paintEvent( QPaintEvent * )
 	QVector<float> * samps = &(model()->m_samples);
 	int length = model()->length();
 	const float maxVal = model()->maxValue();
-
+	
 	float xscale = (float)( width()-4 ) / length;
 	float yscale = (float)( height()-4 ) / ( model()->minValue() - maxVal );
 
@@ -231,23 +284,24 @@ void graph::paintEvent( QPaintEvent * )
 
 	switch( m_graphStyle )
 	{
-		case graph::LinearStyle:
+		case graph::LinearStyle:			
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
 			{
 				// Needs to be rewritten
-				p.drawLine(2+static_cast<int>(i*xscale), 
+				p.drawLine(
+					2+static_cast<int>(i*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
 					);
 			}
 
 			// Draw last segment wrapped around
-			p.drawLine(2+static_cast<int>(length*xscale), 
+			p.drawLine(2+static_cast<int>(length*xscale),
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
-				width()-2,
+				width()-3,
 				2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
 
 			p.setRenderHints( QPainter::Antialiasing, false );
@@ -257,23 +311,43 @@ void graph::paintEvent( QPaintEvent * )
 		case graph::NearestStyle:
 			for( int i=0; i < length; i++ )
 			{
-				p.drawLine(2+static_cast<int>(i*xscale), 
+				p.drawLine(2+static_cast<int>(i*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale )
 					);
-				p.drawLine(2+static_cast<int>((i+1)*xscale), 
+				p.drawLine(2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
 					);
 			}
 
-			p.drawLine(2+static_cast<int>(length*xscale), 
+			p.drawLine(2+static_cast<int>(length*xscale),
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
-				width()-2,
+				width()-3,
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
 			break;
+			
+		case graph::LinearNonCyclicStyle:
+			p.setRenderHints( QPainter::Antialiasing, true );
+
+			for( int i=0; i < length; i++ )
+			{
+				// Needs to be rewritten
+				p.drawLine(
+					2+static_cast<int>(i*xscale),
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+					2+static_cast<int>((i+1)*xscale),
+					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
+					);
+			}
+
+			// Do not draw last segment wrapped around - hence, "non-cyclic"
+
+			p.setRenderHints( QPainter::Antialiasing, false );
+			break;
+		
 
 		default:
 			break;
@@ -281,7 +355,7 @@ void graph::paintEvent( QPaintEvent * )
 
 
 	// draw Pointer
-	if( m_mouseDown ) 
+	if( m_mouseDown )
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
 		p.setPen( QColor( 0xAA, 0xFF, 0x00, 0x70 ) );
@@ -369,7 +443,7 @@ void graphModel::setRange( float _min, float _max )
 
 		if( !m_samples.isEmpty() )
 		{
-			// Trim existing values 
+			// Trim existing values
 			for( int i=0; i < length(); i++ )
 			{
 				m_samples[i] = fmaxf( _min, fminf( m_samples[i], _max ) );
@@ -397,15 +471,14 @@ void graphModel::setSampleAt( int _x, float _val )
 {
 	//snap to the grid
 	_val -= ( m_step != 0.0 ) ? fmod( _val, m_step ) * m_step : 0;
-	// boundary check
-	if ( _x >= 0 && _x < length() &&
-			_val >= minValue() && _val < maxValue() )
-	{
 
-		// change sample shape
-		m_samples[_x] = _val;
-		emit samplesChanged( _x, _x );
-	}
+	// boundary crop	
+	_x = qMax( 0, qMin( length()-1, _x ) );
+	_val = qMax( minValue(), qMin( maxValue(), _val ) );
+
+	// change sample shape
+	m_samples[_x] = _val;
+	emit samplesChanged( _x, _x );
 }
 
 
@@ -509,16 +582,31 @@ void graphModel::smooth()
 	QVector<float> temp = m_samples;
 
 	// Smoothing
-	m_samples[0] = ( temp[0] + temp[length()-1] ) * 0.5f;
-	for ( int i=1; i < length(); i++ )
+	m_samples[0] = ( temp[length()-1] + ( temp[0] * 2 ) + temp[1] ) * 0.25f;
+	for ( int i=1; i < ( length()-1 ); i++ )
 	{
-		m_samples[i] = ( temp[i-1] + temp[i] ) * 0.5f; 	
+		m_samples[i] = ( temp[i-1] + ( temp[i] * 2 ) + temp[i+1] ) * 0.25f;
 	}
+	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 2 ) + temp[0] ) * 0.25f;
 
 	emit samplesChanged(0, length()-1);
 }
 
+void graphModel::smoothNonCyclic()
+{
+	// store values in temporary array
+	QVector<float> temp = m_samples;
 
+	// Smoothing
+	m_samples[0] = ( ( temp[0] * 2 ) + temp[1] ) / 3.0f;
+	for ( int i=1; i < ( length()-1 ); i++ )
+	{
+		m_samples[i] = ( temp[i-1] + ( temp[i] * 2 ) + temp[i+1] ) * 0.25f;
+	}
+	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 2 ) ) / 3.0f;
+
+	emit samplesChanged(0, length()-1);
+}
 
 void graphModel::normalize()
 {
@@ -539,7 +627,7 @@ void graphModel::normalize()
 	if( max != 1.0f ) {
 		emit samplesChanged( 0, length()-1 );
 	}
-}	
+}
 
 
 

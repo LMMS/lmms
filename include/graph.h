@@ -46,13 +46,18 @@ public:
 	{
 		NearestStyle,
 		LinearStyle,
+		LinearNonCyclicStyle,
 		NumGraphStyles
 	};
 
-	graph( QWidget * _parent, graphStyle _style = graph::LinearStyle );
+	graph( QWidget * _parent, graphStyle _style = graph::LinearStyle,
+		int _width = 132,
+		int _height = 104
+	);
 	virtual ~graph();
 
 	void setForeground( const QPixmap & _pixmap );
+
 
 	void setGraphColor( const QColor );
 
@@ -65,6 +70,7 @@ public:
 	{
 		return m_graphStyle;
 	}
+	
 
 	inline void setGraphStyle( graphStyle _s )
 	{
@@ -88,7 +94,8 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	void changeSampleAt(int _x, int _y);
+	void changeSampleAt( int _x, int _y );
+	void drawLineAt( int _x, int _y, int _lastx );
 
 
 	QPixmap m_foreground;
@@ -154,6 +161,7 @@ public slots:
 	QString setWaveToUser( );
 	
 	void smooth();
+	void smoothNonCyclic();
 	void normalize();
 
 signals:
