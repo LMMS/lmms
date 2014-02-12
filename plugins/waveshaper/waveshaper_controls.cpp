@@ -134,7 +134,7 @@ void waveShaperControls::resetClicked()
 
 void waveShaperControls::smoothClicked()
 {
-	m_wavegraphModel.smooth();
+	m_wavegraphModel.smoothNonCyclic();
 	engine::getSong()->setModified();
 }
 

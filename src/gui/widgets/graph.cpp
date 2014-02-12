@@ -108,33 +108,37 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 	int x = _me->x();
 	int y = _me->y();
 
-	static bool skip = false;
+/*	static bool skip = false;
 
 	if( skip )
 	{
 		skip = false;
 		return;
 	}
-
+*/
 	// avoid mouse leaps
 	int diff = x - m_lastCursorX;
 
 	if( diff >= 1 )
 	{
-		x = qMin( width() - 2, m_lastCursorX + 1);
+		x = qMin( width() - 3, m_lastCursorX + 1 );
 	}
-	else if( diff <= 1 )
+	else if( diff <= -1 )
 	{
 		x = qMax( 2, m_lastCursorX - 1 );
 	}
-	else
-	{
-		x = m_lastCursorX;
-	}
-
+	
 	y = qMax( 2, qMin( y, height()-3 ) );
 
-	changeSampleAt( x, y );
+/*	if( qAbs( diff ) > 1 )
+	{ 		
+			drawLineAt( x, y, m_lastCursorX ); 
+		
+	}
+	else
+	{*/
+		changeSampleAt( x, y );
+//	}
 
 	// update mouse
 	if( diff != 0 )
@@ -146,7 +150,7 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 		QCursor::setPos( pt.x(), pt.y() );
 	}
 
-	skip = true;
+//	skip = true;
 }
 
 
@@ -157,9 +161,6 @@ void graph::mousePressEvent( QMouseEvent * _me )
 	{
 		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
 		{
-			// toggle mouse state
-			m_mouseDown = true;
-
 			// get position
 			int x = _me->x();
 			int y = _me->y();
@@ -180,6 +181,7 @@ void graph::mousePressEvent( QMouseEvent * _me )
 
 			drawLineAt( x, y, m_lastCursorX );
 
+			m_mouseDown = true;
 			setCursor( Qt::BlankCursor );
 			m_lastCursorX = x;
 		}
@@ -568,7 +570,21 @@ void graphModel::smooth()
 	emit samplesChanged(0, length()-1);
 }
 
+void graphModel::smoothNonCyclic()
+{
+	// store values in temporary array
+	QVector<float> temp = m_samples;
 
+	// Smoothing
+	m_samples[0] = ( ( temp[0] * 2 ) + temp[1] ) / 3.0f;
+	for ( int i=1; i < ( length()-1 ); i++ )
+	{
+		m_samples[i] = ( temp[i-1] + ( temp[i] * 2 ) + temp[i+1] ) * 0.25f;
+	}
+	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 2 ) ) / 3.0f;
+
+	emit samplesChanged(0, length()-1);
+}
 
 void graphModel::normalize()
 {

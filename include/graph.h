@@ -160,6 +160,7 @@ public slots:
 	QString setWaveToUser( );
 	
 	void smooth();
+	void smoothNonCyclic();
 	void normalize();
 
 signals:

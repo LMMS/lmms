@@ -57,13 +57,13 @@ waveShaperControlDialog::waveShaperControlDialog(
 	waveGraph -> setMaximumSize( 204, 204 );
 	
 	knob * inputKnob = new knob( knobBright_26, this);
-	inputKnob -> move( 10, 251 );
+	inputKnob -> move( 14, 251 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) + " ", "" );
 	
 	knob * outputKnob = new knob( knobBright_26, this );
-	outputKnob -> move( 50, 251 );
+	outputKnob -> move( 54, 251 );
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ) + " ", "" );
