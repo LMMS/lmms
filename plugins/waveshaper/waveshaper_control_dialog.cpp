@@ -45,7 +45,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 300 );
 
-	graph * waveGraph = new graph( this, graph::NearestStyle, 204, 204 );
+	graph * waveGraph = new graph( this, graph::LinearNonCyclicStyle, 204, 204 );
 	waveGraph -> move( 10, 32 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );

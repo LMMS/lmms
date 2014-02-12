@@ -119,26 +119,26 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 	// avoid mouse leaps
 	int diff = x - m_lastCursorX;
 
-	if( diff >= 1 )
+/*	if( diff >= 1 )
 	{
 		x = qMin( width() - 3, m_lastCursorX + 1 );
 	}
 	else if( diff <= -1 )
 	{
 		x = qMax( 2, m_lastCursorX - 1 );
-	}
-	
+	}*/
+
+	x = qMax( 2, qMin( x, width()-3 ) );	
 	y = qMax( 2, qMin( y, height()-3 ) );
 
-/*	if( qAbs( diff ) > 1 )
+	if( qAbs( diff ) > 1 )
 	{ 		
-			drawLineAt( x, y, m_lastCursorX ); 
-		
+		drawLineAt( x, y, m_lastCursorX ); 		
 	}
 	else
-	{*/
+	{
 		changeSampleAt( x, y );
-//	}
+	}
 
 	// update mouse
 	if( diff != 0 )
@@ -205,6 +205,8 @@ void graph::drawLineAt( int _x, int _y, int _lastx )
 	_x -= 2;
 	_y -= 2;
 	_lastx -= 2;
+	
+	_lastx = qMax( 0, qMin( _lastx, width()-5 ) );
 
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-4 ) ) + maxVal;
@@ -272,7 +274,7 @@ void graph::paintEvent( QPaintEvent * )
 	QVector<float> * samps = &(model()->m_samples);
 	int length = model()->length();
 	const float maxVal = model()->maxValue();
-
+	
 	float xscale = (float)( width()-4 ) / length;
 	float yscale = (float)( height()-4 ) / ( model()->minValue() - maxVal );
 
@@ -282,13 +284,14 @@ void graph::paintEvent( QPaintEvent * )
 
 	switch( m_graphStyle )
 	{
-		case graph::LinearStyle:
+		case graph::LinearStyle:			
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
 			{
 				// Needs to be rewritten
-				p.drawLine(2+static_cast<int>(i*xscale),
+				p.drawLine(
+					2+static_cast<int>(i*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
 					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
@@ -298,7 +301,7 @@ void graph::paintEvent( QPaintEvent * )
 			// Draw last segment wrapped around
 			p.drawLine(2+static_cast<int>(length*xscale),
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
-				width()-2,
+				width()-3,
 				2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
 
 			p.setRenderHints( QPainter::Antialiasing, false );
@@ -322,9 +325,29 @@ void graph::paintEvent( QPaintEvent * )
 
 			p.drawLine(2+static_cast<int>(length*xscale),
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
-				width()-2,
+				width()-3,
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
 			break;
+			
+		case graph::LinearNonCyclicStyle:
+			p.setRenderHints( QPainter::Antialiasing, true );
+
+			for( int i=0; i < length; i++ )
+			{
+				// Needs to be rewritten
+				p.drawLine(
+					2+static_cast<int>(i*xscale),
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+					2+static_cast<int>((i+1)*xscale),
+					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
+					);
+			}
+
+			// Do not draw last segment wrapped around - hence, "non-cyclic"
+
+			p.setRenderHints( QPainter::Antialiasing, false );
+			break;
+		
 
 		default:
 			break;
@@ -448,15 +471,14 @@ void graphModel::setSampleAt( int _x, float _val )
 {
 	//snap to the grid
 	_val -= ( m_step != 0.0 ) ? fmod( _val, m_step ) * m_step : 0;
-	// boundary check
-	if ( _x >= 0 && _x < length() &&
-			_val >= minValue() && _val < maxValue() )
-	{
 
-		// change sample shape
-		m_samples[_x] = _val;
-		emit samplesChanged( _x, _x );
-	}
+	// boundary crop	
+	_x = qMax( 0, qMin( length()-1, _x ) );
+	_val = qMax( minValue(), qMin( maxValue(), _val ) );
+
+	// change sample shape
+	m_samples[_x] = _val;
+	emit samplesChanged( _x, _x );
 }
 
 
