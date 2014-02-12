@@ -558,11 +558,12 @@ void graphModel::smooth()
 	QVector<float> temp = m_samples;
 
 	// Smoothing
-	m_samples[0] = ( temp[0] + temp[length()-1] ) * 0.5f;
-	for ( int i=1; i < length(); i++ )
+	m_samples[0] = ( temp[length()-1] + ( temp[0] * 2 ) + temp[1] ) * 0.25f;
+	for ( int i=1; i < ( length()-1 ); i++ )
 	{
-		m_samples[i] = ( temp[i-1] + temp[i] ) * 0.5f;
+		m_samples[i] = ( temp[i-1] + ( temp[i] * 2 ) + temp[i+1] ) * 0.25f;
 	}
+	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 2 ) + temp[0] ) * 0.25f;
 
 	emit samplesChanged(0, length()-1);
 }

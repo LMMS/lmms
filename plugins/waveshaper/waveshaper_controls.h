@@ -67,6 +67,9 @@ private slots:
 	void changeInput();
 	void changeOutput();
 	void samplesChanged( int, int );
+	
+	void resetClicked();
+	void smoothClicked();
 
 private:
 	waveShaperEffect * m_effect;

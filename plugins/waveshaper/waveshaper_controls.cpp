@@ -29,7 +29,8 @@
 #include "waveshaper_controls.h"
 #include "waveshaper.h"
 #include "graph.h"
-
+#include "engine.h"
+#include "song.h"
 
 
 waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
@@ -124,6 +125,20 @@ void waveShaperControls::setDefaultShape()
 	m_wavegraphModel.setLength( 200 );
 	m_wavegraphModel.setSamples( (float*)&shp );
 }
+
+void waveShaperControls::resetClicked()
+{
+	setDefaultShape();
+	engine::getSong()->setModified();
+}
+
+void waveShaperControls::smoothClicked()
+{
+	m_wavegraphModel.smooth();
+	engine::getSong()->setModified();
+}
+
+
 
 #include "moc_waveshaper_controls.cxx"
 

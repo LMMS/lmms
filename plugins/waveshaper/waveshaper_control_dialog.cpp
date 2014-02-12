@@ -30,7 +30,8 @@
 #include "waveshaper_controls.h"
 #include "embed.h"
 #include "graph.h"
-
+#include "pixmap_button.h"
+#include "tooltip.h"
 
 
 waveShaperControlDialog::waveShaperControlDialog(
@@ -42,48 +43,47 @@ waveShaperControlDialog::waveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 222, 300 );
-
-	QVBoxLayout * tl = new QVBoxLayout( this );
-	tl->addSpacing( 30 );
-	tl->addStrut( 204 );
+	setFixedSize( 224, 300 );
 
 	graph * waveGraph = new graph( this, graph::NearestStyle, 204, 204 );
+	waveGraph -> move( 10, 32 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
-	
-	
 	waveGraph -> setAutoFillBackground( true );
-	
 	pal = QPalette();
 	pal.setBrush( backgroundRole(), 
 			PLUGIN_NAME::getIconPixmap("wavegraph") );
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 170, 255, 255 ) );
-
-//	waveGraph -> setMinimumSize( 204, 204);
-//	waveGraph -> resize( 204, 204);
-	
 	waveGraph -> setMaximumSize( 204, 204 );
 	
-	tl -> setSizeConstraint( QLayout::SetNoConstraint );
-	tl -> addWidget( waveGraph );
-	
-	QHBoxLayout * l = new QHBoxLayout;
-
 	knob * inputKnob = new knob( knobBright_26, this);
+	inputKnob -> move( 10, 251 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) + " ", "" );
-
+	
 	knob * outputKnob = new knob( knobBright_26, this );
+	outputKnob -> move( 50, 251 );
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ) + " ", "" );
 
-	l->addWidget( inputKnob );
-	l->addWidget( outputKnob );
-
-	tl->addLayout( l );
-	setLayout( tl );
+	pixmapButton * resetButton = new pixmapButton( this, tr("Reset waveform") );
+	resetButton -> move( 164, 251 );
+	resetButton -> resize( 12, 48 );
+	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
+	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
+	toolTip::add( resetButton, tr( "Click here to reset the wavegraph back to default" ) );
+	
+	pixmapButton * smoothButton = new pixmapButton( this, tr("Smooth waveform") );
+	smoothButton -> move( 164, 267 );
+	smoothButton -> resize( 12, 48 );
+	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
+	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
+	toolTip::add( smoothButton, tr( "Click here to apply smooth to wavegraph" ) );
+	
+	connect( resetButton, SIGNAL (clicked () ),
+			_controls, SLOT ( resetClicked() ) );
+	connect( smoothButton, SIGNAL (clicked () ),
+			_controls, SLOT ( smoothClicked() ) );
 }
-
