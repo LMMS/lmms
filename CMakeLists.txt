@@ -403,6 +403,7 @@ ENDIF(WIN32)
 # make sub-directories
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(data)
+ADD_SUBDIRECTORY(doc)
 
 
 #
