@@ -36,8 +36,8 @@
 waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
-	m_inputModel( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Input gain" ) ),
-	m_outputModel( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Output gain" ) ),
+	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
+	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
 	m_wavegraphModel( 0.0f, 1.0f, 200, this )
 {
 	connect( &m_inputModel, SIGNAL( dataChanged() ),
