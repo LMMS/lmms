@@ -282,10 +282,6 @@ float AutomatableModel::fittedValue( float value ) const
 	{
 		value = roundf( value / m_step ) * m_step;
 	}
-	else
-	{
-		value = m_minValue;
-	}
 
 	// correct rounding error at the border
 	if( qAbs<float>( value - m_maxValue ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
