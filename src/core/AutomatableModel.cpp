@@ -280,7 +280,7 @@ float AutomatableModel::fittedValue( float value ) const
 
 	if( m_step != 0 )
 	{
-		value = roundf( value / m_step ) * m_step;
+		value = nearbyintf( value / m_step ) * m_step;
 	}
 
 	// correct rounding error at the border
