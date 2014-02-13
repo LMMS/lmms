@@ -1,7 +1,7 @@
 /*
  * SideBar.cpp - side-bar in LMMS' MainWindow
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,7 @@
 
 #include "SideBar.h"
 #include "SideBarWidget.h"
+#include "tooltip.h"
 
 
 // internal helper class allowing to create QToolButtons with
@@ -118,6 +119,8 @@ void SideBar::appendTab( SideBarWidget * _sbw )
 
 	_sbw->hide();
 	_sbw->setMinimumWidth( 200 );
+
+	toolTip::add( btn, _sbw->title() );
 }
 
 
