@@ -179,19 +179,6 @@ void NotePlayHandle::setPanning( const panning_t panning )
 
 
 
-int NotePlayHandle::midiVelocity() const
-{
-	int vel = getVolume();
-	if( m_instrumentTrack->getVolume() < DefaultVolume )
-	{
-		vel = ( vel * m_instrumentTrack->getVolume() ) / DefaultVolume;
-	}
-	return qMin( MidiMaxVelocity, vel * MidiMaxVelocity / DefaultVolume );
-}
-
-
-
-
 int NotePlayHandle::midiKey() const
 {
 	return key() - m_origBaseNote + instrumentTrack()->baseNoteModel()->value();

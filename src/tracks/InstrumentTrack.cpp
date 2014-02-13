@@ -193,13 +193,6 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 		m_soundShaping.processAudioBuffer( buf, frames, n );
 		v_scale *= ( (float) n->getVolume() / DefaultVolume );
 	}
-	else
-	{
-		if( getVolume() < DefaultVolume && m_instrument->isMidiBased() )
-		{
-			v_scale = 1;
-		}
-	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	
