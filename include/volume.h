@@ -53,7 +53,7 @@ typedef struct
 
 inline int volumeToMidi( volume_t vol )
 {
-	return vol * MidiMaxVelocity / DefaultVolume;
+	return qMin( MidiMaxVelocity, vol * MidiMaxVelocity / DefaultVolume );
 }
 
 #endif
