@@ -46,7 +46,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 300 );
 
-	graph * waveGraph = new graph( this, graph::LinearNonCyclicStyle, 204, 204 );
+	graph * waveGraph = new graph( this, graph::LinearNonCyclicStyle, 204, 205 );
 	waveGraph -> move( 10, 32 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
@@ -55,7 +55,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 			PLUGIN_NAME::getIconPixmap("wavegraph") );
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 170, 255, 255 ) );
-	waveGraph -> setMaximumSize( 204, 204 );
+	waveGraph -> setMaximumSize( 204, 205 );
 
 	knob * inputKnob = new knob( knobBright_26, this);
 	inputKnob -> move( 14, 251 );
