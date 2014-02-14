@@ -321,7 +321,6 @@ void knob::drawKnob( QPainter * _p )
 				width() / 2 - m_knobPixmap->width() / 2 ), 0,
 				*m_knobPixmap );
 
-//	p.setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
 	p.setRenderHint( QPainter::Antialiasing );
 
 	const int centerAngle = angleFromValue( model()->centerValue(), model()->minValue(), model()->maxValue(), m_totalAngle );
@@ -329,7 +328,11 @@ void knob::drawKnob( QPainter * _p )
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 	
-	QColor col = QApplication::palette().color( QPalette::Active, QPalette::WindowText );
+	QColor col;
+	if( m_knobNum == knobVintage_32 ) 
+	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
+	else
+	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
 	col.setAlpha( 70 );
 	
 	p.setPen( QPen( col, 2 ) );
@@ -366,6 +369,13 @@ void knob::drawKnob( QPainter * _p )
 			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText), 2 ) );
 			p.drawLine( calculateLine( mid, radius ) );
+			break;
+		}
+		case knobVintage_32:
+		{
+			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
+							QPalette::Shadow), 2 ) );
+			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
 	}
