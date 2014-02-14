@@ -73,8 +73,7 @@ public slots:
 private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
-	void startModelChanged();
-	void endModelChanged();
+	void loopPointChanged();
 	void stutterModelChanged();
 
 
@@ -95,8 +94,6 @@ private:
 	BoolModel m_stutterModel;
 
 	f_cnt_t m_nextPlayStartPoint;
-
-	void loopPointChanged();
 
 	friend class AudioFileProcessorView;
 
@@ -164,15 +161,15 @@ public:
 		end,
 	} ;
 
-	class afpKnob : public ::knob
+	class knob : public ::knob
 	{
 		const AudioFileProcessorWaveView * m_waveView;
-		const afpKnob * m_relatedKnob;
+		const knob * m_relatedKnob;
 
 
 	public:
-		afpKnob( QWidget * _parent ) :
-			::knob( knobBright_26, _parent ),
+		knob( QWidget * _parent ) :
+			::knob( knobStyled, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
@@ -184,7 +181,7 @@ public:
 			m_waveView = _wv;
 		}
 
-		void setRelatedKnob( const afpKnob * _knob )
+		void setRelatedKnob( const knob * _knob )
 		{
 			m_relatedKnob = _knob;
 		}
@@ -210,12 +207,6 @@ public:
 public slots:
 	void update()
 	{
-		if( m_sampleBuffer.frames() > 1 )
-		{
-			const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
-			m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
-			m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
-		}
 		updateGraph();
 		QWidget::update();
 	}
@@ -239,8 +230,8 @@ private:
 	f_cnt_t m_to;
 	f_cnt_t m_last_from;
 	f_cnt_t m_last_to;
-	afpKnob * m_startKnob;
-	afpKnob * m_endKnob;
+	knob * m_startKnob;
+	knob * m_endKnob;
 	f_cnt_t m_startFrameX;
 	f_cnt_t m_endFrameX;
 	bool m_isDragging;
@@ -252,7 +243,7 @@ private:
 
 public:
 	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
-	void setKnobs( afpKnob * _start, afpKnob * _end );
+	void setKnobs( knob * _start, knob * _end );
 
 
 private:
