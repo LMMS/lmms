@@ -1,9 +1,9 @@
 /*
  * waveshaper_controls.h - controls for waveshaper-effect
  *
- * Copyright  * (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -49,12 +49,12 @@ public:
 	{
 		return( "waveshapercontrols" );
 	}
-	
+
 	virtual void setDefaultShape();
 
 	virtual int controlCount()
 	{
-		return( 3 );
+		return( 4 );
 	}
 
 	virtual EffectControlDialog * createView()
@@ -67,15 +67,20 @@ private slots:
 	void changeInput();
 	void changeOutput();
 	void samplesChanged( int, int );
-	
+	void changeClip();
+
 	void resetClicked();
 	void smoothClicked();
+
+	void addOneClicked();
+	void subOneClicked();
 
 private:
 	waveShaperEffect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
 	graphModel m_wavegraphModel;
+	BoolModel  m_clipModel;
 
 	friend class waveShaperControlDialog;
 	friend class waveShaperEffect;

@@ -128,12 +128,12 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 		x = qMax( 2, m_lastCursorX - 1 );
 	}*/
 
-	x = qMax( 2, qMin( x, width()-3 ) );	
+	x = qMax( 2, qMin( x, width()-3 ) );
 	y = qMax( 2, qMin( y, height()-3 ) );
 
 	if( qAbs( diff ) > 1 )
-	{ 		
-		drawLineAt( x, y, m_lastCursorX ); 		
+	{
+		drawLineAt( x, y, m_lastCursorX );
 	}
 	else
 	{
@@ -205,7 +205,7 @@ void graph::drawLineAt( int _x, int _y, int _lastx )
 	_x -= 2;
 	_y -= 2;
 	_lastx -= 2;
-	
+
 	_lastx = qMax( 0, qMin( _lastx, width()-5 ) );
 
 	float range = minVal - maxVal;
@@ -270,13 +270,15 @@ void graph::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setPen( QPen( m_graphColor, 1 ) );
+	QColor gcol = QColor( m_graphColor.red(), m_graphColor.green(), m_graphColor.blue(), 100 );
 
 	QVector<float> * samps = &(model()->m_samples);
 	int length = model()->length();
 	const float maxVal = model()->maxValue();
-	
+	const float minVal = model()->minValue();
+
 	float xscale = (float)( width()-4 ) / length;
-	float yscale = (float)( height()-4 ) / ( model()->minValue() - maxVal );
+	float yscale = (float)( height()-4 ) / ( minVal - maxVal );
 
 	// Max index, more useful below
 	length--;
@@ -284,7 +286,7 @@ void graph::paintEvent( QPaintEvent * )
 
 	switch( m_graphStyle )
 	{
-		case graph::LinearStyle:			
+		case graph::LinearStyle:
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
@@ -328,7 +330,7 @@ void graph::paintEvent( QPaintEvent * )
 				width()-3,
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
 			break;
-			
+
 		case graph::LinearNonCyclicStyle:
 			p.setRenderHints( QPainter::Antialiasing, true );
 
@@ -347,7 +349,26 @@ void graph::paintEvent( QPaintEvent * )
 
 			p.setRenderHints( QPainter::Antialiasing, false );
 			break;
-		
+
+		case graph::BarStyle:
+			for( int i=0; i <= length; i++ )
+			{
+				p.fillRect( 2+static_cast<int>( i*xscale ),
+							2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+							qMax( static_cast<int>(xscale) - 1, 1 ),
+							qMax( static_cast<int>( ( minVal - maxVal ) * yscale ) - static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ), 1 ),
+							gcol );
+
+				p.setPen( QPen( m_graphColor, 1 ) );
+
+				p.drawLine( 2+static_cast<int>(i*xscale),
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+					qMax( static_cast<int>(i*xscale) + static_cast<int>(xscale), 2+static_cast<int>(i*xscale) ),
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale )
+					);
+			}
+
+			break;
 
 		default:
 			break;
@@ -472,7 +493,7 @@ void graphModel::setSampleAt( int _x, float _val )
 	//snap to the grid
 	_val -= ( m_step != 0.0 ) ? fmod( _val, m_step ) * m_step : 0;
 
-	// boundary crop	
+	// boundary crop
 	_x = qMax( 0, qMin( length()-1, _x ) );
 	_val = qMax( minValue(), qMin( maxValue(), _val ) );
 

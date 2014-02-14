@@ -47,6 +47,7 @@ public:
 		NearestStyle,
 		LinearStyle,
 		LinearNonCyclicStyle,
+		BarStyle,
 		NumGraphStyles
 	};
 

@@ -310,25 +310,29 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 {
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
+	m_modalBarWidget->show();
+	m_modalBarWidget->move( 0,0 );
 	
 	m_tubeBellWidget = setupTubeBellControls( this );
 	setWidgetBackground( m_tubeBellWidget, "artwork" );
 	m_tubeBellWidget->hide();
+	m_tubeBellWidget->move( 0,0 );
 	
 	m_bandedWGWidget = setupBandedWGControls( this );
 	setWidgetBackground( m_bandedWGWidget, "artwork" );
 	m_bandedWGWidget->hide();
+	m_bandedWGWidget->move( 0,0 );
 	
 	m_presetsCombo = new comboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 64, 157, 99, 22 );
+	m_presetsCombo->setGeometry( 140, 50, 99, 22 );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
 	
-	m_spreadKnob = new knob( knobBright_26, this );
+	m_spreadKnob = new knob( knobVintage_32, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
-	m_spreadKnob->move( 178, 173 );
+	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ) + " ", "" );
 }
 
@@ -358,29 +362,29 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 		
-	m_hardnessKnob = new knob( knobBright_26, widget );
+	m_hardnessKnob = new knob( knobVintage_32, widget );
 	m_hardnessKnob->setLabel( tr( "Hardness" ) );
-	m_hardnessKnob->move( 145, 24 );
+	m_hardnessKnob->move( 30, 90 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ) + " ", "" );
 
-	m_positionKnob = new knob( knobBright_26, widget );
+	m_positionKnob = new knob( knobVintage_32, widget );
 	m_positionKnob->setLabel( tr( "Position" ) );
-	m_positionKnob->move( 195, 24 );
+	m_positionKnob->move( 110, 90 );
 	m_positionKnob->setHintText( tr( "Position:" ) + " ", "" );
 
-	m_vibratoGainKnob = new knob( knobBright_26, widget );
+	m_vibratoGainKnob = new knob( knobVintage_32, widget );
 	m_vibratoGainKnob->setLabel( tr( "Vib Gain" ) );
-	m_vibratoGainKnob->move( 56, 86 );
+	m_vibratoGainKnob->move( 30, 140 );
 	m_vibratoGainKnob->setHintText( tr( "Vib Gain:" ) + " ", "" );
 
-	m_vibratoFreqKnob = new knob( knobBright_26, widget );
+	m_vibratoFreqKnob = new knob( knobVintage_32, widget );
 	m_vibratoFreqKnob->setLabel( tr( "Vib Freq" ) );
-	m_vibratoFreqKnob->move( 117, 86 );
+	m_vibratoFreqKnob->move( 110, 140 );
 	m_vibratoFreqKnob->setHintText( tr( "Vib Freq:" ) + " ", "" );
 
-	m_stickKnob = new knob( knobBright_26, widget );
+	m_stickKnob = new knob( knobVintage_32, widget );
 	m_stickKnob->setLabel( tr( "Stick Mix" ) );
-	m_stickKnob->move( 178, 86 );
+	m_stickKnob->move( 190, 90 );
 	m_stickKnob->setHintText( tr( "Stick Mix:" ) + " ", "" );
 	
 	return( widget );
@@ -394,29 +398,29 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
-	m_modulatorKnob = new knob( knobBright_26, widget );
+	m_modulatorKnob = new knob( knobVintage_32, widget );
 	m_modulatorKnob->setLabel( tr( "Modulator" ) );
-	m_modulatorKnob->move( 145, 24 );
+	m_modulatorKnob->move( 30, 90 );
 	m_modulatorKnob->setHintText( tr( "Modulator:" ) + " ", "" );
 
-	m_crossfadeKnob = new knob( knobBright_26, widget );
+	m_crossfadeKnob = new knob( knobVintage_32, widget );
 	m_crossfadeKnob->setLabel( tr( "Crossfade" ) );
-	m_crossfadeKnob->move( 195, 24 );
+	m_crossfadeKnob->move( 110, 90 );
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ) + " ", "" );
 	
-	m_lfoSpeedKnob = new knob( knobBright_26, widget );
+	m_lfoSpeedKnob = new knob( knobVintage_32, widget );
 	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
-	m_lfoSpeedKnob->move( 56, 86 );
+	m_lfoSpeedKnob->move( 30, 140 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ) + " ", "" );
 	
-	m_lfoDepthKnob = new knob( knobBright_26, widget );
+	m_lfoDepthKnob = new knob( knobVintage_32, widget );
 	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
-	m_lfoDepthKnob->move( 117, 86 );
+	m_lfoDepthKnob->move( 110, 140 );
 	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ) + " ", "" );
 	
-	m_adsrKnob = new knob( knobBright_26, widget );
+	m_adsrKnob = new knob( knobVintage_32, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
-	m_adsrKnob->move( 178, 86 );
+	m_adsrKnob->move( 190, 90 );
 	m_adsrKnob->setHintText( tr( "ADSR:" ) + " ", "" );
 
 	return( widget );
@@ -432,26 +436,26 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 	widget->setFixedSize( 250, 250 );
 	
 	m_strikeLED = new ledCheckBox( tr( "Bowed" ), widget );
-	m_strikeLED->move( 165, 30 );
+	m_strikeLED->move( 138, 25 );
 
-	m_pressureKnob = new knob( knobBright_26, widget );
+	m_pressureKnob = new knob( knobVintage_32, widget );
 	m_pressureKnob->setLabel( tr( "Pressure" ) );
-	m_pressureKnob->move( 56, 86 );
+	m_pressureKnob->move( 30, 90 );
 	m_pressureKnob->setHintText( tr( "Pressure:" ) + " ", "" );
 
-	m_motionKnob = new knob( knobBright_26, widget );
+	m_motionKnob = new knob( knobVintage_32, widget );
 	m_motionKnob->setLabel( tr( "Motion" ) );
-	m_motionKnob->move( 117, 86 );
+	m_motionKnob->move( 110, 90 );
 	m_motionKnob->setHintText( tr( "Motion:" ) + " ", "" );
 	
-	m_velocityKnob = new knob( knobBright_26, widget );
+	m_velocityKnob = new knob( knobVintage_32, widget );
 	m_velocityKnob->setLabel( tr( "Speed" ) );
-	m_velocityKnob->move( 178, 86 );
+	m_velocityKnob->move( 30, 140 );
 	m_velocityKnob->setHintText( tr( "Speed:" ) + " ", "" );
 	
-	m_vibratoKnob = new knob( knobBright_26, widget, tr( "Vibrato" ) );
+	m_vibratoKnob = new knob( knobVintage_32, widget, tr( "Vibrato" ) );
 	m_vibratoKnob->setLabel( tr( "Vibrato" ) );
-	m_vibratoKnob->move( 178, 129 );
+	m_vibratoKnob->move( 110, 140 );
 	m_vibratoKnob->setHintText( tr( "Vibrato:" ) + " ", "" );
 	
 	return( widget );

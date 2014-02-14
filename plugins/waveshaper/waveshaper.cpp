@@ -1,9 +1,9 @@
 /*
  * waveshaper.cpp - waveshaper effect-plugin
  *
- * * Copyright  * (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -89,31 +89,41 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
 
 // apply input gain
-		s[0] *= m_wsControls.m_inputModel.value();
-		s[1] *= m_wsControls.m_inputModel.value();
-		
+		if( m_wsControls.m_inputModel.value() != 1.0f )
+		{
+			s[0] *= m_wsControls.m_inputModel.value();
+			s[1] *= m_wsControls.m_inputModel.value();
+		}
+
+// clip if clip enabled
+		if( m_wsControls.m_clipModel.value() )
+		{
+			s[0] = qBound( -1.0f, s[0], 1.0f );
+			s[1] = qBound( -1.0f, s[1], 1.0f );
+		}
+
 // start effect
 
 		for ( i=0; i <= 1; ++i )
 		{
 			lookup = fabsf( s[i] ) * 200.0f;
 			posneg = s[i] < 0 ? -1.0f : 1.0f;
-			
-			if ( lookup < 1 ) 
+
+			if ( lookup < 1 )
 			{
-				frac = lookup - truncf(lookup);				
+				frac = lookup - truncf(lookup);
 				s[i] = frac * m_wsControls.m_wavegraphModel.samples()[0] * posneg;
 			}
 			else
 			if ( lookup < 200 )
 			{
 				frac = lookup - truncf(lookup);
-				s[i] = 
+				s[i] =
 						(( (1.0f-frac) * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) - 1 ] ) +
-						( frac * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) ] )) 
+						( frac * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) ] ))
 						* posneg;
 			}
-			else 
+			else
 			{
 				s[i] *= m_wsControls.m_wavegraphModel.samples()[199];
 			}
@@ -122,7 +132,7 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 // apply output gain
 		s[0] *= m_wsControls.m_outputModel.value();
 		s[1] *= m_wsControls.m_outputModel.value();
-		
+
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
