@@ -62,6 +62,7 @@ Optional, but strongly recommended:
 - stk, libstk + libstk-dev
 - libfluidsynth with devel files
 - fftw3 with devel-files
+- libfltk1.3 with devel-files (needed by ZynAddSubFx)
 
 For compiling you should have an up to date GCC with g++.
 
