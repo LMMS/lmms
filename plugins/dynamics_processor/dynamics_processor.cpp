@@ -25,6 +25,7 @@
 
 
 #include "dynamics_processor.h"
+#include <math.h>
 #include "embed.cpp"
 
 
@@ -73,6 +74,16 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 {
 	if( !isEnabled() || !isRunning () )
 	{
+		if( currentPeak[0] != 0.0f ) 
+		{ 
+			currentPeak[0] = qMax ( currentPeak[0] - 
+			(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
+		}
+		if( currentPeak[1] != 0.0f ) 
+		{ 
+			currentPeak[1] = qMax ( currentPeak[1] - 
+			(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
+		}		
 		return( false );
 	}
 
@@ -93,6 +104,13 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
+
+// check for nan/inf because they may cause errors?
+		if( isnanf( s[0] ) ) s[0] = 0.0f;
+		if( isnanf( s[1] ) ) s[1] = 0.0f;
+		if( isinff( s[0] ) ) s[0] = 0.0f;
+		if( isinff( s[1] ) ) s[1] = 0.0f;
+		
 
 // update peak values
 		for ( i=0; i <= 1; i++ )
@@ -143,27 +161,32 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 		for ( i=0; i <= 1; i++ )
 		{
-			lookup = sm_peak[i] * 200.0f;
+			if( sm_peak[i] != 0 ) 
+			{ 
+				lookup = sm_peak[i] * 200.0f;
 
-			if ( lookup < 1 )
-			{
-				frac = lookup - truncf(lookup);
-				gain = frac * m_dpControls.m_wavegraphModel.samples()[0];
+				if ( lookup < 1 )
+				{
+					frac = lookup - truncf(lookup);
+					gain = frac * m_dpControls.m_wavegraphModel.samples()[0];
+				}
+				else
+				if ( lookup < 200 )
+				{
+					frac = lookup - truncf(lookup);
+					gain =
+							(( (1.0f-frac) * m_dpControls.m_wavegraphModel.samples()[ (int)truncf(lookup) - 1 ] ) +
+							( frac * m_dpControls.m_wavegraphModel.samples()[ (int)truncf(lookup) ] ));
+				}
+				else
+				{
+					gain = m_dpControls.m_wavegraphModel.samples()[199];
+				};
+				
+				s[i] = ( s[i] / sm_peak[i] ) * gain; 
 			}
-			else
-			if ( lookup < 200 )
-			{
-				frac = lookup - truncf(lookup);
-				gain =
-						(( (1.0f-frac) * m_dpControls.m_wavegraphModel.samples()[ (int)truncf(lookup) - 1 ] ) +
-						( frac * m_dpControls.m_wavegraphModel.samples()[ (int)truncf(lookup) ] ));
-			}
-			else
-			{
-				gain = m_dpControls.m_wavegraphModel.samples()[199];
-			};
+			else { s[i] = 0.0f; }
 			
-			s[i] = ( s[i] / sm_peak[i] ) * gain;
 		}
 
 // apply output gain
