@@ -70,13 +70,13 @@ dynProcControlDialog::dynProcControlDialog(
 	outputKnob->setHintText( tr( "Output gain:" ) + " ", "" );
 	
 	knob * attackKnob = new knob( knobBright_26, this);
-	attackKnob -> move( 14, 291 );
+	attackKnob -> move( 11, 291 );
 	attackKnob->setModel( &_controls->m_attackModel );
 	attackKnob->setLabel( tr( "ATTACK" ) );
 	attackKnob->setHintText( tr( "Peak attack time:" ) + " ", "ms" );
 
 	knob * releaseKnob = new knob( knobBright_26, this );
-	releaseKnob -> move( 54, 291 );
+	releaseKnob -> move( 52, 291 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
 	releaseKnob->setLabel( tr( "RELEASE" ) );
 	releaseKnob->setHintText( tr( "Peak release time:" ) + " ", "ms" );
