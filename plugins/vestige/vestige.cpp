@@ -844,7 +844,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
-	p.setPen( QColor( 0, 0, 0 ) );
+	p.setPen( QColor( 50, 50, 50 ) );
 	p.drawText( 10, 211, tr( "Preset" ) );
 
 //	m_pluginMutex.lock();
