@@ -46,6 +46,7 @@ INCLUDE_DIRECTORIES("${FLTK_INCLUDE_DIR}"
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/zynaddsubfx/src/UI)
 
+ADD_DEFINITIONS(-DPLUGINVERSION)	# removes exit confirmation dialogs etc. in MasterUI.fl
 add_subdirectory(zynaddsubfx/src/Nio)
 add_subdirectory(zynaddsubfx/src/UI)
 
