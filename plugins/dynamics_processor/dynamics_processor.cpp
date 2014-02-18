@@ -28,6 +28,14 @@
 #include <math.h>
 #include "embed.cpp"
 
+#ifdef LMMS_BUILD_WIN32
+#ifndef isnanf
+#define isnanf(x)	isnan(x)
+#endif
+#ifndef isinff
+#define isinff(x)	isinf(x)
+#endif
+#endif
 
 extern "C"
 {
