@@ -42,7 +42,7 @@ int LocalZynAddSubFx::s_instanceCount = 0;
 
 LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master( NULL ),
-	m_ioEngine( new NulEngine )
+	m_ioEngine( NULL )
 {
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -73,6 +73,8 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	}
 
 	++s_instanceCount;
+
+	m_ioEngine = new NulEngine;
 
 	m_master = new Master();
 	m_master->swaplr = 0;
