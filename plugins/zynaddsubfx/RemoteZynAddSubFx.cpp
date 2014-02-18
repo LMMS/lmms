@@ -35,7 +35,7 @@
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 
-#include "src/UI/MasterUI.h"
+#include "zynaddsubfx/src/UI/MasterUI.h"
 
 #include <FL/x.H>
 
@@ -281,4 +281,23 @@ int main( int _argc, char * * _argv )
 	return 0;
 }
 
+
+#ifdef NTK_GUI
+static Fl_Tiled_Image *module_backdrop;
+#endif
+
+void set_module_parameters ( Fl_Widget *o )
+{
+#ifdef NTK_GUI
+	o->box( FL_DOWN_FRAME );
+	o->align( o->align() | FL_ALIGN_IMAGE_BACKDROP );
+	o->color( FL_BLACK );
+	o->image( module_backdrop );
+	o->labeltype( FL_SHADOW_LABEL );
+#else
+	o->box( FL_PLASTIC_UP_BOX );
+	o->color( FL_CYAN );
+	o->labeltype( FL_EMBOSSED_LABEL );
+#endif
+}
 

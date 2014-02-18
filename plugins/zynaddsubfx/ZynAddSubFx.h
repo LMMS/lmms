@@ -32,7 +32,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
-#include "src/globals.h"
+#include "zynaddsubfx/src/globals.h"
 
 
 class QPushButton;

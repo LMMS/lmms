@@ -29,6 +29,7 @@
 #include "note.h"
 
 class Master;
+class NulEngine;
 
 class LocalZynAddSubFx
 {
@@ -66,6 +67,7 @@ protected:
 
 	int m_runningNotes[NumKeys];
 	Master * m_master;
+	NulEngine* m_ioEngine;
 
 } ;
 
