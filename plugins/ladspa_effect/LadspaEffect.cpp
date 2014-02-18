@@ -418,6 +418,11 @@ void LadspaEffect::pluginInstantiation()
 					p->def = 1.0f;
 				}
 			}
+			else if( manager->areHintsSampleRateDependent( m_key, port ) )
+			{
+				p->def *= m_maxSampleRate;
+			}
+
 
 			p->max *= p->scale;
 			p->min *= p->scale;
