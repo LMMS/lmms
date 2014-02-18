@@ -776,7 +776,7 @@ void VestigeInstrumentView::noteOffAll( void )
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
 	{
-		for( int key = 0; key <= MidiMaxNote; ++key )
+		for( int key = 0; key <= MidiMaxKey; ++key )
 		{
 			m_vi->m_plugin->processMidiEvent( MidiEvent( MidiNoteOff, 0, key, 0 ), 0 );
 		}
