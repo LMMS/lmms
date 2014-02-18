@@ -35,6 +35,7 @@
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 
+#include "zynaddsubfx/src/Nio/Nio.h"
 #include "zynaddsubfx/src/UI/MasterUI.h"
 
 #include <FL/x.H>
@@ -49,6 +50,8 @@ public:
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
+		Nio::start();
+
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
@@ -65,6 +68,8 @@ public:
 #else
 		usleep( m_guiSleepTime * 2 * 1000 );
 #endif
+
+		Nio::stop();
 	}
 
 	virtual void updateSampleRate()
