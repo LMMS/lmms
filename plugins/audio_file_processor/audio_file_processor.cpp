@@ -292,13 +292,27 @@ void audioFileProcessor::stutterModelChanged()
 
 void audioFileProcessor::loopPointChanged( void )
 {
-	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPointModel.value() *
+	//check if start is over end and swap values if so
+	if( m_startPointModel.value() > m_endPointModel.value() )
+	{
+		float tmp = m_endPointModel.value();
+		m_endPointModel.setValue( m_startPointModel.value() );
+		m_startPointModel.setValue( tmp );
+	}
+	
+	//check if start & end overlap and nudge end up if so
+	if( m_startPointModel.value() == m_endPointModel.value() )
+	{
+		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001, 1.0d ) );
+	}
+	
+	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
-	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPointModel.value() *
+	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
-	m_nextPlayStartPoint = f1;
-	m_sampleBuffer.setStartFrame( qMin<f_cnt_t>( f1, f2 ) );
-	m_sampleBuffer.setEndFrame( qMax<f_cnt_t>( f1, f2 ) );
+	m_nextPlayStartPoint = f_start;
+	m_sampleBuffer.setStartFrame( f_start );
+	m_sampleBuffer.setEndFrame( f_end );
 	emit dataChanged();
 }
 
@@ -963,8 +977,8 @@ void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px 
 
 void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to )
 {
-	knob * knob = _point == start ? m_startKnob : m_endKnob;
-	if( ! knob )
+	knob * a_knob = _point == start ? m_startKnob : m_endKnob;
+	if( ! a_knob )
 	{
 		return;
 	}
@@ -972,11 +986,11 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cn
 	const double v = double( _frames ) / m_sampleBuffer.frames();
 	if( _slide_to )
 	{
-		knob->slideTo( v );
+		a_knob->slideTo( v );
 	}
 	else
 	{
-		knob->slideBy( v );
+		a_knob->slideBy( v );
 	}
 }
 
@@ -1038,12 +1052,7 @@ float AudioFileProcessorWaveView::knob::getValue( const QPoint & _p )
 		double( m_waveView->m_to - m_waveView->m_from )
 			/ m_waveView->m_sampleBuffer.frames();
 	const float inc = ::knob::getValue( _p ) * dec_fact;
-	const float next = model()->value() - inc;
 
-	if( ! checkBound( next ) )
-	{
-		return 0;
-	}
 	return inc;
 }
 
@@ -1056,9 +1065,9 @@ bool AudioFileProcessorWaveView::knob::checkBound( double _v ) const
 	{
 		return true;
 	}
-
+	
 	if( ( m_relatedKnob->model()->value() - _v > 0 ) !=
-		( m_relatedKnob->model()->value() - model()->value() > 0 ) )
+		( m_relatedKnob->model()->value() - model()->value() >= 0 ) )
 		return false;
 
 	const double d1 = qAbs( m_relatedKnob->model()->value() - model()->value() )
@@ -1069,7 +1078,7 @@ bool AudioFileProcessorWaveView::knob::checkBound( double _v ) const
 		* ( m_waveView->m_sampleBuffer.frames() )
 		/ m_waveView->m_sampleBuffer.sampleRate();
 
-	return d1 < d2 || d2 > 0.02;
+	return d1 < d2 || d2 > 0.005;
 }
 
 
