@@ -37,7 +37,6 @@ OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
-OPTION(WANT_SYSTEM_SR	"Use system's libsamplerate" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
@@ -299,33 +298,7 @@ ENDIF(LMMS_BUILD_WIN32)
 
 
 # check for libsamplerate
-IF(WANT_SYSTEM_SR)
-	PKG_CHECK_MODULES(SAMPLERATE samplerate>=0.1.8)
-	IF(SAMPLERATE_FOUND)
-		SET(LMMS_HAVE_SAMPLERATE TRUE)
-		SET(STATUS_SAMPLERATE "OK")
-	ENDIF(SAMPLERATE_FOUND)
-ENDIF(WANT_SYSTEM_SR)
-IF(NOT LMMS_HAVE_SAMPLERATE)
-	SET(STATUS_SAMPLERATE "bundled")
-	INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate")
-	SET(CMAKE_CROSSCOMPILING_ORIG "${CMAKE_CROSSCOMPILING}")
-	SET(CMAKE_CROSSCOMPILING "")
-	INCLUDE(ChecksForLibSamplerate)
-	SET(LIBSAMPLERATE_SOURCES 
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.c"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_sinc.c"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/high_qual_coeffs.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/mid_qual_coeffs.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/fastest_coeffs.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/common.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_config.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/float_cast.h"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_zoh.c"
-		"${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_linear.c")
-	SET(CMAKE_CROSSCOMPILING "${CMAKE_CROSSCOMPILING_ORIG}")
-ENDIF(NOT LMMS_HAVE_SAMPLERATE)
+PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
 
 
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmmsconfig.h.in" "${CMAKE_BINARY_DIR}/lmmsconfig.h")
@@ -442,7 +415,7 @@ IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
 ENDIF()
 
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz" COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\"" DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1" COMMENT "Generating lmms.1.gz")
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} "${LMMS_ER_H}" ${lmms_UI_out} lmmsconfig.h lmmsversion.h "${WINRC}" "${CMAKE_BINARY_DIR}/lmms.1.gz")
+ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} "${LMMS_ER_H}" ${lmms_UI_out} lmmsconfig.h lmmsversion.h "${WINRC}" "${CMAKE_BINARY_DIR}/lmms.1.gz")
 
 TARGET_LINK_LIBRARIES(lmms ${CMAKE_THREAD_LIBS_INIT} ${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PORTAUDIO_LIBRARIES} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES} ${EXTRA_LIBRARIES})
 
@@ -456,6 +429,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/QtCore4.dll"
 					"${MINGW_PREFIX}/bin/QtGui4.dll"
 					"${MINGW_PREFIX}/bin/QtXml4.dll"
+					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
 					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
@@ -517,11 +491,6 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
 		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
-
-	IF(NOT LMMS_HAVE_SAMPLERATE)
-		INSTALL(FILES "${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h"
-			DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
-	ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 ENDIF(LMMS_BUILD_LINUX)
 
 # package ZynAddSubFX into win32 build
@@ -568,7 +537,6 @@ MESSAGE("\n"
 "Installation Summary\n"
 "--------------------\n"
 "* Install Directory           : ${CMAKE_INSTALL_PREFIX}\n"
-"* libsamplerate               : ${STATUS_SAMPLERATE}\n"
 )
 
 MESSAGE(
