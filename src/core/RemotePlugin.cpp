@@ -139,6 +139,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 	args << QString::number( in()->shmKey() );
 #ifndef DEBUG_REMOTE_PLUGIN
 	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
+	m_process.setWorkingDirectory( QCoreApplication::applicationDirPath() );
 	m_process.start( exec, args );
 	m_watcher.start( QThread::LowestPriority );
 #else
