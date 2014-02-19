@@ -246,9 +246,7 @@ void song::processNextBuffer()
 	// check for looping-mode and act if necessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
-				tl->loopPointsEnabled() &&
-				!( m_playMode == Mode_PlayPattern &&
-					m_patternToPlay->isFreezing() == true );
+				tl->loopPointsEnabled();
 	if( check_loop )
 	{
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
@@ -381,27 +379,6 @@ void song::processNextBuffer()
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
-}
-
-
-
-
-bool song::isFreezingPattern() const
-{
-	return isPlaying() &&
-				m_playMode == Mode_PlayPattern &&
-				m_patternToPlay != NULL &&
-				m_patternToPlay->isFreezing();
-}
-
-
-
-
-bool song::realTimeTask() const
-{
-	return !( m_exporting == true || ( m_playMode == Mode_PlayPattern &&
-		  	m_patternToPlay != NULL &&
-			m_patternToPlay->isFreezing() == true ) );
 }
 
 

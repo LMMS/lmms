@@ -512,7 +512,7 @@ sample_rate_t Mixer::processingSampleRate() const
 
 bool Mixer::criticalXRuns() const
 {
-	return m_cpuLoad >= 99 && engine::getSong()->realTimeTask() == true;
+	return m_cpuLoad >= 99 && engine::getSong()->isExporting() == false;
 }
 
 

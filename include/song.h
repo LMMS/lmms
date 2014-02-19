@@ -150,8 +150,6 @@ public:
 		return m_playing == false && m_paused == false;
 	}
 
-	bool isFreezingPattern() const;
-
 	inline bool isExporting() const
 	{
 		return m_exporting;
@@ -166,8 +164,6 @@ public:
 	{
 		return m_recording;
 	}
-
-	bool realTimeTask() const;
 
 	inline bool isExportDone() const
 	{

@@ -30,7 +30,6 @@
 #include "AutomatableModel.h"
 
 class bbTrack;
-class pattern;
 class SampleTCO;
 class track;
 class AudioPort;
@@ -42,7 +41,6 @@ public:
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleBuffer* sampleBuffer );
 	SamplePlayHandle( SampleTCO* tco );
-	SamplePlayHandle( pattern * _pattern );
 	virtual ~SamplePlayHandle();
 
 	virtual inline bool affinityMatters() const

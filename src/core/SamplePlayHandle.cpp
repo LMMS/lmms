@@ -84,23 +84,6 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( pattern * _pattern ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( _pattern->frozenPattern() ) ),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_audioPort( _pattern->instrumentTrack()->audioPort() ),
-	m_ownAudioPort( false ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( _pattern->instrumentTrack() ),
-	m_bbTrack( NULL )
-{
-}
-
-
-
-
 SamplePlayHandle::~SamplePlayHandle()
 {
 	sharedObject::unref( m_sampleBuffer );

@@ -114,35 +114,33 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 			_buf = m_fxChannels[_ch]->m_buffer;
 		}
 		const fpp_t f = engine::mixer()->framesPerPeriod();
-		if( !engine::getSong()->isFreezingPattern() )
+
+		// only start effects if sound was mixed to this FX channel before
+		if( m_fxChannels[_ch]->m_used )
 		{
-			// only start effects if sound was mixed to this FX channel before
-			if( m_fxChannels[_ch]->m_used )
-			{
-				m_fxChannels[_ch]->m_fxChain.startRunning();
-			}
-
-			// process FX chain
-			m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f, m_fxChannels[_ch]->m_used );
-
-			float peakLeft = engine::mixer()->peakValueLeft( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
-			float peakRight = engine::mixer()->peakValueRight( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
-
-			if( peakLeft > m_fxChannels[_ch]->m_peakLeft )
-			{
-				m_fxChannels[_ch]->m_peakLeft = peakLeft;
-			}
-			if( peakRight > m_fxChannels[_ch]->m_peakRight )
-			{
-				m_fxChannels[_ch]->m_peakRight = peakRight;
-			}
+			m_fxChannels[_ch]->m_fxChain.startRunning();
 		}
+
+		// process FX chain
+		m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f, m_fxChannels[_ch]->m_used );
+
+		float peakLeft = engine::mixer()->peakValueLeft( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
+		float peakRight = engine::mixer()->peakValueRight( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
+
+		if( peakLeft > m_fxChannels[_ch]->m_peakLeft )
+		{
+			m_fxChannels[_ch]->m_peakLeft = peakLeft;
+		}
+		if( peakRight > m_fxChannels[_ch]->m_peakRight )
+		{
+			m_fxChannels[_ch]->m_peakRight = peakRight;
+		}
+
 		m_fxChannels[_ch]->m_used = true;
 	}
 	else
 	{
-		m_fxChannels[_ch]->m_peakLeft =
-					m_fxChannels[_ch]->m_peakRight = 0.0f; 
+		m_fxChannels[_ch]->m_peakLeft = m_fxChannels[_ch]->m_peakRight = 0.0f; 
 	}
 }
 

@@ -42,7 +42,6 @@ class QProgressBar;
 class QPushButton;
 
 class InstrumentTrack;
-class patternFreezeThread;
 class SampleBuffer;
 
 
@@ -93,22 +92,6 @@ public:
 	void checkType();
 
 
-	// functions which are part of freezing-feature
-	inline bool isFreezing() const
-	{
-		return m_freezing;
-	}
-
-	inline bool isFrozen() const
-	{
-		return m_frozenPattern != NULL;
-	}
-
-	SampleBuffer *frozenPattern()
-	{
-		return m_frozenPattern;
-	}
-
 	// settings-management
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -140,9 +123,6 @@ protected slots:
 	void addSteps();
 	void removeSteps();
 	void clear();
-	void freeze();
-	void unfreeze();
-	void abortFreeze();
 	void changeTimeSignature();
 
 
@@ -155,14 +135,7 @@ private:
 	NoteVector m_notes;
 	int m_steps;
 
-	// pattern freezing
-	SampleBuffer* m_frozenPattern;
-	bool m_freezing;
-	volatile bool m_freezeAborted;
-
-
 	friend class patternView;
-	friend class patternFreezeThread;
 	friend class bbEditor;
 
 } ;
@@ -206,7 +179,6 @@ private:
 	static QPixmap * s_stepBtnOverlay;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
-	static QPixmap * s_frozen;
 
 	pattern * m_pat;
 	QPixmap m_paintPixmap;
@@ -214,66 +186,6 @@ private:
 
 } ;
 
-
-
-
-// TODO: move to own header-files
-//
-
-
-class patternFreezeStatusDialog : public QDialog
-{
-	Q_OBJECT
-public:
-	patternFreezeStatusDialog( QThread * _thread );
-	virtual ~patternFreezeStatusDialog();
-
-	void setProgress( int _p );
-
-
-protected:
-	void closeEvent( QCloseEvent * _ce );
-
-
-protected slots:
-	void cancelBtnClicked();
-	void updateProgress();
-
-
-private:
-	QProgressBar * m_progressBar;
-	QPushButton * m_cancelBtn;
-
-	QThread * m_freezeThread;
-
-	int m_progress;
-
-
-signals:
-	void aborted();
-
-} ;
-
-
-
-
-
-class patternFreezeThread : public QThread
-{
-public:
-	patternFreezeThread( pattern * _pattern );
-	virtual ~patternFreezeThread();
-
-
-protected:
-	virtual void run();
-
-
-private:
-	pattern * m_pattern;
-	patternFreezeStatusDialog * m_statusDlg;
-
-} ;
 
 
 #endif

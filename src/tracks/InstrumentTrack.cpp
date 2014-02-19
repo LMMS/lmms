@@ -602,21 +602,6 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			cur_start -= p->startPosition();
 		}
-		if( p->isFrozen() && !engine::getSong()->isExporting() )
-		{
-			if( cur_start > 0 )
-			{
-				continue;
-			}
-
-			SamplePlayHandle* handle = new SamplePlayHandle( p );
-			handle->setBBTrack( bb_track );
-			handle->setOffset( _offset );
-			// send it to the mixer
-			engine::mixer()->addPlayHandle( handle );
-			played_a_note = true;
-			continue;
-		}
 
 		// get all notes from the given pattern...
 		const NoteVector & notes = p->notes();

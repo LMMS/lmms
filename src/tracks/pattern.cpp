@@ -55,7 +55,6 @@ QPixmap * patternView::s_stepBtnOn = NULL;
 QPixmap * patternView::s_stepBtnOverlay = NULL;
 QPixmap * patternView::s_stepBtnOff = NULL;
 QPixmap * patternView::s_stepBtnOffLight = NULL;
-QPixmap * patternView::s_frozen = NULL;
 
 
 
@@ -63,10 +62,7 @@ pattern::pattern( InstrumentTrack * _instrument_track ) :
 	trackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_steps( MidiTime::stepsPerTact() ),
-	m_frozenPattern( NULL ),
-	m_freezing( false ),
-	m_freezeAborted( false )
+	m_steps( MidiTime::stepsPerTact() )
 {
 	setName( _instrument_track->name() );
 	init();
@@ -79,9 +75,7 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_instrumentTrack ),
 	m_instrumentTrack( _pat_to_copy.m_instrumentTrack ),
 	m_patternType( _pat_to_copy.m_patternType ),
-	m_steps( _pat_to_copy.m_steps ),
-	m_frozenPattern( NULL ),
-	m_freezeAborted( false )
+	m_steps( _pat_to_copy.m_steps )
 {
 	for( NoteVector::ConstIterator it = _pat_to_copy.m_notes.begin();
 					it != _pat_to_copy.m_notes.end(); ++it )
@@ -102,11 +96,6 @@ pattern::~pattern()
 	}
 
 	m_notes.clear();
-
-	if( m_frozenPattern )
-	{
-		sharedObject::unref( m_frozenPattern );
-	}
 }
 
 
@@ -358,7 +347,6 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "steps", m_steps );
-	_this.setAttribute( "frozen", m_frozenPattern != NULL );
 
 	// now save settings of all notes
 	for( NoteVector::Iterator it = m_notes.begin();
@@ -376,8 +364,6 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void pattern::loadSettings( const QDomElement & _this )
 {
-	unfreeze();
-
 	m_patternType = static_cast<PatternTypes>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
@@ -414,10 +400,6 @@ void pattern::loadSettings( const QDomElement & _this )
 
 	ensureBeatNotes();
 	checkType();
-/*	if( _this.attribute( "frozen" ).toInt() )
-	{
-		freeze();
-	}*/
 
 	emit dataChanged();
 
@@ -431,55 +413,6 @@ void pattern::clear()
 {
 	clearNotes();
 	ensureBeatNotes();
-}
-
-
-
-
-void pattern::freeze()
-{
-	if( engine::getSong()->isPlaying() )
-	{
-		QMessageBox::information( 0, tr( "Cannot freeze pattern" ),
-						tr( "The pattern currently "
-							"cannot be freezed "
-							"because you're in "
-							"play-mode. Please "
-							"stop and try again!" ),
-						QMessageBox::Ok );
-		return;
-	}
-
-	// already frozen?
-	if( m_frozenPattern != NULL )
-	{
-		// then unfreeze, before freezing it again
-		unfreeze();
-	}
-
-	new patternFreezeThread( this );
-
-}
-
-
-
-
-void pattern::unfreeze()
-{
-	if( m_frozenPattern != NULL )
-	{
-		sharedObject::unref( m_frozenPattern );
-		m_frozenPattern = NULL;
-		emit dataChanged();
-	}
-}
-
-
-
-
-void pattern::abortFreeze()
-{
-	m_freezeAborted = true;
 }
 
 
@@ -624,183 +557,6 @@ void pattern::changeTimeSignature()
 
 
 
-patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
-	QDialog(),
-	m_freezeThread( _thread ),
-	m_progress( 0 )
-{
-	setWindowTitle( tr( "Freezing pattern..." ) );
-	setModal( true );
-
-	m_progressBar = new QProgressBar( this );
-	m_progressBar->setGeometry( 10, 10, 200, 24 );
-	m_progressBar->setMaximum( 100 );
-	m_progressBar->setTextVisible( false );
-	m_progressBar->show();
-	m_cancelBtn = new QPushButton( embed::getIconPixmap( "cancel" ),
-							tr( "Cancel" ), this );
-	m_cancelBtn->setGeometry( 50, 38, 120, 28 );
-	m_cancelBtn->show();
-	connect( m_cancelBtn, SIGNAL( clicked() ), this,
-						SLOT( cancelBtnClicked() ) );
-	show();
-
-	QTimer * update_timer = new QTimer( this );
-	connect( update_timer, SIGNAL( timeout() ),
-					this, SLOT( updateProgress() ) );
-	update_timer->start( 100 );
-
-	setAttribute( Qt::WA_DeleteOnClose, true );
-	connect( this, SIGNAL( aborted() ), this, SLOT( reject() ) );
-
-}
-
-
-
-
-patternFreezeStatusDialog::~patternFreezeStatusDialog()
-{
-	m_freezeThread->wait();
-	delete m_freezeThread;
-}
-
-
-
-
-
-void patternFreezeStatusDialog::setProgress( int _p )
-{
-	m_progress = _p;
-}
-
-
-
-
-void patternFreezeStatusDialog::closeEvent( QCloseEvent * _ce )
-{
-	_ce->ignore();
-	cancelBtnClicked();
-}
-
-
-
-
-void patternFreezeStatusDialog::cancelBtnClicked()
-{
-	emit( aborted() );
-	done( -1 );
-}
-
-
-
-
-void patternFreezeStatusDialog::updateProgress()
-{
-	if( m_progress < 0 )
-	{
-		done( 0 );
-	}
-	else
-	{
-		m_progressBar->setValue( m_progress );
-	}
-}
-
-
-
-
-
-
-
-
-patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
-	m_pattern( _pattern )
-{
-	// create status-dialog
-	m_statusDlg = new patternFreezeStatusDialog( this );
-	QObject::connect( m_statusDlg, SIGNAL( aborted() ),
-					m_pattern, SLOT( abortFreeze() ) );
-
-	start();
-}
-
-
-
-
-patternFreezeThread::~patternFreezeThread()
-{
-	m_pattern->dataChanged();
-}
-
-
-
-
-void patternFreezeThread::run()
-{
-	// create and install audio-sample-recorder
-	bool b;
-	// we cannot create local copy, because at a later stage
-	// Mixer::restoreAudioDevice(...) deletes old audio-dev and thus
-	// AudioSampleRecorder would be destroyed two times...
-	AudioSampleRecorder * freeze_recorder = new AudioSampleRecorder(
-							DEFAULT_CHANNELS, b,
-							engine::mixer() );
-	engine::mixer()->setAudioDevice( freeze_recorder );
-
-	// prepare stuff for playing correct things later
-	engine::getSong()->playPattern( m_pattern, false );
-	song::playPos & ppp = engine::getSong()->getPlayPos(
-						song::Mode_PlayPattern );
-	ppp.setTicks( 0 );
-	ppp.setCurrentFrame( 0 );
-	ppp.m_timeLineUpdate = false;
-
-	m_pattern->m_freezeAborted = false;
-	m_pattern->m_freezing = true;
-
-
-	// now render everything
-	while( ppp < m_pattern->length() &&
-					m_pattern->m_freezeAborted == false )
-	{
-		freeze_recorder->processNextBuffer();
-		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
-	}
-	m_statusDlg->setProgress( 100 );
-
-	// render tails
-	int count = 0;
-	while( engine::mixer()->hasNotePlayHandles() &&
-					m_pattern->m_freezeAborted == false &&
-					++count < 2000 )
-	{
-		freeze_recorder->processNextBuffer();
-	}
-
-
-	m_pattern->m_freezing = false;
-
-	// reset song-editor settings
-	engine::getSong()->stop();
-	ppp.m_timeLineUpdate = true;
-
-	// create final sample-buffer if freezing was successful
-	if( m_pattern->m_freezeAborted == false )
-	{
-		freeze_recorder->createSampleBuffer(
-						&m_pattern->m_frozenPattern );
-	}
-
-	// restore original audio-device
-	engine::mixer()->restoreAudioDevice();
-
-	m_statusDlg->setProgress( -1 );	// we're finished
-
-}
-
-
-
-
 
 patternView::patternView( pattern * _pattern, trackView * _parent ) :
 	trackContentObjectView( _pattern, _parent ),
@@ -830,11 +586,6 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 	{
 		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
 						"step_btn_off_light" ) );
-	}
-
-	if( s_frozen == NULL )
-	{
-		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
@@ -931,26 +682,6 @@ void patternView::constructContextMenu( QMenu * _cm )
 						this, SLOT( changeName() ) );
 	_cm->addSeparator();
 
-	bool freeze_separator = false;
-	if( !( m_pat->m_instrumentTrack->isMuted() || m_pat->isMuted() ) )
-	{
-		_cm->addAction( embed::getIconPixmap( "freeze" ),
-			m_pat->m_frozenPattern ? tr( "Refreeze" ) :
-								tr( "Freeze" ),
-						m_pat, SLOT( freeze() ) );
-		freeze_separator = true;
-	}
-	if( m_pat->m_frozenPattern )
-	{
-		_cm->addAction( embed::getIconPixmap( "unfreeze" ),
-				tr( "Unfreeze" ), m_pat, SLOT( unfreeze() ) );
-		freeze_separator = true;
-	}
-	if( freeze_separator )
-	{
-		_cm->addSeparator();
-	}
-
 	_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
 		tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
 	_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
@@ -1009,16 +740,6 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 		{
 			engine::getPianoRoll()->update();
 		}
-	}
-	else if( m_pat->m_frozenPattern != NULL &&
-					_me->button() == Qt::LeftButton &&
-					_me->modifiers() & Qt::ShiftModifier )
-	{
-		QString s;
-		new stringPairDrag( "sampledata",
-					m_pat->m_frozenPattern->toBase64( s ),
-					embed::getIconPixmap( "freeze" ),
-					this );
 	}
 	else
 	{
@@ -1170,10 +891,6 @@ void patternView::paintEvent( QPaintEvent * )
 				{
 					p.setPen( QColor( 160, 160, 160 ) );
 				}
-				else if( m_pat->m_frozenPattern != NULL )
-				{
-					p.setPen( QColor( 0x70, 0xFF, 0xFF ) );
-				}
 				else
 				{
 					p.setPen( QColor( 0x77, 0xC7, 0xD8 ) );
@@ -1283,13 +1000,6 @@ void patternView::paintEvent( QPaintEvent * )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
 				embed::getIconPixmap( "muted", 16, 16 ) );
-	}
-	else if( m_pat->m_frozenPattern != NULL )
-	{
-		p.setBrush( QBrush() );
-		p.setPen( QColor( 0x70, 255, 255 ) );
-		p.drawRect( 0, 0, width()-1, height() - 1 );
-		p.drawPixmap( 3, height() - s_frozen->height() - 4, *s_frozen );
 	}
 
 	p.end();
