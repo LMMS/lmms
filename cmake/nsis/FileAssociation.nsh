@@ -128,7 +128,6 @@ NoBackup:
   StrCmp $0 "" 0 Skip
     WriteRegStr HKCR "$R0" "" "$R0"
     WriteRegStr HKCR "$R0\shell" "" "open"
-    WriteRegStr HKCR "$R0\DefaultIcon" "" "$R2,0"
 Skip:
   WriteRegStr HKCR "$R0\shell\open\command" "" '"$R2" "%1"'
   WriteRegStr HKCR "$R0\shell\edit" "" "Edit $R0"
