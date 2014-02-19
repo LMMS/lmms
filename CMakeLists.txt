@@ -520,9 +520,9 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf "${TMP}"
 			COMMAND mkdir -p "${TMP}"
 			COMMAND cp AUTHORS build_mingw32 build_mingw64 CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in lmmsconfig.h.in lmmsversion.h.in README TODO "${TMP}"
-			COMMAND cp -r buildtools cmake data include plugins src "${TMP}"
+			COMMAND cp -r buildtools cmake data doc include plugins src "${TMP}"
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
-			COMMAND tar cjf lmms-${VERSION}.tar.bz2 "${TMP}"
+			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
 
 
