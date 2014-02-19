@@ -1804,7 +1804,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			{
 				// left click - play the note
 				m_lastKey = key_num;
-				if( ! m_recording && ! engine::getSong()->isPlaying() )
+				//if( ! m_recording && ! engine::getSong()->isPlaying() )
 				{
 					int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiMaxVelocity;
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
@@ -1857,7 +1857,7 @@ void pianoRoll::testPlayNote( note * n )
 {
 	m_lastKey = n->key();
 	
-	if( ! n->isPlaying() && ! m_recording && ! engine::getSong()->isPlaying() )
+	//if( ! n->isPlaying() && ! m_recording && ! engine::getSong()->isPlaying() )
 	{
 		n->setIsPlaying( true );
 		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), volumeToMidi( n->getVolume() ) );
