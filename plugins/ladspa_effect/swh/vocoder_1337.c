@@ -443,8 +443,15 @@ _fini() {
 
 /* Return a descriptor of the requested plugin type. Only one plugin
    type is available in this library. */
+_WINDOWS_DLL_EXPORT_
 const LADSPA_Descriptor * 
 ladspa_descriptor(unsigned long Index) {
+#ifdef WIN32
+	if (bIsFirstTime) {
+		_init();
+		bIsFirstTime = 0;
+	}
+#endif
   if (Index == 0)
     return g_psDescriptor;
   else
