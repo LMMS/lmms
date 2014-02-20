@@ -239,7 +239,7 @@ void Gb_Apu::write_register( gb_time_t time, gb_addr_t addr, int data )
 int Gb_Apu::read_register( gb_time_t time, gb_addr_t addr )
 {
 	// function now takes actual address, i.e. 0xFFXX
-	require( start_addr <= addr && addr <= end_addr );
+	require( start_addr <= addr && addr < end_addr );
 	
 	run_until( time );
 	
