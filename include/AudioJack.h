@@ -39,7 +39,7 @@
 
 
 class QLineEdit;
-class lcdSpinBox;
+class LcdSpinBox;
 
 
 class AudioJack : public QObject, public AudioDevice
@@ -66,7 +66,7 @@ public:
 
 	private:
 		QLineEdit * m_clientName;
-		lcdSpinBox * m_channels;
+		LcdSpinBox * m_channels;
 
 	} ;
 

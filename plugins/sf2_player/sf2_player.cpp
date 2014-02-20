@@ -40,7 +40,7 @@
 
 #include "patches_dialog.h"
 #include "tooltip.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 
 #include "embed.cpp"
 
@@ -832,12 +832,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 
 
 	// LCDs
-	m_bankNumLcd = new lcdSpinBox( 3, "21pink", this );
+	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_bankNumLcd->move(131, 62);
 //	m_bankNumLcd->addTextForValue( -1, "---" );
 //	m_bankNumLcd->setEnabled( false );
 
-	m_patchNumLcd = new lcdSpinBox( 3, "21pink", this );
+	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move(190, 62);
 //	m_patchNumLcd->addTextForValue( -1, "---" );
 //	m_patchNumLcd->setEnabled( false );

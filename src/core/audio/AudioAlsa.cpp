@@ -32,7 +32,7 @@
 #include "endian_handling.h"
 #include "config_mgr.h"
 #include "engine.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "gui_templates.h"
 #include "templates.h"
 
@@ -502,13 +502,13 @@ AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );
+	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( configManager::inst()->value( "audioalsa",
 							"channels" ).toInt() );
 
-	m_channels = new lcdSpinBox( 1, this );
+	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 180, 20 );

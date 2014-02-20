@@ -27,7 +27,7 @@
 #define _PATCHES_DIALOG_H
 
 #include "ui_patches_dialog.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 
 #include <fluidsynth.h>
 #include <QtGui/QWidget>
@@ -50,7 +50,7 @@ public:
 
 
 	void setup(fluid_synth_t *pSynth, int iChan, const QString & _chanName,
-			lcdSpinBoxModel * _bankModel, lcdSpinBoxModel * _progModel, QLabel *_patchLabel );
+			LcdSpinBoxModel * _bankModel, LcdSpinBoxModel * _progModel, QLabel *_patchLabel );
 
 public slots:
 
@@ -85,8 +85,8 @@ private:
 	//int m_iDirtyCount;
 	int m_dirty;
 
-	lcdSpinBoxModel * m_bankModel;
-	lcdSpinBoxModel * m_progModel;
+	LcdSpinBoxModel * m_bankModel;
+	LcdSpinBoxModel * m_progModel;
 	QLabel *m_patchLabel;
 };
 

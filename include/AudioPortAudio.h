@@ -57,7 +57,7 @@ public:
 
 
 class comboBox;
-class lcdSpinBox;
+class LcdSpinBox;
 
 
 class AudioPortAudio : public AudioDevice
@@ -88,7 +88,7 @@ public:
 	private:
 		comboBox * m_backend;
 		comboBox * m_device;
-		lcdSpinBox * m_channels;
+		LcdSpinBox * m_channels;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;

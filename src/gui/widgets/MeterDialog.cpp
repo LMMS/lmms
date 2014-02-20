@@ -32,7 +32,7 @@
 #include "MeterModel.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 
 
 MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
@@ -49,7 +49,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	num_layout->setMargin( 0 );
 
 
-	m_numerator = new lcdSpinBox( 2, num, tr( "Meter Numerator" ) );
+	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
 
 	num_layout->addWidget( m_numerator );
 
@@ -69,7 +69,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	den_layout->setSpacing( 0 );
 	den_layout->setMargin( 0 );
 
-	m_denominator = new lcdSpinBox( 2, den, tr( "Meter Denominator" ) );
+	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ) );
 	if( _simple )
 	{
 		m_denominator->setLabel( tr( "TIME SIG" ) );

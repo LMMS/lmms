@@ -32,7 +32,7 @@
 
 
 class groupBox;
-class lcdSpinBox;
+class LcdSpinBox;
 class QToolButton;
 
 
@@ -47,15 +47,15 @@ private:
 	virtual void modelChanged();
 
 	groupBox * m_midiInputGroupBox;
-	lcdSpinBox * m_inputChannelSpinBox;
-	lcdSpinBox * m_fixedInputVelocitySpinBox;
+	LcdSpinBox * m_inputChannelSpinBox;
+	LcdSpinBox * m_fixedInputVelocitySpinBox;
 	QToolButton * m_rpBtn;
 
 	groupBox * m_midiOutputGroupBox;
-	lcdSpinBox * m_outputChannelSpinBox;
-	lcdSpinBox * m_fixedOutputVelocitySpinBox;
-	lcdSpinBox * m_outputProgramSpinBox;
-	lcdSpinBox * m_fixedOutputNoteSpinBox;
+	LcdSpinBox * m_outputChannelSpinBox;
+	LcdSpinBox * m_fixedOutputVelocitySpinBox;
+	LcdSpinBox * m_outputProgramSpinBox;
+	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
 
 } ;

@@ -34,7 +34,7 @@
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "led_checkbox.h"
 #include "combobox.h"
 #include "tab_widget.h"
@@ -142,13 +142,13 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
 	
-	m_midiChannelSpinBox = new lcdSpinBox( 2, m_midiGroupBox,
+	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
 			tr( "Input channel" ) );
 	m_midiChannelSpinBox->addTextForValue( 0, "--" );
 	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_midiChannelSpinBox->move( 8, 24 );
 
-	m_midiControllerSpinBox = new lcdSpinBox( 3, m_midiGroupBox,
+	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
 			tr( "Input controller" ) );
 	m_midiControllerSpinBox->addTextForValue( 0, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );

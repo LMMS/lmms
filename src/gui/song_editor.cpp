@@ -41,7 +41,7 @@
 #include "config_mgr.h"
 #include "cpuload_widget.h"
 #include "embed.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "text_float.h"
@@ -115,7 +115,7 @@ songEditor::songEditor( song * _song ) :
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
 
-	m_tempoSpinBox = new lcdSpinBox( 3, tb, tr( "Tempo" ) );
+	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_s->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	toolTip::add( m_tempoSpinBox, tr( "tempo of song" ) );

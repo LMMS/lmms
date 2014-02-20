@@ -29,7 +29,7 @@
 #include "InstrumentView.h"
 #include "opl.h"
 
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "knob.h"
 #include "pixmap_button.h"
 
@@ -140,7 +140,7 @@ class opl2instrumentView : public InstrumentView
 public:
         opl2instrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~opl2instrumentView();
-	lcdSpinBox *m_patch;
+	LcdSpinBox *m_patch;
 	void modelChanged();
 
 	knob *op1_a_kn;

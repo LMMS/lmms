@@ -37,7 +37,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "config_mgr.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
 
@@ -446,13 +446,13 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );	
+	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( configManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
 
-	m_channels = new lcdSpinBox( 1, this );
+	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 180, 20 );

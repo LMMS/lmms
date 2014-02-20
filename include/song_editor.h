@@ -34,7 +34,7 @@ class QScrollBar;
 
 class automatableSlider;
 class comboBox;
-class lcdSpinBox;
+class LcdSpinBox;
 class MeterDialog;
 class song;
 class textFloat;
@@ -108,7 +108,7 @@ private:
 	toolButton * m_recordButton;
 	toolButton * m_recordAccompanyButton;
 	toolButton * m_stopButton;
-	lcdSpinBox * m_tempoSpinBox;
+	LcdSpinBox * m_tempoSpinBox;
 
 	timeLine * m_timeLine;
 

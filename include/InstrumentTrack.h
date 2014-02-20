@@ -49,7 +49,7 @@ class Instrument;
 class InstrumentTrackWindow;
 class InstrumentMidiIOView;
 class knob;
-class lcdSpinBox;
+class LcdSpinBox;
 class midiPortMenu;
 class DataFile;
 class PluginView;
@@ -400,8 +400,8 @@ private:
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
-	lcdSpinBox* m_pitchRangeSpinBox;
-	lcdSpinBox * m_effectChannelNumber;
+	LcdSpinBox* m_pitchRangeSpinBox;
+	LcdSpinBox * m_effectChannelNumber;
 
 
 	// tab-widget with all children

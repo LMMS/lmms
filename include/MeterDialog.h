@@ -30,7 +30,7 @@
 
 #include "ModelView.h"
 
-class lcdSpinBox;
+class LcdSpinBox;
 
 
 class MeterDialog : public QWidget, public ModelView
@@ -43,8 +43,8 @@ public:
 
 
 private:
-	lcdSpinBox * m_numerator;
-	lcdSpinBox * m_denominator;
+	LcdSpinBox * m_numerator;
+	LcdSpinBox * m_denominator;
 
 } ;
 

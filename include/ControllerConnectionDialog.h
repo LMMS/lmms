@@ -42,7 +42,7 @@ class AutoDetectMidiController;
 class comboBox;
 class groupBox;
 class tabWidget;
-class lcdSpinBox;
+class LcdSpinBox;
 class ledCheckBox;
 class MidiPortMenu;
 
@@ -77,8 +77,8 @@ protected slots:
 private:
 	// Midi
 	groupBox * m_midiGroupBox;
-	lcdSpinBox * m_midiChannelSpinBox;
-	lcdSpinBox * m_midiControllerSpinBox;
+	LcdSpinBox * m_midiChannelSpinBox;
+	LcdSpinBox * m_midiControllerSpinBox;
 	ledCheckBox * m_midiAutoDetectCheckBox;
 	MidiPortMenu * m_readablePorts;
 	BoolModel m_midiAutoDetect;

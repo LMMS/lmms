@@ -47,7 +47,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "gui_templates.h"
 #include "templates.h"
 #include "combobox.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
@@ -405,13 +405,13 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
-/*	lcdSpinBoxModel * m = new lcdSpinBoxModel(  );
+/*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( configManager::inst()->value( "audioportaudio",
 							"channels" ).toInt() );
 
-	m_channels = new lcdSpinBox( 1, this );
+	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 308, 20 );*/

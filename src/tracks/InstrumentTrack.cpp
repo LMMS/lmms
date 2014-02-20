@@ -60,7 +60,7 @@
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
 #include "knob.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "led_checkbox.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
@@ -1103,12 +1103,12 @@ void InstrumentTrackView::midiConfigChanged()
 
 
 
-class fxLineLcdSpinBox : public lcdSpinBox 
+class fxLineLcdSpinBox : public LcdSpinBox 
 {
 	public:
 		fxLineLcdSpinBox( int _num_digits, QWidget * _parent, 
 				const QString & _name ) :
-			lcdSpinBox( _num_digits, _parent, _name ) {}
+			LcdSpinBox( _num_digits, _parent, _name ) {}
 
 	protected:
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
@@ -1183,7 +1183,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( m_pitchKnob );
 
 	// set up pitch range knob
-	m_pitchRangeSpinBox= new lcdSpinBox( 2, NULL, tr( "Pitch range (semitones)" ) );
+	m_pitchRangeSpinBox= new LcdSpinBox( 2, NULL, tr( "Pitch range (semitones)" ) );
 	m_pitchRangeSpinBox->setLabel( tr( "RANGE" ) );
 
 	basicControlsLayout->addWidget( m_pitchRangeSpinBox );

@@ -33,7 +33,7 @@
 #include "pixmap_button.h"
 #include "InstrumentView.h"
 #include "knob.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "led_checkbox.h"
 #include "fluidsynth.h"
 #include "SampleBuffer.h"
@@ -132,8 +132,8 @@ private:
 	int m_lastMidiPitchRange;
 	int m_channel;
 
-	lcdSpinBoxModel m_bankNum;
-	lcdSpinBoxModel m_patchNum;
+	LcdSpinBoxModel m_bankNum;
+	LcdSpinBoxModel m_patchNum;
 
 	FloatModel m_gain;
 
@@ -193,8 +193,8 @@ private:
 	pixmapButton * m_fileDialogButton;
 	pixmapButton * m_patchDialogButton;
 
-	lcdSpinBox * m_bankNumLcd;
-	lcdSpinBox * m_patchNumLcd;
+	LcdSpinBox * m_bankNumLcd;
+	LcdSpinBox * m_patchNumLcd;
 
 	QLabel * m_filenameLabel;
 	QLabel * m_patchLabel;

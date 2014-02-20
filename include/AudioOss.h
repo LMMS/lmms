@@ -32,7 +32,7 @@
 #include "AudioDevice.h"
 
 
-class lcdSpinBox;
+class LcdSpinBox;
 class QLineEdit;
 
 
@@ -60,7 +60,7 @@ public:
 
 	private:
 		QLineEdit * m_device;
-		lcdSpinBox * m_channels;
+		LcdSpinBox * m_channels;
 
 	} ;
 

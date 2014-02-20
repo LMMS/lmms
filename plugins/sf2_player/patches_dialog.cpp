@@ -113,8 +113,8 @@ patchesDialog::~patchesDialog()
 // Dialog setup loader.
 void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 						const QString & _chanName,
-						lcdSpinBoxModel * _bankModel,
-						lcdSpinBoxModel * _progModel,
+						LcdSpinBoxModel * _bankModel,
+						LcdSpinBoxModel * _progModel,
 							QLabel * _patchLabel )
 {
 

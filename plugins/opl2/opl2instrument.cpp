@@ -58,7 +58,7 @@
 #include "math.h"
 
 #include "knob.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
 
@@ -578,7 +578,7 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
         InstrumentView( _instrument, _parent )
 {
 	/* Unnecessary? 
-	   m_patch = new lcdSpinBox( 3, this , "PRESET");
+	   m_patch = new LcdSpinBox( 3, this , "PRESET");
 	   m_patch->setLabel( "PRESET" );
 	   m_patch->move( 100, 1 );
 	   m_patch->setEnabled( true );	

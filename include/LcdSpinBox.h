@@ -1,5 +1,5 @@
 /*
- * lcd_spinbox.h - class lcdSpinBox, an improved QLCDNumber
+ * LcdSpinBox.h - class LcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -30,15 +30,15 @@
 #include "AutomatableModelView.h"
 
 
-class EXPORT lcdSpinBox : public LcdWidget, public IntModelView
+class EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	lcdSpinBox( int numDigits, QWidget* parent, const QString& name = QString::null );
+	LcdSpinBox( int numDigits, QWidget* parent, const QString& name = QString::null );
 
-	lcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
+	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
 
-	virtual ~lcdSpinBox();
+	virtual ~LcdSpinBox();
 
 	virtual void modelChanged()
 	{
@@ -82,6 +82,6 @@ signals:
 
 } ;
 
-typedef IntModel lcdSpinBoxModel;
+typedef IntModel LcdSpinBoxModel;
 
 #endif

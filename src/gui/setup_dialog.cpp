@@ -44,7 +44,7 @@
 #include "debug.h"
 #include "tooltip.h"
 #include "led_checkbox.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "FileDialog.h"
 
 

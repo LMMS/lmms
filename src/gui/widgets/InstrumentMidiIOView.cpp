@@ -32,7 +32,7 @@
 #include "embed.h"
 #include "group_box.h"
 #include "gui_templates.h"
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "MidiClient.h"
 #include "Mixer.h"
 #include "tooltip.h"
@@ -54,13 +54,13 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiInputLayout->setContentsMargins( 8, 18, 8, 8 );
 	midiInputLayout->setSpacing( 6 );
 
-	m_inputChannelSpinBox = new lcdSpinBox( 2, m_midiInputGroupBox );
+	m_inputChannelSpinBox = new LcdSpinBox( 2, m_midiInputGroupBox );
 	m_inputChannelSpinBox->addTextForValue( 0, "--" );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_inputChannelSpinBox->setEnabled( false );
 	midiInputLayout->addWidget( m_inputChannelSpinBox );
 
-	m_fixedInputVelocitySpinBox = new lcdSpinBox( 3, m_midiInputGroupBox );
+	m_fixedInputVelocitySpinBox = new LcdSpinBox( 3, m_midiInputGroupBox );
 	m_fixedInputVelocitySpinBox->setDisplayOffset( 1 );
 	m_fixedInputVelocitySpinBox->addTextForValue( 0, "---" );
 	m_fixedInputVelocitySpinBox->setLabel( tr( "VELOCITY" ) );
@@ -82,24 +82,24 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->setContentsMargins( 8, 18, 8, 8 );
 	midiOutputLayout->setSpacing( 6 );
 
-	m_outputChannelSpinBox = new lcdSpinBox( 2, m_midiOutputGroupBox );
+	m_outputChannelSpinBox = new LcdSpinBox( 2, m_midiOutputGroupBox );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_outputChannelSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_outputChannelSpinBox );
 
-	m_fixedOutputVelocitySpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_fixedOutputVelocitySpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
 	m_fixedOutputVelocitySpinBox->setDisplayOffset( 1 );
 	m_fixedOutputVelocitySpinBox->addTextForValue( 0, "---" );
 	m_fixedOutputVelocitySpinBox->setLabel( tr( "VELOCITY" ) );
 	m_fixedOutputVelocitySpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_fixedOutputVelocitySpinBox );
 
-	m_outputProgramSpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_outputProgramSpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
 	m_outputProgramSpinBox->setLabel( tr( "PROGRAM" ) );
 	m_outputProgramSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_outputProgramSpinBox );
 
-	m_fixedOutputNoteSpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_fixedOutputNoteSpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
 	m_fixedOutputNoteSpinBox->setDisplayOffset( 1 );
 	m_fixedOutputNoteSpinBox->addTextForValue( 0, "---" );
 	m_fixedOutputNoteSpinBox->setLabel( tr( "NOTE" ) );

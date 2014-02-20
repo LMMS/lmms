@@ -1,5 +1,5 @@
 /*
- * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
+ * lcd_spinbox.cpp - class LcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
@@ -30,7 +30,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QStyleOptionFrameV2>
 
-#include "lcd_spinbox.h"
+#include "LcdSpinBox.h"
 #include "caption_menu.h"
 #include "engine.h"
 #include "embed.h"
@@ -40,7 +40,7 @@
 
 
 
-lcdSpinBox::lcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
+LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
@@ -52,7 +52,7 @@ lcdSpinBox::lcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 
 
 
-lcdSpinBox::lcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
+LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
@@ -63,13 +63,13 @@ lcdSpinBox::lcdSpinBox( int numDigits, const QString& style, QWidget* parent, co
 
 
 
-lcdSpinBox::~lcdSpinBox()
+LcdSpinBox::~LcdSpinBox()
 {
 }
 
 
 
-void lcdSpinBox::update()
+void LcdSpinBox::update()
 {
 	setValue( model()->value() + m_displayOffset );
 
@@ -78,7 +78,7 @@ void lcdSpinBox::update()
 
 
 
-void lcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
+void LcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
 {
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
@@ -94,7 +94,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
 
 
 
-void lcdSpinBox::mousePressEvent( QMouseEvent* event )
+void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton &&
 		! ( event->modifiers() & Qt::ControlModifier ) &&
@@ -114,7 +114,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent* event )
 
 
 
-void lcdSpinBox::mouseMoveEvent( QMouseEvent* event )
+void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
@@ -132,7 +132,7 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 
 
 
-void lcdSpinBox::mouseReleaseEvent( QMouseEvent* )
+void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 {
 	if( m_mouseMoving )
 	{
@@ -148,7 +148,7 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 
 
 
-void lcdSpinBox::wheelEvent( QWheelEvent * _we )
+void LcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	model()->setInitValue( model()->value() +
@@ -158,5 +158,5 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "moc_lcd_spinbox.cxx"
+#include "moc_LcdSpinBox.cxx"
 
