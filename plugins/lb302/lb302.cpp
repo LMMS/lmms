@@ -338,7 +338,9 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_a = 9;
 	vca_mode = 3;
 
-	vcf = new lb302FilterIIR2(&fs);
+	vcfs[0] = new lb302Filter3Pole(&fs);
+	vcfs[1] = new lb302FilterIIR2(&fs);
+	vcf = vcfs[1];
 
 	sample_cnt = 0;
 	release_frame = 1<<24;
@@ -422,13 +424,8 @@ void lb302Synth::filterChanged()
 
 void lb302Synth::db24Toggled()
 {
-	delete vcf;
-	if(db24Toggle.value()) {
-		vcf = new lb302Filter3Pole(&fs);
-	}
-	else {
-		vcf = new lb302FilterIIR2(&fs);
-	}
+	vcf = vcfs[db24Toggle.value()];
+	// These recalcFilter calls might suck 
 	recalcFilter();
 }
 
@@ -471,6 +468,9 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	float w;
 	float samp;
 
+	// Hold on to the current VCF, and use it throughout this period
+	lb302Filter *filter = vcf;
+
 	if( delete_freq == current_freq ) {
 		// Normal release
 		delete_freq = -1;
@@ -503,7 +503,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
-			vcf->envRecalc();
+			filter->envRecalc();
 
 			vcf_envpos = 0;
 
@@ -599,7 +599,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 #ifdef LB_FILTERED
 		//samp = vcf->process(vco_k)*2.0*vca_a;
 		//samp = vcf->process(vco_k)*2.0;
-		samp = vcf->process(vco_k) * vca_a;
+		samp = filter->process(vco_k) * vca_a;
 		//printf("%f %d\n", vco_c, sample_cnt);	
 		
 

@@ -39,6 +39,8 @@
 #include "knob.h"
 #include "Mixer.h"
 
+static const int NUM_FILTERS = 2;
+
 class lb302SynthView;
 class NotePlayHandle;
 
@@ -198,12 +200,14 @@ private:
 	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE };
 	vco_shape_t vco_shape;
 
+	// Filters (just keep both loaded and switch)
+	lb302Filter* vcfs[NUM_FILTERS];
+
 	// User settings
 	lb302FilterKnobState fs;
-	lb302Filter *vcf;
+	QAtomicPointer<lb302Filter> vcf;
 
 	int release_frame;
-
 
 	// More States
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
