@@ -72,6 +72,7 @@ protected:
 	virtual void wheelEvent( QWheelEvent * _we );
 
 private:
+	bool m_mouseMoving;
 	QPoint m_origMousePos;
 	int m_displayOffset;
 

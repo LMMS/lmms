@@ -43,6 +43,7 @@
 lcdSpinBox::lcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_mouseMoving( false ),
 	m_origMousePos(),
 	m_displayOffset( 0 )
 {
@@ -54,6 +55,7 @@ lcdSpinBox::lcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 lcdSpinBox::lcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_mouseMoving( false ),
 	m_origMousePos(),
 	m_displayOffset( 0 )
 {
@@ -78,8 +80,6 @@ void lcdSpinBox::update()
 
 void lcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
 {
-	m_origMousePos = event->globalPos();
-
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
@@ -100,6 +100,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent* event )
 		! ( event->modifiers() & Qt::ControlModifier ) &&
 						event->y() < cellHeight() + 2  )
 	{
+		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
 		model()->prepareJournalEntryFromOldVal();
@@ -115,7 +116,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent* event )
 
 void lcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
-	if( event->buttons() & Qt::LeftButton )
+	if( m_mouseMoving )
 	{
 		int dy = event->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )
@@ -131,12 +132,17 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 
 
 
-void lcdSpinBox::mouseReleaseEvent( QMouseEvent* event )
+void lcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 {
-	model()->addJournalEntryFromOldToCurVal();
+	if( m_mouseMoving )
+	{
+		model()->addJournalEntryFromOldToCurVal();
 
-	QCursor::setPos( m_origMousePos );
-	QApplication::restoreOverrideCursor();
+		QCursor::setPos( m_origMousePos );
+		QApplication::restoreOverrideCursor();
+
+		m_mouseMoving = false;
+	}
 }
 
 
