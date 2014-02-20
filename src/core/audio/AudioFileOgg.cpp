@@ -122,7 +122,7 @@ bool AudioFileOgg::startEncoding()
 		vorbis_info_clear( &m_vi );
 		return false;
 	}
-    
+
 	if( useVBR() == false )
 	{
 		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
@@ -132,7 +132,7 @@ bool AudioFileOgg::startEncoding()
 		// Turn off management entirely (if it was turned on).
 		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, NULL );
 	}
-    
+
 	vorbis_encode_setup_init( &m_vi );
 
 	// Now, set up the analysis engine, stream encoder, and other
@@ -171,10 +171,12 @@ bool AudioFileOgg::startEncoding()
 		{
 			// clean up
 			finishEncoding();
+			delete[] user_comments;
 			return false;
 		}
 	}
 
+	delete[] user_comments;
 	return true;
 }
 
