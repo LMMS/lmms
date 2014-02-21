@@ -832,10 +832,19 @@ void patternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 96, 96, 96 );
-	lingrad.setColorAt( 0, QColor( 16, 16, 16 ) );
-	lingrad.setColorAt( 0.5, c );
-	lingrad.setColorAt( 1, QColor( 16, 16, 16 ) );
+							QColor( 110, 110, 110 );
+
+	if( m_pat->m_patternType == pattern::BeatPattern )
+	{
+		lingrad.setColorAt( 0, QColor( 16, 16, 16 ) );
+		lingrad.setColorAt( 1, c );
+	}
+	else
+	{
+		lingrad.setColorAt( 1, QColor( 16, 16, 16 ) );
+		lingrad.setColorAt( 0, c );
+	}
+	
 	p.setBrush( lingrad );
 	p.setPen( QColor( 0, 0, 0 ) );
 	//p.drawRect( 0, 0, width() - 1, height() - 1 );
@@ -984,11 +993,11 @@ void patternView::paintEvent( QPaintEvent * )
 	p.setFont( pointSize<8>( p.font() ) );
 	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
-		p.setPen( QColor( 192, 192, 192 ) );
+		p.setPen( QColor( 50, 50, 502 ) );
 	}
 	else
 	{
-		p.setPen( QColor( 32, 240, 101 ) );
+		p.setPen( QColor( 0x77, 0xc7, 0xd8 ).lighter( 140 ) );
 	}
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )

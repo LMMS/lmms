@@ -214,10 +214,10 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 96, 96, 96 );
-	lingrad.setColorAt( 0, QColor(16, 16, 16) );
-	lingrad.setColorAt( 0.5, c );
+							QColor( 110, 110, 110 );
 	lingrad.setColorAt( 1, QColor(16, 16, 16) );
+	lingrad.setColorAt( 0, c );
+
 	p.setBrush( lingrad );
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
@@ -251,11 +251,11 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
-	const QColor cl = QColor( 0xCF, 0xDA, 0xFF );
-	const QColor cd = QColor( 0x99, 0xAF, 0xFF );
+	const QColor cl = QColor( 0x99, 0xAF, 0xFF );
 
 	lin2grad.setColorAt( 1, cl );
-	lin2grad.setColorAt( 0, cd );
+	lin2grad.setColorAt( 0.8, cl );
+	lin2grad.setColorAt( 0, cl.darker( 140 ) );
 
 	// TODO: skip this part for patterns or parts of the pattern that will
 	// not be on the screen
@@ -292,11 +292,11 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	p.setFont( pointSize<8>( p.font() ) );
 	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
-		p.setPen( QColor( 192, 192, 192 ) );
+		p.setPen( QColor( 50, 50, 50 ) );
 	}
 	else
 	{
-		p.setPen( QColor( 0, 180, 60 ) );
+		p.setPen( QColor( 255, 255, 255 ) );
 	}
 
 	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );

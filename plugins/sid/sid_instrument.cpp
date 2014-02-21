@@ -498,19 +498,19 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	m_cutKnob->move( 7 + 2*28, 64 );
 
 	pixmapButton * hp_btn = new pixmapButton( this, NULL );
-	hp_btn->move( 139, 77 );
+	hp_btn->move( 140, 77 );
 	hp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "hpred" ) );
 	hp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "hp" ) );
 	toolTip::add( hp_btn, tr( "High-Pass filter ") );
 
 	pixmapButton * bp_btn = new pixmapButton( this, NULL );
-	bp_btn->move( 163, 77 );
+	bp_btn->move( 164, 77 );
 	bp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpred" ) );
 	bp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bp" ) );
 	toolTip::add( bp_btn, tr( "Band-Pass filter ") );
 
 	pixmapButton * lp_btn = new pixmapButton( this, NULL );
-	lp_btn->move( 184, 77 );
+	lp_btn->move( 185, 77 );
 	lp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "lpred" ) );
 	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
 	toolTip::add( lp_btn, tr( "Low-Pass filter ") );
@@ -522,7 +522,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 	m_offButton = new pixmapButton( this, NULL );
 	m_offButton->setCheckable( true );
-	m_offButton->move( 206, 77 );
+	m_offButton->move( 207, 77 );
 	m_offButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "3offred" ) );
 	m_offButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "3off" ) );
 	toolTip::add( m_offButton, tr( "Voice3 Off ") );
@@ -585,7 +585,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 				"%1 one octave up or down." ).arg( i+1 ) );
 
 		pixmapButton * pulse_btn = new pixmapButton( this, NULL );
-		pulse_btn->move( 189, 101 + i*50 );
+		pulse_btn->move( 187, 101 + i*50 );
 		pulse_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "pulsered" ) );
 		pulse_btn->setInactiveGraphic(
@@ -593,7 +593,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		toolTip::add( pulse_btn, tr( "Pulse Wave" ) );
 
 		pixmapButton * triangle_btn = new pixmapButton( this, NULL );
-		triangle_btn->move( 170, 101 + i*50 );
+		triangle_btn->move( 168, 101 + i*50 );
 		triangle_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "trianglered" ) );
 		triangle_btn->setInactiveGraphic(
@@ -601,7 +601,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		toolTip::add( triangle_btn, tr( "Triangle Wave" ) );
 
 		pixmapButton * saw_btn = new pixmapButton( this, NULL );
-		saw_btn->move( 209, 101 + i*50 );
+		saw_btn->move( 207, 101 + i*50 );
 		saw_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "sawred" ) );
 		saw_btn->setInactiveGraphic(
@@ -609,7 +609,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		toolTip::add( saw_btn, tr( "SawTooth" ) );
 
 		pixmapButton * noise_btn = new pixmapButton( this, NULL );
-		noise_btn->move( 228, 101 + i*50 );
+		noise_btn->move( 226, 101 + i*50 );
 		noise_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "noisered" ) );
 		noise_btn->setInactiveGraphic(

@@ -332,15 +332,14 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	QLinearGradient grad( 0, 0, 0, height() );
 	if( isSelected() )
 	{
-		grad.setColorAt( 0, QColor( 0, 0, 128 ) );
-		grad.setColorAt( 0.5, QColor( 0, 0, 224 ) );
-		grad.setColorAt( 1, QColor( 0, 0, 128 ) );
+		grad.setColorAt( 1, QColor( 16, 16, 16 ) );
+		grad.setColorAt( 0, QColor( 0, 0, 224 ) );
 	}
 	else
 	{
-		grad.setColorAt( 0, QColor( 16, 16, 16 ) );
-		grad.setColorAt( 0.5, QColor( 96, 96, 96 ) );
-		grad.setColorAt( 0, QColor( 16, 16, 16 ) );
+		grad.setColorAt( 1, QColor( 16, 16, 16 ) );
+		grad.setColorAt( 0, QColor( 110, 110, 110 ) );
+
 	}
 	p.fillRect( _pe->rect(), grad );
 

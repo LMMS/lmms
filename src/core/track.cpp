@@ -897,37 +897,34 @@ void trackContentWidget::updateBackground()
 	m_background = QPixmap( w * 2, height() );
 	QPainter pmp( &m_background );
 
-	QLinearGradient grad( 0, 1, 0, h-2 );
-	pmp.fillRect( 0, 0, 1, h, QColor( 96, 96, 96 ) );
-	pmp.fillRect( 1, 0, w+1, h, QColor( 128, 128, 128 ) );
-	grad.setColorAt( 0.0, QColor( 64, 64, 64 ) );
-	grad.setColorAt( 0.3, QColor( 128, 128, 128 ) );
-	grad.setColorAt( 0.5, QColor( 128, 128, 128 ) );
-	grad.setColorAt( 0.95, QColor( 160, 160, 160 ) );
-	pmp.fillRect( 0, 1, w, h-2, grad );
+	QLinearGradient grad( 0,0, 0, h );
+	grad.setColorAt( 0.0, QColor( 50, 50, 50 ) );
+	grad.setColorAt( 0.33, QColor( 15, 15, 15 ) );
+	grad.setColorAt( 1.0, QColor( 12, 12, 12 ) );
+	pmp.fillRect( 0, 0, w, h, grad );
 
-	QLinearGradient grad2( 0,1, 0, h-2 );
-	pmp.fillRect( w+1, 0, w , h, QColor( 96, 96, 96 ) );
-	grad2.setColorAt( 0.0, QColor( 48, 48, 48 ) );
-	grad2.setColorAt( 0.3, QColor( 96, 96, 96 ) );
-	grad2.setColorAt( 0.5, QColor( 96, 96, 96 ) );
-	grad2.setColorAt( 0.95, QColor( 120, 120, 120 ) );
-	pmp.fillRect( w, 1, w , h-2, grad2 );
+	QLinearGradient grad2( 0,0, 0, h );
+	grad2.setColorAt( 0.0, QColor( 50, 50, 50 ) );
+	grad2.setColorAt( 0.33, QColor( 30, 30, 30 ) );
+	grad2.setColorAt( 1.0, QColor( 27, 27, 27 ) );
+	pmp.fillRect( w, 0, w , h, grad2 );
 
-	// draw vertical lines
-	pmp.setPen( QPen( QColor( 0, 0, 0, 112 ), 1 ) );
-	for( float x = 0.5; x < w * 2; x += ppt )
+	// draw lines
+	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
+	// horizontal line
+	pmp.drawLine( 0, 0, w*2, 0 );
+	
+	// vertical lines
+	for( float x = 0; x < w * 2; x += ppt )
 	{
-		pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
+		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	pmp.drawLine( 0, 1, w*2, 1 );
 
-	pmp.setPen( QPen( QColor( 255, 255, 255, 32 ), 1 ) );
-	for( float x = 1.5; x < w * 2; x += ppt )
+	pmp.setPen( QPen( QColor( 140, 140, 140, 128 ), 1 ) );
+	for( float x = 1.0; x < w * 2; x += ppt )
 	{
-		pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
+		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	pmp.drawLine( 0, h-2, w*2, h-2 );
 
 	pmp.end();
 
