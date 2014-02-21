@@ -584,10 +584,10 @@ opl2instrumentView knob {
 }
 
 sidInstrumentView knob {
-	color: rgb(175,175,175);
+	color: rgb(113,95,80);
 	qproperty-outerColor: rgb( 255,255,255 );
 	qproperty-innerRadius: 2;
-	qproperty-outerRadius: 8;
+	qproperty-outerRadius: 7;
 	qproperty-lineWidth: 2;
 }
 
