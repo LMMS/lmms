@@ -462,13 +462,13 @@ public:
 	sidKnob( QWidget * _parent ) :
 			knob( knobStyled, _parent )
 	{
-		setFixedSize( 26, 25 );
-		setCenterPointX( 13.0 );
-		setCenterPointY( 14.0 );
-		setInnerRadius( 0 );
-		setOuterRadius( 5 );
+		setFixedSize( 16, 16 );
+		setCenterPointX( 7.5 );
+		setCenterPointY( 7.5 );
+		setInnerRadius( 2 );
+		setOuterRadius( 8 );
 		setTotalAngle( 270.0 );
-		setLineWidth( 1 );
+		setLineWidth( 2 );
 	}
 };
 
@@ -487,30 +487,30 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 	m_volKnob = new sidKnob( this );
 	m_volKnob->setHintText( tr( "Volume:" ) + " ", "" );
-	m_volKnob->move( 7, 60 );
+	m_volKnob->move( 7, 64 );
 
 	m_resKnob = new sidKnob( this );
 	m_resKnob->setHintText( tr( "Resonance:" ) + " ", "" );
-	m_resKnob->move( 7 + 29, 60 );
+	m_resKnob->move( 7 + 28, 64 );
 
 	m_cutKnob = new sidKnob( this );
 	m_cutKnob->setHintText( tr( "Cutoff frequency:" ) + " ", "Hz" );
-	m_cutKnob->move( 7 + 2*29, 60 );
+	m_cutKnob->move( 7 + 2*28, 64 );
 
 	pixmapButton * hp_btn = new pixmapButton( this, NULL );
-	hp_btn->move( 176, 53 );
+	hp_btn->move( 139, 77 );
 	hp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "hpred" ) );
 	hp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "hp" ) );
 	toolTip::add( hp_btn, tr( "High-Pass filter ") );
 
 	pixmapButton * bp_btn = new pixmapButton( this, NULL );
-	bp_btn->move( 176 + 14, 53 );
+	bp_btn->move( 163, 77 );
 	bp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpred" ) );
 	bp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bp" ) );
 	toolTip::add( bp_btn, tr( "Band-Pass filter ") );
 
 	pixmapButton * lp_btn = new pixmapButton( this, NULL );
-	lp_btn->move( 176 +2*14, 53 );
+	lp_btn->move( 184, 77 );
 	lp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "lpred" ) );
 	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
 	toolTip::add( lp_btn, tr( "Low-Pass filter ") );
@@ -522,19 +522,19 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 	m_offButton = new pixmapButton( this, NULL );
 	m_offButton->setCheckable( true );
-	m_offButton->move( 176 + 3*14, 53 );
+	m_offButton->move( 206, 77 );
 	m_offButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "3offred" ) );
 	m_offButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "3off" ) );
 	toolTip::add( m_offButton, tr( "Voice3 Off ") );
 
 	pixmapButton * mos6581_btn = new pixmapButton( this, NULL );
-	mos6581_btn->move( 190, 67 );
+	mos6581_btn->move( 170, 59 );
 	mos6581_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "6581red" ) );
 	mos6581_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "6581" ) );
 	toolTip::add( mos6581_btn, tr( "MOS6581 SID ") );
 
 	pixmapButton * mos8580_btn = new pixmapButton( this, NULL );
-	mos8580_btn->move( 218, 67 );
+	mos8580_btn->move( 207, 59 );
 	mos8580_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "8580red" ) );
 	mos8580_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "8580" ) );
 	toolTip::add( mos8580_btn, tr( "MOS8580 SID ") );
@@ -547,32 +547,32 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	{
 		knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:") + " ", "" );
-		ak->move( 7, 110 + i*50 );
+		ak->move( 7, 114 + i*50 );
 		ak->setWhatsThis( tr ( "Attack rate determines how rapidly the output "
 				"of Voice %1 rises from zero to peak amplitude." ).arg( i+1 ) );
 
 		knob *dk = new sidKnob( this );
 		dk->setHintText( tr("Decay:") + " ", "" );
-		dk->move( 7 + 29, 110 + i*50 );
+		dk->move( 7 + 28, 114 + i*50 );
 		dk->setWhatsThis( tr ( "Decay rate determines how rapidly the output "
 				"falls from the peak amplitude to the selected Sustain level." ) );
 
 		knob *sk = new sidKnob( this );
 		sk->setHintText( tr("Sustain:") + " ", "" );
-		sk->move( 7 + 2*29, 110 + i*50 );
+		sk->move( 7 + 2*28, 114 + i*50 );
 		sk->setWhatsThis( tr ( "Output of Voice %1 will remain at the selected "
 				"Sustain amplitude as long as the note is held." ).arg( i+1 ) );
 
 		knob *rk = new sidKnob( this );
 		rk->setHintText( tr("Release:") + " ", "" );
-		rk->move( 7 + 3*29, 110 + i*50 );
+		rk->move( 7 + 3*28, 114 + i*50 );
 		rk->setWhatsThis( tr ( "The output of of Voice %1 will fall from "
 				"Sustain amplitude to zero amplitude at the selected Release "
 				"rate." ).arg( i+1 ) );
 
 		knob *pwk = new sidKnob( this );
 		pwk->setHintText( tr("Pulse Width:") + " ", "" );
-		pwk->move( 7 + 4*29, 110 + i*50 );
+		pwk->move( 7 + 4*28, 114 + i*50 );
 		pwk->setWhatsThis( tr ( "The Pulse Width resolution allows the width "
 				"to be smoothly swept with no discernable stepping. The Pulse "
 				"waveform on Oscillator %1 must be selected to have any audible"
@@ -580,12 +580,12 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 		knob *crsk = new sidKnob( this );
 		crsk->setHintText( tr("Coarse:") + " ", " semitones" );
-		crsk->move( 160, 110 + i*50 );
+		crsk->move( 147, 114 + i*50 );
 		crsk->setWhatsThis( tr ( "The Coarse detuning allows to detune Voice "
 				"%1 one octave up or down." ).arg( i+1 ) );
 
 		pixmapButton * pulse_btn = new pixmapButton( this, NULL );
-		pulse_btn->move( 191, 103 + i*50 );
+		pulse_btn->move( 189, 101 + i*50 );
 		pulse_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "pulsered" ) );
 		pulse_btn->setInactiveGraphic(
@@ -593,7 +593,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		toolTip::add( pulse_btn, tr( "Pulse Wave" ) );
 
 		pixmapButton * triangle_btn = new pixmapButton( this, NULL );
-		triangle_btn->move( 191 + 14, 103 + i*50 );
+		triangle_btn->move( 170, 101 + i*50 );
 		triangle_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "trianglered" ) );
 		triangle_btn->setInactiveGraphic(
@@ -601,7 +601,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		toolTip::add( triangle_btn, tr( "Triangle Wave" ) );
 
 		pixmapButton * saw_btn = new pixmapButton( this, NULL );
-		saw_btn->move( 191 + 2*14, 103 + i*50 );
+		saw_btn->move( 209, 101 + i*50 );
 		saw_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "sawred" ) );
 		saw_btn->setInactiveGraphic(
@@ -609,7 +609,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		toolTip::add( saw_btn, tr( "SawTooth" ) );
 
 		pixmapButton * noise_btn = new pixmapButton( this, NULL );
-		noise_btn->move( 191 + 3*14, 103 + i*50 );
+		noise_btn->move( 228, 101 + i*50 );
 		noise_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "noisered" ) );
 		noise_btn->setInactiveGraphic(
@@ -628,7 +628,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 		pixmapButton * sync_btn = new pixmapButton( this, NULL );
 		sync_btn->setCheckable( true );
-		sync_btn->move( 191, 117 + i*50 );
+		sync_btn->move( 207, 134 + i*50 );
 		sync_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "syncred" ) );
 		sync_btn->setInactiveGraphic(
@@ -641,7 +641,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 		pixmapButton * ringMod_btn = new pixmapButton( this, NULL );
 		ringMod_btn->setCheckable( true );
-		ringMod_btn->move( 191 + 2*14, 117 + i*50 );
+		ringMod_btn->move( 170, 116 + i*50 );
 		ringMod_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "ringred" ) );
 		ringMod_btn->setInactiveGraphic(
@@ -654,7 +654,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 		pixmapButton * filter_btn = new pixmapButton( this, NULL );
 		filter_btn->setCheckable( true );
-		filter_btn->move( 191, 131 + i*50 );
+		filter_btn->move( 207, 116 + i*50 );
 		filter_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "filterred" ) );
 		filter_btn->setInactiveGraphic(
@@ -667,7 +667,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 		pixmapButton * test_btn = new pixmapButton( this, NULL );
 		test_btn->setCheckable( true );
-		test_btn->move( 191 +2*14, 131 + i*50 );
+		test_btn->move( 170, 134 + i*50 );
 		test_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "testred" ) );
 		test_btn->setInactiveGraphic(
