@@ -24,7 +24,6 @@
  */
 
 #include <QtCore/QDebug>
-#include <QtCore/QTextStream>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 #include <QtXml/QDomDocument>
@@ -296,8 +295,6 @@ QString sf2Instrument::nodeName() const
 
 void sf2Instrument::freeFont()
 {
-	QTextStream cout( stdout, QIODevice::WriteOnly );
-
 	m_synthMutex.lock();
 	
 	if ( m_font != NULL )
@@ -308,7 +305,7 @@ void sf2Instrument::freeFont()
 		// No more references
 		if( m_font->refCount <= 0 )
 		{
-			cout << "Really deleting " << m_filename << endl;
+			qDebug() << "Really deleting " << m_filename;
 
 			fluid_synth_sfunload( m_synth, m_fontId, true );
 			s_fonts.remove( m_filename );
@@ -317,7 +314,7 @@ void sf2Instrument::freeFont()
 		// Just remove our reference
 		else
 		{
-			cout << "un-referencing " << m_filename << endl;
+			qDebug() << "un-referencing " << m_filename;
 
 			fluid_synth_remove_sfont( m_synth, m_font->fluidFont );
 		}
@@ -347,8 +344,7 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	// Increment Reference
 	if( s_fonts.contains( relativePath ) )
 	{
-		QTextStream cout( stdout, QIODevice::WriteOnly );
-		cout << "Using existing reference to " << relativePath << endl;
+		qDebug() << "Using existing reference to " << relativePath;
 
 		m_font = s_fonts[ relativePath ];
 
