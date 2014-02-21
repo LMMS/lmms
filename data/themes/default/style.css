@@ -583,6 +583,14 @@ opl2instrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
+sidInstrumentView knob {
+	color: rgb(175,175,175);
+	qproperty-outerColor: rgb( 255,255,255 );
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 8;
+	qproperty-lineWidth: 2;
+}
+
 /* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
  * colour codes MUST be of the form #RRGGBB */
 
