@@ -905,8 +905,8 @@ void trackContentWidget::updateBackground()
 
 	QLinearGradient grad2( 0,0, 0, h );
 	grad2.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad2.setColorAt( 0.33, QColor( 30, 30, 30 ) );
-	grad2.setColorAt( 1.0, QColor( 27, 27, 27 ) );
+	grad2.setColorAt( 0.33, QColor( 40, 40, 40 ) );
+	grad2.setColorAt( 1.0, QColor( 30, 30, 30 ) );
 	pmp.fillRect( w, 0, w , h, grad2 );
 
 	// draw lines
