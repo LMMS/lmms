@@ -214,8 +214,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 110, 110, 110 );
-	lingrad.setColorAt( 1, QColor(16, 16, 16) );
+							QColor( 0x99, 0xAF, 0xFF );
+	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
 	p.setBrush( lingrad );
@@ -228,7 +228,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 								pixelsPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
-	p.setPen( QColor( 0, 0, 0 ) );
+	p.setPen( c.darker( 300 ) );
 
 	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
@@ -253,10 +253,17 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lin2grad( 0, min, 0, max );
 	const QColor cl = QColor( 0x99, 0xAF, 0xFF );
 
-	lin2grad.setColorAt( 1, cl );
-	lin2grad.setColorAt( 0.8, cl );
-	lin2grad.setColorAt( 0, cl.darker( 140 ) );
-
+	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
+	{
+		lin2grad.setColorAt( 1, QColor( 200,200,200 ) );
+		lin2grad.setColorAt( 0, QColor( 100,100,100 ) );		
+	}
+	else
+	{
+		lin2grad.setColorAt( 1, QColor( 255,255,255 ) );
+		lin2grad.setColorAt( 0, cl );
+	}
+	
 	// TODO: skip this part for patterns or parts of the pattern that will
 	// not be on the screen
 	for( AutomationPattern::timeMap::const_iterator it =
@@ -296,7 +303,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.setPen( QColor( 255, 255, 255 ) );
+		p.setPen( QColor( 0, 0, 0 ) );
 	}
 
 	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );

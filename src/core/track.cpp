@@ -899,8 +899,8 @@ void trackContentWidget::updateBackground()
 
 	QLinearGradient grad( 0,0, 0, h );
 	grad.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad.setColorAt( 0.33, QColor( 15, 15, 15 ) );
-	grad.setColorAt( 1.0, QColor( 12, 12, 12 ) );
+	grad.setColorAt( 0.33, QColor( 20, 20, 20 ) );
+	grad.setColorAt( 1.0, QColor( 15, 15, 15 ) );
 	pmp.fillRect( 0, 0, w, h, grad );
 
 	QLinearGradient grad2( 0,0, 0, h );
@@ -920,7 +920,7 @@ void trackContentWidget::updateBackground()
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	pmp.setPen( QPen( QColor( 140, 140, 140, 128 ), 1 ) );
+	pmp.setPen( QPen( QColor( 140, 140, 140, 64 ), 1 ) );
 	for( float x = 1.0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
