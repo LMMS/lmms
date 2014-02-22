@@ -82,17 +82,22 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 {
 	if( !isEnabled() || !isRunning () )
 	{
-		if( currentPeak[0] != 0.0f ) 
-		{ 
-			currentPeak[0] = qMax ( currentPeak[0] - 
-			(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
+		if( currentPeak[0] == 0.0f && currentPeak[1] == 0.0f ) return( false );
+		else 
+		{
+			if( currentPeak[0] != 0.0f ) 
+			{ 
+				currentPeak[0] = qMax ( currentPeak[0] - 
+				(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
+			}
+			if( currentPeak[1] != 0.0f ) 
+			{ 
+				currentPeak[1] = qMax ( currentPeak[1] - 
+				(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
+			}
+			
+			return( true );
 		}
-		if( currentPeak[1] != 0.0f ) 
-		{ 
-			currentPeak[1] = qMax ( currentPeak[1] - 
-			(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
-		}		
-		return( false );
 	}
 
 // variables for effect

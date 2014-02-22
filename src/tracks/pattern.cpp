@@ -832,16 +832,16 @@ void patternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 110, 110, 110 );
+							QColor( 119, 199, 216 );
 
 	if( m_pat->m_patternType == pattern::BeatPattern )
 	{
 		lingrad.setColorAt( 0, QColor( 16, 16, 16 ) );
-		lingrad.setColorAt( 1, c );
+		lingrad.setColorAt( 1, QColor( 80, 80, 80 ) );
 	}
 	else
 	{
-		lingrad.setColorAt( 1, QColor( 16, 16, 16 ) );
+		lingrad.setColorAt( 1, c.darker( 300 ) );
 		lingrad.setColorAt( 0, c );
 	}
 	
@@ -857,7 +857,7 @@ void patternView::paintEvent( QPaintEvent * )
 								pixelsPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
-	p.setPen( QColor( 0, 0, 0 ) );
+	p.setPen( c.darker( 300 ) );
 
 	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
@@ -902,7 +902,7 @@ void patternView::paintEvent( QPaintEvent * )
 				}
 				else
 				{
-					p.setPen( QColor( 0x77, 0xC7, 0xD8 ) );
+					p.setPen( QColor( 255, 255, 255 ) );
 				}
 
 				for( NoteVector::Iterator it =
@@ -997,7 +997,7 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.setPen( QColor( 0x77, 0xc7, 0xd8 ).lighter( 140 ) );
+		p.setPen( QColor( 0, 0, 0 ) );
 	}
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )
