@@ -186,8 +186,7 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 		if( m_remotePlugin )
 		{
 			m_remotePlugin->lock();
-			m_remotePlugin->sendMessage(
-				RemotePlugin::message( IdSaveSettingsToFile ).addString( fn ) );
+			m_remotePlugin->sendMessage( RemotePlugin::message( IdSaveSettingsToFile ).addString( fn ) );
 			m_remotePlugin->waitForMessage( IdSaveSettingsToFile );
 			m_remotePlugin->unlock();
 		}
@@ -241,15 +240,12 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		tf.write( a );
 		tf.flush();
 
-		const std::string fn = QSTR_TO_STDSTR(
-									QDir::toNativeSeparators( tf.fileName() ) );
+		const std::string fn = QSTR_TO_STDSTR( QDir::toNativeSeparators( tf.fileName() ) );
 		m_pluginMutex.lock();
 		if( m_remotePlugin )
 		{
 			m_remotePlugin->lock();
-			m_remotePlugin->sendMessage(
-				RemotePlugin::message( IdLoadSettingsFromFile ).
-															addString( fn ) );
+			m_remotePlugin->sendMessage( RemotePlugin::message( IdLoadSettingsFromFile ).addString( fn ) );
 			m_remotePlugin->waitForMessage( IdLoadSettingsFromFile );
 			m_remotePlugin->unlock();
 		}
@@ -260,8 +256,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		m_pluginMutex.unlock();
 
 		m_modifiedControllers.clear();
-		foreach( const QString & c,
-						_this.attribute( "modifiedcontrollers" ).split( ',' ) )
+		foreach( const QString & c, _this.attribute( "modifiedcontrollers" ).split( ',' ) )
 		{
 			if( !c.isEmpty() )
 			{
@@ -293,8 +288,7 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 	if( m_remotePlugin )
 	{
 		m_remotePlugin->lock();
-		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdLoadPresetFile ).addString( fn ) );
+		m_remotePlugin->sendMessage( RemotePlugin::message( IdLoadPresetFile ).addString( fn ) );
 		m_remotePlugin->waitForMessage( IdLoadPresetFile );
 		m_remotePlugin->unlock();
 	}
@@ -305,8 +299,7 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 	}
 
-	instrumentTrack()->setName( QFileInfo( _file ).baseName().
-									replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
+	instrumentTrack()->setName( QFileInfo( _file ).baseName().replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
 
 	m_modifiedControllers.clear();
 
@@ -336,8 +329,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
-	instrumentTrack()->processAudioBuffer( _buf,
-				engine::mixer()->framesPerPeriod(), NULL );
+	instrumentTrack()->processAudioBuffer( _buf, engine::mixer()->framesPerPeriod(), NULL );
 }
 
 
