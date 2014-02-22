@@ -72,18 +72,18 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 {
 	m_displayMode = displayMode;
 
-	m_milliSecondsLCD.setLabel( "MSEC" );
-
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
 			m_majorLCD.setLabel( "MIN" );
 			m_minorLCD.setLabel( "SEC" );
+			m_milliSecondsLCD.setLabel( "MSEC" );
 			break;
 
 		case BarsTicks:
 			m_majorLCD.setLabel( "BAR" );
-			m_minorLCD.setLabel( "TICK" );
+			m_minorLCD.setLabel( "BEAT" );
+			m_milliSecondsLCD.setLabel( "TICK" );
 			break;
 
 		default: break;
@@ -102,16 +102,20 @@ void TimeDisplayWidget::updateTime()
 		case MinutesSeconds:
 			m_majorLCD.setValue( s->getMilliseconds() / 60000 );
 			m_minorLCD.setValue( ( s->getMilliseconds() / 1000 ) % 60 );
+			m_milliSecondsLCD.setValue( s->getMilliseconds() % 1000 );
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setValue( s->getTacts() );
-			m_minorLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) / 3 );
+			m_majorLCD.setValue( s->getTacts() + 1 );
+			m_minorLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) / 
+					     ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
+;
+			m_milliSecondsLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) %
+						    ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
 			break;
 
 		default: break;
 	}
-	m_milliSecondsLCD.setValue( s->getMilliseconds() % 1000 );
 }
 
 
