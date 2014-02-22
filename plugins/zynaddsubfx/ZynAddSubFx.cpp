@@ -143,7 +143,10 @@ ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 	engine::mixer()->removePlayHandles( instrumentTrack() );
 
 	m_pluginMutex.lock();
+	delete m_plugin;
 	delete m_remotePlugin;
+	m_plugin = NULL;
+	m_remotePlugin = NULL;
 	m_pluginMutex.unlock();
 }
 
