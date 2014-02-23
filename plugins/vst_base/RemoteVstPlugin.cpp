@@ -418,6 +418,15 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 
 RemoteVstPlugin::~RemoteVstPlugin()
 {
+	if( m_window != NULL )
+	{
+		pluginDispatch( effEditClose );
+#ifdef LMMS_BUILD_LINUX
+		CloseWindow( m_window );
+#endif
+		m_window = NULL;
+	}
+	pluginDispatch( effMainsChanged, 0, 0 );
 #ifndef USE_QT_SHMEM
 	// detach shared memory segment
 	if( shmdt( m_vstSyncData ) == -1)
@@ -433,14 +442,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 		}
 	}
 #endif
-	if( m_window != NULL )
-	{
-		pluginDispatch( effEditClose );
-#ifdef LMMS_BUILD_LINUX
-		CloseWindow( m_window );
-#endif
-		m_window = NULL;
-	}
 
 	if( m_libInst != NULL )
 	{
