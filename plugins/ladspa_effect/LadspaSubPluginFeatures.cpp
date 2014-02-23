@@ -4,7 +4,7 @@
  *                               hosting LADSPA-plugins
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,6 +52,9 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 
 	QLabel * label = new QLabel( _parent );
 	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
+
+	QLabel* fileInfo = new QLabel( _parent );
+	fileInfo->setText( QWidget::tr( "File: %1" ).arg( lkey.first ) );
 
 	QWidget * maker = new QWidget( _parent );
 	QHBoxLayout * l = new QHBoxLayout( maker );
