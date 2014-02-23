@@ -1,5 +1,5 @@
 ADD_SUBDIRECTORY(audio_file_processor)
-ADD_SUBDIRECTORY(bass_booster)
+ADD_SUBDIRECTORY(BassBooster)
 ADD_SUBDIRECTORY(bit_invader)
 ADD_SUBDIRECTORY(dynamics_processor)
 ADD_SUBDIRECTORY(flp_import)

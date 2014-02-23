@@ -1,8 +1,8 @@
 /*
- * bassbooster_controls.h - controls for bassbooster-effect
+ * BassBoosterControls.h - controls for bassboosterx -effect
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -26,19 +26,19 @@
 #define _BASSBOOSTER_CONTROLS_H
 
 #include "EffectControls.h"
-#include "bassbooster_control_dialog.h"
+#include "BassBoosterControlDialog.h"
 #include "knob.h"
 
 
-class bassBoosterEffect;
+class BassBoosterEffect;
 
 
-class bassBoosterControls : public EffectControls
+class BassBoosterControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	bassBoosterControls( bassBoosterEffect * _eff );
-	virtual ~bassBoosterControls()
+	BassBoosterControls( BassBoosterEffect* effect );
+	virtual ~BassBoosterControls()
 	{
 	}
 
@@ -46,17 +46,17 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName() const
 	{
-		return( "bassboostercontrols" );
+		return "bassboostercontrols";
 	}
 
 	virtual int controlCount()
 	{
-		return( 3 );
+		return 3;
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog* createView()
 	{
-		return( new bassBoosterControlDialog( this ) );
+		return new BassBoosterControlDialog( this );
 	}
 
 
@@ -67,12 +67,12 @@ private slots:
 
 
 private:
-	bassBoosterEffect * m_effect;
+	BassBoosterEffect* m_effect;
 	FloatModel m_freqModel;
 	FloatModel m_gainModel;
 	FloatModel m_ratioModel;
 
-	friend class bassBoosterControlDialog;
+	friend class BassBoosterControlDialog;
 
 } ;
 

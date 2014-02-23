@@ -1,8 +1,8 @@
 /*
- * bassbooster_control_dialog.h - control-dialog for bassbooster-effect
+ * BassBooster.h - bass-booster-effect-plugin
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,22 +22,34 @@
  *
  */
 
-#ifndef _BASSBOOSTER_CONTROL_DIALOG_H
-#define _BASSBOOSTER_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
+#ifndef _BASS_BOOSTER_H
+#define _BASS_BOOSTER_H
+
+#include "Effect.h"
+#include "effect_lib.h"
+#include "BassBoosterControls.h"
 
 
-class bassBoosterControls;
-
-
-class bassBoosterControlDialog : public EffectControlDialog
+class BassBoosterEffect : public Effect
 {
 public:
-	bassBoosterControlDialog( bassBoosterControls * _controls );
-	virtual ~bassBoosterControlDialog()
+	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~BassBoosterEffect();
+	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+
+	virtual EffectControls* controls()
 	{
+		return &m_bbControls;
 	}
+
+
+private:
+	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost> m_bbFX;
+
+	BassBoosterControls m_bbControls;
+
+	friend class BassBoosterControls;
 
 } ;
 

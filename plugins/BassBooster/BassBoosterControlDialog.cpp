@@ -1,8 +1,8 @@
 /*
- * bassbooster_control_dialog.cpp - control-dialog for bassbooster-effect
+ * BassBoosterControlDialog.cpp - control dialog for bassbooster effect
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,23 +22,20 @@
  *
  */
 
-
 #include <QtGui/QLayout>
 
-#include "bassbooster_control_dialog.h"
-#include "bassbooster_controls.h"
+#include "BassBoosterControlDialog.h"
+#include "BassBoosterControls.h"
 #include "embed.h"
 
 
 
-bassBoosterControlDialog::bassBoosterControlDialog(
-					bassBoosterControls * _controls ) :
-	EffectControlDialog( _controls )
+BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* controls ) :
+	EffectControlDialog( controls )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 	setFixedSize( 120, 104 );
 
@@ -48,17 +45,17 @@ bassBoosterControlDialog::bassBoosterControlDialog(
 	QHBoxLayout * l = new QHBoxLayout;
 
 	knob * freqKnob = new knob( knobBright_26, this);
-	freqKnob->setModel( &_controls->m_freqModel );
+	freqKnob->setModel( &controls->m_freqModel );
 	freqKnob->setLabel( tr( "FREQ" ) );
 	freqKnob->setHintText( tr( "Frequency:" ) + " ", "Hz" );
 
 	knob * gainKnob = new knob( knobBright_26, this );
-	gainKnob->setModel( &_controls->m_gainModel );
+	gainKnob->setModel( &controls->m_gainModel );
 	gainKnob->setLabel( tr( "GAIN" ) );
 	gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 
 	knob * ratioKnob = new knob( knobBright_26, this );
-	ratioKnob->setModel( &_controls->m_ratioModel );
+	ratioKnob->setModel( &controls->m_ratioModel );
 	ratioKnob->setLabel( tr( "RATIO" ) );
 	ratioKnob->setHintText( tr( "Ratio:" ) + " ", "" );
 
