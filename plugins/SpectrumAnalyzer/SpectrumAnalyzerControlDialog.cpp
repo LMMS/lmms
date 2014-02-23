@@ -33,10 +33,11 @@
 
 static inline void darken( QImage& img, int x, int y, int w, int h )
 {
-	QRgb * base = ( (QRgb *) img.bits() ) + y*img.width() + x;
+	int imgWidth = img.width();
+	QRgb * base = ( (QRgb *) img.bits() ) + y*imgWidth + x;
 	for( int y = 0; y < h; ++y )
 	{
-		QRgb * d = base + y*w;
+		QRgb * d = base + y*imgWidth;
 		for( int x = 0; x < w; ++x )
 		{
 			// shift each color component by 1 bit and set alpha
