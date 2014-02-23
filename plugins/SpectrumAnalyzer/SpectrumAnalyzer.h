@@ -1,7 +1,7 @@
 /*
- * spectrum_analyzer.h - spectrum anaylzer
+ * SpectrumAnalyzer.h - spectrum anaylzer effect plugin
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,13 +28,13 @@
 
 #include "Effect.h"
 #include "fft_helpers.h"
-#include "spectrumanalyzer_controls.h"
+#include "SpectrumAnalyzerControls.h"
 
 
 const int MAX_BANDS = 249;
 
 
-class spectrumAnalyzer : public Effect
+class SpectrumAnalyzer : public Effect
 {
 public:
 	enum ChannelModes
@@ -44,9 +44,9 @@ public:
 		RightChannel
 	} ;
 
-	spectrumAnalyzer( Model * _parent,
+	SpectrumAnalyzer( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~spectrumAnalyzer();
+	virtual ~SpectrumAnalyzer();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 
@@ -57,7 +57,7 @@ public:
 
 
 private:
-	spectrumAnalyzerControls m_saControls;
+	SpectrumAnalyzerControls m_saControls;
 
 	fftwf_plan m_fftPlan;
 
@@ -69,13 +69,10 @@ private:
 	float m_bands[MAX_BANDS];
 	float m_energy;
 
-	friend class spectrumAnalyzerControls;
-	friend class spectrumView;
+	friend class SpectrumAnalyzerControls;
+	friend class SpectrumView;
 
 } ;
-
-
-
 
 
 #endif

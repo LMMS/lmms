@@ -1,7 +1,7 @@
 /*
- * spectrumanaylzer_controls.cpp - controls for spectrum analyzer
+ * SpectrumAnalyzerControls.cpp - controls for spectrum analyzer
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,18 +23,19 @@
  */
 
 
-#include "spectrum_analyzer.h"
+#include "SpectrumAnalyzer.h"
+#include "SpectrumAnalyzerControls.h"
 
 
 
-spectrumAnalyzerControls::spectrumAnalyzerControls( spectrumAnalyzer * _eff ) :
-	EffectControls( _eff ),
-	m_effect( _eff ),
+SpectrumAnalyzerControls::SpectrumAnalyzerControls( SpectrumAnalyzer* effect ) :
+	EffectControls( effect ),
+	m_effect( effect ),
 	m_linearSpec( false, this, tr( "Linear spectrum" ) ),
-	m_linearYAxis( false, this, tr( "Linear Y-axis" ) ),
-	m_channelMode( spectrumAnalyzer::MergeChannels,
-			spectrumAnalyzer::MergeChannels,
-			spectrumAnalyzer::RightChannel,
+	m_linearYAxis( false, this, tr( "Linear Y axis" ) ),
+	m_channelMode( SpectrumAnalyzer::MergeChannels,
+					SpectrumAnalyzer::MergeChannels,
+					SpectrumAnalyzer::RightChannel,
 						this, tr( "Channel mode" ) )
 {
 }
@@ -42,21 +43,19 @@ spectrumAnalyzerControls::spectrumAnalyzerControls( spectrumAnalyzer * _eff ) :
 
 
 
-void spectrumAnalyzerControls::loadSettings( const QDomElement & _this )
+void SpectrumAnalyzerControls::loadSettings( const QDomElement & _this )
 {
-//	m_freqModel.setValue( _this.attribute( "freq" ).toFloat() );
 }
 
 
 
 
-void spectrumAnalyzerControls::saveSettings( QDomDocument & _doc, 
+void SpectrumAnalyzerControls::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
-//	_this.setAttribute( "freq", m_freqModel.value() );
 }
 
 
 
-#include "moc_spectrumanalyzer_controls.cxx"
+#include "moc_SpectrumAnalyzerControls.cxx"
 

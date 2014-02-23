@@ -1,8 +1,8 @@
 /*
- * spectrumanalyzer_control_dialog.h - view for spectrum analyzer
+ * SpectrumAnalyzerControlDialog.h - view for spectrum analyzer
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,27 +22,27 @@
  *
  */
 
-#ifndef _SPECTRUMANALYZER_CONTROL_DIALOG_H
-#define _SPECTRUMANALYZER_CONTROL_DIALOG_H
+#ifndef _SPECTRUM_ANALYZER_CONTROL_DIALOG_H
+#define _SPECTRUM_ANALYZER_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 
 
-class spectrumAnalyzerControls;
+class SpectrumAnalyzerControls;
 
 
-class spectrumAnalyzerControlDialog : public EffectControlDialog
+class SpectrumAnalyzerControlDialog : public EffectControlDialog
 {
 public:
-	spectrumAnalyzerControlDialog( spectrumAnalyzerControls * _controls );
-	virtual ~spectrumAnalyzerControlDialog()
+	SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls );
+	virtual ~SpectrumAnalyzerControlDialog()
 	{
 	}
 
 private:
-	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void paintEvent( QPaintEvent* event );
 
-	spectrumAnalyzerControls * m_controls;
+	SpectrumAnalyzerControls* m_controls;
 
 	QPixmap m_logXAxis;
 	QPixmap m_logYAxis;

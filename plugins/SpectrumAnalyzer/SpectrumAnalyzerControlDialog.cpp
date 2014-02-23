@@ -1,8 +1,8 @@
 /*
- * spectrumanaylzer_control_dialog.cpp - view for spectrum analyzer
+ * SpectrumAnalyzerControlDialog.cpp - view for spectrum analyzer
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,24 +22,22 @@
  *
  */
 
-
 #include <QtGui/QLayout>
 #include <QtGui/QPainter>
 
-#include "spectrum_analyzer.h"
+#include "SpectrumAnalyzer.h"
 #include "MainWindow.h"
 #include "led_checkbox.h"
 #include "embed.h"
 
 
-static inline void darken( QImage & _i, int _x, int _y, int _w, int _h )
+static inline void darken( QImage& img, int x, int y, int w, int h )
 {
-	const int w = _i.width();
-	QRgb * base = ( (QRgb *) _i.bits() ) + _y*w + _x;
-	for( int y = 0; y < _h; ++y )
+	QRgb * base = ( (QRgb *) img.bits() ) + y*img.width() + x;
+	for( int y = 0; y < h; ++y )
 	{
 		QRgb * d = base + y*w;
-		for( int x = 0; x < _w; ++x )
+		for( int x = 0; x < w; ++x )
 		{
 			// shift each color component by 1 bit and set alpha
 			// to 0xff
@@ -50,26 +48,25 @@ static inline void darken( QImage & _i, int _x, int _y, int _w, int _h )
 
 
 
-class spectrumView : public QWidget
+class SpectrumView : public QWidget
 {
 public:
-	spectrumView( spectrumAnalyzer * _s, QWidget * _parent ) :
+	SpectrumView( SpectrumAnalyzer* s, QWidget * _parent ) :
 		QWidget( _parent ),
-		m_sa( _s ),
+		m_sa( s ),
 		m_backgroundPlain( PLUGIN_NAME::getIconPixmap( "spectrum_background_plain" ).toImage() ),
 		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
-		connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
-				this, SLOT( update() ) );
+		connect( engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
 		setAttribute( Qt::WA_OpaquePaintEvent, true );
 	}
 
-	virtual ~spectrumView()
+	virtual ~SpectrumView()
 	{
 	}
 
-	virtual void paintEvent( QPaintEvent * _pe )
+	virtual void paintEvent( QPaintEvent* event )
 	{
 		QPainter p( this );
 		QImage i = m_sa->m_saControls.m_linearSpec.value() ?
@@ -135,7 +132,7 @@ public:
 
 
 private:
-	spectrumAnalyzer * m_sa;
+	SpectrumAnalyzer * m_sa;
 	QImage m_backgroundPlain;
 	QImage m_background;
 
@@ -144,35 +141,31 @@ private:
 
 
 
-spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
-					spectrumAnalyzerControls * _controls ) :
-	EffectControlDialog( _controls ),
-	m_controls( _controls ),
+SpectrumAnalyzerControlDialog::SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls ) :
+	EffectControlDialog( controls ),
+	m_controls( controls ),
 	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
 	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "background" ) );
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "background" ) );
 	setFixedSize( 280, 243 );
 	setPalette( pal );
 /*	QVBoxLayout * l = new QVBoxLayout( this );*/
-	spectrumView * v = new spectrumView( _controls->m_effect, this );
+	SpectrumView* v = new SpectrumView( controls->m_effect, this );
 	v->move( 27, 30 );
 
 	ledCheckBox * lin_spec = new ledCheckBox( tr( "Linear spectrum" ), this );
 	lin_spec->move( 24, 204 );
-	lin_spec->setModel( &_controls->m_linearSpec );
+	lin_spec->setModel( &controls->m_linearSpec );
 
 	ledCheckBox * lin_y = new ledCheckBox( tr( "Linear Y axis" ), this );
 	lin_y->move( 24, 220 );
-	lin_y->setModel( &_controls->m_linearYAxis );
+	lin_y->setModel( &controls->m_linearYAxis );
 
-	connect( &_controls->m_linearSpec, SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
-	connect( &_controls->m_linearYAxis, SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
+	connect( &controls->m_linearSpec, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( &controls->m_linearYAxis, SIGNAL( dataChanged() ), this, SLOT( update() ) );
 /*	l->addWidget( v );
 	l->addWidget( lin_spec );
 	l->addWidget( lin_y );*/
@@ -180,13 +173,15 @@ spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 }
 
 
-void spectrumAnalyzerControlDialog::paintEvent( QPaintEvent * )
+void SpectrumAnalyzerControlDialog::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+
 	if( !m_controls->m_linearSpec.value() )
 	{
 		p.drawPixmap( 25, 183, m_logXAxis );
 	}
+
 	if( !m_controls->m_linearYAxis.value() )
 	{
 		p.drawPixmap( 3, 47, m_logYAxis);

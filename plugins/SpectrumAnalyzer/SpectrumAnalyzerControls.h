@@ -1,7 +1,7 @@
 /*
- * spectrumanaylzer_controls.h - controls for spectrum-analyzer
+ * SpectrumAnalyzerControls.h - controls for spectrum-analyzer
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,23 +22,23 @@
  *
  */
 
-#ifndef _SPECTRUMANALYZER_CONTROLS_H
-#define _SPECTRUMANALYZER_CONTROLS_H
+#ifndef SPECTRUM_ANALYZER_CONTROLS_H
+#define SPECTRUM_ANALYZER_CONTROLS_H
 
 #include "EffectControls.h"
-#include "spectrumanalyzer_control_dialog.h"
+#include "SpectrumAnalyzerControlDialog.h"
 #include "knob.h"
 
 
-class spectrumAnalyzer;
+class SpectrumAnalyzer;
 
 
-class spectrumAnalyzerControls : public EffectControls
+class SpectrumAnalyzerControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	spectrumAnalyzerControls( spectrumAnalyzer * _eff );
-	virtual ~spectrumAnalyzerControls()
+	SpectrumAnalyzerControls( SpectrumAnalyzer* effect );
+	virtual ~SpectrumAnalyzerControls()
 	{
 	}
 
@@ -46,29 +46,29 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName() const
 	{
-		return( "spectrumanaylzercontrols" );
+		return "spectrumanaylzercontrols";
 	}
 
 	virtual int controlCount()
 	{
-		return( 1 );
+		return 1;
 	}
 
 	virtual EffectControlDialog * createView()
 	{
-		return( new spectrumAnalyzerControlDialog( this ) );
+		return new SpectrumAnalyzerControlDialog( this );
 	}
 
 
 private:
-	spectrumAnalyzer * m_effect;
+	SpectrumAnalyzer* m_effect;
 	BoolModel m_linearSpec;
 	BoolModel m_linearYAxis;
 	IntModel m_channelMode;
 
-	friend class spectrumAnalyzer;
-	friend class spectrumAnalyzerControlDialog;
-	friend class spectrumView;
+	friend class SpectrumAnalyzer;
+	friend class SpectrumAnalyzerControlDialog;
+	friend class SpectrumView;
 
 } ;
 

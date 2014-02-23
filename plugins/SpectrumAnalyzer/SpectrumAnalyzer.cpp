@@ -1,7 +1,7 @@
 /*
- * spectrum_analyzer.cpp - spectrum analyzer plugin
+ * SpectrumAnalyzer.cpp - spectrum analyzer effect plugin
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "spectrum_analyzer.h"
+#include "SpectrumAnalyzer.h"
 
 #include "embed.cpp"
 
@@ -34,9 +34,7 @@ Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Spectrum Analyzer",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"plugin for using arbitrary VST-effects "
-				"inside LMMS." ),
+	QT_TRANSLATE_NOOP( "pluginBrowser", "Graphical spectrum analyzer plugin" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,
@@ -49,7 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 
 
 
-spectrumAnalyzer::spectrumAnalyzer( Model * _parent,
+SpectrumAnalyzer::SpectrumAnalyzer( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &spectrumanalyzer_plugin_descriptor, _parent, _key ),
 	m_saControls( this ),
@@ -58,16 +56,14 @@ spectrumAnalyzer::spectrumAnalyzer( Model * _parent,
 {
 	memset( m_buffer, 0, sizeof( m_buffer ) );
 
-	m_specBuf = (fftwf_complex *) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) *
-						sizeof( fftwf_complex ) );
-	m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer,
-						m_specBuf, FFTW_MEASURE );
+	m_specBuf = (fftwf_complex *) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
+	m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer, m_specBuf, FFTW_MEASURE );
 }
 
 
 
 
-spectrumAnalyzer::~spectrumAnalyzer()
+SpectrumAnalyzer::~SpectrumAnalyzer()
 {
 	fftwf_destroy_plan( m_fftPlan );
 	fftwf_free( m_specBuf );
@@ -76,12 +72,11 @@ spectrumAnalyzer::~spectrumAnalyzer()
 
 
 
-bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames )
+bool SpectrumAnalyzer::processAudioBuffer( sampleFrame* _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
-		return( false );
+		return false;
 	}
 
 	if( !m_saControls.isViewVisible() )
@@ -126,7 +121,7 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_framesFilledUp < FFT_BUFFER_SIZE )
 	{
-		return( isRunning() );
+		return isRunning();
 	}
 
 
@@ -144,15 +139,12 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 			MAX_BANDS,
 			(int)(LOWEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(sr/2)),
 			(int)(HIGHEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(sr/2)));
-		m_energy = maximum( m_bands, MAX_BANDS ) /
-					maximum( m_buffer, FFT_BUFFER_SIZE );
+		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
 	}
 	else
 	{
-		calc13octaveband31( m_absSpecBuf, m_bands,
-						FFT_BUFFER_SIZE+1, sr/2.0 );
-		m_energy = signalpower( m_buffer, FFT_BUFFER_SIZE ) /
-					maximum( m_buffer, FFT_BUFFER_SIZE );
+		calc13octaveband31( m_absSpecBuf, m_bands, FFT_BUFFER_SIZE+1, sr/2.0 );
+		m_energy = signalpower( m_buffer, FFT_BUFFER_SIZE ) / maximum( m_buffer, FFT_BUFFER_SIZE );
 	}
 
 
@@ -160,7 +152,7 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 
 	checkGate( 0 );
 
-	return( isRunning() );
+	return isRunning();
 }
 
 
@@ -171,11 +163,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
 {
-	return( new spectrumAnalyzer( _parent,
-		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
-								_data ) ) );
+	return new SpectrumAnalyzer( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }
