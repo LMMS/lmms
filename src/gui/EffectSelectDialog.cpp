@@ -71,15 +71,23 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 
 	// and fill our source model
 	QStringList pluginNames;
-	for( EffectKeyList::ConstIterator it = m_effectKeys.begin();
-										it != m_effectKeys.end(); ++it )
+	QStringList subPluginNames;
+	for( EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it )
 	{
-		pluginNames += QString( ( *it ).desc->displayName ) +
-			( ( ( *it ).desc->subPluginFeatures != NULL ) ?
-							": " + ( *it ).name
-						:
-							"" );
+		if( ( *it ).desc->subPluginFeatures )
+		{
+			subPluginNames += QString( "%1: %2" ).arg(  ( *it ).desc->displayName, ( *it ).name );
+		}
+		else
+		{
+			pluginNames += ( *it ).desc->displayName;
+		}
 	}
+
+	qSort( pluginNames );
+	qSort( subPluginNames );
+
+	pluginNames += subPluginNames;
 
 	int row = 0;
 	for( QStringList::ConstIterator it = pluginNames.begin();
