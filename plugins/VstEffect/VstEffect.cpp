@@ -38,7 +38,7 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"VST Effect",
+	"VST",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",

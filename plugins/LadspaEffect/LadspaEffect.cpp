@@ -47,7 +47,7 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"LADSPA Effect",
+	"LADSPA",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"plugin for using arbitrary LADSPA-effects "
 				"inside LMMS." ),
