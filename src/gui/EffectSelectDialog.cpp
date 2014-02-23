@@ -44,6 +44,8 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	// query effects
 	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
+	EffectKeyList subPluginEffectKeys;
+
 	for( Plugin::DescriptorList::ConstIterator it = m_pluginDescriptors.begin();
 										it != m_pluginDescriptors.end(); ++it )
 	{
@@ -60,7 +62,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 				// so we're on the safe side and the compiler
 				// likely will reduce that to just "it"
 							&( *it ),
-							m_effectKeys );
+							subPluginEffectKeys );
 		}
 		else
 		{
@@ -69,25 +71,21 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 		}
 	}
 
+	m_effectKeys += subPluginEffectKeys;
+
 	// and fill our source model
 	QStringList pluginNames;
-	QStringList subPluginNames;
 	for( EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it )
 	{
 		if( ( *it ).desc->subPluginFeatures )
 		{
-			subPluginNames += QString( "%1: %2" ).arg(  ( *it ).desc->displayName, ( *it ).name );
+			pluginNames += QString( "%1: %2" ).arg(  ( *it ).desc->displayName, ( *it ).name );
 		}
 		else
 		{
 			pluginNames += ( *it ).desc->displayName;
 		}
 	}
-
-	qSort( pluginNames );
-	qSort( subPluginNames );
-
-	pluginNames += subPluginNames;
 
 	int row = 0;
 	for( QStringList::ConstIterator it = pluginNames.begin();
