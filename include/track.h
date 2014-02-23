@@ -67,7 +67,7 @@ const int TRACK_OP_WIDTH_COMPACT = 60;
 const int MINIMAL_TRACK_HEIGHT = 8;
 const int DEFAULT_TRACK_HEIGHT = 32;
 
-const int TCO_BORDER_WIDTH = 1;
+const int TCO_BORDER_WIDTH = 2;
 
 
 class trackContentObject : public Model, public JournallingObject
