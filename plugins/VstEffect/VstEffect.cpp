@@ -40,8 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	STRINGIFY( PLUGIN_NAME ),
 	"VST Effect",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"plugin for using arbitrary VST-effects "
-				"inside LMMS." ),
+				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	Plugin::Effect,
@@ -127,8 +126,7 @@ void VstEffect::openPlugin( const QString & _plugin )
 {
 	textFloat * tf = textFloat::displayMessage(
 		VstPlugin::tr( "Loading plugin" ),
-		VstPlugin::tr(
-				"Please wait while loading VST-plugin..." ),
+		VstPlugin::tr( "Please wait while loading VST plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	m_pluginMutex.lock();
 	m_plugin = new VstPlugin( _plugin );
@@ -138,21 +136,17 @@ void VstEffect::openPlugin( const QString & _plugin )
 		closePlugin();
 		delete tf;
 		QMessageBox::information( NULL,
-			VstPlugin::tr( "Failed loading VST-plugin" ),
-			VstPlugin::tr( "The VST-plugin %1 could not "
-					"be loaded for some reason.\n"
-					"If it runs with other VST-"
-					"software under Linux, please "
-					"contact an LMMS-developer!"
-					).arg( _plugin ),
-						QMessageBox::Ok );
+			VstPlugin::tr( "Failed loading VST plugin" ),
+			VstPlugin::tr( "The VST plugin %1 could not be loaded for some reason." ).arg( _plugin ),
+			QMessageBox::Ok );
 		return;
 	}
-	VstPlugin::connect( engine::getSong(),
-				SIGNAL( tempoChanged( bpm_t ) ),
-			 m_plugin, SLOT( setTempo( bpm_t ) ) );
+
+	VstPlugin::connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
 	m_plugin->setTempo( engine::getSong()->getTempo() );
+
 	m_pluginMutex.unlock();
+
 	delete tf;
 
 	m_key.attributes["file"] = _plugin;
