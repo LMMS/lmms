@@ -739,8 +739,6 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		return false;
 	}
 
-	m_plugin->user = this;
-
 	if( m_plugin->magic != kEffectMagic )
 	{
 		debugMessage( "File is not a VST plugin\n" );
