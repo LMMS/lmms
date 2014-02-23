@@ -40,7 +40,7 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT dynamics_processor_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Dynamics Processor",
@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamics_processor_plugin_descriptor =
 
 dynProcEffect::dynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &dynamics_processor_plugin_descriptor, _parent, _key ),
+	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
 	m_dpControls( this )
 {
 	currentPeak[0] = 0.0f;
