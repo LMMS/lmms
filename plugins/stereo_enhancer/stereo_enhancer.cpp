@@ -1,8 +1,8 @@
 /*
  * stereo_enhancer.cpp - stereo-enhancer-effect-plugin
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -53,7 +53,7 @@ stereoEnhancerEffect::stereoEnhancerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
-	m_seFX( effectLib::stereoEnhancer( 0.0f ) ),
+	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
 	m_bbControls( this )
@@ -107,7 +107,7 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];
 
 		// Get the width knob value from the Stereo Enhancer effect
-		width = m_seFX.getWideCoeff();
+		width = m_seFX.wideCoeff();
 
 		// Calculate the correct sample frame for processing
 		frameIndex = m_currFrame - width;

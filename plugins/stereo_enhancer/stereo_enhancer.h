@@ -1,8 +1,8 @@
 /*
  * stereo_enhancer.h - stereo-enhancer-effect-plugin
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -27,14 +27,14 @@
 #define _STEREO_ENHANCER_H
 
 #include "Effect.h"
-#include "effect_lib.h"
+#include "DspEffectLibrary.h"
 #include "engine.h"
 #include "stereoenhancer_controls.h"
 
 class stereoEnhancerEffect : public Effect
 {
 public:
-	stereoEnhancerEffect( Model * parent, 
+	stereoEnhancerEffect( Model * parent,
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~stereoEnhancerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
@@ -49,7 +49,7 @@ public:
 
 
 private:
-	effectLib::stereoEnhancer m_seFX;
+	DspEffectLibrary::StereoEnhancer m_seFX;
 	
 	sampleFrame * m_delayBuffer;
 	int m_currFrame;

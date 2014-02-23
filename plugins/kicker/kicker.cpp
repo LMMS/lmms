@@ -108,9 +108,9 @@ QString kickerInstrument::nodeName() const
 
 
 
-//typedef effectLib::foldbackDistortion<> DistFX;
-typedef effectLib::distortion DistFX;
-typedef SweepOscillator<effectLib::monoToStereoAdaptor<DistFX> > SweepOsc;
+//typedef DspEffectLibrary::foldbackDistortion<> DistFX;
+typedef DspEffectLibrary::Distortion DistFX;
+typedef SweepOscillator<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
 
 
 void kickerInstrument::playNote( NotePlayHandle * _n,

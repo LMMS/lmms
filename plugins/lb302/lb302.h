@@ -32,7 +32,7 @@
 #ifndef _LB302_H_
 #define _LB302_H_
 
-#include "effect_lib.h"
+#include "DspEffectLibrary.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "led_checkbox.h"
@@ -96,7 +96,7 @@ class lb302FilterIIR2 : public lb302Filter
 	      vcf_b,            //  
 	      vcf_c;
 
-	effectLib::distortion * m_dist;
+	DspEffectLibrary::Distortion * m_dist;
 };
 
 

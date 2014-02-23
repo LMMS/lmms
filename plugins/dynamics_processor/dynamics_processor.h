@@ -28,7 +28,6 @@
 #define _DYNPROC_H
 
 #include "Effect.h"
-#include "effect_lib.h"
 #include "dynamics_processor_controls.h"
 
 

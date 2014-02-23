@@ -28,7 +28,6 @@
 #define _WAVESHAPER_H
 
 #include "Effect.h"
-#include "effect_lib.h"
 #include "waveshaper_controls.h"
 
 

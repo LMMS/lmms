@@ -1,7 +1,7 @@
 /*
  * SweepOscillator.h - sweeping oscillator
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,10 +26,10 @@
 #define _SWEEP_OSCILLATOR_H
 
 #include "Oscillator.h"
-#include "effect_lib.h"
+#include "DspEffectLibrary.h"
 
 
-template<class FX = effectLib::stereoBypass>
+template<class FX = DspEffectLibrary::StereoBypass>
 class SweepOscillator
 {
 public:
@@ -43,19 +43,16 @@ public:
 	{
 	}
 
-	void update( sampleFrame * _ab, const fpp_t _frames, 
-					const float _freq1, const float _freq2,
-						const float _sample_rate )
+	void update( sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
 	{
-		const float df = _freq2 - _freq1;
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		const float df = freq2 - freq1;
+		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			const sample_t s = Oscillator::sinSample( m_phase );
-			_ab[frame][0] = s;
-			_ab[frame][1] = s;
-			m_FX.nextSample( _ab[frame][0], _ab[frame][1] );
-			m_phase += ( _freq1 + ( frame * df / _frames ) ) /
-								_sample_rate;
+			buf[frame][0] = s;
+			buf[frame][1] = s;
+			m_FX.nextSample( buf[frame][0], buf[frame][1] );
+			m_phase += ( freq1 + ( frame * df / frames ) ) / sampleRate;
 		}
 	}
 

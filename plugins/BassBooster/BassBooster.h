@@ -27,7 +27,7 @@
 #define _BASS_BOOSTER_H
 
 #include "Effect.h"
-#include "effect_lib.h"
+#include "DspEffectLibrary.h"
 #include "BassBoosterControls.h"
 
 
@@ -45,7 +45,7 @@ public:
 
 
 private:
-	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost> m_bbFX;
+	DspEffectLibrary::MonoToStereoAdaptor<DspEffectLibrary::FastBassBoost> m_bbFX;
 
 	BassBoosterControls m_bbControls;
 
