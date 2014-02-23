@@ -1,0 +1,54 @@
+<H1>Adding Plugins to the CMT Library</H1>
+
+<P>The CMT <A HREF="http://www.ladspa.org">
+LADSPA</A> plugin collection is written in C++ and uses a little
+additional sophistication to make plugin writing easier. This document
+describes how to add a new plugin to the toolkit.</P>
+
+<P>At the moment CMT is not under public version control, so please
+send changes to <A HREF="mailto:richard@muse.demon.co.uk">Richard
+Furse</A>.</P>
+
+<P>CMT plugins interpret <CODE>LADSPA_Handle</CODE> entities as
+pointers to objects derived from the <CODE>CMT_PluginInstance</CODE>
+class. Plugin instance structures are defined by subclassing this, so
+writing a descendent of <CODE>CMT_PluginInstance</CODE> is the first
+thing to do. The CMT library provides its own implementation of
+<CODE>connect_port()</CODE>, <CODE>cleanup()</CODE> and a templated
+form of <CODE>instantiate()</CODE> (see
+<CODE>CMT_Instantiate<>()</CODE>). These calls assume that any
+instantiation or cleanup mechanisms required will be written in the
+constructor or destructor of the class.</P>
+
+<P>When writing a plugin module, an initialisation function should be
+included. To ensure this is called, add a call to the
+<CODE>initialise_modules()</CODE> function in
+<CODE>descriptor.cpp</CODE>. The module should also be added to the
+<CODE>makefile</CODE>.</P>
+
+<P>Your initialisation function should construct new
+<CODE>CMT_Desctiptor</CODE> plugin descriptor structures and pass them
+to <CODE>registerNewPluginDescriptor()</CODE>. The
+<CODE>CMT_Descriptor</CODE> is directly descended from
+<CODE>LADSPA_Descriptor</CODE> but provides constructor, destructor
+and <CODE>addPort()</CODE> methods.</P>
+
+<P>All plugins need unique IDs. During development, use values between
+1 and 1000. When the plugin is ready, please request an ID from <A
+HREF="mailto:ladspa@muse.demon.co.uk">ladspa@muse.demon.co.uk</A>. Please
+also add a brief description of your module to <A
+HREF="plugins.html"><CODE>plugins.html</CODE></A>.</P>
+
+<P>In practice, CMT plugin writing is probably best learned by
+example. For a simple case, see the <CODE>mixer.cpp</CODE>
+module. This defines a <CODE>SimpleMixer</CODE> class to handle
+instance data, a <CODE>runSimpleMixer()</CODE> function for use with
+it and a <CODE>mixer_descriptor()</CODE> function to provide a
+description of the plugin to the CMT core. The
+<CODE>mixer_descriptor()</CODE> function is declared and referenced in
+the <CODE>descriptor.cpp</CODE> module. Additional information is
+available in <CODE>cmt.h</CODE> and <CODE>ladspa.h</CODE>.</P>
+
+<P>CMT plugins are <A HREF="license.html">licenced</A> under GPL
+version 2. Please read and understand this license before submitting
+plugins to the library.</P>

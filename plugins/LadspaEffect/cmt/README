@@ -1,0 +1,7 @@
+Computer Music Toolkit (CMT)
+----------------------------
+
+This toolkit is a set of musical sound processing and synthesis tools
+presented as a LADSPA plugin library. See the doc/ directory for
+documentation and installation instructions. See http://www.ladspa.org
+for LADSPA information. See http://www.ladspa.org/cmt for CMT updates.

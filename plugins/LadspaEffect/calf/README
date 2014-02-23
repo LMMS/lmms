@@ -1,0 +1,49 @@
+Calf is a pack of audio plugins - effects and instruments, currently in
+development. The goal is to create a set of plugins using decent algorithms
+and parameter settings, available in a form which is compatible with as many
+open source applications as possible.
+
+How to use Calf plugins:
+
+* LADSPA plugins
+
+Calf is installed as calf.so library in your LADSPA directory (typically
+/usr/lib/ladspa). It means that typical LADSPA host should be able to find
+Calf's plugins.
+
+* DSSI plugins
+
+Calf .so module is also installed in your DSSI plugin directory, which means
+your DSSI host (like jack-dssi-host or rosegarden) should find it and
+include its plugins in the plugin list. 
+
+* JACK client application
+
+You can also use Calf plugins as separate applications, connecting to other
+applications using JACK Audio Connection Kit (version 0.103 or newer is
+required). To run the client, type:
+
+        calfjackhost monosynth !
+
+(! means "connect", last "!" means "connect to output")
+
+Other examples:
+
+        calfjackhost monosynth ! vintagedelay ! flanger !
+
+(runs monosynth into vintagedelay and vintagedelay into flanger, then to
+output)
+
+        calfjackhost ! reverb !
+
+(takes signal from system:capture_1 and _2, puts it through reverb, and then
+sends to system:playback_1 and _2)
+
+You can also change client name or input/output port names with command-line
+options (type calfjackhost --help). Use qjackctl, patchage or jack_connect
+to connect the Calf JACK client to your sound card or other applications, if
+"!" is inadequate for any reason (if I didn't explain it properly, or if it
+doesn't provide the connectivity options needed).
+
+Keep in mind this project is in the early development phase. It is usable
+for certain purposes, but drop me a note if you need something.

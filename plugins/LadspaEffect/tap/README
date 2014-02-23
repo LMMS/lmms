@@ -1,0 +1,44 @@
+TAP-plugins (Tom's Audio Processing plugins)
+--------------------------------------------
+
+AUTHOR: Tom Szilagyi <tszilagyi@users.sourceforge.net>
+WEBPAGE: http://tap-plugins.sf.net
+
+
+Welcome!
+
+TAP-plugins is a bunch of LADSPA plugins for audio processing. It runs
+on the GNU/Linux operating system, and possibly other UNIX-like
+operating systems.
+
+LADSPA stands for Linux Audio Developers Simple Plugin API.
+Learn more about LADSPA at http://www.ladspa.org
+
+You need a LADSPA-aware host program to use these plugins.
+I recommend using Ardour, which is a professional multichannel hard
+disc recorder and digital audio workstation for Linux.  These plugins
+were developed and tested using Ardour, but they should work with any
+LADSPA-capable host.  Learn more about Ardour at http://ardour.org
+
+
+
+Installation and usage of the plugins is very simple.  Please take a
+moment to edit the top of the Makefile if you wish to install the
+plugins in a directory other than /usr/local/lib/ladspa (the default
+place for plugins).  A destination directory for RDF metadata is also
+set there (defaults to /usr/local/share/ladspa/rdf) which you may also
+want to change. Then run "make" and (as root) "make install".  No
+special packages are needed to compile these plugins, so there is no
+./configure script.
+
+A thorough manual is provided in html format. It is identical to the
+project website. There is no need to save that manually, though: it is
+provided as a separate package called tap-plugins-doc. After
+downloading and untarring it, just open index.html with your favorite
+Any Browser to view it.
+
+Questions, comments, suggestions, bugreports and fixes are always
+welcome at: <tszilagyi@users.sourceforge.net>
+
+
+Have fun, turn up the volume and kick the shit out of your neighbours!

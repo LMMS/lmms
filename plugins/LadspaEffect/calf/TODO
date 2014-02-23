@@ -1,0 +1,40 @@
+1. More effects
+
+- auto-wah (might be integrated into filter)
+- envelope follower
+- better reverb (more features, use nested allpasses, use 1-pole 
+  1-zero allpass instead of fractional delays)
+- dynamics processing (Thor already did the compressor)
+- distortion?
+- windy rotary speakery stuff
+- filter: more types
+
+2. Some instruments
+
+- some virtual analogue thing (something larger than Monosynth)
+- FM (by reusing my MMX code, or something)
+
+3. DSP library
+
+- profiling framework
+- optimized code (the one I have now only pretends to be optimized :) )
+- underflow handling
+
+4. Wrappers
+
+- LADSPA: proper rdf (get clearance from drobilla ;) )
+- better jack host (controls etc)
+- BSE
+- buzztard
+- Linux VST
+- LV2
+  Message Context (for Organ)
+  EPP (the rest of them)
+  Mixing Controls
+
+5. Organization stuff (autotools etc)
+
+- correct compilation and installation of LADSPA plugins (current version is a hack!)
+- switch to -O3
+- get to work on 64-bit architectures
+- i18n (gettext or whatever)
