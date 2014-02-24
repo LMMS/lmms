@@ -58,7 +58,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
-	m_totalFramesPlayed( 0 ), 
+	m_totalFramesPlayed( 0 ),
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
@@ -136,8 +136,7 @@ NotePlayHandle::~NotePlayHandle()
 		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
 	{
 		delete *it;
 	}
@@ -189,8 +188,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	if( m_released == false &&
 		instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + engine::mixer()->framesPerPeriod()
-								>= m_frames )
+		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() >= m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
 	}
@@ -214,8 +212,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		// are inserted by arpAndChordsTabWidget::processNote()
 		if( isArpeggioBaseNote() )
 		{
-			m_releaseFramesToDo = m_releaseFramesDone + 2 *
-				engine::mixer()->framesPerPeriod();
+			m_releaseFramesToDo = m_releaseFramesDone + 2 * engine::mixer()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -259,8 +256,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// play sub-notes (e.g. chords)
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); )
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); )
 	{
 		( *it )->play( _working_buffer );
 		if( ( *it )->isFinished() )
@@ -303,8 +299,7 @@ f_cnt_t NotePlayHandle::framesLeft() const
 	}
 	else if( m_released && actualReleaseFramesToDo() >= m_releaseFramesDone )
 	{
-		return m_framesBeforeRelease + actualReleaseFramesToDo() -
-							m_releaseFramesDone;
+		return m_framesBeforeRelease + actualReleaseFramesToDo() - m_releaseFramesDone;
 	}
 	return m_frames+actualReleaseFramesToDo()-m_totalFramesPlayed;
 }
@@ -336,16 +331,14 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	}
 
 	// first note-off all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
 	{
 		( *it )->noteOff( _s );
 	}
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
-			m_instrumentTrack->m_soundShaping.releaseFrames() );
+	m_releaseFramesToDo = qMax<f_cnt_t>( 0, m_instrumentTrack->m_soundShaping.releaseFrames() );
 
 	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
 	{
@@ -422,14 +415,11 @@ void NotePlayHandle::mute()
 
 int NotePlayHandle::index() const
 {
-	const PlayHandleList & playHandles =
-					engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = engine::mixer()->playHandles();
 	int idx = 0;
-	for( PlayHandleList::ConstIterator it = playHandles.begin();
-						it != playHandles.end(); ++it )
+	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
-		const NotePlayHandle * nph =
-				dynamic_cast<const NotePlayHandle *>( *it );
+		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
 		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() )
 		{
 			continue;
@@ -446,17 +436,14 @@ int NotePlayHandle::index() const
 
 
 
-ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack(
-				const InstrumentTrack * _it, bool _all_ph )
+ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentTrack * _it, bool _all_ph )
 {
 	const PlayHandleList & playHandles = engine::mixer()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
-	for( PlayHandleList::ConstIterator it = playHandles.begin();
-						it != playHandles.end(); ++it )
+	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
-		const NotePlayHandle * nph =
-				dynamic_cast<const NotePlayHandle *>( *it );
+		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
 		if( nph != NULL && nph->m_instrumentTrack == _it && ( nph->isReleased() == false || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
@@ -497,12 +484,10 @@ void NotePlayHandle::updateFrequency()
 				engine::getSong()->masterPitch() +
 				m_baseDetuning->value() )
 												 / 12.0f;
-	m_frequency = BaseFreq * powf( 2.0f, pitch +
-		m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
+	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
 	{
 		( *it )->updateFrequency();
 	}
@@ -534,8 +519,7 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	m_frames = (f_cnt_t)new_frames;
 	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
 	{
 		( *it )->resize( _new_tempo );
 	}
