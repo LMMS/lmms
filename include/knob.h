@@ -36,6 +36,7 @@
 class QPixmap;
 class textFloat;
 
+#define SMOOTH_FACTOR 0.125f
 
 enum knobTypes
 {
@@ -155,7 +156,6 @@ private:
 
 	QPoint m_mouseOffset;
 	QPoint m_origMousePos;
-	float m_origValue;
 	bool m_buttonPressed;
 
 	float m_totalAngle;
