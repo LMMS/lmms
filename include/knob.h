@@ -36,8 +36,6 @@
 class QPixmap;
 class textFloat;
 
-#define KNOB_SMOOTH_FACTOR 0.125f
-
 enum knobTypes
 {
 	knobDark_28, knobBright_26, knobSmall_17, knobGreen_17, knobVintage_32, knobStyled
@@ -55,7 +53,7 @@ class EXPORT knob : public QWidget, public FloatModelView
 	Q_PROPERTY(float centerPointY READ centerPointY WRITE setCenterPointY)
 
 	Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth)
-	
+
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
@@ -90,8 +88,8 @@ public:
 
 	float lineWidth() const;
 	void setLineWidth( float _w );
-	
-	QColor outerColor() const; 
+
+	QColor outerColor() const;
 	void setOuterColor( const QColor & _c );
 
 
@@ -140,9 +138,7 @@ private:
 
 	inline float pageSize() const
 	{
-		return( qMax<float>( ( model()->maxValue() -
-					model()->minValue() ) / 100.0f,
-					modelUntyped()->step<float>() ) );
+		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
 	}
 
 
@@ -156,6 +152,7 @@ private:
 
 	QPoint m_mouseOffset;
 	QPoint m_origMousePos;
+	float m_leftOver;
 	bool m_buttonPressed;
 
 	float m_totalAngle;
