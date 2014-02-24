@@ -39,13 +39,13 @@ note::note( const MidiTime & _length, const MidiTime & _pos,
 		int _key, volume_t _volume, panning_t _panning,
 						DetuningHelper * _detuning ) :
 	m_selected( false ),
-	m_oldKey( tLimit( _key, 0, NumKeys ) ),
+	m_oldKey( qBound( 0, _key, NumKeys ) ),
 	m_oldPos( _pos ),
 	m_oldLength( _length ),
 	m_isPlaying( false ),
-	m_key( tLimit( _key, 0, NumKeys ) ),
-	m_volume( tLimit( _volume, MinVolume, MaxVolume ) ),
-	m_panning( tLimit( _panning, PanningLeft, PanningRight ) ),
+	m_key( qBound( 0, _key, NumKeys ) ),
+	m_volume( qBound( MinVolume, _volume, MaxVolume ) ),
+	m_panning( qBound( PanningLeft, _panning, PanningRight ) ),
 	m_length( _length ),
 	m_pos( _pos ),
 	m_detuning( NULL )
@@ -116,7 +116,7 @@ void note::setPos( const MidiTime & _pos )
 
 void note::setKey( const int _key )
 {
-	const int k = tLimit( _key, 0, NumKeys );
+	const int k = qBound( 0, _key, NumKeys );
 //	addJournalEntry( journalEntry( ChangeKey, m_key - k ) );
 	m_key = k;
 }
