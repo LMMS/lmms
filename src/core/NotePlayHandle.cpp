@@ -148,7 +148,7 @@ NotePlayHandle::~NotePlayHandle()
 
 
 
-void NotePlayHandle::setVolume( const volume_t _volume )
+void NotePlayHandle::setVolume( volume_t _volume )
 {
 	note::setVolume( _volume );
 
@@ -158,7 +158,7 @@ void NotePlayHandle::setVolume( const volume_t _volume )
 
 
 
-void NotePlayHandle::setPanning( const panning_t panning )
+void NotePlayHandle::setPanning( panning_t panning )
 {
 	note::setPanning( panning );
 

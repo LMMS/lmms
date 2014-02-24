@@ -107,8 +107,8 @@ public:
 	void setLength( const MidiTime & _length );
 	void setPos( const MidiTime & _pos );
 	void setKey( const int _key );
-	virtual void setVolume( const volume_t volume = DefaultVolume );
-	virtual void setPanning( const panning_t panning = DefaultPanning );
+	virtual void setVolume( volume_t volume );
+	virtual void setPanning( panning_t panning );
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
 

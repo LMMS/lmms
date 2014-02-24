@@ -65,8 +65,8 @@ public:
 					Origin origin = OriginPattern );
 	virtual ~NotePlayHandle();
 
-	virtual void setVolume( const volume_t volume = DefaultVolume );
-	virtual void setPanning( const panning_t panning = DefaultPanning );
+	virtual void setVolume( volume_t volume );
+	virtual void setPanning( panning_t panning );
 
 	int midiVelocity() const
 	{

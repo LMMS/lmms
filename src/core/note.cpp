@@ -124,9 +124,9 @@ void note::setKey( const int _key )
 
 
 
-void note::setVolume( const volume_t _volume )
+void note::setVolume( volume_t _volume )
 {
-	const volume_t v = tLimit( _volume, MinVolume, MaxVolume );
+	const volume_t v = qBound( MinVolume, _volume, MaxVolume );
 //	addJournalEntry( journalEntry( ChangeVolume, (int) m_volume - v ) );
 	m_volume = v;
 }
@@ -134,9 +134,9 @@ void note::setVolume( const volume_t _volume )
 
 
 
-void note::setPanning( const panning_t _panning )
+void note::setPanning( panning_t _panning )
 {
-	const panning_t p = tLimit( _panning, PanningLeft, PanningRight );
+	const panning_t p = qBound( PanningLeft, _panning, PanningRight );
 //	addJournalEntry( journalEntry( ChangePanning, (int) m_panning - p ) );
 	m_panning = p;
 }
