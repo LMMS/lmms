@@ -184,9 +184,9 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 	}
 	else
 	{
-		// simple algorithm for inserting the note between two 
+		// simple algorithm for inserting the note between two
 		// notes with smaller and greater position
-		// maybe it could be optimized by starting in the middle and 
+		// maybe it could be optimized by starting in the middle and
 		// going forward or backward but note-inserting isn't that
 		// time-critical since it is usually not done while playing...
 		long new_note_abs_time = new_note->pos();
@@ -245,7 +245,7 @@ void pattern::removeNote( const note * _note_to_del )
 note * pattern::rearrangeNote( const note * _note_to_proc,
 							const bool _quant_pos )
 {
-	// just rearrange the position of the note by removing it and adding 
+	// just rearrange the position of the note by removing it and adding
 	// a copy of it -> addNote inserts it at the correct position
 	note copy_of_note( *_note_to_proc );
 	removeNote( _note_to_proc );
@@ -257,7 +257,7 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 
 void pattern::rearrangeAllNotes()
 {
-	// sort notes by start time	
+	// sort notes by start time
 	qSort(m_notes.begin(), m_notes.end(), note::lessThan );
 }
 
@@ -765,7 +765,7 @@ void patternView::wheelEvent( QWheelEvent * _we )
 		}
 		note * n = m_pat->m_notes[step];
 		int vol = n->getVolume();
-		
+
 		if( n->length() == 0 && _we->delta() > 0 )
 		{
 			n->setLength( -DefaultTicksPerTact );
@@ -831,25 +831,37 @@ void patternView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 119, 199, 216 );
 
-	if( m_pat->m_patternType == pattern::BeatPattern )
-	{
-		lingrad.setColorAt( 0, QColor( 16, 16, 16 ) );
-		lingrad.setColorAt( 1, QColor( 80, 80, 80 ) );
-	}
+	QColor c;
+
+	if(( m_pat->m_patternType != pattern::BeatPattern ) &&
+				!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
+		c = isSelected() ? QColor( 0, 0, 224 )
+	  				   : QColor( 119, 199, 216 );
 	else
+		c = QColor( 80, 80, 80 );
+
+	if( m_pat->m_patternType != pattern::BeatPattern )
 	{
 		lingrad.setColorAt( 1, c.darker( 300 ) );
 		lingrad.setColorAt( 0, c );
 	}
+	else
+	{
+		lingrad.setColorAt( 0, c.darker( 300 ) );
+		lingrad.setColorAt( 1, c );
+	}
 	
 	p.setBrush( lingrad );
-	p.setPen( QColor( 0, 0, 0 ) );
-	//p.drawRect( 0, 0, width() - 1, height() - 1 );
+	p.setPen( c.darker( 300 ) );
 	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
 
+	p.setBrush( QBrush() );
+	if( m_pat->m_patternType != pattern::BeatPattern )
+	{
+		p.setPen( c.lighter( 130 ) );
+		p.drawRect( QRect( 1, 1, width() - 3, height() - 3 ) );
+	}
 
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
@@ -875,7 +887,7 @@ void patternView::paintEvent( QPaintEvent * )
 		int central_key = 0;
 		if( m_pat->m_notes.size() > 0 )
 		{
-			// first determine the central tone so that we can 
+			// first determine the central tone so that we can
 			// display the area where most of the m_notes are
 			int total_notes = 0;
 			for( NoteVector::Iterator it = m_pat->m_notes.begin();
@@ -981,11 +993,11 @@ void patternView::paintEvent( QPaintEvent * )
 			}
 			else if( ( no / 4 ) % 2 )
 			{
-				p.drawPixmap( x, y, stepoff );
+				p.drawPixmap( x, y, stepoffl );
 			}
 			else
 			{
-				p.drawPixmap( x, y, stepoffl );
+				p.drawPixmap( x, y, stepoff );
 			}
 		}
 	}
@@ -993,7 +1005,7 @@ void patternView::paintEvent( QPaintEvent * )
 	p.setFont( pointSize<8>( p.font() ) );
 	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
-		p.setPen( QColor( 50, 50, 502 ) );
+		p.setPen( QColor( 30, 30, 30 ) );
 	}
 	else
 	{
@@ -1002,7 +1014,7 @@ void patternView::paintEvent( QPaintEvent * )
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )
 	{
-		p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
+		p.drawText( 3, p.fontMetrics().height(), m_pat->name() );
 	}
 
 	if( m_pat->isMuted() )

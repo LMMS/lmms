@@ -174,7 +174,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 				this, SLOT( disconnectObject( QAction * ) ) );
 		_cm->addMenu( m );
 	}
-	
+
 	_cm->addSeparator();
 }
 
@@ -213,14 +213,23 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 0x99, 0xAF, 0xFF );
+	QColor c;
+	if( !( m_pat->getTrack()->isMuted() || m_pat->isMuted() ) )
+		c = isSelected() ? QColor( 0, 0, 224 )
+						 : QColor( 0x99, 0xAF, 0xFF );
+	else
+		c = QColor( 80,80,80 );
+
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
 	p.setBrush( lingrad );
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
+	p.setPen( c.lighter( 160 ) );
+	p.drawRect( 1, 1, width()-3, height()-3 );
+
+	p.setBrush( QBrush() );
+	p.setPen( c.darker( 300 ) );
+	p.drawRect( 0, 0, width()-1, height()-1 );
 
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
@@ -232,40 +241,29 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
-		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
-				TCO_BORDER_WIDTH, x_base + static_cast<int>(
-						ppt * t ) - 1, 5 );
-		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
-				height() - ( 4 + 2 * TCO_BORDER_WIDTH ),
-				x_base + static_cast<int>( ppt * t ) - 1,
-				height() - 2 * TCO_BORDER_WIDTH );
+		const int tx = x_base + static_cast<int>( ppt * t ) - 1;
+		if( tx < ( width() - TCO_BORDER_WIDTH*2 ) )
+		{
+			p.drawLine( tx, TCO_BORDER_WIDTH, tx, 5 );
+			p.drawLine( tx,	height() - ( 4 + 2 * TCO_BORDER_WIDTH ),
+						tx,	height() - 2 * TCO_BORDER_WIDTH );
+		}
 	}
 
 	const float min = m_pat->firstObject()->minValue<float>();
 	const float max = m_pat->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
-	const float h = ( height()-2*TCO_BORDER_WIDTH ) / y_scale;
+	const float h = ( height() - 2*TCO_BORDER_WIDTH ) / y_scale;
 
-	p.translate( 0.0f, max * height() / y_scale-1 );
+	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
-	const QColor cl = QColor( 0x99, 0xAF, 0xFF );
 
-	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
-	{
-		lin2grad.setColorAt( 1, QColor( 200,200,200 ) );
-		lin2grad.setColorAt( 0, QColor( 100,100,100 ) );		
-	}
-	else
-	{
-		lin2grad.setColorAt( 1, QColor( 255,255,255 ) );
-		lin2grad.setColorAt( 0, cl );
-	}
-	
-	// TODO: skip this part for patterns or parts of the pattern that will
-	// not be on the screen
+	lin2grad.setColorAt( 1, c.lighter( 200 ) );
+	lin2grad.setColorAt( 0, c );
+
 	for( AutomationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
@@ -275,6 +273,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			const float x1 = x_base + it.key() * ppt /
 						MidiTime::ticksPerTact();
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
+			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
+			
 			p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
 								lin2grad );
 			break;
@@ -288,6 +288,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 						MidiTime::ticksPerTact();
 			const float x2 = x_base + (i+1) * ppt /
 						MidiTime::ticksPerTact();
+			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 
 			p.fillRect( QRectF( x1, 0.0f, x2-x1, value ),
 								lin2grad );

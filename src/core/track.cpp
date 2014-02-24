@@ -422,8 +422,8 @@ void trackContentObjectView::updateLength()
 	{
 		setFixedWidth(
 		static_cast<int>( m_tco->length() * pixelsPerTact() /
-					MidiTime::ticksPerTact() ) +
-						TCO_BORDER_WIDTH * 2-1 );
+					MidiTime::ticksPerTact() ) + 1 /*+
+						TCO_BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
 }

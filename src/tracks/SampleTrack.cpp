@@ -329,24 +329,33 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 74, 253, 133 );
+	QColor c;
+	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
+		c = isSelected() ? QColor( 0, 0, 224 )
+						 : QColor( 74, 253, 133 );
+	else c = QColor( 80, 80, 80 );
+
 	QLinearGradient grad( 0, 0, 0, height() );
 
 	grad.setColorAt( 1, c.darker( 300 ) );
 	grad.setColorAt( 0, c );
 
-	p.fillRect( _pe->rect(), grad );
+	p.setBrush( grad );
+	p.setPen( c.lighter( 160 ) );
+	p.drawRect( 1, 1, width()-3, height()-3 );
 
-	p.setPen( QColor( 0, 0, 0 ) );
+	p.setBrush( QBrush() );
+	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, width()-1, height()-1 );
+
+
 	if( m_tco->getTrack()->isMuted() || m_tco->isMuted() )
 	{
 		p.setPen( QColor( 128, 128, 128 ) );
 	}
 	else
 	{
-		p.setPen( c.lighter( 300 ) );
+		p.setPen( c.lighter( 200 ) );
 	}
 	QRect r = QRect( 1, 1,
 			qMax( static_cast<int>( m_tco->sampleLength() *

@@ -48,7 +48,7 @@ bbTrack::infoMap bbTrack::s_infoMap;
 
 bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	trackContentObject( _track ),
-	m_color( _color > 0 ? _color : qRgb( 105, 150, 145 ) )
+	m_color( _color > 0 ? _color : qRgb( 128, 182, 175 ) )
 {
 	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
 					bbTrack::numOfBBTrack( getTrack() ) );
@@ -205,12 +205,15 @@ void bbTCOView::paintEvent( QPaintEvent * )
 		}
 	}
 
-	p.setPen( col.dark() );
+	p.setPen( col.lighter( 130 ) );
+	p.drawRect( 1, 1, rect().right()-2, rect().bottom()-2 );
+
+	p.setPen( col.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	p.setFont( pointSize<8>( p.font() ) );
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawText( 2, p.fontMetrics().height() - 1, m_bbTCO->name() );
+	p.drawText( 3, p.fontMetrics().height(), m_bbTCO->name() );
 
 	if( m_bbTCO->isMuted() )
 	{
@@ -402,7 +405,7 @@ trackContentObject * bbTrack::createTCO( const MidiTime & _pos )
 	if( tcos.size() > 0 && dynamic_cast<bbTCO *>( tcos.back() ) != NULL )
 	{
 		return new bbTCO( this, dynamic_cast<bbTCO *>( tcos.back() )->color() );
-		
+
 	}
 	return new bbTCO( this );
 }
@@ -579,7 +582,7 @@ void bbTrackView::clickedTrackLabel()
 	{
 		tv->m_trackLabel->update();
 	}*/
-	
+
 }
 
 
