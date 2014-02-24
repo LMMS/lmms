@@ -388,12 +388,19 @@ void knob::drawKnob( QPainter * _p )
 }
 
 float knob::getValue( const QPoint & _p )
-{	
-	if( engine::mainWindow()->isShiftPressed() )
+{
+	float value;
+
+	// arcane mathemagicks for calculating knob movement 
+	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2 ), 6 ) ) ) / 10.0f;
+	
+	// if shift pressed we want slower movement
+	if( engine::mainWindow()->isShiftPressed() )	
 	{
-		return ( _p.y() * model()->step<float>());
-	}
-	return ( _p.y() * KNOB_SMOOTH_FACTOR * pageSize() );
+		value /= 4.0f;
+		value = qBound( -4.0f, value, 4.0f );
+	}		
+	return value * pageSize();
 }
 
 
@@ -463,6 +470,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
 		m_mouseOffset = QPoint(0, 0);
+		m_leftOver = 0.0f;
 
 		emit sliderPressed();
 
@@ -580,7 +588,18 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::setPosition( const QPoint & _p )
 {
-	model()->setValue( model()->value() - getValue(_p) );
+	const float value = getValue( _p ) + m_leftOver;
+	const float step = model()->step<float>();
+	
+	if( qAbs( value ) >= step )
+	{
+		model()->setValue( model()->value() - value );
+		m_leftOver = 0.0f;
+	}
+	else
+	{
+		m_leftOver = value;
+	}
 }
 
 
