@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _KNOB_H
-#define _KNOB_H
+#ifndef KNOB_H
+#define KNOB_H
 
 #include <QtGui/QWidget>
 #include <QtCore/QPoint>
@@ -36,6 +36,7 @@
 class QPixmap;
 class textFloat;
 
+#define KNOB_SMOOTH_FACTOR 0.125f
 
 enum knobTypes
 {
@@ -155,7 +156,6 @@ private:
 
 	QPoint m_mouseOffset;
 	QPoint m_origMousePos;
-	float m_origValue;
 	bool m_buttonPressed;
 
 	float m_totalAngle;

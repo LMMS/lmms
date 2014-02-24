@@ -71,7 +71,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	}
 
 	setWindowTitle( _name );
-	
+
 	if( m_knobNum != knobStyled )
 	{
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
@@ -301,7 +301,7 @@ void knob::drawKnob( QPainter * _p )
 			QPen pen = p.pen();
 			pen.setWidth( (int) lineWidth() );
 			pen.setCapStyle( Qt::RoundCap );
-			
+
 			p.setPen( pen );
 		}
 
@@ -317,7 +317,7 @@ void knob::drawKnob( QPainter * _p )
 	const float radius = m_knobPixmap->width() / 2.0f - 1;
 	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
 
-	p.drawPixmap( static_cast<int>( 
+	p.drawPixmap( static_cast<int>(
 				width() / 2 - m_knobPixmap->width() / 2 ), 0,
 				*m_knobPixmap );
 
@@ -327,14 +327,14 @@ void knob::drawKnob( QPainter * _p )
 
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
-	
+
 	QColor col;
-	if( m_knobNum == knobVintage_32 ) 
+	if( m_knobNum == knobVintage_32 )
 	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
 	else
 	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
 	col.setAlpha( 70 );
-	
+
 	p.setPen( QPen( col, 2 ) );
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
@@ -388,14 +388,12 @@ void knob::drawKnob( QPainter * _p )
 }
 
 float knob::getValue( const QPoint & _p )
-{
-	const float SMOOTH_FACTOR = 0.125f;
-	float yDist = (_p.y() - m_origMousePos.y()) * SMOOTH_FACTOR;
+{	
 	if( engine::mainWindow()->isShiftPressed() )
 	{
-		return m_origValue - (yDist * model()->step<float>());
+		return ( _p.y() * model()->step<float>());
 	}
-	return m_origValue - (yDist * pageSize());
+	return ( _p.y() * KNOB_SMOOTH_FACTOR * pageSize() );
 }
 
 
@@ -465,7 +463,6 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
 		m_mouseOffset = QPoint(0, 0);
-		m_origValue = model()->value();
 
 		emit sliderPressed();
 
@@ -496,7 +493,7 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( m_buttonPressed && _me->pos() != m_origMousePos )
 	{
-		m_mouseOffset += _me->pos() - m_origMousePos;
+		m_mouseOffset = _me->pos() - m_origMousePos;
 		setPosition( m_mouseOffset );
 		emit sliderMoved( model()->value() );
 		QCursor::setPos( mapToGlobal( m_origMousePos ) );
@@ -583,7 +580,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::setPosition( const QPoint & _p )
 {
-	model()->setValue( getValue(_p) );
+	model()->setValue( model()->value() - getValue(_p) );
 }
 
 
