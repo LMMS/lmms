@@ -393,7 +393,7 @@ float knob::getValue( const QPoint & _p )
 	{
 		return ( _p.y() * model()->step<float>());
 	}
-	return ( _p.y() * SMOOTH_FACTOR * pageSize() );
+	return ( _p.y() * KNOB_SMOOTH_FACTOR * pageSize() );
 }
 
 
