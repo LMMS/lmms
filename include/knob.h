@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _KNOB_H
-#define _KNOB_H
+#ifndef KNOB_H
+#define KNOB_H
 
 #include <QtGui/QWidget>
 #include <QtCore/QPoint>
@@ -36,7 +36,7 @@
 class QPixmap;
 class textFloat;
 
-#define SMOOTH_FACTOR 0.125f
+#define KNOB_SMOOTH_FACTOR 0.125f
 
 enum knobTypes
 {
