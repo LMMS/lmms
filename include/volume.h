@@ -41,16 +41,6 @@ typedef struct
 } stereoVolumeVector;
 
 
-typedef struct
-{
-#ifndef LMMS_DISABLE_SURROUND
-	float vol[4];
-#else
-	float vol[2];
-#endif
-} surroundVolumeVector;
-
-
 inline int volumeToMidi( volume_t vol )
 {
 	return qMin( MidiMaxVelocity, vol * MidiMaxVelocity / DefaultVolume );

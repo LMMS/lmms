@@ -73,7 +73,6 @@
 #include "SamplePlayHandle.h"
 #include "song.h"
 #include "string_pair_drag.h"
-#include "surround_area.h"
 #include "tab_widget.h"
 #include "tooltip.h"
 #include "track_label_button.h"
