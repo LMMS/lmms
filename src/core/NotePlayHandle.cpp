@@ -120,13 +120,6 @@ NotePlayHandle::~NotePlayHandle()
 {
 	noteOff( 0 );
 
-	// inform attached components about MIDI finished (used for recording in Piano Roll)
-	if( m_origin == OriginMidiInput )
-	{
-		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
-		m_instrumentTrack->midiNoteOff( *this );
-	}
-
 	if( isTopNote() )
 	{
 		delete m_baseDetuning;
@@ -360,6 +353,13 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 		m_instrumentTrack->processOutEvent(
 			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
 			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ) );
+	}
+
+	// inform attached components about MIDI finished (used for recording in Piano Roll)
+	if( m_origin == OriginMidiInput )
+	{
+		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
+		m_instrumentTrack->midiNoteOff( *this );
 	}
 
 	m_released = true;
