@@ -220,7 +220,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QColor c;
 	if( !( m_pat->getTrack()->isMuted() || m_pat->isMuted() ) )
 		c = isSelected() ? QColor( 0, 0, 224 )
-						 : styleColor; //QColor( 0x99, 0xAF, 0xFF );
+						 : styleColor;
 	else
 		c = QColor( 80,80,80 );
 

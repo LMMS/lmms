@@ -333,7 +333,7 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	QColor c;
 	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
 		c = isSelected() ? QColor( 0, 0, 224 )
-						 : styleColor; //QColor( 74, 253, 133 );
+						 : styleColor;
 	else c = QColor( 80, 80, 80 );
 
 	QLinearGradient grad( 0, 0, 0, height() );

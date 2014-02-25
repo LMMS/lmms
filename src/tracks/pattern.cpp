@@ -840,7 +840,7 @@ void patternView::paintEvent( QPaintEvent * )
 	if(( m_pat->m_patternType != pattern::BeatPattern ) &&
 				!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
 		c = isSelected() ? QColor( 0, 0, 224 )
-	  				   : styleColor;//QColor( 119, 199, 216 );
+	  				   : styleColor;
 	else
 		c = QColor( 80, 80, 80 );
 
@@ -1028,7 +1028,6 @@ void patternView::paintEvent( QPaintEvent * )
 
 	p.end();
 
-//	p.begin( this );
 	_p.drawPixmap( 0, 0, m_paintPixmap );
 
 }
