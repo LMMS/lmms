@@ -202,6 +202,8 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, trackView * _tv ) :
 	// track future changes of SampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
+
+	setStyle( QApplication::style() );
 }
 
 
