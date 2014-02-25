@@ -913,7 +913,7 @@ void trackContentWidget::updateBackground()
 	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
 	// horizontal line
 	pmp.drawLine( 0, 0, w*2, 0 );
-	
+
 	// vertical lines
 	for( float x = 0; x < w * 2; x += ppt )
 	{
@@ -1850,7 +1850,7 @@ trackContentObject * track::getTCO( int _tco_num )
 	printf( "called track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
 	return createTCO( _tco_num * MidiTime::ticksPerTact() );
-	
+
 }
 
 
@@ -2220,7 +2220,7 @@ void trackView::modelChanged()
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
-	ModelView::modelChanged();	
+	ModelView::modelChanged();
 	setFixedHeight( m_track->getHeight() );
 }
 

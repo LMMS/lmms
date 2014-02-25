@@ -55,6 +55,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	toolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
+	setStyle( QApplication::style() );
 }
 
 
@@ -203,6 +204,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		return;
 	}
 
+	QPainter _p( this );
+	const QColor styleColor = _p.pen().brush().color();
+
 	m_needsUpdate = false;
 
 	if( m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() )
@@ -216,7 +220,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QColor c;
 	if( !( m_pat->getTrack()->isMuted() || m_pat->isMuted() ) )
 		c = isSelected() ? QColor( 0, 0, 224 )
-						 : QColor( 0x99, 0xAF, 0xFF );
+						 : styleColor;
 	else
 		c = QColor( 80,80,80 );
 
@@ -274,7 +278,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 						MidiTime::ticksPerTact();
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
-			
+
 			p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
 								lin2grad );
 			break;
@@ -317,8 +321,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	p.end();
 
-	p.begin( this );
-	p.drawPixmap( 0, 0, m_paintPixmap );
+	_p.drawPixmap( 0, 0, m_paintPixmap );
 
 }
 

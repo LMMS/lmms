@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _AUTOMATION_TRACK_H
-#define _AUTOMATION_TRACK_H
+#ifndef AUTOMATION_TRACK_H
+#define AUTOMATION_TRACK_H
 
 #include "track.h"
 

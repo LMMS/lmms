@@ -594,6 +594,7 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 	toolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
 			"use mouse wheel to set volume of a step" ) );
+	setStyle( QApplication::style() );
 }
 
 
@@ -819,6 +820,9 @@ void patternView::paintEvent( QPaintEvent * )
 		return;
 	}
 
+	QPainter _p( this );
+	const QColor styleColor = _p.pen().brush().color();
+
 	m_pat->changeLength( m_pat->length() );
 
 	m_needsUpdate = false;
@@ -837,7 +841,7 @@ void patternView::paintEvent( QPaintEvent * )
 	if(( m_pat->m_patternType != pattern::BeatPattern ) &&
 				!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
 		c = isSelected() ? QColor( 0, 0, 224 )
-	  				   : QColor( 119, 199, 216 );
+	  				   : styleColor;
 	else
 		c = QColor( 80, 80, 80 );
 
@@ -851,7 +855,7 @@ void patternView::paintEvent( QPaintEvent * )
 		lingrad.setColorAt( 0, c.darker( 300 ) );
 		lingrad.setColorAt( 1, c );
 	}
-	
+
 	p.setBrush( lingrad );
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
@@ -1025,8 +1029,7 @@ void patternView::paintEvent( QPaintEvent * )
 
 	p.end();
 
-	p.begin( this );
-	p.drawPixmap( 0, 0, m_paintPixmap );
+	_p.drawPixmap( 0, 0, m_paintPixmap );
 
 }
 

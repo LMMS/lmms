@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PATTERN_H
-#define _PATTERN_H
+#ifndef PATTERN_H
+#define PATTERN_H
 
 #include <QtCore/QVector>
 #include <QtGui/QWidget>

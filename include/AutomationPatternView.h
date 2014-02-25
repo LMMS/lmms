@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUTOMATION_PATTERN_VIEW_H
-#define _AUTOMATION_PATTERN_VIEW_H
+#ifndef AUTOMATION_PATTERN_VIEW_H
+#define AUTOMATION_PATTERN_VIEW_H
 
 #include "track.h"
 

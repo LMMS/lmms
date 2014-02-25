@@ -3,7 +3,7 @@
  *              (which is a singleton-class) as track
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _BB_TRACK_H
-#define _BB_TRACK_H
+#ifndef BB_TRACK_H
+#define BB_TRACK_H
 
 #include <QtCore/QObject>
 #include <QtCore/QMap>
