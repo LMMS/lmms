@@ -53,9 +53,12 @@ public:
 	{
 		return( m_color );
 	}
+	inline static unsigned int defaultColor()
+	{
+		return qRgb( 128, 182, 175 );
+	}
 
 	virtual trackContentObjectView * createView( trackView * _tv );
-
 
 private:
 	unsigned int m_color;
