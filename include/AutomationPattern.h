@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _AUTOMATION_PATTERN_H
-#define _AUTOMATION_PATTERN_H
+#ifndef AUTOMATION_PATTERN_H
+#define AUTOMATION_PATTERN_H
 
 #include <QtCore/QPointer>
 

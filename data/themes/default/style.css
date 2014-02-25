@@ -467,6 +467,23 @@ TrackContainerView QLabel
 	background: none;
 }
 
+/* Patterns */
+
+/* instrument pattern */
+patternView {
+	color: rgb( 119, 199, 216 );
+}
+
+/* sample track pattern */
+SampleTCOView {
+	color: rgb( 74, 253, 133 );
+}
+
+/* automation pattern */
+AutomationPatternView {
+	color: #99afff;
+}
+
 /* Plugins */
 
 TripleOscillatorView knob {

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TRACK_H
-#define _TRACK_H
+#ifndef TRACK_H
+#define TRACK_H
 
 #include <QtCore/QVector>
 #include <QtCore/QList>

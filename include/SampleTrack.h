@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SAMPLE_TRACK_H
-#define _SAMPLE_TRACK_H
+#ifndef SAMPLE_TRACK_H
+#define SAMPLE_TRACK_H
 
 #include <QtGui/QDialog>
 

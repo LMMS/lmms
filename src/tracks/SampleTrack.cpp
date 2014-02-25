@@ -328,11 +328,12 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 void SampleTCOView::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
+	const QColor styleColor = p.pen().brush().color();
 
 	QColor c;
 	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
 		c = isSelected() ? QColor( 0, 0, 224 )
-						 : QColor( 74, 253, 133 );
+						 : styleColor; //QColor( 74, 253, 133 );
 	else c = QColor( 80, 80, 80 );
 
 	QLinearGradient grad( 0, 0, 0, height() );
