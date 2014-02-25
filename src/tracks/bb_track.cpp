@@ -48,7 +48,7 @@ bbTrack::infoMap bbTrack::s_infoMap;
 
 bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	trackContentObject( _track ),
-	m_color( _color > 0 ? _color : qRgb( 128, 182, 175 ) )
+	m_color( _color > 0 ? _color : defaultColor() )
 {
 	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
 					bbTrack::numOfBBTrack( getTrack() ) );

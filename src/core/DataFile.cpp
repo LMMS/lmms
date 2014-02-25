@@ -41,6 +41,9 @@
 #include "Effect.h"
 #include "lmmsversion.h"
 
+// bbTCO::defaultColor()
+#include "bb_track.h"
+
 
 
 DataFile::typeDescStruct
@@ -678,6 +681,18 @@ void DataFile::upgrade()
 			el.setAttribute( "shape", QString("%1").arg(s) );
 		}
 
+	}
+
+	// new default colour for B&B tracks
+	QDomNodeList list = elementsByTagName( "bbtco" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		unsigned int rgb = el.attribute( "color" ).toUInt();
+		if( rgb == qRgb( 64, 128, 255 ) )
+		{
+			el.setAttribute( "color", bbTCO::defaultColor() );
+		}
 	}
 
 	// Time-signature
