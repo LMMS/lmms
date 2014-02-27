@@ -223,7 +223,7 @@ void sf2Instrument::loadFile( const QString & _file )
 {
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
-		openFile( _file );
+		openFile( _file, false );
 		updatePatch();
 
 		// for some reason we've to call that, otherwise preview of a
