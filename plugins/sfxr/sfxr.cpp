@@ -452,6 +452,8 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
+	float currentSampleRate = engine::mixer()->processingSampleRate();
+	
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -464,6 +466,9 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	}
 
 	fpp_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
+	
+	pitchedFrameNum /= ( currentSampleRate / 44100 );
+	
 	sampleFrame * pitchedBuffer = new sampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
 	for( fpp_t i=0; i<frameNum; i++ )
