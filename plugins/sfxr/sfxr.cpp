@@ -481,7 +481,10 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 
 	delete[] pitchedBuffer;
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, NULL );
+	applyRelease( _working_buffer, _n );
+
+	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, _n );
+	
 }
 
 
