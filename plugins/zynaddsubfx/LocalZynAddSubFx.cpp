@@ -241,7 +241,7 @@ void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 	REALTYPE outputl[SOUND_BUFFER_SIZE];
 	REALTYPE outputr[SOUND_BUFFER_SIZE];
 
-	m_master->AudioOut( outputl, outputr );
+	m_master->GetAudioOutSamples( SOUND_BUFFER_SIZE, SAMPLE_RATE, outputl, outputr );
 
 	for( int f = 0; f < SOUND_BUFFER_SIZE; ++f )
 	{

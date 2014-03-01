@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _LOCAL_ZYNADDSUBFX_H
-#define _LOCAL_ZYNADDSUBFX_H
+#ifndef LOCAL_ZYNADDSUBFX_H
+#define LOCAL_ZYNADDSUBFX_H
 
 #include "MidiEvent.h"
 #include "note.h"
