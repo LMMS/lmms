@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _LCD_SPINBOX_H
-#define _LCD_SPINBOX_H
+#ifndef LCD_SPINBOX_H
+#define LCD_SPINBOX_H
 
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
@@ -70,12 +70,13 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 
 private:
 	bool m_mouseMoving;
 	QPoint m_origMousePos;
 	int m_displayOffset;
-
+	void enterValue();
 
 signals:
 	void manualChange();
