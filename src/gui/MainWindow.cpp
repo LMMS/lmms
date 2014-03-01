@@ -753,7 +753,7 @@ bool MainWindow::saveProject( void )
 bool MainWindow::saveProjectAs( void )
 {
 	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
-			tr( "LMMS Project (*.mmp *.mmpz);;"
+			tr( "LMMS Project (*.mmpz *.mmp);;"
 				"LMMS Project Template (*.mpt)" ) );
 	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
