@@ -392,7 +392,7 @@ float knob::getValue( const QPoint & _p )
 	float value;
 
 	// arcane mathemagicks for calculating knob movement 
-	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2 ), 6 ) ) ) / 10.0f;
+	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2.5f ), 6.0f ) ) ) / 12.0f;
 	
 	// if shift pressed we want slower movement
 	if( engine::mainWindow()->isShiftPressed() )	
