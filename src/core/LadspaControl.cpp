@@ -27,7 +27,6 @@
 
 #include "LadspaControl.h"
 #include "LadspaBase.h"
-#include <QDebug>
 
 LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 								bool _link ) :
@@ -169,7 +168,6 @@ void LadspaControl::saveSettings( QDomDocument & _doc,
 			break;
 		case TIME:
 			m_tempoSyncKnobModel.saveSettingsExtended( _doc, _this, _name );
-			// qDebug() << "TSK saved:" <<_name;
 			break;
 		default:
 			printf("LadspaControl::saveSettings BAD BAD BAD\n");
