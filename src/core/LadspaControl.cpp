@@ -1,7 +1,7 @@
 /*
  * LadspaControl.cpp - model for controlling a LADSPA port
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -34,9 +34,9 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 	Model( _parent ),
 	m_link( _link ),
 	m_port( _port ),
-        m_linkEnabledModel( _link, this, tr( "Link channels" ) ),
-        m_toggledModel( false, this, m_port->name ),
-        m_knobModel( 0, 0, 0, 1, this, m_port->name ),
+	m_linkEnabledModel( _link, this, tr( "Link channels" ) ),
+	m_toggledModel( false, this, m_port->name ),
+	m_knobModel( 0, 0, 0, 1, this, m_port->name ),
 	m_tempoSyncKnobModel( 0, 0, 0, 1, m_port->max, this, m_port->name )
 {
 	if( m_link )
@@ -150,53 +150,70 @@ void LadspaControl::setValue( LADSPA_Data _value )
 
 
 
-void LadspaControl::saveSettings( QDomDocument & _doc,
-					   QDomElement & _this,
-					   const QString & _name )
+void LadspaControl::saveSettings( QDomDocument& doc,
+					   QDomElement& parent,
+					   const QString& name )
 {
+	QDomElement e = doc.createElement( name );
+
 	if( m_link )
 	{
-		m_linkEnabledModel.saveSettings( _doc, _this, _name + "link" );
+		m_linkEnabledModel.saveSettings( doc, e, "link" );
 	}
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggledModel.saveSettings( _doc, _this, _name );
+			m_toggledModel.saveSettings( doc, e, "data" );
 			break;
 		case INTEGER:
 		case FLOATING:
-			m_knobModel.saveSettings( _doc, _this, _name );
+			m_knobModel.saveSettings( doc, e, "data" );
 			break;
 		case TIME:
-			m_tempoSyncKnobModel.saveSettings( _doc, _this, _name );
+			m_tempoSyncKnobModel.saveSettings( doc, e, "data" );
 			break;
 		default:
 			printf("LadspaControl::saveSettings BAD BAD BAD\n");
 			break;
 	}
+
+	parent.appendChild( e );
 }
 
 
 
 
-void LadspaControl::loadSettings( const QDomElement & _this,
-					   const QString & _name )
+void LadspaControl::loadSettings( const QDomElement& parent, const QString& name )
 {
+	QString dataModelName = "data";
+	QString linkModelName = "link";
+	QDomElement e = parent.namedItem( name ).toElement();
+
+	// COMPAT < 1.0.0: detect old data format where there's either no dedicated sub
+	// element or there's a direct sub element with automation link information
+	if( e.isNull() || e.hasAttribute( "id" ) )
+	{
+		dataModelName = name;
+		linkModelName = name + "link";
+		e = parent;
+	}
+
 	if( m_link )
 	{
-		m_linkEnabledModel.loadSettings( _this, _name + "link" );
+		m_linkEnabledModel.loadSettings( e, linkModelName );
 	}
+
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggledModel.loadSettings( _this, _name );
+			m_toggledModel.loadSettings( e, dataModelName );
 			break;
 		case INTEGER:
 		case FLOATING:
-			m_knobModel.loadSettings( _this, _name );
+			m_knobModel.loadSettings( e, dataModelName );
 			break;
 		case TIME:
-			m_tempoSyncKnobModel.loadSettings( _this, _name );
+			m_tempoSyncKnobModel.loadSettings( e, dataModelName );
 			break;
 		default:
 			printf("LadspaControl::loadSettings BAD BAD BAD\n");
