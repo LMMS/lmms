@@ -161,10 +161,8 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	{
 		changeID( node.toElement().attribute( "id" ).toInt() );
 		setValue( node.toElement().attribute( "value" ).toFloat() );
-		return;
 	}
-
-	if( element.hasAttribute( name ) )
+	else if( element.hasAttribute( name ) )
 	{
 		setInitValue( element.attribute( name ).toFloat() );
 	}
