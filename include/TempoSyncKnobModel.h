@@ -56,7 +56,12 @@ public:
 	virtual void saveSettings( QDomDocument & _doc,
 						QDomElement & _this,
 						const QString & _name );
+	virtual void saveSettingsExtended( QDomDocument & _doc, QDomElement & _this,
+				   const QString & _name );
+
 	virtual void loadSettings( const QDomElement & _this,
+						const QString & _name );
+	virtual void loadSettingsExtended( const QDomElement & _this,
 						const QString & _name );
 
 	TempoSyncMode syncMode() const

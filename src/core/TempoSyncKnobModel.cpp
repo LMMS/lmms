@@ -132,6 +132,15 @@ void TempoSyncKnobModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 	FloatModel::saveSettings( _doc, _this, _name );
 }
 
+void TempoSyncKnobModel::saveSettingsExtended( QDomDocument & _doc, QDomElement & _this,
+							const QString & _name )
+{
+ 	_this.setAttribute( _name + "_syncmode", (int) syncMode() );
+	m_custom.saveSettings( _doc, _this, _name );
+	FloatModel::saveSettings( _doc, _this, _name );
+}
+
+
 
 
 
@@ -142,6 +151,16 @@ void TempoSyncKnobModel::loadSettings( const QDomElement & _this,
 	m_custom.loadSettings( _this, _name );
 	FloatModel::loadSettings( _this, _name );
 }
+
+void TempoSyncKnobModel::loadSettingsExtended( const QDomElement & _this,
+							const QString & _name )
+{
+ 	setSyncMode( ( TempoSyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
+	m_custom.loadSettings( _this, _name );
+	FloatModel::loadSettings( _this, _name );
+}
+
+
 
 
 
