@@ -423,6 +423,9 @@ void ZynAddSubFxInstrument::initPlugin()
 					QSTR_TO_STDSTR(
 						QString( configManager::inst()->factoryPresetsDir() +
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
+
+		m_remotePlugin->updateSampleRate( engine::mixer()->processingSampleRate() );
+
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
 	}
@@ -432,6 +435,7 @@ void ZynAddSubFxInstrument::initPlugin()
 		m_plugin->setSampleRate( engine::mixer()->processingSampleRate() );
 		m_plugin->setBufferSize( engine::mixer()->framesPerPeriod() );
 	}
+
 	m_pluginMutex.unlock();
 }
 

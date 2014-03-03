@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _REMOTE_ZYNADDSUBFX_H
-#define _REMOTE_ZYNADDSUBFX_H
+#ifndef REMOTE_ZYNADDSUBFX_H
+#define REMOTE_ZYNADDSUBFX_H
 
 #include "RemotePlugin.h"
 

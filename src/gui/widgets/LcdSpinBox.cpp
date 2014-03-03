@@ -29,6 +29,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QStyleOptionFrameV2>
+#include <QtGui/QInputDialog>
 
 #include "LcdSpinBox.h"
 #include "caption_menu.h"
@@ -119,6 +120,8 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 	if( m_mouseMoving )
 	{
 		int dy = event->globalY() - m_origMousePos.y();
+		if( engine::mainWindow()->isShiftPressed() )
+			dy = qBound( -4, dy/4, 4 );
 		if( dy > 1 || dy < -1 )
 		{
 			model()->setInitValue( model()->value() -
@@ -156,7 +159,30 @@ void LcdSpinBox::wheelEvent( QWheelEvent * _we )
 	emit manualChange();
 }
 
+void LcdSpinBox::mouseDoubleClickEvent( QMouseEvent * )
+{
+	enterValue();
+}
 
+void LcdSpinBox::enterValue()
+{
+	bool ok;
+	int new_val;
+
+	new_val = QInputDialog::getInt(
+			this, windowTitle(),
+			tr( "Please enter a new value between %1 and %2:" ).
+			arg( model()->minValue() ).
+			arg( model()->maxValue() ),
+			model()->value(),
+			model()->minValue(),
+			model()->maxValue(), 4, &ok );
+
+	if( ok )
+	{
+		model()->setValue( new_val );
+	}
+}
 
 #include "moc_LcdSpinBox.cxx"
 

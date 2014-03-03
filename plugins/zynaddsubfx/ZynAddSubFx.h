@@ -2,7 +2,7 @@
  * ZynAddSubFx.h - ZynAddSubFX-embedding plugin
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _ZYNADDSUBFX_H
-#define _ZYNADDSUBFX_H
+#ifndef ZYNADDSUBFX_H
+#define ZYNADDSUBFX_H
 
 #include <QtCore/QMap>
 #include <QtCore/QMutex>

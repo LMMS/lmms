@@ -42,7 +42,7 @@
 #include "piano_roll.h"
 #include "embed.h"
 #include "engine.h"
-#include "FxMixerView.h" 
+#include "FxMixerView.h"
 #include "InstrumentTrack.h"
 #include "PianoView.h"
 #include "about_dialog.h"
@@ -143,7 +143,7 @@ MainWindow::MainWindow( void ) :
 
 	// Load background
 	QString bgArtwork = configManager::inst()->backgroundArtwork();
-	QImage bgImage; 
+	QImage bgImage;
 	if( !bgArtwork.isEmpty() )
 	{
 		bgImage = QImage( bgArtwork );
@@ -228,7 +228,7 @@ void MainWindow::finalize( void )
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
-					Qt::CTRL + Qt::Key_O );	
+					Qt::CTRL + Qt::Key_O );
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
 				embed::getIconPixmap( "project_open_recent" ),
@@ -356,28 +356,28 @@ void MainWindow::finalize( void )
 	project_new_from_template->setMenu( m_templatesMenu );
 	project_new_from_template->setPopupMode( toolButton::InstantPopup );
 
-	toolButton * project_open = new toolButton( 
+	toolButton * project_open = new toolButton(
 					embed::getIconPixmap( "project_open" ),
 					tr( "Open existing project" ),
 					this, SLOT( openProject() ),
 								m_toolBar );
 
 
-	toolButton * project_open_recent = new toolButton( 
+	toolButton * project_open_recent = new toolButton(
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened project" ),
 					this, SLOT( emptySlot() ), m_toolBar );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
 	project_open_recent->setPopupMode( toolButton::InstantPopup );
 
-	toolButton * project_save = new toolButton( 
+	toolButton * project_save = new toolButton(
 					embed::getIconPixmap( "project_save" ),
 					tr( "Save current project" ),
 					this, SLOT( saveProject() ),
 								m_toolBar );
 
 
-	toolButton * project_export = new toolButton( 
+	toolButton * project_export = new toolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
 					engine::getSong(),
@@ -461,7 +461,7 @@ void MainWindow::finalize( void )
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
-	fx_mixer_window->setWhatsThis( 
+	fx_mixer_window->setWhatsThis(
 		tr( "Click here to show or hide the "
 			"FX Mixer. The FX Mixer is a very powerful tool "
 			"for managing effects for your song. You can insert "
@@ -616,7 +616,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 	{
 		_w = _w->parentWidget();
 	}
-	
+
 	_de.setAttribute( "x", _w->x() );
 	_de.setAttribute( "y", _w->y() );
 	_de.setAttribute( "visible", _w->isVisible() );
@@ -788,7 +788,9 @@ bool MainWindow::saveProjectAsNewVersion( void )
 	}
 	else
 	{
-		VersionedSaveDialog::changeFileNameVersion( fileName, true );
+		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
+		while 	( QFile( fileName ).exists() );
+
 		engine::getSong()->guiSaveProjectAs( fileName );
 		return true;
 	}
