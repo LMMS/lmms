@@ -144,24 +144,24 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		}
 	}
 
+	QDomNode connectionNode = element.namedItem( "connection" );
+	if( connectionNode.isElement() )
+	{
+		QDomNode thisConnection = node.toElement().namedItem( name );
+		if( thisConnection.isElement() )
+		{
+			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
+			m_controllerConnection->loadSettings( thisConnection.toElement() );
+			//m_controllerConnection->setTargetName( displayName() );
+		}
+	}
+
 	node = element.namedItem( name );
 	if( node.isElement() )
 	{
 		changeID( node.toElement().attribute( "id" ).toInt() );
 		setValue( node.toElement().attribute( "value" ).toFloat() );
 		return;
-	}
-
-	node = element.namedItem( "connection" );
-	if( node.isElement() )
-	{
-		node = node.namedItem( name );
-		if( node.isElement() )
-		{
-			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
-			m_controllerConnection->loadSettings( node.toElement() );
-			//m_controllerConnection->setTargetName( displayName() );
-		}
 	}
 
 	if( element.hasAttribute( name ) )
