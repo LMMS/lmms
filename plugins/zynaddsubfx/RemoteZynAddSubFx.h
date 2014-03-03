@@ -1,7 +1,7 @@
 /*
  * RemoteZynAddSubFx.h - ZynAddSubFX-embedding plugin
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,8 @@
 enum ZasfRemoteMessageIDs
 {
 	IdZasfPresetDirectory = IdUserBase,
-	IdZasfLmmsWorkingDirectory
+	IdZasfLmmsWorkingDirectory,
+	IdZasfSetPitchWheelBendRange
 } ;
 
 #endif

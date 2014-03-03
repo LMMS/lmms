@@ -49,6 +49,8 @@ public:
 	void setPresetDir( const std::string & _dir );
 	void setLmmsWorkingDir( const std::string & _dir );
 
+	void setPitchWheelBendRange( int semitones );
+
 	void processMidiEvent( const MidiEvent& event );
 
 	void processAudio( sampleFrame * _out );

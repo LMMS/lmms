@@ -119,6 +119,10 @@ public:
 				LocalZynAddSubFx::setLmmsWorkingDir( _m.getString() );
 				break;
 
+			case IdZasfSetPitchWheelBendRange:
+				LocalZynAddSubFx::setPitchWheelBendRange( _m.getInt() );
+				break;
+
 			default:
 				return RemotePluginClient::processMessage( _m );
 		}

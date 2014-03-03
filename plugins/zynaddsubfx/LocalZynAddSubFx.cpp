@@ -190,6 +190,16 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 
 
 
+void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
+{
+	for( int i = 0; i < NUM_MIDI_PARTS; ++i )
+	{
+		m_master->part[i]->ctl.setpitchwheelbendrange( semitones * 100 );
+	}
+}
+
+
+
 void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 {
 	// all functions are called while m_master->mutex is held

@@ -133,6 +133,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( reloadPlugin() ) );
+
+	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
+				this, SLOT( updatePitchRange() ) );
 }
 
 
@@ -377,6 +380,21 @@ void ZynAddSubFxInstrument::reloadPlugin()
 }
 
 
+
+void ZynAddSubFxInstrument::updatePitchRange()
+{
+	m_pluginMutex.lock();
+	if( m_remotePlugin )
+	{
+		m_remotePlugin->sendMessage( RemotePlugin::message( IdZasfSetPitchWheelBendRange ).
+											addInt( instrumentTrack()->midiPitchRange() ) );
+	}
+	else
+	{
+		m_plugin->setPitchWheelBendRange( instrumentTrack()->midiPitchRange() );
+	}
+	m_pluginMutex.unlock();
+}
 
 
 #define GEN_CC_SLOT(slotname,midictl,modelname)						\

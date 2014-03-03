@@ -91,6 +91,8 @@ public:
 private slots:
 	void reloadPlugin();
 
+	void updatePitchRange();
+
 	void updatePortamento();
 	void updateFilterFreq();
 	void updateFilterQ();
