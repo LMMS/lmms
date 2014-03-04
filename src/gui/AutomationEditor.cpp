@@ -1,4 +1,4 @@
-parent/*
+/*
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
  *                        actual setting of dynamic values
  *
