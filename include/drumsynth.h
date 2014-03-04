@@ -28,11 +28,12 @@
 #define _DRUMSYNTH_H__
 
 #include <stdint.h>
+#include "lmms_basics.h"
 
 class DrumSynth {
     public:
         DrumSynth() {};
-        int GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels);
+        int GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
 
     private:
         float LoudestEnv(void);

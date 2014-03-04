@@ -46,7 +46,7 @@ using namespace std;
 #define DWORD __u32
 #define WAVE_FORMAT_PCM			0x0001
 
-const int     Fs    =  44100;
+// const int     Fs    =  44100;
 const float   TwoPi =  6.2831853f;
 const int     MAX   =  0;
 const int     ENV   =  1;
@@ -255,7 +255,7 @@ float DrumSynth::GetPrivateProfileFloat(const char *sec, const char *key, float 
 //  an associative array or something once we have a datastructure to load in to.
 //  llama
 
-int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels)
+int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels, sample_rate_t Fs)
 {
   //input file
   char sec[32];
