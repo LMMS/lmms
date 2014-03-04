@@ -147,7 +147,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	QDomNode connectionNode = element.namedItem( "connection" );
 	if( connectionNode.isElement() )
 	{
-		QDomNode thisConnection = node.toElement().namedItem( name );
+		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
 		if( thisConnection.isElement() )
 		{
 			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
