@@ -99,24 +99,24 @@ MainWindow::MainWindow( void ) :
 				configManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
-					embed::getIconPixmap( "project_file" ),
+					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new fileBrowser(
 				configManager::inst()->userSamplesDir() + "*" +
 				configManager::inst()->factorySamplesDir(),
 					"*", tr( "My samples" ),
-					embed::getIconPixmap( "sample_file" ),
+					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new fileBrowser(
 				configManager::inst()->userPresetsDir() + "*" +
 				configManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My presets" ),
-					embed::getIconPixmap( "preset_file" ),
+					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new fileBrowser( QDir::homePath(), "*",
 							tr( "My home" ),
-					embed::getIconPixmap( "home" ),
+					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	QFileInfoList drives = QDir::drives();
 	QStringList root_paths;
@@ -130,7 +130,7 @@ MainWindow::MainWindow( void ) :
 #else
 							tr( "Root directory" ),
 #endif
-					embed::getIconPixmap( "computer" ),
+					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter,
 #ifdef LMMS_BUILD_WIN32
 							true

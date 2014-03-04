@@ -71,7 +71,7 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 	p.drawText( tx, ty, m_title );
 	p.drawLine( tx, ty+4, width()-4, ty+4 );
 
-	p.drawPixmap( 2, 2, m_icon );
+	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
 }
 
 
