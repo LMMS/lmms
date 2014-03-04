@@ -1,4 +1,4 @@
-/*
+parent/*
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
  *                        actual setting of dynamic values
  *
@@ -439,6 +439,7 @@ AutomationEditor::AutomationEditor() :
 	{
 		engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+		parentWidget()->move( 5, 5 );
 		parentWidget()->hide();
 	}
 	else
