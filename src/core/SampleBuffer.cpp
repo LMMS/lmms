@@ -593,7 +593,7 @@ f_cnt_t SampleBuffer::decodeSampleDS( const char * _f,
 						sample_rate_t & _samplerate )
 {
 	DrumSynth ds;
-	f_cnt_t frames = ds.GetDSFileSamples( _f, _buf, _channels );
+	f_cnt_t frames = ds.GetDSFileSamples( _f, _buf, _channels, _samplerate );
 
 	if ( frames > 0 && _buf != NULL )
 	{
