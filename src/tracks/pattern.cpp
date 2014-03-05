@@ -239,7 +239,7 @@ void pattern::removeNote( const note * _note_to_del )
 
 // returns a pointer to the note at specified step, or NULL if note doesn't exist
 
-note * pattern::getNoteAtStep( int _step )
+note * pattern::noteAtStep( int _step )
 {
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
@@ -775,13 +775,13 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 			return;
 		}
 
-		note * n = m_pat->getNoteAtStep( step );
+		note * n = m_pat->noteAtStep( step );
 
 		// if note at step not found, ensureBeatNotes and try again
 		if( n == NULL )
 		{
 			m_pat -> ensureBeatNotes();
-			n = m_pat->getNoteAtStep( step );
+			n = m_pat->noteAtStep( step );
 			if( n == NULL ) // still can't find a note? bail!
 			{
 				qDebug( "Something went wrong in pattern.cpp: couldn't add note at step %d!", step );
@@ -1049,13 +1049,13 @@ void patternView::paintEvent( QPaintEvent * )
 
 		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
-			note * n = m_pat->getNoteAtStep( it );
+			note * n = m_pat->noteAtStep( it );
 
 			// figure out x and y coordinates for step graphic
 			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
 
-			// get volume and length of note, if getNoteAtStep returned null
+			// get volume and length of note, if noteAtStep returned null
 			// (meaning, note at step doesn't exist for some reason)
 			// then set both at zero, ie. treat as an off step
 			const int vol = ( n != NULL ? n->getVolume() : 0 );
