@@ -439,6 +439,7 @@ AutomationEditor::AutomationEditor() :
 	{
 		engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+		parentWidget()->move( 5, 5 );
 		parentWidget()->hide();
 	}
 	else
