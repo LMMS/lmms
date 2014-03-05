@@ -366,7 +366,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 
 
 
-void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )	// TODO: Remove the expKnobVals, time should be linear
+void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
 					QString( "samplefile,tco_%1" ).arg(
