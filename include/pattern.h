@@ -71,6 +71,8 @@ public:
 
 	void removeNote( const note * _note_to_del );
 
+	note * getNoteAtStep( int _step );
+
 	note * rearrangeNote( const note * _note_to_proc,
 						const bool _quant_pos = true );
 	void rearrangeAllNotes();

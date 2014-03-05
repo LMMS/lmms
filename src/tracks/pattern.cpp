@@ -166,9 +166,6 @@ MidiTime pattern::beatPatternLength() const
 	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
 }
 
-
-
-
 note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 {
 	note * new_note = new note( _new_note );
@@ -240,6 +237,20 @@ void pattern::removeNote( const note * _note_to_del )
 }
 
 
+// returns a pointer to the note at specified step, or NULL if note doesn't exist
+
+note * pattern::getNoteAtStep( int _step )
+{
+	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
+									++it )
+	{
+		if( ( *it )->pos() == ( _step *  MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact() )
+		{
+			return *it;
+		}
+	}
+	return NULL;
+}
 
 
 note * pattern::rearrangeNote( const note * _note_to_proc,
@@ -286,7 +297,7 @@ void pattern::setStep( int _step, bool _enabled )
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
-		if( ( *it )->pos() == _step*DefaultTicksPerTact/16 &&
+		if( ( *it )->pos() == ( _step * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact() &&
 						( *it )->length() <= 0 )
 		{
 			( *it )->setLength( _enabled ?
@@ -423,6 +434,7 @@ void pattern::addSteps()
 	m_steps += MidiTime::stepsPerTact();
 	ensureBeatNotes();
 	emit dataChanged();
+	updateBBTrack();
 }
 
 
@@ -439,7 +451,7 @@ void pattern::removeSteps()
 						it != m_notes.end(); ++it )
 			{
 				if( ( *it )->pos() ==
-					i * MidiTime::ticksPerTact() /
+					( i * MidiTime::ticksPerTact() ) /
 						MidiTime::stepsPerTact() &&
 							( *it )->length() <= 0 )
 				{
@@ -451,6 +463,7 @@ void pattern::removeSteps()
 		m_steps -= _n;
 		emit dataChanged();
 	}
+	updateBBTrack();
 }
 
 
@@ -471,13 +484,12 @@ void pattern::ensureBeatNotes()
 	for( int i = 0; i < m_steps; ++i )
 	{
 		bool found = false;
-		for( NoteVector::Iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+		for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 		{
+			// if a note in this position is the one we want
 			if( ( *it )->pos() ==
-				i * MidiTime::ticksPerTact() /
-					MidiTime::stepsPerTact() &&
-							( *it )->length() <= 0 )
+				( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
+				&& ( *it )->length() <= 0 )
 			{
 				found = true;
 				break;
@@ -485,10 +497,33 @@ void pattern::ensureBeatNotes()
 		}
 		if( found == false )
 		{
-			addNote( note( MidiTime( 0 ), MidiTime( i *
-				MidiTime::ticksPerTact() /
+			addNote( note( MidiTime( 0 ), MidiTime( ( i *
+				MidiTime::ticksPerTact() ) /
 					MidiTime::stepsPerTact() ) ), false );
 		}
+	}
+
+	// remove notes we no longer need:
+	// that is, disabled notes that no longer fall to the steps of the new time sig
+
+	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
+	{
+		bool needed = false;
+		for( int i = 0; i < m_steps; ++i )
+		{
+			if( ( *it )->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
+				|| ( *it )->length() != 0 )
+			{
+				needed = true;
+				break;
+			}
+		}
+		if( needed == false )
+		{
+			delete *it;
+			it = m_notes.erase( it );
+		}
+		else ++it;
 	}
 }
 
@@ -552,6 +587,7 @@ void pattern::changeTimeSignature()
 		qMax<tick_t>( m_steps, MidiTime::stepsPerTact() ),
 				last_pos.getTact() * MidiTime::stepsPerTact() );
 	ensureBeatNotes();
+	updateBBTrack();
 }
 
 
@@ -719,30 +755,63 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 				( fixedTCOs() || pixelsPerTact() >= 96 ||
 				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
 				_me->y() > height() - s_stepBtnOff->height() )
+
+	// when mouse button is pressed in beat/bassline -mode
+
 	{
-		int step = ( _me->x() - TCO_BORDER_WIDTH ) *
-				m_pat->length() / DefaultBeatsPerTact / width();
+//	get the step number that was clicked on and
+//	do calculations in floats to prevent rounding errors...
+		float tmp = ( ( float(_me->x()) - TCO_BORDER_WIDTH ) *
+				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+
+		int step = int( tmp );
+
+//	debugging to ensure we get the correct step...
+//		qDebug( "Step (%f) %d", tmp, step );
+
 		if( step >= m_pat->m_steps )
 		{
+			qDebug( "Something went wrong in pattern.cpp: step %d doesn't exist in pattern!", step );
 			return;
 		}
-		note * n = m_pat->m_notes[step];
-		if( n->length() < 0 )
+
+		note * n = m_pat->getNoteAtStep( step );
+
+		// if note at step not found, ensureBeatNotes and try again
+		if( n == NULL )
 		{
-			n->setLength( 0 );
+			m_pat -> ensureBeatNotes();
+			n = m_pat->getNoteAtStep( step );
+			if( n == NULL ) // still can't find a note? bail!
+			{
+				qDebug( "Something went wrong in pattern.cpp: couldn't add note at step %d!", step );
+				return;
+			}
 		}
-		else
+		else // note at step found
 		{
-			n->setLength( -DefaultTicksPerTact );
+			if( n->length() < 0 )
+			{
+				n->setLength( 0 );	// set note as enabled beat note
+			}
+			else
+			{
+				n->setLength( -DefaultTicksPerTact );	// set note as disabled beat note
+			}
 		}
+
 		engine::getSong()->setModified();
 		update();
+
 		if( engine::getPianoRoll()->currentPattern() == m_pat )
 		{
 			engine::getPianoRoll()->update();
 		}
 	}
 	else
+
+	// if not in beat/bassline -mode, let parent class handle the event
+
 	{
 		trackContentObjectView::mousePressEvent( _me );
 	}
@@ -933,10 +1002,10 @@ void patternView::paintEvent( QPaintEvent * )
 							y_pos < central_y )
 					{
 						const int x1 = 2 * x_base +
-		static_cast<int>( ( *it )->pos() * ppt /
+		static_cast<int>( ( *it )->pos() * ( ppt - TCO_BORDER_WIDTH ) /
 						MidiTime::ticksPerTact() );
 						const int x2 =
-			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ppt / MidiTime::ticksPerTact() );
+			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ( ppt - TCO_BORDER_WIDTH ) / MidiTime::ticksPerTact() );
 						p.drawLine( x1, y_base + y_pos,
 							x2, y_base + y_pos );
 
@@ -945,6 +1014,9 @@ void patternView::paintEvent( QPaintEvent * )
 			}
 		}
 	}
+
+// beat pattern paint event
+
 	else if( m_pat->m_patternType == pattern::BeatPattern &&
 		( fixedTCOs() || ppt >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
@@ -954,8 +1026,10 @@ void patternView::paintEvent( QPaintEvent * )
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
-					m_pat->length() / DefaultBeatsPerTact );
+					m_pat->m_steps );
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
+
+		// scale step graphics to fit the beat pattern length
 		stepon = s_stepBtnOn->scaled( w / steps,
 					      s_stepBtnOn->height(),
 					      Qt::IgnoreAspectRatio,
@@ -972,17 +1046,22 @@ void patternView::paintEvent( QPaintEvent * )
 						s_stepBtnOffLight->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
-		for( NoteVector::Iterator it = m_pat->m_notes.begin();
-					it != m_pat->m_notes.end(); ++it )
+
+		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
-			const int no = ( *it )->pos() / DefaultBeatsPerTact;
-			const int x = TCO_BORDER_WIDTH + static_cast<int>( no *
-								w / steps );
+			note * n = m_pat->getNoteAtStep( it );
+
+			// figure out x and y coordinates for step graphic
+			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
 
-			const int vol = ( *it )->getVolume();
+			// get volume and length of note, if getNoteAtStep returned null
+			// (meaning, note at step doesn't exist for some reason)
+			// then set both at zero, ie. treat as an off step
+			const int vol = ( n != NULL ? n->getVolume() : 0 );
+			const int len = ( n != NULL ? int( n->length() ) : 0 );
 
-			if( ( *it )->length() < 0 )
+			if( len < 0 )
 			{
 				p.drawPixmap( x, y, stepoff );
 				for( int i = 0; i < vol / 5 + 1; ++i )
@@ -995,7 +1074,7 @@ void patternView::paintEvent( QPaintEvent * )
 					p.drawPixmap( x, y, stepoverlay );
 				}
 			}
-			else if( ( no / 4 ) % 2 )
+			else if( ( it / 4 ) % 2 )
 			{
 				p.drawPixmap( x, y, stepoffl );
 			}
@@ -1003,7 +1082,7 @@ void patternView::paintEvent( QPaintEvent * )
 			{
 				p.drawPixmap( x, y, stepoff );
 			}
-		}
+		} // end for loop
 	}
 
 	p.setFont( pointSize<8>( p.font() ) );
