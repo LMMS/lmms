@@ -62,7 +62,7 @@ const int SUSTAIN_KNOB_X = DECAY_KNOB_X+KNOB_X_SPACING;
 const int RELEASE_KNOB_X = SUSTAIN_KNOB_X+KNOB_X_SPACING;
 const int AMOUNT_KNOB_X = RELEASE_KNOB_X+KNOB_X_SPACING;
 
-const float TIME_UNIT_WIDTH = 35.0;
+const float TIME_UNIT_WIDTH = 24.0;
 
 
 const int LFO_GRAPH_X = 6;
@@ -366,7 +366,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 
 
 
-void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
+void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )	// TODO: Remove the expKnobVals, time should be linear
 {
 	stringPairDrag::processDragEnterEvent( _dee,
 					QString( "samplefile,tco_%1" ).arg(
