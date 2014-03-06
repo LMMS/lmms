@@ -536,6 +536,11 @@ void pattern::updateBBTrack()
 	{
 		engine::getBBTrackContainer()->updateBBTrack( this );
 	}
+
+	if( engine::getPianoRoll()->currentPattern() == this )
+	{
+		engine::getPianoRoll()->update();
+	}
 }
 
 
@@ -827,42 +832,42 @@ void patternView::wheelEvent( QWheelEvent * _we )
 				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
 				_we->y() > height() - s_stepBtnOff->height() )
 	{
-		int step = ( _we->x() - TCO_BORDER_WIDTH ) *
-				m_pat->length() / DefaultBeatsPerTact / width();
+//	get the step number that was wheeled on and
+//	do calculations in floats to prevent rounding errors...
+		float tmp = ( ( float(_we->x()) - TCO_BORDER_WIDTH ) *
+				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+
+		int step = int( tmp );
+
 		if( step >= m_pat->m_steps )
 		{
 			return;
 		}
-		note * n = m_pat->m_notes[step];
-		int vol = n->getVolume();
 
-		if( n->length() == 0 && _we->delta() > 0 )
+		int vol = 0;
+		int len = 0;
+
+		note * n = m_pat->noteAtStep( step );
+		if( n != NULL )
+		{
+			vol = n->getVolume();
+			len = n->length();
+		}
+
+		if( len == 0 && _we->delta() > 0 )
 		{
 			n->setLength( -DefaultTicksPerTact );
 			n->setVolume( 5 );
 		}
 		else if( _we->delta() > 0 )
 		{
-			if( vol < 95 )
-			{
-				n->setVolume( vol + 5 );
-			}
-			else
-			{
-				n->setVolume( 100 );
-			}
+			n->setVolume( qMin( 100, vol + 5 ) );
 		}
 		else
 		{
-			if( vol > 5 )
-			{
-				n->setVolume( vol - 5 );
-			}
-			else
-			{
-				n->setLength( 0 );
-			}
+			n->setVolume( qMax( 0, vol - 5 ) );
 		}
+
 		engine::getSong()->setModified();
 		update();
 		if( engine::getPianoRoll()->currentPattern() == m_pat )
