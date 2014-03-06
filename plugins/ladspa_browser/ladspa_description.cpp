@@ -131,7 +131,8 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 	ladspa2LMMS * manager = engine::getLADSPAManager();
 
 	QLabel * name = new QLabel( description );
-	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );
+	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) + 
+		       ( manager->isDSSI( _key ) ? " [DSSI]" : "" ) );
 	layout->addWidget( name );
 
 	QWidget * maker = new QWidget( description );
