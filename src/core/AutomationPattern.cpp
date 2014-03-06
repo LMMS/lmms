@@ -163,17 +163,10 @@ const AutomatableModel * AutomationPattern::firstObject() const
 
 
 
-//TODO: Improve this
 MidiTime AutomationPattern::length() const
 {
-	tick_t max_length = 0;
-
-	for( timeMap::const_iterator it = m_timeMap.begin();
-						it != m_timeMap.end(); ++it )
-	{
-		max_length = qMax<tick_t>( max_length, it.key() );
-	}
-	return MidiTime( qMax( MidiTime( max_length ).getTact() + 1, 1 ), 0 );
+	timeMap::const_iterator it = m_timeMap.end();	
+	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
 }
 
 
@@ -312,6 +305,10 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 	if( v == m_timeMap.begin() )
 	{
 		return 0;
+	}
+	if( v == m_timeMap.end() )
+	{
+		return (v-1).value();
 	}
 
 	return valueAt( v-1, _time - (v-1).key() );
