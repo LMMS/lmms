@@ -165,6 +165,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 
 MidiTime AutomationPattern::length() const
 {
+	if( m_timeMap.isEmpty() ) return 0;
 	timeMap::const_iterator it = m_timeMap.end();	
 	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
 }
