@@ -960,19 +960,29 @@ void patternView::paintEvent( QPaintEvent * )
 				height() - 2 * TCO_BORDER_WIDTH );
 	}
 
+// melody pattern paint event
+	
 	if( m_pat->m_patternType == pattern::MelodyPattern )
 	{
-		int central_key = 0;
 		if( m_pat->m_notes.size() > 0 )
 		{
 			// first determine the central tone so that we can
 			// display the area where most of the m_notes are
+			// also calculate min/max tones so the tonal range can be
+			// properly stretched accross the pattern vertically
+			
+			int central_key = 0;
+			int max_key = 0;
+			int min_key = 9999999;
 			int total_notes = 0;
+			
 			for( NoteVector::Iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 			{
 				if( ( *it )->length() > 0 )
 				{
+					max_key = qMax( max_key, ( *it )->key() );
+					min_key = qMin( min_key, ( *it )->key() );
 					central_key += ( *it )->key();
 					++total_notes;
 				}
@@ -981,10 +991,18 @@ void patternView::paintEvent( QPaintEvent * )
 			if( total_notes > 0 )
 			{
 				central_key = central_key / total_notes;
+				const int keyrange = qMax( qMax( max_key - central_key, central_key - min_key ), 1 );
+				
+				// debug code
+				// qDebug( "keyrange: %d", keyrange );
 
-				const int central_y = height() / 2;
-				int y_base = central_y + TCO_BORDER_WIDTH -1;
+				// determine height of the pattern view, sans borders
+				const int ht = height() - 1 - TCO_BORDER_WIDTH * 2;
+				
+				// determine maximum height value for drawing bounds checking
+				const int max_ht = height() - 1 - TCO_BORDER_WIDTH;
 
+				// set colour based on mute status
 				if( m_pat->getTrack()->isMuted() ||
 							m_pat->isMuted() )
 				{
@@ -992,28 +1010,40 @@ void patternView::paintEvent( QPaintEvent * )
 				}
 				else
 				{
-					p.setPen( QColor( 255, 255, 255 ) );
+					p.setPen( QColor( 255, 255, 255 ) );	/// \todo make this a qproperty
 				}
 
+				// scan through all the notes and draw them on the pattern
 				for( NoteVector::Iterator it =
 							m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 				{
-					const int y_pos = central_key -
-								( *it )->key();
+					// calculate relative y-position
+					const float y_key =
+						( float( central_key - ( *it )->key() ) / keyrange + 1.0f ) / 2;
+					// multiply that by pattern height
+					const int y_pos = static_cast<int>( TCO_BORDER_WIDTH + y_key * ht );
+					
+					// debug code
+					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
 
+					// check that note isn't out of bounds, and has a length
 					if( ( *it )->length() > 0 &&
-							y_pos > -central_y &&
-							y_pos < central_y )
+							y_pos >= TCO_BORDER_WIDTH &&
+							y_pos <= max_ht )
 					{
-						const int x1 = 2 * x_base +
-		static_cast<int>( ( *it )->pos() * ( ppt - TCO_BORDER_WIDTH ) /
-						MidiTime::ticksPerTact() );
-						const int x2 =
-			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ( ppt - TCO_BORDER_WIDTH ) / MidiTime::ticksPerTact() );
-						p.drawLine( x1, y_base + y_pos,
-							x2, y_base + y_pos );
-
+						// calculate start and end x-coords of the line to be drawn
+						const int x1 = x_base +
+							static_cast<int>
+							( ( *it )->pos() * ( ppt  / MidiTime::ticksPerTact() ) );
+						const int x2 = x_base +
+							static_cast<int>
+							( ( ( *it )->pos() + ( *it )->length() ) * ( ppt  / MidiTime::ticksPerTact() ) );
+						
+						// check bounds, draw line
+						if( x1 < width() - TCO_BORDER_WIDTH )
+							p.drawLine( x1, y_pos,
+										qMin( x2, width() - TCO_BORDER_WIDTH ), y_pos );
 					}
 				}
 			}
