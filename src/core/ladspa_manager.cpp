@@ -55,8 +55,6 @@ ladspaManager::ladspaManager()
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/ladspa" );
 #endif
-	// Order doesn't matter here, or does it?
-	ladspaDirectories = ladspaDirectories.toSet().toList();
 
 	for( QStringList::iterator it = ladspaDirectories.begin(); 
 			 		   it != ladspaDirectories.end(); ++it )
