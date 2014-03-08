@@ -261,7 +261,6 @@ const trackView * TrackContainerView::trackViewAt( const int _y ) const
 	for( trackViewList::const_iterator it = m_trackViews.begin();
 						it != m_trackViews.end(); ++it )
 	{
-		i++;
 		const int y_cnt1 = y_cnt;
 		y_cnt += ( *it )->height();
 		if( abs_y >= y_cnt1 && abs_y < y_cnt )
