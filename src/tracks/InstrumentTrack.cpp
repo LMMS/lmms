@@ -195,7 +195,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
-	if( n )
+	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) == false && n != NULL )
 	{
 		m_soundShaping.processAudioBuffer( buf, frames, n );
 		v_scale *= ( (float) n->getVolume() / DefaultVolume );
