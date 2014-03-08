@@ -163,7 +163,8 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// We could do that in all other cases as well but the overhead for silence test is bigger than
 	// what we potentially save. While playing a note, a NotePlayHandle-driven instrument will produce sound in
 	// 99 of 100 cases so that test would be a waste of time.
-	if( n == NULL && MixHelpers::isSilent( buf, frames ) )
+	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) &&
+		MixHelpers::isSilent( buf, frames ) )
 	{
 		// at least pass one silent buffer to allow
 		if( m_silentBuffersProcessed )
