@@ -1319,7 +1319,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
-	if( m_track->instrument() && m_track->instrument()->isBendable() )
+	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::IsNotBendable ) == false )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );

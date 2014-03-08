@@ -52,10 +52,11 @@ public:
 
 	virtual QString nodeName() const;
 
-	inline virtual bool isBendable() const
+	virtual Flags flags() const
 	{
-		return( false );
+		return IsNotBendable;
 	}
+
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
