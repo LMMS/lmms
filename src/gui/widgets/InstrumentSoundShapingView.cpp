@@ -127,6 +127,13 @@ InstrumentSoundShapingView::~InstrumentSoundShapingView()
 
 
 
+void InstrumentSoundShapingView::setFunctionsHidden( bool hidden )
+{
+	m_targetsTabWidget->setHidden( hidden );
+	m_filterGroupBox->setHidden( hidden );
+}
+
+
 
 void InstrumentSoundShapingView::modelChanged()
 {

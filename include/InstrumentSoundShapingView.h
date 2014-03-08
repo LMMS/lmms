@@ -44,6 +44,8 @@ public:
 	InstrumentSoundShapingView( QWidget * _parent );
 	virtual ~InstrumentSoundShapingView();
 
+	void setFunctionsHidden( bool hidden );
+
 
 private:
 	virtual void modelChanged();
