@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include "Midi.h"
 #include "panning_constants.h"
+#include "volume.h"
 
 class MidiEvent
 {
@@ -141,7 +142,7 @@ public:
 
 	volume_t volume() const
 	{
-		return (volume_t)( velocity() * 100 / MidiMaxVelocity );
+		return (volume_t)( velocity() * MaxVolume / MidiMaxVelocity );
 	}
 
 	const void* sourcePort() const

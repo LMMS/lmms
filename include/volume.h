@@ -40,10 +40,4 @@ typedef struct
 	float vol[2];
 } stereoVolumeVector;
 
-
-inline int volumeToMidi( volume_t vol )
-{
-	return qMin( MidiMaxVelocity, vol * MidiMaxVelocity / DefaultVolume );
-}
-
 #endif

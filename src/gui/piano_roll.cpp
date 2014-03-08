@@ -1862,7 +1862,7 @@ void pianoRoll::testPlayNote( note * n )
 	//if( ! n->isPlaying() && ! m_recording && ! engine::getSong()->isPlaying() )
 	{
 		n->setIsPlaying( true );
-		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), volumeToMidi( n->getVolume() ) );
+		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity() );
 
 		MidiEvent event( MidiMetaEvent, 0, n->key(), panningToMidi( n->getPanning() ) );
 
@@ -2223,7 +2223,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					if( m_noteEditMode == NoteEditVolume )
 					{
 						n->setVolume( vol );
-						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, 0, n->key(), volumeToMidi( vol ) ) );
+						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, 0, n->key(), n->midiVelocity() ) );
 					}
 					else if( m_noteEditMode == NoteEditPanning )
 					{
