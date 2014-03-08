@@ -1062,7 +1062,7 @@ void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 
 void InstrumentTrackView::activityIndicatorPressed()
 {
-	model()->processInEvent( MidiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ) );
+	model()->processInEvent( MidiEvent( MidiNoteOn, 0, DefaultKey, MidiDefaultVelocity ) );
 }
 
 

@@ -1808,7 +1808,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_lastKey = key_num;
 				//if( ! m_recording && ! engine::getSong()->isPlaying() )
 				{
-					int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiMaxVelocity;
+					int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity;
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
 				}
 			}
@@ -2129,7 +2129,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		    && _me->buttons() & Qt::LeftButton )
 		{
 			// clicked on a key, play the note
-			testPlayKey( key_num, ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiMaxVelocity, 0 );
+			testPlayKey( key_num, ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity, 0 );
 			update();
 			return;
 		}

@@ -1103,7 +1103,7 @@ void sfxrInstrumentView::previewSound()
 	sfxrInstrument* s = castModel<sfxrInstrument>();
 	InstrumentTrack* it = s->instrumentTrack();
 	it->silenceAllNotes();
-	it->processInEvent( MidiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiMaxVelocity ) );
+	it->processInEvent( MidiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiDefaultVelocity ) );
 }
 
 
