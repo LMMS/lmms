@@ -452,7 +452,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				( ( KEY_ORDER[key_num % KeysPerOctave] ==
 							Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float) MidiMaxVelocity );
+						(float) MidiDefaultVelocity );
 			if( y_diff < 0 )
 			{
 				velocity = 0;
@@ -462,7 +462,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 							Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 			{
-				velocity = MidiMaxVelocity;
+				velocity = MidiDefaultVelocity;
 			}
 			// set note on
 			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
@@ -550,7 +550,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	int velocity = (int)( (float) y_diff /
 		( ( KEY_ORDER[key_num % KeysPerOctave] == Piano::WhiteKey ) ?
 			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float) MidiMaxVelocity );
+						(float) MidiDefaultVelocity );
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
 	// correct volume if necessary
@@ -562,7 +562,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		( ( KEY_ORDER[key_num % KeysPerOctave] == Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 	{
-		velocity = MidiMaxVelocity;
+		velocity = MidiDefaultVelocity;
 	}
 
 	// is the calculated key different from current key? (could be the

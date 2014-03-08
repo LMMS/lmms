@@ -163,7 +163,8 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// We could do that in all other cases as well but the overhead for silence test is bigger than
 	// what we potentially save. While playing a note, a NotePlayHandle-driven instrument will produce sound in
 	// 99 of 100 cases so that test would be a waste of time.
-	if( n == NULL && MixHelpers::isSilent( buf, frames ) )
+	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) &&
+		MixHelpers::isSilent( buf, frames ) )
 	{
 		// at least pass one silent buffer to allow
 		if( m_silentBuffersProcessed )
@@ -184,10 +185,17 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 
 	float v_scale = (float) getVolume() / DefaultVolume;
 
+	// We play MIDI-based instruments at velocity 63 for volume=100%. In order
+	// to get the same output volume, we need to scale it by 2
+	if( m_instrument->flags().testFlag( Instrument::IsMidiBased ) )
+	{
+		v_scale *= 2;
+	}
+
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
-	if( n )
+	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) == false && n != NULL )
 	{
 		m_soundShaping.processAudioBuffer( buf, frames, n );
 		v_scale *= ( (float) n->getVolume() / DefaultVolume );
@@ -1054,7 +1062,7 @@ void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 
 void InstrumentTrackView::activityIndicatorPressed()
 {
-	model()->processInEvent( MidiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ) );
+	model()->processInEvent( MidiEvent( MidiNoteOn, 0, DefaultKey, MidiDefaultVelocity ) );
 }
 
 
@@ -1319,7 +1327,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
-	if( m_track->instrument() && m_track->instrument()->isBendable() )
+	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::IsNotBendable ) == false )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
@@ -1399,6 +1407,8 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_instrumentView = m_track->m_instrument->createView( m_tabWidget );
 		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), 0 );
 		m_tabWidget->setActiveTab( 0 );
+
+		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) );
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change

@@ -80,9 +80,9 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual bool isMidiBased() const
+	virtual Flags flags() const
 	{
-		return true;
+		return IsSingleStreamed | IsMidiBased;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );

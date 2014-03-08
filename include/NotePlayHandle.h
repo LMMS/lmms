@@ -68,11 +68,6 @@ public:
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
 
-	int midiVelocity() const
-	{
-		return volumeToMidi( getVolume() );
-	}
-
 	int midiKey() const;
 	int midiChannel() const
 	{

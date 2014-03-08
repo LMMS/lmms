@@ -63,9 +63,9 @@ public:
 
 	virtual void loadFile( const QString & _file );
 
-	virtual bool isMidiBased( void ) const
+	virtual Flags flags() const
 	{
-		return true;
+		return IsSingleStreamed | IsMidiBased;
 	}
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );

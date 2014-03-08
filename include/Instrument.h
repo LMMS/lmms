@@ -44,6 +44,16 @@ class track;
 class EXPORT Instrument : public Plugin
 {
 public:
+	enum Flag
+	{
+		NoFlags = 0x00,
+		IsSingleStreamed = 0x01,	/*! Instrument provides a single audio stream for all notes */
+		IsMidiBased = 0x02,			/*! Instrument is controlled by MIDI events rather than NotePlayHandles */
+		IsNotBendable = 0x04,		/*! Instrument can't react to pitch bend changes */
+	};
+
+	Q_DECLARE_FLAGS(Flags, Flag);
+
 	Instrument( InstrumentTrack * _instrument_track,
 					const Descriptor * _descriptor );
 	virtual ~Instrument();
@@ -84,17 +94,9 @@ public:
 		return 0;
 	}
 
-	// return false if instrument is not bendable
-	inline virtual bool isBendable() const
+	virtual Flags flags() const
 	{
-		return true;
-	}
-
-	// return true if instruments reacts to MIDI events passed to
-	// handleMidiEvent() rather than playNote() & Co
-	inline virtual bool isMidiBased() const
-	{
-		return false;
+		return NoFlags;
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
@@ -134,5 +136,7 @@ private:
 	InstrumentTrack * m_instrumentTrack;
 
 } ;
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
 
 #endif
