@@ -2,7 +2,7 @@
  * TrackContainerView.h - view-component for TrackContainer
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TRACK_CONTAINER_VIEW_H
-#define _TRACK_CONTAINER_VIEW_H
+#ifndef TRACK_CONTAINER_VIEW_H
+#define TRACK_CONTAINER_VIEW_H
 
 #include <QtCore/QVector>
 #include <QtGui/QScrollArea>
