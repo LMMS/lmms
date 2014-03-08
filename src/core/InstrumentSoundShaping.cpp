@@ -106,38 +106,34 @@ InstrumentSoundShaping::~InstrumentSoundShaping()
 
 
 
-float InstrumentSoundShaping::volumeLevel( NotePlayHandle * _n,
-							const f_cnt_t _frame )
+float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t frame )
 {
-	f_cnt_t release_begin = _frame - _n->releaseFramesDone() +
-						_n->framesBeforeRelease();
+	f_cnt_t envReleaseBegin = frame - n->releaseFramesDone() + n->framesBeforeRelease();
 
-	if( _n->isReleased() == false )
+	if( n->isReleased() == false )
 	{
-		release_begin += engine::mixer()->framesPerPeriod();
+		envReleaseBegin += engine::mixer()->framesPerPeriod();
 	}
 
-	float volume_level;
-	m_envLfoParameters[Volume]->fillLevel( &volume_level, _frame,
-							release_begin, 1 );
+	float level;
+	m_envLfoParameters[Volume]->fillLevel( &level, frame, envReleaseBegin, 1 );
 
-	return volume_level;
+	return level;
 }
 
 
 
 
-void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
-							const fpp_t _frames,
-							NotePlayHandle * _n )
+void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
+							const fpp_t frames,
+							NotePlayHandle* n )
 {
-	const f_cnt_t total_frames = _n->totalFramesPlayed();
-	f_cnt_t release_begin = total_frames - _n->releaseFramesDone() +
-						_n->framesBeforeRelease();
+	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
+	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
 
-	if( _n->isReleased() == false )
+	if( n->isReleased() == false )
 	{
-		release_begin += engine::mixer()->framesPerPeriod();
+		envReleaseBegin += engine::mixer()->framesPerPeriod();
 	}
 
 	// because of optimizations, there's special code for several cases:
@@ -153,16 +149,15 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
 
-		if( _n->m_filter == NULL )
+		if( n->m_filter == NULL )
 		{
-			_n->m_filter = new basicFilters<>(
-				engine::mixer()->processingSampleRate() );
+			n->m_filter = new basicFilters<>( engine::mixer()->processingSampleRate() );
 		}
-		_n->m_filter->setFilterType( m_filterModel.value() );
+		n->m_filter->setFilterType( m_filterModel.value() );
 
 #ifdef __GNUC__
-		float cut_buf[_frames];
-		float res_buf[_frames];
+		float cut_buf[frames];
+		float res_buf[frames];
 #else
 		float * cut_buf = NULL;
 		float * res_buf = NULL;
@@ -171,19 +166,16 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		if( m_envLfoParameters[Cut]->isUsed() )
 		{
 #ifndef __GNUC__
-			cut_buf = new float[_frames];
+			cut_buf = new float[frames];
 #endif
-			m_envLfoParameters[Cut]->fillLevel( cut_buf, total_frames,
-						release_begin, _frames );
+			m_envLfoParameters[Cut]->fillLevel( cut_buf, envTotalFrames, envReleaseBegin, frames );
 		}
 		if( m_envLfoParameters[Resonance]->isUsed() )
 		{
 #ifndef __GNUC__
-			res_buf = new float[_frames];
+			res_buf = new float[frames];
 #endif
-			m_envLfoParameters[Resonance]->fillLevel( res_buf,
-						total_frames, release_begin,
-								_frames );
+			m_envLfoParameters[Resonance]->fillLevel( res_buf, envTotalFrames, envReleaseBegin, frames );
 		}
 
 		const float fcv = m_filterCutModel.value();
@@ -192,7 +184,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		if( m_envLfoParameters[Cut]->isUsed() &&
 			m_envLfoParameters[Resonance]->isUsed() )
 		{
-			for( fpp_t frame = 0; frame < _frames; ++frame )
+			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
 				const float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cut_buf[frame] ) *
 								CUT_FREQ_MULTIPLIER + fcv;
@@ -202,56 +194,56 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 				if( static_cast<int>( new_cut_val ) != old_filter_cut ||
 					static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
-					_n->m_filter->calcFilterCoeffs( new_cut_val, new_res_val );
+					n->m_filter->calcFilterCoeffs( new_cut_val, new_res_val );
 					old_filter_cut = static_cast<int>( new_cut_val );
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
-				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
+				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
+				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
 		else if( m_envLfoParameters[Cut]->isUsed() )
 		{
-			for( fpp_t frame = 0; frame < _frames; ++frame )
+			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
 				float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cut_buf[frame] ) *
 								CUT_FREQ_MULTIPLIER + fcv;
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
 				{
-					_n->m_filter->calcFilterCoeffs( new_cut_val, frv );
+					n->m_filter->calcFilterCoeffs( new_cut_val, frv );
 					old_filter_cut = static_cast<int>( new_cut_val );
 				}
 
-				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
-				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
+				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
+				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
 		else if( m_envLfoParameters[Resonance]->isUsed() )
 		{
-			for( fpp_t frame = 0; frame < _frames; ++frame )
+			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
 				float new_res_val = frv + RES_MULTIPLIER * res_buf[frame];
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
-					_n->m_filter->calcFilterCoeffs( fcv, new_res_val );
+					n->m_filter->calcFilterCoeffs( fcv, new_res_val );
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
-				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
+				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
+				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
 		else
 		{
-			_n->m_filter->calcFilterCoeffs( fcv, frv );
+			n->m_filter->calcFilterCoeffs( fcv, frv );
 
-			for( fpp_t frame = 0; frame < _frames; ++frame )
+			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
-				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
+				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
+				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
 
@@ -264,19 +256,18 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 	if( m_envLfoParameters[Volume]->isUsed() )
 	{
 #ifdef __GNUC__
-		float vol_buf[_frames];
+		float vol_buf[frames];
 #else
-		float * vol_buf = new float[_frames];
+		float * vol_buf = new float[frames];
 #endif
-		m_envLfoParameters[Volume]->fillLevel( vol_buf, total_frames,
-						release_begin, _frames );
+		m_envLfoParameters[Volume]->fillLevel( vol_buf, envTotalFrames, envReleaseBegin, frames );
 
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			float vol_level = vol_buf[frame];
 			vol_level = vol_level * vol_level;
-			_ab[frame][0] = vol_level * _ab[frame][0];
-			_ab[frame][1] = vol_level * _ab[frame][1];
+			buffer[frame][0] = vol_level * buffer[frame][0];
+			buffer[frame][1] = vol_level * buffer[frame][1];
 		}
 #ifndef __GNUC__
 		delete[] vol_buf;
@@ -286,13 +277,13 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 /*	else if( m_envLfoParameters[Volume]->isUsed() == false && m_envLfoParameters[PANNING]->isUsed() )
 	{
 		// only use panning-envelope...
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			float vol_level = pan_buf[frame];
 			vol_level = vol_level*vol_level;
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
-				_ab[frame][chnl] = vol_level * _ab[frame][chnl];
+				buffer[frame][chnl] = vol_level * buffer[frame][chnl];
 			}
 		}
 	}*/
