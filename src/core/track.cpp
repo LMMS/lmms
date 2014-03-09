@@ -2403,10 +2403,12 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const trackView * track_at_y =
-			m_trackContainerView->trackViewAt(
-				mapTo( m_trackContainerView->contentWidget(),
-							_me->pos() ).y() );
+		const int y_pos = m_trackContainerView->contentWidget()->mapFromGlobal( _me->globalPos() ).y();
+		const trackView * track_at_y =	m_trackContainerView->trackViewAt( y_pos );
+
+// debug code
+//			qDebug( "y position %d", y_pos );
+			
 		// a track-widget not equal to ourself?
 		if( track_at_y != NULL && track_at_y != this )
 		{

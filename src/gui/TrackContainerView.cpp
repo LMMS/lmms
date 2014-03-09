@@ -2,7 +2,7 @@
  * TrackContainerView.cpp - view-component for TrackContainer
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -252,8 +252,12 @@ void TrackContainerView::deleteTrackView( trackView * _tv )
 
 const trackView * TrackContainerView::trackViewAt( const int _y ) const
 {
-	const int abs_y = _y + m_scrollArea->viewport()->y();
+	const int abs_y = _y + m_scrollArea->verticalScrollBar()->value();
 	int y_cnt = 0;
+
+//	debug code
+//	qDebug( "abs_y %d", abs_y );
+
 	for( trackViewList::const_iterator it = m_trackViews.begin();
 						it != m_trackViews.end(); ++it )
 	{
