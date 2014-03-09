@@ -82,7 +82,12 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 {
 	if( !isEnabled() || !isRunning () )
 	{
-		if( currentPeak[0] == 0.0f && currentPeak[1] == 0.0f ) return( false );
+//apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
+		currentPeak[0] = 0.0f;
+		currentPeak[1] = 0.0f;
+		return( false );
+		
+/*		if( currentPeak[0] == 0.0f && currentPeak[1] == 0.0f ) return( false );
 		else 
 		{
 			if( currentPeak[0] != 0.0f ) 
@@ -97,7 +102,7 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 			}
 			
 			return( true );
-		}
+		}	*/
 	}
 
 // variables for effect
@@ -110,6 +115,9 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
+
+// debug code	
+//	qDebug( "peaks %f %f", currentPeak[0], currentPeak[1] );
 	
 	float att_tmp = ( 1.0f / ( m_dpControls.m_attackModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate();
 	float rel_tmp = ( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate();
@@ -137,6 +145,9 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 			{
 				currentPeak[i] = qMax ( currentPeak[i] - rel_tmp, qAbs( s[i] ) );
 			}
+			
+			currentPeak[i] = qBound( 0.0f, currentPeak[i], 1.0f );
+			
 		}
 
 // account for stereo mode
@@ -163,11 +174,8 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 
 // apply input gain
-		if( m_dpControls.m_inputModel.value() != 1.0f )
-		{
-			s[0] *= m_dpControls.m_inputModel.value();
-			s[1] *= m_dpControls.m_inputModel.value();
-		}
+		s[0] *= m_dpControls.m_inputModel.value();
+		s[1] *= m_dpControls.m_inputModel.value();
 
 
 // start effect
@@ -196,7 +204,7 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 					gain = m_dpControls.m_wavegraphModel.samples()[199];
 				};
 				
-				s[i] = ( s[i] / sm_peak[i] ) * gain; 
+				s[i] *= ( gain / sm_peak[i] ); 
 			}
 			else { s[i] = 0.0f; }
 			
