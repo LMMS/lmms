@@ -1,5 +1,5 @@
 /*
- * song_editor.h - declaration of class songEditor, a window where you can
+ * SongEditor.h - declaration of class SongEditor, a window where you can
  *                 setup your songs
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -52,12 +52,12 @@ private:
 } ;
 
 
-class songEditor : public TrackContainerView
+class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	songEditor( song * _song );
-	virtual ~songEditor();
+	SongEditor( song * _song );
+	virtual ~SongEditor();
 
 	void setPauseIcon( bool pause );
 

@@ -6084,7 +6084,7 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Sång-Editor</translation>

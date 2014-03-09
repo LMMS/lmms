@@ -6081,7 +6081,7 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>اگر می خواهید پخش ترانه ی خود را متوقف کنید اینجا را کلیک کنید.سازنده موقعیت ترانه به شروع ترانه تنظیم خواهد شد.</translation>

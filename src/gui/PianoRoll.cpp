@@ -62,7 +62,7 @@
 #include "Piano.h"
 #include "pixmap_button.h"
 #include "song.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
@@ -1021,7 +1021,7 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 	
 	// we modified the song
 	update();
-	engine::getSongEditor()->update();
+	engine::songEditor()->update();
 	
 }
 
@@ -1057,7 +1057,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 	
 	// we modified the song
 	update();
-	engine::getSongEditor()->update();
+	engine::songEditor()->update();
 }
 
 
@@ -1745,7 +1745,7 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 							// added new notes, so must update engine, song, etc
 							engine::getSong()->setModified();
 							update();
-							engine::getSongEditor()->update();
+							engine::songEditor()->update();
 						}
 					}
 					
@@ -3643,7 +3643,7 @@ void PianoRoll::cutSelectedNotes()
 	}
 
 	update();
-	engine::getSongEditor()->update();
+	engine::songEditor()->update();
 }
 
 
@@ -3689,7 +3689,7 @@ void PianoRoll::pasteNotes()
 		m_ctrlMode = ModeDraw;
 		m_drawButton->setChecked( true );
 		update();
-		engine::getSongEditor()->update();
+		engine::songEditor()->update();
 	}
 }
 
@@ -3732,7 +3732,7 @@ void PianoRoll::deleteSelectedNotes()
 	{
 		engine::getSong()->setModified();
 		update();
-		engine::getSongEditor()->update();
+		engine::songEditor()->update();
 	}
 	
 }

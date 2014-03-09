@@ -6115,7 +6115,7 @@ Latenza: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Song-Editor</translation>

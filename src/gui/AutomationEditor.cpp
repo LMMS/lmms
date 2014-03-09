@@ -48,7 +48,7 @@
 #include <math.h>
 
 
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "MainWindow.h"
 #include "embed.h"
 #include "engine.h"
@@ -2191,7 +2191,7 @@ void AutomationEditor::cutSelectedValues()
 	}
 
 	update();
-	engine::getSongEditor()->update();
+	engine::songEditor()->update();
 }
 
 
@@ -2213,7 +2213,7 @@ void AutomationEditor::pasteValues()
 		// least one value...
 		engine::getSong()->setModified();
 		update();
-		engine::getSongEditor()->update();
+		engine::songEditor()->update();
 	}
 }
 
@@ -2243,7 +2243,7 @@ void AutomationEditor::deleteSelectedValues()
 	{
 		engine::getSong()->setModified();
 		update();
-		engine::getSongEditor()->update();
+		engine::songEditor()->update();
 	}
 }
 

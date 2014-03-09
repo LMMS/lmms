@@ -6101,7 +6101,7 @@ Latència: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Pica aquí si vols aturar la reproducció de la cançó. El marcador de posició de cançó serà col·locat a l&apos;inici de la cançó.</translation>

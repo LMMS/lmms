@@ -57,7 +57,7 @@
 #include "project_notes.h"
 #include "ProjectRenderer.h"
 #include "rename_dialog.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
@@ -726,9 +726,9 @@ void song::clearProject()
 	{
 		engine::getBBEditor()->clearAllTracks();
 	}
-	if( engine::getSongEditor() )
+	if( engine::songEditor() )
 	{
-		engine::getSongEditor()->clearAllTracks();
+		engine::songEditor()->clearAllTracks();
 	}
 	if( engine::fxMixerView() )
 	{

@@ -37,7 +37,7 @@
 #include "lmmsversion.h"
 #include "MainWindow.h"
 #include "bb_editor.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "song.h"
 #include "PianoRoll.h"
 #include "embed.h"
@@ -867,7 +867,7 @@ void MainWindow::toggleBBEditorWin( bool forceShow )
 
 void MainWindow::toggleSongEditorWin( void )
 {
-	toggleWindow( engine::getSongEditor() );
+	toggleWindow( engine::songEditor() );
 }
 
 

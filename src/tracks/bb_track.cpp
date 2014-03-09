@@ -37,7 +37,7 @@
 #include "Mixer.h"
 #include "rename_dialog.h"
 #include "song.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "templates.h"
 #include "track_label_button.h"
 
@@ -264,7 +264,7 @@ void bbTCOView::changeColor()
 	if( isSelected() )
 	{
 		QVector<selectableObject *> selected =
-				engine::getSongEditor()->selectedObjects();
+				engine::songEditor()->selectedObjects();
 		for( QVector<selectableObject *>::iterator it =
 							selected.begin();
 						it != selected.end(); ++it )

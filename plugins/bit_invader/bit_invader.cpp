@@ -34,7 +34,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "pixmap_button.h"
-#include "song_editor.h"
 #include "templates.h"
 #include "tooltip.h"
 #include "song.h"

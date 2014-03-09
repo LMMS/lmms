@@ -41,7 +41,7 @@
 #include "ProjectJournal.h"
 #include "project_notes.h"
 #include "Plugin.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "song.h"
 
 
@@ -54,7 +54,7 @@ FxMixerView * engine::s_fxMixerView = NULL;
 MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
-songEditor * engine::s_songEditor = NULL;
+SongEditor* engine::s_songEditor = NULL;
 AutomationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
 PianoRoll* engine::s_pianoRoll = NULL;
@@ -89,7 +89,7 @@ void engine::init( const bool _has_gui )
 	if( s_hasGUI )
 	{
 		s_mainWindow = new MainWindow;
-		s_songEditor = new songEditor( s_song );
+		s_songEditor = new SongEditor( s_song );
 		s_fxMixerView = new FxMixerView;
 		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new projectNotes;

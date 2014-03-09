@@ -6091,7 +6091,7 @@ Latenz: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Klicken Sie hier, wenn Sie das Abspielen des Songs stoppen wollen. Der Song-Positions-Marker wird automatisch auf den Song-Anfang zurückgesetzt.</translation>

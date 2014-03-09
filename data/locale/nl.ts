@@ -6086,7 +6086,7 @@ Vertraging: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Klik hier, wanneer je het afspelen van de song wilt stoppen. De song-position-marker zal weer naar het begin van je song worden gezet.</translation>
