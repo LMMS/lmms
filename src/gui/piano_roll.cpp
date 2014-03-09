@@ -1859,7 +1859,7 @@ void pianoRoll::testPlayNote( note * n )
 {
 	m_lastKey = n->key();
 	
-	//if( ! n->isPlaying() && ! m_recording && ! engine::getSong()->isPlaying() )
+	if( n->isPlaying() == false && m_recording == false )
 	{
 		n->setIsPlaying( true );
 		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity() );
