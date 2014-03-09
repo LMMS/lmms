@@ -39,7 +39,7 @@
 #include "gui_templates.h"
 #include "embed.h"
 #include "engine.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "TrackContainer.h"
 #include "rename_dialog.h"
 #include "SampleBuffer.h"
@@ -169,9 +169,9 @@ MidiTime pattern::beatPatternLength() const
 note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 {
 	note * new_note = new note( _new_note );
-	if( _quant_pos && engine::getPianoRoll() )
+	if( _quant_pos && engine::pianoRoll() )
 	{
-		new_note->quantizePos( engine::getPianoRoll()->quantization() );
+		new_note->quantizePos( engine::pianoRoll()->quantization() );
 	}
 
 	engine::mixer()->lock();
@@ -537,9 +537,9 @@ void pattern::updateBBTrack()
 		engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( engine::getPianoRoll()->currentPattern() == this )
+	if( engine::pianoRoll()->currentPattern() == this )
 	{
-		engine::getPianoRoll()->update();
+		engine::pianoRoll()->update();
 	}
 }
 
@@ -645,9 +645,9 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 
 patternView::~patternView()
 {
-	if( engine::getPianoRoll()->currentPattern() == m_pat )
+	if( engine::pianoRoll()->currentPattern() == m_pat )
 	{
-		engine::getPianoRoll()->setCurrentPattern( NULL );
+		engine::pianoRoll()->setCurrentPattern( NULL );
 		// we have to have the song-editor to stop playing if it played
 		// us before
 		if( engine::getSong()->isPlaying() &&
@@ -675,9 +675,9 @@ void patternView::update()
 
 void patternView::openInPianoRoll()
 {
-	engine::getPianoRoll()->setCurrentPattern( m_pat );
-	engine::getPianoRoll()->parentWidget()->show();
-	engine::getPianoRoll()->setFocus();
+	engine::pianoRoll()->setCurrentPattern( m_pat );
+	engine::pianoRoll()->parentWidget()->show();
+	engine::pianoRoll()->setFocus();
 }
 
 
@@ -808,9 +808,9 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 		engine::getSong()->setModified();
 		update();
 
-		if( engine::getPianoRoll()->currentPattern() == m_pat )
+		if( engine::pianoRoll()->currentPattern() == m_pat )
 		{
-			engine::getPianoRoll()->update();
+			engine::pianoRoll()->update();
 		}
 	}
 	else
@@ -870,9 +870,9 @@ void patternView::wheelEvent( QWheelEvent * _we )
 
 		engine::getSong()->setModified();
 		update();
-		if( engine::getPianoRoll()->currentPattern() == m_pat )
+		if( engine::pianoRoll()->currentPattern() == m_pat )
 		{
-			engine::getPianoRoll()->update();
+			engine::pianoRoll()->update();
 		}
 		_we->accept();
 	}

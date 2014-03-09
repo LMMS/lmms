@@ -5119,7 +5119,7 @@ use mouse wheel to set volume of a step</source>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Cortar las notas seleccionadas (Ctrl+X)</translation>

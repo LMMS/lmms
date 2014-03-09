@@ -1,10 +1,10 @@
 /*
- * piano_roll.h - declaration of class pianoRoll which is a window where you
- *                can set and edit notes in an easy way
+ * PianoRoll.h - declaration of class PianoRoll which is a window where you
+ *               can set and edit notes in an easy way
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _PIANO_ROLL_H
 #define _PIANO_ROLL_H
@@ -50,7 +49,7 @@ class pattern;
 class timeLine;
 class toolButton;
 
-class pianoRoll : public QWidget, public SerializingObject
+class PianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -186,7 +185,7 @@ private:
 		stmaMarkCurrentChord,
 	};
 
-	enum pianoRollKeyTypes
+	enum PianoRollKeyTypes
 	{
 		PR_WHITE_KEY_SMALL,
 		PR_WHITE_KEY_BIG,
@@ -199,9 +198,9 @@ private:
 	QList<int> m_markedSemiTones;
 	QMenu * m_semiToneMarkerMenu; // when you right click on the key area
 
-	pianoRoll();
-	pianoRoll( const pianoRoll & );
-	virtual ~pianoRoll();
+	PianoRoll();
+	PianoRoll( const PianoRoll & );
+	virtual ~PianoRoll();
 
 	void autoScroll( const MidiTime & _t );
 
@@ -239,7 +238,7 @@ private:
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
 
-	static pianoRollKeyTypes prKeyOrder[];
+	static PianoRollKeyTypes prKeyOrder[];
 
 
 	QWidget * m_toolBar;

@@ -1,7 +1,7 @@
 /*
- * main_window.cpp - implementation of LMMS-main-window
+ * MainWindow.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,7 +39,7 @@
 #include "bb_editor.h"
 #include "song_editor.h"
 #include "song.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "embed.h"
 #include "engine.h"
 #include "FxMixerView.h"
@@ -883,7 +883,7 @@ void MainWindow::toggleProjectNotesWin( void )
 
 void MainWindow::togglePianoRollWin( void )
 {
-	toggleWindow( engine::getPianoRoll() );
+	toggleWindow( engine::pianoRoll() );
 }
 
 

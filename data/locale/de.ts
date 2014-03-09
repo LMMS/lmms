@@ -5126,7 +5126,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Ausgewählte Noten ausschneiden (Strg+X)</translation>

@@ -5137,7 +5137,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Talla les notes seleccionades (Ctrl+X)</translation>

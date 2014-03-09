@@ -5150,7 +5150,7 @@ la rotellina del mouse impostare il volume delle note</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>Riproduci/metti in pausa questo pattern (Spazio)</translation>

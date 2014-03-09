@@ -61,7 +61,7 @@
 #include "text_float.h"
 #include "combobox.h"
 #include "bb_track_container.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "debug.h"
 
 
@@ -566,7 +566,7 @@ void AutomationEditor::update()
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
-		engine::getPianoRoll()->update();
+		engine::pianoRoll()->update();
 	}
 }
 
@@ -1881,8 +1881,7 @@ void AutomationEditor::play()
 		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
 		{
 			engine::getSong()->stop();
-			engine::getSong()->playPattern( (pattern *)
-				engine::getPianoRoll()->currentPattern() );
+			engine::getSong()->playPattern( (pattern *) engine::pianoRoll()->currentPattern() );
 		}
 		else if( engine::getSong()->isStopped() == false )
 		{
@@ -1890,8 +1889,7 @@ void AutomationEditor::play()
 		}
 		else
 		{
-			engine::getSong()->playPattern( (pattern *)
-				engine::getPianoRoll()->currentPattern() );
+			engine::getSong()->playPattern( (pattern *) engine::pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )

@@ -51,7 +51,7 @@
 #include "visualization_widget.h"
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "config_mgr.h"
 
 
@@ -476,7 +476,7 @@ void songEditor::recordAccompany()
 void songEditor::stop()
 {
 	m_s->stop();
-	engine::getPianoRoll()->stopRecording();
+	engine::pianoRoll()->stopRecording();
 }
 
 

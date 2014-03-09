@@ -5122,7 +5122,7 @@ volume van de steps is met het muiswiel te veranderen</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Knip geselecteerde noten (Ctrl+X)</translation>
