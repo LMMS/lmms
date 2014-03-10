@@ -37,7 +37,7 @@
 
 #include "config_mgr.h"
 #include "project_version.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
 
@@ -95,8 +95,8 @@ DataFile::DataFile( const QString & _fileName ) :
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
 		QMessageBox::critical( NULL,
-			songEditor::tr( "Could not open file" ),
-			songEditor::tr( "Could not open file %1. You probably "
+			SongEditor::tr( "Could not open file" ),
+			SongEditor::tr( "Could not open file %1. You probably "
 					"have no permissions to read this "
 					"file.\n Please make sure to have at "
 					"least read permissions to the file "
@@ -190,8 +190,8 @@ bool DataFile::writeFile( const QString& filename )
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
 		QMessageBox::critical( NULL,
-			songEditor::tr( "Could not write file" ),
-			songEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
+			SongEditor::tr( "Could not write file" ),
+			SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
 							"write to this file. Please make sure you have write-access to "
 							"the file and try again." ).arg( fullName ) );
 		return false;
@@ -731,8 +731,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
 			QMessageBox::critical( NULL,
-				songEditor::tr( "Error in file" ),
-				songEditor::tr( "The file %1 seems to contain "
+				SongEditor::tr( "Error in file" ),
+				SongEditor::tr( "The file %1 seems to contain "
 						"errors and therefore can't be "
 						"loaded." ).
 							arg( _sourceFile ) );

@@ -89,11 +89,8 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
 
 // apply input gain
-		if( m_wsControls.m_inputModel.value() != 1.0f )
-		{
-			s[0] *= m_wsControls.m_inputModel.value();
-			s[1] *= m_wsControls.m_inputModel.value();
-		}
+		s[0] *= m_wsControls.m_inputModel.value();
+		s[1] *= m_wsControls.m_inputModel.value();
 
 // clip if clip enabled
 		if( m_wsControls.m_clipModel.value() )

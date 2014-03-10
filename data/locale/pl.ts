@@ -5157,7 +5157,7 @@ użyj kółka myszy aby ustawić głośność poszczególnych kroków</translati
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>Odtwórz/zatrzymaj aktualny pattern (Spacja)</translation>
@@ -6122,7 +6122,7 @@ Latencja: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Edytor Kompozycji</translation>

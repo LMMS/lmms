@@ -36,12 +36,12 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "pattern.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
 #include "Plugin.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "song.h"
 
 
@@ -54,10 +54,10 @@ FxMixerView * engine::s_fxMixerView = NULL;
 MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
-songEditor * engine::s_songEditor = NULL;
+SongEditor* engine::s_songEditor = NULL;
 AutomationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
-pianoRoll * engine::s_pianoRoll = NULL;
+PianoRoll* engine::s_pianoRoll = NULL;
 projectNotes * engine::s_projectNotes = NULL;
 ProjectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
@@ -89,12 +89,12 @@ void engine::init( const bool _has_gui )
 	if( s_hasGUI )
 	{
 		s_mainWindow = new MainWindow;
-		s_songEditor = new songEditor( s_song );
+		s_songEditor = new SongEditor( s_song );
 		s_fxMixerView = new FxMixerView;
 		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
-		s_pianoRoll = new pianoRoll;
+		s_pianoRoll = new PianoRoll;
 		s_automationEditor = new AutomationEditor;
 
 		s_mainWindow->finalize();

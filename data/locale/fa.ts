@@ -5118,7 +5118,7 @@ use mouse wheel to set volume of a step</source>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>برش نت های انتخاب شده(Ctrl+X)</translation>
@@ -6081,7 +6081,7 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>اگر می خواهید پخش ترانه ی خود را متوقف کنید اینجا را کلیک کنید.سازنده موقعیت ترانه به شروع ترانه تنظیم خواهد شد.</translation>

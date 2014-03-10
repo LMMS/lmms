@@ -41,10 +41,10 @@ class FxMixerView;
 class ProjectJournal;
 class MainWindow;
 class Mixer;
-class pianoRoll;
+class PianoRoll;
 class projectNotes;
 class song;
-class songEditor;
+class SongEditor;
 class ladspa2LMMS;
 class ControllerRackView;
 
@@ -107,7 +107,7 @@ public:
 		return s_fxMixerView;
 	}
 
-	static songEditor * getSongEditor()
+	static SongEditor* songEditor()
 	{
 		return s_songEditor;
 	}
@@ -117,7 +117,7 @@ public:
 		return s_bbEditor;
 	}
 
-	static pianoRoll * getPianoRoll()
+	static PianoRoll* pianoRoll()
 	{
 		return s_pianoRoll;
 	}
@@ -188,10 +188,10 @@ private:
 	// GUI
 	static MainWindow * s_mainWindow;
 	static FxMixerView * s_fxMixerView;
-	static songEditor * s_songEditor;
+	static SongEditor* s_songEditor;
 	static AutomationEditor * s_automationEditor;
 	static bbEditor * s_bbEditor;
-	static pianoRoll * s_pianoRoll;
+	static PianoRoll* s_pianoRoll;
 	static projectNotes * s_projectNotes;
 	static ladspa2LMMS * s_ladspaManager;
 

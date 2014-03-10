@@ -5150,7 +5150,7 @@ utilisez la molette de la souris pour régler le volume d&apos;un pas</translati
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>Jouer/Mettre en pause le motif (Barre d&apos;espace)</translation>
@@ -6114,7 +6114,7 @@ Latence : %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Éditeur de morceau</translation>

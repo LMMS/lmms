@@ -5121,7 +5121,7 @@ use mouse wheel to set volume of a step</source>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>Spela/pausa aktuellt mönster (mellanslag)</translation>
@@ -6084,7 +6084,7 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Sång-Editor</translation>

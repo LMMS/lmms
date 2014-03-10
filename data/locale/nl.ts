@@ -5122,7 +5122,7 @@ volume van de steps is met het muiswiel te veranderen</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Knip geselecteerde noten (Ctrl+X)</translation>
@@ -6086,7 +6086,7 @@ Vertraging: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Klik hier, wanneer je het afspelen van de song wilt stoppen. De song-position-marker zal weer naar het begin van je song worden gezet.</translation>

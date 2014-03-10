@@ -1,5 +1,5 @@
 /*
- * song_editor.cpp - basic window for song-editing
+ * SongEditor.cpp - basic window for song-editing
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -35,7 +35,7 @@
 
 #include <math.h>
 
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "automatable_slider.h"
 #include "combobox.h"
 #include "config_mgr.h"
@@ -51,7 +51,7 @@
 #include "visualization_widget.h"
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "config_mgr.h"
 
 
@@ -75,7 +75,7 @@ void positionLine::paintEvent( QPaintEvent * _pe )
 
 
 
-songEditor::songEditor( song * _song ) :
+SongEditor::SongEditor( song * _song ) :
 	TrackContainerView( _song ),
 	m_s( _song ),
 	m_scrollBack( false ),
@@ -401,14 +401,14 @@ songEditor::songEditor( song * _song ) :
 
 
 
-songEditor::~songEditor()
+SongEditor::~SongEditor()
 {
 }
 
 
 
 
-void songEditor::setHighQuality( bool _hq )
+void SongEditor::setHighQuality( bool _hq )
 {
 	engine::mixer()->changeQuality( Mixer::qualitySettings(
 			_hq ? Mixer::qualitySettings::Mode_HighQuality :
@@ -418,7 +418,7 @@ void songEditor::setHighQuality( bool _hq )
 
 
 
-void songEditor::scrolled( int _new_pos )
+void SongEditor::scrolled( int _new_pos )
 {
 	update();
 	emit positionChanged( m_currentPosition = MidiTime( _new_pos, 0 ) );
@@ -427,7 +427,7 @@ void songEditor::scrolled( int _new_pos )
 
 
 
-void songEditor::setPauseIcon( bool pause )
+void SongEditor::setPauseIcon( bool pause )
 {
 	if( pause == true )
 	{
@@ -442,7 +442,7 @@ void songEditor::setPauseIcon( bool pause )
 
 
 
-void songEditor::play()
+void SongEditor::play()
 {
 	if( engine::getSong()->playMode() != song::Mode_PlaySong )
 	{
@@ -457,7 +457,7 @@ void songEditor::play()
 
 
 
-void songEditor::record()
+void SongEditor::record()
 {
 	m_s->record();
 }
@@ -465,7 +465,7 @@ void songEditor::record()
 
 
 
-void songEditor::recordAccompany()
+void SongEditor::recordAccompany()
 {
 	m_s->playAndRecord();
 }
@@ -473,16 +473,16 @@ void songEditor::recordAccompany()
 
 
 
-void songEditor::stop()
+void SongEditor::stop()
 {
 	m_s->stop();
-	engine::getPianoRoll()->stopRecording();
+	engine::pianoRoll()->stopRecording();
 }
 
 
 
 
-void songEditor::keyPressEvent( QKeyEvent * _ke )
+void SongEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
 		engine::mainWindow()->isShiftPressed() == TRUE &&
@@ -536,7 +536,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void songEditor::wheelEvent( QWheelEvent * _we )
+void SongEditor::wheelEvent( QWheelEvent * _we )
 {
 	if( engine::mainWindow()->isCtrlPressed() == TRUE )
 	{
@@ -578,7 +578,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 
 
 
-void songEditor::masterVolumeChanged( int _new_val )
+void SongEditor::masterVolumeChanged( int _new_val )
 {
 	masterVolumeMoved( _new_val );
 	if( m_mvsStatus->isVisible() == FALSE && m_s->m_loadingProject == FALSE
@@ -594,7 +594,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 
 
 
-void songEditor::masterVolumePressed( void )
+void SongEditor::masterVolumePressed( void )
 {
 	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
@@ -605,7 +605,7 @@ void songEditor::masterVolumePressed( void )
 
 
 
-void songEditor::masterVolumeMoved( int _new_val )
+void SongEditor::masterVolumeMoved( int _new_val )
 {
 	m_mvsStatus->setText( tr( "Value: %1%" ).arg( _new_val ) );
 }
@@ -613,7 +613,7 @@ void songEditor::masterVolumeMoved( int _new_val )
 
 
 
-void songEditor::masterVolumeReleased( void )
+void SongEditor::masterVolumeReleased( void )
 {
 	m_mvsStatus->hide();
 }
@@ -621,7 +621,7 @@ void songEditor::masterVolumeReleased( void )
 
 
 
-void songEditor::masterPitchChanged( int _new_val )
+void SongEditor::masterPitchChanged( int _new_val )
 {
 	masterPitchMoved( _new_val );
 	if( m_mpsStatus->isVisible() == FALSE && m_s->m_loadingProject == FALSE
@@ -636,7 +636,7 @@ void songEditor::masterPitchChanged( int _new_val )
 
 
 
-void songEditor::masterPitchPressed( void )
+void SongEditor::masterPitchPressed( void )
 {
 	m_mpsStatus->moveGlobal( m_masterPitchSlider,
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
@@ -647,7 +647,7 @@ void songEditor::masterPitchPressed( void )
 
 
 
-void songEditor::masterPitchMoved( int _new_val )
+void SongEditor::masterPitchMoved( int _new_val )
 {
 	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( _new_val ) );
 
@@ -656,7 +656,7 @@ void songEditor::masterPitchMoved( int _new_val )
 
 
 
-void songEditor::masterPitchReleased( void )
+void SongEditor::masterPitchReleased( void )
 {
 	m_mpsStatus->hide();
 }
@@ -664,7 +664,7 @@ void songEditor::masterPitchReleased( void )
 
 
 
-void songEditor::updateScrollBar( int _len )
+void SongEditor::updateScrollBar( int _len )
 {
 	m_leftRightScroll->setMaximum( _len );
 }
@@ -703,7 +703,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void songEditor::updatePosition( const MidiTime & _t )
+void SongEditor::updatePosition( const MidiTime & _t )
 {
 	int widgetWidth, trackOpWidth;
 	if( configManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -758,7 +758,7 @@ void songEditor::updatePosition( const MidiTime & _t )
 
 
 
-void songEditor::zoomingChanged()
+void SongEditor::zoomingChanged()
 {
 	const QString & zfac = m_zoomingComboBox->model()->currentText();
 	setPixelsPerTact( zfac.left( zfac.length() - 1 ).toInt() *
@@ -771,7 +771,7 @@ void songEditor::zoomingChanged()
 
 
 
-void songEditor::adjustUiAfterProjectLoad()
+void SongEditor::adjustUiAfterProjectLoad()
 {
 	//if( isMaximized() )
 	{
@@ -787,7 +787,7 @@ void songEditor::adjustUiAfterProjectLoad()
 
 
 
-bool songEditor::allowRubberband() const
+bool SongEditor::allowRubberband() const
 {
 	return( m_editModeButton->isChecked() );
 }
@@ -795,7 +795,7 @@ bool songEditor::allowRubberband() const
 
 
 
-#include "moc_song_editor.cxx"
+#include "moc_SongEditor.cxx"
 
 
 /* vim: set tw=0 noexpandtab: */

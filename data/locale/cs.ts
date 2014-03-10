@@ -5138,7 +5138,7 @@ k nastavení zesílení kroku použijte kolečko myši</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>Přehrát nebo pozastavit přehrávání aktuálního patternu (mezerník)</translation>
@@ -6102,7 +6102,7 @@ Zpoždění %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Editor skladby</translation>

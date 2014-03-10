@@ -5151,7 +5151,7 @@ empregue a roda do rato para modificar o volume un paso</translation>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>Reproducir/Deter o padrón actual (Espazo)</translation>
@@ -6116,7 +6116,7 @@ Latencia: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>Editor de cancións</translation>

@@ -5121,7 +5121,7 @@ use mouse wheel to set volume of a step</source>
     </message>
 </context>
 <context>
-    <name>pianoRoll</name>
+    <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
         <translation>현재 패턴 재생/잠시 중지 (Space)</translation>
@@ -6086,7 +6086,7 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>songEditor</name>
+    <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
         <translation>노래-편집기</translation>

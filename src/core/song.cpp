@@ -52,12 +52,12 @@
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
 #include "ProjectRenderer.h"
 #include "rename_dialog.h"
-#include "song_editor.h"
+#include "SongEditor.h"
 #include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
@@ -726,9 +726,9 @@ void song::clearProject()
 	{
 		engine::getBBEditor()->clearAllTracks();
 	}
-	if( engine::getSongEditor() )
+	if( engine::songEditor() )
 	{
-		engine::getSongEditor()->clearAllTracks();
+		engine::songEditor()->clearAllTracks();
 	}
 	if( engine::fxMixerView() )
 	{
@@ -935,11 +935,9 @@ void song::loadProject( const QString & _file_name )
 					engine::getControllerRackView()->
 						restoreState( node.toElement() );
 				}
-				else if( node.nodeName() ==
-					engine::getPianoRoll()->nodeName() )
+				else if( node.nodeName() == engine::pianoRoll()->nodeName() )
 				{
-					engine::getPianoRoll()->restoreState(
-							node.toElement() );
+					engine::pianoRoll()->restoreState( node.toElement() );
 				}
 				else if( node.nodeName() ==
 					engine::automationEditor()->
@@ -1015,7 +1013,7 @@ bool song::saveProjectFile( const QString & _filename )
 	if( engine::hasGUI() )
 	{
 		engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
-		engine::getPianoRoll()->saveState( dataFile, dataFile.content() );
+		engine::pianoRoll()->saveState( dataFile, dataFile.content() );
 		engine::automationEditor()->saveState( dataFile, dataFile.content() );
 		engine::getProjectNotes()->
 			SerializingObject::saveState( dataFile, dataFile.content() );

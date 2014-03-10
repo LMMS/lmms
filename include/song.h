@@ -354,7 +354,7 @@ private:
 
 
 	friend class engine;
-	friend class songEditor;
+	friend class SongEditor;
 	friend class mainWindow;
 	friend class ControllerRackView;
 

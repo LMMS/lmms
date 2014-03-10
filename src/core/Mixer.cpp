@@ -36,7 +36,7 @@
 #include "engine.h"
 #include "config_mgr.h"
 #include "SamplePlayHandle.h"
-#include "piano_roll.h"
+#include "PianoRoll.h"
 #include "MicroTimer.h"
 #include "atomic_int.h"
 
@@ -556,7 +556,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	song::playPos p = engine::getSong()->getPlayPos(
 						song::Mode_PlayPattern );
 	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
-		engine::getPianoRoll()->isRecording() == true &&
+		engine::pianoRoll()->isRecording() == true &&
 		p != last_metro_pos && p.getTicks() %
 					(DefaultTicksPerTact / 4 ) == 0 )
 	{

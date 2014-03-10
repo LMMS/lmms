@@ -102,7 +102,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 
 timeLine::~timeLine()
 {
-	if( engine::getSongEditor() )
+	if( engine::songEditor() )
 	{
 		m_pos.m_timeLine = NULL;
 	}
