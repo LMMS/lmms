@@ -1907,6 +1907,8 @@ void AutomationEditor::play()
 			engine::getSong()->togglePause();
 		}
 	}
+
+	setPauseIcon( engine::getSong()->isPlaying() );
 }
 
 
