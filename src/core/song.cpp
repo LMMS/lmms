@@ -554,6 +554,12 @@ void song::togglePause()
 
 void song::stop()
 {
+	// do not stop/reset things again if we're stopped already
+	if( m_playMode == Mode_None )
+	{
+		return;
+	}
+
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	m_playing = false;
 	m_paused = false;
