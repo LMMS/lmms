@@ -309,6 +309,9 @@ void song::processNextBuffer()
 					// offset
 					ticks = ticks % ( max_tact * MidiTime::ticksPerTact() );
 
+					// wrap milli second counter
+					m_elapsedMilliSeconds = ( ticks * 60 * 1000 / 48 ) / getTempo();
+
 					m_vstSyncController.setAbsolutePosition( ticks );
 				}
 			}
