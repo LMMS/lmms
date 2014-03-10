@@ -61,7 +61,7 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 	tb_layout->setMargin( 0 );
 
 
-	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
+	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	// TODO: Use style sheet
 	if( configManager::inst()->value( "ui",
