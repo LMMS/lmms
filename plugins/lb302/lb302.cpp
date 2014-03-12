@@ -43,7 +43,6 @@
 #include "embed.cpp"
 #include "moc_lb302.cxx"
 
-
 // Envelope Recalculation period
 #define ENVINC 64
 
@@ -340,7 +339,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	vcfs[0] = new lb302Filter3Pole(&fs);
 	vcfs[1] = new lb302FilterIIR2(&fs);
-	vcf = vcfs[1];
+	db24Toggled();
 
 	sample_cnt = 0;
 	release_frame = 1<<24;
@@ -401,6 +400,7 @@ void lb302Synth::loadSettings( const QDomElement & _this )
 	slideToggle.loadSettings( _this, "slide");
 	deadToggle.loadSettings( _this, "dead");
 	db24Toggle.loadSettings( _this, "db24");
+ 	db24Toggled();
 
 	filterChanged();
 }
