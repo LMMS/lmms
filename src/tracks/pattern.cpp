@@ -605,6 +605,9 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 	m_paintPixmap(),
 	m_needsUpdate( true )
 {
+	connect( engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
+			this, SLOT( update() ) );
+			
 	if( s_stepBtnOn == NULL )
 	{
 		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
@@ -931,13 +934,19 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setBrush( lingrad );
-	p.setPen( c.darker( 300 ) );
+	if( engine::pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != pattern::BeatPattern )
+		p.setPen( c.lighter( 130 ) );
+	else
+		p.setPen( c.darker( 300 ) );
 	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
 
 	p.setBrush( QBrush() );
 	if( m_pat->m_patternType != pattern::BeatPattern )
 	{
-		p.setPen( c.lighter( 130 ) );
+		if( engine::pianoRoll()->currentPattern() == m_pat )
+			p.setPen( c.lighter( 160 ) );
+		else
+			p.setPen( c.lighter( 130 ) );
 		p.drawRect( QRect( 1, 1, width() - 3, height() - 3 ) );
 	}
 
