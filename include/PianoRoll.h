@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _PIANO_ROLL_H
-#define _PIANO_ROLL_H
+#ifndef PIANO_ROLL_H
+#define PIANO_ROLL_H
 
 #include <QtGui/QWidget>
 
@@ -147,6 +147,7 @@ protected slots:
 
 
 signals:
+	void currentPatternChanged();
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -169,7 +170,7 @@ private:
 		ActionChangeNoteProperty,
 		ActionResizeNoteEditArea
 	};
-	
+
 	enum noteEditMode
 	{
 		NoteEditVolume,
@@ -205,7 +206,7 @@ private:
 	void autoScroll( const MidiTime & _t );
 
 	MidiTime newNoteLen() const;
-	
+
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
 	bool isSelection() const;
@@ -213,19 +214,19 @@ private:
 	void testPlayNote( note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes( bool _pause = true );
-	
+
 	inline int noteEditTop() const;
 	inline int keyAreaBottom() const;
 	inline int noteEditBottom() const;
 	inline int keyAreaTop() const;
 	inline int noteEditRight() const;
 	inline int noteEditLeft() const;
-	
+
 	void dragNotes( int x, int y, bool alt, bool shift );
-		
+
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
-			
+
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeyBigPressedPm;
 	static QPixmap * s_whiteKeySmallPm;
@@ -252,7 +253,7 @@ private:
 	toolButton * m_eraseButton;
 	toolButton * m_selectButton;
 	toolButton * m_detuneButton;
-		
+
 	toolButton * m_cutButton;
 	toolButton * m_copyButton;
 	toolButton * m_pasteButton;
@@ -287,22 +288,22 @@ private:
 	int m_selectedTick;
 	int m_selectStartKey;
 	int m_selectedKeys;
-	
+
 	// boundary box around all selected notes when dragging
 	int m_moveBoundaryLeft;
 	int m_moveBoundaryTop;
 	int m_moveBoundaryRight;
 	int m_moveBoundaryBottom;
-	
+
 	// remember where the scrolling started when dragging so that
 	// we can handle dragging while scrolling with arrow keys
 	int m_mouseDownKey;
 	int m_mouseDownTick;
-	
+
 	// remember the last x and y of a mouse movement
 	int m_lastMouseX;
 	int m_lastMouseY;
-	
+
 	// x,y of when the user starts a drag
 	int m_moveStartX;
 	int m_moveStartY;
@@ -312,7 +313,7 @@ private:
 	int m_ppt;
 	int m_totalKeysToScroll;
 
-	// remember these values to use them 
+	// remember these values to use them
 	// for the next note that is set
 	MidiTime m_lenOfNewNotes;
 	volume_t m_lastNoteVolume;
@@ -323,7 +324,7 @@ private:
 
 	editModes m_editMode;
 	editModes m_ctrlMode; // mode they were in before they hit ctrl
-		
+
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -337,7 +338,7 @@ private:
 	note * noteUnderMouse();
 
 	// turn a selection rectangle into selected notes
-	void computeSelectedNotes( bool shift ); 
+	void computeSelectedNotes( bool shift );
 	void clearSelectedNotes();
 
 	friend class engine;
