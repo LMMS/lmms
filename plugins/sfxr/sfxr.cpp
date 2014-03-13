@@ -4,7 +4,7 @@
  * please read readme.txt in this directory
  *
  * Copyright (c) 2014 Wong Cho Ching
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -159,7 +159,7 @@ void SfxrSynth::resetSample( bool restart )
 
 
 
-void SfxrSynth::update( sampleFrame * buffer, const fpp_t frameNum )
+void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 {
 	for(int i=0;i<frameNum;i++)
 	{
@@ -452,7 +452,7 @@ QString sfxrInstrument::nodeName() const
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	float currentSampleRate = engine::mixer()->processingSampleRate();
-	
+
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -464,10 +464,13 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 		return;
 	}
 
-	fpp_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
-	
+	int32_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
+
 	pitchedFrameNum /= ( currentSampleRate / 44100 );
-	
+
+// debug code
+//	qDebug( "pFN %d", pitchedFrameNum );
+
 	sampleFrame * pitchedBuffer = new sampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
 	for( fpp_t i=0; i<frameNum; i++ )
@@ -483,7 +486,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	applyRelease( _working_buffer, _n );
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, _n );
-	
+
 }
 
 
@@ -622,7 +625,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	m_dSlideKnob	->setObjectName( "freqKnob" );
 	m_vibDepthKnob	->setObjectName( "freqKnob" );
 	m_vibSpeedKnob	->setObjectName( "freqKnob" );
-	
+
 	createKnob(m_changeAmtKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Change Amount");
 	createKnob(m_changeSpeedKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*1, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Change Speed");
 
