@@ -4,7 +4,7 @@
  * please read readme.txt in this directory
  *
  * Copyright (c) 2014 Wong Cho Ching
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _SFXR_H
-#define _SFXR_H
+#ifndef SFXR_H
+#define SFXR_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -74,7 +74,7 @@ public:
 	virtual ~SfxrSynth();
 
 	void resetSample( bool restart );
-	void update( sampleFrame * buffer, const fpp_t frameNum );
+	void update( sampleFrame * buffer, const int32_t frameNum );
 
 	bool isPlaying() const;
 
