@@ -309,6 +309,9 @@ void song::processNextBuffer()
 					// offset
 					ticks = ticks % ( max_tact * MidiTime::ticksPerTact() );
 
+					// wrap milli second counter
+					m_elapsedMilliSeconds = ( ticks * 60 * 1000 / 48 ) / getTempo();
+
 					m_vstSyncController.setAbsolutePosition( ticks );
 				}
 			}
@@ -551,6 +554,12 @@ void song::togglePause()
 
 void song::stop()
 {
+	// do not stop/reset things again if we're stopped already
+	if( m_playMode == Mode_None )
+	{
+		return;
+	}
+
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	m_playing = false;
 	m_paused = false;

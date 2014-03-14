@@ -48,6 +48,8 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 {
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
+	connect( engine::automationEditor(), SIGNAL( currentPatternChanged() ),
+			this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedHeight( parentWidget()->height() - 2 );
@@ -228,11 +230,17 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c );
 
 	p.setBrush( lingrad );
-	p.setPen( c.lighter( 160 ) );
+	if( engine::automationEditor()->currentPattern() == m_pat )
+		p.setPen( c.lighter( 160 ) );
+	else
+		p.setPen( c.lighter( 130 ) );
 	p.drawRect( 1, 1, width()-3, height()-3 );
 
 	p.setBrush( QBrush() );
-	p.setPen( c.darker( 300 ) );
+	if( engine::automationEditor()->currentPattern() == m_pat )
+		p.setPen( c.lighter( 130 ) );
+	else
+		p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, width()-1, height()-1 );
 
 	const float ppt = fixedTCOs() ?
@@ -302,16 +310,15 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	p.resetMatrix();
 	p.setFont( pointSize<8>( p.font() ) );
-	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
-	{
-		p.setPen( QColor( 50, 50, 50 ) );
-	}
-	else
-	{
-		p.setPen( QColor( 0, 0, 0 ) );
-	}
 
-	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
+	QColor text_color = ( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
+		? QColor( 30, 30, 30 )
+		: QColor( 255, 255, 255 );
+
+	p.setPen( QColor( 0, 0, 0 ) );
+	p.drawText( 4, p.fontMetrics().height()+1, m_pat->name() );
+	p.setPen( text_color );
+	p.drawText( 3, p.fontMetrics().height(), m_pat->name() );
 
 	if( m_pat->isMuted() )
 	{

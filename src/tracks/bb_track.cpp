@@ -212,9 +212,12 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	p.setFont( pointSize<8>( p.font() ) );
+	
 	p.setPen( QColor( 0, 0, 0 ) );
+	p.drawText( 4, p.fontMetrics().height()+1, m_bbTCO->name() );
+	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 3, p.fontMetrics().height(), m_bbTCO->name() );
-
+	
 	if( m_bbTCO->isMuted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,

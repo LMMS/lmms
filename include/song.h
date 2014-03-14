@@ -170,12 +170,12 @@ public:
 		if ( m_exportLoop )
 		{
 			return m_exporting == true &&
-				m_playPos[Mode_PlaySong].getTact() >= length();
+				m_playPos[Mode_PlaySong].getTicks() >= length() * ticksPerTact();
 		}
 		else
 		{
 			return m_exporting == true &&
-				m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+				m_playPos[Mode_PlaySong].getTicks() >= ( length() + 1 ) * ticksPerTact();
 		}
 	}
 
