@@ -380,9 +380,13 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	if( m_tco->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
-		p.setPen( QColor( 224, 0, 0 ) );
-		p.drawText( 9, p.fontMetrics().height() - 1, "Rec" );
-		p.setBrush( QBrush( QColor( 224, 0, 0 ) ) );
+
+		p.setPen( QColor( 0, 0, 0 ) );	
+		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
+		p.setPen( QColor( 255, 60, 60 ) );	
+		p.drawText( 9, p.fontMetrics().height(), "Rec" );
+		
+		p.setBrush( QBrush( QColor( 255, 60, 60 ) ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}
 }

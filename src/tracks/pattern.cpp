@@ -607,7 +607,7 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 {
 	connect( engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
-			
+
 	if( s_stepBtnOn == NULL )
 	{
 		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
@@ -970,7 +970,7 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 
 // melody pattern paint event
-	
+
 	if( m_pat->m_patternType == pattern::MelodyPattern )
 	{
 		if( m_pat->m_notes.size() > 0 )
@@ -979,12 +979,12 @@ void patternView::paintEvent( QPaintEvent * )
 			// display the area where most of the m_notes are
 			// also calculate min/max tones so the tonal range can be
 			// properly stretched accross the pattern vertically
-			
+
 			int central_key = 0;
 			int max_key = 0;
 			int min_key = 9999999;
 			int total_notes = 0;
-			
+
 			for( NoteVector::Iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 			{
@@ -1001,13 +1001,13 @@ void patternView::paintEvent( QPaintEvent * )
 			{
 				central_key = central_key / total_notes;
 				const int keyrange = qMax( qMax( max_key - central_key, central_key - min_key ), 1 );
-				
+
 				// debug code
 				// qDebug( "keyrange: %d", keyrange );
 
 				// determine height of the pattern view, sans borders
 				const int ht = height() - 1 - TCO_BORDER_WIDTH * 2;
-				
+
 				// determine maximum height value for drawing bounds checking
 				const int max_ht = height() - 1 - TCO_BORDER_WIDTH;
 
@@ -1032,7 +1032,7 @@ void patternView::paintEvent( QPaintEvent * )
 						( float( central_key - ( *it )->key() ) / keyrange + 1.0f ) / 2;
 					// multiply that by pattern height
 					const int y_pos = static_cast<int>( TCO_BORDER_WIDTH + y_key * ht );
-					
+
 					// debug code
 					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
 
@@ -1048,7 +1048,7 @@ void patternView::paintEvent( QPaintEvent * )
 						const int x2 = x_base +
 							static_cast<int>
 							( ( ( *it )->pos() + ( *it )->length() ) * ( ppt  / MidiTime::ticksPerTact() ) );
-						
+
 						// check bounds, draw line
 						if( x1 < width() - TCO_BORDER_WIDTH )
 							p.drawLine( x1, y_pos,
@@ -1130,17 +1130,16 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setFont( pointSize<8>( p.font() ) );
-	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
-	{
-		p.setPen( QColor( 30, 30, 30 ) );
-	}
-	else
-	{
-		p.setPen( QColor( 0, 0, 0 ) );
-	}
+
+	QColor text_color = ( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
+		? QColor( 30, 30, 30 )
+		: QColor( 255, 255, 255 );
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )
 	{
+		p.setPen( QColor( 0, 0, 0 ) );
+		p.drawText( 4, p.fontMetrics().height()+1, m_pat->name() );
+		p.setPen( text_color );
 		p.drawText( 3, p.fontMetrics().height(), m_pat->name() );
 	}
 
