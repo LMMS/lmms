@@ -88,8 +88,8 @@ void waveShaperControls::samplesChanged( int _begin, int _end)
 void waveShaperControls::loadSettings( const QDomElement & _this )
 {
 //load input, output knobs
-	m_inputModel.setValue( _this.attribute( "inputGain" ).toFloat() );
-	m_outputModel.setValue( _this.attribute( "outputGain" ).toFloat() );
+	m_inputModel.loadSettings( _this, "inputGain" );
+	m_outputModel.loadSettings( _this, "outputGain" );
 	
 	m_clipModel.loadSettings( _this, "clipInput" );
 
@@ -110,9 +110,9 @@ void waveShaperControls::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 //save input, output knobs
-	_this.setAttribute( "inputGain", m_inputModel.value() );
-	_this.setAttribute( "outputGain", m_outputModel.value() );
-	
+	m_inputModel.saveSettings( _doc, _this, "inputGain" );
+	m_outputModel.saveSettings( _doc, _this, "outputGain" );
+
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
 
 //save waveshape
