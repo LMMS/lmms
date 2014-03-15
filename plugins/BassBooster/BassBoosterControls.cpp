@@ -81,9 +81,9 @@ void BassBoosterControls::changeRatio()
 
 void BassBoosterControls::loadSettings( const QDomElement& _this )
 {
-	m_freqModel.setValue( _this.attribute( "freq" ).toFloat() );
-	m_gainModel.setValue( _this.attribute( "gain" ).toFloat() );
-	m_ratioModel.setValue( _this.attribute( "ratio" ).toFloat() );
+	m_freqModel.loadSettings( _this, "freq" );
+	m_gainModel.loadSettings( _this, "gain" );
+	m_ratioModel.loadSettings( _this, "ratio");
 }
 
 
@@ -91,9 +91,9 @@ void BassBoosterControls::loadSettings( const QDomElement& _this )
 
 void BassBoosterControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 {
-	_this.setAttribute( "freq", m_freqModel.value() );
-	_this.setAttribute( "gain", m_gainModel.value() );
-	_this.setAttribute( "ratio", m_ratioModel.value() );
+	m_freqModel.saveSettings( doc, _this, "freq" );
+	m_gainModel.saveSettings( doc, _this, "gain" );
+	m_ratioModel.saveSettings( doc, _this, "ratio");
 }
 
 

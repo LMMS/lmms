@@ -86,11 +86,11 @@ void dynProcControls::samplesChanged( int _begin, int _end)
 void dynProcControls::loadSettings( const QDomElement & _this )
 {
 //load knobs, stereomode
-	m_inputModel.setValue( _this.attribute( "inputGain" ).toFloat() );
-	m_outputModel.setValue( _this.attribute( "outputGain" ).toFloat() );
-	m_attackModel.setValue( _this.attribute( "attack" ).toFloat() );
-	m_releaseModel.setValue( _this.attribute( "release" ).toFloat() );
-	m_stereomodeModel.setValue( _this.attribute( "stereoMode" ).toInt() );
+	m_inputModel.loadSettings( _this, "inputGain" );
+	m_outputModel.loadSettings( _this, "outputGain" );
+	m_attackModel.loadSettings( _this, "attack" );
+	m_releaseModel.loadSettings( _this, "release" );
+	m_stereomodeModel.loadSettings( _this, "stereoMode" );
 	
 //load waveshape
 	int size = 0;
@@ -109,11 +109,11 @@ void dynProcControls::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 //save input, output knobs
-	_this.setAttribute( "inputGain", m_inputModel.value() );
-	_this.setAttribute( "outputGain", m_outputModel.value() );
-	_this.setAttribute( "attack", m_attackModel.value() );
-	_this.setAttribute( "release", m_releaseModel.value() );
-	_this.setAttribute( "stereoMode", m_stereomodeModel.value() );
+	m_inputModel.saveSettings( _doc, _this, "inputGain" );
+	m_outputModel.saveSettings( _doc, _this, "outputGain" );
+	m_attackModel.saveSettings( _doc, _this, "attack" );
+	m_releaseModel.saveSettings( _doc, _this, "release" );
+	m_stereomodeModel.saveSettings( _doc, _this, "stereoMode" );
 	
 
 //save waveshape
