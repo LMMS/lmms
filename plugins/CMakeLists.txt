@@ -1,3 +1,4 @@
+ADD_SUBDIRECTORY(Amplifier)
 ADD_SUBDIRECTORY(audio_file_processor)
 ADD_SUBDIRECTORY(BassBooster)
 ADD_SUBDIRECTORY(bit_invader)
