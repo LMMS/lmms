@@ -1,0 +1,153 @@
+/*
+ * DualFilter.cpp - A native dual filter effect plugin with two parallel filters
+ *
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include "DualFilter.h"
+
+#include "embed.cpp"
+#include "basic_filters.h"
+
+
+extern "C"
+{
+
+Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
+{
+	STRINGIFY( PLUGIN_NAME ),
+	"Dual Filter",
+	QT_TRANSLATE_NOOP( "pluginBrowser", "A native amplifier plugin" ),
+	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
+	0x0100,
+	Plugin::Effect,
+	new PluginPixmapLoader( "logo" ),
+	NULL,
+	NULL
+} ;
+
+}
+
+
+
+DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
+	Effect( &dualfilter_plugin_descriptor, parent, key ),
+	m_dfControls( this )
+{
+	m_filter1 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
+	m_filter2 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
+}
+
+
+
+
+DualFilterEffect::~DualFilterEffect()
+{
+	delete m_filter1;
+	delete m_filter2;
+}
+
+
+
+
+bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+{
+	if( !isEnabled() || !isRunning () )
+	{
+		return( false );
+	}
+
+	double outSum = 0.0;
+	const float d = dryLevel();
+	const float w = wetLevel();
+
+	m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
+	m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+
+	if( m_dfControls.m_enabled1Model.value() ) m_filter1->calcFilterCoeffs( m_dfControls.m_cut1Model.value(), m_dfControls.m_res1Model.value() );
+	if( m_dfControls.m_enabled2Model.value() ) m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
+
+	// buffer processing loop
+	for( fpp_t f = 0; f < frames; ++f )
+	{
+		sample_t s[2] = { 0.0f, 0.0f };	// mix
+		sample_t s1[2] = { buf[f][0], buf[f][1] };	// filter 1
+		sample_t s2[2] = { buf[f][0], buf[f][1] };	// filter 2
+
+		// get mix amounts for wet signals of both filters
+		const float mix1 = 1.0f - ( ( m_dfControls.m_mixModel.value( f ) + 1.0f ) / 2.0f );
+		const float mix2 = ( ( m_dfControls.m_mixModel.value( f ) + 1.0f ) / 2.0f );
+
+		// update filter 1
+		if( m_dfControls.m_enabled1Model.value() )
+		{
+			s1[0] = m_filter1->update( s1[0], 0 );
+			s1[1] = m_filter1->update( s1[1], 1 );
+
+			// apply gain
+			s1[0] *= ( m_dfControls.m_gain1Model.value( f ) / 100.0f );
+			s1[1] *= ( m_dfControls.m_gain1Model.value( f ) / 100.0f );
+
+			// apply mix
+			s[0] += ( s1[0] * mix1 );
+			s[1] += ( s1[1] * mix1 );
+		}
+
+		// update filter 2
+		if( m_dfControls.m_enabled2Model.value() )
+		{
+			s2[0] = m_filter2->update( s2[0], 0 );
+			s2[1] = m_filter2->update( s2[1], 1 );
+
+			//apply gain
+			s2[0] *= ( m_dfControls.m_gain2Model.value( f ) / 100.0f );
+			s2[1] *= ( m_dfControls.m_gain2Model.value( f ) / 100.0f );
+
+			// apply mix
+			s[0] += ( s2[0] * mix2 );
+			s[1] += ( s2[1] * mix2 );
+		}
+
+		// do another mix with dry signal
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
+		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+	}
+
+	checkGate( outSum / frames );
+
+	return isRunning();
+}
+
+
+
+extern "C"
+{
+
+// necessary for getting instance out of shared lib
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+{
+	return new DualFilterEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+}
+
+}
+
