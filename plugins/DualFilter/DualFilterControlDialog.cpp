@@ -59,6 +59,9 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	makeknob( res2Knob, 75, 145, m_res2Model, "RESO", "Resonance", "" )
 	makeknob( gain2Knob, 117, 145, m_gain2Model, "GAIN", "Gain", "%" )
 
+	gain1Knob-> setVolumeKnob( true );
+	gain2Knob-> setVolumeKnob( true );
+
 	ledCheckBox * enabled1Toggle = new ledCheckBox( "", this,
 				tr( "Filter 1 enabled" ), ledCheckBox::Green );
 	ledCheckBox * enabled2Toggle = new ledCheckBox( "", this,
