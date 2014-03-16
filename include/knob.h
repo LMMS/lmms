@@ -58,6 +58,8 @@ class EXPORT knob : public QWidget, public FloatModelView
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
+	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
+
 public:
 	knob( int _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
 	virtual ~knob();
@@ -149,6 +151,7 @@ private:
 
 	QPixmap * m_knobPixmap;
 	BoolModel m_volumeKnob;
+	FloatModel m_volumeRatio;
 
 	QPoint m_mouseOffset;
 	QPoint m_origMousePos;

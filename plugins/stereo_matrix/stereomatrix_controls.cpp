@@ -59,10 +59,10 @@ void stereoMatrixControls::changeMatrix()
 
 void stereoMatrixControls::loadSettings( const QDomElement & _this )
 {
-	m_llModel.setValue( _this.attribute( "l-l" ).toFloat() );
-	m_lrModel.setValue( _this.attribute( "l-r" ).toFloat() );
-	m_rlModel.setValue( _this.attribute( "r-l" ).toFloat() );
-	m_rrModel.setValue( _this.attribute( "r-r" ).toFloat() );
+	m_llModel.loadSettings( _this, "l-l" );
+	m_lrModel.loadSettings( _this, "l-r" );
+	m_rlModel.loadSettings( _this, "r-l" );
+	m_rrModel.loadSettings( _this, "r-r" );
 }
 
 
@@ -71,10 +71,10 @@ void stereoMatrixControls::loadSettings( const QDomElement & _this )
 void stereoMatrixControls::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
-	_this.setAttribute( "l-l", m_llModel.value() );
-	_this.setAttribute( "l-r", m_lrModel.value() );
-	_this.setAttribute( "r-l", m_rlModel.value() );
-	_this.setAttribute( "r-r", m_rrModel.value() );
+	m_llModel.saveSettings( _doc, _this, "l-l" );
+	m_lrModel.saveSettings( _doc, _this, "l-r" );
+	m_rlModel.saveSettings( _doc, _this, "r-l" );
+	m_rrModel.saveSettings( _doc, _this, "r-r" );
 }
 
 

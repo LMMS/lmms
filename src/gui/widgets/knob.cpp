@@ -61,6 +61,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_label( "" ),
 	m_knobPixmap( NULL ),
 	m_volumeKnob( false ),
+	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
 	m_angle( -10 ),
 	m_outerColor( NULL )
@@ -668,7 +669,7 @@ QString knob::displayValue() const
 		configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		return m_description.trimmed() + QString( " %1 dBV" ).
-				arg( 20.0 * log10( model()->value() / 100.0 ),
+				arg( 20.0 * log10( model()->value() / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).
