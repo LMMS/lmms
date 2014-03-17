@@ -565,8 +565,9 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 			id[i] = fluid_voice_get_id( voices[i] );
 		}
 
-		fluid_synth_noteon( m_synth, m_channel, midiNote,
-							_n->midiVelocity() );
+		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
+
+		fluid_synth_noteon( m_synth, m_channel, midiNote, _n->midiVelocity( baseVelocity ) );
 
 		// get new voice and save it
 		fluid_synth_get_voicelist( m_synth, voices, poly, -1 );

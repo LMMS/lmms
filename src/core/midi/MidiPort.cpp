@@ -50,6 +50,7 @@ MidiPort::MidiPort( const QString& name,
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed output velocity" ) ),
 	m_fixedOutputNoteModel( -1, -1, MidiMaxNote, this, tr( "Fixed output note" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
+	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
 	m_writableModel( false, this, tr( "Send MIDI-events" ) )
 {
@@ -171,6 +172,7 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_fixedOutputVelocityModel.saveSettings( doc, thisElement, "fixedoutputvelocity" );
 	m_fixedOutputNoteModel.saveSettings( doc, thisElement, "fixedoutputnote" );
 	m_outputProgramModel.saveSettings( doc, thisElement, "outputprogram" );
+	m_baseVelocityModel.saveSettings( doc, thisElement, "basevelocity" );
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
 
@@ -223,6 +225,7 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_fixedInputVelocityModel.loadSettings( thisElement, "fixedinputvelocity" );
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
+	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
 
@@ -253,7 +256,16 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 		}
 		emit writablePortsChanged();
 	}
+
+	if( thisElement.hasAttribute( "basevelocity" ) == false )
+	{
+		// for projects created by LMMS < 0.9.92 there's no value for the base
+		// velocity and for compat reasons we have to stick with maximum velocity
+		// which did not allow note volumes > 100%
+		m_baseVelocityModel.setValue( MidiMaxVelocity );
+	}
 }
+
 
 
 

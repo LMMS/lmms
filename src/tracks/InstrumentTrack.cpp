@@ -185,13 +185,6 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 
 	float v_scale = (float) getVolume() / DefaultVolume;
 
-	// We play MIDI-based instruments at velocity 63 for volume=100%. In order
-	// to get the same output volume, we need to scale it by 2
-	if( m_instrument->flags().testFlag( Instrument::IsMidiBased ) )
-	{
-		v_scale *= 2;
-	}
-
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
@@ -260,7 +253,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					// create (timed) note-play-handle
 					NotePlayHandle* nph = new NotePlayHandle( this, time.frames( engine::framesPerTick() ),
 																typeInfo<f_cnt_t>::max() / 2,
-																note( MidiTime(), MidiTime(), event.key(), event.volume() ),
+																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 																NULL, false, event.channel(),
 																NotePlayHandle::OriginMidiInput );
 					if( engine::mixer()->addPlayHandle( nph ) )
@@ -289,7 +282,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			{
 				// setVolume() calls processOutEvent() with MidiKeyPressure so the
 				// attached instrument will receive the event as well
-				m_notes[event.key()]->setVolume( event.volume() );
+				m_notes[event.key()]->setVolume( event.volume( midiPort()->baseVelocity() ) );
 			}
 			eventHandled = true;
 			break;

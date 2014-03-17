@@ -176,9 +176,9 @@ public:
 		return m_volume;
 	}
 
-	int midiVelocity() const
+	int midiVelocity( int midiBaseVelocity ) const
 	{
-		return qMin( MidiMaxVelocity, getVolume() * MidiMaxVelocity / MaxVolume );
+		return qMin( MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume );
 	}
 
 	inline panning_t getPanning() const

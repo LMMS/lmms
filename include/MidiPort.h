@@ -53,6 +53,7 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(int,fixedOutputVelocity,setFixedOutputVelocity,m_fixedOutputVelocityModel);
 	mapPropertyFromModel(int,fixedOutputNote,setFixedOutputNote,m_fixedOutputNoteModel);
 	mapPropertyFromModel(int,outputProgram,setOutputProgram,m_outputProgramModel);
+	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
@@ -151,6 +152,7 @@ private:
 	IntModel m_fixedOutputVelocityModel;
 	IntModel m_fixedOutputNoteModel;
 	IntModel m_outputProgramModel;
+	IntModel m_baseVelocityModel;
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
 

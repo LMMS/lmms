@@ -58,7 +58,8 @@ private:
 	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
 
-} ;
+	LcdSpinBox* m_baseVelocitySpinBox;
 
+} ;
 
 #endif

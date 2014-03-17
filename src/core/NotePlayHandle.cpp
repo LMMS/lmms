@@ -106,9 +106,11 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 
 	if( !isTopNote() || !instrumentTrack->isArpeggioEnabled() )
 	{
+		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity() ),
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
 			MidiTime::fromFrames( offset(), engine::framesPerTick() ) );
 	}
 }
@@ -152,7 +154,9 @@ void NotePlayHandle::setVolume( volume_t _volume )
 {
 	note::setVolume( _volume );
 
-	m_instrumentTrack->processOutEvent( MidiEvent( MidiKeyPressure, midiChannel(), midiKey(), midiVelocity() ) );
+	const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+	m_instrumentTrack->processOutEvent( MidiEvent( MidiKeyPressure, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ) );
 }
 
 

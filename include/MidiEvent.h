@@ -140,9 +140,9 @@ public:
 		return m_data.m_param[1];
 	}
 
-	volume_t volume() const
+	volume_t volume( int midiBaseVelocity ) const
 	{
-		return (volume_t)( velocity() * MaxVolume / MidiMaxVelocity );
+		return (volume_t)( velocity() * DefaultVolume / midiBaseVelocity );
 	}
 
 	const void* sourcePort() const

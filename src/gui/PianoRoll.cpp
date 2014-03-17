@@ -1864,7 +1864,10 @@ void PianoRoll::testPlayNote( note * n )
 	if( n->isPlaying() == false && m_recording == false )
 	{
 		n->setIsPlaying( true );
-		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity() );
+
+		const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
+
+		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity( baseVelocity ) );
 
 		MidiEvent event( MidiMetaEvent, 0, n->key(), panningToMidi( n->getPanning() ) );
 
@@ -2225,7 +2228,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					if( m_noteEditMode == NoteEditVolume )
 					{
 						n->setVolume( vol );
-						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, 0, n->key(), n->midiVelocity() ) );
+
+						const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
+
+						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, 0, n->key(), n->midiVelocity( baseVelocity ) ) );
 					}
 					else if( m_noteEditMode == NoteEditPanning )
 					{
