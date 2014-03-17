@@ -151,6 +151,11 @@ public:
 
 	virtual QString nodeName() const;
 
+	virtual Flags flags() const
+	{
+		return IsSingleStreamed;
+	}
+
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 0; //4048;
