@@ -45,22 +45,14 @@ class MidiPortMenu;
 class MidiPort : public Model, public SerializingObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,inputChannel,setInputChannel,
-							m_inputChannelModel);
-	mapPropertyFromModel(int,outputChannel,setOutputChannel,
-							m_outputChannelModel);
-	mapPropertyFromModel(int,inputController,setInputController,
-						m_inputControllerModel);
-	mapPropertyFromModel(int,outputController,setOutputController,
-						m_outputControllerModel);
-	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,
-						m_fixedInputVelocityModel);
-	mapPropertyFromModel(int,fixedOutputVelocity,setFixedOutputVelocity,
-						m_fixedOutputVelocityModel);
-	mapPropertyFromModel(int,fixedOutputNote,setFixedOutputNote,
-						m_fixedOutputNoteModel);
-	mapPropertyFromModel(int,outputProgram,setOutputProgram,
-						m_outputProgramModel);
+	mapPropertyFromModel(int,inputChannel,setInputChannel,m_inputChannelModel);
+	mapPropertyFromModel(int,outputChannel,setOutputChannel,m_outputChannelModel);
+	mapPropertyFromModel(int,inputController,setInputController,m_inputControllerModel);
+	mapPropertyFromModel(int,outputController,setOutputController,m_outputControllerModel);
+	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,m_fixedInputVelocityModel);
+	mapPropertyFromModel(int,fixedOutputVelocity,setFixedOutputVelocity,m_fixedOutputVelocityModel);
+	mapPropertyFromModel(int,fixedOutputNote,setFixedOutputNote,m_fixedOutputNoteModel);
+	mapPropertyFromModel(int,outputProgram,setOutputProgram,m_outputProgramModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
