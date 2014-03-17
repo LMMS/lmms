@@ -187,10 +187,10 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 
 	// We play MIDI-based instruments at velocity 63 for volume=100%. In order
 	// to get the same output volume, we need to scale it by 2
-	if( m_instrument->flags().testFlag( Instrument::IsMidiBased ) )
-	{
-		v_scale *= 2;
-	}
+	//~ if( m_instrument->flags().testFlag( Instrument::IsMidiBased ) )
+	//~ {
+		//~ v_scale *= 2;
+	//~ }
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
