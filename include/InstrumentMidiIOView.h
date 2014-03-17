@@ -2,7 +2,7 @@
  * InstrumentMidiIOView.h - widget in instrument-track-window for setting
  *                          up MIDI-related stuff
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _INSTRUMENT_MIDI_IO_VIEW_H
-#define _INSTRUMENT_MIDI_IO_VIEW_H
+#ifndef INSTRUMENT_MIDI_IO_VIEW_H
+#define INSTRUMENT_MIDI_IO_VIEW_H
 
 #include <QtGui/QWidget>
 
@@ -39,7 +39,7 @@ class QToolButton;
 class InstrumentMidiIOView : public QWidget, public ModelView
 {
 public:
-	InstrumentMidiIOView( QWidget * _parent );
+	InstrumentMidiIOView( QWidget* parent );
 	virtual ~InstrumentMidiIOView();
 
 

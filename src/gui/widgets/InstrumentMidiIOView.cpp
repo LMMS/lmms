@@ -158,10 +158,8 @@ void InstrumentMidiIOView::modelChanged()
 
 	m_midiOutputGroupBox->setModel( &mp->m_writableModel );
 	m_outputChannelSpinBox->setModel( &mp->m_outputChannelModel );
-	m_fixedOutputVelocitySpinBox->setModel(
-					&mp->m_fixedOutputVelocityModel );
-	m_fixedOutputNoteSpinBox->setModel(
-					&mp->m_fixedOutputNoteModel );
+	m_fixedOutputVelocitySpinBox->setModel( &mp->m_fixedOutputVelocityModel );
+	m_fixedOutputNoteSpinBox->setModel( &mp->m_fixedOutputNoteModel );
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
 
 	if( m_rpBtn )
