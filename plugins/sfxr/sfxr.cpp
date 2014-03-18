@@ -695,6 +695,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 
 
 	//preview sound on generator/random/mutate button clicked
+/*  // disabled for now	
 	connect( m_pickupBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_laserBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_explosionBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
@@ -704,7 +705,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	connect( m_blipBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_randomizeBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_mutateBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
-
+*/
 }
 
 
