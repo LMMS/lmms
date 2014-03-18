@@ -404,10 +404,7 @@ void song::playSong()
 
 	savePos();
 
-	if( QApplication::type() != QApplication::Tty )
-	{
-		engine::updatePlayPauseIcons();
-	}
+	emit playbackStateChanged();
 }
 
 
@@ -447,7 +444,7 @@ void song::playTrack( track * _trackToPlay )
 
 	savePos();
 
-	engine::updatePlayPauseIcons();
+	emit playbackStateChanged();
 }
 
 
@@ -468,7 +465,7 @@ void song::playBB()
 
 	savePos();
 
-	engine::updatePlayPauseIcons();
+	emit playbackStateChanged();
 }
 
 
@@ -493,7 +490,7 @@ void song::playPattern( pattern * _patternToPlay, bool _loop )
 
 	savePos();
 
-	engine::updatePlayPauseIcons();
+	emit playbackStateChanged();
 }
 
 
@@ -546,7 +543,7 @@ void song::togglePause()
 
 	m_vstSyncController.setPlaybackState( m_playing );
 
-	engine::updatePlayPauseIcons();
+	emit playbackStateChanged();
 }
 
 
@@ -605,9 +602,7 @@ void song::stop()
 
 	m_playMode = Mode_None;
 
-	if(QApplication::type() != QApplication::Tty) {
-		engine::updatePlayPauseIcons();
-	}
+	emit playbackStateChanged();
 }
 
 

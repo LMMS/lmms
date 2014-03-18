@@ -190,6 +190,9 @@ MainWindow::MainWindow() :
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
 		m_autoSaveTimer.start(1000 * 60); // 1 minute
 	}
+
+	connect( engine::getSong(), SIGNAL( playbackStateChanged() ),
+				this, SLOT( updatePlayPauseIcons() ) );
 }
 
 
@@ -921,6 +924,42 @@ void MainWindow::toggleFxMixerWin()
 void MainWindow::toggleControllerRack()
 {
 	toggleWindow( engine::getControllerRackView() );
+}
+
+
+
+
+void MainWindow::updatePlayPauseIcons()
+{
+	engine::songEditor()->setPauseIcon( false );
+	engine::automationEditor()->setPauseIcon( false );
+	engine::getBBEditor()->setPauseIcon( false );
+	engine::pianoRoll()->setPauseIcon( false );
+
+	if( engine::getSong()->isPlaying() )
+	{
+		switch( engine::getSong()->playMode() )
+		{
+			case song::Mode_PlaySong:
+				engine::songEditor()->setPauseIcon( true );
+				break;
+
+			case song::Mode_PlayAutomationPattern:
+				engine::automationEditor()->setPauseIcon( true );
+				break;
+
+			case song::Mode_PlayBB:
+				engine::getBBEditor()->setPauseIcon( true );
+				break;
+
+			case song::Mode_PlayPattern:
+				engine::pianoRoll()->setPauseIcon( true );
+				break;
+
+			default:
+				break;
+		}
+	}
 }
 
 

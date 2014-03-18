@@ -360,6 +360,7 @@ private:
 
 signals:
 	void projectLoaded();
+	void playbackStateChanged();
 	void lengthChanged( int _tacts );
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,

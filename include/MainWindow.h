@@ -107,6 +107,8 @@ public slots:
 	void togglePianoRollWin();
 	void toggleControllerRack();
 
+	void updatePlayPauseIcons();
+
 	void undo();
 	void redo();
 

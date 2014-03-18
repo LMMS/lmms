@@ -146,42 +146,6 @@ void engine::destroy()
 
 
 
-void engine::updatePlayPauseIcons()
-{
-	s_songEditor->setPauseIcon( false );
-	s_automationEditor->setPauseIcon( false );
-	s_bbEditor->setPauseIcon( false );
-	s_pianoRoll->setPauseIcon( false );
-
-	if( s_song->isPlaying() )
-	{
-		switch( s_song->playMode() )
-		{
-			case song::Mode_PlaySong:
-				s_songEditor->setPauseIcon( true );
-				break;
-
-			case song::Mode_PlayAutomationPattern:
-				s_automationEditor->setPauseIcon( true );
-				break;
-
-			case song::Mode_PlayBB:
-				s_bbEditor->setPauseIcon( true );
-				break;
-
-			case song::Mode_PlayPattern:
-				s_pianoRoll->setPauseIcon( true );
-				break;
-
-			default:
-				break;
-		}
-	}
-}
-
-
-
-
 void engine::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
