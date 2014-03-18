@@ -607,7 +607,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	}
 #endif
 
-	const float currentVelocity = _n->volumeLevel( tfp ) * MidiMaxVelocity * DefaultVolume / MaxVolume;
+	const float currentVelocity = _n->volumeLevel( tfp ) * instrumentTrack()->midiPort()->baseVelocity();
 	if( pluginData->fluidVoice &&
 			pluginData->lastVelocity != currentVelocity )
 	{
