@@ -193,7 +193,8 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 38: return 13; // L = c#
 		case 52: return 14; // . = d
 		case 39: return 15; // ; = d#
-		case 86: return 16; // / = e
+		//case 86: return 16; // / = e
+		case 53: return 16; // / = e
 		case 16: return 12; // Q = c
 		case 3: return 13; // 2 = c#
 		case 17: return 14; // W = d
@@ -211,6 +212,9 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 24: return 26; // O = d'
 		case 11: return 27; // 0 = d'#
 		case 25: return 28; // P = e'
+		case 26: return 29; // [
+		case 13: return 30; // =
+		case 27: return 31; // ]
 	}
 #endif
 #ifdef LMMS_BUILD_LINUX
@@ -250,6 +254,9 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 32: return 26; // O = d'
 		case 19: return 27; // 0 = d'#
 		case 33: return 28; // P = e'
+		case 34: return 29; // [
+		case 21: return 30; // = 
+		case 35: return 31; // ]
 	}
 #endif
 #ifdef LMMS_BUILD_APPLE
