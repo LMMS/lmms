@@ -33,6 +33,7 @@
 #include <QtGui/QMenuBar>
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplitter>
+#include <QtGui/QWhatsThis>
 
 #include "lmmsversion.h"
 #include "MainWindow.h"
@@ -67,7 +68,7 @@
 
 
 
-MainWindow::MainWindow( void ) :
+MainWindow::MainWindow() :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
@@ -211,7 +212,7 @@ MainWindow::~MainWindow()
 
 
 
-void MainWindow::finalize( void )
+void MainWindow::finalize()
 {
 	resetWindowTitle();
 	setWindowIcon( embed::getIconPixmap( "icon" ) );
@@ -542,7 +543,7 @@ void MainWindow::addSpacingToToolBar( int _size )
 
 
 
-void MainWindow::resetWindowTitle( void )
+void MainWindow::resetWindowTitle()
 {
 	QString title = "";
 	if( engine::getSong()->projectFileName() != "" )
@@ -564,7 +565,7 @@ void MainWindow::resetWindowTitle( void )
 
 
 
-bool MainWindow::mayChangeProject( void )
+bool MainWindow::mayChangeProject()
 {
 	engine::getSong()->stop();
 
@@ -599,7 +600,7 @@ bool MainWindow::mayChangeProject( void )
 
 
 
-void MainWindow::clearKeyModifiers( void )
+void MainWindow::clearKeyModifiers()
 {
 	m_keyMods.m_ctrl = FALSE;
 	m_keyMods.m_shift = FALSE;
@@ -658,8 +659,20 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 
 
 
+void MainWindow::emptySlot()
+{
+}
 
-void MainWindow::createNewProject( void )
+
+
+void MainWindow::enterWhatsThisMode()
+{
+	QWhatsThis::enterWhatsThisMode();
+}
+
+
+
+void MainWindow::createNewProject()
 {
 	if( mayChangeProject() )
 	{
@@ -708,7 +721,7 @@ void MainWindow::openProject()
 
 
 
-void MainWindow::updateRecentlyOpenedProjectsMenu( void )
+void MainWindow::updateRecentlyOpenedProjectsMenu()
 {
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = configManager::inst()->recentlyOpenedProjects();
@@ -734,7 +747,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 
 
-bool MainWindow::saveProject( void )
+bool MainWindow::saveProject()
 {
 	if( engine::getSong()->projectFileName() == "" )
 	{
@@ -750,7 +763,7 @@ bool MainWindow::saveProject( void )
 
 
 
-bool MainWindow::saveProjectAs( void )
+bool MainWindow::saveProjectAs()
 {
 	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
 			tr( "LMMS Project (*.mmpz *.mmp);;"
@@ -779,7 +792,7 @@ bool MainWindow::saveProjectAs( void )
 
 
 
-bool MainWindow::saveProjectAsNewVersion( void )
+bool MainWindow::saveProjectAsNewVersion()
 {
 	QString fileName = engine::getSong()->projectFileName();
 	if( fileName == "" )
@@ -799,7 +812,7 @@ bool MainWindow::saveProjectAsNewVersion( void )
 
 
 
-void MainWindow::showSettingsDialog( void )
+void MainWindow::showSettingsDialog()
 {
 	setupDialog sd;
 	sd.exec();
@@ -808,7 +821,7 @@ void MainWindow::showSettingsDialog( void )
 
 
 
-void MainWindow::aboutLMMS( void )
+void MainWindow::aboutLMMS()
 {
 	aboutDialog().exec();
 }
@@ -816,7 +829,7 @@ void MainWindow::aboutLMMS( void )
 
 
 
-void MainWindow::help( void )
+void MainWindow::help()
 {
 	QMessageBox::information( this, tr( "Help not available" ),
 				  tr( "Currently there's no help "
@@ -865,7 +878,7 @@ void MainWindow::toggleBBEditorWin( bool forceShow )
 
 
 
-void MainWindow::toggleSongEditorWin( void )
+void MainWindow::toggleSongEditorWin()
 {
 	toggleWindow( engine::songEditor() );
 }
@@ -873,7 +886,7 @@ void MainWindow::toggleSongEditorWin( void )
 
 
 
-void MainWindow::toggleProjectNotesWin( void )
+void MainWindow::toggleProjectNotesWin()
 {
 	toggleWindow( engine::getProjectNotes() );
 }
@@ -881,7 +894,7 @@ void MainWindow::toggleProjectNotesWin( void )
 
 
 
-void MainWindow::togglePianoRollWin( void )
+void MainWindow::togglePianoRollWin()
 {
 	toggleWindow( engine::pianoRoll() );
 }
@@ -889,7 +902,7 @@ void MainWindow::togglePianoRollWin( void )
 
 
 
-void MainWindow::toggleAutomationEditorWin( void )
+void MainWindow::toggleAutomationEditorWin()
 {
 	toggleWindow( engine::automationEditor() );
 }
@@ -897,7 +910,7 @@ void MainWindow::toggleAutomationEditorWin( void )
 
 
 
-void MainWindow::toggleFxMixerWin( void )
+void MainWindow::toggleFxMixerWin()
 {
 	toggleWindow( engine::fxMixerView() );
 }
@@ -905,7 +918,7 @@ void MainWindow::toggleFxMixerWin( void )
 
 
 
-void MainWindow::toggleControllerRack( void )
+void MainWindow::toggleControllerRack()
 {
 	toggleWindow( engine::getControllerRackView() );
 }
@@ -913,7 +926,7 @@ void MainWindow::toggleControllerRack( void )
 
 
 
-void MainWindow::undo( void )
+void MainWindow::undo()
 {
 	engine::projectJournal()->undo();
 }
@@ -921,7 +934,7 @@ void MainWindow::undo( void )
 
 
 
-void MainWindow::redo( void )
+void MainWindow::redo()
 {
 	engine::projectJournal()->redo();
 }
@@ -1015,7 +1028,7 @@ void MainWindow::timerEvent( QTimerEvent * _te)
 
 
 
-void MainWindow::fillTemplatesMenu( void )
+void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
@@ -1064,7 +1077,7 @@ void MainWindow::showTool( QAction * _idx )
 
 
 
-void MainWindow::browseHelp( void )
+void MainWindow::browseHelp()
 {
 	// file:// alternative for offline help
 	QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";

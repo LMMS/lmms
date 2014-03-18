@@ -28,6 +28,7 @@
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
+#include <QtGui/QWhatsThis>
 
 #include "EffectView.h"
 #include "caption_menu.h"
