@@ -1,8 +1,8 @@
 /*
- * main_window.h - declaration of class MainWindow, the main window of LMMS
+ * MainWindow.h - declaration of class MainWindow, the main window of LMMS
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,15 +22,13 @@
  *
  */
 
-
-#ifndef _MAIN_WINDOW_H
-#define _MAIN_WINDOW_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
-#include <QtGui/QWhatsThis>
 
 class QAction;
 class QDomElement;
@@ -46,14 +44,14 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	inline QMdiArea * workspace( void )
+	QMdiArea* workspace()
 	{
-		return( m_workspace );
+		return m_workspace;
 	}
 
-	inline QWidget * toolBar( void )
+	QWidget* toolBar()
 	{
-		return( m_toolBar );
+		return m_toolBar;
 	}
 
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
@@ -63,24 +61,24 @@ public:
 	// every function that replaces current file (e.g. creates new file,
 	// opens another file...) has to call this before and may only process
 	// if this function returns true
-	bool mayChangeProject( void );
+	bool mayChangeProject();
 
 
-	void clearKeyModifiers( void );
+	void clearKeyModifiers();
 
-	inline bool isCtrlPressed( void )
+	bool isCtrlPressed()
 	{
-		return( m_keyMods.m_ctrl );
+		return m_keyMods.m_ctrl;
 	}
 
-	inline bool isShiftPressed( void )
+	bool isShiftPressed()
 	{
-		return( m_keyMods.m_shift );
+		return m_keyMods.m_shift;
 	}
 
-	inline bool isAltPressed( void )
+	bool isAltPressed()
 	{
-		return( m_keyMods.m_alt );
+		return m_keyMods.m_alt;
 	}
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
@@ -88,34 +86,31 @@ public:
 
 
 public slots:
-	void resetWindowTitle( void );
+	void resetWindowTitle();
 
-	inline void emptySlot( void )
-	{
-	}
-	inline void enterWhatsThisMode( void )
-	{
-		QWhatsThis::enterWhatsThisMode();
-	}
-	void createNewProject( void );
+	void emptySlot();
+	void enterWhatsThisMode();
+	void createNewProject();
 	void createNewProjectFromTemplate( QAction * _idx );
-	void openProject( void );
-	bool saveProject( void );
-	bool saveProjectAs( void );
-	bool saveProjectAsNewVersion( void );
-	void showSettingsDialog( void );
-	void aboutLMMS( void );
-	void help( void );
-	void toggleAutomationEditorWin( void );
+	void openProject();
+	bool saveProject();
+	bool saveProjectAs();
+	bool saveProjectAsNewVersion();
+	void showSettingsDialog();
+	void aboutLMMS();
+	void help();
+	void toggleAutomationEditorWin();
 	void toggleBBEditorWin( bool forceShow = false );
-	void toggleSongEditorWin( void );
-	void toggleProjectNotesWin( void );
-	void toggleFxMixerWin( void );
-	void togglePianoRollWin( void );
-	void toggleControllerRack( void );
+	void toggleSongEditorWin();
+	void toggleProjectNotesWin();
+	void toggleFxMixerWin();
+	void togglePianoRollWin();
+	void toggleControllerRack();
 
-	void undo( void );
-	void redo( void );
+	void updatePlayPauseIcons();
+
+	void undo();
+	void redo();
 
 
 protected:
@@ -127,11 +122,11 @@ protected:
 
 
 private:
-	MainWindow( void );
+	MainWindow();
 	MainWindow( const MainWindow & );
 	virtual ~MainWindow();
 
-	void finalize( void );
+	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
 
@@ -169,17 +164,17 @@ private:
 
 
 private slots:
-	void browseHelp( void );
-	void fillTemplatesMenu( void );
+	void browseHelp();
+	void fillTemplatesMenu();
 	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
-	void updateRecentlyOpenedProjectsMenu( void );
+	void updateRecentlyOpenedProjectsMenu();
 
 
 	void autoSave();
 
 signals:
-	void periodicUpdate( void );
+	void periodicUpdate();
 
 } ;
 

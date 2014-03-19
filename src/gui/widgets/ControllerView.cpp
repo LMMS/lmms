@@ -2,7 +2,7 @@
  * ControllerView.cpp - view-component for an controller
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * Copyright (c) 2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,6 +30,7 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QInputDialog>
+#include <QtGui/QWhatsThis>
 
 #include "ControllerView.h"
 

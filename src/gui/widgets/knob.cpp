@@ -29,6 +29,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPalette>
+#include <QtGui/QWhatsThis>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN

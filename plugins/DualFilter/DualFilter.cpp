@@ -55,6 +55,10 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 {
 	m_filter1 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
 	m_filter2 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
+	
+	// ensure filters get updated
+	m_filter1changed = true;
+	m_filter2changed = true;
 }
 
 
@@ -82,10 +86,23 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
 	m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
 	m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+	
+	const bool enabled1 = m_dfControls.m_enabled1Model.value();
+	const bool enabled2 = m_dfControls.m_enabled2Model.value();
 
-	if( m_dfControls.m_enabled1Model.value() ) m_filter1->calcFilterCoeffs( m_dfControls.m_cut1Model.value(), m_dfControls.m_res1Model.value() );
-	if( m_dfControls.m_enabled2Model.value() ) m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
+	// recalculate only when necessary
+	if( enabled1 && m_filter1changed )
+	{
+		m_filter1->calcFilterCoeffs( m_dfControls.m_cut1Model.value(), m_dfControls.m_res1Model.value() );
+		m_filter1changed = false;
+	}
+	if( enabled2 && m_filter2changed )
+	{
+		m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
+		m_filter2changed = false;
+	}
 
+	
 	// buffer processing loop
 	for( fpp_t f = 0; f < frames; ++f )
 	{
@@ -98,7 +115,7 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		const float mix2 = ( ( m_dfControls.m_mixModel.value( f ) + 1.0f ) / 2.0f );
 
 		// update filter 1
-		if( m_dfControls.m_enabled1Model.value() )
+		if( enabled1 )
 		{
 			s1[0] = m_filter1->update( s1[0], 0 );
 			s1[1] = m_filter1->update( s1[1], 1 );
@@ -113,7 +130,7 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		}
 
 		// update filter 2
-		if( m_dfControls.m_enabled2Model.value() )
+		if( enabled2 )
 		{
 			s2[0] = m_filter2->update( s2[0], 0 );
 			s2[1] = m_filter2->update( s2[1], 1 );
@@ -137,6 +154,8 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
 	return isRunning();
 }
+
+
 
 
 

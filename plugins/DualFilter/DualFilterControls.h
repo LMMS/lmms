@@ -62,7 +62,8 @@ public:
 
 
 private slots:
-	void changeControl();
+	void updateFilter1();
+	void updateFilter2();
 	void updateFilters();
 	
 private:
