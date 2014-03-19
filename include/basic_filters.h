@@ -69,7 +69,7 @@ public:
 
 	static inline float minFreq()
 	{
-		return( 10.0f );
+		return( 3.0f );
 	}
 
 	static inline float minQ()
@@ -488,8 +488,8 @@ public:
 				/*, const bool _q_is_bandwidth = false*/ )
 	{
 		// temp coef vars
-		_freq = qMax( _freq, minFreq() ); // limit freq and q for not getting
-		_freq = qMin(_freq, m_sampleRate/2); // bad noise out of the filter...
+		_freq = qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting
+                                                            // bad noise out of the filter...
 
 		_q = qMax( _q, minQ() );
 
