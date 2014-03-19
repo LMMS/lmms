@@ -43,11 +43,15 @@ public:
 		return &m_dfControls;
 	}
 
+
 private:
 	DualFilterControls m_dfControls;
 
 	basicFilters<2> * m_filter1;
 	basicFilters<2> * m_filter2;
+	
+	bool m_filter1changed;
+	bool m_filter2changed;
 
 	friend class DualFilterControls;
 
