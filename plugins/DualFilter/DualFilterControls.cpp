@@ -51,19 +51,13 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	m_res2Model( 0.5, basicFilters<0>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance 2" ) ),
 	m_gain2Model( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Gain 2" ) )
 {
-	connect( &m_enabled1Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_filter1Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_cut1Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_res1Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_gain1Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
+	connect( &m_filter1Model, SIGNAL( dataChanged() ), this, SLOT( updateFilter1() ) );
+	connect( &m_cut1Model, SIGNAL( dataChanged() ), this, SLOT( updateFilter1() ) );
+	connect( &m_res1Model, SIGNAL( dataChanged() ), this, SLOT( updateFilter1() ) );
 
-	connect( &m_mixModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-
-	connect( &m_enabled2Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_filter2Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_cut2Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_res2Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_gain2Model, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
+	connect( &m_filter2Model, SIGNAL( dataChanged() ), this, SLOT( updateFilter2() ) );
+	connect( &m_cut2Model, SIGNAL( dataChanged() ), this, SLOT( updateFilter2() ) );
+	connect( &m_res2Model, SIGNAL( dataChanged() ), this, SLOT( updateFilter2() ) );
 
 	m_filter1Model.addItem( tr( "LowPass" ), new PixmapLoader( "filter_lp" ) );
 	m_filter1Model.addItem( tr( "HiPass" ), new PixmapLoader( "filter_hp" ) );
@@ -102,19 +96,30 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 
 
 
-
-void DualFilterControls::changeControl()
+void DualFilterControls::updateFilter1()
 {
-	engine::getSong()->setModified();
+	m_effect->m_filter1changed = true;
+}
+
+void DualFilterControls::updateFilter2()
+{
+	m_effect->m_filter2changed = true;
 }
 
 
 void DualFilterControls::updateFilters()
 {
+	// swap filters to new ones
+	
 	delete m_effect->m_filter1;
 	delete m_effect->m_filter2;
 	m_effect->m_filter1 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
 	m_effect->m_filter2 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
+	
+	// flag filters as needing recalculation
+	
+	updateFilter1();
+	updateFilter2();
 }
 
 
