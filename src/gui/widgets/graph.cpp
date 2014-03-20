@@ -629,27 +629,60 @@ void graphModel::smoothNonCyclic()
 	emit samplesChanged(0, length()-1);
 }
 
+
+
 void graphModel::normalize()
 {
 	float max = 0.0001f;
+	float avg = 0.0f;
+
+	// first correct dc offset by normalizing to average
 	for( int i = 0; i < length(); i++ )
-	{
-		if( fabsf(m_samples[i]) > max && m_samples[i] != 0.0f )
-		{
-			max = fabs( m_samples[i] );
-		}
-	}
+		avg += m_samples[i];
+	avg /= length();
+	for( int i = 0; i < length(); i++ )
+		m_samples[i] -= avg;
+
+	// then maximize
+	for( int i = 0; i < length(); i++ )
+		max = qMax( max, qAbs( m_samples[i] ) );
 
 	for( int i = 0; i < length(); i++ )
-	{
-		m_samples[i] /= max;
-	}
+		m_samples[i] = qBound( m_minValue, m_samples[i] / max, m_maxValue );
 
-	if( max != 1.0f ) {
+	// signal changes if any
+	if( max != 1.0f || avg != 0.0f )
 		emit samplesChanged( 0, length()-1 );
-	}
 }
 
+
+
+void graphModel::invert()
+{
+	const float range = m_maxValue - m_minValue;
+
+	for( int i = 0; i < length(); i++ )
+		m_samples[i] = m_minValue + ( range - ( m_samples[i] - m_minValue ) );
+
+	emit samplesChanged( 0, length()-1 );
+}
+
+
+
+void graphModel::shiftPhase( int _deg )
+{
+	// calculate offset in samples
+	int offset = ( _deg * length() ) / 360; //multiply first because integers 
+	
+	// store values in temporary array
+	QVector<float> temp = m_samples;
+	
+	// shift phase
+	for( int i = 0; i < length(); i++ )
+		m_samples[i] = temp[ ( i + offset ) % length() ];
+	
+	emit samplesChanged( 0, length()-1 );
+}
 
 
 
