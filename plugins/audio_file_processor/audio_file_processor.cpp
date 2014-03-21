@@ -303,7 +303,7 @@ void audioFileProcessor::loopPointChanged( void )
 	//check if start & end overlap and nudge end up if so
 	if( m_startPointModel.value() == m_endPointModel.value() )
 	{
-		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001, 1.0d ) );
+		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
 	
 	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *
