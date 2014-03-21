@@ -119,8 +119,6 @@ protected slots:
 
 
 private:
-	InstrumentTrack * m_InstrumentTrack;
-
 	OscillatorObject * m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr
