@@ -29,7 +29,7 @@ public:
 private:
   Fl_Box *pair; 
   EnvelopeParams *env; 
-  int oldx,oldy; 
+  int oldx; 
   int currentpoint,cpx,cpdt; 
 public:
   int lastpoint; 

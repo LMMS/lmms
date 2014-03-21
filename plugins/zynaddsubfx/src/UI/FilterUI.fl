@@ -144,7 +144,7 @@ for (i=1;i<lx;i++){
     code {delete [] graphpoints;} {}
   }
   decl {FilterParams *pars;} {}
-  decl {int oldx,oldy;} {}
+  decl {int oldx;} {}
   decl {int *nvowel,*nformant;} {}
   decl {REALTYPE *graphpoints;} {}
 } 

@@ -189,7 +189,7 @@ return(1);} {}
   }
   decl {Fl_Box *pair;} {}
   decl {EnvelopeParams *env;} {}
-  decl {int oldx,oldy;} {}
+  decl {int oldx;} {}
   decl {int currentpoint,cpx,cpdt;} {}
   decl {int lastpoint;} {public
   }

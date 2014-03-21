@@ -1814,7 +1814,7 @@ void PartUI::init(Part *part_,Master *master_,int npart_,BankUI *bankui_) {
   while (klimits[k]!=0){
   	sprintf(tmp,"%d",klimits[k]);
   	keylimitlist->add(tmp);
-  	if ((val==-1)){
+  	if (val==-1){
   		if (klimits[k]>part->Pkeylimit) val=k;
   	};
   	k++;

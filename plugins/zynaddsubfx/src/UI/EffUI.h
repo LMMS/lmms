@@ -24,7 +24,7 @@ public:
   REALTYPE getfreqx(REALTYPE x);
   REALTYPE getfreqpos(REALTYPE freq);
 private:
-  int oldx,oldy; 
+  int oldx; 
 public:
   REALTYPE khzval; 
 private:

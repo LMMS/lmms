@@ -148,7 +148,7 @@ return(20.0*pow((REALTYPE)1000.0,x));} {}
     code {if (freq<0.00001) freq=0.00001;
 return(log(freq/20.0)/log(1000.0));} {}
   }
-  decl {int oldx,oldy;} {}
+  decl {int oldx;} {}
   decl {REALTYPE khzval;} {public
   }
   decl {EffectMgr *eff;} {}

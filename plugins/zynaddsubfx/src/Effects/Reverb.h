@@ -102,10 +102,10 @@ class Reverb:public Effect
         void setroomsize(unsigned char Proomsize);
         void setbandwidth(unsigned char Pbandwidth);
 
-        REALTYPE pan, erbalance;
+        REALTYPE pan;
         //Parameters
         int      lohidamptype; /**<0=disable,1=highdamp(lowpass),2=lowdamp(highpass)*/
-        int      idelaylen, rdelaylen;
+        int      idelaylen;
         int      idelayk;
         REALTYPE lohifb, idelayfb, roomsize, rs; //rs is used to "normalise" the volume according to the roomsize
         int      comblen[REV_COMBS * 2];

@@ -43,7 +43,6 @@ class EffectLFO
         REALTYPE xl, xr;
         REALTYPE incx;
         REALTYPE ampl1, ampl2, ampr1, ampr2; //necessary for "randomness"
-        REALTYPE lfointensity;
         REALTYPE lfornd;
         char     lfotype; /**\todo GET RID OF CHAR (replace with short or enum)*/
 };

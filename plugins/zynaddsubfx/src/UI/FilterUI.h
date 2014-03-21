@@ -23,7 +23,7 @@ public:
   ~FormantFilterGraph();
 private:
   FilterParams *pars; 
-  int oldx,oldy; 
+  int oldx; 
   int *nvowel,*nformant; 
   REALTYPE *graphpoints; 
 };
