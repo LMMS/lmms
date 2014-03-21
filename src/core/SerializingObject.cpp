@@ -47,41 +47,46 @@ SerializingObject::~SerializingObject()
 
 
 
-QDomElement SerializingObject::saveState( QDomDocument & _doc,
-							QDomElement & _parent )
+QDomElement SerializingObject::saveState( QDomDocument& doc, QDomElement& parent )
 {
-	QDomElement _this = _doc.createElement( nodeName() );
-	_parent.appendChild( _this );
-	saveSettings( _doc, _this );
-	if( getHook() )
+	QDomElement element = doc.createElement( nodeName() );
+	parent.appendChild( element );
+
+	saveSettings( doc, element );
+
+	if( hook() )
 	{
-		getHook()->saveSettings( _doc, _this );
+		hook()->saveSettings( doc, element );
 	}
-	return _this;
+
+	return element;
 }
 
 
 
 
-void SerializingObject::restoreState( const QDomElement & _this )
+void SerializingObject::restoreState( const QDomElement& element )
 {
-	loadSettings( _this );
-	if( getHook() )
+	loadSettings( element );
+
+	if( hook() )
 	{
-		getHook()->loadSettings( _this );
+		hook()->loadSettings( element );
 	}
 }
 
 
 
 
-void SerializingObject::setHook( SerializingObjectHook * _hook )
+void SerializingObject::setHook( SerializingObjectHook* hook )
 {
 	if( m_hook )
 	{
 		m_hook->m_hookedIn = NULL;
 	}
-	m_hook = _hook;
+
+	m_hook = hook;
+
 	if( m_hook )
 	{
 		m_hook->m_hookedIn = this;
@@ -91,16 +96,18 @@ void SerializingObject::setHook( SerializingObjectHook * _hook )
 
 
 
-void SerializingObject::saveSettings( QDomDocument &/* _doc*/,
-						QDomElement &/* _this*/ )
+void SerializingObject::saveSettings( QDomDocument& doc, QDomElement& element )
 {
+	Q_UNUSED(doc)
+	Q_UNUSED(element)
 }
 
 
 
 
-void SerializingObject::loadSettings( const QDomElement & /* _this*/ )
+void SerializingObject::loadSettings( const QDomElement& element )
 {
+	Q_UNUSED(element)
 }
 
 

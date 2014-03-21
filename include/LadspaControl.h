@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _LADSPA_CONTROL_H
-#define _LADSPA_CONTROL_H
+#ifndef LADSPA_CONTROL_H
+#define LADSPA_CONTROL_H
 
 #include <ladspa.h>
 
@@ -70,8 +70,7 @@ public:
 		return m_port;
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent,
-								const QString & _name );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent, const QString & _name );
 	virtual void loadSettings( const QDomElement & _this, const QString & _name );
 	inline virtual QString nodeName() const
 	{
@@ -89,6 +88,19 @@ protected slots:
 	void knobChanged();
 	void tempoKnobChanged();
 	void linkStateChanged();
+
+protected:
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	{
+		Q_UNUSED(doc)
+		Q_UNUSED(element)
+	}
+
+	virtual void loadSettings( const QDomElement& element )
+	{
+		Q_UNUSED(element)
+	}
+
 
 
 private:

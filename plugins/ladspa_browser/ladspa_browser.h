@@ -1,6 +1,6 @@
 /*
  * ladspa_browser.h - dialog to display information about installed LADSPA
- *                    plugins
+ *					plugins
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -67,6 +67,18 @@ public:
 	}
 
 	virtual QString nodeName() const;
+
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	{
+		Q_UNUSED(doc)
+		Q_UNUSED(element)
+	}
+
+	virtual void loadSettings( const QDomElement& element )
+	{
+		Q_UNUSED(element)
+	}
+
 
 } ;
 
