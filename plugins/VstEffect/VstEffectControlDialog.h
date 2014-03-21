@@ -55,7 +55,6 @@ private:
 	pixmapButton * m_openPresetButton;
 	pixmapButton * m_rolLPresetButton;
 	pixmapButton * m_rolRPresetButton;
-	pixmapButton * m_selPresetButton;
 	pixmapButton * m_managePluginButton;
 	pixmapButton * m_savePresetButton;
 
