@@ -78,8 +78,6 @@ protected slots:
 private:
 	void closePlugin( void );
 
-	int m_runningNotes[NumKeys];
-
 
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
