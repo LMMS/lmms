@@ -43,10 +43,10 @@
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 19, 19 );
 
-#define A1ROW 25
-#define A2ROW 47
-#define B1ROW 69
-#define B2ROW 91
+#define A1ROW 26
+#define A2ROW 49
+#define B1ROW 72
+#define B2ROW 95
 
 
 const int WAVELEN = 220;

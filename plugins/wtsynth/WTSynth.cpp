@@ -135,12 +135,16 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		if( m_amod == MOD_PM )
 		{
 			A1_lphase = fmodf( A1_lphase + A2_L * PMOD_AMT, WAVELEN );
+			while( A1_lphase < 0 ) A1_lphase += WAVELEN;
 			A1_rphase = fmodf( A1_rphase + A2_R * PMOD_AMT, WAVELEN );
+			while( A1_rphase < 0 ) A1_rphase += WAVELEN;
 		}
 		if( m_bmod == MOD_PM )
 		{
 			B1_lphase = fmodf( B1_lphase + B2_L * PMOD_AMT, WAVELEN );
+			while( B1_lphase < 0 ) B1_lphase += WAVELEN;
 			B1_rphase = fmodf( B1_rphase + B2_R * PMOD_AMT, WAVELEN );
+			while( B1_rphase < 0 ) B1_rphase += WAVELEN;
 		}
 
 		// A1
@@ -399,10 +403,13 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 
 	w-> renderOutput( frames );
 
-	const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
-	const float amix = 1.0 - bmix;
 	for( fpp_t f=0; f < frames; f++ )
 	{
+		// get knob values in sample-exact way
+		const float bmix = ( ( m_abmix.value( f ) + 100.0 ) / 200.0 );
+		const float amix = 1.0 - bmix;
+		
+		// mix a/b streams according to mixing knob
 		_working_buffer[f][0] = ( abuf[f][0] * amix ) +
 								( bbuf[f][0] * bmix );
 		_working_buffer[f][1] = ( abuf[f][1] * amix ) +
@@ -555,30 +562,30 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 
 // knobs... lots of em
 
-	makeknob( a1_volKnob, 96, A1ROW, "Volume", "%", "aKnob" )
-	makeknob( a2_volKnob, 96, A2ROW, "Volume", "%", "aKnob" )
-	makeknob( b1_volKnob, 96, B1ROW, "Volume", "%", "bKnob" )
-	makeknob( b2_volKnob, 96, B2ROW, "Volume", "%", "bKnob"  )
+	makeknob( a1_volKnob, 118, A1ROW, "Volume", "%", "aKnob" )
+	makeknob( a2_volKnob, 118, A2ROW, "Volume", "%", "aKnob" )
+	makeknob( b1_volKnob, 118, B1ROW, "Volume", "%", "bKnob" )
+	makeknob( b2_volKnob, 118, B2ROW, "Volume", "%", "bKnob"  )
 
-	makeknob( a1_panKnob, 121, A1ROW, "Panning", "", "aKnob" )
-	makeknob( a2_panKnob, 121, A2ROW, "Panning", "", "aKnob" )
-	makeknob( b1_panKnob, 121, B1ROW, "Panning", "", "bKnob"  )
-	makeknob( b2_panKnob, 121, B2ROW, "Panning", "", "bKnob"  )
+	makeknob( a1_panKnob, 146, A1ROW, "Panning", "", "aKnob" )
+	makeknob( a2_panKnob, 146, A2ROW, "Panning", "", "aKnob" )
+	makeknob( b1_panKnob, 146, B1ROW, "Panning", "", "bKnob"  )
+	makeknob( b2_panKnob, 146, B2ROW, "Panning", "", "bKnob"  )
 
-	makeknob( a1_multKnob, 146, A1ROW, "Freq. multiplier", "/8", "aKnob" )
-	makeknob( a2_multKnob, 146, A2ROW, "Freq. multiplier", "/8", "aKnob" )
-	makeknob( b1_multKnob, 146, B1ROW, "Freq. multiplier", "/8", "bKnob"  )
-	makeknob( b2_multKnob, 146, B2ROW, "Freq. multiplier", "/8", "bKnob"  )
+	makeknob( a1_multKnob, 172, A1ROW, "Freq. multiplier", "/8", "aKnob" )
+	makeknob( a2_multKnob, 172, A2ROW, "Freq. multiplier", "/8", "aKnob" )
+	makeknob( b1_multKnob, 172, B1ROW, "Freq. multiplier", "/8", "bKnob"  )
+	makeknob( b2_multKnob, 172, B2ROW, "Freq. multiplier", "/8", "bKnob"  )
 
-	makeknob( a1_ltuneKnob, 171, A1ROW, "Left detune", " cents", "aKnob" )
-	makeknob( a2_ltuneKnob, 171, A2ROW, "Left detune", " cents", "aKnob" )
-	makeknob( b1_ltuneKnob, 171, B1ROW, "Left detune", " cents", "bKnob"  )
-	makeknob( b2_ltuneKnob, 171, B2ROW, "Left detune", " cents", "bKnob"  )
+	makeknob( a1_ltuneKnob, 200, A1ROW, "Left detune", " cents", "aKnob" )
+	makeknob( a2_ltuneKnob, 200, A2ROW, "Left detune", " cents", "aKnob" )
+	makeknob( b1_ltuneKnob, 200, B1ROW, "Left detune", " cents", "bKnob"  )
+	makeknob( b2_ltuneKnob, 200, B2ROW, "Left detune", " cents", "bKnob"  )
 
-	makeknob( a1_rtuneKnob, 196, A1ROW, "Right detune", " cents", "aKnob" )
-	makeknob( a2_rtuneKnob, 196, A2ROW, "Right detune", " cents", "aKnob" )
-	makeknob( b1_rtuneKnob, 196, B1ROW, "Right detune", " cents", "bKnob"  )
-	makeknob( b2_rtuneKnob, 196, B2ROW, "Right detune", " cents", "bKnob"  )
+	makeknob( a1_rtuneKnob, 228, A1ROW, "Right detune", " cents", "aKnob" )
+	makeknob( a2_rtuneKnob, 228, A2ROW, "Right detune", " cents", "aKnob" )
+	makeknob( b1_rtuneKnob, 228, B1ROW, "Right detune", " cents", "bKnob"  )
+	makeknob( b2_rtuneKnob, 228, B2ROW, "Right detune", " cents", "bKnob"  )
 
 	makeknob( m_abmixKnob, 4, 4, "A-B Mix", "", "mixKnob" )
 
