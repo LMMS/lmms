@@ -495,7 +495,7 @@ void AutomatableModel::copyValue()
 
 
 
-void AutomatableModel::pasteValue()	
+void AutomatableModel::pasteValue()
 {
 	setValue( copiedValue() );
 }

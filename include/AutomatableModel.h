@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUTOMATABLE_MODEL_H
-#define _AUTOMATABLE_MODEL_H
+#ifndef AUTOMATABLE_MODEL_H
+#define AUTOMATABLE_MODEL_H
 
 #include <math.h>
 
@@ -34,24 +34,24 @@
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
 		public:													\
-			inline type getfunc() const							\
+			type getfunc() const								\
 			{													\
 				return (type) modelname->value();				\
 			}													\
 		public slots:											\
-			inline void setfunc( const type val )				\
+			void setfunc( const type val )						\
 			{													\
 				modelname->setValue( val );						\
 			}
 
 #define mapPropertyFromModel(type,getfunc,setfunc,modelname)	\
 		public:													\
-			inline type getfunc() const							\
+			type getfunc() const								\
 			{													\
 				return (type) modelname.value();				\
 			}													\
 		public slots:											\
-			inline void setfunc( const type val )				\
+			void setfunc( const type val )						\
 			{													\
 				modelname.setValue( (float) val );				\
 			}
@@ -80,8 +80,8 @@ public:
 						const float max = 0,
 						const float step = 0,
 						Model* parent = NULL,
-						const QString& display_name = QString(),
-						bool default_constructed = false );
+						const QString& displayName = QString(),
+						bool defaultConstructed = false );
 
 	virtual ~AutomatableModel();
 
@@ -93,7 +93,7 @@ public:
 
 	bool isAutomated() const;
 
-	inline ControllerConnection* controllerConnection() const
+	ControllerConnection* controllerConnection() const
 	{
 		return m_controllerConnection;
 	}
@@ -103,13 +103,13 @@ public:
 
 
 	template<class T>
-	static inline T castValue( const float v )
+	static T castValue( const float v )
 	{
 		return (T)( v );
 	}
 
 	template<bool>
-	static inline bool castValue( const float v )
+	static bool castValue( const float v )
 	{
 		return ( qRound( v ) != 0 );
 	}
@@ -130,7 +130,7 @@ public:
 
 
 	template<class T>
-	inline T initValue() const
+	T initValue() const
 	{
 		return castValue<T>( m_initValue );
 	}
@@ -141,19 +141,19 @@ public:
 	}
 
 	template<class T>
-	inline T minValue() const
+	T minValue() const
 	{
 		return castValue<T>( m_minValue );
 	}
 
 	template<class T>
-	inline T maxValue() const
+	T maxValue() const
 	{
 		return castValue<T>( m_maxValue );
 	}
 
 	template<class T>
-	inline T step() const
+	T step() const
 	{
 		return castValue<T>( m_step );
 	}
@@ -164,12 +164,12 @@ public:
 	void setAutomatedValue( const float value );
 	void setValue( const float value );
 
-	inline void incValue( int steps )
+	void incValue( int steps )
 	{
 		setValue( m_value + steps * m_step );
 	}
 
-	inline float range() const
+	float range() const
 	{
 		return m_range;
 	}
@@ -280,22 +280,22 @@ signals:
 
 
 #define defaultTypedMethods(type)								\
-	inline type value( int frameOffset = 0 ) const				\
+	type value( int frameOffset = 0 ) const						\
 	{															\
 		return AutomatableModel::value<type>( frameOffset );	\
 	}															\
 																\
-	inline type initValue() const								\
+	type initValue() const										\
 	{															\
 		return AutomatableModel::initValue<type>();				\
 	}															\
 																\
-	inline type minValue() const								\
+	type minValue() const										\
 	{															\
 		return AutomatableModel::minValue<type>();				\
 	}															\
 																\
-	inline type maxValue() const								\
+	type maxValue() const										\
 	{															\
 		return AutomatableModel::maxValue<type>();				\
 	}															\
