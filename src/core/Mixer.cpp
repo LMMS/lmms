@@ -164,6 +164,11 @@ public:
 
 	void processJobQueue();
 
+	int workerNum() const
+	{
+		return m_workerNum;
+	}
+
 
 private:
 	virtual void run()
