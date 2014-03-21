@@ -229,7 +229,7 @@ INT32  *ams_table;
 INT32  *vib_table;
 static INT32 amsIncr;
 static INT32 vibIncr;
-static INT32 feedback2;		/* connect for SLOT 2 */
+INT32 feedback2;		/* connect for SLOT 2 */
 
 /* log output level */
 #define LOG_ERR  3      /* ERROR       */
