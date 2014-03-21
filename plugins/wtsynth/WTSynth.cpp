@@ -24,7 +24,8 @@
 
 #include <QtXml/QDomElement>
 #include <QtGlobal>
-#include <QPixmap>
+#include <QtGui/QBitmap>
+#include <QtGui/QPainter>
 
 #include "WTSynth.h"
 #include "engine.h"
@@ -36,14 +37,13 @@
 
 #include "embed.h"
 
-
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT wtsynth_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"wtsynth",
+	"WTSynth",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
@@ -511,21 +511,6 @@ void WTSynthInstrument::updateTunes( int _osc )
 	m_tuneChanged[_osc] = true;
 }
 
-
-
-
-
-
-#define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobBright_26, this); 			\
-	name ->move( x, y );								\
-	name ->setHintText( tr( hint ) + " ", unit );		\
-	name ->setObjectName( oname );
-
-#define A1ROW 25
-#define A2ROW 47
-#define B1ROW 69
-#define B2ROW 91
 
 WTSynthView::WTSynthView( Instrument * _instrument,
 					QWidget * _parent ) :

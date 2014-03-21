@@ -36,6 +36,18 @@
 #include "pixmap_button.h"
 
 
+#define makeknob( name, x, y, hint, unit, oname ) 		\
+	name = new knob( knobBright_26, this); 				\
+	name ->move( x, y );								\
+	name ->setHintText( tr( hint ) + " ", unit );		\
+	name ->setObjectName( oname );
+
+#define A1ROW 25
+#define A2ROW 47
+#define B1ROW 69
+#define B2ROW 91
+
+
 const int WAVELEN = 220;
 
 const int	MOD_MIX = 0;
@@ -50,8 +62,6 @@ const int	B1_OSC = 2;
 const int	B2_OSC = 3;
 const int	NUM_OSCS = 4;
 
-class WTSynthInstrument;
-class WTSynthView;
 
 class WTSynthObject
 {
@@ -86,12 +96,15 @@ private:
 
 	const sample_rate_t m_samplerate;
 	NotePlayHandle * m_nph;
-	
+
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
-	
+
 	float m_lfreq [NUM_OSCS];
 	float m_rfreq [NUM_OSCS];
+	
+	friend class WTSynthInstrument;
+	friend class WTSynthView;
 };
 
 class WTSynthInstrument : public Instrument
@@ -159,7 +172,7 @@ private:
 	FloatModel a2_rtune;
 	FloatModel b1_rtune;
 	FloatModel b2_rtune;
-	
+
 	graphModel a1_graph;
 	graphModel a2_graph;
 	graphModel b1_graph;
@@ -168,9 +181,9 @@ private:
 	FloatModel m_abmix;
 	IntModel m_amod;
 	IntModel m_bmod;
-	
+
 	IntModel m_selectedGraph;
-	
+
 	bool m_volChanged [NUM_OSCS];
 	bool m_multChanged [NUM_OSCS];
 	bool m_tuneChanged [NUM_OSCS];
@@ -236,13 +249,11 @@ private:
 	automatableButtonGroup * m_aModGroup;
 	automatableButtonGroup * m_bModGroup;
 
-	static QPixmap * s_artwork;
-
 	graph * a1_graph;
 	graph * a2_graph;
 	graph * b1_graph;
 	graph * b2_graph;
-	
+
 	pixmapButton * m_sinWaveButton;
 	pixmapButton * m_triWaveButton;
 	pixmapButton * m_sawWaveButton;
@@ -253,6 +264,8 @@ private:
 	pixmapButton * m_phaseLeftButton;
 	pixmapButton * m_phaseRightButton;
 	
+	friend class WTSynthInstrument;
+
 };
 
 #endif
