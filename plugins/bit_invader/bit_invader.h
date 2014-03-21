@@ -101,8 +101,6 @@ private:
 	
 	float m_normalizeFactor;
 	
-	oscillator * m_osc;
-
 	friend class bitInvaderView;
 } ;
 
