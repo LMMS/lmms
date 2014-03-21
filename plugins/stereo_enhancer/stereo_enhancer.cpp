@@ -69,10 +69,9 @@ stereoEnhancerEffect::~stereoEnhancerEffect()
 {
 	if( m_delayBuffer )
 	{
-		//delete [] m_delayBuffer;
-		delete m_delayBuffer;
-		
+		delete [] m_delayBuffer;
 	}
+
 	m_currFrame = 0;
 }
 
