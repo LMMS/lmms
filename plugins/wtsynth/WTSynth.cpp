@@ -963,7 +963,6 @@ void WTSynthView::sqrWaveClicked()
 
 void WTSynthView::normalizeClicked()
 {
-	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -983,13 +982,11 @@ void WTSynthView::normalizeClicked()
 			engine::getSong()->setModified();
 			break;
 	}
-	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::invertClicked()
 {
-	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1009,13 +1006,11 @@ void WTSynthView::invertClicked()
 			engine::getSong()->setModified();
 			break;
 	}
-	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::smoothClicked()
 {
-	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1035,13 +1030,11 @@ void WTSynthView::smoothClicked()
 			engine::getSong()->setModified();
 			break;
 	}
-	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::phaseLeftClicked()
 {
-	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1061,13 +1054,11 @@ void WTSynthView::phaseLeftClicked()
 			engine::getSong()->setModified();
 			break;
 	}
-	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::phaseRightClicked()
 {
-	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1087,7 +1078,6 @@ void WTSynthView::phaseRightClicked()
 			engine::getSong()->setModified();
 			break;
 	}
-	engine::mixer()->unlock();
 }
 
 
