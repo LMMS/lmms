@@ -2,7 +2,7 @@
  * AutomationPattern.h - declaration of class AutomationPattern, which contains
  *                       all information about an automation pattern
  *
- * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -179,8 +179,8 @@ private:
 
 	bool m_dragging;
 
-	static const float DEFAULT_MIN_VALUE = 0;
-	static const float DEFAULT_MAX_VALUE = 1;
+	static const float DEFAULT_MIN_VALUE;
+	static const float DEFAULT_MAX_VALUE;
 
 	friend class AutomationPatternView;
 

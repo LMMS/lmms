@@ -37,6 +37,9 @@
 #include "song.h"
 
 
+const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
+const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
+
 
 AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	trackContentObject( _auto_track ),
