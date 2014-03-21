@@ -77,7 +77,6 @@ protected:
 
 private:
 	QPixmap m_bg;
-	ledCheckBox * m_bypass;
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
 	bool m_show;
