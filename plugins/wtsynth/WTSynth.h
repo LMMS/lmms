@@ -70,16 +70,25 @@ class WTSynthObject
 public:
 	WTSynthObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph );
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames );
 	virtual ~WTSynthObject();
 
-	void renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_t _frames );
+	void renderOutput( fpp_t _frames );
 
 	void updateFrequencies();
 
 	void changeVolume( int _osc, float _lvol, float _rvol );
 	void changeMult( int _osc, float _mul );
 	void changeTune( int _osc, float _ltune, float _rtune );
+
+	inline sampleFrame * abuf() const
+	{
+		return m_abuf;
+	}
+	inline sampleFrame * bbuf() const
+	{
+		return m_bbuf;
+	}
 
 private:
 	sample_t * m_A1wave;
@@ -99,14 +108,17 @@ private:
 	const sample_rate_t m_samplerate;
 	NotePlayHandle * m_nph;
 
+	fpp_t m_fpp;
+
+	sampleFrame * m_abuf;
+	sampleFrame * m_bbuf;
+
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
 
 	float m_lfreq [NUM_OSCS];
 	float m_rfreq [NUM_OSCS];
-	
-	friend class WTSynthInstrument;
-	friend class WTSynthView;
+
 };
 
 class WTSynthInstrument : public Instrument
@@ -265,8 +277,6 @@ private:
 	pixmapButton * m_smoothButton;
 	pixmapButton * m_phaseLeftButton;
 	pixmapButton * m_phaseRightButton;
-	
-	friend class WTSynthInstrument;
 
 };
 

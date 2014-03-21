@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT wtsynth_plugin_descriptor =
 
 WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph ) :
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames ) :
 				m_A1wave( _A1wave ),
 				m_A2wave( _A2wave ),
 				m_B1wave( _B1wave ),
@@ -64,8 +64,12 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 				m_amod( _amod ),
 				m_bmod( _bmod ),
 				m_samplerate( _samplerate ),
-				m_nph( _nph )
+				m_nph( _nph ),
+				m_fpp( _frames )
 {
+	m_abuf = new sampleFrame[_frames];
+	m_bbuf = new sampleFrame[_frames];
+	
 	m_lphase[A1_OSC] = 0.0f;
 	m_lphase[A2_OSC] = 0.0f;
 	m_lphase[B1_OSC] = 0.0f;
@@ -80,10 +84,12 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 
 WTSynthObject::~WTSynthObject()
 {
+	delete[] m_abuf;
+	delete[] m_bbuf;
 }
 
 
-void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_t _frames )
+void WTSynthObject::renderOutput( fpp_t _frames )
 {
 	for( fpp_t frame = 0; frame < _frames; frame++ )
 	{
@@ -167,8 +173,8 @@ void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_
 				A1_R *= A2_R;
 				break;
 		}
-		_abuf[frame][0] = A1_L * m_lvol[A1_OSC];
-		_abuf[frame][1] = A1_R * m_rvol[A1_OSC];
+		m_abuf[frame][0] = A1_L * m_lvol[A1_OSC];
+		m_abuf[frame][1] = A1_R * m_rvol[A1_OSC];
 
 		// B-series modulation (other than phase mod)
 		switch( m_bmod )
@@ -186,8 +192,8 @@ void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_
 				B1_R *= B2_R;
 				break;
 		}
-		_bbuf[frame][0] = B1_L * m_lvol[B1_OSC];
-		_bbuf[frame][1] = B1_R * m_rvol[B1_OSC];
+		m_bbuf[frame][0] = B1_L * m_lvol[B1_OSC];
+		m_bbuf[frame][1] = B1_R * m_rvol[B1_OSC];
 
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
@@ -322,7 +328,8 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 				const_cast<float*>( b1_graph.samples() ),
 				const_cast<float*>( b2_graph.samples() ),
 				m_amod.value(), m_bmod.value(),
-				engine::mixer()->processingSampleRate(), _n );
+				engine::mixer()->processingSampleRate(), _n,
+				engine::mixer()->framesPerPeriod() );
 
 		w -> changeMult( A1_OSC, a1_mult.value() );
 		w -> changeMult( A2_OSC, a2_mult.value() );
@@ -377,11 +384,11 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		m_multChanged = false;
 	}
 	
-	sampleFrame * abuf = new sampleFrame[frames];
+	sampleFrame * abuf = w->abuf();
 
-	sampleFrame * bbuf = new sampleFrame[frames];
+	sampleFrame * bbuf = w->bbuf();
 
-	w-> renderOutput( abuf, bbuf, frames );
+	w-> renderOutput( frames );
 
 	const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
 	const float amix = 1.0 - bmix;
@@ -392,9 +399,6 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		_working_buffer[f][1] = ( abuf[f][1] * amix ) +
 								( bbuf[f][1] * bmix );
 	}
-
-	delete[] abuf;
-	delete[] bbuf;
 
 	applyRelease( _working_buffer, _n );
 
