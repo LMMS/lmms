@@ -23,9 +23,6 @@
  */
 
 #include <QtXml/QDomElement>
-#include <QtGlobal>
-#include <QtGui/QBitmap>
-#include <QtGui/QPainter>
 
 #include "WTSynth.h"
 #include "engine.h"
@@ -35,7 +32,7 @@
 #include "song.h"
 #include "lmms_math.h"
 
-#include "embed.h"
+#include "embed.cpp"
 
 extern "C"
 {
@@ -95,22 +92,26 @@ void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_
 
 		// A2
 		frac = fraction( m_lphase[A2_OSC] );
-		sample_t A2_L = ( m_A2wave[ int( m_lphase[A2_OSC] ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_A2wave[ int( m_lphase[A2_OSC] + 1 ) % WAVELEN ] * frac );
+		sample_t A2_L = 
+			( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] + 1 ) % WAVELEN ] * frac );
 		A2_L *= m_lvol[A2_OSC];
 		frac = fraction( m_rphase[A2_OSC] );
-		sample_t A2_R = ( m_A2wave[ int( m_rphase[A2_OSC] ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_A2wave[ int( m_rphase[A2_OSC] + 1 ) % WAVELEN ] * frac );
+		sample_t A2_R = 
+			( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] + 1 ) % WAVELEN ] * frac );
 		A2_R *= m_rvol[A2_OSC];
 
 		// B2
 		frac = fraction( m_lphase[B2_OSC] );
-		sample_t B2_L = ( m_A2wave[ int( m_lphase[B2_OSC] ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_B2wave[ int( m_lphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
+		sample_t B2_L = 
+			( m_A2wave[ static_cast<int>( m_lphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
 		B2_L *= m_lvol[B2_OSC];
 		frac = fraction( m_rphase[B2_OSC] );
-		sample_t B2_R = ( m_A2wave[ int( m_rphase[B2_OSC] ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_A2wave[ int( m_rphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
+		sample_t B2_R = 
+			( m_A2wave[ static_cast<int>( m_rphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_A2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
 		B2_R *= m_rvol[B2_OSC];
 
 		// put phases of 1-series oscs into variables because phase modulation might happen
@@ -133,19 +134,23 @@ void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_
 
 		// A1
 		frac = fraction( A1_lphase );
-		sample_t A1_L = ( m_A1wave[ int( A1_lphase ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_A1wave[ int( A1_lphase + 1 ) % WAVELEN ] * frac );
+		sample_t A1_L = 
+			( m_A1wave[ static_cast<int>( A1_lphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_A1wave[ static_cast<int>( A1_lphase + 1 ) % WAVELEN ] * frac );
 		frac = fraction( A1_rphase );
-		sample_t A1_R = ( m_A1wave[ int( A1_rphase ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_A1wave[ int( A1_rphase + 1 ) % WAVELEN ] * frac );
+		sample_t A1_R = 
+			( m_A1wave[ static_cast<int>( A1_rphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_A1wave[ static_cast<int>( A1_rphase + 1 ) % WAVELEN ] * frac );
 
 		// B1
 		frac = fraction( B1_lphase );
-		sample_t B1_L = ( m_B1wave[ int( B1_lphase ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_B1wave[ int( B1_lphase + 1 ) % WAVELEN ] * frac );
+		sample_t B1_L = 
+			( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_B1wave[ static_cast<int>( B1_lphase + 1 ) % WAVELEN ] * frac );
 		frac = fraction( B1_rphase );
-		sample_t B1_R = ( m_B1wave[ int( B1_rphase ) % WAVELEN ] * ( 1 - frac ) ) +
-			( m_B1wave[ int( B1_rphase + 1 ) % WAVELEN ] * frac );
+		sample_t B1_R = 
+			( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_B1wave[ static_cast<int>( B1_rphase + 1 ) % WAVELEN ] * frac );
 
 		// A-series modulation (other than phase mod)
 		switch( m_amod )
@@ -164,7 +169,7 @@ void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_
 				break;
 		}
 		_abuf[frame][0] = A1_L * m_lvol[A1_OSC];
-		_abuf[frame][1] = A1_R * m_rvol[B1_OSC];
+		_abuf[frame][1] = A1_R * m_rvol[A1_OSC];
 
 		// B-series modulation (other than phase mod)
 		switch( m_bmod )
@@ -182,8 +187,8 @@ void WTSynthObject::renderOutput( sampleFrame * _abuf, sampleFrame * _bbuf, fpp_
 				B1_R *= B2_R;
 				break;
 		}
-		_bbuf[frame][0] = B1_L;
-		_bbuf[frame][1] = B1_R;
+		_bbuf[frame][0] = B1_L * m_lvol[B1_OSC];
+		_bbuf[frame][1] = B1_R * m_rvol[B1_OSC];
 
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
@@ -212,15 +217,15 @@ void WTSynthObject::updateFrequencies()
 
 void WTSynthObject::changeVolume( int _osc, float _lvol, float _rvol )
 {
-	m_lvol[_osc] = _lvol;
-	m_rvol[_osc] = _rvol;
+	m_lvol[_osc] = _lvol / 100.0;
+	m_rvol[_osc] = _rvol / 100.0;
+	qDebug( "osc %d vol %f %f", _osc, m_lvol[_osc], m_rvol[_osc] );
 }
 
 
-void WTSynthObject::changeMult( int _osc, int _mul )
+void WTSynthObject::changeMult( int _osc, float _mul )
 {
 	m_mult[_osc] = _mul;
-	updateFrequencies();
 }
 
 
@@ -228,7 +233,6 @@ void WTSynthObject::changeTune( int _osc, float _ltune, float _rtune )
 {
 	m_ltune[_osc] = _ltune;
 	m_rtune[_osc] = _rtune;
-	updateFrequencies();
 }
 
 
@@ -246,10 +250,10 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 		b1_pan( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "Panning B1" ) ),
 		b2_pan( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "Panning B2" ) ),
 
-		a1_mult( 8, 1, 16, this, tr( "Freq. multiplier A1" ) ),
-		a2_mult( 8, 1, 16, this, tr( "Freq. multiplier A2" ) ),
-		b1_mult( 8, 1, 16, this, tr( "Freq. multiplier B1" ) ),
-		b2_mult( 8, 1, 16, this, tr( "Freq. multiplier B2" ) ),
+		a1_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier A1" ) ),
+		a2_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier A2" ) ),
+		b1_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier B1" ) ),
+		b2_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier B2" ) ),
 
 		a1_ltune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Left detune A1" ) ),
 		a2_ltune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Left detune A2" ) ),
@@ -272,30 +276,30 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 
 		m_selectedGraph( 0, 0, 3, this, tr( "Selected graph" ) )
 {
-	connect( &a1_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( A1_OSC ) ) );
-	connect( &a2_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( A2_OSC ) ) );
-	connect( &b1_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( B1_OSC ) ) );
-	connect( &b2_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( B2_OSC ) ) );
+	connect( &a1_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &a2_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &b1_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &b2_vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
 
-	connect( &a1_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( A1_OSC ) ) );
-	connect( &a2_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( A2_OSC ) ) );
-	connect( &b1_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( B1_OSC ) ) );
-	connect( &b2_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes( B2_OSC ) ) );
+	connect( &a1_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &a2_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &b1_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &b2_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
 
-	connect( &a1_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult( A1_OSC ) ) );
-	connect( &a2_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult( A2_OSC ) ) );
-	connect( &b1_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult( B1_OSC ) ) );
-	connect( &b2_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult( B2_OSC ) ) );
+	connect( &a1_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
+	connect( &a2_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
+	connect( &b1_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
+	connect( &b2_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
 
-	connect( &a1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( A1_OSC ) ) );
-	connect( &a2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( A2_OSC ) ) );
-	connect( &b1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( B1_OSC ) ) );
-	connect( &b2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( B2_OSC ) ) );
+	connect( &a1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &a2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &b1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &b2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
 
-	connect( &a1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( A1_OSC ) ) );
-	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( A2_OSC ) ) );
-	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( B1_OSC ) ) );
-	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes( B2_OSC ) ) );
+	connect( &a1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
 
 	a1_graph.setWaveToSine();
 	a2_graph.setWaveToSine();
@@ -345,21 +349,30 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 
 	// update oscs if needed
 
-	if( m_volChanged[A1_OSC] ) 	w-> changeVolume( A1_OSC, leftCh( a1_vol.value(), a1_pan.value() ), rightCh( a1_vol.value(), a1_pan.value() ) );
-	if( m_volChanged[A2_OSC] )	w-> changeVolume( A2_OSC, leftCh( a2_vol.value(), a2_pan.value() ), rightCh( a2_vol.value(), a2_pan.value() ) );
-	if( m_volChanged[B1_OSC] )	w-> changeVolume( B1_OSC, leftCh( b1_vol.value(), b1_pan.value() ), rightCh( b1_vol.value(), b1_pan.value() ) );
-	if( m_volChanged[B2_OSC] )	w-> changeVolume( B2_OSC, leftCh( b2_vol.value(), b2_pan.value() ), rightCh( b2_vol.value(), b2_pan.value() ) );
-
-	if( m_tuneChanged[A1_OSC] ) w-> changeTune( A1_OSC, a1_ltune.value(), a1_rtune.value() );
-	if( m_tuneChanged[A2_OSC] ) w-> changeTune( A2_OSC, a2_ltune.value(), a2_rtune.value() );
-	if( m_tuneChanged[B1_OSC] ) w-> changeTune( B1_OSC, b1_ltune.value(), b1_rtune.value() );
-	if( m_tuneChanged[B2_OSC] ) w-> changeTune( B2_OSC, b2_ltune.value(), b2_rtune.value() );
-
-	if( m_multChanged[A1_OSC] ) w-> changeMult( A1_OSC, a1_mult.value() );
-	if( m_multChanged[A2_OSC] ) w-> changeMult( A2_OSC, a2_mult.value() );
-	if( m_multChanged[B1_OSC] ) w-> changeMult( B1_OSC, b1_mult.value() );
-	if( m_multChanged[B2_OSC] ) w-> changeMult( B2_OSC, b2_mult.value() );
-
+	if( m_volChanged )
+	{
+		w-> changeVolume( A1_OSC, leftCh( a1_vol.value(), a1_pan.value() ), rightCh( a1_vol.value(), a1_pan.value() ) );
+		w-> changeVolume( A2_OSC, leftCh( a2_vol.value(), a2_pan.value() ), rightCh( a2_vol.value(), a2_pan.value() ) );
+		w-> changeVolume( B1_OSC, leftCh( b1_vol.value(), b1_pan.value() ), rightCh( b1_vol.value(), b1_pan.value() ) );
+		w-> changeVolume( B2_OSC, leftCh( b2_vol.value(), b2_pan.value() ), rightCh( b2_vol.value(), b2_pan.value() ) );
+	}
+	if( m_tuneChanged )
+	{
+		w-> changeTune( A1_OSC, a1_ltune.value(), a1_rtune.value() );
+		w-> changeTune( A2_OSC, a2_ltune.value(), a2_rtune.value() );
+		w-> changeTune( B1_OSC, b1_ltune.value(), b1_rtune.value() );
+		w-> changeTune( B2_OSC, b2_ltune.value(), b2_rtune.value() );
+		w-> updateFrequencies();
+	}
+	if( m_multChanged )
+	{
+		w-> changeMult( A1_OSC, a1_mult.value() );
+		w-> changeMult( A2_OSC, a2_mult.value() );
+		w-> changeMult( B1_OSC, b1_mult.value() );
+		w-> changeMult( B2_OSC, b2_mult.value() );
+		w-> updateFrequencies();
+	}
+	
 	sampleFrame * abuf = new sampleFrame[frames];
 
 	sampleFrame * bbuf = new sampleFrame[frames];
@@ -498,17 +511,17 @@ PluginView * WTSynthInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void WTSynthInstrument::updateVolumes( int _osc )
+void WTSynthInstrument::updateVolumes()
 {
-	m_volChanged[_osc] = true;
+	m_volChanged = true;
 }
-void WTSynthInstrument::updateMult( int _osc )
+void WTSynthInstrument::updateMult()
 {
-	m_multChanged[_osc] = true;
+	m_multChanged = true;
 }
-void WTSynthInstrument::updateTunes( int _osc )
+void WTSynthInstrument::updateTunes()
 {
-	m_tuneChanged[_osc] = true;
+	m_tuneChanged = true;
 }
 
 
@@ -519,8 +532,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	pal.setBrush( backgroundRole(),
-			PLUGIN_NAME::getIconPixmap(	"artwork" ) );
+	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap(	"artwork" ) );
 	setPalette( pal );
 
 // knobs... lots of em
@@ -557,6 +569,8 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	a2_volKnob -> setVolumeKnob( true );
 	b1_volKnob -> setVolumeKnob( true );
 	b2_volKnob -> setVolumeKnob( true );
+
+	m_abmixKnob -> setFixedSize( 31, 31 );
 
 
 // button groups next.
@@ -611,7 +625,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	toolTip::add( amod_rmButton, tr( "Ring-modulate A1 and A2" ) );
 
 	pixmapButton * amod_pmButton = new pixmapButton( this, NULL );
-	amod_pmButton -> move( 4, 104 );
+	amod_pmButton -> move( 4, 88 );
 	amod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
 	toolTip::add( amod_pmButton, tr( "Modulate phase of A1 with output of A2" ) );
@@ -642,7 +656,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	toolTip::add( bmod_rmButton, tr( "Ring-modulate B1 and B2" ) );
 
 	pixmapButton * bmod_pmButton = new pixmapButton( this, NULL );
-	bmod_pmButton -> move( 44, 104 );
+	bmod_pmButton -> move( 44, 88 );
 	bmod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
 	toolTip::add( bmod_pmButton, tr( "Modulate phase of B1 with output of B2" ) );

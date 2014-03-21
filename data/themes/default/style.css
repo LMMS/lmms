@@ -613,6 +613,8 @@ WTSynthView knob#aKnob {
 	qproperty-outerColor: rgb( 255, 255, 255 );
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 9;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;	
 	qproperty-lineWidth: 2; 
 }
 
@@ -621,6 +623,8 @@ WTSynthView knob#bKnob {
 	qproperty-outerColor: rgb( 255, 255, 255 );
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 9;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;	
 	qproperty-lineWidth: 2; 
 }
 
@@ -629,6 +633,8 @@ WTSynthView knob#mixKnob {
 	qproperty-outerColor: rgb( 255, 255, 255 );
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 15;
+	qproperty-centerPointX: 15.5;
+	qproperty-centerPointY: 15.5;	
 	qproperty-lineWidth: 2; 
 }
 

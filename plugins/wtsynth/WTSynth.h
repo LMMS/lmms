@@ -37,10 +37,11 @@
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobBright_26, this); 				\
+	name = new knob( knobStyled, this); 				\
 	name ->move( x, y );								\
 	name ->setHintText( tr( hint ) + " ", unit );		\
-	name ->setObjectName( oname );
+	name ->setObjectName( oname );						\
+	name ->setFixedSize( 19, 19 );
 
 #define A1ROW 25
 #define A2ROW 47
@@ -76,7 +77,7 @@ public:
 	void updateFrequencies();
 
 	void changeVolume( int _osc, float _lvol, float _rvol );
-	void changeMult( int _osc, int _mul );
+	void changeMult( int _osc, float _mul );
 	void changeTune( int _osc, float _ltune, float _rtune );
 
 private:
@@ -87,7 +88,7 @@ private:
 
 	float m_lvol [NUM_OSCS];
 	float m_rvol [NUM_OSCS];
-	int m_mult [NUM_OSCS];
+	float m_mult [NUM_OSCS];
 	float m_ltune [NUM_OSCS];
 	float m_rtune [NUM_OSCS];
 
@@ -132,10 +133,10 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
-protected slots:
-	void updateVolumes( int _osc );
-	void updateMult( int _osc );
-	void updateTunes( int _osc );
+public slots:
+	void updateVolumes();
+	void updateMult();
+	void updateTunes();
 
 private:
 	inline float leftCh( float _vol, float _pan )
@@ -158,10 +159,10 @@ private:
 	FloatModel b1_pan;
 	FloatModel b2_pan;
 
-	IntModel a1_mult;
-	IntModel a2_mult;
-	IntModel b1_mult;
-	IntModel b2_mult;
+	FloatModel a1_mult;
+	FloatModel a2_mult;
+	FloatModel b1_mult;
+	FloatModel b2_mult;
 
 	FloatModel a1_ltune;
 	FloatModel a2_ltune;
@@ -184,9 +185,9 @@ private:
 
 	IntModel m_selectedGraph;
 
-	bool m_volChanged [NUM_OSCS];
-	bool m_multChanged [NUM_OSCS];
-	bool m_tuneChanged [NUM_OSCS];
+	bool m_volChanged;
+	bool m_multChanged;
+	bool m_tuneChanged;
 
 	friend class WTSynthView;
 };
