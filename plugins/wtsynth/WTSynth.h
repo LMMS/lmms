@@ -50,6 +50,7 @@
 
 
 const int WAVELEN = 220;
+const int PMOD_AMT = 110;
 
 const int	MOD_MIX = 0;
 const int	MOD_AM = 1;
