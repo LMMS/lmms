@@ -74,6 +74,7 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 	m_lphase[A2_OSC] = 0.0f;
 	m_lphase[B1_OSC] = 0.0f;
 	m_lphase[B2_OSC] = 0.0f;
+	
 	m_rphase[A1_OSC] = 0.0f;
 	m_rphase[A2_OSC] = 0.0f;
 	m_rphase[B1_OSC] = 0.0f;
@@ -91,6 +92,11 @@ WTSynthObject::~WTSynthObject()
 
 void WTSynthObject::renderOutput( fpp_t _frames )
 {
+	if( m_abuf == NULL )
+		m_abuf = new sampleFrame[m_fpp];
+	if( m_bbuf == NULL )
+		m_bbuf = new sampleFrame[m_fpp];
+		
 	for( fpp_t frame = 0; frame < _frames; frame++ )
 	{
 		float frac;
@@ -110,13 +116,13 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		// B2
 		frac = fraction( m_lphase[B2_OSC] );
 		sample_t B2_L = 
-			( m_A2wave[ static_cast<int>( m_lphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
 		B2_L *= m_lvol[B2_OSC];
 		frac = fraction( m_rphase[B2_OSC] );
 		sample_t B2_R = 
-			( m_A2wave[ static_cast<int>( m_rphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
-			( m_A2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
+			( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
+			( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
 		B2_R *= m_rvol[B2_OSC];
 
 		// put phases of 1-series oscs into variables because phase modulation might happen
@@ -142,27 +148,31 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		sample_t A1_L = 
 			( m_A1wave[ static_cast<int>( A1_lphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_A1wave[ static_cast<int>( A1_lphase + 1 ) % WAVELEN ] * frac );
+		A1_L *= m_lvol[A1_OSC];
 		frac = fraction( A1_rphase );
 		sample_t A1_R = 
 			( m_A1wave[ static_cast<int>( A1_rphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_A1wave[ static_cast<int>( A1_rphase + 1 ) % WAVELEN ] * frac );
+		A1_R *= m_rvol[A1_OSC];
 
 		// B1
 		frac = fraction( B1_lphase );
 		sample_t B1_L = 
 			( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B1wave[ static_cast<int>( B1_lphase + 1 ) % WAVELEN ] * frac );
+		B1_L *= m_lvol[B1_OSC];
 		frac = fraction( B1_rphase );
 		sample_t B1_R = 
 			( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B1wave[ static_cast<int>( B1_rphase + 1 ) % WAVELEN ] * frac );
-
-		// A-series modulation (other than phase mod)
+		B1_R *= m_rvol[B1_OSC];
+		
+		// A-series modulation)
 		switch( m_amod )
 		{
 			case MOD_MIX:
-				A1_L += A2_L;
-				A1_R += A2_R;
+				A1_L = ( A1_L + A2_L ) / 2.0;
+				A1_R = ( A1_R + A2_R ) / 2.0;
 				break;
 			case MOD_AM:
 				A1_L *= qMax( 0.0f, A2_L + 1.0f );
@@ -173,15 +183,15 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 				A1_R *= A2_R;
 				break;
 		}
-		m_abuf[frame][0] = A1_L * m_lvol[A1_OSC];
-		m_abuf[frame][1] = A1_R * m_rvol[A1_OSC];
+		m_abuf[frame][0] = A1_L;
+		m_abuf[frame][1] = A1_R;
 
 		// B-series modulation (other than phase mod)
 		switch( m_bmod )
 		{
 			case MOD_MIX:
-				B1_L += B2_L;
-				B1_R += B2_R;
+				B1_L = ( B1_L + B2_L ) / 2.0;
+				B1_R = ( B1_R + B2_R ) / 2.0;
 				break;
 			case MOD_AM:
 				B1_L *= qMax( 0.0f, B2_L + 1.0f );
@@ -192,8 +202,8 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 				B1_R *= B2_R;
 				break;
 		}
-		m_bbuf[frame][0] = B1_L * m_lvol[B1_OSC];
-		m_bbuf[frame][1] = B1_R * m_rvol[B1_OSC];
+		m_bbuf[frame][0] = B1_L;
+		m_bbuf[frame][1] = B1_R;
 
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
@@ -385,7 +395,6 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 	}
 	
 	sampleFrame * abuf = w->abuf();
-
 	sampleFrame * bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
