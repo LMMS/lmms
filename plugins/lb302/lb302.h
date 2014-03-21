@@ -200,8 +200,6 @@ private:
 	      vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
 	      vco_slidebase;    //* The base vco_inc while sliding.
 
-	float vco_detune;
-
 	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE };
 	vco_shape_t vco_shape;
 
@@ -261,8 +259,6 @@ private:
 	knob * m_vcfResKnob;
 	knob * m_vcfDecKnob;
 	knob * m_vcfModKnob;
-
-	knob * m_vcoFineDetuneKnob;
 
 	knob * m_distKnob;
 	knob * m_slideDecKnob;
