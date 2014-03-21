@@ -567,10 +567,10 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	makeknob( b1_volKnob, 118, B1ROW, "Volume", "%", "bKnob" )
 	makeknob( b2_volKnob, 118, B2ROW, "Volume", "%", "bKnob"  )
 
-	makeknob( a1_panKnob, 146, A1ROW, "Panning", "", "aKnob" )
-	makeknob( a2_panKnob, 146, A2ROW, "Panning", "", "aKnob" )
-	makeknob( b1_panKnob, 146, B1ROW, "Panning", "", "bKnob"  )
-	makeknob( b2_panKnob, 146, B2ROW, "Panning", "", "bKnob"  )
+	makeknob( a1_panKnob, 142, A1ROW, "Panning", "", "aKnob" )
+	makeknob( a2_panKnob, 142, A2ROW, "Panning", "", "aKnob" )
+	makeknob( b1_panKnob, 142, B1ROW, "Panning", "", "bKnob"  )
+	makeknob( b2_panKnob, 142, B2ROW, "Panning", "", "bKnob"  )
 
 	makeknob( a1_multKnob, 172, A1ROW, "Freq. multiplier", "/8", "aKnob" )
 	makeknob( a2_multKnob, 172, A2ROW, "Freq. multiplier", "/8", "aKnob" )
@@ -582,10 +582,10 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	makeknob( b1_ltuneKnob, 200, B1ROW, "Left detune", " cents", "bKnob"  )
 	makeknob( b2_ltuneKnob, 200, B2ROW, "Left detune", " cents", "bKnob"  )
 
-	makeknob( a1_rtuneKnob, 228, A1ROW, "Right detune", " cents", "aKnob" )
-	makeknob( a2_rtuneKnob, 228, A2ROW, "Right detune", " cents", "aKnob" )
-	makeknob( b1_rtuneKnob, 228, B1ROW, "Right detune", " cents", "bKnob"  )
-	makeknob( b2_rtuneKnob, 228, B2ROW, "Right detune", " cents", "bKnob"  )
+	makeknob( a1_rtuneKnob, 224, A1ROW, "Right detune", " cents", "aKnob" )
+	makeknob( a2_rtuneKnob, 224, A2ROW, "Right detune", " cents", "aKnob" )
+	makeknob( b1_rtuneKnob, 224, B1ROW, "Right detune", " cents", "bKnob"  )
+	makeknob( b2_rtuneKnob, 224, B2ROW, "Right detune", " cents", "bKnob"  )
 
 	makeknob( m_abmixKnob, 4, 4, "A-B Mix", "", "mixKnob" )
 
@@ -632,27 +632,27 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 
 // A-modulation button group
 	pixmapButton * amod_mixButton = new pixmapButton( this, NULL );
-	amod_mixButton -> move( 4, 40 );
-	amod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
-	amod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
+	amod_mixButton -> move( 4, 50 );
+	amod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "amix_active" ) );
+	amod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "amix_inactive" ) );
 	toolTip::add( amod_mixButton, tr( "Mix output of A2 to A1" ) );
 
 	pixmapButton * amod_amButton = new pixmapButton( this, NULL );
-	amod_amButton -> move( 4, 56 );
-	amod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
-	amod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
+	amod_amButton -> move( 4, 66 );
+	amod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_active" ) );
+	amod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_inactive" ) );
 	toolTip::add( amod_amButton, tr( "Modulate amplitude of A1 with output of A2" ) );
 
 	pixmapButton * amod_rmButton = new pixmapButton( this, NULL );
-	amod_rmButton -> move( 4, 72 );
-	amod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "rm_active" ) );
-	amod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "rm_inactive" ) );
+	amod_rmButton -> move( 4, 82 );
+	amod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_active" ) );
+	amod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_inactive" ) );
 	toolTip::add( amod_rmButton, tr( "Ring-modulate A1 and A2" ) );
 
 	pixmapButton * amod_pmButton = new pixmapButton( this, NULL );
-	amod_pmButton -> move( 4, 88 );
-	amod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
-	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
+	amod_pmButton -> move( 4, 98 );
+	amod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_active" ) );
+	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_inactive" ) );
 	toolTip::add( amod_pmButton, tr( "Modulate phase of A1 with output of A2" ) );
 
 	m_aModGroup = new automatableButtonGroup( this );
@@ -663,27 +663,27 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 
 // B-modulation button group
 	pixmapButton * bmod_mixButton = new pixmapButton( this, NULL );
-	bmod_mixButton -> move( 44, 40 );
-	bmod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
-	bmod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
+	bmod_mixButton -> move( 44, 50 );
+	bmod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bmix_active" ) );
+	bmod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bmix_inactive" ) );
 	toolTip::add( bmod_mixButton, tr( "Mix output of B2 to B1" ) );
 
 	pixmapButton * bmod_amButton = new pixmapButton( this, NULL );
-	bmod_amButton -> move( 44, 56 );
-	bmod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
-	bmod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
+	bmod_amButton -> move( 44, 66 );
+	bmod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_active" ) );
+	bmod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_inactive" ) );
 	toolTip::add( bmod_amButton, tr( "Modulate amplitude of B1 with output of B2" ) );
 
 	pixmapButton * bmod_rmButton = new pixmapButton( this, NULL );
-	bmod_rmButton -> move( 44, 72 );
-	bmod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "rm_active" ) );
-	bmod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "rm_inactive" ) );
+	bmod_rmButton -> move( 44, 82 );
+	bmod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_active" ) );
+	bmod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_inactive" ) );
 	toolTip::add( bmod_rmButton, tr( "Ring-modulate B1 and B2" ) );
 
 	pixmapButton * bmod_pmButton = new pixmapButton( this, NULL );
-	bmod_pmButton -> move( 44, 88 );
-	bmod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
-	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
+	bmod_pmButton -> move( 44, 98 );
+	bmod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_active" ) );
+	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_inactive" ) );
 	toolTip::add( bmod_pmButton, tr( "Modulate phase of B1 with output of B2" ) );
 
 	m_bModGroup = new automatableButtonGroup( this );
@@ -700,7 +700,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	a1_graph = new graph( this, graph::LinearStyle, 224, 105 );
 	a1_graph->move( 4, 141 );
 	a1_graph->setAutoFillBackground( true );
-	a1_graph->setGraphColor( QColor( 255, 255, 255 ) );
+	a1_graph->setGraphColor( QColor( 0x43, 0xb2, 0xff ) );
 	toolTip::add( a1_graph, tr ( "Draw your own waveform here by dragging your mouse on this graph." ) );
 	a1_graph->setPalette( pal );
 
@@ -708,7 +708,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	a2_graph = new graph( this, graph::LinearStyle, 224, 105 );
 	a2_graph->move( 4, 141 );
 	a2_graph->setAutoFillBackground( true );
-	a2_graph->setGraphColor( QColor( 255, 255, 255 ) );
+	a2_graph->setGraphColor( QColor( 0x43, 0xb2, 0xff ) );
 	toolTip::add( a2_graph, tr ( "Draw your own waveform here by dragging your mouse on this graph." ) );
 	a2_graph->setPalette( pal );
 
@@ -716,7 +716,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	b1_graph = new graph( this, graph::LinearStyle, 224, 105 );
 	b1_graph->move( 4, 141 );
 	b1_graph->setAutoFillBackground( true );
-	b1_graph->setGraphColor( QColor( 255, 255, 255 ) );
+	b1_graph->setGraphColor( QColor( 0xfc, 0x54, 0x31 ) );
 	toolTip::add( b1_graph, tr ( "Draw your own waveform here by dragging your mouse on this graph." ) );
 	b1_graph->setPalette( pal );
 
@@ -724,7 +724,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	b2_graph = new graph( this, graph::LinearStyle, 224, 105 );
 	b2_graph->move( 4, 141 );
 	b2_graph->setAutoFillBackground( true );
-	b2_graph->setGraphColor( QColor( 255, 255, 255 ) );
+	b2_graph->setGraphColor( QColor( 0xfc, 0x54, 0x31 ) );
 	toolTip::add( b2_graph, tr ( "Draw your own waveform here by dragging your mouse on this graph." ) );
 	b2_graph->setPalette( pal );
 

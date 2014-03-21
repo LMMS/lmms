@@ -609,30 +609,30 @@ sidInstrumentView knob {
 }
 
 WTSynthView knob#aKnob {
-	color: rgb( 255, 255, 255 );
-	qproperty-outerColor: rgb( 255, 255, 255 );
+	color: #43b2ff;
+	qproperty-outerColor: #43b2ff;
 	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 9;
+	qproperty-outerRadius: 8;
 	qproperty-centerPointX: 9.5;
 	qproperty-centerPointY: 9.5;	
 	qproperty-lineWidth: 2; 
 }
 
 WTSynthView knob#bKnob {
-	color: rgb( 255, 255, 255 );
-	qproperty-outerColor: rgb( 255, 255, 255 );
+	color: #fc5431;
+	qproperty-outerColor: #fc5431;
 	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 9;
+	qproperty-outerRadius: 8;
 	qproperty-centerPointX: 9.5;
 	qproperty-centerPointY: 9.5;	
 	qproperty-lineWidth: 2; 
 }
 
 WTSynthView knob#mixKnob {
-	color: rgb( 255, 255, 255 );
-	qproperty-outerColor: rgb( 255, 255, 255 );
+	color: #43ff82;
+	qproperty-outerColor: #43ff82;
 	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 15;
+	qproperty-outerRadius: 14;
 	qproperty-centerPointX: 15.5;
 	qproperty-centerPointY: 15.5;	
 	qproperty-lineWidth: 2; 
