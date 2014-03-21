@@ -238,7 +238,7 @@ void WTSynthObject::changeVolume( int _osc, float _lvol, float _rvol )
 {
 	m_lvol[_osc] = _lvol / 100.0;
 	m_rvol[_osc] = _rvol / 100.0;
-	qDebug( "osc %d vol %f %f", _osc, m_lvol[_osc], m_rvol[_osc] );
+//	qDebug( "osc %d vol %f %f", _osc, m_lvol[_osc], m_rvol[_osc] );
 }
 
 
@@ -402,18 +402,34 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 	sampleFrame * bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
-
-	for( fpp_t f=0; f < frames; f++ )
+	
+	if( engine::mixer()->currentQualitySettings().sampleExactControllers )
 	{
-		// get knob values in sample-exact way
-		const float bmix = ( ( m_abmix.value( f ) + 100.0 ) / 200.0 );
+		for( fpp_t f=0; f < frames; f++ )
+		{
+			// get knob values in sample-exact way
+			const float bmix = ( ( m_abmix.value( f ) + 100.0 ) / 200.0 );
+			const float amix = 1.0 - bmix;
+			
+			// mix a/b streams according to mixing knob
+			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
+									( bbuf[f][0] * bmix );
+			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
+									( bbuf[f][1] * bmix );
+		}
+	}
+	else
+	{
+		const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
 		const float amix = 1.0 - bmix;
-		
-		// mix a/b streams according to mixing knob
-		_working_buffer[f][0] = ( abuf[f][0] * amix ) +
-								( bbuf[f][0] * bmix );
-		_working_buffer[f][1] = ( abuf[f][1] * amix ) +
-								( bbuf[f][1] * bmix );
+		for( fpp_t f=0; f < frames; f++ )
+		{			
+			// mix a/b streams according to mixing knob
+			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
+									( bbuf[f][0] * bmix );
+			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
+									( bbuf[f][1] * bmix );
+		}		
 	}
 
 	applyRelease( _working_buffer, _n );
@@ -947,6 +963,7 @@ void WTSynthView::sqrWaveClicked()
 
 void WTSynthView::normalizeClicked()
 {
+	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -966,11 +983,13 @@ void WTSynthView::normalizeClicked()
 			engine::getSong()->setModified();
 			break;
 	}
+	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::invertClicked()
 {
+	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -990,11 +1009,13 @@ void WTSynthView::invertClicked()
 			engine::getSong()->setModified();
 			break;
 	}
+	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::smoothClicked()
 {
+	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1014,11 +1035,13 @@ void WTSynthView::smoothClicked()
 			engine::getSong()->setModified();
 			break;
 	}
+	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::phaseLeftClicked()
 {
+	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1038,11 +1061,13 @@ void WTSynthView::phaseLeftClicked()
 			engine::getSong()->setModified();
 			break;
 	}
+	engine::mixer()->unlock();
 }
 
 
 void WTSynthView::phaseRightClicked()
 {
+	engine::mixer()->lock();
 	switch( m_selectedGraphGroup->model()->value() )
 	{
 		case A1_OSC:
@@ -1062,6 +1087,7 @@ void WTSynthView::phaseRightClicked()
 			engine::getSong()->setModified();
 			break;
 	}
+	engine::mixer()->unlock();
 }
 
 
