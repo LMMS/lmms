@@ -129,15 +129,12 @@ private:
 	pixmapButton * m_ch2VolSweepDirButton;
 	knob * m_ch2SweepStepLengthKnob;
 
-	pixmapButton * m_ch3OnButton;
 	knob * m_ch3VolumeKnob;
 
 	knob * m_ch4VolumeKnob;
 	pixmapButton * m_ch4VolSweepDirButton;
 	knob * m_ch4SweepStepLengthKnob;
-	knob * m_ch4ShiftClockFreqKnob;
 	pixmapButton * m_ch4ShiftRegWidthButton;
-	knob * m_ch4FreqDivRatioKnob;
 
 	knob * m_so1VolumeKnob;
 	knob * m_so2VolumeKnob;
