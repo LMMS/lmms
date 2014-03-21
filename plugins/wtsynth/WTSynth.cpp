@@ -74,7 +74,6 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 	m_rphase[A2_OSC] = 0.0f;
 	m_rphase[B1_OSC] = 0.0f;
 	m_rphase[B2_OSC] = 0.0f;
-	updateFrequencies();
 }
 
 
@@ -357,6 +356,7 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		w-> changeVolume( A2_OSC, leftCh( a2_vol.value(), a2_pan.value() ), rightCh( a2_vol.value(), a2_pan.value() ) );
 		w-> changeVolume( B1_OSC, leftCh( b1_vol.value(), b1_pan.value() ), rightCh( b1_vol.value(), b1_pan.value() ) );
 		w-> changeVolume( B2_OSC, leftCh( b2_vol.value(), b2_pan.value() ), rightCh( b2_vol.value(), b2_pan.value() ) );
+		m_volChanged = false;
 	}
 	if( m_tuneChanged )
 	{
@@ -365,6 +365,7 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		w-> changeTune( B1_OSC, b1_ltune.value(), b1_rtune.value() );
 		w-> changeTune( B2_OSC, b2_ltune.value(), b2_rtune.value() );
 		w-> updateFrequencies();
+		m_tuneChanged = false;
 	}
 	if( m_multChanged )
 	{
@@ -373,6 +374,7 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		w-> changeMult( B1_OSC, b1_mult.value() );
 		w-> changeMult( B2_OSC, b2_mult.value() );
 		w-> updateFrequencies();
+		m_multChanged = false;
 	}
 	
 	sampleFrame * abuf = new sampleFrame[frames];
@@ -380,10 +382,11 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 	sampleFrame * bbuf = new sampleFrame[frames];
 
 	w-> renderOutput( abuf, bbuf, frames );
+
+	const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
+	const float amix = 1.0 - bmix;
 	for( fpp_t f=0; f < frames; f++ )
 	{
-		const float amix = ( ( m_abmix.value( f ) - 100.0 ) / -200.0 );
-		const float bmix = 1.0 - amix;
 		_working_buffer[f][0] = ( abuf[f][0] * amix ) +
 								( bbuf[f][0] * bmix );
 		_working_buffer[f][1] = ( abuf[f][1] * amix ) +
