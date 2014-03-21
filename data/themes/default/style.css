@@ -608,6 +608,31 @@ sidInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
+WTSynthView knob#aKnob {
+	color: rgb( 255, 255, 255 );
+	qproperty-outerColor: rgb( 255, 255, 255 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 9;
+	qproperty-lineWidth: 2; 
+}
+
+WTSynthView knob#bKnob {
+	color: rgb( 255, 255, 255 );
+	qproperty-outerColor: rgb( 255, 255, 255 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 9;
+	qproperty-lineWidth: 2; 
+}
+
+WTSynthView knob#mixKnob {
+	color: rgb( 255, 255, 255 );
+	qproperty-outerColor: rgb( 255, 255, 255 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 15;
+	qproperty-lineWidth: 2; 
+}
+
+
 /* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
  * colour codes MUST be of the form #RRGGBB */
 
