@@ -87,8 +87,6 @@ private:
 	pixmapButton * m_button;
 	pixmapButton * m_lastBtn;
 
-	int m_selected;
-
 } ;
 
 typedef IntModel nineButtonSelectorModel;
