@@ -181,10 +181,12 @@ int main( int argc, char * * argv )
 		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
 						QString( argv[i] ) == "-u" ) )
 		{
-			DataFile dataFile( QString( argv[i + 1] ) );
+			QString inFile( argv[i + 1] );
+			DataFile dataFile( inFile );
 			if (argc > i+2)
 			{
-				dataFile.writeFile( argv[i + 2] );
+				const QString outFile = argv[i + 2];
+				dataFile.writeFile( outFile );
 			}
 			else
 			{
