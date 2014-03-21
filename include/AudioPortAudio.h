@@ -88,7 +88,6 @@ public:
 	private:
 		comboBox * m_backend;
 		comboBox * m_device;
-		LcdSpinBox * m_channels;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;

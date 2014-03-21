@@ -195,11 +195,11 @@ public:
 
 	/*! \brief Saves settings (value, automation links and controller connections) of AutomatableModel into
 				specified DOM element using <name> as attribute/node name */
-	void saveSettings( QDomDocument& doc, QDomElement& element, const QString& name );
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element, const QString& name );
 
 	/*! \brief Loads settings (value, automation links and controller connections) of AutomatableModel from
 				specified DOM element using <name> as attribute/node name */
-	void loadSettings( const QDomElement& element, const QString& name );
+	virtual void loadSettings( const QDomElement& element, const QString& name );
 
 	virtual QString nodeName() const
 	{
@@ -236,6 +236,13 @@ public slots:
 
 
 protected:
+	virtual void redoStep( JournalEntry& je );
+	virtual void undoStep( JournalEntry& je );
+
+	float fittedValue( float value ) const;
+
+
+private:
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
 	{
 		saveSettings( doc, element, "value" );
@@ -246,13 +253,6 @@ protected:
 		loadSettings( element, "value" );
 	}
 
-	virtual void redoStep( JournalEntry& je );
-	virtual void undoStep( JournalEntry& je );
-
-	float fittedValue( float value ) const;
-
-
-private:
 	void linkModel( AutomatableModel* model );
 	void unlinkModel( AutomatableModel* model );
 

@@ -2,7 +2,7 @@
  * DummyInstrument.h - instrument used as fallback if an instrument couldn't
  *                     be loaded
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	virtual void playNote( NotePlayHandle *, bool, sampleFrame * )
+	virtual void playNote( NotePlayHandle *, sampleFrame * )
 	{
 	}
 

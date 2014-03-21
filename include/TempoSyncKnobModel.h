@@ -53,8 +53,8 @@ public:
 				const QString & _display_name = QString() );
 	virtual ~TempoSyncKnobModel();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name = "value" );
-	virtual void loadSettings( const QDomElement & _this, const QString& name = "value" );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name );
+	void loadSettings( const QDomElement & _this, const QString& name );
 
 	TempoSyncMode syncMode() const
 	{

@@ -474,7 +474,6 @@ private:
 #else
 	int m_shmID;
 #endif
-	size_t m_shmSize;
 	shmData * m_data;
 #ifdef USE_QT_SEMAPHORES
 	QSystemSemaphore m_dataSem;
@@ -780,7 +779,6 @@ private:
 	void resizeSharedProcessingMemory();
 
 
-	bool m_initialized;
 	bool m_failed;
 
 	QProcess m_process;

@@ -65,11 +65,8 @@ private slots:
 private:
 	QVector<ControllerView *> m_controllerViews;
 
-	QVBoxLayout * m_mainLayout;
 	QScrollArea * m_scrollArea;
 	QPushButton * m_addButton;
-	
-	int m_lastY;
 
 } ;
 

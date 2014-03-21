@@ -307,8 +307,6 @@ private:
 	typedef QVector<trackContentObjectView *> tcoViewVector;
 	tcoViewVector m_tcoViews;
 
-	int m_pixelsPerTact;
-
 	QPixmap m_background;
 
 } ;
