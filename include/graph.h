@@ -102,7 +102,6 @@ private:
 	QPixmap m_foreground;
 	QColor m_graphColor;
 
-	graphModel * m_graphModel;
 	graphStyle m_graphStyle;
 
 	bool m_mouseDown;
