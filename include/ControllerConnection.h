@@ -100,7 +100,7 @@ protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
 	Controller * m_controller;
 	QString m_targetName;
-	int m_controllerId;	
+	int m_controllerId;
 	
 	bool m_ownsController;
 
