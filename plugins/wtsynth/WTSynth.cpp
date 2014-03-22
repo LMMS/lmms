@@ -292,7 +292,7 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 		b2_graph( -1.0f, 1.0f, WAVELEN, this ),
 
 		m_abmix( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "A-B Mix" ) ),
-		m_envAmt( 0.0f, -200.0f, 200.0f, 0.1f, this, tr( "A-B Mix envelope amount" ) ),
+		m_envAmt( 0.0f, -200.0f, 200.0f, 1.0f, this, tr( "A-B Mix envelope amount" ) ),
 		m_envAtt( 0.0f, 0.0f, 2000.0f, 1.0f, this, tr( "A-B Mix envelope attack" ) ),
 		m_envDec( 0.0f, 0.0f, 2000.0f, 1.0f, this, tr( "A-B Mix envelope decay" ) ),
 
