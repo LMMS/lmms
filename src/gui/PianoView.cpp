@@ -469,7 +469,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 							Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 			{
-				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity() );
+				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
 			// set note on
 			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
