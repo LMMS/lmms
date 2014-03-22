@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PIANO_H
-#define _PIANO_H
+#ifndef PIANO_H
+#define PIANO_H
 
 #include "note.h"
 #include "Model.h"
@@ -50,7 +50,7 @@ public:
 		return m_pressedKeys[key];
 	}
 
-	void handleKeyPress( int key, int midiVelocity = MidiDefaultVelocity );
+	void handleKeyPress( int key, int midiVelocity = -1 );
 	void handleKeyRelease( int key );
 
 	InstrumentTrack* instrumentTrack() const

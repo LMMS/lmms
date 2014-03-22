@@ -3,7 +3,7 @@
  *             for testing + according model class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@
  * \mainpage Instrument plugin keyboard display classes
  *
  * \section introduction Introduction
- * 
+ *
  * \todo fill this out
  * \todo write isWhite inline function and replace throughout
  */
@@ -95,6 +95,10 @@ void Piano::setKeyState( int key, bool state )
  */
 void Piano::handleKeyPress( int key, int midiVelocity )
 {
+	if( midiVelocity == -1 )
+	{
+		midiVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+	}
 	if( isValidKey( key ) )
 	{
 		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, 0, key, midiVelocity ) );
