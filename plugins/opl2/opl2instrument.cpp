@@ -395,7 +395,7 @@ void opl2instrument::play( sampleFrame * _working_buffer )
                 sample_t s = float(renderbuffer[frame])/32768.0;
                 for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
                 {
-                        _working_buffer[frame][ch] = s;
+                        _working_buffer[frame][ch] = s * 4.0;
                 }
 	}
 	emulatorMutex.unlock();
