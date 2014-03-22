@@ -354,9 +354,9 @@ float AutomatableModel::fittedValue( float value ) const
 		value = nearbyintf( value / m_step ) * m_step;
 	}
 
-	round_at(value, m_maxValue, m_step);
-	round_at(value, m_minValue, m_step);
-	round_at(value, 0, m_step);
+	round_at(value, m_maxValue);
+	round_at(value, m_minValue);
+	round_at(value, 0.0f);
 
 	if( value < m_minValue )
 	{
