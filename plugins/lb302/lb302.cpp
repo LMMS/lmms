@@ -337,8 +337,8 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_a = 9;
 	vca_mode = 3;
 
-	vcfs[0] = new lb302Filter3Pole(&fs);
-	vcfs[1] = new lb302FilterIIR2(&fs);
+	vcfs[0] = new lb302FilterIIR2(&fs);
+	vcfs[1] = new lb302Filter3Pole(&fs);
 	db24Toggled();
 
 	sample_cnt = 0;
@@ -346,18 +346,16 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	catch_frame = 0;
 	catch_decay = 0;
 
-	recalcFilter();
-
 	last_offset = 0;
 
 	new_freq = -1;
 	current_freq = -1;
 	delete_freq = -1;
 
+	filterChanged();
+
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::mixer()->addPlayHandle( iph );
-
-	filterChanged();
 }
 
 
