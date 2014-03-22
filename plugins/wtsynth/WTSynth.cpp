@@ -57,10 +57,6 @@ Plugin::Descriptor PLUGIN_EXPORT wtsynth_plugin_descriptor =
 WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
 					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames ) :
-				m_A1wave( _A1wave ),
-				m_A2wave( _A2wave ),
-				m_B1wave( _B1wave ),
-				m_B2wave( _B2wave ),
 				m_amod( _amod ),
 				m_bmod( _bmod ),
 				m_samplerate( _samplerate ),
@@ -79,6 +75,12 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 	m_rphase[A2_OSC] = 0.0f;
 	m_rphase[B1_OSC] = 0.0f;
 	m_rphase[B2_OSC] = 0.0f;
+	
+	// copy wavegraphs to the synth object to prevent race conditions
+	memcpy( &m_A1wave, _A1wave, sizeof( m_A1wave ) );
+	memcpy( &m_A2wave, _A2wave, sizeof( m_A2wave ) );
+	memcpy( &m_B1wave, _B1wave, sizeof( m_B1wave ) );
+	memcpy( &m_B2wave, _B2wave, sizeof( m_B2wave ) );
 }
 
 

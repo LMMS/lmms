@@ -91,11 +91,6 @@ public:
 	}
 
 private:
-	sample_t * m_A1wave;
-	sample_t * m_A2wave;
-	sample_t * m_B1wave;
-	sample_t * m_B2wave;
-
 	float m_lvol [NUM_OSCS];
 	float m_rvol [NUM_OSCS];
 	float m_mult [NUM_OSCS];
@@ -118,7 +113,11 @@ private:
 
 	float m_lfreq [NUM_OSCS];
 	float m_rfreq [NUM_OSCS];
-
+	
+	float m_A1wave [WAVELEN];
+	float m_A2wave [WAVELEN];
+	float m_B1wave [WAVELEN];
+	float m_B2wave [WAVELEN];
 };
 
 class WTSynthInstrument : public Instrument
