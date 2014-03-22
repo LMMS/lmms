@@ -65,17 +65,17 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 {
 	m_abuf = new sampleFrame[_frames];
 	m_bbuf = new sampleFrame[_frames];
-	
+
 	m_lphase[A1_OSC] = 0.0f;
 	m_lphase[A2_OSC] = 0.0f;
 	m_lphase[B1_OSC] = 0.0f;
 	m_lphase[B2_OSC] = 0.0f;
-	
+
 	m_rphase[A1_OSC] = 0.0f;
 	m_rphase[A2_OSC] = 0.0f;
 	m_rphase[B1_OSC] = 0.0f;
 	m_rphase[B2_OSC] = 0.0f;
-	
+
 	// copy wavegraphs to the synth object to prevent race conditions
 	memcpy( &m_A1wave, _A1wave, sizeof( m_A1wave ) );
 	memcpy( &m_A2wave, _A2wave, sizeof( m_A2wave ) );
@@ -98,31 +98,31 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		m_abuf = new sampleFrame[m_fpp];
 	if( m_bbuf == NULL )
 		m_bbuf = new sampleFrame[m_fpp];
-		
+
 	for( fpp_t frame = 0; frame < _frames; frame++ )
 	{
 		float frac;
 
 		// A2
 		frac = fraction( m_lphase[A2_OSC] );
-		sample_t A2_L = 
+		sample_t A2_L =
 			( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] + 1 ) % WAVELEN ] * frac );
 		A2_L *= m_lvol[A2_OSC];
 		frac = fraction( m_rphase[A2_OSC] );
-		sample_t A2_R = 
+		sample_t A2_R =
 			( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] + 1 ) % WAVELEN ] * frac );
 		A2_R *= m_rvol[A2_OSC];
 
 		// B2
 		frac = fraction( m_lphase[B2_OSC] );
-		sample_t B2_L = 
+		sample_t B2_L =
 			( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
 		B2_L *= m_lvol[B2_OSC];
 		frac = fraction( m_rphase[B2_OSC] );
-		sample_t B2_R = 
+		sample_t B2_R =
 			( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ] * frac );
 		B2_R *= m_rvol[B2_OSC];
@@ -151,28 +151,28 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 
 		// A1
 		frac = fraction( A1_lphase );
-		sample_t A1_L = 
+		sample_t A1_L =
 			( m_A1wave[ static_cast<int>( A1_lphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_A1wave[ static_cast<int>( A1_lphase + 1 ) % WAVELEN ] * frac );
 		A1_L *= m_lvol[A1_OSC];
 		frac = fraction( A1_rphase );
-		sample_t A1_R = 
+		sample_t A1_R =
 			( m_A1wave[ static_cast<int>( A1_rphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_A1wave[ static_cast<int>( A1_rphase + 1 ) % WAVELEN ] * frac );
 		A1_R *= m_rvol[A1_OSC];
 
 		// B1
 		frac = fraction( B1_lphase );
-		sample_t B1_L = 
+		sample_t B1_L =
 			( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B1wave[ static_cast<int>( B1_lphase + 1 ) % WAVELEN ] * frac );
 		B1_L *= m_lvol[B1_OSC];
 		frac = fraction( B1_rphase );
-		sample_t B1_R = 
+		sample_t B1_R =
 			( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ] * ( 1.0f - frac ) ) +
 			( m_B1wave[ static_cast<int>( B1_rphase + 1 ) % WAVELEN ] * frac );
 		B1_R *= m_rvol[B1_OSC];
-		
+
 		// A-series modulation)
 		switch( m_amod )
 		{
@@ -271,10 +271,10 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 		b1_pan( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "Panning B1" ) ),
 		b2_pan( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "Panning B2" ) ),
 
-		a1_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier A1" ) ),
-		a2_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier A2" ) ),
-		b1_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier B1" ) ),
-		b2_mult( 8.0f, 1.0, 16.0, 1.0, this, tr( "Freq. multiplier B2" ) ),
+		a1_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier A1" ) ),
+		a2_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier A2" ) ),
+		b1_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier B1" ) ),
+		b2_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier B2" ) ),
 
 		a1_ltune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Left detune A1" ) ),
 		a2_ltune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Left detune A2" ) ),
@@ -292,6 +292,10 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 		b2_graph( -1.0f, 1.0f, WAVELEN, this ),
 
 		m_abmix( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "A-B Mix" ) ),
+		m_envAmt( 0.0f, -200.0f, 200.0f, 0.1f, this, tr( "A-B Mix envelope amount" ) ),
+		m_envAtt( 0.0f, 0.0f, 2000.0f, 1.0f, this, tr( "A-B Mix envelope attack" ) ),
+		m_envDec( 0.0f, 0.0f, 2000.0f, 1.0f, this, tr( "A-B Mix envelope decay" ) ),
+
 		m_amod( 0, 0, 3, this, tr( "A2-A1 modulation" ) ),
 		m_bmod( 0, 0, 3, this, tr( "B2-B1 modulation" ) ),
 
@@ -361,7 +365,7 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		w -> changeVolume( A2_OSC, leftCh( a2_vol.value(), a2_pan.value() ), rightCh( a2_vol.value(), a2_pan.value() ) );
 		w -> changeVolume( B1_OSC, leftCh( b1_vol.value(), b1_pan.value() ), rightCh( b1_vol.value(), b1_pan.value() ) );
 		w -> changeVolume( B2_OSC, leftCh( b2_vol.value(), b2_pan.value() ), rightCh( b2_vol.value(), b2_pan.value() ) );
-		
+
 		w -> updateFrequencies();
 
 		_n->m_pluginData = w;
@@ -399,20 +403,42 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 		w-> updateFrequencies();
 		m_multChanged = false;
 	}
-	
+
 	sampleFrame * abuf = w->abuf();
 	sampleFrame * bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
-	
+
+	// envelope parameters
+	const float envAmt = m_envAmt.value();
+	const float envAtt = ( m_envAtt.value() * w->samplerate() ) / 1000.0f;
+	const float envDec = ( m_envDec.value() * w->samplerate() ) / 1000.0f;
+	const float envLen = envAtt + envDec;
+	const float tfp_ = static_cast<float>( _n->totalFramesPlayed() );
+
+	// if sample-exact is enabled, use sample-exact calculations...
 	if( engine::mixer()->currentQualitySettings().sampleExactControllers )
 	{
 		for( fpp_t f=0; f < frames; f++ )
 		{
+			const float tfp = tfp_ + f;
+			// handle mixing envelope
+			float mixvalue = m_abmix.value( f );
+			if( envAmt != 0.0f && tfp < envLen )
+			{
+				if( tfp < envAtt )
+				{
+					mixvalue = qBound( -100.0f, mixvalue + ( tfp / envAtt * envAmt ), 100.0f );
+				}
+				else
+				{
+					mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - envAtt ) / envDec * envAmt ), 100.0f );
+				}
+			}
 			// get knob values in sample-exact way
-			const float bmix = ( ( m_abmix.value( f ) + 100.0 ) / 200.0 );
+			const float bmix = ( ( mixvalue + 100.0 ) / 200.0 );
 			const float amix = 1.0 - bmix;
-			
+
 			// mix a/b streams according to mixing knob
 			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
 									( bbuf[f][0] * bmix );
@@ -420,18 +446,52 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 									( bbuf[f][1] * bmix );
 		}
 	}
-	else
+	
+	// if sample-exact is not enabled, use simpler calculations:
+	// if mix envelope is active, and we haven't gone past the envelope end, use envelope-aware calculation...
+	else if( envAmt != 0.0f && tfp_ < envLen )
 	{
-		const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
-		const float amix = 1.0 - bmix;
+		const float mixvalue_ = m_abmix.value();
 		for( fpp_t f=0; f < frames; f++ )
-		{			
+		{
+			float mixvalue = mixvalue_;
+			const float tfp = tfp_ + f;
+			// handle mixing envelope
+			if( tfp < envAtt )
+			{
+				mixvalue = qBound( -100.0f, mixvalue + ( tfp / envAtt * envAmt ), 100.0f );
+			}
+			else
+			{
+				mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - envAtt ) / envDec * envAmt ), 100.0f );
+			}
+
+			// get knob values
+			const float bmix = ( ( mixvalue + 100.0 ) / 200.0 );
+			const float amix = 1.0 - bmix;
+
 			// mix a/b streams according to mixing knob
 			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
 									( bbuf[f][0] * bmix );
 			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
 									( bbuf[f][1] * bmix );
-		}		
+		}
+	} 
+
+	// ... mix envelope is inactive or we've past the end of envelope, so use a faster calculation to save cpu
+	else
+	{
+		// get knob values
+		const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
+		const float amix = 1.0 - bmix;
+		for( fpp_t f=0; f < frames; f++ )
+		{
+			// mix a/b streams according to mixing knob
+			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
+									( bbuf[f][0] * bmix );
+			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
+									( bbuf[f][1] * bmix );
+		}
 	}
 
 	applyRelease( _working_buffer, _n );
@@ -487,6 +547,10 @@ void WTSynthInstrument::saveSettings( QDomDocument & _doc,
 	_this.setAttribute( "b2_wave", sampleString );
 
 	m_abmix.saveSettings( _doc, _this, "abmix" );
+	m_envAmt.saveSettings( _doc, _this, "envAmt" );
+	m_envAtt.saveSettings( _doc, _this, "envAtt" );
+	m_envDec.saveSettings( _doc, _this, "envDec" );
+
 	m_amod.saveSettings( _doc, _this, "amod" );
 	m_bmod.saveSettings( _doc, _this, "bmod" );
 	m_selectedGraph.saveSettings( _doc, _this, "selgraph" );
@@ -536,6 +600,11 @@ void WTSynthInstrument::loadSettings( const QDomElement & _this )
 	delete[] dst;
 
 	m_abmix.loadSettings( _this, "abmix" );
+
+	m_envAmt.loadSettings( _this, "envAmt" );
+	m_envAtt.loadSettings( _this, "envAtt" );
+	m_envDec.loadSettings( _this, "envDec" );
+
 	m_amod.loadSettings( _this, "amod" );
 	m_bmod.loadSettings( _this, "bmod" );
 	m_selectedGraph.loadSettings( _this, "selgraph" );
@@ -580,32 +649,36 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 
 // knobs... lots of em
 
-	makeknob( a1_volKnob, 118, A1ROW, "Volume", "%", "aKnob" )
-	makeknob( a2_volKnob, 118, A2ROW, "Volume", "%", "aKnob" )
-	makeknob( b1_volKnob, 118, B1ROW, "Volume", "%", "bKnob" )
-	makeknob( b2_volKnob, 118, B2ROW, "Volume", "%", "bKnob"  )
+	makeknob( a1_volKnob, 130, A1ROW, "Volume", "%", "aKnob" )
+	makeknob( a2_volKnob, 130, A2ROW, "Volume", "%", "aKnob" )
+	makeknob( b1_volKnob, 130, B1ROW, "Volume", "%", "bKnob" )
+	makeknob( b2_volKnob, 130, B2ROW, "Volume", "%", "bKnob"  )
 
-	makeknob( a1_panKnob, 142, A1ROW, "Panning", "", "aKnob" )
-	makeknob( a2_panKnob, 142, A2ROW, "Panning", "", "aKnob" )
-	makeknob( b1_panKnob, 142, B1ROW, "Panning", "", "bKnob"  )
-	makeknob( b2_panKnob, 142, B2ROW, "Panning", "", "bKnob"  )
+	makeknob( a1_panKnob, 154, A1ROW, "Panning", "", "aKnob" )
+	makeknob( a2_panKnob, 154, A2ROW, "Panning", "", "aKnob" )
+	makeknob( b1_panKnob, 154, B1ROW, "Panning", "", "bKnob"  )
+	makeknob( b2_panKnob, 154, B2ROW, "Panning", "", "bKnob"  )
 
-	makeknob( a1_multKnob, 172, A1ROW, "Freq. multiplier", "/8", "aKnob" )
-	makeknob( a2_multKnob, 172, A2ROW, "Freq. multiplier", "/8", "aKnob" )
-	makeknob( b1_multKnob, 172, B1ROW, "Freq. multiplier", "/8", "bKnob"  )
-	makeknob( b2_multKnob, 172, B2ROW, "Freq. multiplier", "/8", "bKnob"  )
+	makeknob( a1_multKnob, 178, A1ROW, "Freq. multiplier", "/8", "aKnob" )
+	makeknob( a2_multKnob, 178, A2ROW, "Freq. multiplier", "/8", "aKnob" )
+	makeknob( b1_multKnob, 178, B1ROW, "Freq. multiplier", "/8", "bKnob"  )
+	makeknob( b2_multKnob, 178, B2ROW, "Freq. multiplier", "/8", "bKnob"  )
 
-	makeknob( a1_ltuneKnob, 200, A1ROW, "Left detune", " cents", "aKnob" )
-	makeknob( a2_ltuneKnob, 200, A2ROW, "Left detune", " cents", "aKnob" )
-	makeknob( b1_ltuneKnob, 200, B1ROW, "Left detune", " cents", "bKnob"  )
-	makeknob( b2_ltuneKnob, 200, B2ROW, "Left detune", " cents", "bKnob"  )
+	makeknob( a1_ltuneKnob, 202, A1ROW, "Left detune", " cents", "aKnob" )
+	makeknob( a2_ltuneKnob, 202, A2ROW, "Left detune", " cents", "aKnob" )
+	makeknob( b1_ltuneKnob, 202, B1ROW, "Left detune", " cents", "bKnob"  )
+	makeknob( b2_ltuneKnob, 202, B2ROW, "Left detune", " cents", "bKnob"  )
 
-	makeknob( a1_rtuneKnob, 224, A1ROW, "Right detune", " cents", "aKnob" )
-	makeknob( a2_rtuneKnob, 224, A2ROW, "Right detune", " cents", "aKnob" )
-	makeknob( b1_rtuneKnob, 224, B1ROW, "Right detune", " cents", "bKnob"  )
-	makeknob( b2_rtuneKnob, 224, B2ROW, "Right detune", " cents", "bKnob"  )
+	makeknob( a1_rtuneKnob, 226, A1ROW, "Right detune", " cents", "aKnob" )
+	makeknob( a2_rtuneKnob, 226, A2ROW, "Right detune", " cents", "aKnob" )
+	makeknob( b1_rtuneKnob, 226, B1ROW, "Right detune", " cents", "bKnob"  )
+	makeknob( b2_rtuneKnob, 226, B2ROW, "Right detune", " cents", "bKnob"  )
 
-	makeknob( m_abmixKnob, 4, 4, "A-B Mix", "", "mixKnob" )
+	makeknob( m_abmixKnob, 4, 3, "A-B Mix", "", "mixKnob" )
+
+	makeknob( m_envAmtKnob, 88, 3, "Mix envelope amount", "", "mixenvKnob" )
+	makeknob( m_envAttKnob, 88, A1ROW, "Mix envelope attack", " ms", "mixenvKnob" )
+	makeknob( m_envDecKnob, 88, A2ROW, "Mix envelope decay", " ms", "mixenvKnob" )
 
 // let's set volume knobs
 	a1_volKnob -> setVolumeKnob( true );
@@ -1123,6 +1196,10 @@ void WTSynthView::modelChanged()
 	a2_graph -> setModel( &w -> a2_graph );
 	b1_graph -> setModel( &w -> b1_graph );
 	b2_graph -> setModel( &w -> b2_graph );
+
+	m_envAmtKnob -> setModel( &w -> m_envAmt );
+	m_envAttKnob -> setModel( &w -> m_envAtt );
+	m_envDecKnob -> setModel( &w -> m_envDec );
 
 }
 

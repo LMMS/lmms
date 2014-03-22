@@ -612,7 +612,7 @@ WTSynthView knob#aKnob {
 	color: #43b2ff;
 	qproperty-outerColor: #43b2ff;
 	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 8;
+	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 9.5;
 	qproperty-centerPointY: 9.5;	
 	qproperty-lineWidth: 2; 
@@ -622,7 +622,7 @@ WTSynthView knob#bKnob {
 	color: #fc5431;
 	qproperty-outerColor: #fc5431;
 	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 8;
+	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 9.5;
 	qproperty-centerPointY: 9.5;	
 	qproperty-lineWidth: 2; 
@@ -632,12 +632,21 @@ WTSynthView knob#mixKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 14;
+	qproperty-outerRadius: 13;
 	qproperty-centerPointX: 15.5;
 	qproperty-centerPointY: 15.5;	
 	qproperty-lineWidth: 2; 
 }
 
+WTSynthView knob#mixenvKnob {
+	color: #43ff82;
+	qproperty-outerColor: #43ff82;
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;	
+	qproperty-lineWidth: 2;
+}
 
 /* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
  * colour codes MUST be of the form #RRGGBB */

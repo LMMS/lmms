@@ -89,6 +89,10 @@ public:
 	{
 		return m_bbuf;
 	}
+	inline sample_rate_t samplerate() const
+	{
+		return m_samplerate;
+	}
 
 private:
 	float m_lvol [NUM_OSCS];
@@ -113,7 +117,7 @@ private:
 
 	float m_lfreq [NUM_OSCS];
 	float m_rfreq [NUM_OSCS];
-	
+
 	float m_A1wave [WAVELEN];
 	float m_A2wave [WAVELEN];
 	float m_B1wave [WAVELEN];
@@ -192,6 +196,11 @@ private:
 	graphModel b2_graph;
 
 	FloatModel m_abmix;
+
+	FloatModel m_envAmt;
+	FloatModel m_envAtt;
+	FloatModel m_envDec;
+
 	IntModel m_amod;
 	IntModel m_bmod;
 
@@ -257,6 +266,10 @@ private:
 	knob * b2_rtuneKnob;
 
 	knob * m_abmixKnob;
+
+	knob * m_envAmtKnob;
+	knob * m_envAttKnob;
+	knob * m_envDecKnob;
 
 	automatableButtonGroup * m_selectedGraphGroup;
 	automatableButtonGroup * m_aModGroup;
