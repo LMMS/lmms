@@ -412,8 +412,9 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 	// envelope parameters
 	const float envAmt = m_envAmt.value();
 	const float envAtt = ( m_envAtt.value() * w->samplerate() ) / 1000.0f;
+	const float envHold = ( m_envHold.value() * w->samplerate() ) / 1000.0f;
 	const float envDec = ( m_envDec.value() * w->samplerate() ) / 1000.0f;
-	const float envLen = envAtt + envDec;
+	const float envLen = envAtt + envDec + envHold;
 	const float tfp_ = static_cast<float>( _n->totalFramesPlayed() );
 
 	// if sample-exact is enabled, use sample-exact calculations...
@@ -430,9 +431,13 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 				{
 					mixvalue = qBound( -100.0f, mixvalue + ( tfp / envAtt * envAmt ), 100.0f );
 				}
+				else if ( tfp >= envAtt && tfp < envAtt + envHold )
+				{
+					mixvalue = qBound( -100.0f, mixvalue + envAmt, 100.0f );
+				}
 				else
 				{
-					mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - envAtt ) / envDec * envAmt ), 100.0f );
+					mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - ( envAtt + envHold ) ) / envDec * envAmt ), 100.0f );
 				}
 			}
 			// get knob values in sample-exact way
@@ -461,9 +466,13 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 			{
 				mixvalue = qBound( -100.0f, mixvalue + ( tfp / envAtt * envAmt ), 100.0f );
 			}
+			else if ( tfp >= envAtt && tfp < envAtt + envHold )
+			{
+				mixvalue = qBound( -100.0f, mixvalue + envAmt, 100.0f );
+			}
 			else
 			{
-				mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - envAtt ) / envDec * envAmt ), 100.0f );
+				mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - ( envAtt + envHold ) ) / envDec * envAmt ), 100.0f );
 			}
 
 			// get knob values
@@ -549,6 +558,7 @@ void WTSynthInstrument::saveSettings( QDomDocument & _doc,
 	m_abmix.saveSettings( _doc, _this, "abmix" );
 	m_envAmt.saveSettings( _doc, _this, "envAmt" );
 	m_envAtt.saveSettings( _doc, _this, "envAtt" );
+	m_envHold.saveSettings( _doc, _this, "envHold" );
 	m_envDec.saveSettings( _doc, _this, "envDec" );
 
 	m_amod.saveSettings( _doc, _this, "amod" );
@@ -603,6 +613,7 @@ void WTSynthInstrument::loadSettings( const QDomElement & _this )
 
 	m_envAmt.loadSettings( _this, "envAmt" );
 	m_envAtt.loadSettings( _this, "envAtt" );
+	m_envHold.loadSettings( _this, "envHold" );
 	m_envDec.loadSettings( _this, "envDec" );
 
 	m_amod.loadSettings( _this, "amod" );
@@ -677,8 +688,10 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	makeknob( m_abmixKnob, 4, 3, "A-B Mix", "", "mixKnob" )
 
 	makeknob( m_envAmtKnob, 88, 3, "Mix envelope amount", "", "mixenvKnob" )
-	makeknob( m_envAttKnob, 88, A1ROW, "Mix envelope attack", " ms", "mixenvKnob" )
-	makeknob( m_envDecKnob, 88, A2ROW, "Mix envelope decay", " ms", "mixenvKnob" )
+	
+	maketsknob( m_envAttKnob, 88, A1ROW, "Mix envelope attack", " ms", "mixenvKnob" )
+	maketsknob( m_envHoldKnob, 88, A2ROW, "Mix envelope hold", " ms", "mixenvKnob" )
+	maketsknob( m_envDecKnob, 88, B1ROW, "Mix envelope decay", " ms", "mixenvKnob" )
 
 // let's set volume knobs
 	a1_volKnob -> setVolumeKnob( true );
@@ -1199,6 +1212,7 @@ void WTSynthView::modelChanged()
 
 	m_envAmtKnob -> setModel( &w -> m_envAmt );
 	m_envAttKnob -> setModel( &w -> m_envAtt );
+	m_envHoldKnob -> setModel( &w -> m_envHold );
 	m_envDecKnob -> setModel( &w -> m_envDec );
 
 }

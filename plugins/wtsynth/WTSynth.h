@@ -37,7 +37,14 @@
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobStyled, this); 				\
+	name = new knob( knobStyled, this ); 				\
+	name ->move( x, y );								\
+	name ->setHintText( tr( hint ) + " ", unit );		\
+	name ->setObjectName( oname );						\
+	name ->setFixedSize( 19, 19 );
+
+#define maketsknob( name, x, y, hint, unit, oname ) 		\
+	name = new TempoSyncKnob( knobStyled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( tr( hint ) + " ", unit );		\
 	name ->setObjectName( oname );						\
@@ -198,8 +205,10 @@ private:
 	FloatModel m_abmix;
 
 	FloatModel m_envAmt;
-	FloatModel m_envAtt;
-	FloatModel m_envDec;
+	
+	TempoSyncKnobModel m_envAtt;
+	TempoSyncKnobModel m_envHold;
+	TempoSyncKnobModel m_envDec;
 
 	IntModel m_amod;
 	IntModel m_bmod;
@@ -268,8 +277,10 @@ private:
 	knob * m_abmixKnob;
 
 	knob * m_envAmtKnob;
-	knob * m_envAttKnob;
-	knob * m_envDecKnob;
+	
+	TempoSyncKnob * m_envAttKnob;
+	TempoSyncKnob * m_envHoldKnob;
+	TempoSyncKnob * m_envDecKnob;
 
 	automatableButtonGroup * m_selectedGraphGroup;
 	automatableButtonGroup * m_aModGroup;
