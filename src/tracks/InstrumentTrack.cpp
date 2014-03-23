@@ -1238,15 +1238,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// FX tab
 	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
 
-	 // Do not add ENV/LFO tab for the plugin window for SF2 Player and OpulenZ bcause it has no effecton them
-	int i = 1;
-	if (!m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ))
-	{
-		m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), i++ );
-	}
-	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), i++ );
-	m_tabWidget->addTab( m_effectView, tr( "FX" ), i++ );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), i++ );
+	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), 2 );
+	m_tabWidget->addTab( m_effectView, tr( "FX" ), 3 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -1258,9 +1253,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	setModel( _itv->model() );
-
-	// Let the window know we may have a tab removed from the regular model
-	modelChanged(); // Get the instrument window to refresh
 
 	updateInstrumentView();
 
