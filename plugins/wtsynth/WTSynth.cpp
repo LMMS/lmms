@@ -294,9 +294,9 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 		m_abmix( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "A-B Mix" ) ),
 		m_envAmt( 0.0f, -200.0f, 200.0f, 1.0f, this, tr( "A-B Mix envelope amount" ) ),
 		
-		m_envAtt( 0.0f, 0.0f, 2000.0f, 1.0f, 1.0f, this, tr( "A-B Mix envelope attack" ) ),
-		m_envHold( 0.0f, 0.0f, 2000.0f, 1.0f, 1.0f, this, tr( "A-B Mix envelope hold" ) ),
-		m_envDec( 0.0f, 0.0f, 2000.0f, 1.0f, 1.0f, this, tr( "A-B Mix envelope decay" ) ),
+		m_envAtt( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "A-B Mix envelope attack" ) ),
+		m_envHold( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "A-B Mix envelope hold" ) ),
+		m_envDec( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "A-B Mix envelope decay" ) ),
 
 		m_amod( 0, 0, 3, this, tr( "A2-A1 modulation" ) ),
 		m_bmod( 0, 0, 3, this, tr( "B2-B1 modulation" ) ),
