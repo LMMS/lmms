@@ -244,6 +244,7 @@ protected slots:
 	void invertClicked();
 	void phaseLeftClicked();
 	void phaseRightClicked();
+	void loadClicked();
 
 private:
 	virtual void modelChanged();
@@ -300,6 +301,7 @@ private:
 	pixmapButton * m_smoothButton;
 	pixmapButton * m_phaseLeftButton;
 	pixmapButton * m_phaseRightButton;
+	pixmapButton * m_loadButton;
 
 };
 

@@ -838,33 +838,39 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 // misc pushbuttons
 // waveform modifications
 
+	m_loadButton = new pixmapButton( this, tr( "Load waveform" ) );
+	m_loadButton -> move ( 176, 121 );
+	m_loadButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "load_active" ) );
+	m_loadButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "load_inactive" ) );
+	toolTip::add( m_loadButton, tr( "Click to load a waveform from a sample file" ) );
+
 	m_phaseLeftButton = new pixmapButton( this, tr( "Phase left" ) );
-	m_phaseLeftButton -> move ( 200, 121 );
+	m_phaseLeftButton -> move ( 196, 121 );
 	m_phaseLeftButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "phl_active" ) );
 	m_phaseLeftButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "phl_inactive" ) );
 	toolTip::add( m_phaseLeftButton, tr( "Click to shift phase by -15 degrees" ) );
 
 	m_phaseRightButton = new pixmapButton( this, tr( "Phase right" ) );
-	m_phaseRightButton -> move ( 216, 121 );
+	m_phaseRightButton -> move ( 213, 121 );
 	m_phaseRightButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "phr_active" ) );
 	m_phaseRightButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "phr_inactive" ) );
 	toolTip::add( m_phaseRightButton, tr( "Click to shift phase by +15 degrees" ) );
 
 	m_normalizeButton = new pixmapButton( this, tr( "Normalize" ) );
-	m_normalizeButton -> move ( 232, 121 );
+	m_normalizeButton -> move ( 230, 121 );
 	m_normalizeButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "norm_active" ) );
 	m_normalizeButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "norm_inactive" ) );
 	toolTip::add( m_normalizeButton, tr( "Click to normalize" ) );
 
 
 	m_invertButton = new pixmapButton( this, tr( "Invert" ) );
-	m_invertButton -> move ( 232, 138 );
+	m_invertButton -> move ( 230, 138 );
 	m_invertButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "inv_active" ) );
 	m_invertButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "inv_inactive" ) );
 	toolTip::add( m_invertButton, tr( "Click to invert" ) );
 
 	m_smoothButton = new pixmapButton( this, tr( "Smooth" ) );
-	m_smoothButton -> move ( 232, 155 );
+	m_smoothButton -> move ( 230, 155 );
 	m_smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	m_smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
 	toolTip::add( m_smoothButton, tr( "Click to smooth" ) );
@@ -872,25 +878,25 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 // waveforms
 
 	m_sinWaveButton = new pixmapButton( this, tr( "Sine wave" ) );
-	m_sinWaveButton -> move ( 232, 176 );
+	m_sinWaveButton -> move ( 230, 176 );
 	m_sinWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sin_active" ) );
 	m_sinWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sin_inactive" ) );
 	toolTip::add( m_sinWaveButton, tr( "Click for sine wave" ) );
 
 	m_triWaveButton = new pixmapButton( this, tr( "Triangle wave" ) );
-	m_triWaveButton -> move ( 232, 194 );
+	m_triWaveButton -> move ( 230, 194 );
 	m_triWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tri_active" ) );
 	m_triWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tri_inactive" ) );
 	toolTip::add( m_triWaveButton, tr( "Click for triangle wave" ) );
 
 	m_sawWaveButton = new pixmapButton( this, tr( "Triangle wave" ) );
-	m_sawWaveButton -> move ( 232, 212 );
+	m_sawWaveButton -> move ( 230, 212 );
 	m_sawWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "saw_active" ) );
 	m_sawWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "saw_inactive" ) );
 	toolTip::add( m_sawWaveButton, tr( "Click for saw wave" ) );
 
 	m_sqrWaveButton = new pixmapButton( this, tr( "Square wave" ) );
-	m_sqrWaveButton -> move ( 232, 230 );
+	m_sqrWaveButton -> move ( 230, 230 );
 	m_sqrWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sqr_active" ) );
 	m_sqrWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sqr_inactive" ) );
 	toolTip::add( m_sqrWaveButton, tr( "Click for square wave" ) );
@@ -906,6 +912,7 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 	connect( m_smoothButton, SIGNAL( clicked() ), this, SLOT( smoothClicked() ) );
 	connect( m_phaseLeftButton, SIGNAL( clicked() ), this, SLOT( phaseLeftClicked() ) );
 	connect( m_phaseRightButton, SIGNAL( clicked() ), this, SLOT( phaseRightClicked() ) );
+	connect( m_loadButton, SIGNAL( clicked() ), this, SLOT( loadClicked() ) );	
 
 	connect( a1_selectButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 	connect( a2_selectButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
@@ -1165,6 +1172,31 @@ void WTSynthView::phaseRightClicked()
 			break;
 		case B2_OSC:
 			b2_graph->model()->shiftPhase( 15 );
+			engine::getSong()->setModified();
+			break;
+	}
+}
+
+
+void WTSynthView::loadClicked()
+{
+	QString fileName; 
+	switch( m_selectedGraphGroup->model()->value() )
+	{
+		case A1_OSC:
+			a1_graph->model()->setWaveToUser();
+			engine::getSong()->setModified();
+			break;
+		case A2_OSC:
+			a2_graph->model()->setWaveToUser();
+			engine::getSong()->setModified();
+			break;
+		case B1_OSC:
+			b1_graph->model()->setWaveToUser();
+			engine::getSong()->setModified();
+			break;
+		case B2_OSC:
+			b2_graph->model()->setWaveToUser();
 			engine::getSong()->setModified();
 			break;
 	}
