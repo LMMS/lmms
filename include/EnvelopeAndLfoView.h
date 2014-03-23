@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _ENVELOPE_AND_LFO_VIEW_H
-#define _ENVELOPE_AND_LFO_VIEW_H
+#ifndef ENVELOPE_AND_LFO_VIEW_H
+#define ENVELOPE_AND_LFO_VIEW_H
 
 #include <QtGui/QWidget>
 
