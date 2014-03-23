@@ -31,7 +31,7 @@
 #include "graph.h"
 #include "AutomatableModel.h"
 #include "automatable_button.h"
-#include "knob.h"
+#include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
 #include "pixmap_button.h"
 
