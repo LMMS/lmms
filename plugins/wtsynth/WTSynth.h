@@ -83,6 +83,7 @@ public:
 	static void changeVolume( int _osc, float _lvol, float _rvol );
 	static void changeMult( int _osc, float _mul );
 	static void changeTune( int _osc, float _ltune, float _rtune );
+	static void updateFrequency();
 
 	static inline void changeXtalk( float _xtalk )
 	{
@@ -111,6 +112,8 @@ private:
 	static float s_ltune [NUM_OSCS];
 	static float s_rtune [NUM_OSCS];
 	static float s_xtalk;
+	static float s_lfreq [NUM_OSCS];
+	static float s_rfreq [NUM_OSCS];
 
 	// linear interpolation
 /*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
@@ -142,9 +145,6 @@ private:
 
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
-
-	float m_lfreq [NUM_OSCS];
-	float m_rfreq [NUM_OSCS];
 
 	float m_A1wave [WAVELEN];
 	float m_A2wave [WAVELEN];

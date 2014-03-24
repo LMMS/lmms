@@ -62,7 +62,8 @@ float WTSynthObject::s_mult [NUM_OSCS];
 float WTSynthObject::s_ltune [NUM_OSCS];
 float WTSynthObject::s_rtune [NUM_OSCS];
 float WTSynthObject::s_xtalk;
-
+float WTSynthObject::s_lfreq [NUM_OSCS];
+float WTSynthObject::s_rfreq [NUM_OSCS];
 
 
 WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
@@ -105,13 +106,6 @@ WTSynthObject::~WTSynthObject()
 
 void WTSynthObject::renderOutput( fpp_t _frames )
 {
-	// calculate frequencies
-	for( int i = 0; i < NUM_OSCS; i++ )
-	{
-		m_lfreq[i] = ( s_mult[i] / 8 ) * powf( 2, s_ltune[i] / 1200 );
-		m_rfreq[i] = ( s_mult[i] / 8 ) * powf( 2, s_rtune[i] / 1200 );
-	}
-
 	if( m_abuf == NULL )
 		m_abuf = new sampleFrame[m_fpp];
 	if( m_bbuf == NULL )
@@ -225,9 +219,9 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
 		{
-			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_lfreq[i] ) ) );
+			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * s_lfreq[i] ) ) );
 			m_lphase[i] = fmodf( m_lphase[i], WAVELEN );
-			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_rfreq[i] ) ) );
+			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * s_rfreq[i] ) ) );
 			m_rphase[i] = fmodf( m_rphase[i], WAVELEN );
 		}
 	}
@@ -253,6 +247,17 @@ void WTSynthObject::changeTune( int _osc, float _ltune, float _rtune )
 {
 	s_ltune[_osc] = _ltune;
 	s_rtune[_osc] = _rtune;
+}
+
+
+void WTSynthObject::updateFrequency()
+{
+	// calculate frequencies
+	for( int i = 0; i < NUM_OSCS; i++ )
+	{
+		s_lfreq[i] = ( s_mult[i] / 8 ) * powf( 2, s_ltune[i] / 1200 );
+		s_rfreq[i] = ( s_mult[i] / 8 ) * powf( 2, s_rtune[i] / 1200 );
+	}
 }
 
 
@@ -614,6 +619,7 @@ void WTSynthInstrument::updateMult()
 	WTSynthObject::changeMult( A2_OSC, a2_mult.value() );
 	WTSynthObject::changeMult( B1_OSC, b1_mult.value() );
 	WTSynthObject::changeMult( B2_OSC, b2_mult.value() );
+	WTSynthObject::updateFrequency();	
 }
 void WTSynthInstrument::updateTunes()
 {
@@ -621,6 +627,7 @@ void WTSynthInstrument::updateTunes()
 	WTSynthObject::changeTune( A2_OSC, a2_ltune.value(), a2_rtune.value() );
 	WTSynthObject::changeTune( B1_OSC, b1_ltune.value(), b1_rtune.value() );
 	WTSynthObject::changeTune( B2_OSC, b2_ltune.value(), b2_rtune.value() );
+	WTSynthObject::updateFrequency();
 }
 void WTSynthInstrument::updateXtalk()
 {
