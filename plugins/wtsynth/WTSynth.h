@@ -71,24 +71,16 @@ extern const int	B1_OSC = 2;
 extern const int	B2_OSC = 3;
 extern const int	NUM_OSCS = 4;
 
+class WTSynthInstrument;
 
 class WTSynthObject
 {
 public:
 	WTSynthObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames );
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
+					WTSynthInstrument * _w );
 	virtual ~WTSynthObject();
-
-	static void changeVolume( int _osc, float _lvol, float _rvol );
-	static void changeMult( int _osc, float _mul );
-	static void changeTune( int _osc, float _ltune, float _rtune );
-	static void updateFrequency();
-
-	static inline void changeXtalk( float _xtalk )
-	{
-		s_xtalk = _xtalk;
-	};
 
 	void renderOutput( fpp_t _frames );
 
@@ -106,15 +98,6 @@ public:
 	}
 
 private:
-	static float s_lvol [NUM_OSCS];
-	static float s_rvol [NUM_OSCS];
-	static float s_mult [NUM_OSCS];
-	static float s_ltune [NUM_OSCS];
-	static float s_rtune [NUM_OSCS];
-	static float s_xtalk;
-	static float s_lfreq [NUM_OSCS];
-	static float s_rfreq [NUM_OSCS];
-
 	// linear interpolation
 /*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
 	{
@@ -139,6 +122,8 @@ private:
 	NotePlayHandle * m_nph;
 
 	fpp_t m_fpp;
+
+	WTSynthInstrument * m_parent;
 
 	sampleFrame * m_abuf;
 	sampleFrame * m_bbuf;
@@ -176,22 +161,27 @@ public:
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
-
+	
 public slots:
 	void updateVolumes();
-	void updateMult();
-	void updateTunes();
-	void updateXtalk();
+	void updateFreq();
+
+protected:
+	float m_lvol [NUM_OSCS];
+    float m_rvol [NUM_OSCS];
+
+	float m_lfreq [NUM_OSCS];
+	float m_rfreq [NUM_OSCS];
 
 private:
 	inline float leftCh( float _vol, float _pan )
 	{
-		return ( _pan <= 0 ? 1.0 : 1.0 - ( _pan / 100.0 ) ) * _vol;
+		return ( _pan <= 0 ? 1.0 : 1.0 - ( _pan / 100.0 ) ) * _vol / 100.0;
 	}
 
 	inline float rightCh( float _vol, float _pan )
 	{
-		return ( _pan >= 0 ? 1.0 : 1.0 + ( _pan / 100.0 ) ) * _vol;
+		return ( _pan >= 0 ? 1.0 : 1.0 + ( _pan / 100.0 ) ) * _vol / 100.0;
 	}
 
 	FloatModel a1_vol;
@@ -239,6 +229,7 @@ private:
 
 	IntModel m_selectedGraph;
 
+	friend class WTSynthObject;
 	friend class WTSynthView;
 };
 

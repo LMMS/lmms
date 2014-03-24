@@ -54,26 +54,18 @@ Plugin::Descriptor PLUGIN_EXPORT wtsynth_plugin_descriptor =
 }
 
 
-// these need to be here
-
-float WTSynthObject::s_lvol [NUM_OSCS];
-float WTSynthObject::s_rvol [NUM_OSCS];
-float WTSynthObject::s_mult [NUM_OSCS];
-float WTSynthObject::s_ltune [NUM_OSCS];
-float WTSynthObject::s_rtune [NUM_OSCS];
-float WTSynthObject::s_xtalk;
-float WTSynthObject::s_lfreq [NUM_OSCS];
-float WTSynthObject::s_rfreq [NUM_OSCS];
 
 
 WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames ) :
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
+					WTSynthInstrument * _w ) :
 				m_amod( _amod ),
 				m_bmod( _bmod ),
 				m_samplerate( _samplerate ),
 				m_nph( _nph ),
-				m_fpp( _frames )
+				m_fpp( _frames ),
+				m_parent( _w )
 {
 	m_abuf = new sampleFrame[_frames];
 	m_bbuf = new sampleFrame[_frames];
@@ -124,10 +116,10 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		// A2
 		sample_t A2_L = interpolate( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) % WAVELEN ],
 							m_A2wave[ static_cast<int>( m_lphase[A2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_lphase[A2_OSC] ) ) * s_lvol[A2_OSC];
+							fraction( m_lphase[A2_OSC] ) ) * m_parent->m_lvol[A2_OSC];
 		sample_t A2_R = interpolate( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) % WAVELEN ],
 							m_A2wave[ static_cast<int>( m_rphase[A2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_rphase[A2_OSC] ) ) * s_rvol[A2_OSC];
+							fraction( m_rphase[A2_OSC] ) ) * m_parent->m_rvol[A2_OSC];
 		// if phase mod, add to phases
 		if( m_amod == MOD_PM )
 		{
@@ -139,26 +131,27 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		// A1
 		sample_t A1_L = interpolate( m_A1wave[ static_cast<int>( A1_lphase ) % WAVELEN ],
 							m_A1wave[ static_cast<int>( A1_lphase + 1 ) % WAVELEN ],
-							fraction( A1_lphase ) ) * s_lvol[A1_OSC];
+							fraction( A1_lphase ) ) * m_parent->m_lvol[A1_OSC];
 		sample_t A1_R = interpolate( m_A1wave[ static_cast<int>( A1_rphase ) % WAVELEN ],
 							m_A1wave[ static_cast<int>( A1_rphase + 1 ) % WAVELEN ],
-							fraction( A1_rphase ) ) * s_rvol[A1_OSC];
+							fraction( A1_rphase ) ) * m_parent->m_rvol[A1_OSC];
 
 		/////////////   B-series   /////////////////
 
 		// B2
 		sample_t B2_L = interpolate( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) % WAVELEN ],
 						m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ],
-						fraction( m_lphase[B2_OSC] ) ) * s_lvol[B2_OSC];
+						fraction( m_lphase[B2_OSC] ) ) * m_parent->m_lvol[B2_OSC];
 		sample_t B2_R = interpolate( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) % WAVELEN ],
 						m_B2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ],
-						fraction( m_rphase[B2_OSC] ) ) * s_rvol[B2_OSC];
+						fraction( m_rphase[B2_OSC] ) ) * m_parent->m_rvol[B2_OSC];
 
 		// if crosstalk active, add a1
-		if( s_xtalk > 0.0 )
+		const float xt = m_parent->m_xtalk.value();
+		if( xt > 0.0 )
 		{
-			B2_L += ( A1_L * s_xtalk ) / 100.0f;
-			B2_R += ( A1_R * s_xtalk ) / 100.0f;
+			B2_L += ( A1_L * xt ) / 100.0f;
+			B2_R += ( A1_R * xt ) / 100.0f;
 		}
 
 		// if phase mod, add to phases
@@ -172,10 +165,10 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		// B1
 		sample_t B1_L = interpolate( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ],
 							m_B1wave[ static_cast<int>( B1_lphase + 1 ) % WAVELEN ],
-							fraction( B1_lphase ) ) * s_lvol[B1_OSC];
+							fraction( B1_lphase ) ) * m_parent->m_lvol[B1_OSC];
 		sample_t B1_R = interpolate( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ],
 							m_B1wave[ static_cast<int>( B1_rphase + 1 ) % WAVELEN ],
-							fraction( B1_rphase ) ) * s_rvol[B1_OSC];
+							fraction( B1_rphase ) ) * m_parent->m_rvol[B1_OSC];
 
 
 		// A-series modulation)
@@ -219,46 +212,15 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
 		{
-			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * s_lfreq[i] ) ) );
+			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_lfreq[i] ) ) );
 			m_lphase[i] = fmodf( m_lphase[i], WAVELEN );
-			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * s_rfreq[i] ) ) );
+			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_rfreq[i] ) ) );
 			m_rphase[i] = fmodf( m_rphase[i], WAVELEN );
 		}
 	}
 
 }
 
-
-void WTSynthObject::changeVolume( int _osc, float _lvol, float _rvol )
-{
-	WTSynthObject::s_lvol[_osc] = _lvol / 100.0;
-	WTSynthObject::s_rvol[_osc] = _rvol / 100.0;
-//	qDebug( "osc %d vol %f %f", _osc, m_lvol[_osc], m_rvol[_osc] );
-}
-
-
-void WTSynthObject::changeMult( int _osc, float _mul )
-{
-	s_mult[_osc] = _mul;
-}
-
-
-void WTSynthObject::changeTune( int _osc, float _ltune, float _rtune )
-{
-	s_ltune[_osc] = _ltune;
-	s_rtune[_osc] = _rtune;
-}
-
-
-void WTSynthObject::updateFrequency()
-{
-	// calculate frequencies
-	for( int i = 0; i < NUM_OSCS; i++ )
-	{
-		s_lfreq[i] = ( s_mult[i] / 8 ) * powf( 2, s_ltune[i] / 1200 );
-		s_rfreq[i] = ( s_mult[i] / 8 ) * powf( 2, s_rtune[i] / 1200 );
-	}
-}
 
 
 WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
@@ -318,32 +280,28 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &b1_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
 	connect( &b2_pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
 
-	connect( &a1_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
-	connect( &a2_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
-	connect( &b1_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
-	connect( &b2_mult, SIGNAL( dataChanged() ), this, SLOT( updateMult() ) );
+	connect( &a1_mult, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &a2_mult, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &b1_mult, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &b2_mult, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
 
-	connect( &a1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-	connect( &a2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-	connect( &b1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-	connect( &b2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
+	connect( &a1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &a2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &b1_ltune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &b2_ltune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
 
-	connect( &a1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateTunes() ) );
-
-	connect( &m_xtalk, SIGNAL( dataChanged() ), this, SLOT( updateXtalk() ) );
+	connect( &a1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
 
 	a1_graph.setWaveToSine();
 	a2_graph.setWaveToSine();
 	b1_graph.setWaveToSine();
 	b2_graph.setWaveToSine();
 
-	updateMult();
-	updateTunes();
 	updateVolumes();
-	updateXtalk();
+	updateFreq();
 }
 
 
@@ -363,7 +321,7 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 				const_cast<float*>( b2_graph.samples() ),
 				m_amod.value(), m_bmod.value(),
 				engine::mixer()->processingSampleRate(), _n,
-				engine::mixer()->framesPerPeriod() );
+				engine::mixer()->framesPerPeriod(), this );
 
 		_n->m_pluginData = w;
 	}
@@ -608,32 +566,34 @@ PluginView * WTSynthInstrument::instantiateView( QWidget * _parent )
 
 void WTSynthInstrument::updateVolumes()
 {
-	WTSynthObject::changeVolume( A1_OSC, leftCh( a1_vol.value(), a1_pan.value() ), rightCh( a1_vol.value(), a1_pan.value() ) );
-	WTSynthObject::changeVolume( A2_OSC, leftCh( a2_vol.value(), a2_pan.value() ), rightCh( a2_vol.value(), a2_pan.value() ) );
-	WTSynthObject::changeVolume( B1_OSC, leftCh( b1_vol.value(), b1_pan.value() ), rightCh( b1_vol.value(), b1_pan.value() ) );
-	WTSynthObject::changeVolume( B2_OSC, leftCh( b2_vol.value(), b2_pan.value() ), rightCh( b2_vol.value(), b2_pan.value() ) );
-}
-void WTSynthInstrument::updateMult()
-{
-	WTSynthObject::changeMult( A1_OSC, a1_mult.value() );
-	WTSynthObject::changeMult( A2_OSC, a2_mult.value() );
-	WTSynthObject::changeMult( B1_OSC, b1_mult.value() );
-	WTSynthObject::changeMult( B2_OSC, b2_mult.value() );
-	WTSynthObject::updateFrequency();	
-}
-void WTSynthInstrument::updateTunes()
-{
-	WTSynthObject::changeTune( A1_OSC, a1_ltune.value(), a1_rtune.value() );
-	WTSynthObject::changeTune( A2_OSC, a2_ltune.value(), a2_rtune.value() );
-	WTSynthObject::changeTune( B1_OSC, b1_ltune.value(), b1_rtune.value() );
-	WTSynthObject::changeTune( B2_OSC, b2_ltune.value(), b2_rtune.value() );
-	WTSynthObject::updateFrequency();
-}
-void WTSynthInstrument::updateXtalk()
-{
-	WTSynthObject::changeXtalk( m_xtalk.value() );
+	m_lvol[A1_OSC] = leftCh( a1_vol.value(), a1_pan.value() );
+	m_rvol[A1_OSC] = rightCh( a1_vol.value(), a1_pan.value() );
+
+	m_lvol[A2_OSC] = leftCh( a2_vol.value(), a2_pan.value() );
+	m_rvol[A2_OSC] = rightCh( a2_vol.value(), a2_pan.value() );
+
+	m_lvol[B1_OSC] = leftCh( b1_vol.value(), b1_pan.value() );
+	m_rvol[B1_OSC] = rightCh( b1_vol.value(), b1_pan.value() );
+
+	m_lvol[B2_OSC] = leftCh( b2_vol.value(), b2_pan.value() );
+	m_rvol[B2_OSC] = rightCh( b2_vol.value(), b2_pan.value() );
 }
 
+void WTSynthInstrument::updateFreq()
+{
+	// calculate frequencies
+	m_lfreq[A1_OSC] = ( a1_mult.value() / 8 ) * powf( 2, a1_ltune.value() / 1200 );
+	m_rfreq[A1_OSC] = ( a1_mult.value() / 8 ) * powf( 2, a1_rtune.value() / 1200 );
+	
+	m_lfreq[A2_OSC] = ( a2_mult.value() / 8 ) * powf( 2, a2_ltune.value() / 1200 );
+	m_rfreq[A2_OSC] = ( a2_mult.value() / 8 ) * powf( 2, a2_rtune.value() / 1200 );
+
+	m_lfreq[B1_OSC] = ( b1_mult.value() / 8 ) * powf( 2, b1_ltune.value() / 1200 );
+	m_rfreq[B1_OSC] = ( b1_mult.value() / 8 ) * powf( 2, b1_rtune.value() / 1200 );
+
+	m_lfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_ltune.value() / 1200 );
+	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );	
+}
 
 
 WTSynthView::WTSynthView( Instrument * _instrument,
