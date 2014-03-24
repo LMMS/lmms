@@ -40,6 +40,10 @@
 #include "text_float.h"
 
 
+#if QT_VERSION < 0x040800
+#define MiddleButton MidButton
+#endif
+
 
 QPixmap * timeLine::s_timeLinePixmap = NULL;
 QPixmap * timeLine::s_posMarkerPixmap = NULL;
