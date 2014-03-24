@@ -445,10 +445,10 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 	AutomatableModel* lm = m_linkedModels.first();
 	if( lm->controllerConnection() )
 	{
-		return lm->controllerValue( frameOffset );
+		return fittedValue( lm->controllerValue( frameOffset ) );
 	}
 
-	return lm->m_value;
+	return fittedValue( lm->m_value );
 }
 
 
