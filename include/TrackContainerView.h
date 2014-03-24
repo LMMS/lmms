@@ -139,9 +139,6 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
 
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
-
 	MidiTime m_currentPosition;
 
 

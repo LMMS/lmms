@@ -279,7 +279,7 @@ void MainWindow::finalize()
 
 	QMenu * edit_menu = new QMenu( this );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-/*	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
 					this, SLOT( undo() ),
 					Qt::CTRL + Qt::Key_Z );
@@ -287,7 +287,7 @@ void MainWindow::finalize()
 					tr( "Redo" ),
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_R );
-	edit_menu->addSeparator();*/
+	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );

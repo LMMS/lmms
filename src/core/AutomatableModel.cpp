@@ -46,7 +46,6 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_step( step ),
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
-	m_journalEntryReady( false ),
 	m_setValueDepth( 0 ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
@@ -184,7 +183,7 @@ void AutomatableModel::setValue( const float value )
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
-		addJournalEntry( JournalEntry( 0, m_value - old_val ) );
+		addJournalCheckPoint();
 
 		// notify linked models
 		for( AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it )
@@ -305,51 +304,6 @@ float AutomatableModel::fittedValue( float value ) const
 	return value;
 }
 
-
-
-
-
-void AutomatableModel::redoStep( JournalEntry& je )
-{
-	bool journalling = testAndSetJournalling( false );
-	setValue( value<float>() + (float) je.data().toDouble() );
-	setJournalling( journalling );
-}
-
-
-
-
-void AutomatableModel::undoStep( JournalEntry& je )
-{
-	JournalEntry inv( je.actionID(), -je.data().toDouble() );
-	redoStep( inv );
-}
-
-
-
-
-void AutomatableModel::prepareJournalEntryFromOldVal()
-{
-	m_oldValue = value<float>();
-	saveJournallingState( false );
-	m_journalEntryReady = true;
-}
-
-
-
-
-void AutomatableModel::addJournalEntryFromOldToCurVal()
-{
-	if( m_journalEntryReady )
-	{
-		restoreJournallingState();
-		if( value<float>() != m_oldValue )
-		{
-			addJournalEntry( JournalEntry( 0, value<float>() - m_oldValue ) );
-		}
-		m_journalEntryReady = false;
-	}
-}
 
 
 
