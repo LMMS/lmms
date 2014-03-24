@@ -287,14 +287,14 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
 	}
-	else if( event->button() == Qt::RightButton || event->button() == Qt:: MiddleButton )
+	else if( event->button() == Qt::RightButton || event->button() == Qt::MiddleButton )
 	{
 		const MidiTime t = m_begin + static_cast<int>( event->x() * MidiTime::ticksPerTact() / m_ppt );
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
-		if( ( event->modifiers() & Qt::ShiftModifier ) || event->button() == Qt:: MiddleButton )
+		if( ( event->modifiers() & Qt::ShiftModifier ) || event->button() == Qt::MiddleButton )
 		{
 			m_action = MoveLoopBegin;
 		}
