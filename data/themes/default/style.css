@@ -648,6 +648,16 @@ WTSynthView knob#mixenvKnob {
 	qproperty-lineWidth: 2;
 }
 
+WTSynthView knob#xtalkKnob {
+	color: #fb50fb;
+	qproperty-outerColor: #fb50fb;
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;	
+	qproperty-lineWidth: 2;
+}
+
 /* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
  * colour codes MUST be of the form #RRGGBB */
 

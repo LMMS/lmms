@@ -56,20 +56,20 @@
 #define B2ROW 95
 
 
-const int WAVELEN = 220;
-const int PMOD_AMT = 110;
+extern const int WAVELEN = 220;
+extern const int PMOD_AMT = 110;
 
-const int	MOD_MIX = 0;
-const int	MOD_AM = 1;
-const int	MOD_RM = 2;
-const int	MOD_PM = 3;
-const int  NUM_MODS = 4;
+extern const int	MOD_MIX = 0;
+extern const int	MOD_AM = 1;
+extern const int	MOD_RM = 2;
+extern const int	MOD_PM = 3;
+extern const int  NUM_MODS = 4;
 
-const int	A1_OSC = 0;
-const int	A2_OSC = 1;
-const int	B1_OSC = 2;
-const int	B2_OSC = 3;
-const int	NUM_OSCS = 4;
+extern const int	A1_OSC = 0;
+extern const int	A2_OSC = 1;
+extern const int	B1_OSC = 2;
+extern const int	B2_OSC = 3;
+extern const int	NUM_OSCS = 4;
 
 
 class WTSynthObject
@@ -80,13 +80,16 @@ public:
 					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames );
 	virtual ~WTSynthObject();
 
+	static void changeVolume( int _osc, float _lvol, float _rvol );
+	static void changeMult( int _osc, float _mul );
+	static void changeTune( int _osc, float _ltune, float _rtune );
+
+	static inline void changeXtalk( float _xtalk )
+	{
+		s_xtalk = _xtalk;
+	};
+
 	void renderOutput( fpp_t _frames );
-
-	void updateFrequencies();
-
-	void changeVolume( int _osc, float _lvol, float _rvol );
-	void changeMult( int _osc, float _mul );
-	void changeTune( int _osc, float _ltune, float _rtune );
 
 	inline sampleFrame * abuf() const
 	{
@@ -102,11 +105,29 @@ public:
 	}
 
 private:
-	float m_lvol [NUM_OSCS];
-	float m_rvol [NUM_OSCS];
-	float m_mult [NUM_OSCS];
-	float m_ltune [NUM_OSCS];
-	float m_rtune [NUM_OSCS];
+	static float s_lvol [NUM_OSCS];
+	static float s_rvol [NUM_OSCS];
+	static float s_mult [NUM_OSCS];
+	static float s_ltune [NUM_OSCS];
+	static float s_rtune [NUM_OSCS];
+	static float s_xtalk;
+
+	// linear interpolation
+/*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
+	{
+		return s1 + ( s2 - s1 ) * x;
+	}*/
+	// quick and dirty approximation of cubic interpolation
+	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
+	{
+		const float x2 = powf( x, 2 );
+		const float x3 = powf( x, 3 );
+		const float m = s2 - s1;
+
+		return ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
+				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ) +
+				( ( x + x3 * 2.0 - x2 * 3.0 ) * m );
+	}
 
 	int m_amod;
 	int m_bmod;
@@ -160,6 +181,7 @@ public slots:
 	void updateVolumes();
 	void updateMult();
 	void updateTunes();
+	void updateXtalk();
 
 private:
 	inline float leftCh( float _vol, float _pan )
@@ -205,19 +227,17 @@ private:
 	FloatModel m_abmix;
 
 	FloatModel m_envAmt;
-	
+
 	TempoSyncKnobModel m_envAtt;
 	TempoSyncKnobModel m_envHold;
 	TempoSyncKnobModel m_envDec;
+
+	FloatModel m_xtalk;
 
 	IntModel m_amod;
 	IntModel m_bmod;
 
 	IntModel m_selectedGraph;
-
-	bool m_volChanged;
-	bool m_multChanged;
-	bool m_tuneChanged;
 
 	friend class WTSynthView;
 };
@@ -278,10 +298,12 @@ private:
 	knob * m_abmixKnob;
 
 	knob * m_envAmtKnob;
-	
+
 	TempoSyncKnob * m_envAttKnob;
 	TempoSyncKnob * m_envHoldKnob;
 	TempoSyncKnob * m_envDecKnob;
+
+	knob * m_xtalkKnob;
 
 	automatableButtonGroup * m_selectedGraphGroup;
 	automatableButtonGroup * m_aModGroup;
