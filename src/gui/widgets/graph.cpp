@@ -679,7 +679,11 @@ void graphModel::shiftPhase( int _deg )
 	
 	// shift phase
 	for( int i = 0; i < length(); i++ )
-		m_samples[i] = temp[ ( i + offset ) % length() ];
+	{
+		int o = ( i + offset ) % length();
+		while( o < 0 ) o += length();
+		m_samples[i] = temp[o];
+	}
 	
 	emit samplesChanged( 0, length()-1 );
 }
