@@ -238,7 +238,7 @@ TrackContainerView QFrame{
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-nStateButton {	
+nStateButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -366,7 +366,7 @@ toolButton#playButton {
 
 toolButton#stopButton {
 	border-top-right-radius: 5px 15px;
-	border-bottom-right-radius: 5px 15px;	
+	border-bottom-right-radius: 5px 15px;
 }
 
 /* record and record-accompany can be styled with #recordButton and #recordAccompanyButton respectively */
@@ -608,54 +608,40 @@ sidInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-WTSynthView knob#aKnob {
+WatsynView knob {
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;
+	qproperty-lineWidth: 2;
+}
+
+WatsynView knob#aKnob {
 	color: #43b2ff;
 	qproperty-outerColor: #43b2ff;
-	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 7;
-	qproperty-centerPointX: 9.5;
-	qproperty-centerPointY: 9.5;	
-	qproperty-lineWidth: 2; 
 }
 
-WTSynthView knob#bKnob {
+WatsynView knob#bKnob {
 	color: #fc5431;
 	qproperty-outerColor: #fc5431;
-	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 7;
-	qproperty-centerPointX: 9.5;
-	qproperty-centerPointY: 9.5;	
-	qproperty-lineWidth: 2; 
 }
 
-WTSynthView knob#mixKnob {
+WatsynView knob#mixKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
-	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 13;
 	qproperty-centerPointX: 15.5;
-	qproperty-centerPointY: 15.5;	
-	qproperty-lineWidth: 2; 
+	qproperty-centerPointY: 15.5;
 }
 
-WTSynthView knob#mixenvKnob {
+WatsynView knob#mixenvKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
-	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 7;
-	qproperty-centerPointX: 9.5;
-	qproperty-centerPointY: 9.5;	
-	qproperty-lineWidth: 2;
 }
 
-WTSynthView knob#xtalkKnob {
+WatsynView knob#xtalkKnob {
 	color: #fb50fb;
 	qproperty-outerColor: #fb50fb;
-	qproperty-innerRadius: 1;
-	qproperty-outerRadius: 7;
-	qproperty-centerPointX: 9.5;
-	qproperty-centerPointY: 9.5;	
-	qproperty-lineWidth: 2;
 }
 
 /* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace

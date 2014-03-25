@@ -1,5 +1,5 @@
 /*
- * WTSynth.cpp - work in process, name pending
+ * Watsyn.cpp - a 4-oscillator modulating wavetable synth
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
@@ -24,7 +24,7 @@
 
 #include <QtXml/QDomElement>
 
-#include "WTSynth.h"
+#include "Watsyn.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "templates.h"
@@ -37,10 +37,10 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT wtsynth_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"WTSynth",
+	"Watsyn",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
@@ -56,10 +56,10 @@ Plugin::Descriptor PLUGIN_EXPORT wtsynth_plugin_descriptor =
 
 
 
-WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
+WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
 					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
-					WTSynthInstrument * _w ) :
+					WatsynInstrument * _w ) :
 				m_amod( _amod ),
 				m_bmod( _bmod ),
 				m_samplerate( _samplerate ),
@@ -89,14 +89,14 @@ WTSynthObject::WTSynthObject( float * _A1wave, float * _A2wave,
 
 
 
-WTSynthObject::~WTSynthObject()
+WatsynObject::~WatsynObject()
 {
 	delete[] m_abuf;
 	delete[] m_bbuf;
 }
 
 
-void WTSynthObject::renderOutput( fpp_t _frames )
+void WatsynObject::renderOutput( fpp_t _frames )
 {
 	if( m_abuf == NULL )
 		m_abuf = new sampleFrame[m_fpp];
@@ -223,8 +223,8 @@ void WTSynthObject::renderOutput( fpp_t _frames )
 
 
 
-WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, &wtsynth_plugin_descriptor ),
+WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
+		Instrument( _instrument_track, &watsyn_plugin_descriptor ),
 
 		a1_vol( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Volume A1" ) ),
 		a2_vol( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Volume A2" ) ),
@@ -305,17 +305,17 @@ WTSynthInstrument::WTSynthInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-WTSynthInstrument::~WTSynthInstrument()
+WatsynInstrument::~WatsynInstrument()
 {
 }
 
 
-void WTSynthInstrument::playNote( NotePlayHandle * _n,
+void WatsynInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		WTSynthObject * w = new WTSynthObject( const_cast<float*>( a1_graph.samples() ),
+		WatsynObject * w = new WatsynObject( const_cast<float*>( a1_graph.samples() ),
 				const_cast<float*>( a2_graph.samples() ),
 				const_cast<float*>( b1_graph.samples() ),
 				const_cast<float*>( b2_graph.samples() ),
@@ -328,7 +328,7 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
-	WTSynthObject * w = static_cast<WTSynthObject *>( _n->m_pluginData );
+	WatsynObject * w = static_cast<WatsynObject *>( _n->m_pluginData );
 
 	sampleFrame * abuf = w->abuf();
 	sampleFrame * bbuf = w->bbuf();
@@ -435,13 +435,13 @@ void WTSynthInstrument::playNote( NotePlayHandle * _n,
 }
 
 
-void WTSynthInstrument::deleteNotePluginData( NotePlayHandle * _n )
+void WatsynInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<WTSynthObject *>( _n->m_pluginData );
+	delete static_cast<WatsynObject *>( _n->m_pluginData );
 }
 
 
-void WTSynthInstrument::saveSettings( QDomDocument & _doc,
+void WatsynInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	a1_vol.saveSettings( _doc, _this, "a1_vol" );
@@ -495,7 +495,7 @@ void WTSynthInstrument::saveSettings( QDomDocument & _doc,
 }
 
 
-void WTSynthInstrument::loadSettings( const QDomElement & _this )
+void WatsynInstrument::loadSettings( const QDomElement & _this )
 {
 	a1_vol.loadSettings( _this, "a1_vol" );
 	a2_vol.loadSettings( _this, "a2_vol" );
@@ -552,19 +552,19 @@ void WTSynthInstrument::loadSettings( const QDomElement & _this )
 }
 
 
-QString WTSynthInstrument::nodeName() const
+QString WatsynInstrument::nodeName() const
 {
-	return( wtsynth_plugin_descriptor.name );
+	return( watsyn_plugin_descriptor.name );
 }
 
 
-PluginView * WTSynthInstrument::instantiateView( QWidget * _parent )
+PluginView * WatsynInstrument::instantiateView( QWidget * _parent )
 {
-	return( new WTSynthView( this, _parent ) );
+	return( new WatsynView( this, _parent ) );
 }
 
 
-void WTSynthInstrument::updateVolumes()
+void WatsynInstrument::updateVolumes()
 {
 	m_lvol[A1_OSC] = leftCh( a1_vol.value(), a1_pan.value() );
 	m_rvol[A1_OSC] = rightCh( a1_vol.value(), a1_pan.value() );
@@ -579,7 +579,7 @@ void WTSynthInstrument::updateVolumes()
 	m_rvol[B2_OSC] = rightCh( b2_vol.value(), b2_pan.value() );
 }
 
-void WTSynthInstrument::updateFreq()
+void WatsynInstrument::updateFreq()
 {
 	// calculate frequencies
 	m_lfreq[A1_OSC] = ( a1_mult.value() / 8 ) * powf( 2, a1_ltune.value() / 1200 );
@@ -596,7 +596,7 @@ void WTSynthInstrument::updateFreq()
 }
 
 
-WTSynthView::WTSynthView( Instrument * _instrument,
+WatsynView::WatsynView( Instrument * _instrument,
 					QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -871,13 +871,13 @@ WTSynthView::WTSynthView( Instrument * _instrument,
 }
 
 
-WTSynthView::~WTSynthView()
+WatsynView::~WatsynView()
 {
 }
 
 
 
-void WTSynthView::updateLayout()
+void WatsynView::updateLayout()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -910,7 +910,7 @@ void WTSynthView::updateLayout()
 
 
 
-void WTSynthView::sinWaveClicked()
+void WatsynView::sinWaveClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -934,7 +934,7 @@ void WTSynthView::sinWaveClicked()
 }
 
 
-void WTSynthView::triWaveClicked()
+void WatsynView::triWaveClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -958,7 +958,7 @@ void WTSynthView::triWaveClicked()
 }
 
 
-void WTSynthView::sawWaveClicked()
+void WatsynView::sawWaveClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -982,7 +982,7 @@ void WTSynthView::sawWaveClicked()
 }
 
 
-void WTSynthView::sqrWaveClicked()
+void WatsynView::sqrWaveClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -1006,7 +1006,7 @@ void WTSynthView::sqrWaveClicked()
 }
 
 
-void WTSynthView::normalizeClicked()
+void WatsynView::normalizeClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -1030,7 +1030,7 @@ void WTSynthView::normalizeClicked()
 }
 
 
-void WTSynthView::invertClicked()
+void WatsynView::invertClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -1054,7 +1054,7 @@ void WTSynthView::invertClicked()
 }
 
 
-void WTSynthView::smoothClicked()
+void WatsynView::smoothClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -1078,7 +1078,7 @@ void WTSynthView::smoothClicked()
 }
 
 
-void WTSynthView::phaseLeftClicked()
+void WatsynView::phaseLeftClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -1102,7 +1102,7 @@ void WTSynthView::phaseLeftClicked()
 }
 
 
-void WTSynthView::phaseRightClicked()
+void WatsynView::phaseRightClicked()
 {
 	switch( m_selectedGraphGroup->model()->value() )
 	{
@@ -1126,7 +1126,7 @@ void WTSynthView::phaseRightClicked()
 }
 
 
-void WTSynthView::loadClicked()
+void WatsynView::loadClicked()
 {
 	QString fileName;
 	switch( m_selectedGraphGroup->model()->value() )
@@ -1151,9 +1151,9 @@ void WTSynthView::loadClicked()
 }
 
 
-void WTSynthView::modelChanged()
+void WatsynView::modelChanged()
 {
-	WTSynthInstrument * w = castModel<WTSynthInstrument>();
+	WatsynInstrument * w = castModel<WatsynInstrument>();
 
 	a1_volKnob -> setModel( &w -> a1_vol );
 	a2_volKnob -> setModel( &w -> a2_vol );
@@ -1210,11 +1210,11 @@ extern "C"
 // necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-	return( new WTSynthInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new WatsynInstrument( static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 
 }
 
 
-#include "moc_WTSynth.cxx"
+#include "moc_Watsyn.cxx"

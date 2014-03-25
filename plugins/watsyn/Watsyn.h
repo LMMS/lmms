@@ -1,5 +1,5 @@
 /*
- * WTSynth.h - work in process, name pending
+ * Watsyn.h - a 4-oscillator modulating wavetable synth
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef WTSYNTH_H
-#define WTSYNTH_H
+#ifndef WATSYN_H
+#define WATSYN_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -71,16 +71,16 @@ extern const int	B1_OSC = 2;
 extern const int	B2_OSC = 3;
 extern const int	NUM_OSCS = 4;
 
-class WTSynthInstrument;
+class WatsynInstrument;
 
-class WTSynthObject
+class WatsynObject
 {
 public:
-	WTSynthObject( 	float * _A1wave, float * _A2wave,
+	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
 					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
-					WTSynthInstrument * _w );
-	virtual ~WTSynthObject();
+					WatsynInstrument * _w );
+	virtual ~WatsynObject();
 
 	void renderOutput( fpp_t _frames );
 
@@ -103,17 +103,33 @@ private:
 	{
 		return s1 + ( s2 - s1 ) * x;
 	}*/
+
 	// quick and dirty approximation of cubic interpolation
 	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
 	{
 		const float x2 = powf( x, 2 );
 		const float x3 = powf( x, 3 );
-		const float m = s2 - s1;
+		//const float m = s2 - s1;
+
+		return ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
+				( ( x3 * -2.0 + x2 * 3.0 ) * s2 );// +
+				//( ( x + x3 * 2.0 - x2 * 3.0 ) * m );
+	}
+
+	// more accurate cubic interpolation...
+	// consumes more cpu than ^ but doesn't bring a marked increase in sound quality IMO
+/*	inline sample_t interpolate( sample_t s0, sample_t s1, sample_t s2, sample_t s3, float x )
+	{
+		const float x2 = powf( x, 2 );
+		const float x3 = powf( x, 3 );
+		const float m1 = ( s2 - s0 ) / 2;
+		const float m2 = ( s3 - s1 ) / 2;
 
 		return ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
 				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ) +
-				( ( x + x3 * 2.0 - x2 * 3.0 ) * m );
-	}
+				( ( x3 - x2 * 2 + x ) * m1 ) +
+				( ( x3 - x2 ) * m2 );
+	}*/
 
 	int m_amod;
 	int m_bmod;
@@ -123,7 +139,7 @@ private:
 
 	fpp_t m_fpp;
 
-	WTSynthInstrument * m_parent;
+	WatsynInstrument * m_parent;
 
 	sampleFrame * m_abuf;
 	sampleFrame * m_bbuf;
@@ -137,12 +153,12 @@ private:
 	float m_B2wave [WAVELEN];
 };
 
-class WTSynthInstrument : public Instrument
+class WatsynInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	WTSynthInstrument( InstrumentTrack * _instrument_track );
-	virtual ~WTSynthInstrument();
+	WatsynInstrument( InstrumentTrack * _instrument_track );
+	virtual ~WatsynInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
@@ -161,7 +177,7 @@ public:
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
-	
+
 public slots:
 	void updateVolumes();
 	void updateFreq();
@@ -229,18 +245,18 @@ private:
 
 	IntModel m_selectedGraph;
 
-	friend class WTSynthObject;
-	friend class WTSynthView;
+	friend class WatsynObject;
+	friend class WatsynView;
 };
 
 
-class WTSynthView : public InstrumentView
+class WatsynView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	WTSynthView( Instrument * _instrument,
+	WatsynView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~WTSynthView();
+	virtual ~WatsynView();
 
 protected slots:
 	void updateLayout();
