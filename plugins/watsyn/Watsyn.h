@@ -99,23 +99,23 @@ public:
 
 private:
 	// linear interpolation
-/*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
+	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
 	{
 		return s1 + ( s2 - s1 ) * x;
-	}*/
-
+	}
+/*
 	// quick and dirty approximation of cubic interpolation
 	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
 	{
 		const float x2 = powf( x, 2 );
 		const float x3 = powf( x, 3 );
-		//const float m = s2 - s1;
+		const float m = s2 - s1;
 
 		return ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
-				( ( x3 * -2.0 + x2 * 3.0 ) * s2 );// +
-				//( ( x + x3 * 2.0 - x2 * 3.0 ) * m );
+				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ); +
+				( ( x + x3 * 2.0 - x2 * 3.0 ) * m );
 	}
-
+*/
 	// more accurate cubic interpolation...
 	// consumes more cpu than ^ but doesn't bring a marked increase in sound quality IMO
 /*	inline sample_t interpolate( sample_t s0, sample_t s1, sample_t s2, sample_t s3, float x )
