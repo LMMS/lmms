@@ -61,7 +61,7 @@ const int WAVELEN = 4400;
 
 const int WAVERATIO = WAVELEN / GRAPHLEN;
 
-const int PMOD_AMT = 110;
+const int PMOD_AMT = WAVELEN / 2;
 
 const int	MOD_MIX = 0;
 const int	MOD_AM = 1;
