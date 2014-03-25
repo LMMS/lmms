@@ -81,6 +81,7 @@ WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 	m_rphase[B2_OSC] = 0.0f;
 
 	// copy wavegraphs to the synth object to prevent race conditions
+
 	memcpy( &m_A1wave, _A1wave, sizeof( m_A1wave ) );
 	memcpy( &m_A2wave, _A2wave, sizeof( m_A2wave ) );
 	memcpy( &m_B1wave, _B1wave, sizeof( m_B1wave ) );
@@ -251,10 +252,10 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 		b1_rtune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Right detune B1" ) ),
 		b2_rtune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Right detune B2" ) ),
 
-		a1_graph( -1.0f, 1.0f, WAVELEN, this ),
-		a2_graph( -1.0f, 1.0f, WAVELEN, this ),
-		b1_graph( -1.0f, 1.0f, WAVELEN, this ),
-		b2_graph( -1.0f, 1.0f, WAVELEN, this ),
+		a1_graph( -1.0f, 1.0f, GRAPHLEN, this ),
+		a2_graph( -1.0f, 1.0f, GRAPHLEN, this ),
+		b1_graph( -1.0f, 1.0f, GRAPHLEN, this ),
+		b2_graph( -1.0f, 1.0f, GRAPHLEN, this ),
 
 		m_abmix( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "A-B Mix" ) ),
 		m_envAmt( 0.0f, -200.0f, 200.0f, 1.0f, this, tr( "A-B Mix envelope amount" ) ),
@@ -294,6 +295,11 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
 	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
 	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	
+	connect( &a1_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaves() ) );
+	connect( &a2_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaves() ) );
+	connect( &b1_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaves() ) );
+	connect( &b2_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaves() ) );
 
 	a1_graph.setWaveToSine();
 	a2_graph.setWaveToSine();
@@ -302,6 +308,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 
 	updateVolumes();
 	updateFreq();
+	updateWaves();
 }
 
 
@@ -315,10 +322,11 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		WatsynObject * w = new WatsynObject( const_cast<float*>( a1_graph.samples() ),
-				const_cast<float*>( a2_graph.samples() ),
-				const_cast<float*>( b1_graph.samples() ),
-				const_cast<float*>( b2_graph.samples() ),
+		WatsynObject * w = new WatsynObject(
+				&A1_wave[0],
+				&A2_wave[0],
+				&B1_wave[0],
+				&B2_wave[0],
 				m_amod.value(), m_bmod.value(),
 				engine::mixer()->processingSampleRate(), _n,
 				engine::mixer()->framesPerPeriod(), this );
@@ -491,7 +499,7 @@ void WatsynInstrument::saveSettings( QDomDocument & _doc,
 
 	m_amod.saveSettings( _doc, _this, "amod" );
 	m_bmod.saveSettings( _doc, _this, "bmod" );
-	m_selectedGraph.saveSettings( _doc, _this, "selgraph" );
+/*	m_selectedGraph.saveSettings( _doc, _this, "selgraph" );*/
 }
 
 
@@ -548,7 +556,7 @@ void WatsynInstrument::loadSettings( const QDomElement & _this )
 
 	m_amod.loadSettings( _this, "amod" );
 	m_bmod.loadSettings( _this, "bmod" );
-	m_selectedGraph.loadSettings( _this, "selgraph" );
+/*	m_selectedGraph.loadSettings( _this, "selgraph" );*/
 }
 
 
@@ -593,6 +601,16 @@ void WatsynInstrument::updateFreq()
 
 	m_lfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_ltune.value() / 1200 );
 	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );	
+}
+
+
+void WatsynInstrument::updateWaves()
+{
+	// do cip+oversampling on the wavetables to improve quality
+	cipcpy( &A1_wave[0], const_cast<float*>( a1_graph.samples() ) );
+	cipcpy( &A2_wave[0], const_cast<float*>( a2_graph.samples() ) );
+	cipcpy( &B1_wave[0], const_cast<float*>( b1_graph.samples() ) );
+	cipcpy( &B2_wave[0], const_cast<float*>( b2_graph.samples() ) );
 }
 
 

@@ -56,20 +56,24 @@
 #define B2ROW 95
 
 
-extern const int WAVELEN = 220;
-extern const int PMOD_AMT = 110;
+const int GRAPHLEN = 220;
+const int WAVELEN = 4400;
 
-extern const int	MOD_MIX = 0;
-extern const int	MOD_AM = 1;
-extern const int	MOD_RM = 2;
-extern const int	MOD_PM = 3;
-extern const int  NUM_MODS = 4;
+const int WAVERATIO = WAVELEN / GRAPHLEN;
 
-extern const int	A1_OSC = 0;
-extern const int	A2_OSC = 1;
-extern const int	B1_OSC = 2;
-extern const int	B2_OSC = 3;
-extern const int	NUM_OSCS = 4;
+const int PMOD_AMT = 110;
+
+const int	MOD_MIX = 0;
+const int	MOD_AM = 1;
+const int	MOD_RM = 2;
+const int	MOD_PM = 3;
+const int  NUM_MODS = 4;
+
+const int	A1_OSC = 0;
+const int	A2_OSC = 1;
+const int	B1_OSC = 2;
+const int	B2_OSC = 3;
+const int	NUM_OSCS = 4;
 
 class WatsynInstrument;
 
@@ -131,6 +135,7 @@ private:
 				( ( x3 - x2 ) * m2 );
 	}*/
 
+
 	int m_amod;
 	int m_bmod;
 
@@ -181,6 +186,7 @@ public:
 public slots:
 	void updateVolumes();
 	void updateFreq();
+	void updateWaves();
 
 protected:
 	float m_lvol [NUM_OSCS];
@@ -198,6 +204,37 @@ private:
 	inline float rightCh( float _vol, float _pan )
 	{
 		return ( _pan >= 0 ? 1.0 : 1.0 + ( _pan / 100.0 ) ) * _vol / 100.0;
+	}
+
+	// memcpy with cubic interpolation (cip for short) and 10x oversampling to increase wavetable quality
+	inline void cipcpy( float * _dst, float * _src )
+	{
+		// calculate cyclic tangents
+		float tang[GRAPHLEN];
+		tang[0] = ( _src[1] - _src[ GRAPHLEN - 1] ) / 2;
+		tang[ GRAPHLEN - 1 ] = ( _src[0] - _src[ GRAPHLEN - 2 ] ) / 2;
+		for( int i = 1; i < GRAPHLEN-1; i++ )
+		{
+			tang[i] = ( _src[i+1] - _src[i-1] ) / 2;
+		}
+		
+		// calculate cspline
+		for( int i=0; i < WAVELEN; i++ )
+		{
+			const float s1 = _src[ i / WAVERATIO ];
+			const float s2 = _src[ ( i / WAVERATIO + 1 ) % GRAPHLEN ];
+			const float m1 = tang[ i / WAVERATIO ];
+			const float m2 = tang[ ( i / WAVERATIO + 1 ) % GRAPHLEN ];
+			
+			const float x = static_cast<float>( i % WAVERATIO ) / WAVERATIO;
+			const float x2 = x * x;
+			const float x3 = x * x * x;
+			
+			_dst[i] = ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
+				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ) +
+				( ( x3 - x2 * 2 + x ) * m1 ) +
+				( ( x3 - x2 ) * m2 );		
+		}
 	}
 
 	FloatModel a1_vol;
@@ -244,6 +281,11 @@ private:
 	IntModel m_bmod;
 
 	IntModel m_selectedGraph;
+	
+	float A1_wave [WAVELEN];
+	float A2_wave [WAVELEN];
+	float B1_wave [WAVELEN];
+	float B2_wave [WAVELEN];
 
 	friend class WatsynObject;
 	friend class WatsynView;
