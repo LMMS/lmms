@@ -49,7 +49,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								const f_cnt_t _frames,
 								const note& n,
 								NotePlayHandle *parent,
-								const bool _part_of_arp,
 								int midiEventChannel,
 								Origin origin ) :
 	PlayHandle( TypeNotePlayHandle, _offset ),
@@ -63,8 +62,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
 	m_released( false ),
-	m_topNote( parent == NULL  ),
-	m_partOfArpeggio( _part_of_arp ),
+	m_hasParent( parent != NULL  ),
+	m_hadChildren( false ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
 	m_origTempo( engine::getSong()->getTempo() ),
@@ -76,7 +75,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin )
 {
-	if( isTopNote() )
+	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
 		m_instrumentTrack->m_processHandles.push_back( this );
@@ -86,10 +85,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_baseDetuning = parent->m_baseDetuning;
 
 		parent->m_subNotes.push_back( this );
-		// if there was an arp-note added and parent is a base-note
-		// we set arp-note-flag for indicating that parent is an
-		// arpeggio-base-note
-		parent->m_partOfArpeggio = isPartOfArpeggio() && parent->isTopNote();
+		parent->m_hadChildren = true;
 
 		m_bbTrack = parent->m_bbTrack;
 	}
@@ -104,7 +100,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if( !isTopNote() || !instrumentTrack->isArpeggioEnabled() )
+	if( !isMasterNote() || !instrumentTrack->isArpeggioEnabled() )
 	{
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
@@ -122,7 +118,7 @@ NotePlayHandle::~NotePlayHandle()
 {
 	noteOff( 0 );
 
-	if( isTopNote() )
+	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
@@ -209,12 +205,13 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	if( m_released )
 	{
 		f_cnt_t todo = engine::mixer()->framesPerPeriod();
+
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
 		// because we do not allow NotePlayHandle::isFinished() to be true
 		// until all sub-notes are completely played and no new ones
 		// are inserted by arpAndChordsTabWidget::processNote()
-		if( isArpeggioBaseNote() )
+		if( isMasterNote() )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 * engine::mixer()->framesPerPeriod();
 		}
@@ -272,16 +269,6 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		{
 			++it;
 		}
-	}
-
-	// if this note is a base-note and there're no more sub-notes left we
-	// can set m_releaseFramesDone to m_releaseFramesToDo so that
-	// NotePlayHandle::isFinished() returns true and also this base-note is
-	// removed from mixer's active note vector
-	if( m_released && isArpeggioBaseNote() && m_subNotes.size() == 0 )
-	{
-		m_releaseFramesDone = m_releaseFramesToDo;
-		m_frames = 0;
 	}
 
 	// update internal data
@@ -344,7 +331,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, m_instrumentTrack->m_soundShaping.releaseFrames() );
 
-	if( !isTopNote() || !instrumentTrack()->isArpeggioEnabled() )
+	if( hasParent() || !instrumentTrack()->isArpeggioEnabled() )
 	{
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
@@ -367,8 +354,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 f_cnt_t NotePlayHandle::actualReleaseFramesToDo() const
 {
-	return m_instrumentTrack->m_soundShaping.releaseFrames(/*
-							isArpeggioBaseNote()*/ );
+	return m_instrumentTrack->m_soundShaping.releaseFrames();
 }
 
 
@@ -395,19 +381,10 @@ float NotePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 
 
-bool NotePlayHandle::isArpeggioBaseNote() const
-{
-	return isTopNote() && ( m_partOfArpeggio || m_instrumentTrack->isArpeggioEnabled() );
-}
-
-
-
-
 void NotePlayHandle::mute()
 {
 	// mute all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
 	{
 		( *it )->mute();
 	}
@@ -471,10 +448,11 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 			offset() == _nph.offset() &&
 			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
 			m_released == _nph.m_released &&
-			m_topNote == _nph.m_topNote &&
-			m_partOfArpeggio == _nph.m_partOfArpeggio &&
+			m_hasParent == _nph.m_hasParent &&
 			m_origBaseNote == _nph.m_origBaseNote &&
-			m_muted == _nph.m_muted;
+			m_muted == _nph.m_muted &&
+			m_midiChannel == _nph.m_midiChannel &&
+			m_origin == _nph.m_origin;
 }
 
 

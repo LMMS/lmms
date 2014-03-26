@@ -252,7 +252,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					NotePlayHandle* nph = new NotePlayHandle( this, time.frames( engine::framesPerTick() ),
 																typeInfo<f_cnt_t>::max() / 2,
 																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
-																NULL, false, event.channel(),
+																NULL, event.channel(),
 																NotePlayHandle::OriginMidiInput );
 					if( engine::mixer()->addPlayHandle( nph ) )
 					{
@@ -431,18 +431,17 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote( NotePlayHandle * _n, 
-						sampleFrame * _working_buffer )
+void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 {
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
-	m_noteStacking.processNote( _n );
-	m_arpeggio.processNote( _n );
+	m_noteStacking.processNote( n );
+	m_arpeggio.processNote( n );
 
-	if( !_n->isArpeggioBaseNote() && m_instrument != NULL )
+	if( n->isMasterNote() == false && m_instrument != NULL )
 	{
 		// all is done, so now lets play the note!
-		m_instrument->playNote( _n, _working_buffer );
+		m_instrument->playNote( n, workingBuffer );
 	}
 }
 
