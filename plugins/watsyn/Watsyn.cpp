@@ -219,10 +219,8 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		{
 			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_lfreq[i] ) ) );
 			m_lphase[i] = fmodf( m_lphase[i], WAVELEN );
-			if( m_lphase[i] < 0 ) m_lphase[i] += WAVELEN;
 			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_rfreq[i] ) ) );
 			m_rphase[i] = fmodf( m_rphase[i], WAVELEN );
-			if( m_rphase[i] < 0 ) m_rphase[i] += WAVELEN;
 		}
 	}
 
