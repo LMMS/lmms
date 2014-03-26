@@ -106,7 +106,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
-	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
+	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
@@ -115,15 +115,13 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
-
 	m_baseNoteModel.setInitValue( DefaultKey );
-	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateBaseNote() ) );
-	connect( &m_pitchModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePitch() ) );
 
-	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
-				this, SLOT( updatePitchRange() ) );
+	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
+	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
+	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
+
+    m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -706,6 +704,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
+	m_effectChannelModel.setRange( 0, INT_MAX );
 	m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 
