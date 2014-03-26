@@ -56,11 +56,11 @@
 #define B2ROW 95
 
 
-const int GRAPHLEN = 220;
-const int WAVELEN = 4400;
+const int GRAPHLEN = 220; // don't change - must be same as the size of the widget
 
-const int WAVERATIO = WAVELEN / GRAPHLEN;
+const int WAVERATIO = 25; // oversampling ratio
 
+const int WAVELEN = GRAPHLEN * WAVERATIO;
 const int PMOD_AMT = WAVELEN / 2;
 
 const int	MOD_MIX = 0;
@@ -107,34 +107,6 @@ private:
 	{
 		return s1 + ( s2 - s1 ) * x;
 	}
-/*
-	// quick and dirty approximation of cubic interpolation
-	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
-	{
-		const float x2 = powf( x, 2 );
-		const float x3 = powf( x, 3 );
-		const float m = s2 - s1;
-
-		return ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
-				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ); +
-				( ( x + x3 * 2.0 - x2 * 3.0 ) * m );
-	}
-*/
-	// more accurate cubic interpolation...
-	// consumes more cpu than ^ but doesn't bring a marked increase in sound quality IMO
-/*	inline sample_t interpolate( sample_t s0, sample_t s1, sample_t s2, sample_t s3, float x )
-	{
-		const float x2 = powf( x, 2 );
-		const float x3 = powf( x, 3 );
-		const float m1 = ( s2 - s0 ) / 2;
-		const float m2 = ( s3 - s1 ) / 2;
-
-		return ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
-				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ) +
-				( ( x3 - x2 * 2 + x ) * m1 ) +
-				( ( x3 - x2 ) * m2 );
-	}*/
-
 
 	int m_amod;
 	int m_bmod;
