@@ -260,7 +260,7 @@ void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 	float outputl[synth->buffersize];
 	float outputr[synth->buffersize];
 
-	m_master->GetAudioOutSamples( SOUND_BUFFER_SIZE, SAMPLE_RATE, outputl, outputr );
+	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
 
 	// TODO: move to MixHelpers
 	for( int f = 0; f < synth->buffersize; ++f )
