@@ -94,6 +94,7 @@ public:
 
 
 	void processNextBuffer();
+	void setPlayMode(PlayModes, TrackList, int);
 
 	inline int getMilliseconds() const
 	{

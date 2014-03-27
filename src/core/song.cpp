@@ -198,45 +198,7 @@ void song::processNextBuffer()
 	TrackList track_list;
 	int tco_num = -1;
 
-	switch( m_playMode )
-	{
-		case Mode_PlaySong:
-			track_list = tracks();
-			// at song-start we have to reset the LFOs
-			if( m_playPos[Mode_PlaySong] == 0 )
-			{
-				EnvelopeAndLfoParameters::instances()->reset();
-			}
-			break;
-
-		case Mode_PlayTrack:
-			track_list.push_back( m_trackToPlay );
-			break;
-
-		case Mode_PlayBB:
-			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
-			{
-				tco_num = engine::getBBTrackContainer()->
-								currentBB();
-				track_list.push_back( bbTrack::findBBTrack(
-								tco_num ) );
-			}
-			break;
-
-		case Mode_PlayPattern:
-			if( m_patternToPlay != NULL )
-			{
-				tco_num = m_patternToPlay->getTrack()->
-						getTCONum( m_patternToPlay );
-				track_list.push_back(
-						m_patternToPlay->getTrack() );
-			}
-			break;
-
-		default:
-			return;
-
-	}
+	setPlayMode(m_playMode, track_list, tco_num);
 
 	if( track_list.empty() == true )
 	{
@@ -384,7 +346,47 @@ void song::processNextBuffer()
 	}
 }
 
+void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
+  switch( m_playMode )
+	{
+		case Mode_PlaySong:
+			track_list = tracks();
+			// at song-start we have to reset the LFOs
+			if( m_playPos[Mode_PlaySong] == 0 )
+			{
+				EnvelopeAndLfoParameters::instances()->reset();
+			}
+			break;
 
+		case Mode_PlayTrack:
+			track_list.push_back( m_trackToPlay );
+			break;
+
+		case Mode_PlayBB:
+			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
+			{
+				tco_num = engine::getBBTrackContainer()->
+								currentBB();
+				track_list.push_back( bbTrack::findBBTrack(
+								tco_num ) );
+			}
+			break;
+
+		case Mode_PlayPattern:
+			if( m_patternToPlay != NULL )
+			{
+				tco_num = m_patternToPlay->getTrack()->
+						getTCONum( m_patternToPlay );
+				track_list.push_back(
+						m_patternToPlay->getTrack() );
+			}
+			break;
+
+		default:
+			return;
+
+	}
+}
 
 
 void song::playSong()
