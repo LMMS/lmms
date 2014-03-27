@@ -200,6 +200,50 @@ void song::processNextBuffer()
 
 	setPlayMode(m_playMode, track_list, tco_num);
 
+	
+}
+
+void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
+  switch( m_playMode )
+	{
+		case Mode_PlaySong:
+			track_list = tracks();
+			// at song-start we have to reset the LFOs
+			if( m_playPos[Mode_PlaySong] == 0 )
+			{
+				EnvelopeAndLfoParameters::instances()->reset();
+			}
+			break;
+
+		case Mode_PlayTrack:
+			track_list.push_back( m_trackToPlay );
+			break;
+
+		case Mode_PlayBB:
+			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
+			{
+				tco_num = engine::getBBTrackContainer()->
+								currentBB();
+				track_list.push_back( bbTrack::findBBTrack(
+								tco_num ) );
+			}
+			break;
+
+		case Mode_PlayPattern:
+			if( m_patternToPlay != NULL )
+			{
+				tco_num = m_patternToPlay->getTrack()->
+						getTCONum( m_patternToPlay );
+				track_list.push_back(
+						m_patternToPlay->getTrack() );
+			}
+			break;
+
+		default:
+			return;
+
+	}
+	
 	if( track_list.empty() == true )
 	{
 		return;
@@ -343,48 +387,6 @@ void song::processNextBuffer()
 		m_elapsedMilliSeconds += (((played_frames/frames_per_tick)*60*1000/48)/getTempo());
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
-	}
-}
-
-void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
-  switch( m_playMode )
-	{
-		case Mode_PlaySong:
-			track_list = tracks();
-			// at song-start we have to reset the LFOs
-			if( m_playPos[Mode_PlaySong] == 0 )
-			{
-				EnvelopeAndLfoParameters::instances()->reset();
-			}
-			break;
-
-		case Mode_PlayTrack:
-			track_list.push_back( m_trackToPlay );
-			break;
-
-		case Mode_PlayBB:
-			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
-			{
-				tco_num = engine::getBBTrackContainer()->
-								currentBB();
-				track_list.push_back( bbTrack::findBBTrack(
-								tco_num ) );
-			}
-			break;
-
-		case Mode_PlayPattern:
-			if( m_patternToPlay != NULL )
-			{
-				tco_num = m_patternToPlay->getTrack()->
-						getTCONum( m_patternToPlay );
-				track_list.push_back(
-						m_patternToPlay->getTrack() );
-			}
-			break;
-
-		default:
-			return;
-
 	}
 }
 
