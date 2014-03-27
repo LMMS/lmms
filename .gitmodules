@@ -1,0 +1,3 @@
+[submodule "plugins/zynaddsubfx/zynaddsubfx"]
+	path = plugins/zynaddsubfx/zynaddsubfx
+	url = git://github.com/LMMS/zynaddsubfx.git
