@@ -34,8 +34,8 @@ template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {
 public:
-	KickerOsc( const FX & fx, const float start, const float end, const float slope, const float length ) :
-		m_phase( 0.25f ),
+	KickerOsc( const FX & fx, const float start, const float end, const float offset, const float slope, const float length ) :
+		m_phase( offset ),
 		m_startFreq( start ),
 		m_endFreq( end ),
 		m_slope( slope ),
@@ -65,7 +65,10 @@ public:
 			buf[frame][1] = s;
 			m_FX.nextSample( buf[frame][0], buf[frame][1] );
 			m_phase += m_freq / sampleRate;
-			m_freq = m_endFreq + ( ( m_startFreq - m_endFreq ) * ( 1 - powf( m_counter / m_length, m_slope ) ) );
+
+			const double change = ( m_counter < m_length ) ? ( ( m_startFreq - m_endFreq ) * ( 1 - powf( m_counter / m_length, m_slope ) ) ) : 0;
+			//~ qDebug( "%f (%f) [%lu, %f]", change, powf( m_counter / m_length, m_slope ), m_counter, m_length );
+			m_freq = m_endFreq + change;
 			++m_counter;
 		}
 	}
@@ -79,8 +82,8 @@ private:
 	const float m_length;
 	FX m_FX;
 
-	fpp_t m_counter;
-	float m_freq;
+	unsigned long m_counter;
+	double m_freq;
 
 };
 
