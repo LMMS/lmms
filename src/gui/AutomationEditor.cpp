@@ -39,7 +39,6 @@
 #include <QtGui/QWheelEvent>
 #include <QToolTip>
 
-#include <QtCore/QDebug>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
