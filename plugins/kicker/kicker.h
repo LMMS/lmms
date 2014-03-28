@@ -1,5 +1,6 @@
 /*
- * kicker.h - bassdrum-synthesizer
+ * kicker.h - drum synthesizer
+ * Copyright (c) 2014 Hannu Haahti <grejppi/at/gmail.com>
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

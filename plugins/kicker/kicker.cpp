@@ -1,7 +1,8 @@
 /*
- * kicker.cpp - bassdrum-synthesizer
+ * kicker.cpp - drum synthesizer
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2014 Hannu Haahti <grejppi/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 	STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Versatile kick- & bassdrum-synthesizer" ),
+				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,
@@ -126,7 +127,6 @@ QString kickerInstrument::nodeName() const
 
 
 
-//typedef DspEffectLibrary::foldbackDistortion<> DistFX;
 typedef DspEffectLibrary::Distortion DistFX;
 typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
 
@@ -156,25 +156,10 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 		_n->noteOff();
 	}
 
-	//const float freq = instrumentTrack()->frequency( _n ) / 2;
-	//~ const float fdiff = m_endFreqModel.value() - m_startFreqModel.value();
-/*	const fpp_t frames = _n->isReleased() ?
-		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
-							_n->releaseFramesDone(),
-			engine::mixer()->framesPerAudioBuffer() ), 0 )
-		:
-		engine::mixer()->framesPerAudioBuffer();*/
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	//~ const float slopePoint = powf( fdiff / decfr, 1 + m_slopeModel.value() * 6 );
-
-	//~ const float f1 = m_startFreqModel.value() + tfp * ((fdiff/decfr) * slopePoint);
-	//~ const float f2 = m_startFreqModel.value() + (frames+tfp-1) * ((fdiff/decfr) * slopePoint);
-
-
 
 	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
-	so->update( _working_buffer, frames,
-				engine::mixer()->processingSampleRate() );
+	so->update( _working_buffer, frames, engine::mixer()->processingSampleRate() );
 
 	if( _n->isReleased() )
 	{

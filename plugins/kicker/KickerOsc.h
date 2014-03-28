@@ -59,7 +59,6 @@ public:
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			const double gain = ( 1 - fastPow( ( m_counter < m_length ) ? m_counter / m_length : 1, m_env ) );
-			//~ qDebug( "%f", gain );
 			const sample_t s = ( Oscillator::sinSample( m_phase ) * ( 1 - m_noise ) ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
 			buf[frame][0] = s * gain;
 			buf[frame][1] = s * gain;
@@ -67,7 +66,6 @@ public:
 			m_phase += m_freq / sampleRate;
 
 			const double change = ( m_counter < m_length ) ? ( ( m_startFreq - m_endFreq ) * ( 1 - fastPow( m_counter / m_length, m_slope ) ) ) : 0;
-			//~ qDebug( "%f (%f) [%lu, %f]", change, powf( m_counter / m_length, m_slope ), m_counter, m_length );
 			m_freq = m_endFreq + change;
 			++m_counter;
 		}
