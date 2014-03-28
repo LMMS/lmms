@@ -60,11 +60,12 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &kicker_plugin_descriptor ),
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
-	m_decayModel( 120.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Decay" ) ),
+	m_decayModel( 440.0f, 5.0f, 2000.0f, 1.0f, this, tr( "Decay" ) ),
 	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Distortion" ) ),
 	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
-	m_clickModel( 1.0f, 0.0f, 1.0f, 0.1f, this, tr( "Click" ) ),
-	m_slopeModel( 0.5f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) )
+	m_envModel( 0.163f, 0.01f, 1.0f, 0.001f, this, tr( "Env" ) ),
+	m_clickModel( 0.4f, 0.0f, 1.0f, 0.05f, this, tr( "Click" ) ),
+	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) )
 {
 }
 
@@ -86,6 +87,7 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 	m_decayModel.saveSettings( _doc, _this, "decay" );
 	m_distModel.saveSettings( _doc, _this, "dist" );
 	m_gainModel.saveSettings( _doc, _this, "gain" );
+	m_envModel.saveSettings( _doc, _this, "env" );
 	m_clickModel.saveSettings( _doc, _this, "click" );
 	m_slopeModel.saveSettings( _doc, _this, "slope" );
 }
@@ -100,7 +102,8 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_decayModel.loadSettings( _this, "decay" );
 	m_distModel.loadSettings( _this, "dist" );
 	m_gainModel.loadSettings( _this, "gain" );
-	m_clickModel.loadSettings( _this, "gain" );
+	m_envModel.loadSettings( _this, "env" );
+	m_clickModel.loadSettings( _this, "click" );
 	m_slopeModel.loadSettings( _this, "slope" );
 }
 
@@ -135,6 +138,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 					m_endFreqModel.value(),
 					m_clickModel.value() * 0.25f,
 					m_slopeModel.value(),
+					m_envModel.value(),
 					decfr );
 	}
 	else if( tfp > decfr && !_n->isReleased() )
@@ -233,13 +237,17 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 203, 124 );
 
+	m_envKnob = new kickerKnob( this );
+	m_envKnob->setHintText( tr( "Env:" ) + " ", "" );
+	m_envKnob->move( 203, 204 );
+
 	m_clickKnob = new kickerKnob( this );
 	m_clickKnob->setHintText( tr( "Click:" ) + " ", "" );
-	m_clickKnob->move( 203, 164 );
+	m_clickKnob->move( 12, 204 );
 
 	m_slopeKnob = new kickerKnob( this );
 	m_slopeKnob->setHintText( tr( "Slope:" ) + " ", "" );
-	m_slopeKnob->move( 203, 204 );
+	m_slopeKnob->move( 59, 204 );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -266,6 +274,7 @@ void kickerInstrumentView::modelChanged()
 	m_decayKnob->setModel( &k->m_decayModel );
 	m_distKnob->setModel( &k->m_distModel );
 	m_gainKnob->setModel( &k->m_gainModel );
+	m_envKnob->setModel( &k->m_envModel );
 	m_clickKnob->setModel( &k->m_clickModel );
 	m_slopeKnob->setModel( &k->m_slopeModel );
 }
