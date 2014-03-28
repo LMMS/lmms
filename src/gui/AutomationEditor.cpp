@@ -40,7 +40,6 @@
 #include <QToolTip>
 
 
-
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -63,7 +62,7 @@
 #include "bb_track_container.h"
 #include "PianoRoll.h"
 #include "debug.h"
-
+#include "MeterModel.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;
@@ -104,7 +103,8 @@ AutomationEditor::AutomationEditor() :
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
 				Qt::QueuedConnection );
-
+	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+						this, SLOT( update() ) );
 	// init pixmaps
 	if( s_toolDraw == NULL )
 	{
@@ -820,7 +820,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 			x -= VALUES_WIDTH;
 
 			// get tick in which the user clicked
-			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
+			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
 			// get time map of current pattern
@@ -840,7 +840,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
-		( pos_ticks<= it.key() + DefaultTicksPerTact *4 / m_ppt ) &&
+		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
 					level <= it.value() )
 				{
 					break;
@@ -884,7 +884,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				int aligned_x = (int)( (float)( (
 						it.key() -
 						m_currentPosition ) *
-						m_ppt ) / DefaultTicksPerTact );
+						m_ppt ) / MidiTime::ticksPerTact() );
 				m_moveXOffset = x - aligned_x - 1;
 				// set move-cursor
 				QCursor c( Qt::SizeAllCursor );
@@ -993,7 +993,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			x -= m_moveXOffset;
 		}
 
-		int pos_ticks = x * DefaultTicksPerTact / m_ppt +
+		int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
 		{
@@ -1117,7 +1117,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 
 			// get tick in which the cursor is posated
-			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
+			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
 			m_selectedTick = pos_ticks - m_selectStartTick;
@@ -1138,7 +1138,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			// move selection + selected values
 
 			// do horizontal move-stuff
-			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
+			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 			int ticks_diff = pos_ticks -
 							m_moveStartTick;
@@ -1163,8 +1163,8 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 			m_selectStartTick += ticks_diff;
 
-			int tact_diff = ticks_diff / DefaultTicksPerTact;
-			ticks_diff = ticks_diff % DefaultTicksPerTact;
+			int tact_diff = ticks_diff / MidiTime::ticksPerTact();
+			ticks_diff = ticks_diff % MidiTime::ticksPerTact();
 
 
 			// do vertical move-stuff
@@ -1214,19 +1214,19 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				{
 					int value_tact =
 						( it.key() /
-							DefaultTicksPerTact )
+							MidiTime::ticksPerTact() )
 								+ tact_diff;
 					int value_ticks =
 						( it.key() %
-							DefaultTicksPerTact )
+							MidiTime::ticksPerTact() )
 								+ ticks_diff;
 					// ensure value_ticks range
-					if( value_ticks / DefaultTicksPerTact )
+					if( value_ticks / MidiTime::ticksPerTact() )
 					{
 						value_tact += value_ticks
-							/ DefaultTicksPerTact;
+							/ MidiTime::ticksPerTact();
 						value_ticks %=
-							DefaultTicksPerTact;
+							MidiTime::ticksPerTact();
 					}
 					m_pattern->removeValue( it.key() );
 					new_value_pos = MidiTime( value_tact,
@@ -1277,7 +1277,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 
 			// get tick in which the cursor is posated
-			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
+			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
 			m_selectedTick = pos_ticks -
@@ -1443,43 +1443,46 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 								grid_height  );
 
 	// draw vertical raster
-	int tact_16th = m_currentPosition / ( DefaultTicksPerTact / 16 );
-	const int offset = ( m_currentPosition % (DefaultTicksPerTact/16) ) *
-					m_ppt / DEFAULT_STEPS_PER_TACT / 8;
-
 	if( m_pattern )
 	{
+		int tick, x;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel )
 								* m_y_delta );
-
-		for( int x = VALUES_WIDTH - offset; x < width();
-			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
-		{
-			if( x >= VALUES_WIDTH )
-			{
-				// every tact-start needs to be a bright line
-				if( tact_16th % 16 == 0 )
-				{
-	 				p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
-				}
-				// normal line
-				else if( tact_16th % 4 == 0 )
-				{
-					p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
-				}
-				// weak line
-				else
-				{
-					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
-				}
-				p.drawLine( x, grid_bottom, x, x_line_end );
-			}
+		// 3 independent loops, because quantization might not divide evenly into
+		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
+		// First quantization grid...
+		for( tick = m_currentPosition - m_currentPosition % quantization(),
+			     x = xCoordOfTick( tick );
+		     x<=width(); 
+		     tick += quantization(), x = xCoordOfTick( tick ) ) 
+		{					
+			p.setPen( QColor( 0x2F, 0x2F, 0x2F ) );
+			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
-
-		// TODO: move this horizontal line drawing code into the same loop as 
-		// the value ticks?
+		// Then beat grid 
+		int ticksPerBeat = DefaultTicksPerTact / 
+			engine::getSong()->getTimeSigModel().getDenominator();
+		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
+			     x = xCoordOfTick( tick );
+		     x<=width(); 
+		     tick += ticksPerBeat, x = xCoordOfTick( tick ) ) 
+		{					
+			p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
+			p.drawLine( x, grid_bottom, x, x_line_end );
+		}
+		// and finally bars
+		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
+			     x = xCoordOfTick( tick );
+		     x<=width(); 
+		     tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) ) 
+		{
+			p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
+			p.drawLine( x, grid_bottom, x, x_line_end );
+		}
+		
+		/// \todo move this horizontal line drawing code into the same loop as the value ticks?
 		if( m_y_auto )
 		{
 			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
@@ -1626,8 +1629,8 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 
 	// now draw selection-frame
 	int x = ( sel_pos_start - m_currentPosition ) * m_ppt /
-							DefaultTicksPerTact;
-	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / DefaultTicksPerTact;
+							MidiTime::ticksPerTact();
+	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / MidiTime::ticksPerTact();
 	int y, h;
 	if( m_y_auto )
 	{
@@ -1681,7 +1684,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 int AutomationEditor::xCoordOfTick( int _tick )
 {
 	return VALUES_WIDTH + ( ( _tick - m_currentPosition )
-						* m_ppt / DefaultTicksPerTact );
+						* m_ppt / MidiTime::ticksPerTact() );
 }
 
 
@@ -2126,7 +2129,7 @@ void AutomationEditor::getSelectedValues( timeMap & _selected_values )
 									++it )
 	{
 		//TODO: Add constant
-		tick_t len_ticks = DefaultTicksPerTact / 16;
+		tick_t len_ticks = MidiTime::ticksPerTact() / 16;
 
 		float level = it.value();
 		tick_t pos_ticks = it.key();
@@ -2260,17 +2263,17 @@ void AutomationEditor::updatePosition( const MidiTime & _t )
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - VALUES_WIDTH;
-		if( _t > m_currentPosition + w * DefaultTicksPerTact / m_ppt )
+		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() / m_ppt )
 		{
 			m_leftRightScroll->setValue( _t.getTact() *
-							DefaultTicksPerTact );
+							MidiTime::ticksPerTact() );
 		}
 		else if( _t < m_currentPosition )
 		{
-			MidiTime t = qMax( _t - w * DefaultTicksPerTact *
-					DefaultTicksPerTact / m_ppt, 0 );
+			MidiTime t = qMax( _t - w * MidiTime::ticksPerTact() *
+					MidiTime::ticksPerTact() / m_ppt, 0 );
 			m_leftRightScroll->setValue( t.getTact() *
-							DefaultTicksPerTact );
+							MidiTime::ticksPerTact() );
 		}
 		m_scrollBack = FALSE;
 	}
