@@ -131,9 +131,9 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 		((handleState *)_n->m_pluginData)->setFrameIndex( m_nextPlayStartPoint );
 
 // debug code
-		qDebug( "frames %d", m_sampleBuffer.frames() );
+/*		qDebug( "frames %d", m_sampleBuffer.frames() );
 		qDebug( "startframe %d", m_sampleBuffer.startFrame() );
-		qDebug( "nextPlayStartPoint %d", m_nextPlayStartPoint );
+		qDebug( "nextPlayStartPoint %d", m_nextPlayStartPoint );*/
 	}
 
 	if( ! _n->isFinished() )

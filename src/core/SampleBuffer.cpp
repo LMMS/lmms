@@ -628,7 +628,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
 						m_endFrame - m_startFrame ) /
 								freq_factor );
-	qDebug( "total pitched frames %d", total_frames_for_current_pitch );
+
 	if( total_frames_for_current_pitch == 0 )
 	{
 		return false;
@@ -664,7 +664,6 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 			return false;
 		}
 	}
-	qDebug( "frames for loop %d", frames_for_loop );
 
 	sampleFrame * tmp = NULL;
 
