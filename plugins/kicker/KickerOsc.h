@@ -60,7 +60,7 @@ public:
 		{
 			const double gain = ( 1 - fastPow( ( m_counter < m_length ) ? m_counter / m_length : 1, m_env ) );
 			//~ qDebug( "%f", gain );
-			const sample_t s = Oscillator::sinSample( m_phase ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
+			const sample_t s = ( Oscillator::sinSample( m_phase ) * ( 1 - m_noise ) ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
 			buf[frame][0] = s * gain;
 			buf[frame][1] = s * gain;
 			m_FX.nextSample( buf[frame][0], buf[frame][1] );
