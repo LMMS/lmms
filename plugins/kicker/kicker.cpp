@@ -31,7 +31,7 @@
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "NotePlayHandle.h"
-#include "SweepOscillator.h"
+#include "KickerOsc.h"
 
 #include "embed.cpp"
 
@@ -62,7 +62,8 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 120.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Decay" ) ),
 	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Distortion" ) ),
-	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) )
+	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
+	m_slopeModel( 0.5f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) )
 {
 }
 
@@ -84,6 +85,7 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 	m_decayModel.saveSettings( _doc, _this, "decay" );
 	m_distModel.saveSettings( _doc, _this, "dist" );
 	m_gainModel.saveSettings( _doc, _this, "gain" );
+	m_slopeModel.saveSettings( _doc, _this, "slope" );
 }
 
 
@@ -96,6 +98,7 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_decayModel.loadSettings( _this, "decay" );
 	m_distModel.loadSettings( _this, "dist" );
 	m_gainModel.loadSettings( _this, "gain" );
+	m_slopeModel.loadSettings( _this, "slope" );
 }
 
 
@@ -110,7 +113,7 @@ QString kickerInstrument::nodeName() const
 
 //typedef DspEffectLibrary::foldbackDistortion<> DistFX;
 typedef DspEffectLibrary::Distortion DistFX;
-typedef SweepOscillator<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
+typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
 
 
 void kickerInstrument::playNote( NotePlayHandle * _n,
@@ -124,7 +127,11 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 	{
 		_n->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),
-							m_gainModel.value() ) );
+							m_gainModel.value() ),
+					m_startFreqModel.value(),
+					m_endFreqModel.value(),
+					m_slopeModel.value(),
+					decfr );
 	}
 	else if( tfp > decfr && !_n->isReleased() )
 	{
@@ -132,7 +139,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	//const float freq = instrumentTrack()->frequency( _n ) / 2;
-	const float fdiff = m_endFreqModel.value() - m_startFreqModel.value();
+	//~ const float fdiff = m_endFreqModel.value() - m_startFreqModel.value();
 /*	const fpp_t frames = _n->isReleased() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
 							_n->releaseFramesDone(),
@@ -140,12 +147,15 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 		:
 		engine::mixer()->framesPerAudioBuffer();*/
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const float f1 = m_startFreqModel.value() + tfp * fdiff / decfr;
-	const float f2 = m_startFreqModel.value() + (frames+tfp-1)*fdiff/decfr;
+	//~ const float slopePoint = powf( fdiff / decfr, 1 + m_slopeModel.value() * 6 );
+
+	//~ const float f1 = m_startFreqModel.value() + tfp * ((fdiff/decfr) * slopePoint);
+	//~ const float f2 = m_startFreqModel.value() + (frames+tfp-1) * ((fdiff/decfr) * slopePoint);
+
 
 
 	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
-	so->update( _working_buffer, frames, f1, f2,
+	so->update( _working_buffer, frames,
 				engine::mixer()->processingSampleRate() );
 
 	if( _n->isReleased() )
@@ -219,6 +229,10 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 203, 124 );
 
+	m_slopeKnob = new kickerKnob( this );
+	m_slopeKnob->setHintText( tr( "Slope:" ) + " ", "" );
+	m_slopeKnob->move( 203, 164 );
+
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
@@ -244,6 +258,7 @@ void kickerInstrumentView::modelChanged()
 	m_decayKnob->setModel( &k->m_decayModel );
 	m_distKnob->setModel( &k->m_distModel );
 	m_gainKnob->setModel( &k->m_gainModel );
+	m_slopeKnob->setModel( &k->m_slopeModel );
 }
 
 

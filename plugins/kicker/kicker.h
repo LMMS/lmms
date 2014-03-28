@@ -66,6 +66,7 @@ private:
 	FloatModel m_decayModel;
 	FloatModel m_distModel;
 	FloatModel m_gainModel;
+	FloatModel m_slopeModel;
 
 	friend class kickerInstrumentView;
 
@@ -88,6 +89,7 @@ private:
 	knob * m_decayKnob;
 	knob * m_distKnob;
 	knob * m_gainKnob;
+	knob * m_slopeKnob;
 
 } ;
 
