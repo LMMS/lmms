@@ -3,7 +3,7 @@
  *                          (instrument-plugin for using audio-files)
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _AUDIO_FILE_PROCESSOR_H
-#define _AUDIO_FILE_PROCESSOR_H
+#ifndef AUDIO_FILE_PROCESSOR_H
+#define AUDIO_FILE_PROCESSOR_H
 
 #include <QtGui/QPixmap>
 
@@ -44,7 +44,7 @@ public:
 	audioFileProcessor( InstrumentTrack * _instrument_track );
 	virtual ~audioFileProcessor();
 
-	virtual void playNote( NotePlayHandle * _n, 
+	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
@@ -78,17 +78,18 @@ private slots:
 
 
 signals:
-	void isPlaying( f_cnt_t _frames_played );
+	void isPlaying( f_cnt_t _current_frame );
 
 
 private:
 	typedef SampleBuffer::handleState handleState;
 
 	SampleBuffer m_sampleBuffer;
-	
+
 	FloatModel m_ampModel;
 	FloatModel m_startPointModel;
 	FloatModel m_endPointModel;
+	FloatModel m_loopPointModel;
 	BoolModel m_reverseModel;
 	BoolModel m_loopModel;
 	BoolModel m_stutterModel;
@@ -132,6 +133,8 @@ private:
 	knob * m_ampKnob;
 	knob * m_startKnob;
 	knob * m_endKnob;
+	knob * m_loopKnob;
+
 	pixmapButton * m_openAudioFileButton;
 	pixmapButton * m_reverseButton;
 	pixmapButton * m_loopButton;
@@ -159,6 +162,7 @@ public:
 	{
 		start,
 		end,
+		loop
 	} ;
 
 	class knob : public ::knob
@@ -211,7 +215,7 @@ public slots:
 		QWidget::update();
 	}
 
-	void isPlaying( f_cnt_t _frames_played );
+	void isPlaying( f_cnt_t _current_frame );
 
 
 private:
@@ -222,6 +226,7 @@ private:
 		wave,
 		sample_start,
 		sample_end,
+		sample_loop
 	} ;
 
 	SampleBuffer& m_sampleBuffer;
@@ -232,8 +237,10 @@ private:
 	f_cnt_t m_last_to;
 	knob * m_startKnob;
 	knob * m_endKnob;
+	knob * m_loopKnob;
 	f_cnt_t m_startFrameX;
 	f_cnt_t m_endFrameX;
+	f_cnt_t m_loopFrameX;
 	bool m_isDragging;
 	QPoint m_draggingLastPoint;
 	draggingType m_draggingType;
@@ -243,7 +250,7 @@ private:
 
 public:
 	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
-	void setKnobs( knob * _start, knob * _end );
+	void setKnobs( knob * _start, knob * _end, knob * _loop );
 
 
 private:

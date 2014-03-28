@@ -628,6 +628,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
 						m_endFrame - m_startFrame ) /
 								freq_factor );
+
 	if( total_frames_for_current_pitch == 0 )
 	{
 		return false;
@@ -1243,7 +1244,7 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 void SampleBuffer::setStartFrame( const f_cnt_t _s )
 {
 	m_varLock.lock();
-	m_loopStartFrame = m_startFrame = _s;
+	m_startFrame = _s;
 	m_varLock.unlock();
 }
 
@@ -1253,7 +1254,7 @@ void SampleBuffer::setStartFrame( const f_cnt_t _s )
 void SampleBuffer::setEndFrame( const f_cnt_t _e )
 {
 	m_varLock.lock();
-	m_loopEndFrame = m_endFrame = _e;
+	m_endFrame = _e;
 	m_varLock.unlock();
 }
 

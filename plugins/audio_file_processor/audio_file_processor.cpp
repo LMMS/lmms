@@ -72,10 +72,11 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
 	m_sampleBuffer(),
 	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
-	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
+	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample" ) ),
 	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
+	m_loopPointModel( 0, 0, 1, 0.0000001f, this, tr( "Loopback point" ) ),
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
-	m_loopModel( false, this, tr( "Loop") ),
+	m_loopModel( false, this, tr( "Loop enabled" ) ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
 	m_nextPlayStartPoint( 0 )
 {
@@ -87,8 +88,11 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
+	connect( &m_loopPointModel, SIGNAL( dataChanged() ),
+				this, SLOT( loopPointChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 	    		this, SLOT( stutterModelChanged() ) );
+	loopPointChanged();
 }
 
 
@@ -124,27 +128,31 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 			m_nextPlayStartPoint = m_sampleBuffer.startFrame();
 		}
 		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
-		((handleState *)_n->m_pluginData)->setFrameIndex(m_nextPlayStartPoint);
+		((handleState *)_n->m_pluginData)->setFrameIndex( m_nextPlayStartPoint );
+
+// debug code
+/*		qDebug( "frames %d", m_sampleBuffer.frames() );
+		qDebug( "startframe %d", m_sampleBuffer.startFrame() );
+		qDebug( "nextPlayStartPoint %d", m_nextPlayStartPoint );*/
 	}
 
-	if( m_sampleBuffer.play( _working_buffer,
-					(handleState *)_n->m_pluginData,
-					frames, _n->frequency(),
-						m_loopModel.value() ) == TRUE )
+	if( ! _n->isFinished() )
 	{
-		applyRelease( _working_buffer, _n );
-		instrumentTrack()->processAudioBuffer( _working_buffer,
-								frames,_n );
-		int framesPosition;
-		if( m_stutterModel.value() == true )
+		if( m_sampleBuffer.play( _working_buffer,
+						(handleState *)_n->m_pluginData,
+						frames, _n->frequency(),
+						m_loopModel.value() ) )
 		{
-			framesPosition = m_nextPlayStartPoint;
+			applyRelease( _working_buffer, _n );
+			instrumentTrack()->processAudioBuffer( _working_buffer,
+									frames,_n );
+
+			emit isPlaying( ((handleState *)_n->m_pluginData)->frameIndex() );
 		}
 		else
 		{
-			framesPosition = _n->totalFramesPlayed() * _n->frequency() / m_sampleBuffer.frequency();
+			emit isPlaying( 0 );
 		}
-		emit isPlaying( framesPosition );
 	}
 	else
 	{
@@ -182,6 +190,7 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	m_ampModel.saveSettings( _doc, _this, "amp" );
 	m_startPointModel.saveSettings( _doc, _this, "sframe" );
 	m_endPointModel.saveSettings( _doc, _this, "eframe" );
+	m_loopPointModel.saveSettings( _doc, _this, "lframe" );
 	m_stutterModel.saveSettings( _doc, _this, "stutter" );
 
 }
@@ -199,11 +208,23 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	{
 		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
 	}
+
 	m_reverseModel.loadSettings( _this, "reversed" );
 	m_loopModel.loadSettings( _this, "looped" );
 	m_ampModel.loadSettings( _this, "amp" );
 	m_startPointModel.loadSettings( _this, "sframe" );
 	m_endPointModel.loadSettings( _this, "eframe" );
+	
+	// compat code for not having a separate loopback point
+	if( _this.hasAttribute( "lframe" ) )
+	{
+		m_loopPointModel.loadSettings( _this, "lframe" );
+	}
+	else
+	{
+		m_loopPointModel.setValue( m_startPointModel.value() );
+	}
+
 	m_stutterModel.loadSettings( _this, "stutter" );
 
 	loopPointChanged();
@@ -235,6 +256,7 @@ int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
+
 
 
 
@@ -292,7 +314,7 @@ void audioFileProcessor::stutterModelChanged()
 
 void audioFileProcessor::loopPointChanged( void )
 {
-	//check if start is over end and swap values if so
+	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
 	{
 		float tmp = m_endPointModel.value();
@@ -300,7 +322,7 @@ void audioFileProcessor::loopPointChanged( void )
 		m_startPointModel.setValue( tmp );
 	}
 	
-	//check if start & end overlap and nudge end up if so
+	// check if start & end overlap and nudge end up if so
 	if( m_startPointModel.value() == m_endPointModel.value() )
 	{
 		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
@@ -311,8 +333,17 @@ void audioFileProcessor::loopPointChanged( void )
 	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
 	m_nextPlayStartPoint = f_start;
+
+	// check that loop point is between start-end points
+	if( m_loopPointModel.value() < m_startPointModel.value() )
+		m_loopPointModel.setValue( m_startPointModel.value() );
+	if( m_loopPointModel.value() > m_endPointModel.value() )
+		m_loopPointModel.setValue( m_endPointModel.value() );
+
 	m_sampleBuffer.setStartFrame( f_start );
 	m_sampleBuffer.setEndFrame( f_end );
+	m_sampleBuffer.setLoopStartFrame( static_cast<f_cnt_t>( m_loopPointModel.value() * ( m_sampleBuffer.frames()-1 ) ) );
+	m_sampleBuffer.setLoopEndFrame( f_end );
 	emit dataChanged();
 }
 
@@ -367,18 +398,14 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 200, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_on" ) );
+							"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_off" ) );
-	toolTip::add( m_loopButton,
-				tr( "Loop sample at start- and end-point" ) );
+							"loop_off" ) );
+	toolTip::add( m_loopButton, tr( "Enable loop" ) );
 	m_loopButton->setWhatsThis(
-		tr( "Here you can set, whether looping-mode is enabled. If "
-			"enabled, AudioFileProcessor loops between start and "
-			"end-points of a sample until the whole note is played. "
-			"This is useful for things like string and choir "
-			"samples." ) );
-
+		tr( "This button enables looping. "
+			"The sample loops between the end point and the loop point." ) );
+	
 	m_stutterButton = new pixmapButton( this );
 	m_stutterButton->setCheckable( true );
 	m_stutterButton->move( 226, 124 );
@@ -412,26 +439,29 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
 	m_startKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
-			"AudioFileProcessor should begin playing your sample. "
-			"If you enable looping-mode, this is the point to "
-			"which AudioFileProcessor returns if a note is longer "
-			"than the sample between the start and end-points." ) );
+			"AudioFileProcessor should begin playing your sample. " ) );
 
 	m_endKnob = new AudioFileProcessorWaveView::knob( this );
 	m_endKnob->move( 119, 108 );
 	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
 	m_endKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
-			"AudioFileProcessor should stop playing your sample. "
-			"If you enable looping-mode, this is the point where "
-			"AudioFileProcessor returns if a note is longer than "
-			"the sample between the start and end-points." ) );
+			"AudioFileProcessor should stop playing your sample. " ) );
+
+	m_loopKnob = new AudioFileProcessorWaveView::knob( this );
+	m_loopKnob->move( 68, 58 );
+	m_loopKnob->setHintText( tr( "Loopback point:" )+" ", "" );
+	m_loopKnob->setWhatsThis(
+		tr( "With this knob you can set the point where "
+			"the loop starts. " ) );
+
 
 	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
 	m_waveView->move( 2, 172 );
 	m_waveView->setKnobs(
 		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
-		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_endKnob )
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_endKnob ),
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_loopKnob )
 	);
 
 	connect( castModel<audioFileProcessor>(), SIGNAL( isPlaying( f_cnt_t ) ),
@@ -572,6 +602,7 @@ void AudioFileProcessorView::modelChanged( void )
 	m_ampKnob->setModel( &a->m_ampModel );
 	m_startKnob->setModel( &a->m_startPointModel );
 	m_endKnob->setModel( &a->m_endPointModel );
+	m_loopKnob->setModel( &a->m_loopPointModel );
 	m_reverseButton->setModel( &a->m_reverseModel );
 	m_loopButton->setModel( &a->m_loopModel );
 	m_stutterButton->setModel( &a->m_stutterModel );
@@ -612,17 +643,9 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 
 
 
-void AudioFileProcessorWaveView::isPlaying( f_cnt_t _frames_played )
+void AudioFileProcessorWaveView::isPlaying( f_cnt_t _current_frame )
 {
-	const f_cnt_t nb_frames = m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame();
-	if( nb_frames < 1 )
-	{
-		m_framesPlayed = 0;
-	}
-	else
-	{
-		m_framesPlayed = _frames_played % nb_frames;
-	}
+	m_framesPlayed = _current_frame;
 	update();
 }
 
@@ -652,14 +675,18 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 {
 	m_isDragging = true;
 	m_draggingLastPoint = _me->pos();
-
-	if( isCloseTo( _me->x(), m_startFrameX ) )
+	
+	const int start_dist =		qAbs( m_startFrameX - _me->x() );
+	const int end_dist = 		qAbs( m_endFrameX - _me->x() );
+	const int loop_dist =		qAbs( m_loopFrameX - _me->x() );
+	
+	draggingType dt = sample_loop; int md = loop_dist;
+	if( start_dist < loop_dist ) { dt = sample_start; md = start_dist; }
+	if( end_dist < start_dist ) { dt = sample_end; md = end_dist; }
+		
+	if( md < 3 )
 	{
-		m_draggingType = sample_start;
-	}
-	else if( isCloseTo( _me->x(), m_endFrameX ) )
-	{
-		m_draggingType = sample_end;
+		m_draggingType = dt;
 	}
 	else
 	{
@@ -691,7 +718,8 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 			QApplication::overrideCursor()->shape() == Qt::SizeHorCursor;
 
 		if( isCloseTo( _me->x(), m_startFrameX ) ||
-			isCloseTo( _me->x(), m_endFrameX ) )
+			isCloseTo( _me->x(), m_endFrameX ) ||
+			isCloseTo( _me->x(), m_loopFrameX ) )
 		{
 			if( ! is_size_cursor )
 			{
@@ -714,6 +742,10 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 		case sample_end:
 			slideSamplePointByPx( end, step );
 			break;
+		case sample_loop:
+			slideSamplePointByPx( loop, step );
+			break;
+		case wave:
 		default:
 			if( qAbs( _me->y() - m_draggingLastPoint.y() )
 				< 2 * qAbs( _me->x() - m_draggingLastPoint.x() ) )
@@ -748,12 +780,16 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 
 	p.drawPixmap( s_padding, s_padding, m_graph );
 
-	p.setPen( QColor( 0xFF, 0xFF, 0xFF ) );
+	p.setPen( QColor( 0xFF, 0xFF, 0xFF ) );  //TODO: put into a qproperty
 	const QRect graph_rect( s_padding, s_padding, width() - 2 * s_padding, height() - 2 * s_padding );
 	const f_cnt_t frames = m_to - m_from;
 	m_startFrameX = graph_rect.x() + ( m_sampleBuffer.startFrame() - m_from ) *
 						double( graph_rect.width() ) / frames;
 	m_endFrameX = graph_rect.x() + ( m_sampleBuffer.endFrame() - m_from ) *
+						double( graph_rect.width() ) / frames;
+	m_loopFrameX = graph_rect.x() + ( m_sampleBuffer.loopStartFrame() - m_from ) *
+						double( graph_rect.width() ) / frames;
+	const int played_width_px = ( m_framesPlayed - m_from ) *
 						double( graph_rect.width() ) / frames;
 
 	p.drawLine( m_startFrameX, graph_rect.y(),
@@ -761,6 +797,11 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 					graph_rect.height() + graph_rect.y() );
 	p.drawLine( m_endFrameX, graph_rect.y(),
 					m_endFrameX,
+					graph_rect.height() + graph_rect.y() );
+					
+	p.setPen( QColor( 0x7F, 0xFF, 0xFF ) ); //TODO: put into a qproperty
+	p.drawLine( m_loopFrameX, graph_rect.y(),
+					m_loopFrameX,
 					graph_rect.height() + graph_rect.y() );
 
 	if( m_endFrameX - m_startFrameX > 2 )
@@ -770,31 +811,36 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 			graph_rect.y(),
 			m_endFrameX - m_startFrameX - 1,
 			graph_rect.height() + graph_rect.y(),
-			QColor( 95, 195, 255, 70 )
+			QColor( 95, 175, 255, 50 ) //TODO: put into a qproperty
+		);
+		if( m_endFrameX - m_loopFrameX > 2 )
+			p.fillRect(
+				m_loopFrameX + 1,
+				graph_rect.y(),
+				m_endFrameX - m_loopFrameX - 1,
+				graph_rect.height() + graph_rect.y(),
+				QColor( 95, 205, 255, 65 ) //TODO: put into a qproperty
 		);
 
 		if( m_framesPlayed && m_animation)
 		{
-			const int played_width_px = m_framesPlayed
-				/ double( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() )
-				* ( m_endFrameX - m_startFrameX );
-			QLinearGradient g( m_startFrameX + 1, 0, m_startFrameX + 1 + played_width_px, 0 );
-			const QColor c( 0, 120, 255, 180 );
+			QLinearGradient g( m_startFrameX, 0, played_width_px, 0 );
+			const QColor c( 0, 120, 255, 180 ); //TODO: put into a qproperty
 			g.setColorAt( 0, Qt::transparent );
 			g.setColorAt( 0.8, c );
 			g.setColorAt( 1,  c );
 			p.fillRect(
 				m_startFrameX + 1,
 				graph_rect.y(),
-				played_width_px,
+				played_width_px - ( m_startFrameX + 1 ),
 				graph_rect.height() + graph_rect.y(),
 				g
 			);
-			p.setPen( QColor( 255, 255, 255 ) );
+			p.setPen( QColor( 255, 255, 255 ) ); //TODO: put into a qproperty
 			p.drawLine(
-				m_startFrameX + 1 + played_width_px,
+				played_width_px,
 				graph_rect.y(),
-				m_startFrameX + 1 + played_width_px,
+				played_width_px,
 				graph_rect.height() + graph_rect.y()
 			);
 			m_framesPlayed = 0;
@@ -949,16 +995,19 @@ void AudioFileProcessorWaveView::slide( int _px )
 
 
 
-void AudioFileProcessorWaveView::setKnobs( knob * _start, knob * _end )
+void AudioFileProcessorWaveView::setKnobs( knob * _start, knob * _end, knob * _loop )
 {
 	m_startKnob = _start;
 	m_endKnob = _end;
+	m_loopKnob = _loop;
 
 	m_startKnob->setWaveView( this );
 	m_startKnob->setRelatedKnob( m_endKnob );
 
 	m_endKnob->setWaveView( this );
 	m_endKnob->setRelatedKnob( m_startKnob );
+	
+	m_loopKnob->setWaveView( this );
 }
 
 
@@ -977,20 +1026,33 @@ void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px 
 
 void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to )
 {
-	knob * a_knob = _point == start ? m_startKnob : m_endKnob;
-	if( ! a_knob )
+	knob * a_knob = m_startKnob;
+	switch( _point )
+	{
+		case end:
+			a_knob = m_endKnob;
+			break;
+		case loop:
+			a_knob = m_loopKnob;
+			break;
+		case start:
+			break;
+	}
+	if( a_knob == NULL )
 	{
 		return;
 	}
-
-	const double v = double( _frames ) / m_sampleBuffer.frames();
-	if( _slide_to )
-	{
-		a_knob->slideTo( v );
-	}
 	else
 	{
-		a_knob->slideBy( v );
+		const double v = static_cast<double>( _frames ) / m_sampleBuffer.frames();
+		if( _slide_to )
+		{
+			a_knob->slideTo( v );
+		}
+		else
+		{
+			a_knob->slideBy( v );
+		}
 	}
 }
 
@@ -1003,12 +1065,15 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 	{
 		return;
 	}
-	const double v = double( _frames ) / m_sampleBuffer.frames();
-	if(m_startKnob) {
+	const double v = static_cast<double>( _frames ) / m_sampleBuffer.frames();
+	if( m_startKnob ) {
 		m_startKnob->slideBy( v, false );
 	}
-	if(m_endKnob) {
+	if( m_endKnob ) {
 		m_endKnob->slideBy( v, false );
+	}
+	if( m_loopKnob ) {
+		m_loopKnob->slideBy( v, false );
 	}
 }
 
