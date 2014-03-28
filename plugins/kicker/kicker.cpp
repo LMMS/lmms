@@ -66,7 +66,9 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_envModel( 0.163f, 0.01f, 1.0f, 0.001f, this, tr( "Env" ) ),
 	m_noiseModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Noise" ) ),
 	m_clickModel( 0.4f, 0.0f, 1.0f, 0.05f, this, tr( "Click" ) ),
-	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) )
+	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) ),
+	m_startNoteModel( false, this, tr( "Start from note" ) ),
+	m_endNoteModel( false, this, tr( "End to note" ) )
 {
 }
 
@@ -92,6 +94,8 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 	m_noiseModel.saveSettings( _doc, _this, "noise" );
 	m_clickModel.saveSettings( _doc, _this, "click" );
 	m_slopeModel.saveSettings( _doc, _this, "slope" );
+	m_startNoteModel.saveSettings( _doc, _this, "startnote" );
+	m_endNoteModel.saveSettings( _doc, _this, "endnote" );
 }
 
 
@@ -108,6 +112,8 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_noiseModel.loadSettings( _this, "noise" );
 	m_clickModel.loadSettings( _this, "click" );
 	m_slopeModel.loadSettings( _this, "slope" );
+	m_startNoteModel.loadSettings( _this, "startnote" );
+	m_endNoteModel.loadSettings( _this, "endnote" );
 }
 
 
@@ -137,8 +143,8 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),
 							m_gainModel.value() ),
-					m_startFreqModel.value(),
-					m_endFreqModel.value(),
+					m_startNoteModel.value() ? _n->frequency() : m_startFreqModel.value(),
+					m_endNoteModel.value() ? _n->frequency() : m_endFreqModel.value(),
 					m_noiseModel.value() * m_noiseModel.value(),
 					m_clickModel.value() * 0.25f,
 					m_slopeModel.value(),
@@ -257,6 +263,11 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_clickKnob->setHintText( tr( "Click:" ) + " ", "" );
 	m_clickKnob->move( 200, 155 );
 
+	m_startNoteToggle = new ledCheckBox( "", this );
+	m_startNoteToggle->move( 24, 79 );
+
+	m_endNoteToggle = new ledCheckBox( "", this );
+	m_endNoteToggle->move( 69, 79 );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -287,6 +298,8 @@ void kickerInstrumentView::modelChanged()
 	m_noiseKnob->setModel( &k->m_noiseModel );
 	m_clickKnob->setModel( &k->m_clickModel );
 	m_slopeKnob->setModel( &k->m_slopeModel );
+	m_startNoteToggle->setModel( &k->m_startNoteModel );
+	m_endNoteToggle->setModel( &k->m_endNoteModel );
 }
 
 

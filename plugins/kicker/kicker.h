@@ -30,6 +30,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"
+#include "led_checkbox.h"
 
 
 class kickerInstrumentView;
@@ -46,11 +47,15 @@ public:
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( NotePlayHandle * _n );
 
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName() const;
+
+	virtual Flags flags() const
+	{
+		return IsNotBendable;
+	}
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
@@ -70,6 +75,9 @@ private:
 	FloatModel m_noiseModel;
 	FloatModel m_clickModel;
 	FloatModel m_slopeModel;
+
+	BoolModel m_startNoteModel;
+	BoolModel m_endNoteModel;
 
 	friend class kickerInstrumentView;
 
@@ -96,6 +104,9 @@ private:
 	knob * m_noiseKnob;
 	knob * m_clickKnob;
 	knob * m_slopeKnob;
+
+	ledCheckBox * m_startNoteToggle;
+	ledCheckBox * m_endNoteToggle;
 
 } ;
 
