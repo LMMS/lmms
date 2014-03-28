@@ -64,6 +64,7 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Distortion" ) ),
 	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
 	m_envModel( 0.163f, 0.01f, 1.0f, 0.001f, this, tr( "Env" ) ),
+	m_noiseModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Noise" ) ),
 	m_clickModel( 0.4f, 0.0f, 1.0f, 0.05f, this, tr( "Click" ) ),
 	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) )
 {
@@ -88,6 +89,7 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 	m_distModel.saveSettings( _doc, _this, "dist" );
 	m_gainModel.saveSettings( _doc, _this, "gain" );
 	m_envModel.saveSettings( _doc, _this, "env" );
+	m_noiseModel.saveSettings( _doc, _this, "noise" );
 	m_clickModel.saveSettings( _doc, _this, "click" );
 	m_slopeModel.saveSettings( _doc, _this, "slope" );
 }
@@ -103,6 +105,7 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_distModel.loadSettings( _this, "dist" );
 	m_gainModel.loadSettings( _this, "gain" );
 	m_envModel.loadSettings( _this, "env" );
+	m_noiseModel.loadSettings( _this, "noise" );
 	m_clickModel.loadSettings( _this, "click" );
 	m_slopeModel.loadSettings( _this, "slope" );
 }
@@ -136,6 +139,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 							m_gainModel.value() ),
 					m_startFreqModel.value(),
 					m_endFreqModel.value(),
+					m_noiseModel.value(),
 					m_clickModel.value() * 0.25f,
 					m_slopeModel.value(),
 					m_envModel.value(),
@@ -206,7 +210,7 @@ public:
 	kickerKnob( QWidget * _parent ) :
 			knob( knobStyled, _parent )
 	{
-		setFixedSize( 37, 47 );
+		setFixedSize( 35, 45 );
 	}
 };
 
@@ -219,35 +223,40 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 {
 	m_startFreqKnob = new kickerKnob( this );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
-	m_startFreqKnob->move( 12, 124 );
+	m_startFreqKnob->move( 15, 100 );
 
 	m_endFreqKnob = new kickerKnob( this );
 	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
-	m_endFreqKnob->move( 59, 124 );
-
-	m_decayKnob = new kickerKnob( this );
-	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "ms" );
-	m_decayKnob->move( 107, 124 );
-
-	m_distKnob = new kickerKnob( this );
-	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
-	m_distKnob->move( 155, 124 );
-
-	m_gainKnob = new kickerKnob( this );
-	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
-	m_gainKnob->move( 203, 124 );
-
-	m_envKnob = new kickerKnob( this );
-	m_envKnob->setHintText( tr( "Env:" ) + " ", "" );
-	m_envKnob->move( 203, 204 );
-
-	m_clickKnob = new kickerKnob( this );
-	m_clickKnob->setHintText( tr( "Click:" ) + " ", "" );
-	m_clickKnob->move( 12, 204 );
+	m_endFreqKnob->move( 60, 100 );
 
 	m_slopeKnob = new kickerKnob( this );
 	m_slopeKnob->setHintText( tr( "Slope:" ) + " ", "" );
-	m_slopeKnob->move( 59, 204 );
+	m_slopeKnob->move( 105, 100 );
+
+	m_gainKnob = new kickerKnob( this );
+	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
+	m_gainKnob->move( 15, 155 );
+
+	m_decayKnob = new kickerKnob( this );
+	m_decayKnob->setHintText( tr( "Length:" ) + " ", "ms" );
+	m_decayKnob->move( 60, 155 );
+
+	m_envKnob = new kickerKnob( this );
+	m_envKnob->setHintText( tr( "Env:" ) + " ", "" );
+	m_envKnob->move( 105, 155 );
+
+	m_noiseKnob = new kickerKnob( this );
+	m_noiseKnob->setHintText( tr( "Noise:" ) + " ", "" );
+	m_noiseKnob->move( 200, 45 );
+
+	m_distKnob = new kickerKnob( this );
+	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
+	m_distKnob->move( 200, 100 );
+
+	m_clickKnob = new kickerKnob( this );
+	m_clickKnob->setHintText( tr( "Click:" ) + " ", "" );
+	m_clickKnob->move( 200, 155 );
+
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -275,6 +284,7 @@ void kickerInstrumentView::modelChanged()
 	m_distKnob->setModel( &k->m_distModel );
 	m_gainKnob->setModel( &k->m_gainModel );
 	m_envKnob->setModel( &k->m_envModel );
+	m_noiseKnob->setModel( &k->m_noiseModel );
 	m_clickKnob->setModel( &k->m_clickModel );
 	m_slopeKnob->setModel( &k->m_slopeModel );
 }

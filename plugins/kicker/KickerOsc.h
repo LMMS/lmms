@@ -36,10 +36,11 @@ template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {
 public:
-	KickerOsc( const FX & fx, const float start, const float end, const float offset, const float slope, const float env, const float length ) :
+	KickerOsc( const FX & fx, const float start, const float end, const float noise, const float offset, const float slope, const float env, const float length ) :
 		m_phase( offset ),
 		m_startFreq( start ),
 		m_endFreq( end ),
+		m_noise( noise ),
 		m_slope( slope ),
 		m_env( env ),
 		m_length( length ),
@@ -59,7 +60,7 @@ public:
 		{
 			const double gain = ( 1 - fastPow( ( m_counter < m_length ) ? m_counter / m_length : 1, m_env ) );
 			//~ qDebug( "%f", gain );
-			const sample_t s = Oscillator::sinSample( m_phase );
+			const sample_t s = Oscillator::sinSample( m_phase ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
 			buf[frame][0] = s * gain;
 			buf[frame][1] = s * gain;
 			m_FX.nextSample( buf[frame][0], buf[frame][1] );
@@ -77,6 +78,7 @@ private:
 	float m_phase;
 	const float m_startFreq;
 	const float m_endFreq;
+	const float m_noise;
 	const float m_slope;
 	const float m_env;
 	const float m_length;

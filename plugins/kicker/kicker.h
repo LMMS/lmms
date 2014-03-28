@@ -67,6 +67,7 @@ private:
 	FloatModel m_distModel;
 	FloatModel m_gainModel;
 	FloatModel m_envModel;
+	FloatModel m_noiseModel;
 	FloatModel m_clickModel;
 	FloatModel m_slopeModel;
 
@@ -92,6 +93,7 @@ private:
 	knob * m_distKnob;
 	knob * m_gainKnob;
 	knob * m_envKnob;
+	knob * m_noiseKnob;
 	knob * m_clickKnob;
 	knob * m_slopeKnob;
 
