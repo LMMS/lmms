@@ -125,6 +125,9 @@ const int NUM_MODS = 4;
 
 const float MODCLIP = 2.0;
 
+const float MIN_FREQ = 18.0f;
+const float MAX_FREQ = 48000.0f;
+
 class MonstroInstrument;
 class MonstroView;
 

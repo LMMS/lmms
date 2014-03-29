@@ -96,17 +96,24 @@ MonstroSynth::~MonstroSynth()
 void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 {
 // macros for modulating with env/lfos
-#define modulatefreq( car, mod, min, max )	\
-		if( mod##_e1 != 0.0 ) car = qBound( min, car * static_cast<float>( fastPow( 2, m_env1_buf[f] * mod##_e1 ) ), max );	\
-		if( mod##_e2 != 0.0 ) car = qBound( min, car * static_cast<float>( fastPow( 2, m_env2_buf[f] * mod##_e2 ) ), max );	\
-		if( mod##_l1 != 0.0 ) car = qBound( min, car * static_cast<float>( fastPow( 2, m_lfo1_buf[f] * mod##_l1 ) ), max );	\
-		if( mod##_l2 != 0.0 ) car = qBound( min, car * static_cast<float>( fastPow( 2, m_lfo2_buf[f] * mod##_l2 ) ), max );	
+#define modulatefreq( car, mod )	\
+		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_env1_buf[f] * mod##_e1 ) ), MAX_FREQ );	\
+		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_env2_buf[f] * mod##_e2 ) ), MAX_FREQ );	\
+		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
+		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
 
-#define modulateabs( car, mod, min, max ) \
-		if( mod##_e1 != 0.0 ) car = qBound( min, car + mod##_e1 / 2 * m_env1_buf[f], max );	\
-		if( mod##_e2 != 0.0 ) car = qBound( min, car + mod##_e2 / 2 * m_env2_buf[f], max );	\
-		if( mod##_l1 != 0.0 ) car = qBound( min, car + mod##_l1 / 2 * m_lfo1_buf[f], max );	\
-		if( mod##_l2 != 0.0 ) car = qBound( min, car + mod##_l2 / 2 * m_lfo2_buf[f], max );
+#define modulateabs( car, mod ) \
+		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 / 2 * m_env1_buf[f], 1.0f );	\
+		if( mod##_e2 != 0.0 ) car = qBound( 0.0f, car + mod##_e2 / 2 * m_env2_buf[f], 1.0f );	\
+		if( mod##_l1 != 0.0 ) car = qBound( 0.0f, car + mod##_l1 / 2 * m_lfo1_buf[f], 1.0f );	\
+		if( mod##_l2 != 0.0 ) car = qBound( 0.0f, car + mod##_l2 / 2 * m_lfo2_buf[f], 1.0f );
+		
+#define modulatephs( car, mod ) \
+		if( mod##_e1 != 0.0 ) car = fraction( car + mod##_e1 / 2 * m_env1_buf[f] );	\
+		if( mod##_e2 != 0.0 ) car = fraction( car + mod##_e2 / 2 * m_env2_buf[f] );	\
+		if( mod##_l1 != 0.0 ) car = fraction( car + mod##_l1 / 2 * m_lfo1_buf[f] );	\
+		if( mod##_l2 != 0.0 ) car = fraction( car + mod##_l2 / 2 * m_lfo2_buf[f] );
+
 		
 #define modulatevol( car, mod ) \
 		if( mod##_e1 > 0.0 ) car = qBound( 0.0f, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
@@ -221,6 +228,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	//o2-o3 modulation
 	
 	const int omod = m_parent->m_o23Mod.value();
+	
+	// frequency helpers
+	
+	const int srquot = 1.0 / static_cast<float>( m_samplerate );
 
 	///////////////////////////
 	//                       //
@@ -251,18 +262,18 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// calc and mod frequencies
 		float o1l_f = o1lfb;
 		float o1r_f = o1rfb;
-		modulatefreq( o1l_f, o1f, 20.0f, 20000.0f )
-		modulatefreq( o1r_f, o1f, 20.0f, 20000.0f )
+		modulatefreq( o1l_f, o1f )
+		modulatefreq( o1r_f, o1f )
 		
 		// calc and modulate phase
 		float o1l_p = m_osc1l_phase + o1lpo;
 		float o1r_p = m_osc1r_phase + o1rpo;
-		modulateabs( o1l_p, o1p, 0.0f, 1.0f )
-		modulateabs( o1r_p, o1p,  0.0f, 1.0f )
+		modulatephs( o1l_p, o1p )
+		modulatephs( o1r_p, o1p )
 		
 		// calc and modulate pulse
 		float o1_pw = pw;
-		modulateabs( o1_pw, o1pw, -1.0f, 1.0f )
+		modulateabs( o1_pw, o1pw )
 		
 		// pulse wave osc
 		sample_t O1L = ( o1l_p < o1_pw ) ? 1.0f : -1.0f;
@@ -275,8 +286,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatevol( O1R, o1v )
 		
 		// update osc1 phases	
-		m_osc1l_phase = fraction( m_osc1l_phase + ( 1.0 / ( static_cast<float>( m_samplerate ) / o1l_f ) ) );
-		m_osc1r_phase = fraction( m_osc1r_phase + ( 1.0 / ( static_cast<float>( m_samplerate ) / o1r_f ) ) );
+		m_osc1l_phase = fraction( m_osc1l_phase + srquot / o1l_f );
+		m_osc1r_phase = fraction( m_osc1r_phase + srquot / o1r_f );
 		
 		/////////////////////////////
 		//				           //
@@ -287,14 +298,14 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// calc and mod frequencies
 		float o2l_f = o2lfb;
 		float o2r_f = o2rfb;
-		modulatefreq( o2l_f, o2f, 20.0f, 20000.0f )
-		modulatefreq( o2r_f, o2f, 20.0f, 20000.0f )
+		modulatefreq( o2l_f, o2f )
+		modulatefreq( o2r_f, o2f )
 		
 		// calc and modulate phase
 		float o2l_p = m_osc2l_phase + o2lpo;
 		float o2r_p = m_osc2r_phase + o2rpo;
-		modulateabs( o2l_p, o2p, 0.0f, 1.0f )
-		modulateabs( o2r_p, o2p, 0.0f, 1.0f )
+		modulatephs( o2l_p, o2p )
+		modulatephs( o2r_p, o2p )
 		
 		// multi-wave DC Oscillator
 		sample_t O2L = oscillate( o2w, o2l_p );
@@ -307,8 +318,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatevol( O2R, o2v )
 		
 		// update osc2 phases	
-		m_osc2l_phase = fraction( m_osc2l_phase + ( 1.0 / ( static_cast<float>( m_samplerate ) / o2l_f ) ) );
-		m_osc2r_phase = fraction( m_osc2r_phase + ( 1.0 / ( static_cast<float>( m_samplerate ) / o2r_f ) ) );
+		m_osc2l_phase = fraction( m_osc2l_phase + srquot / o2l_f );
+		m_osc2r_phase = fraction( m_osc2r_phase + srquot / o2r_f );
 		
 		/////////////////////////////
 		//				           //
@@ -319,25 +330,25 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// calc and mod frequencies
 		float o3l_f = o3fb;
 		float o3r_f = o3fb;
-		modulatefreq( o3l_f, o3f, 20.0f, 20000.0f )
-		modulatefreq( o3r_f, o3f, 20.0f, 20000.0f )
+		modulatefreq( o3l_f, o3f )
+		modulatefreq( o3r_f, o3f )
 		// o2 modulation?
 		if( omod == MOD_FM )
 		{
-			o3l_f = qBound( 20.0f, o3l_f * static_cast<float>( fastPow( 2, O2L ) ), 20000.0f );
-			o3r_f = qBound( 20.0f, o3r_f * static_cast<float>( fastPow( 2, O2R ) ), 20000.0f );
+			o3l_f = qBound( MIN_FREQ, o3l_f * static_cast<float>( fastPow( 4, O2L ) ), MAX_FREQ );
+			o3r_f = qBound( MIN_FREQ, o3r_f * static_cast<float>( fastPow( 4, O2R ) ), MAX_FREQ );
 		}
 		
 		// calc and modulate phase
 		float o3l_p = m_osc3l_phase + o3lpo;
 		float o3r_p = m_osc3r_phase + o3rpo;
-		modulateabs( o3l_p, o3p, 0.0f, 1.0f )
-		modulateabs( o3r_p, o3p, 0.0f, 1.0f )
+		modulatephs( o3l_p, o3p )
+		modulatephs( o3r_p, o3p )
 		// o2 modulation?
 		if( omod == MOD_PM )
 		{
-			o3l_p = qBound( 0.0f, o3l_p + O2L/2, 1.0f );
-			o3r_p = qBound( 0.0f, o3r_p + O2R/2, 1.0f );
+			o3l_p = fraction( o3l_p + O2L/2 );
+			o3r_p = fraction( o3r_p + O2R/2 );
 		}
 
 		// multi-wave DC Oscillator, sub-osc 1
@@ -350,7 +361,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		
 		// calc and modulate sub
 		float sub = o3sub;
-		modulateabs( sub, o3s, 0.0f, 1.0f )
+		modulateabs( sub, o3s )
 		
 		sample_t O3L = interpolate( O3AL, O3BL, sub );
 		sample_t O3R = interpolate( O3AR, O3BR, sub );
@@ -368,8 +379,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 
 		// update osc3 phases	
-		m_osc3l_phase = fraction( m_osc3l_phase + ( 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f ) ) );
-		m_osc3r_phase = fraction( m_osc3r_phase + ( 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f ) ) );
+		m_osc3l_phase = fraction( m_osc3l_phase + srquot / o3l_f );
+		m_osc3r_phase = fraction( m_osc3r_phase + srquot / o3r_f );
 		
 		_buf[f][0] = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		_buf[f][1] = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
