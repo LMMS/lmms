@@ -874,7 +874,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 
 	ms->renderOutput( frames, _working_buffer );
 
-	//applyRelease( _working_buffer, _n );
+	applyRelease( _working_buffer, _n );
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
