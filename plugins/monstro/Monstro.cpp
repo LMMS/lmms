@@ -316,8 +316,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatevol( O2R, o2v )
 		
 		// update osc2 phases	
-		m_osc2l_phase = fraction( m_osc2l_phase + ( 1.0f / static_cast<float>( m_samplerate ) / o2l_f ) );
-		m_osc2r_phase = fraction( m_osc2r_phase + ( 1.0f / static_cast<float>( m_samplerate ) / o2r_f ) );
+		m_osc2l_phase = fraction( m_osc2l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2l_f ) );
+		m_osc2r_phase = fraction( m_osc2r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2r_f ) );
 		
 		/////////////////////////////
 		//				           //
@@ -377,8 +377,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 
 		// update osc3 phases	
-		m_osc3l_phase = fraction( m_osc3l_phase + ( 1.0f / static_cast<float>( m_samplerate ) / o3l_f ) );
-		m_osc3r_phase = fraction( m_osc3r_phase + ( 1.0f / static_cast<float>( m_samplerate ) / o3r_f ) );
+		m_osc3l_phase = fraction( m_osc3l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f ) );
+		m_osc3r_phase = fraction( m_osc3r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f ) );
 		
 		_buf[f][0] = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		_buf[f][1] = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
