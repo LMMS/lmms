@@ -73,10 +73,16 @@ void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void TrackContainer::loadSettings( const QDomElement & _this )
 {
+	bool journalRestore = _this.parentNode().nodeName() == "journaldata";
+	if( journalRestore )
+	{
+		clearAllTracks();
+	}
+
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( engine::hasGUI() )
+	if( !journalRestore && engine::hasGUI() )
 	{
 		if( pd == NULL )
 		{
@@ -154,6 +160,8 @@ void TrackContainer::addTrack( track * _track )
 {
 	if( _track->type() != track::HiddenAutomationTrack )
 	{
+		addJournalCheckPoint();
+
 		m_tracksMutex.lockForWrite();
 		m_tracks.push_back( _track );
 		m_tracksMutex.unlock();

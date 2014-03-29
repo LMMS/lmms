@@ -206,11 +206,6 @@ public:
 		return "automatablemodel";
 	}
 
-	void prepareJournalEntryFromOldVal();
-
-	void addJournalEntryFromOldToCurVal();
-
-
 	QString displayValue( const float val ) const
 	{
 		switch( m_dataType )
@@ -236,9 +231,6 @@ public slots:
 
 
 protected:
-	virtual void redoStep( JournalEntry& je );
-	virtual void undoStep( JournalEntry& je );
-
 	float fittedValue( float value ) const;
 
 
@@ -269,7 +261,6 @@ private:
 	// most objects will need this temporarily (until sampleExact is
 	// standard)
 	float m_oldValue;
-	bool m_journalEntryReady;
 	int m_setValueDepth;
 
 	AutoModelVector m_linkedModels;

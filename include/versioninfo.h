@@ -1,5 +1,5 @@
 #ifdef __GNUC__
-#define GCC_VERSION "GCC "__VERSION__
+#define GCC_VERSION "GCC " __VERSION__
 #else
 #define GCC_VERSION "unknown compiler"
 #endif

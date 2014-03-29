@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _SAMPLE_BUFFER_H
-#define _SAMPLE_BUFFER_H
+#ifndef SAMPLE_BUFFER_H
+#define SAMPLE_BUFFER_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
@@ -108,6 +108,16 @@ public:
 	{
 		return m_endFrame;
 	}
+	
+	inline f_cnt_t loopStartFrame() const
+	{
+		return m_loopStartFrame;
+	}
+
+	inline f_cnt_t loopEndFrame() const
+	{
+		return m_loopEndFrame;
+	}
 
 	void setLoopStartFrame( f_cnt_t _start )
 	{
@@ -175,7 +185,7 @@ public:
     QString openAudioFile() const;
     QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
-	
+
 	QString & toBase64( QString & _dst ) const;
 
 

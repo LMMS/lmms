@@ -1,4 +1,4 @@
-zynaddsubfx_icon ICON zynaddsubfx_icon.ico
+zynaddsubfx_icon ICON zynaddsubfx/zynaddsubfx.ico
 #include <windows.h>
 
 VS_VERSION_INFO	VERSIONINFO

@@ -24,19 +24,25 @@
 
 #include <lmmsconfig.h>
 
+#include "zynaddsubfx/src/Misc/Util.h"
 #include <unistd.h>
 
 #include "LocalZynAddSubFx.h"
 
-#include "src/Input/NULLMidiIn.h"
-#include "src/Misc/Master.h"
-#include "src/Misc/Dump.h"
+#include "zynaddsubfx/src/Nio/NulEngine.h"
+#include "zynaddsubfx/src/Misc/Master.h"
+#include "zynaddsubfx/src/Misc/Part.h"
+#include "zynaddsubfx/src/Misc/Dump.h"
 
+
+SYNTH_T* synth = NULL;
 
 int LocalZynAddSubFx::s_instanceCount = 0;
 
 
-LocalZynAddSubFx::LocalZynAddSubFx()
+LocalZynAddSubFx::LocalZynAddSubFx() :
+	m_master( NULL ),
+	m_ioEngine( NULL )
 {
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -53,16 +59,22 @@ LocalZynAddSubFx::LocalZynAddSubFx()
 
 		initConfig();
 
-		OSCIL_SIZE = config.cfg.OscilSize;
+		synth = new SYNTH_T;
+		synth->oscilsize = config.cfg.OscilSize;
+		synth->alias();
 
 		srand( time( NULL ) );
-		denormalkillbuf = new REALTYPE[SOUND_BUFFER_SIZE];
-		for( int i = 0; i < SOUND_BUFFER_SIZE; ++i )
+
+		denormalkillbuf = new float[synth->buffersize];
+		for( int i = 0; i < synth->buffersize; ++i )
 		{
 			denormalkillbuf[i] = (RND-0.5)*1e-16;
 		}
 	}
+
 	++s_instanceCount;
+
+	m_ioEngine = new NulEngine;
 
 	m_master = new Master();
 	m_master->swaplr = 0;
@@ -94,17 +106,19 @@ void LocalZynAddSubFx::initConfig()
 
 
 
-void LocalZynAddSubFx::setSampleRate( int _sampleRate )
+void LocalZynAddSubFx::setSampleRate( int sampleRate )
 {
-	SAMPLE_RATE = _sampleRate;
+	synth->samplerate = sampleRate;
+	synth->alias();
 }
 
 
 
 
-void LocalZynAddSubFx::setBufferSize( int _bufferSize )
+void LocalZynAddSubFx::setBufferSize( int bufferSize )
 {
-	SOUND_BUFFER_SIZE = _bufferSize;
+	synth->buffersize = bufferSize;
+	synth->alias();
 }
 
 
@@ -160,14 +174,12 @@ void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 	m_presetsDir = _dir;
 	for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
 	{
-		if( config.cfg.bankRootDirList[i] == NULL )
+		if( config.cfg.bankRootDirList[i].empty() )
 		{
-			config.cfg.bankRootDirList[i] = new char[MAX_STRING_SIZE];
-			strcpy( config.cfg.bankRootDirList[i], m_presetsDir.c_str() );
+			config.cfg.bankRootDirList[i] = m_presetsDir;
 			break;
 		}
-		else if( strcmp( config.cfg.bankRootDirList[i],
-							m_presetsDir.c_str() ) == 0 )
+		else if( config.cfg.bankRootDirList[i] == m_presetsDir )
 		{
 			break;
 		}
@@ -202,41 +214,38 @@ void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 
 void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 {
-	// all functions are called while m_master->mutex is held
-	static NULLMidiIn midiIn;
-
 	switch( event.type() )
 	{
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				if( event.key() <= 0 || event.key() >= 128 )
+				if( event.key() < 0 || event.key() > MidiMaxKey )
 				{
 					break;
 				}
 				if( m_runningNotes[event.key()] > 0 )
 				{
-					m_master->NoteOff( event.channel(), event.key() );
+					m_master->noteOff( event.channel(), event.key() );
 				}
 				++m_runningNotes[event.key()];
-				m_master->NoteOn( event.channel(), event.key(), event.velocity() );
+				m_master->noteOn( event.channel(), event.key(), event.velocity() );
 				break;
 			}
 		case MidiNoteOff:
-			if( event.key() <= 0 || event.key() >= 128 )
+			if( event.key() < 0 || event.key() > MidiMaxKey )
 			{
 				break;
 			}
 			if( --m_runningNotes[event.key()] <= 0 )
 			{
-				m_master->NoteOff( event.channel(), event.key() );
+				m_master->noteOff( event.channel(), event.key() );
 			}
 			break;
 		case MidiPitchBend:
-			m_master->SetController( event.channel(), C_pitchwheel, event.pitchBend()-8192 );
+			m_master->setController( event.channel(), C_pitchwheel, event.pitchBend()-8192 );
 			break;
 		case MidiControlChange:
-			m_master->SetController( event.channel(), midiIn.getcontroller( event.controllerNumber() ), event.controllerValue() );
+			m_master->setController( event.channel(), event.controllerNumber(), event.controllerValue() );
 			break;
 		default:
 			break;
@@ -248,12 +257,13 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 
 void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 {
-	REALTYPE outputl[SOUND_BUFFER_SIZE];
-	REALTYPE outputr[SOUND_BUFFER_SIZE];
+	float outputl[synth->buffersize];
+	float outputr[synth->buffersize];
 
-	m_master->GetAudioOutSamples( SOUND_BUFFER_SIZE, SAMPLE_RATE, outputl, outputr );
+	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
 
-	for( int f = 0; f < SOUND_BUFFER_SIZE; ++f )
+	// TODO: move to MixHelpers
+	for( int f = 0; f < synth->buffersize; ++f )
 	{
 		_out[f][0] = outputl[f];
 		_out[f][1] = outputr[f];

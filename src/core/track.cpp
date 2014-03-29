@@ -149,7 +149,6 @@ void trackContentObject::movePosition( const MidiTime & _pos )
 {
 	if( m_startPosition != _pos )
 	{
-		addJournalEntry( JournalEntry( Move, m_startPosition - _pos ) );
 		m_startPosition = _pos;
 		engine::getSong()->updateLength();
 	}
@@ -170,52 +169,10 @@ void trackContentObject::changeLength( const MidiTime & _length )
 {
 	if( m_length != _length )
 	{
-		addJournalEntry( JournalEntry( Resize, m_length - _length ) );
 		m_length = _length;
 		engine::getSong()->updateLength();
 	}
 	emit lengthChanged();
-}
-
-
-
-
-/*! \brief Undo one journal entry of this trackContentObject
- *
- *  Restore the previous state of this track content object.  This will
- *  restore the position or the length of the track content object
- *  depending on what was changed.
- *
- * \param _je The journal entry to undo
- */
-void trackContentObject::undoStep( JournalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case Move:
-			movePosition( startPosition() + _je.data().toInt() );
-			break;
-		case Resize:
-			changeLength( length() + _je.data().toInt() );
-			break;
-	}
-	restoreJournallingState();
-}
-
-
-
-
-/*! \brief Redo one journal entry of this trackContentObject
- *
- *  Undoes one 'undo' of this track content object.
- *
- * \param _je The journal entry to redo
- */
-void trackContentObject::redoStep( JournalEntry & _je )
-{
-	JournalEntry je( _je.actionID(), -_je.data().toInt() );
-	undoStep( je );
 }
 
 
@@ -367,6 +324,8 @@ bool trackContentObjectView::fixedTCOs()
  */
 bool trackContentObjectView::close()
 {
+	m_trackView->getTrack()->addJournalCheckPoint();
+
 	m_trackView->getTrackContentWidget()->removeTCOView( this );
 	return QWidget::close();
 }
@@ -577,6 +536,8 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		/*	engine::mainWindow()->isShiftPressed() == false &&*/
 							fixedTCOs() == false )
 	{
+		m_tco->addJournalCheckPoint();
+
 		// move or resize
 		m_tco->setJournalling( false );
 
@@ -770,9 +731,6 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 	if( m_action == Move || m_action == Resize )
 	{
 		m_tco->setJournalling( true );
-		m_tco->addJournalEntry( JournalEntry( m_action, m_oldTime -
-			( ( m_action == Move ) ?
-				m_tco->startPosition() : m_tco->length() ) ) );
 	}
 	m_action = NoAction;
 	delete m_hint;
@@ -945,9 +903,6 @@ void trackContentWidget::updateBackground()
 void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 {
 	trackContentObject * tco = _tcov->getTrackContentObject();
-/*	QMap<QString, QVariant> map;
-	map["id"] = tco->id();
-	addJournalEntry( JournalEntry( AddTrackContentObject, map ) );*/
 
 	m_tcoViews.push_back( _tcov );
 
@@ -972,14 +927,6 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 						_tcov );
 	if( it != m_tcoViews.end() )
 	{
-/*		QMap<QString, QVariant> map;
-		DataFile dataFile( DataFile::JournalData );
-		_tcov->getTrackContentObject()->saveState( dataFile, dataFile.content() );
-		map["id"] = _tcov->getTrackContentObject()->id();
-		map["state"] = dataFile.toString();
-		addJournalEntry( JournalEntry( RemoveTrackContentObject,
-								map ) );*/
-
 		m_tcoViews.erase( it );
 		engine::getSong()->setModified();
 	}
@@ -1121,6 +1068,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 	{
 		const MidiTime pos = getPosition( _de->pos().x()
 							).toNearestTact();
+		getTrack()->addJournalCheckPoint();
 		trackContentObject * tco = getTrack()->createTCO( pos );
 
 		// value contains our XML-data so simply create a
@@ -1204,71 +1152,6 @@ void trackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 	updateBackground();
 	// Force redraw
 	QWidget::resizeEvent( resizeEvent );
-}
-
-
-
-
-/*! \brief Undo an action on the trackContentWidget
- *
- * \param _je the details of the edit journal
- */
-void trackContentWidget::undoStep( JournalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case AddTrackContentObject:
-		{
-			QMap<QString, QVariant> map = _je.data().toMap();
-			trackContentObject * tco =
-				dynamic_cast<trackContentObject *>(
-			engine::projectJournal()->journallingObject( map["id"].toInt() ) );
-			DataFile dataFile( DataFile::JournalData );
-			tco->saveState( dataFile, dataFile.content() );
-			map["state"] = dataFile.toString();
-			_je.data() = map;
-			tco->deleteLater();
-			break;
-		}
-
-		case RemoveTrackContentObject:
-		{
-			trackContentObject * tco = getTrack()->createTCO( MidiTime( 0 ) );
-			DataFile dataFile(
-				_je.data().toMap()["state"].
-					toString().toUtf8() );
-			tco->restoreState( dataFile.content().firstChild().toElement() );
-			break;
-		}
-	}
-	restoreJournallingState();
-}
-
-
-
-
-/*! \brief Redo an action of the trackContentWidget
- *
- * \param _je the entry in the edit journal to redo.
- */
-void trackContentWidget::redoStep( JournalEntry & _je )
-{
-	switch( _je.actionID() )
-	{
-		case AddTrackContentObject:
-		case RemoveTrackContentObject:
-			_je.actionID() = ( _je.actionID() ==
-						AddTrackContentObject ) ?
-				RemoveTrackContentObject :
-						AddTrackContentObject;
-			undoStep( _je );
-			_je.actionID() = ( _je.actionID() ==
-						AddTrackContentObject ) ?
-				RemoveTrackContentObject :
-						AddTrackContentObject;
-			break;
-	}
 }
 
 
@@ -2227,55 +2110,6 @@ void trackView::modelChanged()
 
 
 
-/*! \brief Undo a change to this track View.
- *
- *  \param _je the Journal Entry to undo.
- */
-void trackView::undoStep( JournalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case MoveTrack:
-			if( _je.data().toInt() > 0 )
-			{
-				m_trackContainerView->moveTrackViewUp( this );
-			}
-			else
-			{
-				m_trackContainerView->moveTrackViewDown( this );
-			}
-			break;
-		case ResizeTrack:
-			setFixedHeight( qMax<int>( height() +
-						_je.data().toInt(),
-						MINIMAL_TRACK_HEIGHT ) );
-			m_trackContainerView->realignTracks();
-			break;
-			/*case RestoreTrack:
-			setFixedHeight( DEFAULT_TRACK_HEIGHT );
-			m_trackContainerView->realignTracks();
-			break; */
-	}
-	restoreJournallingState();
-}
-
-
-
-
-/*! \brief Redo a change to this track View.
- *
- *  \param _je the Journal Event to redo.
- */
-void trackView::redoStep( JournalEntry & _je )
-{
-	JournalEntry je( _je.actionID(), -_je.data().toInt() );
-	undoStep( je );
-}
-
-
-
-
 /*! \brief Start a drag event on this track View.
  *
  *  \param _dee the DragEnterEvent to start.
@@ -2412,6 +2246,7 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 		// a track-widget not equal to ourself?
 		if( track_at_y != NULL && track_at_y != this )
 		{
+			addJournalCheckPoint();
 			// then move us up/down there!
 			if( _me->y() < 0 )
 			{
@@ -2421,7 +2256,6 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_trackContainerView->moveTrackViewDown( this );
 			}
-			addJournalEntry( JournalEntry( MoveTrack, _me->y() ) );
 		}
 	}
 	else if( m_action == ResizeTrack )

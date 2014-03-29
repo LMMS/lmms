@@ -25,6 +25,7 @@
 #ifndef _VST_PLUGIN_H
 #define _VST_PLUGIN_H
 
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
 #include <QtCore/QPointer>
 #include <QtCore/QString>
