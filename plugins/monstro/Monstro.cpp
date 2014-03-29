@@ -96,21 +96,21 @@ MonstroSynth::~MonstroSynth()
 void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 {
 // macros for modulating with env/lfos
-#define modulatefreq( car, mod )	\
-		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_env1_buf[f] * mod##_e1 ) ), MAX_FREQ );	\
-		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_env2_buf[f] * mod##_e2 ) ), MAX_FREQ );	\
-		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
-		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
+#define modulatefreq( car, mod ) \
+		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env1_buf[f] * mod##_e1 ) ), MAX_FREQ );	\
+		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env2_buf[f] * mod##_e2 ) ), MAX_FREQ );	\
+		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 5.0, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
+		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 5.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
 
 #define modulateabs( car, mod ) \
-		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 / 2 * m_env1_buf[f], 1.0f );	\
-		if( mod##_e2 != 0.0 ) car = qBound( 0.0f, car + mod##_e2 / 2 * m_env2_buf[f], 1.0f );	\
+		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 * m_env1_buf[f], 1.0f );	\
+		if( mod##_e2 != 0.0 ) car = qBound( 0.0f, car + mod##_e2 * m_env2_buf[f], 1.0f );	\
 		if( mod##_l1 != 0.0 ) car = qBound( 0.0f, car + mod##_l1 / 2 * m_lfo1_buf[f], 1.0f );	\
 		if( mod##_l2 != 0.0 ) car = qBound( 0.0f, car + mod##_l2 / 2 * m_lfo2_buf[f], 1.0f );
 		
 #define modulatephs( car, mod ) \
-		if( mod##_e1 != 0.0 ) car = fraction( car + mod##_e1 / 2 * m_env1_buf[f] );	\
-		if( mod##_e2 != 0.0 ) car = fraction( car + mod##_e2 / 2 * m_env2_buf[f] );	\
+		if( mod##_e1 != 0.0 ) car = fraction( car + mod##_e1 * m_env1_buf[f] );	\
+		if( mod##_e2 != 0.0 ) car = fraction( car + mod##_e2 * m_env2_buf[f] );	\
 		if( mod##_l1 != 0.0 ) car = fraction( car + mod##_l1 / 2 * m_lfo1_buf[f] );	\
 		if( mod##_l2 != 0.0 ) car = fraction( car + mod##_l2 / 2 * m_lfo2_buf[f] );
 
@@ -176,7 +176,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o2rfb = ( m_parent->m_osc2r_freq * m_nph->frequency() );	
 	const float o2f_e1 = ( m_parent->m_pit2env1.value() );
 	const float o2f_e2 = ( m_parent->m_pit2env2.value() );
-	const float o2f_l1 = ( m_parent->m_pit2lfo2.value() );
+	const float o2f_l1 = ( m_parent->m_pit2lfo1.value() );
 	const float o2f_l2 = ( m_parent->m_pit2lfo2.value() );
 
 	// get volumes
@@ -229,7 +229,6 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	
 	const int omod = m_parent->m_o23Mod.value();
 	
-	// frequency helpers
 	
 	///////////////////////////
 	//                       //
@@ -333,8 +332,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// o2 modulation?
 		if( omod == MOD_FM )
 		{
-			o3l_f = qBound( MIN_FREQ, o3l_f * static_cast<float>( fastPow( 4, O2L ) ), MAX_FREQ );
-			o3r_f = qBound( MIN_FREQ, o3r_f * static_cast<float>( fastPow( 4, O2R ) ), MAX_FREQ );
+			o3l_f = qBound( MIN_FREQ, o3l_f * powf( 5, O2L ), MAX_FREQ );
+			o3r_f = qBound( MIN_FREQ, o3r_f * powf( 5, O2R ), MAX_FREQ );
 		}
 		
 		// calc and modulate phase
@@ -1151,17 +1150,17 @@ void MonstroInstrument::updateVolumes()
 
 void MonstroInstrument::updateFreq()
 {
-	m_osc1l_freq = powf( 2.0d, m_osc1Crs.value() / 12.0d ) *  
-					powf( 2.0d, m_osc1Ftl.value() / 1200.0d );
-	m_osc1r_freq = powf( 2.0d, m_osc1Crs.value() / 12.0d ) *  
-					powf( 2.0d, m_osc1Ftr.value() / 1200.0d );
+	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *  
+					powf( 2.0f, m_osc1Ftl.value() / 1200.0f );
+	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *  
+					powf( 2.0f, m_osc1Ftr.value() / 1200.0f );
 					
-	m_osc2l_freq = powf( 2.0d, m_osc2Crs.value() / 12.0d ) *  
-					powf( 2.0d, m_osc2Ftl.value() / 1200.0d );
-	m_osc2r_freq = powf( 2.0d, m_osc2Crs.value() / 12.0d ) *  
-					powf( 2.0d, m_osc2Ftr.value() / 1200.0d );
+	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *  
+					powf( 2.0f, m_osc2Ftl.value() / 1200.0f );
+	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *  
+					powf( 2.0f, m_osc2Ftr.value() / 1200.0f );
 					
-	m_osc3_freq = powf( 2.0d, m_osc3Crs.value() / 12.0d );
+	m_osc3_freq = powf( 2.0f, m_osc3Crs.value() / 12.0f );
 }
 
 
@@ -1422,7 +1421,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc1CrsKnob, KNOBCOL3, O1ROW, "Coarse detune", " seminotes", "osc1Knob" )
 	makeknob( m_osc1FtlKnob, KNOBCOL4, O1ROW, "Finetune left", " cents", "osc1Knob" )
 	makeknob( m_osc1FtrKnob, KNOBCOL5, O1ROW, "Finetune right", " cents", "osc1Knob" )
-	makeknob( m_osc1SpoKnob, KNOBCOL6, O1ROW, "Stereo phase offset", "°", "osc1Knob" )
+	makeknob( m_osc1SpoKnob, KNOBCOL6, O1ROW, "Stereo phase offset", " deg", "osc1Knob" )
 	makeknob( m_osc1PwKnob,  KNOBCOL7, O1ROW, "Pulse width", "%", "osc1Knob" )
 
 	m_osc1VolKnob -> setVolumeKnob( true );
@@ -1432,7 +1431,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc2CrsKnob, KNOBCOL3, O2ROW, "Coarse detune", " seminotes", "osc2Knob" )
 	makeknob( m_osc2FtlKnob, KNOBCOL4, O2ROW, "Finetune left", " cents", "osc2Knob" )
 	makeknob( m_osc2FtrKnob, KNOBCOL5, O2ROW, "Finetune right", " cents", "osc2Knob" )
-	makeknob( m_osc2SpoKnob, KNOBCOL6, O2ROW, "Stereo phase offset", "°", "osc2Knob" )
+	makeknob( m_osc2SpoKnob, KNOBCOL6, O2ROW, "Stereo phase offset", " deg", "osc2Knob" )
 	
 	m_osc2VolKnob -> setVolumeKnob( true );
 	
@@ -1443,7 +1442,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc3VolKnob, KNOBCOL1, O3ROW, "Volume", "%", "osc3Knob" )
 	makeknob( m_osc3PanKnob, KNOBCOL2, O3ROW, "Panning", "", "osc3Knob" )
 	makeknob( m_osc3CrsKnob, KNOBCOL3, O3ROW, "Coarse detune", " seminotes", "osc3Knob" )
-	makeknob( m_osc3SpoKnob, KNOBCOL4, O3ROW, "Stereo phase offset", "°", "osc3Knob" )
+	makeknob( m_osc3SpoKnob, KNOBCOL4, O3ROW, "Stereo phase offset", " deg", "osc3Knob" )
 	makeknob( m_osc3SubKnob, KNOBCOL5, O3ROW, "Sub-osc mix", "", "osc3Knob" )
 
 	m_osc3Wave1Box = new comboBox( view );
@@ -1460,7 +1459,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, "Attack", " ms", "lfoKnob" )
 	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, "Rate", " ms", "lfoKnob" )
-	makeknob( m_lfo1PhsKnob, LFOCOL3, LFOROW, "Phase", "°", "lfoKnob" )
+	makeknob( m_lfo1PhsKnob, LFOCOL3, LFOROW, "Phase", " deg", "lfoKnob" )
 	
 	m_lfo2WaveBox = new comboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, 22 );
@@ -1468,7 +1467,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	maketsknob( m_lfo2AttKnob, LFOCOL4, LFOROW, "Attack", " ms", "lfoKnob" )
 	maketsknob( m_lfo2RateKnob, LFOCOL5, LFOROW, "Rate", " ms", "lfoKnob" )
-	makeknob( m_lfo2PhsKnob, LFOCOL6, LFOROW, "Phase", "°", "lfoKnob" )
+	makeknob( m_lfo2PhsKnob, LFOCOL6, LFOROW, "Phase", " deg", "lfoKnob" )
 	
 	maketsknob( m_env1PreKnob, KNOBCOL1, E1ROW, "Pre-delay", " ms", "envKnob" )
 	maketsknob( m_env1AttKnob, KNOBCOL2, E1ROW, "Attack", " ms", "envKnob" )
