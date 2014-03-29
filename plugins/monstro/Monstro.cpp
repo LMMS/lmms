@@ -110,9 +110,9 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		
 #define modulatevol( car, mod ) \
 		if( mod##_e1 > 0.0 ) car = qBound( 0.0f, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
-		if( mod##_e1 < 0.0 ) car = qBound( 0.0f, car * ( 0.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
+		if( mod##_e1 < 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
 		if( mod##_e2 > 0.0 ) car = qBound( 0.0f, car * ( 1.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
-		if( mod##_e2 < 0.0 ) car = qBound( 0.0f, car * ( 0.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
+		if( mod##_e2 < 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
 		if( mod##_l1 != 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_l1 * m_lfo1_buf[f] ), MODCLIP );	\
 		if( mod##_l2 != 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_l2 * m_lfo2_buf[f] ), MODCLIP );
 		
