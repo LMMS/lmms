@@ -236,17 +236,17 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_envKnob->setHintText( tr( "Env:" ) + " ", "" );
 	m_envKnob->move( 105, 155 );
 
-	m_noiseKnob = new kickerKnob( this );
-	m_noiseKnob->setHintText( tr( "Noise:" ) + " ", "" );
-	m_noiseKnob->move( 200, 45 );
-
-	m_distKnob = new kickerKnob( this );
-	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
-	m_distKnob->move( 200, 100 );
-
 	m_clickKnob = new kickerKnob( this );
 	m_clickKnob->setHintText( tr( "Click:" ) + " ", "" );
-	m_clickKnob->move( 200, 155 );
+	m_clickKnob->move( 200, 45 );
+
+	m_noiseKnob = new kickerKnob( this );
+	m_noiseKnob->setHintText( tr( "Noise:" ) + " ", "" );
+	m_noiseKnob->move( 200, 100 );
+
+	m_distKnob = new kickerKnob( this );
+	m_distKnob->setHintText( tr( "Dist:" ) + " ", "" );
+	m_distKnob->move( 200, 155 );
 
 	m_startNoteToggle = new ledCheckBox( "", this );
 	m_startNoteToggle->move( 24, 79 );
