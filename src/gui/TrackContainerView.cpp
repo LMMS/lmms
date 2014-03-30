@@ -223,7 +223,7 @@ void TrackContainerView::realignTracks()
 
 void TrackContainerView::createTrackView( track * _t )
 {
-	m_tc->addJournalCheckPoint();
+	//m_tc->addJournalCheckPoint();
 
 	_t->createView( this );
 }
@@ -233,7 +233,7 @@ void TrackContainerView::createTrackView( track * _t )
 
 void TrackContainerView::deleteTrackView( trackView * _tv )
 {
-	m_tc->addJournalCheckPoint();
+	//m_tc->addJournalCheckPoint();
 
 	track * t = _tv->getTrack();
 	removeTrackView( _tv );
