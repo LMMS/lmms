@@ -97,8 +97,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 {
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
-		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env1_buf[f] * mod##_e1 ) ), MAX_FREQ );	\
-		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env2_buf[f] * mod##_e2 ) ), MAX_FREQ );	\
+		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_env1_buf[f] * mod##_e1 * 2 ) ), MAX_FREQ );	\
+		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_env2_buf[f] * mod##_e2 * 2 ) ), MAX_FREQ );	\
 		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
 		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
 
@@ -661,6 +661,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 			{
 				m_env1_buf[f] = calcSlope( s, env1_s );
 				m_env1_phase = qMin( 4.0f - env1_sus, m_env1_phase + m_parent->m_env1_dec );
+				if( m_env1_phase == 4.0f ) m_env1_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
 			}
 		}
 		else if( m_env1_phase < 5.0f ) // release phase
@@ -712,6 +713,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 			{
 				m_env2_buf[f] = calcSlope( s, env2_s );
 				m_env2_phase = qMin( 4.0f - env2_sus, m_env2_phase + m_parent->m_env2_dec );
+				if( m_env1_phase == 4.0f ) m_env1_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
 			}
 		}
 		else if( m_env2_phase < 5.0f ) // release phase
