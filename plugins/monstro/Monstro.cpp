@@ -99,8 +99,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 #define modulatefreq( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env1_buf[f] * mod##_e1 ) ), MAX_FREQ );	\
 		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env2_buf[f] * mod##_e2 ) ), MAX_FREQ );	\
-		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.5, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
-		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.5, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
+		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
+		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 * m_env1_buf[f], 1.0f );	\
@@ -113,7 +113,6 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_e2 != 0.0 ) car = fraction( car + mod##_e2 * m_env2_buf[f] );	\
 		if( mod##_l1 != 0.0 ) car = fraction( car + mod##_l1 / 2 * m_lfo1_buf[f] );	\
 		if( mod##_l2 != 0.0 ) car = fraction( car + mod##_l2 / 2 * m_lfo2_buf[f] );
-
 		
 #define modulatevol( car, mod ) \
 		if( mod##_e1 > 0.0 ) car = qBound( 0.0f, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
@@ -272,6 +271,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		float o1_pw = pw;
 		modulateabs( o1_pw, o1pw )
 		
+		// bounds check for phase
+		if( o1l_p < 0 ) o1l_p += 1.0f;
+		if( o1r_p < 0 ) o1r_p += 1.0f;
+		
 		// pulse wave osc
 		sample_t O1L = ( o1l_p < o1_pw ) ? 1.0f : -1.0f;
 		sample_t O1R = ( o1r_p < o1_pw ) ? 1.0f : -1.0f;
@@ -303,6 +306,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		float o2r_p = m_osc2r_phase + o2rpo;
 		modulatephs( o2l_p, o2p )
 		modulatephs( o2r_p, o2p )
+
+		// bounds check for phase
+		if( o2l_p < 0 ) o2l_p += 1.0f;
+		if( o2r_p < 0 ) o2r_p += 1.0f;
 		
 		// multi-wave DC Oscillator
 		sample_t O2L = oscillate( o2w, o2l_p );
@@ -347,6 +354,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			o3l_p = fraction( o3l_p + O2L/2 );
 			o3r_p = fraction( o3r_p + O2R/2 );
 		}
+		
+		// bounds check for phase
+		if( o3l_p < 0 ) o3l_p += 1.0f;
+		if( o3r_p < 0 ) o3r_p += 1.0f;
 
 		// multi-wave DC Oscillator, sub-osc 1
 		sample_t O3AL = oscillate( o3w1, o3l_p );
@@ -449,11 +460,29 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 					m_lfo1_buf[f] = lfo1_s;
 				}
 				break;
+		case WAVE_SQRSOFT:
+				for( f_cnt_t f = 0; f < _frames; f++ )
+				{
+					const f_cnt_t t = f + m_nph->totalFramesPlayed();
+					lfo1_s = oscillate( WAVE_SQRSOFT, lfo1_p + static_cast<float>( t ) / lfo1_r );
+					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
+					m_lfo1_buf[f] = lfo1_s;
+				}
+				break;
 		case WAVE_MOOG:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
 					const f_cnt_t t = f + m_nph->totalFramesPlayed();
 					lfo1_s = Oscillator::moogSawSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
+					m_lfo1_buf[f] = lfo1_s;
+				}
+				break;
+		case WAVE_SINABS:
+				for( f_cnt_t f = 0; f < _frames; f++ )
+				{
+					const f_cnt_t t = f + m_nph->totalFramesPlayed();
+					lfo1_s = oscillate( WAVE_SINABS, lfo1_p + static_cast<float>( t ) / lfo1_r );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
 				}
@@ -529,11 +558,29 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 					m_lfo2_buf[f] = lfo2_s;
 				}
 				break;
+		case WAVE_SQRSOFT:
+				for( f_cnt_t f = 0; f < _frames; f++ )
+				{
+					const f_cnt_t t = f + m_nph->totalFramesPlayed();
+					lfo2_s = oscillate( WAVE_SQRSOFT, lfo2_p + static_cast<float>( t ) / lfo2_r );
+					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
+					m_lfo2_buf[f] = lfo2_s;
+				}
+				break;
 		case WAVE_MOOG:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
 					const f_cnt_t t = f + m_nph->totalFramesPlayed();
 					lfo2_s = Oscillator::moogSawSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
+					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
+					m_lfo2_buf[f] = lfo2_s;
+				}
+				break;
+		case WAVE_SINABS:
+				for( f_cnt_t f = 0; f < _frames; f++ )
+				{
+					const f_cnt_t t = f + m_nph->totalFramesPlayed();
+					lfo2_s = oscillate( WAVE_SINABS, lfo2_p + static_cast<float>( t ) / lfo2_r );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
 				}
@@ -797,8 +844,8 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 	setwavemodel( m_osc2Wave )
 	setwavemodel( m_osc3Wave1 )
 	setwavemodel( m_osc3Wave2 )
-	setwavemodel( m_lfo1Wave )
-	setwavemodel( m_lfo2Wave )
+	setlfowavemodel( m_lfo1Wave )
+	setlfowavemodel( m_lfo2Wave )
 
 // make connections:
 

@@ -59,11 +59,23 @@
 	name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
 	name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
 	name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
 	name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+	name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
 	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
 	name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );
 
-
+#define setlfowavemodel( name ) 												\
+	name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
+	name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+	name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+	name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+	name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
+	name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+	name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
+	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
+	name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
 
 
 const int O1ROW = 22;
@@ -112,10 +124,12 @@ const int WAVE_TRI = 1;
 const int WAVE_SAW = 2;
 const int WAVE_RAMP = 3;
 const int WAVE_SQR = 4;
-const int WAVE_MOOG = 5;
-const int WAVE_EXP = 6;
-const int WAVE_NOISE = 7;
-const int NUM_WAVES = 8;
+const int WAVE_SQRSOFT = 5;
+const int WAVE_MOOG = 6;
+const int WAVE_SINABS = 7;
+const int WAVE_EXP = 8;
+const int WAVE_NOISE = 9;
+const int NUM_WAVES = 10;
 
 const int MOD_MIX = 0;
 const int MOD_AM = 1;
@@ -206,8 +220,20 @@ private:
 			case WAVE_SQR:
 				return Oscillator::squareSample( _ph );
 				break;
+			case WAVE_SQRSOFT:
+			{
+				const float ph = fraction( _ph );
+				if( ph < 0.1 )	return Oscillator::sinSample( ph * 5 + 0.75 );
+				else if( ph < 0.5 ) return 1.0f;
+				else if( ph < 0.6 ) return Oscillator::sinSample( ph * 5 + 0.75 );
+				else return -1.0f;
+				break;
+			}
 			case WAVE_MOOG:
 				return Oscillator::moogSawSample( _ph );
+				break;
+			case WAVE_SINABS:
+				return qAbs( Oscillator::sinSample( _ph ) );
 				break;
 			case WAVE_EXP:
 				return Oscillator::expSample( _ph );
