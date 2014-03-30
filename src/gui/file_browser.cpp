@@ -225,6 +225,7 @@ bool fileBrowser::filterItems( QTreeWidgetItem * _item, const QString & _filter 
 
 void fileBrowser::reloadTree( void )
 {
+	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_l->clear();
 	QStringList paths = m_directories.split( '*' );
@@ -232,6 +233,8 @@ void fileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
+	m_filterEdit->setText( text );
+	filterItems( text );
 }
 
 
