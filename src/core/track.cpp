@@ -324,8 +324,6 @@ bool trackContentObjectView::fixedTCOs()
  */
 bool trackContentObjectView::close()
 {
-	m_trackView->getTrack()->addJournalCheckPoint();
-
 	m_trackView->getTrackContentWidget()->removeTCOView( this );
 	return QWidget::close();
 }
@@ -342,6 +340,8 @@ bool trackContentObjectView::close()
  */
 void trackContentObjectView::remove()
 {
+	m_trackView->getTrack()->addJournalCheckPoint();
+
 	// delete ourself
 	close();
 	m_tco->deleteLater();
@@ -2246,7 +2246,6 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 		// a track-widget not equal to ourself?
 		if( track_at_y != NULL && track_at_y != this )
 		{
-			addJournalCheckPoint();
 			// then move us up/down there!
 			if( _me->y() < 0 )
 			{
