@@ -666,8 +666,7 @@ void song::addBBTrack()
 {
 	engine::mixer()->lock();
 	track * t = track::create( track::BBTrack, this );
-	engine::getBBTrackContainer()->setCurrentBB(
-						bbTrack::numOfBBTrack( t ) );
+	engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
 	engine::mixer()->unlock();
 }
 
@@ -920,8 +919,7 @@ void song::loadProject( const QString & _file_name )
 		{
 			if( node.nodeName() == "trackcontainer" )
 			{
-				( (JournallingObject *)( this ) )->
-					restoreState( node.toElement() );
+				( (JournallingObject *)( this ) )->restoreState( node.toElement() );
 			}
 			else if( node.nodeName() == "controllers" )
 			{
@@ -933,37 +931,25 @@ void song::loadProject( const QString & _file_name )
 			}
 			else if( engine::hasGUI() )
 			{
-				if( node.nodeName() ==
-					engine::getControllerRackView()->nodeName() )
+				if( node.nodeName() == engine::getControllerRackView()->nodeName() )
 				{
-					engine::getControllerRackView()->
-						restoreState( node.toElement() );
+					engine::getControllerRackView()->restoreState( node.toElement() );
 				}
 				else if( node.nodeName() == engine::pianoRoll()->nodeName() )
 				{
 					engine::pianoRoll()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() ==
-					engine::automationEditor()->
-								nodeName() )
+				else if( node.nodeName() == engine::automationEditor()->nodeName() )
 				{
-					engine::automationEditor()->
-						restoreState( node.toElement() );
+					engine::automationEditor()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() ==
-						engine::getProjectNotes()->
-								nodeName() )
+				else if( node.nodeName() == engine::getProjectNotes()->nodeName() )
 				{
-					 engine::getProjectNotes()->
-			SerializingObject::restoreState( node.toElement() );
+					 engine::getProjectNotes()->SerializingObject::restoreState( node.toElement() );
 				}
-				else if( node.nodeName() ==
-						m_playPos[Mode_PlaySong].
-							m_timeLine->nodeName() )
+				else if( node.nodeName() == m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
 				{
-					m_playPos[Mode_PlaySong].
-						m_timeLine->restoreState(
-							node.toElement() );
+					m_playPos[Mode_PlaySong].m_timeLine->restoreState( node.toElement() );
 				}
 			}
 		}
@@ -1019,15 +1005,13 @@ bool song::saveProjectFile( const QString & _filename )
 		engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
 		engine::pianoRoll()->saveState( dataFile, dataFile.content() );
 		engine::automationEditor()->saveState( dataFile, dataFile.content() );
-		engine::getProjectNotes()->
-			SerializingObject::saveState( dataFile, dataFile.content() );
-		m_playPos[Mode_PlaySong].m_timeLine->saveState(
-							dataFile, dataFile.content() );
+		engine::getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+		m_playPos[Mode_PlaySong].m_timeLine->saveState( dataFile, dataFile.content() );
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );
 
-    return dataFile.writeFile( _filename );
+	return dataFile.writeFile( _filename );
 }
 
 
@@ -1172,8 +1156,7 @@ void song::exportProject(bool multiExport)
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( __fileEncodeDevices[idx].m_fileFormat !=
-						ProjectRenderer::NumFileFormats )
+		while( __fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats )
 		{
 			types << tr( __fileEncodeDevices[idx].m_description );
 			++idx;
@@ -1224,8 +1207,7 @@ void song::setModified()
 	{
 		m_modified = true;
 		if( engine::mainWindow() &&
-			QThread::currentThread() ==
-					engine::mainWindow()->thread() )
+			QThread::currentThread() == engine::mainWindow()->thread() )
 		{
 			engine::mainWindow()->resetWindowTitle();
 		}
@@ -1260,14 +1242,6 @@ void song::removeController( Controller * _controller )
 		}
 		emit dataChanged();
 	}
-}
-
-
-
-
-bool song::isLoadingProject()
-{
-	return m_loadingProject;
 }
 
 
