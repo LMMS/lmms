@@ -210,26 +210,29 @@ public:
 	void loadProject( const QString & _filename );
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & _filename );
-    bool saveProjectFile( const QString & _filename );
-	inline const QString & projectFileName() const
+	bool saveProjectFile( const QString & _filename );
+
+	const QString & projectFileName() const
 	{
 		return m_fileName;
 	}
-	inline bool isLoadingProject() const
+
+	bool isLoadingProject() const
 	{
 		return m_loadingProject;
 	}
-	inline bool isModified() const
+
+	bool isModified() const
 	{
 		return m_modified;
 	}
 
-	inline virtual QString nodeName() const
+	virtual QString nodeName() const
 	{
 		return "song";
 	}
 
-	virtual inline bool fixedTCOs() const
+	virtual bool fixedTCOs() const
 	{
 		return false;
 	}
@@ -273,8 +276,6 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
-
-	bool isLoadingProject();
 
 
 private slots:
