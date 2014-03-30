@@ -50,8 +50,7 @@ bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	trackContentObject( _track ),
 	m_color( _color > 0 ? _color : defaultColor() )
 {
-	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
-					bbTrack::numOfBBTrack( getTrack() ) );
+	tact_t t = engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
 	{
 		saveJournallingState( false );
@@ -108,6 +107,12 @@ void bbTCO::loadSettings( const QDomElement & _this )
 	}
 }
 
+
+
+int bbTCO::bbTrackIndex()
+{
+	return dynamic_cast<bbTrack *>( getTrack() )->index();
+}
 
 
 
@@ -190,8 +195,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 1, col.light( 70 ) );
 	p.fillRect( rect(), lingrad );
 
-	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
-				bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
+	tact_t t = engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
 	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerTact() );
@@ -230,7 +234,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 void bbTCOView::openInBBEditor()
 {
-	engine::getBBTrackContainer()->setCurrentBB( bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
+	engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
 
 	engine::mainWindow()->toggleBBEditorWin( true );
 }
@@ -504,18 +508,6 @@ bbTrack * bbTrack::findBBTrack( int _bb_num )
 
 
 
-int bbTrack::numOfBBTrack( track * _track )
-{
-	if( dynamic_cast<bbTrack *>( _track ) != NULL )
-	{
-		return s_infoMap[dynamic_cast<bbTrack *>( _track )];
-	}
-	return 0;
-}
-
-
-
-
 void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 {
 	bbTrack * t1 = dynamic_cast<bbTrack *>( _track1 );
@@ -577,8 +569,7 @@ bool bbTrackView::close()
 
 void bbTrackView::clickedTrackLabel()
 {
-	engine::getBBTrackContainer()->setCurrentBB(
-					bbTrack::numOfBBTrack( m_bbTrack ) );
+	engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
 	engine::getBBEditor()->show();
 /*	foreach( bbTrackView * tv,
 			trackContainerView()->findChildren<bbTrackView *>() )

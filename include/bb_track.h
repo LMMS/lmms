@@ -58,6 +58,8 @@ public:
 		return qRgb( 128, 182, 175 );
 	}
 
+	int bbTrackIndex();
+
 	virtual trackContentObjectView * createView( trackView * _tv );
 
 private:
@@ -122,8 +124,12 @@ public:
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 	static bbTrack * findBBTrack( int _bb_num );
-	static int numOfBBTrack( track * _track );
 	static void swapBBTracks( track * _track1, track * _track2 );
+
+	int index()
+	{
+		return s_infoMap[this];
+	}
 
 	bool automationDisabled( track * _track )
 	{
