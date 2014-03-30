@@ -666,7 +666,8 @@ void song::addBBTrack()
 {
 	engine::mixer()->lock();
 	track * t = track::create( track::BBTrack, this );
-	engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
+	engine::getBBTrackContainer()->setCurrentBB(
+						bbTrack::numOfBBTrack( t ) );
 	engine::mixer()->unlock();
 }
 
