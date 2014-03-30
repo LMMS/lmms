@@ -53,6 +53,14 @@
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
+#define maketinyled( name, x, y, ttip ) \
+	name = new pixmapButton( view, NULL ); 	\
+	name -> setCheckable( true );			\
+	name -> move( x, y );					\
+	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
+	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
+	toolTip::add( name, tr( ttip ) );
+
 #define setwavemodel( name ) 												\
 	name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
 	name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
@@ -159,7 +167,7 @@ inline double fastPow( double a, double b )
 }
 
 
-class MonstroSynth 
+class MonstroSynth
 {
 public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
@@ -172,7 +180,7 @@ public:
 	{
 		return m_samplerate;
 	}
-	
+
 private:
 
 	MonstroInstrument * m_parent;
@@ -193,14 +201,14 @@ private:
 		return s1 + ( s2 - s1 ) * x;
 	}
 
-	
+
 	inline sample_t calcSlope( sample_t _s, float _slope )
 	{
 		if( _slope == 0.0f ) return _s;
 		const double exp = fastPow( 10.0, static_cast<double>( _slope * -1.0 ) );
 		return fastPow( _s, exp );
 	}
-	
+
 	inline sample_t oscillate( int _wave, const float _ph )
 	{
 		switch( _wave )
@@ -245,7 +253,7 @@ private:
 		}
 		return 0.0;
 	}
-	
+
 
 	float m_osc1l_phase;
 	float m_osc1r_phase;
@@ -256,10 +264,15 @@ private:
 
 	sample_t m_env1_phase;
 	sample_t m_env2_phase;
-	
+
+	float m_lfo1_phase;
+	float m_lfo2_phase;
+
 	sample_t m_lfo1_last;
 	sample_t m_lfo2_last;
 
+	sample_t m_osc1l_last;
+	sample_t m_osc1r_last;
 };
 
 class MonstroInstrument : public Instrument
@@ -305,7 +318,7 @@ protected:
 	float m_osc2l_freq;
 	float m_osc2r_freq;
 	float m_osc3_freq;
-	
+
 	float m_osc1l_po;
 	float m_osc1r_po;
 	float m_osc2l_po;
@@ -318,7 +331,7 @@ protected:
 	float m_env1_hold;
 	float m_env1_dec;
 	float m_env1_rel;
-	
+
 	float m_env2_pre;
 	float m_env2_att;
 	float m_env2_hold;
@@ -327,13 +340,13 @@ protected:
 
 	f_cnt_t m_env1_len;
 	f_cnt_t m_env2_len;
-	
+
 	f_cnt_t m_env1_relF;
 	f_cnt_t m_env2_relF;
-	
+
 	f_cnt_t m_lfo1_att;
 	f_cnt_t m_lfo2_att;
-	
+
 	sample_rate_t m_samplerate;
 	fpp_t m_fpp;
 
@@ -361,6 +374,8 @@ private:
 	FloatModel	m_osc1Ftr;
 	FloatModel	m_osc1Spo;
 	FloatModel	m_osc1Pw;
+	BoolModel	m_osc1SSR;
+	BoolModel	m_osc1SSF;
 
 	FloatModel	m_osc2Vol;
 	FloatModel	m_osc2Pan;
@@ -369,6 +384,7 @@ private:
 	FloatModel	m_osc2Ftr;
 	FloatModel	m_osc2Spo;
 	ComboBoxModel	m_osc2Wave;
+	BoolModel	m_osc2Sync;
 
 	FloatModel	m_osc3Vol;
 	FloatModel	m_osc3Pan;
@@ -377,6 +393,7 @@ private:
 	FloatModel	m_osc3Sub;
 	ComboBoxModel	m_osc3Wave1;
 	ComboBoxModel	m_osc3Wave2;
+	BoolModel	m_osc3Sync;
 
 	ComboBoxModel	m_lfo1Wave;
 	TempoSyncKnobModel	m_lfo1Att;
@@ -505,6 +522,8 @@ private:
 	knob *	m_osc1FtrKnob;
 	knob *	m_osc1SpoKnob;
 	knob *	m_osc1PwKnob;
+	pixmapButton * m_osc1SSRButton;
+	pixmapButton * m_osc1SSFButton;
 
 	knob *	m_osc2VolKnob;
 	knob *	m_osc2PanKnob;
@@ -513,6 +532,7 @@ private:
 	knob *	m_osc2FtrKnob;
 	knob *	m_osc2SpoKnob;
 	comboBox *	m_osc2WaveBox;
+	pixmapButton * m_osc2SyncButton;
 
 	knob *	m_osc3VolKnob;
 	knob *	m_osc3PanKnob;
@@ -521,6 +541,7 @@ private:
 	knob *	m_osc3SubKnob;
 	comboBox *	m_osc3Wave1Box;
 	comboBox *	m_osc3Wave2Box;
+	pixmapButton * m_osc3SyncButton;
 
 	comboBox *	m_lfo1WaveBox;
 	TempoSyncKnob *	m_lfo1AttKnob;
@@ -560,7 +581,7 @@ private:
 //    matrix view knobs        //
 //                             //
 /////////////////////////////////
-	
+
 	knob * 	m_vol1env1Knob;
 	knob *	m_vol1env2Knob;
 	knob *	m_vol1lfo1Knob;
@@ -614,7 +635,7 @@ private:
 	knob * 	m_sub3env1Knob;
 	knob *	m_sub3env2Knob;
 	knob *	m_sub3lfo1Knob;
-	knob *	m_sub3lfo2Knob;	
+	knob *	m_sub3lfo2Knob;
 
 };
 

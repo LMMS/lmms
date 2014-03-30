@@ -80,6 +80,12 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 
 	m_env1_phase = 0.0;
 	m_env2_phase = 0.0;
+
+	m_lfo1_phase = 0.0;
+	m_lfo2_phase = 0.0;
+
+	m_osc1l_last = 0.0;
+	m_osc1r_last = 0.0;
 }
 
 
@@ -100,20 +106,20 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_env1_buf[f] * mod##_e1 * 2 ) ), MAX_FREQ );	\
 		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_env2_buf[f] * mod##_e2 * 2 ) ), MAX_FREQ );	\
 		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
-		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
+		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 * m_env1_buf[f], 1.0f );	\
 		if( mod##_e2 != 0.0 ) car = qBound( 0.0f, car + mod##_e2 * m_env2_buf[f], 1.0f );	\
 		if( mod##_l1 != 0.0 ) car = qBound( 0.0f, car + mod##_l1 / 2 * m_lfo1_buf[f], 1.0f );	\
 		if( mod##_l2 != 0.0 ) car = qBound( 0.0f, car + mod##_l2 / 2 * m_lfo2_buf[f], 1.0f );
-		
+
 #define modulatephs( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = fraction( car + mod##_e1 * m_env1_buf[f] );	\
 		if( mod##_e2 != 0.0 ) car = fraction( car + mod##_e2 * m_env2_buf[f] );	\
 		if( mod##_l1 != 0.0 ) car = fraction( car + mod##_l1 / 2 * m_lfo1_buf[f] );	\
 		if( mod##_l2 != 0.0 ) car = fraction( car + mod##_l2 / 2 * m_lfo2_buf[f] );
-		
+
 #define modulatevol( car, mod ) \
 		if( mod##_e1 > 0.0 ) car = qBound( 0.0f, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
 		if( mod##_e1 < 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
@@ -121,7 +127,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_e2 < 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
 		if( mod##_l1 != 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_l1 * m_lfo1_buf[f] ), MODCLIP );	\
 		if( mod##_l2 != 0.0 ) car = qBound( 0.0f, car * ( 1.0f + mod##_l2 * m_lfo2_buf[f] ), MODCLIP );
-		
+
 	// pre-render env's and lfo's
 	renderModulators( _frames );
 
@@ -132,7 +138,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o1pw_e2 = ( m_parent->m_pw1env2.value() );
 	const float o1pw_l1 = ( m_parent->m_pw1lfo1.value() );
 	const float o1pw_l2 = ( m_parent->m_pw1lfo2.value() );
-	
+
 	// get phases
 	const float o1lpo = m_parent->m_osc1l_po;
 	const float o1rpo = m_parent->m_osc1r_po;
@@ -140,8 +146,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o1p_e2 = ( m_parent->m_phs1env2.value() );
 	const float o1p_l1 = ( m_parent->m_phs1lfo1.value() );
 	const float o1p_l2 = ( m_parent->m_phs1lfo2.value() );
-	
-	// get pitch 
+
+	// get pitch
 	const float o1lfb = ( m_parent->m_osc1l_freq * m_nph->frequency() );
 	const float o1rfb = ( m_parent->m_osc1r_freq * m_nph->frequency() );
 	const float o1f_e1 = ( m_parent->m_pit1env1.value() );
@@ -157,11 +163,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o1v_l1 = ( m_parent->m_vol1lfo1.value() );
 	const float o1v_l2 = ( m_parent->m_vol1lfo2.value() );
 
-	
 	// update osc2
 	// get waveform
 	const int o2w = m_parent->m_osc2Wave.value();
-	
+
 	// get phases
 	const float o2lpo = m_parent->m_osc2l_po;
 	const float o2rpo = m_parent->m_osc2r_po;
@@ -170,9 +175,9 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o2p_l1 = ( m_parent->m_phs2lfo1.value() );
 	const float o2p_l2 = ( m_parent->m_phs2lfo2.value() );
 
-	// get pitch 
+	// get pitch
 	const float o2lfb = ( m_parent->m_osc2l_freq * m_nph->frequency() );
-	const float o2rfb = ( m_parent->m_osc2r_freq * m_nph->frequency() );	
+	const float o2rfb = ( m_parent->m_osc2r_freq * m_nph->frequency() );
 	const float o2f_e1 = ( m_parent->m_pit2env1.value() );
 	const float o2f_e2 = ( m_parent->m_pit2env2.value() );
 	const float o2f_l1 = ( m_parent->m_pit2lfo1.value() );
@@ -185,8 +190,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o2v_e2 = ( m_parent->m_vol2env2.value() );
 	const float o2v_l1 = ( m_parent->m_vol2lfo2.value() );
 	const float o2v_l2 = ( m_parent->m_vol2lfo2.value() );
-	
-	
+
+
 
 	// update osc3
 	// get waveforms
@@ -222,27 +227,33 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	const float o3s_e2 = ( m_parent->m_sub3env2.value() );
 	const float o3s_l1 = ( m_parent->m_sub3lfo1.value() );
 	const float o3s_l2 = ( m_parent->m_sub3lfo2.value() );
-	
-	
+
+
 	//o2-o3 modulation
-	
+
 	const int omod = m_parent->m_o23Mod.value();
-	
-	
+
+	// sync information
+
+	const bool o1ssr = m_parent->m_osc1SSR.value();
+	const bool o1ssf = m_parent->m_osc1SSF.value();
+	const bool o2sync = m_parent->m_osc2Sync.value();
+	const bool o3sync = m_parent->m_osc3Sync.value();
+
 	///////////////////////////
 	//                       //
 	// 	 start buffer loop   //
 	//                       //
 	///////////////////////////
-	
-	
-	
+
+
+
 	for( f_cnt_t f = 0; f < _frames; f++ )
-	{	
+	{
 
 /*
 	// debug code
-		if( f % 10 == 0 ) { 
+		if( f % 10 == 0 ) {
 			qDebug( "env1 %f -- env1 phase %f", m_env1_buf[f], m_env1_phase );
 			qDebug( "env1 pre %f att %f dec %f rel %f ", m_parent->m_env1_pre, m_parent->m_env1_att,
 				m_parent->m_env1_dec, m_parent->m_env1_rel );
@@ -255,52 +266,80 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		//				           //
 		/////////////////////////////
 
+		// sync send "signals"
+		bool syncl = false;
+		bool syncr = false;
+
 		// calc and mod frequencies
 		float o1l_f = o1lfb;
 		float o1r_f = o1rfb;
 		modulatefreq( o1l_f, o1f )
 		modulatefreq( o1r_f, o1f )
-		
+
 		// calc and modulate phase
 		float o1l_p = m_osc1l_phase + o1lpo;
 		float o1r_p = m_osc1r_phase + o1rpo;
 		modulatephs( o1l_p, o1p )
 		modulatephs( o1r_p, o1p )
-		
+
 		// calc and modulate pulse
 		float o1_pw = pw;
 		modulateabs( o1_pw, o1pw )
-		
+
 		// bounds check for phase
 		if( o1l_p < 0 ) o1l_p += 1.0f;
 		if( o1r_p < 0 ) o1r_p += 1.0f;
-		
+
 		// pulse wave osc
 		sample_t O1L = ( o1l_p < o1_pw ) ? 1.0f : -1.0f;
 		sample_t O1R = ( o1r_p < o1_pw ) ? 1.0f : -1.0f;
-		
+
+		// check for rise/fall, and "send" sync if appropriate
+		// sync on rise
+		if( o1ssr )
+		{
+			if( O1L > m_osc1l_last ) syncl = true;
+			if( O1R > m_osc1r_last ) syncr = true;
+		}
+		if( o1ssf )
+		{
+			if( O1L < m_osc1l_last ) syncl = true;
+			if( O1R < m_osc1r_last ) syncr = true;
+		}
+
+		// update last before signal is touched
+		m_osc1l_last = O1L;
+		m_osc1r_last = O1R;
+
 		// modulate volume
 		O1L *= o1lv;
 		O1R *= o1rv;
 		modulatevol( O1L, o1v )
 		modulatevol( O1R, o1v )
-		
-		// update osc1 phases	
+
+		// update osc1 phases
 		m_osc1l_phase = fraction( m_osc1l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o1l_f ) );
 		m_osc1r_phase = fraction( m_osc1r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o1r_f ) );
-		
+
 		/////////////////////////////
 		//				           //
 		//          OSC 2          //
 		//				           //
 		/////////////////////////////
-		
+
 		// calc and mod frequencies
 		float o2l_f = o2lfb;
 		float o2r_f = o2rfb;
 		modulatefreq( o2l_f, o2f )
 		modulatefreq( o2r_f, o2f )
-		
+
+		// check for sync
+		if( o2sync )
+		{
+			if( syncl ) m_osc2l_phase = 0.0f;
+			if( syncr ) m_osc2r_phase = 0.0f;
+		}
+
 		// calc and modulate phase
 		float o2l_p = m_osc2l_phase + o2lpo;
 		float o2r_p = m_osc2r_phase + o2rpo;
@@ -310,21 +349,21 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// bounds check for phase
 		if( o2l_p < 0 ) o2l_p += 1.0f;
 		if( o2r_p < 0 ) o2r_p += 1.0f;
-		
+
 		// multi-wave DC Oscillator
 		sample_t O2L = oscillate( o2w, o2l_p );
 		sample_t O2R = oscillate( o2w, o2r_p );
-		
+
 		// modulate volume
 		O2L *= o2lv;
 		O2R *= o2rv;
 		modulatevol( O2L, o2v )
 		modulatevol( O2R, o2v )
-		
-		// update osc2 phases	
+
+		// update osc2 phases
 		m_osc2l_phase = fraction( m_osc2l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2l_f ) );
 		m_osc2r_phase = fraction( m_osc2r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2r_f ) );
-		
+
 		/////////////////////////////
 		//				           //
 		//          OSC 3          //
@@ -342,7 +381,14 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			o3l_f = qBound( MIN_FREQ, o3l_f * powf( 4.0f, O2L ), MAX_FREQ );
 			o3r_f = qBound( MIN_FREQ, o3r_f * powf( 4.0f, O2R ), MAX_FREQ );
 		}
-		
+
+		// check for sync
+		if( o3sync )
+		{
+			if( syncl ) m_osc3l_phase = 0.0f;
+			if( syncr ) m_osc3r_phase = 0.0f;
+		}
+
 		// calc and modulate phase
 		float o3l_p = m_osc3l_phase + o3lpo;
 		float o3r_p = m_osc3r_phase + o3rpo;
@@ -354,7 +400,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			o3l_p = fraction( o3l_p + O2L/2 );
 			o3r_p = fraction( o3r_p + O2R/2 );
 		}
-		
+
 		// bounds check for phase
 		if( o3l_p < 0 ) o3l_p += 1.0f;
 		if( o3r_p < 0 ) o3r_p += 1.0f;
@@ -366,14 +412,14 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// multi-wave DC Oscillator, sub-osc 2
 		sample_t O3BL = oscillate( o3w2, o3l_p );
 		sample_t O3BR = oscillate( o3w2, o3r_p );
-		
+
 		// calc and modulate sub
 		float sub = o3sub;
 		modulateabs( sub, o3s )
-		
+
 		sample_t O3L = interpolate( O3AL, O3BL, sub );
 		sample_t O3R = interpolate( O3AR, O3BR, sub );
-		
+
 		// modulate volume
 		O3L *= o3lv;
 		O3R *= o3rv;
@@ -386,10 +432,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			O3R = qBound( -MODCLIP, O3R * qMax( 0.0f, 1.0f + O2R ), MODCLIP );
 		}
 
-		// update osc3 phases	
+		// update osc3 phases
 		m_osc3l_phase = fraction( m_osc3l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f ) );
 		m_osc3r_phase = fraction( m_osc3r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f ) );
-		
+
 		_buf[f][0] = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		_buf[f][1] = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 	}
@@ -399,15 +445,21 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 void MonstroSynth::renderModulators( fpp_t _frames )
 {
 	// LFO phase offsets
-	const float lfo1_p = m_parent->m_lfo1Phs.value() / 360.0f;
-	const float lfo2_p = m_parent->m_lfo2Phs.value() / 360.0f;
+	const float lfo1_po = m_parent->m_lfo1Phs.value() / 360.0f;
+	const float lfo2_po = m_parent->m_lfo2Phs.value() / 360.0f;
+
+	// remove cruft from phase counters to prevent overflow
+	m_lfo1_phase = fraction( m_lfo1_phase );
+	m_lfo2_phase = fraction( m_lfo2_phase );
 
 	// LFO rates
 	const float lfo1_r = m_parent->m_lfo1Rate.value() / 1000.0f * m_samplerate;
 	const float lfo2_r = m_parent->m_lfo2Rate.value() / 1000.0f * m_samplerate;
 
-	// LFOs
+	// frames played before
+	const f_cnt_t tfp = m_nph->totalFramesPlayed();
 
+	// LFOs
 	sample_t lfo1_s;
 	sample_t lfo2_s;
 
@@ -418,93 +470,112 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		case WAVE_SINE:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::sinSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::sinSample( ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_TRI:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::triangleSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::triangleSample( ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_SAW:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::sawSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::sawSample( ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_RAMP:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::sawSample( lfo1_p + static_cast<float>( t ) / lfo1_r ) * -1.0f;
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::sawSample( ph ) * -1.0f;
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_SQR:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::squareSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::squareSample( ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_SQRSOFT:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = oscillate( WAVE_SQRSOFT, lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = oscillate( WAVE_SQRSOFT, ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_MOOG:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::moogSawSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::moogSawSample( ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_SINABS:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = oscillate( WAVE_SINABS, lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = oscillate( WAVE_SINABS, ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_EXP:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo1_s = Oscillator::expSample( lfo1_p + static_cast<float>( t ) / lfo1_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo1_phase + lfo1_po;
+					lfo1_s = Oscillator::expSample( ph );
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 		case WAVE_NOISE:
 		default:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
+					const f_cnt_t t = f + tfp;
 					if( t % static_cast<int>( lfo1_r ) == 0 ) m_lfo1_last = Oscillator::noiseSample( 0.0f );
 					lfo1_s = m_lfo1_last;
 					if( t < m_parent->m_lfo1_att ) lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 					m_lfo1_buf[f] = lfo1_s;
+					m_lfo1_phase += 1.0 / lfo1_r;
 				}
 				break;
 	}
@@ -516,93 +587,112 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		case WAVE_SINE:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::sinSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
-					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::sinSample( ph );
+					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_TRI:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::triangleSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::triangleSample( ph );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_SAW:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::sawSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::sawSample( ph );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_RAMP:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::sawSample( lfo2_p + static_cast<float>( t ) / lfo2_r ) * -1.0f;
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::sawSample( ph ) * -1.0f;
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_SQR:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::squareSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::squareSample( ph );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_SQRSOFT:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = oscillate( WAVE_SQRSOFT, lfo2_p + static_cast<float>( t ) / lfo2_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = oscillate( WAVE_SQRSOFT, ph );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_MOOG:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::moogSawSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::moogSawSample( ph );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_SINABS:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = oscillate( WAVE_SINABS, lfo2_p + static_cast<float>( t ) / lfo2_r );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = oscillate( WAVE_SINABS, ph );
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_EXP:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
-					lfo2_s = Oscillator::expSample( lfo2_p + static_cast<float>( t ) / lfo2_r );
-					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
+					const f_cnt_t t = f + tfp;
+					const float ph = m_lfo2_phase + lfo2_po;
+					lfo2_s = Oscillator::expSample( ph );
+					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 		case WAVE_NOISE:
 		default:
 				for( f_cnt_t f = 0; f < _frames; f++ )
 				{
-					const f_cnt_t t = f + m_nph->totalFramesPlayed();
+					const f_cnt_t t = f + tfp;
 					if( t % static_cast<int>( lfo2_r ) == 0 ) m_lfo2_last = Oscillator::noiseSample( 0.0f );
 					lfo2_s = m_lfo2_last;
 					if( t < m_parent->m_lfo2_att ) lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 					m_lfo2_buf[f] = lfo2_s;
+					m_lfo2_phase += 1.0 / lfo2_r;
 				}
 				break;
 	}
@@ -617,10 +707,10 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 
 	const float env1_s = m_parent-> m_env1Slope.value();
 	const float env2_s = m_parent-> m_env2Slope.value();
-	
+
 	const float env1_sus = m_parent-> m_env1Sus.value();
 	const float env2_sus = m_parent-> m_env2Sus.value();
-	
+
 	for( f_cnt_t f = 0; f < _frames; f++ )
 	{
 		// envelope 1
@@ -633,7 +723,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 			else if( m_env1_phase < 3.0f ) m_env1_phase = 4.0f;
 			else m_env1_phase = 4.0f + fraction( m_env1_phase );
 		}
-		
+
 		// process envelope
 		if( m_env1_phase < 1.0f ) // pre-delay phase
 		{
@@ -653,7 +743,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		else if( m_env1_phase < 4.0f ) // decay phase
 		{
 			const sample_t s = 1.0f - fraction( m_env1_phase );
-			if( s <= env1_sus )	
+			if( s <= env1_sus )
 			{
 				m_env1_buf[f] = env1_sus;
 			}
@@ -685,7 +775,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 			else if( m_env2_phase < 3.0f ) m_env2_phase = 4.0f;
 			else m_env2_phase = 4.0f + fraction( m_env2_phase );
 		}
-		
+
 		// process envelope
 		if( m_env2_phase < 1.0f ) // pre-delay phase
 		{
@@ -705,7 +795,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		else if( m_env2_phase < 4.0f ) // decay phase
 		{
 			const sample_t s = 1.0f - fraction( m_env2_phase );
-			if( s <= env2_sus )	
+			if( s <= env2_sus )
 			{
 				m_env2_buf[f] = env2_sus;
 			}
@@ -739,6 +829,8 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		m_osc1Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 Fine detune right" ) ),
 		m_osc1Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 1 Stereo phase offset" ) ),
 		m_osc1Pw( 50.0, 0.0, 100.0, 0.01, this, tr( "Osc 1 Pulse width" ) ),
+		m_osc1SSR( false, this, tr( "Osc 1 Sync send on rise" ) ),
+		m_osc1SSF( false, this, tr( "Osc 1 Sync send on fall" ) ),
 
 		m_osc2Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 2 Volume" ) ),
 		m_osc2Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 2 Panning" ) ),
@@ -747,6 +839,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		m_osc2Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 Fine detune right" ) ),
 		m_osc2Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 2 Stereo phase offset" ) ),
 		m_osc2Wave( this, tr( "Osc 2 Waveform" ) ),
+		m_osc2Sync( false, this, tr( "Osc 2 Sync" ) ),
 
 		m_osc3Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 3 Volume" ) ),
 		m_osc3Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 Panning" ) ),
@@ -755,15 +848,16 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		m_osc3Sub( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 Sub-oscillator mix" ) ),
 		m_osc3Wave1( this, tr( "Osc 3 Waveform 1" ) ),
 		m_osc3Wave2( this, tr( "Osc 3 Waveform 2" ) ),
+		m_osc3Sync( false, this, tr( "Osc 3 Sync" ) ),
 
 		m_lfo1Wave( this, tr( "LFO 1 Waveform" ) ),
 		m_lfo1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 1 Attack" ) ),
-		m_lfo1Rate( 1.0f, 0.1, 20000.0, 0.1, 20000.0f, this, tr( "LFO 1 Rate" ) ),
+		m_lfo1Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 1 Rate" ) ),
 		m_lfo1Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 1 Phase" ) ),
 
 		m_lfo2Wave( this, tr( "LFO 2 Waveform" ) ),
 		m_lfo2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 2 Attack" ) ),
-		m_lfo2Rate( 1.0f, 0.1, 20000.0, 0.1, 20000.0f, this, tr( "LFO 2 Rate" ) ),
+		m_lfo2Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 2 Rate" ) ),
 		m_lfo2Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 2 Phase" ) ),
 
 		m_env1Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 Pre-delay" ) ),
@@ -876,7 +970,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO() ) );
 	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO() ) );
 	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO() ) );
-	
+
 // updateEnvelope1
 
 	connect( &m_env1Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
@@ -952,6 +1046,8 @@ void MonstroInstrument::saveSettings( QDomDocument & _doc,
 	m_osc1Ftr.saveSettings( _doc, _this, "o1ftr" );
 	m_osc1Spo.saveSettings( _doc, _this, "o1spo" );
 	m_osc1Pw.saveSettings( _doc, _this, "o1pw" );
+	m_osc1SSR.saveSettings( _doc, _this, "o1ssr" );
+	m_osc1SSF.saveSettings( _doc, _this, "o1ssf" );
 
 	m_osc2Vol.saveSettings( _doc, _this, "o2vol" );
 	m_osc2Pan.saveSettings( _doc, _this, "o2pan" );
@@ -960,6 +1056,7 @@ void MonstroInstrument::saveSettings( QDomDocument & _doc,
 	m_osc2Ftr.saveSettings( _doc, _this, "o2ftr" );
 	m_osc2Spo.saveSettings( _doc, _this, "o2spo" );
 	m_osc2Wave.saveSettings( _doc, _this, "o2wav" );
+	m_osc2Sync.saveSettings( _doc, _this, "o2syn" );
 
 	m_osc3Vol.saveSettings( _doc, _this, "o3vol" );
 	m_osc3Pan.saveSettings( _doc, _this, "o3pan" );
@@ -968,6 +1065,7 @@ void MonstroInstrument::saveSettings( QDomDocument & _doc,
 	m_osc3Sub.saveSettings( _doc, _this, "o3sub" );
 	m_osc3Wave1.saveSettings( _doc, _this, "o3wav1" );
 	m_osc3Wave2.saveSettings( _doc, _this, "o3wav2" );
+	m_osc3Sync.saveSettings( _doc, _this, "o3syn" );
 
 	m_lfo1Wave.saveSettings( _doc, _this, "l1wav" );
 	m_lfo1Att.saveSettings( _doc, _this, "l1att" );
@@ -995,7 +1093,7 @@ void MonstroInstrument::saveSettings( QDomDocument & _doc,
 	m_env2Rel.saveSettings( _doc, _this, "e2rel" );
 	m_env2Slope.saveSettings( _doc, _this, "e2slo" );
 
-	m_o23Mod.saveSettings( _doc, _this, "o23mo" );	
+	m_o23Mod.saveSettings( _doc, _this, "o23mo" );
 
 	m_vol1env1.saveSettings( _doc, _this, "v1e1" );
 	m_vol1env2.saveSettings( _doc, _this, "v1e2" );
@@ -1051,8 +1149,8 @@ void MonstroInstrument::saveSettings( QDomDocument & _doc,
 	m_sub3env2.saveSettings( _doc, _this, "s3e2" );
 	m_sub3lfo1.saveSettings( _doc, _this, "s3l1" );
 	m_sub3lfo2.saveSettings( _doc, _this, "s3l2" );
-	
-}						
+
+}
 
 void MonstroInstrument::loadSettings( const QDomElement & _this )
 {
@@ -1063,6 +1161,8 @@ void MonstroInstrument::loadSettings( const QDomElement & _this )
 	m_osc1Ftr.loadSettings( _this, "o1ftr" );
 	m_osc1Spo.loadSettings( _this, "o1spo" );
 	m_osc1Pw.loadSettings( _this, "o1pw" );
+	m_osc1SSR.loadSettings( _this, "o1ssr" );
+	m_osc1SSF.loadSettings( _this, "o1ssf" );
 
 	m_osc2Vol.loadSettings( _this, "o2vol" );
 	m_osc2Pan.loadSettings( _this, "o2pan" );
@@ -1071,6 +1171,7 @@ void MonstroInstrument::loadSettings( const QDomElement & _this )
 	m_osc2Ftr.loadSettings( _this, "o2ftr" );
 	m_osc2Spo.loadSettings( _this, "o2spo" );
 	m_osc2Wave.loadSettings( _this, "o2wav" );
+	m_osc2Sync.loadSettings( _this, "o2syn" );
 
 	m_osc3Vol.loadSettings( _this, "o3vol" );
 	m_osc3Pan.loadSettings( _this, "o3pan" );
@@ -1079,6 +1180,7 @@ void MonstroInstrument::loadSettings( const QDomElement & _this )
 	m_osc3Sub.loadSettings( _this, "o3sub" );
 	m_osc3Wave1.loadSettings( _this, "o3wav1" );
 	m_osc3Wave2.loadSettings( _this, "o3wav2" );
+	m_osc3Sync.loadSettings( _this, "o3syn" );
 
 	m_lfo1Wave.loadSettings( _this, "l1wav" );
 	m_lfo1Att.loadSettings( _this, "l1att" );
@@ -1106,7 +1208,7 @@ void MonstroInstrument::loadSettings( const QDomElement & _this )
 	m_env2Rel.loadSettings( _this, "e2rel" );
 	m_env2Slope.loadSettings( _this, "e2slo" );
 
-	m_o23Mod.loadSettings( _this, "o23mo" );	
+	m_o23Mod.loadSettings( _this, "o23mo" );
 
 	m_vol1env1.loadSettings( _this, "v1e1" );
 	m_vol1env2.loadSettings( _this, "v1e2" );
@@ -1162,7 +1264,7 @@ void MonstroInstrument::loadSettings( const QDomElement & _this )
 	m_sub3env2.loadSettings( _this, "s3e2" );
 	m_sub3lfo1.loadSettings( _this, "s3l1" );
 	m_sub3lfo2.loadSettings( _this, "s3l2" );
-	
+
 }
 
 
@@ -1174,7 +1276,7 @@ QString MonstroInstrument::nodeName() const
 
 f_cnt_t MonstroInstrument::desiredReleaseFrames() const
 {
-	return qMax( 64, qMax( m_env1_relF, m_env2_relF ) );
+	return 64;
 }
 
 
@@ -1188,27 +1290,27 @@ void MonstroInstrument::updateVolumes()
 {
 	m_osc1l_vol = leftCh( m_osc1Vol.value(), m_osc1Pan.value() );
 	m_osc1r_vol = rightCh( m_osc1Vol.value(), m_osc1Pan.value() );
-	
+
 	m_osc2l_vol = leftCh( m_osc2Vol.value(), m_osc2Pan.value() );
 	m_osc2r_vol = rightCh( m_osc2Vol.value(), m_osc2Pan.value() );
-	
+
 	m_osc3l_vol = leftCh( m_osc3Vol.value(), m_osc3Pan.value() );
-	m_osc3r_vol = rightCh( m_osc3Vol.value(), m_osc3Pan.value() );	
+	m_osc3r_vol = rightCh( m_osc3Vol.value(), m_osc3Pan.value() );
 }
 
 
 void MonstroInstrument::updateFreq()
 {
-	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *  
+	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc1Ftl.value() / 1200.0f );
-	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *  
+	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc1Ftr.value() / 1200.0f );
-					
-	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *  
+
+	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc2Ftl.value() / 1200.0f );
-	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *  
+	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc2Ftr.value() / 1200.0f );
-					
+
 	m_osc3_freq = powf( 2.0f, m_osc3Crs.value() / 12.0f );
 }
 
@@ -1217,10 +1319,10 @@ void MonstroInstrument::updatePO()
 {
 	m_osc1l_po = m_osc1Spo.value() / 360.0;
 	m_osc1r_po = ( m_osc1Spo.value() * -1.0 ) / 360.0;
-	
+
 	m_osc2l_po = m_osc2Spo.value() / 360.0;
 	m_osc2r_po = ( m_osc2Spo.value() * -1.0 ) / 360.0;
-	
+
 	m_osc3l_po = m_osc3Spo.value() / 360.0;
 	m_osc3r_po = ( m_osc3Spo.value() * -1.0 ) / 360.0;
 }
@@ -1237,7 +1339,7 @@ void MonstroInstrument::updateEnvelope1()
 		else m_env1_dec =  1.0 / ( m_env1Dec.value()  / 1000.0f ) / m_samplerate;
 	if( m_env1Rel.value() == 0.0f ) m_env1_rel = 1.0;
 		else m_env1_rel =  1.0 / ( m_env1Rel.value()  / 1000.0f ) / m_samplerate;
-	
+
 	m_env1_len = ( m_env1Pre.value() + m_env1Att.value() + m_env1Hold.value() + m_env1Dec.value() ) * m_samplerate / 1000.0f;
 	m_env1_relF = m_env1Rel.value() * m_samplerate / 1000.0f;
 }
@@ -1253,7 +1355,7 @@ void MonstroInstrument::updateEnvelope2()
 		else m_env2_dec =  1.0 / ( m_env2Dec.value()  / 1000.0f ) / m_samplerate;
 	if( m_env2Rel.value() == 0.0f ) m_env2_rel = 1.0;
 		else m_env2_rel =  1.0 / ( m_env2Rel.value()  / 1000.0f ) / m_samplerate;
-	
+
 	m_env2_len = ( m_env2Pre.value() + m_env2Att.value() + m_env2Hold.value() + m_env2Dec.value() ) * m_samplerate / 1000.0f;
 	m_env2_relF = m_env2Rel.value() * m_samplerate / 1000.0f;
 }
@@ -1283,30 +1385,30 @@ MonstroView::MonstroView( Instrument * _instrument,
 	setWidgetBackground( m_operatorsView, "artwork_op" );
 	m_operatorsView->show();
 	m_operatorsView->move( 0, 0 );
-	
+
 	m_matrixView = setupMatrixView( this );
 	setWidgetBackground( m_matrixView, "artwork_mat" );
 	m_matrixView->hide();
 	m_matrixView->move( 0, 0 );
-	
+
 // "tab buttons"
-	
+
 	pixmapButton * m_opViewButton = new pixmapButton( this, NULL );
 	m_opViewButton -> move( 0,0 );
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
 	toolTip::add( m_opViewButton, tr( "Operators view" ) );
-	
+
 	pixmapButton * m_matViewButton = new pixmapButton( this, NULL );
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
 	toolTip::add( m_matViewButton, tr( "Matrix view" ) );
-	
+
 	m_selectedViewGroup = new automatableButtonGroup( this );
 	m_selectedViewGroup -> addButton( m_opViewButton );
 	m_selectedViewGroup -> addButton( m_matViewButton );
-	
+
 	connect( m_opViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 	connect( m_matViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 }
@@ -1336,7 +1438,7 @@ void MonstroView::updateLayout()
 void MonstroView::modelChanged()
 {
 	MonstroInstrument * m = castModel<MonstroInstrument>();
-	
+
 	m_osc1VolKnob-> setModel( &m-> m_osc1Vol );
 	m_osc1PanKnob-> setModel( &m-> m_osc1Pan );
 	m_osc1CrsKnob-> setModel( &m-> m_osc1Crs );
@@ -1344,6 +1446,8 @@ void MonstroView::modelChanged()
 	m_osc1FtrKnob-> setModel( &m-> m_osc1Ftr );
 	m_osc1SpoKnob-> setModel( &m-> m_osc1Spo );
 	m_osc1PwKnob-> setModel( &m-> m_osc1Pw );
+	m_osc1SSRButton-> setModel( &m-> m_osc1SSR );
+	m_osc1SSFButton-> setModel( &m-> m_osc1SSF );
 
 	m_osc2VolKnob-> setModel( &m-> m_osc2Vol );
 	m_osc2PanKnob-> setModel( &m-> m_osc2Pan );
@@ -1352,25 +1456,27 @@ void MonstroView::modelChanged()
 	m_osc2FtrKnob-> setModel( &m-> m_osc2Ftr );
 	m_osc2SpoKnob-> setModel( &m-> m_osc2Spo );
 	m_osc2WaveBox-> setModel( &m-> m_osc2Wave );
+	m_osc2SyncButton-> setModel( &m-> m_osc2Sync );
 
 	m_osc3VolKnob-> setModel( &m-> m_osc3Vol );
 	m_osc3PanKnob-> setModel( &m-> m_osc3Pan );
 	m_osc3CrsKnob-> setModel( &m-> m_osc3Crs );
 	m_osc3SpoKnob-> setModel( &m-> m_osc3Spo );
-	m_osc3SubKnob-> setModel( &m-> m_osc3Sub );	
+	m_osc3SubKnob-> setModel( &m-> m_osc3Sub );
 	m_osc3Wave1Box-> setModel( &m-> m_osc3Wave1 );
 	m_osc3Wave2Box-> setModel( &m-> m_osc3Wave2 );
-	
+	m_osc3SyncButton-> setModel( &m-> m_osc3Sync );
+
 	m_lfo1WaveBox-> setModel( &m-> m_lfo1Wave );
 	m_lfo1AttKnob-> setModel( &m-> m_lfo1Att );
 	m_lfo1RateKnob-> setModel( &m-> m_lfo1Rate );
 	m_lfo1PhsKnob-> setModel( &m-> m_lfo1Phs );
-	
+
 	m_lfo2WaveBox-> setModel( &m-> m_lfo2Wave );
 	m_lfo2AttKnob-> setModel( &m-> m_lfo2Att );
 	m_lfo2RateKnob-> setModel( &m-> m_lfo2Rate );
 	m_lfo2PhsKnob-> setModel( &m-> m_lfo2Phs );
-	
+
 	m_env1PreKnob-> setModel( &m->  m_env1Pre );
 	m_env1AttKnob-> setModel( &m->  m_env1Att );
 	m_env1HoldKnob-> setModel( &m->  m_env1Hold );
@@ -1378,7 +1484,7 @@ void MonstroView::modelChanged()
 	m_env1SusKnob-> setModel( &m->  m_env1Sus );
 	m_env1RelKnob-> setModel( &m->  m_env1Rel  );
 	m_env1SlopeKnob-> setModel( &m->  m_env1Slope );
-	
+
 	m_env2PreKnob-> setModel( &m->  m_env2Pre );
 	m_env2AttKnob-> setModel( &m->  m_env2Att );
 	m_env2HoldKnob-> setModel( &m->  m_env2Hold );
@@ -1386,10 +1492,10 @@ void MonstroView::modelChanged()
 	m_env2SusKnob-> setModel( &m->  m_env2Sus );
 	m_env2RelKnob-> setModel( &m->  m_env2Rel  );
 	m_env2SlopeKnob-> setModel( &m->  m_env2Slope );
-	
+
 	m_o23ModGroup-> setModel( &m-> m_o23Mod );
 	m_selectedViewGroup-> setModel( &m-> m_selectedView );
-	
+
 	m_vol1env1Knob-> setModel( &m-> m_vol1env1 );
 	m_vol1env2Knob-> setModel( &m-> m_vol1env2 );
 	m_vol1lfo1Knob-> setModel( &m-> m_vol1lfo1 );
@@ -1444,7 +1550,7 @@ void MonstroView::modelChanged()
 	m_sub3env2Knob-> setModel( &m-> m_sub3env2 );
 	m_sub3lfo1Knob-> setModel( &m-> m_sub3lfo1 );
 	m_sub3lfo2Knob-> setModel( &m->	m_sub3lfo2 );
-	
+
 }
 
 
@@ -1461,10 +1567,10 @@ void MonstroView::setWidgetBackground( QWidget * _widget, const QString & _pic )
 QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 {
 	// operators view
-	
+
 	QWidget * view = new QWidget( _parent );
 	view-> setFixedSize( 250, 250 );
-	
+
 	makeknob( m_osc1VolKnob, KNOBCOL1, O1ROW, "Volume", "%", "osc1Knob" )
 	makeknob( m_osc1PanKnob, KNOBCOL2, O1ROW, "Panning", "", "osc1Knob" )
 	makeknob( m_osc1CrsKnob, KNOBCOL3, O1ROW, "Coarse detune", " seminotes", "osc1Knob" )
@@ -1475,19 +1581,24 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc1VolKnob -> setVolumeKnob( true );
 
+	maketinyled( m_osc1SSRButton, 230, 34, "Send sync on pulse rise" )
+	maketinyled( m_osc1SSFButton, 230, 44, "Send sync on pulse fall" )
+
 	makeknob( m_osc2VolKnob, KNOBCOL1, O2ROW, "Volume", "%", "osc2Knob" )
 	makeknob( m_osc2PanKnob, KNOBCOL2, O2ROW, "Panning", "", "osc2Knob" )
 	makeknob( m_osc2CrsKnob, KNOBCOL3, O2ROW, "Coarse detune", " seminotes", "osc2Knob" )
 	makeknob( m_osc2FtlKnob, KNOBCOL4, O2ROW, "Finetune left", " cents", "osc2Knob" )
 	makeknob( m_osc2FtrKnob, KNOBCOL5, O2ROW, "Finetune right", " cents", "osc2Knob" )
 	makeknob( m_osc2SpoKnob, KNOBCOL6, O2ROW, "Stereo phase offset", " deg", "osc2Knob" )
-	
+
 	m_osc2VolKnob -> setVolumeKnob( true );
-	
+
 	m_osc2WaveBox = new comboBox( view );
-	m_osc2WaveBox -> setGeometry( KNOBCOL7, O2ROW + 4, 42, 22 );
+	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, 22 );
 	m_osc2WaveBox->setFont( pointSize<8>( m_osc2WaveBox->font() ) );
-	
+
+	maketinyled( m_osc2SyncButton, 204, O2ROW - 3, "Sync oscillator 2" )
+
 	makeknob( m_osc3VolKnob, KNOBCOL1, O3ROW, "Volume", "%", "osc3Knob" )
 	makeknob( m_osc3PanKnob, KNOBCOL2, O3ROW, "Panning", "", "osc3Knob" )
 	makeknob( m_osc3CrsKnob, KNOBCOL3, O3ROW, "Coarse detune", " seminotes", "osc3Knob" )
@@ -1495,29 +1606,31 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc3SubKnob, KNOBCOL5, O3ROW, "Sub-osc mix", "", "osc3Knob" )
 
 	m_osc3Wave1Box = new comboBox( view );
-	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 4, 42, 22 );
+	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, 22 );
 	m_osc3Wave1Box->setFont( pointSize<8>( m_osc3Wave1Box->font() ) );
 
 	m_osc3Wave2Box = new comboBox( view );
-	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 4, 42, 22 );
+	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, 22 );
 	m_osc3Wave2Box->setFont( pointSize<8>( m_osc3Wave2Box->font() ) );
-	
+
+	maketinyled( m_osc3SyncButton, 204, O3ROW - 3, "Sync oscillator 3" )
+
 	m_lfo1WaveBox = new comboBox( view );
 	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, 22 );
-	m_lfo1WaveBox->setFont( pointSize<8>( m_lfo1WaveBox->font() ) );	
+	m_lfo1WaveBox->setFont( pointSize<8>( m_lfo1WaveBox->font() ) );
 
 	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, "Attack", " ms", "lfoKnob" )
 	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, "Rate", " ms", "lfoKnob" )
 	makeknob( m_lfo1PhsKnob, LFOCOL3, LFOROW, "Phase", " deg", "lfoKnob" )
-	
+
 	m_lfo2WaveBox = new comboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, 22 );
-	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );	
+	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
 	maketsknob( m_lfo2AttKnob, LFOCOL4, LFOROW, "Attack", " ms", "lfoKnob" )
 	maketsknob( m_lfo2RateKnob, LFOCOL5, LFOROW, "Rate", " ms", "lfoKnob" )
 	makeknob( m_lfo2PhsKnob, LFOCOL6, LFOROW, "Phase", " deg", "lfoKnob" )
-	
+
 	maketsknob( m_env1PreKnob, KNOBCOL1, E1ROW, "Pre-delay", " ms", "envKnob" )
 	maketsknob( m_env1AttKnob, KNOBCOL2, E1ROW, "Attack", " ms", "envKnob" )
 	maketsknob( m_env1HoldKnob, KNOBCOL3, E1ROW, "Hold", " ms", "envKnob" )
@@ -1546,7 +1659,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
 	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
 	toolTip::add( m_amButton, tr( "Modulate amplitude of Osc3 with Osc2" ) );
-	
+
 	pixmapButton * m_fmButton = new pixmapButton( view, NULL );
 	m_fmButton -> move( 225, 185 + 15*2 );
 	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
@@ -1558,13 +1671,13 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
 	toolTip::add( m_pmButton, tr( "Modulate phase of Osc3 with Osc2" ) );
-	
+
 	m_o23ModGroup = new automatableButtonGroup( view );
 	m_o23ModGroup-> addButton( m_mixButton );
 	m_o23ModGroup-> addButton( m_amButton );
 	m_o23ModGroup-> addButton( m_fmButton );
 	m_o23ModGroup-> addButton( m_pmButton );
-	
+
 	return( view );
 }
 
@@ -1572,10 +1685,10 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 QWidget * MonstroView::setupMatrixView( QWidget * _parent )
 {
 	// matrix view
-	
+
 	QWidget * view = new QWidget( _parent );
 	view-> setFixedSize( 250, 250 );
-	
+
 	makeknob( m_vol1env1Knob, MATCOL1, MATROW1, "Modulation amount", "", "matrixKnob" )
 	makeknob( m_vol1env2Knob, MATCOL2, MATROW1, "Modulation amount", "", "matrixKnob" )
 	makeknob( m_vol1lfo1Knob, MATCOL3, MATROW1, "Modulation amount", "", "matrixKnob" )
@@ -1630,7 +1743,7 @@ QWidget * MonstroView::setupMatrixView( QWidget * _parent )
 	makeknob( m_sub3env2Knob, MATCOL6, MATROW6, "Modulation amount", "", "matrixKnob" )
 	makeknob( m_sub3lfo1Knob, MATCOL7, MATROW6, "Modulation amount", "", "matrixKnob" )
 	makeknob( m_sub3lfo2Knob, MATCOL8, MATROW6, "Modulation amount", "", "matrixKnob" )
-	
+
 	return( view );
 }
 
