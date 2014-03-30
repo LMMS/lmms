@@ -161,10 +161,9 @@ bbEditor::~bbEditor()
 
 void bbEditor::removeBBView( int _bb )
 {
-	QList<trackView *> tl = trackViews();
-	for( int i = 0; i < tl.size(); ++i )
+	foreach( trackView* view, trackViews() )
 	{
-		tl[i]->getTrackContentWidget()->removeTCOView( _bb );
+		view->getTrackContentWidget()->removeTCOView( _bb );
 	}
 }
 
