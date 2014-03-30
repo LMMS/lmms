@@ -156,6 +156,8 @@ void TrackContainerView::removeTrackView( trackView * _tv )
 
 void TrackContainerView::moveTrackViewUp( trackView * _tv )
 {
+	m_tc->addJournalCheckPoint();
+
 	for( int i = 1; i < m_trackViews.size(); ++i )
 	{
 		trackView * t = m_trackViews[i];
@@ -178,6 +180,8 @@ void TrackContainerView::moveTrackViewUp( trackView * _tv )
 
 void TrackContainerView::moveTrackViewDown( trackView * _tv )
 {
+	m_tc->addJournalCheckPoint();
+
 	for( int i = 0; i < m_trackViews.size()-1; ++i )
 	{
 		trackView * t = m_trackViews[i];
@@ -219,6 +223,8 @@ void TrackContainerView::realignTracks()
 
 void TrackContainerView::createTrackView( track * _t )
 {
+	m_tc->addJournalCheckPoint();
+
 	_t->createView( this );
 }
 

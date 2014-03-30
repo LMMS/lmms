@@ -160,8 +160,6 @@ void TrackContainer::addTrack( track * _track )
 {
 	if( _track->type() != track::HiddenAutomationTrack )
 	{
-		addJournalCheckPoint();
-
 		m_tracksMutex.lockForWrite();
 		m_tracks.push_back( _track );
 		m_tracksMutex.unlock();
