@@ -99,8 +99,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 #define modulatefreq( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env1_buf[f] * mod##_e1 ) ), MAX_FREQ );	\
 		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 10.0, m_env2_buf[f] * mod##_e2 ) ), MAX_FREQ );	\
-		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 5.0, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
-		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 5.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
+		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.5, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
+		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.5, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );	
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 * m_env1_buf[f], 1.0f );	\
@@ -332,8 +332,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// o2 modulation?
 		if( omod == MOD_FM )
 		{
-			o3l_f = qBound( MIN_FREQ, o3l_f * powf( 5, O2L ), MAX_FREQ );
-			o3r_f = qBound( MIN_FREQ, o3r_f * powf( 5, O2R ), MAX_FREQ );
+			o3l_f = qBound( MIN_FREQ, o3l_f * powf( 4.0f, O2L ), MAX_FREQ );
+			o3r_f = qBound( MIN_FREQ, o3r_f * powf( 4.0f, O2R ), MAX_FREQ );
 		}
 		
 		// calc and modulate phase
