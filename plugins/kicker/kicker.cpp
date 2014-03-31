@@ -69,7 +69,8 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_clickModel( 0.4f, 0.0f, 1.0f, 0.05f, this, tr( "Click" ) ),
 	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Slope" ) ),
 	m_startNoteModel( false, this, tr( "Start from note" ) ),
-	m_endNoteModel( false, this, tr( "End to note" ) )
+	m_endNoteModel( false, this, tr( "End to note" ) ),
+	m_versionModel( 0, 0, KICKER_PRESET_VERSION, this, "" )
 {
 }
 
@@ -97,6 +98,7 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 	m_slopeModel.saveSettings( _doc, _this, "slope" );
 	m_startNoteModel.saveSettings( _doc, _this, "startnote" );
 	m_endNoteModel.saveSettings( _doc, _this, "endnote" );
+	m_versionModel.saveSettings( _doc, _this, "version" );
 }
 
 
@@ -115,6 +117,17 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_slopeModel.loadSettings( _this, "slope" );
 	m_startNoteModel.loadSettings( _this, "startnote" );
 	m_endNoteModel.loadSettings( _this, "endnote" );
+	m_versionModel.loadSettings( _this, "version" );
+
+	// Try to maintain backwards compatibility
+	if( m_versionModel.value() < 1 )
+	{
+		m_decayModel.setValue( m_decayModel.value() * 1.33f );
+		m_envModel.setValue( 1.0f );
+		m_slopeModel.setValue( 1.0f );
+		m_clickModel.setValue( 0.0f );
+		m_versionModel.setValue( KICKER_PRESET_VERSION );
+	}
 }
 
 

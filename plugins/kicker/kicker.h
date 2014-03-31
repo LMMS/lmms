@@ -34,6 +34,9 @@
 #include "led_checkbox.h"
 
 
+#define KICKER_PRESET_VERSION 1
+
+
 class kickerInstrumentView;
 class NotePlayHandle;
 
@@ -79,6 +82,8 @@ private:
 
 	BoolModel m_startNoteModel;
 	BoolModel m_endNoteModel;
+
+	IntModel m_versionModel;
 
 	friend class kickerInstrumentView;
 
