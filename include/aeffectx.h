@@ -113,12 +113,7 @@ const int effGetVstVersion = 58; // currently unused
 const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
 const int kVstLangEnglish = 1;
 const int kVstMidiType = 1;
-/*const int kVstParameterUsesFloatStep = 1 << 2;
-const int kVstPpqPosValid = 1 << 9;
-const int kVstTempoValid = 1 << 10;
-const int kVstBarsValid = 1 << 11;
-const int kVstCyclePosValid = 1 << 12;
-const int kVstTimeSigValid = 1 << 13;*/
+
 const int kVstTransportPlaying = 1 << 1;
 const int kVstTransportCycleActive = 1 << 2;
 const int kVstTransportChanged = 1;
