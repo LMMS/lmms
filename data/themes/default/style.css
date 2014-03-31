@@ -644,6 +644,16 @@ WatsynView knob#xtalkKnob {
 	qproperty-outerColor: #fb50fb;
 }
 
+MonstroView knob {
+	color: #ffffff;
+	qproperty-outerColor: #aaaaaa;
+	qproperty-outerRadius: 9;
+	qproperty-innerRadius: 6;
+	qproperty-centerPointX: 10;
+	qproperty-centerPointY: 10;
+	qproperty-lineWidth: 2.5;
+}
+
 /* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
  * colour codes MUST be of the form #RRGGBB */
 
