@@ -47,8 +47,8 @@
 
 QPixmap * timeLine::s_timeLinePixmap = NULL;
 QPixmap * timeLine::s_posMarkerPixmap = NULL;
-QPixmap * timeLine::s_loopPointPixmap = NULL;
-
+QPixmap * timeLine::s_loopPointBeginPixmap = NULL;
+QPixmap * timeLine::s_loopPointEndPixmap = NULL;
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			song::playPos & _pos, const MidiTime & _begin,
