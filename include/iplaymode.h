@@ -28,6 +28,11 @@
 
 class IPlayMode
 {
+public:
+    virtual ~IPlayMode(){}
+    virtual void process(PlayModes, TrackList,int) = 0;
 };
+
+
 
 #endif // IPLAYMODE_H
