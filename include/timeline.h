@@ -149,7 +149,8 @@ protected:
 private:
 	static QPixmap * s_timeLinePixmap;
 	static QPixmap * s_posMarkerPixmap;
-	static QPixmap * s_loopPointPixmap;
+	static QPixmap * s_loopPointBeginPixmap;
+	static QPixmap * s_loopPointEndPixmap;
 	static QPixmap * s_loopPointDisabledPixmap;
 
 	AutoScrollStates m_autoScroll;
