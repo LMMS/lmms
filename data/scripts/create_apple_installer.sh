@@ -13,8 +13,16 @@
 # MacPorts Location
 MACPORTS=/opt/local
  
+ # LMMS source directory
+CMAKE_SRC=$HOME/lmms
+ 
 # LMMS compiled resources
-CMAKE_INSTALL=$HOME/lmms/target
+CMAKE_INSTALL=$CMAKE_SRC/target
+
+# LMMS source build directory
+CMAKE_BUILD=$CMAKE_SRC/build
+
+
 
 # Place to create ".app" bundle
 APP=$HOME/Desktop/LMMS.app
@@ -74,7 +82,7 @@ install_name_tool -change libZynAddSubFxCore.dylib \
    @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
    $APP/Contents/lib/lmms/libzynaddsubfx.so
 
-install_name_tool -change $HOME/lmms/build/plugins/zynaddsubfx/libZynAddSubFxCore.dylib \
+install_name_tool -change $CMAKE_BUILD/plugins/zynaddsubfx/libZynAddSubFxCore.dylib \
    @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
    $APP/Contents/MacOS/RemoteZynAddSubFx
 
@@ -96,7 +104,7 @@ _executables="$_executables -executable=$APP/Contents/Frameworks/libZynAddSubFxC
 macdeployqt $APP $_executables
 
 # OS X Specific Artwork
-cp $HOME/lmms/data/lmms.icns $APP/Contents/Resources/
+cp $CMAKE_SRC/data/lmms.icns $APP/Contents/Resources/
 
 # Create "Info.plist" using lmms.icns file, http://iconverticons.com/online/)
 echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$APP/Contents/Info.plist"
@@ -110,4 +118,6 @@ echo -e "   </dict>" >> "$APP/Contents/Info.plist"
 echo -e "</plist>" >> "$APP/Contents/Info.plist"
 
 # Done.  Ready to build DMG
-echo -e "\nFinished.\n\nPlease run \"create_apple_dmg.sh\" to build the installer.\n"
+echo -e "\nFinished.\n\nPlease run \"create_apple_dmg.sh\" from the Desktop to build the installer.\n"
+cp $CMAKE_SRC/data/scripts/create_apple_dmg.sh $HOME/Desktop/
+chmod +x $HOME/Desktop/create_apple_dmg.sh
