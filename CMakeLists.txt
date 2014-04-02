@@ -52,7 +52,7 @@ IF(LMMS_BUILD_APPLE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	# MacPorts: /opt/local/lib
-	SET(LIBRARY_PATH "/opt/local/lib:${LIBRARY_PATH}")
+	LINK_DIRECTORIES(${LINK_DIRECTORIES} /opt/local/lib)
 ENDIF(LMMS_BUILD_APPLE)
 
 
