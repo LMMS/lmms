@@ -16,7 +16,8 @@ DMG_BACKGROUND_IMG="dmg_branding.png"
 cp $HOME/lmms/data/$DMG_BACKGROUND_IMG .
 
 # you should not need to change these
-APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
+APP_LOWERCASE=$(echo $APP_NAME|tr '[:upper:]' '[:lower:]')
+APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_LOWERCASE}"
 
 VOL_NAME="${APP_NAME} ${VERSION}"   # volume name will be "SuperCoolApp 1.0.0"
 DMG_TMP="${VOL_NAME}-temp.dmg"
@@ -66,7 +67,7 @@ popd
 # figure out how big our DMG needs to be
 #  assumes our contents are at least 1M!
 SIZE=`du -sh "${STAGING_DIR}" | sed 's/\([0-9\.]*\)M\(.*\)/\1/'` 
-SIZE=`echo "${SIZE} + 1.0" | bc | awk '{print int($1+0.5)}'`
+SIZE=`echo "${SIZE} + 5.0" | bc | awk '{print int($1+0.5)}'`
 
 if [ $? -ne 0 ]; then
    echo "Error: Cannot compute size of staging dir"
