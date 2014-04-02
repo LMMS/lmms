@@ -119,5 +119,6 @@ echo -e "</plist>" >> "$APP/Contents/Info.plist"
 
 # Done.  Ready to build DMG
 echo -e "\nFinished.\n\nPlease run \"create_apple_dmg.sh\" from the Desktop to build the installer.\n"
+echo -e "Note: You can drag/drop it into this terminal window.)\n"
 cp $CMAKE_SRC/data/scripts/create_apple_dmg.sh $HOME/Desktop/
 chmod +x $HOME/Desktop/create_apple_dmg.sh
