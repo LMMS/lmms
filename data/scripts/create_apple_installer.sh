@@ -99,16 +99,15 @@ macdeployqt $APP $_executables
 cp $HOME/lmms/data/lmms.icns $APP/Contents/Resources/
 
 # Create "Info.plist" using lmms.icns file, http://iconverticons.com/online/)
-echo "\
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
-<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\"\
-\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\
-   <plist version=\"1.0\">\
-   <dict>\
-      <key>CFBundleIconFile</key>\
-      <string>lmms.icns</string>\
-   </dict>\
-</plist>" > "$APP/Contents/Info.plist"
+echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$APP/Contents/Info.plist"
+echo -e "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\"" >> "$APP/Contents/Info.plist"
+echo -e "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> "$APP/Contents/Info.plist"
+echo -e "   <plist version=\"1.0\">" >> "$APP/Contents/Info.plist"
+echo -e "   <dict>" >> "$APP/Contents/Info.plist"
+echo -e "      <key>CFBundleIconFile</key>" >> "$APP/Contents/Info.plist"
+echo -e "      <string>lmms.icns</string>" >> "$APP/Contents/Info.plist"
+echo -e "   </dict>" >> "$APP/Contents/Info.plist"
+echo -e "</plist>" >> "$APP/Contents/Info.plist"
 
 # Done.  Ready to build DMG
 echo -e "\nFinished.\n\nPlease run \"create_apple_dmg.sh\" to build the installer.\n"
