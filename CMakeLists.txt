@@ -43,6 +43,19 @@ OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 
+
+IF(LMMS_BUILD_APPLE)
+        SET(WANT_ALSA OFF)
+	SET(WANT_PULSEAUDIO OFF)
+	SET(WANT_SWH OFF)
+	SET(WANT_VST OFF)
+	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	# MacPorts: /opt/local/lib
+	LINK_DIRECTORIES(${LINK_DIRECTORIES} /opt/local/lib)
+ENDIF(LMMS_BUILD_APPLE)
+
+
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
@@ -307,7 +320,11 @@ CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmms.rc.in" "${CMAKE_BINARY_DIR}/lmms.rc")
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in" "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
 
 # set compiler flags
-SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
+SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
+IF(NOT LMMS_BUILD_APPLE)
+   SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
+ENDIF()
+
 SET(CMAKE_C_FLAGS "-O2 -g ${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
