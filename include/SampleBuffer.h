@@ -287,12 +287,13 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame * getSampleFragment( f_cnt_t _start, f_cnt_t _frames,
+	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
 						LoopMode _loopmode,
 						sampleFrame * * _tmp,
-						bool * _backwards ) const;
-	f_cnt_t getLoopedIndex( f_cnt_t _index ) const;
-	f_cnt_t getPingPongIndex( f_cnt_t _index ) const;
+						bool * _backwards, f_cnt_t _loopstart, f_cnt_t _loopend,
+						f_cnt_t _end ) const;
+	f_cnt_t getLoopedIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
+	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 
 
 signals:

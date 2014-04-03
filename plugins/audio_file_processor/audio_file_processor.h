@@ -96,6 +96,7 @@ private:
 	BoolModel m_stutterModel;
 
 	f_cnt_t m_nextPlayStartPoint;
+	bool m_nextPlayBackwards;
 
 	friend class AudioFileProcessorView;
 
