@@ -141,7 +141,7 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 		if( m_sampleBuffer.play( _working_buffer,
 						(handleState *)_n->m_pluginData,
 						frames, _n->frequency(),
-						m_loopModel.value() ) )
+						m_loopModel.value() ? SampleBuffer::LoopPingPong : SampleBuffer::LoopOff ) )
 		{
 			applyRelease( _working_buffer, _n );
 			instrumentTrack()->processAudioBuffer( _working_buffer,

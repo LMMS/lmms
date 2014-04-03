@@ -610,7 +610,7 @@ f_cnt_t SampleBuffer::decodeSampleDS( const char * _f,
 bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const fpp_t _frames,
 					const float _freq,
-					const bool _looped )
+					const LoopMode _loopmode )
 {
 	QMutexLocker ml( &m_varLock );
 
@@ -620,7 +620,10 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		return false;
 	}
-
+	
+	// variable for determining if we should currently be playing backwards in a ping-pong loop
+	bool is_backwards = _state->isBackwards();
+	
 	const double freq_factor = (double) _freq / (double) m_frequency *
 		m_sampleRate / engine::mixer()->processingSampleRate();
 
@@ -643,12 +646,20 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	// this holds the number of remaining frames in current loop
 	f_cnt_t frames_for_loop;
-	if( _looped )
+	if( _loopmode == LoopOn )
 	{
 		play_frame = getLoopedIndex( play_frame );
 		frames_for_loop = static_cast<f_cnt_t>(
 					( m_loopEndFrame - play_frame ) /
 								freq_factor );
+	}
+	else if( _loopmode == LoopPingPong )
+	{
+		play_frame = getPingPongIndex( play_frame );
+		if( is_backwards ) 
+			frames_for_loop = static_cast<f_cnt_t>( ( play_frame - m_loopStartFrame ) / freq_factor );
+		else 
+			frames_for_loop = static_cast<f_cnt_t>( ( m_loopEndFrame - play_frame ) / freq_factor );
 	}
 	else
 	{
@@ -676,7 +687,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor )
 								+ margin;
 		src_data.data_in = getSampleFragment( play_frame,
-					fragment_size, _looped, &tmp )[0];
+					fragment_size, _loopmode, &tmp, &is_backwards )[0];
 		src_data.data_out = _ab[0];
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
@@ -695,10 +706,32 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					src_data.output_frames_gen, _frames );
 		}
 		// Advance
-		play_frame += src_data.input_frames_used;
-		if( _looped )
+		switch( _loopmode )
 		{
-			play_frame = getLoopedIndex( play_frame );
+			case LoopOff:
+				play_frame += src_data.input_frames_used;
+				break;
+			case LoopOn:
+				play_frame += src_data.input_frames_used;
+				play_frame = getLoopedIndex( play_frame );
+				break;
+			case LoopPingPong:
+			{
+				f_cnt_t left = src_data.input_frames_used;
+				if( _state->isBackwards() )
+				{
+					play_frame -= src_data.input_frames_used;
+					if( play_frame < m_loopStartFrame )
+					{
+						left -= ( m_loopStartFrame - play_frame );
+						play_frame = m_loopStartFrame;
+					}
+					else left = 0;
+				}
+				play_frame += left;
+				play_frame = getPingPongIndex( play_frame );
+				break;				
+			}
 		}
 	}
 	else
@@ -708,19 +741,42 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 		// Generate output
 		memcpy( _ab,
-			getSampleFragment( play_frame, _frames, _looped, &tmp ),
+			getSampleFragment( play_frame, _frames, _loopmode, &tmp, &is_backwards ),
 						_frames * BYTES_PER_FRAME );
 		// Advance
-		play_frame += _frames;
-		if( _looped )
+		switch( _loopmode )
 		{
-			play_frame = getLoopedIndex( play_frame );
+			case LoopOff:
+				play_frame += _frames;
+				break;
+			case LoopOn:
+				play_frame += _frames;
+				play_frame = getLoopedIndex( play_frame );
+				break;
+			case LoopPingPong:
+			{
+				f_cnt_t left = _frames;
+				if( _state->isBackwards() )
+				{
+					play_frame -= _frames;
+					if( play_frame < m_loopStartFrame )
+					{
+						left -= ( m_loopStartFrame - play_frame );
+						play_frame = m_loopStartFrame;
+					}
+					else left = 0;
+				}
+				play_frame += left;
+				play_frame = getPingPongIndex( play_frame );
+				break;				
+			}
 		}
 	}
 
 	delete[] tmp;
 
-	_state->m_frameIndex = play_frame;
+	_state->setBackwards( is_backwards );
+	_state->setFrameIndex( play_frame );
 
 	return true;
 
@@ -730,28 +786,33 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 
 sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
-		f_cnt_t _frames, bool _looped, sampleFrame * * _tmp ) const
+		f_cnt_t _frames, LoopMode _loopmode, sampleFrame * * _tmp, bool * _backwards ) const
 {
-	if( _looped )
+	if( _loopmode == LoopOn )
 	{
 		if( _start + _frames <= m_loopEndFrame )
 		{
 			return m_data + _start;
 		}
 	}
-	else
+	else if( _loopmode == LoopOff )
 	{
 		if( _start + _frames <= m_endFrame )
 		{
 			return m_data + _start;
 		}
 	}
+/*	else
+	{
+		if( ! *_backwards && _start + _frames < m_loopEndFrame )
+			return m_data + _start;
+	}*/
 
 	*_tmp = new sampleFrame[_frames];
 
-	if( _looped )
+	if( _loopmode == LoopOn )
 	{
-		f_cnt_t copied = m_loopEndFrame - _start;
+		f_cnt_t copied = qMin( _frames, m_loopEndFrame - _start );
 		memcpy( *_tmp, m_data + _start, copied * BYTES_PER_FRAME );
 		f_cnt_t loop_frames = m_loopEndFrame - m_loopStartFrame;
 		while( _frames - copied > 0 )
@@ -761,6 +822,62 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 						todo * BYTES_PER_FRAME );
 			copied += todo;
 		}
+	}
+	else if( _loopmode == LoopPingPong )
+	{
+		f_cnt_t copied = 0;
+		bool backwards = *_backwards;
+		f_cnt_t pos = _start;
+		
+		if( backwards )
+		{
+			copied = qMin( _frames, pos - m_loopStartFrame );
+			for( int i=0; i < copied; i++ )
+			{
+				//memcpy( *_tmp + i, m_data + pos - i, BYTES_PER_FRAME );
+				(*_tmp)[i][0] = m_data[ pos - i ][0];
+				(*_tmp)[i][1] = m_data[ pos - i ][1];
+			}
+			pos -= copied;
+			if( pos == m_loopStartFrame ) backwards = false;
+		}
+		else
+		{
+			copied = qMin( _frames, m_loopEndFrame - pos );
+			memcpy( *_tmp, m_data + pos, copied * BYTES_PER_FRAME );
+			pos += copied;
+			if( pos == m_loopEndFrame ) backwards = true;
+		}
+
+		while( copied < _frames )
+		{
+			if( pos >= m_loopEndFrame ) backwards = true;
+			if( pos <= m_loopStartFrame ) backwards = false;
+			pos = qBound( m_loopStartFrame, pos, m_loopEndFrame );
+			/*qDebug( backwards ? "backwards" : "forwards" );
+			qDebug( "pos %d", pos );*/
+			if( backwards )
+			{
+				f_cnt_t todo = qMin( _frames - copied, pos - m_loopStartFrame );
+				for ( int i=0; i < todo; i++ )
+				{
+					//memcpy( *_tmp + ( copied + i ), m_data + ( pos - i ), BYTES_PER_FRAME );
+					(*_tmp)[ copied + i ][0] = m_data[ pos - i ][0];
+					(*_tmp)[ copied + i ][1] = m_data[ pos - i ][1];
+				}
+				pos -= todo;
+				copied += todo;	
+				if( pos == m_loopStartFrame ) backwards = false;
+			}
+			else
+			{
+				f_cnt_t todo = qMin( _frames - copied, m_loopEndFrame - pos );
+				memcpy( *_tmp + copied, m_data + pos, todo * BYTES_PER_FRAME );
+				pos += todo;
+				if( pos == m_loopEndFrame ) backwards = true;
+			}
+		}
+		*_backwards = backwards;
 	}
 	else
 	{
@@ -787,6 +904,21 @@ f_cnt_t SampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 }
 
 
+f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index ) const
+{
+	if( _index < m_loopEndFrame )
+	{
+		return _index;
+	}
+	const f_cnt_t looplen = m_loopEndFrame - m_loopStartFrame;
+	const f_cnt_t looppos = ( _index - m_loopEndFrame ) % ( looplen*2 );
+
+	f_cnt_t r;
+	if( looppos < looplen ) r= m_loopEndFrame - looppos;
+	else r= m_loopStartFrame + ( looppos - looplen );
+	qDebug( "index %d   ---     pingpongindex %d", _index, r );
+	return r;
+}
 
 
 void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
@@ -915,19 +1047,19 @@ QString SampleBuffer::openAndSetWaveformFile()
 	{
 		m_audioFile = configManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
 	}
-	
+
 	QString fileName = this->openAudioFile();
 
 	if(!fileName.isEmpty())
 	{
 		this->setAudioFile( fileName );
-	} 
-	else 
+	}
+	else
 	{
 		m_audioFile = "";
 	}
 
-	return fileName;	
+	return fileName;
 }
 
 
@@ -1328,7 +1460,8 @@ QString SampleBuffer::tryToMakeAbsolute( const QString & _file )
 
 SampleBuffer::handleState::handleState( bool _varying_pitch ) :
 	m_frameIndex( 0 ),
-	m_varyingPitch( _varying_pitch )
+	m_varyingPitch( _varying_pitch ),
+	m_isBackwards( false )
 {
 	int error;
 	if( ( m_resamplingData = src_new(/*
