@@ -34,6 +34,7 @@
 #include "SampleBuffer.h"
 #include "knob.h"
 #include "pixmap_button.h"
+#include "automatable_button.h"
 
 
 
@@ -91,10 +92,11 @@ private:
 	FloatModel m_endPointModel;
 	FloatModel m_loopPointModel;
 	BoolModel m_reverseModel;
-	BoolModel m_loopModel;
+	IntModel m_loopModel;
 	BoolModel m_stutterModel;
 
 	f_cnt_t m_nextPlayStartPoint;
+	bool m_nextPlayBackwards;
 
 	friend class AudioFileProcessorView;
 
@@ -137,7 +139,7 @@ private:
 
 	pixmapButton * m_openAudioFileButton;
 	pixmapButton * m_reverseButton;
-	pixmapButton * m_loopButton;
+	automatableButtonGroup * m_loopGroup;
 	pixmapButton * m_stutterButton;
 
 } ;
@@ -270,7 +272,7 @@ private:
 
 	static bool isCloseTo( int _a, int _b )
 	{
-		return qAbs( _a - _b ) < 3;
+		return qAbs( _a - _b ) < 4;
 	}
 
 } ;
