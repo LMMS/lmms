@@ -52,6 +52,7 @@
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
+#include "PlaySong.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -95,6 +96,7 @@ song::song() :
 	m_elapsedMilliSeconds( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
+
 {
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
@@ -195,28 +197,32 @@ void song::processNextBuffer()
 		return;
 	}
 
-	TrackList track_list;
+	
 	int tco_num = -1;
-
-	setPlayMode(m_playMode, track_list, tco_num);
+	setPlayMode(m_playMode, tco_num);
 
 	
 }
 
-void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
+TrackContainer::TrackList song::getTrackList(){
+  
+  return m_tracklist;
+}
+void song::setPlayMode(PlayModes m_playMode, int tco_num){
   switch( m_playMode )
 	{
 		case Mode_PlaySong:
-			track_list = tracks();
+			
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
 			{
-				EnvelopeAndLfoParameters::instances()->reset();
+				PlaySong *ps = new PlaySong;
+				m_tracklist = ps->process(this);
 			}
 			break;
 
 		case Mode_PlayTrack:
-			track_list.push_back( m_trackToPlay );
+			m_tracklist.push_back( m_trackToPlay );
 			break;
 
 		case Mode_PlayBB:
@@ -224,7 +230,7 @@ void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
 			{
 				tco_num = engine::getBBTrackContainer()->
 								currentBB();
-				track_list.push_back( bbTrack::findBBTrack(
+				m_tracklist.push_back( bbTrack::findBBTrack(
 								tco_num ) );
 			}
 			break;
@@ -234,7 +240,7 @@ void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
 			{
 				tco_num = m_patternToPlay->getTrack()->
 						getTCONum( m_patternToPlay );
-				track_list.push_back(
+				m_tracklist.push_back(
 						m_patternToPlay->getTrack() );
 			}
 			break;
@@ -244,7 +250,7 @@ void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
 
 	}
 	
-	if( track_list.empty() == true )
+	if( m_tracklist.empty() == true )
 	{
 		return;
 	}
@@ -372,9 +378,9 @@ void song::setPlayMode(PlayModes m_playMode, TrackList track_list, int tco_num){
 			}
 
 			// loop through all tracks and play them
-			for( int i = 0; i < track_list.size(); ++i )
+			for( int i = 0; i < m_tracklist.size(); ++i )
 			{
-				track_list[i]->play( m_playPos[m_playMode],
+				m_tracklist[i]->play( m_playPos[m_playMode],
 						played_frames,
 						total_frames_played, tco_num );
 			}

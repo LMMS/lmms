@@ -25,12 +25,15 @@
 
 #ifndef IPLAYMODE_H
 #define IPLAYMODE_H
+#include "song.h"
+#include "TrackContainer.h"
 
 class IPlayMode
 {
 public:
+    typedef QVector<track *> TrackList;
     virtual ~IPlayMode(){}
-    virtual void process(PlayModes, TrackList,int) = 0;
+    virtual TrackList process(song *const) = 0;
 };
 
 
