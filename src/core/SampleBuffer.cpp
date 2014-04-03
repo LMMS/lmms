@@ -620,10 +620,10 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		return false;
 	}
-	
+
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool is_backwards = _state->isBackwards();
-	
+
 	const double freq_factor = (double) _freq / (double) m_frequency *
 		m_sampleRate / engine::mixer()->processingSampleRate();
 
@@ -639,6 +639,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	// this holds the number of the first frame to play
 	f_cnt_t play_frame = _state->m_frameIndex;
+
 	if( play_frame < m_startFrame )
 	{
 		play_frame = m_startFrame;
@@ -656,9 +657,9 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	else if( _loopmode == LoopPingPong )
 	{
 		play_frame = getPingPongIndex( play_frame );
-		if( is_backwards ) 
+		if( is_backwards )
 			frames_for_loop = static_cast<f_cnt_t>( ( play_frame - m_loopStartFrame ) / freq_factor );
-		else 
+		else
 			frames_for_loop = static_cast<f_cnt_t>( ( m_loopEndFrame - play_frame ) / freq_factor );
 	}
 	else
@@ -730,7 +731,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 				}
 				play_frame += left;
 				play_frame = getPingPongIndex( play_frame );
-				break;				
+				break;
 			}
 		}
 	}
@@ -768,7 +769,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 				}
 				play_frame += left;
 				play_frame = getPingPongIndex( play_frame );
-				break;				
+				break;
 			}
 		}
 	}
@@ -804,8 +805,9 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 	}
 /*	else
 	{
-		if( ! *_backwards && _start + _frames < m_loopEndFrame )
-			return m_data + _start;
+		if( ! *_backwards && pos + _frames < m_loopEndFrame )
+		    *_index = pos + _frames;
+			return m_data + pos;
 	}*/
 
 	*_tmp = new sampleFrame[_frames];
@@ -815,20 +817,19 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 		f_cnt_t copied = qMin( _frames, m_loopEndFrame - _start );
 		memcpy( *_tmp, m_data + _start, copied * BYTES_PER_FRAME );
 		f_cnt_t loop_frames = m_loopEndFrame - m_loopStartFrame;
-		while( _frames - copied > 0 )
+		while( copied < _frames )
 		{
 			f_cnt_t todo = qMin( _frames - copied, loop_frames );
-			memcpy( *_tmp + copied, m_data + m_loopStartFrame,
-						todo * BYTES_PER_FRAME );
+			memcpy( *_tmp + copied, m_data + m_loopStartFrame, todo * BYTES_PER_FRAME );
 			copied += todo;
 		}
 	}
 	else if( _loopmode == LoopPingPong )
 	{
-		f_cnt_t copied = 0;
-		bool backwards = *_backwards;
 		f_cnt_t pos = _start;
-		
+		bool backwards = *_backwards;
+		f_cnt_t copied = 0;
+
 		if( backwards )
 		{
 			copied = qMin( _frames, pos - m_loopStartFrame );
@@ -866,7 +867,7 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 					(*_tmp)[ copied + i ][1] = m_data[ pos - i ][1];
 				}
 				pos -= todo;
-				copied += todo;	
+				copied += todo;
 				if( pos == m_loopStartFrame ) backwards = false;
 			}
 			else
@@ -874,6 +875,7 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 				f_cnt_t todo = qMin( _frames - copied, m_loopEndFrame - pos );
 				memcpy( *_tmp + copied, m_data + pos, todo * BYTES_PER_FRAME );
 				pos += todo;
+				copied += todo;
 				if( pos == m_loopEndFrame ) backwards = true;
 			}
 		}

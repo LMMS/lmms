@@ -76,7 +76,7 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
 	m_loopPointModel( 0, 0, 1, 0.0000001f, this, tr( "Loopback point" ) ),
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
-	m_loopModel( false, this, tr( "Loop enabled" ) ),
+	m_loopModel( 0, 0, 2, this, tr( "Loop mode" ) ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
 	m_nextPlayStartPoint( 0 )
 {
@@ -383,7 +383,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_reverseButton = new pixmapButton( this );
 	m_reverseButton->setCheckable( TRUE );
-	m_reverseButton->move( 174, 124 );
+	m_reverseButton->move( 200, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_on" ) );
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -394,17 +394,50 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
 
-	m_loopButton = new pixmapButton( this );
-	m_loopButton->setCheckable( TRUE );
-	m_loopButton->move( 200, 124 );
-	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_on" ) );
-	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_off" ) );
-	toolTip::add( m_loopButton, tr( "Enable loop" ) );
-	m_loopButton->setWhatsThis(
-		tr( "This button enables looping. "
+// loop button group
+
+	pixmapbutton * m_loopOffButton = new pixmapButton( this );
+	m_loopOffButton->setCheckable( TRUE );
+	m_loopOffButton->move( 174, 144 );
+	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_off_on" ) );
+	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_off_off" ) );
+	toolTip::add( m_loopOffButton, tr( "Disable loop" ) );
+	m_loopOffButton->setWhatsThis(
+		tr( "This button disables looping. "
+			"The sample plays only once from start to end. " ) );
+
+
+	pixmapbutton * m_loopOnButton = new pixmapButton( this );
+	m_loopOnButton->setCheckable( TRUE );
+	m_loopOnButton->move( 200, 144 );
+	m_loopOnButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_on_on" ) );
+	m_loopOnButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_on_off" ) );
+	toolTip::add( m_loopOnButton, tr( "Enable loop" ) );
+	m_loopOnButton->setWhatsThis(
+		tr( "This button enables forwards-looping. "
 			"The sample loops between the end point and the loop point." ) );
+
+	pixmapbutton * m_loopPingPongButton = new pixmapButton( this );
+	m_loopPingPongButton->setCheckable( TRUE );
+	m_loopPingPongButton->move( 226, 144 );
+	m_loopPingPongButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_pingpong_on" ) );
+	m_loopPingPongButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_pingpong_off" ) );
+	toolTip::add( m_loopPingPongButton, tr( "Enable loop" ) );
+	m_loopPingPongButton->setWhatsThis(
+		tr( "This button enables ping-pong-looping. "
+			"The sample loops backwards and forwards between the end point "
+			"and the loop point." ) );
+			
+	m_loopGroup = new automatableButtonGroup( this );
+	m_loopGroup->addButton( m_loopOffButton );
+	m_loopGroup->addButton( m_loopOnButton );
+	m_loopGroup->addButton( m_loopPingPongButton );
 	
 	m_stutterButton = new pixmapButton( this );
 	m_stutterButton->setCheckable( true );
@@ -604,7 +637,7 @@ void AudioFileProcessorView::modelChanged( void )
 	m_endKnob->setModel( &a->m_endPointModel );
 	m_loopKnob->setModel( &a->m_loopPointModel );
 	m_reverseButton->setModel( &a->m_reverseModel );
-	m_loopButton->setModel( &a->m_loopModel );
+	m_loopGroup->setModel( &a->m_loopModel );
 	m_stutterButton->setModel( &a->m_stutterModel );
 	sampleUpdated();
 }
@@ -684,7 +717,7 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 	if( start_dist < loop_dist ) { dt = sample_start; md = start_dist; }
 	if( end_dist < start_dist ) { dt = sample_end; md = end_dist; }
 		
-	if( md < 3 )
+	if( md < 4 )
 	{
 		m_draggingType = dt;
 	}
@@ -780,7 +813,6 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 
 	p.drawPixmap( s_padding, s_padding, m_graph );
 
-	p.setPen( QColor( 0xFF, 0xFF, 0xFF ) );  //TODO: put into a qproperty
 	const QRect graph_rect( s_padding, s_padding, width() - 2 * s_padding, height() - 2 * s_padding );
 	const f_cnt_t frames = m_to - m_from;
 	m_startFrameX = graph_rect.x() + ( m_sampleBuffer.startFrame() - m_from ) *
@@ -792,6 +824,14 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 	const int played_width_px = ( m_framesPlayed - m_from ) *
 						double( graph_rect.width() ) / frames;
 
+	// loop point line
+	p.setPen( QColor( 0x7F, 0xFF, 0xFF ) ); //TODO: put into a qproperty
+	p.drawLine( m_loopFrameX, graph_rect.y(),
+					m_loopFrameX,
+					graph_rect.height() + graph_rect.y() );
+
+	// start/end lines
+	p.setPen( QColor( 0xFF, 0xFF, 0xFF ) );  //TODO: put into a qproperty
 	p.drawLine( m_startFrameX, graph_rect.y(),
 					m_startFrameX,
 					graph_rect.height() + graph_rect.y() );
@@ -799,10 +839,6 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 					m_endFrameX,
 					graph_rect.height() + graph_rect.y() );
 					
-	p.setPen( QColor( 0x7F, 0xFF, 0xFF ) ); //TODO: put into a qproperty
-	p.drawLine( m_loopFrameX, graph_rect.y(),
-					m_loopFrameX,
-					graph_rect.height() + graph_rect.y() );
 
 	if( m_endFrameX - m_startFrameX > 2 )
 	{
