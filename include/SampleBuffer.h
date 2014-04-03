@@ -71,7 +71,7 @@ public:
 		{
 			return m_isBackwards;
 		}
-		
+
 		inline void setBackwards( bool _backwards )
 		{
 			m_isBackwards = _backwards;
@@ -81,7 +81,7 @@ public:
 	private:
 		f_cnt_t m_frameIndex;
 		const bool m_varyingPitch;
-		bool m_isBackwards;		
+		bool m_isBackwards;
 		SRC_STATE * m_resamplingData;
 
 		friend class SampleBuffer;
@@ -145,6 +145,16 @@ public:
 	{
 		m_varLock.lock();
 		m_loopEndFrame = _end;
+		m_varLock.unlock();
+	}
+
+	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
+	{
+		m_varLock.lock();
+		m_startFrame = _start;
+		m_endFrame = _end;
+		m_loopStartFrame = _loopstart;
+		m_loopEndFrame = _loopend;
 		m_varLock.unlock();
 	}
 
