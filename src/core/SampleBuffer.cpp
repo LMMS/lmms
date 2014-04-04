@@ -186,6 +186,7 @@ void SampleBuffer::update( bool _keep_settings )
 		char * f = qstrdup( file.toUtf8().constData() );
 #endif
 		int_sample_t * buf = NULL;
+		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = engine::mixer()->baseSampleRate();
 		m_frames = 0;
@@ -210,7 +211,7 @@ void SampleBuffer::update( bool _keep_settings )
 #endif
 		if( m_frames == 0 )
 		{
-			m_frames = decodeSampleSF( f, buf, channels,
+			m_frames = decodeSampleSF( f, fbuf, channels,
 								samplerate );
 		}
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -377,7 +378,7 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 
 
 f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
-					int_sample_t * & _buf,
+					sample_t * & _buf,
 					ch_cnt_t & _channels,
 					sample_rate_t & _samplerate )
 {
@@ -385,29 +386,19 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 	SF_INFO sf_info;
 	f_cnt_t frames = 0;
 	bool sf_rr = false;
-	sample_t * fbuf = 0;
 
 	if( ( snd_file = sf_open( _f, SFM_READ, &sf_info ) ) != NULL )
 	{
 		frames = sf_info.frames;
 
-		// check if float
-		if ( (sf_info.format & SF_FORMAT_SUBMASK) == SF_FORMAT_FLOAT ) // if yes, use float format for buffer
-		{
-			fbuf = new sample_t[sf_info.channels * frames];
-			sf_rr = sf_read_float( snd_file, fbuf, sf_info.channels * frames );
-		}
-		else // otherwise, use int
-		{
-			_buf = new int_sample_t[sf_info.channels * frames];
-			sf_rr = sf_read_short( snd_file, _buf, sf_info.channels * frames );
-		}
+		_buf = new sample_t[sf_info.channels * frames];
+		sf_rr = sf_read_float( snd_file, _buf, sf_info.channels * frames );
 
 		if( sf_rr < sf_info.channels * frames )
 		{
 #ifdef DEBUG_LMMS
-			printf( "SampleBuffer::decodeSampleSF(): could not read"
-				" sample %s: %s\n", _f, sf_strerror( NULL ) );
+			qDebug( "SampleBuffer::decodeSampleSF(): could not read"
+				" sample %s: %s", _f, sf_strerror( NULL ) );
 #endif
 		}
 		_channels = sf_info.channels;
@@ -418,19 +409,15 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 	else
 	{
 #ifdef DEBUG_LMMS
-		printf( "SampleBuffer::decodeSampleSF(): could not load "
-				"sample %s: %s\n", _f, sf_strerror( NULL ) );
+		qDebug( "SampleBuffer::decodeSampleSF(): could not load "
+				"sample %s: %s", _f, sf_strerror( NULL ) );
 #endif
 	}
     //write down either directly or convert i->f depending on file type
 
-    if ( frames > 0 && fbuf != NULL )
+    if ( frames > 0 && _buf != NULL )
     {
-        directFloatWrite ( fbuf, frames, _channels);
-    }
-    else if ( frames > 0 && _buf != NULL )
-    {
-        convertIntToFloat ( _buf, frames, _channels);
+        directFloatWrite ( _buf, frames, _channels);
     }
 
 	return frames;
