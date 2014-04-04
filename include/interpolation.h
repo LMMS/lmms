@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _INTERPOLATION_H
-#define _INTERPOLATION_H
+#ifndef INTERPOLATION_H
+#define INTERPOLATION_H
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -87,7 +87,13 @@ inline float cosinusInterpolate( float v0, float v1, float x )
 
 inline float linearInterpolate( float v0, float v1, float x )
 {
-	return( v0*( 1.0f-x ) + v1*x );
+// take advantage of fma function if present in hardware
+
+#ifdef FP_FAST_FMAF
+	return fmaf( x, v1-v0, v0 );
+#else
+	return x * (v1-v0) + v0;
+#endif	
 }
 
 
