@@ -32,6 +32,16 @@ class PlaySong : public IPlayMode
 {
 public:
   TrackList process(song *const);
+  	enum PlayModes
+	{
+		Mode_None,
+		Mode_PlaySong,
+		Mode_PlayTrack,
+		Mode_PlayBB,
+		Mode_PlayPattern,
+		Mode_PlayAutomationPattern,
+		Mode_Count
+	} ;
 };
 
 #endif // PLAYSONG_H

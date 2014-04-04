@@ -25,9 +25,12 @@
 
 #ifndef PLAYBB_H
 #define PLAYBB_H
+#include <iplaymode.h>
 
-class PlayBB
+class PlayBB : public IPlayMode
 {
+public:
+  TrackList process(song *const);
 };
 
 #endif // PLAYBB_H

@@ -54,6 +54,7 @@
 #include "pattern.h"
 #include "PlaySong.h"
 #include "PlayTrack.h"
+#include "PlayBB.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -216,17 +217,13 @@ track * song::getTrackToPlay(){
 void song::setPlayMode(PlayModes m_playMode, int tco_num){
   PlaySong *ps = new PlaySong;
   PlayTrack *aPlayTrack = new PlayTrack;
+  PlayBB *aPlayBB = new PlayBB;
   switch( m_playMode )
 	{
 	        
 		case Mode_PlaySong:
 			
-			// at song-start we have to reset the LFOs
-			if( m_playPos[Mode_PlaySong] == 0 )
-			{
-				
-				m_tracklist = ps->process(this);
-			}
+			ps->process(this);
 			break;
 
 		case Mode_PlayTrack:
@@ -235,13 +232,7 @@ void song::setPlayMode(PlayModes m_playMode, int tco_num){
 			break;
 
 		case Mode_PlayBB:
-			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
-			{
-				tco_num = engine::getBBTrackContainer()->
-								currentBB();
-				m_tracklist.push_back( bbTrack::findBBTrack(
-								tco_num ) );
-			}
+			aPlayBB->process(this);
 			break;
 
 		case Mode_PlayPattern:

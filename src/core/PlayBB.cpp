@@ -24,4 +24,19 @@
 
 
 #include "PlayBB.h"
+#include "TrackContainer.h"
+#include "bb_track.h"
+#include "bb_track_container.h"
 
+   IPlayMode::TrackList PlayBB::process(song *const aSong){
+ 
+  if( engine::getBBTrackContainer()->numOfBBs() > 0 )
+			{
+				int tco_num = engine::getBBTrackContainer()->
+								currentBB();
+				aSong->m_tracklist.push_back( bbTrack::findBBTrack(
+								tco_num ) );
+			}
+  
+  return aSong->m_tracklist;
+}

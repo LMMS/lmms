@@ -27,11 +27,13 @@
 #include "TrackContainer.h"
 #include "EnvelopeAndLfoParameters.h"
 
+
    IPlayMode::TrackList PlaySong::process(song *const aSong){
  
   aSong->m_tracklist = aSong->tracks();
-  
+  if( aSong->m_playPos[Mode_PlaySong] == 0 )
+			{
   EnvelopeAndLfoParameters::instances()->reset();
-  
+			}
   return aSong->m_tracklist;
 }
