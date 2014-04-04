@@ -359,6 +359,7 @@ private:
 	friend class mainWindow;
 	friend class ControllerRackView;
 	friend class PlaySong;
+	friend class PlayTrack;
 signals:
 	void projectLoaded();
 	void playbackStateChanged();

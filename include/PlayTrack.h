@@ -1,5 +1,5 @@
 /*
- * PlaySong.h - PlaySong strategy.
+ * PlayTrack.h - PlayTrack strategy.
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,14 +24,12 @@
 
 
 
-#ifndef PLAYSONG_H
-#define PLAYSONG_H
+#ifndef PLAYTRACK_H
+#define PLAYTRACK_H
 #include <iplaymode.h>
 
-class PlaySong : public IPlayMode
+class PlayTrack
 {
-public:
-  TrackList process(song *const);
 };
 
-#endif // PLAYSONG_H
+#endif // PLAYTRACK_H
