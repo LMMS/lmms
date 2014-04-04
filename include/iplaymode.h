@@ -33,7 +33,7 @@ class IPlayMode
 public:
     typedef QVector<track *> TrackList;
     virtual ~IPlayMode(){}
-    virtual TrackList process(song *const) = 0;
+    virtual void process(song *const) = 0;
 };
 
 

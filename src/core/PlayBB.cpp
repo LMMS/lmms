@@ -28,7 +28,7 @@
 #include "bb_track.h"
 #include "bb_track_container.h"
 
-   IPlayMode::TrackList PlayBB::process(song *const aSong){
+   void PlayBB::process(song *const aSong){
  
   if( engine::getBBTrackContainer()->numOfBBs() > 0 )
 			{
@@ -37,6 +37,4 @@
 				aSong->m_tracklist.push_back( bbTrack::findBBTrack(
 								tco_num ) );
 			}
-  
-  return aSong->m_tracklist;
 }

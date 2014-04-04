@@ -30,7 +30,7 @@
 class PlayPattern : public IPlayMode
 {
 public:
-  TrackList process(song *const);
+  void process(song *const);
 };
 
 #endif // PLAYPATTERN_H

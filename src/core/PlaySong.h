@@ -31,7 +31,7 @@
 class PlaySong : public IPlayMode
 {
 public:
-  TrackList process(song *const);
+  void process(song *const);
   	enum PlayModes
 	{
 		Mode_None,

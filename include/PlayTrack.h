@@ -31,7 +31,7 @@
 class PlayTrack : public IPlayMode
 {
 public:
-  TrackList process(song *const);
+  void process(song *const);
 };
 
 #endif // PLAYTRACK_H

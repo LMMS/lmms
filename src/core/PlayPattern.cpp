@@ -29,7 +29,7 @@
 #include "pattern.h"
 
 
-  IPlayMode::TrackList PlayPattern::process(song *const aSong){
+  void PlayPattern::process(song *const aSong){
  
  			if( aSong->m_patternToPlay != NULL )
 			{
@@ -39,5 +39,4 @@
 						aSong->m_patternToPlay->getTrack() );
 			}
 			
-  return aSong->m_tracklist;
 }

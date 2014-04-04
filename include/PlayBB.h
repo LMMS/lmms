@@ -30,7 +30,7 @@
 class PlayBB : public IPlayMode
 {
 public:
-  TrackList process(song *const);
+  void process(song *const);
 };
 
 #endif // PLAYBB_H
