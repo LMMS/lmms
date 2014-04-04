@@ -356,10 +356,7 @@ void audioFileProcessor::loopPointChanged( void )
 	m_nextPlayStartPoint = f_start;
 	m_nextPlayBackwards = false;
 
-	m_sampleBuffer.setStartFrame( f_start );
-	m_sampleBuffer.setEndFrame( f_end );
-	m_sampleBuffer.setLoopStartFrame( f_loop );
-	m_sampleBuffer.setLoopEndFrame( f_end );
+	m_sampleBuffer.setAllPointFrames( f_start, f_end, f_loop, f_end );
 	emit dataChanged();
 }
 
@@ -734,11 +731,6 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 	draggingType dt = sample_loop; int md = loop_dist;
 	if( start_dist < loop_dist ) { dt = sample_start; md = start_dist; }
 	else if( end_dist < loop_dist ) { dt = sample_end; md = end_dist; }
-
-/*	qDebug( "x %d", x );
-	qDebug( "loopframex %d", m_loopFrameX );
-	qDebug( "dt %d", dt );
-	qDebug( "md %d", md );*/
 
 	if( md < 4 )
 	{
