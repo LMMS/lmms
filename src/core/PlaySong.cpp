@@ -29,9 +29,9 @@
 
    IPlayMode::TrackList PlaySong::process(song *const aSong){
  
-  const TrackList track_list = aSong->tracks();
+  aSong->m_tracklist = aSong->tracks();
   
   EnvelopeAndLfoParameters::instances()->reset();
   
-  return track_list;
+  return aSong->m_tracklist;
 }

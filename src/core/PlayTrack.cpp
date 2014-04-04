@@ -30,6 +30,7 @@
  
   const TrackList track_list = aSong->tracks();
   
+  aSong->m_tracklist.push_back(aSong->m_trackToPlay);
   
   return track_list;
  }

@@ -53,6 +53,7 @@
 #include "NotePlayHandle.h"
 #include "pattern.h"
 #include "PlaySong.h"
+#include "PlayTrack.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -213,20 +214,24 @@ track * song::getTrackToPlay(){
 }
 
 void song::setPlayMode(PlayModes m_playMode, int tco_num){
+  PlaySong *ps = new PlaySong;
+  PlayTrack *aPlayTrack = new PlayTrack;
   switch( m_playMode )
 	{
+	        
 		case Mode_PlaySong:
 			
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
 			{
-				PlaySong *ps = new PlaySong;
+				
 				m_tracklist = ps->process(this);
 			}
 			break;
 
 		case Mode_PlayTrack:
-			m_tracklist.push_back( m_trackToPlay );
+		  
+			aPlayTrack->process(this);
 			break;
 
 		case Mode_PlayBB:
