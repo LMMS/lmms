@@ -363,6 +363,7 @@ private:
 	friend class PlaySong;
 	friend class PlayTrack;
 	friend class PlayBB;
+	friend class PlayPattern;
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
