@@ -52,9 +52,10 @@
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
+#include "PlayBB.h"
+#include "PlayPattern.h"
 #include "PlaySong.h"
 #include "PlayTrack.h"
-#include "PlayBB.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -218,6 +219,7 @@ void song::setPlayMode(PlayModes m_playMode, int tco_num){
   PlaySong *ps = new PlaySong;
   PlayTrack *aPlayTrack = new PlayTrack;
   PlayBB *aPlayBB = new PlayBB;
+  PlayPattern *aPlayPattern = new PlayPattern;
   switch( m_playMode )
 	{
 	        
@@ -236,13 +238,7 @@ void song::setPlayMode(PlayModes m_playMode, int tco_num){
 			break;
 
 		case Mode_PlayPattern:
-			if( m_patternToPlay != NULL )
-			{
-				tco_num = m_patternToPlay->getTrack()->
-						getTCONum( m_patternToPlay );
-				m_tracklist.push_back(
-						m_patternToPlay->getTrack() );
-			}
+			aPlayPattern->process(this);
 			break;
 
 		default:

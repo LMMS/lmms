@@ -25,9 +25,12 @@
 
 #ifndef PLAYPATTERN_H
 #define PLAYPATTERN_H
+#include <iplaymode.h>
 
-class PlayPattern
+class PlayPattern : public IPlayMode
 {
+public:
+  TrackList process(song *const);
 };
 
 #endif // PLAYPATTERN_H

@@ -24,4 +24,20 @@
 
 
 #include "PlayPattern.h"
+#include "TrackContainer.h"
+#include "track.h"
+#include "pattern.h"
 
+
+  IPlayMode::TrackList PlayPattern::process(song *const aSong){
+ 
+ 			if( aSong->m_patternToPlay != NULL )
+			{
+				aSong->m_patternToPlay->getTrack()->
+						getTCONum( aSong->m_patternToPlay );
+				aSong->m_tracklist.push_back(
+						aSong->m_patternToPlay->getTrack() );
+			}
+			
+  return aSong->m_tracklist;
+}
