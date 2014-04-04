@@ -103,10 +103,10 @@ public:
 
 private:
 	// linear interpolation
-	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
+/*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
 	{
 		return s1 + ( s2 - s1 ) * x;
-	}
+	}*/ // we use the one in interpolation.h now
 
 	int m_amod;
 	int m_bmod;

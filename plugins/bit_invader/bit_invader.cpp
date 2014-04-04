@@ -37,6 +37,7 @@
 #include "templates.h"
 #include "tooltip.h"
 #include "song.h"
+#include "interpolation.h"
 
 #include "embed.cpp"
 
@@ -108,9 +109,9 @@ sample_t bSynth::nextStringSample()
 		}
 		
 		// Nachkommaanteil
-		float frac = sample_realindex - static_cast<int>(sample_realindex);
+		const float frac = fraction( sample_realindex );
 		
-		sample = sample_shape[a]*(1-frac) + sample_shape[b]*(frac);
+		sample = linearInterpolate( sample_shape[a], sample_shape[b], frac );
 
 	} else {
 		// No interpolation

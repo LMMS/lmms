@@ -80,7 +80,8 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
 	float f = cosf( x * ( F_PI_2 ) );
-	return( v0*f + v1*( 1.0f-f ) );
+	return( v1 - f * (v1-v0) );
+//	return( v0*f + v1*( 1.0f-f ) );
 }
 
 

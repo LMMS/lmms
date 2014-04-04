@@ -33,6 +33,7 @@
 #include "tooltip.h"
 #include "song.h"
 #include "lmms_math.h"
+#include "interpolation.h"
 
 #include "embed.cpp"
 
@@ -417,8 +418,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		float sub = o3sub;
 		modulateabs( sub, o3s )
 
-		sample_t O3L = interpolate( O3AL, O3BL, sub );
-		sample_t O3R = interpolate( O3AR, O3BR, sub );
+		sample_t O3L = linearInterpolate( O3AL, O3BL, sub );
+		sample_t O3R = linearInterpolate( O3AR, O3BR, sub );
 
 		// modulate volume
 		O3L *= o3lv;
