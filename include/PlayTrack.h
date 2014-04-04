@@ -28,8 +28,10 @@
 #define PLAYTRACK_H
 #include <iplaymode.h>
 
-class PlayTrack
+class PlayTrack : public IPlayMode
 {
+public:
+  TrackList process(song *const);
 };
 
 #endif // PLAYTRACK_H

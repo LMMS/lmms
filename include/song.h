@@ -96,6 +96,8 @@ public:
 	void processNextBuffer();
 	void setPlayMode(PlayModes, int);
 	TrackList getTrackList(); 
+	track* getTrackToPlay();
+	
 	inline int getMilliseconds() const
 	{
 		return m_elapsedMilliSeconds;

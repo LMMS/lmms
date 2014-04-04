@@ -26,3 +26,10 @@
 
 #include "PlayTrack.h"
 
+ IPlayMode::TrackList PlayTrack::process(song *const aSong){
+ 
+  const TrackList track_list = aSong->tracks();
+  
+  
+  return track_list;
+ }

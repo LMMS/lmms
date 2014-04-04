@@ -196,18 +196,22 @@ void song::processNextBuffer()
 	{
 		return;
 	}
-
 	
 	int tco_num = -1;
 	setPlayMode(m_playMode, tco_num);
-
-	
 }
+
+
 
 TrackContainer::TrackList song::getTrackList(){
   
   return m_tracklist;
 }
+
+track * song::getTrackToPlay(){
+  return m_trackToPlay;
+}
+
 void song::setPlayMode(PlayModes m_playMode, int tco_num){
   switch( m_playMode )
 	{
