@@ -246,11 +246,41 @@ void AutomatableModel::setValue( const float value )
 
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
+//! @todo This should be moved into a maths header
 template<class T> T log_to_linear_scale(T min, T max, T value)
-// we get min and max from the class => TODO
 {
-	printf("scale: in: %f, out: %f\n",value, exp((log(max)-log(min)) * value + log(min)));
 	return exp((log(max)-log(min)) * value + log(min));
+}
+
+
+
+
+template<class T> T AutomatableModel::log_to_linear_scale(T value) const
+{
+	return ::log_to_linear_scale(minValue<float>(), maxValue<float>(), value);
+}
+
+
+
+
+//! @todo: this should be moved into a maths header
+template<class T>
+void round_at(T& value, const T& where, const T& step_size)
+{
+	if( qAbs<float>( value - where )
+		< typeInfo<float>::minEps() * qAbs<float>( step_size ) )
+	{
+		value = where;
+	}
+}
+
+
+
+
+template<class T>
+void AutomatableModel::round_at(T& value, const T& where) const
+{
+	::round_at(value, where, m_step);
 }
 
 
@@ -265,7 +295,6 @@ void AutomatableModel::setAutomatedValue( const float value )
 		(m_scaleType == Linear)
 		? value
 		: log_to_linear_scale(
-			minValue<float>(), maxValue<float>(),
 			// fit value into [0,1]:
 			(value - minValue<float>()) / maxValue<float>()
 			);
@@ -332,19 +361,6 @@ void AutomatableModel::setStep( const float step )
 
 
 
-template<class T>
-void AutomatableModel::round_at(T& value, const T& where) const
-{
-	if( qAbs<float>( value - where )
-		< typeInfo<float>::minEps() * qAbs<float>( m_step ) )
-	{
-		value = where;
-	}
-}
-
-
-
-
 float AutomatableModel::fittedValue( float value ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
@@ -354,9 +370,9 @@ float AutomatableModel::fittedValue( float value ) const
 		value = nearbyintf( value / m_step ) * m_step;
 	}
 
-	round_at(value, m_maxValue, m_step);
-	round_at(value, m_minValue, m_step);
-	round_at(value, 0, m_step);
+	round_at(value, m_maxValue);
+	round_at(value, m_minValue);
+	round_at(value, 0.0f);
 
 	if( value < m_minValue )
 	{
@@ -462,7 +478,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 			break;
 		case Logarithmic:
-			v = log_to_linear_scale(minValue<float>(), maxValue<float>(),
+			v = log_to_linear_scale(
 				controllerConnection()->currentValue( frameOffset ));
 			break;
 		default:

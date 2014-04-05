@@ -182,7 +182,6 @@ public:
 
 	void setRange( const float min, const float max, const float step = 1 );
 	void setScaleType( ScaleType sc ) {
-		printf("Settings scale to: %d\n", (int)sc);
 		m_scaleType = sc;
 	}
 	void setScaleLogarithmic( bool set_to_true = true )
@@ -251,6 +250,10 @@ public slots:
 
 
 protected:
+	//! returns a value which is in range between min() and
+	//! max() and aligned according to the step size (step size 0.05 -> value
+	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
+	//! doing your own calculations.
 	float fittedValue( float value ) const;
 
 
@@ -267,6 +270,10 @@ private:
 
 	void linkModel( AutomatableModel* model );
 	void unlinkModel( AutomatableModel* model );
+
+	//! @brief Scales @value from linear to logarithmic.
+	//! Value should be within [0,1]
+	template<class T> T log_to_linear_scale(T value) const;
 
 	//! rounds @a value to @a where if it is close to it
 	//! @param value will be modified to rounded value
