@@ -245,6 +245,18 @@ nStateButton {
 	min-width: 26px;
 }
 
+/* track background colors */
+trackContentWidget {
+	qproperty-darkerColor1: rgb( 50, 50, 50 );
+	qproperty-darkerColor2: rgb( 20, 20, 20 );
+	qproperty-darkerColor3: rgb( 15, 15, 15 );
+	qproperty-lighterColor1: rgb( 50, 50, 50 );
+	qproperty-lighterColor2: rgb( 40, 40, 40 );
+	qproperty-lighterColor3: rgb( 30, 30, 30 );
+	qproperty-gradMidPoint: 0.33;
+}
+
+
 /* gear button in tracks */
 
 trackOperationsWidget > QPushButton {

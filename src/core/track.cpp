@@ -817,7 +817,14 @@ void trackContentObjectView::setAutoResizeEnabled( bool _e )
  */
 trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
-	m_trackView( _parent )
+	m_trackView( _parent ),
+	m_darkerColor1( NULL ),
+	m_darkerColor2( NULL ),
+	m_darkerColor3( NULL ),
+	m_lighterColor1( NULL ),
+	m_lighterColor2( NULL ),
+	m_lighterColor3( NULL ),
+	m_gradMidPoint( 0.0f )
 {
 	setAcceptDrops( true );
 
@@ -825,6 +832,16 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 			SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( changePosition( const MidiTime & ) ) );
 
+//initialize qproperties
+	setDarkerColor1( QColor( 0, 0, 0 ) );
+	setDarkerColor2( QColor( 0, 0, 0 ) );
+	setDarkerColor3( QColor( 0, 0, 0 ) );
+	setLighterColor1( QColor( 0, 0, 0 ) );
+	setLighterColor2( QColor( 0, 0, 0 ) );
+	setLighterColor3( QColor( 0, 0, 0 ) );
+	
+	setStyle( QApplication::style() );
+	
 	updateBackground();
 }
 
@@ -856,15 +873,15 @@ void trackContentWidget::updateBackground()
 	QPainter pmp( &m_background );
 
 	QLinearGradient grad( 0,0, 0, h );
-	grad.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad.setColorAt( 0.33, QColor( 20, 20, 20 ) );
-	grad.setColorAt( 1.0, QColor( 15, 15, 15 ) );
+	grad.setColorAt( 0.0, darkerColor1() );
+	grad.setColorAt( gradMidPoint(), darkerColor2() );
+	grad.setColorAt( 1.0, darkerColor3() );
 	pmp.fillRect( 0, 0, w, h, grad );
 
 	QLinearGradient grad2( 0,0, 0, h );
-	grad2.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad2.setColorAt( 0.33, QColor( 40, 40, 40 ) );
-	grad2.setColorAt( 1.0, QColor( 30, 30, 30 ) );
+	grad2.setColorAt( 0.0, lighterColor1() );
+	grad2.setColorAt( gradMidPoint(), lighterColor2() );
+	grad2.setColorAt( 1.0, lighterColor3() );
 	pmp.fillRect( w, 0, w , h, grad2 );
 
 	// draw lines
@@ -1195,6 +1212,49 @@ MidiTime trackContentWidget::endPosition( const MidiTime & _pos_start )
 }
 
 
+// qproperty access methods
+
+QColor trackContentWidget::darkerColor1() const 
+{ if( m_darkerColor1 ) return *m_darkerColor1; else return QColor( 0, 0, 0 ); }
+
+QColor trackContentWidget::darkerColor2() const 
+{ if( m_darkerColor2 ) return *m_darkerColor2; else return QColor( 0, 0, 0 ); }
+
+QColor trackContentWidget::darkerColor3() const 
+{ if( m_darkerColor3 ) return *m_darkerColor3; else return QColor( 0, 0, 0 ); }
+
+QColor trackContentWidget::lighterColor1() const 
+{ if( m_lighterColor1 ) return *m_lighterColor1; else return QColor( 0, 0, 0 ); }
+
+QColor trackContentWidget::lighterColor2() const 
+{ if( m_lighterColor2 ) return *m_lighterColor2; else return QColor( 0, 0, 0 ); }
+
+QColor trackContentWidget::lighterColor3() const 
+{ if( m_lighterColor3 ) return *m_lighterColor3; else return QColor( 0, 0, 0 ); }
+
+void trackContentWidget::setDarkerColor1( const QColor & _c ) 
+{ if( m_darkerColor1 ) *m_darkerColor1 = _c; else m_darkerColor1 = new QColor( _c ); }
+
+void trackContentWidget::setDarkerColor2( const QColor & _c ) 
+{ if( m_darkerColor2 ) *m_darkerColor2 = _c; else m_darkerColor2 = new QColor( _c ); }
+
+void trackContentWidget::setDarkerColor3( const QColor & _c ) 
+{ if( m_darkerColor3 ) *m_darkerColor3 = _c; else m_darkerColor3 = new QColor( _c ); }
+
+void trackContentWidget::setLighterColor1( const QColor & _c ) 
+{ if( m_lighterColor1 ) *m_lighterColor1 = _c; else m_lighterColor1 = new QColor( _c ); }
+
+void trackContentWidget::setLighterColor2( const QColor & _c ) 
+{ if( m_lighterColor2 ) *m_lighterColor2 = _c; else m_lighterColor2 = new QColor( _c ); }
+
+void trackContentWidget::setLighterColor3( const QColor & _c ) 
+{ if( m_lighterColor3 ) *m_lighterColor3 = _c; else m_lighterColor3 = new QColor( _c ); }
+
+float trackContentWidget::gradMidPoint() const 
+{ return m_gradMidPoint; }
+
+void trackContentWidget::setGradMidPoint( float _g ) 
+{ m_gradMidPoint = _g; }
 
 
 
