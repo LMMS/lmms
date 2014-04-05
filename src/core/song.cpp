@@ -216,41 +216,41 @@ track * song::getTrackToPlay(){
 }
 
 void song::setPlayMode(PlayModes m_playMode, int tco_num){
-  PlaySong *ps = new PlaySong;
-  PlayTrack *aPlayTrack = new PlayTrack;
-  PlayBB *aPlayBB = new PlayBB;
-  PlayPattern *aPlayPattern = new PlayPattern;
+  
+  IPlayMode * pm;
+  
   switch( m_playMode )
 	{
 	        
 		case Mode_PlaySong:
-			
-			ps->process(this);
-			break;
+		  pm = new PlaySong;
+		  break;
 
 		case Mode_PlayTrack:
-		  
-			aPlayTrack->process(this);
-			break;
+		  pm = new PlayTrack;
+		  break;
 
 		case Mode_PlayBB:
-			aPlayBB->process(this);
-			break;
+		  pm = new PlayBB;
+		  break;
 
 		case Mode_PlayPattern:
-			aPlayPattern->process(this);
-			break;
+		  pm = new PlayPattern;
+		  break;
 
 		default:
 			return;
 
 	}
 	
+	pm->process(this);
+	
 	if( m_tracklist.empty() == true )
 	{
 		return;
 	}
 
+	
 	// check for looping-mode and act if necessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
