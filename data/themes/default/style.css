@@ -499,7 +499,12 @@ SampleTCOView {
 AutomationPatternView {
 	color: #99afff;
 	qproperty-fgColor: rgb( 204, 215, 255 );
-	qproperty-textColor: rgb( 255, 255, 255 );	
+	qproperty-textColor: rgb( 255, 255, 255 );
+}
+
+/* bb-pattern */
+bbTCOView {
+	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
 /* Plugins */
