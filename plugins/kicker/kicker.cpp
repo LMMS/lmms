@@ -120,7 +120,7 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_versionModel.loadSettings( _this, "version" );
 
 	// Try to maintain backwards compatibility
-	if( m_versionModel.value() < 1 )
+	if( !_this.hasAttribute( "version" ) )
 	{
 		m_decayModel.setValue( m_decayModel.value() * 1.33f );
 		m_envModel.setValue( 1.0f );
