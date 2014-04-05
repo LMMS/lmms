@@ -1120,7 +1120,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		m_trackView->trackContainerView()->fixedTCOs() == false )
 	{
 		const MidiTime pos = getPosition( _de->pos().x()
-							).toNearestTact();
+                                          ).getTact() * MidiTime::ticksPerTact();
 		trackContentObject * tco = getTrack()->createTCO( pos );
 
 		// value contains our XML-data so simply create a
