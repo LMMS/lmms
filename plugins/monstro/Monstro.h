@@ -36,7 +36,7 @@
 #include "pixmap_button.h"
 #include "combobox.h"
 #include "Oscillator.h"
-// #include "fastpow.h" // once grejppi's fastpow gets merged
+#include "lmms_math.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
@@ -152,19 +152,6 @@ const float MAX_FREQ = 48000.0f;
 
 class MonstroInstrument;
 class MonstroView;
-
-// use grejppi's once it's merged
-inline double fastPow( double a, double b )
-{
-	union
-	{
-		double d;
-		int32_t x[2];
-	} u = { a };
-  u.x[1] = static_cast<int32_t>( b * ( u.x[1] - 1072632447 ) + 1072632447 );
-  u.x[0] = 0;
-  return u.d;
-}
 
 
 class MonstroSynth

@@ -26,6 +26,7 @@
 #ifndef _LMMS_MATH_H
 #define _LMMS_MATH_H
 
+#include <stdint.h>
 
 #ifdef __INTEL_COMPILER
 
@@ -105,6 +106,19 @@ static inline int fast_rand()
 }
 
 
+
+// source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+static inline double fastPow( double a, double b )
+{
+	union
+	{
+		double d;
+		int32_t x[2];
+	} u = { a };
+	u.x[1] = static_cast<int32_t>( b * ( u.x[1] - 1072632447 ) + 1072632447 );
+	u.x[0] = 0;
+	return u.d;
+}
 
 
 #endif
