@@ -1019,7 +1019,7 @@ void patternView::paintEvent( QPaintEvent * )
 				}
 				else
 				{
-					p.setPen( QColor( 255, 255, 255 ) );	/// \todo make this a qproperty
+					p.setPen( fgColor() );	
 				}
 
 				// scan through all the notes and draw them on the pattern
@@ -1133,7 +1133,7 @@ void patternView::paintEvent( QPaintEvent * )
 
 	QColor text_color = ( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 		? QColor( 30, 30, 30 )
-		: QColor( 255, 255, 255 );
+		: textColor();
 
 	if( m_pat->name() != m_pat->instrumentTrack()->name() )
 	{

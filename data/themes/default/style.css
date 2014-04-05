@@ -484,16 +484,22 @@ TrackContainerView QLabel
 /* instrument pattern */
 patternView {
 	color: rgb( 119, 199, 216 );
+	qproperty-fgColor: rgb( 187, 227, 236 );
+	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
 /* sample track pattern */
 SampleTCOView {
 	color: rgb( 74, 253, 133 );
+	qproperty-fgColor: rgb( 187, 227, 236 );
+	qproperty-textColor: rgb( 255, 60, 60 );	
 }
 
 /* automation pattern */
 AutomationPatternView {
 	color: #99afff;
+	qproperty-fgColor: rgb( 204, 215, 255 );
+	qproperty-textColor: rgb( 255, 255, 255 );	
 }
 
 /* Plugins */

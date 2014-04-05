@@ -163,6 +163,11 @@ private:
 class trackContentObjectView : public selectableObject, public ModelView
 {
 	Q_OBJECT
+
+// theming qproperties
+	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+
 public:
 	trackContentObjectView( trackContentObject * _tco, trackView * _tv );
 	virtual ~trackContentObjectView();
@@ -173,7 +178,11 @@ public:
 	{
 		return m_tco;
 	}
-
+// qproperty access func
+	QColor fgColor() const;
+	QColor textColor() const;
+	void setFgColor( const QColor & _c );
+	void setTextColor( const QColor & _c );
 
 public slots:
 	virtual bool close();
@@ -228,6 +237,9 @@ private:
 
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
+// qproperty fields
+	QColor * m_fgColor;
+	QColor * m_textColor;
 } ;
 
 
