@@ -33,6 +33,7 @@
 #include "tooltip.h"
 #include "song.h"
 #include "lmms_math.h"
+#include "interpolation.h"
 
 #include "embed.cpp"
 
@@ -103,10 +104,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 {
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
-		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_env1_buf[f] * mod##_e1 * 2 ) ), MAX_FREQ );	\
-		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_env2_buf[f] * mod##_e2 * 2 ) ), MAX_FREQ );	\
-		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo1_buf[f] * mod##_l1 ) ), MAX_FREQ );	\
-		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * static_cast<float>( fastPow( 2.0, m_lfo2_buf[f] * mod##_l2 ) ), MAX_FREQ );
+		if( mod##_e1 != 0.0 ) car = qBound( MIN_FREQ, car * powf( 2.0, m_env1_buf[f] * mod##_e1 * 2 ), MAX_FREQ );	\
+		if( mod##_e2 != 0.0 ) car = qBound( MIN_FREQ, car * powf( 2.0, m_env2_buf[f] * mod##_e2 * 2 ), MAX_FREQ );	\
+		if( mod##_l1 != 0.0 ) car = qBound( MIN_FREQ, car * powf( 2.0, m_lfo1_buf[f] * mod##_l1 ), MAX_FREQ );	\
+		if( mod##_l2 != 0.0 ) car = qBound( MIN_FREQ, car * powf( 2.0, m_lfo2_buf[f] * mod##_l2 ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0 ) car = qBound( 0.0f, car + mod##_e1 * m_env1_buf[f], 1.0f );	\
@@ -251,14 +252,14 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	for( f_cnt_t f = 0; f < _frames; f++ )
 	{
 
-/*
-	// debug code
+
+/*	// debug code
 		if( f % 10 == 0 ) {
 			qDebug( "env1 %f -- env1 phase %f", m_env1_buf[f], m_env1_phase );
 			qDebug( "env1 pre %f att %f dec %f rel %f ", m_parent->m_env1_pre, m_parent->m_env1_att,
 				m_parent->m_env1_dec, m_parent->m_env1_rel );
-		}
-*/
+		}*/
+
 
 		/////////////////////////////
 		//				           //
@@ -378,8 +379,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// o2 modulation?
 		if( omod == MOD_FM )
 		{
-			o3l_f = qBound( MIN_FREQ, o3l_f * powf( 4.0f, O2L ), MAX_FREQ );
-			o3r_f = qBound( MIN_FREQ, o3r_f * powf( 4.0f, O2R ), MAX_FREQ );
+			o3l_f = qBound( MIN_FREQ, o3l_f * powf( 2.0f, O2L * 2 ), MAX_FREQ );
+			o3r_f = qBound( MIN_FREQ, o3r_f * powf( 2.0f, O2R * 2 ), MAX_FREQ );
 		}
 
 		// check for sync
@@ -417,8 +418,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		float sub = o3sub;
 		modulateabs( sub, o3s )
 
-		sample_t O3L = interpolate( O3AL, O3BL, sub );
-		sample_t O3R = interpolate( O3AR, O3BR, sub );
+		sample_t O3L = linearInterpolate( O3AL, O3BL, sub );
+		sample_t O3R = linearInterpolate( O3AR, O3BR, sub );
 
 		// modulate volume
 		O3L *= o3lv;

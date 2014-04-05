@@ -183,11 +183,10 @@ private:
 	void renderModulators( fpp_t _frames );
 
 	// linear interpolation
-	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
+/*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
 	{
 		return s1 + ( s2 - s1 ) * x;
-	}
-
+	}*/ // using interpolation.h from now on
 
 	inline sample_t calcSlope( sample_t _s, float _slope )
 	{

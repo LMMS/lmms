@@ -232,23 +232,13 @@ public:
 
 	inline sample_t userWaveSample( const float _sample ) const
 	{
-		// Precise implementation
-//		const float frame = fraction( _sample ) * m_frames;
-//		const f_cnt_t f1 = static_cast<f_cnt_t>( frame );
-//		const f_cnt_t f2 = ( f1 + 1 ) % m_frames;
-//		sample_t waveSample = linearInterpolate( m_data[f1][0],
-//						m_data[f2][0],
-//						fraction( frame ) );
-//		return waveSample;
-
-		// Fast implementation
 		const float frame = _sample * m_frames;
 		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % m_frames;
 		if( f1 < 0 )
 		{
 			f1 += m_frames;
 		}
-		return m_data[f1][0];
+		return linearInterpolate( m_data[f1][0], m_data[ (f1 + 1) % m_frames ][0], fraction( frame ) );
 	}
 
 	static QString tryToMakeRelative( const QString & _file );
