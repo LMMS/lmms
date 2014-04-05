@@ -305,12 +305,12 @@ void LadspaEffect::pluginInstantiation()
 			// Determine the port's category.
 			if( manager->isPortAudio( m_key, port ) )
 			{
-		// Nasty manual memory management--was having difficulty
-		// with some prepackaged plugins that were segfaulting
-		// during cleanup.  It was easier to troubleshoot with the
-		// memory management all taking place in one file.
+				// Nasty manual memory management--was having difficulty
+				// with some prepackaged plugins that were segfaulting
+				// during cleanup.  It was easier to troubleshoot with the
+				// memory management all taking place in one file.
 				p->buffer = 
-		new LADSPA_Data[engine::mixer()->framesPerPeriod()];
+					new LADSPA_Data[engine::mixer()->framesPerPeriod()];
 
 				if( p->name.toUpper().contains( "IN" ) &&
 					manager->isPortInput( m_key, port ) )
@@ -430,6 +430,7 @@ void LadspaEffect::pluginInstantiation()
 
 			p->value = p->def;
 
+			p->suggests_logscale = manager->isLogarithmic( m_key, port );
 
 			ports.append( p );
 

@@ -51,6 +51,8 @@ typedef enum BufferData
 	NONE
 } buffer_data_t;
 
+//! This struct is used to hold port descriptions internally
+//! which where received from the ladspa plugin
 typedef struct PortDescription
 {
 	QString name;
@@ -64,6 +66,9 @@ typedef struct PortDescription
 	LADSPA_Data min;
 	LADSPA_Data def;
 	LADSPA_Data value;
+	//! This is true iff ladspa suggests logscale
+	//! Note however that the model can still decide to use a linear scale
+	bool suggests_logscale;
 	LADSPA_Data * buffer;
 	LadspaControl * control;
 } port_desc_t;
