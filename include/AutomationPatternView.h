@@ -33,10 +33,14 @@ class AutomationPattern;
 class AutomationPatternView : public trackContentObjectView
 {
 	Q_OBJECT
+
+// theming qproperties
+	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+
 public:
 	AutomationPatternView( AutomationPattern * _pat, trackView * _parent );
 	virtual ~AutomationPatternView();
-
 
 public slots:
 	virtual void update();
@@ -67,7 +71,6 @@ private:
 	bool m_needsUpdate;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );
-
 } ;
 
 

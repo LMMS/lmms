@@ -147,6 +147,10 @@ private:
 class patternView : public trackContentObjectView
 {
 	Q_OBJECT
+
+// theming qproperties
+	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 public:
 	patternView( pattern * _pattern, trackView * _parent );
 	virtual ~patternView();
@@ -185,7 +189,6 @@ private:
 	pattern * m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
-
 } ;
 
 

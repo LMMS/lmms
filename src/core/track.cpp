@@ -249,7 +249,9 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	m_action( NoAction ),
 	m_autoResize( false ),
 	m_initialMouseX( 0 ),
-	m_hint( NULL )
+	m_hint( NULL ),
+	m_fgColor( NULL ),
+	m_textColor( NULL )
 {
 	if( s_textFloat == NULL )
 	{
@@ -274,6 +276,9 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
+
+	setFgColor( QColor( 0,0,0 ) );
+	setTextColor( QColor( 0,0,0 ) );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 }
@@ -313,6 +318,23 @@ bool trackContentObjectView::fixedTCOs()
 }
 
 
+
+// qproperty access functions, to be inherited & used by TCOviews
+//! \brief CSS theming qproperty access method
+QColor trackContentObjectView::fgColor() const
+{ if( m_fgColor ) return *m_fgColor; else return QColor( 0,0,0 ); }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentObjectView::textColor() const
+{ if( m_textColor ) return *m_textColor; else return QColor( 0,0,0 ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentObjectView::setFgColor( const QColor & _c )
+{ if( m_fgColor ) *m_fgColor = _c; else m_fgColor = new QColor( 0,0,0 ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentObjectView::setTextColor( const QColor & _c )
+{ if( m_textColor ) *m_textColor = _c; else m_textColor = new QColor( 0,0,0 ); }
 
 
 /*! \brief Close a trackContentObjectView
@@ -817,7 +839,14 @@ void trackContentObjectView::setAutoResizeEnabled( bool _e )
  */
 trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
-	m_trackView( _parent )
+	m_trackView( _parent ),
+	m_darkerColor1( NULL ),
+	m_darkerColor2( NULL ),
+	m_darkerColor3( NULL ),
+	m_lighterColor1( NULL ),
+	m_lighterColor2( NULL ),
+	m_lighterColor3( NULL ),
+	m_gradMidPoint( 0.0f )
 {
 	setAcceptDrops( true );
 
@@ -825,6 +854,16 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 			SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( changePosition( const MidiTime & ) ) );
 
+//initialize qproperties
+	setDarkerColor1( QColor( 0, 0, 0 ) );
+	setDarkerColor2( QColor( 0, 0, 0 ) );
+	setDarkerColor3( QColor( 0, 0, 0 ) );
+	setLighterColor1( QColor( 0, 0, 0 ) );
+	setLighterColor2( QColor( 0, 0, 0 ) );
+	setLighterColor3( QColor( 0, 0, 0 ) );
+	
+	setStyle( QApplication::style() );
+	
 	updateBackground();
 }
 
@@ -856,15 +895,15 @@ void trackContentWidget::updateBackground()
 	QPainter pmp( &m_background );
 
 	QLinearGradient grad( 0,0, 0, h );
-	grad.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad.setColorAt( 0.33, QColor( 20, 20, 20 ) );
-	grad.setColorAt( 1.0, QColor( 15, 15, 15 ) );
+	grad.setColorAt( 0.0, darkerColor1() );
+	grad.setColorAt( gradMidPoint(), darkerColor2() );
+	grad.setColorAt( 1.0, darkerColor3() );
 	pmp.fillRect( 0, 0, w, h, grad );
 
 	QLinearGradient grad2( 0,0, 0, h );
-	grad2.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad2.setColorAt( 0.33, QColor( 40, 40, 40 ) );
-	grad2.setColorAt( 1.0, QColor( 30, 30, 30 ) );
+	grad2.setColorAt( 0.0, lighterColor1() );
+	grad2.setColorAt( gradMidPoint(), lighterColor2() );
+	grad2.setColorAt( 1.0, lighterColor3() );
 	pmp.fillRect( w, 0, w , h, grad2 );
 
 	// draw lines
@@ -1195,6 +1234,62 @@ MidiTime trackContentWidget::endPosition( const MidiTime & _pos_start )
 }
 
 
+// qproperty access methods
+//! \brief CSS theming qproperty access method
+QColor trackContentWidget::darkerColor1() const 
+{ if( m_darkerColor1 ) return *m_darkerColor1; else return QColor( 0, 0, 0 ); }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentWidget::darkerColor2() const 
+{ if( m_darkerColor2 ) return *m_darkerColor2; else return QColor( 0, 0, 0 ); }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentWidget::darkerColor3() const 
+{ if( m_darkerColor3 ) return *m_darkerColor3; else return QColor( 0, 0, 0 ); }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentWidget::lighterColor1() const 
+{ if( m_lighterColor1 ) return *m_lighterColor1; else return QColor( 0, 0, 0 ); }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentWidget::lighterColor2() const 
+{ if( m_lighterColor2 ) return *m_lighterColor2; else return QColor( 0, 0, 0 ); }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentWidget::lighterColor3() const 
+{ if( m_lighterColor3 ) return *m_lighterColor3; else return QColor( 0, 0, 0 ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setDarkerColor1( const QColor & _c ) 
+{ if( m_darkerColor1 ) *m_darkerColor1 = _c; else m_darkerColor1 = new QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setDarkerColor2( const QColor & _c ) 
+{ if( m_darkerColor2 ) *m_darkerColor2 = _c; else m_darkerColor2 = new QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setDarkerColor3( const QColor & _c ) 
+{ if( m_darkerColor3 ) *m_darkerColor3 = _c; else m_darkerColor3 = new QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setLighterColor1( const QColor & _c ) 
+{ if( m_lighterColor1 ) *m_lighterColor1 = _c; else m_lighterColor1 = new QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setLighterColor2( const QColor & _c ) 
+{ if( m_lighterColor2 ) *m_lighterColor2 = _c; else m_lighterColor2 = new QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setLighterColor3( const QColor & _c ) 
+{ if( m_lighterColor3 ) *m_lighterColor3 = _c; else m_lighterColor3 = new QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+float trackContentWidget::gradMidPoint() const 
+{ return m_gradMidPoint; }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setGradMidPoint( float _g ) 
+{ m_gradMidPoint = _g; }
 
 
 

@@ -38,6 +38,9 @@
 #include "Oscillator.h"
 #include "lmms_math.h"
 
+//
+//	UI Macros
+//
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new knob( knobStyled, view ); 				\
@@ -85,7 +88,7 @@
 	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
 	name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
 
-
+// UI constants
 const int O1ROW = 22;
 const int O2ROW = 22 + 39;
 const int O3ROW = 22 + 39 * 2;
@@ -127,6 +130,7 @@ const int MATROW6 = 22 + 39*5;
 const int OPVIEW = 0;
 const int MATVIEW = 1;
 
+// waveform enumerators
 const int WAVE_SINE = 0;
 const int WAVE_TRI = 1;
 const int WAVE_SAW = 2;
@@ -139,6 +143,7 @@ const int WAVE_EXP = 8;
 const int WAVE_NOISE = 9;
 const int NUM_WAVES = 10;
 
+// modulation enumerators
 const int MOD_MIX = 0;
 const int MOD_AM = 1;
 const int MOD_FM = 2;
@@ -149,6 +154,11 @@ const float MODCLIP = 2.0;
 
 const float MIN_FREQ = 18.0f;
 const float MAX_FREQ = 48000.0f;
+
+// constants for amp delta capping - these will be divided by samplerate by the synth
+const float ADCAP1 = 44100 / 4;
+const float ADCAP2 = 44100 / 4.5;
+
 
 class MonstroInstrument;
 class MonstroView;
@@ -259,6 +269,18 @@ private:
 
 	sample_t m_osc1l_last;
 	sample_t m_osc1r_last;
+
+	sample_t m_osc2l_last;
+	sample_t m_osc2r_last;
+
+	sample_t m_osc3l_last;
+	sample_t m_osc3r_last;
+	
+	sample_t m_l_last;
+	sample_t m_r_last;
+	
+	float m_adcap1;
+	float m_adcap2;
 };
 
 class MonstroInstrument : public Instrument
