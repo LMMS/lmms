@@ -98,8 +98,8 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_r_last = 0.0f;
 
 // constants for very simple antialias/bandlimiting by amp delta capping
-	m_adcap3 = ( 44100 * 0.3 ) / m_samplerate;
-	m_adcap4 = ( 44100 * 0.25 ) / m_samplerate;
+	m_adcap1 = ADCAP1 / m_samplerate;
+	m_adcap2 = ADCAP2 / m_samplerate;
 }
 
 
@@ -404,8 +404,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		sample_t O2R = oscillate( o2w, o2r_p );
 
 		// do simple alias reduction filtering before volume is touched, by capping amplitude delta
-		O2L = qBound( m_osc2l_last - m_adcap3, O2L, m_osc2l_last + m_adcap3 );
-		O2R = qBound( m_osc2r_last - m_adcap3, O2R, m_osc2r_last + m_adcap3 );
+		O2L = qBound( m_osc2l_last - m_adcap1, O2L, m_osc2l_last + m_adcap1 );
+		O2R = qBound( m_osc2r_last - m_adcap1, O2R, m_osc2r_last + m_adcap1 );
 		m_osc2l_last = O2L;
 		m_osc2r_last = O2R;
 
@@ -469,8 +469,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		sample_t O3R = linearInterpolate( O3AR, O3BR, sub );
 
 		// do very simple bandlimit filtering by amp delta capping, before volume is touched
-		O3L = qBound( m_osc3l_last - m_adcap3, O3L, m_osc3l_last + m_adcap3 );
-		O3R = qBound( m_osc3r_last - m_adcap3, O3R, m_osc3r_last + m_adcap3 );
+		O3L = qBound( m_osc3l_last - m_adcap1, O3L, m_osc3l_last + m_adcap1 );
+		O3R = qBound( m_osc3r_last - m_adcap1, O3R, m_osc3r_last + m_adcap1 );
 		m_osc3l_last = O3L;
 		m_osc3r_last = O3R;
 
@@ -494,8 +494,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		L = qBound( m_l_last - m_adcap4, L, m_l_last + m_adcap4 );
-		R = qBound( m_r_last - m_adcap4, R, m_r_last + m_adcap4 );
+		L = qBound( m_l_last - m_adcap2, L, m_l_last + m_adcap2 );
+		R = qBound( m_r_last - m_adcap2, R, m_r_last + m_adcap2 );
 
 		_buf[f][0] = L;
 		_buf[f][1] = R;
