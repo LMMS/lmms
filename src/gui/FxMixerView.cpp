@@ -71,15 +71,15 @@ FxMixerView::FxMixerView() :
 
 	// Channel area
 	m_channelAreaWidget = new QWidget;
-	chLayout = new QHBoxLayout(m_channelAreaWidget);
-	chLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	chLayout = new QHBoxLayout( m_channelAreaWidget );
+	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
 	chLayout->setSpacing( 0 );
 	chLayout->setMargin( 0 );
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// add master channel
-	m_fxChannelViews.resize(m->numChannels());
-	m_fxChannelViews[0] = new FxChannelView(this, this, 0);
+	m_fxChannelViews.resize( m->numChannels() );
+	m_fxChannelViews[0] = new FxChannelView( this, this, 0 );
 
 	FxChannelView * masterView = m_fxChannelViews[0];
 	ml->addWidget( masterView->m_fxLine, 0, Qt::AlignTop );
@@ -90,7 +90,7 @@ FxMixerView::FxMixerView() :
 	for( int i = 1; i < m_fxChannelViews.size(); ++i )
 	{
 		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
+		chLayout->addWidget( m_fxChannelViews[i]->m_fxLine );
 	}
 
 	// add the scrolling section to the main layout
@@ -98,22 +98,22 @@ FxMixerView::FxMixerView() :
 	class ChannelArea : public QScrollArea
 	{
 		public:
-			ChannelArea(QWidget * parent, FxMixerView * mv) :
-				QScrollArea(parent), m_mv(mv) {}
+			ChannelArea( QWidget * parent, FxMixerView * mv ) :
+				QScrollArea( parent ), m_mv( mv ) {}
 			~ChannelArea() {}
-			virtual void keyPressEvent(QKeyEvent * e)
+			virtual void keyPressEvent( QKeyEvent * e )
 			{
-				m_mv->keyPressEvent(e);
+				m_mv->keyPressEvent( e );
 			}
 		private:
 			FxMixerView * m_mv;
 	};
-	channelArea = new ChannelArea(this, this);
-	channelArea->setWidget(m_channelAreaWidget);
+	channelArea = new ChannelArea( this, this );
+	channelArea->setWidget( m_channelAreaWidget );
 	channelArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	channelArea->setFrameStyle( QFrame::NoFrame );
 	channelArea->setMinimumWidth( fxLineSize.width() * 6 );
-	channelArea->setFixedHeight( fxLineSize.height() + 
+	channelArea->setFixedHeight( fxLineSize.height() +
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
 	ml->addWidget(channelArea);
 
@@ -124,10 +124,12 @@ FxMixerView::FxMixerView() :
 	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
-	
+
 	// Create EffectRack and set initial index to master channel
 	m_rackView = new EffectRackView( &m->m_fxChannels[0]->m_fxChain, this );
+	m_rackView->setFixedSize( 245, fxLineSize.height() );
 	ml->addWidget( m_rackView, 0, Qt::AlignTop );
+	
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
 	setLayout( ml );
@@ -344,7 +346,7 @@ void FxMixerView::deleteChannel(int index)
 
 
 
-void FxMixerView::moveChannelLeft(int index) 
+void FxMixerView::moveChannelLeft(int index)
 {
 	// can't move master or first channel left or last channel right
 	if( index <= 1 || index >= m_fxChannelViews.size() ) return;
