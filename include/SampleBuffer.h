@@ -260,7 +260,7 @@ private:
     void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
     void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
-	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
+	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #ifdef LMMS_HAVE_OGGVORBIS
