@@ -259,6 +259,18 @@ private:
 
 	sample_t m_osc1l_last;
 	sample_t m_osc1r_last;
+
+	sample_t m_osc2l_last;
+	sample_t m_osc2r_last;
+
+	sample_t m_osc3l_last;
+	sample_t m_osc3r_last;
+	
+	sample_t m_l_last;
+	sample_t m_r_last;
+	
+	float m_adcap3;
+	float m_adcap4;
 };
 
 class MonstroInstrument : public Instrument
