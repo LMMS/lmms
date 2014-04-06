@@ -73,7 +73,7 @@
 
 /*! The width of the resize grip in pixels
  */
-const int RESIZE_GRIP_WIDTH = 4;
+const int RESIZE_GRIP_WIDTH = 8;
 
 /*! The size of the track buttons in pixels
  */
@@ -422,8 +422,8 @@ void trackContentObjectView::updateLength()
 	{
 		setFixedWidth(
 		static_cast<int>( m_tco->length() * pixelsPerTact() /
-					MidiTime::ticksPerTact() ) + 1 /*+
-						TCO_BORDER_WIDTH * 2-1*/ );
+                    MidiTime::ticksPerTact() ) + 1 /*+
+                        TCO_BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
 }
