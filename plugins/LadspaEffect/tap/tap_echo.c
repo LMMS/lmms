@@ -436,10 +436,10 @@ LADSPA_Descriptor * stereo_descriptor = NULL;
 
 
 
-/* __attribute__((constructor)) _init() is called automatically when the plugin library is first
+/*  _init() is called automatically when the plugin library is first
    loaded. */
 void 
-__attribute__((constructor)) _init() {
+ _init() {
 	
 	char ** port_names;
 	LADSPA_PortDescriptor * port_descriptors;
@@ -607,9 +607,9 @@ delete_descriptor(LADSPA_Descriptor * descriptor) {
 }
 
 
-/* __attribute__((destructor)) _fini() is called automatically when the library is unloaded. */
+/*  _fini() is called automatically when the library is unloaded. */
 void
-__attribute__((destructor)) _fini() {
+ _fini() {
 	delete_descriptor(stereo_descriptor);
 }
 
