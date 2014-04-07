@@ -273,8 +273,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lin2grad( 0, min, 0, max );
 
-	lin2grad.setColorAt( 1, c.lighter( 200 ) );
-	lin2grad.setColorAt( 0, c );
+	lin2grad.setColorAt( 1, fgColor().lighter( 150 ) );
+	lin2grad.setColorAt( 0.5, fgColor() );
+	lin2grad.setColorAt( 0, fgColor().darker( 150 ) );
 
 	for( AutomationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
@@ -313,7 +314,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QColor text_color = ( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 		? QColor( 30, 30, 30 )
-		: QColor( 255, 255, 255 );
+		: textColor();
 
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawText( 4, p.fontMetrics().height()+1, m_pat->name() );

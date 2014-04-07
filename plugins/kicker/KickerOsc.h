@@ -29,7 +29,7 @@
 #include "DspEffectLibrary.h"
 #include "Oscillator.h"
 
-#include "fastpow.h"
+#include "lmms_math.h"
 
 
 template<class FX = DspEffectLibrary::StereoBypass>

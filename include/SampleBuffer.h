@@ -46,6 +46,11 @@ class EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 public:
+	enum LoopMode {
+		LoopOff = 0,
+		LoopOn,
+		LoopPingPong
+	};
 	class EXPORT handleState
 	{
 	public:
@@ -62,11 +67,21 @@ public:
 			m_frameIndex = _index;
 		}
 
+		inline bool isBackwards() const
+		{
+			return m_isBackwards;
+		}
+
+		inline void setBackwards( bool _backwards )
+		{
+			m_isBackwards = _backwards;
+		}
 
 
 	private:
 		f_cnt_t m_frameIndex;
 		const bool m_varyingPitch;
+		bool m_isBackwards;
 		SRC_STATE * m_resamplingData;
 
 		friend class SampleBuffer;
@@ -86,7 +101,7 @@ public:
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
 				const float _freq,
-				const bool _looped = false );
+				const LoopMode _loopmode = LoopOff );
 
 	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 );
 	inline void visualize( QPainter & _p, const QRect & _dr, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 )
@@ -108,7 +123,7 @@ public:
 	{
 		return m_endFrame;
 	}
-	
+
 	inline f_cnt_t loopStartFrame() const
 	{
 		return m_loopStartFrame;
@@ -130,6 +145,16 @@ public:
 	{
 		m_varLock.lock();
 		m_loopEndFrame = _end;
+		m_varLock.unlock();
+	}
+
+	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
+	{
+		m_varLock.lock();
+		m_startFrame = _start;
+		m_endFrame = _end;
+		m_loopStartFrame = _loopstart;
+		m_loopEndFrame = _loopend;
 		m_varLock.unlock();
 	}
 
@@ -207,23 +232,13 @@ public:
 
 	inline sample_t userWaveSample( const float _sample ) const
 	{
-		// Precise implementation
-//		const float frame = fraction( _sample ) * m_frames;
-//		const f_cnt_t f1 = static_cast<f_cnt_t>( frame );
-//		const f_cnt_t f2 = ( f1 + 1 ) % m_frames;
-//		sample_t waveSample = linearInterpolate( m_data[f1][0],
-//						m_data[f2][0],
-//						fraction( frame ) );
-//		return waveSample;
-
-		// Fast implementation
 		const float frame = _sample * m_frames;
 		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % m_frames;
 		if( f1 < 0 )
 		{
 			f1 += m_frames;
 		}
-		return m_data[f1][0];
+		return linearInterpolate( m_data[f1][0], m_data[ (f1 + 1) % m_frames ][0], fraction( frame ) );
 	}
 
 	static QString tryToMakeRelative( const QString & _file );
@@ -245,7 +260,7 @@ private:
     void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
     void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
-	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
+	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -272,10 +287,13 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame * getSampleFragment( f_cnt_t _start, f_cnt_t _frames,
-						bool _looped,
-						sampleFrame * * _tmp ) const;
-	f_cnt_t getLoopedIndex( f_cnt_t _index ) const;
+	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
+						LoopMode _loopmode,
+						sampleFrame * * _tmp,
+						bool * _backwards, f_cnt_t _loopstart, f_cnt_t _loopend,
+						f_cnt_t _end ) const;
+	f_cnt_t getLoopedIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
+	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 
 
 signals:

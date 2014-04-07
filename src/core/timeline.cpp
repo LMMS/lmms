@@ -47,8 +47,8 @@
 
 QPixmap * timeLine::s_timeLinePixmap = NULL;
 QPixmap * timeLine::s_posMarkerPixmap = NULL;
-QPixmap * timeLine::s_loopPointPixmap = NULL;
-
+QPixmap * timeLine::s_loopPointBeginPixmap = NULL;
+QPixmap * timeLine::s_loopPointEndPixmap = NULL;
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			song::playPos & _pos, const MidiTime & _begin,
@@ -81,10 +81,15 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
 							"playpos_marker" ) );
 	}
-	if( s_loopPointPixmap == NULL )
+	if( s_loopPointBeginPixmap == NULL )
 	{
-		s_loopPointPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point" ) );
+		s_loopPointBeginPixmap = new QPixmap( embed::getIconPixmap(
+							"loop_point_b" ) );
+	}
+	if( s_loopPointEndPixmap == NULL )
+	{
+		s_loopPointEndPixmap = new QPixmap( embed::getIconPixmap(
+							"loop_point_e" ) );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -235,8 +240,8 @@ void timeLine::paintEvent( QPaintEvent * )
 	p.setPen( QColor( 0, 0, 0 ) );
 
 	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
-	p.drawPixmap( markerX( loopBegin() )+2, 2, *s_loopPointPixmap );
-	p.drawPixmap( markerX( loopEnd() )+2, 2, *s_loopPointPixmap );
+	p.drawPixmap( markerX( loopBegin() )+2, 2, *s_loopPointBeginPixmap );
+	p.drawPixmap( markerX( loopEnd() )+2, 2, *s_loopPointEndPixmap );
 	p.setOpacity( 1.0 );
 
 

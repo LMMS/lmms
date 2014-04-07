@@ -358,7 +358,7 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	}
 	else
 	{
-		p.setPen( c.lighter( 200 ) );
+		p.setPen( fgColor() );
 	}
 	QRect r = QRect( 1, 1,
 			qMax( static_cast<int>( m_tco->sampleLength() *
@@ -383,10 +383,10 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 
 		p.setPen( QColor( 0, 0, 0 ) );	
 		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( QColor( 255, 60, 60 ) );	
+		p.setPen( textColor() );	
 		p.drawText( 9, p.fontMetrics().height(), "Rec" );
 		
-		p.setBrush( QBrush( QColor( 255, 60, 60 ) ) );
+		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}
 }

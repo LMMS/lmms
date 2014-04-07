@@ -31,6 +31,7 @@
 #include "tooltip.h"
 #include "song.h"
 #include "lmms_math.h"
+#include "interpolation.h"
 
 #include "embed.cpp"
 
@@ -132,10 +133,10 @@ void WatsynObject::renderOutput( fpp_t _frames )
 			if( A1_rphase < 0 ) A1_rphase += WAVELEN;
 		}
 		// A1
-		sample_t A1_L = interpolate( m_A1wave[ static_cast<int>( A1_lphase ) ],
+		sample_t A1_L = linearInterpolate( m_A1wave[ static_cast<int>( A1_lphase ) ],
 							m_A1wave[ static_cast<int>( A1_lphase + 1 ) % WAVELEN ],
 							fraction( A1_lphase ) ) * m_parent->m_lvol[A1_OSC];
-		sample_t A1_R = interpolate( m_A1wave[ static_cast<int>( A1_rphase ) ],
+		sample_t A1_R = linearInterpolate( m_A1wave[ static_cast<int>( A1_rphase ) ],
 							m_A1wave[ static_cast<int>( A1_rphase + 1 ) % WAVELEN ],
 							fraction( A1_rphase ) ) * m_parent->m_rvol[A1_OSC];
 
@@ -168,10 +169,10 @@ void WatsynObject::renderOutput( fpp_t _frames )
 			if( B1_rphase < 0 ) B1_rphase += WAVELEN;
 		}
 		// B1
-		sample_t B1_L = interpolate( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ],
+		sample_t B1_L = linearInterpolate( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ],
 							m_B1wave[ static_cast<int>( B1_lphase + 1 ) % WAVELEN ],
 							fraction( B1_lphase ) ) * m_parent->m_lvol[B1_OSC];
-		sample_t B1_R = interpolate( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ],
+		sample_t B1_R = linearInterpolate( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ],
 							m_B1wave[ static_cast<int>( B1_rphase + 1 ) % WAVELEN ],
 							fraction( B1_rphase ) ) * m_parent->m_rvol[B1_OSC];
 

@@ -25,8 +25,9 @@
 
 
 #include "waveshaper.h"
-#include <math.h>
+#include "lmms_math.h"
 #include "embed.cpp"
+#include "interpolation.h"
 
 
 extern "C"
@@ -77,9 +78,6 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 // variables for effect
 	int i = 0;
-	float lookup;
-	float frac;
-	float posneg;
 
 	double out_sum = 0.0;
 	const float d = dryLevel();
@@ -101,23 +99,20 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 // start effect
 
-		for ( i=0; i <= 1; ++i )
+		for( i=0; i <= 1; ++i )
 		{
-			lookup = fabsf( s[i] ) * 200.0f;
-			posneg = s[i] < 0 ? -1.0f : 1.0f;
+			const int lookup = static_cast<int>( fabsf( s[i] ) * 200.0f );
+			const float frac = fraction( fabsf( s[i] ) * 200.0f ); 
+			const float posneg = s[i] < 0 ? -1.0f : 1.0f;
 
-			if ( lookup < 1 )
+			if( lookup < 1 )
 			{
-				frac = lookup - truncf(lookup);
 				s[i] = frac * m_wsControls.m_wavegraphModel.samples()[0] * posneg;
 			}
-			else
-			if ( lookup < 200 )
-			{
-				frac = lookup - truncf(lookup);
-				s[i] =
-						(( (1.0f-frac) * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) - 1 ] ) +
-						( frac * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) ] ))
+			else if( lookup < 200 )
+			{	
+				s[i] = linearInterpolate( m_wsControls.m_wavegraphModel.samples()[ lookup - 1 ], 
+						m_wsControls.m_wavegraphModel.samples()[ lookup ], frac )
 						* posneg;
 			}
 			else
