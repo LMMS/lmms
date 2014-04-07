@@ -37,6 +37,7 @@
 #include "combobox.h"
 #include "Oscillator.h"
 #include "lmms_math.h"
+#include "BandLimitedWave.h"
 
 //
 //	UI Macros
@@ -66,15 +67,21 @@
 
 #define setwavemodel( name ) 												\
 	name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
-	name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-	name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-	name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-	name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+	name .addItem( tr( "Bandlimited Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+	name .addItem( tr( "Bandlimited Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+	name .addItem( tr( "Bandlimited Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+	name .addItem( tr( "Bandlimited Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+	name .addItem( tr( "Bandlimited Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
 	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
-	name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
-	name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
+	name .addItem( tr( "Absolute sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
 	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
-	name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );
+	name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );	\
+	name .addItem( tr( "Digital Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+	name .addItem( tr( "Digital Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+	name .addItem( tr( "Digital Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+	name .addItem( tr( "Digital Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+	name .addItem( tr( "Digital Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+
 
 #define setlfowavemodel( name ) 												\
 	name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
@@ -82,8 +89,8 @@
 	name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
 	name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
 	name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
 	name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
 	name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
 	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
 	name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
@@ -136,12 +143,20 @@ const int WAVE_TRI = 1;
 const int WAVE_SAW = 2;
 const int WAVE_RAMP = 3;
 const int WAVE_SQR = 4;
-const int WAVE_SQRSOFT = 5;
-const int WAVE_MOOG = 6;
+const int WAVE_MOOG = 5;
+
+const int WAVE_SQRSOFT = 6;
 const int WAVE_SINABS = 7;
 const int WAVE_EXP = 8;
 const int WAVE_NOISE = 9;
-const int NUM_WAVES = 10;
+
+const int WAVE_TRI_D = 10;
+const int WAVE_SAW_D = 11;
+const int WAVE_RAMP_D = 12;
+const int WAVE_SQR_D = 13;
+const int WAVE_MOOG_D = 14;
+
+const int NUM_WAVES = 15;
 
 // modulation enumerators
 const int MOD_MIX = 0;
@@ -156,8 +171,8 @@ const float MIN_FREQ = 18.0f;
 const float MAX_FREQ = 48000.0f;
 
 // constants for amp delta capping - these will be divided by samplerate by the synth
-const float ADCAP1 = 44100 / 4;
-const float ADCAP2 = 44100 / 4.5;
+const float ADCAP1 = 44100 / 2;
+const float ADCAP2 = 44100 / 3;
 
 
 class MonstroInstrument;
@@ -205,7 +220,7 @@ private:
 		return fastPow( _s, exp );
 	}
 
-	inline sample_t oscillate( int _wave, const float _ph )
+	inline sample_t oscillate( int _wave, const float _ph, float _wavelen )
 	{
 		switch( _wave )
 		{
@@ -213,16 +228,20 @@ private:
 				return Oscillator::sinSample( _ph );
 				break;
 			case WAVE_TRI:
-				return Oscillator::triangleSample( _ph );
+				//return Oscillator::triangleSample( _ph );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLTriangle );
 				break;
 			case WAVE_SAW:
-				return Oscillator::sawSample( _ph );
+				//return Oscillator::sawSample( _ph );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSaw );
 				break;
 			case WAVE_RAMP:
-				return Oscillator::sawSample( _ph ) * -1.0;
+				//return Oscillator::sawSample( _ph ) * -1.0;
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSaw ) * -1.0;
 				break;
 			case WAVE_SQR:
-				return Oscillator::squareSample( _ph );
+				//return Oscillator::squareSample( _ph );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSquare );
 				break;
 			case WAVE_SQRSOFT:
 			{
@@ -234,7 +253,8 @@ private:
 				break;
 			}
 			case WAVE_MOOG:
-				return Oscillator::moogSawSample( _ph );
+				//return Oscillator::moogSawSample( _ph );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLMoog );
 				break;
 			case WAVE_SINABS:
 				return qAbs( Oscillator::sinSample( _ph ) );
@@ -243,9 +263,25 @@ private:
 				return Oscillator::expSample( _ph );
 				break;
 			case WAVE_NOISE:
-			default:
 				return Oscillator::noiseSample( _ph );
 				break;
+
+			case WAVE_TRI_D:
+				return Oscillator::triangleSample( _ph );
+				break;
+			case WAVE_SAW_D:
+				return Oscillator::sawSample( _ph );
+				break;
+			case WAVE_RAMP_D:
+				return Oscillator::sawSample( _ph ) * -1.0;
+				break;
+			case WAVE_SQR_D:
+				return Oscillator::squareSample( _ph );
+				break;
+			case WAVE_MOOG_D:
+				return Oscillator::moogSawSample( _ph );
+				break;
+
 		}
 		return 0.0;
 	}
@@ -275,10 +311,10 @@ private:
 
 	sample_t m_osc3l_last;
 	sample_t m_osc3r_last;
-	
+
 	sample_t m_l_last;
 	sample_t m_r_last;
-	
+
 	float m_adcap1;
 	float m_adcap2;
 };
