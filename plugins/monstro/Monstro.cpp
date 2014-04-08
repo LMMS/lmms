@@ -79,6 +79,11 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_osc3l_phase = 0.0f;
 	m_osc3r_phase = 0.0f;
 
+	m_ph2l_last = 0.0f;
+	m_ph2r_last = 0.0f;
+	m_ph3l_last = 0.0f;
+	m_ph3r_last = 0.0f;
+
 	m_env1_phase = 0.0f;
 	m_env2_phase = 0.0f;
 
@@ -282,6 +287,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o3l_p;
 	float o3r_p;
 	float sub;
+	
+	// phase delta calculation vars
+	float pd_l;
+	float pd_r;
 
 	// begin for loop
 	for( f_cnt_t f = 0; f < _frames; f++ )
@@ -399,9 +408,15 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( o2l_p < 0 ) o2l_p -= floorf( o2l_p );
 		if( o2r_p < 0 ) o2r_p -= floorf( o2r_p );
 
+		// phase delta
+		pd_l = qAbs( o2l_p - m_ph2l_last );
+		if( pd_l > 0.5 ) pd_l = 1.0 - pd_l;
+		pd_r = qAbs( o2r_p - m_ph2r_last );
+		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
+		
 		// multi-wave DC Oscillator
-		sample_t O2L = oscillate( o2w, o2l_p, BandLimitedWave::freqToLen( o2l_f, m_samplerate ) );
-		sample_t O2R = oscillate( o2w, o2r_p, BandLimitedWave::freqToLen( o2r_f, m_samplerate ) );
+		sample_t O2L = oscillate( o2w, o2l_p, BandLimitedWave::pdToLen( pd_l ) );
+		sample_t O2R = oscillate( o2w, o2r_p, BandLimitedWave::pdToLen( pd_r ) );
 
 		// do amplitude delta cap
 		O2L = qBound( m_osc2l_last - m_adcap1, O2L, m_osc2l_last + m_adcap1 );
@@ -416,8 +431,11 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatevol( O2R, o2v )
 
 		// update osc2 phases
+		m_ph2l_last = m_osc2l_phase;
+		m_ph2r_last = m_osc2r_phase;
 		m_osc2l_phase = fraction( m_osc2l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2l_f ) );
 		m_osc2r_phase = fraction( m_osc2r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2r_f ) );
+		
 
 		/////////////////////////////
 		//				           //
@@ -453,13 +471,19 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( o3l_p < 0 ) o3l_p -= floorf( o3l_p );
 		if( o3r_p < 0 ) o3r_p -= floorf( o3r_p );
 
+		// phase delta
+		pd_l = qAbs( o3l_p - m_ph3l_last );
+		if( pd_l > 0.5 ) pd_l = 1.0 - pd_l;
+		pd_r = qAbs( o3r_p - m_ph3r_last );
+		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
+		
 		// multi-wave DC Oscillator, sub-osc 1
-		sample_t O3AL = oscillate( o3w1, o3l_p, BandLimitedWave::freqToLen( o3l_f, m_samplerate ) );
-		sample_t O3AR = oscillate( o3w1, o3r_p, BandLimitedWave::freqToLen( o3r_f, m_samplerate ) );
+		sample_t O3AL = oscillate( o3w1, o3l_p, BandLimitedWave::pdToLen( pd_l ) );
+		sample_t O3AR = oscillate( o3w1, o3r_p, BandLimitedWave::pdToLen( pd_r ) );
 
 		// multi-wave DC Oscillator, sub-osc 2
-		sample_t O3BL = oscillate( o3w2, o3l_p, BandLimitedWave::freqToLen( o3l_f, m_samplerate ) );
-		sample_t O3BR = oscillate( o3w2, o3r_p, BandLimitedWave::freqToLen( o3r_f, m_samplerate ) );
+		sample_t O3BL = oscillate( o3w2, o3l_p, BandLimitedWave::pdToLen( pd_l ) );
+		sample_t O3BR = oscillate( o3w2, o3r_p, BandLimitedWave::pdToLen( pd_r ) );
 
 		// calc and modulate sub
 		sub = o3sub;
@@ -487,6 +511,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 
 		// update osc3 phases
+		m_ph3l_last = m_osc3l_phase;
+		m_ph3r_last = m_osc3r_phase;		
 		m_osc3l_phase = fraction( m_osc3l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f ) );
 		m_osc3r_phase = fraction( m_osc3r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f ) );
 

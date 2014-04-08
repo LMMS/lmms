@@ -315,6 +315,12 @@ private:
 	sample_t m_l_last;
 	sample_t m_r_last;
 
+	float m_ph2l_last;
+	float m_ph2r_last;
+
+	float m_ph3l_last;
+	float m_ph3r_last;
+
 	float m_adcap1;
 	float m_adcap2;
 };

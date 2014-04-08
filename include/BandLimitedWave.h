@@ -81,6 +81,12 @@ public:
 	{
 		return static_cast<float>( _sr ) / _f;
 	}
+	
+	/*! \brief This method converts phase delta to wavelength. It assumes a phase scale of 0 to 1. */
+	static inline float pdToLen( float _pd )
+	{
+		return 1.0f / _pd;
+	}
 
 	/*! \brief This method provides interpolated samples of bandlimited waveforms.
 	 *  \param _ph The phase of the sample.
