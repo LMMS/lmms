@@ -314,6 +314,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
 	m_arpDirectionModel.addItem( tr( "Down" ), new PixmapLoader( "arp_down" ) );
 	m_arpDirectionModel.addItem( tr( "Up and down" ), new PixmapLoader( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Down and up" ), new PixmapLoader( "arp_up_and_down" ) );
 	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
@@ -428,6 +429,19 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			{
 				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
 			}
+		}
+		else if( dir == ArpDirDownAndUp && range > 1 )
+		{
+			// copied from ArpDirUpAndDown above
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			// if greater than range, we have to play down...
+			// looks like the code for arp_dir==DOWN... :)
+			if( cur_arp_idx >= range )
+			{
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+			}
+			// inverts direction
+			cur_arp_idx = range - cur_arp_idx - 1;
 		}
 		else if( dir == ArpDirRandom )
 		{
