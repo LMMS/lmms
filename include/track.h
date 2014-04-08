@@ -238,8 +238,8 @@ private:
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
 // qproperty fields
-	QColor * m_fgColor;
-	QColor * m_textColor;
+	QColor m_fgColor;
+	QColor m_textColor;
 } ;
 
 
@@ -249,18 +249,18 @@ private:
 class trackContentWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	
+
 	// qproperties for track background gradients
 	Q_PROPERTY( QColor darkerColor1 READ darkerColor1 WRITE setDarkerColor1 )
 	Q_PROPERTY( QColor darkerColor2 READ darkerColor2 WRITE setDarkerColor2 )
 	Q_PROPERTY( QColor darkerColor3 READ darkerColor3 WRITE setDarkerColor3 )
-	
+
 	Q_PROPERTY( QColor lighterColor1 READ lighterColor1 WRITE setLighterColor1 )
 	Q_PROPERTY( QColor lighterColor2 READ lighterColor2 WRITE setLighterColor2 )
 	Q_PROPERTY( QColor lighterColor3 READ lighterColor3 WRITE setLighterColor3 )
-	
+
 	Q_PROPERTY( float gradMidPoint READ gradMidPoint WRITE setGradMidPoint )
-	
+
 public:
 	trackContentWidget( trackView * _parent );
 	virtual ~trackContentWidget();
@@ -291,15 +291,15 @@ public:
 	QColor lighterColor3() const;
 
 	float gradMidPoint() const;
-	
+
 	void setDarkerColor1( const QColor & _c );
 	void setDarkerColor2( const QColor & _c );
 	void setDarkerColor3( const QColor & _c );
-	
+
 	void setLighterColor1( const QColor & _c );
 	void setLighterColor2( const QColor & _c );
 	void setLighterColor3( const QColor & _c );
-	
+
 	void setGradMidPoint( float _g );
 
 public slots:
@@ -343,12 +343,12 @@ private:
 	QPixmap m_background;
 
 	// qproperty fields
-	QColor * m_darkerColor1;
-	QColor * m_darkerColor2;
-	QColor * m_darkerColor3;
-	QColor * m_lighterColor1;
-	QColor * m_lighterColor2;
-	QColor * m_lighterColor3;
+	QColor m_darkerColor1;
+	QColor m_darkerColor2;
+	QColor m_darkerColor3;
+	QColor m_lighterColor1;
+	QColor m_lighterColor2;
+	QColor m_lighterColor3;
 	float m_gradMidPoint;
 } ;
 
