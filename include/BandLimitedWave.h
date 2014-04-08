@@ -128,58 +128,26 @@ public:
 		const float ph = fraction( _ph );
 		const float lookupf = ph * static_cast<float>( tlen );
 		const int lookup = static_cast<int>( lookupf );
+		const float ip = fraction( lookupf );
+		
 		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-		return linearInterpolate( s1, s2, fraction( lookupf ) );
+		const sample_t s12 = linearInterpolate( s1, s2, ip );
 		
+		return s12;
+		/*if( _wavelen > 0.75 * tlen ) return s12;
 		
-		/*const int tlen1 = 1 << t;
-		const int tlen2 = 1 << ( t - 1 );
+		lookup = lookup >> 1;
+		tlen = tlen >> 1;
+		t -= 1;
+		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
+		const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+		const sample_t s34 = linearInterpolate( s3, s4, ip );
 		
-		const float ph = fraction( _ph );
-		const float lookupf = ph * static_cast<float>( tlen1 );
-		const int lookup1 = static_cast<int>( lookupf );
-		const int lookup2 = static_cast<int>( ph * static_cast<float>( tlen2 ) );
-
-		const sample_t s1 = linearInterpolate( s_waveforms[ _wave ].sampleAt( t, lookup1 ),
-												s_waveforms[ _wave ].sampleAt( t, ( lookup1 + 1 ) % tlen1 ),
-												fraction( lookupf ) );
-		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t - 1, lookup2 );
-
-		const float ip = static_cast<float>( tlen1 - _wavelen ) / static_cast<float>( tlen2 );
+		const float ip2 = ( ( _wavelen - tlen ) / tlen - 0.5 ) * 2.0;
 		
-		return linearInterpolate( s1, s2, ip );*/
-	};
-
-	/*! \brief The same as oscillate but uses cosinus interpolation instead of linear.
-	 */
-	static inline sample_t oscillateCos( float _ph, float _wavelen, Waveforms _wave )
-	{
-		int t = MAXLEN;
-		while( ( 1 << t ) > _wavelen ) { t--; }
-		t = qMax( 1, t );
-
-		const int tlen = 1 << t;
-		const float ph = fraction( _ph );
-		const int lookup = static_cast<int>( ph * tlen );
-		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-
-		return cosinusInterpolate( s1, s2, ph );
-	};
-
-	/*! \brief The same as oscillate but without any interpolation.
-	 */
-	static inline sample_t oscillateNoip( float _ph, float _wavelen, Waveforms _wave )
-	{
-		int t = MAXLEN;
-		while( ( 1 << t ) > _wavelen ) { t--; }
-		t = qMax( 1, t );
-
-		const int tlen = 1 << t;
-		const float ph = fraction( _ph );
-		const int lookup = static_cast<int>( ph * tlen );
-		return s_waveforms[ _wave ].sampleAt( t, lookup );
+		return linearInterpolate( s34, s12, ip2 );*/
+		
 	};
 
 
