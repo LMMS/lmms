@@ -120,5 +120,12 @@ static inline double fastPow( double a, double b )
 	return u.d;
 }
 
+// sinc function
+static inline double sinc( double _x )
+{
+	return sin( F_PI * _x ) / ( F_PI * _x );
+}
+
+
 
 #endif
