@@ -537,7 +537,7 @@ void pattern::updateBBTrack()
 		engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( engine::pianoRoll()->currentPattern() == this )
+	if( engine::pianoRoll() && engine::pianoRoll()->currentPattern() == this )
 	{
 		engine::pianoRoll()->update();
 	}
