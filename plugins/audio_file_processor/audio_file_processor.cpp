@@ -397,7 +397,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_reverseButton = new pixmapButton( this );
 	m_reverseButton->setCheckable( TRUE );
-	m_reverseButton->move( 200, 124 );
+	m_reverseButton->move( 164, 105 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_on" ) );
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -412,7 +412,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	pixmapButton * m_loopOffButton = new pixmapButton( this );
 	m_loopOffButton->setCheckable( TRUE );
-	m_loopOffButton->move( 174, 144 );
+	m_loopOffButton->move( 190, 105 );
 	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_off_on" ) );
 	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -425,7 +425,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	pixmapButton * m_loopOnButton = new pixmapButton( this );
 	m_loopOnButton->setCheckable( TRUE );
-	m_loopOnButton->move( 200, 144 );
+	m_loopOnButton->move( 190, 124 );
 	m_loopOnButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_on_on" ) );
 	m_loopOnButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -437,7 +437,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	pixmapButton * m_loopPingPongButton = new pixmapButton( this );
 	m_loopPingPongButton->setCheckable( TRUE );
-	m_loopPingPongButton->move( 226, 144 );
+	m_loopPingPongButton->move( 216, 124 );
 	m_loopPingPongButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_pingpong_on" ) );
 	m_loopPingPongButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -455,7 +455,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_stutterButton = new pixmapButton( this );
 	m_stutterButton->setCheckable( true );
-	m_stutterButton->move( 226, 124 );
+	m_stutterButton->move( 164, 124 );
 	m_stutterButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"stutter_on" ) );
 	m_stutterButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -472,8 +472,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_ampKnob = new knob( knobBright_26, this );
 	m_ampKnob->setVolumeKnob( TRUE );
-	m_ampKnob->move( 17, 108 );
-	m_ampKnob->setFixedSize( 37, 47 );
+	m_ampKnob->move( 5, 108 );
 	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
 	m_ampKnob->setWhatsThis(
 		tr( "With this knob you can set the amplify ratio. When you "
@@ -482,21 +481,21 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new AudioFileProcessorWaveView::knob( this );
-	m_startKnob->move( 68, 108 );
+	m_startKnob->move( 45, 108 );
 	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
 	m_startKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should begin playing your sample. " ) );
 
 	m_endKnob = new AudioFileProcessorWaveView::knob( this );
-	m_endKnob->move( 119, 108 );
+	m_endKnob->move( 125, 108 );
 	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
 	m_endKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should stop playing your sample. " ) );
 
 	m_loopKnob = new AudioFileProcessorWaveView::knob( this );
-	m_loopKnob->move( 68, 58 );
+	m_loopKnob->move( 85, 108 );
 	m_loopKnob->setHintText( tr( "Loopback point:" )+" ", "" );
 	m_loopKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
@@ -684,6 +683,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
 	}
 
+	m_graph.fill( Qt::transparent );
 	update();
 }
 
@@ -968,6 +968,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
 	p.setPen( QColor( 255, 255, 255 ) );
+
 	m_sampleBuffer.visualize(
 		p,
 		QRect( 0, 0, m_graph.width(), m_graph.height() ),

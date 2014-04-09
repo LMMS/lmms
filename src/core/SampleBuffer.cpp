@@ -664,8 +664,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		SRC_DATA src_data;
 		// Generate output
-		const f_cnt_t margin = 64;
-		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + margin;
+		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN;
 		src_data.data_in =
 			getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
 			loopStartFrame, loopEndFrame, endFrame )[0];
@@ -771,7 +770,6 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 		f_cnt_t _frames, LoopMode _loopmode, sampleFrame * * _tmp, bool * _backwards,
 		f_cnt_t _loopstart, f_cnt_t _loopend, f_cnt_t _end ) const
 {
-
 	if( _loopmode == LoopOff )
 	{
 		if( _index + _frames <= _end )
@@ -902,6 +900,8 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
 {
+	if( m_frames == 0 ) return;
+
 	const bool focus_on_range = _to_frame <= m_frames
 					&& 0 <= _from_frame && _from_frame < _to_frame;
 //	_p.setClipRect( _clip );
@@ -922,6 +922,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	}
 	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
 	QPoint * l = new QPoint[nb_frames / fpp + 1];
+	QPoint * r = new QPoint[nb_frames / fpp + 1];
 	int n = 0;
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
@@ -929,11 +930,13 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	for( int frame = first; frame < last; frame += fpp )
 	{
 		l[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
-			(int)( yb - ( ( m_data[frame][0]+m_data[frame][1] ) *
-								y_space ) ) );
+			(int)( yb - ( m_data[frame][0] * y_space ) ) );
+		r[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
+			(int)( yb - ( m_data[frame][1] * y_space ) ) );
 		++n;
 	}
 	_p.drawPolyline( l, nb_frames / fpp );
+	_p.drawPolyline( r, nb_frames / fpp );
 	delete[] l;
 }
 
@@ -1442,10 +1445,13 @@ SampleBuffer::handleState::handleState( bool _varying_pitch ) :
 	m_isBackwards( false )
 {
 	int error;
+	
 	if( ( m_resamplingData = src_new(/*
 		( engine::mixer()->highQuality() == true ) ?
 					SRC_SINC_FASTEST :*/
-					SRC_LINEAR,
+					engine::mixer()->currentQualitySettings().
+							libsrcInterpolation(),
+					/*SRC_LINEAR,*/
 					DEFAULT_CHANNELS, &error ) ) == NULL )
 	{
 		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );

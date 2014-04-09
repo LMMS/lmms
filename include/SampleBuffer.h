@@ -42,6 +42,8 @@
 class QPainter;
 
 
+const f_cnt_t MARGIN = 4;
+
 class EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
