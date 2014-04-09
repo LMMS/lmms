@@ -34,9 +34,9 @@ void BandLimitedWave::generateWaves()
 	int i;
 
 // saw wave - BLSaw
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
+		const int len = TLENS[i];
 		//const double om = 1.0 / len;
 		double max = 0.0;
 		
@@ -65,9 +65,9 @@ void BandLimitedWave::generateWaves()
 	}
 	
 // square wave - BLSquare
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
+		const int len = TLENS[i];
 		//const double om = 1.0 / len;
 		double max = 0.0;
 		
@@ -97,9 +97,9 @@ void BandLimitedWave::generateWaves()
 
 
 // triangle wave - BLTriangle
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
+		const int len = TLENS[i];
 		//const double om = 1.0 / len;
 		double max = 0.0;
 		
@@ -131,9 +131,9 @@ void BandLimitedWave::generateWaves()
 	
 // moog saw wave - BLMoog
 // basically, just add in triangle + 270-phase saw
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
+		const int len = TLENS[i];
 		
 		for( int ph = 0; ph < len; ph++ )
 		{
