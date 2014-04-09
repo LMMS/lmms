@@ -174,6 +174,8 @@ public:
 
 
 	static void generateWaves();
+	
+	static bool s_wavesGenerated;
 
 	static WaveMipMap s_waveforms [NumBLWaveforms];
 };

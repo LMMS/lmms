@@ -1026,6 +1026,10 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		m_sub3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Sub3-LFO2" ) )
 
 {
+// make sure the wavetables exist:
+// generate bandlimited wavetables 
+	BandLimitedWave::generateWaves();
+	
 // setup waveboxes
 	setwavemodel( m_osc2Wave )
 	setwavemodel( m_osc3Wave1 )

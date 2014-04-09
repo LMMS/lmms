@@ -27,10 +27,13 @@
 
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
-
+bool BandLimitedWave::s_wavesGenerated = false;
 
 void BandLimitedWave::generateWaves()
 {
+// don't generate if they already exist
+	if( s_wavesGenerated ) return;
+	
 	int i;
 
 // saw wave - BLSaw
@@ -144,4 +147,6 @@ void BandLimitedWave::generateWaves()
 		}
 	}
 	
+	s_wavesGenerated = true;
+
 }
