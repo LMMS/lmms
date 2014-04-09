@@ -55,7 +55,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 				m_toggledModel.setValue( true );
 			}
 			// TODO: careful: we must prevent saved scales
-			m_toggledModel.setScaleLogarithmic(m_port->suggests_logscale);
+			m_toggledModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		case INTEGER:
@@ -68,7 +68,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
 			// TODO: careful: we must prevent saved scales
-			m_knobModel.setScaleLogarithmic(m_port->suggests_logscale);
+			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		case FLOATING:
@@ -81,7 +81,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
 			// TODO: careful: we must prevent saved scales
-			m_knobModel.setScaleLogarithmic(m_port->suggests_logscale);
+			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		case TIME:
@@ -92,7 +92,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			connect( &m_tempoSyncKnobModel, SIGNAL( dataChanged() ),
 					 this, SLOT( tempoKnobChanged() ) );
 			// TODO: careful: we must prevent saved scales
-			m_tempoSyncKnobModel.setScaleLogarithmic(m_port->suggests_logscale);
+			m_tempoSyncKnobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		default:

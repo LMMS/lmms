@@ -86,7 +86,7 @@ bool AutomatableModel::isAutomated() const
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
-	bool automated_or_controlled = false;
+	bool automatedOrControlled = false;
 
 	if( isAutomated() )
 	{
@@ -97,7 +97,7 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		me.setAttribute( "value", m_value );
 		element.appendChild( me );
 
-		automated_or_controlled = true;
+		automatedOrControlled = true;
 	}
 	else
 	{
@@ -126,14 +126,15 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 
 		controllerElement.appendChild( element );
 
-		automated_or_controlled = true;
+		automatedOrControlled = true;
 	}
 
-	if(automated_or_controlled && (m_scaleType != Linear))
+	if( automatedOrControlled && ( m_scaleType != Linear ) )
 	{	// note: if we have more scale types than two, make
 		// a mapper function enums <-> string
-		if(m_scaleType == Logarithmic)
-		 element.setAttribute("scale_type", "log");
+		if(m_scaleType == Logarithmic) {
+			element.setAttribute( "scale_type", "log" );
+		}
 	}
 }
 
@@ -143,13 +144,14 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
 	// read scale type and overwrite default scale type
-	if(element.hasAttribute("scale_type")) // wrong in most cases
+	if( element.hasAttribute("scale_type") ) // wrong in most cases
 	{
-		if(element.attribute("scale_type") == "log")
-		 setScaleType(Logarithmic);
+		if( element.attribute("scale_type") == "log" )
+		 setScaleType( Logarithmic );
 	}
-	else
-	 setScaleType(Linear);
+	else {
+		setScaleType( Linear );
+	}
 
 	// compat code
 	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
@@ -246,11 +248,41 @@ void AutomatableModel::setValue( const float value )
 
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
-template<class T> T log_to_linear_scale(T min, T max, T value)
-// we get min and max from the class => TODO
+//! @todo This should be moved into a maths header
+template<class T> T logToLinearScale(T min, T max, T value)
 {
-	printf("scale: in: %f, out: %f\n",value, exp((log(max)-log(min)) * value + log(min)));
-	return exp((log(max)-log(min)) * value + log(min));
+	return exp( ( log(max) - log(min) ) * value + log(min) );
+}
+
+
+
+
+template<class T> T AutomatableModel::logToLinearScale(T value) const
+{
+	return ::logToLinearScale( minValue<float>(), maxValue<float>(), value );
+}
+
+
+
+
+//! @todo: this should be moved into a maths header
+template<class T>
+void roundAt( T& value, const T& where, const T& step_size )
+{
+	if( qAbs<float>( value - where )
+		< typeInfo<float>::minEps() * qAbs<float>( step_size ) )
+	{
+		value = where;
+	}
+}
+
+
+
+
+template<class T>
+void AutomatableModel::roundAt( T& value, const T& where ) const
+{
+	::roundAt(value, where, m_step);
 }
 
 
@@ -262,11 +294,10 @@ void AutomatableModel::setAutomatedValue( const float value )
 	const float oldValue = m_value;
 
 	const float scaled_value =
-		(m_scaleType == Linear)
+		( m_scaleType == Linear )
 		? value
-		: log_to_linear_scale(
-			minValue<float>(), maxValue<float>(),
-			// fit value into [0,1]:
+		: logToLinearScale(
+			// fits value into [0,1]:
 			(value - minValue<float>()) / maxValue<float>()
 			);
 
@@ -332,19 +363,6 @@ void AutomatableModel::setStep( const float step )
 
 
 
-template<class T>
-void AutomatableModel::round_at(T& value, const T& where) const
-{
-	if( qAbs<float>( value - where )
-		< typeInfo<float>::minEps() * qAbs<float>( m_step ) )
-	{
-		value = where;
-	}
-}
-
-
-
-
 float AutomatableModel::fittedValue( float value ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
@@ -354,9 +372,9 @@ float AutomatableModel::fittedValue( float value ) const
 		value = nearbyintf( value / m_step ) * m_step;
 	}
 
-	round_at(value, m_maxValue);
-	round_at(value, m_minValue);
-	round_at(value, 0.0f);
+	roundAt( value, m_maxValue );
+	roundAt( value, m_minValue );
+	roundAt( value, 0.0f );
 
 	if( value < m_minValue )
 	{
@@ -455,20 +473,19 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 {
 	if( m_controllerConnection )
 	{
-		float v;
+		float v = 0;
 		switch(m_scaleType)
 		{
 		case Linear:
 			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 			break;
 		case Logarithmic:
-			v = log_to_linear_scale(minValue<float>(), maxValue<float>(),
+			v = logToLinearScale(
 				controllerConnection()->currentValue( frameOffset ));
 			break;
 		default:
 			qFatal("AutomatableModel::controllerValue(int)"
 				"lacks implementation for a scale type");
-			v = 0; // suppress warning...
 			break;
 		}
 		if( typeInfo<float>::isEqual( m_step, 1 ) )
