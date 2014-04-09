@@ -55,17 +55,37 @@ textFloat * knob::s_textFloat = NULL;
 
 
 
-knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
-	QWidget( _parent ),
-	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
-	m_knobNum( _knob_num ),
-	m_label( "" ),
-	m_knobPixmap( NULL ),
-	m_volumeKnob( false ),
-	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false ),
-	m_angle( -10 ),
-	m_outerColor( NULL )
+//! @todo: in C++11, we can use delegating ctors
+#define DEFAULT_KNOB_INITIALIZER_LIST \
+	QWidget( _parent ), \
+	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ), \
+	m_label( "" ), \
+	m_knobPixmap( NULL ), \
+	m_volumeKnob( false ), \
+	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
+	m_buttonPressed( false ), \
+	m_angle( -10 )
+
+knob::knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
+	DEFAULT_KNOB_INITIALIZER_LIST,
+	m_knobNum( _knob_num )
+{
+	init( _name );
+}
+
+knob::knob( QWidget * _parent, const QString & _name ) :
+	DEFAULT_KNOB_INITIALIZER_LIST,
+	m_knobNum( knobBright_26 )
+{
+	init( _name );
+}
+
+#undef DEFAULT_KNOB_INITIALIZER_LIST
+
+
+
+
+void knob::init( const QString & _name )
 {
 	if( s_textFloat == NULL )
 	{
@@ -162,6 +182,23 @@ void knob::setOuterRadius( float _r )
 
 
 
+
+knobTypes knob::knobNum() const
+{
+	return m_knobNum;
+}
+
+
+
+
+void knob::setknobNum( knobTypes _k )
+{
+	m_knobNum = _k;
+}
+
+
+
+
 QPointF knob::centerPoint() const
 {
 	return m_centerPoint;
@@ -213,28 +250,42 @@ void knob::setLineWidth( float _w )
 
 QColor knob::outerColor() const
 {
-	if( m_outerColor )
-	{
-		return *m_outerColor;
-	}
-	else
-	{
-		return QColor();
-	}
+	return m_outerColor;
 }
 
 
 
 void knob::setOuterColor( const QColor & _c )
 {
-	if( m_outerColor )
-	{
-		*m_outerColor = _c;
-	}
-	else
-	{
-		m_outerColor = new QColor( _c );
-	}
+	m_outerColor = _c;
+}
+
+
+
+QColor knob::lineColor() const
+{
+	return m_lineColor;
+}
+
+
+
+void knob::setlineColor( const QColor & _c )
+{
+	m_lineColor = _c;
+}
+
+
+
+QColor knob::arcColor() const
+{
+	return m_arcColor;
+}
+
+
+
+void knob::setarcColor( const QColor & _c )
+{
+	m_arcColor = _c;
 }
 
 
@@ -290,11 +341,11 @@ void knob::drawKnob( QPainter * _p )
 		p.setRenderHint( QPainter::Antialiasing );
 
 		// Perhaps this can move to setOuterRadius()
-		if( m_outerColor )
+		if( m_outerColor.isValid() )
 		{
 			QRadialGradient gradient( centerPoint(), outerRadius() );
-			gradient.setColorAt(0.4, _p->pen().brush().color() );
-			gradient.setColorAt(1, *m_outerColor );
+			gradient.setColorAt( 0.4, _p->pen().brush().color() );
+			gradient.setColorAt( 1, m_outerColor );
 
 			p.setPen( QPen( gradient, lineWidth(),
 						Qt::SolidLine, Qt::RoundCap ) );
@@ -380,6 +431,8 @@ void knob::drawKnob( QPainter * _p )
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
+		case knobStyled:
+			break;
 	}
 
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );

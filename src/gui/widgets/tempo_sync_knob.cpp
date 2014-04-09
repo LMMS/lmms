@@ -36,7 +36,7 @@
 
 
 
-TempoSyncKnob::TempoSyncKnob( int _knob_num, QWidget * _parent,
+TempoSyncKnob::TempoSyncKnob( knobTypes _knob_num, QWidget * _parent,
 						const QString & _name ) :
 	knob( _knob_num, _parent, _name ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
