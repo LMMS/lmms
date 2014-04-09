@@ -27,30 +27,35 @@
 
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
-
+bool BandLimitedWave::s_wavesGenerated = false;
 
 void BandLimitedWave::generateWaves()
 {
+// don't generate if they already exist
+	if( s_wavesGenerated ) return;
+	
 	int i;
 
 // saw wave - BLSaw
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
-		const double om = 1.0 / len;
+		const int len = TLENS[i];
+		//const double om = 1.0 / len;
 		double max = 0.0;
 		
 		for( int ph = 0; ph < len; ph++ )
 		{
 			int harm = 1;
 			double s = 0.0f;
+			double hlen;
 			do
 			{
+				hlen = static_cast<double>( len ) / static_cast<double>( harm );
 				const double amp = -1.0 / static_cast<double>( harm );
-				const double a2 = cos( om * harm * F_2PI );
-				s += amp * a2 * sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
+				//const double a2 = cos( om * harm * F_2PI );
+				s += amp * /*a2 **/sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
 				harm++;
-			} while( len/harm > 2 );
+			} while( hlen >= 4.0 );
 			s_waveforms[ BandLimitedWave::BLSaw ].setSampleAt( i, ph, s );
 			max = qMax( max, qAbs( s ) );
 		}
@@ -63,23 +68,25 @@ void BandLimitedWave::generateWaves()
 	}
 	
 // square wave - BLSquare
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
-		const double om = 1.0 / len;
+		const int len = TLENS[i];
+		//const double om = 1.0 / len;
 		double max = 0.0;
 		
 		for( int ph = 0; ph < len; ph++ )
 		{
 			int harm = 1;
 			double s = 0.0f;
+			double hlen;
 			do
 			{
+				hlen = static_cast<double>( len ) / static_cast<double>( harm );
 				const double amp = 1.0 / static_cast<double>( harm );
-				const double a2 = cos( om * harm * F_2PI );
-				s += amp * a2 * sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
+				//const double a2 = cos( om * harm * F_2PI );
+				s += amp * /*a2 **/ sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
 				harm += 2;
-			} while( len/harm > 2 );
+			} while( hlen >= 4.0 );
 			s_waveforms[ BandLimitedWave::BLSquare ].setSampleAt( i, ph, s );
 			max = qMax( max, qAbs( s ) );
 		}
@@ -93,9 +100,9 @@ void BandLimitedWave::generateWaves()
 
 
 // triangle wave - BLTriangle
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
+		const int len = TLENS[i];
 		//const double om = 1.0 / len;
 		double max = 0.0;
 		
@@ -103,14 +110,16 @@ void BandLimitedWave::generateWaves()
 		{
 			int harm = 1;
 			double s = 0.0f;
+			double hlen;
 			do
 			{
+				hlen = static_cast<double>( len ) / static_cast<double>( harm );
 				const double amp = 1.0 / static_cast<double>( harm * harm );
 				//const double a2 = cos( om * harm * F_2PI );
 				s += amp * /*a2 **/ sin( ( static_cast<double>( ph * harm ) / static_cast<double>( len ) + 
 						( ( harm + 1 ) % 4 == 0 ? 0.5 : 0.0 ) ) * F_2PI );
 				harm += 2;
-			} while( len/harm > 2 );
+			} while( hlen >= 4.0 );
 			s_waveforms[ BandLimitedWave::BLTriangle ].setSampleAt( i, ph, s );
 			max = qMax( max, qAbs( s ) );
 		}
@@ -125,9 +134,9 @@ void BandLimitedWave::generateWaves()
 	
 // moog saw wave - BLMoog
 // basically, just add in triangle + 270-phase saw
-	for( i = 1; i <= MAXLEN; i++ )
+	for( i = 0; i <= MAXTBL; i++ )
 	{
-		const int len = 1 << i;
+		const int len = TLENS[i];
 		
 		for( int ph = 0; ph < len; ph++ )
 		{
@@ -138,4 +147,6 @@ void BandLimitedWave::generateWaves()
 		}
 	}
 	
+	s_wavesGenerated = true;
+
 }

@@ -65,7 +65,6 @@
 #include "ProjectRenderer.h"
 #include "DataFile.h"
 #include "song.h"
-#include "BandLimitedWave.h"
 
 static inline QString baseName( const QString & _file )
 {
@@ -119,9 +118,6 @@ int main( int argc, char * * argv )
 	QCoreApplication * app = core_only ?
 			new QCoreApplication( argc, argv ) :
 					new QApplication( argc, argv ) ;
-
-	// generate bandlimited wavetables for instruments to use
-	BandLimitedWave::generateWaves();
 
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
 	ProjectRenderer::OutputSettings os( 44100, false, 160,

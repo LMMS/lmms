@@ -32,23 +32,41 @@
 #include "engine.h"
 #include "Mixer.h"
 
-#define MAXLEN 12
-#define MIPMAPSIZE 1 << ( MAXLEN + 1 )
+#define MAXLEN 11
+#define MIPMAPSIZE 2 << ( MAXLEN + 1 )
+#define MIPMAPSIZE3 3 << ( MAXLEN + 1 )
+#define MAXTBL 23
+#define MINTLEN 2 << 0
+#define MAXTLEN 3 << MAXLEN
 
+// table for table sizes
+const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
+					2 << 2, 3 << 2, 2 << 3, 3 << 3,
+					2 << 4, 3 << 4, 2 << 5, 3 << 5,
+					2 << 6, 3 << 6, 2 << 7, 3 << 7,
+					2 << 8, 3 << 8, 2 << 9, 3 << 9,
+					2 << 10, 3 << 10, 2 << 11, 3 << 11 };
 
 typedef struct
 {
 public:
 	inline sample_t sampleAt( int _table, int _ph )
 	{
-		return m_data[ ( 1 << _table ) + _ph ];
+		if( _table % 2 == 0 )
+		{	return m_data[ TLENS[ _table ] + _ph ]; }
+		else
+		{	return m_data3[ TLENS[ _table ] + _ph ]; }
 	}
 	inline void setSampleAt( int _table, int _ph, sample_t _sample )
 	{
-		m_data[ ( 1 << _table ) + _ph ] = _sample;
+		if( _table % 2 == 0 )
+		{	m_data[ TLENS[ _table ] + _ph ] = _sample; }
+		else
+		{ 	m_data3[ TLENS[ _table ] + _ph ] = _sample; }
 	}
 private:
 	sample_t m_data [ MIPMAPSIZE ];
+	sample_t m_data3 [ MIPMAPSIZE3 ];
 } WaveMipMap;
 
 
@@ -96,10 +114,10 @@ public:
 	static inline sample_t oscillate( float _ph, float _wavelen, Waveforms _wave )
 	{
 		// high wavelen/ low freq
-		if( _wavelen >= 1 << MAXLEN )
+		if( _wavelen > TLENS[ MAXTBL -1 ] )
 		{
-			const int t = MAXLEN;
-			const int tlen = 1 << t;
+			const int t = MAXTBL;
+			const int tlen = TLENS[t];
 			const float ph = fraction( _ph );
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
@@ -110,8 +128,8 @@ public:
 		// low wavelen/ high freq
 		if( _wavelen <= 2.0f )
 		{
-			const int t = 1;
-			const int tlen = 2;
+			const int t = 0;
+			const int tlen = TLENS[t];
 			const float ph = fraction( _ph );
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
@@ -121,69 +139,43 @@ public:
 		}
 		
 		// get the next higher tlen
-		int t = 2;
-		while( ( 1 << t ) < _wavelen ) { t++; }
+		int t = 1;
+		while( TLENS[t] < _wavelen ) { t++; }
 		
-		const int tlen = 1 << t;
+		int tlen = TLENS[t];
 		const float ph = fraction( _ph );
 		const float lookupf = ph * static_cast<float>( tlen );
-		const int lookup = static_cast<int>( lookupf );
+		int lookup = static_cast<int>( lookupf );
+		const float ip = fraction( lookupf );
+		
 		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-		return linearInterpolate( s1, s2, fraction( lookupf ) );
+		//const sample_t sr = linearInterpolate( s1, s2, ip );
 		
+		const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
+		const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
+		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
+		const sample_t sr = cubicInterpolate( s0, s1, s2, s3, ip );
 		
-		/*const int tlen1 = 1 << t;
-		const int tlen2 = 1 << ( t - 1 );
+		return sr;
 		
-		const float ph = fraction( _ph );
-		const float lookupf = ph * static_cast<float>( tlen1 );
-		const int lookup1 = static_cast<int>( lookupf );
-		const int lookup2 = static_cast<int>( ph * static_cast<float>( tlen2 ) );
-
-		const sample_t s1 = linearInterpolate( s_waveforms[ _wave ].sampleAt( t, lookup1 ),
-												s_waveforms[ _wave ].sampleAt( t, ( lookup1 + 1 ) % tlen1 ),
-												fraction( lookupf ) );
-		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t - 1, lookup2 );
-
-		const float ip = static_cast<float>( tlen1 - _wavelen ) / static_cast<float>( tlen2 );
+/*		lookup = lookup << 1;
+		tlen = tlen << 1;
+		t += 1;
+		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
+		const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+		const sample_t s34 = linearInterpolate( s3, s4, ip );
 		
-		return linearInterpolate( s1, s2, ip );*/
-	};
-
-	/*! \brief The same as oscillate but uses cosinus interpolation instead of linear.
-	 */
-	static inline sample_t oscillateCos( float _ph, float _wavelen, Waveforms _wave )
-	{
-		int t = MAXLEN;
-		while( ( 1 << t ) > _wavelen ) { t--; }
-		t = qMax( 1, t );
-
-		const int tlen = 1 << t;
-		const float ph = fraction( _ph );
-		const int lookup = static_cast<int>( ph * tlen );
-		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-
-		return cosinusInterpolate( s1, s2, ph );
-	};
-
-	/*! \brief The same as oscillate but without any interpolation.
-	 */
-	static inline sample_t oscillateNoip( float _ph, float _wavelen, Waveforms _wave )
-	{
-		int t = MAXLEN;
-		while( ( 1 << t ) > _wavelen ) { t--; }
-		t = qMax( 1, t );
-
-		const int tlen = 1 << t;
-		const float ph = fraction( _ph );
-		const int lookup = static_cast<int>( ph * tlen );
-		return s_waveforms[ _wave ].sampleAt( t, lookup );
+		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
+		
+		return linearInterpolate( s12, s34, ip2 );
+	*/	
 	};
 
 
 	static void generateWaves();
+	
+	static bool s_wavesGenerated;
 
 	static WaveMipMap s_waveforms [NumBLWaveforms];
 };

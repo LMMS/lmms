@@ -79,11 +79,14 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
-	float f = cosf( x * ( F_PI_2 ) );
-	return( v1 - f * (v1-v0) );
+	const float f = ( 1.0f - cosf( x * F_PI ) ) * 0.5f;
+#ifdef FP_FAST_FMAF
+	return fmaf( x, v1-v0, v0 );
+#else
+	return f * (v1-v0) + v0;
+#endif	
 //	return( v0*f + v1*( 1.0f-f ) );
 }
-
 
 
 inline float linearInterpolate( float v0, float v1, float x )

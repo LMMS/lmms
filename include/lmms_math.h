@@ -23,10 +23,11 @@
  */
 
 
-#ifndef _LMMS_MATH_H
-#define _LMMS_MATH_H
+#ifndef LMMS_MATH_H
+#define LMMS_MATH_H
 
 #include <stdint.h>
+#include "lmms_constants.h"
 
 #ifdef __INTEL_COMPILER
 
@@ -119,6 +120,13 @@ static inline double fastPow( double a, double b )
 	u.x[0] = 0;
 	return u.d;
 }
+
+// sinc function
+static inline double sinc( double _x )
+{
+	return _x == 0.0 ? 1.0 : sin( F_PI * _x ) / ( F_PI * _x );
+}
+
 
 
 #endif
