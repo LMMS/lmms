@@ -60,12 +60,17 @@
 
 class ControllerConnection;
 
-
 class EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
 	typedef QVector<AutomatableModel *> AutoModelVector;
+
+	enum ScaleType
+	{
+		Linear,
+		Logarithmic
+	};
 
 	enum DataType
 	{
@@ -175,6 +180,13 @@ public:
 	}
 
 	void setRange( const float min, const float max, const float step = 1 );
+	void setScaleType( ScaleType sc ) {
+		m_scaleType = sc;
+	}
+	void setScaleLogarithmic( bool setToTrue = true )
+	{
+		setScaleType( setToTrue ? Logarithmic : Linear );
+	}
 
 	void setStep( const float step );
 
@@ -193,8 +205,14 @@ public:
 
 	void unlinkAllModels();
 
-	/*! \brief Saves settings (value, automation links and controller connections) of AutomatableModel into
-				specified DOM element using <name> as attribute/node name */
+	/**
+	 * @brief Saves settings (value, automation links and controller connections) of AutomatableModel into
+	 *  specified DOM element using <name> as attribute/node name
+	 * @param doc TODO
+	 * @param element Where this option shall be saved.
+	 *  Depending on the model, this can be done in an attribute or in a subnode.
+	 * @param name Name to store this model as.
+	 */
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element, const QString& name );
 
 	/*! \brief Loads settings (value, automation links and controller connections) of AutomatableModel from
@@ -231,6 +249,10 @@ public slots:
 
 
 protected:
+	//! returns a value which is in range between min() and
+	//! max() and aligned according to the step size (step size 0.05 -> value
+	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
+	//! doing your own calculations.
 	float fittedValue( float value ) const;
 
 
@@ -248,8 +270,17 @@ private:
 	void linkModel( AutomatableModel* model );
 	void unlinkModel( AutomatableModel* model );
 
+	//! @brief Scales @value from linear to logarithmic.
+	//! Value should be within [0,1]
+	template<class T> T logToLinearScale( T value ) const;
+
+	//! rounds @a value to @a where if it is close to it
+	//! @param value will be modified to rounded value
+	template<class T> void roundAt( T &value, const T &where ) const;
+
 
 	DataType m_dataType;
+	ScaleType m_scaleType; //! scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;
@@ -267,6 +298,7 @@ private:
 	bool m_hasLinkedModels;
 
 
+	//! NULL if not appended to controller, otherwise connection info
 	ControllerConnection* m_controllerConnection;
 
 

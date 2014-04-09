@@ -39,6 +39,7 @@ AutomatableModel::AutomatableModel( DataType type,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
 	m_dataType( type ),
+	m_scaleType( Linear ),
 	m_value( val ),
 	m_initValue( val ),
 	m_minValue( min ),
@@ -85,21 +86,30 @@ bool AutomatableModel::isAutomated() const
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
+	bool automatedOrControlled = false;
+
 	if( isAutomated() )
 	{
+		// automation needs tuple of data (name, id, value)
+		// => it must be appended as a node
 		QDomElement me = doc.createElement( name );
 		me.setAttribute( "id", id() );
 		me.setAttribute( "value", m_value );
 		element.appendChild( me );
+
+		automatedOrControlled = true;
 	}
 	else
 	{
+		// non automation => can be saved as attribute
 		element.setAttribute( name, m_value );
 	}
 
 	if( m_controllerConnection )
 	{
 		QDomElement controllerElement;
+
+		// get "connection" element (and create it if needed)
 		QDomNode node = element.namedItem( "connection" );
 		if( node.isElement() )
 		{
@@ -115,6 +125,16 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		m_controllerConnection->saveSettings( doc, element );
 
 		controllerElement.appendChild( element );
+
+		automatedOrControlled = true;
+	}
+
+	if( automatedOrControlled && ( m_scaleType != Linear ) )
+	{	// note: if we have more scale types than two, make
+		// a mapper function enums <-> string
+		if(m_scaleType == Logarithmic) {
+			element.setAttribute( "scale_type", "log" );
+		}
 	}
 }
 
@@ -123,6 +143,16 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
+	// read scale type and overwrite default scale type
+	if( element.hasAttribute("scale_type") ) // wrong in most cases
+	{
+		if( element.attribute("scale_type") == "log" )
+		 setScaleType( Logarithmic );
+	}
+	else {
+		setScaleType( Linear );
+	}
+
 	// compat code
 	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
 	if( node.isElement() )
@@ -141,9 +171,12 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 			}
 			return;
 		}
+		// logscales were not existing at this point of time
+		// so they can be ignored
 	}
 
 	QDomNode connectionNode = element.namedItem( "connection" );
+	// reads controller connection
 	if( connectionNode.isElement() )
 	{
 		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
@@ -154,14 +187,20 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 			//m_controllerConnection->setTargetName( displayName() );
 		}
 	}
-
+	
+	// models can be stored as elements (port00) or attributes (port10):
+	// <ladspacontrols port10="4.41">
+	//   <port00 value="4.41" id="4249278"/>
+	// </ladspacontrols>
+	// element => there is automation data
 	node = element.namedItem( name );
-	if( node.isElement() )
-	{
-		changeID( node.toElement().attribute( "id" ).toInt() );
-		setValue( node.toElement().attribute( "value" ).toFloat() );
-	}
-	else if( element.hasAttribute( name ) )
+        if( node.isElement() )
+        {
+                changeID( node.toElement().attribute( "id" ).toInt() );
+                setValue( node.toElement().attribute( "value" ).toFloat() );
+        }
+        else if( element.hasAttribute( name ) )
+	// attribute => read the element's value from the attribute list
 	{
 		setInitValue( element.attribute( name ).toFloat() );
 	}
@@ -207,12 +246,63 @@ void AutomatableModel::setValue( const float value )
 
 
 
+//! @brief Scales @value from linear to logarithmic.
+//! Value should be within [0,1]
+//! @todo This should be moved into a maths header
+template<class T> T logToLinearScale(T min, T max, T value)
+{
+	return exp( ( log(max) - log(min) ) * value + log(min) );
+}
+
+
+
+
+template<class T> T AutomatableModel::logToLinearScale(T value) const
+{
+	return ::logToLinearScale( minValue<float>(), maxValue<float>(), value );
+}
+
+
+
+
+//! @todo: this should be moved into a maths header
+template<class T>
+void roundAt( T& value, const T& where, const T& step_size )
+{
+	if( qAbs<float>( value - where )
+		< typeInfo<float>::minEps() * qAbs<float>( step_size ) )
+	{
+		value = where;
+	}
+}
+
+
+
+
+template<class T>
+void AutomatableModel::roundAt( T& value, const T& where ) const
+{
+	::roundAt(value, where, m_step);
+}
+
+
+
+
 void AutomatableModel::setAutomatedValue( const float value )
 {
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
-	m_value = fittedValue( value );
+	const float scaled_value =
+		( m_scaleType == Linear )
+		? value
+		: logToLinearScale(
+			// fits value into [0,1]:
+			(value - minValue<float>()) / maxValue<float>()
+			);
+
+	m_value = fittedValue( scaled_value );
+
 	if( oldValue != m_value )
 	{
 		// notify linked models
@@ -223,6 +313,8 @@ void AutomatableModel::setAutomatedValue( const float value )
 				!(*it)->fittedValue( m_value ) !=
 							 (*it)->m_value )
 			{
+				// @TOBY: don't take m_value, but better: value,
+				// otherwise, we convert to log twice?
 				(*it)->setAutomatedValue( m_value );
 			}
 		}
@@ -280,17 +372,9 @@ float AutomatableModel::fittedValue( float value ) const
 		value = nearbyintf( value / m_step ) * m_step;
 	}
 
-	// correct rounding error at the border
-	if( qAbs<float>( value - m_maxValue ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
-	{
-		value = m_maxValue;
-	}
-
-	// correct rounding error if value = 0
-	if( qAbs<float>( value ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
-	{
-		value = 0;
-	}
+	roundAt( value, m_maxValue );
+	roundAt( value, m_minValue );
+	roundAt( value, 0.0f );
 
 	if( value < m_minValue )
 	{
@@ -384,11 +468,26 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 
 
 
+
 float AutomatableModel::controllerValue( int frameOffset ) const
 {
 	if( m_controllerConnection )
 	{
-		const float v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
+		float v = 0;
+		switch(m_scaleType)
+		{
+		case Linear:
+			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
+			break;
+		case Logarithmic:
+			v = logToLinearScale(
+				controllerConnection()->currentValue( frameOffset ));
+			break;
+		default:
+			qFatal("AutomatableModel::controllerValue(int)"
+				"lacks implementation for a scale type");
+			break;
+		}
 		if( typeInfo<float>::isEqual( m_step, 1 ) )
 		{
 			return qRound( v );
