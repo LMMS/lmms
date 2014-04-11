@@ -677,17 +677,18 @@ MonstroView knob {
 	qproperty-lineWidth: 2.5;
 }
 
-/* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
- * colour codes MUST be of the form #RRGGBB */
+/* palette information  */
 
-palette:background {color: #5b6571}
-palette:windowtext {color: #f0f0f0}
-palette:base {color: #808080}
-palette:text {color: #e0e0e0}
-palette:button {color: #c9c9c9}
-palette:shadow {color: #000000}
-palette:buttontext {color: #000000}
-palette:brighttext {color: #4afd85}
-palette:highlight {color: #202020}
-palette:highlightedtext {color: #ffffff}
+LmmsPalette {
+	qproperty-background: #5b6571;
+	qproperty-windowText: #f0f0f0;
+	qproperty-base: #808080;
+	qproperty-text: #e0e0e0;
+	qproperty-button: #c9c9c9;
+	qproperty-shadow: #000;
+	qproperty-buttonText: #000;
+	qproperty-brightText: #4afd85;
+	qproperty-highlight: #202020;
+	qproperty-highlightedText: #ffffff;
+}
 
