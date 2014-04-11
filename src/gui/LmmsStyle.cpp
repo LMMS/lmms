@@ -30,7 +30,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleOption>
-#include <QWidget>
 
 #include "LmmsStyle.h"
 #include "LmmsPalette.h"
@@ -204,7 +203,6 @@ LmmsStyle::LmmsStyle() :
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
-	//qApp->setPalette( standardPalette() );
 	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
 }
 
