@@ -204,7 +204,8 @@ LmmsStyle::LmmsStyle() :
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
-	qApp->setPalette( standardPalette() );
+	//qApp->setPalette( standardPalette() );
+	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
 }
 
 
@@ -212,24 +213,9 @@ LmmsStyle::LmmsStyle() :
 
 QPalette LmmsStyle::standardPalette( void ) const
 {
-	if( s_palette != NULL) return * s_palette;
+	if( s_palette != NULL) { return * s_palette; }
 
 	QPalette pal = QPlastiqueStyle::standardPalette();
-
-
-/*	sane defaults in case fetching from stylesheet fails*/
-/*
-	pal.setColor( QPalette::Background, QColor( 91, 101, 113 ) );
-	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );
-	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
-	pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
-	pal.setColor( QPalette::Button, QColor( 201, 201, 201 ) );
-	pal.setColor( QPalette::Shadow, QColor( 0, 0, 0 ) );
-	pal.setColor( QPalette::ButtonText, QColor( 0, 0, 0 ) );
-	pal.setColor( QPalette::BrightText, QColor( 74, 253, 133 ) );
-	pal.setColor( QPalette::Highlight, QColor( 100, 100, 100 ) );
-	pal.setColor( QPalette::HighlightedText, QColor( 255, 255, 255 ) );
-*/
 
 	return( pal );
 }

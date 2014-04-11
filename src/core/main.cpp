@@ -390,10 +390,14 @@ int main( int argc, char * * argv )
 	if( render_out.isEmpty() )
 	{
 		// init style and palette
-		QApplication::setStyle( new LmmsStyle() );
+		LmmsStyle * lmmsstyle = new LmmsStyle();
+		QApplication::setStyle( lmmsstyle );
 		
-		LmmsPalette * lmmspal = new LmmsPalette( NULL );
+		LmmsPalette * lmmspal = new LmmsPalette( NULL, lmmsstyle );
+		lmmspal->show();	// necessary to get properties
+		lmmspal->hide();		
 		QPalette lpal = lmmspal->palette();
+
 		QApplication::setPalette( lpal );
 		LmmsStyle::s_palette = &lpal;
 

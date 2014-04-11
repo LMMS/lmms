@@ -24,17 +24,13 @@
  */
 
 #include <QtGui/QWidget>
+#include "export.h"
 
 #ifndef LMMSPALETTE_H
 #define LMMSPALETTE_H
 
-#define ACCESSMET( read, write ) \
-	QColor read () const \
-	{	return m_##read ; } \
-	void write ( const QColor & c ) \
-	{	m_##read = QColor( c ); }
 
-class LmmsPalette : public QWidget
+class EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor background READ background WRITE setBackground )
@@ -49,8 +45,13 @@ class LmmsPalette : public QWidget
 	Q_PROPERTY( QColor highlightedText READ highlightedText WRITE setHighlightedText )
 
 public:
-	LmmsPalette( QWidget * parent ); 
+	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
 	virtual ~LmmsPalette();
+
+#define ACCESSMET( read, write ) \
+	QColor read () const; \
+	void write ( const QColor & c ); \
+
 
 	ACCESSMET( background, setBackground )
 	ACCESSMET( windowText, setWindowText )
@@ -62,6 +63,8 @@ public:
 	ACCESSMET( brightText, setBrightText )
 	ACCESSMET( highlight, setHighlight )
 	ACCESSMET( highlightedText, setHighlightedText )
+
+#undef ACCESSMET
 
 	QPalette palette() const;
 
