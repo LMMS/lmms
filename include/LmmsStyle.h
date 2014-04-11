@@ -29,53 +29,7 @@
 
 #include <QtGui/QPlastiqueStyle>
 
-#define ACCESSMET( read, write ) \
-	QColor read () \
-	{	return m_##read ; } \
-	void write ( const QColor & _c ) \
-	{	m_##read = QColor( _c ); }
 
-class LmmsPalette: public QWidget
-{
-	Q_OBJECT
-	Q_PROPERTY( QColor background READ background WRITE setBackground )
-	Q_PROPERTY( QColor windowText READ windowText WRITE setWindowText )
-	Q_PROPERTY( QColor base READ base WRITE setBase )
-	Q_PROPERTY( QColor text READ text WRITE setText )
-	Q_PROPERTY( QColor button READ button WRITE setButton )
-	Q_PROPERTY( QColor shadow READ shadow WRITE setShadow )
-	Q_PROPERTY( QColor buttonText READ buttonText WRITE setButtonText )
-	Q_PROPERTY( QColor brightText READ brightText WRITE setBrightText )
-	Q_PROPERTY( QColor highlight READ highlight WRITE setHighlight )
-	Q_PROPERTY( QColor highlightedText READ highlightedText WRITE setHighlightedText )
-
-public:
-	LmmsPalette( QWidget * _parent ); 
-	virtual ~LmmsPalette() {};
-
-	ACCESSMET( background, setBackground )
-	ACCESSMET( windowText, setWindowText )
-	ACCESSMET( base, setBase )
-	ACCESSMET( text, setText )
-	ACCESSMET( button, setButton )
-	ACCESSMET( shadow, setShadow )
-	ACCESSMET( buttonText, setButtonText )
-	ACCESSMET( brightText, setBrightText )
-	ACCESSMET( highlight, setHighlight )
-	ACCESSMET( highlightedText, setHighlightedText )
-
-private:
-	QColor m_background;
-	QColor m_windowText;
-	QColor m_base;
-	QColor m_text;
-	QColor m_button;
-	QColor m_shadow;
-	QColor m_buttonText;
-	QColor m_brightText;
-	QColor m_highlight;
-	QColor m_highlightedText;
-};
 
 class LmmsStyle : public QPlastiqueStyle
 {
@@ -134,11 +88,13 @@ public:
 //	QSize sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const;
 //	QRect subControlRect( ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget ) const;
 
+	static QPalette * s_palette;
+
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
 	QColor m_colors[ LmmsStyle::NumColorRoles ];
 
-} ;
+};
 
 #endif

@@ -65,6 +65,7 @@
 #include "ProjectRenderer.h"
 #include "DataFile.h"
 #include "song.h"
+#include "LmmsPalette.h"
 
 static inline QString baseName( const QString & _file )
 {
@@ -390,6 +391,12 @@ int main( int argc, char * * argv )
 	{
 		// init style and palette
 		QApplication::setStyle( new LmmsStyle() );
+		
+		LmmsPalette * lmmspal = new LmmsPalette( NULL );
+		QPalette lpal = lmmspal->palette();
+		QApplication::setPalette( lpal );
+		LmmsStyle::s_palette = &lpal;
+
 
 		// show splash screen
 		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );

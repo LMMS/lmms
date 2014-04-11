@@ -33,7 +33,7 @@
 #include <QWidget>
 
 #include "LmmsStyle.h"
-
+#include "LmmsPalette.h"
 
 const int BUTTON_LENGTH = 24;
 
@@ -107,7 +107,7 @@ static const char * const s_scrollbarArrowLeftXpm[] = {
 		"..#$$%",
 		"...+@@"};
 
-
+QPalette * LmmsStyle::s_palette = NULL;
 
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -197,13 +197,6 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 
 
-LmmsPalette::LmmsPalette( QWidget * _parent ) : QWidget( _parent )
-{
-	setStyle( QApplication::style() );
-}
-
-
-
 LmmsStyle::LmmsStyle() :
 	QPlastiqueStyle()
 {
@@ -219,8 +212,10 @@ LmmsStyle::LmmsStyle() :
 
 QPalette LmmsStyle::standardPalette( void ) const
 {
-	LmmsPalette * lmmspal = new LmmsPalette( NULL );
+	if( s_palette != NULL) return * s_palette;
+
 	QPalette pal = QPlastiqueStyle::standardPalette();
+
 
 /*	sane defaults in case fetching from stylesheet fails*/
 /*
@@ -235,18 +230,6 @@ QPalette LmmsStyle::standardPalette( void ) const
 	pal.setColor( QPalette::Highlight, QColor( 100, 100, 100 ) );
 	pal.setColor( QPalette::HighlightedText, QColor( 255, 255, 255 ) );
 */
-/* fetch from stylesheet using LmmsPalette */
-
-	pal.setColor( QPalette::Background, 		lmmspal->background() );	
-	pal.setColor( QPalette::WindowText, 		lmmspal->windowText() );	
-	pal.setColor( QPalette::Base, 				lmmspal->base() );	
-	pal.setColor( QPalette::ButtonText, 		lmmspal->buttonText() );	
-	pal.setColor( QPalette::BrightText, 		lmmspal->brightText() );	
-	pal.setColor( QPalette::Text, 				lmmspal->text() );	
-	pal.setColor( QPalette::Button, 			lmmspal->button() );	
-	pal.setColor( QPalette::Shadow, 			lmmspal->shadow() );	
-	pal.setColor( QPalette::Highlight, 			lmmspal->highlight() );	
-	pal.setColor( QPalette::HighlightedText, 	lmmspal->highlightedText() );	
 
 	return( pal );
 }
