@@ -24,7 +24,12 @@
 
 #include "lmmsconfig.h"
 
+#ifndef LMMS_BUILD_APPLE
 #include <Qt/QtXml>
+#endif
+#ifdef LMMS_BUILD_APPLE 
+#include <QtXml>
+#endif
 #include <QtCore/QTemporaryFile>
 #include <QtGui/QDropEvent>
 #include <QtGui/QGridLayout>

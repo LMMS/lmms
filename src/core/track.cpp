@@ -1095,7 +1095,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		m_trackView->trackContainerView()->fixedTCOs() == false )
 	{
 		const MidiTime pos = getPosition( _de->pos().x()
-							).toNearestTact();
+                            ).getTact() * MidiTime::ticksPerTact();
 		getTrack()->addJournalCheckPoint();
 		trackContentObject * tco = getTrack()->createTCO( pos );
 
