@@ -55,7 +55,7 @@ void BandLimitedWave::generateWaves()
 				//const double a2 = cos( om * harm * F_2PI );
 				s += amp * /*a2 **/sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
 				harm++;
-			} while( hlen >= 4.0 );
+			} while( hlen > 2.0 );
 			s_waveforms[ BandLimitedWave::BLSaw ].setSampleAt( i, ph, s );
 			max = qMax( max, qAbs( s ) );
 		}
@@ -86,7 +86,7 @@ void BandLimitedWave::generateWaves()
 				//const double a2 = cos( om * harm * F_2PI );
 				s += amp * /*a2 **/ sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
 				harm += 2;
-			} while( hlen >= 4.0 );
+			} while( hlen > 2.0 );
 			s_waveforms[ BandLimitedWave::BLSquare ].setSampleAt( i, ph, s );
 			max = qMax( max, qAbs( s ) );
 		}
@@ -119,7 +119,7 @@ void BandLimitedWave::generateWaves()
 				s += amp * /*a2 **/ sin( ( static_cast<double>( ph * harm ) / static_cast<double>( len ) + 
 						( ( harm + 1 ) % 4 == 0 ? 0.5 : 0.0 ) ) * F_2PI );
 				harm += 2;
-			} while( hlen >= 4.0 );
+			} while( hlen > 2.0 );
 			s_waveforms[ BandLimitedWave::BLTriangle ].setSampleAt( i, ph, s );
 			max = qMax( max, qAbs( s ) );
 		}
