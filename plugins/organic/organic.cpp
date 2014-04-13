@@ -75,7 +75,7 @@ QPixmap * organicInstrumentView::s_artwork = NULL;
 
 organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &organic_plugin_descriptor ),
-	m_modulationAlgo( Oscillator::SignalMix ),
+	m_modulationAlgo( Oscillator::SignalMix, Oscillator::SignalMix, Oscillator::SignalMix),
 	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
 	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
 {
@@ -117,8 +117,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
-					this, SLOT( updateAllDetuning() ) );
-
+					this, SLOT( updateAllDetuning() ) );	
 }
 
 
