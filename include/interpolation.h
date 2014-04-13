@@ -101,4 +101,50 @@ inline float linearInterpolate( float v0, float v1, float x )
 }
 
 
+inline float optimalInterpolate( float v0, float v1, float x )
+{
+	const float z = x - 0.5f;
+	const float even = v1 + v0;
+	const float odd = v1 - v0;
+	
+	const float c0 = even * 0.50037842517188658;
+	const float c1 = odd * 1.00621089801788210;
+	const float c2 = even * -0.004541102062639801;
+	const float c3 = odd * -1.57015627178718420;
+	
+	return ( ( c3*z + c2 ) * z + c1 ) * z + c0;
+}
+
+
+inline float optimal4pInterpolate( float v0, float v1, float v2, float v3, float x )
+{
+	const float z = x - 0.5f;
+	const float even1 = v2 + v1;
+	const float odd1 = v2 - v1;
+	const float even2 = v3 + v0; 
+	const float odd2 = v3 - v0;
+
+	const float c0 = even1 * 0.45868970870461956 + even2 * 0.04131401926395584;
+	const float c1 = odd1 * 0.48068024766578432 + odd2 * 0.17577925564495955;
+	const float c2 = even1 * -0.246185007019907091 + even2 * 0.24614027139700284;
+	const float c3 = odd1 * -0.36030925263849456 + odd2 * 0.10174985775982505;
+
+	return ( ( c3*z + c2 ) * z + c1 ) * z + c0;
+}
+
+
+
+inline float lagrangeInterpolate( float v0, float v1, float v2, float v3, float x )
+{
+	const float c0 = v1;
+	const float c1 = v2 - v0 * ( 1.0f / 3.0f ) - v1 * 0.5f - v3 * ( 1.0f / 6.0f );
+	const float c2 = 0.5f * (v0 + v2) - v1;
+	const float c3 = ( 1.0f/6.0f ) * ( v3 - v0 ) + 0.5f * ( v1 - v2 );
+	return ( ( c3*x + c2 ) * x + c1 ) * x + c0;
+}
+
+
+
+
+
 #endif
