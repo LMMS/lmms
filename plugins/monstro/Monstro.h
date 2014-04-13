@@ -172,7 +172,7 @@ const float MAX_FREQ = 48000.0f;
 
 // constants for amp delta capping - these will be divided by samplerate by the synth
 const float ADCAP1 = 44100 / 2;
-const float ADCAP2 = 44100 / 3;
+const float ADCAP2 = 44100 / 2.25;
 
 
 class MonstroInstrument;

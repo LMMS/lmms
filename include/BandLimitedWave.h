@@ -114,33 +114,47 @@ public:
 	static inline sample_t oscillate( float _ph, float _wavelen, Waveforms _wave )
 	{
 		// high wavelen/ low freq
-		if( _wavelen > TLENS[ MAXTBL -1 ] )
+		if( _wavelen > TLENS[ MAXTBL ] )
 		{
 			const int t = MAXTBL;
 			const int tlen = TLENS[t];
 			const float ph = fraction( _ph );
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
+			const float ip = fraction( lookupf );
+
 			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-			return linearInterpolate( s1, s2, fraction( lookupf ) );
+			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
+			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
+			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
+			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
+			
+			return sr;
 		}
 		// low wavelen/ high freq
-		if( _wavelen <= 2.0f )
+		if( _wavelen < 3.0f )
 		{
 			const int t = 0;
 			const int tlen = TLENS[t];
 			const float ph = fraction( _ph );
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
+			const float ip = fraction( lookupf );
+			
 			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-			return linearInterpolate( s1, s2, fraction( lookupf ) );
+			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
+			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
+			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
+			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
+			
+			return sr;
 		}
 		
 		// get the next higher tlen
-		int t = 1;
-		while( TLENS[t] < _wavelen ) { t++; }
+		int t = MAXTBL - 1;
+		while( _wavelen < TLENS[t] ) { t--; }
 		
 		int tlen = TLENS[t];
 		const float ph = fraction( _ph );
@@ -150,12 +164,11 @@ public:
 		
 		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-		//const sample_t sr = linearInterpolate( s1, s2, ip );
-		
+
 		const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
 		const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
-		const sample_t sr = cubicInterpolate( s0, s1, s2, s3, ip );
+		const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
 		
 		return sr;
 		
