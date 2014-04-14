@@ -59,7 +59,7 @@
 
 const int GRAPHLEN = 220; // don't change - must be same as the size of the widget
 
-const int WAVERATIO = 25; // oversampling ratio
+const int WAVERATIO = 32; // oversampling ratio
 
 const int WAVELEN = GRAPHLEN * WAVERATIO;
 const int PMOD_AMT = WAVELEN / 2;
@@ -177,7 +177,7 @@ private:
 	inline void srccpy( float * _dst, float * _src )
 	{
 		int err;
-		SRC_STATE * src_state = src_new( SRC_SINC_MEDIUM_QUALITY, 1, &err );
+		SRC_STATE * src_state = src_new( SRC_SINC_FASTEST, 1, &err );
 		SRC_DATA src_data;
 		src_data.data_in = _src;
 		src_data.input_frames = GRAPHLEN;

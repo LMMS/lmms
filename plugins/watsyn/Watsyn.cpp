@@ -116,14 +116,13 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		/////////////   A-series   /////////////////
 
 		// A2
-		sample_t A2_L = m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) ] * m_parent->m_lvol[A2_OSC];
-							/*interpolate( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) % WAVELEN ],
+		sample_t A2_L = linearInterpolate( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) ],
 							m_A2wave[ static_cast<int>( m_lphase[A2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_lphase[A2_OSC] ) ) * m_parent->m_lvol[A2_OSC];*/
-		sample_t A2_R = m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) ] * m_parent->m_rvol[A2_OSC];
-		/*interpolate( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) % WAVELEN ],
+							fraction( m_lphase[A2_OSC] ) ) * m_parent->m_lvol[A2_OSC];
+		sample_t A2_R = linearInterpolate( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) ],
 							m_A2wave[ static_cast<int>( m_rphase[A2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_rphase[A2_OSC] ) ) * m_parent->m_rvol[A2_OSC];*/
+							fraction( m_rphase[A2_OSC] ) ) * m_parent->m_rvol[A2_OSC];
+
 		// if phase mod, add to phases
 		if( m_amod == MOD_PM )
 		{
@@ -143,14 +142,12 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		/////////////   B-series   /////////////////
 
 		// B2
-		sample_t B2_L = m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) ] * m_parent->m_lvol[B2_OSC];
-						/*interpolate( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) % WAVELEN ],
-						m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ],
-						fraction( m_lphase[B2_OSC] ) ) * m_parent->m_lvol[B2_OSC];*/
-		sample_t B2_R = m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) ] * m_parent->m_rvol[B2_OSC];
-						/*interpolate( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) % WAVELEN ],
-						m_B2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ],
-						fraction( m_rphase[B2_OSC] ) ) * m_parent->m_rvol[B2_OSC];*/
+		sample_t B2_L = linearInterpolate( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) ],
+							m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ],
+							fraction( m_lphase[B2_OSC] ) ) * m_parent->m_lvol[B2_OSC];
+		sample_t B2_R = linearInterpolate( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) ],
+							m_B2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ],
+							fraction( m_rphase[B2_OSC] ) ) * m_parent->m_rvol[B2_OSC];
 
 		// if crosstalk active, add a1
 		const float xt = m_parent->m_xtalk.value();
