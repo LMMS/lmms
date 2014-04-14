@@ -34,6 +34,7 @@
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
 #include "pixmap_button.h"
+#include <samplerate.h>
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
@@ -102,12 +103,6 @@ public:
 	}
 
 private:
-	// linear interpolation
-/*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
-	{
-		return s1 + ( s2 - s1 ) * x;
-	}*/ // we use the one in interpolation.h now
-
 	int m_amod;
 	int m_bmod;
 
@@ -178,8 +173,25 @@ private:
 		return ( _pan >= 0 ? 1.0 : 1.0 + ( _pan / 100.0 ) ) * _vol / 100.0;
 	}
 
-	// memcpy with cubic interpolation (cip for short) and 10x oversampling to increase wavetable quality
-	inline void cipcpy( float * _dst, float * _src )
+	// memcpy utilizing libsamplerate (src) for sinc interpolation
+	inline void srccpy( float * _dst, float * _src )
+	{
+		int err;
+		SRC_STATE * src_state = src_new( SRC_SINC_MEDIUM_QUALITY, 1, &err );
+		SRC_DATA src_data;
+		src_data.data_in = _src;
+		src_data.input_frames = GRAPHLEN;
+		src_data.data_out = _dst;
+		src_data.output_frames = WAVELEN;
+		src_data.src_ratio = static_cast<double>( WAVERATIO );
+		src_data.end_of_input = 1;
+		err = src_process( src_state, &src_data ); 
+		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
+		src_delete( src_state );
+	}
+
+	// memcpy utilizing cubic interpolation
+/*	inline void cipcpy( float * _dst, float * _src )
 	{
 		// calculate cyclic tangents
 		float tang[GRAPHLEN];
@@ -207,7 +219,8 @@ private:
 				( ( x3 - x2 * 2 + x ) * m1 ) +
 				( ( x3 - x2 ) * m2 );		
 		}
-	}
+	}*/
+
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;
