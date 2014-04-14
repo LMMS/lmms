@@ -221,8 +221,11 @@ void graph::drawLineAt( int _x, int _y, int _lastx )
 	for ( int i = 0; i < linelen; i++ )
 	{
 		int x = (_x + (i * xstep));		// get x value
-		model()->setSampleAt( (int)( x * xscale ), val + (i * ystep));
+		model()->drawSampleAt( (int)( x * xscale ), val + (i * ystep));
 	}
+	int start = qMin( _x, _x + ( ( linelen - 1 ) * xstep ) );
+	int end = qMax( _x, _x + ( ( linelen - 1 ) * xstep ) );
+	model()->samplesChanged( start, end );
 }
 
 void graph::changeSampleAt( int _x, int _y )
@@ -488,18 +491,10 @@ void graphModel::setLength( int _length )
 
 
 
-void graphModel::setSampleAt( int _x, float _val )
+void graphModel::setSampleAt( int x, float val )
 {
-	//snap to the grid
-	_val -= ( m_step != 0.0 ) ? fmod( _val, m_step ) * m_step : 0;
-
-	// boundary crop
-	_x = qMax( 0, qMin( length()-1, _x ) );
-	_val = qMax( minValue(), qMin( maxValue(), _val ) );
-
-	// change sample shape
-	m_samples[_x] = _val;
-	emit samplesChanged( _x, _x );
+	drawSampleAt( x, val );
+	emit samplesChanged( x, x );
 }
 
 
@@ -687,6 +682,22 @@ void graphModel::shiftPhase( int _deg )
 	
 	emit samplesChanged( 0, length()-1 );
 }
+
+
+
+void graphModel::drawSampleAt( int x, float val )
+{
+	//snap to the grid
+	val -= ( m_step != 0.0 ) ? fmod( val, m_step ) * m_step : 0;
+
+	// boundary crop
+	x = qMax( 0, qMin( length()-1, x ) );
+	val = qMax( minValue(), qMin( maxValue(), val ) );
+
+	// change sample shape
+	m_samples[x] = val;
+}
+
 
 
 
