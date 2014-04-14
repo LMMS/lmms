@@ -612,10 +612,10 @@ void WatsynInstrument::updateFreq()
 void WatsynInstrument::updateWaves()
 {
 	// do cip+oversampling on the wavetables to improve quality
-	cipcpy( &A1_wave[0], const_cast<float*>( a1_graph.samples() ) );
-	cipcpy( &A2_wave[0], const_cast<float*>( a2_graph.samples() ) );
-	cipcpy( &B1_wave[0], const_cast<float*>( b1_graph.samples() ) );
-	cipcpy( &B2_wave[0], const_cast<float*>( b2_graph.samples() ) );
+	srccpy( &A1_wave[0], const_cast<float*>( a1_graph.samples() ) );
+	srccpy( &A2_wave[0], const_cast<float*>( a2_graph.samples() ) );
+	srccpy( &B1_wave[0], const_cast<float*>( b1_graph.samples() ) );
+	srccpy( &B2_wave[0], const_cast<float*>( b2_graph.samples() ) );
 }
 
 
