@@ -66,7 +66,8 @@ class EXPORT knob : public QWidget, public FloatModelView
 
 	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
 
-	void init( const QString & _name ); //!< to be called by ctors
+	void initUi( const QString & _name ); //!< to be called by ctors
+	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
 	knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
