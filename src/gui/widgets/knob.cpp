@@ -70,14 +70,14 @@ knob::knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	DEFAULT_KNOB_INITIALIZER_LIST,
 	m_knobNum( _knob_num )
 {
-	init( _name );
+	initUi( _name );
 }
 
 knob::knob( QWidget * _parent, const QString & _name ) :
 	DEFAULT_KNOB_INITIALIZER_LIST,
 	m_knobNum( knobBright_26 )
 {
-	init( _name );
+	initUi( _name );
 }
 
 #undef DEFAULT_KNOB_INITIALIZER_LIST
@@ -85,7 +85,7 @@ knob::knob( QWidget * _parent, const QString & _name ) :
 
 
 
-void knob::init( const QString & _name )
+void knob::initUi( const QString & _name )
 {
 	if( s_textFloat == NULL )
 	{
@@ -94,6 +94,19 @@ void knob::init( const QString & _name )
 
 	setWindowTitle( _name );
 
+	onKnobNumUpdated();
+	setTotalAngle( 270.0f );
+	setInnerRadius( 1.0f );
+	setOuterRadius( 10.0f );
+	setFocusPolicy( Qt::ClickFocus );
+	doConnections();
+}
+
+
+
+
+void knob::onKnobNumUpdated()
+{
 	if( m_knobNum != knobStyled )
 	{
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
@@ -101,11 +114,6 @@ void knob::init( const QString & _name )
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
-	setTotalAngle( 270.0f );
-	setInnerRadius( 1.0f );
-	setOuterRadius( 10.0f );
-	setFocusPolicy( Qt::ClickFocus );
-	doConnections();
 }
 
 
@@ -193,7 +201,11 @@ knobTypes knob::knobNum() const
 
 void knob::setknobNum( knobTypes _k )
 {
-	m_knobNum = _k;
+	if( m_knobNum != _k )
+	{
+		m_knobNum = _k;
+		onKnobNumUpdated();
+	}
 }
 
 

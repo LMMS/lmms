@@ -35,8 +35,8 @@ class EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
 public:
+	LcdWidget( QWidget* parent, const QString& name = QString::null );
 	LcdWidget( int numDigits, QWidget* parent, const QString& name = QString::null );
-
 	LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
 
 	virtual ~LcdWidget();
@@ -50,6 +50,10 @@ public:
 		update();
 	}
 
+	Q_PROPERTY( int numDigits READ numDigits WRITE setNumDigits )
+
+	inline int numDigits() const { return m_numDigits; }
+	inline void setNumDigits( int n ) { m_numDigits = n; updateSize(); }
 
 public slots:
 	virtual void setMarginWidth( int _width );
@@ -81,6 +85,8 @@ private:
 	int m_cellHeight;
 	int m_numDigits;
 	int m_marginWidth;
+
+	void initUi( const QString& name, const QString &style = QString("19green") ); //!< to be called by ctors
 
 } ;
 
