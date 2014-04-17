@@ -57,35 +57,8 @@
 #include "MidiWinMM.h"
 #include "MidiDummy.h"
 
+#include "MemoryHelper.h"
 
-
-
-static void aligned_free( void * _buf )
-{
-	if( _buf != NULL )
-	{
-		int *ptr2=(int *)_buf - 1;
-		_buf = (char *)_buf- *ptr2;
-		free(_buf);
-	}
-}
-
-static void * aligned_malloc( int _bytes )
-{
-	char *ptr,*ptr2,*aligned_ptr;
-	int align_mask = ALIGN_SIZE- 1;
-	ptr=(char *)malloc(_bytes +ALIGN_SIZE+ sizeof(int));
-	if(ptr==NULL) return(NULL);
-
-	ptr2 = ptr + sizeof(int);
-	aligned_ptr = ptr2 + (ALIGN_SIZE- ((size_t)ptr2 & align_mask));
-
-
-	ptr2 = aligned_ptr - sizeof(int);
-	*((int *)ptr2)=(int)(aligned_ptr - ptr);
-
-	return(aligned_ptr);
-}
 
 
 
@@ -146,12 +119,12 @@ Mixer::Mixer() :
 		m_fifo = new fifo( 1 );
 	}
 
-	m_workingBuf = (sampleFrame*) aligned_malloc( m_framesPerPeriod *
+	m_workingBuf = (sampleFrame*) MemoryHelper::alignedMalloc( m_framesPerPeriod *
 							sizeof( sampleFrame ) );
 	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = (surroundSampleFrame*)
-			aligned_malloc( m_framesPerPeriod *
+			MemoryHelper::alignedMalloc( m_framesPerPeriod *
 						sizeof( surroundSampleFrame ) );
 
 		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
@@ -201,10 +174,10 @@ Mixer::~Mixer()
 
 	for( int i = 0; i < 3; i++ )
 	{
-		aligned_free( m_bufferPool[i] );
+		MemoryHelper::alignedFree( m_bufferPool[i] );
 	}
 
-	aligned_free( m_workingBuf );
+	MemoryHelper::alignedFree( m_workingBuf );
 
 	for( int i = 0; i < 2; ++i )
 	{
