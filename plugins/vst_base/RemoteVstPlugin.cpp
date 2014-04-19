@@ -427,6 +427,7 @@ RemoteVstPlugin::~RemoteVstPlugin()
 		m_window = NULL;
 	}
 	pluginDispatch( effMainsChanged, 0, 0 );
+	pluginDispatch( effClose );
 #ifndef USE_QT_SHMEM
 	// detach shared memory segment
 	if( shmdt( m_vstSyncData ) == -1)
