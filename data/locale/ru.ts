@@ -461,7 +461,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>MAPPING FUNCTION</source>
-        <translation>ПЕРЕОПРЕДЕНИЕ</translation>
+        <translation>ПЕРЕОПРЕДЕЛЕНИЕ</translation>
     </message>
     <message>
         <source>OK</source>
