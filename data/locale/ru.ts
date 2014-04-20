@@ -730,7 +730,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Modulate Env-Amount</source>
-        <translation>Модулировать значение огибающей</translation>
+        <translation>Модулировать огибающую</translation>
     </message>
 </context>
 <context>
@@ -885,7 +885,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>MODULATE ENV-AMOUNT</source>
-        <translation>МОДУЛИРОВАТЬ ЗНАЧЕНИЕ ОГИБАЮЩЕЙ</translation>
+        <translation>МОДУЛИР ОГИБАЮЩУЮ</translation>
     </message>
     <message>
         <source>Click here to make the envelope-amount controlled by this LFO.</source>
@@ -1706,11 +1706,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation>Груп.ЧФ csg</translation>
+        <translation>Сред.ЧФ csg</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation>Груп.ЧФ czpg</translation>
+        <translation>Сред.ЧФ czpg</translation>
     </message>
     <message>
         <source>Notch</source>
@@ -1734,7 +1734,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation>RC Груп.ЧФ 12 дБ</translation>
+        <translation>RC Сред.ЧФ 12 дБ</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
@@ -1746,7 +1746,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation>RC Груп.ЧФ 24дБ</translation>
+        <translation>RC Сред.ЧФ 24дБ</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
@@ -1856,7 +1856,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>VOL</source>
-        <translation>ГРОМК</translation>
+        <translation>ГРОМ</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -1903,7 +1903,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>ГРОМ</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -1931,7 +1931,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>PITCH</source>
-        <translation>ТОНАЛ</translation>
+        <translation>ТОН</translation>
     </message>
     <message>
         <source>FX channel</source>
