@@ -2888,7 +2888,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation type="unfinished">Сломан на месте:</translation>
+        <translation type="unfinished">Вместо сломанного:</translation>
     </message>
     <message>
         <source>Channels In: </source>
