@@ -27,6 +27,7 @@
 #include <QtXml/QDomElement>
 
 #include <cstdio>
+#include <cfloat>
 
 #include "Effect.h"
 #include "engine.h"
@@ -135,7 +136,7 @@ void Effect::checkGate( double _out_sum )
 {
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum <= gate()+0.000001 )
+	if( _out_sum <= gate() + FLT_MIN )
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
