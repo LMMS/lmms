@@ -35,7 +35,7 @@
 #include "knob.h"
 #include "pixmap_button.h"
 #include "automatable_button.h"
-
+#include "combobox.h"
 
 
 class audioFileProcessor : public Instrument
@@ -94,6 +94,7 @@ private:
 	BoolModel m_reverseModel;
 	IntModel m_loopModel;
 	BoolModel m_stutterModel;
+	ComboBoxModel m_interpModel;
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
@@ -141,6 +142,7 @@ private:
 	pixmapButton * m_reverseButton;
 	automatableButtonGroup * m_loopGroup;
 	pixmapButton * m_stutterButton;
+	comboBox * m_interpBox;
 
 } ;
 

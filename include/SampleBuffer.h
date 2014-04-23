@@ -37,12 +37,16 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
+#include "Mixer.h"
 
 
 class QPainter;
 
-
-const f_cnt_t MARGIN = 4;
+// values for buffer margins, used for various libsamplerate interpolation modes
+// the array positions correspond to the converter_type parameter values in libsamplerate
+// if there appears problems with playback on some interpolation mode, then the value for that mode
+// may need to be higher - conversely, to optimize, some may work with lower values
+const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
 class EXPORT SampleBuffer : public QObject, public sharedObject
 {
@@ -56,7 +60,7 @@ public:
 	class EXPORT handleState
 	{
 	public:
-		handleState( bool _varying_pitch = false );
+		handleState( bool _varying_pitch = false, int interp_mode = SRC_LINEAR );
 		virtual ~handleState();
 
 		inline const f_cnt_t frameIndex() const
@@ -78,6 +82,11 @@ public:
 		{
 			m_isBackwards = _backwards;
 		}
+		
+		inline int interpMode() const
+		{
+			return m_interpMode;
+		}
 
 
 	private:
@@ -85,6 +94,7 @@ public:
 		const bool m_varyingPitch;
 		bool m_isBackwards;
 		SRC_STATE * m_resamplingData;
+		int m_interpMode;
 
 		friend class SampleBuffer;
 
