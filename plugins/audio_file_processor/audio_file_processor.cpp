@@ -29,6 +29,7 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QDropEvent>
 
+#include <samplerate.h>
 
 #include "audio_file_processor.h"
 #include "engine.h"
@@ -78,6 +79,7 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
 	m_loopModel( 0, 0, 2, this, tr( "Loop mode" ) ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
+	m_interpModel( this, tr( "Interpolation mode" ) ),
 	m_nextPlayStartPoint( 0 ),
 	m_nextPlayBackwards( false )
 {
@@ -93,6 +95,13 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 	    		this, SLOT( stutterModelChanged() ) );
+	    		
+//interpolation modes
+	m_interpModel.addItem( tr( "None" ) );
+	m_interpModel.addItem( tr( "Linear" ) );
+	m_interpModel.addItem( tr( "Sinc" ) );
+	m_interpModel.setValue( 1 );
+	
 	loopPointChanged();
 }
 
@@ -130,7 +139,21 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 			m_nextPlayStartPoint = m_sampleBuffer.startFrame();
 			m_nextPlayBackwards = false;
 		}
-		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
+		// set interpolation mode for libsamplerate
+		int srcmode = SRC_LINEAR;
+		switch( m_interpModel.value() )
+		{
+			case 0:
+				srcmode = SRC_ZERO_ORDER_HOLD;
+				break;
+			case 1:
+				srcmode = SRC_LINEAR;
+				break;
+			case 2:
+				srcmode = SRC_SINC_MEDIUM_QUALITY;
+				break;
+		}
+		_n->m_pluginData = new handleState( _n->hasDetuningInfo(), srcmode );
 		((handleState *)_n->m_pluginData)->setFrameIndex( m_nextPlayStartPoint );
 		((handleState *)_n->m_pluginData)->setBackwards( m_nextPlayBackwards );
 
@@ -197,6 +220,7 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	m_endPointModel.saveSettings( _doc, _this, "eframe" );
 	m_loopPointModel.saveSettings( _doc, _this, "lframe" );
 	m_stutterModel.saveSettings( _doc, _this, "stutter" );
+	m_interpModel.saveSettings( _doc, _this, "interp" );
 
 }
 
@@ -214,7 +238,6 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
 	}
 
-	m_reverseModel.loadSettings( _this, "reversed" );
 	m_loopModel.loadSettings( _this, "looped" );
 	m_ampModel.loadSettings( _this, "amp" );
 	m_endPointModel.loadSettings( _this, "eframe" );
@@ -231,7 +254,17 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 		m_startPointModel.setValue( m_loopPointModel.value() );
 	}
 
+	m_reverseModel.loadSettings( _this, "reversed" );
+
 	m_stutterModel.loadSettings( _this, "stutter" );
+	if( _this.hasAttribute( "interp" ) )
+	{
+		m_interpModel.loadSettings( _this, "interp" );
+	}
+	else
+	{
+		m_interpModel.setValue( 1 ); //linear by default
+	}
 
 	loopPointChanged();
 }
@@ -299,6 +332,8 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 void audioFileProcessor::reverseModelChanged( void )
 {
 	m_sampleBuffer.setReversed( m_reverseModel.value() );
+	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
+	m_nextPlayBackwards = false;
 }
 
 
@@ -501,7 +536,12 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 		tr( "With this knob you can set the point where "
 			"the loop starts. " ) );
 
+// interpolation selector
+	m_interpBox = new comboBox( this );
+	m_interpBox->setGeometry( 142, 62, 82, 22 );
+	m_interpBox->setFont( pointSize<8>( m_interpBox->font() ) );
 
+// wavegraph
 	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
 	m_waveView->move( 2, 172 );
 	m_waveView->setKnobs(
@@ -652,6 +692,7 @@ void AudioFileProcessorView::modelChanged( void )
 	m_reverseButton->setModel( &a->m_reverseModel );
 	m_loopGroup->setModel( &a->m_loopModel );
 	m_stutterButton->setModel( &a->m_stutterModel );
+	m_interpBox->setModel( &a->m_interpModel );
 	sampleUpdated();
 }
 
@@ -668,6 +709,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_last_to( 0 ),
 	m_startKnob( 0 ),
 	m_endKnob( 0 ),
+	m_loopKnob( 0 ),
 	m_isDragging( false ),
 	m_reversed( false ),
 	m_framesPlayed( 0 ),

@@ -24,7 +24,6 @@
 
 
 #include "SampleBuffer.h"
-#include "Mixer.h"
 
 
 #include <QtCore/QBuffer>
@@ -664,7 +663,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		SRC_DATA src_data;
 		// Generate output
-		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN;
+		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN[ _state->interpMode() ];
 		src_data.data_in =
 			getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
 			loopStartFrame, loopEndFrame, endFrame )[0];
@@ -1439,22 +1438,17 @@ QString SampleBuffer::tryToMakeAbsolute( const QString & _file )
 
 
 
-SampleBuffer::handleState::handleState( bool _varying_pitch ) :
+SampleBuffer::handleState::handleState( bool _varying_pitch, int interp_mode ) :
 	m_frameIndex( 0 ),
 	m_varyingPitch( _varying_pitch ),
 	m_isBackwards( false )
 {
 	int error;
+	m_interpMode = interp_mode;
 	
-	if( ( m_resamplingData = src_new(/*
-		( engine::mixer()->highQuality() == true ) ?
-					SRC_SINC_FASTEST :*/
-					engine::mixer()->currentQualitySettings().
-							libsrcInterpolation(),
-					/*SRC_LINEAR,*/
-					DEFAULT_CHANNELS, &error ) ) == NULL )
+	if( ( m_resamplingData = src_new( interp_mode, DEFAULT_CHANNELS, &error ) ) == NULL )
 	{
-		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
+		qDebug( "Error: src_new() failed in sample_buffer.cpp!\n" );
 	}
 }
 
