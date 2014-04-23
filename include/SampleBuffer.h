@@ -60,32 +60,32 @@ public:
 	class EXPORT handleState
 	{
 	public:
-		handleState( bool _varying_pitch = false, int interp_mode = SRC_LINEAR );
+		handleState( bool _varying_pitch = false, int interpolation_mode = SRC_LINEAR );
 		virtual ~handleState();
 
-		inline const f_cnt_t frameIndex() const
+		const f_cnt_t frameIndex() const
 		{
 			return m_frameIndex;
 		}
 
-		inline void setFrameIndex( f_cnt_t _index )
+		void setFrameIndex( f_cnt_t _index )
 		{
 			m_frameIndex = _index;
 		}
 
-		inline bool isBackwards() const
+		bool isBackwards() const
 		{
 			return m_isBackwards;
 		}
 
-		inline void setBackwards( bool _backwards )
+		void setBackwards( bool _backwards )
 		{
 			m_isBackwards = _backwards;
 		}
 		
-		inline int interpMode() const
+		int interpolationMode() const
 		{
-			return m_interpMode;
+			return m_interpolationMode;
 		}
 
 
@@ -94,7 +94,7 @@ public:
 		const bool m_varyingPitch;
 		bool m_isBackwards;
 		SRC_STATE * m_resamplingData;
-		int m_interpMode;
+		int m_interpolationMode;
 
 		friend class SampleBuffer;
 
