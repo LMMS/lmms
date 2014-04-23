@@ -94,7 +94,7 @@ private:
 	BoolModel m_reverseModel;
 	IntModel m_loopModel;
 	BoolModel m_stutterModel;
-	ComboBoxModel m_interpModel;
+	ComboBoxModel m_interpolationModel;
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;

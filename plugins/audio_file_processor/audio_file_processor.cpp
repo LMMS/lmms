@@ -79,7 +79,7 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
 	m_loopModel( 0, 0, 2, this, tr( "Loop mode" ) ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
-	m_interpModel( this, tr( "Interpolation mode" ) ),
+	m_interpolationModel( this, tr( "Interpolation mode" ) ),
 	m_nextPlayStartPoint( 0 ),
 	m_nextPlayBackwards( false )
 {
@@ -97,10 +97,10 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	    		this, SLOT( stutterModelChanged() ) );
 	    		
 //interpolation modes
-	m_interpModel.addItem( tr( "None" ) );
-	m_interpModel.addItem( tr( "Linear" ) );
-	m_interpModel.addItem( tr( "Sinc" ) );
-	m_interpModel.setValue( 1 );
+	m_interpolationModel.addItem( tr( "None" ) );
+	m_interpolationModel.addItem( tr( "Linear" ) );
+	m_interpolationModel.addItem( tr( "Sinc" ) );
+	m_interpolationModel.setValue( 1 );
 	
 	loopPointChanged();
 }
@@ -141,7 +141,7 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 		}
 		// set interpolation mode for libsamplerate
 		int srcmode = SRC_LINEAR;
-		switch( m_interpModel.value() )
+		switch( m_interpolationModel.value() )
 		{
 			case 0:
 				srcmode = SRC_ZERO_ORDER_HOLD;
@@ -220,7 +220,7 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	m_endPointModel.saveSettings( _doc, _this, "eframe" );
 	m_loopPointModel.saveSettings( _doc, _this, "lframe" );
 	m_stutterModel.saveSettings( _doc, _this, "stutter" );
-	m_interpModel.saveSettings( _doc, _this, "interp" );
+	m_interpolationModel.saveSettings( _doc, _this, "interp" );
 
 }
 
@@ -259,11 +259,11 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_stutterModel.loadSettings( _this, "stutter" );
 	if( _this.hasAttribute( "interp" ) )
 	{
-		m_interpModel.loadSettings( _this, "interp" );
+		m_interpolationModel.loadSettings( _this, "interp" );
 	}
 	else
 	{
-		m_interpModel.setValue( 1 ); //linear by default
+		m_interpolationModel.setValue( 1 ); //linear by default
 	}
 
 	loopPointChanged();
@@ -692,7 +692,7 @@ void AudioFileProcessorView::modelChanged( void )
 	m_reverseButton->setModel( &a->m_reverseModel );
 	m_loopGroup->setModel( &a->m_loopModel );
 	m_stutterButton->setModel( &a->m_stutterModel );
-	m_interpBox->setModel( &a->m_interpModel );
+	m_interpBox->setModel( &a->m_interpolationModel );
 	sampleUpdated();
 }
 
