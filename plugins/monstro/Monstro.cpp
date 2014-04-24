@@ -89,6 +89,9 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 
 	m_lfo1_phase = 0.0f;
 	m_lfo2_phase = 0.0f;
+	
+	m_lfo1_s = Oscillator::noiseSample( 0.0f );
+	m_lfo2_s = Oscillator::noiseSample( 0.0f );
 
 	m_osc1l_last = 0.0f;
 	m_osc1r_last = 0.0f;
