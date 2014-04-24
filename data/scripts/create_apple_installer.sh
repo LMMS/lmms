@@ -22,6 +22,8 @@ CMAKE_INSTALL=$CMAKE_SRC/target
 # LMMS source build directory
 CMAKE_BUILD=$CMAKE_SRC/build
 
+# STK rawwaves directory
+STK_RAWWAVE=$HOME/stk-*/rawwaves
 
 
 # Place to create ".app" bundle
@@ -55,6 +57,10 @@ mkdir -p $APP
 cd $CMAKE_INSTALL
 mkdir $APP/Contents
 cp -R * $APP/Contents
+
+# Manually copy STK rawwaves
+mkdir -p $APP/Contents/share/stk/rawwaves
+cp $STK_RAWWAVE/*.raw $APP/Contents/share/stk/rawwaves
 
 # Make all libraries writable for macdeployqt
 cd $APP
