@@ -358,7 +358,7 @@ void configManager::loadConfigFile()
 #if defined(LMMS_BUILD_WIN32)
 		m_stkDir = m_dataDir + "stk/rawwaves/";
 #elif defined(LMMS_BUILD_APPLE)
-                m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
 		m_stkDir = "/usr/share/stk/rawwaves/";
 #endif
