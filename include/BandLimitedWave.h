@@ -26,6 +26,11 @@
 #ifndef BANDLIMITEDWAVE_H
 #define BANDLIMITEDWAVE_H
 
+#include <QString>
+#include <QDataStream>
+#include <QFile>
+
+#include "config_mgr.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -50,24 +55,52 @@ const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
 typedef struct
 {
 public:
-	inline sample_t sampleAt( int _table, int _ph )
+	inline sample_t sampleAt( int table, int ph )
 	{
-		if( _table % 2 == 0 )
-		{	return m_data[ TLENS[ _table ] + _ph ]; }
+		if( table % 2 == 0 )
+		{	return m_data[ TLENS[ table ] + ph ]; }
 		else
-		{	return m_data3[ TLENS[ _table ] + _ph ]; }
+		{	return m_data3[ TLENS[ table ] + ph ]; }
 	}
-	inline void setSampleAt( int _table, int _ph, sample_t _sample )
+	inline void setSampleAt( int table, int ph, sample_t sample )
 	{
-		if( _table % 2 == 0 )
-		{	m_data[ TLENS[ _table ] + _ph ] = _sample; }
+		if( table % 2 == 0 )
+		{	m_data[ TLENS[ table ] + ph ] = sample; }
 		else
-		{ 	m_data3[ TLENS[ _table ] + _ph ] = _sample; }
+		{ 	m_data3[ TLENS[ table ] + ph ] = sample; }
 	}
 private:
 	sample_t m_data [ MIPMAPSIZE ];
 	sample_t m_data3 [ MIPMAPSIZE3 ];
+
 } WaveMipMap;
+
+
+QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
+{
+	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
+	{
+		for( int i = 0; i < TLENS[tbl]; i++ )
+		{
+			out << waveMipMap.sampleAt( tbl, i );
+		}
+	}
+    return out;
+}
+
+QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
+{
+	sample_t sample;
+	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
+	{
+		for( int i = 0; i < TLENS[tbl]; i++ )
+		{
+			in >> sample;
+			waveMipMap.setSampleAt( tbl, i, sample );
+		}
+	}
+    return in;
+}
 
 
 class BandLimitedWave
@@ -88,22 +121,22 @@ public:
 	/*! \brief This method converts frequency to wavelength. The oscillate function takes wavelength as argument so
 	 * use this to convert your note frequency to wavelength before using it.
 	 */
-	static inline float freqToLen( float _f )
+	static inline float freqToLen( float f )
 	{
-		return freqToLen( _f, engine::mixer()->processingSampleRate() );
+		return freqToLen( f, engine::mixer()->processingSampleRate() );
 	}
 
 	/*! \brief This method converts frequency to wavelength, but you can use any custom sample rate with it.
 	 */
-	static inline float freqToLen( float _f, sample_rate_t _sr )
+	static inline float freqToLen( float f, sample_rate_t sr )
 	{
-		return static_cast<float>( _sr ) / _f;
+		return static_cast<float>( sr ) / f;
 	}
 	
 	/*! \brief This method converts phase delta to wavelength. It assumes a phase scale of 0 to 1. */
-	static inline float pdToLen( float _pd )
+	static inline float pdToLen( float pd )
 	{
-		return 1.0f / _pd;
+		return 1.0f / pd;
 	}
 
 	/*! \brief This method provides interpolated samples of bandlimited waveforms.
@@ -189,8 +222,10 @@ public:
 	static void generateWaves();
 	
 	static bool s_wavesGenerated;
-
+	
 	static WaveMipMap s_waveforms [NumBLWaveforms];
+	
+	static QString s_wavetableDir;
 };
 
 
