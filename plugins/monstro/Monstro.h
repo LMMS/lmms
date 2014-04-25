@@ -93,7 +93,8 @@
 	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
 	name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
 	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
-	name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
+	name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );	\
+	name .addItem( tr( "Random smooth" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
 
 // UI constants
 const int O1ROW = 22;
@@ -158,6 +159,11 @@ const int WAVE_MOOG_D = 14;
 
 const int NUM_WAVES = 15;
 
+// lfo-specific enumerators
+const int WAVE_RANDOM = 9;
+const int WAVE_RANDOM_SMOOTH = 10;
+const int NUM_LFO_WAVES = 11;
+
 // modulation enumerators
 const int MOD_MIX = 0;
 const int MOD_AM = 1;
@@ -170,10 +176,7 @@ const float MODCLIP = 2.0;
 const float MIN_FREQ = 18.0f;
 const float MAX_FREQ = 48000.0f;
 
-// constants for amp delta capping - these will be divided by samplerate by the synth
-const float ADCAP1 = 44100 / 2;
-const float ADCAP2 = 44100 / 2.25;
-
+const float INTEGRATOR = 3.0f / 7.0f;
 
 class MonstroInstrument;
 class MonstroView;
@@ -302,15 +305,12 @@ private:
 
 	sample_t m_lfo1_last;
 	sample_t m_lfo2_last;
+	
+	sample_t m_lfo1_s;
+	sample_t m_lfo2_s;
 
 	sample_t m_osc1l_last;
 	sample_t m_osc1r_last;
-
-	sample_t m_osc2l_last;
-	sample_t m_osc2r_last;
-
-	sample_t m_osc3l_last;
-	sample_t m_osc3r_last;
 
 	sample_t m_l_last;
 	sample_t m_r_last;
@@ -321,8 +321,10 @@ private:
 	float m_ph3l_last;
 	float m_ph3r_last;
 
-	float m_adcap1;
-	float m_adcap2;
+	bool m_invert2l;
+	bool m_invert3l;
+	bool m_invert2r;
+	bool m_invert3r;
 };
 
 class MonstroInstrument : public Instrument
@@ -434,7 +436,8 @@ private:
 	FloatModel	m_osc2Ftr;
 	FloatModel	m_osc2Spo;
 	ComboBoxModel	m_osc2Wave;
-	BoolModel	m_osc2Sync;
+	BoolModel	m_osc2SyncH;
+	BoolModel	m_osc2SyncR;
 
 	FloatModel	m_osc3Vol;
 	FloatModel	m_osc3Pan;
@@ -443,7 +446,8 @@ private:
 	FloatModel	m_osc3Sub;
 	ComboBoxModel	m_osc3Wave1;
 	ComboBoxModel	m_osc3Wave2;
-	BoolModel	m_osc3Sync;
+	BoolModel	m_osc3SyncH;
+	BoolModel	m_osc3SyncR;
 
 	ComboBoxModel	m_lfo1Wave;
 	TempoSyncKnobModel	m_lfo1Att;
@@ -582,7 +586,8 @@ private:
 	knob *	m_osc2FtrKnob;
 	knob *	m_osc2SpoKnob;
 	comboBox *	m_osc2WaveBox;
-	pixmapButton * m_osc2SyncButton;
+	pixmapButton * m_osc2SyncHButton;
+	pixmapButton * m_osc2SyncRButton;
 
 	knob *	m_osc3VolKnob;
 	knob *	m_osc3PanKnob;
@@ -591,7 +596,8 @@ private:
 	knob *	m_osc3SubKnob;
 	comboBox *	m_osc3Wave1Box;
 	comboBox *	m_osc3Wave2Box;
-	pixmapButton * m_osc3SyncButton;
+	pixmapButton * m_osc3SyncHButton;
+	pixmapButton * m_osc3SyncRButton;
 
 	comboBox *	m_lfo1WaveBox;
 	TempoSyncKnob *	m_lfo1AttKnob;
