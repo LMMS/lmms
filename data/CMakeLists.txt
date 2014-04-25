@@ -4,6 +4,7 @@ ADD_SUBDIRECTORY(presets)
 ADD_SUBDIRECTORY(projects)
 ADD_SUBDIRECTORY(samples)
 ADD_SUBDIRECTORY(themes)
+ADD_SUBDIRECTORY(wavetables)
 
 IF(LMMS_BUILD_LINUX)
    INSTALL(FILES themes/default/icon.png DESTINATION "${DATA_DIR}/pixmaps" RENAME lmms.png)
