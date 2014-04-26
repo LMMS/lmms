@@ -22,18 +22,18 @@
  */
 
 
-#ifndef _MEMORY_HELPER_H_
-#define _MEMORY_HELPER_H_
+#ifndef MEMORY_HELPER_H
+#define MEMORY_HELPER_H
 
 /**
  * Helper class to alocate aligned memory and free it.
  */
 class MemoryHelper {
 public:
-  
-	static void* alignedMalloc(int);
 
-	static void alignedFree(void*);
+	static void* alignedMalloc( int );
+
+	static void alignedFree( void* );
 
 private:
 };
