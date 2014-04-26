@@ -101,17 +101,20 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 				sender->process();
 			}
 
-			// get the send level...
-			const float amt =
-				fxm->channelSendModel( senderIndex, m_channelIndex )->value();
-
-			// mix it's output with this one's output
-			sampleFrame * ch_buf = sender->m_buffer;
-			const float v = sender->m_volumeModel.value() * amt;
-			for( f_cnt_t f = 0; f < fpp; ++f )
+			if( sender->m_hasInput || sender->m_stillRunning )
 			{
-				_buf[f][0] += ch_buf[f][0] * v;
-				_buf[f][1] += ch_buf[f][1] * v;
+				// get the send level...
+				const float amt =
+					fxm->channelSendModel( senderIndex, m_channelIndex )->value();
+
+				// mix it's output with this one's output
+				sampleFrame * ch_buf = sender->m_buffer;
+				const float v = sender->m_volumeModel.value() * amt;
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					_buf[f][0] += ch_buf[f][0] * v;
+					_buf[f][1] += ch_buf[f][1] * v;
+				}
 			}
 			
 			// if sender channel hasInput, then we hasInput too
