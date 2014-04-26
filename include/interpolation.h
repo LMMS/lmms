@@ -81,7 +81,7 @@ inline float cosinusInterpolate( float v0, float v1, float x )
 {
 	const float f = ( 1.0f - cosf( x * F_PI ) ) * 0.5f;
 #ifdef FP_FAST_FMAF
-	return fmaf( x, v1-v0, v0 );
+	return fmaf( f, v1-v0, v0 );
 #else
 	return f * (v1-v0) + v0;
 #endif	

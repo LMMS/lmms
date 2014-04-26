@@ -693,6 +693,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 						m_lfo1_s = Oscillator::noiseSample( 0.0f );
 					}
 					m_lfo1_buf[f] = cosinusInterpolate( m_lfo1_last, m_lfo1_s, p );
+					if( t < m_parent->m_lfo1_att ) m_lfo1_buf[f] *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
 				}
 				m_lfo1_phase += static_cast<float>( _frames ) / lfo1_r;
 				break;
@@ -825,6 +826,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 						m_lfo2_s = Oscillator::noiseSample( 0.0f );
 					}
 					m_lfo2_buf[f] = cosinusInterpolate( m_lfo2_last, m_lfo2_s, p );
+					if( t < m_parent->m_lfo2_att ) m_lfo2_buf[f] *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
 				}
 				m_lfo2_phase += static_cast<float>( _frames ) / lfo2_r;
 				break;
