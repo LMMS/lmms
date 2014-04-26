@@ -36,6 +36,7 @@
 
 FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_fxChain( NULL ),
+	m_hasInput( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
@@ -112,13 +113,23 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 				_buf[f][0] += ch_buf[f][0] * v;
 				_buf[f][1] += ch_buf[f][1] * v;
 			}
+			
+			// if sender channel hasInput, then we hasInput too
+			if( sender->m_hasInput ) m_hasInput = true;
 		}
 	}
 
 	const float v = m_volumeModel.value();
 
-	m_fxChain.startRunning();
-	m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, true );
+	if( m_hasInput ) 
+	{
+		// only start fxchain when we have input...
+		m_fxChain.startRunning(); 
+	}
+	if( m_hasInput || m_stillRunning )
+	{
+		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, m_hasInput );
+	}
 	m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
 	m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
 }
@@ -420,6 +431,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
 		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, engine::mixer()->framesPerPeriod() );
+		m_fxChannels[_ch]->m_hasInput = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
 }
@@ -486,6 +498,8 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		engine::mixer()->clearAudioBuffer( m_fxChannels[i]->m_buffer, engine::mixer()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;
+		// also reset hasInput
+		m_fxChannels[i]->m_hasInput = false;
 	}
 }
 
