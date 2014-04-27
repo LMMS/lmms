@@ -599,6 +599,17 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			remove();
 		}
 	}
+	else if( _me->button() == Qt::MidButton )
+	{
+		if( _me->modifiers() & Qt::ControlModifier )
+		{
+			m_tco->toggleMute();
+		}
+		else if( fixedTCOs() == false )
+		{
+			remove();
+		}
+	}
 }
 
 
