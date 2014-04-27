@@ -266,30 +266,33 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	///////////////////////////
 
 
-	// declare variables for for loop
+	// declare working variables for for loop
+
+	// phase manipulation vars - these can be reused by all oscs
+	float leftph;
+	float rightph;
+	float coeff_l;
+	float coeff_r;
+	
 	// osc1 vars
 	float o1l_f;
 	float o1r_f;
-	float o1l_p;
-	float o1r_p;
+	float o1l_p = m_osc1l_phase + o1lpo; // we add phase offset here so we don't have to do it every frame
+	float o1r_p = m_osc1r_phase + o1rpo; // then substract it again after loop... 
 	float o1_pw;
 
 	// osc2 vars
 	float o2l_f;
 	float o2r_f;
-	float o2l_p;
-	float o2r_p;
+	float o2l_p = m_osc2l_phase + o2lpo;
+	float o2r_p = m_osc2r_phase + o2rpo;
 
 	// osc3 vars
 	float o3l_f;
 	float o3r_f;
-	float o3l_p;
-	float o3r_p;
+	float o3l_p = m_osc3l_phase + o3lpo;
+	float o3r_p = m_osc3r_phase + o3rpo;
 	float sub;
-
-	// phase delta calculation vars
-	float pd_l;
-	float pd_r;
 
 	// begin for loop
 	for( f_cnt_t f = 0; f < _frames; f++ )
@@ -316,23 +319,19 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatefreq( o1l_f, o1f )
 		modulatefreq( o1r_f, o1f )
 
-		// calc and modulate phase
-		o1l_p = m_osc1l_phase + o1lpo;
-		o1r_p = m_osc1r_phase + o1rpo;
-		modulatephs( o1l_p, o1p )
-		modulatephs( o1r_p, o1p )
-
 		// calc and modulate pulse
 		o1_pw = pw;
 		modulateabs( o1_pw, o1pw )
 
-		// bounds check for phase
-		if( o1l_p < 0 ) o1l_p -= floorf( o1l_p );
-		if( o1r_p < 0 ) o1r_p -= floorf( o1r_p );
+		// calc and modulate phase
+		leftph = o1l_p;
+		rightph = o1r_p;		
+		modulatephs( leftph, o1p )
+		modulatephs( rightph, o1p )
 
 		// pulse wave osc
-		sample_t O1L = ( fraction( o1l_p ) < o1_pw ) ? 1.0f : -1.0f;
-		sample_t O1R = ( fraction( o1r_p ) < o1_pw ) ? 1.0f : -1.0f;
+		sample_t O1L = ( absFraction( leftph ) < o1_pw ) ? 1.0f : -1.0f;
+		sample_t O1R = ( absFraction( rightph ) < o1_pw ) ? 1.0f : -1.0f;
 
 		// check for rise/fall, and sync if appropriate
 		// sync on rise
@@ -341,13 +340,13 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			// hard sync
 			if( o2sync )
 			{
-				if( O1L > m_osc1l_last ) m_osc2l_phase = 0.0f;
-				if( O1R > m_osc1r_last ) m_osc2r_phase = 0.0f;
+				if( O1L > m_osc1l_last ) o2l_p = o2lpo;
+				if( O1R > m_osc1r_last ) o2r_p = o2rpo;
 			}
 			if( o3sync )
 			{
-				if( O1L > m_osc1l_last ) m_osc3l_phase = 0.0f;
-				if( O1R > m_osc1r_last ) m_osc3r_phase = 0.0f;
+				if( O1L > m_osc1l_last ) o3l_p = o3lpo;
+				if( O1R > m_osc1r_last ) o3r_p = o3rpo;
 			}
 			// reverse sync
 			if( o2syncr )
@@ -367,13 +366,13 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			// hard sync
 			if( o2sync )
 			{
-				if( O1L < m_osc1l_last ) m_osc2l_phase = 0.0f;
-				if( O1R < m_osc1r_last ) m_osc2r_phase = 0.0f;
+				if( O1L < m_osc1l_last ) o2l_p = o2lpo;
+				if( O1R < m_osc1r_last ) o2r_p = o2rpo;
 			}
 			if( o3sync )
 			{
-				if( O1L < m_osc1l_last ) m_osc3l_phase = 0.0f;
-				if( O1R < m_osc1r_last ) m_osc3r_phase = 0.0f;
+				if( O1L < m_osc1l_last ) o3l_p = o3lpo;
+				if( O1R < m_osc1r_last ) o3r_p = o3rpo;
 			}
 			// reverse sync
 			if( o2syncr )
@@ -405,9 +404,9 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatevol( O1L, o1v )
 		modulatevol( O1R, o1v )
 
-		// update osc1 phases
-		m_osc1l_phase = fraction( m_osc1l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o1l_f ) );
-		m_osc1r_phase = fraction( m_osc1r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o1r_f ) );
+		// update osc1 phase working variable
+		o1l_p += 1.0f / ( static_cast<float>( m_samplerate ) / o1l_f );
+		o1r_p += 1.0f / ( static_cast<float>( m_samplerate ) / o1r_f );
 
 		/////////////////////////////
 		//				           //
@@ -422,24 +421,22 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		modulatefreq( o2r_f, o2f )
 
 		// calc and modulate phase
-		o2l_p = m_osc2l_phase + o2lpo;
-		o2r_p = m_osc2r_phase + o2rpo;
-		modulatephs( o2l_p, o2p )
-		modulatephs( o2r_p, o2p )
-
-		// bounds check for phase
-		if( o2l_p < 0 ) o2l_p -= floorf( o2l_p );
-		if( o2r_p < 0 ) o2r_p -= floorf( o2r_p );
+		leftph = o2l_p;
+		rightph = o2r_p;		
+		modulatephs( leftph, o2p )
+		modulatephs( rightph, o2p )
+		leftph = lowBoundCheck( leftph );
+		rightph = lowBoundCheck( rightph );
 
 		// phase delta
-		pd_l = qAbs( o2l_p - m_ph2l_last );
+		pd_l = qAbs( leftph - m_ph2l_last );
 		if( pd_l > 0.5 ) pd_l = 1.0 - pd_l;
-		pd_r = qAbs( o2r_p - m_ph2r_last );
+		pd_r = qAbs( rightph - m_ph2r_last );
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator
-		sample_t O2L = oscillate( o2w, o2l_p, BandLimitedWave::pdToLen( pd_l ) );
-		sample_t O2R = oscillate( o2w, o2r_p, BandLimitedWave::pdToLen( pd_r ) );
+		sample_t O2L = oscillate( o2w, leftph, BandLimitedWave::pdToLen( pd_l ) );
+		sample_t O2R = oscillate( o2w, rightph, BandLimitedWave::pdToLen( pd_r ) );
 
 		// modulate volume
 		O2L *= o2lv;
@@ -452,11 +449,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( m_invert2r ) O2R *= -1.0;
 
 		// update osc2 phases
-		m_ph2l_last = m_osc2l_phase;
-		m_ph2r_last = m_osc2r_phase;
-		m_osc2l_phase = fraction( m_osc2l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2l_f ) );
-		m_osc2r_phase = fraction( m_osc2r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o2r_f ) );
-
+		m_ph2l_last = leftph;
+		m_ph2r_last = rightph;
+		o2l_p += 1.0f / ( static_cast<float>( m_samplerate ) / o2l_f );
+		o2r_p += 1.0f / ( static_cast<float>( m_samplerate ) / o2r_f );
 
 		/////////////////////////////
 		//				           //
@@ -477,34 +473,33 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 
 		// calc and modulate phase
-		o3l_p = m_osc3l_phase + o3lpo;
-		o3r_p = m_osc3r_phase + o3rpo;
-		modulatephs( o3l_p, o3p )
-		modulatephs( o3r_p, o3p )
+		leftph = o3l_p;
+		rightph = o3r_p;		
+		modulatephs( leftph, o3p )
+		modulatephs( rightph, o3p )
+		
 		// o2 modulation?
 		if( omod == MOD_PM )
 		{
-			o3l_p = fraction( o3l_p + O2L/2 );
-			o3r_p = fraction( o3r_p + O2R/2 );
+			leftph += O2L/2;
+			rightph += O2R/2;
 		}
-
-		// bounds check for phase
-		if( o3l_p < 0 ) o3l_p -= floorf( o3l_p );
-		if( o3r_p < 0 ) o3r_p -= floorf( o3r_p );
+		leftph = lowBoundCheck( leftph );
+		rightph = lowBoundCheck( rightph );
 
 		// phase delta
-		pd_l = qAbs( o3l_p - m_ph3l_last );
+		pd_l = qAbs( leftph - m_ph3l_last );
 		if( pd_l > 0.5 ) pd_l = 1.0 - pd_l;
-		pd_r = qAbs( o3r_p - m_ph3r_last );
+		pd_r = qAbs( rightph - m_ph3r_last );
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator, sub-osc 1
-		sample_t O3AL = oscillate( o3w1, o3l_p, BandLimitedWave::pdToLen( pd_l ) );
-		sample_t O3AR = oscillate( o3w1, o3r_p, BandLimitedWave::pdToLen( pd_r ) );
+		sample_t O3AL = oscillate( o3w1, leftph, BandLimitedWave::pdToLen( pd_l ) );
+		sample_t O3AR = oscillate( o3w1, rightph, BandLimitedWave::pdToLen( pd_r ) );
 
 		// multi-wave DC Oscillator, sub-osc 2
-		sample_t O3BL = oscillate( o3w2, o3l_p, BandLimitedWave::pdToLen( pd_l ) );
-		sample_t O3BR = oscillate( o3w2, o3r_p, BandLimitedWave::pdToLen( pd_r ) );
+		sample_t O3BL = oscillate( o3w2, leftph, BandLimitedWave::pdToLen( pd_l ) );
+		sample_t O3BR = oscillate( o3w2, rightph, BandLimitedWave::pdToLen( pd_r ) );
 
 		// calc and modulate sub
 		sub = o3sub;
@@ -530,10 +525,10 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( m_invert3r ) O3R *= -1.0;
 
 		// update osc3 phases
-		m_ph3l_last = m_osc3l_phase;
-		m_ph3r_last = m_osc3r_phase;
-		m_osc3l_phase = fraction( m_osc3l_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f ) );
-		m_osc3r_phase = fraction( m_osc3r_phase + 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f ) );
+		m_ph3l_last = leftph;
+		m_ph3r_last = rightph;
+		o3l_p += 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f );
+		o3r_p += 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f );
 
 		// integrator - very simple filter
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
@@ -545,6 +540,15 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		m_l_last = L;
 		m_r_last = R;
 	}
+	
+	// update phases
+	m_osc1l_phase = absFraction( o1l_p - o1lpo );
+	m_osc1r_phase = absFraction( o1r_p - o1rpo );
+	m_osc2l_phase = absFraction( o2l_p - o2lpo );
+	m_osc2r_phase = absFraction( o2r_p - o2rpo );
+	m_osc3l_phase = absFraction( o3l_p - o3lpo );
+	m_osc3r_phase = absFraction( o3r_p - o3rpo );
+	
 }
 
 
@@ -1088,29 +1092,29 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateVolumes
 
-	connect( &m_osc1Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
-	connect( &m_osc1Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
-	connect( &m_osc2Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
-	connect( &m_osc2Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
-	connect( &m_osc3Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
-	connect( &m_osc3Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolumes() ) );
+	connect( &m_osc1Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ) );
+	connect( &m_osc1Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ) );
+	connect( &m_osc2Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ) );
+	connect( &m_osc2Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ) );
+	connect( &m_osc3Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ) );
+	connect( &m_osc3Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ) );
 
 // updateFreq
 
-	connect( &m_osc1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
-	connect( &m_osc2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
-	connect( &m_osc3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &m_osc1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
+	connect( &m_osc2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
+	connect( &m_osc3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
 
-	connect( &m_osc1Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
-	connect( &m_osc2Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &m_osc1Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
+	connect( &m_osc2Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
 
-	connect( &m_osc1Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
-	connect( &m_osc2Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq() ) );
+	connect( &m_osc1Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
+	connect( &m_osc2Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
 
 // updatePO
-	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO() ) );
-	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO() ) );
-	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO() ) );
+	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO1() ) );
+	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO2() ) );
+	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO3() ) );
 
 // updateEnvelope1
 
@@ -1140,9 +1144,15 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 	m_fpp = engine::mixer()->framesPerPeriod();
 
 	updateSamplerate();
-	updateVolumes();
-	updateFreq();
-	updatePO();
+	updateVolume1();
+	updateVolume2();
+	updateVolume3();
+	updateFreq1();
+	updateFreq2();
+	updateFreq3();
+	updatePO1();
+	updatePO2();
+	updatePO3();
 }
 
 
@@ -1431,46 +1441,71 @@ PluginView * MonstroInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void MonstroInstrument::updateVolumes()
+void MonstroInstrument::updateVolume1()
 {
 	m_osc1l_vol = leftCh( m_osc1Vol.value(), m_osc1Pan.value() );
 	m_osc1r_vol = rightCh( m_osc1Vol.value(), m_osc1Pan.value() );
+}
 
+
+void MonstroInstrument::updateVolume2()
+{
 	m_osc2l_vol = leftCh( m_osc2Vol.value(), m_osc2Pan.value() );
 	m_osc2r_vol = rightCh( m_osc2Vol.value(), m_osc2Pan.value() );
+}
 
+
+void MonstroInstrument::updateVolume3()
+{
 	m_osc3l_vol = leftCh( m_osc3Vol.value(), m_osc3Pan.value() );
 	m_osc3r_vol = rightCh( m_osc3Vol.value(), m_osc3Pan.value() );
 }
 
 
-void MonstroInstrument::updateFreq()
+void MonstroInstrument::updateFreq1()
 {
 	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc1Ftl.value() / 1200.0f );
 	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc1Ftr.value() / 1200.0f );
+}
 
+
+void MonstroInstrument::updateFreq2()
+{
 	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc2Ftl.value() / 1200.0f );
 	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
 					powf( 2.0f, m_osc2Ftr.value() / 1200.0f );
+}
 
+
+void MonstroInstrument::updateFreq3()
+{
 	m_osc3_freq = powf( 2.0f, m_osc3Crs.value() / 12.0f );
 }
 
 
-void MonstroInstrument::updatePO()
+void MonstroInstrument::updatePO1()
 {
-	m_osc1l_po = m_osc1Spo.value() / 720.0;
-	m_osc1r_po = ( m_osc1Spo.value() * -1.0 ) / 720.0;
-
-	m_osc2l_po = m_osc2Spo.value() / 720.0;
-	m_osc2r_po = ( m_osc2Spo.value() * -1.0 ) / 720.0;
-
-	m_osc3l_po = m_osc3Spo.value() / 720.0;
-	m_osc3r_po = ( m_osc3Spo.value() * -1.0 ) / 720.0;
+	m_osc1l_po = m_osc1Spo.value() / 720.0f;
+	m_osc1r_po = ( m_osc1Spo.value() * -1.0 ) / 720.0f;
 }
+
+
+void MonstroInstrument::updatePO2()
+{
+	m_osc2l_po = m_osc2Spo.value() / 720.0f;
+	m_osc2r_po = ( m_osc2Spo.value() * -1.0 ) / 720.0f;
+}
+
+
+void MonstroInstrument::updatePO3()
+{
+	m_osc3l_po = m_osc3Spo.value() / 720.0f;
+	m_osc3r_po = ( m_osc3Spo.value() * -1.0 ) / 720.0f;
+}
+
 
 void MonstroInstrument::updateEnvelope1()
 {

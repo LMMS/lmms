@@ -152,8 +152,14 @@ public:
 
 public slots:
 	void updateVolumes();
-	void updateFreq();
-	void updateWaves();
+	void updateFreqA1();
+	void updateFreqA2();
+	void updateFreqB1();
+	void updateFreqB2();
+	void updateWaveA1();
+	void updateWaveA2();
+	void updateWaveB1();
+	void updateWaveB2();
 
 protected:
 	float m_lvol [NUM_OSCS];
