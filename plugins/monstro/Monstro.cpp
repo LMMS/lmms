@@ -425,8 +425,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		rightph = o2r_p;		
 		modulatephs( leftph, o2p )
 		modulatephs( rightph, o2p )
-		leftph = lowBoundCheck( leftph );
-		rightph = lowBoundCheck( rightph );
+		leftph = absFraction( leftph );
+		rightph = absFraction( rightph );
 
 		// phase delta
 		pd_l = qAbs( leftph - m_ph2l_last );
@@ -484,8 +484,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			leftph += O2L/2;
 			rightph += O2R/2;
 		}
-		leftph = lowBoundCheck( leftph );
-		rightph = lowBoundCheck( rightph );
+		leftph = absFraction( leftph );
+		rightph = absFraction( rightph );
 
 		// phase delta
 		pd_l = qAbs( leftph - m_ph3l_last );
