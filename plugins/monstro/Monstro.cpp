@@ -271,8 +271,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// phase manipulation vars - these can be reused by all oscs
 	float leftph;
 	float rightph;
-	float coeff_l;
-	float coeff_r;
+	float pd_l;
+	float pd_r;
 	
 	// osc1 vars
 	float o1l_f;
