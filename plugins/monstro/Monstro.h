@@ -223,6 +223,13 @@ private:
 		return fastPow( _s, exp );
 	}
 
+	// checks for lower bound for phase, upper bound is already checked by oscillator-functions in both
+	// oscillator.h and bandlimitedwave.h so we save some cpu by only checking lower bound
+	inline float lowBoundCheck( float ph )
+	{
+		return ph < 0.0f ? ph - ( static_cast<int>( ph ) - 1.0f ) : ph;
+	}
+
 	inline sample_t oscillate( int _wave, const float _ph, float _wavelen )
 	{
 		switch( _wave )
@@ -349,9 +356,15 @@ public:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 public slots:
-	void updateVolumes();
-	void updateFreq();
-	void updatePO();
+	void updateVolume1();
+	void updateVolume2();
+	void updateVolume3();
+	void updateFreq1();
+	void updateFreq2();
+	void updateFreq3();
+	void updatePO1();
+	void updatePO2();
+	void updatePO3();
 	void updateEnvelope1();
 	void updateEnvelope2();
 	void updateLFOAtts();
