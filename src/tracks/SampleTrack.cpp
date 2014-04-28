@@ -231,6 +231,11 @@ void SampleTCOView::updateSample()
 
 void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	if( _cme->modifiers() )
+	{
+		return;
+	}
+
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
 	{

@@ -532,11 +532,6 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		}
 		return;
 	}
-	else if( _me->modifiers() & Qt::ShiftModifier )
-	{
-		// add/remove object to/from selection
-		selectableObject::mousePressEvent( _me );
-	}
 	else if( _me->button() == Qt::LeftButton &&
 			_me->modifiers() & Qt::ControlModifier )
 	{
@@ -592,6 +587,17 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		// setup text-float as if TCO was already moved/resized
 		mouseMoveEvent( _me );
 		s_textFloat->show();
+	}
+	else if( _me->button() == Qt::RightButton )
+	{
+		if( _me->modifiers() & Qt::ControlModifier )
+		{
+			m_tco->toggleMute();
+		}
+		else if( _me->modifiers() & Qt::ShiftModifier && fixedTCOs() == false )
+		{
+			remove();
+		}
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
@@ -771,6 +777,11 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
  */
 void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	if( _cme->modifiers() )
+	{
+		return;
+	}
+
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
 	{
