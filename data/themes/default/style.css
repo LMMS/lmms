@@ -545,24 +545,29 @@ AudioFileProcessorView knob {
 }
 
 organicInstrumentView knob {
-	color: rgb(205, 16, 216);
-	qproperty-outerColor: rgb(23, 9, 24);
-	/*qproperty-outerColor: rgb(64, 21, 67);*/
+	color: rgb(124, 207, 98);
+	qproperty-outerColor: rgb(13, 42, 4);
 	qproperty-innerRadius: 2;
-	qproperty-outerRadius: 8.7;
+	qproperty-outerRadius: 7.5;
 	qproperty-centerPointX: 10.5;
 	qproperty-centerPointY: 10.5;
-	qproperty-lineWidth: 2;
+	qproperty-lineWidth: 1.5;
 }
 
+organicInstrumentView knob#harmKnob {
+	color: rgb(205, 98, 216);
+	qproperty-outerColor: rgb(18, 4, 18);
+}
 
 organicInstrumentView knob#fx1Knob,
 organicInstrumentView knob#volKnob {
+	color: rgb(157, 157, 157);
+	qproperty-outerColor: rgb(37, 37, 37);
 	qproperty-innerRadius: 4;
-	qproperty-outerRadius: 11.2;
+	qproperty-outerRadius: 10.0;
 	qproperty-centerPointX: 18.5;
 	qproperty-centerPointY: 13.8;
-	qproperty-lineWidth: 3;
+	qproperty-lineWidth: 2;
 }
 
 sf2InstrumentView knob {
