@@ -871,6 +871,8 @@ void song::createNewProjectFromTemplate( const QString & _template )
 // load given song
 void song::loadProject( const QString & _file_name )
 {
+	QDomNode node;
+
 	m_loadingProject = true;
 
 	clearProject();
@@ -912,7 +914,19 @@ void song::loadProject( const QString & _file_name )
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
-	QDomNode node = dataFile.content().firstChild();
+	// Load mixer first to be able to set the correct range for FX channels
+	node = dataFile.content().firstChildElement( engine::fxMixer()->nodeName() );
+	if( !node.isNull() )
+	{
+		engine::fxMixer()->restoreState( node.toElement() );
+		if( engine::hasGUI() )
+		{
+			// refresh FxMixerView
+			engine::fxMixerView()->refreshDisplay();
+		}
+	}
+
+	node = dataFile.content().firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -924,15 +938,6 @@ void song::loadProject( const QString & _file_name )
 			else if( node.nodeName() == "controllers" )
 			{
 				restoreControllerStates( node.toElement() );
-			}
-			else if( node.nodeName() == engine::fxMixer()->nodeName() )
-			{
-				engine::fxMixer()->restoreState( node.toElement() );
-				if( engine::hasGUI() )
-				{
-					// refresh FxMixerView
-					engine::fxMixerView()->refreshDisplay();
-				}
 			}
 			else if( engine::hasGUI() )
 			{
