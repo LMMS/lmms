@@ -69,6 +69,8 @@ const QString WAVEFORM_NAMES[6] = {
 	"Moog saw wave",
 	"Exponential wave"
 	};
+	
+const float CENT = 1.0f / 1200.0f;
 
 class OscillatorObject : public Model
 {

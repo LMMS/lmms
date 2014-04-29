@@ -171,7 +171,7 @@ void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_osc[i]->m_panModel.saveSettings( _doc, _this, "pan" + is );
 		m_osc[i]->m_harmModel.saveSettings( _doc, _this, "newharmonic" + is );
 
-		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "detune"
+		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "newdetune"
 									+ is );
 		m_osc[i]->m_oscModel.saveSettings( _doc, _this, "wavetype"
 									+ is );
@@ -190,7 +190,14 @@ void organicInstrument::loadSettings( const QDomElement & _this )
 	{
 		QString is = QString::number( i );
 		m_osc[i]->m_volModel.loadSettings( _this, "vol" + is );
-		m_osc[i]->m_detuneModel.loadSettings( _this, "detune" + is );
+		if( _this.hasAttribute( "detune" + is ) )
+		{
+			m_osc[i]->m_detuneModel.setValue( _this.attribute( "detune" ).toInt() * 12 );			
+		}
+		else
+		{
+			m_osc[i]->m_detuneModel.loadSettings( _this, "newdetune" + is );
+		}
 		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
 		m_osc[i]->m_oscModel.loadSettings( _this, "wavetype" + is );
 		
@@ -410,7 +417,8 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent ),
+	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
 
@@ -426,6 +434,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob->setFixedSize( 37, 47 );
 	m_fx1Knob->setHintText( tr( "Distortion:" ) + " ", QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
+	m_fx1Knob->setWhatsThis( tr( "The distortion knob adds distortion to the output of the instrument. " ) );
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
@@ -434,6 +443,8 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volKnob->setObjectName( "volKnob" );
+	m_volKnob->setWhatsThis( tr( "The volume knob controls the volume of the output of the instrument. "
+									"It is cumulative with the instrument window's volume control. " ) );
 
 	// randomise
 	m_randBtn = new pixmapButton( this, tr( "Randomise" ) );
@@ -442,7 +453,9 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							"randomise_pressed" ) );
 	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
-
+	m_randBtn->setWhatsThis( tr( "The randomize button randomizes all knobs except the harmonics,"
+									"main volume and distortion knobs. ") );
+	
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );
 
@@ -515,11 +528,10 @@ void organicInstrumentView::modelChanged()
 		panKnob->setHintText( tr("Osc %1 panning:").arg(
 							i + 1 ) + " ", "" );
 							
-		// setup knob for left fine-detuning
+		// setup knob for fine-detuning
 		knob * detuneKnob = new organicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
-		detuneKnob->setHintText( tr( "Osc %1 fine detuning "
-							"left:" ).arg( i + 1 )
+		detuneKnob->setHintText( tr( "Osc %1 stereo detuning" ).arg( i + 1 )
 							+ " ", " " +
 							tr( "cents" ) );
 
@@ -565,7 +577,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 			this, tr( "Osc %1 volume" ).arg( _index + 1 ) ),
 	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
 			this, tr( "Osc %1 panning" ).arg( _index + 1 ) ),
-	m_detuneModel( 0.0f, -100.0f, 100.0f, 1.0f, 
+	m_detuneModel( 0.0f, -1200.0f, 1200.0f, 1.0f, 
 			this, tr( "Osc %1 fine detuning left" ).arg( _index + 1 ) )
 {
 }
@@ -614,10 +626,10 @@ void OscillatorObject::updateVolume()
 void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
-				+ (float)m_detuneModel.value() / 100.0f ) /
+				+ (float)m_detuneModel.value() * CENT ) /
 				engine::mixer()->processingSampleRate();
 	m_detuningRight = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
-				- (float)m_detuneModel.value() / 100.0f ) /
+				- (float)m_detuneModel.value() * CENT ) /
 				engine::mixer()->processingSampleRate();
 }
 
