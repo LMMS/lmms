@@ -69,7 +69,7 @@ find . -type f -print0 | xargs -0 chmod u+w
 # Move lmms binary to the proper location
 mkdir -p $APP/Contents/MacOS
 mv $APP/Contents/bin/lmms $APP/Contents/MacOS
-rmdir $APP/Contents/bin
+rm -rf $APP/Contents/bin
 
 # Move libraries to proper locations
 mkdir -p $APP/Contents/Frameworks
