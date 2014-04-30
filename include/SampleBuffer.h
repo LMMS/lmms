@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef _SAMPLE_BUFFER_H
-#define _SAMPLE_BUFFER_H
+#ifndef SAMPLE_BUFFER_H
+#define SAMPLE_BUFFER_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
@@ -99,29 +98,18 @@ public:
 		return m_audioFile;
 	}
 
-	inline f_cnt_t startFrame() const
+	f_cnt_t startFrame() const
 	{
 		return m_startFrame;
 	}
 
-	inline f_cnt_t endFrame() const
+	f_cnt_t endFrame() const
 	{
 		return m_endFrame;
 	}
 
-	void setLoopStartFrame( f_cnt_t _start )
-	{
-		m_varLock.lock();
-		m_loopStartFrame = _start;
-		m_varLock.unlock();
-	}
-
-	void setLoopEndFrame( f_cnt_t _end )
-	{
-		m_varLock.lock();
-		m_loopEndFrame = _end;
-		m_varLock.unlock();
-	}
+	void setLoopStartFrame( f_cnt_t start );
+	void setLoopEndFrame( f_cnt_t end );
 
 	inline f_cnt_t frames() const
 	{
@@ -223,13 +211,16 @@ public:
 public slots:
 	void setAudioFile( const QString & _audio_file );
 	void loadFromBase64( const QString & _data );
-	void setStartFrame( const f_cnt_t _s );
-	void setEndFrame( const f_cnt_t _e );
+	void setStartFrame( f_cnt_t start );
+	void setEndFrame( f_cnt_t end );
 	void setAmplification( float _a );
 	void setReversed( bool _on );
 
 
 private:
+	/*! Ensures that all settings are sane like end frame > start frame etc. */
+	void sanitizeSettings();
+
 	void update( bool _keep_settings = false );
 
     void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
@@ -272,6 +263,5 @@ signals:
 	void sampleUpdated();
 
 } ;
-
 
 #endif
