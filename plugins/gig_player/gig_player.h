@@ -65,6 +65,19 @@ public:
 
 
 
+struct Dimension
+{
+	Dimension()
+	{
+		for( int i = 0; i < 8; ++i)
+			DimValues[i] = 0;
+	}
+
+	uint DimValues[8];
+};
+
+
+
 class gigNote
 {
 public:
@@ -166,6 +179,7 @@ public:
 public slots:
 	void openFile( const QString & _gigFile, bool updateTrackName = true );
 	void updatePatch();
+	void updateSampleRate();
 
 
 private:
@@ -176,11 +190,10 @@ private:
 	SRC_STATE * m_srcState;
 
 	gigInstance* m_instance;
+	gig::Instrument* m_instrument;
+	uint32_t m_RandomSeed;
 
 	QString m_filename;
-
-	// Protect the array of active notes
-	QMutex m_notesRunningMutex;
 
 	// Protect synth when we are re-creating it.
 	QMutex m_synthMutex;
@@ -198,6 +211,10 @@ private:
 
 private:
 	void freeInstance();
+	void getInstrument();
+	gigNote sampleToNote( gig::Sample* pSample, int midiNote );
+	Dimension getDimensions( gig::Region* pRegion, int velocity, bool release );
+	gigNote convertSampleRate( gigNote& old, int oldRate, int newRate );
 
 	friend class gigInstrumentView;
 
