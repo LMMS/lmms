@@ -555,7 +555,7 @@ void PADnoteParameters::applyparameters(bool lockmutex)
 {
     const int samplesize   = (((int) 1) << (Pquality.samplesize + 14));
     int      spectrumsize = samplesize / 2;
-    REALTYPE spectrum[spectrumsize];
+    REALTYPE *spectrum = new REALTYPE[spectrumsize];
     int      profilesize  = 512;
     REALTYPE profile[profilesize];
 
@@ -652,6 +652,8 @@ void PADnoteParameters::applyparameters(bool lockmutex)
     }
     delete (fft);
     deleteFFTFREQS(&fftfreqs);
+
+	delete[] spectrum;
 
     //delete the additional samples that might exists and are not useful
     if(lockmutex) {
