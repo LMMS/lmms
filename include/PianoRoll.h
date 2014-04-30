@@ -53,6 +53,9 @@ class PianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
+	/*! \brief Resets settings to default when e.g. creating a new project */
+	void reset();
+
 	void setCurrentPattern( pattern * _new_pattern );
 
 	inline void stopRecording()

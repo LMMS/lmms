@@ -641,6 +641,15 @@ PianoRoll::PianoRoll() :
 }
 
 
+
+void PianoRoll::reset()
+{
+	m_lastNoteVolume = DefaultVolume;
+	m_lastNotePanning = DefaultPanning;
+}
+
+
+
 void PianoRoll::changeNoteEditMode( int i )
 {
 	m_noteEditMode = (noteEditMode) i;

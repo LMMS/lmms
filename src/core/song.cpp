@@ -749,6 +749,11 @@ void song::clearProject()
 		engine::automationEditor()->setCurrentPattern( NULL );
 	}
 
+	if( engine::pianoRoll() )
+	{
+		engine::pianoRoll()->reset();
+	}
+
 	m_tempoModel.reset();
 	m_masterVolumeModel.reset();
 	m_masterPitchModel.reset();
