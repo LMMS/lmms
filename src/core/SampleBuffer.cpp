@@ -752,14 +752,14 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 {
 	if( _looped )
 	{
-		if( _start + _frames <= m_loopEndFrame )
+		if( _start + _frames <= m_loopEndFrame || m_loopStartFrame >= m_loopEndFrame )
 		{
 			return m_data + _start;
 		}
 	}
 	else
 	{
-		if( _start + _frames <= m_endFrame )
+		if( _start + _frames <= m_endFrame || m_startFrame >= m_endFrame )
 		{
 			return m_data + _start;
 		}
