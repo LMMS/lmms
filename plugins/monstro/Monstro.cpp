@@ -105,6 +105,12 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_invert3r = false;
 	
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
+	
+	m_counter2l = 0;
+	m_counter2r = 0;
+	m_counter3l = 0;
+	m_counter3r = 0;
+	m_counterMax = ( m_samplerate * 10 ) / 44100;
 }
 
 
@@ -275,6 +281,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float rightph;
 	float pd_l;
 	float pd_r;
+	float len_l;
+	float len_r;
 	
 	// osc1 vars
 	float o1l_f;
@@ -342,24 +350,24 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			// hard sync
 			if( o2sync )
 			{
-				if( O1L > m_osc1l_last ) o2l_p = o2lpo;
-				if( O1R > m_osc1r_last ) o2r_p = o2rpo;
+				if( O1L > m_osc1l_last ) { o2l_p = o2lpo; m_counter2l = m_counterMax; }
+				if( O1R > m_osc1r_last ) { o2r_p = o2rpo; m_counter2r = m_counterMax; }
 			}
 			if( o3sync )
 			{
-				if( O1L > m_osc1l_last ) o3l_p = o3lpo;
-				if( O1R > m_osc1r_last ) o3r_p = o3rpo;
+				if( O1L > m_osc1l_last ) { o3l_p = o3lpo; m_counter3l = m_counterMax; }
+				if( O1R > m_osc1r_last ) { o3r_p = o3rpo; m_counter3r = m_counterMax; }
 			}
 			// reverse sync
 			if( o2syncr )
 			{
-				if( O1L > m_osc1l_last ) m_invert2l = !m_invert2l;
-				if( O1R > m_osc1r_last ) m_invert2r = !m_invert2r;
+				if( O1L > m_osc1l_last ) { m_invert2l = !m_invert2l; m_counter2l = m_counterMax; }
+				if( O1R > m_osc1r_last ) { m_invert2r = !m_invert2r; m_counter2r = m_counterMax; }
 			}
 			if( o3syncr )
 			{
-				if( O1L > m_osc1l_last ) m_invert3l = !m_invert3l;
-				if( O1R > m_osc1r_last ) m_invert3r = !m_invert3r;
+				if( O1L > m_osc1l_last ) { m_invert3l = !m_invert3l; m_counter3l = m_counterMax; }
+				if( O1R > m_osc1r_last ) { m_invert3r = !m_invert3r; m_counter3r = m_counterMax; }
 			}
 		}
 		// sync on fall
@@ -368,24 +376,24 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			// hard sync
 			if( o2sync )
 			{
-				if( O1L < m_osc1l_last ) o2l_p = o2lpo;
-				if( O1R < m_osc1r_last ) o2r_p = o2rpo;
+				if( O1L < m_osc1l_last ) { o2l_p = o2lpo; m_counter2l = m_counterMax; }
+				if( O1R < m_osc1r_last ) { o2r_p = o2rpo; m_counter2r = m_counterMax; }
 			}
 			if( o3sync )
 			{
-				if( O1L < m_osc1l_last ) o3l_p = o3lpo;
-				if( O1R < m_osc1r_last ) o3r_p = o3rpo;
+				if( O1L < m_osc1l_last ) { o3l_p = o3lpo; m_counter3l = m_counterMax; }
+				if( O1R < m_osc1r_last ) { o3r_p = o3rpo; m_counter3r = m_counterMax; }
 			}
 			// reverse sync
 			if( o2syncr )
 			{
-				if( O1L < m_osc1l_last ) m_invert2l = !m_invert2l;
-				if( O1R < m_osc1r_last ) m_invert2r = !m_invert2r;
+				if( O1L < m_osc1l_last ) { m_invert2l = !m_invert2l; m_counter2l = m_counterMax; }
+				if( O1R < m_osc1r_last ) { m_invert2r = !m_invert2r; m_counter2r = m_counterMax; }
 			}
 			if( o3syncr )
 			{
-				if( O1L < m_osc1l_last ) m_invert3l = !m_invert3l;
-				if( O1R < m_osc1r_last ) m_invert3r = !m_invert3r;
+				if( O1L < m_osc1l_last ) { m_invert3l = !m_invert3l; m_counter3l = m_counterMax; }
+				if( O1R < m_osc1r_last ) { m_invert3r = !m_invert3r; m_counter3r = m_counterMax; }
 			}			
 		}
 
@@ -437,8 +445,12 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator
-		sample_t O2L = oscillate( o2w, leftph, BandLimitedWave::pdToLen( pd_l ) );
-		sample_t O2R = oscillate( o2w, rightph, BandLimitedWave::pdToLen( pd_r ) );
+		len_l = BandLimitedWave::pdToLen( pd_l );
+		len_r = BandLimitedWave::pdToLen( pd_r );
+		if( m_counter2l > 0 ) { len_l /= m_counter2l; m_counter2l--; }
+		if( m_counter2r > 0 ) { len_r /= m_counter2r; m_counter2r--; }
+		sample_t O2L = oscillate( o2w, leftph, len_l );
+		sample_t O2R = oscillate( o2w, rightph, len_r );
 
 		// modulate volume
 		O2L *= o2lv;
@@ -495,13 +507,18 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		pd_r = qAbs( rightph - m_ph3r_last );
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
-		// multi-wave DC Oscillator, sub-osc 1
-		sample_t O3AL = oscillate( o3w1, leftph, BandLimitedWave::pdToLen( pd_l ) );
-		sample_t O3AR = oscillate( o3w1, rightph, BandLimitedWave::pdToLen( pd_r ) );
+		// multi-wave DC Oscillator
+		len_l = BandLimitedWave::pdToLen( pd_l );
+		len_r = BandLimitedWave::pdToLen( pd_r );
+		if( m_counter3l > 0 ) { len_l /= m_counter3l; m_counter3l--; }
+		if( m_counter3r > 0 ) { len_r /= m_counter3r; m_counter3r--; }
+		//  sub-osc 1
+		sample_t O3AL = oscillate( o3w1, leftph, len_l );
+		sample_t O3AR = oscillate( o3w1, rightph, len_r );
 
 		// multi-wave DC Oscillator, sub-osc 2
-		sample_t O3BL = oscillate( o3w2, leftph, BandLimitedWave::pdToLen( pd_l ) );
-		sample_t O3BR = oscillate( o3w2, rightph, BandLimitedWave::pdToLen( pd_r ) );
+		sample_t O3BL = oscillate( o3w2, leftph, len_l );
+		sample_t O3BR = oscillate( o3w2, rightph, len_r );
 
 		// calc and modulate sub
 		sub = o3sub;
