@@ -103,6 +103,8 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_invert2r = false;
 	m_invert3l = false;
 	m_invert3r = false;
+	
+	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 }
 
 
@@ -534,8 +536,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		_buf[f][0] = linearInterpolate( L, m_l_last, INTEGRATOR );
-		_buf[f][1] = linearInterpolate( R, m_r_last, INTEGRATOR );
+		_buf[f][0] = linearInterpolate( L, m_l_last, m_integrator );
+		_buf[f][1] = linearInterpolate( R, m_r_last, m_integrator );
 
 		m_l_last = L;
 		m_r_last = R;
