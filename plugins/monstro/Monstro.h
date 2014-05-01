@@ -334,6 +334,12 @@ private:
 	bool m_invert3r;
 	
 	float m_integrator;
+	
+	int m_counter2l;
+	int m_counter2r;
+	int m_counter3l;
+	int m_counter3r;
+	int m_counterMax;
 };
 
 class MonstroInstrument : public Instrument
