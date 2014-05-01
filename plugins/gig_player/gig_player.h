@@ -67,13 +67,15 @@ public:
 
 struct Dimension
 {
-	Dimension()
+	Dimension() :
+		release( false )
 	{
 		for( int i = 0; i < 8; ++i)
 			DimValues[i] = 0;
 	}
 
 	uint DimValues[8];
+	bool release;
 };
 
 
@@ -81,52 +83,22 @@ struct Dimension
 class gigNote
 {
 public:
-	gigNote() :
-		position( 0 ),
-		midiNote( -1 ),
-		note( NULL ),
-		size( 0 )
-	{
-	}
+	gigNote();
+	gigNote(int size, bool release );
+	gigNote( const gigNote& g );
+	~gigNote();
 
-	gigNote(int size) :
-		position( 0 ),
-		midiNote( -1 ),
-		size( size )
-	{
-		note = new sampleFrame[size];
+	// Move constructor
+	gigNote( gigNote&& g );
 
-		// Initialize to no sound
-		for (int i = 0; i < size; ++i)
-		{
-			note[i][0] = float();
-			note[i][1] = float();
-		}
-	}
-
-	gigNote( const gigNote& g ) :
-		position( g.position ),
-		midiNote( g.midiNote ),
-		note( NULL ),
-		size( g.size )
-	{
-		if (size > 0)
-		{
-			note = new sampleFrame[size];
-			std::copy(&g.note[0], &g.note[size], &note[0]);
-		}
-	}
-
-	~gigNote()
-	{
-		if (note)
-			delete[] note;
-	}
+	// Move assignment
+	gigNote& operator=( gigNote&& g );
 
 	int position;
 	int midiNote;
 	sampleFrame* note;
 	int size; // Don't try changing this...
+	bool release; // Whether to trigger a release sample on key up
 };
 
 
@@ -212,9 +184,10 @@ private:
 private:
 	void freeInstance();
 	void getInstrument();
-	gigNote sampleToNote( gig::Sample* pSample, int midiNote );
+	gigNote sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release );
 	Dimension getDimensions( gig::Region* pRegion, int velocity, bool release );
 	gigNote convertSampleRate( gigNote& old, int oldRate, int newRate );
+	void addNotes( int midiNote, int velocity, bool release ); // Locks m_synthMutex internally
 
 	friend class gigInstrumentView;
 

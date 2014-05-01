@@ -349,38 +349,9 @@ void gigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 			if( !m_instrument )
 				getInstrument();
 
-			// Find the sample we want to play (based on velocity, etc.)
-			if( m_instrument )
-			{
-				gig::Region* pRegion = m_instrument->GetFirstRegion();
-
-				while( pRegion )
-				{
-					const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
-					const uint velocity = _n->midiVelocity( baseVelocity );
-
-					Dimension dim = getDimensions( pRegion, velocity, false );
-					gig::DimensionRegion* pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
-					gig::Sample* pSample = pDimRegion->pSample;
-
-					if( pSample )
-					{
-						int keyLow = pRegion->KeyRange.low;
-						int keyHigh = pRegion->KeyRange.high;
-
-						if( midiNote >= keyLow && midiNote <= keyHigh )
-						{
-							gigNote note = sampleToNote(pSample, midiNote);
-
-							m_synthMutex.lock();
-							m_notes.push_back(note);
-							m_synthMutex.unlock();
-						}
-					}
-
-					pRegion = m_instrument->GetNextRegion();
-				}
-			}
+			const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
+			const uint velocity = _n->midiVelocity( baseVelocity );
+			addNotes( midiNote, velocity, false );
 		}
 	}
 }
@@ -403,62 +374,18 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 
 	m_synthMutex.lock();
 
-	/*const int currentMidiPitch = instrumentTrack()->midiPitch();
-	if( m_lastMidiPitch != currentMidiPitch )
-		m_lastMidiPitch = currentMidiPitch;
-	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
-	if( m_lastMidiPitchRange != currentMidiPitchRange )
-		m_lastMidiPitchRange = currentMidiPitchRange;*/
-
-	/*if( m_internalSampleRate < engine::mixer()->processingSampleRate() &&
-							m_srcState != NULL )
+	for( int i = 0; i < frames; ++i )
 	{
-		const fpp_t frames = engine::mixer()->framesPerPeriod();
-		const fpp_t f = frames * m_internalSampleRate / engine::mixer()->processingSampleRate();
-#ifdef __GNUC__
-		sampleFrame tmp[f];
-#else
-		sampleFrame * tmp = new sampleFrame[f];
-#endif
-
-		qDebug() << "Warning: playing at different sample rate";
-
-        // TODO: get sample, interleave left/right channels
-		SRC_DATA src_data;
-		src_data.data_in = tmp[0];
-		src_data.data_out = _working_buffer[0];
-		src_data.input_frames = f;
-		src_data.output_frames = frames;
-		src_data.src_ratio = (double) frames / f;
-		src_data.end_of_input = 0;
-		int error = src_process( m_srcState, &src_data );
-#ifndef __GNUC__
-		delete[] tmp;
-#endif
-		if( error )
+		for( std::list<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 		{
-			qCritical( "gigInstrument: error while resampling: %s", src_strerror( error ) );
-		}
-		if( src_data.output_frames_gen > frames )
-		{
-			qCritical( "gigInstrument: not enough frames: %ld / %d", src_data.output_frames_gen, frames );
-		}
-	}
-	else
-	{*/
-		for( int i = 0; i < frames; ++i )
-		{
-			for( std::list<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+			if( note->position < note->size && note->size > 0 )
 			{
-				if( note->position < note->size && note->size > 0 )
-				{
-					_working_buffer[i][0] += note->note[note->position][0]*m_gain.value();
-					_working_buffer[i][1] += note->note[note->position][1]*m_gain.value();
-					++note->position;
-				}
+				_working_buffer[i][0] += note->note[note->position][0]*m_gain.value();
+				_working_buffer[i][1] += note->note[note->position][1]*m_gain.value();
+				++note->position;
 			}
 		}
-	//}
+	}
 
 	m_synthMutex.unlock();
 
@@ -494,15 +421,17 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 	}
 	while( deleted );
 
-	// TODO: instead of fading out, use getDimensions(region, velocity, release = true)
-	// to see if we should create a new "note" for the release of the note, e.g.
-	// the piano releasing a key sound
+	// Is the note supposed to have a release sample played?
+	bool noteRelease = false;
 
 	// Fade out the note we want to end
+	// TODO: implement proper ADSR from GIG specs
 	for( std::list<gigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
 	{
 		if( i->midiNote == pluginData->midiNote )
 		{
+			noteRelease = i->release;
+
 			float fadeOut = 0.5; // Seconds
 			int len = std::min( int( floor( fadeOut * engine::mixer()->processingSampleRate() ) ),
 					i->size-i->position );
@@ -526,6 +455,14 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 	}
 
 	m_synthMutex.unlock();
+
+	if (noteRelease)
+	{
+		// Add the release notes if available
+		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
+		const uint velocity = _n->midiVelocity( baseVelocity );
+		addNotes( pluginData->midiNote , velocity, true );
+	}
 
 	delete pluginData;
 }
@@ -561,6 +498,7 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 				break;
 			case gig::dimension_releasetrigger:
 				//VoiceType = (ReleaseTriggerVoice) ? Voice::type_release_trigger : (!iLayer) ? Voice::type_release_trigger_required : Voice::type_normal;
+				dim.release = true;
 				dim.DimValues[i] = (uint) release;
 				break;
 			case gig::dimension_keyboard:
@@ -603,13 +541,12 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 			case gig::dimension_effect3depth:
 			case gig::dimension_effect4depth:
 			case gig::dimension_effect5depth:
-				dim.DimValues[i] = 0;
-				break;
 			case gig::dimension_none:
-				qDebug() << "Error: dimension=none";
+				dim.DimValues[i] = 0;
 				break;
 			default:
 				qDebug() << "Error: Unknown dimension";
+				dim.DimValues[i] = 0;
 		}
 	}
 
@@ -619,13 +556,13 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 
 
 
-gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote )
+gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release )
 {
 	if( !pSample )
 		return gigNote();
 
 	gig::buffer_t buf = pSample->LoadSampleData();
-	gigNote note( pSample->SamplesTotal );
+	gigNote note( pSample->SamplesTotal, release );
 	note.midiNote = midiNote;
 
 	// 24 Bit
@@ -651,12 +588,12 @@ gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote )
 		{
 			for( int i = 0; i < pSample->SamplesTotal/pSample->Channels; ++i )
 			{
-				note.note[i][0] = 1.0/0x10000*pInt[pSample->Channels*i];
+				note.note[i][0] = 1.0/0x10000*pInt[pSample->Channels*i] * attenuation;
 
 				if( pSample->Channels == 1 )
 					note.note[i][1] = note.note[i][0];
 				else
-					note.note[i][1] = 1.0/0x10000*pInt[pSample->Channels*i+1];
+					note.note[i][1] = 1.0/0x10000*pInt[pSample->Channels*i+1] * attenuation;
 			}
 		}
 		else
@@ -715,7 +652,7 @@ void gigInstrument::getInstrument()
 
 gigNote gigInstrument::convertSampleRate( gigNote& old, int oldRate, int newRate )
 {
-	gigNote note( ceil( (double)old.size*newRate/oldRate ) );
+	gigNote note( ceil( (double)old.size*newRate/oldRate ), old.release );
 	note.midiNote = old.midiNote;
 
 	SRC_DATA src_data;
@@ -757,6 +694,50 @@ void gigInstrument::updateSampleRate()
 		qCritical( "error while creating libsamplerate data structure in gigInstrument::updateSampleRate()" );
 
 	m_synthMutex.unlock();
+}
+
+
+
+// Find the sample we want to play (based on velocity, etc.)
+void gigInstrument::addNotes( int midiNote, int velocity, bool release )
+{
+	if( m_instrument )
+	{
+		gig::Region* pRegion = m_instrument->GetFirstRegion();
+
+		while( pRegion )
+		{
+			Dimension dim = getDimensions( pRegion, velocity, release );
+			gig::DimensionRegion* pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
+			gig::Sample* pSample = pDimRegion->pSample;
+
+			if( pSample && pDimRegion->pSample->SamplesTotal != 0 )
+			{
+				int keyLow = pRegion->KeyRange.low;
+				int keyHigh = pRegion->KeyRange.high;
+
+				if( midiNote >= keyLow && midiNote <= keyHigh )
+				{
+					float attenuation;
+					float length = (double) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
+
+					if (release)
+						attenuation = 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
+					else
+						attenuation = pDimRegion->SampleAttenuation;
+
+					gigNote note = sampleToNote( pSample, midiNote,
+							attenuation, dim.release );
+
+					m_synthMutex.lock();
+					m_notes.push_back(note);
+					m_synthMutex.unlock();
+				}
+			}
+
+			pRegion = m_instrument->GetNextRegion();
+		}
+	}
 }
 
 
@@ -959,6 +940,81 @@ void gigInstrumentView::showPatchDialog()
 	pd.exec();
 }
 
+
+
+gigNote::gigNote() :
+		position( 0 ),
+		midiNote( -1 ),
+		note( NULL ),
+		size( 0 ),
+		release( false )
+{
+}
+
+gigNote::gigNote(int size, bool release ) :
+	position( 0 ),
+	midiNote( -1 ),
+	size( size ),
+	release( release )
+{
+	note = new sampleFrame[size];
+
+	// Initialize to no sound
+	for (int i = 0; i < size; ++i)
+	{
+		note[i][0] = float();
+		note[i][1] = float();
+	}
+}
+
+gigNote::gigNote( const gigNote& g ) :
+	position( g.position ),
+	midiNote( g.midiNote ),
+	note( NULL ),
+	size( g.size ),
+	release( g.release )
+{
+	if (size > 0)
+	{
+		note = new sampleFrame[size];
+		std::copy(&g.note[0], &g.note[size], &note[0]);
+	}
+}
+
+// Move constructor
+gigNote::gigNote( gigNote&& g ) :
+	position( g.position ),
+	midiNote( g.midiNote ),
+	note( NULL ),
+	size( 0 ),
+	release( g.release )
+{
+	*this = std::move( g );
+}
+
+// Move assignment
+gigNote& gigNote::operator=( gigNote&& g )
+{
+	if( this != &g )
+	{
+		if( note )
+			delete[] note;
+
+		size = g.size;
+		note = g.note;
+
+		g.size = 0;
+		g.note = NULL;
+	}
+
+	return *this;
+}
+
+gigNote::~gigNote()
+{
+	if (note)
+		delete[] note;
+}
 
 
 extern "C"
