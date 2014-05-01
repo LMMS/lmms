@@ -29,9 +29,9 @@
 #include <stdint.h>
 #include "lmms_constants.h"
 
-#ifdef __INTEL_COMPILER
-
 #include <math.h>
+
+#ifdef __INTEL_COMPILER
 
 static inline float absFraction( const float _x )
 {

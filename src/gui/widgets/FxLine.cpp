@@ -29,6 +29,7 @@
 #include <QtGui/QInputDialog>
 #include <QtGui/QPainter>
 #include <QtGui/QLineEdit>
+#include <QtGui/QWhatsThis>
 
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -36,6 +37,8 @@
 #include "engine.h"
 #include "SendButtonIndicator.h"
 #include "gui_templates.h"
+#include "caption_menu.h"
+
 
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	QWidget( _parent ),
@@ -61,7 +64,22 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->move( 4, 58 );
 	m_lcd->setMarginWidth( 1 );
+	
+	setWhatsThis( tr(
+	"The FX channel receives input from one or more instrument tracks.\n "
+	"It in turn can be routed to multiple other FX channels. LMMS automatically "
+	"takes care of preventing infinite loops for you and doesn't allow making "
+	"a connection that would result in an infinite loop.\n\n"
+	
+	"In order to route the channel to another channel, select the FX channel "
+	"and click on the \"send\" button on the channel you want to send to. "
+	"The knob under the send button controls the level of signal that is sent "
+	"to the channel.\n\n"
+	
+	"You can remove and move FX channels in the context menu, which is accessed "
+	"by right-clicking the FX channel.\n") );
 }
+
 
 FxLine::~FxLine()
 {
@@ -125,6 +143,7 @@ static void drawFxLine( QPainter* p, const QWidget *fxLine, const QString& name,
 
 }
 
+
 void FxLine::paintEvent( QPaintEvent * )
 {
 	FxMixer * mix = engine::fxMixer();
@@ -138,12 +157,47 @@ void FxLine::paintEvent( QPaintEvent * )
 	painter.end();
 }
 
+
 void FxLine::mousePressEvent( QMouseEvent * )
 {
 	m_mv->setCurrentFxLine( this );
 }
 
+
 void FxLine::mouseDoubleClickEvent( QMouseEvent * )
+{
+	renameChannel();
+}
+
+
+void FxLine::contextMenuEvent( QContextMenuEvent * )
+{
+	FxMixer * mix = engine::fxMixer();
+	QPointer<captionMenu> contextMenu = new captionMenu( mix->effectChannel( m_channelIndex )->m_name );
+	if( m_channelIndex != 0 ) // no move-options in master 
+	{
+		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
+		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
+	}
+	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
+	contextMenu->addSeparator();
+	
+	if( m_channelIndex != 0 ) // no remove-option in master
+	{
+		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ),
+							this, SLOT( removeChannel() ) );
+		contextMenu->addSeparator();
+	}
+	
+	contextMenu->addAction( embed::getIconPixmap( "help" ),
+						tr( "&Help" ),
+						this, SLOT( displayHelp() ) );
+	contextMenu->exec( QCursor::pos() );
+	delete contextMenu;
+}
+
+
+void FxLine::renameChannel()
 {
 	bool ok;
 	FxMixer * mix = engine::fxMixer();
@@ -154,9 +208,37 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 			QLineEdit::Normal, mix->effectChannel(m_channelIndex)->m_name, &ok );
 	if( ok && !new_name.isEmpty() )
 	{
-		mix->effectChannel(m_channelIndex)->m_name = new_name;
+		mix->effectChannel( m_channelIndex )->m_name = new_name;
 		update();
 	}
+}
+
+
+void FxLine::removeChannel()
+{
+	FxMixerView * mix = engine::fxMixerView();
+	mix->deleteChannel( m_channelIndex );
+}
+
+
+void FxLine::moveChannelLeft()
+{
+	FxMixerView * mix = engine::fxMixerView();
+	mix->moveChannelLeft( m_channelIndex );
+}
+
+
+void FxLine::moveChannelRight()
+{
+	FxMixerView * mix = engine::fxMixerView();
+	mix->moveChannelRight( m_channelIndex );
+}
+
+
+void FxLine::displayHelp()
+{
+	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
+								whatsThis() );
 }
 
 #include "moc_FxLine.cxx"
