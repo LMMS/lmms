@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _FX_LINE_H
-#define _FX_LINE_H
+#ifndef FX_LINE_H
+#define FX_LINE_H
 
 #include <QWidget>
 #include <QLabel>
@@ -46,6 +46,7 @@ public:
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * );
 	virtual void mouseDoubleClickEvent( QMouseEvent * );
+	virtual void contextMenuEvent( QContextMenuEvent * );
 
 	inline int channelIndex() { return m_channelIndex; }
 	void setChannelIndex(int index);
@@ -56,11 +57,16 @@ public:
 private:
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
-
-
 	int m_channelIndex;
 
-} ;
+private slots:
+	void renameChannel();
+	void removeChannel();
+	void moveChannelLeft();
+	void moveChannelRight();
+	void displayHelp();
+
+};
 
 
 #endif // FXLINE_H
