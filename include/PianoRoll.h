@@ -28,13 +28,14 @@
 #define PIANO_ROLL_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QInputDialog>
 
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "note.h"
 #include "lmms_basics.h"
 #include "song.h"
-
+#include "tooltip.h"
 
 class QPainter;
 class QPixmap;
@@ -111,6 +112,8 @@ protected:
 	void selectAll();
 	void getSelectedNotes( NoteVector & _selected_notes );
 
+	// for entering values with dblclick in the vol/pan bars
+	void enterValue( note* n );
 
 protected slots:
 	void play();
@@ -144,7 +147,6 @@ protected slots:
 
 	void changeNoteEditMode( int i );
 	void markSemiTone( int i );
-
 
 signals:
 	void currentPatternChanged();
@@ -241,6 +243,7 @@ private:
 
 	static PianoRollKeyTypes prKeyOrder[];
 
+	static textFloat * s_textFloat;
 
 	QWidget * m_toolBar;
 

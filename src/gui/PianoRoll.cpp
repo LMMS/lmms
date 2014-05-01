@@ -67,7 +67,7 @@
 #include "text_float.h"
 #include "timeline.h"
 #include "tool_button.h"
-#include "tooltip.h"
+#include "text_float.h"
 
 
 typedef AutomationPattern::timeMap timeMap;
@@ -125,6 +125,8 @@ QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
+
+textFloat * PianoRoll::s_textFloat = NULL;
 
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
@@ -274,6 +276,12 @@ PianoRoll::PianoRoll() :
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap(
 							"automation" ) );
+	}
+	
+	// init text-float
+	if( s_textFloat == NULL )
+	{
+		s_textFloat = new textFloat;
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -1420,6 +1428,7 @@ void PianoRoll::leaveEvent( QEvent * _e )
 	}
 
 	QWidget::leaveEvent( _e );
+	s_textFloat->hide();
 }
 
 
@@ -1863,11 +1872,34 @@ void PianoRoll::mouseDoubleClickEvent( QMouseEvent * _me )
 		return;
 	}
 
-	// if they clicked in the note edit area, clear selection
+	// if they clicked in the note edit area, enter value for the volume bar
 	if( _me->x() > noteEditLeft() && _me->x() < noteEditRight()
 	    && _me->y() > noteEditTop() && _me->y() < noteEditBottom() )
 	{
-		clearSelectedNotes();
+		// get values for going through notes
+		int pixel_range = 4;
+		int x = _me->x() - WHITE_KEY_WIDTH;
+		int ticks_start = ( x-pixel_range/2 ) *
+					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
+		int ticks_end = ( x+pixel_range/2 ) *
+					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
+		
+		// get note-vector of current pattern
+		NoteVector notes; 
+		notes += m_pattern->notes();
+		
+		// go through notes to figure out which one we want to change
+		note * n = NULL;
+		foreach( note * i, notes )
+		{
+			if( i->pos().getTicks() >= ticks_start
+				&& i->pos().getTicks() <= ticks_end
+				&& i->length().getTicks() != 0 )
+			{
+				n = i;
+			}
+		}
+		if( n != NULL ) { enterValue( n ); } 
 	}
 }
 
@@ -2023,6 +2055,7 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 void PianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 {
+	s_textFloat->hide();
 	bool mustRepaint = false;
 
 	if( _me->button() & Qt::LeftButton )
@@ -2184,7 +2217,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			}
 		}
 		else if( ( edit_note == true || m_action == ActionChangeNoteProperty ) &&
-				_me->buttons() & Qt::LeftButton )
+				( _me->buttons() & Qt::LeftButton || _me->buttons() & Qt::MiddleButton ) )
 		{
 			// editing note properties
 
@@ -2194,38 +2227,66 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 			// convert to ticks so that we can check which notes
 			// are in the range
-			int ticks_start = (x-pixel_range/2) *
+			int ticks_start = ( x-pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
-			int ticks_end = (x+pixel_range/2) *
+			int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 			// get note-vector of current pattern
 			const NoteVector & notes = m_pattern->notes();
 
 			// determine what volume/panning to set note to
-			volume_t vol = tLimit<int>( MinVolume +
-							( ( (float)noteEditBottom() ) - ( (float)_me->y() ) ) /
-							( (float)( noteEditBottom() - noteEditTop() ) ) *
-							( MaxVolume - MinVolume ),
-										MinVolume, MaxVolume );
-			panning_t pan = tLimit<int>( PanningLeft +
-							( (float)( noteEditBottom() - _me->y() ) ) /
-							( (float)( noteEditBottom() - noteEditTop() ) ) *
-							( (float)( PanningRight - PanningLeft ) ),
-									  PanningLeft, PanningRight);
-
+			// if middle-click, set to defaults
+			volume_t vol;
+			panning_t pan;
+			
+			if( _me->buttons() & Qt::LeftButton )
+			{
+				vol = tLimit<int>( MinVolume +
+								( ( (float)noteEditBottom() ) - ( (float)_me->y() ) ) /
+								( (float)( noteEditBottom() - noteEditTop() ) ) *
+								( MaxVolume - MinVolume ),
+											MinVolume, MaxVolume );
+				pan = tLimit<int>( PanningLeft +
+								( (float)( noteEditBottom() - _me->y() ) ) /
+								( (float)( noteEditBottom() - noteEditTop() ) ) *
+								( (float)( PanningRight - PanningLeft ) ),
+										  PanningLeft, PanningRight);
+			}
+			else
+			{
+				vol = DefaultVolume;
+				pan = DefaultPanning;
+			}
+			
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				m_lastNoteVolume = vol;
+				//! \todo display velocity for MIDI-based instruments
+				// possibly dBV values too? not sure if it makes sense for note volumes...
+				s_textFloat->setText( tr("Volume: %1%").arg( vol ) );
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
 				m_lastNotePanning = pan;
+				if( pan < 0 )
+				{
+					s_textFloat->setText( tr("Panning: %1% left").arg( qAbs( pan ) ) );
+				}
+				else if( pan > 0 )
+				{
+					s_textFloat->setText( tr("Panning: %1% right").arg( qAbs( pan ) ) );
+				}
+				else
+				{
+					s_textFloat->setText( tr("Panning: center") );
+				}
 			}
 
 
 
 			// loop through vector
+			bool on_note = false;
 			bool use_selection = isSelection();
 			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 			for( int i = 0; i < notes.size(); ++i )
@@ -2236,6 +2297,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					&& n->length().getTicks() != 0
 					&& ( n->selected() || ! use_selection ) )
 				{
+					on_note = true;
 					m_pattern->dataChanged();
 
 					// play the note so that the user can tell how loud it is
@@ -2269,10 +2331,22 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					}
 				}
 
+				// set textfloat visible if we're on a note
+				if( on_note )
+				{
+					s_textFloat->moveGlobal( this,	QPoint( _me->x() + 4, _me->y() + 16 ) );
+					s_textFloat->show();
+				}
+				else
+				{
+					s_textFloat->hide();
+				}
+
 				--it;
 
 			}
 		}
+		
 		else if( _me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
 		{
 			// set move- or resize-cursor
@@ -3262,6 +3336,69 @@ void PianoRoll::resizeEvent( QResizeEvent * )
 void PianoRoll::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
+	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
+	if( _we->x() > noteEditLeft() && _we->x() < noteEditRight()
+	&& _we->y() > noteEditTop() && _we->y() < noteEditBottom() )
+	{
+		// get values for going through notes
+		int pixel_range = 8;
+		int x = _we->x() - WHITE_KEY_WIDTH;
+		int ticks_start = ( x-pixel_range/2 ) *
+					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
+		int ticks_end = ( x+pixel_range/2 ) *
+					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
+		
+		// get note-vector of current pattern
+		NoteVector notes; 
+		notes += m_pattern->notes();
+		
+		// go through notes to figure out which one we want to change
+		note * n = NULL;
+		foreach( note * i, notes )
+		{
+			if( i->pos().getTicks() >= ticks_start
+				&& i->pos().getTicks() <= ticks_end
+				&& i->length().getTicks() != 0 )
+			{
+				n = i;
+			}
+		}
+		if( n != NULL ) 
+		{
+			const int step = _we->delta() > 0 ? 1.0 : -1.0;
+			if( m_noteEditMode == NoteEditVolume )
+			{
+				volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
+				n->setVolume( vol );
+				s_textFloat->setText( tr("Volume: %1%").arg( vol ) );
+				m_lastNoteVolume = vol;
+			}
+			else if( m_noteEditMode == NoteEditPanning )
+			{
+				panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
+				n->setPanning( pan );
+				if( pan < 0 )
+				{
+					s_textFloat->setText( tr("Panning: %1% left").arg( qAbs( pan ) ) );
+				}
+				else if( pan > 0 )
+				{
+					s_textFloat->setText( tr("Panning: %1% right").arg( qAbs( pan ) ) );
+				}
+				else
+				{
+					s_textFloat->setText( tr("Panning: center") );
+				}
+				m_lastNotePanning = pan;
+			}
+			s_textFloat->moveGlobal( this,	QPoint( _we->x() + 4, _we->y() + 16 ) );
+			s_textFloat->setVisibilityTimeOut( 1000 );
+			update();
+		}
+	}
+	
+	// not in note edit area, so handle scrolling/zooming
+	else
 	if( _we->modifiers() & Qt::ControlModifier )
 	{
 		if( _we->delta() > 0 )
@@ -3601,6 +3738,42 @@ void PianoRoll::getSelectedNotes( NoteVector & _selected_notes )
 }
 
 
+void PianoRoll::enterValue( note* n )
+{
+	if( m_noteEditMode == NoteEditVolume )
+	{
+		bool ok;
+		int new_val;
+		new_val = QInputDialog::getInt(	this, "Piano roll: note volume",
+					tr( "Please enter a new value between %1 and %2:" ).
+						arg( MinVolume ).arg( MaxVolume ),
+					n->getVolume(),
+					MinVolume, MaxVolume, 1, &ok );
+
+		if( ok )
+		{
+			n->setVolume( new_val );
+			m_lastNoteVolume = new_val;
+		}
+	}
+	else if( m_noteEditMode == NoteEditPanning )
+	{
+		bool ok;
+		int new_val;
+		new_val = QInputDialog::getInt(	this, "Piano roll: note panning",
+					tr( "Please enter a new value between %1 and %2:" ).
+							arg( PanningLeft ).arg( PanningRight ),
+						n->getPanning(),
+						PanningLeft, PanningRight, 1, &ok );
+
+		if( ok )
+		{
+			n->setPanning( new_val );
+			m_lastNotePanning = new_val;
+		}
+		
+	}
+}
 
 
 void PianoRoll::copy_to_clipboard( const NoteVector & _notes ) const
