@@ -113,7 +113,7 @@ protected:
 	void getSelectedNotes( NoteVector & _selected_notes );
 
 	// for entering values with dblclick in the vol/pan bars
-	void enterValue( note* n );
+	void enterValue( NoteVector* nv );
 
 protected slots:
 	void play();
