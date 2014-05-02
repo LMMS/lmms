@@ -216,12 +216,10 @@ private:
 		return s1 + ( s2 - s1 ) * x;
 	}*/ // using interpolation.h from now on
 
-	inline sample_t calcSlope( sample_t _s, float _slope )
-	{
-		if( _slope == 0.0f ) return _s;
-		const double exp = fastPow( 10.0, static_cast<double>( _slope * -1.0 ) );
-		return fastPow( _s, exp );
-	}
+	inline sample_t calcSlope1( sample_t s );
+
+	inline sample_t calcSlope2( sample_t s );
+
 
 	// checks for lower bound for phase, upper bound is already checked by oscillator-functions in both
 	// oscillator.h and bandlimitedwave.h so we save some cpu by only checking lower bound
@@ -306,7 +304,7 @@ private:
 
 	sample_t m_env1_phase;
 	sample_t m_env2_phase;
-
+	
 	float m_lfo1_phase;
 	float m_lfo2_phase;
 
@@ -377,7 +375,9 @@ public slots:
 	void updateEnvelope2();
 	void updateLFOAtts();
 	void updateSamplerate();
-
+	void updateSlope1();
+	void updateSlope2();
+	
 protected:
 	float m_osc1l_vol;
 	float m_osc1r_vol;
@@ -416,6 +416,9 @@ protected:
 
 	f_cnt_t m_env1_relF;
 	f_cnt_t m_env2_relF;
+
+	float m_slope1;
+	float m_slope2;
 
 	f_cnt_t m_lfo1_att;
 	f_cnt_t m_lfo2_att;

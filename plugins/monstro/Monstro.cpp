@@ -111,6 +111,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_counter3l = 0;
 	m_counter3r = 0;
 	m_counterMax = ( m_samplerate * 10 ) / 44100;
+	
 }
 
 
@@ -140,8 +141,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_l2 != 0.0f ) car = qBound( 0.0f, car + mod##_l2 * 0.5f * m_lfo2_buf[f], 1.0f );
 
 #define modulatephs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += ( mod##_e1 * m_env1_buf[f] );	\
-		if( mod##_e2 != 0.0f ) car += ( mod##_e2 * m_env2_buf[f] );	\
+		if( mod##_e1 != 0.0f ) car += qBound( -1.0f, ( mod##_e1 * m_env1_buf[f] ), 1.0f );	\
+		if( mod##_e2 != 0.0f ) car += qBound( -1.0f, ( mod##_e2 * m_env2_buf[f] ), 1.0f );	\
 		if( mod##_l1 != 0.0f ) car += ( mod##_l1 * 0.5f * m_lfo1_buf[f] );	\
 		if( mod##_l2 != 0.0f ) car += ( mod##_l2 * 0.5f * m_lfo2_buf[f] );
 
@@ -863,9 +864,6 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 	//
 	/////////////////////////////////////////////
 
-	const float env1_s = m_parent-> m_env1Slope.value();
-	const float env2_s = m_parent-> m_env2Slope.value();
-
 	const float env1_sus = m_parent-> m_env1Sus.value();
 	const float env2_sus = m_parent-> m_env2Sus.value();
 
@@ -890,7 +888,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env1_phase < 2.0f ) // attack phase
 		{
-			m_env1_buf[f] = calcSlope( fraction( m_env1_phase ), env1_s );
+			m_env1_buf[f] = calcSlope1( fraction( m_env1_phase ) );
 			m_env1_phase = qMin( 2.0f, m_env1_phase + m_parent->m_env1_att );
 		}
 		else if( m_env1_phase < 3.0f ) // hold phase
@@ -900,7 +898,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env1_phase < 4.0f ) // decay phase
 		{
-			const sample_t s = calcSlope( 1.0f - fraction( m_env1_phase ), env1_s );
+			const sample_t s = calcSlope1( 1.0f - fraction( m_env1_phase ) );
 			if( s <= env1_sus )
 			{
 				m_env1_buf[f] = env1_sus;
@@ -914,7 +912,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env1_phase < 5.0f ) // release phase
 		{
-			m_env1_buf[f] = calcSlope( 1.0f - fraction( m_env1_phase ), env1_s );
+			m_env1_buf[f] = calcSlope1( 1.0f - fraction( m_env1_phase ) );
 			m_env1_phase += m_parent->m_env1_rel;
 		}
 		else m_env1_buf[f] = 0.0f;
@@ -942,7 +940,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env2_phase < 2.0f ) // attack phase
 		{
-			m_env2_buf[f] = calcSlope( fraction( m_env2_phase ), env2_s );
+			m_env2_buf[f] = calcSlope2( fraction( m_env2_phase ) );
 			m_env2_phase = qMin( 2.0f, m_env2_phase + m_parent->m_env2_att );
 		}
 		else if( m_env2_phase < 3.0f ) // hold phase
@@ -952,7 +950,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env2_phase < 4.0f ) // decay phase
 		{
-			const sample_t s = calcSlope( 1.0f - fraction( m_env2_phase ), env2_s );
+			const sample_t s = calcSlope2( 1.0f - fraction( m_env2_phase ) );
 			if( s <= env2_sus )
 			{
 				m_env2_buf[f] = env2_sus;
@@ -966,7 +964,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env2_phase < 5.0f ) // release phase
 		{
-			m_env2_buf[f] = calcSlope( 1.0f - fraction( m_env2_phase), env2_s );
+			m_env2_buf[f] = calcSlope2( 1.0f - fraction( m_env2_phase) );
 			m_env2_phase += m_parent->m_env2_rel;
 		}
 		else m_env2_buf[f] = 0.0f;
@@ -975,6 +973,20 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 
 }
 
+
+inline sample_t MonstroSynth::calcSlope1( sample_t s )
+{
+	if( m_parent->m_slope1 == 1.0f ) return s;
+	if( s == -1.0 || s == 0.0 || s == 1.0 ) return s;
+	return fastPow( s, m_parent->m_slope1 );
+}
+
+inline sample_t MonstroSynth::calcSlope2( sample_t s )
+{
+	if( m_parent->m_slope2 == 1.0f ) return s;
+	if( s == -1.0 || s == 0.0 || s == 1.0 ) return s;
+	return fastPow( s, m_parent->m_slope2 );
+}
 
 
 MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
@@ -1142,6 +1154,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_env1Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
 	connect( &m_env1Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
 	connect( &m_env1Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
+	connect( &m_env1Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope1() ) );
 
 // updateEnvelope2
 
@@ -1150,7 +1163,8 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_env2Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
 	connect( &m_env2Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
 	connect( &m_env2Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-
+	connect( &m_env2Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope2() ) );
+	
 // updateLFOAtts
 
 	connect( &m_lfo1Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ) );
@@ -1573,6 +1587,20 @@ void MonstroInstrument::updateSamplerate()
 	updateEnvelope1();
 	updateEnvelope2();
 	updateLFOAtts();
+}
+
+
+void MonstroInstrument::updateSlope1()
+{
+	const float slope = m_env1Slope.value();
+	m_slope1 = powf( 10.0f, static_cast<double>( slope * -1.0f ) ); 
+}
+
+
+void MonstroInstrument::updateSlope2()
+{
+	const float slope = m_env2Slope.value();
+	m_slope2 = powf( 10.0f, static_cast<double>( slope * -1.0f ) ); 
 }
 
 
