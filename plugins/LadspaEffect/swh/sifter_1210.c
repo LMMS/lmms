@@ -33,7 +33,11 @@ void _init(); // forward declaration
 
 inline int partition(LADSPA_Data array[], int left, int right);
 
+#ifdef LMMS_BUILD_APPLE
+void q_sort(LADSPA_Data array[], int left, int right) {
+#else
 inline void q_sort(LADSPA_Data array[], int left, int right) {
+#endif
         float pivot = partition(array, left, right);
 
         if (left < pivot) {
