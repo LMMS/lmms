@@ -977,14 +977,14 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 inline sample_t MonstroSynth::calcSlope1( sample_t s )
 {
 	if( m_parent->m_slope1 == 1.0f ) return s;
-	if( s == 0.0f || s == 1.0f ) return s;
+	if( s == 0.0f ) return s;
 	return fastPow( s, m_parent->m_slope1 );
 }
 
 inline sample_t MonstroSynth::calcSlope2( sample_t s )
 {
 	if( m_parent->m_slope2 == 1.0f ) return s;
-	if( s == 0.0f || s == 1.0f ) return s;
+	if( s == 0.0f ) return s;
 	return fastPow( s, m_parent->m_slope2 );
 }
 
