@@ -146,12 +146,12 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_l2 != 0.0f ) car += ( mod##_l2 * 0.5f * m_lfo2_buf[f] );
 
 #define modulatevol( car, mod ) \
-		if( mod##_e1 > 0.0f ) car = qBound( 0.0f, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
-		if( mod##_e1 < 0.0f ) car = qBound( 0.0f, car * ( 1.0f + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
-		if( mod##_e2 > 0.0f ) car = qBound( 0.0f, car * ( 1.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
-		if( mod##_e2 < 0.0f ) car = qBound( 0.0f, car * ( 1.0f + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
-		if( mod##_l1 != 0.0f ) car = qBound( 0.0f, car * ( 1.0f + mod##_l1 * m_lfo1_buf[f] ), MODCLIP );	\
-		if( mod##_l2 != 0.0f ) car = qBound( 0.0f, car * ( 1.0f + mod##_l2 * m_lfo2_buf[f] ), MODCLIP );
+		if( mod##_e1 > 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
+		if( mod##_e1 < 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
+		if( mod##_e2 > 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
+		if( mod##_e2 < 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
+		if( mod##_l1 != 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_l1 * m_lfo1_buf[f] ), MODCLIP );	\
+		if( mod##_l2 != 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_l2 * m_lfo2_buf[f] ), MODCLIP );
 
 	// pre-render env's and lfo's
 	renderModulators( _frames );
@@ -900,14 +900,14 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env1_phase < 4.0f ) // decay phase
 		{
-			const sample_t s = 1.0f - fraction( m_env1_phase );
+			const sample_t s = calcSlope( 1.0f - fraction( m_env1_phase ), env1_s );
 			if( s <= env1_sus )
 			{
 				m_env1_buf[f] = env1_sus;
 			}
 			else
 			{
-				m_env1_buf[f] = calcSlope( s, env1_s );
+				m_env1_buf[f] = s;
 				m_env1_phase = qMin( 4.0f - env1_sus, m_env1_phase + m_parent->m_env1_dec );
 				if( m_env1_phase == 4.0f ) m_env1_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
 			}
@@ -952,14 +952,14 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		}
 		else if( m_env2_phase < 4.0f ) // decay phase
 		{
-			const sample_t s = 1.0f - fraction( m_env2_phase );
+			const sample_t s = calcSlope( 1.0f - fraction( m_env2_phase ), env2_s );
 			if( s <= env2_sus )
 			{
 				m_env2_buf[f] = env2_sus;
 			}
 			else
 			{
-				m_env2_buf[f] = calcSlope( s, env2_s );
+				m_env2_buf[f] = s;
 				m_env2_phase = qMin( 4.0f - env2_sus, m_env2_phase + m_parent->m_env2_dec );
 				if( m_env1_phase == 4.0f ) m_env1_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
 			}
