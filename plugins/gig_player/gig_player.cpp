@@ -84,6 +84,7 @@ gigInstrument::gigInstrument( InstrumentTrack * _instrument_track ) :
 	m_instance( NULL ),
 	m_instrument( NULL ),
 	m_RandomSeed( 0 ),
+	m_currentKeyDimension( 0 ),
 	m_filename( "" ),
 	m_lastMidiPitch( -1 ),
 	m_lastMidiPitchRange( -1 ),
@@ -193,20 +194,14 @@ void gigInstrument::freeInstance()
 		// No more references
 		if( m_instance->refCount <= 0 )
 		{
-			qDebug() << "Really deleting " << m_filename;
-
 			s_instances.remove( m_filename );
 			delete m_instance;
 		}
-		// Just remove our reference
-		else
-		{
-			qDebug() << "un-referencing " << m_filename;
-		}
-		s_instancesMutex.unlock();
 
+		s_instancesMutex.unlock();
 		m_instance = NULL;
 	}
+
 	m_synthMutex.unlock();
 }
 
@@ -230,10 +225,7 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 	// Increment Reference
 	if( s_instances.contains( relativePath ) )
 	{
-		qDebug() << "Using existing reference to " << relativePath;
-
 		m_instance = s_instances[ relativePath ];
-
 		m_instance->refCount++;
 	}
 
@@ -258,15 +250,11 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 	m_synthMutex.unlock();
 
 	if( succeeded )
-	{
 		m_filename = relativePath;
-		emit fileChanged();
-	}
 	else
-	{
 		m_filename = "";
-		emit fileChanged();
-	}
+
+	emit fileChanged();
 
 	delete[] gigAscii;
 
@@ -291,8 +279,13 @@ void gigInstrument::updatePatch()
 
 QString gigInstrument::getCurrentPatchName()
 {
+	m_synthMutex.lock();
+
 	if( !m_instance )
+	{
+		m_synthMutex.unlock();
 		return "";
+	}
 
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
@@ -311,12 +304,14 @@ QString gigInstrument::getCurrentPatchName()
 			if( name == "" )
 				name = "<no name>";
 
+			m_synthMutex.unlock();
 			return name;
 		}
 
 		pInstrument = m_instance->gig.GetNextInstrument();
 	}
 
+	m_synthMutex.unlock();
 	return "";
 }
 
@@ -366,7 +361,7 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
 	// Initialize to zeros
-	for (int i = 0; i < frames; ++i)
+	for( int i = 0; i < frames; ++i )
 	{
 		_working_buffer[i][0] = 0;
 		_working_buffer[i][1] = 0;
@@ -432,7 +427,7 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 		{
 			noteRelease = i->release;
 
-			float fadeOut = 0.5; // Seconds
+			float fadeOut = 0.25; // Seconds
 			int len = std::min( int( floor( fadeOut * engine::mixer()->processingSampleRate() ) ),
 					i->size-i->position );
 			int endPoint = i->position+len;
@@ -456,7 +451,7 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 	m_synthMutex.unlock();
 
-	if (noteRelease)
+	if( noteRelease )
 	{
 		// Add the release notes if available
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
@@ -497,14 +492,11 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 				dim.DimValues[i] = velocity;
 				break;
 			case gig::dimension_releasetrigger:
-				//VoiceType = (ReleaseTriggerVoice) ? Voice::type_release_trigger : (!iLayer) ? Voice::type_release_trigger_required : Voice::type_normal;
 				dim.release = true;
 				dim.DimValues[i] = (uint) release;
 				break;
 			case gig::dimension_keyboard:
-				//dim.DimValues[i] = (uint) (pEngineChannel->CurrentKeyDimension * pRegion->pDimensionDefinitions[i].zones);
-				dim.DimValues[i] = 0;
-				// TODO: may be useful?
+				dim.DimValues[i] = (uint) (m_currentKeyDimension * pRegion->pDimensionDefinitions[i].zones);
 				break;
 			case gig::dimension_roundrobin:
 			case gig::dimension_roundrobinkeyboard:
@@ -558,47 +550,56 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 
 gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release )
 {
-	if( !pSample )
+	if( !pSample || pSample->Channels == 0 )
 		return gigNote();
 
 	gig::buffer_t buf = pSample->LoadSampleData();
 	gigNote note( pSample->SamplesTotal, release );
 	note.midiNote = midiNote;
 
+	if( pSample->Channels > 2 )
+		qDebug() << "Warning: only using first two channels of GIG file";
+
 	// 24 Bit
-	// TODO: implement this
 	if( pSample->BitDepth == 24 )
 	{
-		qDebug() << "Error: not 16 bit... not implemented";
-		/*int n = pSample->SamplesTotal * pSample->Channels;
+		uint8_t* pInt = static_cast<uint8_t*>( buf.pStart );
 
-		for (int i = n-1; i>=0; i-=pSample->Channels)
-			for (int j = 0; j < pSample->Channels; ++j)
-				note.note[i][j] =
-					1.0/0x800000*(pWave[i*3+j]
-						| pWave[i*3+1+3*j]<<8
-						| pWave[i*3+2+3*j]<<16);*/
+		for( int i = 0; i < pSample->SamplesTotal/pSample->Channels; ++i )
+		{
+			int32_t valueLeft = (pInt[3*pSample->Channels*i]<<8) |
+					    (pInt[3*pSample->Channels*i+1]<<16) |
+					    (pInt[3*pSample->Channels*i+2]<<24);
+
+			note.note[i][0] = 1.0/0x100000000*attenuation*valueLeft;
+
+			if( pSample->Channels == 1 )
+			{
+				note.note[i][1] = note.note[i][0];
+			}
+			else
+			{
+				int32_t valueRight = (pInt[3*pSample->Channels*i+3]<<8) |
+							(pInt[3*pSample->Channels*i+4]<<16) |
+							(pInt[3*pSample->Channels*i+5]<<24);
+
+				note.note[i][1] = 1.0/0x100000000*attenuation*valueRight;
+			}
+		}
 	}
 	// 16 Bit
 	else
 	{
-		int16_t* pInt = reinterpret_cast<int16_t*>( buf.pStart );
+		int16_t* pInt = static_cast<int16_t*>( buf.pStart );
 
-		if( pSample->Channels <= 2 )
+		for( int i = 0; i < pSample->SamplesTotal/pSample->Channels; ++i )
 		{
-			for( int i = 0; i < pSample->SamplesTotal/pSample->Channels; ++i )
-			{
-				note.note[i][0] = 1.0/0x10000*pInt[pSample->Channels*i] * attenuation;
+			note.note[i][0] = 1.0/0x10000*pInt[pSample->Channels*i] * attenuation;
 
-				if( pSample->Channels == 1 )
-					note.note[i][1] = note.note[i][0];
-				else
-					note.note[i][1] = 1.0/0x10000*pInt[pSample->Channels*i+1] * attenuation;
-			}
-		}
-		else
-		{
-			qDebug() << "Error: not stereo... not implemented";
+			if( pSample->Channels == 1 )
+				note.note[i][1] = note.note[i][0];
+			else
+				note.note[i][1] = 1.0/0x10000*pInt[pSample->Channels*i+1] * attenuation;
 		}
 	}
 
@@ -609,7 +610,6 @@ gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote, float a
 	int outputRate = engine::mixer()->processingSampleRate();
 	if( sampleRate != outputRate )
 	{
-		qDebug() << "Warning: converting sample rate";
 		gigNote converted = convertSampleRate( note, sampleRate, outputRate );
 		return converted;
 	}
@@ -628,6 +628,8 @@ void gigInstrument::getInstrument()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
+	m_synthMutex.lock();
+
 	if( m_instance )
 	{
 		gig::Instrument* pInstrument = m_instance->gig.GetFirstInstrument();
@@ -645,6 +647,8 @@ void gigInstrument::getInstrument()
 
 		m_instrument = pInstrument;
 	}
+
+	m_synthMutex.unlock();
 }
 
 
@@ -662,7 +666,10 @@ gigNote gigInstrument::convertSampleRate( gigNote& old, int oldRate, int newRate
 	src_data.output_frames = note.size;
 	src_data.src_ratio = (double) note.size / old.size;
 	src_data.end_of_input = 0;
+
+	m_srcMutex.lock();
 	int error = src_process( m_srcState, &src_data );
+	m_srcMutex.unlock();
 
 	if( error )
 	{
@@ -682,7 +689,7 @@ gigNote gigInstrument::convertSampleRate( gigNote& old, int oldRate, int newRate
 
 void gigInstrument::updateSampleRate()
 {
-	m_synthMutex.lock();
+	m_srcMutex.lock();
 
 	if( m_srcState != NULL )
 		src_delete( m_srcState );
@@ -693,7 +700,7 @@ void gigInstrument::updateSampleRate()
 	if( m_srcState == NULL || error )
 		qCritical( "error while creating libsamplerate data structure in gigInstrument::updateSampleRate()" );
 
-	m_synthMutex.unlock();
+	m_srcMutex.unlock();
 }
 
 
@@ -701,9 +708,20 @@ void gigInstrument::updateSampleRate()
 // Find the sample we want to play (based on velocity, etc.)
 void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 {
+	m_synthMutex.lock();
+
 	if( m_instrument )
 	{
 		gig::Region* pRegion = m_instrument->GetFirstRegion();
+
+		// Change key dimension, e.g. change samples based on what key is pressed
+		// in a certain range.
+		if( midiNote >= m_instrument->DimensionKeyRange.low && midiNote
+				<= m_instrument->DimensionKeyRange.high )
+			m_currentKeyDimension = float( midiNote -
+					m_instrument->DimensionKeyRange.low ) / (
+						m_instrument->DimensionKeyRange.high -
+						m_instrument->DimensionKeyRange.low + 1 );
 
 		while( pRegion )
 		{
@@ -718,26 +736,30 @@ void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 
 				if( midiNote >= keyLow && midiNote <= keyHigh )
 				{
-					float attenuation;
+					float attenuation = pDimRegion->GetVelocityAttenuation( velocity );;
 					float length = (double) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
 
+					//qDebug() << "Playing sample " << QString::fromStdString( pSample->pInfo->Name );
+
+					// TODO: sample panning? looping? crossfade different layers?
+
 					if (release)
-						attenuation = 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
+						attenuation *= 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
 					else
-						attenuation = pDimRegion->SampleAttenuation;
+						attenuation *= pDimRegion->SampleAttenuation;
 
 					gigNote note = sampleToNote( pSample, midiNote,
 							attenuation, dim.release );
 
-					m_synthMutex.lock();
 					m_notes.push_back(note);
-					m_synthMutex.unlock();
 				}
 			}
 
 			pRegion = m_instrument->GetNextRegion();
 		}
 	}
+
+	m_synthMutex.unlock();
 }
 
 
@@ -789,7 +811,6 @@ gigInstrumentView::gigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
 
-
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_bankNumLcd->move(131, 62);
@@ -823,6 +844,7 @@ gigInstrumentView::gigInstrumentView( Instrument * _instrument, QWidget * _paren
 gigInstrumentView::~gigInstrumentView()
 {
 }
+
 
 
 

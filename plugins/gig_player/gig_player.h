@@ -164,12 +164,14 @@ private:
 	gigInstance* m_instance;
 	gig::Instrument* m_instrument;
 	uint32_t m_RandomSeed;
+	float m_currentKeyDimension;
 
 	QString m_filename;
 
 	// Protect synth when we are re-creating it.
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
+	QMutex m_srcMutex;
 
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
