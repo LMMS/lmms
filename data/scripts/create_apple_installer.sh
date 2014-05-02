@@ -111,6 +111,7 @@ macdeployqt $APP $_executables
  
 # OS X Specific Artwork
 cp $CMAKE_SRC/data/lmms.icns $APP/Contents/Resources/
+cp $CMAKE_SRC/data/project.icns $APP/Contents/Resources/
  
 # Create "Info.plist" using lmms.icns file, http://iconverticons.com/online/)
 echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$APP/Contents/Info.plist"
