@@ -1879,27 +1879,57 @@ void PianoRoll::mouseDoubleClickEvent( QMouseEvent * _me )
 		// get values for going through notes
 		int pixel_range = 4;
 		int x = _me->x() - WHITE_KEY_WIDTH;
-		int ticks_start = ( x-pixel_range/2 ) *
+		const int ticks_start = ( x-pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
-		int ticks_end = ( x+pixel_range/2 ) *
+		const int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
+		const int ticks_middle = x * MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		
 		// get note-vector of current pattern
 		NoteVector notes; 
 		notes += m_pattern->notes();
 		
 		// go through notes to figure out which one we want to change
-		note * n = NULL;
+		NoteVector nv;
 		foreach( note * i, notes )
 		{
 			if( i->pos().getTicks() >= ticks_start
 				&& i->pos().getTicks() <= ticks_end
-				&& i->length().getTicks() != 0 )
+				&& i->length().getTicks() != 0
+				&& ( i->selected() || ! isSelection() ) )
 			{
-				n = i;
+				nv += i;
 			}
 		}
-		if( n != NULL ) { enterValue( n ); } 
+		// make sure we're on a note
+		if( nv.size() > 0 )
+		{
+			note * closest = NULL;
+			int closest_dist = 9999999;
+			// if we caught multiple notes, find the closest...
+			if( nv.size() > 1 )
+			{
+				foreach( note * i, nv )
+				{
+					const int dist = qAbs( i->pos().getTicks() - ticks_middle );
+					if( dist < closest_dist ) { closest = i; closest_dist = dist; }
+				}
+				// ... then remove all notes from the vector that aren't on the same exact time
+				NoteVector::Iterator it = nv.begin();
+				while( it != nv.end() )
+				{
+					if( ( *it )->pos().getTicks() != closest->pos().getTicks() )
+					{
+						it = nv.erase( it ); 
+					}
+					else
+					{
+						it++;
+					}
+				}
+			}
+			enterValue( &nv );
+		}
 	}
 }
 
@@ -3353,30 +3383,37 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 		notes += m_pattern->notes();
 		
 		// go through notes to figure out which one we want to change
-		note * n = NULL;
+		NoteVector nv;
 		foreach( note * i, notes )
 		{
 			if( i->pos().getTicks() >= ticks_start
 				&& i->pos().getTicks() <= ticks_end
-				&& i->length().getTicks() != 0 )
+				&& i->length().getTicks() != 0
+				&& ( i->selected() || ! isSelection() ) )
 			{
-				n = i;
+				nv += i;
 			}
 		}
-		if( n != NULL ) 
+		if( nv.size() > 0 ) 
 		{
 			const int step = _we->delta() > 0 ? 1.0 : -1.0;
 			if( m_noteEditMode == NoteEditVolume )
 			{
-				volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
-				n->setVolume( vol );
-				s_textFloat->setText( tr("Volume: %1%").arg( vol ) );
-				m_lastNoteVolume = vol;
+				foreach( note * n, nv )
+				{
+					volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
+					n->setVolume( vol );
+				}
+				s_textFloat->setText( tr("Volume: %1%").arg( nv[0]->getVolume() ) );
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
-				n->setPanning( pan );
+				foreach( note * n, nv )
+				{
+					panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
+					n->setPanning( pan );
+				}
+				panning_t pan = nv[0]->getPanning();
 				if( pan < 0 )
 				{
 					s_textFloat->setText( tr("Panning: %1% left").arg( qAbs( pan ) ) );
@@ -3389,10 +3426,12 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 				{
 					s_textFloat->setText( tr("Panning: center") );
 				}
-				m_lastNotePanning = pan;
 			}
-			s_textFloat->moveGlobal( this,	QPoint( _we->x() + 4, _we->y() + 16 ) );
-			s_textFloat->setVisibilityTimeOut( 1000 );
+			if( nv.size() == 1 )
+			{
+				s_textFloat->moveGlobal( this,	QPoint( _we->x() + 4, _we->y() + 16 ) );
+				s_textFloat->setVisibilityTimeOut( 1000 );
+			}
 			update();
 		}
 	}
@@ -3738,8 +3777,9 @@ void PianoRoll::getSelectedNotes( NoteVector & _selected_notes )
 }
 
 
-void PianoRoll::enterValue( note* n )
+void PianoRoll::enterValue( NoteVector* nv )
 {
+
 	if( m_noteEditMode == NoteEditVolume )
 	{
 		bool ok;
@@ -3747,12 +3787,15 @@ void PianoRoll::enterValue( note* n )
 		new_val = QInputDialog::getInt(	this, "Piano roll: note volume",
 					tr( "Please enter a new value between %1 and %2:" ).
 						arg( MinVolume ).arg( MaxVolume ),
-					n->getVolume(),
+					(*nv)[0]->getVolume(),
 					MinVolume, MaxVolume, 1, &ok );
 
 		if( ok )
 		{
-			n->setVolume( new_val );
+			foreach( note * n, *nv )
+			{
+				n->setVolume( new_val );
+			}
 			m_lastNoteVolume = new_val;
 		}
 	}
@@ -3763,12 +3806,15 @@ void PianoRoll::enterValue( note* n )
 		new_val = QInputDialog::getInt(	this, "Piano roll: note panning",
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( PanningLeft ).arg( PanningRight ),
-						n->getPanning(),
+						(*nv)[0]->getPanning(),
 						PanningLeft, PanningRight, 1, &ok );
 
 		if( ok )
 		{
-			n->setPanning( new_val );
+			foreach( note * n, *nv )
+			{
+				n->setPanning( new_val );
+			}
 			m_lastNotePanning = new_val;
 		}
 		
