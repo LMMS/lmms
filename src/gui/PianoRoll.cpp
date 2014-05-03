@@ -2247,7 +2247,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			}
 		}
 		else if( ( edit_note == true || m_action == ActionChangeNoteProperty ) &&
-				( _me->buttons() & Qt::LeftButton || _me->buttons() & Qt::MiddleButton ) )
+				( _me->buttons() & Qt::LeftButton || _me->buttons() & Qt::MiddleButton
+				|| ( _me->buttons() & Qt::RightButton && _me->modifiers() & Qt::ShiftModifier ) ) )
 		{
 			// editing note properties
 
