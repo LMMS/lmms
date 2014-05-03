@@ -77,6 +77,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	m_scrollArea->show();
 	m_rubberBand->hide();
+	m_rubberBand->setEnabled( false );
 
 	setAcceptDrops( true );
 
@@ -381,6 +382,7 @@ void TrackContainerView::mousePressEvent( QMouseEvent * _me )
 	if( allowRubberband() == true )
 	{
 		m_origin = m_scrollArea->mapFromParent( _me->pos() );
+		m_rubberBand->setEnabled( true );
 		m_rubberBand->setGeometry( QRect( m_origin, QSize() ) );
 		m_rubberBand->show();
 	}
@@ -407,6 +409,7 @@ void TrackContainerView::mouseMoveEvent( QMouseEvent * _me )
 void TrackContainerView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_rubberBand->hide();
+	m_rubberBand->setEnabled( false );
 	QWidget::mouseReleaseEvent( _me );
 }
 

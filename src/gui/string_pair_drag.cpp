@@ -4,7 +4,7 @@
  *                        for all drag'n'drop-actions within LMMS
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -93,10 +93,25 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 
 
+QString stringPairDrag::decodeMimeKey( const QMimeData * mimeData )
+{
+	return( QString( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
+}
+
+
+
+
+QString stringPairDrag::decodeMimeValue( const QMimeData * mimeData )
+{
+	return( QString( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
+}
+
+
+
+
 QString stringPairDrag::decodeKey( QDropEvent * _de )
 {
-	return( QString( _de->mimeData()->data( mimeType()
-						) ).section( ':', 0, 0 ) );
+	return decodeMimeKey( _de->mimeData() );
 }
 
 
@@ -104,8 +119,5 @@ QString stringPairDrag::decodeKey( QDropEvent * _de )
 
 QString stringPairDrag::decodeValue( QDropEvent * _de )
 {
-	return( QString( _de->mimeData()->data( mimeType()
-						) ).section( ':', 1, -1 ) );
+	return decodeMimeValue( _de->mimeData() );
 }
-
-
