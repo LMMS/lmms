@@ -24,7 +24,7 @@
 #include "impulses/20-matchless-chieftain-sm57.h"
 #include "impulses/21-matchless-chieftain-sm57-off.h"
 
-#ifdef LMMS_BULD_APPLE
+#ifdef LMMS_BUILD_APPLE
 void mk_imps(fftw_real **impulse_freq)
 #else
 inline void mk_imps(fftw_real **impulse_freq)
