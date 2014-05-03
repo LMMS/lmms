@@ -2,6 +2,7 @@
 
 #define IMPULSES      21
 
+#include "lmmsconfig.h"
 #include "impulses/01-unit.h"
 #include "impulses/02-steves-flat.h"
 #include "impulses/03-stk-m1.h"
