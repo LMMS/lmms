@@ -2,7 +2,6 @@
 
 #define IMPULSES      21
 
-#include "lmmsconfig.h"
 #include "impulses/01-unit.h"
 #include "impulses/02-steves-flat.h"
 #include "impulses/03-stk-m1.h"
@@ -25,7 +24,7 @@
 #include "impulses/20-matchless-chieftain-sm57.h"
 #include "impulses/21-matchless-chieftain-sm57-off.h"
 
-#ifdef LMMS_BUILD_APPLE
+#ifdef __clang__
 void mk_imps(fftw_real **impulse_freq)
 #else
 inline void mk_imps(fftw_real **impulse_freq)
