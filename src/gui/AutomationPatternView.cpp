@@ -38,6 +38,7 @@
 #include "tooltip.h"
 
 
+QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 						trackView * _parent ) :
@@ -58,6 +59,9 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 	toolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
 	setStyle( QApplication::style() );
+	
+	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
+							"pat_rec" ) ); }
 }
 
 
@@ -134,6 +138,11 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 }
 
 
+void AutomationPatternView::toggleRecording()
+{
+	m_pat->setRecording( ! m_pat->isRecording() );
+	update();
+}
 
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
@@ -156,6 +165,9 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
+	_cm->addAction( embed::getIconPixmap( "record" ),
+						tr( "Set/clear record" ),
+						this, SLOT( toggleRecording() ) );
 	if( !m_pat->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
@@ -236,12 +248,6 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		p.setPen( c.lighter( 130 ) );
 	p.drawRect( 1, 1, width()-3, height()-3 );
 
-	p.setBrush( QBrush() );
-	if( engine::automationEditor()->currentPattern() == m_pat )
-		p.setPen( c.lighter( 130 ) );
-	else
-		p.setPen( c.darker( 300 ) );
-	p.drawRect( 0, 0, width()-1, height()-1 );
 
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
@@ -310,6 +316,22 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.resetMatrix();
+
+	// recording icon for when recording automation
+	if( m_pat->isRecording() )
+	{
+		p.drawPixmap( 4, 14, *s_pat_rec );
+	}
+
+	// outer edge
+	p.setBrush( QBrush() );
+	if( engine::automationEditor()->currentPattern() == m_pat )
+		p.setPen( c.lighter( 130 ) );
+	else
+		p.setPen( c.darker( 300 ) );
+	p.drawRect( 0, 0, width()-1, height()-1 );
+
+	// pattern name
 	p.setFont( pointSize<8>( p.font() ) );
 
 	QColor text_color = ( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
@@ -326,6 +348,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
 				embed::getIconPixmap( "muted", 16, 16 ) );
 	}
+
 
 	p.end();
 
