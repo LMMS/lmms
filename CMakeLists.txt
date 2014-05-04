@@ -667,6 +667,8 @@ SET(MACOSX_BUNDLE_MIMETYPE "application/x-lmms-project")
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/lmms.plist.in" "${CMAKE_INSTALL_PREFIX}/Info.plist")
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_bundle.sh.in" "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh")
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_dmg.sh.in" "${CMAKE_INSTALL_PREFIX}/create_apple_dmg.sh")
+# Add execute permissions to bundle script
+FILE(COPY "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh" DESTINATION "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh" FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE) 
 #endif
 
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
