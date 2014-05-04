@@ -1479,6 +1479,9 @@ void trackOperationsWidget::removeTrack()
  *
  *  For all track types, we have the Clone and Remove options.
  *  For instrument-tracks we also offer the MIDI-control-menu
+ *  For automation tracks, extra options: turn on/off recording
+ *  on all TCOs (same should be added for sample tracks when
+ *  sampletrack recording is implemented)
  */
 void trackOperationsWidget::updateMenu()
 {
@@ -1497,10 +1500,44 @@ void trackOperationsWidget::updateMenu()
 		to_menu->addMenu( dynamic_cast<InstrumentTrackView *>(
 						m_trackView )->midiMenu() );
 	}
+	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
+	{
+		to_menu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
+		to_menu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+	}
 }
 
 
+void trackOperationsWidget::recordingOn()
+{
+	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	if( atv )
+	{
+		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		{
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+			if( ap ) { ap->setRecording( true ); }
+		}
+		atv->update();
+	}
+}
 
+
+void trackOperationsWidget::recordingOff()
+{
+	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	if( atv )
+	{
+		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		{
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+			if( ap ) { ap->setRecording( false ); }
+		}
+		atv->update();
+	}	
+}
 
 
 // ===========================================================================
