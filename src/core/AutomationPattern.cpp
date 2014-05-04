@@ -47,7 +47,9 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_objects(),
 	m_tension( 1.0 ),
 	m_progressionType( DiscreteProgression ),
-	m_dragging( false )
+	m_dragging( false ),
+	m_isRecording( false ),
+	m_lastRecordedValue( 0 )
 {
 	changeLength( MidiTime( 1, 0 ) );
 }
@@ -469,24 +471,41 @@ const QString AutomationPattern::name() const
 
 
 
-void AutomationPattern::processMidiTime( const MidiTime & _time )
+void AutomationPattern::processMidiTime( const MidiTime & time )
 {
-	if( _time >= 0 && hasAutomation() )
+	if( ! isRecording() )
 	{
-		const float val = valueAt( _time );
-		for( objectVector::iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+		if( time >= 0 && hasAutomation() )
 		{
-			if( *it )
+			const float val = valueAt( time );
+			for( objectVector::iterator it = m_objects.begin();
+							it != m_objects.end(); ++it )
 			{
-				( *it )->setAutomatedValue( val );
-			}
+				if( *it )
+				{
+					( *it )->setAutomatedValue( val );
+				}
 
+			}	
+		}
+	}
+	else
+	{
+		if( time >= 0 && hasAutomation() && ! m_objects.isEmpty() )
+		{
+			const float value = static_cast<float>( firstObject()->getValue() );
+			if( value != m_lastRecordedValue ) 
+			{
+				putValue( time, value, true );
+				m_lastRecordedValue = value;
+			}
+			else if( valueAt( time ) != value )
+			{
+				removeValue( time, false );
+			}
 		}
 	}
 }
-
-
 
 
 
