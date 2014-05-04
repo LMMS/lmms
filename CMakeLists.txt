@@ -668,7 +668,10 @@ CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/lmms.plist.in" "${CMAKE_INSTALL_PREFIX}
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_bundle.sh.in" "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh")
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_dmg.sh.in" "${CMAKE_INSTALL_PREFIX}/create_apple_dmg.sh")
 # Add execute permissions to bundle script
-FILE(COPY "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh" DESTINATION "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh" FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE) 
+SET(CHMOD_CMD "chmod")
+SET(CHMOD_ARG1 "u+x")
+SET(CHMOD_ARG2 "chmod u+x "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh")
+EXECUTE_PROCESS(COMMAND ${CHMOD_CMD} ${CHMOD_ARG1} ${CHMOD_ARG2})
 #endif
 
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
