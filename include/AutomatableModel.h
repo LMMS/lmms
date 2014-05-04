@@ -133,16 +133,6 @@ public:
 
 	float controllerValue( int frameOffset ) const;
 
-	// get value always in float - for automation recording
-	inline float getValue( int frameOffset = 0 ) const
-	{
-		if( unlikely( m_hasLinkedModels || m_controllerConnection != NULL ) )
-		{
-			return controllerValue( frameOffset );
-		}
-		return m_value;
-	}
-
 	template<class T>
 	T initValue() const
 	{
