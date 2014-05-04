@@ -37,9 +37,9 @@ LIBREADLINE=$MACPORTS/lib/libreadline.6.2.dylib
 echo -e "\n\nRunning..."
  
 # Check for u+w permissions on libreadline
-_perm=`stat -f "%p" $LIBREADLINE`
-_perm=${_perm:3:1}
-if [ ${_perm} != "7" ]
+CHECKREADLINE=$(stat -f "%p" $LIBREADLINE)
+CHECKREADLINE=${CHECKREADLINE:3:1}
+if [ "$CHECKREADLINE" != "7" ]
 then
   echo -e "\n\n\t\t\t\t***********\n\t\t\t\t* WARNING *\n\t\t\t\t***********"
   echo -e "File $LIBREADLINE is not marked as user writable."
