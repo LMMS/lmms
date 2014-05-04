@@ -14,13 +14,13 @@
 MACPORTS=/opt/local
  
  # LMMS project root directory (extracted source)
-CMAKE_SRC=@CMAKE_SOURCE_DIR@
+CMAKE_SRC=/Users/tres/lmms
  
 # LMMS compiled (install) resources
-CMAKE_INSTALL=@CMAKE_INSTALL_PREFIX@
+CMAKE_INSTALL=/Users/tres/lmms/target
  
 # LMMS working build directory
-CMAKE_BUILD=@CMAKE_CURRENT_BINARY_DIR@
+CMAKE_BUILD=/Users/tres/lmms/build
  
 # STK rawwaves directory
 STK_RAWWAVE=$HOME/stk-*/rawwaves
@@ -60,7 +60,7 @@ cp -R * "$APP/Contents"
  
 # Manually copy STK rawwaves
 mkdir -p "$APP/Contents/share/stk/rawwaves"
-cp "$STK_RAWWAVE/*.raw" "$APP/Contents/share/stk/rawwaves"
+cp $STK_RAWWAVE/*.raw "$APP/Contents/share/stk/rawwaves"
  
 # Make all libraries writable for macdeployqt
 cd "$APP"
@@ -93,18 +93,18 @@ install_name_tool -change "$CMAKE_BUILD/plugins/zynaddsubfx/libZynAddSubFxCore.d
    "$APP/Contents/MacOS/RemoteZynAddSubFx"
  
 # Build a list of shared objects in target/lib/lmms
-for file in  "$APP/Contents/lib/lmms/*.so"; do
-   _executables="$_executables -executable=\"$APP/Contents/lib/lmms/${file##*/}\""
+for file in $APP/Contents/lib/lmms/*.so; do
+   _executables="$_executables -executable=$APP/Contents/lib/lmms/${file##*/}"
 done
  
 # Build a list of shared objects in target/lib/lmms/ladspa
-for file in  "$APP/Contents/lib/lmms/ladspa/*.so"; do
-   _executables="$_executables -executable=\"$APP/Contents/lib/lmms/ladspa/${file##*/}\""
+for file in  $APP/Contents/lib/lmms/ladspa/*.so; do
+   _executables="$_executables -executable=$APP/Contents/lib/lmms/ladspa/${file##*/}"
 done
  
 # Additional binaries that require linking
-_executables="$_executables -executable=\"$APP/Contents/MacOS/RemoteZynAddSubFx\""
-_executables="$_executables -executable=\"$APP/Contents/Frameworks/libZynAddSubFxCore.dylib\""
+_executables="$_executables -executable=$APP/Contents/MacOS/RemoteZynAddSubFx"
+_executables="$_executables -executable=$APP/Contents/Frameworks/libZynAddSubFxCore.dylib"
  
 # Build our App Package using "macdeployqt"
 macdeployqt "$APP" $_executables
@@ -114,7 +114,7 @@ cp "$CMAKE_SRC/data/lmms.icns" "$APP/Contents/Resources/"
 cp "$CMAKE_SRC/data/project.icns" "$APP/Contents/Resources/"
  
 # Copy "Info.plist" into bundle
-cp "$CMAKE_BUILD/Info.plist" "$APP/Contents/Info.plist"
+cp "$CMAKE_INSTALL/Info.plist" "$APP/Contents/Info.plist"
  
 # Done.  Ready to build DMG
 echo -e "\nFinished.\n\nPlease run \"create_apple_dmg.sh\" from the Desktop to build the installer.\n"
