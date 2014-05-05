@@ -663,16 +663,16 @@ SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
 SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
 SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
 SET(MACOSX_BUNDLE_MIMETYPE "application/x-lmms-project")
-#ifdef LMMS_BUILD_APPLE
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/lmms.plist.in" "${CMAKE_INSTALL_PREFIX}/Info.plist")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_bundle.sh.in" "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_dmg.sh.in" "${CMAKE_INSTALL_PREFIX}/create_apple_dmg.sh")
-# Add execute permissions to bundle script
-SET(CHMOD_CMD "chmod")
-SET(CHMOD_ARG1 "u+x")
-SET(CHMOD_ARG2 "${CMAKE_INSTALL_PREFIX}/create_apple_bundle.sh")
-EXECUTE_PROCESS(COMMAND ${CHMOD_CMD} ${CHMOD_ARG1} ${CHMOD_ARG2})
-#endif
+IF(LMMS_BUILD_APPLE)
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/lmms.plist.in" "${CMAKE_INSTALL_PREFIX}/Info.plist")
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_bundle.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/create_apple_bundle.sh" @ONLY)
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/data/scripts/create_apple_dmg.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/create_apple_dmg.sh" @ONLY)
+	# Add execute permissions to bundle script
+	SET(CHMOD_CMD "chmod")
+	SET(CHMOD_ARG1 "u+x")
+	SET(CHMOD_ARG2 "${CMAKE_CURRENT_BINARY_DIR}/create_apple_bundle.sh")
+	EXECUTE_PROCESS(COMMAND ${CHMOD_CMD} ${CHMOD_ARG1} ${CHMOD_ARG2})
+ENDIF(LMMS_BUILD_APPLE)
 
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "lmms-${VERSION}")
