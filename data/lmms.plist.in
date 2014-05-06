@@ -24,30 +24,24 @@
         <key>CFBundleDocumentTypes</key>
         <array>
                 <dict>
-                        <key>CFBundleTypeExtensions</key>
-                        <array>
-                                <string>mmp</string>
-                                <string>MMP</string>
-                                <string>mmpz</string>
-                                <string>MMPZ</string>
-                        </array>
-                        <key>LSItemContentTypes</key>
-                        <array>
-                                <string>public.mmp</string>
-                                <string>public.mmpz</string>
-                        </array>
                         <key>CFBundleTypeIconFile</key>
                         <string>project.icns</string>
                         <key>CFBundleTypeName</key>
                         <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
                         <key>CFBundleTypeRole</key>
                         <string>Editor</string>
-                        <key>CFBundleTypeMIMETypes</key>
+                        <key>LSIsAppleDefaultForType</key>
+                        <true/>
+                        <key>LSItemContentTypes</key>
                         <array>
-                                <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+                                <string>public.mmp</string>
+                                <string>public.mmpz</string>
                         </array>
-                        <key>NSDocumentClass</key>
-                        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+                        <key>CFBundleTypeExtensions</key>
+                        <array>
+                                <string>mmp</string>
+                                <string>mmpz</string>
+                        </array>
                 </dict>
         </array>
 </dict>
