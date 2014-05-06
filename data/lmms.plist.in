@@ -1,0 +1,48 @@
+<!-- Apple Application Bundle Info.plist -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>CFBundleExecutable</key>
+        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@</string>
+        <key>CFBundleGetInfoString</key>
+        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ @MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+        <key>CFBundleIdentifier</key>
+        <string>net.sourceforge.lmms</string>
+        <key>CFBundleIconFile</key>
+        <string>@MACOSX_BUNDLE_ICON_FILE@</string>
+        <key>CFBundleName</key>
+        <string>@MACOSX_BUNDLE_BUNDLE_NAME@</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleVersion</key>
+        <string>@MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+        <key>CFBundleDocumentTypes</key>
+        <array>
+                <dict>
+                        <key>CFBundleTypeIconFile</key>
+                        <string>project.icns</string>
+                        <key>CFBundleTypeName</key>
+                        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+                        <key>CFBundleTypeRole</key>
+                        <string>Editor</string>
+                        <key>LSIsAppleDefaultForType</key>
+                        <true/>
+                        <key>LSItemContentTypes</key>
+                        <array>
+                                <string>public.mmp</string>
+                                <string>public.mmpz</string>
+                        </array>
+                        <key>CFBundleTypeExtensions</key>
+                        <array>
+                                <string>mmp</string>
+                                <string>mmpz</string>
+                        </array>
+                </dict>
+        </array>
+</dict>
+</plist>

@@ -99,8 +99,10 @@ inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out
   for (i=0; i<length; i++) {
     impulse_time[i] = imp[i];
   }
-  for (; i<fftl; i++) {
-    impulse_time[i] = 0.0f;
+  
+  int last = i;
+  for (i = 0; i<fftl; i++) {
+    if (i >=last) impulse_time[i] = 0.0f;
   }
 #ifdef FFTW3
   fftwf_execute(tmp_plan);

@@ -10,10 +10,10 @@ if [ -d "$dir" ]; then
 fi
 
 # set up your app name, version number, and background image file name
-APP_NAME="LMMS"
-VERSION="1.0.0"
+APP_NAME="@MACOSX_BUNDLE_BUNDLE_NAME@"
+VERSION="@MACOSX_BUNDLE_LONG_VERSION_STRING@"
 DMG_BACKGROUND_IMG="dmg_branding.png"
-cp $HOME/lmms/data/$DMG_BACKGROUND_IMG .
+cp "@CMAKE_SOURCE_DIR@/data/${DMG_BACKGROUND_IMG}" .
 
 # you should not need to change these
 APP_LOWERCASE=$(echo $APP_NAME|tr '[:upper:]' '[:lower:]')
