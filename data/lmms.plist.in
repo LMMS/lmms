@@ -102,7 +102,7 @@
                 <key>UTTypeReferenceURL</key>
                 <string>@MACOSX_BUNDLE_PROJECT_URL@</string>
                 <key>UTTypeDescription</key>
-                <string>LMMS Project</string>
+                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
                 <key>UTTypeIconFile</key>
                 <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
                 <key>UTTypeConformsTo</key>
