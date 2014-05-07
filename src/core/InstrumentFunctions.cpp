@@ -364,7 +364,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table[selected_arp].size();
-	const int range = (int)( cur_chord_size * m_arpRangeModel.value() );
+	const int range = (int)( cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value() );
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
@@ -449,7 +449,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// just pick a random chord-index
 			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
 		}
-
+		cur_arp_idx = (int)( cur_arp_idx / m_arpRepeatsModel.value() );
 		// now calculate final key for our arp-note
 		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size ) *
 							KeysPerOctave + chord_table[selected_arp][cur_arp_idx % cur_chord_size];
