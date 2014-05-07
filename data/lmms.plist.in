@@ -44,7 +44,7 @@
     <string>6.0</string>
 
     <key>CFBundleIdentifier</key>
-    <string>net.sourceforge.lmms</string>
+    <string>@MACOSX_BUNDLE_MIMETYPE_ID@</string>
 
     <key>CFBundleDocumentTypes</key>
     <array>
