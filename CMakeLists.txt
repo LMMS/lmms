@@ -397,7 +397,7 @@ SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
 SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
 SET(MACOSX_BUNDLE_MIMETYPE "application/x-lmms-project")
 SET(MACOSX_BUNDLE_MIMETYPE_ICON "project.icns")
-SET(MACOSX_BUNDLE_MIMETYPE_ID "net.sourceforget.lmms")
+SET(MACOSX_BUNDLE_MIMETYPE_ID "net.sourceforge.lmms")
 SET(MACOSX_BUNDLE_PROJECT_URL "http://lmms.sourceforge.net")
 
 
