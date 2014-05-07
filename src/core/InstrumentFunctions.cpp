@@ -423,23 +423,21 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
 			if( cur_arp_idx >= range )
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - m_arpRepeatsModel.value();
 			}
 		}
 		else if( dir == ArpDirDownAndUp && range > 1 )
 		{
 			// copied from ArpDirUpAndDown above
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
-			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
 			if( cur_arp_idx >= range )
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - m_arpRepeatsModel.value();
 			}
 			// inverts direction
 			cur_arp_idx = range - cur_arp_idx - 1;
@@ -449,6 +447,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// just pick a random chord-index
 			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
 		}
+		// Divide cur_arp_idx with wanted repeats. This method doesn't work with random though.
 		cur_arp_idx = (int)( cur_arp_idx / m_arpRepeatsModel.value() );
 		// now calculate final key for our arp-note
 		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size ) *
