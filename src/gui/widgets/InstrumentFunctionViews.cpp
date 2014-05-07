@@ -103,6 +103,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new comboBox() ),
 	m_arpRangeKnob( new knob( knobBright_26 ) ),
+	m_arpRepeatsKnob( new knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
 	m_arpGateKnob( new knob( knobBright_26 ) ),
 	m_arpDirectionComboBox( new comboBox() ),
@@ -135,7 +136,12 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
 			"number of octaves." ) );
-
+			
+	m_arpRepeatsKnob->setLabel( tr( "REPEATS" ) );
+	m_arpRepeatsKnob->setHintText( tr( "Note repeats:" ) + " ", " " + tr( "time(s)" ) );
+	m_arpRepeatsKnob->setWhatsThis(
+		tr( "Use this knob for setting the number of times every note "
+			"in the arpeggio will repeat." ) );
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " + tr( "ms" ) );
@@ -170,6 +176,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpRepeatsKnob, 0, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpTimeKnob, 3, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
 
@@ -194,6 +201,7 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
+	m_arpRepeatsKnob->setModel( &m_a->m_arpRepeatsModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
 	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );
