@@ -668,13 +668,13 @@ static void init_timetables( FM_OPL *OPL , int ARRATE , int DRRATE ) {
 			OPL->AR_TABLE[i] = EG_AED-1;
 			OPL->DR_TABLE[i] = OPL->DR_TABLE[60];
 		}
-		#if 0
+#if 0
 			for ( i = 0; i < 64 ; i++ ) {	/* make for overflow area */
 				LOG(LOG_WAR,("rate %2d , ar %f ms , dr %f ms \n",i,
 					((double)(EG_ENT<<ENV_BITS) / OPL->AR_TABLE[i]) * (1000.0 / OPL->rate),
 					((double)(EG_ENT<<ENV_BITS) / OPL->DR_TABLE[i]) * (1000.0 / OPL->rate) ));
 			}
-		#endif
+#endif
 	}
 }
 
@@ -871,7 +871,7 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v) {
 					}
 				}
 				return;
-	#if BUILD_Y8950
+#if BUILD_Y8950
 			case 0x06:		/* Key Board OUT */
 				if ( OPL->type&OPL_TYPE_KEYBOARD ) {
 					if ( OPL->keyboardhandler_w ) {
@@ -904,7 +904,7 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v) {
 					YM_DELTAT_ADPCM_Write(OPL->deltat,r-0x07,v);
 				}
 				return;
-	#if 0
+#if 0
 			case 0x15:		/* DAC data    */
 			case 0x16:
 			case 0x17:		/* SHIFT    */
@@ -924,8 +924,8 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v) {
 				return;
 			case 0x1a:		/* PCM data */
 				return;
-	#endif
-	#endif
+#endif
+#endif
 		}
 		break;
 	case 0x20:	/* am,vib,ksr,eg type,mul */
