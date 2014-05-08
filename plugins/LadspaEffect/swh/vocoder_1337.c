@@ -43,7 +43,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -333,7 +333,7 @@ LADSPA_Descriptor * g_psDescriptor = NULL;
 
 /*****************************************************************************/
 
-/* _init() is called automatically when the plugin library is first
+/* __attribute__((constructor)) swh_init() is called automatically when the plugin library is first
    loaded. */
 void 
 _init() {
