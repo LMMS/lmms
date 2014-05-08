@@ -335,8 +335,7 @@ LADSPA_Descriptor * g_psDescriptor = NULL;
 
 /* __attribute__((constructor)) swh_init() is called automatically when the plugin library is first
    loaded. */
-void 
-_init() {
+void __attribute__((constructor)) swh_init() {
   char ** pcPortNames;
   LADSPA_PortDescriptor * piPortDescriptors;
   LADSPA_PortRangeHint * psPortRangeHints;
@@ -448,7 +447,7 @@ const LADSPA_Descriptor *
 ladspa_descriptor(unsigned long Index) {
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif

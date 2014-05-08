@@ -70,7 +70,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
