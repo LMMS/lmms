@@ -3,6 +3,9 @@
 <plist version="1.0">
   <dict>
 
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+
     <key>CFBundleIconFile</key>
     <string>@MACOSX_BUNDLE_ICON_FILE@</string>
 
@@ -48,11 +51,11 @@
 
     <key>CFBundleDocumentTypes</key>
     <array>
+    
       <dict>
         <key>CFBundleTypeExtensions</key>
           <array>
             <string>mmpz</string>
-            <string>mmp</string>
           </array>
         <key>CFBundleTypeIconFile</key>
         <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
@@ -61,11 +64,36 @@
         <key>CFBundleTypeOSTypes</key>
            <array>
              <string>mmpz</string>
+           </array>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleTypeMIMETypes</key>
+        <array>
+           <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+        </array>
+      </dict>
+      
+      <dict>
+        <key>CFBundleTypeExtensions</key>
+          <array>
+            <string>mmp</string>
+          </array>
+        <key>CFBundleTypeIconFile</key>
+        <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+        <key>CFBundleTypeName</key>
+        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project (uncompressed)</string>
+        <key>CFBundleTypeOSTypes</key>
+           <array>
              <string>mmp</string>
            </array>
         <key>CFBundleTypeRole</key>
         <string>Editor</string>
+        <key>CFBundleTypeMIMETypes</key>
+        <array>
+           <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+        </array>
       </dict>
+      
     </array>
 
     <key>UTExportedTypeDeclarations</key>
@@ -85,14 +113,10 @@
                 </array>
                 <key>UTTypeTagSpecification</key>
                 <dict>
-                    <key>@MACOSX_BUNDLE_MIMETYPE_ID@.mmpz</key>
-                    <string>MMPZ</string>
                     <key>public.filename-extension</key>
                     <array>
                         <string>mmpz</string>
                     </array>
-                    <key>public.mime-type</key>
-                    <string>@MACOSX_BUNDLE_MIMETYPE@</string>
                 </dict>
             </dict>
 
@@ -102,7 +126,7 @@
                 <key>UTTypeReferenceURL</key>
                 <string>@MACOSX_BUNDLE_PROJECT_URL@</string>
                 <key>UTTypeDescription</key>
-                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project (uncompressed)</string>
                 <key>UTTypeIconFile</key>
                 <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
                 <key>UTTypeConformsTo</key>
@@ -112,14 +136,10 @@
                 </array>
                 <key>UTTypeTagSpecification</key>
                 <dict>
-                    <key>@MACOSX_BUNDLE_MIMETYPE_ID@.mmp</key>
-                    <string>MMP</string>
                     <key>public.filename-extension</key>
                     <array>
                         <string>mmp</string>
                     </array>
-                    <key>public.mime-type</key>
-                    <string>@MACOSX_BUNDLE_MIMETYPE@</string>
                 </dict>
             </dict>
         </array>
