@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -497,7 +497,7 @@ static void runAddingButthigh_iir(LADSPA_Handle instance, unsigned long sample_c
 	iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
