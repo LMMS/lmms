@@ -78,6 +78,11 @@ private:
 	groupBox * m_arpGroupBox;
 	comboBox * m_arpComboBox;
 	knob * m_arpRangeKnob;
+	knob * m_arpCycleKnob;
+	knob * m_arpRepeatsKnob;
+	knob * m_arpSkipKnob;
+	knob * m_arpMissKnob;
+	knob * m_arpFreezeKnob;
 	TempoSyncKnob * m_arpTimeKnob;
 	knob * m_arpGateKnob;
 
