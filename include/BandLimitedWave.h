@@ -31,6 +31,7 @@
 #include <QFile>
 
 #include "config_mgr.h"
+#include "export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -103,7 +104,7 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
 }
 
 
-class BandLimitedWave
+class EXPORT BandLimitedWave
 {
 public:
 	enum Waveforms
