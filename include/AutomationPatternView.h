@@ -50,7 +50,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void disconnectObject( QAction * _a );
-
+	void toggleRecording();
 
 protected:
 	virtual void constructContextMenu( QMenu * );
@@ -69,6 +69,8 @@ private:
 	AutomationPattern * m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
+	
+	static QPixmap * s_pat_rec;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;

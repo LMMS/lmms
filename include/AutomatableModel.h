@@ -133,7 +133,6 @@ public:
 
 	float controllerValue( int frameOffset ) const;
 
-
 	template<class T>
 	T initValue() const
 	{

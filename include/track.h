@@ -373,7 +373,8 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-
+	void recordingOn();
+	void recordingOff();
 
 private:
 	static QPixmap * s_grip;

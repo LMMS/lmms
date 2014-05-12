@@ -155,12 +155,20 @@ public:
 	static AutomationPattern * globalAutomationPattern( AutomatableModel * _m );
 	static void resolveAllIDs();
 
+	bool isRecording() const
+	{
+		return m_isRecording;
+	}
+	
+	void setRecording( const bool b )
+	{
+		m_isRecording = b;
+	}
 
 public slots:
 	void clear();
 	void openInAutomationEditor();
 	void objectDestroyed( jo_id_t );
-
 
 private:
 	void cleanObjects();
@@ -179,6 +187,9 @@ private:
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
+	
+	bool m_isRecording;
+	float m_lastRecordedValue;
 
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;

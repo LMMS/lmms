@@ -388,6 +388,12 @@ void MainWindow::finalize()
 							SLOT( exportProject() ),
 								m_toolBar );
 
+	toolButton * whatsthis = new toolButton(
+				embed::getIconPixmap( "whatsthis" ),
+					tr( "What's this?" ),
+					this, SLOT( enterWhatsThisMode() ),
+								m_toolBar );
+
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -396,7 +402,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
 	m_toolBarLayout->addWidget( project_save, 0, 5 );
 	m_toolBarLayout->addWidget( project_export, 0, 6 );
-
+	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
 
 
 	// window-toolbar
