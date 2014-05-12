@@ -1600,8 +1600,6 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 				++it;
 			}
 
-			Q_ASSERT( it == time_map.end()-1 );
-
 			for( int i = it.key(), x = xCoordOfTick( i ); x <= width();
 							i++, x = xCoordOfTick( i ) )
 			{

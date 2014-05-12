@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+
+    <key>CFBundleIconFile</key>
+    <string>@MACOSX_BUNDLE_ICON_FILE@</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleGetInfoString</key>
+    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ @MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+
+<!--
+    #############################################################
+    #    Apple Creator Code Registered Application Signatures   #
+    #############################################################
+    #    Company:       LMMS Foundation                         #
+    #    Registrant:    tres.finocchiaro@gmail.com              #
+    #    ASCII Code:    LMMS                                    #
+    #    HEX:           4C4D4D53                                #
+    #############################################################
+    #    Contact Apple Developer Support at cfreg@apple.com     #
+    #    with any requested changes                             #
+    #############################################################
+-->
+    <key>CFBundleSignature</key>
+    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@</string>
+
+    <key>CFBundleExecutable</key>
+    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@</string>
+
+    <key>CFBundleVersion</key>
+    <string>@MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>@MACOSX_BUNDLE_LONG_VERSION_STRING@</string>
+
+    <key>CFBundleName</key>
+    <string>@MACOSX_BUNDLE_BUNDLE_NAME@</string>
+
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>@MACOSX_BUNDLE_MIMETYPE_ID@</string>
+
+    <key>CFBundleDocumentTypes</key>
+    <array>
+    
+      <dict>
+        <key>CFBundleTypeExtensions</key>
+          <array>
+            <string>mmpz</string>
+          </array>
+        <key>CFBundleTypeIconFile</key>
+        <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+        <key>CFBundleTypeName</key>
+        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+        <key>CFBundleTypeOSTypes</key>
+           <array>
+             <string>mmpz</string>
+           </array>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleTypeMIMETypes</key>
+        <array>
+           <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+        </array>
+      </dict>
+      
+      <dict>
+        <key>CFBundleTypeExtensions</key>
+          <array>
+            <string>mmp</string>
+          </array>
+        <key>CFBundleTypeIconFile</key>
+        <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+        <key>CFBundleTypeName</key>
+        <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project (uncompressed)</string>
+        <key>CFBundleTypeOSTypes</key>
+           <array>
+             <string>mmp</string>
+           </array>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleTypeMIMETypes</key>
+        <array>
+           <string>@MACOSX_BUNDLE_MIMETYPE@</string>
+        </array>
+      </dict>
+      
+    </array>
+
+    <key>UTExportedTypeDeclarations</key>
+        <array>
+            <dict>
+                <key>UTTypeIdentifier</key>
+                <string>@MACOSX_BUNDLE_MIMETYPE_ID@.mmpz</string>
+                <key>UTTypeReferenceURL</key>
+                <string>@MACOSX_BUNDLE_PROJECT_URL@</string>
+                <key>UTTypeDescription</key>
+                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project</string>
+                <key>UTTypeIconFile</key>
+                <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.data</string>
+                </array>
+                <key>UTTypeTagSpecification</key>
+                <dict>
+                    <key>public.filename-extension</key>
+                    <array>
+                        <string>mmpz</string>
+                    </array>
+                </dict>
+            </dict>
+
+            <dict>
+                <key>UTTypeIdentifier</key>
+                <string>@MACOSX_BUNDLE_MIMETYPE_ID@.mmp</string>
+                <key>UTTypeReferenceURL</key>
+                <string>@MACOSX_BUNDLE_PROJECT_URL@</string>
+                <key>UTTypeDescription</key>
+                <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@ Project (uncompressed)</string>
+                <key>UTTypeIconFile</key>
+                <string>@MACOSX_BUNDLE_MIMETYPE_ICON@</string>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.xml</string>
+                    <string>public.data</string>
+                </array>
+                <key>UTTypeTagSpecification</key>
+                <dict>
+                    <key>public.filename-extension</key>
+                    <array>
+                        <string>mmp</string>
+                    </array>
+                </dict>
+            </dict>
+        </array>
+  </dict>
+</plist>

@@ -24,7 +24,11 @@
 #include "impulses/20-matchless-chieftain-sm57.h"
 #include "impulses/21-matchless-chieftain-sm57-off.h"
 
+#ifdef __clang__
+void mk_imps(fftw_real **impulse_freq)
+#else
 inline void mk_imps(fftw_real **impulse_freq)
+#endif
 {
 	int c = 0;
 	MK_IMP(unit);

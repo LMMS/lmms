@@ -228,10 +228,10 @@ cleanup_Sigmoid(LADSPA_Handle Instance) {
 LADSPA_Descriptor * mono_descriptor = NULL;
 
 
-/*  _init() is called automatically when the plugin library is first
+/* __attribute__((constructor)) tap_init() is called automatically when the plugin library is first
    loaded. */
 void 
- _init() {
+__attribute__((constructor)) tap_init() {
 	
 	char ** port_names;
 	LADSPA_PortDescriptor * port_descriptors;
@@ -318,9 +318,9 @@ delete_descriptor(LADSPA_Descriptor * descriptor) {
 }
 
 
-/*  _fini() is called automatically when the library is unloaded. */
+/* __attribute__((destructor)) tap_fini() is called automatically when the library is unloaded. */
 void
- _fini() {
+__attribute__((destructor)) tap_fini() {
 	delete_descriptor(mono_descriptor);
 }
 

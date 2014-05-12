@@ -1,0 +1,121 @@
+#!/bin/bash
+#title         :create_applet_installer.sh
+#description   :Creates Apple ".app" bundle for LMMS
+#author        :Tres Finocchiaro
+#date          :20140504
+#version       :1.1
+#usage         :bash create_applet_installer.sh
+#notes         :See also https://github.com/LMMS
+#notes         :Troubleshooting try: export DYLD_PRINT_LIBRARIES=1; export VERBOSE=1;
+#requires      :deploymacqt
+#=========================================================================================
+ 
+# MacPorts Location
+MACPORTS=/opt/local
+ 
+ # LMMS project root directory (extracted source)
+CMAKE_SRC=@CMAKE_SOURCE_DIR@
+ 
+# LMMS compiled (install) resources
+CMAKE_INSTALL=@CMAKE_INSTALL_PREFIX@
+ 
+# LMMS working build directory
+CMAKE_BUILD=$(cd @CMAKE_CURRENT_BINARY_DIR@/../..; pwd)
+
+# STK rawwaves directory
+STK_RAWWAVE=${HOME}/stk-*/rawwaves
+ 
+# Place to create ".app" bundle
+APP=${HOME}/Desktop/LMMS.app
+ 
+# MacPorts installs libreadline with wrong permissions
+LIBREADLINE=${MACPORTS}/lib/libreadline.6.2.dylib
+
+# The DMG packager script location
+DMG_SCRIPT_SRC=${CMAKE_BUILD}/create_apple_dmg.sh
+DMG_SCRIPT_DST=${HOME}/Desktop/create_apple_dmg.sh
+ 
+#=========================================================================================
+
+MSG_COLOR='\x1B[1;36m'
+COLOR_RESET='\x1B[0m'
+echo -e "${MSG_COLOR}\n\nCreating App Bundle \"${APP}\"...${COLOR_RESET}"
+ 
+# Check for u+w permissions on libreadline
+CHECKREADLINE=$(stat -f "%p" $LIBREADLINE)
+CHECKREADLINE=${CHECKREADLINE:3:1}
+if [ "${CHECKREADLINE}" != "7" ]
+then
+  echo -e "\n\n\t\t\t\t***********\n\t\t\t\t* WARNING *\n\t\t\t\t***********"
+  echo -e "File ${LIBREADLINE} is not marked as user writable."
+  echo -e "This will break macdeployqt's linking process after it is copied."
+  echo -e "A sudo password is required to elevate and fix using chmod u+w."
+  echo -e "\nPLEASE ENTER SUDO PASSWORD:"
+  sudo chmod u+w "${MACPORTS}/lib/libreadline.6.2.dylib"
+fi
+ 
+# Remove any old .app bundles
+rm -Rf ${APP}
+ 
+# Create new bundle, copy our built code to it
+mkdir -p ${APP}
+cd ${CMAKE_INSTALL}
+mkdir ${APP}/Contents
+cp -R * ${APP}/Contents
+ 
+# Manually copy STK rawwaves
+mkdir -p ${APP}/Contents/share/stk/rawwaves
+cp ${STK_RAWWAVE}/*.raw ${APP}/Contents/share/stk/rawwaves
+ 
+# Make all libraries writable for macdeployqt
+cd ${APP}
+find . -type f -print0 | xargs -0 chmod u+w
+ 
+# Move lmms binary to the proper location
+mkdir -p ${APP}/Contents/MacOS
+mv ${APP}/Contents/bin/lmms ${APP}/Contents/MacOS
+rm -rf ${APP}/Contents/bin
+ 
+# Move libraries to proper locations
+mkdir -p ${APP}/Contents/Frameworks
+mv ${APP}/Contents/lib/lmms/libZynAddSubFxCore.dylib \
+   ${APP}/Contents/Frameworks/libZynAddSubFxCore.dylib
+   
+mv ${APP}/Contents/lib/lmms/RemoteZynAddSubFx \
+   ${APP}/Contents/MacOS/RemoteZynAddSubFx
+ 
+# Fix more Zyn Linking issues
+install_name_tool -change libZynAddSubFxCore.dylib \
+   @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
+   ${APP}/Contents/lib/lmms/libzynaddsubfx.so
+ 
+install_name_tool -change ${CMAKE_BUILD}/plugins/zynaddsubfx/libZynAddSubFxCore.dylib \
+   @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
+   ${APP}/Contents/MacOS/RemoteZynAddSubFx
+ 
+# Build a list of shared objects in target/lib/lmms
+for file in  ${APP}/Contents/lib/lmms/*.so; do
+   _executables="${_executables} -executable=${APP}/Contents/lib/lmms/${file##*/}"
+done
+ 
+# Build a list of shared objects in target/lib/lmms/ladspa
+for file in  ${APP}/Contents/lib/lmms/ladspa/*.so; do
+_executables="${_executables} -executable=${APP}/Contents/lib/lmms/ladspa/${file##*/}"
+done
+ 
+# Additional binaries that require linking
+_executables="${_executables} -executable=${APP}/Contents/MacOS/RemoteZynAddSubFx"
+_executables="${_executables} -executable=${APP}/Contents/Frameworks/libZynAddSubFxCore.dylib"
+ 
+# Build our App Package using "macdeployqt"
+macdeployqt ${APP} $_executables
+ 
+# OS X Specific Artwork
+cp ${CMAKE_SRC}/data/*.icns ${APP}/Contents/Resources/
+ 
+# Done.  Ready to build DMG
+echo -e "\nFinished.\n\nYou may run LMMS from the Desktop."
+echo -e "\nTo create an Apple DMG Package run ${MSG_COLOR}\"${DMG_SCRIPT_DST}\"${COLOR_RESET}.\n"
+echo -e "(Note: You can drag/drop the script directly into this terminal window.)\n"
+cp ${DMG_SCRIPT_SRC} ${DMG_SCRIPT_DST}
+chmod +x ${DMG_SCRIPT_DST}

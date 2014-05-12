@@ -26,7 +26,7 @@ IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32)
 
 	# workaround for broken wineg++ in WINE 1.4 (shipped e.g. with Ubuntu Precise)
-	EXEC_PROGRAM( wineg++ ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
+	EXEC_PROGRAM( ${WINE_CXX} ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
 	if("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
@@ -34,7 +34,7 @@ ENDIF(LMMS_HOST_X86_64)
 
 ADD_CUSTOM_COMMAND(
 		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
-		COMMAND wineg++
+		COMMAND ${WINE_CXX}
 		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -mwindows -lpthread ${EXTRA_FLAGS} -o RemoteVstPlugin
 		COMMAND find -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
 		TARGET vstbase

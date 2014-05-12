@@ -1,4 +1,4 @@
-LMMS 1.0.0
+LMMS 1.0.2
 ===========
 
 Copyright (c) 2004-2014 by LMMS developers
@@ -93,13 +93,9 @@ can be found at
 http://lmms.sourceforge.net
 
 
-Details on development can be found at
+Details on development can be found in the Wiki:
 
-http://lmms.sourceforge.net/development.php
-
-or in the Wiki:
-
-http://lmms.sourceforge.net/wiki/
+https://github.com/LMMS/lmms/wiki
 
 Before coding a new big feature, please ALWAYS post your idea and suggestions
 about your feature and about the intended implementation to the

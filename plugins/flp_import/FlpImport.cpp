@@ -982,6 +982,7 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 
 			case FLP_LayerChans:
 				p.channels[data].layerParent = cur_channel;
+				break;
 
 			// DWORD EVENTS
 			case FLP_Color:
