@@ -300,11 +300,14 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
-	m_arpCycleModel( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Cycle steps" ) ),
-	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
-	m_arpFreezeModel( 0.0f, 0.0f, 20.0f, 1.0f, this, tr( "Freeze point" ) ),
+	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
+	m_arpScrambleModel( 0.0f, 0.0f, 4.0f, 1.0f, this, tr( "Scramble mode" ) ),
+	m_arpCycleModel( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Cycle steps" ) ),
+//	m_arpCycleShiftModel( false, this, tr( "Cycle mode" ) ),
+	m_arpFloorModel( 0.0f, 0.0f, 20.0f, 1.0f, this, tr( "Floor" ) ),
+	m_arpCeilModel( 0.0f, 0.0f, 20.0f, 1.0f, this, tr( "Ceiling" ) ),
 	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
@@ -413,7 +416,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-			if( ( rand() % 100 ) < m_arpSkipModel.value() )
+			if( 100 * ( (float) rand() / (float) RAND_MAX ) < m_arpSkipModel.value() )
 			{
 				// update counters
 				frames_processed += arp_frames;
@@ -423,13 +426,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		int dir = m_arpDirectionModel.value();
-		
+
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
 		int miss = m_arpMissModel.value();
 		if( miss )
 		{
-			if( rand() % 100 < ( miss * miss ) / 100 )
+			if( 100 * ( (float) rand() / (float) RAND_MAX ) < ( miss * miss ) / 100 )
 			{
 				dir = ArpDirRandom;
 			}
@@ -451,7 +454,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
+			cur_arp_idx = ( cur_frame / arp_frames ) % 
+					( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
 			if( cur_arp_idx >= range )
@@ -462,7 +466,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		else if( dir == ArpDirDownAndUp && range > 1 )
 		{
 			// copied from ArpDirUpAndDown above
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
+			cur_arp_idx = ( cur_frame / arp_frames ) %
+					( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
 			if( cur_arp_idx >= range )
@@ -480,36 +485,124 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Divide cur_arp_idx with wanted repeats. This method doesn't work with random though.
 		cur_arp_idx = (int)( cur_arp_idx / m_arpRepeatsModel.value() );
 
+
+//	qDebug("cur_arp_idx %i: ", cur_arp_idx);
+//	qDebug("scramble: %i", scramble);
+
+
+		// Scramble part 1
+		int scramble = m_arpScrambleModel.value();
+		if( scramble < 5 && dir != ArpDirRandom )
+		{
+			switch( scramble )
+			{
+				case 1:
+					// Shift left one
+					cur_arp_idx++;
+					break;
+				case 2:
+					// Shift left two
+					cur_arp_idx +=2;
+					break;
+				case 3:
+					// Shift left three
+					cur_arp_idx +=3;
+					break;
+				case 4:
+					// Shift left four
+					cur_arp_idx +=4;
+					break;
+			}
+			if ( cur_arp_idx >= range )
+			{
+				int i = 0;
+				while( cur_arp_idx >= (int)( range / m_arpRepeatsModel.value() ) )
+				{
+					cur_arp_idx -= range;
+					i++;
+				}
+			}
+		}
+
+//	qDebug("cur_arp_idx: %i", cur_arp_idx);
+//	qDebug("scramble: %i \n", scramble);
+
+
 		// Cycle notes
 		const int cycle = m_arpCycleModel.value();
 		if( cycle )
 		{
+//			if( dir == arpDirUp || dir == arpDirDown )
 			cur_arp_idx *= cycle + 1;
 			int i = 0;
-			while( cur_arp_idx >= range )
+			while( cur_arp_idx >= (int)( range / m_arpRepeatsModel.value() ) )
 			{
-				cur_arp_idx -= range;// + ( range % 2 ? 0 : 1 );
+				cur_arp_idx -= range;
 				i++;
 			}
-			qDebug("i = %i", i);
-			if ( cur_arp_idx == 0 )
+			
+//			fabs( cur_arp_idx );
+//			qDebug("cur_arp_idx = %i", i);
+//			qDebug("i = %i", i);
+//			int cycleShift = m_arpCycleShiftModel.value();// ? 1 : 0;
+//			qDebug("cycleShift = %i", cycleShift);
+//			if ( cycleShift )
+//			{
+//				cur_arp_idx ^= ( rand() % range );//= cycleShift;
+//			}
+		}
+
+		// Scramble part 2
+		if( scramble > 4 && dir != ArpDirRandom )
+		{
+			switch( scramble )
 			{
-				cur_arp_idx += i;
+				case 5:
+					// Shift left one
+					cur_arp_idx++;
+					if ( cur_arp_idx == 0 && range != 0 )
+					{
+						cur_arp_idx -= range;
+					}
+					break;
+//				case 6:
+//					break;
+//				case 7:
+//					break;
+//				case 8:
+//					break;
+//	;) - Your expansion here!
+//				case 9:
+//					break;
+			}
+			if ( cur_arp_idx >= range )
+			{
+				cur_arp_idx -= range;
 			}
 		}
-		
-		// Freeze. Note stuck at set index.
-		if( m_arpFreezeModel.value() && m_arpFreezeModel.value() < cur_arp_idx )
+
+		// Floor.
+		int floor = m_arpFloorModel.value();
+		if( floor && floor > cur_arp_idx )
 		{
+			cur_arp_idx = floor;
 /*			if( dir == ArpDirDown || dir == ArpDirDownAndUp )
 			{
-	 			cur_arp_idx = cur_arp_idx -  m_arpFreezeModel.value();
+	 			cur_arp_idx = cur_arp_idx -  m_arpCeilModel.value();
  			}
 			else
-			{*/
-				cur_arp_idx = m_arpFreezeModel.value();
-/*			}*/
+			{
+				cur_arp_idx = m_arpCeilModel.value();
+			}*/
 		}
+
+		// Ceil. Note stuck at set index.
+		int ceiling = m_arpCeilModel.value();
+		if( ceiling && cur_arp_idx > ceiling )
+		{
+			cur_arp_idx = ceiling;
+		}
+
 		// now calculate final key for our arp-note
 		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size ) *
 							KeysPerOctave + chord_table[selected_arp][cur_arp_idx % cur_chord_size];
@@ -554,10 +647,13 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpModel.saveSettings( _doc, _this, "arp" );
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
 	m_arpCycleModel.saveSettings( _doc, _this, "cyclerange" );
+//	m_arpCycleShiftModel.saveSettings( _doc, _this, "arpcycleshift" );
 	m_arpRepeatsModel.saveSettings( _doc, _this, "arprepeats" );
+	m_arpScrambleModel.saveSettings( _doc, _this, "arpscramble" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
 	m_arpMissModel.saveSettings( _doc, _this, "arpmiss" );
-	m_arpFreezeModel.saveSettings( _doc, _this, "arpfreeze" );
+	m_arpFloorModel.saveSettings( _doc, _this, "arpfloor" );
+	m_arpCeilModel.saveSettings( _doc, _this, "arpceiling" );
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionModel.saveSettings( _doc, _this, "arpdir" );
@@ -573,10 +669,13 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpModel.loadSettings( _this, "arp" );
 	m_arpRangeModel.loadSettings( _this, "arprange" );
 	m_arpCycleModel.loadSettings( _this, "arpcycle" );
+//	m_arpCycleShiftModel.loadSettings( _this, "arpcycleshift" );
 	m_arpRepeatsModel.loadSettings( _this, "arprepeats" );
+	m_arpScrambleModel.loadSettings( _this, "arpscramble" );
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
 	m_arpMissModel.loadSettings( _this, "arpmiss" );
-	m_arpFreezeModel.loadSettings( _this, "arpfreeze" );
+	m_arpFloorModel.loadSettings( _this, "arpfloor" );
+	m_arpCeilModel.loadSettings( _this, "arpceiling" );
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
