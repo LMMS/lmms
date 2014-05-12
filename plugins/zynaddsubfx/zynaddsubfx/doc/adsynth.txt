@@ -1,0 +1,148 @@
+AdSynth
+-------
+
+AdSynth, a primarily additive synthesis engine, is one of the three major
+synthesis engines available in ZynAddSubFX.
+The basic concept of this engine is the summation of a collection of voices,
+each of which consist of oscillators.
+
+High Level (Global)
+~~~~~~~~~~~~~~~~~~~
+
+AdSynth's global level consists of the elements shown in the below figure:
+
+.AdSynth Global Elements
+image::gen/ad-note.png[scalewidth="50%",width="700"]
+
+The global level of adsynth is almost entirely composed of previously discussed
+elements.
+However a few new features appear here, this includes velocity sensing, punch,
+detune options and realative bandwidth , and resonance.
+
+.AdSynth Global Window
+image::images/ad-global.png[]
+
+
+Velocity sensing is simply an exponental transformation from the note's velocity
+to some parameter change.
+The below diagram shows how the velocity senseing controls affects this
+translation over the whole range of possible note velocities.
+
+.Velocity Sensing Chart
+image::gen/velf.png[scalewidth="50%",width="600"]
+
+The puch of a note in AdSynth is a constant amplification to the output at the
+start of the note, with its length determined by the punch time and stretch and
+the amplitude being determined by the punch strength and velocity sensing.
+The relBW control in the frequency pane is effectively a multiplier for detuning
+all voices within an adnote.
+
+NOTE: TODO Talk about resonance
+
+
+The sum of the voices are passed through filters and amplification to produce
+the final sound.
+This could lead one to think that ad-note is just a bunch of minor
+postprocessing and at this level much of the sound generation is hidden.
+
+Voices
+~~~~~~
+
+The voice gives access to a similar setup to the global parameters and then some
+more, such as the modulator, oscillator, and unison features.
+
+.AdSynth Voice Window
+image::images/ad-voice.png[]
+
+Modulation
+^^^^^^^^^^
+
+Within the options for modulation, one can select:
+
+* Morph
+* Ring Modulation
+* Phase Modulation
+* Frequency Modulation
+* Disabled
+
+Unison
+^^^^^^
+
+Unison is useful in creating the chorus like sound of many simultaneous
+oscillators
+
+Oscillator
+~~~~~~~~~~
+
+The oscillator is lets you choose the basic waveform, which oscillates while
+the sound is playing and is then further modified.
+
+.Oscillator Window
+image::images/uioscil.png[]
+
+[[adsynth::oscilllator::types_of_waveshaping, Types of Waveshaping]]
+Types of Waveshaping
+^^^^^^^^^^^^^^^^^^^^
+
+Waveshaping can be done using the *Wsh* area in the Oscillator editor.
+
+The type of distortion has much influence on how the overtones are being placed.
+Sometimes, you get a "fat" bass, and sometimes, high frequencies are added,
+makeing the sound "crystal clear".
+
+Atan & Sigmoid
+++++++++++++++
+
+This is the default setting. It is an easy way to apply loudness to a
+wave without getting undesired high overtones. Thus, it can be used both for
+making instruments that sound like "real" ones, but also for electronic music.
+The transformation turns, roughly said, every amplitude into a square amplitude.
+Thus, sine, power, pulse and triangle turn into a usual square wave, while a saw
+turns into a phased square wave. A chirp wave turns into a kind of phase
+modulated square wave.
+
+Quants
+++++++
+
+http://en.wikipedia.org/wiki/Quantization_%28sound_processing%29[Quantization]
+adds high overtones early. It can be seen as an unnatural effect, which is often
+used for electronic music.
+
+The transformation is a bit similar to building
+the http://en.wikipedia.org/wiki/Riemann_sum[lower sum] of a wave,
+mathematically said. This means that the transformation effect turns your
+"endless high" sampled wave into only a few samples. The more distortion you
+will apply, the less samples will be used. Indeed, this is equivalent to say
+that more input amplification is used. To see this, here is a small sample of
+code, where "ws" is the (correctly scaled amount of input amplification, and "n"
+the number of original samples.
+
+---------------------------------
+for(i = 0; i < n; ++i)
+  smps[i] = floor(smps[i] / ws + 0.5f) * ws;
+---------------------------------
+
+NOTE: If you turn on quantisation very high, you might be confused
+that, especially high notes, make no sound. The reason: High frequencies are 
+"forgotten" if you sample with only few samples. Also, the sign of an amplitude 
+can be forgotten. This behaviour might make some quantisations a bit unexpected.
+
+Limiting & Clipping
++++++++++++++++++++
+
+http://en.wikipedia.org/wiki/Limiting[Limiting] usually means that for a signal,
+the amplitude is modified because it exceeds its maximum value. Overdrive, as
+often used for guitars, is often achieved by limiting: It happens because an
+amplifier "overdrives" the maximum amplitude it can deliver.
+
+ZynAddSubFX has two types of limiting. Soft limiting, here as *Lmt*, means
+that the sound may not exceed a certain value. If the amplitude does so, it will
+simply be reduced to the limiting value. The overtones are generated in the
+lower frequencies first.
+
+Hard limiting, is also called clipping and abbreviated *Clip*. This means that
+if the maximum is exceeded, instead of being constant at the limiting value, the
+original signal still has some influence on the output signal. Still, it does
+not exceed the limiting value. For ZynAddSubFX, a signal exceeding the limiting
+value will continue to grow "in the negative". This leads to overtones being
+generated on the full frequency band.

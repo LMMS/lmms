@@ -1,0 +1,82 @@
+ZYNADDSUBFX(1)
+==============
+:doctype: manpage
+
+NAME
+----
+zynaddsubfx - a software synthesizer
+
+SYNOPSIS
+--------
+*zynaddsubfx* ['OPTIONS']
+
+DESCRIPTION
+-----------
+
+*zynaddsubfx* is a polyphonic multimbral synthesizer, which supports three
+synthesis engines and numerous effects to generate sound.
+
+1) ADsynth generates sounds by adding a number of voices.
+   Each voice has filters, envelopes, LFOs, morphing, modulation
+   (Ring Modulation, Phase Modulation... the modulators can have any
+   shape), resonance, etc...
+   Each voice includes a waveform generator with up to 128 sine/non-sine
+   harmonics.
+   You can use Fourier synthesis or if you don't like it you
+   can wave-shaping/filtering of functions.
+
+2) SUBsynth is a simple engine which makes sounds through
+   harmonic filtering of white noise
+
+3) PADsynth is an engine that makes very beautiful pads and other instruments,
+   which can be exported for use with other programs.
+
+Midi and audio support exists for OSS, ALSA, JACK, and others...
+
+OPTIONS
+-------
+
+*-h, --help*::
+    Display command-line help and exit
+*-v, --version*::
+    Display version and exit
+*-l, --load=FILE*::
+    Loads a .xmz file
+*-L, --load-instrument*=FILE::
+    Loads a .xiz file
+*-r --sample-rate*=SR::
+    Set the sample rate SR
+*-b, --buffer-size*=SR::
+    Set the buffer size, which determines the granularity of how often parameter
+    changes can be applied
+*-o, --oscil-size*=OS::
+    Set the ADsynth oscillator size
+*-S, --swap*::
+    Swap Left and Right output channels
+*-D, --dump*::
+    Dumps midi note ON/OFF commands
+*-U, --no-gui*::
+    Run ZynAddSubFX without user interface
+*-N, --named*=Name::
+    Postfix IO Name when possible
+*-a, --auto-connect*::
+    AutoConnect when using JACK
+*-O, --output*=engine::
+    Set Output Engine
+*-I, --input*=engine::
+    Set Input Engine
+*-e, --exec-after-init*=command::
+    Run post-initialization script. This script will be run after midi and audio
+    drivers have been initialized.
+
+BUGS
+----
+Please report any bugs to either the mailing list
+    zynaddsubfx-user@lists.sourceforge.net
+or the bugtracker
+    http://sourceforge.net/tracker/?group_id=62934
+
+AUTHOR
+------
+ZynAddSubFX was originally written by Nasca Octavian Paul. It is currently being
+maintained by Mark McCurry.

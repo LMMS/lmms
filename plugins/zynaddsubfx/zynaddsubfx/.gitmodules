@@ -1,0 +1,3 @@
+[submodule "instruments"]
+	path = instruments
+	url = git://git.code.sf.net/p/zynaddsubfx/instruments

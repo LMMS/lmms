@@ -1,0 +1,27 @@
+	Frequently Asked Questions
+	--------------------------
+
+Q1) What means "ZynAddSubFX" ?
+A1) The name of the program comes from 4 words:
+    1) Synthesizer ('S'->'Z') --> Zyn
+       ^^^
+    2) Additive Synthesis ------> Add
+       ^^^
+    3) Subtractive Synthesis ---> Sub
+       ^^^
+    4) Effects  ----------------> FX 
+    
+    So, ZynAddSubFX is a SYNthesizer with ADDitive, SUBtractive engines and effects.
+        
+
+Q2) How can I load files from older versions of ZynAddSubFX (like *.mas_zyn,etc)
+A2) You need to convert them into new format. Please use 2.0.0pre1 or (recommended) 2.0.0pre2 versions of ZynAddSubFX to load old file formants and save them in the new formats
+
+
+Q3) How can I change the number of parts, voices to ADSynth, effects, etc. ?
+A3) Look in src/globals.h and change there these values. You don't have to change anything else, just recompile all. But most settings must be below 128. As the rule of the thumb if a setting is 128 or below 128, please don't make it bigger than 128. Anyway, I don't believe that you'll need more than 128 for these settings; for example you don't need 128(or more) effects same time? That's why I put the limit of 128 (using 7 bits of char).
+
+
+Q4) How do I enable Jack support on ZynAddSubFX ?
+A4) If your system has the jack libraries installed, ZynAddSubFX should automatically build with jack support. It is highly recommended that the Jack samplerate to be equal to ZynAddSubFX samplerate (SAMPLE_RATE from globals.h), otherwise the resampling will be done and this will decrease the quality a bit.
+

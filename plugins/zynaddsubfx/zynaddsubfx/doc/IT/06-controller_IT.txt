@@ -1,0 +1,56 @@
+Controller
+---------
+
+image::./images/uicontroller.png[]
+
+General
+~~~~~~~
+
+* *ModWh*: Modulation Wheel depth (profondità della Modulation Wheel)
+* *Exp MWh*: Exponential Modulation Wheel (cambia la scala di mudulazione in
+             esponenziale)
+* *BwDpth*: Bandwidth Depth (profondità della Bandwidth)
+* *Exp BW*: Exponential Bandwidth (cambia la scala di Bandwidth in esponenziale)
+* *PanDpth*: Panning Depth (profondità del pan)
+* *FltQ*: Filter Q (resonance) depth
+* *FltCut* Filter Cutoff frequency depth (profondità della frequenza di taglio)
+* *Expr*: Attiva/disattiva Expression
+* *Vol*: Attiva/disattiva la ricezione di Volume controller
+* *FMamp*: Attiva/disattiva la ricezione di Modulation Amplitude controller (76)
+* *Sustain*: Attiva/disattiva sustain pedal
+* *PWheelB.Rng (cents)*: Pitch Wheel Bend Range (cents; 100 cents = 1 semitono)
+
+Portamento
+~~~~~~~~~~
+
+* *Rcv.*: Controlla se la parte riceve il Portamento - On/Off (65)
+* *time*: La durata del Portamento
+* *thresh*: La soglia '(Threshold)' del Portamento.
+Rappresenta il minimo o il massimo numero di semitoni (o centesimi di semitono)
+richiesti per lo start del Portamento.
+La differenza è calcolata tra l'ultima nota e la corrente.
+* *th.type*: Il tipo di Threshold
+Se selezionato significa che il Portamento si attiva quando la differenza
+delle frequenze è al di sopra della soglia ("thresh"); non selezionato si attiva
+quando è al di sotto della soglia.
+
+NOTE: La Threshold si riferisce alle frequenze e non alle note MIDI
+	 (si potrebbe tenere in considerazione se si usano scale microtonali).
+
+
+Proportional Portamento
+^^^^^^^^^^^^^^^^^^^^^^
+////
+TODO: add graphs to explain prp.rate and prp. depth
+////
+
+* *Propt.*: Se il Portamento è proporzionale al rapporto '(Ratio)' delle frequenze
+* *Prp. Rate*: Ratio necessaria per raddoppiare il tempo del Portamento
+* *Prp. Dpth* 
+
+Resonance
+~~~~~~~~~
+
+* *CFdpth*: Controlla la profondità del centro della Resonance
+* *BWdpth*: Controlla la profondità della larghezza di banda (Bandwidth) della 
+Resonance 

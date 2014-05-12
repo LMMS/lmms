@@ -1,0 +1,28 @@
+Zynaddsubfx
+===========
+:Author: Paul Nasca and Mark McCurry, translated by Ilario Glasgo
+
+include::01-intro_IT.txt[]
+
+include::02-filter_IT.txt[]
+
+include::03-lfo_IT.txt[]
+
+include::04-envelope_IT.txt[]
+
+include::05-adsynth_IT.txt[]
+
+include::06-controller_IT.txt[]
+
+/////////////////////////////
+include 07-effects_IT.txt
+include nrpn.txt
+/////////////////////////////
+
+include::08-saving_IT.txt[]
+
+include::APPENDIX_A-mididefaults_IT.txt[]
+
+include::APPENDIX_B-build_IT.txt[]
+
+include::APPENDIX_C-doc_getting_IT.txt[]

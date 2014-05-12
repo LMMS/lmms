@@ -1,0 +1,65 @@
+LFO
+---
+:author: Paul Nasca
+
+Introduction
+~~~~~~~~~~~~
+
+"LFO" means Low Frequency Oscillator.
+These oscillators are not used to make sounds by themselves, but they changes
+somes parameters (like the frequencies, the amplitudes or the filters).
+
+The LFOs has some basic parameters:
+
+* *Delay*: This parameter sets how much time takes since the start of the
+           note to the start of the LFO
+* *Start Phase*: The possition that a LFO will start at
+* *Frequency*: How fast the LFO is (i.e. how fast the parameter's controlled by
+               the LFO changes)
+* *Depth*: The amplitude of the LFO (i.e. how much the parameter's controlled
+           by the LFO changes)
+
+image:images/lfo0.png[]
+
+Another important LFO parameter is the shape.
+There are many LFO Types according to the shape.
+ZynAddSubFX supports the folowing LFO shapes:
+
+image:images/lfo1.png[]
+
+Another parameter is the LFO Randomness.
+It modifies the LFO amplitude or the LFO frequency at random.
+In ZynAddSubFX you can choose how much the LFO frequency or LFO amplitude
+changes by this parameter.
+In the folowing images are shown some examples of randomness and how changes
+the shape of a triangle LFO.
+
+image:images/lfo2.png[]
+
+Other parameters are:
+
+* *Continous mode*: If this mode is used, the LFO will not start from "zero" on each new note, but it will be continuous. This is very usefull if you apply on filters to make interesting sweeps.
+* *Stretch*: It controlls how much the LFO frequency changes according to the
+note's frequency.
+It can vary from negative stretch (the LFO frequency is decreased on higher
+notes) to zero (the LFO frequency will be the same on all notes) to positive
+stretch (the LFO frequency will be increased on higher notes).
+
+User Interface
+~~~~~~~~~~~~~~
+
+In ZynAddSubFX, LFO parameters are shown as:
+
+image:images/uilfo.jpg[]
+
+Theese parameters are:
+
+* *Freq*: LFO Frequency
+* *Depth*: LFO Depth
+* *Start*: LFO Start Phase - 
+If this knob is at the lowest value, the LFO Start Phase will be random.
+* *Delay*: LFO Delay
+* *A.R.*: LFO Amplitude Randomnes
+* *F.R.*: LFO Frequency Randomness
+* *C.*: LFO Continous Mode
+* *Str.*: LFO Stretch - in the image above the LFO stretch is set to zero

@@ -1,0 +1,70 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0102 
+header_name {.h} 
+code_name {.cxx}
+decl {//Copyright (c) 2002-2003 Nasca Octavian Paul} {selected
+} 
+
+decl {//License: GNU GPL 2} {} 
+
+decl {\#include <stdlib.h>} {public
+} 
+
+decl {\#include "Spliter.h"} {public
+} 
+
+class SpliterUI {} {
+  Function {make_window()} {open
+  } {
+    Fl_Window spliteruiwindow {
+      label {Midi Spliter}
+      callback {o->hide();
+exit(0);}
+      xywh {225 187 375 72} hide
+    } {
+      Fl_Counter {} {
+        label {Split note}
+        callback {spliter->Psplitpoint=(int) o->value();}
+        xywh {93 27 114 24} labelsize 12 align 5 minimum 0 maximum 127 step 1 value 60 textfont 1 textsize 16
+        code0 {o->value(spliter->Psplitpoint);}
+        code1 {o->lstep(12);}
+      }
+      Fl_Counter {} {
+        label {Input Channel}
+        callback {spliter->Pchin=(int) o->value();}
+        xywh {6 30 69 18} type Simple labelsize 10 align 5 minimum 0 maximum 15 step 1 textfont 1
+        code0 {o->value(spliter->Pchin);}
+      }
+      Fl_Counter {} {
+        label {Output Channel 1}
+        callback {spliter->Pchout1=(int) o->value();}
+        xywh {285 18 69 18} type Simple labelsize 10 align 5 minimum 0 maximum 15 step 1 textfont 1
+        code0 {o->value(spliter->Pchout1);}
+      }
+      Fl_Counter {} {
+        label {Output Channel 2}
+        callback {spliter->Pchout2=(int) o->value();}
+        xywh {285 36 69 18} type Simple labelsize 10 align 6 minimum 0 maximum 15 step 1 textfont 1
+        code0 {o->value(spliter->Pchout2);}
+      }
+      Fl_Counter {} {
+        label {Tr.1(oct.)}
+        callback {spliter->Poct1=(int) o->value();}
+        tooltip {Transpose (octaves)} xywh {225 18 48 18} type Simple labelsize 10 align 5 minimum -8 maximum 8 step 1 textfont 1
+        code0 {o->value(spliter->Poct1);}
+      }
+      Fl_Counter {} {
+        label {Tr.2(oct.)}
+        callback {spliter->Poct2=(int) o->value();}
+        tooltip {Transpose (octaves)} xywh {225 36 48 18} type Simple labelsize 10 align 6 minimum -8 maximum 8 step 1 textfont 1
+        code0 {o->value(spliter->Poct2);}
+      }
+    }
+  }
+  Function {SpliterUI(Spliter *spliter_)} {} {
+    code {spliter=spliter_;
+make_window();
+spliteruiwindow->show();} {}
+  }
+  decl {Spliter *spliter;} {}
+} 

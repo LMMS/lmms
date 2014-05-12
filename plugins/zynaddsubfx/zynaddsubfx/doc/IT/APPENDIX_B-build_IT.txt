@@ -1,0 +1,61 @@
+Appendice B: Compilare ZynAddSubFX
+--------------------------------
+
+Introduzione a CMake
+~~~~~~~~~~~~~~~~~~~~~
+
+************************************************************************
+Note: Questa sezione è in gran parte copiata dal wiki di OpenSceneGraph:
+http://www.openscenegraph.org/projects/osg/wiki/Build/CMake
+************************************************************************
+
+ZynAddSubFX usa CMake come suo sistema di compilazione unificato. CMake
+è capace di leggere semplici build script dall'albero dei sorgenti e
+creare da questo un sistema di compilazione specifico per la piattaforma.
+Questo sistema di compilazione può avere la forma di VisualStudio project
+files, Unix Makefiles o XCode project files. CMake è capace di individuare
+automaticamente le dipendeze esterne e consente di attivare/disattivare
+la compilazione del modulo e di configurare varie opzioni di compilazione.
+
+L'uso di un sistema di compilazione unificato consente di evitare rotture
+di compilazione che erano presenti nel precedente metodo di compilazione,
+ovvero quello di mantenere tre obiettivi di compilazione separati per
+VisualStudio, Unix "make" and XCode. Si riduce anche l'onere della
+manutenzione per gli sviluppatori base e collaboratori.
+Nell'insieme, l'uso di CMake dovrebbe portare come risultato una migliore
+coerenza e build più stabili su ogni piattaforma per gli utenti finali e
+una maggiore produttività nello sviluppo di nuove versioni.
+Speriamo che con una maggior coerenza di builds tra piattaforme renderà
+più facile per gli sviluppatori utilizzare la 'development version' di
+ZynAddSubFX e aiutare a contribuire ai testing e alle migliorie,
+portando ad un codice di più alta qualità.
+
+Quick start guide
+~~~~~~~~~~~~~~~~~
+
+Per i più impazienti, qui c'è una guida veloce su come compilare
+immediatamente ZynAddSubFX da sorgenti.
+
+************************************************************************
+Note: Ciò presuppone che tu abbia già una copia dei sorgenti.
+************************************************************************
+
+---------------------------------
+#enter the source directory
+cd zynaddsubfx
+
+#make a directory for an out-of-source build
+mkdir build
+cd build
+
+#generate a cmake build project here from the cmake root, which is
+#found in the directory below the current one
+cmake ..
+
+#OPTIONAL: Adjust compile variables in the Cache file:
+ccmake .
+
+#And finally, build as usual using make
+make
+---------------------------------
+

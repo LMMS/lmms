@@ -1,0 +1,59 @@
+Appendix B: Building ZynAddSubFX
+--------------------------------
+
+Introduction to CMake
+~~~~~~~~~~~~~~~~~~~~~
+
+********************************************************************
+Note: This section is mostly copied from the OpenSceneGraph wiki, at:
+http://www.openscenegraph.org/projects/osg/wiki/Build/CMake
+********************************************************************
+
+ZynAddSubFX uses CMake as its unified build system. CMake
+is able to read simple build scripts from the source tree and create
+from this a platform-specific build system. This build system can be in
+the form of VisualStudio project files, Unix Makefiles or XCode project
+files. CMake is able to automatically locate external dependencies, and
+allows you to toggle on/off module compilation and configure various
+build options.
+
+The use of a unified build system has allowed to avoid build breakages
+that were common in the previous build method of maintaining three
+separate build targets for VisualStudio, Unix "make" and XCode. It also
+reduces the maintenance burden for core developers and contributors.
+Taken together usage of CMake should result in better consistency and
+more stable builds across all platforms for end users and a greater
+productivity in development of new versions. Hopefully with greater
+consistency of builds across platforms it will be easier for developers
+to use the development version of ZynAddSubFX and help contribute
+to its testing and refinement, leading to a high-quality code base.
+
+Quick start guide
+~~~~~~~~~~~~~~~~~
+
+For the impatient ones, here is a quick guide on how to immediately
+build ZynAddSubFX from source.
+
+**************************************************************
+Note: This assumes that you already have a copy of the source.
+**************************************************************
+
+---------------------------------
+#enter the source directory
+cd zynaddsubfx
+
+#make a directory for an out-of-source build
+mkdir build
+cd build
+
+#generate a cmake build project here from the cmake root, which is
+#found in the directory below the current one
+cmake ..
+
+#OPTIONAL: Adjust compile variables in the Cache file:
+ccmake .
+
+#And finally, build as usual using make
+make
+---------------------------------
+

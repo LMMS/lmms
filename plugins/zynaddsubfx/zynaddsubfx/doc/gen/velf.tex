@@ -1,0 +1,16 @@
+\documentclass{standalone}
+\usepackage{tikz,pgfplots}
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis}[domain=0:1,samples=128,no markers,
+        xlabel=Note Velocity,ylabel=Param Magnitude,
+       legend style={ cells={anchor=east}, legend pos=outer north east}]
+        \addplot gnuplot{x^8^1};
+        \addlegendentry{max sensing}
+        \addplot gnuplot{x^(8^-1)};
+        \addlegendentry{min sensing}
+        \addplot gnuplot{x};
+        \addlegendentry{avg sensing}
+    \end{axis}
+\end{tikzpicture}
+\end{document}

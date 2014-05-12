@@ -1,0 +1,134 @@
+Envelopes
+---------
+
+Introduzione
+~~~~~~~~~~~~
+Gli inviluppi controllano come cambiano nel tempo l'ampiezza, la frequenza o il
+filtro.
+
+Amplitude Envelopes (inviluppi di ampiezza)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Questi inviluppi controllano l'ampiezza del suono.
+In ZynAddSubFX, gli inviluppi di ampiezza possono essere lineari o logaritmici.
+Nell'immagine seguente sono mostrate le differenze tra questi inviluppi.
+
+image:images/envelope1.png[Alt text]
+
+L'inviluppo di ampiezza è diviso in:
+* *Attack*: Inizia all'attacco della nota (Note On). Il volume inizia da 0 al
+massimo. In ZynAddSubFX l'attack è sempre lineare
+* *Decay*: Il volume scende dal valore massimo ad un livello chiamato "Sustain level"
+* *Sustain*: Il volume rimane costante fino a quando il tasto non viene
+rilasciato (Note Off). Dopo questo, avviene l'ultima fase.
+* *Release*: Il volume scende a zero.
+
+Frequency Envelopes
+~~~~~~~~~~~~~~~~~~~
+
+Questi inviluppi controllano la frequenza (o, più esattamente, il 'pitch')
+degli oscillatori.
+La seguente figura disegna le fasi di questi inviluppi.
+
+image::images/envelope2.png[Alt text]
+
+La linea puntinata rappresenta il pitch reale del suono senza inviluppo.
+
+Gli inviluppi di frequenza sono divisi in 3 fasi:
+
+* *Attack*: Inizia all'attacco della nota (Note On). La frequenza inizia da un
+certo valore e "scivola" alla reale frequenza della nota.
+* *Sustain*: La frequenza è la stessa per tutto il periodo di Sustain
+* *Release*: Questa fase inizia con il Note Off e scala la frequenza della nota
+ad un certo valore
+
+Filter Envelopes
+~~~~~~~~~~~~~~~~
+
+Questi inviluppi controllano la frequenza di cutoff dei filtri e sono divisi in:
+
+image:images/envelope3.png[Alt Text]
+
+* *Attack*: Inizia all'inizio della nota (Note On). La frequenza di cutoff inizia
+ad un certo valore e scala ad un altro
+* *Decay*: La frequenza di cutoff continua a scivolare verso il valore reale della
+frequenza di cutoff del filtro (linea puntinata)
+* *Sustain*: La frequenza di cutoff è la stessa per tutto il periodo di
+Sustain (linea puntinata)
+* *Release*: Questa fase inizia con il Note Off e scala la frequenza di cutoff della
+nota ad un certo valore
+
+Freemode Envelopes
+~~~~~~~~~~~~~~~~~~
+
+Per tutti gli inviluppi c'è una modalità che consente all'utente di impostare un numero
+arbitrario di fasi e punti di controllo. Questa modalità è chiamata 'Freemode'.
+
+image:images/envelope4.png[Alt Text]
+
+L'unica fase che rimane sempre definita è il Sustain, dove gli inviluppi si bloccano
+fino ad un evento Note Off.
+
+User Interface
+~~~~~~~~~~~~~~
+Tutti i tipi di inviluppi hanno alcuni controlli comuni:
+
+* *E*: Mostra una finestra che può far vedere la vera forma dell'inviluppo o convertirlo
+in 'Freemode' per editarlo
+* *Stretch*: Come l'inviluppo è allungato in base alla nota.
+Sulle note più alte gli inviluppi sono più corti delle note più basse.
+Nel valore più a sinistra lo 'stretch' è zero.
+Il valore più a destra indica un allungamento del 200%; ciò significa che l'inviluppo
+è allungato circa 4 volte/ottava.
+* *frcR*: Release forzato. Se questa opzione è settata su On, il rilascio andrà al
+valore finale anche se la fase di Sustain non è stata completata.
+Di solito questo parametro è settato.
+
+
+I parametri degli Amplitude Evelopes in ZynAddSubFX sono:
+
+image:images/uienvelope3.jpg[Alt Text]
+
+* *A.dt*: Durata Attack
+* *D.dt*: Durata Decay
+* *S.Val*: Valore di Sustain
+* *R.dt*: Release time
+* *L*: Se questa opzione è settata l'inviluppo è lineare, altrimenti sarà logaritmico.
+
+
+Per i Frequency Envelopes l'interfaccia ha i seguenti parametri:
+
+image:images/uienvelope2.jpg[Alt Text]
+
+* *A.val*: Valore di Attack
+* *A.dt*: Durata Attack
+* *R.dt*: Release time
+* *R.val*: Valore di Release
+
+
+I Filter Evelopes hanno i parametri:
+
+image:images/uienvelope1.jpg[Alt Text]
+
+* *A.val*: Valore di Attack
+* *A.dt*: Durata di Attack
+* *D.val*: Valore di Decay
+* *D.dt*: Decay time
+* *R.dt*: Release time
+* *R.val*: Valore di Release
+
+I Freemode Envelopes hanno una finestra separata per impostare parametri e controlli:
+
+image:images/uienvelope0.jpg[]
+
+* *Control points (punti di controllo)*: Puoi muovere i punti usando il mouse.
+In basso a destra nella finestra viene mostrata la durata totale dell'inviluppo.
+Se si clicka su un control point verrà visualizzata la durata della fase in cui
+è quel punto.
+* *Freemode*: Questo pulsante attiva o disattiva la modalità 'Freemode'
+* *Add Point*: Aggiunge un punto dopo il punto correntemente selezionato.
+Puoi selezionare un punto clickandoci su.
+* *Delete point*: Rimuove il punto dall'inviluppo.
+* *Sust.*: Imposta il punto di Sustain. E' mostrato usando la linea gialla.
+* *Str.*: Envelope stretch
+

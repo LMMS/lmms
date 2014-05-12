@@ -1,0 +1,217 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include <FL/Fl_Box.H>} {selected public
+} 
+
+decl {\#include <stdlib.h>} {public
+} 
+
+decl {\#include "Controller.h"} {public
+} 
+
+decl {Controller *controller;} {} 
+
+class Pad {: {public Fl_Box}
+} {
+  Function {Pad(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+    code {} {}
+  }
+  Function {temp_draw()} {} {
+    code {/*int ox=x(),oy=y(),lx=w(),ly=h(),i,ix,iy,oiy;
+float freqx;
+
+fl_color(FL_BLACK);
+fl_rectf(ox,oy,lx,ly);
+
+
+
+fl_color(FL_GRAY);
+
+fl_line_style(FL_SOLID);
+fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
+*/} {}
+  }
+  Function {sendmidi(int button,float datax,float datay)} {} {
+    code {controller->send(button,datax);
+controller->send(button+1,datay);} {}
+  }
+  Function {handle(int event)} {return_type int
+  } {
+    code {int x_=Fl::event_x()-x();
+int y_=Fl::event_y()-y();
+
+if ((event==FL_PUSH)||(event==FL_DRAG)){
+  if (x_<0) x_=0;if (y_<0) y_=0;
+  if (x_>=w()) x_=w();if (y_>=h()-1) y_=h()-1;
+
+  float tmpx=(float) x_/(w());
+  float tmpy=1.0-(float) y_/h();
+
+  int b=Fl::event_buttons()>>24;
+
+  if (b&1) sendmidi(0,tmpx,tmpy);
+  if (b&2) sendmidi(2,tmpx,tmpy);
+  if (b&4) sendmidi(4,tmpx,tmpy);
+
+};
+
+return(1);} {}
+  }
+  decl {int oldx,oldy;} {}
+} 
+
+class ControllerUI {} {
+  Function {make_window()} {} {
+    Fl_Window controlleruiwindow {
+      label {Midi Controller}
+      callback {o->hide();
+exit(0);}
+      xywh {210 213 340 410} type Double hide
+    } {
+      Fl_Counter {} {
+        label {Output Channel}
+        callback {controller->Pchout=(int) o->value();}
+        xywh {10 13 75 22} type Simple labelsize 10 align 5 minimum 0 maximum 15 step 1 textfont 1
+        code0 {o->value(controller->Pchout);}
+      }
+      Fl_Box {} {
+        xywh {10 80 320 320} box ENGRAVED_BOX color 176
+        class Pad
+      }
+      Fl_Choice {} {
+        callback {nbut=(int) o->value();
+refreshvalues();}
+        xywh {10 50 75 20} down_box BORDER_BOX
+      } {
+        MenuItem {} {
+          label {But.1 X}
+          xywh {0 0 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem {} {
+          label {But.1 Y}
+          xywh {10 10 100 20} labelfont 1 labelsize 12 divider
+        }
+        MenuItem {} {
+          label {But.2 X}
+          xywh {10 10 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem {} {
+          label {But.2 Y}
+          xywh {20 20 100 20} labelfont 1 labelsize 12 divider
+        }
+        MenuItem {} {
+          label {But.3 X}
+          xywh {20 20 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem {} {
+          label {But.3 Y}
+          xywh {30 30 100 20} labelfont 1 labelsize 12
+        }
+      }
+      Fl_Group ctlgroup {
+        xywh {95 35 60 40} box ENGRAVED_BOX
+      } {
+        Fl_Counter ctlcounter {
+          label Controller
+          callback {controller->pars[nbut].ctl.par=(int) o->value();}
+          xywh {100 50 50 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+        }
+      }
+      Fl_Choice modechoice {
+        label Mode
+        callback {controller->pars[nbut].mode=(int) o->value();
+refreshvalues();}
+        xywh {95 13 60 20} down_box BORDER_BOX labelsize 10 align 5
+      } {
+        MenuItem {} {
+          label OFF
+          xywh {30 30 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem {} {
+          label {Ctl.}
+          xywh {20 20 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem {} {
+          label RPN
+          xywh {30 30 100 20} labelfont 1 labelsize 12 deactivate
+        }
+        MenuItem {} {
+          label NRPN
+          xywh {40 40 100 20} labelfont 1 labelsize 12
+        }
+      }
+      Fl_Group nrpngroup {
+        xywh {160 35 170 40} box ENGRAVED_BOX
+      } {
+        Fl_Counter cparcounter {
+          label {CoarseP.}
+          callback {controller->pars[nbut].nrpn.cpar=(int) o->value();}
+          xywh {165 50 50 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+        }
+        Fl_Counter fparcounter {
+          label {FineP.}
+          callback {controller->pars[nbut].nrpn.fpar=(int) o->value();}
+          xywh {220 50 50 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+        }
+        Fl_Counter cvalcounter {
+          label {CoarseV.}
+          callback {controller->pars[nbut].nrpn.cval=(int) o->value();}
+          xywh {275 50 50 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+        }
+      }
+      Fl_Counter val1counter {
+        label {Val.1}
+        callback {controller->pars[nbut].val1=(int) o->value();}
+        xywh {190 15 50 15} type Simple labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+      }
+      Fl_Counter val2counter {
+        label {Val.2}
+        callback {controller->pars[nbut].val2=(int) o->value();}
+        xywh {275 15 50 15} type Simple labelsize 10 align 5 minimum 0 maximum 127 step 1 value 127 textfont 1 textsize 12
+      }
+      Fl_Button exchangebutton {
+        label {<->}
+        callback {unsigned char tmp=controller->pars[nbut].val2;
+controller->pars[nbut].val2=controller->pars[nbut].val1;
+controller->pars[nbut].val1=tmp;
+refreshvalues();}
+        xywh {245 15 25 15} box THIN_UP_BOX
+      }
+    }
+  }
+  Function {refreshvalues()} {} {
+    code {modechoice->value(controller->pars[nbut].mode);
+val1counter->value(controller->pars[nbut].val1);
+val2counter->value(controller->pars[nbut].val2);
+ctlcounter->value(controller->pars[nbut].ctl.par);
+cparcounter->value(controller->pars[nbut].nrpn.cpar);
+fparcounter->value(controller->pars[nbut].nrpn.fpar);
+cvalcounter->value(controller->pars[nbut].nrpn.cval);
+
+if (controller->pars[nbut].mode!=0){
+  val1counter->activate();
+  val2counter->activate();
+  exchangebutton->activate();
+}else{
+  val1counter->deactivate();
+  val2counter->deactivate();
+  exchangebutton->deactivate();
+};
+
+if (controller->pars[nbut].mode==1) ctlgroup->activate();
+   else ctlgroup->deactivate();
+
+if (controller->pars[nbut].mode==3) nrpngroup->activate();
+   else nrpngroup->deactivate();} {}
+  }
+  Function {ControllerUI(Controller *controller_)} {} {
+    code {nbut=0;
+controller=controller_;
+make_window();
+refreshvalues();
+controlleruiwindow->show();} {}
+  }
+  decl {int nbut;} {}
+} 

@@ -1,0 +1,22 @@
+Begin4
+Title:		ZynAddSubFX 
+Version: 	2.2.1
+Entered-date: 	28-04-2005
+Description: 	A real-time software synthesizer for Linux with many 
+		features, including polyphony, multi-timbral and microtonal 
+		capabilities. It includes randomness of some parameters,which 
+		makes warm sounds, like analogue synthesizers.
+		The program has system/insertion effects, too.
+		ZynAddSubFX has much more features, don't let be cheated by
+		the size of the source code :) 
+Keywords: 	synthesizer,MIDI,ALSA,music,X11,microtonal,real-time
+Author:		zynaddsubfx@yahoo.com (Nasca Paul)
+Maintained-by: 	zynaddsubfx@yahoo.com (Nasca Paul)
+Primary-site: 	zynaddsubfx.sourceforge.net
+		sourceforge.net/projects/zynaddsubfx
+		920k ZynAddSubFX-2.2.0.tar.bz2  (source code)
+Alternate-site: 
+Original-site:
+Platforms: 	Linux with X11
+Copying-policy: GNU General Public License (version 2)
+End

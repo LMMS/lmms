@@ -1,0 +1,50 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{matrix,shapes,chains,scopes}
+\begin{document}
+\input{fig.sty}
+
+\begin{tikzpicture}[
+    point/.style={coordinate},
+    every on chain/.style={rounded corners}]
+    %Style
+
+    \matrix[row sep=5mm, column sep=5mm] {
+    &
+    \node        (fb)  {$f_b$};&
+    \node        (del) {$Delay$};
+    &&&&& \\
+    &
+    \node[op]    (pb1) {$\times$};&
+    \node[block] (pb2) {$z^{-n}$}; &
+    &&&& \\
+
+    \node           (p1) {$x[n]$}; &
+    \node[op]       (p2) {$+$}; &
+    \node[point]    (p3) {};&
+    \node[block]    (p4) {HP/LP}; &
+    \node[block]    (p5) {Comb Filter}; &
+    \node[block]    (p6) {Allpass}; &
+    \node           (p7) {$y[n]$}; \\
+    };
+
+    \draw[->] (fb) -- (pb1);
+    \draw[->] (del) -- (pb2);
+    { [start chain=trunk]
+    \chainin (p1)[join=by tip];
+    \chainin (p2)[join=by tip] ;
+    \chainin (p3)[join=by {}];
+    %\chainin[join by={}] (p3);
+    { [start branch]
+    \chainin (pb2)[join=by tip];
+    \chainin (pb1)[join=by tip];
+    \chainin (p2)[join=by tip];
+    }
+    \chainin (p4)[join=by tip];
+    \chainin (p5)[join=by tip];
+    \chainin (p6)[join=by tip];
+    \chainin (p7)[join=by tip];
+    }
+
+\end{tikzpicture}
+\end{document}

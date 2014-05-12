@@ -1,0 +1,162 @@
+NRPN (Non Registered Parameters Number)
+---------------------------------------
+
+NRPNs can control all system and insertion effect parameters.
+For example, you may change the reverb time when playing to keyboard or
+flanger's lfo frequency.
+You can disable the NRPN receiving by deselecting the "NRPN" checkbox from the
+main window (near "Master Keyshift" counter).
+The controls can be sent on any midi channel 
+(the midi channels numbers are ignored).
+
+The parameters are:
+
+- NRPN coarse (99 or 0x63)sets the system/insertion effects (4 for system effects or 8 for insertion effects)
+- NRPN fine (98 or 0x62)sets the number of the effect (first effect is 0)
+- Data entry coarse (6) sets the parameter number of effect to change(see below)
+- Data entry fine (26) sets the parameter of the effect
+
+You have to send NRPN coarse/fine before sending Data entry coarse/fine.
+If the effect/parameter doesn't exists or is set to none, then the NRPN is
+ignored.
+
+Example(all values in this example are hex):
+
+    B0 63 08 // Select the insertion effects
+    B0 62 01 // Select the second effect (remember: the first is 00 and not 01)
+    B0 06 00 // Select the effect parameter 00
+    B0 26 7F // Change the parameter of effect to the value 7F (127)
+
+WARNING: Changing of some of the effect parameters produces clicks when sounds
+passes thru these effects.
+I advise you to change only when the sound volume that passes thru the effect to be very low (or silence).
+Some parameters produce clicks when are changed very fast.
+
+Here are the effects parameter number (for Data entry coarse).
+The parameters that produces clicks are written in [red]#red# and have (AC)
+after their entry (always clicks).
+The parameter that produces clicks only when they are changed fast are written
+in [orange]#orange# and have a (FC) after the entry (Fast Clicks).
+Most parameters has the range from 0 to 127.
+When parameters have another range, it is written as [low...high] .
+
+Reverb
+~~~~~~
+
+[verse]
++[orange]#00 - Volume or Dry/Wet (FC)#
+[orange]#01 - Pan (FC)#
+02 - Reverb Time
+[orange]#03 - Initial Delay (FC)#
+04 - Initial Delay Feedback
+[grey]#05 - reserved#
+[grey]#06 - reserved#
+07 - Low Pass
+08 - High Pass
+09 - High Frequency Damping [64..127] 64=no damping
+[red]#10 - Reverb Type [0..1] 0 - Random, 1 - Freeverb (AC)#
+[red]#11 - Room Size (AC)#+
+
+Echo
+~~~~
+
+[verse]
++[orange]#00 - Volume or Dry/Wet (FC)#
+[orange]#01 - Pan (FC)#
+[red]#02 - Delay (AC)#
+[red]#03 - Delay between left and right (AC)#
+[orange]#04 - Left/Right Crossing (FC)#
+05 - Feedback
+06 - High Frequency Damp+
+
+
+Chorus
+~~~~~~
+
+[verse]
++[orange]#00 - Volume or Dry/Wet (FC)#
+[orange]#01 - Pan (FC)#
+02 - LFO Frequency
+03 - LFO Randomness
+04 - LFO Type [0..1]
+05 - LFO Stereo Difference
+06 - LFO Depth
+07 - Delay
+08 - Feedback
+[orange]#09 - Left/Right Crossing (FC)#
+[grey]#10 - reserved#
+[red]#11 - Mode [0..1] (0=add, 1=subtract) (AC)#+
+
+Phaser
+~~~~~~
+
+[verse]
++[orange]#00 - Volume or Dry/Wet (FC)#
+[orange]#01 - Pan (FC)#
+02 - LFO Frequency
+03 - LFO Randomness
+04 - LFO Type [0..1]
+05 - LFO Stereo Difference
+06 - LFO Depth
+07 - Feedback
+[red]#08 - Number of stages [0..11] (AC)#
+[orange]#09 - Let/Right Crossing (FC)#
+[red]#10 - Mode [0..1] (0=add, 1=subtract) (AC)#
+11 - Phase+
+
+AlienWah
+~~~~~~~~
+
+[verse]
++[orange]#00 - Volume or Dry/Wet (FC)#
+[orange]#01 - Pan (FC)#
+02 - LFO Frequency
+03 - LFO Randomness
+04 - LFO Type [0..1]
+05 - LFO Stereo Difference
+06 - LFO Depth
+07 - Feedback
+08 - Delay [0..100]
+[orange]#09 - Left/Right Crossing (FC)#
+10 - Phase+
+
+Distorsion
+~~~~~~~~~~
+
+[verse]
++[orange]#00 - Volume or Dry/Wet (FC)#
+[orange]#01 - Pan (FC)#
+02 - Left/Right Crossing
+[orange]#03 - Drive (FC)#
+[orange]#04 - Level (FC)#
+05 - Type [0..11]
+06 - Invert the signal (negate) [0..1]
+07 - Low Pass
+08 - High Pass
+09 - Mode [0.1] (0=mono,1=stereo)+
+
+EQ
+~~
+
+[verse]
++[orange]#00 - Gain (FC)#+
+
+All other settings of the EQ are shown in a different way.
+The N represent the band ("B." setting in the UI) and the first band is 0
+(and not 1), like it is shown in the UI.
+Change the "N" with the band you like.
+If you want to change a band that doesn't exist, the NRPN will be ignored.
+
+[verse]
++[red]#10+N*5 - Change the mode of the filter [0..9] (AC)#
+11+N*5 - Band's filter frequency
+12+N*5 - Band's filter gain
+13+N*5 - Band's filter Q (bandwidth or resonance)
+[grey]#14+N*5 - reserved#+
+
+Example of setting the gain on the second band:
+
+. The bands start counting from  0, so the second band is 1 => N=1.
+.  The formula is 12+N*5 => 12+1*5=17, so the number of effect parameter
+.  (for Data entry coarse) is 17.
+

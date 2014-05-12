@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=ZynAddSubFX - Alsa
+Comment=A powerful realtime software synthesizer
+Exec=zynaddsubfx -I alsa -O alsa
+Icon=zynaddsubfx
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;

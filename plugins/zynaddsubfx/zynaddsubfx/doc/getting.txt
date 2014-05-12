@@ -1,0 +1,65 @@
+Appendix C: Getting ZynAddSubFX
+-------------------------------
+
+Usually there are several methods to obtain a copy of ZynAddSubFX.
+
+SourceForge::
+    http://sourceforge.net/projects/zynaddsubfx/files/
+Distribuition::
+    apt/yum/others
+Git::
+    git clone git://git.code.sf.net/p/zynaddsubfx/code zynaddsubfx
+
+Introduction to Git
+~~~~~~~~~~~~~~~~~~~
+
+For those who want to live on the bleeding edge or who want to assist with
+making sure that the next release has fewer bugs, you will want to get aquanted
+with git.
+Git is used to manage the source code for this project and can be used to
+quickly and easily get an up-to-date copy of the source code.
+
+Getting the Source Code
+^^^^^^^^^^^^^^^^^^^^^^^
+
+In order to get a copy of the ZynAddSubFX source code, all that needs to be done is:
+
+---------------------------------------------
+git clone git://git.code.sf.net/p/zynaddsubfx/code zynaddsubfx
+
+cd zynaddsubfx
+
+#Download additional resources
+git submodule init
+git submodule update
+---------------------------------------------
+
+You should now be in the directory of the source code.
+
+For simple steps on building, please see Appendix B of the manual.
+
+Checking out a branch
+^^^^^^^^^^^^^^^^^^^^^
+
+Lets say that development has extended into the creation of a new feature that
+you want to preview.
+For the sake of this guide, lets assume that the name of the branch that the
+feature is on is foo.
+
+-----------------------------------------
+#checkout the foo branch from sourceforge
+git checkout --track -b foo origin/foo
+
+#lets checkout the primary branch again
+git checkout master
+
+#hop back to the other branch
+git checkout foo
+----------------------------------------
+
+Now one should be able to change branches and go into the build directory (as
+described in Appendix B) and recompile ZynAddSubFX.
+
+NOTE: When using branches other than the master be aware that stability may
+      suffer
+

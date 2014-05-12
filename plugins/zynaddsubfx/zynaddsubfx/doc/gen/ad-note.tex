@@ -1,0 +1,37 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{matrix,shapes,chains,scopes}
+\begin{document}
+\input{fig.sty}
+\begin{tikzpicture}
+    \matrix (mtx) [matrix of nodes, row sep=5mm, column sep=5mm] {
+    &
+    |[lfo]| Freq LFO   &
+    |[lfo]| Filter LFO &
+    |[lfo]| Amp LFO    &
+    &\\
+    |[block]| Base Fq. &
+    |[block]| Voices   &
+    |[block]| Filter   &
+    |[block, shape=isosceles triangle]| Volume &
+    {Output} \\
+    &
+    |[env]| Freq Env&
+    |[env]| Filter Env&
+    |[env]| Amp Env&\\
+    };
+
+    { [start chain=trunk]
+    \chainin (mtx-2-1)[join=by tip];
+    \chainin (mtx-2-2)[join=by tip];
+    \chainin (mtx-2-3)[join=by tip];
+    \chainin (mtx-2-4)[join=by tip];
+    \chainin (mtx-2-5)[join=by tip];
+    }
+    \foreach \i in {2,3,4}
+    {
+        \draw[->] (mtx-1-\i) -- (mtx-2-\i);
+        \draw[->] (mtx-3-\i) -- (mtx-2-\i);
+    }
+\end{tikzpicture}
+\end{document}

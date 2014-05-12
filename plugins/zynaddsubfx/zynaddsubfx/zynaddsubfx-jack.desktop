@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=ZynAddSubFX - Jack
+Comment=A powerful realtime software synthesizer
+Exec=zynaddsubfx -I jack -O jack
+Icon=zynaddsubfx
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;

@@ -1,0 +1,81 @@
+[[filters]]
+Filters
+-------
+:Author: Mark McCurry
+:Date: June 24, 2012
+
+ZynAddSubFX offers several different types of filters, which can be used to
+shape the spectrum of a signal.
+The primary parameters that affect the characteristics of the filter are the
+cutoff, resonance, filter stages, and the filter type.
+
+* *Cutoff*: This value determines which frequency marks the changing point for
+            the filter. In a low pass filter, this value marks the point where
+            higher frequencies are attenuated.
+* *Resonance*: The resonance of a filter determines how much excess energy is
+               present at the cutoff frequency. In ZynAddSubFX, this is
+               represented by the Q-factor, which is defined to be the cutoff
+               frequency divided by the bandwidth. In other words higher Q
+               values result in a much more narrow resonant spike.
+* *Stages*: The number of stages in a given filter describes how sharply it is
+            able to make changes in the frequency response.
+
+The basic 'analog' filters that ZynAddSubFX offers are shown below, with the
+center frequency being marked by the red line.
+The 'state variable' filters should look quite similar.
+
+image:images/filter0.png[]
+
+As previously mentioned, the Q value of a filter affects how concentrated the
+signal's energy is at the cutoff frequency; The result of differing Q values are
+below.
+
+TIP: For many classical analog sounds, high Q values were used on sweeping
+filters. A simple high Q low pass filter modulated by a strong envelope is
+usually sufficient to get a good sound.
+
+image:images/filter1.png[]
+
+Lastly, the affect of the order of the filter can be seen below.
+This is roughly synonymous with the number of stages of the filter.
+For more complex patches it is important to realize that the extra sharpness in
+the filter does not come for free as it requires many more calculations being
+performed; This phenomena is the most visible in subsynth, where it is easy to
+need several hundred filter stages to produce a given note.
+
+image:images/filter2.png[]
+
+
+
+There are different types of filters. The number of poles define what will
+happen at a given frequency. Mathematically, the filters are functions which
+have poles that correspond to that frequency. Usually, two poles mean that the
+function has more "steepness", and that you can set the exact value of the
+function at the poles by defining the "resonance value". Filters with two poles
+are also often referenced
+as http://de.wikipedia.org/wiki/Butterworth-Filter[Butterworth Filters].
+
+********************************************************************
+For the interested, functions having poles means that we are given a quotient of
+polynomials. The denominator has degree 1 or 2, depending on the filter having
+one or two poles. In the file _DSP/AnalogFilter.cpp_,
+_AnalogFilter::computefiltercoefs()_ sets the coefficients (depending on the
+filter type), and _AnalogFilter::singlefilterout()_ shows the whole polynomial
+(in a formula where no quotient is needed).
+********************************************************************
+
+User Interface
+~~~~~~~~~~~~~~
+
+image:images/uifilter.png[]
+
+* *C.freq*: Cutoff frequency
+* *Q*: Level of resonance for the filter
+* *V.SnsA.*: Velocity sensing amount for filter cutoff
+* *V.Sns.*: Velocity sensing function
+* *freq.tr*: Frequency tracking amount. When this parameter is positive, higher
+             note frequencies shift the filter's cutoff frequency higher.
+* *gain*: Additional gain/attenuation for filter
+* *St*: Filter stages
+
+NOTE: TODO add a lengthy section on the formant filter setup
