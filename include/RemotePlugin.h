@@ -42,9 +42,7 @@
 #endif
 
 #ifdef LMMS_BUILD_APPLE
-#include <unistd.h>
 #define USE_QT_SEMAPHORES
-#define USE_QT_SHMEM
 #endif
 
 
