@@ -86,7 +86,7 @@ mv ${APP}/Contents/lib/lmms/RemoteZynAddSubFx \
  
 # Fix more Zyn Linking issues
 install_name_tool -change libZynAddSubFxCore.dylib \
-   @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
+   @loader_path/../Frameworks/libZynAddSubFxCore.dylib \
    ${APP}/Contents/lib/lmms/libzynaddsubfx.so
  
 install_name_tool -change ${CMAKE_BUILD}/plugins/zynaddsubfx/libZynAddSubFxCore.dylib \
