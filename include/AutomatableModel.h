@@ -29,6 +29,7 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
+#include "MidiTime.h"
 
 
 // simple way to map a property of a view to a model
@@ -239,6 +240,7 @@ public:
 		return m_hasLinkedModels;
 	}
 
+	float globalAutomationValueAt( const MidiTime& time );
 
 public slots:
 	virtual void reset();

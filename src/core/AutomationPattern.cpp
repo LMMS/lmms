@@ -551,6 +551,51 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 }
 
 
+/*! \brief returns a list of all the automation patterns everywhere that are connected to a specific model
+ *  \param _m the model we want to look for
+ */
+QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
+{
+	QVector<AutomationPattern *> patterns;
+	TrackContainer::TrackList l;
+	l += engine::getSong()->tracks();
+	l += engine::getBBTrackContainer()->tracks();
+	l += engine::getSong()->globalAutomationTrack();
+	
+	// go through all tracks...
+	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	{
+		// we want only automation tracks...
+		if( ( *it )->type() == track::AutomationTrack ||
+			( *it )->type() == track::HiddenAutomationTrack )
+		{
+			// get patterns in those tracks....
+			const track::tcoVector & v = ( *it )->getTCOs();
+			// go through all the patterns...
+			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			{
+				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
+				// check that the pattern has automation
+				if( a && a->hasAutomation() )
+				{
+					// now check is the pattern is connected to the model we want by going through all the connections
+					// of the pattern
+					bool has_object = false;
+					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					{
+						if( *k == _m )
+						{
+							has_object = true;
+						}
+					}
+					// if the patterns is connected to the model, add it to the list
+					if( has_object ) { patterns += a; }
+				}
+			}
+		}
+	}
+	return patterns;
+}
 
 
 

@@ -152,6 +152,7 @@ public:
 
 
 	static bool isAutomated( const AutomatableModel * _m );
+	static QVector<AutomationPattern *> patternsForModel( const AutomatableModel * _m );
 	static AutomationPattern * globalAutomationPattern( AutomatableModel * _m );
 	static void resolveAllIDs();
 
