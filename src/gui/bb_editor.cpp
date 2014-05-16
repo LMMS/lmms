@@ -278,9 +278,7 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Enter )
 	{
-		{
-			play();
-		}
+		play();
 	}
 	else if ( _ke->key() == Qt::Key_Plus )
 	{
