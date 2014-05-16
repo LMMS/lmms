@@ -263,8 +263,8 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	InstrumentView( _instrument, _parent )
 {
 	const int ROW1 = 14;
-	const int ROW2 = ROW1 + 51;
-	const int ROW3 = ROW2 + 51;
+	const int ROW2 = ROW1 + 56;
+	const int ROW3 = ROW2 + 56;
 	const int LED_ROW = 63;
 	const int COL1 = 14;
 	const int COL2 = COL1 + 56;
