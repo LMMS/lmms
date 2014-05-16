@@ -280,7 +280,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (lowpass_iirDescriptor) {
 		free((LADSPA_PortDescriptor *)lowpass_iirDescriptor->PortDescriptors);
 		free((char **)lowpass_iirDescriptor->PortNames);

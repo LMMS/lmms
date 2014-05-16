@@ -401,7 +401,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (valveRectDescriptor) {
 		free((LADSPA_PortDescriptor *)valveRectDescriptor->PortDescriptors);
 		free((char **)valveRectDescriptor->PortNames);
