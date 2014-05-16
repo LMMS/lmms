@@ -523,13 +523,24 @@ TripleOscillatorView knob {
 }
 
 
-kickerInstrumentView knob {
-	color: rgb(240, 147, 14);
-	qproperty-outerColor: rgb(30, 35, 37);
-	qproperty-innerRadius: 4;
-	qproperty-outerRadius: 11.2;
-	qproperty-centerPointX: 18.5;
-	qproperty-centerPointY: 13.5;
+kickerInstrumentView knob#smallKnob {
+	color: #595959;
+	qproperty-outerColor: black;
+	qproperty-innerRadius: 3;
+	qproperty-outerRadius: 11.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+
+kickerInstrumentView knob#largeKnob {
+	color: #0c3b89;
+	qproperty-outerColor: #519fff;
+	qproperty-innerRadius: 12.0;
+	qproperty-outerRadius: 14.5;
+	qproperty-centerPointX: 17.0;
+	qproperty-centerPointY: 17.0;
 	qproperty-lineWidth: 3;
 }
 

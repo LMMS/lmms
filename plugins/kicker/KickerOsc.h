@@ -30,19 +30,24 @@
 #include "Oscillator.h"
 
 #include "lmms_math.h"
+#include "interpolation.h"
 
 
 template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {
 public:
-	KickerOsc( const FX & fx, const float start, const float end, const float noise, const float offset, const float slope, const float env, const float length ) :
+	KickerOsc( const FX & fx, const float start, const float end, const float noise, const float offset, 
+		const float slope, const float env, const float diststart, const float distend, const float length ) :
 		m_phase( offset ),
 		m_startFreq( start ),
 		m_endFreq( end ),
 		m_noise( noise ),
 		m_slope( slope ),
 		m_env( env ),
+		m_distStart( diststart ),
+		m_distEnd( distend ),
+		m_hasDistEnv( diststart != distend ),
 		m_length( length ),
 		m_FX( fx ),
 		m_counter( 0 ),
@@ -62,6 +67,15 @@ public:
 			const sample_t s = ( Oscillator::sinSample( m_phase ) * ( 1 - m_noise ) ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
 			buf[frame][0] = s * gain;
 			buf[frame][1] = s * gain;
+			
+			// update distortion envelope if necessary
+			if( m_hasDistEnv && m_counter < m_length )
+			{
+				float thres = linearInterpolate( m_distStart, m_distEnd, m_counter / m_length );
+				m_FX.leftFX().setThreshold( thres );
+				m_FX.rightFX().setThreshold( thres );
+			}
+			
 			m_FX.nextSample( buf[frame][0], buf[frame][1] );
 			m_phase += m_freq / sampleRate;
 
@@ -79,6 +93,9 @@ private:
 	const float m_noise;
 	const float m_slope;
 	const float m_env;
+	const float m_distStart;
+	const float m_distEnd;
+	const bool m_hasDistEnv;
 	const float m_length;
 	FX m_FX;
 
