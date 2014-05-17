@@ -33,7 +33,6 @@ class QLabel;
 class comboBox;
 class groupBox;
 class knob;
-//class ledCheckBox;
 class TempoSyncKnob;
 
 class InstrumentFunctionArpeggio;
@@ -84,7 +83,6 @@ private:
 	knob * m_arpRepeatsKnob;
 	knob * m_arpScrambleKnob;
 	knob * m_arpCycleKnob;
-//	ledCheckBox * m_arpCycleShiftCb;
 	knob * m_arpFloorKnob;
 	knob * m_arpCeilKnob;
 	TempoSyncKnob * m_arpTimeKnob;

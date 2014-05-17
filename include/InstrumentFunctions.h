@@ -201,7 +201,6 @@ private:
 	FloatModel m_arpRepeatsModel;
 	FloatModel m_arpScrambleModel;
 	FloatModel m_arpCycleModel;
-//	BoolModel m_arpCycleShiftModel;
 	FloatModel m_arpFloorModel;
 	FloatModel m_arpCeilModel;
 	TempoSyncKnobModel m_arpTimeModel;

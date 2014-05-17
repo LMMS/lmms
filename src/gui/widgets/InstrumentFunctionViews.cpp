@@ -33,7 +33,6 @@
 #include "group_box.h"
 #include "gui_templates.h"
 #include "knob.h"
-//#include "led_checkbox.h"
 #include "pixmap_button.h"
 #include "TempoSyncKnob.h"
 #include "tooltip.h"
@@ -109,7 +108,6 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpRepeatsKnob( new knob( knobBright_26 ) ),
 	m_arpScrambleKnob( new knob( knobBright_26 ) ),
 	m_arpCycleKnob( new knob( knobBright_26 ) ),
-//	m_arpCycleShiftCb( new ledCheckBox( tr( "<-" ), this ) ),
 	m_arpFloorKnob( new knob( knobBright_26 ) ),
 	m_arpCeilKnob( new knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
@@ -152,12 +150,6 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 		tr( "Changes the path the cycle takes." ) );
 
 
-//	m_arpCycleShiftCb->setFont( pointSizeF( m_arpCycleShiftCb->font(), 6.5 ) );
-//	m_arpCycleShiftCb->setWhatsThis(
-//		tr( "Use this knob for setting the number of notes to skip"
-//			"while cycling through the range." ) );
-
-
 	m_arpScrambleKnob->setLabel( tr( "SCR" ) );
 	m_arpScrambleKnob->setHintText( tr( "Scramble mode:" ) + " ", " " );
 	m_arpScrambleKnob->setWhatsThis(
@@ -168,6 +160,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 			"3 - Start with fourth note "
 			"4 - Start with fifth note "
 			"5 - After cycle, add one if stuck " ) );
+
 
 	m_arpRepeatsKnob->setLabel( tr( "REP" ) );
 	m_arpRepeatsKnob->setHintText( tr( "Note repeats:" ) + " ", " " + tr( "time(s)" ) );
@@ -192,15 +185,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpMissKnob->setHintText( tr( "Fail rate:" ) + " ", " " + tr( "%" ) );
 	m_arpMissKnob->setWhatsThis(
 		tr( "The miss function will make the arpeggiator miss the "
-			"intended note. With increasing fail rate you set "
-			"both the chance of failure and the number of notes "
-			"you may land off target.") );
+			"intended note.") );
 
 
 	m_arpFloorKnob->setLabel( tr( "FLOOR" ) );
 	m_arpFloorKnob->setHintText( tr( "Bottom note clamp:" ) + " ", " " );
 	m_arpFloorKnob->setWhatsThis(
-		tr( "Note gets stuck on same bottom key after this amount of steps.") );
+		tr( "Note gets stuck on same bottom key when they go below this amount of steps.") );
 
 
 	m_arpCeilKnob->setLabel( tr( "CEIL" ) );
@@ -244,7 +235,6 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpRepeatsKnob, 0, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpCycleKnob, 0, 3, 2, 1, Qt::AlignHCenter );
-//	mainLayout->addWidget( m_arpCycleShiftCb, 0, 4, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpScrambleKnob, 0, 4, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
@@ -275,7 +265,6 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
 	m_arpCycleKnob->setModel( &m_a->m_arpCycleModel );
-//	m_arpCycleShiftCb->setModel( &m_a->m_arpCycleShiftModel );
 	m_arpScrambleKnob->setModel( &m_a->m_arpScrambleModel );
 	m_arpRepeatsKnob->setModel( &m_a->m_arpRepeatsModel );
 	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );

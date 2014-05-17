@@ -305,9 +305,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpScrambleModel( 0.0f, 0.0f, 4.0f, 1.0f, this, tr( "Scramble mode" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Cycle steps" ) ),
-//	m_arpCycleShiftModel( false, this, tr( "Cycle mode" ) ),
 	m_arpFloorModel( 0.0f, 0.0f, 20.0f, 1.0f, this, tr( "Floor" ) ),
-	m_arpCeilModel( 0.0f, 0.0f, 20.0f, 1.0f, this, tr( "Ceiling" ) ),
+	m_arpCeilModel( 20.0f, 0.0f, 20.0f, 1.0f, this, tr( "Ceiling" ) ),
 	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
@@ -416,7 +415,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-			if( 100 * ( (float) rand() / (float) RAND_MAX ) < m_arpSkipModel.value() )
+			if( 101 * ( (float) rand() / (float) RAND_MAX ) < m_arpSkipModel.value() )
 			{
 				// update counters
 				frames_processed += arp_frames;
@@ -454,7 +453,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = ( cur_frame / arp_frames ) % 
+			cur_arp_idx = ( cur_frame / arp_frames ) %
 					( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
@@ -468,8 +467,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// copied from ArpDirUpAndDown above
 			cur_arp_idx = ( cur_frame / arp_frames ) %
 					( range * 2 - (int)( 2 * m_arpRepeatsModel.value() ) );
-			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
 			if( cur_arp_idx >= range )
 			{
 				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - m_arpRepeatsModel.value();
@@ -481,14 +478,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		{
 			// just pick a random chord-index
 			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
-		} 
+		}
 		// Divide cur_arp_idx with wanted repeats. This method doesn't work with random though.
 		cur_arp_idx = (int)( cur_arp_idx / m_arpRepeatsModel.value() );
-
-
-//	qDebug("cur_arp_idx %i: ", cur_arp_idx);
-//	qDebug("scramble: %i", scramble);
-
 
 		// Scramble part 1
 		int scramble = m_arpScrambleModel.value();
@@ -524,10 +516,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			}
 		}
 
-//	qDebug("cur_arp_idx: %i", cur_arp_idx);
-//	qDebug("scramble: %i \n", scramble);
-
-
 		// Cycle notes
 		const int cycle = m_arpCycleModel.value();
 		if( cycle )
@@ -540,16 +528,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				cur_arp_idx -= range;
 				i++;
 			}
-			
-//			fabs( cur_arp_idx );
-//			qDebug("cur_arp_idx = %i", i);
-//			qDebug("i = %i", i);
-//			int cycleShift = m_arpCycleShiftModel.value();// ? 1 : 0;
-//			qDebug("cycleShift = %i", cycleShift);
-//			if ( cycleShift )
-//			{
-//				cur_arp_idx ^= ( rand() % range );//= cycleShift;
-//			}
 		}
 
 		// Scramble part 2
@@ -567,13 +545,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 					break;
 //				case 6:
 //					break;
-//				case 7:
-//					break;
-//				case 8:
-//					break;
 //	;) - Your expansion here!
-//				case 9:
-//					break;
+//
 			}
 			if ( cur_arp_idx >= range )
 			{
@@ -583,22 +556,14 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// Floor.
 		int floor = m_arpFloorModel.value();
-		if( floor && floor > cur_arp_idx )
+		if( cur_arp_idx < floor )
 		{
 			cur_arp_idx = floor;
-/*			if( dir == ArpDirDown || dir == ArpDirDownAndUp )
-			{
-	 			cur_arp_idx = cur_arp_idx -  m_arpCeilModel.value();
- 			}
-			else
-			{
-				cur_arp_idx = m_arpCeilModel.value();
-			}*/
 		}
 
 		// Ceil. Note stuck at set index.
 		int ceiling = m_arpCeilModel.value();
-		if( ceiling && cur_arp_idx > ceiling )
+		if( cur_arp_idx > ceiling )
 		{
 			cur_arp_idx = ceiling;
 		}
@@ -647,7 +612,6 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpModel.saveSettings( _doc, _this, "arp" );
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
 	m_arpCycleModel.saveSettings( _doc, _this, "cyclerange" );
-//	m_arpCycleShiftModel.saveSettings( _doc, _this, "arpcycleshift" );
 	m_arpRepeatsModel.saveSettings( _doc, _this, "arprepeats" );
 	m_arpScrambleModel.saveSettings( _doc, _this, "arpscramble" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
@@ -669,7 +633,6 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpModel.loadSettings( _this, "arp" );
 	m_arpRangeModel.loadSettings( _this, "arprange" );
 	m_arpCycleModel.loadSettings( _this, "arpcycle" );
-//	m_arpCycleShiftModel.loadSettings( _this, "arpcycleshift" );
 	m_arpRepeatsModel.loadSettings( _this, "arprepeats" );
 	m_arpScrambleModel.loadSettings( _this, "arpscramble" );
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
