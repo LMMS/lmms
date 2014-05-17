@@ -373,7 +373,7 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,track_%1,track_%2" ).
+				"importedproject,soundfontfile,vstpluginfile,track_%1,track_%2" ).
 						arg( track::InstrumentTrack ).
 						arg( track::SampleTrack ) );
 }
@@ -395,7 +395,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile" )
+	else if( type == "samplefile" || type == "pluginpresetfile" || type == "soundfontfile" || type == "vstpluginfile" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
