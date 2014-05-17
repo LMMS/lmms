@@ -934,7 +934,7 @@ void fileItem::initPixmaps( void )
 		case SampleFile:
 		case SoundFontFile:		// TODO
 		case PatchFile:			// TODO
-        case VstPluginFile:     // TODO
+		case VstPluginFile:		// TODO
 			setIcon( 0, *s_sampleFilePixmap );
 			break;
 		case MidiFile:
