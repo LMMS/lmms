@@ -77,31 +77,11 @@ private:
 } WaveMipMap;
 
 
-QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
-{
-	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
-	{
-		for( int i = 0; i < TLENS[tbl]; i++ )
-		{
-			out << waveMipMap.sampleAt( tbl, i );
-		}
-	}
-    return out;
-}
+QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap );
 
-QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
-{
-	sample_t sample;
-	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
-	{
-		for( int i = 0; i < TLENS[tbl]; i++ )
-		{
-			in >> sample;
-			waveMipMap.setSampleAt( tbl, i, sample );
-		}
-	}
-    return in;
-}
+
+QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap );
+
 
 
 class EXPORT BandLimitedWave
@@ -133,7 +113,7 @@ public:
 	{
 		return static_cast<float>( sr ) / f;
 	}
-	
+
 	/*! \brief This method converts phase delta to wavelength. It assumes a phase scale of 0 to 1. */
 	static inline float pdToLen( float pd )
 	{
@@ -163,7 +143,7 @@ public:
 			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
 			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-			
+
 			return sr;
 		}
 		// low wavelen/ high freq
@@ -175,27 +155,27 @@ public:
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
 			const float ip = fraction( lookupf );
-			
+
 			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
 			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
 			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
 			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-			
+
 			return sr;
 		}
-		
+
 		// get the next higher tlen
 		int t = MAXTBL - 1;
 		while( _wavelen < TLENS[t] ) { t--; }
-		
+
 		int tlen = TLENS[t];
 		const float ph = fraction( _ph );
 		const float lookupf = ph * static_cast<float>( tlen );
 		int lookup = static_cast<int>( lookupf );
 		const float ip = fraction( lookupf );
-		
+
 		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
 
@@ -203,29 +183,29 @@ public:
 		const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
 		const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-		
+
 		return sr;
-		
+
 /*		lookup = lookup << 1;
 		tlen = tlen << 1;
 		t += 1;
 		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
 		const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
 		const sample_t s34 = linearInterpolate( s3, s4, ip );
-		
+
 		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
-		
+
 		return linearInterpolate( s12, s34, ip2 );
-	*/	
+	*/
 	};
 
 
 	static void generateWaves();
-	
+
 	static bool s_wavesGenerated;
-	
+
 	static WaveMipMap s_waveforms [NumBLWaveforms];
-	
+
 	static QString s_wavetableDir;
 };
 

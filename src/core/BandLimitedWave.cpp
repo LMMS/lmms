@@ -30,6 +30,34 @@ WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;
 QString BandLimitedWave::s_wavetableDir = "";
 
+
+QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
+{
+	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
+	{
+		for( int i = 0; i < TLENS[tbl]; i++ )
+		{
+			out << waveMipMap.sampleAt( tbl, i );
+		}
+	}
+    return out;
+}
+
+QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
+{
+	sample_t sample;
+	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
+	{
+		for( int i = 0; i < TLENS[tbl]; i++ )
+		{
+			in >> sample;
+			waveMipMap.setSampleAt( tbl, i, sample );
+		}
+	}
+    return in;
+}
+
+
 void BandLimitedWave::generateWaves()
 {
 // don't generate if they already exist
