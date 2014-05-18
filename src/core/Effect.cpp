@@ -2,7 +2,7 @@
  * Effect.cpp - base-class for effects
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,7 +23,6 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 
 #include <cstdio>
@@ -31,8 +30,8 @@
 
 #include "Effect.h"
 #include "engine.h"
-#include "DummyEffect.h"
 #include "EffectChain.h"
+#include "EffectControls.h"
 #include "EffectView.h"
 
 
@@ -110,11 +109,11 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-Effect * Effect::instantiate( const QString & _plugin_name,
+Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
 {
-	Plugin * p = Plugin::instantiate( _plugin_name, _parent, _key );
+	Plugin * p = Plugin::instantiate( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{
@@ -124,9 +123,10 @@ Effect * Effect::instantiate( const QString & _plugin_name,
 		return effect;
 	}
 
-	// not quite... so delete plugin and return dummy effect
+	// not quite... so delete plugin and leave it up to the caller to instantiate a DummyEffect
 	delete p;
-	return new DummyEffect( _parent );
+
+	return NULL;
 }
 
 

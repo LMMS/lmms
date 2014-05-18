@@ -82,9 +82,10 @@ public:
 class DummyEffect : public Effect
 {
 public:
-	DummyEffect( Model * _parent ) :
+	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
 		Effect( NULL, _parent, NULL ),
-		m_controls( this )
+		m_controls( this ),
+		m_originalPluginData( originalPluginData )
 	{
 	}
 
@@ -102,9 +103,16 @@ public:
 		return false;
 	}
 
+	const QDomElement& originalPluginData() const
+	{
+		return m_originalPluginData;
+	}
+
+
 
 private:
 	DummyEffectControls m_controls;
+	const QDomElement m_originalPluginData;
 
 } ;
 
