@@ -251,9 +251,7 @@ ProjectRenderer* exportProjectDialog::prepRender()
 	Mixer::qualitySettings qs =
 			Mixer::qualitySettings(
 					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()),
-					sampleExactControllersCB->isChecked(),
-					aliasFreeOscillatorsCB->isChecked() );
+					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
 	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
 			samplerateCB->currentText().section(" ", 0, 0).toUInt(),

@@ -106,8 +106,6 @@ public:
 
 		Interpolation interpolation;
 		Oversampling oversampling;
-		bool sampleExactControllers;
-		bool aliasFreeOscillators;
 
 		qualitySettings( Mode _m )
 		{
@@ -116,31 +114,22 @@ public:
 				case Mode_Draft:
 					interpolation = Interpolation_Linear;
 					oversampling = Oversampling_None;
-					sampleExactControllers = false;
-					aliasFreeOscillators = false;
 					break;
 				case Mode_HighQuality:
 					interpolation =
 						Interpolation_SincFastest;
 					oversampling = Oversampling_2x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = false;
 					break;
 				case Mode_FinalMix:
 					interpolation = Interpolation_SincBest;
 					oversampling = Oversampling_8x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = true;
 					break;
 			}
 		}
 
-		qualitySettings( Interpolation _i, Oversampling _o, bool _sec,
-								bool _afo ) :
+		qualitySettings( Interpolation _i, Oversampling _o ) :
 			interpolation( _i ),
-			oversampling( _o ),
-			sampleExactControllers( _sec ),
-			aliasFreeOscillators( _afo )
+			oversampling( _o )
 		{
 		}
 
