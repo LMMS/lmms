@@ -733,7 +733,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (lcrDelayDescriptor) {
 		free((LADSPA_PortDescriptor *)lcrDelayDescriptor->PortDescriptors);
 		free((char **)lcrDelayDescriptor->PortNames);

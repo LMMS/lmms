@@ -618,7 +618,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (sc4Descriptor) {
 		free((LADSPA_PortDescriptor *)sc4Descriptor->PortDescriptors);
 		free((char **)sc4Descriptor->PortNames);

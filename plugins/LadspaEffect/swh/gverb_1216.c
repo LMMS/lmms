@@ -429,7 +429,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (gverbDescriptor) {
 		free((LADSPA_PortDescriptor *)gverbDescriptor->PortDescriptors);
 		free((char **)gverbDescriptor->PortNames);

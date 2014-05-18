@@ -278,7 +278,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (highpass_iirDescriptor) {
 		free((LADSPA_PortDescriptor *)highpass_iirDescriptor->PortDescriptors);
 		free((char **)highpass_iirDescriptor->PortNames);

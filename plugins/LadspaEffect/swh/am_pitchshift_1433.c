@@ -455,7 +455,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (amPitchshiftDescriptor) {
 		free((LADSPA_PortDescriptor *)amPitchshiftDescriptor->PortDescriptors);
 		free((char **)amPitchshiftDescriptor->PortNames);
