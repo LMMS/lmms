@@ -199,11 +199,11 @@ knobTypes knob::knobNum() const
 
 
 
-void knob::setknobNum( knobTypes _k )
+void knob::setKnobNum( knobTypes k )
 {
-	if( m_knobNum != _k )
+	if( m_knobNum != k )
 	{
-		m_knobNum = _k;
+		m_knobNum = k;
 		onKnobNumUpdated();
 	}
 }
@@ -266,40 +266,74 @@ QColor knob::outerColor() const
 }
 
 
-
-void knob::setOuterColor( const QColor & _c )
+void knob::setOuterColor( const QColor & c )
 {
-	m_outerColor = _c;
+	m_outerColor = c;
 }
-
 
 
 QColor knob::lineColor() const
 {
-	return m_lineColor;
-}
-
-
-
-void knob::setlineColor( const QColor & _c )
-{
-	m_lineColor = _c;
+#define KNOBTYPE_SWITCH( knobtype ) \
+	case knobtype : \
+		return m_##knobtype##_lineColor; \
+		break;
+		
+	switch( m_knobNum )
+	{
+		KNOBTYPE_SWITCH( knobDark_28 )
+		KNOBTYPE_SWITCH( knobBright_26 )
+		KNOBTYPE_SWITCH( knobSmall_17 )
+		KNOBTYPE_SWITCH( knobGreen_17 )
+		KNOBTYPE_SWITCH( knobVintage_32 )
+		case knobStyled:
+		default:
+			break;
+	}
+	return QColor();
+#undef KNOBTYPE_SWITCH
 }
 
 
 
 QColor knob::arcColor() const
 {
-	return m_arcColor;
+#define KNOBTYPE_SWITCH( knobtype ) \
+	case knobtype : \
+		return m_##knobtype##_arcColor; \
+		break;
+		
+	switch( m_knobNum )
+	{
+		KNOBTYPE_SWITCH( knobDark_28 )
+		KNOBTYPE_SWITCH( knobBright_26 )
+		KNOBTYPE_SWITCH( knobSmall_17 )
+		KNOBTYPE_SWITCH( knobGreen_17 )
+		KNOBTYPE_SWITCH( knobVintage_32 )
+		case knobStyled:
+		default:
+			break;
+	}
+	return QColor();
+#undef KNOBTYPE_SWITCH
 }
 
 
+#define KNOBTYPE_PROPERTIES( knobtype ) \
+	QColor knob:: knobtype##_lineColor() const \
+	{ return m_##knobtype##_lineColor; } \
+	QColor knob:: knobtype##_arcColor() const \
+	{ return m_##knobtype##_arcColor; } \
+	void knob:: knobtype##_setLineColor( const QColor & c ) \
+	{ m_##knobtype##_lineColor = c; } \
+	void knob:: knobtype##_setArcColor( const QColor & c ) \
+	{ m_##knobtype##_arcColor = c; } 
 
-void knob::setarcColor( const QColor & _c )
-{
-	m_arcColor = _c;
-}
-
+	KNOBTYPE_PROPERTIES( knobDark_28 )
+	KNOBTYPE_PROPERTIES( knobBright_26 )
+	KNOBTYPE_PROPERTIES( knobSmall_17 )
+	KNOBTYPE_PROPERTIES( knobGreen_17 )
+	KNOBTYPE_PROPERTIES( knobVintage_32 )
 
 
 
@@ -393,34 +427,28 @@ void knob::drawKnob( QPainter * _p )
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 
-	QColor col;
-	if( m_knobNum == knobVintage_32 )
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
-	else
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
+	QColor col = arcColor();
 	col.setAlpha( 70 );
 
 	p.setPen( QPen( col, 2 ) );
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
+	p.setPen( QPen( lineColor(), 2 ) );
+
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::WindowText ), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
@@ -431,15 +459,11 @@ void knob::drawKnob( QPainter * _p )
 		}
 		case knobGreen_17:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText), 2 ) );
 			p.drawLine( calculateLine( mid, radius ) );
 			break;
 		}
 		case knobVintage_32:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
@@ -447,6 +471,7 @@ void knob::drawKnob( QPainter * _p )
 			break;
 	}
 
+	p.setPen( QPen( arcColor(), 2 ) );
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
 
 	p.end();
