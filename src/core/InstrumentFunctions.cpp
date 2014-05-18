@@ -305,8 +305,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpScrambleModel( 0.0f, 0.0f, 4.0f, 1.0f, this, tr( "Scramble mode" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Cycle steps" ) ),
-	m_arpFloorModel( 0.0f, 0.0f, 20.0f, 1.0f, this, tr( "Floor" ) ),
-	m_arpCeilModel( 20.0f, 0.0f, 20.0f, 1.0f, this, tr( "Ceiling" ) ),
+	m_arpFloorModel( 0.0f, 0.0f, 16.0f, 1.0f, this, tr( "Floor" ) ),
+	m_arpCeilModel( 20.0f, 0.0f, 16.0f, 1.0f, this, tr( "Ceiling" ) ),
 	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
@@ -567,7 +567,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// Ceil. Note stuck at set index.
 		int ceiling = m_arpCeilModel.value();
-		if( cur_arp_idx > ceiling )
+		if( ceiling < m_arpCeilModel.maxValue() && ceiling < cur_arp_idx )
 		{
 			cur_arp_idx = ceiling;
 		}
@@ -615,7 +615,7 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpEnabledModel.saveSettings( _doc, _this, "arp-enabled" );
 	m_arpModel.saveSettings( _doc, _this, "arp" );
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
-	m_arpCycleModel.saveSettings( _doc, _this, "cyclerange" );
+	m_arpCycleModel.saveSettings( _doc, _this, "arpcycle" );
 	m_arpRepeatsModel.saveSettings( _doc, _this, "arprepeats" );
 	m_arpScrambleModel.saveSettings( _doc, _this, "arpscramble" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
