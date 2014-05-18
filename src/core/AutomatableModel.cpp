@@ -555,6 +555,70 @@ void AutomatableModel::pasteValue()
 
 
 
+float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
+{
+	// get patterns that connect to this model
+	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
+	if( patterns.isEmpty() )
+	{
+		// if no such patterns exist, return current value
+		return m_value;
+	}
+	else
+	{
+		// of those patterns:
+		// find the patterns which overlap with the miditime position
+		QVector<AutomationPattern *> patterns_in_range;
+		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+		{
+			int s = ( *it )->startPosition();
+			int e = ( *it )->endPosition();
+			if( s <= time && e >= time ) { patterns_in_range += ( *it ); } 
+		}
+		
+		AutomationPattern * latest_pattern = NULL;
+		
+		if( ! patterns_in_range.isEmpty() )
+		{
+			// if there are more than one overlapping patterns, just use the first one because
+			// multiple pattern behaviour is undefined anyway
+			latest_pattern = patterns_in_range[0];
+		}
+		else
+		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
+		{
+			int latest_position = 0;
+			
+			for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+			{
+				int e = ( *it )->endPosition();
+				if( e <= time && e > latest_position )
+				{
+					latest_position = e;
+					latest_pattern = ( *it );
+				}
+			}
+		}
+		
+		if( latest_pattern )
+		{
+			// scale/fit the value appropriately and return it
+			const float value = latest_pattern->valueAt( time );
+			const float scaled_value =
+				( m_scaleType == Linear )
+				? value
+				: logToLinearScale(
+					// fits value into [0,1]:
+					(value - minValue<float>()) / maxValue<float>()
+					);
+			return fittedValue( scaled_value );
+		}
+		// if we still find no pattern, the value at that time is undefined so 
+		// just return current value as the best we can do
+		else return m_value;
+	}
+}
+
 
 #include "moc_AutomatableModel.cxx"
 
