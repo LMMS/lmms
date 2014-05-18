@@ -273,23 +273,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="sampleExactControllersCB" >
-          <property name="text" >
-           <string>Sample-exact controllers</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QCheckBox" name="exportLoopCB">
           <property name="text">
            <string>Export as loop (remove end silence)</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="aliasFreeOscillatorsCB" >
-          <property name="text" >
-           <string>Alias-free oscillators</string>
           </property>
          </widget>
         </item>

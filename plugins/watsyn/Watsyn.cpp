@@ -360,7 +360,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	const float tfp_ = static_cast<float>( _n->totalFramesPlayed() );
 
 	// if sample-exact is enabled, use sample-exact calculations...
-	if( engine::mixer()->currentQualitySettings().sampleExactControllers )
+	// disabled pending proper implementation of sample-exactness
+/*	if( engine::mixer()->currentQualitySettings().sampleExactControllers )
 	{
 		for( fpp_t f=0; f < frames; f++ )
 		{
@@ -393,10 +394,11 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 									( bbuf[f][1] * bmix );
 		}
 	}
-
+	else*/ 
+	
 	// if sample-exact is not enabled, use simpler calculations:
 	// if mix envelope is active, and we haven't gone past the envelope end, use envelope-aware calculation...
-	else if( envAmt != 0.0f && tfp_ < envLen )
+	if( envAmt != 0.0f && tfp_ < envLen )
 	{
 		const float mixvalue_ = m_abmix.value();
 		for( fpp_t f=0; f < frames; f++ )
