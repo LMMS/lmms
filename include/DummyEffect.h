@@ -1,7 +1,7 @@
 /*
  * DummyEffect.h - effect used as fallback if an effect couldn't be loaded
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _DUMMY_EFFECT_H
-#define _DUMMY_EFFECT_H
+#ifndef DUMMY_EFFECT_H
+#define DUMMY_EFFECT_H
 
 #include "Effect.h"
 #include "EffectControls.h"
@@ -58,15 +58,15 @@ public:
 		return 0;
 	}
 
-	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	inline virtual void loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & )
 	{
 	}
 
-	inline virtual QString nodeName() const
+	virtual QString nodeName() const
 	{
 		return "DummyControls";
 	}
@@ -82,17 +82,17 @@ public:
 class DummyEffect : public Effect
 {
 public:
-	inline DummyEffect( Model * _parent ) :
+	DummyEffect( Model * _parent ) :
 		Effect( NULL, _parent, NULL ),
 		m_controls( this )
 	{
 	}
 
-	inline virtual ~DummyEffect()
+	virtual ~DummyEffect()
 	{
 	}
 
-	inline virtual EffectControls * controls()
+	virtual EffectControls * controls()
 	{
 		return &m_controls;
 	}
