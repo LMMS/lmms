@@ -510,6 +510,23 @@ bbTCOView {
 	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
+
+/* Knobs */
+
+knob {
+	qproperty-knobDark_28_lineColor: #f0f0f0;
+	qproperty-knobDark_28_arcColor: #f0f0f0;
+	qproperty-knobBright_26_lineColor: #f0f0f0;
+	qproperty-knobBright_26_arcColor: #f0f0f0;
+	qproperty-knobSmall_17_lineColor: #f0f0f0;
+	qproperty-knobSmall_17_arcColor: #f0f0f0;
+    qproperty-knobGreen_17_lineColor: #4afd85;
+    qproperty-knobGreen_17_arcColor: #4afd85;
+    qproperty-knobVintage_32_lineColor: #000;
+    qproperty-knobVintage_32_arcColor: #f0f0f0;
+}
+
+
 /* Plugins */
 
 TripleOscillatorView knob {

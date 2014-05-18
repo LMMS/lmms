@@ -41,7 +41,15 @@ enum knobTypes
 	knobDark_28, knobBright_26, knobSmall_17, knobGreen_17, knobVintage_32, knobStyled
 } ;
 
-
+#define KNOBTYPE_PROPERTIES_PUBLIC( knobtype ) \
+	QColor knobtype##_lineColor() const; \
+	QColor knobtype##_arcColor() const; \
+	void knobtype##_setLineColor( const QColor & c ); \
+	void knobtype##_setArcColor( const QColor & c ); 
+	
+#define KNOBTYPE_PROPERTIES_PRIVATE( knobtype ) \
+	QColor m_##knobtype##_lineColor; \
+	QColor m_##knobtype##_arcColor; 
 
 class EXPORT knob : public QWidget, public FloatModelView
 {
@@ -59,12 +67,32 @@ class EXPORT knob : public QWidget, public FloatModelView
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setlineColor)
-	Q_PROPERTY(QColor arcColor READ arcColor WRITE setarcColor)
+
+	// Even more Unfortunately, the CSS syntax by setting properties by another property just doesn't work,
+	// no matter what I do, so the only thing I can do is create separate properties for line/arc of
+	// each nonstyled knobtype
+	Q_PROPERTY( QColor knobDark_28_lineColor READ knobDark_28_lineColor WRITE knobDark_28_setLineColor )
+	Q_PROPERTY( QColor knobDark_28_arcColor READ knobDark_28_arcColor WRITE knobDark_28_setArcColor )
+	Q_PROPERTY( QColor knobBright_26_lineColor READ knobBright_26_lineColor WRITE knobBright_26_setLineColor )
+	Q_PROPERTY( QColor knobBright_26_arcColor READ knobBright_26_arcColor WRITE knobBright_26_setArcColor )
+	Q_PROPERTY( QColor knobSmall_17_lineColor READ knobSmall_17_lineColor WRITE knobSmall_17_setLineColor )
+	Q_PROPERTY( QColor knobSmall_17_arcColor READ knobSmall_17_arcColor WRITE knobSmall_17_setArcColor )
+	Q_PROPERTY( QColor knobGreen_17_lineColor READ knobGreen_17_lineColor WRITE knobGreen_17_setLineColor )
+	Q_PROPERTY( QColor knobGreen_17_arcColor READ knobGreen_17_arcColor WRITE knobGreen_17_setArcColor )
+	Q_PROPERTY( QColor knobVintage_32_lineColor READ knobVintage_32_lineColor WRITE knobVintage_32_setLineColor )
+	Q_PROPERTY( QColor knobVintage_32_arcColor READ knobVintage_32_arcColor WRITE knobVintage_32_setArcColor )
+	
+	KNOBTYPE_PROPERTIES_PUBLIC( knobDark_28 )
+	KNOBTYPE_PROPERTIES_PUBLIC( knobBright_26 )
+	KNOBTYPE_PROPERTIES_PUBLIC( knobSmall_17 )
+	KNOBTYPE_PROPERTIES_PUBLIC( knobGreen_17 )
+	KNOBTYPE_PROPERTIES_PUBLIC( knobVintage_32 )
+
+
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
-	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
+	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setKnobNum)
 
 	void initUi( const QString & _name ); //!< to be called by ctors
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
@@ -93,8 +121,8 @@ public:
 	void setOuterRadius( float _r );
 
 	knobTypes knobNum() const;
-	void setknobNum( knobTypes _k );
-
+	void setKnobNum( knobTypes k );
+	
 	QPointF centerPoint() const;
 	float centerPointX() const;
 	void setCenterPointX( float _c );
@@ -106,10 +134,9 @@ public:
 
 	QColor outerColor() const;
 	void setOuterColor( const QColor & _c );
+	
 	QColor lineColor() const;
-	void setlineColor( const QColor & _c );
 	QColor arcColor() const;
-	void setarcColor( const QColor & _c );
 
 
 signals:
@@ -184,8 +211,11 @@ private:
 	float m_outerRadius;
 	float m_lineWidth;
 	QColor m_outerColor;
-	QColor m_lineColor; //!< unused yet
-	QColor m_arcColor; //!< unused yet
+	KNOBTYPE_PROPERTIES_PRIVATE( knobDark_28 )
+	KNOBTYPE_PROPERTIES_PRIVATE( knobBright_26 )
+	KNOBTYPE_PROPERTIES_PRIVATE( knobSmall_17 )
+	KNOBTYPE_PROPERTIES_PRIVATE( knobGreen_17 )
+	KNOBTYPE_PROPERTIES_PRIVATE( knobVintage_32 )
 
 	knobTypes m_knobNum;
 
