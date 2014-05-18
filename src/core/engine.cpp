@@ -43,6 +43,7 @@
 #include "Plugin.h"
 #include "SongEditor.h"
 #include "song.h"
+#include "BandLimitedWave.h"
 
 
 bool engine::s_hasGUI = true;
@@ -71,6 +72,9 @@ QMap<QString, QString> engine::s_pluginFileHandling;
 void engine::init( const bool _has_gui )
 {
 	s_hasGUI = _has_gui;
+
+	// generate (load from file) bandlimited wavetables
+	BandLimitedWave::generateWaves();
 
 	initPluginFileHandling();
 
