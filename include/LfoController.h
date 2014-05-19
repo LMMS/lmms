@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _LFO_CONTROLLER_H
-#define _LFO_CONTROLLER_H
+#ifndef LFO_CONTROLLER_H
+#define LFO_CONTROLLER_H
 
 #include <QtGui/QWidget>
 
@@ -59,8 +59,8 @@ public slots:
 
 
 protected:
-	// The internal per-controller get-value function
-	virtual float value( int _offset );
+	// The internal per-controller value updating function
+	virtual void updateValueBuffer();
 
 	FloatModel m_baseModel;
 	TempoSyncKnobModel m_speedModel;
@@ -69,17 +69,19 @@ protected:
 	IntModel m_waveModel;
 	IntModel m_multiplierModel;
 
-	int m_duration;
-	int m_phaseCorrection;
-	int m_phaseOffset;
-	
+	float m_duration;
+	float m_phaseOffset;
+	float m_currentPhase;
+
 	sample_t (*m_sampleFunction)( const float );
 
 private:
 	SampleBuffer * m_userDefSampleBuffer;
 
 protected slots:
+	void updatePhase();
 	void updateSampleFunction();
+	void updateDuration();
 
 	friend class LfoControllerDialog;
 

@@ -40,7 +40,7 @@
 #include "PeakController.h"
 
 
-unsigned int Controller::s_frames = 0;
+unsigned int Controller::s_periods = 0;
 QVector<Controller *> Controller::s_controllers;
 
 
@@ -49,6 +49,8 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
+	m_valueBuffer( engine::mixer()->framesPerPeriod() ),
+	m_bufferLastUpdated( 0 ),
 	m_connectionCount( 0 ),
 	m_type( _type )
 {
@@ -97,6 +99,7 @@ Controller::~Controller()
 		engine::getSong()->removeController( this );
 	}
 
+	m_valueBuffer.clear();
 	// Remove connections by destroyed signal
 }
 
@@ -115,17 +118,41 @@ float Controller::currentValue( int _offset )
 
 
 
-float Controller::value( int _offset )
+float Controller::value( int offset )
 {
-	return 0.5f;
+	if( m_bufferLastUpdated != s_periods )
+	{
+		updateValueBuffer();
+	}
+	return m_valueBuffer.values()[ offset ];
 }
 	
+
+ValueBuffer * Controller::valueBuffer()
+{
+	if( m_bufferLastUpdated != s_periods )
+	{
+		updateValueBuffer();
+	}
+	return &m_valueBuffer;
+}
+
+
+void Controller::updateValueBuffer()
+{
+	float * values = m_valueBuffer.values();
+	for( int i = 0; i < m_valueBuffer.length(); i++ )
+	{
+		values[i] = 0.5f;
+	}
+	m_bufferLastUpdated = s_periods;
+}
 
 
 // Get position in frames
 unsigned int Controller::runningFrames()
 {
-	return s_frames;
+	return s_periods * engine::mixer()->framesPerPeriod();
 }
 
 
@@ -133,7 +160,7 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return s_frames / engine::mixer()->processingSampleRate();
+	return runningFrames() / engine::mixer()->processingSampleRate();
 }
 
 
@@ -149,7 +176,7 @@ void Controller::triggerFrameCounter()
 		emit s_controllers.at(i)->valueChanged();
 	}
 
-	s_frames += engine::mixer()->framesPerPeriod();
+	s_periods ++;
 	//emit s_signaler.triggerValueChanged();
 }
 
@@ -157,7 +184,7 @@ void Controller::triggerFrameCounter()
 
 void Controller::resetFrameCounter()
 {
-	s_frames = 0;
+	s_periods = 0;
 }
 
 

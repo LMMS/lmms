@@ -41,6 +41,7 @@ MidiController::MidiController( Model * _parent ) :
 			engine::mixer()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f )
 {
+	setSampleExact( true );
 	connect( &m_midiPort, SIGNAL( modeChanged() ),
 			this, SLOT( updateName() ) );
 }
@@ -55,12 +56,19 @@ MidiController::~MidiController()
 
 
 
-float MidiController::value( int _offset )
+void MidiController::updateValueBuffer()
 {
-	return m_lastValue;
+	if( m_previousValue != m_lastValue )
+	{
+		m_valueBuffer.interpolate( m_previousValue, m_lastValue );
+		m_previousValue = m_lastValue;
+	}
+	else
+	{
+		m_valueBuffer.fill( m_lastValue );
+	}
+	m_bufferLastUpdated = s_periods;
 }
-
-
 
 
 void MidiController::updateName()
@@ -86,6 +94,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 					  m_midiPort.inputChannel() == 0 ) )
 			{
 				unsigned char val = event.controllerValue();
+				m_previousValue = m_lastValue;
 				m_lastValue = (float)( val ) / 127.0f;
 				emit valueChanged();
 			}

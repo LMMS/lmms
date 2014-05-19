@@ -34,6 +34,7 @@
 #include "Mixer.h"
 #include "LfoController.h"
 #include "ControllerDialog.h"
+#include "lmms_math.h"
 
 //const float TWO_PI = 6.28318531f;
 
@@ -47,14 +48,26 @@ LfoController::LfoController( Model * _parent ) :
 			this, tr( "Oscillator waveform" ) ),
 	m_multiplierModel( 0, 0, 2, this, tr( "Frequency Multiplier" ) ),
 	m_duration( 1000 ),
-	m_phaseCorrection( 0 ),
-	m_phaseOffset( 0 ),
+	m_phaseOffset( 0 ),	
+	m_currentPhase( 0 ),
 	m_sampleFunction( &Oscillator::sinSample ),
 	m_userDefSampleBuffer( new SampleBuffer )
 {
-
+	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleFunction() ) );
+	
+	connect( &m_speedModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateDuration() ) );
+	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateDuration() ) );
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), 
+			this, SLOT( updateDuration() ) );
+	
+	connect( engine::getSong(), SIGNAL( playbackStateChanged() ),
+			this, SLOT( updatePhase() ) );
+			
+	updateDuration();
 }
 
 
@@ -72,83 +85,55 @@ LfoController::~LfoController()
 }
 
 
-
-
-// This code took forever to get right. It can
-// definately be optimized.
-// The code should probably be integrated with the oscillator class. But I
-// don't know how to use oscillator because it is so confusing
-float LfoController::value( int _offset )
+void LfoController::updateValueBuffer()
 {
-	int frame = runningFrames() + _offset + m_phaseCorrection;
+	m_phaseOffset = m_phaseModel.value() / 360.0;
+	
+	float * values = m_valueBuffer.values();
+	
+	float phase = m_currentPhase + m_phaseOffset;
+	for( int i = 0; i < m_valueBuffer.length(); i++ )
+	{		
+		const float currentSample = m_sampleFunction != NULL 
+			? m_sampleFunction( phase )
+			: m_userDefSampleBuffer->userWaveSample( phase );
+			
+		values[i] = m_baseModel.value() + ( m_amountModel.value() * currentSample / 2.0f );
 
-	//If the song is playing, sync the value with the time of the song.
-	if( engine::getSong()->isPlaying() || engine::getSong()->isExporting() )
-	{
-		// The new duration in frames
-		// (Samples/Second) / (periods/second) = (Samples/cycle)
-		float newDurationF =
-				engine::mixer()->processingSampleRate() *
-				m_speedModel.value();
-
-		switch(m_multiplierModel.value() )
-		{
-			case 1:
-				newDurationF /= 100.0;
-				break;
-
-			case 2:
-				newDurationF *= 100.0;
-				break;
-
-			default:
-				break;
-		}
-
-		m_phaseOffset = qRound(
-			m_phaseModel.value() * newDurationF / 360.0 );
-
-
-		int newDuration = static_cast<int>( newDurationF );
-		m_phaseCorrection = static_cast<int>(engine::getSong()->getTicks()*engine::framesPerTick())%newDuration
-								+ m_phaseOffset;
-
-		// re-run the first calculation again
-		frame = m_phaseCorrection + _offset;
+		phase += 1.0 / m_duration;
 	}
+	
+	m_currentPhase = absFraction( phase - m_phaseOffset );
+	m_bufferLastUpdated = s_periods;
+}
 
-	// speedModel  0..1   fast..slow  0ms..20000ms
-	// duration m_duration
-	//
 
-	//  frames / (20seconds of frames)
-	float sampleFrame = float( frame+m_phaseOffset ) / 
-		(engine::mixer()->processingSampleRate() *  m_speedModel.value() );
+void LfoController::updatePhase()
+{
+	m_currentPhase = ( engine::getSong()->getTicks() * engine::framesPerTick() ) / m_duration;
+}
+
+
+void LfoController::updateDuration()
+{
+	float newDurationF = engine::mixer()->processingSampleRate() *	m_speedModel.value();
 
 	switch(m_multiplierModel.value() )
 	{
 		case 1:
-			sampleFrame *= 100.0;
+			newDurationF /= 100.0;
 			break;
 
 		case 2:
-			sampleFrame /= 100.0;
+			newDurationF *= 100.0;
 			break;
 
 		default:
 			break;
 	}
-
-	// 44100 frames/sec
-	return m_baseModel.value() + ( m_amountModel.value() * 
-				( m_sampleFunction != NULL ?
-					m_sampleFunction(sampleFrame):
-					m_userDefSampleBuffer->userWaveSample(sampleFrame) )
-			/ 2.0f );
+	
+	m_duration = newDurationF;
 }
-
-
-
 
 void LfoController::updateSampleFunction()
 {
