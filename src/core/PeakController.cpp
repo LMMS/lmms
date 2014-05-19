@@ -51,6 +51,7 @@ PeakController::PeakController( Model * _parent,
 	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect )
 {
+	setSampleExact( true );
 	if( m_peakEffect )
 	{
 		connect( m_peakEffect, SIGNAL( destroyed( ) ),
@@ -74,16 +75,18 @@ PeakController::~PeakController()
 }
 
 
-
-float PeakController::value( int _offset )
+void PeakController::updateValueBuffer()
 {
 	if( m_peakEffect )
 	{
-		return m_peakEffect->lastSample();
+		m_valueBuffer.interpolate( m_peakEffect->previousSample(), m_peakEffect->lastSample() );
 	}
-	return( 0 );
+	else
+	{
+		m_valueBuffer.fill( 0 );
+	}
+	m_bufferLastUpdated = s_periods;
 }
-
 
 
 void PeakController::handleDestroyedEffect( )

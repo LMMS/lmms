@@ -31,6 +31,7 @@
 #include "Mixer.h"
 #include "Model.h"
 #include "JournallingObject.h"
+#include "ValueBuffer.h"
 
 class ControllerDialog;
 class Controller;
@@ -62,6 +63,8 @@ public:
 	virtual ~Controller();
 
 	virtual float currentValue( int _offset );
+	// The per-controller get-value-in-buffers function
+	virtual ValueBuffer * valueBuffer();
 
 	inline bool isSampleExact() const
 	{
@@ -111,6 +114,10 @@ public:
 		return tLimit<float>( _val, 0.0f, 1.0f );
 	}
 
+	static unsigned int runningPeriods()
+	{
+		return s_periods;
+	}
 	static unsigned int runningFrames();
 	static float runningTime();
 
@@ -138,6 +145,15 @@ protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
+	virtual void updateValueBuffer();
+
+	// buffer for storing sample-exact values in case there
+	// are more than one model wanting it, so we don't have to create it
+	// again every time
+	ValueBuffer m_valueBuffer;
+	// when we last updated the valuebuffer - so we know if we have to update it
+	unsigned int m_bufferLastUpdated;
+
 	float m_currentValue;
 	bool  m_sampleExact;
 	int m_connectionCount;
@@ -147,7 +163,7 @@ protected:
 
 	static ControllerVector s_controllers;
 
-	static unsigned int s_frames;
+	static unsigned int s_periods;
 
 
 signals:

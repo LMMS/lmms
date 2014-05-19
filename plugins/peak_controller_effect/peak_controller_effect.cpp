@@ -63,6 +63,7 @@ PeakControllerEffect::PeakControllerEffect(
 	m_effectId( rand() ),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
+	m_previousSample( 0 ),
 	m_lastRMS( -1 ),
 	m_lastRMSavail(false),
 	m_autoController( NULL )
@@ -89,11 +90,15 @@ namespace helpers
 {
 
 	//! returns 1.0f if val > 0.0f, -1.0 else
-	inline float sign(float val) { return -1.0f + 2.0f * (val > 0.0f); }
+	inline float sign( float val ) 
+	{ 
+		return -1.0f + 2.0f * ( val > 0.0f ); 
+	}
 
 	//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-	inline float sqrt_neg(float val) {
-		return sqrtf(fabs(val)) * helpers::sign(val);
+	inline float sqrt_neg( float val ) 
+	{
+		return sqrtf( fabs( val ) ) * helpers::sign( val );
 	}
 
 }
@@ -113,7 +118,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	// RMS:
 	double sum = 0;
 
-	if(c.m_absModel.value())
+	if( c.m_absModel.value() )
 	{
 		for( int i = 0; i < _frames; ++i )
 		{
@@ -127,8 +132,8 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 		{
 			// the value is absolute because of squaring,
 			// so we need to correct it
-			sum +=	_buf[i][0]*_buf[i][0]*helpers::sign(_buf[i][0])
-			 + _buf[i][1]*_buf[i][1]*helpers::sign(_buf[i][1]);
+			sum += _buf[i][0] * _buf[i][0] * helpers::sign( _buf[i][0] )
+				+ _buf[i][1] * _buf[i][1] * helpers::sign( _buf[i][1] );
 		}
 	}
 
@@ -157,6 +162,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	curRMS = (1-a)*curRMS + a*m_lastRMS;
 
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
+	m_previousSample = m_lastSample;
 	m_lastSample = c.m_baseModel.value() + amount*curRMS;
 	m_lastRMS = curRMS;
 

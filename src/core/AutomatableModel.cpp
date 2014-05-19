@@ -48,8 +48,11 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
 	m_setValueDepth( 0 ),
+	m_strictStepSize( false ),
 	m_hasLinkedModels( false ),
-	m_controllerConnection( NULL )
+	m_controllerConnection( NULL ),
+	m_valueBuffer( static_cast<int>( engine::mixer()->framesPerPeriod() ) )
+
 {
 	setInitValue( val );
 }
@@ -69,6 +72,8 @@ AutomatableModel::~AutomatableModel()
 	{
 		delete m_controllerConnection;
 	}
+	
+	m_valueBuffer.clear();
 
 	emit destroyed( id() );
 }
@@ -81,7 +86,38 @@ bool AutomatableModel::isAutomated() const
 	return AutomationPattern::isAutomated( this );
 }
 
-
+bool AutomatableModel::hasSampleExactData() const
+{
+	// if a controller is connected...
+	if( m_controllerConnection != NULL ) 
+	{ 
+		// ...and is sample-exact, then return true
+		if( m_controllerConnection->getController()->isSampleExact() )
+		{
+			return true; 
+		}
+	}
+	// check also the same for the first linked model
+	if( hasLinkedModels() )
+	{
+		AutomatableModel* lm = m_linkedModels.first();
+		if( lm->m_controllerConnection != NULL )
+		{
+			if( lm->m_controllerConnection->getController()->isSampleExact() )
+			{
+				return true; 
+			}
+		}
+	}
+	// if we have values we can interpolate return true
+	if( m_oldValue != m_value )
+	{
+		return true;
+	}
+	
+	// otherwise, return false
+	return false;
+}
 
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
@@ -215,10 +251,11 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 
 void AutomatableModel::setValue( const float value )
 {
+	m_oldValue = m_value;
 	++m_setValueDepth;
 	const float old_val = m_value;
 
-	m_value = fittedValue( value );
+	m_value = fittedValue( value, true );
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
@@ -290,6 +327,7 @@ void AutomatableModel::roundAt( T& value, const T& where ) const
 
 void AutomatableModel::setAutomatedValue( const float value )
 {
+	m_oldValue = m_value;
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
@@ -363,11 +401,11 @@ void AutomatableModel::setStep( const float step )
 
 
 
-float AutomatableModel::fittedValue( float value ) const
+float AutomatableModel::fittedValue( float value, bool forceStep ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
 
-	if( m_step != 0 )
+	if( m_step != 0 && ( m_strictStepSize || forceStep ) )
 	{
 		value = nearbyintf( value / m_step ) * m_step;
 	}
@@ -488,7 +526,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 				"lacks implementation for a scale type");
 			break;
 		}
-		if( typeInfo<float>::isEqual( m_step, 1 ) )
+		if( typeInfo<float>::isEqual( m_step, 1 ) && m_strictStepSize )
 		{
 			return qRound( v );
 		}
@@ -505,6 +543,67 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 }
 
 
+ValueBuffer * AutomatableModel::valueBuffer()
+{
+	ValueBuffer * vb;
+	if( m_controllerConnection && m_controllerConnection->getController()->isSampleExact() )
+	{
+		vb = m_controllerConnection->valueBuffer();
+		if( vb )
+		{
+			float * values = vb->values();
+			float * nvalues = m_valueBuffer.values();
+			switch( m_scaleType )
+			{
+			case Linear:
+				for( int i = 0; i < m_valueBuffer.length(); i++ )
+				{
+					nvalues[i] = minValue<float>() + ( range() * values[i] );
+				}
+				break;
+			case Logarithmic:
+				for( int i = 0; i < m_valueBuffer.length(); i++ )
+				{
+					nvalues[i] = logToLinearScale( values[i] );
+				}
+				break;
+			default:
+				qFatal("AutomatableModel::valueBuffer() "
+					"lacks implementation for a scale type");
+				break;
+			}
+			return &m_valueBuffer;
+		}
+	}
+	AutomatableModel* lm = NULL;
+	if( m_hasLinkedModels ) 
+	{
+		lm = m_linkedModels.first();
+	}
+	if( lm && lm->controllerConnection() && lm->controllerConnection()->getController()->isSampleExact() )
+	{
+		vb = lm->valueBuffer();
+		float * values = vb->values();
+		float * nvalues = m_valueBuffer.values();
+		for( int i = 0; i < vb->length(); i++ )
+		{
+			nvalues[i] = fittedValue( values[i], false );
+		}
+		return &m_valueBuffer;
+	}
+	
+	if( m_oldValue != m_value )
+	{
+		m_valueBuffer.interpolate( m_oldValue, m_value );
+		m_oldValue = m_value;
+		return &m_valueBuffer;
+	}
+	
+	// if we have no sample-exact source for a ValueBuffer, create one and fill it with current value
+	// ideally, recipients should check first if we hasSampleExactData before fetching ValueBuffers
+	m_valueBuffer.fill( m_value );
+	return &m_valueBuffer;
+}
 
 
 void AutomatableModel::unlinkControllerConnection()

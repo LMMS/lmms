@@ -74,29 +74,62 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
+	
+	ValueBuffer * volBuf = m_ampControls.m_volumeModel.hasSampleExactData() 
+		? m_ampControls.m_volumeModel.valueBuffer() 
+		: NULL;
+		
+	ValueBuffer * panBuf = m_ampControls.m_panModel.hasSampleExactData()
+		? m_ampControls.m_panModel.valueBuffer() 
+		: NULL;
+		
+	ValueBuffer * leftBuf = m_ampControls.m_leftModel.hasSampleExactData()
+		? m_ampControls.m_leftModel.valueBuffer() 
+		: NULL;
+
+	ValueBuffer * rightBuf = m_ampControls.m_rightModel.hasSampleExactData()
+		? m_ampControls.m_rightModel.valueBuffer() 
+		: NULL;
+
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 //		qDebug( "offset %d, value %f", f, m_ampControls.m_volumeModel.value( f ) );
 		
 		sample_t s[2] = { buf[f][0], buf[f][1] };
 
-		// convert vol/pan values to left/right values
-		const float left1 = m_ampControls.m_volumeModel.value( f ) *
-			( m_ampControls.m_panModel.value( f ) <= 0
-			? 1.0
-			: 1.0 - m_ampControls.m_panModel.value( f ) / 100.0 );
-		const float right1 = m_ampControls.m_volumeModel.value( f ) *
-			( m_ampControls.m_panModel.value( f ) >= 0
-			? 1.0
-			: 1.0 + m_ampControls.m_panModel.value( f ) / 100.0 );
+		// vol knob
+		if( volBuf )
+		{
+			s[0] *= volBuf->values()[ f ] * 0.01f;
+			s[1] *= volBuf->values()[ f ] * 0.01f;
+		}
+		else
+		{
+			s[0] *= m_ampControls.m_volumeModel.value() * 0.01f;
+			s[1] *= m_ampControls.m_volumeModel.value() * 0.01f;
+		}
 
-		// first stage amplification
-		s[0] *= ( left1 / 100.0 );
-		s[1] *= ( right1 / 100.0 );
+		// convert pan values to left/right values
+		const float pan = panBuf 
+			? panBuf->values()[ f ] 
+			: m_ampControls.m_panModel.value();
+		const float left1 = pan <= 0
+			? 1.0
+			: 1.0 - m_ampControls.m_panModel.value( f ) * 0.01f;
+		const float right1 = pan >= 0
+			? 1.0
+			: 1.0 + m_ampControls.m_panModel.value( ) * 0.01f;
 
 		// second stage amplification
-		s[0] *= ( m_ampControls.m_leftModel.value( f ) / 100.0 );
-		s[1] *= ( m_ampControls.m_rightModel.value( f ) / 100.0 );
+		const float left2 = leftBuf
+			? leftBuf->values()[ f ] 
+			: m_ampControls.m_leftModel.value();
+		const float right2 = rightBuf
+			? rightBuf->values()[ f ] 
+			: m_ampControls.m_rightModel.value();
+			
+		s[0] *= left1 * left2 * 0.01;
+		s[1] *= right1 * right2 * 0.01;
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];

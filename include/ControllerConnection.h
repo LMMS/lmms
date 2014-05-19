@@ -27,14 +27,15 @@
  */
 
 
-#ifndef _CONTROLLER_CONNECTION_H
-#define _CONTROLLER_CONNECTION_H
+#ifndef CONTROLLER_CONNECTION_H
+#define CONTROLLER_CONNECTION_H
 
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
 #include "Controller.h"
 #include "JournallingObject.h"
+#include "ValueBuffer.h"
 
 class ControllerConnection;
 
@@ -63,6 +64,11 @@ public:
 	float currentValue( int _offset )
 	{
 		return m_controller->currentValue( _offset );
+	}
+	
+	ValueBuffer * valueBuffer()
+	{
+		return m_controller->valueBuffer();
 	}
 
 	inline void setTargetName( const QString & _name );

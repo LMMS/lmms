@@ -30,6 +30,7 @@
 #include "JournallingObject.h"
 #include "Model.h"
 #include "MidiTime.h"
+#include "ValueBuffer.h"
 
 
 // simple way to map a property of a view to a model
@@ -98,6 +99,13 @@ public:
 	}
 
 	bool isAutomated() const;
+	bool isAutomatedOrControlled() const
+	{
+		return isAutomated() || m_controllerConnection != NULL;
+	}
+	
+	bool hasSampleExactData() const;
+
 
 	ControllerConnection* controllerConnection() const
 	{
@@ -133,6 +141,12 @@ public:
 	}
 
 	float controllerValue( int frameOffset ) const;
+
+	// returns sample-exact data as a ValueBuffer
+	// should only be called when sample-exact data exists
+	// in other cases (eg. for automation), the receiving end should interpolate
+	// the values themselves
+	ValueBuffer * valueBuffer();
 
 	template<class T>
 	T initValue() const
@@ -241,6 +255,16 @@ public:
 	}
 
 	float globalAutomationValueAt( const MidiTime& time );
+	
+	bool strictStepSize() const
+	{
+		return m_strictStepSize;
+	}
+	
+	void setStrictStepSize( const bool b )
+	{
+		m_strictStepSize = b;
+	}
 
 public slots:
 	virtual void reset();
@@ -254,7 +278,7 @@ protected:
 	//! max() and aligned according to the step size (step size 0.05 -> value
 	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
 	//! doing your own calculations.
-	float fittedValue( float value ) const;
+	float fittedValue( float value, bool forceStep = false ) const;
 
 
 private:
@@ -290,10 +314,13 @@ private:
 	float m_range;
 	float m_centerValue;
 
-	// most objects will need this temporarily (until sampleExact is
-	// standard)
+	// currently unused?
 	float m_oldValue;
 	int m_setValueDepth;
+	
+	// used to determine if step size should be applied strictly (ie. always)
+	// or only when value set from gui (default)
+	bool m_strictStepSize;
 
 	AutoModelVector m_linkedModels;
 	bool m_hasLinkedModels;
@@ -305,6 +332,7 @@ private:
 
 	static float s_copiedValue;
 
+	ValueBuffer m_valueBuffer;
 
 signals:
 	void initValueChanged( float val );
