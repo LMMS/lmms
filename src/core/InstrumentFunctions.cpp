@@ -243,11 +243,9 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 		for( int octave_cnt = 0; octave_cnt < m_chordRangeModel.value(); ++octave_cnt )
 		{
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
-			// if octave_cnt == 1 we're in the first octave and
-			// the base-note is already done, so we don't have to
-			// create it in the following loop, then we loop until
-			// there's a -1 in the interval-array
-			for( int i = ( octave_cnt == 0 ) ? 1 : 0; i < chord_table[selected_chord].size(); ++i )
+
+			// process all notes in the chord
+			for( int i = 0; i < chord_table[selected_chord].size(); ++i )
 			{
 				// add interval to sub-note-key
 				const int sub_note_key = sub_note_key_base + (int) chord_table[selected_chord][i];
