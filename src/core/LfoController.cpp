@@ -95,10 +95,11 @@ void LfoController::updateValueBuffer()
 
 	// roll phase up until we're in sync with period counter
 	m_bufferLastUpdated++; 
-	while( m_bufferLastUpdated != s_periods )
+	if( m_bufferLastUpdated < s_periods )
 	{
-		phase += static_cast<float>( engine::framesPerTick() ) / m_duration;
-		m_bufferLastUpdated++;
+		int diff = s_periods - m_bufferLastUpdated;
+		phase += static_cast<float>( engine::framesPerTick() * diff ) / m_duration;
+		m_bufferLastUpdated += diff;
 	}
 
 
