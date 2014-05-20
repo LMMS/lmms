@@ -66,6 +66,8 @@ LfoController::LfoController( Model * _parent ) :
 	
 	connect( engine::getSong(), SIGNAL( playbackStateChanged() ),
 			this, SLOT( updatePhase() ) );
+	connect( engine::getSong(), SIGNAL( playbackPositionChanged() ),
+			this, SLOT( updatePhase() ) );
 			
 	updateDuration();
 }
@@ -87,11 +89,19 @@ LfoController::~LfoController()
 
 void LfoController::updateValueBuffer()
 {
-	m_phaseOffset = m_phaseModel.value() / 360.0;
-	
-	float * values = m_valueBuffer.values();
-	
+	m_phaseOffset = m_phaseModel.value() / 360.0;	
+	float * values = m_valueBuffer.values();	
 	float phase = m_currentPhase + m_phaseOffset;
+
+	// roll phase up until we're in sync with period counter
+	m_bufferLastUpdated++; 
+	while( m_bufferLastUpdated != s_periods )
+	{
+		phase += static_cast<float>( engine::framesPerTick() ) / m_duration;
+		m_bufferLastUpdated++;
+	}
+
+
 	for( int i = 0; i < m_valueBuffer.length(); i++ )
 	{		
 		const float currentSample = m_sampleFunction != NULL 
@@ -104,13 +114,13 @@ void LfoController::updateValueBuffer()
 	}
 	
 	m_currentPhase = absFraction( phase - m_phaseOffset );
-	m_bufferLastUpdated = s_periods;
 }
 
 
 void LfoController::updatePhase()
 {
-	m_currentPhase = ( engine::getSong()->getTicks() * engine::framesPerTick() ) / m_duration;
+	m_currentPhase = ( engine::getSong()->getFrames() ) / m_duration;
+	m_bufferLastUpdated = s_periods - 1;
 }
 
 

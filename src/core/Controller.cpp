@@ -40,7 +40,7 @@
 #include "PeakController.h"
 
 
-unsigned int Controller::s_periods = 0;
+long Controller::s_periods = 0;
 QVector<Controller *> Controller::s_controllers;
 
 
@@ -50,7 +50,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	Model( _parent, _display_name ),
 	JournallingObject(),
 	m_valueBuffer( engine::mixer()->framesPerPeriod() ),
-	m_bufferLastUpdated( 0 ),
+	m_bufferLastUpdated( -1 ),
 	m_connectionCount( 0 ),
 	m_type( _type )
 {
@@ -82,6 +82,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 			}
 		}
 	}
+	updateValueBuffer();
 }
 
 
@@ -184,6 +185,10 @@ void Controller::triggerFrameCounter()
 
 void Controller::resetFrameCounter()
 {
+	for( int i = 0; i < s_controllers.size(); ++i ) 
+	{
+		s_controllers.at( i )->m_bufferLastUpdated = 0;
+	} 
 	s_periods = 0;
 }
 

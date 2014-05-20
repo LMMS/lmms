@@ -114,7 +114,7 @@ public:
 		return tLimit<float>( _val, 0.0f, 1.0f );
 	}
 
-	static unsigned int runningPeriods()
+	static long runningPeriods()
 	{
 		return s_periods;
 	}
@@ -152,7 +152,7 @@ protected:
 	// again every time
 	ValueBuffer m_valueBuffer;
 	// when we last updated the valuebuffer - so we know if we have to update it
-	unsigned int m_bufferLastUpdated;
+	long m_bufferLastUpdated;
 
 	float m_currentValue;
 	bool  m_sampleExact;
@@ -163,7 +163,7 @@ protected:
 
 	static ControllerVector s_controllers;
 
-	static unsigned int s_periods;
+	static long s_periods;
 
 
 signals:

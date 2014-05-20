@@ -48,7 +48,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
 	m_setValueDepth( 0 ),
-	m_strictStepSize( false ),
+	m_hasStrictStepSize( false ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( engine::mixer()->framesPerPeriod() ) )
@@ -331,7 +331,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
-	const float scaled_value =
+	const float scaledValue =
 		( m_scaleType == Linear )
 		? value
 		: logToLinearScale(
@@ -339,7 +339,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 			(value - minValue<float>()) / maxValue<float>()
 			);
 
-	m_value = fittedValue( scaled_value );
+	m_value = fittedValue( scaledValue );
 
 	if( oldValue != m_value )
 	{
@@ -405,7 +405,7 @@ float AutomatableModel::fittedValue( float value, bool forceStep ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
 
-	if( m_step != 0 && ( m_strictStepSize || forceStep ) )
+	if( m_step != 0 && ( m_hasStrictStepSize || forceStep ) )
 	{
 		value = nearbyintf( value / m_step ) * m_step;
 	}
@@ -526,7 +526,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 				"lacks implementation for a scale type");
 			break;
 		}
-		if( typeInfo<float>::isEqual( m_step, 1 ) && m_strictStepSize )
+		if( typeInfo<float>::isEqual( m_step, 1 ) && m_hasStrictStepSize )
 		{
 			return qRound( v );
 		}
@@ -667,50 +667,50 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	{
 		// of those patterns:
 		// find the patterns which overlap with the miditime position
-		QVector<AutomationPattern *> patterns_in_range;
+		QVector<AutomationPattern *> patternsInRange;
 		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 		{
 			int s = ( *it )->startPosition();
 			int e = ( *it )->endPosition();
-			if( s <= time && e >= time ) { patterns_in_range += ( *it ); } 
+			if( s <= time && e >= time ) { patternsInRange += ( *it ); } 
 		}
 		
-		AutomationPattern * latest_pattern = NULL;
+		AutomationPattern * latestPattern = NULL;
 		
-		if( ! patterns_in_range.isEmpty() )
+		if( ! patternsInRange.isEmpty() )
 		{
 			// if there are more than one overlapping patterns, just use the first one because
 			// multiple pattern behaviour is undefined anyway
-			latest_pattern = patterns_in_range[0];
+			latestPattern = patternsInRange[0];
 		}
 		else
 		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
 		{
-			int latest_position = 0;
+			int latestPosition = 0;
 			
 			for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 			{
 				int e = ( *it )->endPosition();
-				if( e <= time && e > latest_position )
+				if( e <= time && e > latestPosition )
 				{
-					latest_position = e;
-					latest_pattern = ( *it );
+					latestPosition = e;
+					latestPattern = ( *it );
 				}
 			}
 		}
 		
-		if( latest_pattern )
+		if( latestPattern )
 		{
 			// scale/fit the value appropriately and return it
-			const float value = latest_pattern->valueAt( time );
-			const float scaled_value =
+			const float value = latestPattern->valueAt( time );
+			const float scaledValue =
 				( m_scaleType == Linear )
 				? value
 				: logToLinearScale(
 					// fits value into [0,1]:
 					(value - minValue<float>()) / maxValue<float>()
 					);
-			return fittedValue( scaled_value );
+			return fittedValue( scaledValue );
 		}
 		// if we still find no pattern, the value at that time is undefined so 
 		// just return current value as the best we can do

@@ -523,6 +523,12 @@ void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 	m_elapsedMilliSeconds += (((( _ticks - m_playPos[_play_mode].getTicks()))*60*1000/48)/getTempo());
 	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
+
+// send a signal if playposition changes during playback
+	if( isPlaying() ) 
+	{
+		emit playbackPositionChanged();
+	}
 }
 
 
