@@ -256,14 +256,14 @@ public:
 
 	float globalAutomationValueAt( const MidiTime& time );
 	
-	bool strictStepSize() const
+	bool hasStrictStepSize() const
 	{
-		return m_strictStepSize;
+		return m_hasStrictStepSize;
 	}
 	
 	void setStrictStepSize( const bool b )
 	{
-		m_strictStepSize = b;
+		m_hasStrictStepSize = b;
 	}
 
 public slots:
@@ -320,7 +320,7 @@ private:
 	
 	// used to determine if step size should be applied strictly (ie. always)
 	// or only when value set from gui (default)
-	bool m_strictStepSize;
+	bool m_hasStrictStepSize;
 
 	AutoModelVector m_linkedModels;
 	bool m_hasLinkedModels;

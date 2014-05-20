@@ -48,7 +48,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
 	m_setValueDepth( 0 ),
-	m_strictStepSize( false ),
+	m_hasStrictStepSize( false ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( engine::mixer()->framesPerPeriod() ) )
@@ -331,7 +331,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
-	const float scaled_value =
+	const float scaledValue =
 		( m_scaleType == Linear )
 		? value
 		: logToLinearScale(
@@ -339,7 +339,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 			(value - minValue<float>()) / maxValue<float>()
 			);
 
-	m_value = fittedValue( scaled_value );
+	m_value = fittedValue( scaledValue );
 
 	if( oldValue != m_value )
 	{
@@ -405,7 +405,7 @@ float AutomatableModel::fittedValue( float value, bool forceStep ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
 
-	if( m_step != 0 && ( m_strictStepSize || forceStep ) )
+	if( m_step != 0 && ( m_hasStrictStepSize || forceStep ) )
 	{
 		value = nearbyintf( value / m_step ) * m_step;
 	}
@@ -526,7 +526,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 				"lacks implementation for a scale type");
 			break;
 		}
-		if( typeInfo<float>::isEqual( m_step, 1 ) && m_strictStepSize )
+		if( typeInfo<float>::isEqual( m_step, 1 ) && m_hasStrictStepSize )
 		{
 			return qRound( v );
 		}
@@ -710,7 +710,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 					// fits value into [0,1]:
 					(value - minValue<float>()) / maxValue<float>()
 					);
-			return fittedValue( scaled_value );
+			return fittedValue( scaledValue );
 		}
 		// if we still find no pattern, the value at that time is undefined so 
 		// just return current value as the best we can do
