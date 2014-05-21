@@ -92,7 +92,7 @@ song::song() :
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
-	m_elapsedMilliSeconds( 0 ),
+	m_elapsedFrames( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
@@ -252,7 +252,7 @@ void song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			m_elapsedMilliSeconds = (tl->loopBegin().getTicks()*60*1000/48)/getTempo();
+			updateElapsedFrames();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 		}
@@ -310,7 +310,7 @@ void song::processNextBuffer()
 					ticks = ticks % ( max_tact * MidiTime::ticksPerTact() );
 
 					// wrap milli second counter
-					m_elapsedMilliSeconds = ( ticks * 60 * 1000 / 48 ) / getTempo();
+					updateElapsedFrames();
 
 					m_vstSyncController.setAbsolutePosition( ticks );
 				}
@@ -324,7 +324,7 @@ void song::processNextBuffer()
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
-					m_elapsedMilliSeconds = ((tl->loopBegin().getTicks())*60*1000/48)/getTempo();
+					updateElapsedFrames();
 				}
 			}
 			else
@@ -378,7 +378,7 @@ void song::processNextBuffer()
 		total_frames_played += played_frames;
 		m_playPos[m_playMode].setCurrentFrame( played_frames +
 								current_frame );
-		m_elapsedMilliSeconds += (((played_frames/frames_per_tick)*60*1000/48)/getTempo());
+		m_elapsedFrames += played_frames;
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
@@ -520,12 +520,26 @@ void song::updateLength()
 void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 {
 	m_elapsedTicks += m_playPos[_play_mode].getTicks() - _ticks;
-	m_elapsedMilliSeconds += (((( _ticks - m_playPos[_play_mode].getTicks()))*60*1000/48)/getTempo());
 	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
+	updateElapsedFrames();
 }
 
 
+void song::updateElapsedFrames()
+{
+	tick_t tickPos = m_playPos[ m_playMode ].getTicks();
+	m_elapsedFrames = m_playPos[ m_playMode ].currentFrame(); 
+	
+	for( MidiTime i = MidiTime( 0 ); i < tickPos; i += 1 )
+	{
+		float tempo = m_tempoModel.globalAutomationValueAt( i );
+		const float oneTick = 1.0 / 48.0; // one tick in beats
+		m_elapsedFrames += static_cast<int>( 60.0f / tempo * oneTick * engine::mixer()->processingSampleRate() );
+	}
+/*	qDebug( "frames %d", m_elapsedFrames );
+	qDebug( "ms %d", getMilliseconds() );*/
+}
 
 
 void song::togglePause()
@@ -569,14 +583,14 @@ void song::stop()
 		{
 			case timeLine::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
-				m_elapsedMilliSeconds = 0;
+				m_elapsedFrames = 0;
 				break;
 
 			case timeLine::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
-					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
+					updateElapsedFrames();
 					tl->savePos( -1 );
 				}
 				break;
@@ -589,7 +603,7 @@ void song::stop()
 	else
 	{
 		m_playPos[m_playMode].setTicks( 0 );
-		m_elapsedMilliSeconds = 0;
+		m_elapsedFrames = 0;
 	}
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );

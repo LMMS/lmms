@@ -97,12 +97,17 @@ public:
 
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds;
+		const float ms = ( static_cast<float>( m_elapsedFrames ) * 1000.0 ) / engine::mixer()->processingSampleRate();
+		return static_cast<int>( ms );
 	}
-	inline void setMilliSeconds( float _ellapsedMilliSeconds )
+	
+	f_cnt_t elapsedFrames() const
 	{
-		m_elapsedMilliSeconds = (_ellapsedMilliSeconds);
+		return m_elapsedFrames;
 	}
+	
+	void updateElapsedFrames();
+	
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -347,7 +352,7 @@ private:
 	pattern * m_patternToPlay;
 	bool m_loopPattern;
 
-	double m_elapsedMilliSeconds;
+	f_cnt_t m_elapsedFrames;
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
