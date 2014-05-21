@@ -568,42 +568,42 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	{
 		// of those patterns:
 		// find the patterns which overlap with the miditime position
-		QVector<AutomationPattern *> patterns_in_range;
+		QVector<AutomationPattern *> patternsInRange;
 		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 		{
 			int s = ( *it )->startPosition();
 			int e = ( *it )->endPosition();
-			if( s <= time && e >= time ) { patterns_in_range += ( *it ); } 
+			if( s <= time && e >= time ) { patternsInRange += ( *it ); } 
 		}
 		
-		AutomationPattern * latest_pattern = NULL;
+		AutomationPattern * latestPattern = NULL;
 		
-		if( ! patterns_in_range.isEmpty() )
+		if( ! patternsInRange.isEmpty() )
 		{
 			// if there are more than one overlapping patterns, just use the first one because
 			// multiple pattern behaviour is undefined anyway
-			latest_pattern = patterns_in_range[0];
+			latestPattern = patternsInRange[0];
 		}
 		else
 		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
 		{
-			int latest_position = 0;
+			int latestPosition = 0;
 			
 			for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 			{
 				int e = ( *it )->endPosition();
-				if( e <= time && e > latest_position )
+				if( e <= time && e > latestPosition )
 				{
-					latest_position = e;
-					latest_pattern = ( *it );
+					latestPosition = e;
+					latestPattern = ( *it );
 				}
 			}
 		}
 		
-		if( latest_pattern )
+		if( latestPattern )
 		{
 			// scale/fit the value appropriately and return it
-			const float value = latest_pattern->valueAt( time );
+			const float value = latestPattern->valueAt( time - latestPattern->startPosition() );
 			const float scaled_value =
 				( m_scaleType == Linear )
 				? value
