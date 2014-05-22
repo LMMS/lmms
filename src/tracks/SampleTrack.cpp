@@ -463,14 +463,11 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	grad.setColorAt( 1, c.darker( 300 ) );
 	grad.setColorAt( 0, c );
 
-	p.setBrush( grad );
-	p.setPen( c.lighter( 160 ) );
-	p.drawRect( 1, 1, width()-3, height()-3 );
+	p.fillRect( 0, 0, width(), height(), QBrush( grad ) );
 
 	p.setBrush( QBrush() );
-	p.setPen( c.darker( 300 ) );
-	p.drawRect( 0, 0, width()-1, height()-1 );
-
+	p.setPen( c.lighter( 160 ) );
+	p.drawRect( 1, 1, width()-3, height()-3 );
 
 	if( m_tco->getTrack()->isMuted() || m_tco->isMuted() )
 	{
@@ -497,13 +494,13 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	// in the future, we might optimize this by checking if there is any tempo automation overlapping the tco,
 	// and use a simpler paint algorithm if there isn't
 	QVector<f_cnt_t> framePos = engine::getSong()->elapsedFramesAt( m_tco->startPosition(), m_tco->length() + 1 ); // add 1 just in case
-	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
+	p.setClipRect( QRect( 2, 2, width() - 4, height() - 4 ) );
 	float i = 0; 
 	int x = 0;
 	while( i < m_tco->length() ) 
 	{
 		// get rectangle for this step
-		QRect r = QRect( x + 1, 1, 
+		QRect r = QRect( x, 1, 
 			xstep, height() - 4 );
 	
 		// get frame window for this step
@@ -525,7 +522,12 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 		x += xstep;
 	}
 	
-	p.translate( 0, 0 );
+	p.resetMatrix();
+	p.setClipping( false );
+
+	p.setBrush( QBrush() );
+	p.setPen( c.darker( 300 ) );
+	p.drawRect( 0, 0, width(), height() );
 	
 	// pattern name
 	p.setFont( pointSize<8>( p.font() ) );
