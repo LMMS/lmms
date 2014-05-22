@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SAMPLE_PLAY_HANDLE_H
-#define _SAMPLE_PLAY_HANDLE_H
+#ifndef SAMPLE_PLAY_HANDLE_H
+#define SAMPLE_PLAY_HANDLE_H
 
 #include "Mixer.h"
 #include "SampleBuffer.h"
@@ -40,7 +40,7 @@ class SamplePlayHandle : public PlayHandle
 public:
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleBuffer* sampleBuffer );
-	SamplePlayHandle( SampleTCO* tco );
+	SamplePlayHandle( SampleTCO* tco, f_cnt_t startframe );
 	virtual ~SamplePlayHandle();
 
 	virtual inline bool affinityMatters() const
@@ -59,6 +59,12 @@ public:
 	{
 		return( m_frame );
 	}
+	inline void setFramePosition( f_cnt_t pos )
+	{
+		m_frame = pos;
+		m_state.setFrameIndex( pos );
+	}
+	
 	void setDoneMayReturnTrue( bool _enable )
 	{
 		m_doneMayReturnTrue = _enable;
@@ -90,6 +96,8 @@ private:
 	track * m_track;
 
 	bbTrack * m_bbTrack;
+	
+	SampleTCO * m_tco;
 
 } ;
 

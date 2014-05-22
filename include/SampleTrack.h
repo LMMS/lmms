@@ -62,18 +62,33 @@ public:
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
+	bool isPlaying() const
+	{
+		return m_isPlaying;
+	}
+	
+	void setPlaying( bool b )
+	{
+		m_isPlaying = b;
+	}
+	
+	bool startPlayback( const MidiTime & start, f_cnt_t offset );
+	void stopPlayback();
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
-	void updateLength( bpm_t = 0 );
+	void updateLength();
 	void toggleRecord();
-
+	void updatePlayPosition();
 
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 
+	bool m_isPlaying;
+
+	PlayHandle * m_handle;
 
 	friend class SampleTCOView;
 
@@ -100,6 +115,7 @@ public:
 
 public slots:
 	void updateSample();
+	void changeName();
 
 
 protected:
@@ -113,6 +129,8 @@ protected:
 
 private:
 	SampleTCO * m_tco;
+	
+	static QPixmap * s_pat_rec;
 } ;
 
 
@@ -145,6 +163,11 @@ public:
 		return "sampletrack";
 	}
 
+	inline FloatModel * volumeModel()
+	{
+		return &m_volumeModel;
+	}
+	
 
 private:
 	AudioPort m_audioPort;

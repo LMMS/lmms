@@ -47,20 +47,24 @@
 #include "EffectRackView.h"
 #include "track_label_button.h"
 #include "config_mgr.h"
+#include "rename_dialog.h"
 
 
 SampleTCO::SampleTCO( track * _track ) :
 	trackContentObject( _track ),
-	m_sampleBuffer( new SampleBuffer )
+	m_sampleBuffer( new SampleBuffer ),
+	m_isPlaying( false )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
 	restoreJournallingState();
 
-	// we need to receive bpm-change-events, because then we have to
-	// change length of this TCO
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength( bpm_t ) ) );
+	connect( engine::getSong(), SIGNAL( elapsedFramesChanged() ),
+					this, SLOT( updatePlayPosition() ) );
+	connect( this, SIGNAL( positionChanged() ),
+					this, SLOT( updatePlayPosition() ) );
+					
+	changeLength( DefaultTicksPerTact );
 }
 
 
@@ -68,6 +72,10 @@ SampleTCO::SampleTCO( track * _track ) :
 
 SampleTCO::~SampleTCO()
 {
+	if( m_isPlaying )
+	{
+		stopPlayback();
+	}
 	sharedObject::unref( m_sampleBuffer );
 }
 
@@ -76,7 +84,7 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const MidiTime & _length )
 {
-	trackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
+	trackContentObject::changeLength( _length );
 }
 
 
@@ -120,9 +128,12 @@ void SampleTCO::toggleRecord()
 
 
 
-void SampleTCO::updateLength( bpm_t )
+void SampleTCO::updateLength()
 {
-	changeLength( sampleLength() );
+	if( m_sampleBuffer->frames() > 0 )
+	{
+		changeLength( sampleLength() );
+	}
 }
 
 
@@ -130,7 +141,10 @@ void SampleTCO::updateLength( bpm_t )
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / engine::framesPerTick() );
+	f_cnt_t start = engine::getSong()->elapsedFramesAt( startPosition() );
+	f_cnt_t end = start + m_sampleBuffer->frames();
+	MidiTime m = MidiTime( engine::getSong()->miditimeAtFrames( end ) - startPosition() );
+	return m;
 }
 
 
@@ -184,13 +198,94 @@ trackContentObjectView * SampleTCO::createView( trackView * _tv )
 }
 
 
+/** @brief Starts the playback of this sampletrack tco
+ * should only be called by the sampletrack and only when isPlaying() is false
+ * @param start Miditime to start playback from (global time, not tco time)
+ * @param offset the frame offset that gets passed to the playhandle - if miditime tick is mid-period
+ */
+bool SampleTCO::startPlayback( const MidiTime & start, f_cnt_t offset )
+{
+	// if we start at beginning, it's simple - no extra calculation needed
+	f_cnt_t startframe = 0;
+	// if we start from the middle, use tempo-aware calculation in song to figure out starting frame
+	if( start > startPosition() )
+	{
+		// substract the frameposition at tco start from current frameposition to get frameposition to play from
+		startframe = engine::getSong()->elapsedFramesAt( start ) - engine::getSong()->elapsedFramesAt( startPosition() );
+	}
+	
+	bool played_a_note = false;
+		if( ! isMuted() )
+		{
+			// move this to its own startRecord function, perhaps?
+			if( isRecord() )
+			{
+				if( !engine::getSong()->isRecording() )
+				{
+					return false;
+				}
+				SampleRecordHandle* smpHandle = new SampleRecordHandle( this );
+				m_handle = smpHandle;
+			}
+			else
+			{
+				if( m_sampleBuffer->frames() <= startframe )
+				{
+					return false;
+				}
+				SamplePlayHandle* smpHandle = new SamplePlayHandle( this, startframe );
+				smpHandle->setVolumeModel( static_cast<SampleTrack *>( getTrack() )->volumeModel() );
+				m_handle = smpHandle;
+				m_isPlaying = true;
+			}
+			// set offset
+			m_handle->setOffset( offset );
+			// send it to the mixer
+			engine::mixer()->addPlayHandle( m_handle );
+			played_a_note = true;
+		}
+	return played_a_note;
+}
+
+/** @brief forces playback of this tco to stop
+ * used for stopping playback before sample end, so the user can adjust play time of the tco
+ * should only be called when isPlaying() is true, we don't check for it here
+ */
+void SampleTCO::stopPlayback()
+{
+	if( m_handle )
+	{
+		SamplePlayHandle * smpHandle = dynamic_cast<SamplePlayHandle *>( m_handle );
+		if( smpHandle )
+		{
+			// we set the frame position of the playhandle to negative, which causes the playhandle to cease playing
+			// and also to set the isPlaying property of this tco to false, so we don't have to do that here
+			smpHandle->setFramePosition( -1 );
+			// this may not be the prettiest solution, but it is efficient
+		}
+	}
+}
 
 
+/** @brief slot for updating play position
+ * gets triggered whenever the position is changed in ways other than normal song progression
+ * eg. loopbacks, manual changes
+ */
+void SampleTCO::updatePlayPosition()
+{
+	if( m_isPlaying && m_handle )
+	{
+		SamplePlayHandle * smpHandle = dynamic_cast<SamplePlayHandle *>( m_handle );
+		if( smpHandle )
+		{
+			f_cnt_t startframe = engine::getSong()->elapsedFrames() - 
+				engine::getSong()->elapsedFramesAt( startPosition() );
+			smpHandle->setFramePosition( startframe );
+		}
+	}
+}
 
-
-
-
-
+QPixmap * SampleTCOView::s_pat_rec = NULL;
 
 SampleTCOView::SampleTCOView( SampleTCO * _tco, trackView * _tv ) :
 	trackContentObjectView( _tco, _tv ),
@@ -204,6 +299,9 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, trackView * _tv ) :
 			this, SLOT( updateSample() ) );
 
 	setStyle( QApplication::style() );
+	
+	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
+							"pat_rec" ) ); }
 }
 
 
@@ -250,6 +348,9 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 					tr( "Copy" ), m_tco, SLOT( copy() ) );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
+	contextMenu.addAction( embed::getIconPixmap( "edit_rename" ),
+					tr( "Change name" ),
+						this, SLOT( changeName() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
 				tr( "Mute/unmute (<Ctrl> + middle click)" ),
@@ -262,6 +363,15 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	contextMenu.exec( QCursor::pos() );
 }
 
+
+void SampleTCOView::changeName()
+{
+	QString s = m_tco->name();
+	renameDialog rename_dlg( s );
+	rename_dlg.exec();
+	m_tco->setName( s );
+	update();
+}
 
 
 
@@ -365,35 +475,75 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	{
 		p.setPen( fgColor() );
 	}
-	QRect r = QRect( 1, 1,
-			qMax( static_cast<int>( m_tco->sampleLength() *
-				pixelsPerTact() / DefaultTicksPerTact ), 1 ),
-								height() - 4 );
-	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
-	m_tco->m_sampleBuffer->visualize( p, r, _pe->rect() );
-	if( r.width() < width() - 1 )
+	
+	// waveform drawing code
+	
+	// start by calculating how many ticks we have per pixel, do it in float because otherwise it'll just be 0 
+	const float ticksPerPixel = static_cast<float>( DefaultTicksPerTact ) / pixelsPerTact();
+	int xstep = 2; // go in steps of 2 pixels min. - this is to make the drawing faster
+	// if the step size doesn't increment a whole tick (very high zoom levels), increase it
+	while( xstep * ticksPerPixel < 1.0f )
 	{
-		p.drawLine( r.x() + r.width(), r.y() + r.height() / 2,
-				width() - 2, r.y() + r.height() / 2 );
+		xstep++;
 	}
-
+	// get the total tick increment per iteration
+	const float ticksPerStep = ticksPerPixel * xstep;
+	// get frame values in a vector
+	// in the future, we might optimize this by checking if there is any tempo automation overlapping the tco,
+	// and use a simpler paint algorithm if there isn't
+	QVector<f_cnt_t> framePos = engine::getSong()->elapsedFramesAt( m_tco->startPosition(), m_tco->length() + 1 ); // add 1 just in case
+	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
+	float i = 0; 
+	int x = 0;
+	while( i < m_tco->length() ) 
+	{
+		// get rectangle for this step
+		QRect r = QRect( x + 1, 1, 
+			xstep, height() - 4 );
+	
+		// get frame window for this step
+		f_cnt_t frameStart = framePos[ static_cast<int>( i ) ] - framePos[0];
+		f_cnt_t frameEnd = framePos[ static_cast<int>( i + ticksPerStep  ) ] - framePos[0];
+		
+		// if we're still within the bounds of the samplebuffer's content, visualize it
+		if( frameStart < m_tco->m_sampleBuffer->frames() )
+		{
+			m_tco->m_sampleBuffer->visualize( p, r, _pe->rect(), frameStart, frameEnd );
+		}
+		// if not, just draw a flatline
+		else
+		{
+			p.drawLine( r.x(), r.y() + r.height() / 2, r.x() + r.width(), r.y() + r.height() / 2 );
+		}
+		
+		i += ticksPerStep;
+		x += xstep;
+	}
+	
 	p.translate( 0, 0 );
+	
+	// pattern name
+	p.setFont( pointSize<8>( p.font() ) );
+
+	QColor text_color = ( m_tco->isMuted() || m_tco->getTrack()->isMuted() )
+		? QColor( 30, 30, 30 )
+		: textColor();
+
+	p.setPen( QColor( 0, 0, 0 ) );
+	p.drawText( 4, p.fontMetrics().height()+1, m_tco->name() );
+	p.setPen( text_color );
+	p.drawText( 3, p.fontMetrics().height(), m_tco->name() );
+	
 	if( m_tco->isMuted() )
 	{
 		p.drawPixmap( 3, 8, embed::getIconPixmap( "muted", 16, 16 ) );
 	}
 	if( m_tco->isRecord() )
 	{
-		p.setFont( pointSize<7>( p.font() ) );
-
-		p.setPen( QColor( 0, 0, 0 ) );	
-		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( textColor() );	
-		p.drawText( 9, p.fontMetrics().height(), "Rec" );
-		
-		p.setBrush( QBrush( textColor() ) );
-		p.drawEllipse( 4, 5, 4, 4 );
+		p.drawPixmap( 4, 14, *s_pat_rec );
 	}
+	
+	
 }
 
 
@@ -421,8 +571,8 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _offset, int /*_tco_num*/ )
+bool SampleTrack::play( const MidiTime & start, const fpp_t frames,
+						const f_cnt_t offset, int /*_tco_num*/ )
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
@@ -430,35 +580,26 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		trackContentObject * tco = getTCO( i );
-		if( tco->startPosition() != _start )
+		
+		if( start <= tco->endPosition()  )
 		{
-			continue;
-		}
-		SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
-		if( !st->isMuted() )
-		{
-			PlayHandle* handle;
-			if( st->isRecord() )
+			if( start >= tco->startPosition() )
 			{
-				if( !engine::getSong()->isRecording() )
+				SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
+				if( !st->isPlaying() )
 				{
-					return played_a_note;
+					played_a_note = st->startPlayback( start, offset );
 				}
-				SampleRecordHandle* smpHandle = new SampleRecordHandle( st );
-				handle = smpHandle;
 			}
-			else
+		}
+		else
+		{
+			// force stop at end of tco, even if the sample is longer
+			SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
+			if( st->isPlaying() )
 			{
-				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
-				smpHandle->setVolumeModel( &m_volumeModel );
-				handle = smpHandle;
+				st->stopPlayback();
 			}
-//TODO: check whether this works
-//			handle->setBBTrack( _tco_num );
-			handle->setOffset( _offset );
-			// send it to the mixer
-			engine::mixer()->addPlayHandle( handle );
-			played_a_note = true;
 		}
 	}
 

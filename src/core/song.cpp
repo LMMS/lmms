@@ -526,19 +526,75 @@ void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 }
 
 
+/** @brief update song framecounter, called whenever play position changes
+ * emits signal elapsedFramesChanged() which can be received by objects that want to know when
+ * the song's play position changes
+ */
 void song::updateElapsedFrames()
 {
-	tick_t tickPos = m_playPos[ m_playMode ].getTicks();
-	m_elapsedFrames = m_playPos[ m_playMode ].currentFrame(); 
-	
-	for( MidiTime i = MidiTime( 0 ); i < tickPos; i += 1 )
-	{
-		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		const float oneTick = 1.0 / 48.0; // one tick in beats
-		m_elapsedFrames += static_cast<int>( 60.0f / tempo * oneTick * engine::mixer()->processingSampleRate() );
-	}
+	m_elapsedFrames = m_playPos[ m_playMode ].currentFrame() + elapsedFramesAt( m_playPos[ m_playMode ] ); 
+
+	emit elapsedFramesChanged();
 /*	qDebug( "frames %d", m_elapsedFrames );
 	qDebug( "ms %d", getMilliseconds() );*/
+}
+
+
+/** @brief returns the frames elapsed from song start (or, frame position) of a given miditime
+ * takes song's tempo automation in account
+ * @param time the miditime to convert to frames
+ */
+f_cnt_t song::elapsedFramesAt( const MidiTime & time )
+{
+	const float oneTick = 60.0 / 48.0; // one minute / ticks per beat
+	f_cnt_t frames = 0;
+	for( MidiTime i = MidiTime( 0 ); i < time; i += 1 )
+	{
+		float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( oneTick / tempo * engine::mixer()->processingSampleRate() );
+	}
+	return frames;
+}
+
+
+/** @brief returns a vector of framepositions at a range of miditimes
+ * @param start the starting miditime where we want the first frame value
+ * @param length length in ticks of the range we want converted
+ */
+QVector<f_cnt_t> song::elapsedFramesAt( const MidiTime & start, tick_t length )
+{
+	const float oneTick = 60.0 / 48.0; // one minute / ticks per beat
+	f_cnt_t frames = 0;
+	QVector<f_cnt_t> framelist;
+	for( MidiTime i = MidiTime( 0 ); i < start + length; i += 1 )
+	{
+		float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( oneTick / tempo * engine::mixer()->processingSampleRate() );
+		if( i >= start )
+		{
+			framelist.append( frames );
+		}
+	}
+	return framelist;
+}
+
+
+/** @brief returns the miditime at frame position, rounding up to next tick
+ * useful for determining the length in ticks of a song object that only has length in frames (eg. sampletrack)
+ * @param framepos The position in frames
+ */
+MidiTime song::miditimeAtFrames( f_cnt_t framepos )
+{
+	const float oneTick = 60.0 / 48.0; // one minute / ticks per beat
+	f_cnt_t frames = 0;
+	MidiTime i = MidiTime( 0 );
+	while( frames < framepos )
+	{
+		float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( oneTick / tempo * engine::mixer()->processingSampleRate() );
+		i += 1;
+	}
+	return i;
 }
 
 

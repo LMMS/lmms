@@ -107,6 +107,9 @@ public:
 	}
 	
 	void updateElapsedFrames();
+	f_cnt_t elapsedFramesAt( const MidiTime & time );
+	QVector<f_cnt_t> elapsedFramesAt( const MidiTime & start, tick_t length );
+	MidiTime miditimeAtFrames( f_cnt_t framepos );
 	
 	inline int getTacts() const
 	{
@@ -367,6 +370,7 @@ private:
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
+	void elapsedFramesChanged();
 	void lengthChanged( int _tacts );
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,
