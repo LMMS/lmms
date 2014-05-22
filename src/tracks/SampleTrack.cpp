@@ -53,7 +53,8 @@
 SampleTCO::SampleTCO( track * _track ) :
 	trackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
-	m_isPlaying( false )
+	m_isPlaying( false ),
+	m_needsUpdate( false )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -62,7 +63,7 @@ SampleTCO::SampleTCO( track * _track ) :
 	connect( engine::getSong(), SIGNAL( elapsedFramesChanged() ),
 					this, SLOT( updatePlayPosition() ) );
 	connect( this, SIGNAL( positionChanged() ),
-					this, SLOT( updatePlayPosition() ) );
+					this, SLOT( updatePlayPosition( ) ) );
 					
 	changeLength( DefaultTicksPerTact );
 }
@@ -205,6 +206,7 @@ trackContentObjectView * SampleTCO::createView( trackView * _tv )
  */
 bool SampleTCO::startPlayback( const MidiTime & start, f_cnt_t offset )
 {
+	m_needsUpdate = false;
 	// if we start at beginning, it's simple - no extra calculation needed
 	f_cnt_t startframe = 0;
 	// if we start from the middle, use tempo-aware calculation in song to figure out starting frame
@@ -267,23 +269,35 @@ void SampleTCO::stopPlayback()
 }
 
 
-/** @brief slot for updating play position
- * gets triggered whenever the position is changed in ways other than normal song progression
- * eg. loopbacks, manual changes
- */
-void SampleTCO::updatePlayPosition()
+void SampleTCO::updatePlayback( const MidiTime & start, f_cnt_t offset )
 {
 	if( m_isPlaying && m_handle )
 	{
 		SamplePlayHandle * smpHandle = dynamic_cast<SamplePlayHandle *>( m_handle );
 		if( smpHandle )
 		{
-			f_cnt_t startframe = engine::getSong()->elapsedFrames() - 
+			f_cnt_t startframe = engine::getSong()->elapsedFramesAt( start ) -
 				engine::getSong()->elapsedFramesAt( startPosition() );
 			smpHandle->setFramePosition( startframe );
+			smpHandle->setOffset( offset );
 		}
 	}
+	m_needsUpdate = false;
 }
+
+
+/** @brief slot for updating play position
+ * gets triggered whenever the position is changed in ways other than normal song progression
+ * eg. loopbacks, manual changes
+ */
+void SampleTCO::updatePlayPosition( )
+{
+	if( m_isPlaying )
+	{
+		m_needsUpdate = true;
+	}
+}
+
 
 QPixmap * SampleTCOView::s_pat_rec = NULL;
 
@@ -586,9 +600,13 @@ bool SampleTrack::play( const MidiTime & start, const fpp_t frames,
 			if( start >= tco->startPosition() )
 			{
 				SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
-				if( !st->isPlaying() )
+				if( !st->isPlaying() ) // is not playing but should be
 				{
 					played_a_note = st->startPlayback( start, offset );
+				}
+				else if ( st->needsUpdate() ) // is playing but needs update
+				{
+					st->updatePlayback( start, offset );
 				}
 			}
 		}
@@ -596,7 +614,7 @@ bool SampleTrack::play( const MidiTime & start, const fpp_t frames,
 		{
 			// force stop at end of tco, even if the sample is longer
 			SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
-			if( st->isPlaying() )
+			if( st->isPlaying() ) // is playing but shouldn't be
 			{
 				st->stopPlayback();
 			}

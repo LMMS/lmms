@@ -72,8 +72,19 @@ public:
 		m_isPlaying = b;
 	}
 	
+	bool needsUpdate() const
+	{ 
+		return m_needsUpdate;
+	}
+	
+	void setNeedsUpdate( bool b )
+	{
+		m_needsUpdate = b;
+	}
+	
 	bool startPlayback( const MidiTime & start, f_cnt_t offset );
 	void stopPlayback();
+	void updatePlayback( const MidiTime & start, f_cnt_t offset );
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
@@ -87,6 +98,7 @@ private:
 	BoolModel m_recordModel;
 
 	bool m_isPlaying;
+	bool m_needsUpdate;
 
 	PlayHandle * m_handle;
 
