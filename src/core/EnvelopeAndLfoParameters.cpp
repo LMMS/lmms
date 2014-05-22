@@ -218,6 +218,14 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 		case UserDefinedWave:
 			shape_sample = m_userWave.userWaveSample( phase );
 			break;
+		case RandomWave:
+			shape_sample = m_random;
+			if( frame == 0 )
+			{
+				updateRandomWave();
+				shape_sample = m_random;
+			}
+			break;
 		case SineWave:
 		default:
 			shape_sample = Oscillator::sinSample( phase );
@@ -237,6 +245,14 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
 	m_bad_lfoShapeData = false;
+}
+
+
+
+
+void EnvelopeAndLfoParameters::updateRandomWave()
+{
+	m_random = Oscillator::noiseSample( 0.0f );
 }
 
 

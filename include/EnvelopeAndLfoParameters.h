@@ -157,6 +157,7 @@ private:
 	float m_lfoAmount;
 	bool m_lfoAmountIsZero;
 	sample_t * m_lfoShapeData;
+	sample_t m_random;
 	bool m_bad_lfoShapeData;
 	SampleBuffer m_userWave;
 
@@ -167,11 +168,13 @@ private:
 		SawWave,
 		SquareWave,
 		UserDefinedWave,
+		RandomWave,
 		NumLfoShapes
 	} ;
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLfoShapeData();
+	void updateRandomWave();
 
 
 
