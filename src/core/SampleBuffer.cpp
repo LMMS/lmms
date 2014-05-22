@@ -325,8 +325,8 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 				for( f_cnt_t frame = 0; frame < _frames;
 								++frame )
 				{
-					m_data[frame][0] = _fbuf[idx+0];
-					m_data[frame][1] = _fbuf[idx+ch];
+					m_data[frame][0] = _fbuf[idx+0] * m_amplification;
+					m_data[frame][1] = _fbuf[idx+ch] * m_amplification;
 					idx -= _channels;
 				}
 			}
@@ -336,8 +336,8 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 				for( f_cnt_t frame = 0; frame < _frames;
 								++frame )
 				{
-					m_data[frame][0] = _fbuf[idx+0];
-					m_data[frame][1] = _fbuf[idx+ch];
+					m_data[frame][0] = _fbuf[idx+0] * m_amplification;
+					m_data[frame][1] = _fbuf[idx+ch] * m_amplification;
 					idx += _channels;
 				}
 			}
