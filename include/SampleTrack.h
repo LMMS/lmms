@@ -40,6 +40,13 @@ class SampleTCO : public trackContentObject
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
+	enum SampleTCOState 
+	{
+		Inactive,
+		Playing,
+		SampleEnded,
+		Recording
+	};
 	SampleTCO( track * _track );
 	virtual ~SampleTCO();
 
@@ -62,14 +69,14 @@ public:
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
-	bool isPlaying() const
+	SampleTCOState sampleTCOState() const
 	{
-		return m_isPlaying;
+		return m_sampleTCOState;
 	}
 	
-	void setPlaying( bool b )
+	void setSampleTCOState( SampleTCOState s )
 	{
-		m_isPlaying = b;
+		m_sampleTCOState = s;
 	}
 	
 	bool needsUpdate() const
@@ -80,6 +87,15 @@ public:
 	void setNeedsUpdate( bool b )
 	{
 		m_needsUpdate = b;
+	}
+
+	// callback for playhandle destructor
+	void playHandleDestroyed( PlayHandle * handle )
+	{
+		if( m_handle == handle ) 
+		{
+			m_handle = NULL;
+		}
 	}
 	
 	bool startPlayback( const MidiTime & start, f_cnt_t offset );
@@ -97,7 +113,7 @@ private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 
-	bool m_isPlaying;
+	SampleTCOState m_sampleTCOState;
 	bool m_needsUpdate;
 
 	PlayHandle * m_handle;

@@ -97,7 +97,7 @@ SamplePlayHandle::~SamplePlayHandle()
 	}
 	if( m_tco )
 	{
-		m_tco->setPlaying( false );
+		m_tco->playHandleDestroyed( this );
 	}
 }
 

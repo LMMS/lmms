@@ -53,7 +53,7 @@
 SampleTCO::SampleTCO( track * _track ) :
 	trackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
-	m_isPlaying( false ),
+	m_sampleTCOState( Inactive ),
 	m_needsUpdate( false )
 {
 	saveJournallingState( false );
@@ -61,6 +61,8 @@ SampleTCO::SampleTCO( track * _track ) :
 	restoreJournallingState();
 
 	connect( engine::getSong(), SIGNAL( elapsedFramesChanged() ),
+					this, SLOT( updatePlayPosition() ) );
+	connect( engine::getSong(), SIGNAL( playbackStateChanged() ),
 					this, SLOT( updatePlayPosition() ) );
 	connect( this, SIGNAL( positionChanged() ),
 					this, SLOT( updatePlayPosition( ) ) );
@@ -73,7 +75,7 @@ SampleTCO::SampleTCO( track * _track ) :
 
 SampleTCO::~SampleTCO()
 {
-	if( m_isPlaying )
+	if( m_sampleTCOState == Playing )
 	{
 		stopPlayback();
 	}
@@ -200,7 +202,7 @@ trackContentObjectView * SampleTCO::createView( trackView * _tv )
 
 
 /** @brief Starts the playback of this sampletrack tco
- * should only be called by the sampletrack and only when isPlaying() is false
+ * should only be called by the sampletrack and only when tco is in playback range
  * @param start Miditime to start playback from (global time, not tco time)
  * @param offset the frame offset that gets passed to the playhandle - if miditime tick is mid-period
  */
@@ -216,38 +218,26 @@ bool SampleTCO::startPlayback( const MidiTime & start, f_cnt_t offset )
 		startframe = engine::getSong()->elapsedFramesAt( start ) - engine::getSong()->elapsedFramesAt( startPosition() );
 	}
 	
-	bool played_a_note = false;
-		if( ! isMuted() )
-		{
-			// move this to its own startRecord function, perhaps?
-			if( isRecord() )
-			{
-				if( !engine::getSong()->isRecording() )
-				{
-					return false;
-				}
-				SampleRecordHandle* smpHandle = new SampleRecordHandle( this );
-				m_handle = smpHandle;
-			}
-			else
-			{
-				if( m_sampleBuffer->frames() <= startframe )
-				{
-					return false;
-				}
-				SamplePlayHandle* smpHandle = new SamplePlayHandle( this, startframe );
-				smpHandle->setVolumeModel( static_cast<SampleTrack *>( getTrack() )->volumeModel() );
-				m_handle = smpHandle;
-				m_isPlaying = true;
-			}
-			// set offset
-			m_handle->setOffset( offset );
-			// send it to the mixer
-			engine::mixer()->addPlayHandle( m_handle );
-			played_a_note = true;
-		}
-	return played_a_note;
+	if( m_sampleBuffer->frames() <= startframe )
+	{
+		m_sampleTCOState = SampleEnded;
+		m_handle = NULL;
+		return false;
+	}
+
+	SamplePlayHandle* smpHandle = new SamplePlayHandle( this, startframe );
+	smpHandle->setVolumeModel( static_cast<SampleTrack *>( getTrack() )->volumeModel() );
+	m_handle = smpHandle;
+	m_sampleTCOState = Playing;
+
+	// set offset
+	m_handle->setOffset( offset );
+	// send it to the mixer
+	engine::mixer()->addPlayHandle( m_handle );
+
+	return true;
 }
+
 
 /** @brief forces playback of this tco to stop
  * used for stopping playback before sample end, so the user can adjust play time of the tco
@@ -261,28 +251,25 @@ void SampleTCO::stopPlayback()
 		if( smpHandle )
 		{
 			// we set the frame position of the playhandle to negative, which causes the playhandle to cease playing
-			// and also to set the isPlaying property of this tco to false, so we don't have to do that here
 			smpHandle->setFramePosition( -1 );
-			// this may not be the prettiest solution, but it is efficient
 		}
+		m_handle = NULL;
 	}
+	m_sampleTCOState = Inactive;
+	m_needsUpdate = false;
 }
 
 
 void SampleTCO::updatePlayback( const MidiTime & start, f_cnt_t offset )
 {
-	if( m_isPlaying && m_handle )
+	// stop existing playback
+	if( m_sampleTCOState == Playing )
 	{
-		SamplePlayHandle * smpHandle = dynamic_cast<SamplePlayHandle *>( m_handle );
-		if( smpHandle )
-		{
-			f_cnt_t startframe = engine::getSong()->elapsedFramesAt( start ) -
-				engine::getSong()->elapsedFramesAt( startPosition() );
-			smpHandle->setFramePosition( startframe );
-			smpHandle->setOffset( offset );
-		}
+		stopPlayback();
 	}
-	m_needsUpdate = false;
+	
+	// restart playback
+	startPlayback( start, offset );
 }
 
 
@@ -292,7 +279,11 @@ void SampleTCO::updatePlayback( const MidiTime & start, f_cnt_t offset )
  */
 void SampleTCO::updatePlayPosition( )
 {
-	if( m_isPlaying )
+	if( engine::getSong()->isPaused() ) // stop playback when pausing, so sampletrack can restart it
+	{
+		stopPlayback();
+	} 
+	else if( m_sampleTCOState == Playing || m_sampleTCOState == SampleEnded )
 	{
 		m_needsUpdate = true;
 	}
@@ -595,26 +586,42 @@ bool SampleTrack::play( const MidiTime & start, const fpp_t frames,
 	{
 		trackContentObject * tco = getTCO( i );
 		
-		if( start <= tco->endPosition()  )
+		if( start <= tco->endPosition() && start >= tco->startPosition() )
 		{
-			if( start >= tco->startPosition() )
+			SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
+			
+			if( st->isRecord() && engine::getSong()->isRecording() ) 
 			{
-				SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
-				if( !st->isPlaying() ) // is not playing but should be
+				// sampletrack recording:
+				// to be implemented later
+				return false;
+			}
+			else if( ! st->isMuted() ) // is not muted
+			{
+				if( st->sampleTCOState() == SampleTCO::Inactive ) // is not playing but should be
 				{
 					played_a_note = st->startPlayback( start, offset );
 				}
-				else if ( st->needsUpdate() ) // is playing but needs update
+				else if( ( st->sampleTCOState() == SampleTCO::Playing || 
+					st->sampleTCOState() == SampleTCO::SampleEnded ) && st->needsUpdate() ) // is playing/ended but needs update
 				{
 					st->updatePlayback( start, offset );
 				}
+/*					else if( st->sampleTCOState() == SampleTCO::Recording ) // recording but should be playing
+				{
+					// do nothing yet
+				}*/
+			}
+			else if( st->sampleTCOState() == SampleTCO::Playing ) // is playing but shouldn't be because muted
+			{
+				st->stopPlayback();
 			}
 		}
 		else
 		{
 			// force stop at end of tco, even if the sample is longer
 			SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
-			if( st->isPlaying() ) // is playing but shouldn't be
+			if( st->sampleTCOState() == SampleTCO::Playing ) // is playing but shouldn't be
 			{
 				st->stopPlayback();
 			}

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SONG_H
-#define _SONG_H
+#ifndef SONG_H
+#define SONG_H
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
@@ -72,7 +72,8 @@ public:
 			MidiTime( _abs ),
 			m_timeLine( NULL ),
 			m_timeLineUpdate( true ),
-			m_currentFrame( 0.0f )
+			m_currentFrame( 0.0f ),
+			m_positionChanged( false )
 		{
 		}
 		inline void setCurrentFrame( const float _f )
@@ -86,9 +87,29 @@ public:
 		timeLine * m_timeLine;
 		bool m_timeLineUpdate;
 
+		// used for manually moving position from the timeline
+		inline void movePosition( tick_t tick )
+		{
+			m_positionChanged = true;
+			m_newPosition = tick;
+		}
+		
+		inline bool positionChanged()
+		{
+			return m_positionChanged;
+		}
+		
+		inline void updatePosition()
+		{
+			setTicks( m_newPosition );
+			setCurrentFrame( 0 );
+			m_positionChanged = false;
+		}
+
 	private:
 		float m_currentFrame;
-
+		bool m_positionChanged;
+		tick_t m_newPosition;
 	} ;
 
 
@@ -260,7 +281,6 @@ public:
 		return m_timeSigModel;
 	}
 
-
 public slots:
 	void playSong();
 	void record();
@@ -323,6 +343,11 @@ private:
 	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
 	void restoreControllerStates( const QDomElement & _this );
 
+	inline float framesPerTick( bpm_t tempo )
+	{
+		const float oneTick = 60.0 / 48.0;
+		return ( engine::mixer()->processingSampleRate() * oneTick ) / tempo;
+	}
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -360,7 +385,6 @@ private:
 	tact_t m_elapsedTacts;
 
 	VstSyncController m_vstSyncController;
-
 
 	friend class engine;
 	friend class SongEditor;

@@ -152,8 +152,8 @@ void engine::destroy()
 
 void engine::updateFramesPerTick()
 {
-	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerTact / s_song->getTempo();
+	const float oneTick = 60.0 / 48.0;
+	s_framesPerTick = ( s_mixer->processingSampleRate() * oneTick ) / s_song->getTempo();
 }
 
 

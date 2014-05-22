@@ -207,10 +207,20 @@ void song::processNextBuffer()
 			{
 				EnvelopeAndLfoParameters::instances()->reset();
 			}
+			if( m_playPos[Mode_PlaySong].positionChanged() )
+			{
+				m_playPos[Mode_PlaySong].updatePosition();
+				updateElapsedFrames();
+			}
 			break;
 
 		case Mode_PlayTrack:
 			track_list.push_back( m_trackToPlay );
+			if( m_playPos[Mode_PlayTrack].positionChanged() )
+			{
+				m_playPos[Mode_PlayTrack].updatePosition();
+				updateElapsedFrames();
+			}
 			break;
 
 		case Mode_PlayBB:
@@ -220,6 +230,11 @@ void song::processNextBuffer()
 								currentBB();
 				track_list.push_back( bbTrack::findBBTrack(
 								tco_num ) );
+			}
+			if( m_playPos[Mode_PlayBB].positionChanged() )
+			{
+				m_playPos[Mode_PlayBB].updatePosition();
+				updateElapsedFrames();
 			}
 			break;
 
@@ -231,6 +246,10 @@ void song::processNextBuffer()
 				track_list.push_back(
 						m_patternToPlay->getTrack() );
 			}
+			if( m_playPos[Mode_PlayPattern].positionChanged() )
+			{
+				m_playPos[Mode_PlayPattern].updatePosition();
+			}			
 			break;
 
 		default:
@@ -546,12 +565,11 @@ void song::updateElapsedFrames()
  */
 f_cnt_t song::elapsedFramesAt( const MidiTime & time )
 {
-	const float oneTick = 60.0 / 48.0; // one minute / ticks per beat
 	f_cnt_t frames = 0;
 	for( MidiTime i = MidiTime( 0 ); i < time; i += 1 )
 	{
 		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		frames += static_cast<int>( oneTick / tempo * engine::mixer()->processingSampleRate() );
+		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
 	}
 	return frames;
 }
@@ -563,13 +581,12 @@ f_cnt_t song::elapsedFramesAt( const MidiTime & time )
  */
 QVector<f_cnt_t> song::elapsedFramesAt( const MidiTime & start, tick_t length )
 {
-	const float oneTick = 60.0 / 48.0; // one minute / ticks per beat
 	f_cnt_t frames = 0;
 	QVector<f_cnt_t> framelist;
 	for( MidiTime i = MidiTime( 0 ); i < start + length; i += 1 )
 	{
 		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		frames += static_cast<int>( oneTick / tempo * engine::mixer()->processingSampleRate() );
+		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
 		if( i >= start )
 		{
 			framelist.append( frames );
@@ -585,13 +602,12 @@ QVector<f_cnt_t> song::elapsedFramesAt( const MidiTime & start, tick_t length )
  */
 MidiTime song::miditimeAtFrames( f_cnt_t framepos )
 {
-	const float oneTick = 60.0 / 48.0; // one minute / ticks per beat
 	f_cnt_t frames = 0;
 	MidiTime i = MidiTime( 0 );
 	while( frames < framepos )
 	{
 		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		frames += static_cast<int>( oneTick / tempo * engine::mixer()->processingSampleRate() );
+		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
 		i += 1;
 	}
 	return i;
