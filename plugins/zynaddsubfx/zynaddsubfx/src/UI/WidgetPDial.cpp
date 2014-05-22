@@ -174,22 +174,6 @@ int WidgetPDial::handle(int event)
 //#endif
 }
 
-void WidgetPDial::drawgradient(int cx, int cy, int sx, double m1, double m2)
-{
-#ifdef NTK_GUI
-    return;
-#else
-    for(int i = (int)(m1 * sx); i < (int)(m2 * sx); i++) {
-        double tmp = 1.0f - powf(i * 1.0f / sx, 2.0f);
-        pdialcolor(140
-                   + (int) (tmp
-                            * 90), 140
-                   + (int)(tmp * 90), 140 + (int) (tmp * 100));
-        fl_arc(cx + sx / 2 - i / 2, cy + sx / 2 - i / 2, i, i, 0, 360 );
-    }
-#endif
-}
-
 void WidgetPDial::draw()
 {
 #ifdef NTK_GUI
@@ -199,59 +183,56 @@ void WidgetPDial::draw()
     
     return;
 #else
-    int cx = x(), cy = y(), sx = w(), sy = h();
+    const int cx = x(), cy = y(), sx = w(), sy = h();
+    const double a1 = angle1(), a2 = angle2();
+    const double val = (value() - minimum()) / (maximum() - minimum());
+    // even radius produces less artifacts if no antialiasing is avail
+    const int rad = (sx > sy ? sy : sx) &~1;
 
-    //clears the button face
-    pdialcolor(190, 190, 200);
-    fl_pie(cx - 1, cy - 1, sx + 2, sy + 2, 0, 360);
+    /* clears the button background */
+    pdialcolor(160, 160, 160);
+    fl_pie(cx - 2, cy - 2, rad + 4, rad + 4, 0, 360);
 
-    /* //Draws the button face (gradinet) */
-    drawgradient(cx, cy, sx, 0.5f, 1.0f); 
+    /* dark outline */
+    fl_color(60, 60, 60);
+    fl_pie(cx - 1, cy - 1, rad + 2, rad + 2, 0, 360);
 
-    double val = (value() - minimum()) / (maximum() - minimum());
+    /* Draws the button faceplate, min/max */
+    pdialcolor(110, 110, 115);
+    fl_pie(cx, cy, rad, rad, 270 - a2, 270 - a1);
 
-    //draws the scale
-    pdialcolor(220, 220, 250);
-    double a1 = angle1(), a2 = angle2();
-    for(int i = 0; i < 12; i++) {
-        double a = -i / 12.0f * 360.0f - val * (a2 - a1) - a1;
-        fl_pie(cx, cy, sx, sy, a + 270 - 3, a + 3 + 270);
+    /* knob center */
+    if (rad > 8) {
+        pdialcolor(140, 140, 145);
+        fl_pie(cx + 4, cy + 4, rad - 8, rad - 8, 0, 360);
     }
 
-    drawgradient(cx, cy, sx, 0.0f, 0.75f);
-
-
-
-    //draws the value
+    /* value circle */
     double a = -(a2 - a1) * val - a1;
+    fl_line_style(0, 2, 0);
+    pdialcolor(0, 200, 0);
+    fl_arc(cx + 1, cy + 1, rad - 2, rad - 2, a - 90, a1 - 180);
+    fl_line_style(0);
 
-    //draws the max and min points
-    pdialcolor(0, 100, 200);
-    int xp =
-        (int)(cx + sx / 2.0f + sx / 2.0f * sinf(angle1() / 180.0f * 3.141592f));
-    int yp =
-        (int)(cy + sy / 2.0f + sy / 2.0f * cosf(angle1() / 180.0f * 3.141592f));
-    fl_pie(xp - 2, yp - 2, 4, 4, 0, 360);
-
-    xp = (int)(cx + sx / 2.0f + sx / 2.0f * sinf(angle2() / 180.0f * 3.141592f));
-    yp = (int)(cy + sy / 2.0f + sy / 2.0f * cosf(angle2() / 180.0f * 3.141592f));
-    fl_pie(xp - 2, yp - 2, 4, 4, 0, 360);
+    /* draw value line */
+    int ll = rad/4;
+    if (ll < 2) ll = 2;
 
     fl_push_matrix();
 
-    fl_translate(cx + sx / 2, cy + sy / 2);
+    fl_translate(cx + rad / 2, cy + rad / 2);
     fl_rotate(a - 90.0f);
 
-    fl_translate(sx / 2, 0);
+    fl_translate(rad / 2, 0);
 
     fl_begin_polygon();
     pdialcolor(0, 0, 0);
-    fl_vertex(-10, -4);
-    fl_vertex(-10, 4);
+    fl_vertex(-ll, 0);
     fl_vertex(0, 0);
     fl_end_polygon();
 
     fl_pop_matrix();
+
 #endif
 }
 

@@ -751,7 +751,7 @@ if (pars->Pmode==0){
    bwdial->activate();
    bwcents->activate();
    hprofile->activate();
-   hprofile->color(54);
+   hprofile->color(51);
    bwscale->activate();
 } else {
    bwprofilegroup->deactivate();
@@ -1063,7 +1063,7 @@ if (pars->Pmode==0){
    bwdial->activate();
    bwcents->activate();
    hprofile->activate();
-   hprofile->color(54);
+   hprofile->color(51);
    bwscale->activate();
 } else {
    bwprofilegroup->deactivate();

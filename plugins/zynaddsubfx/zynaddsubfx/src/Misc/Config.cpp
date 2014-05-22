@@ -88,14 +88,22 @@ void Config::init()
         cfg.bankRootDirList[1] = "./";
         cfg.bankRootDirList[2] = "/usr/share/zynaddsubfx/banks";
         cfg.bankRootDirList[3] = "/usr/local/share/zynaddsubfx/banks";
+#ifdef __APPLE__
+        cfg.bankRootDirList[4] = "../Resources/banks";
+#else
         cfg.bankRootDirList[4] = "../banks";
+#endif
         cfg.bankRootDirList[5] = "banks";
     }
 
     if(cfg.presetsDirList[0].empty()) {
         //presets
         cfg.presetsDirList[0] = "./";
+#ifdef __APPLE__
+        cfg.presetsDirList[1] = "../Resources/presets";
+#else
         cfg.presetsDirList[1] = "../presets";
+#endif
         cfg.presetsDirList[2] = "presets";
         cfg.presetsDirList[3] = "/usr/share/zynaddsubfx/presets";
         cfg.presetsDirList[4] = "/usr/local/share/zynaddsubfx/presets";

@@ -11,7 +11,6 @@ class WidgetPDial:public Fl_Dial
         WidgetPDial(int x, int y, int w, int h, const char *label = 0);
         ~WidgetPDial();
         int handle(int event);
-        void drawgradient(int cx, int cy, int sx, double m1, double m2);
         void draw();
         void pdialcolor(int r, int g, int b);
         void tooltip(const char *c);
