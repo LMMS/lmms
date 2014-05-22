@@ -250,15 +250,6 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	sqr_lfo_btn->setWhatsThis(
 		tr( "Click here for a square-wave." ) );
 
-	pixmapButton * random_lfo_btn = new pixmapButton( this, NULL );
-	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
-	random_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-						"random_wave_active" ) );
-	random_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-						"random_wave_inactive" ) );
-	random_lfo_btn->setWhatsThis(
-		tr( "Click here for random wave." ) );
-
 	m_userLfoBtn = new pixmapButton( this, NULL );
 	m_userLfoBtn->move( LFO_SHAPES_X+75, LFO_SHAPES_Y );
 	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
@@ -273,14 +264,22 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
 				this, SLOT( lfoUserWaveChanged() ) );
 
+	pixmapButton * random_lfo_btn = new pixmapButton( this, NULL );
+	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
+	random_lfo_btn->setActiveGraphic( embed::getIconPixmap(
+						"random_wave_active" ) );
+	random_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
+						"random_wave_inactive" ) );
+	random_lfo_btn->setWhatsThis(
+		tr( "Click here for random wave." ) );
+
 	m_lfoWaveBtnGrp = new automatableButtonGroup( this );
 	m_lfoWaveBtnGrp->addButton( sin_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( triangle_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( saw_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( sqr_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( random_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
-
+	m_lfoWaveBtnGrp->addButton( random_lfo_btn );
 
 	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
 	m_x100Cb->setFont( pointSizeF( m_x100Cb->font(), 6.5 ) );
@@ -536,11 +535,21 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 					val = Oscillator::squareSample( phase );
 					break;
 				case EnvelopeAndLfoParameters::RandomWave:
-					val = Oscillator::squareSample( phase );// <- dummy!
+					val = Oscillator::sawSample( phase );
+		//		val = Oscillator::noiseSample( phase );
+//					shape_sample = m_random;
+//					if( frame == 0 )
+//					{
+//						updateRandomWave();
+//						shape_sample = m_random;
+//					}
+//					break;
+//					val = Oscillator::squareSample( phase );// <- dummy!
 					break;
 				case EnvelopeAndLfoParameters::UserDefinedWave:
 					val = m_params->m_userWave.
 							userWaveSample( phase );
+					break;
 			}
 			if( static_cast<f_cnt_t>( cur_sample ) <=
 						m_params->m_lfoAttackFrames )
