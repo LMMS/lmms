@@ -272,8 +272,7 @@ void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 {
 			// following code transforms int-samples into
 			// float-samples and does amplifying & reversing
-			const float fac = m_amplification /
-						OUTPUT_SAMPLE_MULTIPLIER;
+			const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
 			m_data = new sampleFrame[_frames];
 			const int ch = ( _channels > 1 ) ? 1 : 0;
 
@@ -325,8 +324,8 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 				for( f_cnt_t frame = 0; frame < _frames;
 								++frame )
 				{
-					m_data[frame][0] = _fbuf[idx+0] * m_amplification;
-					m_data[frame][1] = _fbuf[idx+ch] * m_amplification;
+					m_data[frame][0] = _fbuf[idx+0];
+					m_data[frame][1] = _fbuf[idx+ch];
 					idx -= _channels;
 				}
 			}
@@ -336,8 +335,8 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 				for( f_cnt_t frame = 0; frame < _frames;
 								++frame )
 				{
-					m_data[frame][0] = _fbuf[idx+0] * m_amplification;
-					m_data[frame][1] = _fbuf[idx+ch] * m_amplification;
+					m_data[frame][0] = _fbuf[idx+0];
+					m_data[frame][1] = _fbuf[idx+ch];
 					idx += _channels;
 				}
 			}
@@ -758,6 +757,12 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	_state->setBackwards( is_backwards );
 	_state->setFrameIndex( play_frame );
 
+	for( fpp_t i = 0; i < _frames; ++i )
+	{
+		_ab[i][0] *= m_amplification;
+		_ab[i][1] *= m_amplification;
+	}
+
 	return true;
 
 }
@@ -929,9 +934,9 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	for( int frame = first; frame < last; frame += fpp )
 	{
 		l[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
-			(int)( yb - ( m_data[frame][0] * y_space ) ) );
+			(int)( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
 		r[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
-			(int)( yb - ( m_data[frame][1] * y_space ) ) );
+			(int)( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
 		++n;
 	}
 	_p.drawPolyline( l, nb_frames / fpp );
