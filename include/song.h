@@ -129,8 +129,9 @@ public:
 	
 	void updateElapsedFrames();
 	f_cnt_t elapsedFramesAt( const MidiTime & time );
-	QVector<f_cnt_t> elapsedFramesAt( const MidiTime & start, tick_t length );
+	f_cnt_t lengthInFramesAt( const MidiTime & start, tick_t length );
 	MidiTime miditimeAtFrames( f_cnt_t framepos );
+	f_cnt_t framesPerTickAt( const MidiTime & time );
 	
 	inline int getTacts() const
 	{

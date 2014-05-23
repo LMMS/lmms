@@ -214,8 +214,8 @@ bool SampleTCO::startPlayback( const MidiTime & start, f_cnt_t offset )
 	// if we start from the middle, use tempo-aware calculation in song to figure out starting frame
 	if( start > startPosition() )
 	{
-		// substract the frameposition at tco start from current frameposition to get frameposition to play from
-		startframe = engine::getSong()->elapsedFramesAt( start ) - engine::getSong()->elapsedFramesAt( startPosition() );
+		// convert our starting position to frame offset
+		startframe = engine::getSong()->lengthInFramesAt( startPosition(), start - startPosition() );
 	}
 	
 	if( m_sampleBuffer->frames() <= startframe )
@@ -493,24 +493,23 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	// get frame values in a vector
 	// in the future, we might optimize this by checking if there is any tempo automation overlapping the tco,
 	// and use a simpler paint algorithm if there isn't
-	QVector<f_cnt_t> framePos = engine::getSong()->elapsedFramesAt( m_tco->startPosition(), m_tco->length() + 1 ); // add 1 just in case
 	p.setClipRect( QRect( 2, 2, width() - 4, height() - 4 ) );
 	float i = 0; 
 	int x = 0;
+	f_cnt_t framecount = 0;
 	while( i < m_tco->length() ) 
 	{
 		// get rectangle for this step
 		QRect r = QRect( x, 1, 
 			xstep, height() - 4 );
+
+		const f_cnt_t framestep = engine::getSong()->lengthInFramesAt( 
+			m_tco->startPosition() + static_cast<int>( i ), static_cast<int>( ticksPerStep ) );
 	
-		// get frame window for this step
-		f_cnt_t frameStart = framePos[ static_cast<int>( i ) ] - framePos[0];
-		f_cnt_t frameEnd = framePos[ static_cast<int>( i + ticksPerStep  ) ] - framePos[0];
-		
 		// if we're still within the bounds of the samplebuffer's content, visualize it
-		if( frameStart < m_tco->m_sampleBuffer->frames() )
+		if( framecount < m_tco->m_sampleBuffer->frames() )
 		{
-			m_tco->m_sampleBuffer->visualize( p, r, _pe->rect(), frameStart, frameEnd );
+			m_tco->m_sampleBuffer->visualize( p, r, _pe->rect(), framecount, framecount + framestep );
 		}
 		// if not, just draw a flatline
 		else
@@ -518,6 +517,8 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 			p.drawLine( r.x(), r.y() + r.height() / 2, r.x() + r.width(), r.y() + r.height() / 2 );
 		}
 		
+		// increment framecount
+		framecount += framestep;
 		i += ticksPerStep;
 		x += xstep;
 	}

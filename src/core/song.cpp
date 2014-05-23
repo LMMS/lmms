@@ -271,18 +271,18 @@ void song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			updateElapsedFrames();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+			updateElapsedFrames();
 		}
 	}
 
 	f_cnt_t total_frames_played = 0;
-	const float frames_per_tick = engine::framesPerTick();
 
 	while( total_frames_played
 				< engine::mixer()->framesPerPeriod() )
 	{
+		const float frames_per_tick = engine::framesPerTick();
 		m_vstSyncController.update();
 
 		f_cnt_t played_frames = engine::mixer()->framesPerPeriod() - total_frames_played;
@@ -383,6 +383,8 @@ void song::processNextBuffer()
 						played_frames,
 						total_frames_played, tco_num );
 			}
+			
+			// qDebug( "counted %d, calculated %d", elapsedFrames(), elapsedFramesAt( m_playPos[m_playMode] ) );
 
 			// loop through all tracks and play them
 			for( int i = 0; i < track_list.size(); ++i )
@@ -568,31 +570,27 @@ f_cnt_t song::elapsedFramesAt( const MidiTime & time )
 	f_cnt_t frames = 0;
 	for( MidiTime i = MidiTime( 0 ); i < time; i += 1 )
 	{
-		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
+		const float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( framesPerTick( tempo ) );
 	}
 	return frames;
 }
 
 
-/** @brief returns a vector of framepositions at a range of miditimes
- * @param start the starting miditime where we want the first frame value
- * @param length length in ticks of the range we want converted
+/** @brief returns a conversion of ticks -> frames at a given miditime
+ * useful for calculating lengths of patterns
+ * @param start the starting miditime where we want the calculation to be performed
+ * @param length length in ticks we want to convert
  */
-QVector<f_cnt_t> song::elapsedFramesAt( const MidiTime & start, tick_t length )
+f_cnt_t song::lengthInFramesAt( const MidiTime & start, tick_t length )
 {
 	f_cnt_t frames = 0;
-	QVector<f_cnt_t> framelist;
-	for( MidiTime i = MidiTime( 0 ); i < start + length; i += 1 )
+	for( MidiTime i = MidiTime( start ); i < start + length; i += 1 )
 	{
 		float tempo = m_tempoModel.globalAutomationValueAt( i );
 		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
-		if( i >= start )
-		{
-			framelist.append( frames );
-		}
 	}
-	return framelist;
+	return frames;
 }
 
 
@@ -607,10 +605,20 @@ MidiTime song::miditimeAtFrames( f_cnt_t framepos )
 	while( frames < framepos )
 	{
 		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
+		frames += static_cast<int>( framesPerTick( tempo ) );
 		i += 1;
 	}
 	return i;
+}
+
+
+/** @brief returns the framesPerTick at a given miditime
+ * @param time the miditime to look at
+ */
+f_cnt_t song::framesPerTickAt( const MidiTime & time )
+{
+	float tempo = m_tempoModel.globalAutomationValueAt( time );
+	return static_cast<f_cnt_t>( framesPerTick( tempo ) );
 }
 
 
