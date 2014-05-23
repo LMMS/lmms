@@ -535,16 +535,11 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 					val = Oscillator::squareSample( phase );
 					break;
 				case EnvelopeAndLfoParameters::RandomWave:
-					val = Oscillator::sawSample( phase );
-		//		val = Oscillator::noiseSample( phase );
-//					shape_sample = m_random;
-//					if( frame == 0 )
-//					{
-//						updateRandomWave();
-//						shape_sample = m_random;
-//					}
-//					break;
-//					val = Oscillator::squareSample( phase );// <- dummy!
+					if( x % (int)( 900 * m_lfoSpeedKnob->value<float>() + 1 ) == 0 )
+					{
+						updateRandomGraph();
+					}
+					val = m_randomGraph;
 					break;
 				case EnvelopeAndLfoParameters::UserDefinedWave:
 					val = m_params->m_userWave.
@@ -573,6 +568,13 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.drawText( LFO_GRAPH_X + 52, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 						QString::number( ms_per_osc ) );
 
+}
+
+
+
+void EnvelopeAndLfoView::updateRandomGraph()
+{
+	m_randomGraph = Oscillator::noiseSample( 0.0f );
 }
 
 

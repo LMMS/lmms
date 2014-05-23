@@ -68,6 +68,7 @@ void EnvelopeAndLfoParameters::LfoInstances::reset()
 
 
 
+
 void EnvelopeAndLfoParameters::LfoInstances::add( EnvelopeAndLfoParameters * lfo )
 {
 	QMutexLocker m( &m_lfoListMutex );
@@ -82,7 +83,6 @@ void EnvelopeAndLfoParameters::LfoInstances::remove( EnvelopeAndLfoParameters * 
 	QMutexLocker m( &m_lfoListMutex );
 	m_lfos.removeAll( lfo );
 }
-
 
 
 
@@ -219,12 +219,11 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 			shape_sample = m_userWave.userWaveSample( phase );
 			break;
 		case RandomWave:
-			shape_sample = m_random;
 			if( frame == 0 )
 			{
 				updateRandomWave();
-				shape_sample = m_random;
 			}
+			shape_sample = m_random;
 			break;
 		case SineWave:
 		default:
