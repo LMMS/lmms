@@ -588,7 +588,7 @@ f_cnt_t song::lengthInFramesAt( const MidiTime & start, tick_t length )
 	for( MidiTime i = MidiTime( start ); i < start + length; i += 1 )
 	{
 		float tempo = m_tempoModel.globalAutomationValueAt( i );
-		frames += static_cast<int>( ceilf( framesPerTick( tempo ) ) );
+		frames += static_cast<int>( framesPerTick( tempo ) );
 	}
 	return frames;
 }
