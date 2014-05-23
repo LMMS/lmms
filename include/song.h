@@ -102,7 +102,6 @@ public:
 		inline void updatePosition()
 		{
 			setTicks( m_newPosition );
-			setCurrentFrame( 0 );
 			m_positionChanged = false;
 		}
 

@@ -207,20 +207,10 @@ void song::processNextBuffer()
 			{
 				EnvelopeAndLfoParameters::instances()->reset();
 			}
-			if( m_playPos[Mode_PlaySong].positionChanged() )
-			{
-				m_playPos[Mode_PlaySong].updatePosition();
-				updateElapsedFrames();
-			}
 			break;
 
 		case Mode_PlayTrack:
 			track_list.push_back( m_trackToPlay );
-			if( m_playPos[Mode_PlayTrack].positionChanged() )
-			{
-				m_playPos[Mode_PlayTrack].updatePosition();
-				updateElapsedFrames();
-			}
 			break;
 
 		case Mode_PlayBB:
@@ -230,11 +220,6 @@ void song::processNextBuffer()
 								currentBB();
 				track_list.push_back( bbTrack::findBBTrack(
 								tco_num ) );
-			}
-			if( m_playPos[Mode_PlayBB].positionChanged() )
-			{
-				m_playPos[Mode_PlayBB].updatePosition();
-				updateElapsedFrames();
 			}
 			break;
 
@@ -246,10 +231,6 @@ void song::processNextBuffer()
 				track_list.push_back(
 						m_patternToPlay->getTrack() );
 			}
-			if( m_playPos[Mode_PlayPattern].positionChanged() )
-			{
-				m_playPos[Mode_PlayPattern].updatePosition();
-			}			
 			break;
 
 		default:
@@ -261,6 +242,13 @@ void song::processNextBuffer()
 	{
 		return;
 	}
+
+	// update manually changed playposition
+	if( m_playPos[m_playMode].positionChanged() )
+	{
+		m_playPos[m_playMode].updatePosition();
+		updateElapsedFrames();
+	}	
 
 	// check for looping-mode and act if necessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
@@ -278,11 +266,11 @@ void song::processNextBuffer()
 	}
 
 	f_cnt_t total_frames_played = 0;
+	static float frames_per_tick = engine::framesPerTick();
 
 	while( total_frames_played
 				< engine::mixer()->framesPerPeriod() )
 	{
-		const float frames_per_tick = engine::framesPerTick();
 		m_vstSyncController.update();
 
 		f_cnt_t played_frames = engine::mixer()->framesPerPeriod() - total_frames_played;
@@ -393,6 +381,9 @@ void song::processNextBuffer()
 						played_frames,
 						total_frames_played, tco_num );
 			}
+			
+			// update framespertick here so we know it'll always be updated at the beginning of the tick
+			frames_per_tick = engine::framesPerTick();
 		}
 
 		// update frame-counters
