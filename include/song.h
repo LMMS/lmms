@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SONG_H
-#define _SONG_H
+#ifndef SONG_H
+#define SONG_H
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
@@ -72,7 +72,8 @@ public:
 			MidiTime( _abs ),
 			m_timeLine( NULL ),
 			m_timeLineUpdate( true ),
-			m_currentFrame( 0.0f )
+			m_currentFrame( 0.0f ),
+			m_positionChanged( false )
 		{
 		}
 		inline void setCurrentFrame( const float _f )
@@ -86,9 +87,28 @@ public:
 		timeLine * m_timeLine;
 		bool m_timeLineUpdate;
 
+		// used for manually moving position from the timeline
+		inline void movePosition( tick_t tick )
+		{
+			m_positionChanged = true;
+			m_newPosition = tick;
+		}
+		
+		inline bool positionChanged()
+		{
+			return m_positionChanged;
+		}
+		
+		inline void updatePosition()
+		{
+			setTicks( m_newPosition );
+			m_positionChanged = false;
+		}
+
 	private:
 		float m_currentFrame;
-
+		bool m_positionChanged;
+		tick_t m_newPosition;
 	} ;
 
 
@@ -97,12 +117,21 @@ public:
 
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds;
+		const float ms = ( static_cast<float>( m_elapsedFrames ) * 1000.0 ) / engine::mixer()->processingSampleRate();
+		return static_cast<int>( ms );
 	}
-	inline void setMilliSeconds( float _ellapsedMilliSeconds )
+	
+	f_cnt_t elapsedFrames() const
 	{
-		m_elapsedMilliSeconds = (_ellapsedMilliSeconds);
+		return m_elapsedFrames;
 	}
+	
+	void updateElapsedFrames();
+	f_cnt_t elapsedFramesAt( const MidiTime & time );
+	f_cnt_t lengthInFramesAt( const MidiTime & start, tick_t length );
+	MidiTime miditimeAtFrames( f_cnt_t framepos );
+	f_cnt_t framesPerTickAt( const MidiTime & time );
+	
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -252,7 +281,6 @@ public:
 		return m_timeSigModel;
 	}
 
-
 public slots:
 	void playSong();
 	void record();
@@ -315,6 +343,11 @@ private:
 	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
 	void restoreControllerStates( const QDomElement & _this );
 
+	inline float framesPerTick( bpm_t tempo )
+	{
+		const float oneTick = 60.0 / 48.0;
+		return ( engine::mixer()->processingSampleRate() * oneTick ) / tempo;
+	}
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -347,12 +380,11 @@ private:
 	pattern * m_patternToPlay;
 	bool m_loopPattern;
 
-	double m_elapsedMilliSeconds;
+	f_cnt_t m_elapsedFrames;
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
 	VstSyncController m_vstSyncController;
-
 
 	friend class engine;
 	friend class SongEditor;
@@ -362,6 +394,7 @@ private:
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
+	void elapsedFramesChanged();
 	void lengthChanged( int _tacts );
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,

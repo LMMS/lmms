@@ -23,10 +23,11 @@
  */
 
 
-#ifndef _ENGINE_H
-#define _ENGINE_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include "lmmsconfig.h"
+#include "lmms_basics.h"
 
 #include <QtCore/QMap>
 

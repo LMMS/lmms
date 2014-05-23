@@ -338,9 +338,11 @@ void timeLine::mouseMoveEvent( QMouseEvent* event )
 	switch( m_action )
 	{
 		case MovePositionMarker:
-			m_pos.setTicks( t.getTicks() );
-			engine::getSong()->setMilliSeconds(((((t.getTicks()))*60*1000/48)/engine::getSong()->getTempo()));
-			m_pos.setCurrentFrame( 0 );
+			m_pos.movePosition( t.getTicks() );
+			if( ! engine::getSong()->isPlaying() )
+			{
+				m_pos.updatePosition();
+			}
 			updatePosition();
 			break;
 

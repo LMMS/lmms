@@ -40,6 +40,13 @@ class SampleTCO : public trackContentObject
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
+	enum SampleTCOState 
+	{
+		Inactive,
+		Playing,
+		SampleEnded,
+		Recording
+	};
 	SampleTCO( track * _track );
 	virtual ~SampleTCO();
 
@@ -62,18 +69,54 @@ public:
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
+	SampleTCOState sampleTCOState() const
+	{
+		return m_sampleTCOState;
+	}
+	
+	void setSampleTCOState( SampleTCOState s )
+	{
+		m_sampleTCOState = s;
+	}
+	
+	bool needsUpdate() const
+	{ 
+		return m_needsUpdate;
+	}
+	
+	void setNeedsUpdate( bool b )
+	{
+		m_needsUpdate = b;
+	}
+
+	// callback for playhandle destructor
+	void playHandleDestroyed( PlayHandle * handle )
+	{
+		if( m_handle == handle ) 
+		{
+			m_handle = NULL;
+		}
+	}
+	
+	bool startPlayback( const MidiTime & start, f_cnt_t offset );
+	void stopPlayback();
+	void updatePlayback( const MidiTime & start, f_cnt_t offset );
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
-	void updateLength( bpm_t = 0 );
+	void updateLength();
 	void toggleRecord();
-
+	void updatePlayPosition();
 
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 
+	SampleTCOState m_sampleTCOState;
+	bool m_needsUpdate;
+
+	PlayHandle * m_handle;
 
 	friend class SampleTCOView;
 
@@ -100,6 +143,7 @@ public:
 
 public slots:
 	void updateSample();
+	void changeName();
 
 
 protected:
@@ -113,6 +157,8 @@ protected:
 
 private:
 	SampleTCO * m_tco;
+	
+	static QPixmap * s_pat_rec;
 } ;
 
 
@@ -145,6 +191,11 @@ public:
 		return "sampletrack";
 	}
 
+	inline FloatModel * volumeModel()
+	{
+		return &m_volumeModel;
+	}
+	
 
 private:
 	AudioPort m_audioPort;

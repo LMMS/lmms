@@ -92,7 +92,7 @@ song::song() :
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
-	m_elapsedMilliSeconds( 0 ),
+	m_elapsedFrames( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
@@ -243,6 +243,13 @@ void song::processNextBuffer()
 		return;
 	}
 
+	// update manually changed playposition
+	if( m_playPos[m_playMode].positionChanged() )
+	{
+		m_playPos[m_playMode].updatePosition();
+		updateElapsedFrames();
+	}	
+
 	// check for looping-mode and act if necessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
@@ -252,14 +259,14 @@ void song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			m_elapsedMilliSeconds = (tl->loopBegin().getTicks()*60*1000/48)/getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+			updateElapsedFrames();
 		}
 	}
 
 	f_cnt_t total_frames_played = 0;
-	const float frames_per_tick = engine::framesPerTick();
+	static float frames_per_tick = engine::framesPerTick();
 
 	while( total_frames_played
 				< engine::mixer()->framesPerPeriod() )
@@ -310,7 +317,7 @@ void song::processNextBuffer()
 					ticks = ticks % ( max_tact * MidiTime::ticksPerTact() );
 
 					// wrap milli second counter
-					m_elapsedMilliSeconds = ( ticks * 60 * 1000 / 48 ) / getTempo();
+					updateElapsedFrames();
 
 					m_vstSyncController.setAbsolutePosition( ticks );
 				}
@@ -324,7 +331,7 @@ void song::processNextBuffer()
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
-					m_elapsedMilliSeconds = ((tl->loopBegin().getTicks())*60*1000/48)/getTempo();
+					updateElapsedFrames();
 				}
 			}
 			else
@@ -364,6 +371,8 @@ void song::processNextBuffer()
 						played_frames,
 						total_frames_played, tco_num );
 			}
+			
+			// qDebug( "counted %d, calculated %d", elapsedFrames(), elapsedFramesAt( m_playPos[m_playMode] ) );
 
 			// loop through all tracks and play them
 			for( int i = 0; i < track_list.size(); ++i )
@@ -372,13 +381,16 @@ void song::processNextBuffer()
 						played_frames,
 						total_frames_played, tco_num );
 			}
+			
+			// update framespertick here so we know it'll always be updated at the beginning of the tick
+			frames_per_tick = engine::framesPerTick();
 		}
 
 		// update frame-counters
 		total_frames_played += played_frames;
 		m_playPos[m_playMode].setCurrentFrame( played_frames +
 								current_frame );
-		m_elapsedMilliSeconds += (((played_frames/frames_per_tick)*60*1000/48)/getTempo());
+		m_elapsedFrames += played_frames;
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
@@ -520,12 +532,85 @@ void song::updateLength()
 void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 {
 	m_elapsedTicks += m_playPos[_play_mode].getTicks() - _ticks;
-	m_elapsedMilliSeconds += (((( _ticks - m_playPos[_play_mode].getTicks()))*60*1000/48)/getTempo());
 	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
+	updateElapsedFrames();
 }
 
 
+/** @brief update song framecounter, called whenever play position changes
+ * emits signal elapsedFramesChanged() which can be received by objects that want to know when
+ * the song's play position changes
+ */
+void song::updateElapsedFrames()
+{
+	m_elapsedFrames = m_playPos[ m_playMode ].currentFrame() + elapsedFramesAt( m_playPos[ m_playMode ] ); 
+
+	emit elapsedFramesChanged();
+/*	qDebug( "frames %d", m_elapsedFrames );
+	qDebug( "ms %d", getMilliseconds() );*/
+}
+
+
+/** @brief returns the frames elapsed from song start (or, frame position) of a given miditime
+ * takes song's tempo automation in account
+ * @param time the miditime to convert to frames
+ */
+f_cnt_t song::elapsedFramesAt( const MidiTime & time )
+{
+	f_cnt_t frames = 0;
+	for( MidiTime i = MidiTime( 0 ); i < time; i += 1 )
+	{
+		const float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( framesPerTick( tempo ) );
+	}
+	return frames;
+}
+
+
+/** @brief returns a conversion of ticks -> frames at a given miditime
+ * useful for calculating lengths of patterns
+ * @param start the starting miditime where we want the calculation to be performed
+ * @param length length in ticks we want to convert
+ */
+f_cnt_t song::lengthInFramesAt( const MidiTime & start, tick_t length )
+{
+	f_cnt_t frames = 0;
+	for( MidiTime i = MidiTime( start ); i < start + length; i += 1 )
+	{
+		float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( framesPerTick( tempo ) );
+	}
+	return frames;
+}
+
+
+/** @brief returns the miditime at frame position, rounding up to next tick
+ * useful for determining the length in ticks of a song object that only has length in frames (eg. sampletrack)
+ * @param framepos The position in frames
+ */
+MidiTime song::miditimeAtFrames( f_cnt_t framepos )
+{
+	f_cnt_t frames = 0;
+	MidiTime i = MidiTime( 0 );
+	while( frames < framepos )
+	{
+		float tempo = m_tempoModel.globalAutomationValueAt( i );
+		frames += static_cast<int>( framesPerTick( tempo ) );
+		i += 1;
+	}
+	return i;
+}
+
+
+/** @brief returns the framesPerTick at a given miditime
+ * @param time the miditime to look at
+ */
+f_cnt_t song::framesPerTickAt( const MidiTime & time )
+{
+	float tempo = m_tempoModel.globalAutomationValueAt( time );
+	return static_cast<f_cnt_t>( framesPerTick( tempo ) );
+}
 
 
 void song::togglePause()
@@ -569,14 +654,14 @@ void song::stop()
 		{
 			case timeLine::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
-				m_elapsedMilliSeconds = 0;
+				m_elapsedFrames = 0;
 				break;
 
 			case timeLine::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
-					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
+					updateElapsedFrames();
 					tl->savePos( -1 );
 				}
 				break;
@@ -589,7 +674,7 @@ void song::stop()
 	else
 	{
 		m_playPos[m_playMode].setTicks( 0 );
-		m_elapsedMilliSeconds = 0;
+		m_elapsedFrames = 0;
 	}
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );

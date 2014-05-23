@@ -495,7 +495,7 @@ patternView {
 SampleTCOView {
 	color: rgb( 74, 253, 133 );
 	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 60, 60 );	
+	qproperty-textColor: rgb( 255, 255, 255 );	
 }
 
 /* automation pattern */

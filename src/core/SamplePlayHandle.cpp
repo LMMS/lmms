@@ -43,7 +43,8 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_bbTrack( NULL ),
+	m_tco( NULL )
 {
 }
 
@@ -60,25 +61,28 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_bbTrack( NULL ),
+	m_tco( NULL )
 {
 }
 
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
+SamplePlayHandle::SamplePlayHandle( SampleTCO* tco, f_cnt_t startframe ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
 	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
+	m_frame( startframe ),
 	m_audioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() ),
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( tco->getTrack() ),
-	m_bbTrack( NULL )
+	m_bbTrack( NULL ),
+	m_tco( tco )
 {
+	m_state.setFrameIndex( m_frame );
 }
 
 
@@ -91,6 +95,10 @@ SamplePlayHandle::~SamplePlayHandle()
 	{
 		delete m_audioPort;
 	}
+	if( m_tco )
+	{
+		m_tco->playHandleDestroyed( this );
+	}
 }
 
 
@@ -99,7 +107,7 @@ SamplePlayHandle::~SamplePlayHandle()
 void SamplePlayHandle::play( sampleFrame * _working_buffer )
 {
 	//play( 0, _try_parallelizing );
-	if( framesDone() >= totalFrames() )
+	if( framesDone() >= totalFrames() || framesDone() < 0 )
 	{
 		return;
 	}
@@ -125,7 +133,7 @@ void SamplePlayHandle::play( sampleFrame * _working_buffer )
 
 bool SamplePlayHandle::isFinished() const
 {
-	return framesDone() >= totalFrames() && m_doneMayReturnTrue == true;
+	return ( framesDone() >= totalFrames() || framesDone() < 0 ) && m_doneMayReturnTrue == true;
 }
 
 
