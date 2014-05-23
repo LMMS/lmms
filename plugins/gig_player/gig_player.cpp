@@ -427,12 +427,12 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 		{
 			noteRelease = i->release;
 
-			float fadeOut = 0.25; // Seconds
+			float fadeOut = i->releaseTime; // Seconds
 			int len = std::min( int( floor( fadeOut * engine::mixer()->processingSampleRate() ) ),
 					i->size-i->position );
 			int endPoint = i->position+len;
 
-			if (len <= 0)
+			if (len < 0)
 				break;
 
 			for( int k = i->position, j = 0; k < endPoint; ++k, ++j )
@@ -548,13 +548,14 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 
 
 
-gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release )
+gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote,
+		float attenuation, bool release, float releaseTime )
 {
 	if( !pSample || pSample->Channels == 0 )
 		return gigNote();
 
 	gig::buffer_t buf = pSample->LoadSampleData();
-	gigNote note( pSample->SamplesTotal, release );
+	gigNote note( pSample->SamplesTotal, release, releaseTime );
 	note.midiNote = midiNote;
 
 	if( pSample->Channels > 2 )
@@ -656,7 +657,7 @@ void gigInstrument::getInstrument()
 
 gigNote gigInstrument::convertSampleRate( gigNote& old, int oldRate, int newRate )
 {
-	gigNote note( ceil( (double)old.size*newRate/oldRate ), old.release );
+	gigNote note( ceil( (double)old.size*newRate/oldRate ), old.release, old.releaseTime );
 	note.midiNote = old.midiNote;
 
 	SRC_DATA src_data;
@@ -749,7 +750,7 @@ void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 						attenuation *= pDimRegion->SampleAttenuation;
 
 					gigNote note = sampleToNote( pSample, midiNote,
-							attenuation, dim.release );
+							attenuation, dim.release, pDimRegion->EG1Release );
 
 					m_notes.push_back(note);
 				}
@@ -969,17 +970,20 @@ gigNote::gigNote() :
 		midiNote( -1 ),
 		note( NULL ),
 		size( 0 ),
-		release( false )
+		release( false ),
+		releaseTime( 0 )
 {
 }
 
-gigNote::gigNote(int size, bool release ) :
+gigNote::gigNote(int size, bool release, float releaseTime ) :
 	position( 0 ),
 	midiNote( -1 ),
 	size( size ),
-	release( release )
+	release( release ),
+	releaseTime( releaseTime )
 {
-	note = new sampleFrame[size];
+	if( size > 0 )
+		note = new sampleFrame[size];
 
 	// Initialize to no sound
 	for (int i = 0; i < size; ++i)
@@ -994,12 +998,18 @@ gigNote::gigNote( const gigNote& g ) :
 	midiNote( g.midiNote ),
 	note( NULL ),
 	size( g.size ),
-	release( g.release )
+	release( g.release ),
+	releaseTime( g.releaseTime )
 {
 	if (size > 0)
 	{
 		note = new sampleFrame[size];
-		std::copy(&g.note[0], &g.note[size], &note[0]);
+
+		for (int i = 0; i < size; ++i)
+		{
+			note[i][0] = g.note[i][0];
+			note[i][1] = g.note[i][1];
+		}
 	}
 }
 
@@ -1009,7 +1019,8 @@ gigNote::gigNote( gigNote&& g ) :
 	midiNote( g.midiNote ),
 	note( NULL ),
 	size( 0 ),
-	release( g.release )
+	release( g.release ),
+	releaseTime( g.releaseTime )
 {
 	*this = std::move( g );
 }
@@ -1024,6 +1035,10 @@ gigNote& gigNote::operator=( gigNote&& g )
 
 		size = g.size;
 		note = g.note;
+		position = g.position;
+		midiNote = g.midiNote;
+		release = g.release;
+		releaseTime = g.releaseTime;
 
 		g.size = 0;
 		g.note = NULL;

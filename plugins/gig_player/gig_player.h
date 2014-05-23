@@ -84,7 +84,7 @@ class gigNote
 {
 public:
 	gigNote();
-	gigNote(int size, bool release );
+	gigNote(int size, bool release, float releaseTime );
 	gigNote( const gigNote& g );
 	~gigNote();
 
@@ -99,6 +99,7 @@ public:
 	sampleFrame* note;
 	int size; // Don't try changing this...
 	bool release; // Whether to trigger a release sample on key up
+	float releaseTime; // After letting up, time to fade out
 };
 
 
@@ -186,7 +187,7 @@ private:
 private:
 	void freeInstance();
 	void getInstrument();
-	gigNote sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release );
+	gigNote sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release, float releaseTime );
 	Dimension getDimensions( gig::Region* pRegion, int velocity, bool release );
 	gigNote convertSampleRate( gigNote& old, int oldRate, int newRate );
 	void addNotes( int midiNote, int velocity, bool release ); // Locks m_synthMutex internally
