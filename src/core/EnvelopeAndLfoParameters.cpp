@@ -221,7 +221,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 		case RandomWave:
 			if( frame == 0 )
 			{
-				updateRandomWave();
+				m_random = Oscillator::noiseSample( 0.0f );
 			}
 			shape_sample = m_random;
 			break;
@@ -244,14 +244,6 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
 	m_bad_lfoShapeData = false;
-}
-
-
-
-
-void EnvelopeAndLfoParameters::updateRandomWave()
-{
-	m_random = Oscillator::noiseSample( 0.0f );
 }
 
 

@@ -174,8 +174,6 @@ private:
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLfoShapeData();
-	void updateRandomWave();
-
 
 
 	friend class EnvelopeAndLfoView;

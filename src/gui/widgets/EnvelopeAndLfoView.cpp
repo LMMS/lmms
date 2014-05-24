@@ -537,7 +537,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 				case EnvelopeAndLfoParameters::RandomWave:
 					if( x % (int)( 900 * m_lfoSpeedKnob->value<float>() + 1 ) == 0 )
 					{
-						updateRandomGraph();
+						m_randomGraph = Oscillator::noiseSample( 0.0f );
 					}
 					val = m_randomGraph;
 					break;
@@ -568,13 +568,6 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.drawText( LFO_GRAPH_X + 52, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 						QString::number( ms_per_osc ) );
 
-}
-
-
-
-void EnvelopeAndLfoView::updateRandomGraph()
-{
-	m_randomGraph = Oscillator::noiseSample( 0.0f );
 }
 
 

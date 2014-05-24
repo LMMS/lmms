@@ -92,7 +92,6 @@ private:
 	ledCheckBox * m_controlEnvAmountCb;
 	
 	float m_randomGraph;
-	void updateRandomGraph();
 } ;
 
 #endif
