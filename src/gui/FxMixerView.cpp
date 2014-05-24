@@ -198,6 +198,12 @@ void FxMixerView::refreshDisplay()
 		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 	}
+	
+	// update all fx lines
+	for( int i = 0; i < m_fxChannelViews.size(); ++i )
+	{
+		updateFxLine( i );
+	}
 
 	updateMaxChannelSelector();
 }
