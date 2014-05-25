@@ -556,6 +556,12 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 							const f_cnt_t _offset, int _tco_num )
 {
+	// if the track is muted, don't play anything
+	if( isMuted() ) 
+	{
+		return false;
+	}
+	
 	const float frames_per_tick = engine::framesPerTick();
 
 	tcoVector tcos;
