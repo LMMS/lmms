@@ -696,6 +696,16 @@ MonstroView knob {
 	qproperty-lineWidth: 2.5;
 }
 
+NesInstrumentView knob {
+	color: #e7231b;
+	qproperty-outerColor: #fff;
+	qproperty-outerRadius: 11.0;
+	qproperty-innerRadius: 8.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
 /* palette information  */
 
 LmmsPalette {
