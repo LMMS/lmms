@@ -84,9 +84,6 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	m_12Last = 0.0f;
 	m_34Last = 0.0f;
 	
-	m_itm = 0.0f;
-	m_otm = 0.0f;
-	
 	m_lastNoteFreq = 0.0f;
 	
 	m_maxWlen = wavelength( MIN_FREQ );
@@ -143,10 +140,17 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	int ch4EnvLen = wavelength( floorf( 240.0 / ( m_parent->m_ch4EnvLen.value() + 1 ) ) );
 	bool ch4EnvLoop = m_parent->m_ch4EnvLooped.value();
 	
+	// processing variables for operators
 	int ch1;
 	int ch2;
 	int ch3;
 	int ch4;
+	
+	// levels for generators (used for dc offset compensation)
+	int ch1Level;
+	int ch2Level;
+	int ch3Level;
+	int ch4Level;
 	
 	int ch1SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch1SweepRate.value() + 1 ) ) );
 	int ch2SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch2SweepRate.value() + 1 ) ) );
@@ -187,13 +191,14 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		// render pulse wave
 		if( m_wlen1 <= m_maxWlen && m_wlen1 >= MIN_WLEN && ch1Enabled )
 		{
+			ch1Level = m_parent->m_ch1EnvEnabled.value()
+				? static_cast<int>( ( m_parent->m_ch1Volume.value() * m_ch1EnvValue ) / 15.0 )
+				: static_cast<int>( m_parent->m_ch1Volume.value() );
 			ch1 = m_ch1Counter > m_wlen1 * ch1DutyCycle 
 				? 0
-				: m_parent->m_ch1EnvEnabled.value()
-						? static_cast<int>( ( m_parent->m_ch1Volume.value() * m_ch1EnvValue ) / 15.0 )
-						: static_cast<int>( m_parent->m_ch1Volume.value() );
+				: ch1Level;
 		}
-		else ch1 = 0;
+		else ch1 = ch1Level = 0;
 		
 		// update sweep
 		m_ch1SweepCounter++;
@@ -240,13 +245,14 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		// render pulse wave
 		if( m_wlen2 <= m_maxWlen && m_wlen2 >= MIN_WLEN && ch2Enabled )
 		{
+			ch2Level = m_parent->m_ch2EnvEnabled.value()
+				? static_cast<int>( ( m_parent->m_ch2Volume.value() * m_ch2EnvValue ) / 15.0 )
+				: static_cast<int>( m_parent->m_ch2Volume.value() );
 			ch2 = m_ch2Counter > m_wlen2 * ch2DutyCycle 
 				? 0
-				: m_parent->m_ch2EnvEnabled.value()
-						? static_cast<int>( ( m_parent->m_ch2Volume.value() * m_ch2EnvValue ) / 15.0 )
-						: static_cast<int>( m_parent->m_ch2Volume.value() );
+				: ch2Level;
 		}
-		else ch2 = 0;
+		else ch2 = ch2Level = 0;
 		
 		// update sweep
 		m_ch2SweepCounter++;
@@ -297,10 +303,11 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		// render triangle wave
 		if( m_wlen3 <= m_maxWlen && ch3Enabled )
 		{
+			ch3Level = static_cast<int>( m_parent->m_ch3Volume.value() );
 			ch3 = TRIANGLE_WAVETABLE[ ( m_ch3Counter * 32 ) / m_wlen3 ];
-			ch3 = ( ch3 * static_cast<int>( m_parent->m_ch3Volume.value() ) ) / 15;
+			ch3 = ( ch3 * ch3Level ) / 15;
 		}
-		else ch3 = 0;
+		else ch3 = ch3Level = 0;
 		
 		m_ch3Counter++;
 		
@@ -314,13 +321,14 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		// render pseudo noise 
 		if( ch4Enabled )
 		{
+			ch4Level = m_parent->m_ch4EnvEnabled.value()
+				? ( static_cast<int>( m_parent->m_ch4Volume.value() ) * m_ch4EnvValue ) / 15
+				: static_cast<int>( m_parent->m_ch4Volume.value() );
 			ch4 = LFSR()
-				? ( m_parent->m_ch4EnvEnabled.value()
-						? ( static_cast<int>( m_parent->m_ch4Volume.value() ) * m_ch4EnvValue ) / 15
-						: static_cast<int>( m_parent->m_ch4Volume.value() ) )
+				? ch4Level
 				: 0;
 		}
-		else ch4 = 0;
+		else ch4 = ch4Level = 0;
 		
 		// update framecounters
 		m_ch4Counter++;
@@ -349,42 +357,47 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		//                            //
 		////////////////////////////////			
 		
-		float ch12 = static_cast<float>( ch1 + ch2 ); 
+		float pin1 = static_cast<float>( ch1 + ch2 ); 
 		// add dithering noise
-		ch12 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
-		ch12 = ch12 / 15.0f - 1.0f;
+		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
+		pin1 = pin1 / 30.0f;
 		
-		ch12 = signedPow( ch12, NES_DIST );
+		pin1 = signedPow( pin1, NES_DIST );
+		
+		pin1 = pin1 * 2.0f - 1.0f;
 		
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		ch12 = linearInterpolate( ch12, m_12Last, m_nsf );
-		m_12Last = ch12;
+		pin1 = linearInterpolate( pin1, m_12Last, m_nsf );
+		m_12Last = pin1;
+
+		// compensate DC offset
+		pin1 += 1.0f - signedPow( static_cast<float>( ch1Level + ch2Level ) / 30.0f, NES_DIST );
+		
+		pin1 *= NES_MIXING_12;
 
 		
-		ch12 *= NES_MIXING_12;
-
-		
-		float ch34 = static_cast<float>( ch3 + ch4 ); 
+		float pin2 = static_cast<float>( ch3 + ch4 ); 
 		// add dithering noise
-		ch34 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
-		ch34 = ch34 / 15.0f - 1.0f;
+		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
+		pin2 = pin2 / 30.0f;
 		
-		ch34 = signedPow( ch34, NES_DIST );
+		pin2 = signedPow( pin2, NES_DIST );
+		
+		pin2 = pin2 * 2.0f - 1.0f;
 
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		ch34 = linearInterpolate( ch34, m_34Last, m_nsf );
-		m_34Last = ch34;
+		pin2 = linearInterpolate( pin2, m_34Last, m_nsf );
+		m_34Last = pin2;
 		
+		// compensate DC offset
+		pin2 += 1.0f - signedPow( static_cast<float>( ch3Level + ch4Level ) / 30.0f, NES_DIST );
 		
-		ch34 *= NES_MIXING_34;
+		pin2 *= NES_MIXING_34;
 		
-		float mixdown = ( ch12 + ch34 ) * NES_MIXING_ALL * m_parent->m_masterVol.value();
-		
-		// dc offset removal
-		m_otm = 0.999f * m_otm + mixdown - m_itm;
-		m_itm = mixdown;
-		buf[f][0] = m_otm;
-		buf[f][1] = m_otm;
+		const float mixdown = ( pin1 + pin2 ) * NES_MIXING_ALL * m_parent->m_masterVol.value();
+
+		buf[f][0] = mixdown;
+		buf[f][1] = mixdown;
 		
 	} // end framebuffer loop
 
