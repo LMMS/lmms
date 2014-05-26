@@ -155,12 +155,23 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	int ch2Sweep = static_cast<int>( m_parent->m_ch2SweepAmt.value() * -1.0 );
 
 	// the amounts are inverted so we correct them here
-	ch1Sweep = ch1Sweep > 0 
-		? 7 - ch1Sweep
-		: -7 - ch1Sweep;
-	ch2Sweep = ch2Sweep > 0 
-		? 7 - ch2Sweep
-		: -7 - ch2Sweep;
+	if( ch1Sweep > 0 )
+	{
+		ch1Sweep = 8 - ch1Sweep;
+	}
+	if( ch1Sweep < 0 )
+	{
+		ch1Sweep = -8 - ch1Sweep;
+	}
+
+	if( ch2Sweep > 0 )
+	{
+		ch2Sweep = 8 - ch2Sweep;
+	}
+	if( ch2Sweep < 0 )
+	{
+		ch2Sweep = -8 - ch2Sweep;
+	}
 
 	
 	// start framebuffer loop
