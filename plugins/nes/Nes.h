@@ -73,7 +73,7 @@ const float NES_MIXING_12 = 1.0 / 20.0;
 const float NES_MIXING_34 = 1.0 / 12.0;
 const float NES_MIXING_ALL = 1.0 / ( NES_MIXING_12 + NES_MIXING_34 ); // constants to simulate the hardwired mixing values for nes channels
 
-const int MIN_WLEN = 8;
+const int MIN_WLEN = 4;
 
 
 class NesInstrument;
@@ -156,9 +156,6 @@ private:
 	
 	float m_12Last;
 	float m_34Last;
-	
-	float m_itm;
-	float m_otm;
 
 	float m_lastNoteFreq;
 	
