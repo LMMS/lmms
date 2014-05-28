@@ -1494,6 +1494,8 @@ inline int PianoRoll::keyAreaBottom() const
 
 void PianoRoll::mousePressEvent( QMouseEvent * _me )
 {
+	m_startedWithShift = _me->modifiers() & Qt::ShiftModifier;
+	
 	if( validPattern() == false )
 	{
 		return;
@@ -2238,7 +2240,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			bool replay_note = key_num != m_lastKey
 							&& m_action == ActionMoveNote;
 
-			if( replay_note )
+			if( replay_note || ( m_action == ActionMoveNote && ( _me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
 			{
 				pauseTestNotes();
 			}
@@ -2250,7 +2252,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				_me->modifiers() & Qt::ShiftModifier
 			);
 
-			if( replay_note && m_action == ActionMoveNote )
+			if( replay_note && m_action == ActionMoveNote && ! ( ( _me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
 			{
 				pauseTestNotes( false );
 			}
@@ -2679,7 +2681,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 	}
 
 	// make sure notes won't go outside boundary conditions
-	if( m_action == ActionMoveNote )
+	if( m_action == ActionMoveNote && ! ( shift && ! m_startedWithShift ) )
 	{
 		if( m_moveBoundaryLeft + off_ticks < 0 )
 		{
@@ -2720,7 +2722,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 
 		if( ( *it )->selected() )
 		{
-			if( m_action == ActionMoveNote )
+			if( m_action == ActionMoveNote && ! ( shift && ! m_startedWithShift ) )
 			{
 				// moving note
 				int pos_ticks = ( *it )->oldPos().getTicks()
@@ -2765,6 +2767,17 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 				}
 				( *it )->setLength( MidiTime( ticks_new ) );
 
+				m_lenOfNewNotes = ( *it )->length();
+			}
+			else if( m_action == ActionMoveNote && ( shift && ! m_startedWithShift ) )
+			{
+				// quick resize, toggled by holding shift after starting a note move, but not before
+				int ticks_new = ( *it )->oldLength().getTicks() + off_ticks;
+				if( ticks_new <= 0 )
+				{
+					ticks_new = 1;
+				}
+				( *it )->setLength( MidiTime( ticks_new ) );
 				m_lenOfNewNotes = ( *it )->length();
 			}
 		}
