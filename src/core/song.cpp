@@ -1198,7 +1198,28 @@ void song::exportProject(bool multiExport)
 	if( efd.exec() == QDialog::Accepted &&
 		!efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
 	{
-		const QString export_file_name = efd.selectedFiles()[0];
+		QString suffix = "";
+
+		if ( !multiExport )
+		{
+			int stx = efd.selectedNameFilter().indexOf("(*.");
+			int etx = efd.selectedNameFilter().indexOf(")");
+	
+			if (stx > 0 && etx > stx) 
+			{
+				// Get first extension from selected dropdown.
+				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
+				suffix = efd.selectedNameFilter().
+					mid(stx + 2, etx - stx - 2).split(" ")[0].trimmed();
+				if ( efd.selectedFiles()[0].endsWith(suffix) ) {
+					suffix = "";
+				}
+			}
+		}
+
+
+		const QString export_file_name = efd.selectedFiles()[0] +
+			suffix;
 		exportProjectDialog epd( export_file_name,
 						engine::mainWindow(), multiExport );
 		epd.exec();
