@@ -85,6 +85,7 @@ public:
 	virtual ~NesObject();
 	
 	void renderOutput( sampleFrame * buf, fpp_t frames );
+	void updateVibrato( float * freq );
 	
 	void updateLFSR( bool mode )
 	{
@@ -136,6 +137,9 @@ private:
 	NotePlayHandle * m_nph;
 	fpp_t m_fpp;
 	
+	int m_pitchUpdateCounter;
+	int m_pitchUpdateFreq;
+	
 	int m_ch1Counter;
 	int m_ch2Counter;
 	int m_ch3Counter;
@@ -168,6 +172,9 @@ private:
 	int m_wlen2;
 	int m_wlen3;
 	int m_wlen4;
+	
+// vibrato
+	int m_vibratoPhase;
 };
 
 
