@@ -63,6 +63,9 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	m_nph( nph ),
 	m_fpp( frames )
 {
+	m_pitchUpdateCounter = 0;
+	m_pitchUpdateFreq = wavelength( 60.0f );	
+	
 	m_LFSR = LFSR_INIT;
 	
 	m_ch1Counter = 0;
@@ -84,11 +87,28 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	m_12Last = 0.0f;
 	m_34Last = 0.0f;
 	
-	m_lastNoteFreq = 0.0f;
-	
 	m_maxWlen = wavelength( MIN_FREQ );
 	
 	m_nsf = NES_SIMPLE_FILTER * ( m_samplerate / 44100.0 );
+	
+	// calculate initial frequency
+	const float freq = m_nph->frequency();
+	m_wlen1 = wavelength( freq * m_parent->m_freq1 );
+	m_wlen2 = wavelength( freq * m_parent->m_freq2 );
+	m_wlen3 = wavelength( freq * m_parent->m_freq3 );
+	
+	if( m_parent->m_ch4NoiseFreqMode.value() )
+	{
+		m_wlen4 = wavelength( freq );
+	}
+	else
+	{
+		m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
+	}
+	
+	m_lastNoteFreq = freq;	
+	
+	m_vibratoPhase = 0;
 }
 
 
@@ -99,25 +119,6 @@ NesObject::~NesObject()
 
 void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 {
-	// check if frequency has changed, if so, update wavelengths of ch1-3
-	if( m_nph->frequency() != m_lastNoteFreq )
-	{
-		m_wlen1 = wavelength( m_nph->frequency() * m_parent->m_freq1 );
-		m_wlen2 = wavelength( m_nph->frequency() * m_parent->m_freq2 );
-		m_wlen3 = wavelength( m_nph->frequency() * m_parent->m_freq3 );
-	}
-	// noise channel can use either note freq or preset freqs
-	if( m_parent->m_ch4NoiseFreqMode.value() )
-	{
-		m_wlen4 = wavelength( m_nph->frequency() );
-	}
-	else
-	{
-		m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
-	}
-	
-	m_lastNoteFreq = m_nph->frequency();
-	
 	////////////////////////////////
 	//	                          //
 	//  variables for processing  //
@@ -176,12 +177,53 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	{
 		ch2Sweep = -8 - ch2Sweep;
 	}
-
 	
+	// is vibrato active
+	bool vibratoActive = m_parent->m_vibrato.value() > 0;
+	
+		
 	// start framebuffer loop
-	
+		
 	for( f_cnt_t f = 0; f < frames; f++ )
 	{
+		////////////////////////////////
+		//	                          //
+		//        pitch update        //
+		//                            //
+		////////////////////////////////
+
+		m_pitchUpdateCounter++;
+
+		if( m_pitchUpdateCounter >= m_pitchUpdateFreq )
+		{
+			m_pitchUpdateCounter = 0;
+			float freq = m_nph->frequency();
+			// if vibrato is active, update vibrato
+			if( vibratoActive )
+			{
+				updateVibrato( &freq );
+			}
+			// check if frequency has changed, if so, update wavelengths of ch1-3
+			if( freq != m_lastNoteFreq )
+			{
+				m_wlen1 = wavelength( freq * m_parent->m_freq1 );
+				m_wlen2 = wavelength( freq * m_parent->m_freq2 );
+				m_wlen3 = wavelength( freq * m_parent->m_freq3 );
+			}
+			// noise channel can use either note freq or preset freqs
+			if( m_parent->m_ch4NoiseFreqMode.value() )
+			{
+				m_wlen4 = wavelength( freq );
+			}
+			else
+			{
+				m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
+			}
+			
+			m_lastNoteFreq = freq;
+		}
+
+		
 		////////////////////////////////
 		//	                          //
 		//        channel 1           //
@@ -404,6 +446,18 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 }
 
 
+void NesObject::updateVibrato( float * freq )
+{
+	float vibratoAmt = floorf( m_parent->m_vibrato.value() ) / 15.0f;
+	m_vibratoPhase++;
+	m_vibratoPhase %= 32;
+	float vibratoRatio = 1.0f + ( static_cast<float>( TRIANGLE_WAVETABLE[ m_vibratoPhase ] ) * 0.02f * vibratoAmt );
+	*freq *= vibratoRatio;
+}
+
+
+
+
 NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	Instrument( instrumentTrack, &nes_plugin_descriptor ),
 	m_ch1Enabled( true, this ),
@@ -453,7 +507,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	
 	//master
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
-	m_vibrato( 0.0f, 0.0f, 15.0f, 1.0f, this, tr( "Vibrato (unimplemented)" ) )
+	m_vibrato( 0.0f, 0.0f, 15.0f, 1.0f, this, tr( "Vibrato" ) )
 {
 	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
 	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
@@ -751,7 +805,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	
 	//master
 	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, "Master Volume", "", "" )
-	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, "Vibrato (unimplemented)", "", "" )
+	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, "Vibrato", "", "" )
 
 }
 
