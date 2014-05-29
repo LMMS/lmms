@@ -627,6 +627,9 @@ void NesInstrument::saveSettings(  QDomDocument & doc, QDomElement & element )
 		m_ch4NoiseMode.saveSettings( doc, element, "nmode4" );
 		m_ch4NoiseFreqMode.saveSettings( doc, element, "nfrqmode4" );
 		m_ch4NoiseFreq.saveSettings( doc, element, "nfreq4" );
+		
+		m_ch4NoiseQuantize.saveSettings( doc, element, "nq4" );
+		m_ch4Sweep.saveSettings( doc, element, "nswp4" );
 	
 	//master
 		m_masterVol.saveSettings( doc, element, "vol" );
@@ -681,6 +684,9 @@ void NesInstrument::loadSettings( const QDomElement & element )
 		m_ch4NoiseMode.loadSettings(  element, "nmode4" );
 		m_ch4NoiseFreqMode.loadSettings(  element, "nfrqmode4" );
 		m_ch4NoiseFreq.loadSettings(  element, "nfreq4" );
+		
+		m_ch4NoiseQuantize.loadSettings(  element, "nq4" );
+		m_ch4Sweep.loadSettings(  element, "nswp4" );
 	
 	//master
 		m_masterVol.loadSettings(  element, "vol" );
