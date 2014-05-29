@@ -83,6 +83,7 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	
 	m_ch1SweepCounter = 0;
 	m_ch2SweepCounter = 0;
+	m_ch4SweepCounter = 0;
 	
 	m_12Last = 0.0f;
 	m_34Last = 0.0f;
@@ -91,24 +92,12 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	
 	m_nsf = NES_SIMPLE_FILTER * ( m_samplerate / 44100.0 );
 	
-	// calculate initial frequency
-	const float freq = m_nph->frequency();
-	m_wlen1 = wavelength( freq * m_parent->m_freq1 );
-	m_wlen2 = wavelength( freq * m_parent->m_freq2 );
-	m_wlen3 = wavelength( freq * m_parent->m_freq3 );
-	
-	if( m_parent->m_ch4NoiseFreqMode.value() )
-	{
-		m_wlen4 = wavelength( freq );
-	}
-	else
-	{
-		m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
-	}
-	
-	m_lastNoteFreq = freq;	
+	m_lastNoteFreq = 0;
+	m_lastNoiseFreq = -1.0f; // value that is always different than noisefreq so it gets updated at start
 	
 	m_vibratoPhase = 0;
+	
+	updatePitch();
 }
 
 
@@ -155,9 +144,18 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	
 	int ch1SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch1SweepRate.value() + 1 ) ) );
 	int ch2SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch2SweepRate.value() + 1 ) ) );
+	int ch4SweepRate = wavelength( floorf( 60.0f / ( 8.0f - qAbs( m_parent->m_ch4Sweep.value() ) ) ) );
 
 	int ch1Sweep = static_cast<int>( m_parent->m_ch1SweepAmt.value() * -1.0 );
 	int ch2Sweep = static_cast<int>( m_parent->m_ch2SweepAmt.value() * -1.0 );
+
+	int ch4Sweep = 0;
+	if( m_parent->m_ch4Sweep.value() != 0.0f )
+	{
+		ch4Sweep = m_parent->m_ch4Sweep.value() > 0.0f
+			? -1
+			: 1;
+	}
 
 	// the amounts are inverted so we correct them here
 	if( ch1Sweep > 0 )
@@ -178,9 +176,6 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		ch2Sweep = -8 - ch2Sweep;
 	}
 	
-	// is vibrato active
-	bool vibratoActive = m_parent->m_vibrato.value() > 0;
-	
 		
 	// start framebuffer loop
 		
@@ -191,39 +186,15 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		//        pitch update        //
 		//                            //
 		////////////////////////////////
-
+		
 		m_pitchUpdateCounter++;
-
 		if( m_pitchUpdateCounter >= m_pitchUpdateFreq )
 		{
+			updatePitch();
 			m_pitchUpdateCounter = 0;
-			float freq = m_nph->frequency();
-			// if vibrato is active, update vibrato
-			if( vibratoActive )
-			{
-				updateVibrato( &freq );
-			}
-			// check if frequency has changed, if so, update wavelengths of ch1-3
-			if( freq != m_lastNoteFreq )
-			{
-				m_wlen1 = wavelength( freq * m_parent->m_freq1 );
-				m_wlen2 = wavelength( freq * m_parent->m_freq2 );
-				m_wlen3 = wavelength( freq * m_parent->m_freq3 );
-			}
-			// noise channel can use either note freq or preset freqs
-			if( m_parent->m_ch4NoiseFreqMode.value() )
-			{
-				m_wlen4 = wavelength( freq );
-			}
-			else
-			{
-				m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
-			}
-			
-			m_lastNoteFreq = freq;
 		}
 
-		
+
 		////////////////////////////////
 		//	                          //
 		//        channel 1           //
@@ -392,6 +363,26 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 			}
 		}
 		
+		m_ch4SweepCounter++;
+		if( m_ch4SweepCounter >= ch4SweepRate )
+		{
+			m_ch4SweepCounter = 0;
+			if( ch4Sweep != 0 )
+			{
+				int freqN = nearestNoiseFreq( static_cast<float>( m_samplerate ) / m_wlen4 );
+				freqN = qBound( 0, freqN + ch4Sweep, 15 );
+				m_wlen4 = wavelength( NOISE_FREQS[ freqN ] );
+
+				if( m_wlen4 == 0 && ch4Sweep == 1 ) // a workaround for sweep getting stuck on 0 wavelength
+				{
+					while( m_wlen4 == 0 )
+					{
+						m_wlen4 = wavelength( NOISE_FREQS[ ++freqN ] );
+					}
+				}
+			}
+		}
+		
 
 		////////////////////////////////
 		//	                          //
@@ -456,6 +447,41 @@ void NesObject::updateVibrato( float * freq )
 }
 
 
+void NesObject::updatePitch()
+{
+	float freq = m_nph->frequency();
+	// if vibrato is active, update vibrato
+	if( m_parent->m_vibrato.value() > 0 )
+	{
+		updateVibrato( &freq );
+	}
+	// check if frequency has changed, if so, update wavelengths of ch1-3
+	if( freq != m_lastNoteFreq )
+	{
+		m_wlen1 = wavelength( freq * m_parent->m_freq1 );
+		m_wlen2 = wavelength( freq * m_parent->m_freq2 );
+		m_wlen3 = wavelength( freq * m_parent->m_freq3 );
+	}
+	// noise channel can use either note freq or preset freqs
+	if( m_parent->m_ch4NoiseFreqMode.value() && freq != m_lastNoteFreq ) 
+	{
+		float f = freq * 2.0f;
+		if( m_parent->m_ch4NoiseQuantize.value() ) // note freq can be quantized to the preset freqs
+		{
+			f = NOISE_FREQS[ nearestNoiseFreq( f ) ];
+		}
+		m_wlen4 = wavelength( f );
+	}
+	if( ! m_parent->m_ch4NoiseFreqMode.value() && m_lastNoiseFreq != m_parent->m_ch4NoiseFreq.value() )
+	{
+		m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
+		m_lastNoiseFreq = m_parent->m_ch4NoiseFreq.value();
+	}
+	
+	m_lastNoteFreq = freq;
+}
+
+
 
 
 NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
@@ -504,6 +530,9 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_ch4NoiseMode( false, this ),
 	m_ch4NoiseFreqMode( false, this ),
 	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Noise frequency" ) ), 
+	
+	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 Noise frequency sweep" ) ), 
+	m_ch4NoiseQuantize( true, this ),
 	
 	//master
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
@@ -794,13 +823,16 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	makeknob( m_ch4VolumeKnob, KNOB_X1, KNOB_Y4, "Volume", "", "" )
 	makeknob( m_ch4NoiseFreqKnob, KNOB_X2, KNOB_Y4, "Noise Frequency", "", "" )
 	makeknob( m_ch4EnvLenKnob, KNOB_X3, KNOB_Y4, "Envelope length", "", "" )
+	makeknob( m_ch4SweepKnob, KNOB_X4, KNOB_Y4, "Frequency sweep", "", "" )
 	
 	makenesled( m_ch4EnabledBtn, KNOB_X1, KNOB_Y4 - 12, "Enable channel 4" )
 	makenesled( m_ch4EnvEnabledBtn, KNOB_X3, KNOB_Y4 - 12, "Enable envelope 4" )
 	makenesled( m_ch4EnvLoopedBtn, 129, KNOB_Y4 - 12, "Enable envelope 4 loop" )
 
-	makenesled( m_ch4NoiseModeBtn, 129, 203, "Noise mode" )
-	makenesled( m_ch4NoiseFreqModeBtn,  129, 224, "Use note frequency for noise" )
+	makenesled( m_ch4NoiseQuantizeBtn, 162, KNOB_Y4 - 12, "Quantize noise frequency when using note frequency" )
+	
+	makenesled( m_ch4NoiseFreqModeBtn,  148, 203, "Use note frequency for noise" )
+	makenesled( m_ch4NoiseModeBtn, 148, 224, "Noise mode" )
 
 	
 	//master
@@ -865,6 +897,9 @@ void NesInstrumentView::modelChanged()
 	m_ch4NoiseModeBtn->setModel( &nes->m_ch4NoiseMode );
 	m_ch4NoiseFreqModeBtn->setModel( &nes->m_ch4NoiseFreqMode );
 	m_ch4NoiseFreqKnob->setModel( &nes->m_ch4NoiseFreq );
+
+	m_ch4SweepKnob->setModel( &nes->m_ch4Sweep );
+	m_ch4NoiseQuantizeBtn->setModel( &nes->m_ch4NoiseQuantize );
 
 	//master
 	m_masterVolKnob->setModel( &nes->m_masterVol );
