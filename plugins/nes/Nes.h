@@ -86,6 +86,7 @@ public:
 	
 	void renderOutput( sampleFrame * buf, fpp_t frames );
 	void updateVibrato( float * freq );
+	void updatePitch();
 	
 	void updateLFSR( bool mode )
 	{
@@ -131,6 +132,19 @@ public:
 			: powf( f, e );
 	}
 	
+	inline int nearestNoiseFreq( float f )
+	{
+		int n = 15;
+		for( int i = 15; i >= 0; i-- )
+		{
+			if( f >= NOISE_FREQS[ i ] )
+			{
+				n = i;
+			}
+		}
+		return n;
+	}
+	
 private:
 	NesInstrument * m_parent;
 	const sample_rate_t m_samplerate;
@@ -155,6 +169,7 @@ private:
 	
 	int m_ch1SweepCounter;
 	int m_ch2SweepCounter;
+	int m_ch4SweepCounter;
 	
 	uint16_t m_LFSR;
 	
@@ -162,6 +177,7 @@ private:
 	float m_34Last;
 
 	float m_lastNoteFreq;
+	float m_lastNoiseFreq;
 	
 	int m_maxWlen;
 	
@@ -262,6 +278,9 @@ private:
 	BoolModel	m_ch4NoiseFreqMode;
 	FloatModel	m_ch4NoiseFreq;
 	
+	FloatModel	m_ch4Sweep;
+	BoolModel	m_ch4NoiseQuantize;
+	
 	//master
 	FloatModel	m_masterVol;
 	FloatModel	m_vibrato;
@@ -329,6 +348,9 @@ private:
 	pixmapButton * 	m_ch4NoiseModeBtn;
 	pixmapButton * 	m_ch4NoiseFreqModeBtn;
 	knob *			m_ch4NoiseFreqKnob;
+	
+	knob *			m_ch4SweepKnob;
+	pixmapButton *	m_ch4NoiseQuantizeBtn;
 	
 	//master
 	knob *			m_masterVolKnob;
