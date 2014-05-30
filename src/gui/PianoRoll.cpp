@@ -172,7 +172,11 @@ PianoRoll::PianoRoll() :
 	m_editMode( ModeDraw ),
 	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
-	m_scrollBack( false )
+	m_scrollBack( false ),
+	m_gridColor( 0, 0, 0 ),
+	m_noteModeColor( 0, 0, 0 ),
+	m_noteColor( 0, 0, 0 ),
+	m_barColor( 0, 0, 0 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Volume" ) );
@@ -832,10 +836,36 @@ void PianoRoll::setPauseIcon( bool pause )
 }
 
 
+/** \brief qproperty access implementation */
+
+QColor PianoRoll::gridColor() const
+{ return m_gridColor; }
+
+void PianoRoll::setGridColor( const QColor & c )
+{ m_gridColor = c; }
+
+QColor PianoRoll::noteModeColor() const
+{ return m_noteModeColor; }
+
+void PianoRoll::setNoteModeColor( const QColor & c )
+{ m_noteModeColor = c; }
+
+QColor PianoRoll::noteColor() const
+{ return m_noteColor; }
+
+void PianoRoll::setNoteColor( const QColor & c )
+{ m_noteColor = c; }
+
+QColor PianoRoll::barColor() const
+{ return m_barColor; }
+
+void PianoRoll::setBarColor( const QColor & c )
+{ m_barColor = c; }
+
 
 
 inline void PianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
-					int _width, note * _n )
+					int _width, note * _n, const QColor & noteCol )
 {
 	++_x;
 	++_y;
@@ -846,9 +876,8 @@ inline void PianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 		_width = 2;
 	}
 
-	int volVal = qMin( 255, (int) (
-			( (float)( _n->getVolume() - MinVolume ) ) /
-			( (float)( MaxVolume - MinVolume ) ) * 255.0f) );
+	int volVal = qMin( 255, 25 + (int) ( ( (float)( _n->getVolume() - MinVolume ) ) /
+			( (float)( MaxVolume - MinVolume ) ) * 230.0f) );
 	float rightPercent = qMin<float>( 1.0f,
 			( (float)( _n->getPanning() - PanningLeft ) ) /
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
@@ -857,8 +886,7 @@ inline void PianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 			( (float)( PanningRight - _n->getPanning() ) ) /
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	const QColor defaultNoteColor( 0x77, 0xC7, 0xD8 );
-	QColor col = defaultNoteColor;
+	QColor col = QColor( noteCol );
 
 	if( _n->length() < 0 )
 	{
@@ -894,13 +922,13 @@ inline void PianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	_p.setPen( Qt::SolidLine );
 	_p.setBrush( Qt::NoBrush );
 
-	col = defaultNoteColor;
+	col = QColor( noteCol );
 	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(),
 					qMin<float>( 255, volVal*1.7f ) ) );
 	_p.drawLine( _x, _y, _x + _width, _y );
 	_p.drawLine( _x, _y, _x, _y + KEY_LINE_HEIGHT - 2 );
 
-	col = defaultNoteColor;
+	col = QColor( noteCol );
 	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(), volVal/1.7 ) );
 	_p.drawLine( _x + _width, _y, _x + _width, _y + KEY_LINE_HEIGHT - 2 );
 	_p.drawLine( _x, _y + KEY_LINE_HEIGHT - 2, _x + _width,
@@ -908,7 +936,7 @@ inline void PianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 
 	// that little tab thing on the end hinting at the user
 	// to resize the note
-	_p.setPen( defaultNoteColor.lighter( 200 ) );
+	_p.setPen( noteCol.lighter( 200 ) );
 	if( _width > 2 )
 	{
 		_p.drawLine( _x + _width - 3, _y + 2, _x + _width - 3,
@@ -927,7 +955,7 @@ inline void PianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 								int _y )
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
-	_p.setPen( QColor( 0x99, 0xAF, 0xFF ) );
+	_p.setPen( noteColor() );
 
 	int old_x = 0;
 	int old_y = 0;
@@ -2851,10 +2879,18 @@ static void printNoteHeights(QPainter& p, int bottom, int width, int startKey)
 
 void PianoRoll::paintEvent( QPaintEvent * _pe )
 {
+	QColor horizCol = QColor( gridColor() );
+	QColor vertCol = QColor( gridColor() );
+	
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
+
+	QColor bgColor = p.background().color();
+	
+	// fill with bg color
+	p.fillRect( 0,0, width(), height(), bgColor );
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
@@ -2965,21 +3001,19 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 		// label C-keys...
 		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 		{
+			const QString cLabel = "C" + QString::number( static_cast<int>( key / KeysPerOctave ) );
 			p.setPen( QColor( 240, 240, 240 ) );
-			p.drawText( C_KEY_LABEL_X + 1, y+14, "C" +
-					QString::number( static_cast<int>( key /
-							KeysPerOctave ) ) );
+			p.drawText( C_KEY_LABEL_X + 1, y+14, cLabel );
 			p.setPen( QColor( 0, 0, 0 ) );
-			p.drawText( C_KEY_LABEL_X, y + 13, "C" +
-					QString::number( static_cast<int>( key /
-							KeysPerOctave ) ) );
-			p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
+			p.drawText( C_KEY_LABEL_X, y + 13, cLabel );
+			horizCol.setAlpha( 192 );
 		}
 		else
 		{
-			p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+			horizCol.setAlpha( 128 );
 		}
 		// draw key-line
+		p.setPen( horizCol );
 		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
 		++key;
 	}
@@ -3057,14 +3091,13 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 	// erase the area below the piano, because there might be keys that
 	// should be only half-visible
 	p.fillRect( QRect( 0, keyAreaBottom(),
-			WHITE_KEY_WIDTH, noteEditBottom()-keyAreaBottom() ),
-			QColor( 0, 0, 0 ) );
+			WHITE_KEY_WIDTH, noteEditBottom()-keyAreaBottom() ), bgColor );
 
 	// display note editing info
 	QFont f = p.font();
 	f.setBold( false );
 	p.setFont( pointSize<10>( f ) );
-	p.setPen( QColor( 255, 255, 255) );
+	p.setPen( noteModeColor() );
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ),
 			   Qt::AlignCenter | Qt::TextWordWrap,
@@ -3107,17 +3140,19 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 			// every tact-start needs to be a bright line
 			if( tact_16th % spt == 0 )
 			{
-	 			p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
+	 			p.setPen( gridColor() );
 			}
 			// normal line
 			else if( tact_16th % 4 == 0 )
 			{
-				p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
+				vertCol.setAlpha( 160 );
+				p.setPen( vertCol );
 			}
 			// weak line
 			else
 			{
-				p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+				vertCol.setAlpha( 128 );
+				p.setPen( vertCol );
 			}
 
 			p.drawLine( (int)x, PR_TOP_MARGIN, (int)x, height() -
@@ -3126,7 +3161,8 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 			// extra 32nd's line
 			if( show32nds )
 			{
-				p.setPen( QColor( 0x22, 0x22, 0x22 ) );
+				vertCol.setAlpha( 80 );
+				p.setPen( vertCol );
 				p.drawLine( (int)(x + pp16th/2) , PR_TOP_MARGIN,
 						(int)(x + pp16th/2), height() -
 						PR_BOTTOM_MARGIN );
@@ -3205,15 +3241,14 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 				// note
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
-								note_width, *it );
+								note_width, *it, noteColor() );
 			}
 
 			// draw note editing stuff
 			int editHandleTop = 0;
 			if( m_noteEditMode == NoteEditVolume )
 			{
-				QColor color = QColor::fromHsv( 140, 221,
-						qMin(255, 60 + ( *it )->getVolume() ) );
+				QColor color = barColor().lighter( 30 + ( ( *it )->getVolume() * 90 / MaxVolume ) );
 				if( ( *it )->selected() )
 				{
 					color.setRgb( 0x00, 0x40, 0xC0 );
@@ -3231,7 +3266,7 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				QColor color( 0x99, 0xAF, 0xFF );
+				QColor color( noteColor() );
 				if( ( *it )->selected() )
 				{
 					color.setRgb( 0x00, 0x40, 0xC0 );
@@ -3259,8 +3294,7 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 		}
 
-		p.setPen( QPen( QColor( 0x99, 0xAF, 0xFF ),
-				NE_LINE_WIDTH+2 ) );
+		p.setPen( QPen( noteColor(), NE_LINE_WIDTH+2 ) );
 		p.drawPoints( editHandles );
 
 	}
@@ -3269,7 +3303,8 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 		QFont f = p.font();
 		f.setBold( true );
 		p.setFont( pointSize<14>( f ) );
-		p.setPen( QColor( 0x4A, 0xFD, 0x85 ) );
+		p.setPen( QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ) );
 		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
 				tr( "Please open a pattern by double-clicking "
 								"on it!" ) );
@@ -3299,21 +3334,21 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
+	// set alpha for horizontal lines
+	horizCol.setAlpha( 64 );
+
 	// horizontal line for the key under the cursor
 	if( validPattern() == true )
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
 		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
-					( key_num - m_startKey + 1 ),
-				width() - 10, KEY_LINE_HEIGHT - 7,
-							QColor( 64, 64, 64 ) );
+					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, horizCol );
 	}
 
 	// bar to resize note edit area
 	p.setClipRect( 0, 0, width(), height() );
 	p.fillRect( QRect( 0, keyAreaBottom(),
-					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ),
-			   QColor( 64, 64, 64 ) );
+					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), horizCol );
 
 	const QPixmap * cursor = NULL;
 	// draw current edit-mode-icon below the cursor

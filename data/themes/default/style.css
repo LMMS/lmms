@@ -95,6 +95,10 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: rgb(0, 0, 0);
+	qproperty-gridColor: rgb( 128, 128, 128 );
+	qproperty-noteModeColor: rgb( 255, 255, 255 );
+	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-barColor: #4afd85;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
