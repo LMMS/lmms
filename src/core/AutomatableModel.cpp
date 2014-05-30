@@ -703,7 +703,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 		{
 			// scale/fit the value appropriately and return it
 			const float value = latestPattern->valueAt( time - latestPattern->startPosition() );
-			const float scaled_value =
+			const float scaledValue =
 				( m_scaleType == Linear )
 				? value
 				: logToLinearScale(
