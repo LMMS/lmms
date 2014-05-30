@@ -347,6 +347,9 @@ private:
 	void computeSelectedNotes( bool shift );
 	void clearSelectedNotes();
 
+	// did we start a mouseclick with shift pressed
+	bool m_startedWithShift;
+
 	friend class engine;
 
 
