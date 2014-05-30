@@ -105,7 +105,8 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
-	m_mutedModel( false, this, tr( "Muted" ) )
+	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_selectViewOnCreate( false )
 {
 	if( getTrack() )
 	{
@@ -248,7 +249,8 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	m_trackView( _tv ),
 	m_action( NoAction ),
 	m_autoResize( false ),
-	m_initialMouseX( 0 ),
+	m_initialMousePos( QPoint( 0, 0 ) ),
+	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_hint( NULL ),
 	m_fgColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 )
@@ -436,8 +438,17 @@ void trackContentObjectView::updatePosition()
  */
 void trackContentObjectView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "tco_" +
-				QString::number( m_tco->getTrack()->type() ) );
+	trackContentWidget * tcw = getTrackView()->getTrackContentWidget();
+	MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
+	if( tcw->canPasteSelection( tcoPos, _dee->mimeData() ) == false )
+	{
+		_dee->ignore();
+	}
+	else
+	{
+		stringPairDrag::processDragEnterEvent( _dee, "tco_" +
+					QString::number( m_tco->getTrack()->type() ) );
+	}
 }
 
 
@@ -456,19 +467,41 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
-	if( type == ( "tco_" + QString::number( m_tco->getTrack()->type() ) ) )
+
+	// Track must be the same type to paste into
+	if( type != ( "tco_" + QString::number( m_tco->getTrack()->type() ) ) )
 	{
-		// value contains our XML-data so simply create a
-		// DataFile which does the rest for us...
-		DataFile dataFile( value.toUtf8() );
-		// at least save position before getting to moved to somewhere
-		// the user doesn't expect...
-		MidiTime pos = m_tco->startPosition();
-		m_tco->restoreState( dataFile.content().firstChild().toElement() );
- 		m_tco->movePosition( pos );
-		AutomationPattern::resolveAllIDs();
-		_de->accept();
+		return;
 	}
+
+	// Defer to rubberband paste if we're in that mode
+	if( m_trackView->trackContainerView()->allowRubberband() == true )
+	{
+		trackContentWidget * tcw = getTrackView()->getTrackContentWidget();
+		MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
+		if( tcw->pasteSelection( tcoPos, _de ) == true )
+		{
+			_de->accept();
+		}
+		return;
+	}
+
+	// Don't allow pasting a tco into itself.
+	QWidget * qwSource = _de->source();
+	if( qwSource != NULL &&
+	    dynamic_cast<trackContentObjectView *>( qwSource ) == this )
+	{
+		return;
+	}
+
+	// Copy state into existing tco
+	DataFile dataFile( value.toUtf8() );
+	MidiTime pos = m_tco->startPosition();
+	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
+	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
+	m_tco->movePosition( pos );
+	AutomationPattern::resolveAllIDs();
+	_de->accept();
 }
 
 
@@ -490,8 +523,54 @@ void trackContentObjectView::leaveEvent( QEvent * _e )
 	}
 }
 
+/*! \brief Create a DataFile suitable for copying multiple trackContentObjects.
+ *
+ *	trackContentObjects in the vector are written to the "tcos" node in the
+ *  DataFile.  The trackContentObjectView's initial mouse position is written
+ *  to the "initialMouseX" node in the DataFile.  When dropped on a track,
+ *  this is used to create copies of the TCOs.
+ *
+ * \param tcos The trackContectObjects to save in a DataFile
+ */
+DataFile trackContentObjectView::createTCODataFiles(
+    				const QVector<trackContentObjectView *> & tcoViews) const
+{
+	track * t = m_trackView->getTrack();
+	TrackContainer * tc = t->trackContainer();
+	DataFile dataFile( DataFile::DragNDropData );
+	QDomElement tcoParent = dataFile.createElement( "tcos" );
 
+	typedef QVector<trackContentObjectView *> tcoViewVector;
+	for( tcoViewVector::const_iterator it = tcoViews.begin();
+			it != tcoViews.end(); ++it )
+	{
+		// Insert into the dom under the "tcos" element
+		int trackIndex = tc->tracks().indexOf( ( *it )->m_trackView->getTrack() );
+		QDomElement tcoElement = dataFile.createElement( "tco" );
+		tcoElement.setAttribute( "trackIndex", trackIndex );
+		( *it )->m_tco->saveState( dataFile, tcoElement );
+		tcoParent.appendChild( tcoElement );
+	}
 
+	dataFile.content().appendChild( tcoParent );
+
+	// Add extra metadata needed for calculations later
+	int initialTrackIndex = tc->tracks().indexOf( t );
+	if( initialTrackIndex < 0 )
+	{
+		printf("Failed to find selected track in the TrackContainer.\n");
+		return dataFile;
+	}
+	QDomElement metadata = dataFile.createElement( "copyMetadata" );
+	// initialTrackIndex is the index of the track that was touched
+	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
+	// grabbedTCOPos is the pos of the tact containing the TCO we grabbed
+	metadata.setAttribute( "grabbedTCOPos", m_tco->startPosition() );
+
+	dataFile.content().appendChild( metadata );
+
+	return dataFile;
+}
 
 /*! \brief Handle a mouse press on this trackContentObjectView.
  *
@@ -510,34 +589,41 @@ void trackContentObjectView::leaveEvent( QEvent * _e )
  */
 void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 {
+	setInitialMousePos( _me->pos() );
 	if( m_trackView->trackContainerView()->allowRubberband() == true &&
-					_me->button() == Qt::LeftButton )
+	    _me->button() == Qt::LeftButton )
 	{
-		// if rubberband is active, we can be selected
-		if( !m_trackView->trackContainerView()->rubberBandActive() )
+		if( m_trackView->trackContainerView()->rubberBandActive() == true )
 		{
-			if( _me->modifiers() & Qt::ControlModifier )
-			{
-				setSelected( !isSelected() );
-			}
-			else if( isSelected() == true )
-			{
-				m_action = MoveSelection;
-				m_initialMouseX = _me->x();
-			}
-		}
-		else
-		{
+			// Propagate to trackView for rubberbanding
 			selectableObject::mousePressEvent( _me );
 		}
-		return;
+		else if ( _me->modifiers() & Qt::ControlModifier )
+		{
+			if( isSelected() == true )
+			{
+				m_action = CopySelection;
+			}
+			else
+			{
+				m_action = ToggleSelected;
+			}
+		}
+		else if( !_me->modifiers() )
+		{
+			if( isSelected() == true )
+			{
+				m_action = MoveSelection;
+			}
+		}
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			_me->modifiers() & Qt::ControlModifier )
+			 _me->modifiers() & Qt::ControlModifier )
 	{
 		// start drag-action
-		DataFile dataFile( DataFile::DragNDropData );
-		m_tco->saveState( dataFile, dataFile.content() );
+		QVector<trackContentObjectView *> tcoViews;
+		tcoViews.push_back( this );
+		DataFile dataFile = createTCODataFiles( tcoViews );
 		QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
 						128, 128,
 						Qt::KeepAspectRatio,
@@ -555,7 +641,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		// move or resize
 		m_tco->setJournalling( false );
 
-		m_initialMouseX = _me->x();
+		setInitialMousePos( _me->pos() );
 
 		if( _me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
@@ -630,6 +716,46 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
  */
 void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 {
+	if( m_action == CopySelection )
+	{
+		if( mouseMovedDistance( _me, 2 ) == true &&
+		    m_trackView->trackContainerView()->allowRubberband() == true &&
+		    m_trackView->trackContainerView()->rubberBandActive() == false &&
+		    ( _me->modifiers() & Qt::ControlModifier ) )
+		{
+			// Clear the action here because mouseReleaseEvent will not get
+			// triggered once we go into drag.
+			m_action = NoAction;
+
+			// Collect all selected TCOs
+			QVector<trackContentObjectView *> tcoViews;
+			QVector<selectableObject *> so =
+				m_trackView->trackContainerView()->selectedObjects();
+			for( QVector<selectableObject *>::iterator it = so.begin();
+					it != so.end(); ++it )
+			{
+				trackContentObjectView * tcov =
+					dynamic_cast<trackContentObjectView *>( *it );
+				if( tcov != NULL )
+				{
+					tcoViews.push_back( tcov );
+				}
+			}
+
+			// Write the TCOs to the DataFile for copying
+			DataFile dataFile = createTCODataFiles( tcoViews );
+
+			// TODO -- thumbnail for all selected
+			QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
+				128, 128,
+				Qt::KeepAspectRatio,
+				Qt::SmoothTransformation );
+			new stringPairDrag( QString( "tco_%1" ).arg(
+								m_tco->getTrack()->type() ),
+								dataFile.toString(), thumbnail, this );
+		}
+	}
+
 	if( _me->modifiers() & Qt::ControlModifier )
 	{
 		delete m_hint;
@@ -639,7 +765,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	if( m_action == Move )
 	{
-		const int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
+		const int x = mapToParent( _me->pos() ).x() - m_initialMousePos.x();
 		MidiTime t = qMax( 0, (int)
 			m_trackView->trackContainerView()->currentPosition()+
 				static_cast<int>( x * MidiTime::ticksPerTact() /
@@ -660,7 +786,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_action == MoveSelection )
 	{
-		const int dx = _me->x() - m_initialMouseX;
+		const int dx = _me->x() - m_initialMousePos.x();
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<trackContentObject *> tcos;
@@ -720,7 +846,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if( _me->x() > width() - RESIZE_GRIP_WIDTH )
+		if( _me->x() > width() - RESIZE_GRIP_WIDTH && !_me->buttons() )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -753,6 +879,16 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
  */
 void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 {
+	// If the CopySelection was chosen as the action due to mouse movement,
+	// it will have been cleared.  At this point Toggle is the desired action.
+	// An active stringPairDrag will prevent this method from being called,
+	// so a real CopySelection would not have occurred.
+	if( m_action == CopySelection ||
+	    ( m_action == ToggleSelected && mouseMovedDistance( _me, 2 ) == false ) )
+	{
+		setSelected( !isSelected() );
+	}
+
 	if( m_action == Move || m_action == Resize )
 	{
 		m_tco->setJournalling( true );
@@ -829,6 +965,21 @@ float trackContentObjectView::pixelsPerTact()
 void trackContentObjectView::setAutoResizeEnabled( bool _e )
 {
 	m_autoResize = _e;
+}
+
+
+
+
+/*! \brief Detect whether the mouse moved more than n pixels on screen.
+ *
+ * \param _me The QMouseEvent.
+ * \param distance The threshold distance that the mouse has moved to return true.
+ */
+bool trackContentObjectView::mouseMovedDistance( QMouseEvent * _me, int distance )
+{
+	QPoint dPos = mapToGlobal( _me->pos() ) - m_initialMouseGlobalPos;
+	const int pixelsMoved = dPos.manhattanLength();
+	return ( pixelsMoved > distance || pixelsMoved < -distance );
 }
 
 
@@ -1081,17 +1232,196 @@ void trackContentWidget::changePosition( const MidiTime & _new_pos )
 
 
 
+/*! \brief Return the position of the trackContentWidget in Tacts.
+ *
+ * \param _mouse_x the mouse's current X position in pixels.
+ */
+MidiTime trackContentWidget::getPosition( int _mouse_x )
+{
+	TrackContainerView * tv = m_trackView->trackContainerView();
+	return MidiTime( tv->currentPosition() +
+					 _mouse_x *
+					 MidiTime::ticksPerTact() /
+					 static_cast<int>( tv->pixelsPerTact() ) );
+}
+
+
+
+
 /*! \brief Respond to a drag enter event on the trackContentWidget
  *
  * \param _dee the Drag Enter Event to respond to
  */
 void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "tco_" +
-					QString::number( getTrack()->type() ) );
+	MidiTime tcoPos = MidiTime( getPosition( _dee->pos().x() ).getTact(), 0 );
+	if( canPasteSelection( tcoPos, _dee->mimeData() ) == false )
+	{
+		_dee->ignore();
+	}
+	else
+	{
+		stringPairDrag::processDragEnterEvent( _dee, "tco_" +
+						QString::number( getTrack()->type() ) );
+	}
 }
 
 
+
+
+/*! \brief Returns whether a selection of TCOs can be pasted into this
+ *
+ * \param tcoPos the position of the TCO slot being pasted on
+ * \param _de the DropEvent generated
+ */
+bool trackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData )
+{
+	track * t = getTrack();
+	QString type = stringPairDrag::decodeMimeKey( mimeData );
+	QString value = stringPairDrag::decodeMimeValue( mimeData );
+
+	// We can only paste into tracks of the same type
+	if( type != ( "tco_" + QString::number( t->type() ) ) ||
+		m_trackView->trackContainerView()->fixedTCOs() == true )
+	{
+		return false;
+	}
+
+	// value contains XML needed to reconstruct TCOs and place them
+	DataFile dataFile( value.toUtf8() );
+
+	// Extract the metadata and which TCO was grabbed
+	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
+	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
+	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
+	MidiTime grabbedTCOTact = MidiTime( grabbedTCOPos.getTact(), 0 );
+
+	// Extract the track index that was originally clicked
+	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
+	const int initialTrackIndex = tiAttr.value().toInt();
+
+	// Get the current track's index
+	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
+	const int currentTrackIndex = tracks.indexOf( t );
+
+	// Don't paste if we're on the same tact
+	if( tcoPos == grabbedTCOTact && currentTrackIndex == initialTrackIndex )
+	{
+		return false;
+	}
+
+	// Extract the tco data
+	QDomElement tcoParent = dataFile.content().firstChildElement( "tcos" );
+	QDomNodeList tcoNodes = tcoParent.childNodes();
+
+	// Determine if all the TCOs will land on a valid track
+	for( int i = 0; i<tcoNodes.length(); i++ )
+	{
+		QDomElement tcoElement = tcoNodes.item( i ).toElement();
+		int trackIndex = tcoElement.attributeNode( "trackIndex" ).value().toInt();
+		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
+
+		// Track must be in TrackContainer's tracks
+		if( finalTrackIndex < 0 || finalTrackIndex >= tracks.size() )
+		{
+			return false;
+		}
+
+		// Track must be of the same type
+		track * startTrack = tracks.at( trackIndex );
+		track * endTrack = tracks.at( finalTrackIndex );
+		if( startTrack->type() != endTrack->type() )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*! \brief Pastes a selection of TCOs onto the track
+ *
+ * \param tcoPos the position of the TCO slot being pasted on
+ * \param _de the DropEvent generated
+ */
+bool trackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
+{
+	if( canPasteSelection( tcoPos, _de->mimeData() ) == false )
+	{
+		return false;
+	}
+
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+
+	getTrack()->addJournalCheckPoint();
+
+	// value contains XML needed to reconstruct TCOs and place them
+	DataFile dataFile( value.toUtf8() );
+
+	// Extract the tco data
+	QDomElement tcoParent = dataFile.content().firstChildElement( "tcos" );
+	QDomNodeList tcoNodes = tcoParent.childNodes();
+
+	// Extract the track index that was originally clicked
+	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
+	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
+	int initialTrackIndex = tiAttr.value().toInt();
+	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
+	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
+	MidiTime grabbedTCOTact = MidiTime( grabbedTCOPos.getTact(), 0 );
+
+	// Snap the mouse position to the beginning of the dropped tact, in ticks
+	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
+	const int currentTrackIndex = tracks.indexOf( getTrack() );
+
+	bool allowRubberband = m_trackView->trackContainerView()->allowRubberband();
+
+	// Unselect the old group
+	if( allowRubberband == true )
+	{
+		const QVector<selectableObject *> so =
+			m_trackView->trackContainerView()->selectedObjects();
+		for( QVector<selectableObject *>::const_iterator it = so.begin();
+		    	it != so.end(); ++it )
+		{
+			( *it )->setSelected( false );
+		}
+	}
+
+	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
+	// onto their final position.
+
+	for( int i = 0; i<tcoNodes.length(); i++ )
+	{
+		QDomElement outerTCOElement = tcoNodes.item( i ).toElement();
+		QDomElement tcoElement = outerTCOElement.firstChildElement();
+
+		int trackIndex = outerTCOElement.attributeNode( "trackIndex" ).value().toInt();
+		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
+		track * t = tracks.at( finalTrackIndex );
+
+		// Compute the final position by moving the tco's pos by
+		// the number of tacts between the first TCO and the mouse drop TCO
+		MidiTime oldPos = tcoElement.attributeNode( "pos" ).value().toInt();
+		MidiTime offset = oldPos - MidiTime( oldPos.getTact(), 0 );
+		MidiTime oldTact = MidiTime( oldPos.getTact(), 0 );
+		MidiTime delta = offset + ( oldTact - grabbedTCOTact );
+		MidiTime pos = tcoPos + delta;
+
+		trackContentObject * tco = t->createTCO( pos );
+		tco->restoreState( tcoElement );
+		tco->movePosition( pos );
+		if( allowRubberband == true )
+		{
+			tco->selectViewOnCreate( true );
+		}
+	}
+
+	AutomationPattern::resolveAllIDs();
+
+	return true;
+}
 
 
 /*! \brief Respond to a drop event on the trackContentWidget
@@ -1100,31 +1430,12 @@ void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
  */
 void trackContentWidget::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
-	if( type == ( "tco_" + QString::number( getTrack()->type() ) ) &&
-		m_trackView->trackContainerView()->fixedTCOs() == false )
+	MidiTime tcoPos = MidiTime( getPosition( _de->pos().x() ).getTact(), 0 );
+	if( pasteSelection( tcoPos, _de ) == true )
 	{
-		const MidiTime pos = getPosition( _de->pos().x()
-                            ).getTact() * MidiTime::ticksPerTact();
-		getTrack()->addJournalCheckPoint();
-		trackContentObject * tco = getTrack()->createTCO( pos );
-
-		// value contains our XML-data so simply create a
-		// DataFile which does the rest for us...
-		DataFile dataFile( value.toUtf8() );
-		// at least save position before getting moved to somewhere
-		// the user doesn't expect...
-		tco->restoreState( dataFile.content().firstChild().toElement() );
-		tco->movePosition( pos );
-
-		AutomationPattern::resolveAllIDs();
-
 		_de->accept();
 	}
 }
-
-
 
 
 
@@ -1207,21 +1518,6 @@ track * trackContentWidget::getTrack()
 
 
 
-/*! \brief Return the position of the trackContentWidget in Tacts.
- *
- * \param _mouse_x the mouse's current X position in pixels.
- */
-MidiTime trackContentWidget::getPosition( int _mouse_x )
-{
-	return MidiTime( m_trackView->trackContainerView()->
-					currentPosition() + _mouse_x *
-						MidiTime::ticksPerTact() /
-			static_cast<int>( m_trackView->
-				trackContainerView()->pixelsPerTact() ) );
-}
-
-
-
 /*! \brief Return the end position of the trackContentWidget in Tacts.
  *
  * \param _pos_start the starting position of the Widget (from getPosition())
@@ -1232,6 +1528,8 @@ MidiTime trackContentWidget::endPosition( const MidiTime & _pos_start )
 	const int w = width();
 	return _pos_start + static_cast<int>( w * MidiTime::ticksPerTact() / ppt );
 }
+
+
 
 
 // qproperty access methods
@@ -1536,7 +1834,7 @@ void trackOperationsWidget::recordingOff()
 			if( ap ) { ap->setRecording( false ); }
 		}
 		atv->update();
-	}	
+	}
 }
 
 
@@ -2445,9 +2743,13 @@ void trackView::paintEvent( QPaintEvent * _pe )
  */
 void trackView::createTCOView( trackContentObject * _tco )
 {
-	_tco->createView( this );
+	trackContentObjectView * tv = _tco->createView( this );
+	if( _tco->getSelectViewOnCreate() == true )
+	{
+		tv->setSelected( true );
+	}
+	_tco->selectViewOnCreate( false );
 }
-
 
 
 
