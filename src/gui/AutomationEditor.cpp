@@ -1,6 +1,6 @@
 /*
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
- *                        actual setting of dynamic values
+ *						actual setting of dynamic values
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2013 Paul Giblock <pgib/at/users.sourceforge.net>
@@ -98,7 +98,10 @@ AutomationEditor::AutomationEditor() :
 	m_y_delta( DEFAULT_Y_DELTA ),
 	m_y_auto( TRUE ),
 	m_editMode( DRAW ),
-	m_scrollBack( FALSE )
+	m_scrollBack( FALSE ),
+	m_gridColor( 0,0,0 ),
+	m_graphColor( 0,0,0 ),
+	m_vertexColor( 0,0,0 )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -358,7 +361,7 @@ AutomationEditor::AutomationEditor() :
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 
 	m_zoomingYModel.addItem( "Auto" );
-	for( int i = 0; i < 6; ++i )
+	for( int i = 0; i < 7; ++i )
 	{
 		m_zoomingYModel.addItem( QString::number( 25 << i ) + "%" );
 	}
@@ -377,15 +380,13 @@ AutomationEditor::AutomationEditor() :
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
-	// TODO: leak
-	ComboBoxModel * quantize_model = new ComboBoxModel( /* this */ );
 	for( int i = 0; i < 7; ++i )
 	{
-		quantize_model->addItem( "1/" + QString::number( 1 << i ) );
+		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
-	quantize_model->setValue( quantize_model->findText( "1/16" ) );
+	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
-	m_quantizeComboBox->setModel( quantize_model );
+	m_quantizeComboBox->setModel( &m_quantizeModel );
 
 
 	tb_layout->addSpacing( 5 );
@@ -456,6 +457,7 @@ AutomationEditor::~AutomationEditor()
 {
 	m_zoomingXModel.disconnect();
 	m_zoomingYModel.disconnect();
+	m_quantizeModel.disconnect();
 	m_tensionModel->disconnect();
 }
 
@@ -502,6 +504,20 @@ void AutomationEditor::setPauseIcon( bool pause )
 	}
 }
 
+// qproperty access methods
+
+QColor AutomationEditor::gridColor() const
+{ return m_gridColor; }
+QColor AutomationEditor::graphColor() const
+{ return m_graphColor; }
+QColor AutomationEditor::vertexColor() const
+{ return m_vertexColor; }
+void AutomationEditor::setGridColor( const QColor & c )
+{ m_gridColor = c; }
+void AutomationEditor::setGraphColor( const QColor & c )
+{ m_graphColor = c; }
+void AutomationEditor::setVertexColor( const QColor & c )
+{ m_vertexColor = c; }
 
 
 
@@ -1454,34 +1470,34 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
 		for( tick = m_currentPosition - m_currentPosition % quantization(),
-			     x = xCoordOfTick( tick );
-		     x<=width(); 
-		     tick += quantization(), x = xCoordOfTick( tick ) ) 
-		{					
+				 x = xCoordOfTick( tick );
+			 x<=width();
+			 tick += quantization(), x = xCoordOfTick( tick ) )
+		{
 			p.setPen( QColor( 0x2F, 0x2F, 0x2F ) );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
-		// Then beat grid 
-		int ticksPerBeat = DefaultTicksPerTact / 
+		// Then beat grid
+		int ticksPerBeat = DefaultTicksPerTact /
 			engine::getSong()->getTimeSigModel().getDenominator();
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-			     x = xCoordOfTick( tick );
-		     x<=width(); 
-		     tick += ticksPerBeat, x = xCoordOfTick( tick ) ) 
-		{					
+				 x = xCoordOfTick( tick );
+			 x<=width();
+			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		{
 			p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 		// and finally bars
 		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
-			     x = xCoordOfTick( tick );
-		     x<=width(); 
-		     tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) ) 
+				 x = xCoordOfTick( tick );
+			 x<=width();
+			 tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
 		{
 			p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
-		
+
 		/// \todo move this horizontal line drawing code into the same loop as the value ticks?
 		if( m_y_auto )
 		{
@@ -1743,10 +1759,12 @@ void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
 		}
 		_p.fillRect( x, y_start, rect_width, rect_height, current_color );
 	}
+	
 	else
 	{
 		printf("not in range\n");
 	}
+	
 }
 
 
@@ -1798,25 +1816,48 @@ void AutomationEditor::resizeEvent( QResizeEvent * )
 void AutomationEditor::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	if( _we->modifiers() & Qt::ControlModifier )
+	if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::ShiftModifier )
 	{
+		int y = m_zoomingYModel.value();
 		if( _we->delta() > 0 )
 		{
-			m_ppt = qMin( m_ppt * 2, m_y_delta *
-						DEFAULT_STEPS_PER_TACT * 8 );
+			y++;
 		}
-		else if( m_ppt >= 72 )
+		if( _we->delta() < 0 )
 		{
-			m_ppt /= 2;
+			y--;
 		}
-		// update combobox with zooming-factor
-		m_zoomingXComboBox->model()->setValue(
-			m_zoomingXComboBox->model()->findText( QString::number(
-					qRound( m_ppt * 100 /
-						DEFAULT_PPT ) ) +"%" ) );
-		// update timeline
-		m_timeLine->setPixelsPerTact( m_ppt );
+		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
+		m_zoomingYModel.setValue( y );	
+	}
+	else if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::AltModifier )
+	{
+		int q = m_quantizeModel.value();
+		if( _we->delta() > 0 )
+		{
+			q--;
+		}
+		if( _we->delta() < 0 )
+		{
+			q++;
+		}
+		q = qBound( 0, q, m_quantizeModel.size() - 1 );
+		m_quantizeModel.setValue( q );
 		update();
+	}
+	else if( _we->modifiers() & Qt::ControlModifier )
+	{
+		int x = m_zoomingXModel.value();
+		if( _we->delta() > 0 )
+		{
+			x++;
+		}
+		if( _we->delta() < 0 )
+		{
+			x--;
+		}
+		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
+		m_zoomingXModel.setValue( x );
 	}
 	else if( _we->modifiers() & Qt::ShiftModifier
 			|| _we->orientation() == Qt::Horizontal )
