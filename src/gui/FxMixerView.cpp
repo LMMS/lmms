@@ -199,6 +199,9 @@ void FxMixerView::refreshDisplay()
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 	}
 	
+	// set selected fx line to 0
+	setCurrentFxLine( 0 );
+	
 	// update all fx lines
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
