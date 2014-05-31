@@ -1370,11 +1370,9 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
 	const int outerRadius = qBound( 2, ( m_ppt * quantization() ) / 576, 5 ); // man, getting this calculation right took forever
-	const int innerRadius = outerRadius - 1;
-	p.setBrush( QBrush( vertexColor().lighter( 200 ) ) );
-	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
+	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
-	p.drawEllipse( x - innerRadius, y - innerRadius, innerRadius * 2, innerRadius * 2 );
+	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
 }
 
 
@@ -1580,8 +1578,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin();
-			p.setPen( graphColor() );
+			timeMap::iterator it = time_map.begin();			
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1618,10 +1615,11 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 				{
 					is_selected = TRUE;
 				}
-
+				
 				float *values = m_pattern->valuesAfter( it.key() );
 				for( int i = 0; i < (it+1).key() - it.key(); i++ )
 				{
+					
 					drawLevelTick( p, it.key() + i, values[i],
 									is_selected );
 				}
@@ -1770,7 +1768,7 @@ void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
 			rect_height = (int)( _level * m_y_delta );
 		}
 
-		QColor current_color( 0x9F, 0xAF, 0xFF );
+		QColor current_color( graphColor() );
 		if( _is_selected == TRUE )
 		{
 			current_color.setRgb( 0x00, 0x40, 0xC0 );
