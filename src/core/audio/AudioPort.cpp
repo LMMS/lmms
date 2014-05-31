@@ -37,7 +37,9 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL )
+	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL ),
+	m_volumeBuffer( NULL ),
+	m_panningBuffer( NULL )
 {
 	engine::mixer()->clearAudioBuffer( m_firstBuffer, engine::mixer()->framesPerPeriod() );
 	engine::mixer()->clearAudioBuffer( m_secondBuffer, engine::mixer()->framesPerPeriod() );
@@ -121,6 +123,8 @@ bool AudioPort::processEffects()
 
 void AudioPort::doProcessing( sampleFrame * )
 {
+	applyValueBuffers();
+
 	const bool me = processEffects();
 	if( me || m_bufferUsage != NoUsage )
 	{
@@ -129,3 +133,43 @@ void AudioPort::doProcessing( sampleFrame * )
 	}
 }
 
+
+void AudioPort::applyValueBuffers()
+{
+	if( m_volumeBuffer )
+	{
+		if( m_bufferUsage != NoUsage )
+		{
+			float * values = m_volumeBuffer->values();
+			lockFirstBuffer();
+			for( f_cnt_t f = 0; f < engine::mixer()->framesPerPeriod(); f++ )
+			{
+				m_firstBuffer[f][0] *= values[f] * 0.01f; // compensate because we expect the volume to be on 0-100 scale
+				m_firstBuffer[f][1] *= values[f] * 0.01f;
+			}
+			unlockFirstBuffer();
+		}
+		// these buffers are single use
+		m_volumeBuffer = NULL;
+	}
+	if( m_panningBuffer )
+	{
+		if( m_bufferUsage != NoUsage )
+		{
+			float * values = m_panningBuffer->values();
+			lockFirstBuffer();
+			for( f_cnt_t f = 0; f < engine::mixer()->framesPerPeriod(); f++ )
+			{
+				m_firstBuffer[f][0] *= values[f] <= 0
+					? 1.0f
+					: 1.0f - values[f] * 0.01f;
+				m_firstBuffer[f][1] *= values[f] >= 0
+					? 1.0f
+					: 1.0f + values[f] * 0.01f;
+			}
+			unlockFirstBuffer();
+		}
+		// these buffers are single use
+		m_panningBuffer = NULL;
+	}
+}

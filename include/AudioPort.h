@@ -22,14 +22,15 @@
  *
  */
 
-#ifndef _AUDIO_PORT_H
-#define _AUDIO_PORT_H
+#ifndef AUDIO_PORT_H
+#define AUDIO_PORT_H
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
 #include "Mixer.h"
+#include "ValueBuffer.h"
 
 class EffectChain;
 
@@ -124,6 +125,17 @@ public:
 		BothBuffers
 	} ;
 
+	inline void setVolumeBuffer( ValueBuffer * vb )
+	{
+		m_volumeBuffer = vb;
+	}
+
+	inline void setPanningBuffer( ValueBuffer * vb )
+	{
+		m_panningBuffer = vb;
+	}
+
+	void applyValueBuffers();
 
 private:
 	volatile bufferUsages m_bufferUsage;
@@ -137,9 +149,11 @@ private:
 	fx_ch_t m_nextFxChannel;
 
 	QString m_name;
-	
+
 	EffectChain * m_effects;
 
+	ValueBuffer * m_volumeBuffer;
+	ValueBuffer * m_panningBuffer;
 
 	friend class Mixer;
 	friend class MixerWorkerThread;

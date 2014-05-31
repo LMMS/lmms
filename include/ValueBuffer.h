@@ -121,6 +121,20 @@ public:
 			m_values[i] = linearInterpolate( start, end, f );
 		}
 	}
+	
+	void multiply( float f )
+	{
+		for( int i = 0; i < m_length; i++ )
+		{
+			m_values[i] *= f;
+		}
+	}
+	
+	ValueBuffer & operator*=( const float & f )
+	{
+		multiply( f );
+		return *this;
+	}
 
 	static ValueBuffer interpolatedBuffer( float start, float end, int length )
 	{
