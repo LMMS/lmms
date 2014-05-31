@@ -3494,27 +3494,50 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 		}
 	}
 	
-	// not in note edit area, so handle scrolling/zooming
+	// not in note edit area, so handle scrolling/zooming and quantization change
 	else
-	if( _we->modifiers() & Qt::ControlModifier )
+	if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::AltModifier )
 	{
+		int q = m_quantizeModel.value();
 		if( _we->delta() > 0 )
 		{
-			m_ppt = qMin( m_ppt * 2, KEY_LINE_HEIGHT *
-						DefaultStepsPerTact * 8 );
+			q--;
 		}
-		else if( m_ppt >= 72 )
+		if( _we->delta() < 0 )
 		{
-			m_ppt /= 2;
+			q++;
 		}
+		q = qBound( 0, q, m_quantizeModel.size() - 1 );
+		m_quantizeModel.setValue( q );
+	}
+	else if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::ShiftModifier )
+	{
+		int l = m_noteLenModel.value();
+		if( _we->delta() > 0 )
+		{
+			l--;
+		}
+		if( _we->delta() < 0 )
+		{
+			l++;
+		}
+		l = qBound( 0, l, m_noteLenModel.size() - 1 );
+		m_noteLenModel.setValue( l );
+	}
+	else if( _we->modifiers() & Qt::ControlModifier )
+	{
+		int z = m_zoomingModel.value();
+		if( _we->delta() > 0 )
+		{
+			z++;
+		}
+		if( _we->delta() < 0 )
+		{
+			z--;
+		}
+		z = qBound( 0, z, m_zoomingModel.size() - 1 );
 		// update combobox with zooming-factor
-		m_zoomingModel.setValue(
-				m_zoomingModel.findText( QString::number(
-					static_cast<int>( m_ppt * 100 /
-						DEFAULT_PR_PPT ) ) +"%" ) );
-		// update timeline
-		m_timeLine->setPixelsPerTact( m_ppt );
-		update();
+		m_zoomingModel.setValue( z );
 	}
 	else if( _we->modifiers() & Qt::ShiftModifier
 			 || _we->orientation() == Qt::Horizontal )
@@ -4123,13 +4146,6 @@ void PianoRoll::zoomingChanged()
 
 void PianoRoll::quantizeChanged()
 {
-	if( m_quantizeModel.value() == 0 &&
-			m_noteLenModel.value() == 0 )
-	{
-		m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
-		return;
-	}
-	// Could be smarter
 	update();
 }
 
@@ -4138,7 +4154,14 @@ int PianoRoll::quantization() const
 {
 	if( m_quantizeModel.value() == 0 )
 	{
-		return newNoteLen();
+		if( m_noteLenModel.value() > 0 )
+		{
+			return newNoteLen();
+		}
+		else
+		{
+			return DefaultTicksPerTact / 16;
+		}
 	}
 	return DefaultTicksPerTact / m_quantizeModel.currentText().right(
 				m_quantizeModel.currentText().length() -
