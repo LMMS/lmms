@@ -71,8 +71,6 @@ QPixmap * AutomationEditor::s_toolSelect = NULL;
 QPixmap * AutomationEditor::s_toolMove = NULL;
 
 
-const QColor DRAGGABLE_PIN_COLOR = QColor( 0xFF, 0x00, 0x00 );
-const QColor DRAGGABLE_PIN_BORDER_COLOR = QColor( 0xFF, 0xFF, 0xFF );
 
 
 AutomationEditor::AutomationEditor() :
@@ -101,7 +99,8 @@ AutomationEditor::AutomationEditor() :
 	m_scrollBack( FALSE ),
 	m_gridColor( 0,0,0 ),
 	m_graphColor( 0,0,0 ),
-	m_vertexColor( 0,0,0 )
+	m_vertexColor( 0,0,0 ),
+	m_scaleColor( 0,0,0 )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -512,12 +511,16 @@ QColor AutomationEditor::graphColor() const
 { return m_graphColor; }
 QColor AutomationEditor::vertexColor() const
 { return m_vertexColor; }
+QColor AutomationEditor::scaleColor() const
+{ return m_scaleColor; }
 void AutomationEditor::setGridColor( const QColor & c )
 { m_gridColor = c; }
 void AutomationEditor::setGraphColor( const QColor & c )
 { m_graphColor = c; }
 void AutomationEditor::setVertexColor( const QColor & c )
 { m_vertexColor = c; }
+void AutomationEditor::setScaleColor( const QColor & c )
+{ m_scaleColor = c; }
 
 
 
@@ -1366,13 +1369,12 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 {
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
-	int outerRadius = qMin( 8, m_ppt/quantization() );
-	int innerRadius = qMax( 0, outerRadius-2 );
-	p.setBrush( QBrush( DRAGGABLE_PIN_BORDER_COLOR ) );
-	p.drawEllipse( x-outerRadius/2, y-outerRadius/2, outerRadius, outerRadius );
-	p.setBrush( QBrush( DRAGGABLE_PIN_COLOR ) );
-	p.drawEllipse( x-innerRadius/2, y-innerRadius/2, innerRadius, innerRadius );
-	p.setBrush( QBrush() );
+	const int outerRadius = qBound( 2, ( m_ppt * quantization() ) / 576, 5 ); // man, getting this calculation right took forever
+	const int innerRadius = outerRadius - 1;
+	p.setBrush( QBrush( vertexColor().lighter( 200 ) ) );
+	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
+	p.setBrush( QBrush( vertexColor() ) );
+	p.drawEllipse( x - innerRadius, y - innerRadius, innerRadius * 2, innerRadius * 2 );
 }
 
 
@@ -1387,6 +1389,12 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
+	// get foregrounf color
+	QColor fgColor = p.pen().brush().color();
+	// get background color and fill background
+	QColor bgColor = p.background().color();
+	p.fillRect( 0, 0, width(), height(), bgColor );
+
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
 
@@ -1396,7 +1404,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 
 	p.fillRect( 0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
-						QColor( 0x33, 0x33, 0x33 ) );
+						scaleColor() );
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
@@ -1413,11 +1421,12 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			{
 				const QString & label = m_pattern->firstObject()
 						->displayValue( level[i] );
-				p.setPen( QColor( 240, 240, 240 ) );
+				p.setPen( QApplication::palette().color( QPalette::Active,
+							QPalette::Shadow ) );
 				p.drawText( 1, y[i] - font_height + 1,
 					VALUES_WIDTH - 10, 2 * font_height,
 					text_flags, label );
-				p.setPen( QColor( 0, 0, 0 ) );
+				p.setPen( fgColor );
 				p.drawText( 0, y[i] - font_height,
 					VALUES_WIDTH - 10, 2 * font_height,
 					text_flags, label );
@@ -1441,11 +1450,12 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 				const QString & label = m_pattern->firstObject()
 							->displayValue( level );
 				y = yCoordOfLevel( level );
-				p.setPen( QColor( 240, 240, 240 ) );
+				p.setPen( QApplication::palette().color( QPalette::Active,
+							QPalette::Shadow ) );
 				p.drawText( 1, y - font_height + 1,
 					VALUES_WIDTH - 10, 2 * font_height,
 					text_flags, label );
-				p.setPen( QColor( 0, 0, 0 ) );
+				p.setPen( fgColor );
 				p.drawText( 0, y - font_height,
 					VALUES_WIDTH - 10, 2 * font_height,
 					text_flags, label );
@@ -1459,6 +1469,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 								grid_height  );
 
 	// draw vertical raster
+	QColor lineColor = QColor( gridColor() );
 	if( m_pattern )
 	{
 		int tick, x;
@@ -1474,7 +1485,8 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			 x<=width();
 			 tick += quantization(), x = xCoordOfTick( tick ) )
 		{
-			p.setPen( QColor( 0x2F, 0x2F, 0x2F ) );
+			lineColor.setAlpha( 80 );
+			p.setPen( lineColor );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 		// Then beat grid
@@ -1485,7 +1497,8 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			 x<=width();
 			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
 		{
-			p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
+			lineColor.setAlpha( 160 );
+			p.setPen( lineColor );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 		// and finally bars
@@ -1494,14 +1507,16 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			 x<=width();
 			 tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
 		{
-			p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
+			lineColor.setAlpha( 255 );
+			p.setPen( lineColor );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
 		/// \todo move this horizontal line drawing code into the same loop as the value ticks?
 		if( m_y_auto )
 		{
-			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
+			lineColor.setAlpha( 160 );
+			QPen pen( lineColor );
 			p.setPen( pen );
 			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
 								grid_bottom );
@@ -1522,11 +1537,13 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 				y =  yCoordOfLevel( (float)level );
 				if( level % 5 == 0 )
 				{
-					p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
+					lineColor.setAlpha( 160 );
+					p.setPen( lineColor );
 				}
 				else
 				{
-					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+					lineColor.setAlpha( 80 );
+					p.setPen( lineColor );
 				}
 
 				// draw level line
@@ -1564,7 +1581,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		if( time_map.size() > 0 )
 		{
 			timeMap::iterator it = time_map.begin();
-			p.setPen( QColor( 0xCF, 0xD9, 0xFF ) );
+			p.setPen( graphColor() );
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1633,7 +1650,8 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		QFont f = p.font();
 		f.setBold( TRUE );
 		p.setFont( pointSize<14>( f ) );
-		p.setPen( QColor( 74, 253, 133 ) );
+		p.setPen( QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
 				grid_height - 40, Qt::TextWordWrap,
