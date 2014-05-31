@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SONG_H
-#define _SONG_H
+#ifndef SONG_H
+#define SONG_H
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
@@ -130,6 +130,10 @@ public:
 	inline int getTicks() const
 	{
 		return currentTick();
+	}
+	inline f_cnt_t getFrames() const
+	{
+		return currentFrame();
 	}
 	inline bool isTempoAutomated()
 	{
@@ -310,6 +314,12 @@ private:
 	{
 		return m_playPos[m_playMode].getTicks();
 	}
+	
+	inline f_cnt_t currentFrame() const
+	{
+		return m_playPos[m_playMode].getTicks() * engine::framesPerTick() + m_playPos[m_playMode].currentFrame();
+	}
+	
 	void setPlayPos( tick_t _ticks, PlayModes _play_mode );
 
 	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
@@ -362,6 +372,7 @@ private:
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
+	void playbackPositionChanged();
 	void lengthChanged( int _tacts );
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,
