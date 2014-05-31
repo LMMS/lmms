@@ -76,6 +76,7 @@
 #include "tab_widget.h"
 #include "tooltip.h"
 #include "track_label_button.h"
+#include "ValueBuffer.h"
 
 
 
@@ -181,8 +182,14 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// now
 	m_audioPort.effects()->startRunning();
 
-	float v_scale = (float) getVolume() / DefaultVolume;
-
+	ValueBuffer * volumeBuffer = m_volumeModel.hasSampleExactData()
+		? m_volumeModel.valueBuffer()
+		: NULL;
+	
+	float v_scale = volumeBuffer
+		? 1.0f 
+		: (float) getVolume() / DefaultVolume;
+	
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
@@ -196,8 +203,15 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	
 	int framesToMix = frames;
 	int offset = 0;
-	int panning = m_panningModel.value();
-
+	
+	ValueBuffer * panningBuffer = m_panningModel.hasSampleExactData()
+		? m_panningModel.valueBuffer()
+		: NULL;
+		
+	int panning = panningBuffer
+		? 0 
+		: m_panningModel.value();
+		
 	if( n )
 	{
 		framesToMix = qMin<f_cnt_t>( n->framesLeftForCurrentPeriod(), framesToMix );
@@ -207,7 +221,8 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 		panning = tLimit<int>( panning, PanningLeft, PanningRight );
 	}
 
-	engine::mixer()->bufferToPort( buf, framesToMix, offset, panningToVolumeVector( panning, v_scale ), &m_audioPort );
+	engine::mixer()->bufferToPort( buf, framesToMix, offset, panningToVolumeVector( panning, v_scale ), &m_audioPort, volumeBuffer, panningBuffer );
+	
 }
 
 

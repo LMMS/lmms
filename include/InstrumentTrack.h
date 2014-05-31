@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _INSTRUMENT_TRACK_H
-#define _INSTRUMENT_TRACK_H
+#ifndef INSTRUMENT_TRACK_H
+#define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
