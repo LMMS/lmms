@@ -26,6 +26,7 @@
 #ifndef VALUE_BUFFER_H
 #define VALUE_BUFFER_H
 
+#include <QtGlobal>
 #include "interpolation.h"
 #include <string.h>
 
@@ -120,6 +121,29 @@ public:
 			f += fstep;
 			m_values[i] = linearInterpolate( start, end, f );
 		}
+	}
+
+	void multiply( float f )
+	{
+		for( int i = 0; i < m_length; i++ )
+		{
+			m_values[i] *= f;
+		}
+	}
+	
+	ValueBuffer & operator*=( const float & f )
+	{
+		multiply( f );
+		return *this;
+	}
+	
+	ValueBuffer & operator+=( const ValueBuffer & v )
+	{
+		for( int i = 0; i < qMin( m_length, v.length() ); i++ )
+		{
+			m_values[i] += v.values()[i];
+		}
+		return *this;
 	}
 
 	static ValueBuffer interpolatedBuffer( float start, float end, int length )
