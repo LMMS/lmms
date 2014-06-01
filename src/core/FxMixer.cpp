@@ -79,7 +79,7 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 	// SMF: OK, due to the fact, that the data from the audio-tracks has been
 	//			written into our buffer already, all which needs to be done at this
-	//			stage is to process inter-channel sends. 
+	//			stage is to process inter-channel sends.
 
 	if( m_muteModel.value() == false )
 	{
@@ -110,45 +110,29 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 				// mix it's output with this one's output
 				sampleFrame * ch_buf = sender->m_buffer;
-				
-				// use sample-exact mixing if sample-exact values are available				
+
+				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * fxm->channelSendModel( senderIndex, m_channelIndex )->value();
-					for( f_cnt_t f = 0; f < fpp; ++f )
-					{
-						_buf[f][0] += ch_buf[f][0] * v;
-						_buf[f][1] += ch_buf[f][1] * v;
-					}
+					MixHelpers::addMultiplied( _buf, ch_buf, v, fpp );
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					for( f_cnt_t f = 0; f < fpp; ++f )
-					{
-						_buf[f][0] += ch_buf[f][0] * sendBuf->values()[f] * volBuf->values()[f];
-						_buf[f][1] += ch_buf[f][1] * sendBuf->values()[f] * volBuf->values()[f];
-					}
+					MixHelpers::addMultipliedByBuffers( _buf, ch_buf, volBuf, sendBuf, fpp );					
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = fxm->channelSendModel( senderIndex, m_channelIndex )->value();
-					for( f_cnt_t f = 0; f < fpp; ++f )
-					{
-						_buf[f][0] += ch_buf[f][0] * v * volBuf->values()[f];
-						_buf[f][1] += ch_buf[f][1] * v * volBuf->values()[f];
-					}
+					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, volBuf, fpp );
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					for( f_cnt_t f = 0; f < fpp; ++f )
-					{
-						_buf[f][0] += ch_buf[f][0] * sendBuf->values()[f] * v;
-						_buf[f][1] += ch_buf[f][1] * sendBuf->values()[f] * v;
-					}
+					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, sendBuf, fpp );
 				}
 			}
-			
+
 			// if sender channel hasInput, then we hasInput too
 			if( sender->m_hasInput ) m_hasInput = true;
 		}
@@ -156,10 +140,10 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 	const float v = m_volumeModel.value();
 
-	if( m_hasInput ) 
+	if( m_hasInput )
 	{
 		// only start fxchain when we have input...
-		m_fxChain.startRunning(); 
+		m_fxChain.startRunning();
 	}
 	if( m_hasInput || m_stillRunning )
 	{
@@ -533,7 +517,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 			m_fxChannels[0]->m_buffer[f][1] *= volBuf->values()[f];
 		}
 	}
-	
+
 	const float v = volBuf
 		? 1.0f
 		: m_fxChannels[0]->m_volumeModel.value();

@@ -115,10 +115,10 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 			: m_ampControls.m_panModel.value();
 		const float left1 = pan <= 0
 			? 1.0
-			: 1.0 - m_ampControls.m_panModel.value( f ) * 0.01f;
+			: 1.0 - pan * 0.01f;
 		const float right1 = pan >= 0
 			? 1.0
-			: 1.0 + m_ampControls.m_panModel.value( ) * 0.01f;
+			: 1.0 + pan * 0.01f;
 
 		// second stage amplification
 		const float left2 = leftBuf

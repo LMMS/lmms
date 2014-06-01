@@ -26,6 +26,7 @@
 #ifndef VALUE_BUFFER_H
 #define VALUE_BUFFER_H
 
+#include <QtGlobal>
 #include "interpolation.h"
 #include <string.h>
 

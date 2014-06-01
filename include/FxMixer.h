@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _FX_MIXER_H
-#define _FX_MIXER_H
+#ifndef FX_MIXER_H
+#define FX_MIXER_H
 
 #include "Model.h"
 #include "Mixer.h"
