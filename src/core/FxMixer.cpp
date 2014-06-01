@@ -32,7 +32,7 @@
 
 #include "InstrumentTrack.h"
 #include "bb_track_container.h"
-
+#include "ValueBuffer.h"
 
 FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_fxChain( NULL ),
@@ -42,7 +42,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_peakRight( 0.0f ),
 	m_buffer( new sampleFrame[engine::mixer()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
-	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
+	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
 	m_lock(),
 	m_channelIndex( idx ),
@@ -79,10 +79,7 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 	// SMF: OK, due to the fact, that the data from the audio-tracks has been
 	//			written into our buffer already, all which needs to be done at this
-	//			stage is to process inter-channel sends. I really don't like the idea
-	//			of using threads for this -- it just doesn't make any sense and wastes
-	//			cpu-cylces... so I just go through every child of this channel and
-	//			call the acc. doProcessing() directly.
+	//			stage is to process inter-channel sends. 
 
 	if( m_muteModel.value() == false )
 	{
@@ -103,17 +100,52 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
-				// get the send level...
-				const float amt =
-					fxm->channelSendModel( senderIndex, m_channelIndex )->value();
+				// figure out if we're getting sample-exact input
+				ValueBuffer * sendBuf = fxm->channelSendModel( senderIndex, m_channelIndex )->hasSampleExactData()
+					? fxm->channelSendModel( senderIndex, m_channelIndex )->valueBuffer()
+					: NULL;
+				ValueBuffer * volBuf = sender->m_volumeModel.hasSampleExactData()
+					? sender->m_volumeModel.valueBuffer()
+					: NULL;
 
 				// mix it's output with this one's output
 				sampleFrame * ch_buf = sender->m_buffer;
-				const float v = sender->m_volumeModel.value() * amt;
-				for( f_cnt_t f = 0; f < fpp; ++f )
+				
+				// use sample-exact mixing if sample-exact values are available				
+				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
-					_buf[f][0] += ch_buf[f][0] * v;
-					_buf[f][1] += ch_buf[f][1] * v;
+					const float v = sender->m_volumeModel.value() * fxm->channelSendModel( senderIndex, m_channelIndex )->value();
+					for( f_cnt_t f = 0; f < fpp; ++f )
+					{
+						_buf[f][0] += ch_buf[f][0] * v;
+						_buf[f][1] += ch_buf[f][1] * v;
+					}
+				}
+				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
+				{
+					for( f_cnt_t f = 0; f < fpp; ++f )
+					{
+						_buf[f][0] += ch_buf[f][0] * sendBuf->values()[f] * volBuf->values()[f];
+						_buf[f][1] += ch_buf[f][1] * sendBuf->values()[f] * volBuf->values()[f];
+					}
+				}
+				else if( volBuf ) // volume has sample-exact data but send does not
+				{
+					const float v = fxm->channelSendModel( senderIndex, m_channelIndex )->value();
+					for( f_cnt_t f = 0; f < fpp; ++f )
+					{
+						_buf[f][0] += ch_buf[f][0] * v * volBuf->values()[f];
+						_buf[f][1] += ch_buf[f][1] * v * volBuf->values()[f];
+					}
+				}
+				else // vice versa
+				{
+					const float v = sender->m_volumeModel.value();
+					for( f_cnt_t f = 0; f < fpp; ++f )
+					{
+						_buf[f][0] += ch_buf[f][0] * sendBuf->values()[f] * v;
+						_buf[f][1] += ch_buf[f][1] * sendBuf->values()[f] * v;
+					}
 				}
 			}
 			
@@ -488,7 +520,23 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	}
 	//m_fxChannels[0]->doProcessing( NULL );
 
-	const float v = m_fxChannels[0]->m_volumeModel.value();
+	// handle sample-exact data in master volume fader
+	ValueBuffer * volBuf = m_fxChannels[0]->m_volumeModel.hasSampleExactData()
+		? m_fxChannels[0]->m_volumeModel.valueBuffer()
+		: NULL;
+
+	if( volBuf )
+	{
+		for( int f = 0; f < fpp; f++ )
+		{
+			m_fxChannels[0]->m_buffer[f][0] *= volBuf->values()[f];
+			m_fxChannels[0]->m_buffer[f][1] *= volBuf->values()[f];
+		}
+	}
+	
+	const float v = volBuf
+		? 1.0f
+		: m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
 	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
