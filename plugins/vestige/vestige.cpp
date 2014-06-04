@@ -241,7 +241,7 @@ void vestigeInstrument::loadFile( const QString & _file )
             	instrumentTrack()->name() ==
                 	InstrumentTrack::tr( "Default preset" ) ||
             	instrumentTrack()->name() == 
-                	vestige_plugin_descriptor.displayName;
+                	displayName();
 
 	m_pluginMutex.unlock();
 
