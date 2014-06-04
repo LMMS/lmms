@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _INSTRUMENT_TRACK_H
-#define _INSTRUMENT_TRACK_H
+#ifndef INSTRUMENT_TRACK_H
+#define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
@@ -71,8 +71,8 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
 	// silence all running notes played by this track
 	void silenceAllNotes();
 
