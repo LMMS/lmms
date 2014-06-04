@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _INSTRUMENT_H
-#define _INSTRUMENT_H
+#ifndef INSTRUMENT_H
+#define INSTRUMENT_H
 
 #include <QtGui/QWidget>
 
@@ -101,7 +101,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime() )
+	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
 	{
 		return true;
 	}

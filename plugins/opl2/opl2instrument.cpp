@@ -283,7 +283,7 @@ int opl2instrument::pushVoice(int v) {
 	return i;
 }
 
-bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
+bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;

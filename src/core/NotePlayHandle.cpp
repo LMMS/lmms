@@ -107,7 +107,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
 			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), engine::framesPerTick() ) );
+			MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
+			offset() );
 	}
 }
 
@@ -336,7 +337,8 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
 			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ) );
+			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ), 
+			_s );
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
