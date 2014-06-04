@@ -237,9 +237,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != NULL &&
-		instrumentTrack()->name() == m_plugin->name() ) ||
-			instrumentTrack()->name() ==
-				InstrumentTrack::tr( "Default preset" );
+        	instrumentTrack()->name() == m_plugin->name() ) ||
+            	instrumentTrack()->name() == InstrumentTrack::tr( "Default preset" ) ||
+            	instrumentTrack()->name() == displayName();
+
 	m_pluginMutex.unlock();
 
 	if ( m_plugin != NULL )
@@ -310,12 +311,12 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->processMidiEvent( event, offset );
+		m_plugin->processMidiEvent( event, time );
 	}
 	m_pluginMutex.unlock();
 
