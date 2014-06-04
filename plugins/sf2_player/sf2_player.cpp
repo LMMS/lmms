@@ -352,7 +352,7 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 	delete[] sf2Ascii;
 
-	if( updateTrackName || instrumentTrack()->displayName() == displayName())
+	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
    		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
 	}
