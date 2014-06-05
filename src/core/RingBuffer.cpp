@@ -218,6 +218,7 @@ void RingBuffer::write( sampleFrame * src, f_cnt_t offset, f_cnt_t length )
 	lock();
 	
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
+	if( length == 0 ) { length = m_fpp; }
 	
 	if( pos + length <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
@@ -248,6 +249,7 @@ void RingBuffer::writeAdding( sampleFrame * src, f_cnt_t offset, f_cnt_t length 
 	lock();
 	
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
+	if( length == 0 ) { length = m_fpp; }
 	
 	if( pos + length <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
@@ -278,6 +280,7 @@ void RingBuffer::writeAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt
 	lock();
 	
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
+	if( length == 0 ) { length = m_fpp; }
 	
 	if( pos + length <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
