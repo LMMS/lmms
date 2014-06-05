@@ -24,6 +24,7 @@
  */
 
 #include <QtXml/QDomElement>
+#include <QtGui/QColorDialog>
 #include <QtGui/QDropEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QLayout>
@@ -35,6 +36,7 @@
 #include "gui_templates.h"
 #include "SampleTrack.h"
 #include "song.h"
+#include "SongEditor.h"
 #include "embed.h"
 #include "engine.h"
 #include "tooltip.h"
@@ -56,7 +58,9 @@ SampleTCO::SampleTCO( track * _track ) :
 	saveJournallingState( false );
 	setSampleFile( "" );
 	restoreJournallingState();
-
+	m_fg_color = defaultFgColor();
+	m_bg_color = defaultBgColor();
+	
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
 	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
@@ -155,6 +159,9 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
 	// TODO: start- and end-frame
+	_this.setAttribute( "fg_color", m_fg_color );
+	_this.setAttribute( "bg_color", m_bg_color );
+
 }
 
 
@@ -173,6 +180,15 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
+	
+	if( _this.attribute( "fg_color" ).toUInt() != 0 )
+	{
+		m_fg_color = _this.attribute( "fg_color" ).toUInt();
+	}
+	if( _this.attribute( "bg_color" ).toUInt() != 0 )
+	{
+		m_bg_color = _this.attribute( "bg_color" ).toUInt();
+	}
 }
 
 
@@ -254,9 +270,12 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
 				tr( "Mute/unmute (<Ctrl> + middle click)" ),
 						m_tco, SLOT( toggleMute() ) );
-	contextMenu.addAction( embed::getIconPixmap( "record" ),
-				tr( "Set/clear record" ),
-						m_tco, SLOT( toggleRecord() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+				tr( "Change foreground color" ),
+						this, SLOT( changeFgColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+				tr( "Change background color" ),
+						this, SLOT( changeBgColor() ) );
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -335,8 +354,9 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 void SampleTCOView::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	const QColor styleColor = p.pen().brush().color();
-
+	QColor styleColor = p.pen().brush().color();
+	if (m_tco->m_bg_color != 0) styleColor = QColor( m_tco->m_bg_color );
+	
 	QColor c;
 	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
 		c = isSelected() ? QColor( 0, 0, 224 )
@@ -363,13 +383,14 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	}
 	else
 	{
-		p.setPen( fgColor() );
+		p.setPen( m_tco->m_fg_color );
 	}
 	QRect r = QRect( 1, 1,
 			qMax( static_cast<int>( m_tco->sampleLength() *
 				pixelsPerTact() / DefaultTicksPerTact ), 1 ),
 								height() - 4 );
 	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
+	m_tco->m_sampleBuffer->setColor( m_tco->m_fg_color );
 	m_tco->m_sampleBuffer->visualize( p, r, _pe->rect() );
 	if( r.width() < width() - 1 )
 	{
@@ -396,8 +417,81 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	}
 }
 
+void SampleTCOView::changeFgColor()
+{
+	QColor _new_color = QColorDialog::getColor( m_tco->m_fg_color );
+	if( !_new_color.isValid() )
+	{
+		return;
+	}
+	if( isSelected() )
+	{
+		QVector<selectableObject *> selected =
+				engine::songEditor()->selectedObjects();
+		for( QVector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			SampleTCOView * sample_tcov = dynamic_cast<SampleTCOView *>( *it );
+			if( sample_tcov )
+			{
+				sample_tcov->setFgColor( _new_color );
+			}
+		}
+	}
+	else
+	{
+		setFgColor( _new_color );
+	}
+}
 
+void SampleTCOView::changeBgColor()
+{
+	QColor _new_color = QColorDialog::getColor( m_tco->m_bg_color );
+	if( !_new_color.isValid() )
+	{
+		return;
+	}
+	if( isSelected() )
+	{
+		QVector<selectableObject *> selected =
+				engine::songEditor()->selectedObjects();
+		for( QVector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			SampleTCOView * sample_tcov = dynamic_cast<SampleTCOView *>( *it );
+			if( sample_tcov )
+			{
+				sample_tcov->setBgColor( _new_color );
+			}
+		}
+	}
+	else
+	{
+		setBgColor( _new_color );
+	}
+}
 
+void SampleTCOView::setFgColor( QColor _new_color )
+{
+	if( _new_color.rgb() != m_tco->m_fg_color )
+	{
+		m_tco->m_fg_color = _new_color.rgb();
+		engine::getSong()->setModified();
+		update();
+	}
+}
+
+void SampleTCOView::setBgColor( QColor _new_color )
+{
+	if( _new_color.rgb() != m_tco->m_bg_color )
+	{
+		m_tco->m_bg_color = _new_color.rgb();
+		engine::getSong()->setModified();
+		update();
+	}
+}
 
 
 

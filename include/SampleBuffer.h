@@ -29,6 +29,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
+#include <QColor>
 
 #include <samplerate.h>
 
@@ -255,7 +256,16 @@ public:
 
 	static QString tryToMakeRelative( const QString & _file );
 	static QString tryToMakeAbsolute( const QString & _file );
-
+	
+	void setColor(QColor _new_color)
+	{
+		m_color = _new_color.rgb();
+	}
+	
+	QColor getColor() const
+	{
+		return m_color;
+	}
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
@@ -307,7 +317,8 @@ private:
 	f_cnt_t getLoopedIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 
-
+	unsigned int m_color;
+	
 signals:
 	void sampleUpdated();
 
