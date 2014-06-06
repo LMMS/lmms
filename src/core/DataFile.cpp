@@ -683,18 +683,6 @@ void DataFile::upgrade()
 
 	}
 
-	// new default colour for B&B tracks
-	QDomNodeList list = elementsByTagName( "bbtco" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
-	{
-		QDomElement el = list.item( i ).toElement();
-		unsigned int rgb = el.attribute( "color" ).toUInt();
-		if( rgb == qRgb( 64, 128, 255 ) )
-		{
-			el.setAttribute( "color", bbTCO::defaultColor() );
-		}
-	}
-
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )
 	{
