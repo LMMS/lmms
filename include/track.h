@@ -179,6 +179,7 @@ class trackContentObjectView : public selectableObject, public ModelView
 
 // theming qproperties
 	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor bgColor READ bgColor WRITE setBgColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
@@ -193,8 +194,10 @@ public:
 	}
 // qproperty access func
 	QColor fgColor() const;
+	QColor bgColor() const;
 	QColor textColor() const;
 	void setFgColor( const QColor & _c );
+	void setBgColor( const QColor & _c );
 	void setTextColor( const QColor & _c );
 
 public slots:
@@ -257,6 +260,7 @@ private:
 
 // qproperty fields
 	QColor m_fgColor;
+	QColor m_bgColor;
 	QColor m_textColor;
 
 	inline void setInitialMousePos( QPoint pos )

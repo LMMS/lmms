@@ -253,6 +253,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_hint( NULL ),
 	m_fgColor( 0, 0, 0 ),
+	m_bgColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 )
 {
 	if( s_textFloat == NULL )
@@ -324,12 +325,20 @@ QColor trackContentObjectView::fgColor() const
 { return m_fgColor; }
 
 //! \brief CSS theming qproperty access method
+QColor trackContentObjectView::bgColor() const
+{ return m_bgColor; }
+
+//! \brief CSS theming qproperty access method
 QColor trackContentObjectView::textColor() const
 { return m_textColor; }
 
 //! \brief CSS theming qproperty access method
 void trackContentObjectView::setFgColor( const QColor & _c )
 { m_fgColor = QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentObjectView::setBgColor( const QColor & _c )
+{ m_bgColor = QColor( _c ); }
 
 //! \brief CSS theming qproperty access method
 void trackContentObjectView::setTextColor( const QColor & _c )

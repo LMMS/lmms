@@ -917,7 +917,11 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const int yb = h / 2 + _dr.y();
 	const float y_space = h*0.25f;
 	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
-
+	
+	QColor c;
+	if (m_color) c = QColor(m_color);
+	else         c = _p.pen().color();
+	
 	if( nb_frames < 60000 )
 	{
 		_p.setRenderHint( QPainter::Antialiasing );

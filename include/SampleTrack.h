@@ -62,6 +62,22 @@ public:
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
+	inline unsigned int fgColor() const
+	{
+		return( m_fg_color );
+	}
+	inline static unsigned int defaultFgColor()
+	{
+		return qRgb( 128, 182, 175 );
+	}
+	inline unsigned int bgColor() const
+	{
+		return( m_bg_color );
+	}
+	inline static unsigned int defaultBgColor()
+	{
+		return qRgb( 128, 182, 175 );
+	}
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
@@ -73,6 +89,8 @@ public slots:
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
+	unsigned int m_fg_color;
+	unsigned int m_bg_color;
 
 
 	friend class SampleTCOView;
@@ -88,18 +106,30 @@ signals:
 class SampleTCOView : public trackContentObjectView
 {
 	Q_OBJECT
-	
-// theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
 	SampleTCOView( SampleTCO * _tco, trackView * _tv );
 	virtual ~SampleTCOView();
 
+	QColor fgColor() const
+	{
+		return( m_tco->m_fg_color );
+	}
+	void setFgColor( QColor _new_color );
+
+	QColor bgColor() const
+	{
+		return( m_tco->m_bg_color );
+	}
+	void setBgColor( QColor _new_color );
+
 
 public slots:
 	void updateSample();
+
+protected slots:
+	void changeFgColor();
+	void changeBgColor();
 
 
 protected:
