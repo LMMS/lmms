@@ -22,11 +22,12 @@
  *
  */
 
-#ifndef _INSTRUMENT_PLAY_HANDLE_H
-#define _INSTRUMENT_PLAY_HANDLE_H
+#ifndef INSTRUMENT_PLAY_HANDLE_H
+#define INSTRUMENT_PLAY_HANDLE_H
 
 #include "PlayHandle.h"
 #include "Instrument.h"
+#include "NotePlayHandle.h"
 
 
 class InstrumentPlayHandle : public PlayHandle
@@ -45,6 +46,25 @@ public:
 
 	virtual void play( sampleFrame * _working_buffer )
 	{
+		// if the instrument is midi-based, we can safely render right away
+		if( m_instrument->flags() & Instrument::IsMidiBased )
+		{
+			m_instrument->play( _working_buffer );
+			return;
+		}
+		
+		// if not, we need to ensure that all our nph's have been processed first
+		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
+		
+		foreach( const NotePlayHandle * cnph, nphv )
+		{
+			NotePlayHandle * nph = const_cast<NotePlayHandle *>( cnph );
+			while( nph->state() != ThreadableJob::Done )
+			{
+				nph->process();
+			}
+		}
+		
 		m_instrument->play( _working_buffer );
 	}
 

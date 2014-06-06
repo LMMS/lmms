@@ -79,7 +79,7 @@ public:
 
 	virtual Flags flags() const
 	{
-		return IsSingleStreamed | IsMidiBased;
+		return IsSingleStreamed;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
