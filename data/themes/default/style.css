@@ -18,8 +18,15 @@ AutomationEditor {
 	color: #e0e0e0;
 	qproperty-vertexColor: #ff77af;
 	qproperty-gridColor: #808080;
-	qproperty-graphColor: #99afff;
-	qproperty-scaleColor: rgb( 32, 32, 32 );
+	
+	qproperty-graphColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0, x2:0, y2:1,
+                     stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
+	/*#99afff;*/
+	qproperty-scaleColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #333, stop:1 #202020);
+	/*rgb( 32, 32, 32 );*/
 }
 
 /* text box */
@@ -259,13 +266,10 @@ nStateButton {
 
 /* track background colors */
 trackContentWidget {
-	qproperty-darkerColor1: rgb( 50, 50, 50 );
-	qproperty-darkerColor2: rgb( 20, 20, 20 );
-	qproperty-darkerColor3: rgb( 15, 15, 15 );
-	qproperty-lighterColor1: rgb( 50, 50, 50 );
-	qproperty-lighterColor2: rgb( 40, 40, 40 );
-	qproperty-lighterColor3: rgb( 30, 30, 30 );
-	qproperty-gradMidPoint: 0.33;
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
 }
 
 
