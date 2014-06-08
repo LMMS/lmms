@@ -51,9 +51,9 @@ class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
-	Q_PROPERTY( QColor graphColor READ graphColor WRITE setGraphColor )
 	Q_PROPERTY( QColor vertexColor READ vertexColor WRITE setVertexColor )
-	Q_PROPERTY( QColor scaleColor READ scaleColor WRITE setScaleColor )
+	Q_PROPERTY( QBrush scaleColor READ scaleColor WRITE setScaleColor )
+	Q_PROPERTY( QBrush graphColor READ graphColor WRITE setGraphColor )	
 public:
 	void setCurrentPattern( AutomationPattern * _new_pattern );
 
@@ -81,13 +81,13 @@ public:
 
 	// qproperty access methods
 	QColor gridColor() const;
-	QColor graphColor() const;
+	QBrush graphColor() const;
 	QColor vertexColor() const;
-	QColor scaleColor() const;
+	QBrush scaleColor() const;
 	void setGridColor( const QColor & c );
-	void setGraphColor( const QColor & c );
+	void setGraphColor( const QBrush & c );
 	void setVertexColor( const QColor & c );
-	void setScaleColor( const QColor & c );
+	void setScaleColor( const QBrush & c );
 
 public slots:
 	void update();
@@ -266,9 +266,9 @@ private:
 	bool inBBEditor();
 
 	QColor m_gridColor;
-	QColor m_graphColor;
+	QBrush m_graphColor;
 	QColor m_vertexColor;
-	QColor m_scaleColor;
+	QBrush m_scaleColor;
 
 	friend class engine;
 

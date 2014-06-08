@@ -98,9 +98,9 @@ AutomationEditor::AutomationEditor() :
 	m_editMode( DRAW ),
 	m_scrollBack( FALSE ),
 	m_gridColor( 0,0,0 ),
-	m_graphColor( 0,0,0 ),
+	m_graphColor(),
 	m_vertexColor( 0,0,0 ),
-	m_scaleColor( 0,0,0 )
+	m_scaleColor()
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -507,19 +507,19 @@ void AutomationEditor::setPauseIcon( bool pause )
 
 QColor AutomationEditor::gridColor() const
 { return m_gridColor; }
-QColor AutomationEditor::graphColor() const
+QBrush AutomationEditor::graphColor() const
 { return m_graphColor; }
 QColor AutomationEditor::vertexColor() const
 { return m_vertexColor; }
-QColor AutomationEditor::scaleColor() const
+QBrush AutomationEditor::scaleColor() const
 { return m_scaleColor; }
 void AutomationEditor::setGridColor( const QColor & c )
 { m_gridColor = c; }
-void AutomationEditor::setGraphColor( const QColor & c )
+void AutomationEditor::setGraphColor( const QBrush & c )
 { m_graphColor = c; }
 void AutomationEditor::setVertexColor( const QColor & c )
 { m_vertexColor = c; }
-void AutomationEditor::setScaleColor( const QColor & c )
+void AutomationEditor::setScaleColor( const QBrush & c )
 { m_scaleColor = c; }
 
 
@@ -1387,10 +1387,10 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
-	// get foregrounf color
+	// get foreground color
 	QColor fgColor = p.pen().brush().color();
 	// get background color and fill background
-	QColor bgColor = p.background().color();
+	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
 	// set font-size to 8
@@ -1768,12 +1768,11 @@ void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
 			rect_height = (int)( _level * m_y_delta );
 		}
 
-		QColor current_color( graphColor() );
-		if( _is_selected == TRUE )
-		{
-			current_color.setRgb( 0x00, 0x40, 0xC0 );
-		}
-		_p.fillRect( x, y_start, rect_width, rect_height, current_color );
+		QBrush currentColor = _is_selected
+			? QBrush( QColor( 0x00, 0x40, 0xC0 ) )
+			: graphColor();
+
+		_p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
 	
 	else

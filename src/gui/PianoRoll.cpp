@@ -2887,7 +2887,7 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
-	QColor bgColor = p.background().color();
+	QBrush bgColor = p.background();
 	
 	// fill with bg color
 	p.fillRect( 0,0, width(), height(), bgColor );
