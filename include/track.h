@@ -30,6 +30,7 @@
 #include <QtCore/QList>
 #include <QtGui/QWidget>
 #include <QColor>
+#include <QMimeData>
 
 #include "lmms_basics.h"
 #include "MidiTime.h"
@@ -37,6 +38,7 @@
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "ModelView.h"
+#include "DataFile.h"
 
 
 class QMenu;
@@ -123,6 +125,16 @@ public:
 
 	virtual trackContentObjectView * createView( trackView * _tv ) = 0;
 
+	inline void selectViewOnCreate( bool select )
+	{
+		m_selectViewOnCreate = select;
+	}
+
+	inline bool getSelectViewOnCreate()
+	{
+		return m_selectViewOnCreate;
+	}
+
 
 public slots:
 	void copy();
@@ -153,6 +165,7 @@ private:
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 
+	bool m_selectViewOnCreate;
 
 	friend class trackContentObjectView;
 
@@ -210,6 +223,8 @@ protected:
 		return m_trackView;
 	}
 
+	DataFile createTCODataFiles(const QVector<trackContentObjectView *> & tcos) const;
+
 
 protected slots:
 	void updateLength();
@@ -222,7 +237,9 @@ private:
 		NoAction,
 		Move,
 		MoveSelection,
-		Resize
+		Resize,
+		CopySelection,
+		ToggleSelected
 	} ;
 
 	static textFloat * s_textFloat;
@@ -231,7 +248,8 @@ private:
 	trackView * m_trackView;
 	Actions m_action;
 	bool m_autoResize;
-	int m_initialMouseX;
+	QPoint m_initialMousePos;
+	QPoint m_initialMouseGlobalPos;
 
 	textFloat * m_hint;
 
@@ -240,6 +258,15 @@ private:
 // qproperty fields
 	QColor m_fgColor;
 	QColor m_textColor;
+
+	inline void setInitialMousePos( QPoint pos )
+	{
+		m_initialMousePos = pos;
+		m_initialMouseGlobalPos = mapToGlobal( pos );
+	}
+
+	bool mouseMovedDistance( QMouseEvent * _me, int distance );
+
 } ;
 
 
@@ -270,6 +297,9 @@ public:
 			removeTCOView( m_tcoViews[_tco_num] );
 		}
 	}
+
+	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
+	bool pasteSelection( MidiTime tcoPos, QDropEvent * _de );
 
 	MidiTime endPosition( const MidiTime & _pos_start );
 

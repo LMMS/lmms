@@ -25,6 +25,7 @@
 #include <math.h>
 
 #include "MixHelpers.h"
+#include "ValueBuffer.h"
 
 
 namespace MixHelpers
@@ -104,6 +105,25 @@ void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, in
 	run<>( dst, src, frames, AddMultipliedOp(coeffSrc) );
 }
 
+
+void addMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
+{
+	for( int f = 0; f < frames; ++f )
+	{
+		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
+		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
+	}
+}
+
+void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames )
+{
+	for( int f = 0; f < frames; ++f )
+	{
+		dst[f][0] += src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
+		dst[f][1] += src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
+	}
+
+}
 
 
 struct AddMultipliedStereoOp

@@ -3,7 +3,7 @@
  *                               for Qt4
  *
  * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 
 
 #include "rubberband.h"
-
 
 
 rubberBand::rubberBand( QWidget * _parent ) :
@@ -67,14 +66,17 @@ QVector<selectableObject *> rubberBand::selectedObjects() const
 void rubberBand::resizeEvent( QResizeEvent * _re )
 {
 	QRubberBand::resizeEvent( _re );
-	QVector<selectableObject *> so = selectableObjects();
-	for( QVector<selectableObject *>::iterator it = so.begin();
-							it != so.end(); ++it )
+	if( isEnabled() )
 	{
-		( *it )->setSelected( QRect( pos(), size() ).intersects(
-				QRect( ( *it )->mapTo( parentWidget(),
-								QPoint() ),
-							( *it )->size() ) ) );
+		QVector<selectableObject *> so = selectableObjects();
+		for( QVector<selectableObject *>::iterator it = so.begin();
+								it != so.end(); ++it )
+		{
+			( *it )->setSelected( QRect( pos(), size() ).intersects(
+					QRect( ( *it )->mapTo( parentWidget(),
+									QPoint() ),
+								( *it )->size() ) ) );
+		}
 	}
 }
 
