@@ -39,7 +39,7 @@ class TrackContainer;
 class bbTCO : public trackContentObject
 {
 public:
-	bbTCO( track * _track, unsigned int _color = 0 );
+	bbTCO( track * _track );
 	virtual ~bbTCO();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -49,13 +49,24 @@ public:
 		return( "bbtco" );
 	}
 
-	inline unsigned int color() const
+	unsigned int color() const
 	{
-		return( m_color );
+		return( m_color.rgb() );
 	}
-	inline static unsigned int defaultColor()
+	
+	QColor colorObj() const
 	{
-		return qRgb( 128, 182, 175 );
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = QColor( c );
+	}
+
+	void setUseStyleColor( bool b )
+	{
+		m_useStyleColor = b;
 	}
 
 	int bbTrackIndex();
@@ -63,7 +74,8 @@ public:
 	virtual trackContentObjectView * createView( trackView * _tv );
 
 private:
-	unsigned int m_color;
+	QColor m_color;
+	bool m_useStyleColor;
 
 
 	friend class bbTCOView;
@@ -91,6 +103,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void changeColor();
+	void resetColor();
 
 
 protected:
@@ -144,6 +157,26 @@ public:
 		m_disabledTracks.removeAll( _track );
 	}
 
+	static void setLastTCOColor( const QColor & c )
+	{
+		if( ! s_lastTCOColor )
+		{
+			s_lastTCOColor = new QColor( c );
+		}
+		else
+		{
+			*s_lastTCOColor = QColor( c );
+		}
+	}
+	
+	static void clearLastTCOColor()
+	{
+		if( s_lastTCOColor )
+		{
+			delete s_lastTCOColor;
+		}
+		s_lastTCOColor = NULL;
+	}
 
 protected:
 	inline virtual QString nodeName() const
@@ -158,6 +191,7 @@ private:
 	typedef QMap<bbTrack *, int> infoMap;
 	static infoMap s_infoMap;
 
+	static QColor * s_lastTCOColor;
 
 	friend class bbTrackView;
 

@@ -46,9 +46,10 @@
 bbTrack::infoMap bbTrack::s_infoMap;
 
 
-bbTCO::bbTCO( track * _track, unsigned int _color ) :
+bbTCO::bbTCO( track * _track ) :
 	trackContentObject( _track ),
-	m_color( _color > 0 ? _color : defaultColor() )
+	m_color( 128, 128, 128 ),
+	m_useStyleColor( true )
 {
 	tact_t t = engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
@@ -69,41 +70,73 @@ bbTCO::~bbTCO()
 
 
 
-void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void bbTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 {
-	_this.setAttribute( "name", name() );
-	if( _this.parentNode().nodeName() == "clipboard" )
+	element.setAttribute( "name", name() );
+	if( element.parentNode().nodeName() == "clipboard" )
 	{
-		_this.setAttribute( "pos", -1 );
+		element.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		_this.setAttribute( "pos", startPosition() );
+		element.setAttribute( "pos", startPosition() );
 	}
-	_this.setAttribute( "len", length() );
-	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "color", m_color );
+	element.setAttribute( "len", length() );
+	element.setAttribute( "muted", isMuted() );
+	element.setAttribute( "color", color() );
+	
+	if( m_useStyleColor )
+	{
+		element.setAttribute( "usestyle", 1 );
+	}
+	else
+	{
+		element.setAttribute( "usestyle", 0 );
+	}
 }
 
 
 
 
-void bbTCO::loadSettings( const QDomElement & _this )
+void bbTCO::loadSettings( const QDomElement & element )
 {
-	setName( _this.attribute( "name" ) );
-	if( _this.attribute( "pos" ).toInt() >= 0 )
+	setName( element.attribute( "name" ) );
+	if( element.attribute( "pos" ).toInt() >= 0 )
 	{
-		movePosition( _this.attribute( "pos" ).toInt() );
+		movePosition( element.attribute( "pos" ).toInt() );
 	}
-	changeLength( _this.attribute( "len" ).toInt() );
-	if( _this.attribute( "muted" ).toInt() != isMuted() )
+	changeLength( element.attribute( "len" ).toInt() );
+	if( element.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
 	}
 
-	if( _this.attribute( "color" ).toUInt() != 0 )
+	if( element.hasAttribute( "color" ) )
 	{
-		m_color = _this.attribute( "color" ).toUInt();
+		setColor( QColor( element.attribute( "color" ).toUInt() ) );
+	}
+	
+	if( element.hasAttribute( "usestyle" ) )
+	{
+		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
+		{
+			m_useStyleColor = true;
+		}
+		else
+		{
+			m_useStyleColor = false;
+		}
+	}
+	else
+	{
+		if( m_color.rgb() == qRgb( 128, 182, 175 ) || m_color.rgb() == qRgb( 64, 128, 255 ) ) // old or older default color
+		{
+			m_useStyleColor = true;
+		}
+		else
+		{
+			m_useStyleColor = false;
+		}
 	}
 }
 
@@ -163,6 +196,8 @@ void bbTCOView::constructContextMenu( QMenu * _cm )
 						this, SLOT( changeName() ) );
 	_cm->addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Change color" ), this, SLOT( changeColor() ) );
+	_cm->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Reset color to default" ), this, SLOT( resetColor() ) );
 }
 
 
@@ -178,7 +213,12 @@ void bbTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 void bbTCOView::paintEvent( QPaintEvent * )
 {
-	QColor col( m_bbTCO->m_color );
+	QPainter p( this );
+
+	QColor col = m_bbTCO->m_useStyleColor 
+		? p.pen().brush().color()
+		: m_bbTCO->colorObj();
+
 	if( m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted() )
 	{
 		col = QColor( 160, 160, 160 );
@@ -188,7 +228,6 @@ void bbTCOView::paintEvent( QPaintEvent * )
 		col = QColor( qMax( col.red() - 128, 0 ),
 					qMax( col.green() - 128, 0 ), 255 );
 	}
-	QPainter p( this );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	lingrad.setColorAt( 0, col.light( 130 ) );
@@ -263,8 +302,8 @@ void bbTCOView::changeName()
 
 void bbTCOView::changeColor()
 {
-	QColor _new_color = QColorDialog::getColor( m_bbTCO->m_color );
-	if( !_new_color.isValid() )
+	QColor new_color = QColorDialog::getColor( m_bbTCO->m_color );
+	if( ! new_color.isValid() )
 	{
 		return;
 	}
@@ -279,34 +318,48 @@ void bbTCOView::changeColor()
 			bbTCOView * bb_tcov = dynamic_cast<bbTCOView *>( *it );
 			if( bb_tcov )
 			{
-				bb_tcov->setColor( _new_color );
+				bb_tcov->setColor( new_color );
 			}
 		}
 	}
 	else
 	{
-		setColor( _new_color );
+		setColor( new_color );
 	}
 }
 
 
-
-
-void bbTCOView::setColor( QColor _new_color )
+/** \brief Makes the BB pattern use the colour defined in the stylesheet */
+void bbTCOView::resetColor() 
 {
-	if( _new_color.rgb() != m_bbTCO->m_color )
+	if( ! m_bbTCO->m_useStyleColor )
 	{
-		m_bbTCO->m_color = _new_color.rgb();
+		m_bbTCO->m_useStyleColor = true;
 		engine::getSong()->setModified();
 		update();
 	}
+	bbTrack::clearLastTCOColor();
+}
+
+
+
+void bbTCOView::setColor( QColor new_color )
+{
+	if( new_color.rgb() != m_bbTCO->color() )
+	{
+		m_bbTCO->setColor( new_color );
+		m_bbTCO->m_useStyleColor = false;
+		engine::getSong()->setModified();
+		update();
+	}
+	bbTrack::setLastTCOColor( new_color );
 }
 
 
 
 
 
-
+QColor * bbTrack::s_lastTCOColor = NULL;
 
 bbTrack::bbTrack( TrackContainer* tc ) :
 	track( BBTrack, tc )
@@ -404,20 +457,14 @@ trackView * bbTrack::createView( TrackContainerView* tcv )
 
 trackContentObject * bbTrack::createTCO( const MidiTime & _pos )
 {
-	// if we're creating a new bbTCO, we colorize it according to the
-	// previous bbTCO, so we have to get all TCOs from 0 to _pos and
-	// pickup the last and take the color if it
-	tcoVector tcos;
-	getTCOsInRange( tcos, 0, _pos );
-	if( tcos.size() > 0 && dynamic_cast<bbTCO *>( tcos.back() ) != NULL )
+	bbTCO * bbtco = new bbTCO( this );
+	if( s_lastTCOColor )
 	{
-		return new bbTCO( this, dynamic_cast<bbTCO *>( tcos.back() )->color() );
-
+		bbtco->setColor( *s_lastTCOColor );
+		bbtco->setUseStyleColor( false );
 	}
-	return new bbTCO( this );
+	return bbtco;
 }
-
-
 
 
 

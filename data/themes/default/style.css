@@ -520,6 +520,7 @@ AutomationPatternView {
 
 /* bb-pattern */
 bbTCOView {
+	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
 	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
