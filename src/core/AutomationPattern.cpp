@@ -35,6 +35,8 @@
 #include "ProjectJournal.h"
 #include "bb_track_container.h"
 #include "song.h"
+#include "text_float.h"
+#include "embed.h"
 
 
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
@@ -96,8 +98,8 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 		{
 			if( *it == _obj )
 			{
-				// Already exists
-				// TODO: Maybe let the user know in some non-annoying way
+				textFloat::displayMessage( _obj->displayName(), tr( "Model is already connected "
+												"to this pattern." ), embed::getIconPixmap( "automation" ), 2000 );
 				return;
 			}
 		}

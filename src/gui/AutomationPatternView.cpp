@@ -391,14 +391,6 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		{
 			engine::automationEditor()->setCurrentPattern( m_pat );
 		}
-
-		//This is the only model that's just added to AutomationPattern.
-		if( m_pat->m_objects.size() == 1 )
-		{
-			//scale the points to fit the new min. and max. value
-			this->scaleTimemapToFit( AutomationPattern::DEFAULT_MIN_VALUE,
-									 AutomationPattern::DEFAULT_MAX_VALUE );
-		}
 	}
 	else
 	{
