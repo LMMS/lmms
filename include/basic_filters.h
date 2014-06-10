@@ -138,7 +138,7 @@ public:
 			m_rclp1[_chnl] = m_rcbp1[_chnl] = m_rchp1[_chnl] = m_rclast1[_chnl] = 0.0f;
 			
 			for(int i=0; i<6; i++)
-			   m_vflp[i][_chnl] = m_vfbp[i][_chnl] = m_vfhp[i][_chnl] = m_vflast[i][_chnl] = 0.0f;
+			   m_vfbp[i][_chnl] = m_vfhp[i][_chnl] = m_vflast[i][_chnl] = 0.0f;
 		}
 	}
 
@@ -631,7 +631,7 @@ private:
 	frame m_rcbp1, m_rclp1, m_rchp1, m_rclast1;
 
 	// in/out history for Formant-filters
-	frame m_vfbp[6], m_vflp[6], m_vfhp[6], m_vflast[6];
+	frame m_vfbp[6], m_vfhp[6], m_vflast[6];
 	
 	FilterTypes m_type;
 	bool m_doubleFilter;
