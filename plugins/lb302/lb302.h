@@ -245,6 +245,7 @@ private:
 
 	friend class lb302SynthView;
 
+	NotePlayHandle * m_playingNote;
 	NotePlayHandleList m_notes;
 	QMutex m_notesMutex;
 } ;
