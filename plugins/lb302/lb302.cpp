@@ -472,7 +472,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	// Hold on to the current VCF, and use it throughout this period
 	lb302Filter *filter = vcf;
 
-	if( delete_freq == current_freq ) {
+	if( release_frame == 0 || delete_freq == current_freq ) {
 		// Normal release
 		delete_freq = -1;
 		vca_mode = 1;
@@ -761,27 +761,29 @@ void lb302Synth::processNote( NotePlayHandle * _n )
 	//if (_n->released() && catch_decay == 0)
 	//        catch_decay = 1;
 
-	bool decay_note = false;
+/*	bool decay_note = false;*/
 
-	release_frame = _n->framesLeft() - desiredReleaseFrames();
+	release_frame = qMax( release_frame, _n->framesLeft() );
 
 
 	//LB303 if ( _n->totalFramesPlayed() <= 0 ) {
 		// This code is obsolete, hence the "if false"
 
 		// Existing note. Allow it to decay.
-		if(deadToggle.value() == 0 && decay_note) {
+/*		if(deadToggle.value() == 0 && decay_note) {
 
-	/*		lb302Note note;
+			lb302Note note;
 			note.vco_inc = _n->frequency()*vco_detune/engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 			note.dead = deadToggle.value();
 			initNote(&note);
 			vca_mode=0;
-	*/
+	
 
-		}
+		}*/
 		/// Start a new note.
-		else if( _n->m_pluginData == NULL ) {
+		if( _n->m_pluginData != this || ( ! m_playingNote && ! _n->isReleased() ) ) 
+		{
+			m_playingNote = _n;
 			new_freq = _n->unpitchedFrequency();
 			true_freq = _n->frequency();
 			_n->m_pluginData = this;
@@ -808,6 +810,7 @@ void lb302Synth::processNote( NotePlayHandle * _n )
 
 void lb302Synth::play( sampleFrame * _working_buffer )
 {
+	release_frame = 0;
 	while( ! m_notes.isEmpty() )
 	{
 		processNote( m_notes.takeFirst() );
@@ -825,9 +828,10 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 void lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 {
 	//printf("GONE\n");
-	if( _n->unpitchedFrequency() == current_freq )
+	if( m_playingNote == _n )
 	{
 		delete_freq = current_freq;
+		m_playingNote = NULL;
 	}
 }
 
