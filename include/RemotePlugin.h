@@ -52,7 +52,7 @@
 #include <process.h>
 #endif
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 #if QT_VERSION >= 0x040400
 #include <QtCore/QSystemSemaphore>
@@ -75,7 +75,7 @@
 
 #ifdef USE_QT_SHMEM
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 #if QT_VERSION >= 0x040400
 #include <QtCore/QSharedMemory>
