@@ -331,7 +331,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_attack = 1.0 - 0.96406088;
 	vca_decay = 0.99897516;
 
-	vco_shape = SAWTOOTH;
+	vco_shape = BL_SAWTOOTH;
 
 	// Experimenting with a0 between original (0.5) and 1.0
 	vca_a0 = 0.5;
@@ -343,15 +343,13 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	db24Toggled();
 
 	sample_cnt = 0;
-	release_frame = 1<<24;
+	release_frame = 0;
 	catch_frame = 0;
 	catch_decay = 0;
 
 	last_offset = 0;
 
-	new_freq = -1;
-	current_freq = -1;
-	delete_freq = -1;
+	new_freq = false;
 
 	filterChanged();
 
@@ -472,27 +470,20 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	// Hold on to the current VCF, and use it throughout this period
 	lb302Filter *filter = vcf;
 
-	if( release_frame == 0 || delete_freq == current_freq ) {
-		// Normal release
-		delete_freq = -1;
+	if( release_frame == 0 || ! m_playingNote ) 
+	{
 		vca_mode = 1;
 	}
 
-	if( new_freq > 0.0f ) {
+	if( new_freq ) 
+	{
 		//printf("  playing new note..\n");
 		lb302Note note;
 		note.vco_inc = GET_INC( true_freq );
-		//printf("GET_INC %f %f %d\n", note.vco_inc, new_freq, vca_mode );
-		///**vco_detune*//engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
-		//printf("VCO_INC = %f\n", note.vco_inc);
 		note.dead = deadToggle.value();
 		initNote(&note);
-		//printf("%f %f,  ", vco_inc, vco_c);
 
-		current_freq = new_freq;
-
-		new_freq = -1.0f;
-		//printf("GOT_INC %f %f %d\n\n", note.vco_inc, new_freq, vca_mode );
+		new_freq = false;
 	}
 
 
@@ -500,7 +491,13 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
 
-	for(int i=0;i<size;i++) {
+	for( int i=0; i<size; i++ ) 
+	{
+		// start decay if we're past release
+		if( i >= release_frame )
+		{
+			vca_mode = 1;
+		}
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
@@ -524,16 +521,9 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 
 		// update vco
 		vco_c += vco_inc;
-
+		
 		if(vco_c > 0.5)
 			vco_c -= 1.0;
-
-		/*LB303
-		if (catch_decay > 0) {
-			if (catch_decay < decay_frames) {
-				catch_decay++;
-			}
-		}*/
 
 		switch(int(rint(wave_shape.value()))) {
 			case 0: vco_shape = SAWTOOTH; break;
@@ -640,16 +630,10 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 		*/
 		//LB302 samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
-		for(int c=0; c<DEFAULT_CHANNELS; c++) {
-			outbuf[i][c]=samp;
+		for( int c = 0; c < DEFAULT_CHANNELS; c++ ) 
+		{
+			outbuf[i][c] = samp;
 		}
-
-
-		/*LB303
-		if((int)i>=release_frame) {
-			vca_mode=1;
-		}
-		*/
 
 		// Handle Envelope
 		if(vca_mode==0) {
@@ -696,18 +680,7 @@ void lb302Synth::initNote( lb302Note *n)
 		vca_mode = 2;
 	}
 
-	// Initiate Slide
-	// TODO: Break out into function, should be called again on detuneChanged
-	if (vco_slideinc) {
-		//printf("    sliding\n");
-		vco_slide = vco_inc-vco_slideinc;	// Slide amount
-		vco_slidebase = vco_inc;			// The REAL frequency
-		vco_slideinc = 0;					// reset from-note
-	}
-	else {
-		vco_slide = 0;
-	}
-	// End break-out
+	initSlide();
 
 	// Slide-from note, save inc for next note
 	if (slideToggle.value()) {
@@ -730,6 +703,21 @@ void lb302Synth::initNote( lb302Note *n)
 }
 
 
+void lb302Synth::initSlide()
+{
+	// Initiate Slide
+	if (vco_slideinc) {
+		//printf("    sliding\n");
+		vco_slide = vco_inc-vco_slideinc;	// Slide amount
+		vco_slidebase = vco_inc;			// The REAL frequency
+		vco_slideinc = 0;					// reset from-note
+	}
+	else {
+		vco_slide = 0;
+	}
+}
+
+
 void lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	if( _n->isMasterNote() )
@@ -748,49 +736,34 @@ void lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 		m_notes.prepend( _n );
 	}
 	m_notesMutex.unlock();
+	
+	release_frame = qMax( release_frame, _n->framesLeft() + _n->offset() );
 }
 
 
 
 void lb302Synth::processNote( NotePlayHandle * _n )
 {
-	//fpp_t framesPerPeriod = engine::mixer()->framesPerPeriod();
-
-	// Currently have release/decay disabled
-	// Start the release decay if this is the first release period.
-	//if (_n->released() && catch_decay == 0)
-	//        catch_decay = 1;
-
-/*	bool decay_note = false;*/
-
-	release_frame = qMax( release_frame, _n->framesLeft() );
-
-
-	//LB303 if ( _n->totalFramesPlayed() <= 0 ) {
-		// This code is obsolete, hence the "if false"
-
-		// Existing note. Allow it to decay.
-/*		if(deadToggle.value() == 0 && decay_note) {
-
-			lb302Note note;
-			note.vco_inc = _n->frequency()*vco_detune/engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
-			note.dead = deadToggle.value();
-			initNote(&note);
-			vca_mode=0;
-	
-
-		}*/
 		/// Start a new note.
-		if( _n->m_pluginData != this || ( ! m_playingNote && ! _n->isReleased() ) ) 
+		if( _n->m_pluginData != this ) 
 		{
 			m_playingNote = _n;
-			new_freq = _n->unpitchedFrequency();
-			true_freq = _n->frequency();
+			new_freq = true;
 			_n->m_pluginData = this;
+		}
+		
+		if( ! m_playingNote && ! _n->isReleased() && release_frame > 0 )
+		{
+			m_playingNote = _n;
+			if ( slideToggle.value() ) 
+			{
+				vco_slideinc = GET_INC( _n->frequency() );
+			}
 		}
 
 		// Check for slide
-		if( _n->unpitchedFrequency() == current_freq ) {
+		if( m_playingNote == _n ) 
+		{
 			true_freq = _n->frequency();
 
 			if( slideToggle.value() ) {
@@ -800,27 +773,22 @@ void lb302Synth::processNote( NotePlayHandle * _n )
 				vco_inc = GET_INC( true_freq );
 			}
 		}
-
-	//LB303 }
-
-
 }
 
 
 
 void lb302Synth::play( sampleFrame * _working_buffer )
 {
-	release_frame = 0;
 	while( ! m_notes.isEmpty() )
 	{
 		processNote( m_notes.takeFirst() );
 	};
-
+	
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
-	process( _working_buffer, frames);
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames,
-									NULL );
+	process( _working_buffer, frames );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	release_frame = 0;
 }
 
 
@@ -830,7 +798,6 @@ void lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 	//printf("GONE\n");
 	if( m_playingNote == _n )
 	{
-		delete_freq = current_freq;
 		m_playingNote = NULL;
 	}
 }
