@@ -169,6 +169,7 @@ private:
 	void processNote( NotePlayHandle * n );
 
 	void initNote(lb302Note *note);
+	void initSlide();
 
 private:
 	FloatModel vcf_cut_knob;
@@ -234,9 +235,7 @@ private:
 	int catch_frame;
 	int catch_decay;
 
-	float new_freq;
-	float current_freq;
-	float delete_freq;
+	bool new_freq;
 	float true_freq;
 
 	void recalcFilter();
