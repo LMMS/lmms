@@ -108,6 +108,8 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 
 void kickerInstrument::loadSettings( const QDomElement & _this )
 {
+	m_versionModel.loadSettings( _this, "version" );
+
 	m_startFreqModel.loadSettings( _this, "startfreq" );
 	m_endFreqModel.loadSettings( _this, "endfreq" );
 	m_decayModel.loadSettings( _this, "decay" );
@@ -126,18 +128,22 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_clickModel.loadSettings( _this, "click" );
 	m_slopeModel.loadSettings( _this, "slope" );
 	m_startNoteModel.loadSettings( _this, "startnote" );
+	if( m_versionModel.value() < 1 )
+	{
+		m_startNoteModel.setValue( false );
+	}
 	m_endNoteModel.loadSettings( _this, "endnote" );
-	m_versionModel.loadSettings( _this, "version" );
 
 	// Try to maintain backwards compatibility
 	if( !_this.hasAttribute( "version" ) )
 	{
+
 		m_decayModel.setValue( m_decayModel.value() * 1.33f );
 		m_envModel.setValue( 1.0f );
 		m_slopeModel.setValue( 1.0f );
 		m_clickModel.setValue( 0.0f );
-		m_versionModel.setValue( KICKER_PRESET_VERSION );
 	}
+	m_versionModel.setValue( KICKER_PRESET_VERSION );
 }
 
 
