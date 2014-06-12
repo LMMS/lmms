@@ -207,13 +207,13 @@ void FxMixer::deleteChannel(int index)
 	}
 
 	// delete all of this channel's sends and receives
-	for(int i=0; i<m_fxChannels[index]->m_sends.size(); ++i)
+	while( ! m_fxChannels[index]->m_sends.isEmpty() )
 	{
-		deleteChannelSend(index, m_fxChannels[index]->m_sends[i]);
+		deleteChannelSend( index, m_fxChannels[index]->m_sends.first() );
 	}
-	for(int i=0; i<m_fxChannels[index]->m_receives.size(); ++i)
+	while( ! m_fxChannels[index]->m_receives.isEmpty() )
 	{
-		deleteChannelSend(m_fxChannels[index]->m_receives[i], index);
+		deleteChannelSend( m_fxChannels[index]->m_receives.first(), index );
 	}
 
 	for(int i=0; i<m_fxChannels.size(); ++i)
