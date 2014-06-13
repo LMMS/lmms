@@ -94,7 +94,7 @@ public:
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
 	virtual bool isFinished() const
 	{
-		return m_released && framesLeft() <= 0;
+		return m_released && framesLeft() <= 0 && m_scheduledNoteOff < 0;
 	}
 
 	/*! Returns number of frames left for playback */
@@ -264,6 +264,7 @@ private:
 											// played after release
 	f_cnt_t m_releaseFramesDone;			// number of frames done after
 											// release of note
+	f_cnt_t m_scheduledNoteOff;			// variable for scheduling noteoff at next period
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
 	bool m_hasParent;
