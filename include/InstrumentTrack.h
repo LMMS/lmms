@@ -160,6 +160,8 @@ public:
 	{
 		return &m_baseNoteModel;
 	}
+	
+	int baseNote() const;
 
 	Piano *pianoModel()
 	{

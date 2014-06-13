@@ -68,7 +68,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_muted( false ),
 	m_bbTrack( NULL ),
 	m_origTempo( engine::getSong()->getTempo() ),
-	m_origBaseNote( instrumentTrack->baseNoteModel()->value() ),
+	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
@@ -182,7 +182,7 @@ void NotePlayHandle::setPanning( panning_t panning )
 
 int NotePlayHandle::midiKey() const
 {
-	return key() - m_origBaseNote + instrumentTrack()->baseNoteModel()->value();
+	return key() - m_origBaseNote + instrumentTrack()->baseNote();
 }
 
 

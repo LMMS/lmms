@@ -135,6 +135,11 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 }
 
 
+int InstrumentTrack::baseNote() const
+{
+	return m_baseNoteModel.value() - engine::getSong()->masterPitch();
+}
+
 
 
 InstrumentTrack::~InstrumentTrack()
@@ -537,7 +542,7 @@ void InstrumentTrack::updatePitchRange()
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
-	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
+	int key = baseNote();
 	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
 }
 
