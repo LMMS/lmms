@@ -56,14 +56,21 @@ public:
 		// if not, we need to ensure that all our nph's have been processed first
 		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
 		
-		foreach( const NotePlayHandle * cnph, nphv )
+		bool nphsLeft;
+		do
 		{
-			NotePlayHandle * nph = const_cast<NotePlayHandle *>( cnph );
-			while( nph->state() != ThreadableJob::Done )
+			nphsLeft = false;
+			foreach( const NotePlayHandle * cnph, nphv )
 			{
-				nph->process();
+				NotePlayHandle * nph = const_cast<NotePlayHandle *>( cnph );
+				if( nph->state() != ThreadableJob::Done && ! nph->isFinished() )
+				{
+					nphsLeft = true;
+					nph->process();
+				}
 			}
 		}
+		while( nphsLeft );
 		
 		m_instrument->play( _working_buffer );
 	}
