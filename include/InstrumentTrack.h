@@ -74,7 +74,7 @@ public:
 	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
 	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
 	// silence all running notes played by this track
-	void silenceAllNotes();
+	void silenceAllNotes( bool removeIPH = false );
 
 	bool isSustainPedalPressed() const
 	{

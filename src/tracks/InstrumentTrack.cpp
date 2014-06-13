@@ -144,8 +144,8 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
-	// kill all running notes
-	silenceAllNotes();
+	// kill all running notes and the iph
+	silenceAllNotes( true );
 
 	// now we're save deleting the instrument
 	delete m_instrument;
@@ -402,7 +402,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 
 
-void InstrumentTrack::silenceAllNotes()
+void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
 	engine::mixer()->lock();
 	for( int i = 0; i < NumKeys; ++i )
@@ -413,7 +413,7 @@ void InstrumentTrack::silenceAllNotes()
 
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	engine::mixer()->removePlayHandles( this );
+	engine::mixer()->removePlayHandles( this, removeIPH );
 	engine::mixer()->unlock();
 }
 
@@ -700,7 +700,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
-	silenceAllNotes();
+	silenceAllNotes( true );
 
 	engine::mixer()->lock();
 
@@ -776,7 +776,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 
 Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 {
-	silenceAllNotes();
+	silenceAllNotes( true );
 
 	engine::mixer()->lock();
 	delete m_instrument;
