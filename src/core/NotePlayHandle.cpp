@@ -119,7 +119,14 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 NotePlayHandle::~NotePlayHandle()
 {
 	noteOff( 0 );
-
+	if( m_scheduledNoteOff >= 0 ) // ensure that scheduled noteoffs get triggered if somehow the nph got destructed prematurely
+	{
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+			MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
+			m_scheduledNoteOff );
+	}
+	
 	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
@@ -199,7 +206,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	if( m_released == false &&
 		instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() >= m_frames )
+		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() > m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
 	}
