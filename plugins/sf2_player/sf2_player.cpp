@@ -542,7 +542,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	{
 		SF2PluginData * pluginData = new SF2PluginData;
 		pluginData->midiNote = midiNote;
-		pluginData->lastPanning = -1;
+		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = 127;
 		pluginData->fluidVoice = NULL;
 
@@ -588,7 +588,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_notesRunningMutex.unlock();
 	}
 
-	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
+/*	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
 #ifdef SOMEONE_FIXED_PER_NOTE_PANNING
 	if( pluginData->fluidVoice &&
@@ -620,7 +620,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_synthMutex.unlock();
 
 		pluginData->lastVelocity = currentVelocity;
-	}
+	}*/
 }
 
 
