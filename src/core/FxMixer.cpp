@@ -538,9 +538,9 @@ void FxMixer::clearChannel(fx_ch_t index)
 	if( index > 0)
 	{
 		// delete existing sends
-		for( int i=0; i<ch->m_sends.size(); ++i)
+		while( ! ch->m_sends.isEmpty() )
 		{
-			deleteChannelSend(index, ch->m_sends[i]);
+			deleteChannelSend( index, ch->m_sends.first() );
 		}
 
 		// add send to master
@@ -548,11 +548,10 @@ void FxMixer::clearChannel(fx_ch_t index)
 	}
 
 	// delete receives
-	for( int i=0; i<ch->m_receives.size(); ++i)
+	while( ! ch->m_receives.isEmpty() )
 	{
-		deleteChannelSend(ch->m_receives[i], index);
+		deleteChannelSend( ch->m_receives.first(), index );
 	}
-
 }
 
 void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
