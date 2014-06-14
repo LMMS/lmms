@@ -140,6 +140,7 @@ private:
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
+	QMutex m_sendsMutex;
 
 	void addChannelLeaf( int _ch, sampleFrame * _buf );
 

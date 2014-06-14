@@ -252,7 +252,7 @@ void FxMixer::moveChannelLeft(int index)
 	{
 		return;
 	}
-
+	m_sendsMutex.lock();
 	// channels to swap
 	int a = index - 1, b = index;
 
@@ -314,6 +314,7 @@ void FxMixer::moveChannelLeft(int index)
 	FxChannel * tmpChannel = m_fxChannels[a];
 	m_fxChannels[a] = m_fxChannels[b];
 	m_fxChannels[b] = tmpChannel;
+	m_sendsMutex.unlock();
 }
 
 
@@ -340,7 +341,7 @@ void FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
 	}
 
 	// connection does not exist. create a new one
-
+	m_sendsMutex.lock();
 	// add to from's sends
 	from->m_sends.push_back(toChannel);
 	from->m_sendAmount.push_back(new FloatModel(amount, 0, 1, 0.001, NULL,
@@ -348,7 +349,7 @@ void FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
 
 	// add to to's receives
 	m_fxChannels[toChannel]->m_receives.push_back(fromChannel);
-
+	m_sendsMutex.unlock();
 }
 
 
@@ -359,7 +360,7 @@ void FxMixer::deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
 	// delete the send
 	FxChannel * from = m_fxChannels[fromChannel];
 	FxChannel * to	 = m_fxChannels[toChannel];
-
+	m_sendsMutex.lock();
 	// find and delete the send entry
 	for(int i=0; i<from->m_sends.size(); ++i) {
 		if( from->m_sends[i] == toChannel )
@@ -382,6 +383,7 @@ void FxMixer::deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
 			break;
 		}
 	}
+	m_sendsMutex.unlock();
 }
 
 
@@ -480,6 +482,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// and add all channels to job list that have no dependencies
 	// when the channel completes it will check its parent to see if it needs
 	// to be processed.
+	m_sendsMutex.lock();
 	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
 	addChannelLeaf( 0, _buf );
 	while( m_fxChannels[0]->state() != ThreadableJob::Done )
@@ -487,6 +490,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		MixerWorkerThread::startAndWaitForJobs();
 	}
 	//m_fxChannels[0]->doProcessing( NULL );
+	m_sendsMutex.unlock();
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
