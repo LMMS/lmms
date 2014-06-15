@@ -344,7 +344,6 @@ private:
 	int m_counter3r;
 	int m_counterMax;
 	
-	float m_minfreq_pd;
 	float m_fmCorrection;
 };
 

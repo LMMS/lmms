@@ -112,7 +112,6 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_counter3r = 0;
 	m_counterMax = ( m_samplerate * 10 ) / 44100;
 
-	m_minfreq_pd = 1.0f / ( m_samplerate / MIN_FREQ );
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
 }
 
@@ -152,12 +151,13 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_l2 != 0.0f ) car += m_lfo2_buf[f] * mod##_l2;
 
 #define modulatevol( car, mod ) \
-		if( mod##_e1 > 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
-		if( mod##_e1 < 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_e1 * m_env1_buf[f] ), MODCLIP );	\
-		if( mod##_e2 > 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
-		if( mod##_e2 < 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_e2 * m_env2_buf[f] ), MODCLIP );	\
-		if( mod##_l1 != 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_l1 * m_lfo1_buf[f] ), MODCLIP ); \
-		if( mod##_l2 != 0.0f ) car = qBound( -MODCLIP, car * ( 1.0f + mod##_l2 * m_lfo2_buf[f] ), MODCLIP );
+		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ); \
+		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * m_env1_buf[f] );	\
+		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] );	\
+		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * m_env2_buf[f] );	\
+		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * m_lfo1_buf[f] ); \
+		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * m_lfo2_buf[f] ); \
+		car = qBound( -MODCLIP, car, MODCLIP );
 
 	// pre-render env's and lfo's
 	renderModulators( _frames );
@@ -192,8 +192,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// get volumes
 	const float o1lv = m_parent->m_osc1l_vol;
 	const float o1rv = m_parent->m_osc1r_vol;
-	const float o1v_e1 = ( m_parent->m_vol1env1.value() * 2.0f );
-	const float o1v_e2 = ( m_parent->m_vol1env2.value() * 2.0f );
+	const float o1v_e1 = ( m_parent->m_vol1env1.value() );
+	const float o1v_e2 = ( m_parent->m_vol1env2.value() );
 	const float o1v_l1 = ( m_parent->m_vol1lfo1.value() );
 	const float o1v_l2 = ( m_parent->m_vol1lfo2.value() );
 	const bool o1v_mod = o1v_e1 != 0.0f || o1v_e2 != 0.0f || o1v_l1 != 0.0f || o1v_l2 != 0.0f;
@@ -246,8 +246,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 
 	// get pitch modulators
 	const float o3fb = ( m_parent->m_osc3_freq * m_nph->frequency() );
-	const float o3f_e1 = ( m_parent->m_pit3env1.value() );
-	const float o3f_e2 = ( m_parent->m_pit3env2.value() );
+	const float o3f_e1 = ( m_parent->m_pit3env1.value() * 2.0f );
+	const float o3f_e2 = ( m_parent->m_pit3env2.value() * 2.0f );
 	const float o3f_l1 = ( m_parent->m_pit3lfo1.value() );
 	const float o3f_l2 = ( m_parent->m_pit3lfo2.value() );
 	const bool o3f_mod = o3f_e1 != 0.0f || o3f_e2 != 0.0f || o3f_l1 != 0.0f || o3f_l2 != 0.0f;
@@ -288,7 +288,6 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// 	 start buffer loop   //
 	//                       //
 	///////////////////////////
-
 
 	// declare working variables for for loop
 
