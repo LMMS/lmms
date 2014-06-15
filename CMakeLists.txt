@@ -655,6 +655,8 @@ SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
   \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+  DeleteRegKey HKCR \\\"LMMS Project\\\"
+  DeleteRegKey HKCR \\\"LMMS Project (compressed)\\\"
   ")
 ELSE(WIN32)
 SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")
