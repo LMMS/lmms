@@ -1008,7 +1008,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 			{
 				m_env2_buf[f] = s;
 				m_env2_phase = qMin( 4.0f - env2_sus, m_env2_phase + m_parent->m_env2_dec );
-				if( m_env1_phase == 4.0f ) m_env1_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
+				if( m_env2_phase == 4.0f ) m_env2_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
 			}
 		}
 		else if( m_env2_phase < 5.0f ) // release phase
