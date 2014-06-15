@@ -178,6 +178,11 @@ const float MAX_FREQ = 48000.0f;
 
 const float INTEGRATOR = 3.0f / 7.0f;
 
+const float FM_AMOUNT = 0.25f;
+
+const float PW_MIN = 0.25f;
+const float PW_MAX = 100.0f - PW_MIN;
+
 class MonstroInstrument;
 class MonstroView;
 
@@ -338,6 +343,9 @@ private:
 	int m_counter3l;
 	int m_counter3r;
 	int m_counterMax;
+	
+	float m_minfreq_pd;
+	float m_fmCorrection;
 };
 
 class MonstroInstrument : public Instrument
