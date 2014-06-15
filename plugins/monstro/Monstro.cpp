@@ -143,8 +143,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( mod##_e1 != 0.0f ) car += m_env1_buf[f] * mod##_e1; \
 		if( mod##_e2 != 0.0f ) car += m_env2_buf[f] * mod##_e2; \
 		if( mod##_l1 != 0.0f ) car += m_lfo1_buf[f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += m_lfo2_buf[f] * mod##_l2; \
-		car = qBound( 0.0f, car, 1.0f );
+		if( mod##_l2 != 0.0f ) car += m_lfo2_buf[f] * mod##_l2; 
 
 #define modulatephs( car, mod ) \
 		if( mod##_e1 != 0.0f ) car += m_env1_buf[f] * mod##_e1; \
@@ -562,6 +561,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( o3s_mod )
 		{
 			modulateabs( sub, o3s )
+			sub = qBound( 0.0f, sub, 1.0f );
 		}
 
 		sample_t O3L = linearInterpolate( O3AL, O3BL, sub );
