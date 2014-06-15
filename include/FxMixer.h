@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _FX_MIXER_H
-#define _FX_MIXER_H
+#ifndef FX_MIXER_H
+#define FX_MIXER_H
 
 #include "Model.h"
 #include "Mixer.h"
@@ -140,6 +140,7 @@ private:
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
+	QMutex m_sendsMutex;
 
 	void addChannelLeaf( int _ch, sampleFrame * _buf );
 
