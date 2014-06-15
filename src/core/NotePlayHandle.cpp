@@ -61,13 +61,14 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
+	m_scheduledNoteOff( -1 ),
 	m_released( false ),
 	m_hasParent( parent != NULL  ),
 	m_hadChildren( false ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
 	m_origTempo( engine::getSong()->getTempo() ),
-	m_origBaseNote( instrumentTrack->baseNoteModel()->value() ),
+	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
@@ -100,7 +101,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if( !isMasterNote() || !instrumentTrack->isArpeggioEnabled() )
+	if( hasParent() || !instrumentTrack->isArpeggioEnabled() )
 	{
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
@@ -118,7 +119,14 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 NotePlayHandle::~NotePlayHandle()
 {
 	noteOff( 0 );
-
+	if( m_scheduledNoteOff >= 0 ) // ensure that scheduled noteoffs get triggered if somehow the nph got destructed prematurely
+	{
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+			MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
+			m_scheduledNoteOff );
+	}
+	
 	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
@@ -174,7 +182,7 @@ void NotePlayHandle::setPanning( panning_t panning )
 
 int NotePlayHandle::midiKey() const
 {
-	return key() - m_origBaseNote + instrumentTrack()->baseNoteModel()->value();
+	return key() - m_origBaseNote + instrumentTrack()->baseNote();
 }
 
 
@@ -182,6 +190,15 @@ int NotePlayHandle::midiKey() const
 
 void NotePlayHandle::play( sampleFrame * _working_buffer )
 {
+	if( m_scheduledNoteOff >= 0 ) // always trigger scheduled noteoffs, because they're only scheduled if the note is released
+	{
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+			MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
+			m_scheduledNoteOff );
+		m_scheduledNoteOff = -1;
+	}
+	
 	if( m_muted )
 	{
 		return;
@@ -189,7 +206,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	if( m_released == false &&
 		instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() >= m_frames )
+		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() > m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
 	}
@@ -289,9 +306,9 @@ f_cnt_t NotePlayHandle::framesLeft() const
 	{
 		return m_framesBeforeRelease;
 	}
-	else if( m_released && actualReleaseFramesToDo() >= m_releaseFramesDone )
+	else if( m_released )
 	{
-		return m_framesBeforeRelease + actualReleaseFramesToDo() - m_releaseFramesDone;
+		return m_framesBeforeRelease + m_releaseFramesToDo - m_releaseFramesDone;
 	}
 	return m_frames+actualReleaseFramesToDo()-m_totalFramesPlayed;
 }
@@ -330,15 +347,23 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = qMax<f_cnt_t>( 0, m_instrumentTrack->m_soundShaping.releaseFrames() );
+	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
 
 	if( hasParent() || !instrumentTrack()->isArpeggioEnabled() )
 	{
 		// send MidiNoteOff event
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ), 
-			_s );
+		f_cnt_t realOffset = offset() + _s; // get actual frameoffset of release, in global time
+		if( realOffset < engine::mixer()->framesPerPeriod() ) // if release happens during this period, trigger midievent
+		{
+			m_instrumentTrack->processOutEvent(
+				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+				MidiTime::fromFrames( realOffset, engine::framesPerTick() ), 
+				realOffset );
+		}
+		else // if release flows over to next period, use m_scheduledNoteOff to trigger it later
+		{
+			m_scheduledNoteOff = realOffset - engine::mixer()->framesPerPeriod();
+		}
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
