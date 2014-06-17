@@ -464,6 +464,7 @@ inline float GET_INC(float freq) {
 
 int lb302Synth::process(sampleFrame *outbuf, const int size)
 {
+	const float sampleRatio = 44100.f / engine::mixer()->processingSampleRate();
 	float w;
 	float samp;
 
@@ -506,9 +507,9 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 			vcf_envpos = 0;
 
 			if (vco_slide) {
-					vco_inc=vco_slidebase-vco_slide;
+					vco_inc = vco_slidebase - vco_slide;
 					// Calculate coeff from dec_knob on knob change.
-					vco_slide*= 0.9+(slide_dec_knob.value()*0.0999); // TODO: Adjust for Hz and ENVINC
+					vco_slide -= vco_slide * ( 0.1f - slide_dec_knob.value() * 0.0999f ) * sampleRatio; // TODO: Adjust for ENVINC
 
 			}
 		}
