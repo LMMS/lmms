@@ -230,7 +230,6 @@ private:
 	NotePlayHandle* m_notes[NumKeys];
 	int m_runningMidiNotes[NumKeys];
 	bool m_sustainPedalPressed;
-	QMutex m_notesMutex;
 
 	bool m_silentBuffersProcessed;
 
