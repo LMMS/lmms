@@ -240,7 +240,7 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	engine::mixer()->lock();
-
+	QMutexLocker locker( &m_notesMutex );
 	bool eventHandled = false;
 
 	switch( event.type() )

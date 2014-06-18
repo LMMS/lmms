@@ -235,7 +235,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 	// time an audio-buffer is rendered...
 	if( ( _n->origin() == NotePlayHandle::OriginArpeggio || ( _n->hasParent() == false && _n->instrumentTrack()->isArpeggioEnabled() == false ) ) &&
 			_n->totalFramesPlayed() == 0 &&
-			m_chordsEnabledModel.value() == true )
+			m_chordsEnabledModel.value() == true && ! _n->isReleased() )
 	{
 		// then insert sub-notes for chord
 		const int selected_chord = m_chordsModel.value();
