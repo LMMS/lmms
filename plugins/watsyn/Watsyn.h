@@ -183,17 +183,25 @@ private:
 	inline void srccpy( float * _dst, float * _src )
 	{
 		int err;
+		const int margin = 64;
+		
+		// copy to temp array
+		float * tmp = new float [ GRAPHLEN + margin ];
+		memcpy( tmp, _src, sizeof( float ) * GRAPHLEN );
+		memcpy( tmp + GRAPHLEN, _src, sizeof( float ) * margin );
 		SRC_STATE * src_state = src_new( SRC_SINC_FASTEST, 1, &err );
 		SRC_DATA src_data;
-		src_data.data_in = _src;
-		src_data.input_frames = GRAPHLEN;
+		src_data.data_in = tmp;
+		src_data.input_frames = GRAPHLEN + margin;
 		src_data.data_out = _dst;
 		src_data.output_frames = WAVELEN;
 		src_data.src_ratio = static_cast<double>( WAVERATIO );
-		src_data.end_of_input = 1;
+		src_data.end_of_input = 0;
 		err = src_process( src_state, &src_data ); 
 		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
 		src_delete( src_state );
+		
+		delete tmp;
 	}
 
 	// memcpy utilizing cubic interpolation
