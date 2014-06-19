@@ -45,19 +45,18 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex )
 {
-	setFixedSize( 32, 287 );
+	setFixedSize( 33, 287 );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 
 	// mixer sends knob
 	m_sendKnob = new knob( knobBright_26, this, tr("Channel send amount") );
-	m_sendKnob->move(3, 22);
+	m_sendKnob->move( 3, 22 );
 	m_sendKnob->setVisible(false);
 
 	// send button indicator
-	m_sendBtn = new SendButtonIndicator(this, this, m_mv);
-	m_sendBtn->setPixmap(embed::getIconPixmap("mixer_send_off", 23, 16));
-	m_sendBtn->move(4,4);
+	m_sendBtn = new SendButtonIndicator( this, this, m_mv );
+	m_sendBtn->move( 2, 2 );
 
 	// channel number
 	m_lcd = new LcdWidget( 2, this );
@@ -97,37 +96,34 @@ void FxLine::setChannelIndex(int index) {
 }
 
 
-static void drawFxLine( QPainter* p, const QWidget *fxLine, const QString& name, bool isActive, bool sendToThis )
+static void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis )
 {
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	QColor bg_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Background );
 	QColor sh_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Shadow );
-	QColor te_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Text );
+	QColor te_color = p->pen().brush().color();
 	QColor bt_color = QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText );
 
 
-	p->fillRect( fxLine->rect(), isActive ? bg_color.lighter(130) : bg_color );
+	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
 
-	p->setPen( bg_color.darker(130) );
+	p->setPen( QColor( 0, 0, 0, 75 ) );
 	p->drawRect( 0, 0, width-2, height-2 );
 
-	p->setPen( bg_color.lighter(150) );
-	p->drawRect( 1, 1, width-2, height-2 );
+	p->setPen( QColor( 255, 255, 255, 75 ) );
+	p->drawRect( 1, 1, width-3, height-3 );
 
-	p->setPen( isActive ? sh_color : bg_color.darker(130) );
+	p->setPen( isActive ? sh_color : QColor( 0, 0, 0, 50 ) );
 	p->drawRect( 0, 0, width-1, height-1 );
 
 	// draw the mixer send background
 	if( sendToThis )
 	{
-		p->drawPixmap(2, 0, 28, 56,
-					  embed::getIconPixmap("send_bg_arrow", 28, 56));
+		p->drawPixmap( 3, 0, 28, 56,
+					  embed::getIconPixmap("send_bg_arrow", 28, 56 ) );
 	}
 
 	// draw the channel name
@@ -239,6 +235,16 @@ void FxLine::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
+}
+
+QBrush FxLine::backgroundActive() const
+{
+	return m_backgroundActive;
+}
+
+void FxLine::setBackgroundActive( const QBrush & c )
+{
+	m_backgroundActive = c;
 }
 
 #include "moc_FxLine.cxx"

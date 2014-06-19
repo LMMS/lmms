@@ -40,6 +40,7 @@ class FxLine : public QWidget
 {
 	Q_OBJECT
 public:
+	Q_PROPERTY( QBrush backgroundActive READ backgroundActive WRITE setBackgroundActive )
 	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
 	~FxLine();
 
@@ -54,10 +55,14 @@ public:
 	knob * m_sendKnob;
 	SendButtonIndicator * m_sendBtn;
 
+	QBrush backgroundActive() const;
+	void setBackgroundActive( const QBrush & c );
+
 private:
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
+	QBrush m_backgroundActive;
 
 private slots:
 	void renameChannel();

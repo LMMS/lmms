@@ -48,7 +48,6 @@
 #include "song.h"
 #include "bb_track_container.h"
 
-
 FxMixerView::FxMixerView() :
 	QWidget(),
 	ModelView( NULL, this ),
@@ -118,10 +117,10 @@ FxMixerView::FxMixerView() :
 	ml->addWidget(channelArea);
 
 	// show the add new effect channel button
-	QPushButton * newChannelBtn = new QPushButton("new", this );
-	newChannelBtn->setFont(QFont("sans-serif", 10, 1, false));
-	newChannelBtn->setFixedSize(fxLineSize);
-	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
+	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
+	newChannelBtn->setObjectName( "newChannelBtn" );
+	newChannelBtn->setFixedSize( fxLineSize );
+	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
@@ -257,7 +256,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	FxMixer * m = engine::fxMixer();
 	m_fader = new fader( &m->effectChannel(_chIndex)->m_volumeModel,
 					tr( "FX Fader %1" ).arg( _chIndex ), m_fxLine );
-	m_fader->move( 15-m_fader->width()/2,
+	m_fader->move( 16-m_fader->width()/2,
 					m_fxLine->height()-
 					m_fader->height()-5 );
 

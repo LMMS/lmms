@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _FX_MIXER_VIEW_H
-#define _FX_MIXER_VIEW_H
+#ifndef FX_MIXER_VIEW_H
+#define FX_MIXER_VIEW_H
 
 #include <QtGui/QWidget>
 #include <QtGui/QHBoxLayout>
