@@ -101,7 +101,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if( hasParent() || !instrumentTrack->isArpeggioEnabled() )
+	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
 	{
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
@@ -229,7 +229,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		// because we do not allow NotePlayHandle::isFinished() to be true
 		// until all sub-notes are completely played and no new ones
 		// are inserted by arpAndChordsTabWidget::processNote()
-		if( isMasterNote() )
+		if( ! m_subNotes.isEmpty() )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 * engine::mixer()->framesPerPeriod();
 		}
@@ -349,7 +349,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
 
-	if( hasParent() || !instrumentTrack()->isArpeggioEnabled() )
+	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
 	{
 		// send MidiNoteOff event
 		f_cnt_t realOffset = offset() + _s; // get actual frameoffset of release, in global time
