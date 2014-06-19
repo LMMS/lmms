@@ -58,6 +58,8 @@ public:
 	QBrush backgroundActive() const;
 	void setBackgroundActive( const QBrush & c );
 
+	static const int FxLineHeight;
+
 private:
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;

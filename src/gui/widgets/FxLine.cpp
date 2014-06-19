@@ -39,13 +39,14 @@
 #include "gui_templates.h"
 #include "caption_menu.h"
 
+const int FxLine::FxLineHeight = 287;
 
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	QWidget( _parent ),
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex )
 {
-	setFixedSize( 33, 287 );
+	setFixedSize( 33, FxLineHeight );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 
