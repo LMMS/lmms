@@ -153,8 +153,8 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		const float xt = m_parent->m_xtalk.value();
 		if( xt > 0.0 )
 		{
-			B2_L += ( A1_L * xt ) / 100.0f;
-			B2_R += ( A1_R * xt ) / 100.0f;
+			B2_L += ( A1_L * xt ) * 0.01f;
+			B2_R += ( A1_R * xt ) * 0.01f;
 		}
 
 		// if phase mod, add to phases
