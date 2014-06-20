@@ -128,20 +128,6 @@ static inline double sinc( double _x )
 }
 
 
-//! @brief Returns logarithm of value, while accounting for zeros or negative values
-static inline float saneLog( float value )
-{
-	if( value == 0.0f ) 
-	{ 
-		return 0.0f; 
-	}
-	return value < 0.0f 
-		? logf( -value ) * -1.0f
-		: logf( value );
-}
-
-
-
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
 static inline float logToLinearScale( float min, float max, float value )
