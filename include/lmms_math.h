@@ -128,5 +128,42 @@ static inline double sinc( double _x )
 }
 
 
+//! @brief Returns logarithm of value, while accounting for zeros or negative values
+static inline float saneLog( float value )
+{
+	if( value == 0.0f ) 
+	{ 
+		return 0.0f; 
+	}
+	return value < 0.0f 
+		? logf( -value ) * -1.0f
+		: logf( value );
+}
+
+
+
+//! @brief Scales @value from linear to logarithmic.
+//! Value should be within [0,1]
+static inline float logToLinearScale( float min, float max, float value )
+{
+	if( min < 0 )
+	{
+		return powf( value * ( 1.0f - min / max ) + min / max, F_E ) * ( max - min ) + min;
+	}
+	return powf( value, F_E ) * ( max - min ) + min;
+}
+
+
+//! @brief Scales value from logarithmic to linear. Value should be in min-max range.
+static inline float linearToLogScale( float min, float max, float value )
+{
+	static const float EXP = 1.0f / F_E;
+	const float val = ( value - min ) / ( max - min );
+	if( min < 0 )
+	{
+		return powf( val * ( 1.0f - min / max ) + min / max, EXP ) * ( max - min ) + min;
+	}
+	return powf( val, EXP ) * ( max - min ) + min;
+}
 
 #endif
