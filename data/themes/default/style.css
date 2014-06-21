@@ -1,7 +1,9 @@
 /********************
  * LMMS style sheet *
  ********************/
-QLabel {
+ 
+/* most foreground text items */
+QLabel, QTreeWidget, QListWidget, QGroupBox {
 	color: #e0e0e0;
 }
 
@@ -15,6 +17,18 @@ QMdiArea {
 
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
+	color: #e0e0e0;
+	qproperty-vertexColor: #ff77af;
+	qproperty-gridColor: #808080;
+	
+	qproperty-graphColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0, x2:0, y2:1,
+                     stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
+	/*#99afff;*/
+	qproperty-scaleColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #333, stop:1 #202020);
+	/*rgb( 32, 32, 32 );*/
 }
 
 /* text box */
@@ -95,6 +109,10 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: rgb(0, 0, 0);
+	qproperty-gridColor: rgb( 128, 128, 128 );
+	qproperty-noteModeColor: rgb( 255, 255, 255 );
+	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-barColor: #4afd85;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
@@ -250,13 +268,10 @@ nStateButton {
 
 /* track background colors */
 trackContentWidget {
-	qproperty-darkerColor1: rgb( 50, 50, 50 );
-	qproperty-darkerColor2: rgb( 20, 20, 20 );
-	qproperty-darkerColor3: rgb( 15, 15, 15 );
-	qproperty-lighterColor1: rgb( 50, 50, 50 );
-	qproperty-lighterColor2: rgb( 40, 40, 40 );
-	qproperty-lighterColor3: rgb( 30, 30, 30 );
-	qproperty-gradMidPoint: 0.33;
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
 }
 
 
@@ -469,6 +484,19 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 	font-size: 10px;
 }
 
+FxLine {
+	background: #5b6571;
+	color: #e0e0e0;
+	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0, 
+								stop:0 #7b838d, stop:1 #6b7581 );
+}
+
+/* persistent peak markers for fx peak meters */
+fader {
+	qproperty-peakGreen: rgb( 74, 253, 133);
+	qproperty-peakRed: rgb( 255, 100, 100);
+}
+
 timeLine {
 	font-size: 8px;
 }
@@ -507,6 +535,7 @@ AutomationPatternView {
 
 /* bb-pattern */
 bbTCOView {
+	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
 	qproperty-textColor: rgb( 255, 255, 255 );
 }
 

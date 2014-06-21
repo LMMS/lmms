@@ -255,7 +255,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (foldoverDescriptor) {
 		free((LADSPA_PortDescriptor *)foldoverDescriptor->PortDescriptors);
 		free((char **)foldoverDescriptor->PortNames);

@@ -53,6 +53,10 @@ class toolButton;
 class PianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
+	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
+	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
+	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 public:
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
@@ -93,7 +97,16 @@ public:
 	}
 
 	void setPauseIcon( bool pause );
-
+	
+	// qproperty acces functions
+	QColor gridColor() const;
+	void setGridColor( const QColor & _c );
+	QColor noteModeColor() const;
+	void setNoteModeColor( const QColor & _c );
+	QColor noteColor() const;
+	void setNoteColor( const QColor & _c );
+	QColor barColor() const;
+	void setBarColor( const QColor & _c );
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -110,7 +123,7 @@ protected:
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width, note * _n );
+					int  _width, note * _n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
 	void getSelectedNotes( NoteVector & _selected_notes );
@@ -352,6 +365,11 @@ private:
 
 	friend class engine;
 
+	// qproperty fields
+	QColor m_gridColor;
+	QColor m_noteModeColor;
+	QColor m_noteColor;
+	QColor m_barColor;
 
 signals:
 	void positionChanged( const MidiTime & );

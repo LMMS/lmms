@@ -43,11 +43,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation type="unfinished">Copyright (c) 2004-2008, les développeurs de LMMS {2004-2010,?} {2004-2014,?}</translation>
+        <translation>Copyright (c) 2004-2014, les développeurs de LMMS</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -113,18 +113,18 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Continue sample playback across notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Continuer de jouer l&apos;échantillon à traver les notes</translation>
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer cette option fait que l&apos;échantillon continue de jouer à traver les différentes notes - si vous changez la hauteur, ou si la longueur de la note s&apos;arrête avant la fin de l&apos;échantillon, alors la note suivante jouée continuera où elle aura été arrêtée. Pour remettre à zéro le jeu au début de l&apos;échantillon, insérez une note en bas du clavier (&lt; 20 Hz)</translation>
     </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>
     <message>
         <source>Sample length:</source>
-        <translation type="unfinished"></translation>
+        <translation>Longueur de l&apos;échantillon:</translation>
     </message>
 </context>
 <context>
@@ -237,171 +237,171 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Remove song-global automation</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprime l&apos;automation globale de la chanson</translation>
     </message>
     <message>
         <source>Remove all linked controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprime tous les contrôles liés</translation>
     </message>
 </context>
 <context>
     <name>AutomationEditor</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished">Jouer/Mettre en pause le motif (Barre d&apos;espace)</translation>
+        <translation>Jouer/Mettre en pause le motif (Barre d&apos;espace)</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished">Arrêter de jouer le motif (Barre d&apos;espace)</translation>
+        <translation>Arrêter de jouer le motif courant (Barre d&apos;espace)</translation>
     </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation type="unfinished">Cliquez ici si vous souhaitez jouer le motif. Ceci est utile pendant son édition. Le motif est automatiquement rejoué lorsque sa fin est atteinte.</translation>
+        <translation>Cliquez ici si vous souhaitez jouer le motif courant. Ceci est utile pendant son édition.  Le motif est automatiquement rejoué lorsque sa fin est atteinte.</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation type="unfinished">Cliquez ici si vous souhaitez arrêter de jouer le motif.</translation>
+        <translation>Cliquez ici si vous souhaitez arrêter de jouer le motif courant.</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished">Mode dessin (Shift+D)</translation>
+        <translation>Mode dessin (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished">Mode effacement (Shift+E)</translation>
+        <translation>Mode effacement (Shift+E)</translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">Cliquez ici et le mode dessin sera activé. Dans ce mode vous pourrez ajouter et déplacer des valeurs particulières. Ceci est le mode par défaut qui est utilisé la plupart du temps. Vous pouvez aussi appuyer sur les touches &apos;Shift+D&apos; de votre clavier pour activer ce mode.</translation>
+        <translation>Cliquez ici et le mode dessin sera activé. Dans ce mode vous pourrez ajouter et déplacer des valeurs particulières.  Ceci est le mode par défaut qui est utilisé la plupart du temps.  Vous pouvez aussi appuyer sur les touches &apos;Shift+D&apos; de votre clavier pour activer ce mode.</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">Cliquez ici et le mode effacement sera activé. Dans ce mode vous pourrez effacer des valeurs particulières. Vous pouvez aussi appuyer sur les touches &apos;Shift+E&apos; de votre clavier pour activer ce mode.</translation>
+        <translation>Cliquez ici et le mode effacement sera activé. Dans ce mode vous pourrez effacer des valeurs particulières. Vous pouvez aussi appuyer sur les touches &apos;Shift+E&apos; de votre clavier pour activer ce mode.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">Couper les valeurs sélectionnées (Ctrl+X)</translation>
+        <translation>Couper les valeurs sélectionnées (Ctrl+X)</translation>
     </message>
     <message>
         <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">Copier les valeurs sélectionnées (Ctrl+C)</translation>
+        <translation>Copier les valeurs sélectionnées (Ctrl+C)</translation>
     </message>
     <message>
         <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">Coller les valeurs sélectionnées (Ctrl+V)</translation>
+        <translation>Coller les valeurs sélectionnées (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">Cliquez ici et les valeurs sélectionnées seront coupées et copiées dans le presse-papier. Vous pourrez les coller n&apos;importe où dans n&apos;importe quel motif en cliquant sur le bouton coller.</translation>
+        <translation>Cliquez ici et les valeurs sélectionnées seront coupées et copiées dans le presse-papier.  Vous pourrez les coller n&apos;importe où dans n&apos;importe quel motif en cliquant sur le bouton coller.</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">Cliquez ici et les valeurs sélectionnées seront copiées dans le presse-papier. Vous pourrez les coller n&apos;importe où dans n&apos;importe quel motif en cliquant sur le bouton coller.</translation>
+        <translation>Cliquez ici et les valeurs sélectionnées seront copiées dans le presse-papier.  Vous pourrez les coller n&apos;importe où dans n&apos;importe quel motif en cliquant sur le bouton coller.</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished">Cliquez ici et les valeurs se trouvant dans le presse-papier seront collées sur la première mesure visible.</translation>
+        <translation>Cliquez ici et les valeurs se trouvant dans le presse-papier seront collées sur la première mesure visible.</translation>
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">Éditeur d&apos;automation - pas de motif</translation>
+        <translation>Éditeur d&apos;automation - pas de motif</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation type="unfinished">Éditeur d&apos;automation - %1</translation>
+        <translation>Éditeur d&apos;automation - %1</translation>
     </message>
     <message>
         <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation type="unfinished">Veuillez ouvrir un motif d&apos;automation avec le menu contextuel d&apos;un contrôle !</translation>
+        <translation>Veuillez ouvrir un motif d&apos;automation avec le menu contextuel d&apos;un contrôle !</translation>
     </message>
     <message>
         <source>Values copied</source>
-        <translation type="unfinished">Les valeurs ont été copiées</translation>
+        <translation>Les valeurs ont été copiées</translation>
     </message>
     <message>
         <source>All selected values were copied to the clipboard.</source>
-        <translation type="unfinished">Toutes les valeurs ont été copiées dans le presse-papier.</translation>
+        <translation>Toutes les valeurs ont été copiées dans le presse-papier.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression discrète</translation>
     </message>
     <message>
         <source>Linear progression</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression linéaire</translation>
     </message>
     <message>
         <source>Cubic Hermite progression</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression cubique de Hermite</translation>
     </message>
     <message>
         <source>Tension: </source>
-        <translation type="unfinished"></translation>
+        <translation>Tension : </translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici pour choisir la progression discrète pour ce motif d&apos;automation.  La valeur de l&apos;objet connecté restera contante entre les points de contrôle et se verra affecter immédiatement une nouvelle valeur quand un point de contrôle est atteint.</translation>
     </message>
     <message>
         <source>Click here to choose linear progressions for this automation pattern.  The value of the connected object will change at a steady rate over time between control points to reach the correct value at each control point without a sudden change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici pour choisir la progression linéaire pour ce motif d&apos;automation.  La valeur de l&apos;objet connecté changera à un taux contant entre les points de contrôle et atteindra la valeur correcte à chaque point de contrôle sans changement soudain.</translation>
     </message>
     <message>
         <source>Click here to choose cubic hermite progressions for this automation pattern.  The value of the connected object will change in a smooth curve and ease in to the peaks and valleys.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici pour choisir la progression cubique de Hermite pour ce motif d&apos;automation.  La valeur de l&apos;objet connecté changera suivant une courbe lisse.</translation>
     </message>
     <message>
         <source>Tension value for spline</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeur de tension pour la spline</translation>
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values.  A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une valeur de tension élevée donne une courbe plus lisse mais introduit des dépassements pour certaines valeurs.  Une valeur de tension basse fera que la pente de la courbe se stabilisera à chaque point de contrôle.</translation>
     </message>
 </context>
 <context>
     <name>AutomationPattern</name>
     <message>
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation type="unfinished">Déplacer un contrôle en appuyant sur &lt;Ctrl&gt;</translation>
+        <translation>Déplacer un contrôle en appuyant sur &lt;Ctrl&gt;</translation>
     </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation type="unfinished">double-cliquer pour ouvrir ce motif dans l&apos;éditeur d&apos;automation</translation>
+        <translation>double-cliquer pour ouvrir ce motif dans l&apos;éditeur d&apos;automation</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation type="unfinished">Ouvrir dans l&apos;éditeur d&apos;automation</translation>
+        <translation>Ouvrir dans l&apos;éditeur d&apos;automation</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished">Effacer</translation>
+        <translation>Effacer</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished">Réinitialiser le nom</translation>
+        <translation>Réinitialiser le nom</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished">Changer le nom</translation>
+        <translation>Changer le nom</translation>
     </message>
     <message>
         <source>%1 Connections</source>
-        <translation type="unfinished">%1 connexions</translation>
+        <translation>%1 connexions</translation>
     </message>
     <message>
         <source>Disconnect &quot;%1&quot;</source>
-        <translation type="unfinished">Déconnecter &quot;%1&quot;</translation>
+        <translation>Déconnecter &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
-        <translation type="unfinished">Piste d&apos;automation</translation>
+        <translation>Piste d&apos;automation</translation>
     </message>
 </context>
 <context>
@@ -482,11 +482,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Confirm Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer la suppression</translation>
     </message>
     <message>
         <source>Confirm delete? There are existing connection(s) associted with this controller. There is no way to undo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer la suppression ? Il existe des connection(s) associée(s) avec ce contrôleur. Il n&apos;est pas possible d&apos;annuler cette action.</translation>
     </message>
 </context>
 <context>
@@ -1037,7 +1037,7 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>Export as loop (remove end silence)</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter sous la forme d&apos;une boucle (supprime le silence de fin)</translation>
     </message>
 </context>
 <context>
@@ -1082,130 +1082,130 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     <name>InstrumentFunctionArpeggio</name>
     <message>
         <source>Arpeggio</source>
-        <translation type="unfinished">Arpège</translation>
+        <translation>Arpège</translation>
     </message>
     <message>
         <source>Arpeggio type</source>
-        <translation type="unfinished">Type d&apos;arpège</translation>
+        <translation>Type d&apos;arpège</translation>
     </message>
     <message>
         <source>Arpeggio range</source>
-        <translation type="unfinished">Gamme d&apos;arpège</translation>
+        <translation>Plage d&apos;arpège</translation>
     </message>
     <message>
         <source>Arpeggio time</source>
-        <translation type="unfinished">Temps d&apos;arpège</translation>
+        <translation>Temps d&apos;arpège</translation>
     </message>
     <message>
         <source>Arpeggio gate</source>
-        <translation type="unfinished">Durée d&apos;arpège</translation>
+        <translation>Durée d&apos;arpège</translation>
     </message>
     <message>
         <source>Arpeggio direction</source>
-        <translation type="unfinished">Sens d&apos;arpège</translation>
+        <translation>Direction de l&apos;arpège</translation>
     </message>
     <message>
         <source>Arpeggio mode</source>
-        <translation type="unfinished">Mode d&apos;arpège</translation>
+        <translation>Mode d&apos;arpège</translation>
     </message>
     <message>
         <source>Up</source>
-        <translation type="unfinished">Ascendant</translation>
+        <translation>Ascendant</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished">Descendant</translation>
+        <translation>Descendant</translation>
     </message>
     <message>
         <source>Up and down</source>
-        <translation type="unfinished">Ascendant et descendant</translation>
+        <translation>Ascendant et descendant</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished">Aléatoire</translation>
+        <translation>Aléatoire</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished">Libre</translation>
+        <translation>Libre</translation>
     </message>
     <message>
         <source>Sort</source>
-        <translation type="unfinished">Tri</translation>
+        <translation>Tri</translation>
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync</translation>
     </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
     <message>
         <source>ARPEGGIO</source>
-        <translation type="unfinished">ARPÈGE</translation>
+        <translation>ARPÈGE</translation>
     </message>
     <message>
         <source>An arpeggio is a method playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords. The only difference is that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads, but there are a lot of other possible chords, you can select.</source>
-        <translation type="unfinished">Un arpège est une façon de jouer des instruments (en particulier ceux à cordes pincées), qui rend la musique plus vivante. Les cordes de tels instruments (p. ex. les harpes) sont pincées comme des accords. La seule différence est que cela est fait de manière séquentielle, ce qui fait que les notes ne sont pas jouées en même temps. Les arpèges typiques sont des triades majeures ou mineures, mais il y a beaucoup d&apos;autres accords possibles, vous pouvez choisr.</translation>
+        <translation>Un arpège est une façon de jouer des instruments (en particulier ceux à cordes pincées), qui rend la musique plus vivante. Les cordes de tels instruments (p. ex. les harpes) sont pincées comme des accords. La seule différence est que cela est fait de manière séquentielle, ce qui fait que les notes ne sont pas jouées en même temps. Les arpèges typiques sont des triades majeures ou mineures, mais il y a beaucoup d&apos;autres accords possibles, vous pouvez choisr.</translation>
     </message>
     <message>
         <source>RANGE</source>
-        <translation type="unfinished">GAMME</translation>
+        <translation>PLAGE</translation>
     </message>
     <message>
         <source>Arpeggio range:</source>
-        <translation type="unfinished">Gamme d&apos;arpège :</translation>
+        <translation>Plage d&apos;arpège :</translation>
     </message>
     <message>
         <source>octave(s)</source>
-        <translation type="unfinished">octave(s)</translation>
+        <translation>octave(s)</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
-        <translation type="unfinished">Utilisez ce bouton pour régler la gamme d&apos;octaves de l&apos;arpège. L&apos;arpège sélectionné sera joué sur le nombre d&apos;octaves choisi.</translation>
+        <translation>Utilisez ce bouton pour régler la plage de l&apos;arpège en octaves. L&apos;arpège sélectionné sera joué sur le nombre d&apos;octaves choisi.</translation>
     </message>
     <message>
         <source>TIME</source>
-        <translation type="unfinished">TEMPS</translation>
+        <translation>TEMPS</translation>
     </message>
     <message>
         <source>Arpeggio time:</source>
-        <translation type="unfinished">Temps d&apos;arpège :</translation>
+        <translation>Temps d&apos;arpège :</translation>
     </message>
     <message>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
-        <translation type="unfinished">Utilisez ce bouton pour régler le temps d&apos;arpège en millisecondes. Le temps d&apos;arpège indique la durée pendant laquelle chaque note de l&apos;arpège sera joué.</translation>
+        <translation>Utilisez ce bouton pour régler le temps d&apos;arpège en millisecondes. Le temps d&apos;arpège indique la durée pendant laquelle chaque note de l&apos;arpège sera joué.</translation>
     </message>
     <message>
         <source>GATE</source>
-        <translation type="unfinished"></translation>
+        <translation>DUREE</translation>
     </message>
     <message>
         <source>Arpeggio gate:</source>
-        <translation type="unfinished">Durée d&apos;arpège :</translation>
+        <translation>Durée d&apos;arpège :</translation>
     </message>
     <message>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato arpeggios.</source>
-        <translation type="unfinished">Utilisez ce bouton pour régler la durée d&apos;arpège. La durée d&apos;arpège indique le pourcentage d&apos;une note complète de l&apos;arpège qui sera joué. Avec ceci vous pouvez faire de beaux arpèges staccato.</translation>
+        <translation>Utilisez ce bouton pour régler la durée d&apos;arpège. La durée d&apos;arpège indique le pourcentage d&apos;une note complète de l&apos;arpège qui sera joué. Avec ceci vous pouvez faire de beaux arpèges staccato.</translation>
     </message>
     <message>
         <source>Chord:</source>
-        <translation type="unfinished"></translation>
+        <translation>Accord:</translation>
     </message>
     <message>
         <source>Direction:</source>
-        <translation type="unfinished">Sens :</translation>
+        <translation>Direction :</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation type="unfinished">Mode :</translation>
+        <translation>Mode :</translation>
     </message>
 </context>
 <context>
@@ -1576,7 +1576,7 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>Minor</source>
-        <translation type="unfinished"></translation>
+        <translation>Mineur</translation>
     </message>
 </context>
 <context>
@@ -1599,11 +1599,11 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>STACKING</source>
-        <translation type="unfinished"></translation>
+        <translation>EMPILEMENT</translation>
     </message>
     <message>
         <source>Chord:</source>
-        <translation type="unfinished"></translation>
+        <translation>Accord:</translation>
     </message>
 </context>
 <context>
@@ -1638,7 +1638,7 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>NOTE</source>
-        <translation type="unfinished"></translation>
+        <translation>NOTE</translation>
     </message>
 </context>
 <context>
@@ -1713,31 +1713,31 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC Passe Bas 12dB</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC Passe Bande 12dB</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC Passe Haut 12dB</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC Passe Bas 24dB</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC Passe Bande 24dB</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC Passe Haut 24dB</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre Formant Vocal</translation>
     </message>
 </context>
 <context>
@@ -1780,11 +1780,11 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>FREQ</source>
-        <translation type="unfinished">FRÉQ</translation>
+        <translation>FRÉQ</translation>
     </message>
     <message>
         <source>cutoff frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence de coupure:</translation>
     </message>
 </context>
 <context>
@@ -1823,7 +1823,7 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>Pitch range</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage de hauteur</translation>
     </message>
 </context>
 <context>
@@ -1953,11 +1953,11 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     </message>
     <message>
         <source>Pitch range (semitones)</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage de hauteur (demi-tons)</translation>
     </message>
     <message>
         <source>RANGE</source>
-        <translation type="unfinished">GAMME</translation>
+        <translation>PLAGE</translation>
     </message>
 </context>
 <context>
@@ -2128,7 +2128,8 @@ Un clic-droit fera apparaître un menu contextuel où vous pourrez changer l&apo
     <message>
         <source>Click here for a user-defined shape.
 Double click to pick a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici pour une forme définie par l&apos;utilisateur.
+Double cliquez pour choisir un fichier.</translation>
     </message>
 </context>
 <context>
@@ -2355,39 +2356,39 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     </message>
     <message>
         <source>Save as new &amp;version</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer comme nouvelle &amp;version</translation>
     </message>
     <message>
         <source>E&amp;xport tracks...</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;xporter les pistes...</translation>
     </message>
     <message>
         <source>LMMS (*.mmp *.mmpz)</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS (*.mmp *.mmpz)</translation>
     </message>
     <message>
         <source>LMMS Project (*.mmp *.mmpz);;LMMS Project Template (*.mpt)</source>
-        <translation type="unfinished"></translation>
+        <translation>Projet LMMS (*.mmp *.mmpz);;Modèle de projet LMMS (*.mpt)</translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Version %1</translation>
     </message>
     <message>
         <source>Project recovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupération de projet</translation>
     </message>
     <message>
         <source>It looks like the last session did not end properly. Do you want to recover the project of this session?</source>
-        <translation type="unfinished"></translation>
+        <translation>Il semble que la dernière session ne se soit pas terminée correctement. Voulez-vous récupérer le projet de cette session?</translation>
     </message>
     <message>
         <source>Configuration file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de configuration</translation>
     </message>
     <message>
         <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur pendant l&apos;analyse du fichier de configuration à la ligne %1:%2:%3</translation>
     </message>
 </context>
 <context>
@@ -2503,7 +2504,7 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     </message>
     <message>
         <source>Fixed output note</source>
-        <translation type="unfinished"></translation>
+        <translation>Note de sortie fixe</translation>
     </message>
 </context>
 <context>
@@ -2604,11 +2605,11 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     </message>
     <message>
         <source>Peak Controller Bug</source>
-        <translation type="unfinished"></translation>
+        <translation>Bug du contrôleur de crêtes</translation>
     </message>
     <message>
         <source>Due to a bug in older version of LMMS, the peak controllers may not be connect properly. Please ensure that peak controllers are connected properly and re-save this file. Sorry for any inconvenience caused.</source>
-        <translation type="unfinished"></translation>
+        <translation>A cause d&apos;un bug dans les anciennes versions de LMMS, les contrôleurs de crêtes peuvent ne pas s&apos;être connecté correctement. Verifiez que les contrôleurs de crêtes sont connectés correctement et re-sauvegardez ce fichier. Désolé pour la gène occasionnée.</translation>
     </message>
 </context>
 <context>
@@ -2638,31 +2639,31 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished">Attaque :</translation>
+        <translation>Attaque :</translation>
     </message>
     <message>
         <source>Release:</source>
-        <translation type="unfinished">Relâchement :</translation>
+        <translation>Relâchement :</translation>
     </message>
     <message>
         <source>AMNT</source>
-        <translation type="unfinished"></translation>
+        <translation>AMNT</translation>
     </message>
     <message>
         <source>MULT</source>
-        <translation type="unfinished"></translation>
+        <translation>MULT</translation>
     </message>
     <message>
         <source>Amount Multiplicator:</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplicateur de quantité:</translation>
     </message>
     <message>
         <source>ATCK</source>
-        <translation type="unfinished"></translation>
+        <translation>ATCK</translation>
     </message>
     <message>
         <source>DCAY</source>
-        <translation type="unfinished"></translation>
+        <translation>DCAY</translation>
     </message>
 </context>
 <context>
@@ -2681,19 +2682,19 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     </message>
     <message>
         <source>Attack</source>
-        <translation type="unfinished">Attaque</translation>
+        <translation>Attaque</translation>
     </message>
     <message>
         <source>Release</source>
-        <translation type="unfinished">Relâchement</translation>
+        <translation>Relâchement</translation>
     </message>
     <message>
         <source>Abs Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeur Abs</translation>
     </message>
     <message>
         <source>Amount Multiplicator</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplicateur de quantité</translation>
     </message>
 </context>
 <context>
@@ -2740,87 +2741,87 @@ Raison : &quot;%2&quot;</translation>
     <message>
         <source>C</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>Db</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Db</translation>
     </message>
     <message>
         <source>C#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>C#</translation>
     </message>
     <message>
         <source>D</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>D</translation>
     </message>
     <message>
         <source>Eb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Eb</translation>
     </message>
     <message>
         <source>D#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>D#</translation>
     </message>
     <message>
         <source>E</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>Fb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Fb</translation>
     </message>
     <message>
         <source>Gb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Gb</translation>
     </message>
     <message>
         <source>F#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>F#</translation>
     </message>
     <message>
         <source>G</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>G</translation>
     </message>
     <message>
         <source>Ab</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ab</translation>
     </message>
     <message>
         <source>G#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>G#</translation>
     </message>
     <message>
         <source>A</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>Bb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Bb</translation>
     </message>
     <message>
         <source>A#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>A#</translation>
     </message>
     <message>
         <source>B</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
 </context>
 <context>
@@ -2874,108 +2875,108 @@ Raison : &quot;%2&quot;</translation>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
-        <translation type="unfinished">Ouvrir un fichier audio</translation>
+        <translation>Ouvrir un fichier audio</translation>
     </message>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</source>
-        <translation type="unfinished">Tous les fichiers audio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</translation>
+        <translation>Tous les fichiers audio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</translation>
     </message>
     <message>
         <source>Wave-Files (*.wav)</source>
-        <translation type="unfinished">Fichiers WAVE (*.wav)</translation>
+        <translation>Fichiers WAVE (*.wav)</translation>
     </message>
     <message>
         <source>OGG-Files (*.ogg)</source>
-        <translation type="unfinished">Fichiers OGG (*.ogg)</translation>
+        <translation>Fichiers OGG (*.ogg)</translation>
     </message>
     <message>
         <source>DrumSynth-Files (*.ds)</source>
-        <translation type="unfinished">Fichiers DrumSynth (*.ds)</translation>
+        <translation>Fichiers DrumSynth (*.ds)</translation>
     </message>
     <message>
         <source>FLAC-Files (*.flac)</source>
-        <translation type="unfinished">Fichiers FLAC (*.flac)</translation>
+        <translation>Fichiers FLAC (*.flac)</translation>
     </message>
     <message>
         <source>SPEEX-Files (*.spx)</source>
-        <translation type="unfinished">Fichiers SPEEX (*.spx)</translation>
+        <translation>Fichiers SPEEX (*.spx)</translation>
     </message>
     <message>
         <source>MP3-Files (*.mp3)</source>
-        <translation type="unfinished">Fichiers MP3 (*.mp3)</translation>
+        <translation>Fichiers MP3 (*.mp3)</translation>
     </message>
     <message>
         <source>VOC-Files (*.voc)</source>
-        <translation type="unfinished">Fichiers VOC (*.voc)</translation>
+        <translation>Fichiers VOC (*.voc)</translation>
     </message>
     <message>
         <source>AIFF-Files (*.aif *.aiff)</source>
-        <translation type="unfinished">Fichiers AIFF (*.aif *.aiff)</translation>
+        <translation>Fichiers AIFF (*.aif *.aiff)</translation>
     </message>
     <message>
         <source>AU-Files (*.au)</source>
-        <translation type="unfinished">Fichiers AU (*.au)</translation>
+        <translation>Fichiers AU (*.au)</translation>
     </message>
     <message>
         <source>RAW-Files (*.raw)</source>
-        <translation type="unfinished">Fichiers RAW (*.raw)</translation>
+        <translation>Fichiers RAW (*.raw)</translation>
     </message>
 </context>
 <context>
     <name>SampleTCOView</name>
     <message>
         <source>double-click to select sample</source>
-        <translation type="unfinished">Double-cliquez pour choisir un échantillon</translation>
+        <translation>Double-cliquez pour choisir un échantillon</translation>
     </message>
     <message>
         <source>Delete (middle mousebutton)</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer (bouton du milieu de la souris)</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished">Couper</translation>
+        <translation>Couper</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Copier</translation>
+        <translation>Copier</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished">Coller</translation>
+        <translation>Coller</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished">Couper/Jouer (&lt;Ctrl&gt; + clic-milieu)</translation>
+        <translation>Couper/Jouer (&lt;Ctrl&gt; + clic-milieu)</translation>
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation type="unfinished">Régler/Effacer l&apos;enregistrement</translation>
+        <translation>Régler/Effacer l&apos;enregistrement</translation>
     </message>
 </context>
 <context>
     <name>SampleTrack</name>
     <message>
         <source>Sample track</source>
-        <translation type="unfinished">Piste d&apos;échantillon</translation>
+        <translation>Piste d&apos;échantillon</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">Volume</translation>
+        <translation>Volume</translation>
     </message>
 </context>
 <context>
     <name>SampleTrackView</name>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished">Volume de la piste</translation>
+        <translation>Volume de la piste</translation>
     </message>
     <message>
         <source>Channel volume:</source>
-        <translation type="unfinished">Volume du canal :</translation>
+        <translation>Volume du canal :</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation type="unfinished">VOL</translation>
+        <translation>VOL</translation>
     </message>
 </context>
 <context>
@@ -3061,50 +3062,50 @@ Raison : &quot;%2&quot;</translation>
     <name>TimeDisplayWidget</name>
     <message>
         <source>click to change time units</source>
-        <translation type="unfinished"></translation>
+        <translation>cliquez pour changer les unités de temps</translation>
     </message>
 </context>
 <context>
     <name>TrackContainer</name>
     <message>
         <source>Couldn&apos;t import file</source>
-        <translation type="unfinished">Le fichier n&apos;a pas pu être importé</translation>
+        <translation>Le fichier n&apos;a pas pu être importé</translation>
     </message>
     <message>
         <source>Couldn&apos;t find a filter for importing file %1.
 You should convert this file into a format supported by LMMS using another software.</source>
-        <translation type="unfinished">Aucun filtre n&apos;a pu être trouvé pour importer le fichier %1.
+        <translation>Aucun filtre n&apos;a pu être trouvé pour importer le fichier %1.
 Vous devriez convertir ce fichier dans un format pris en charge par LMMS en utilisant un autre logiciel.</translation>
     </message>
     <message>
         <source>Couldn&apos;t open file</source>
-        <translation type="unfinished">Le fichier n&apos;a pas pu être ouvert</translation>
+        <translation>Le fichier n&apos;a pas pu être ouvert</translation>
     </message>
     <message>
         <source>Couldn&apos;t open file %1 for reading.
 Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished">Le fichier %1 n&apos;a pas pu être ouvert en lecture.
+        <translation>Le fichier %1 n&apos;a pas pu être ouvert en lecture.
 Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le répertoire qui contient ce fichier et réessayez !</translation>
     </message>
     <message>
         <source>Loading project...</source>
-        <translation type="unfinished">Chargement du projet...</translation>
+        <translation>Chargement du projet...</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Please wait...</source>
-        <translation type="unfinished">Veuillez patienter...</translation>
+        <translation>Veuillez patienter...</translation>
     </message>
     <message>
         <source>Importing MIDI-file...</source>
-        <translation type="unfinished">Importation du fichier MIDI...</translation>
+        <translation>Importation du fichier MIDI...</translation>
     </message>
     <message>
         <source>Importing FLP-file...</source>
-        <translation type="unfinished">Importation du fichier FLP...</translation>
+        <translation>Importation du fichier FLP...</translation>
     </message>
 </context>
 <context>
@@ -3254,22 +3255,22 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     <name>Ui</name>
     <message>
         <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished"></translation>
+        <translation>Contributeurs classés par nombre de commits:</translation>
     </message>
     <message>
         <source>Involved</source>
-        <translation type="unfinished"></translation>
+        <translation>Impliqué</translation>
     </message>
 </context>
 <context>
     <name>VersionedSaveDialog</name>
     <message>
         <source>Increment version number</source>
-        <translation type="unfinished"></translation>
+        <translation>Incrémenter le numéro de version</translation>
     </message>
     <message>
         <source>Decrement version number</source>
-        <translation type="unfinished"></translation>
+        <translation>Décrémenter le numéro de version</translation>
     </message>
 </context>
 <context>
@@ -3312,110 +3313,110 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Control VST-plugin from LMMS host</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôler le greffon VST à partir de l&apos;hôte LMMS</translation>
     </message>
     <message>
         <source>Click here, if you want to control VST-plugin from host.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez contrôler le greffon VST à partir de l&apos;hôte.</translation>
     </message>
     <message>
         <source>Open VST-plugin preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir les pré-réglages du greffon VST</translation>
     </message>
     <message>
         <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez ouvrir un autre pré-réglage de greffon VST *.fxp, *.fxb.</translation>
     </message>
     <message>
         <source>Previous (-)</source>
-        <translation type="unfinished"></translation>
+        <translation>Précédent (-)</translation>
     </message>
     <message>
         <source>Click here, if you want to switch to another VST-plugin preset program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez passer à un autre programme de pré-réglage de plugin VST.</translation>
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished">Enregistrer le préréglage</translation>
+        <translation>Enregistrer le pré-réglage</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez sauvegarder le programme de pré-réglage de greffon VST courant.</translation>
     </message>
     <message>
         <source>Next (+)</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivant (+)</translation>
     </message>
     <message>
         <source>Click here to select presets that are currently loaded in VST.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici pour sélectionner les pré-réglages qui sont actuellement chargés dans le VST.</translation>
     </message>
     <message>
         <source>Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Pré-réglage</translation>
     </message>
     <message>
         <source>by </source>
-        <translation type="unfinished"></translation>
+        <translation>par </translation>
     </message>
     <message>
         <source> - VST plugin control</source>
-        <translation type="unfinished"></translation>
+        <translation> - contrôle de greffon VST</translation>
     </message>
 </context>
 <context>
     <name>VstEffectControlDialog</name>
     <message>
         <source>Show/hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer/Cacher</translation>
     </message>
     <message>
         <source>Control VST-plugin from LMMS host</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôler le greffon VST à partir de l&apos;hôte LMMS</translation>
     </message>
     <message>
         <source>Click here, if you want to control VST-plugin from host.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez contrôler le greffon VST à partir de l&apos;hôte.</translation>
     </message>
     <message>
         <source>Open VST-plugin preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir le pré-réglage du greffon VST</translation>
     </message>
     <message>
         <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez ouvrir un autre pré-réglage de greffon VST *.fxp, *.fxb.</translation>
     </message>
     <message>
         <source>Previous (-)</source>
-        <translation type="unfinished"></translation>
+        <translation>Précédent (-)</translation>
     </message>
     <message>
         <source>Click here, if you want to switch to another VST-plugin preset program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez passer à un autre programme de pré-réglage de plugin VST.</translation>
     </message>
     <message>
         <source>Next (+)</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivant (+)</translation>
     </message>
     <message>
         <source>Click here to select presets that are currently loaded in VST.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici pour sélectionner les pré-réglages qui sont actuellement chargés dans le VST.</translation>
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished">Enregistrer le préréglage</translation>
+        <translation>Enregistrer le pré-réglage</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez sauvegarder le programme de pré-réglage de greffon VST courant.</translation>
     </message>
     <message>
         <source>Effect by: </source>
-        <translation type="unfinished"></translation>
+        <translation>Effet par:</translation>
     </message>
     <message>
         <source>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</translation>
     </message>
 </context>
 <context>
@@ -3440,78 +3441,78 @@ S&apos;il fonctionne avec d&apos;autres logiciels VST sous Linux, merci de conta
     </message>
     <message>
         <source>Open Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir le Pré-réglage</translation>
     </message>
     <message>
         <source>Vst Plugin Preset (*.fxp *.fxb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pré-réglage de Greffon VST (*.fxp *.fxb)</translation>
     </message>
     <message>
         <source>: default</source>
-        <translation type="unfinished"></translation>
+        <translation>: défaut</translation>
     </message>
     <message>
         <source>&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;</translation>
     </message>
     <message>
         <source>&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;</translation>
     </message>
     <message>
         <source>Save Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le pré-réglage</translation>
     </message>
     <message>
         <source>.fxp</source>
-        <translation type="unfinished"></translation>
+        <translation>.fxp</translation>
     </message>
     <message>
         <source>.FXP</source>
-        <translation type="unfinished"></translation>
+        <translation>.FXP</translation>
     </message>
     <message>
         <source>.FXB</source>
-        <translation type="unfinished"></translation>
+        <translation>.FXB</translation>
     </message>
     <message>
         <source>.fxb</source>
-        <translation type="unfinished"></translation>
+        <translation>.fxb</translation>
     </message>
 </context>
 <context>
     <name>ZynAddSubFxInstrument</name>
     <message>
         <source>Portamento</source>
-        <translation type="unfinished"></translation>
+        <translation>Portamento</translation>
     </message>
     <message>
         <source>Filter Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence du Filtre</translation>
     </message>
     <message>
         <source>Filter Resonance</source>
-        <translation type="unfinished"></translation>
+        <translation>Résonance du Filtre</translation>
     </message>
     <message>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Largeur de bande</translation>
     </message>
     <message>
         <source>FM Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Gain FM</translation>
     </message>
     <message>
         <source>Resonance Center Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence Centrale de la Résonance</translation>
     </message>
     <message>
         <source>Resonance Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Largeur de Bande de la Résonance</translation>
     </message>
     <message>
         <source>Forward MIDI Control Change Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Transmet les évènements MIDI Control Change</translation>
     </message>
 </context>
 <context>
@@ -3526,63 +3527,63 @@ S&apos;il fonctionne avec d&apos;autres logiciels VST sous Linux, merci de conta
     </message>
     <message>
         <source>Portamento:</source>
-        <translation type="unfinished"></translation>
+        <translation>Portamento:</translation>
     </message>
     <message>
         <source>PORT</source>
-        <translation type="unfinished"></translation>
+        <translation>PORT</translation>
     </message>
     <message>
         <source>Filter Frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence du Filtre:</translation>
     </message>
     <message>
         <source>FREQ</source>
-        <translation type="unfinished">FRÉQ</translation>
+        <translation>FRÉQ</translation>
     </message>
     <message>
         <source>Filter Resonance:</source>
-        <translation type="unfinished"></translation>
+        <translation>Résonance du Filtre:</translation>
     </message>
     <message>
         <source>RES</source>
-        <translation type="unfinished">RES</translation>
+        <translation>RES</translation>
     </message>
     <message>
         <source>Bandwidth:</source>
-        <translation type="unfinished"></translation>
+        <translation>Largeur de bande:</translation>
     </message>
     <message>
         <source>BW</source>
-        <translation type="unfinished"></translation>
+        <translation>BW</translation>
     </message>
     <message>
         <source>FM Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gain FM:</translation>
     </message>
     <message>
         <source>FM GAIN</source>
-        <translation type="unfinished"></translation>
+        <translation>GAIN FM</translation>
     </message>
     <message>
         <source>Resonance center frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence centrale de la résonance:</translation>
     </message>
     <message>
         <source>RES CF</source>
-        <translation type="unfinished"></translation>
+        <translation>RES CF</translation>
     </message>
     <message>
         <source>Resonance bandwidth:</source>
-        <translation type="unfinished"></translation>
+        <translation>Largeur de Bande de la Résonance:</translation>
     </message>
     <message>
         <source>RES BW</source>
-        <translation type="unfinished"></translation>
+        <translation>RES BW</translation>
     </message>
     <message>
         <source>Forward MIDI Control Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Transmet les évènements MIDI Control Change</translation>
     </message>
 </context>
 <context>
@@ -3609,7 +3610,8 @@ S&apos;il fonctionne avec d&apos;autres logiciels VST sous Linux, merci de conta
     </message>
     <message>
         <source>Stutter</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>??</translatorcomment>
+        <translation>Bégaiement</translation>
     </message>
 </context>
 <context>
@@ -3686,11 +3688,11 @@ S&apos;il fonctionne avec d&apos;autres logiciels VST sous Linux, merci de conta
     </message>
     <message>
         <source>Remove steps</source>
-        <translation type="unfinished">Supprimer des pas</translation>
+        <translation>Supprimer des pas</translation>
     </message>
     <message>
         <source>Add steps</source>
-        <translation type="unfinished">Ajouter des pas</translation>
+        <translation>Ajouter des pas</translation>
     </message>
 </context>
 <context>
@@ -3720,7 +3722,7 @@ S&apos;il fonctionne avec d&apos;autres logiciels VST sous Linux, merci de conta
     </message>
     <message>
         <source>Clone of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Clone de %1</translation>
     </message>
 </context>
 <context>
@@ -3838,7 +3840,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
     <name>fader</name>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Veuillez entrer un valeur entre %1 et %2 :</translation>
+        <translation>Veuillez entrer un valeur entre %1 et %2 :</translation>
     </message>
 </context>
 <context>
@@ -4586,62 +4588,62 @@ En double-cliquant sur ces greffons vous ferez apparaître des informations sur 
     <name>manageVSTEffectView</name>
     <message>
         <source> - VST parameter control</source>
-        <translation type="unfinished"></translation>
+        <translation> - Paramètre de contrôle VST</translation>
     </message>
     <message>
         <source>VST Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>VST Sync</translation>
     </message>
     <message>
         <source>Click here if you want to synchronize all parameters with VST plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez synchroniser tous les paramètres avec le greffon VST.</translation>
     </message>
     <message>
         <source>Automated</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatique</translation>
     </message>
     <message>
         <source>Click here if you want to display automated parameters only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez seulement afficher les paramètres automatiques.</translation>
     </message>
     <message>
         <source>    Close    </source>
-        <translation type="unfinished"></translation>
+        <translation>    Fermer </translation>
     </message>
     <message>
         <source>Close VST effect knob-controller window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer la fenêtre des boutons contrôleurs des effets VST.</translation>
     </message>
 </context>
 <context>
     <name>manageVestigeInstrumentView</name>
     <message>
         <source> - VST plugin control</source>
-        <translation type="unfinished"></translation>
+        <translation> - contrôle de greffon VST</translation>
     </message>
     <message>
         <source>VST Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>VST Sync</translation>
     </message>
     <message>
         <source>Click here if you want to synchronize all parameters with VST plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez synchroniser tous les paramètres avec le greffon VST.</translation>
     </message>
     <message>
         <source>Automated</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatique</translation>
     </message>
     <message>
         <source>Click here if you want to display automated parameters only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquez ici si vous voulez seulement afficher les paramètres automatiques.</translation>
     </message>
     <message>
         <source>    Close    </source>
-        <translation type="unfinished"></translation>
+        <translation>    Fermer </translation>
     </message>
     <message>
         <source>Close VST plugin knob-controller window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer la fenêtre des boutons contrôleurs des effets VST.</translation>
     </message>
 </context>
 <context>
@@ -4655,39 +4657,39 @@ En double-cliquant sur ces greffons vous ferez apparaître des informations sur 
     <name>opl2instrument</name>
     <message>
         <source>Patch</source>
-        <translation type="unfinished">Son</translation>
+        <translation>Son</translation>
     </message>
     <message>
         <source>Op 1 Attack</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Decay</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Sustain</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Release</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Level</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Level Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Frequency Multiple</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Feedback</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Op 1 Key Scaling Rate</source>
@@ -4759,15 +4761,15 @@ En double-cliquant sur ces greffons vous ferez apparaître des informations sur 
     </message>
     <message>
         <source>FM</source>
-        <translation type="unfinished"></translation>
+        <translation>FM</translation>
     </message>
     <message>
         <source>Vibrato Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>Profondeur de Vibrato</translation>
     </message>
     <message>
         <source>Tremolo Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>Profondeur de Trémolo</translation>
     </message>
 </context>
 <context>
@@ -5269,27 +5271,27 @@ utilisez la molette de la souris pour régler le volume d&apos;un pas</translati
     </message>
     <message>
         <source>Mark/unmark current semitone</source>
-        <translation type="unfinished"></translation>
+        <translation>Cocher/décocher le demi-ton courant</translation>
     </message>
     <message>
         <source>Mark current scale</source>
-        <translation type="unfinished"></translation>
+        <translation>Cocher la gamme courante</translation>
     </message>
     <message>
         <source>Mark current chord</source>
-        <translation type="unfinished"></translation>
+        <translation>Cocher l&apos;accord courant</translation>
     </message>
     <message>
         <source>Unmark all</source>
-        <translation type="unfinished"></translation>
+        <translation>Déchocher tout</translation>
     </message>
     <message>
         <source>No scale</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de gamme</translation>
     </message>
     <message>
         <source>No chord</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas d&apos;accord</translation>
     </message>
 </context>
 <context>
@@ -5405,15 +5407,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>2-operator FM Synth</source>
-        <translation type="unfinished"></translation>
+        <translation>Synthé FM à 2 opérateurs</translation>
     </message>
     <message>
         <source>Filter for importing Hydrogen files into LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre pour importer des fichiers Hydrogen dans LMMS</translation>
     </message>
     <message>
         <source>LMMS port of sfxr</source>
-        <translation type="unfinished"></translation>
+        <translation>Port LMMS de sfxr</translation>
     </message>
 </context>
 <context>
@@ -5712,35 +5714,35 @@ Latence : %2 ms</translation>
     </message>
     <message>
         <source>One instrument track window mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode fenêtre une piste d&apos;instrument</translation>
     </message>
     <message>
         <source>Compact track buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Boutons de piste compacte</translation>
     </message>
     <message>
         <source>Sync VST plugins to host playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync les greffons VST à la lecture de l&apos;hôte</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer les étiquettes de note dans le piano virtuel</translation>
     </message>
     <message>
         <source>Enable waveform display by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer l&apos;affichage de forme d&apos;onde par défaut</translation>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacement fluide dans l&apos;Editeur de Chanson</translation>
     </message>
     <message>
         <source>Enable auto save feature</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer la fonction de sauvegarde automatique</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher le curseur de lecture dans AudioFileProcessor</translation>
     </message>
 </context>
 <context>
@@ -5877,7 +5879,7 @@ Latence : %2 ms</translation>
     <name>sfxrInstrument</name>
     <message>
         <source>Wave Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Forme d&apos;Onde</translation>
     </message>
 </context>
 <context>
@@ -6106,11 +6108,11 @@ Latence : %2 ms</translation>
     </message>
     <message>
         <source>Hydrogen projects</source>
-        <translation type="unfinished"></translation>
+        <translation>Projets Hydrogen</translation>
     </message>
     <message>
         <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez un répertoire pour écrire les pistes exportées...</translation>
     </message>
 </context>
 <context>
@@ -6231,7 +6233,7 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peux pas ouvrir %1 en écriture. Vous n&apos;avez probablement pas les droits pour écrire dans ce fichier. Assurez vous que vous avez les droits d&apos;accès en écriture pour ce fichier et essayez à nouveau.</translation>
     </message>
 </context>
 <context>
@@ -6344,11 +6346,11 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
+        <translation>Appuyez sur &lt;Ctrl&gt; pour désactiver les marqueur magnétiques de jeu en boucle.</translation>
     </message>
     <message>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintenez &lt;Shift&gt; pour déplacer le marqueur de début de jeu en boucle. Appuyez sur &lt;Ctrl&gt; pour désactiver les marqueurs magnétiques de jeu en boucle.</translation>
     </message>
 </context>
 <context>

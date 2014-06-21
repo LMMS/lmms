@@ -947,7 +947,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (gongDescriptor) {
 		free((LADSPA_PortDescriptor *)gongDescriptor->PortDescriptors);
 		free((char **)gongDescriptor->PortNames);

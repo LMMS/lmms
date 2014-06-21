@@ -22,11 +22,12 @@
  *
  */
 
-#ifndef _FX_MIXER_VIEW_H
-#define _FX_MIXER_VIEW_H
+#ifndef FX_MIXER_VIEW_H
+#define FX_MIXER_VIEW_H
 
 #include <QtGui/QWidget>
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QStackedLayout>
 #include <QtGui/QScrollArea>
 
 #include "FxLine.h"
@@ -54,6 +55,7 @@ public:
 		FxLine * m_fxLine;
 		pixmapButton * m_muteBtn;
 		fader * m_fader;
+		EffectRackView * m_rackView;
 	};
 
 
@@ -94,7 +96,7 @@ public:
 	// make sure the display syncs up with the fx mixer.
 	// useful for loading projects
 	void refreshDisplay();
-
+	
 private slots:
 	void updateFaders();
 	void addNewChannel();
@@ -108,9 +110,12 @@ private:
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
 	QWidget * m_channelAreaWidget;
-	EffectRackView * m_rackView;
+	QStackedLayout * m_racksLayout;
+	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
+	
+	friend class FxChannelView;
 } ;
 
 #endif

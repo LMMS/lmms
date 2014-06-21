@@ -237,9 +237,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != NULL &&
-		instrumentTrack()->name() == m_plugin->name() ) ||
-			instrumentTrack()->name() ==
-				InstrumentTrack::tr( "Default preset" );
+        	instrumentTrack()->name() == m_plugin->name() ) ||
+            	instrumentTrack()->name() == InstrumentTrack::tr( "Default preset" ) ||
+            	instrumentTrack()->name() == displayName();
+
 	m_pluginMutex.unlock();
 
 	if ( m_plugin != NULL )
@@ -310,12 +311,12 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->processMidiEvent( event, time );
+		m_plugin->processMidiEvent( event, offset );
 	}
 	m_pluginMutex.unlock();
 
@@ -881,8 +882,9 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 
 	m_vi->m_subWindow = engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-	m_vi->m_subWindow->setFixedSize( 960, 300);
+	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
+	m_vi->m_subWindow->setFixedWidth( 960 );
+	m_vi->m_subWindow->setMinimumHeight( 300 );
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );

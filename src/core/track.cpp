@@ -998,14 +998,7 @@ bool trackContentObjectView::mouseMovedDistance( QMouseEvent * _me, int distance
  */
 trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
-	m_trackView( _parent ),
-	m_darkerColor1( 0, 0, 0 ),
-	m_darkerColor2( 0, 0, 0 ),
-	m_darkerColor3( 0, 0, 0 ),
-	m_lighterColor1( 0, 0, 0 ),
-	m_lighterColor2( 0, 0, 0 ),
-	m_lighterColor3( 0, 0, 0 ),
-	m_gradMidPoint( 0.0f )
+	m_trackView( _parent )
 {
 	setAcceptDrops( true );
 
@@ -1045,17 +1038,8 @@ void trackContentWidget::updateBackground()
 	m_background = QPixmap( w * 2, height() );
 	QPainter pmp( &m_background );
 
-	QLinearGradient grad( 0,0, 0, h );
-	grad.setColorAt( 0.0, darkerColor1() );
-	grad.setColorAt( gradMidPoint(), darkerColor2() );
-	grad.setColorAt( 1.0, darkerColor3() );
-	pmp.fillRect( 0, 0, w, h, grad );
-
-	QLinearGradient grad2( 0,0, 0, h );
-	grad2.setColorAt( 0.0, lighterColor1() );
-	grad2.setColorAt( gradMidPoint(), lighterColor2() );
-	grad2.setColorAt( 1.0, lighterColor3() );
-	pmp.fillRect( w, 0, w , h, grad2 );
+	pmp.fillRect( 0, 0, w, h, darkerColor() );
+	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
 	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
@@ -1534,61 +1518,20 @@ MidiTime trackContentWidget::endPosition( const MidiTime & _pos_start )
 
 // qproperty access methods
 //! \brief CSS theming qproperty access method
-QColor trackContentWidget::darkerColor1() const
-{ return m_darkerColor1; }
+QBrush trackContentWidget::darkerColor() const
+{ return m_darkerColor; }
 
 //! \brief CSS theming qproperty access method
-QColor trackContentWidget::darkerColor2() const
-{ return m_darkerColor2; }
+QBrush trackContentWidget::lighterColor() const
+{ return m_lighterColor; }
 
 //! \brief CSS theming qproperty access method
-QColor trackContentWidget::darkerColor3() const
-{ return m_darkerColor3; }
+void trackContentWidget::setDarkerColor( const QBrush & c )
+{ m_darkerColor = c; }
 
 //! \brief CSS theming qproperty access method
-QColor trackContentWidget::lighterColor1() const
-{ return m_lighterColor1; }
-
-//! \brief CSS theming qproperty access method
-QColor trackContentWidget::lighterColor2() const
-{ return m_lighterColor2; }
-
-//! \brief CSS theming qproperty access method
-QColor trackContentWidget::lighterColor3() const
-{ return m_lighterColor3; }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setDarkerColor1( const QColor & _c )
-{ m_darkerColor1 = QColor( _c ); }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setDarkerColor2( const QColor & _c )
-{ m_darkerColor2 = QColor( _c ); }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setDarkerColor3( const QColor & _c )
-{ m_darkerColor3 = QColor( _c ); }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setLighterColor1( const QColor & _c )
-{ m_lighterColor1 = QColor( _c ); }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setLighterColor2( const QColor & _c )
-{ m_lighterColor2 = QColor( _c ); }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setLighterColor3( const QColor & _c )
-{ m_lighterColor3 = QColor( _c ); }
-
-//! \brief CSS theming qproperty access method
-float trackContentWidget::gradMidPoint() const
-{ return m_gradMidPoint; }
-
-//! \brief CSS theming qproperty access method
-void trackContentWidget::setGradMidPoint( float _g )
-{ m_gradMidPoint = _g; }
-
+void trackContentWidget::setLighterColor( const QBrush & c )
+{ m_lighterColor = c; }
 
 
 

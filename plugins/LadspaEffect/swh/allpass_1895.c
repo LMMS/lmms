@@ -1346,7 +1346,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (allpass_nDescriptor) {
 		free((LADSPA_PortDescriptor *)allpass_nDescriptor->PortDescriptors);
 		free((char **)allpass_nDescriptor->PortNames);

@@ -424,7 +424,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (matrixSpatialiserDescriptor) {
 		free((LADSPA_PortDescriptor *)matrixSpatialiserDescriptor->PortDescriptors);
 		free((char **)matrixSpatialiserDescriptor->PortNames);

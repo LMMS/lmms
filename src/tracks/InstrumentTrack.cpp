@@ -135,12 +135,17 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 }
 
 
+int InstrumentTrack::baseNote() const
+{
+	return m_baseNoteModel.value() - engine::getSong()->masterPitch();
+}
+
 
 
 InstrumentTrack::~InstrumentTrack()
 {
-	// kill all running notes
-	silenceAllNotes();
+	// kill all running notes and the iph
+	silenceAllNotes( true );
 
 	// now we're save deleting the instrument
 	delete m_instrument;
@@ -232,10 +237,9 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 
 
-void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time )
+void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	engine::mixer()->lock();
-
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -335,7 +339,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			break;
 	}
 
-	if( eventHandled == false && instrument()->handleMidiEvent( event, time ) == false )
+	if( eventHandled == false && instrument()->handleMidiEvent( event, time, offset ) == false )
 	{
 		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
 	}
@@ -346,7 +350,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 
 
-void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time )
+void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	// do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if( m_instrument == NULL )
@@ -366,10 +370,10 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			{
 				if( m_runningMidiNotes[key] > 0 )
 				{
-					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time );
+					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 				}
 				++m_runningMidiNotes[key];
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
 
 				emit newNote();
 			}
@@ -381,12 +385,12 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
 			{
 				m_runningMidiNotes[key] = qMax( 0, m_runningMidiNotes[key] );
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 			}
 			break;
 
 		default:
-			m_instrument->handleMidiEvent( transposedEvent, time );
+			m_instrument->handleMidiEvent( transposedEvent, time, offset );
 			break;
 	}
 
@@ -397,7 +401,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 
 
-void InstrumentTrack::silenceAllNotes()
+void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
 	engine::mixer()->lock();
 	for( int i = 0; i < NumKeys; ++i )
@@ -408,7 +412,7 @@ void InstrumentTrack::silenceAllNotes()
 
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	engine::mixer()->removePlayHandles( this );
+	engine::mixer()->removePlayHandles( this, removeIPH );
 	engine::mixer()->unlock();
 }
 
@@ -537,7 +541,7 @@ void InstrumentTrack::updatePitchRange()
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
-	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
+	int key = baseNote();
 	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
 }
 
@@ -695,7 +699,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
-	silenceAllNotes();
+	silenceAllNotes( true );
 
 	engine::mixer()->lock();
 
@@ -771,7 +775,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 
 Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 {
-	silenceAllNotes();
+	silenceAllNotes( true );
 
 	engine::mixer()->lock();
 	delete m_instrument;
@@ -1323,6 +1327,7 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
 		m_pitchKnob->show();
+		m_pitchRangeSpinBox->show();
 	}
 	else
 	{

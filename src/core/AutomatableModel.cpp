@@ -432,7 +432,7 @@ float AutomatableModel::fittedValue( float value, bool forceStep ) const
 
 void AutomatableModel::linkModel( AutomatableModel* model )
 {
-	if( !m_linkedModels.contains( model ) )
+	if( !m_linkedModels.contains( model ) && model != this )
 	{
 		m_linkedModels.push_back( model );
 		m_hasLinkedModels = true;
@@ -464,8 +464,8 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	model1->linkModel( model2 );
-	model2->linkModel( model1 );
+		model1->linkModel( model2 );
+		model2->linkModel( model1 );
 }
 
 

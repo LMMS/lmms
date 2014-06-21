@@ -318,7 +318,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (modDelayDescriptor) {
 		free((LADSPA_PortDescriptor *)modDelayDescriptor->PortDescriptors);
 		free((char **)modDelayDescriptor->PortNames);

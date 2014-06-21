@@ -15,7 +15,7 @@ INCLUDE(FindPkgConfig)
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "0")
-SET(VERSION_PATCH "90")
+SET(VERSION_PATCH "91")
 #SET(VERSION_SUFFIX "")
 SET(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 IF(VERSION_SUFFIX)
@@ -660,6 +660,8 @@ SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
   \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+  DeleteRegKey HKCR \\\"LMMS Project\\\"
+  DeleteRegKey HKCR \\\"LMMS Project (compressed)\\\"
   ")
 ELSE(WIN32)
 SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")

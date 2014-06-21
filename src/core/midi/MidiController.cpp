@@ -81,7 +81,7 @@ void MidiController::updateName()
 
 
 
-void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time )
+void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	unsigned char controllerNum;
 	switch( event.type() )

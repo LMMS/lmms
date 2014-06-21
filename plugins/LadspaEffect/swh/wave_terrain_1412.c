@@ -231,7 +231,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (waveTerrainDescriptor) {
 		free((LADSPA_PortDescriptor *)waveTerrainDescriptor->PortDescriptors);
 		free((char **)waveTerrainDescriptor->PortNames);

@@ -686,13 +686,13 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 
 
-void Mixer::removePlayHandles( track * _track )
+void Mixer::removePlayHandles( track * _track, bool removeIPHs )
 {
 	lock();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( _track ) )
+		if( ( *it )->isFromTrack( _track ) && ( removeIPHs || ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle ) )
 		{
 			delete *it;
 			it = m_playHandles.erase( it );

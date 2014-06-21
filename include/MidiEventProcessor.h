@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_EVENT_PROCESSOR_H
-#define _MIDI_EVENT_PROCESSOR_H
+#ifndef MIDI_EVENT_PROCESSOR_H
+#define MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
 #include "MidiTime.h"
@@ -42,8 +42,8 @@ public:
 	}
 
 	// to be implemented by inheriting classes
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() ) = 0;
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() ) = 0;
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
 
 } ;
 
