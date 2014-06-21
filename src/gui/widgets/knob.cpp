@@ -674,8 +674,10 @@ void knob::setPosition( const QPoint & _p )
 
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
-		const float pos = ( oldValue - model()->minValue() ) / model()->range();
-		const float ratio = 0.1f + pos * 15.f;
+		const float pos = model()->minValue() < 0 
+			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
+			: ( oldValue - model()->minValue() ) / model()->range();
+		const float ratio = 0.1f + qAbs( pos ) * 15.f;
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
