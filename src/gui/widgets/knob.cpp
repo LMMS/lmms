@@ -34,8 +34,8 @@
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
-#include <math.h>
 
+#include "lmms_math.h"
 #include "knob.h"
 #include "caption_menu.h"
 #include "config_mgr.h"
@@ -320,7 +320,7 @@ bool knob::updateAngle()
 	int angle = 0;
 	if( model() && model()->maxValue() != model()->minValue() )
 	{
-		angle = angleFromValue( model()->value(), model()->minValue(), model()->maxValue(), m_totalAngle );
+		angle = angleFromValue( model()->inverseScaledValue( model()->value() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 	}
 	if( qAbs( angle - m_angle ) > 3 )
 	{
@@ -388,7 +388,7 @@ void knob::drawKnob( QPainter * _p )
 
 	p.setRenderHint( QPainter::Antialiasing );
 
-	const int centerAngle = angleFromValue( model()->centerValue(), model()->minValue(), model()->maxValue(), m_totalAngle );
+	const int centerAngle = angleFromValue( model()->inverseScaledValue( model()->centerValue() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
@@ -669,15 +669,39 @@ void knob::setPosition( const QPoint & _p )
 {
 	const float value = getValue( _p ) + m_leftOver;
 	const float step = model()->step<float>();
-	
-	if( qAbs( value ) >= step )
+	const float oldValue = model()->value();
+
+
+	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
-		model()->setValue( model()->value() - value );
-		m_leftOver = 0.0f;
+		const float pos = model()->minValue() < 0 
+			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
+			: ( oldValue - model()->minValue() ) / model()->range();
+		const float ratio = 0.1f + qAbs( pos ) * 15.f;
+		float newValue = value * ratio;
+		if( qAbs( newValue ) >= step )
+		{
+			model()->setValue( oldValue - newValue );
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = value;
+		}
 	}
-	else
+
+		
+	else // linear code
 	{
-		m_leftOver = value;
+		if( qAbs( value ) >= step )
+		{	
+			model()->setValue( oldValue - value );
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = value;
+		}
 	}
 }
 

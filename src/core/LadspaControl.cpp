@@ -76,7 +76,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
 					&& m_port->max == 10.0f ? 4000.0f :
-								400.0f ) );
+								( m_port->suggests_logscale ? 8000.0f : 800.0f ) ) );
 			m_knobModel.setInitValue( m_port->def );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
@@ -87,7 +87,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 		case TIME:
 			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max,
 					  ( m_port->max -
-						m_port->min ) / 400.0f );
+						m_port->min ) / 800.0f );
 			m_tempoSyncKnobModel.setInitValue( m_port->def );
 			connect( &m_tempoSyncKnobModel, SIGNAL( dataChanged() ),
 					 this, SLOT( tempoKnobChanged() ) );

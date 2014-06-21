@@ -162,7 +162,11 @@ public:
 	{
 		return castValue<T>( m_step );
 	}
-
+	
+	//! @brief Returns value scaled with the scale type and min/max values of this model
+	float scaledValue( float value ) const;
+	//! @brief Returns value applied with the inverse of this model's scale type
+	float inverseScaledValue( float value ) const;
 
 	void setInitValue( const float value );
 
@@ -186,6 +190,10 @@ public:
 	void setScaleLogarithmic( bool setToTrue = true )
 	{
 		setScaleType( setToTrue ? Logarithmic : Linear );
+	}
+	bool isScaleLogarithmic() const
+	{
+		return m_scaleType == Logarithmic;
 	}
 
 	void setStep( const float step );
@@ -224,16 +232,7 @@ public:
 		return "automatablemodel";
 	}
 
-	QString displayValue( const float val ) const
-	{
-		switch( m_dataType )
-		{
-			case Float: return QString::number( castValue<float>( val ) );
-			case Integer: return QString::number( castValue<int>( val ) );
-			case Bool: return QString::number( castValue<bool>( val ) );
-		}
-		return "0";
-	}
+	QString displayValue( const float val ) const;
 
 	bool hasLinkedModels() const
 	{

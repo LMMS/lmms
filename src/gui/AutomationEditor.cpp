@@ -1359,7 +1359,8 @@ inline void AutomationEditor::drawCross( QPainter & _p )
 	QPoint tt_pos =  QCursor::pos();
 	tt_pos.ry() -= 64;
 	tt_pos.rx() += 32;
-	QToolTip::showText( tt_pos,QString::number( level ),this);
+	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
+	QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
 }
 
 
@@ -1896,17 +1897,10 @@ float AutomationEditor::getLevel( int _y )
 	// pressed level
 	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
 			( m_maxLevel - m_minLevel ) * ( level_line_y - _y )
-					/ (float)( level_line_y - TOP_MARGIN ) :
+					/ (float)( level_line_y - ( TOP_MARGIN + 2 ) ) :
 			( level_line_y - _y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
-	if( level < m_bottomLevel )
-	{
-		level = m_bottomLevel;
-	}
-	else if( level > m_topLevel )
-	{
-		level = m_topLevel;
-	}
+	level = qBound( m_bottomLevel, level, m_topLevel );
 
 	return( level );
 }
