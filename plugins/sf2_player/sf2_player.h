@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _SF2_PLAYER_H
-#define _SF2_PLAYER_H
+#ifndef SF2_PLAYER_H
+#define SF2_PLAYER_H
 
 #include <QtCore/QMutex>
 
