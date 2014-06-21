@@ -274,7 +274,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (karaokeDescriptor) {
 		free((LADSPA_PortDescriptor *)karaokeDescriptor->PortDescriptors);
 		free((char **)karaokeDescriptor->PortNames);

@@ -420,9 +420,9 @@ void __attribute__((constructor)) swh_init() {
 
 /*****************************************************************************/
 
-/* _fini() is called automatically when the library is unloaded. */
+/*  __attribute__((destructor)) swh_fini() is called automatically when the library is unloaded. */
 void 
-_fini() {
+ __attribute__((destructor)) swh_fini() {
   long lIndex;
   if (g_psDescriptor) {
     free((char *)g_psDescriptor->Label);

@@ -1,7 +1,9 @@
 /********************
  * LMMS style sheet *
  ********************/
-QLabel {
+ 
+/* most foreground text items */
+QLabel, QTreeWidget, QListWidget, QGroupBox {
 	color: #e0e0e0;
 }
 

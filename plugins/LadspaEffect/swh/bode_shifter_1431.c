@@ -458,7 +458,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (bodeShifterDescriptor) {
 		free((LADSPA_PortDescriptor *)bodeShifterDescriptor->PortDescriptors);
 		free((char **)bodeShifterDescriptor->PortNames);
