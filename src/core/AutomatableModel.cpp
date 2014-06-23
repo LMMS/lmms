@@ -27,7 +27,7 @@
 #include "AutomatableModel.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
-
+#include "lmms_math.h"
 
 float AutomatableModel::s_copiedValue = 0;
 
@@ -283,22 +283,39 @@ void AutomatableModel::setValue( const float value )
 
 
 
-//! @brief Scales @value from linear to logarithmic.
-//! Value should be within [0,1]
-//! @todo This should be moved into a maths header
-template<class T> T logToLinearScale(T min, T max, T value)
+template<class T> T AutomatableModel::logToLinearScale( T value ) const
 {
-	return exp( ( log(max) - log(min) ) * value + log(min) );
+	return castValue<T>( ::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
+}
+
+
+float AutomatableModel::scaledValue( float value ) const
+{
+	return m_scaleType == Linear
+		? value
+		: logToLinearScale<float>( ( value - minValue<float>() ) / m_range );
+}
+
+
+float AutomatableModel::inverseScaledValue( float value ) const
+{
+	return m_scaleType == Linear
+		? value
+		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
 }
 
 
 
-
-template<class T> T AutomatableModel::logToLinearScale(T value) const
+QString AutomatableModel::displayValue( const float val ) const
 {
-	return ::logToLinearScale( minValue<float>(), maxValue<float>(), value );
+	switch( m_dataType )
+	{
+		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
+		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
+		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
+	}
+	return "0";
 }
-
 
 
 
@@ -331,15 +348,9 @@ void AutomatableModel::setAutomatedValue( const float value )
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
-	const float scaledValue =
-		( m_scaleType == Linear )
-		? value
-		: logToLinearScale(
-			// fits value into [0,1]:
-			(value - minValue<float>()) / maxValue<float>()
-			);
+	const float scaled_value = scaledValue( value );
 
-	m_value = fittedValue( scaledValue );
+	m_value = fittedValue( scaled_value );
 
 	if( oldValue != m_value )
 	{
@@ -351,9 +362,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 				!(*it)->fittedValue( m_value ) !=
 							 (*it)->m_value )
 			{
-				// @TOBY: don't take m_value, but better: value,
-				// otherwise, we convert to log twice?
-				(*it)->setAutomatedValue( m_value );
+				(*it)->setAutomatedValue( value );
 			}
 		}
 		emit dataChanged();
@@ -703,14 +712,8 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 		{
 			// scale/fit the value appropriately and return it
 			const float value = latestPattern->valueAt( time - latestPattern->startPosition() );
-			const float scaledValue =
-				( m_scaleType == Linear )
-				? value
-				: logToLinearScale(
-					// fits value into [0,1]:
-					(value - minValue<float>()) / maxValue<float>()
-					);
-			return fittedValue( scaledValue );
+			const float scaled_value = scaledValue( value );
+			return fittedValue( scaled_value );
 		}
 		// if we still find no pattern, the value at that time is undefined so 
 		// just return current value as the best we can do

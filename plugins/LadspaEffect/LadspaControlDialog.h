@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _LADSPA_CONTROL_DIALOG_H
-#define _LADSPA_CONTROL_DIALOG_H
+#ifndef LADSPA_CONTROL_DIALOG_H
+#define LADSPA_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 

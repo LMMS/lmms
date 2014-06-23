@@ -22,10 +22,11 @@
  *
  */
 
-#ifndef _LMMS_CONSTANTS_H
-#define _LMMS_CONSTANTS_H
+#ifndef LMMS_CONSTANTS_H
+#define LMMS_CONSTANTS_H
 
 const float F_PI = 3.1415926535f;
+const float F_E =  2.718281828459045f;
 const float F_2PI = 2*F_PI;
 const float F_PI_2 = F_PI*0.5;
 

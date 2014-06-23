@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _LADSPA_CONTROLS_H
-#define _LADSPA_CONTROLS_H
+#ifndef LADSPA_CONTROLS_H
+#define LADSPA_CONTROLS_H
 
 #include "EffectControls.h"
 #include "LadspaControl.h"

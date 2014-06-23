@@ -128,5 +128,40 @@ static inline double sinc( double _x )
 }
 
 
+//! @brief Exponential function that deals with negative bases
+static inline float signedPowf( float v, float e )
+{
+	return v < 0 
+		? powf( -v, e ) * -1.0f
+		: powf( v, e );
+}
+
+
+//! @brief Scales @value from linear to logarithmic.
+//! Value should be within [0,1]
+static inline float logToLinearScale( float min, float max, float value )
+{
+	if( min < 0 )
+	{
+		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float val = value * ( max - min ) + min;
+		return signedPowf( val / mmax, F_E ) * mmax;
+	}
+	return powf( value, F_E ) * ( max - min ) + min;
+}
+
+
+//! @brief Scales value from logarithmic to linear. Value should be in min-max range.
+static inline float linearToLogScale( float min, float max, float value )
+{
+	static const float EXP = 1.0f / F_E;
+	const float val = ( value - min ) / ( max - min );
+	if( min < 0 )
+	{
+		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		return signedPowf( value / mmax, EXP ) * mmax;
+	}
+	return powf( val, EXP ) * ( max - min ) + min;
+}
 
 #endif
