@@ -205,7 +205,7 @@ void FxMixer::deleteChannel(int index)
 			}
 		}
 	}
-
+	
 	// delete all of this channel's sends and receives
 	while( ! m_fxChannels[index]->m_sends.isEmpty() )
 	{
@@ -241,6 +241,12 @@ void FxMixer::deleteChannel(int index)
 	// actually delete the channel
 	delete m_fxChannels[index];
 	m_fxChannels.remove(index);
+	
+	// check names of all channels above the removal
+	for( int i = index; i < m_fxChannels.size(); ++i )
+	{
+		validateChannelName( i, i + 1 );
+	}
 }
 
 
@@ -314,6 +320,11 @@ void FxMixer::moveChannelLeft(int index)
 	FxChannel * tmpChannel = m_fxChannels[a];
 	m_fxChannels[a] = m_fxChannels[b];
 	m_fxChannels[b] = tmpChannel;
+	
+	// check names
+	validateChannelName( a, b );
+	validateChannelName( b, a );
+
 	m_sendsMutex.unlock();
 }
 
@@ -324,6 +335,15 @@ void FxMixer::moveChannelRight(int index)
 	moveChannelLeft(index+1);
 }
 
+
+void FxMixer::validateChannelName( int index, int oldIndex )
+{
+	FxChannel * fxc = m_fxChannels[ index ];
+	if( fxc->m_name == tr( "FX %1" ).arg( oldIndex ) )
+	{
+		fxc->m_name = tr( "FX %1" ).arg( index );
+	}
+}
 
 
 void FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
