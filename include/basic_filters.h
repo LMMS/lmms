@@ -1,11 +1,11 @@
 /*
  * basic_filters.h - simple but powerful filter-class with most used filters
  *
- * original file by ??? 
+ * original file by ???
  * modified and enhanced by Tobias Doerffel
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -127,16 +127,16 @@ public:
 			// reset in/out history for simple filters
 			m_ou1[_chnl] = m_ou2[_chnl] = m_in1[_chnl] =
 					m_in2[_chnl] = 0.0f;
-					
+
 			// reset in/out history for moog-filter
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
 					m_oldx[_chnl] = m_oldy1[_chnl] =
 					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
-					
+
 			// reset in/out history for RC-filters
 			m_rclp0[_chnl] = m_rcbp0[_chnl] = m_rchp0[_chnl] = m_rclast0[_chnl] = 0.0f;
 			m_rclp1[_chnl] = m_rcbp1[_chnl] = m_rchp1[_chnl] = m_rclast1[_chnl] = 0.0f;
-			
+
 			for(int i=0; i<6; i++)
 			   m_vflp[i][_chnl] = m_vfbp[i][_chnl] = m_vfhp[i][_chnl] = m_vflast[i][_chnl] = 0.0f;
 		}
@@ -186,130 +186,135 @@ public:
 			// (C) 1998 ... 2009 S.Fendt. Released under the GPL v2.0  or any later version.
 
 			case Lowpass_RC12:
-			case Bandpass_RC12:
-			case Highpass_RC12:
 			{
-				sample_t lp, hp, bp;
-
-				sample_t in;
-
-				// 4-times oversampled... (even the moog-filter would benefit from this)
+				sample_t lp, bp, hp, in;
 				for( int n = 4; n != 0; --n )
 				{
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_rcb + m_rclp0[_chnl] * m_rca;
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_rclast0[_chnl] = in;
 					m_rclp0[_chnl] = lp;
 					m_rchp0[_chnl] = hp;
 					m_rcbp0[_chnl] = bp;
 				}
+				return lp;
+				break;
+			}
+			case Highpass_RC12:
+			case Bandpass_RC12:
+			{
+				sample_t hp, bp, in;
+				for( int n = 4; n != 0; --n )
+				{
+					in = _in0 + m_rcbp0[_chnl] * m_rcq;
+					in = qBound( -1.0f, in, 1.0f );
 
-				if( m_type == Lowpass_RC12 )
-					out = lp;
-				else if( m_type == Bandpass_RC12 )
-					out = bp;
-				else
-					out = hp;
-				
-				return( out );
+					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
+					hp = qBound( -1.0f, hp, 1.0f );
+
+					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
+					bp = qBound( -1.0f, bp, 1.0f );
+
+					m_rclast0[_chnl] = in;
+					m_rchp0[_chnl] = hp;
+					m_rcbp0[_chnl] = bp;
+				}
+				return m_type == Highpass_RC12 ? hp : bp;
 				break;
 			}
 
 			case Lowpass_RC24:
-			case Bandpass_RC24:
-			case Highpass_RC24:
 			{
-				sample_t lp, hp, bp;
-
-				sample_t in;
-
+				sample_t lp, bp, hp, in;
 				for( int n = 4; n != 0; --n )
 				{
 					// first stage is as for the 12dB case...
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_rcb + m_rclp0[_chnl] * m_rca;
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_rclast0[_chnl] = in;
 					m_rclp0[_chnl] = lp;
+					m_rcbp0[_chnl] = bp;
+					m_rchp0[_chnl] = hp;
+
+					// second stage gets the output of the first stage as input...
+					in = lp + m_rcbp1[_chnl] * m_rcq;
+					in = qBound( -1.0f, in, 1.0f );
+
+					lp = in * m_rcb + m_rclp1[_chnl] * m_rca;
+					lp = qBound( -1.0f, lp, 1.0f );
+
+					hp = m_rcc * ( m_rchp1[_chnl] + in - m_rclast1[_chnl] );
+					hp = qBound( -1.0f, hp, 1.0f );
+
+					bp = hp * m_rcb + m_rcbp1[_chnl] * m_rca;
+					bp = qBound( -1.0f, bp, 1.0f );
+
+					m_rclast1[_chnl] = in;
+					m_rclp1[_chnl] = lp;
+					m_rcbp1[_chnl] = bp;
+					m_rchp1[_chnl] = hp;
+				}
+				return lp;
+				break;
+			}
+			case Highpass_RC24:
+			case Bandpass_RC24:
+			{
+				sample_t hp, bp, in;
+				for( int n = 4; n != 0; --n )
+				{
+					// first stage is as for the 12dB case...
+					in = _in0 + m_rcbp0[_chnl] * m_rcq;
+					in = qBound( -1.0f, in, 1.0f );
+
+					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
+					hp = qBound( -1.0f, hp, 1.0f );
+
+					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
+					bp = qBound( -1.0f, bp, 1.0f );
+
+					m_rclast0[_chnl] = in;
 					m_rchp0[_chnl] = hp;
 					m_rcbp0[_chnl] = bp;
 
 					// second stage gets the output of the first stage as input...
-					if( m_type == Lowpass_RC24 )
-					{
-						in = lp + m_rcbp1[_chnl] * m_rcq;
-					}
-					else if( m_type == Bandpass_RC24 )
-					{
-						in = bp + m_rcbp1[_chnl] * m_rcq;
-					}
-					else
-					{
-   						in = hp + m_rcbp1[_chnl] * m_rcq;
-					}
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = m_type == Highpass_RC24
+						? hp + m_rcbp1[_chnl] * m_rcq
+						: bp + m_rcbp1[_chnl] * m_rcq;
 
-					lp = in * m_rcb + m_rclp1[_chnl] * m_rca;
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					in = qBound( -1.0f, in, 1.0f );
 
 					hp = m_rcc * ( m_rchp1[_chnl] + in - m_rclast1[_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_rcb + m_rcbp1[_chnl] * m_rca;
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_rclast1[_chnl] = in;
-					m_rclp1[_chnl] = lp;
 					m_rchp1[_chnl] = hp;
 					m_rcbp1[_chnl] = bp;
 				}
-
-				// output is second stage-lowpass...
-				if( m_type == Lowpass_RC24 )
-				{
-					out = lp;
-				}
-				else if( m_type == Bandpass_RC24 )
-				{
-					out = bp;
-				}
-				else
-				{
-					out = hp;
-				}
-			
-				return out;
+				return m_type == Highpass_RC24 ? hp : bp;
 				break;
 			}
 
@@ -317,146 +322,146 @@ public:
 			{
 				sample_t lp, hp, bp, in;
 
-		out = 0;
-		for(int o=0; o<4; o++)
-		{
-			// first formant
-			in = _in0 + m_vfbp[0][_chnl] * m_vfq;
-			in = (in > +1.f) ? +1.f : in;
-			in = (in < -1.f) ? -1.f : in;
+				out = 0;
+				for(int o=0; o<4; o++)
+				{
+					// first formant
+					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
 
-			lp = in * m_vfb[0] + m_vflp[0][_chnl] * m_vfa[0];
-			lp = (lp > +1.f) ? +1.f : lp;
-			lp = (lp < -1.f) ? -1.f : lp;
+					lp = in * m_vfb[0] + m_vflp[0][_chnl] * m_vfa[0];
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
 
-			hp = m_vfc[0] * ( m_vfhp[0][_chnl] + in - m_vflast[0][_chnl] );
-			hp = (hp > +1.f) ? +1.f : hp;
-			hp = (hp < -1.f) ? -1.f : hp;
+					hp = m_vfc[0] * ( m_vfhp[0][_chnl] + in - m_vflast[0][_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
 
-			bp = hp * m_vfb[0] + m_vfbp[0][_chnl] * m_vfa[0];
-			bp = (bp > +1.f) ? +1.f : bp;
-			bp = (bp < -1.f) ? -1.f : bp;
+					bp = hp * m_vfb[0] + m_vfbp[0][_chnl] * m_vfa[0];
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
 
-			m_vflast[0][_chnl] = in;
-			m_vflp[0][_chnl] = lp;
-			m_vfhp[0][_chnl] = hp;
-			m_vfbp[0][_chnl] = bp;
+					m_vflast[0][_chnl] = in;
+					m_vflp[0][_chnl] = lp;
+					m_vfhp[0][_chnl] = hp;
+					m_vfbp[0][_chnl] = bp;
 
-			in = bp + m_vfbp[2][_chnl] * m_vfq;
-			in = (in > +1.f) ? +1.f : in;
-			in = (in < -1.f) ? -1.f : in;
+					in = bp + m_vfbp[2][_chnl] * m_vfq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
 
-			lp = in * m_vfb[0] + m_vflp[2][_chnl] * m_vfa[0];
-			lp = (lp > +1.f) ? +1.f : lp;
-			lp = (lp < -1.f) ? -1.f : lp;
+					lp = in * m_vfb[0] + m_vflp[2][_chnl] * m_vfa[0];
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
 
-			hp = m_vfc[0] * ( m_vfhp[2][_chnl] + in - m_vflast[2][_chnl] );
-			hp = (hp > +1.f) ? +1.f : hp;
-			hp = (hp < -1.f) ? -1.f : hp;
+					hp = m_vfc[0] * ( m_vfhp[2][_chnl] + in - m_vflast[2][_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
 
-			bp = hp * m_vfb[0] + m_vfbp[2][_chnl] * m_vfa[0];
-			bp = (bp > +1.f) ? +1.f : bp;
-			bp = (bp < -1.f) ? -1.f : bp;
+					bp = hp * m_vfb[0] + m_vfbp[2][_chnl] * m_vfa[0];
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
 
-			m_vflast[2][_chnl] = in;
-			m_vflp[2][_chnl] = lp;
-			m_vfhp[2][_chnl] = hp;
-			m_vfbp[2][_chnl] = bp;  
-			      
-			in = bp + m_vfbp[4][_chnl] * m_vfq;
-			in = (in > +1.f) ? +1.f : in;
-			in = (in < -1.f) ? -1.f : in;
+					m_vflast[2][_chnl] = in;
+					m_vflp[2][_chnl] = lp;
+					m_vfhp[2][_chnl] = hp;
+					m_vfbp[2][_chnl] = bp;
 
-			lp = in * m_vfb[0] + m_vflp[4][_chnl] * m_vfa[0];
-			lp = (lp > +1.f) ? +1.f : lp;
-			lp = (lp < -1.f) ? -1.f : lp;
+					in = bp + m_vfbp[4][_chnl] * m_vfq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
 
-			hp = m_vfc[0] * ( m_vfhp[4][_chnl] + in - m_vflast[4][_chnl] );
-			hp = (hp > +1.f) ? +1.f : hp;
-			hp = (hp < -1.f) ? -1.f : hp;
+					lp = in * m_vfb[0] + m_vflp[4][_chnl] * m_vfa[0];
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
 
-			bp = hp * m_vfb[0] + m_vfbp[4][_chnl] * m_vfa[0];
-			bp = (bp > +1.f) ? +1.f : bp;
-			bp = (bp < -1.f) ? -1.f : bp;
+					hp = m_vfc[0] * ( m_vfhp[4][_chnl] + in - m_vflast[4][_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
 
-			m_vflast[4][_chnl] = in;
-			m_vflp[4][_chnl] = lp;
-			m_vfhp[4][_chnl] = hp;
-			m_vfbp[4][_chnl] = bp;  
+					bp = hp * m_vfb[0] + m_vfbp[4][_chnl] * m_vfa[0];
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
 
-			out += bp;
+					m_vflast[4][_chnl] = in;
+					m_vflp[4][_chnl] = lp;
+					m_vfhp[4][_chnl] = hp;
+					m_vfbp[4][_chnl] = bp;
 
-			// second formant
-			in = _in0 + m_vfbp[0][_chnl] * m_vfq;
-			in = (in > +1.f) ? +1.f : in;
-			in = (in < -1.f) ? -1.f : in;
+					out += bp;
 
-			lp = in * m_vfb[1] + m_vflp[1][_chnl] * m_vfa[1];
-			lp = (lp > +1.f) ? +1.f : lp;
-			lp = (lp < -1.f) ? -1.f : lp;
+					// second formant
+					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
 
-			hp = m_vfc[1] * ( m_vfhp[1][_chnl] + in - m_vflast[1][_chnl] );
-			hp = (hp > +1.f) ? +1.f : hp;
-			hp = (hp < -1.f) ? -1.f : hp;
+					lp = in * m_vfb[1] + m_vflp[1][_chnl] * m_vfa[1];
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
 
-			bp = hp * m_vfb[1] + m_vfbp[1][_chnl] * m_vfa[1];
-			bp = (bp > +1.f) ? +1.f : bp;
-			bp = (bp < -1.f) ? -1.f : bp;
+					hp = m_vfc[1] * ( m_vfhp[1][_chnl] + in - m_vflast[1][_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
 
-			m_vflast[1][_chnl] = in;
-			m_vflp[1][_chnl] = lp;
-			m_vfhp[1][_chnl] = hp;
-			m_vfbp[1][_chnl] = bp;
+					bp = hp * m_vfb[1] + m_vfbp[1][_chnl] * m_vfa[1];
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
 
-			in = bp + m_vfbp[3][_chnl] * m_vfq;
-			in = (in > +1.f) ? +1.f : in;
-			in = (in < -1.f) ? -1.f : in;
+					m_vflast[1][_chnl] = in;
+					m_vflp[1][_chnl] = lp;
+					m_vfhp[1][_chnl] = hp;
+					m_vfbp[1][_chnl] = bp;
 
-			lp = in * m_vfb[1] + m_vflp[3][_chnl] * m_vfa[1];
-			lp = (lp > +1.f) ? +1.f : lp;
-			lp = (lp < -1.f) ? -1.f : lp;
+					in = bp + m_vfbp[3][_chnl] * m_vfq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
 
-			hp = m_vfc[1] * ( m_vfhp[3][_chnl] + in - m_vflast[3][_chnl] );
-			hp = (hp > +1.f) ? +1.f : hp;
-			hp = (hp < -1.f) ? -1.f : hp;
+					lp = in * m_vfb[1] + m_vflp[3][_chnl] * m_vfa[1];
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
 
-			bp = hp * m_vfb[1] + m_vfbp[3][_chnl] * m_vfa[1];
-			bp = (bp > +1.f) ? +1.f : bp;
-			bp = (bp < -1.f) ? -1.f : bp;
+					hp = m_vfc[1] * ( m_vfhp[3][_chnl] + in - m_vflast[3][_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
 
-			m_vflast[3][_chnl] = in;
-			m_vflp[3][_chnl] = lp;
-			m_vfhp[3][_chnl] = hp;
-			m_vfbp[3][_chnl] = bp;  
+					bp = hp * m_vfb[1] + m_vfbp[3][_chnl] * m_vfa[1];
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
 
-			in = bp + m_vfbp[5][_chnl] * m_vfq;
-			in = (in > +1.f) ? +1.f : in;
-			in = (in < -1.f) ? -1.f : in;
+					m_vflast[3][_chnl] = in;
+					m_vflp[3][_chnl] = lp;
+					m_vfhp[3][_chnl] = hp;
+					m_vfbp[3][_chnl] = bp;
 
-			lp = in * m_vfb[1] + m_vflp[5][_chnl] * m_vfa[1];
-			lp = (lp > +1.f) ? +1.f : lp;
-			lp = (lp < -1.f) ? -1.f : lp;
+					in = bp + m_vfbp[5][_chnl] * m_vfq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
 
-			hp = m_vfc[1] * ( m_vfhp[5][_chnl] + in - m_vflast[5][_chnl] );
-			hp = (hp > +1.f) ? +1.f : hp;
-			hp = (hp < -1.f) ? -1.f : hp;
+					lp = in * m_vfb[1] + m_vflp[5][_chnl] * m_vfa[1];
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
 
-			bp = hp * m_vfb[1] + m_vfbp[5][_chnl] * m_vfa[1];
-			bp = (bp > +1.f) ? +1.f : bp;
-			bp = (bp < -1.f) ? -1.f : bp;
+					hp = m_vfc[1] * ( m_vfhp[5][_chnl] + in - m_vflast[5][_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
 
-			m_vflast[5][_chnl] = in;
-			m_vflp[5][_chnl] = lp;
-			m_vfhp[5][_chnl] = hp;
-			m_vfbp[5][_chnl] = bp;  
+					bp = hp * m_vfb[1] + m_vfbp[5][_chnl] * m_vfa[1];
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
 
-			out += bp;
-            }
-            
+					m_vflast[5][_chnl] = in;
+					m_vflp[5][_chnl] = lp;
+					m_vfhp[5][_chnl] = hp;
+					m_vfbp[5][_chnl] = bp;
+
+					out += bp;
+				}
+
 				return( out/2.0f );
 				break;
 			}
-			
+
 			default:
 				// filter
 				out = m_b0a0*_in0 +
@@ -504,11 +509,11 @@ public:
 			{
 				_freq = 50.f;
 			}
-		
+
 			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
 			m_rcb = 1.0f - m_rca;
 			m_rcc = (1.0f/(_freq*2.0f*M_PI)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
-			
+
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
 			m_rcq = _q/4.f;
 		}
@@ -529,11 +534,11 @@ public:
 			const float fract = ( _freq/14000.f * 4.f ) -
 								(float)vowel;
 
-			// interpolate between formant frequencies         
-			const float f0 = _f[vowel+0][0] * ( 1.0f - fract ) + 
+			// interpolate between formant frequencies
+			const float f0 = _f[vowel+0][0] * ( 1.0f - fract ) +
 						_f[vowel+1][0] * ( fract );
 
-			const float f1 = _f[vowel+0][1] * ( 1.0f - fract ) + 
+			const float f1 = _f[vowel+0][1] * ( 1.0f - fract ) +
 						_f[vowel+1][1] * ( fract );
 
 			m_vfa[0] = 1.0f - (1.0f/(m_sampleRate*4)) /
@@ -552,7 +557,7 @@ public:
 					( (1.0f/(f1*2.0f*M_PI)) +
 						(1.0f/(m_sampleRate*4)) );
 		}
-		
+
 		if( m_type == Moog )
 		{
 			// [ 0 - 0.5 ]
@@ -647,7 +652,7 @@ private:
 
 	// coeffs for formant-filters
 	float m_vfa[4], m_vfb[4], m_vfc[4], m_vfq;
-	
+
 	typedef sample_t frame[CHANNELS];
 
 	// in/out history
@@ -655,14 +660,14 @@ private:
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
-	
+
 	// in/out history for RC-type-filters
 	frame m_rcbp0, m_rclp0, m_rchp0, m_rclast0;
 	frame m_rcbp1, m_rclp1, m_rchp1, m_rclast1;
 
 	// in/out history for Formant-filters
 	frame m_vfbp[6], m_vflp[6], m_vfhp[6], m_vflast[6];
-	
+
 	FilterTypes m_type;
 	bool m_doubleFilter;
 
