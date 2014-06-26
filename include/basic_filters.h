@@ -26,8 +26,8 @@
  */
 
 
-#ifndef _BASIC_FILTERS_H
-#define _BASIC_FILTERS_H
+#ifndef BASIC_FILTERS_H
+#define BASIC_FILTERS_H
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -327,20 +327,16 @@ public:
 				{
 					// first formant
 					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_vfb[0] + m_vflp[0][_chnl] * m_vfa[0];
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_vfc[0] * ( m_vfhp[0][_chnl] + in - m_vflast[0][_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_vfb[0] + m_vfbp[0][_chnl] * m_vfa[0];
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_vflast[0][_chnl] = in;
 					m_vflp[0][_chnl] = lp;
@@ -348,20 +344,16 @@ public:
 					m_vfbp[0][_chnl] = bp;
 
 					in = bp + m_vfbp[2][_chnl] * m_vfq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_vfb[0] + m_vflp[2][_chnl] * m_vfa[0];
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_vfc[0] * ( m_vfhp[2][_chnl] + in - m_vflast[2][_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_vfb[0] + m_vfbp[2][_chnl] * m_vfa[0];
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_vflast[2][_chnl] = in;
 					m_vflp[2][_chnl] = lp;
@@ -369,20 +361,16 @@ public:
 					m_vfbp[2][_chnl] = bp;
 
 					in = bp + m_vfbp[4][_chnl] * m_vfq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_vfb[0] + m_vflp[4][_chnl] * m_vfa[0];
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_vfc[0] * ( m_vfhp[4][_chnl] + in - m_vflast[4][_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_vfb[0] + m_vfbp[4][_chnl] * m_vfa[0];
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_vflast[4][_chnl] = in;
 					m_vflp[4][_chnl] = lp;
@@ -393,20 +381,16 @@ public:
 
 					// second formant
 					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_vfb[1] + m_vflp[1][_chnl] * m_vfa[1];
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_vfc[1] * ( m_vfhp[1][_chnl] + in - m_vflast[1][_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_vfb[1] + m_vfbp[1][_chnl] * m_vfa[1];
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_vflast[1][_chnl] = in;
 					m_vflp[1][_chnl] = lp;
@@ -414,20 +398,16 @@ public:
 					m_vfbp[1][_chnl] = bp;
 
 					in = bp + m_vfbp[3][_chnl] * m_vfq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_vfb[1] + m_vflp[3][_chnl] * m_vfa[1];
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_vfc[1] * ( m_vfhp[3][_chnl] + in - m_vflast[3][_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_vfb[1] + m_vfbp[3][_chnl] * m_vfa[1];
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_vflast[3][_chnl] = in;
 					m_vflp[3][_chnl] = lp;
@@ -435,20 +415,16 @@ public:
 					m_vfbp[3][_chnl] = bp;
 
 					in = bp + m_vfbp[5][_chnl] * m_vfq;
-					in = (in > +1.f) ? +1.f : in;
-					in = (in < -1.f) ? -1.f : in;
+					in = qBound( -1.0f, in, 1.0f );
 
 					lp = in * m_vfb[1] + m_vflp[5][_chnl] * m_vfa[1];
-					lp = (lp > +1.f) ? +1.f : lp;
-					lp = (lp < -1.f) ? -1.f : lp;
+					lp = qBound( -1.0f, lp, 1.0f );
 
 					hp = m_vfc[1] * ( m_vfhp[5][_chnl] + in - m_vflast[5][_chnl] );
-					hp = (hp > +1.f) ? +1.f : hp;
-					hp = (hp < -1.f) ? -1.f : hp;
+					hp = qBound( -1.0f, hp, 1.0f );
 
 					bp = hp * m_vfb[1] + m_vfbp[5][_chnl] * m_vfa[1];
-					bp = (bp > +1.f) ? +1.f : bp;
-					bp = (bp < -1.f) ? -1.f : bp;
+					bp = qBound( -1.0f, bp, 1.0f );
 
 					m_vflast[5][_chnl] = in;
 					m_vflp[5][_chnl] = lp;
@@ -493,9 +469,6 @@ public:
 				/*, const bool _q_is_bandwidth = false*/ )
 	{
 		// temp coef vars
-		_freq = qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting
-                                                            // bad noise out of the filter...
-
 		_q = qMax( _q, minQ() );
 
 		if( m_type == Lowpass_RC12  ||
@@ -505,10 +478,7 @@ public:
 			m_type == Bandpass_RC24 ||
 			m_type == Highpass_RC24 )
 		{
-			if( _freq < 50.f )
-			{
-				_freq = 50.f;
-			}
+			_freq = qBound( 50.0f, _freq, 20000.0f );
 
 			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
 			m_rcb = 1.0f - m_rca;
@@ -516,12 +486,15 @@ public:
 
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
 			m_rcq = _q/4.f;
+			return;
 		}
 
 		if( m_type == Formantfilter )
 		{
+			_freq = qBound( minFreq(), _freq, 20000.0f ); // limit freq and q for not getting bad noise out of the filter...
+
 			// formats for a, e, i, o, u, a
-			const float _f[5][2] = { { 1000, 1400 }, { 500, 2300 },
+			static const float _f[5][2] = { { 1000, 1400 }, { 500, 2300 },
 							{ 320, 3200 },
 							{ 500, 1000 },
 							{ 320, 800 } };
@@ -556,10 +529,13 @@ public:
 			m_vfc[1] = (1.0f/(f1*2.0f*M_PI)) /
 					( (1.0f/(f1*2.0f*M_PI)) +
 						(1.0f/(m_sampleRate*4)) );
+			return;
 		}
 
 		if( m_type == Moog )
 		{
+			_freq = qBound( minFreq(), _freq, 20000.0f ); 
+
 			// [ 0 - 0.5 ]
 			const float f = _freq / m_sampleRate;
 			// (Empirical tunning)
@@ -577,6 +553,7 @@ public:
 		}
 
 		// other filters
+		_freq = qBound( minFreq(), _freq, 20000.0f ); 
 		const float omega = F_2PI * _freq / m_sampleRate;
 		const float tsin = sinf( omega );
 		const float tcos = cosf( omega );
