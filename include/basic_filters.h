@@ -39,6 +39,7 @@
 #include "Mixer.h"
 #include "templates.h"
 #include "lmms_constants.h"
+#include "interpolation.h"
 
 //#include <iostream>
 //#include <cstdlib>
@@ -498,21 +499,19 @@ public:
 							{ 320, 3200 },
 							{ 500, 1000 },
 							{ 320, 800 } };
+			static const float freqRatio = 4.0f / 14000.0f;
 
 			// Stretch Q/resonance
 			m_vfq = _q/4.f;
 
 			// frequency in lmms ranges from 1Hz to 14000Hz
-			const int vowel = (int)( floor( _freq/14000.f * 4.f ) );
-			const float fract = ( _freq/14000.f * 4.f ) -
-								(float)vowel;
+			const float vowelf = _freq * freqRatio;
+			const int vowel = static_cast<int>( vowelf );
+			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = _f[vowel+0][0] * ( 1.0f - fract ) +
-						_f[vowel+1][0] * ( fract );
-
-			const float f1 = _f[vowel+0][1] * ( 1.0f - fract ) +
-						_f[vowel+1][1] * ( fract );
+			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract );
+			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract );
 
 			m_vfa[0] = 1.0f - (1.0f/(m_sampleRate*4)) /
 						( (1.0f/(f0*2.0f*M_PI)) +
