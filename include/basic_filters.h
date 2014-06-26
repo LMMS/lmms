@@ -486,7 +486,7 @@ public:
 			m_rcc = (1.0f/(_freq*2.0f*M_PI)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
 
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
-			m_rcq = _q/4.f;
+			m_rcq = _q * 0.25f;
 			return;
 		}
 
@@ -502,7 +502,7 @@ public:
 			static const float freqRatio = 4.0f / 14000.0f;
 
 			// Stretch Q/resonance
-			m_vfq = _q/4.f;
+			m_vfq = _q * 0.25f;
 
 			// frequency in lmms ranges from 1Hz to 14000Hz
 			const float vowelf = _freq * freqRatio;
