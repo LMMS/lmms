@@ -117,14 +117,17 @@ public:
 	int createChannel();
 
 	// delete a channel from the FX mixer.
-	void deleteChannel(int index);
+	void deleteChannel( int index );
 
 	// delete all the mixer channels except master and remove all effects
 	void clear();
 
 	// re-arrange channels
-	void moveChannelLeft(int index);
-	void moveChannelRight(int index);
+	void moveChannelLeft( int index );
+	void moveChannelRight( int index );
+
+	// validate channel's name: if channel has been moved and still has its original name, change the name to fit new position
+	void validateChannelName( int index, int oldIndex );
 
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(fx_ch_t channelIndex);
@@ -139,7 +142,7 @@ private:
 	QVector<FxChannel *> m_fxChannels;
 
 	// make sure we have at least num channels
-	void allocateChannelsTo(int num);
+	void allocateChannelsTo( int num );
 	QMutex m_sendsMutex;
 
 	void addChannelLeaf( int _ch, sampleFrame * _buf );
