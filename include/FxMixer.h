@@ -32,7 +32,8 @@
 #include "ThreadableJob.h"
 
 
-
+class FxRoute;
+typedef QVector<FxRoute *> FxRouteVector;
 
 class FxChannel : public ThreadableJob
 {
@@ -58,11 +59,10 @@ class FxChannel : public ThreadableJob
 		bool m_queued; // are we queued up for rendering yet?
 
 		// pointers to other channels that this one sends to
-		QVector<fx_ch_t> m_sends;
-		QVector<FloatModel *> m_sendAmount;
+		FxRouteVector m_sends;
 
 		// pointers to other channels that send to this one
-		QVector<fx_ch_t> m_receives;
+		FxRouteVector m_receives;
 
 		virtual bool requiresProcessing() const { return true; }
 
@@ -70,6 +70,43 @@ class FxChannel : public ThreadableJob
 		virtual void doProcessing( sampleFrame * _working_buffer );
 };
 
+
+class FxRoute : public QObject
+{
+	public:		
+		FxRoute( FxChannel * from, FxChannel * to, float amount );
+		virtual ~FxRoute();
+		
+	fx_ch_t senderIndex() const
+	{
+		return m_from->m_channelIndex;
+	}
+	
+	fx_ch_t receiverIndex() const
+	{
+		return m_to->m_channelIndex;
+	}
+	
+	FloatModel * amount() const
+	{
+		return m_amount;
+	}
+	
+	FxChannel * sender() const
+	{
+		return m_from;
+	}
+	
+	FxChannel * receiver() const
+	{
+		return m_to;
+	}
+		
+	private:
+		FxChannel * m_from;
+		FxChannel * m_to;
+		FloatModel * m_amount;
+};
 
 
 class EXPORT FxMixer : public JournallingObject, public Model
@@ -100,13 +137,16 @@ public:
 	// it is safe to call even if the send already exists
 	void createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
 						   float amount = 1.0f);
+	void createRoute( FxChannel * from, FxChannel * to, float amount );
 
 	// delete the connection made by createChannelSend
 	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
+	void deleteChannelSend( FxRoute * route );
 
 	// determine if adding a send from sendFrom to
 	// sendTo would result in an infinite mixer loop.
 	bool isInfiniteLoop(fx_ch_t fromChannel, fx_ch_t toChannel);
+	bool checkInfiniteLoop( FxChannel * from, FxChannel * to );
 
 	// return the FloatModel of fromChannel sending its output to the input of
 	// toChannel. NULL if there is no send.
@@ -129,10 +169,15 @@ public:
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(fx_ch_t channelIndex);
 
+	// rename channels when moving etc. if they still have their original name
+	void validateChannelName( int index, int oldIndex );
+
 	inline fx_ch_t numChannels() const
 	{
 		return m_fxChannels.size();
 	}
+
+	FxRouteVector m_fxRoutes;
 
 private:
 	// the fx channels in the mixer. index 0 is always master.
@@ -142,7 +187,7 @@ private:
 	void allocateChannelsTo(int num);
 	QMutex m_sendsMutex;
 
-	void addChannelLeaf( int _ch, sampleFrame * _buf );
+	void addChannelLeaf( FxChannel * ch, sampleFrame * buf );
 
 	friend class MixerWorkerThread;
 	friend class FxMixerView;
