@@ -41,7 +41,7 @@ FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
 	m_amount = new FloatModel( amount, 0, 1, 0.001, NULL,
-			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex, m_to->m_channelIndex ) );
+			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
 }
 
 

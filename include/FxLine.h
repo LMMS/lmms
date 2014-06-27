@@ -61,13 +61,14 @@ public:
 	static const int FxLineHeight;
 
 private:
-	static void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis );
+	static void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;
 	static QPixmap * s_sendBgArrow;
+	static QPixmap * s_receiveBgArrow;
 
 private slots:
 	void renameChannel();
