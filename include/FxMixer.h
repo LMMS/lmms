@@ -101,6 +101,8 @@ class FxRoute : public QObject
 	{
 		return m_to;
 	}
+	
+	void updateName();
 		
 	private:
 		FxChannel * m_from;

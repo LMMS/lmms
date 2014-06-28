@@ -52,6 +52,15 @@ FxRoute::~FxRoute()
 }
 
 
+void FxRoute::updateName()
+{
+	if( m_amount)
+	{
+		m_amount->setDisplayName( 
+			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
+	}
+}
+
 
 FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_fxChain( NULL ),
@@ -660,5 +669,17 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 	if( fxc->m_name == tr( "FX %1" ).arg( oldIndex ) )
 	{
 		fxc->m_name = tr( "FX %1" ).arg( index );
+	}
+	// set correct channel index
+	fxc->m_channelIndex = index;
+
+	// now check all routes and update names of the send models
+	foreach( FxRoute * r, fxc->m_sends )
+	{
+		r->updateName();
+	}
+	foreach( FxRoute * r, fxc->m_receives )
+	{
+		r->updateName();
 	}
 }
