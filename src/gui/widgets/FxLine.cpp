@@ -41,6 +41,7 @@
 
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
+QPixmap * FxLine::s_receiveBgArrow = NULL;
 
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	QWidget( _parent ),
@@ -50,6 +51,10 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	if( ! s_sendBgArrow )
 	{
 		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
+	}
+	if( ! s_receiveBgArrow )
+	{
+		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
 	}
 
 	setFixedSize( 33, FxLineHeight );
@@ -103,7 +108,7 @@ void FxLine::setChannelIndex(int index) {
 }
 
 
-void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis )
+void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis )
 {
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
@@ -126,7 +131,11 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 	// draw the mixer send background
 	if( sendToThis )
 	{
-		p->drawPixmap( 2, 0, 29, 56, *FxLine::s_sendBgArrow );
+		p->drawPixmap( 2, 0, 29, 56, *s_sendBgArrow );
+	}
+	else if( receiveFromThis )
+	{
+		p->drawPixmap( 2, 0, 29, 56, *s_receiveBgArrow );
 	}
 
 	// draw the channel name
@@ -148,11 +157,13 @@ void FxLine::paintEvent( QPaintEvent * )
 	FxMixer * mix = engine::fxMixer();
 	bool sendToThis = mix->channelSendModel(
 		m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
+	bool receiveFromThis = mix->channelSendModel(
+		m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
 	QPainter painter;
 	painter.begin( this );
 	drawFxLine( &painter, this,
 		mix->effectChannel( m_channelIndex )->m_name,
-		m_mv->currentFxLine() == this, sendToThis );
+		m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
 	painter.end();
 }
 
