@@ -121,7 +121,7 @@ FxMixerView::FxMixerView() :
 	channelArea->setMinimumWidth( fxLineSize.width() * 6 );
 	channelArea->setFixedHeight( fxLineSize.height() +
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
-	ml->addWidget(channelArea);
+	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
@@ -132,7 +132,7 @@ FxMixerView::FxMixerView() :
 
 
 	// add the stacked layout for the effect racks of fx channels 
-	ml->addWidget( m_racksWidget, 0, Qt::AlignTop );
+	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
 	
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
