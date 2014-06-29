@@ -28,6 +28,7 @@
 
 #include <stdint.h>
 #include "lmms_constants.h"
+#include <QtCore/QtGlobal>
 
 #include <math.h>
 

@@ -1987,7 +1987,7 @@ void PianoRoll::testPlayNote( note * n )
 
 		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity( baseVelocity ) );
 
-		MidiEvent event( MidiMetaEvent, 0, n->key(), panningToMidi( n->getPanning() ) );
+		MidiEvent event( MidiMetaEvent, -1, n->key(), panningToMidi( n->getPanning() ) );
 
 		event.setMetaEvent( MidiNotePanning );
 
@@ -2380,12 +2380,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 						const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
 
-						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, 0, n->key(), n->midiVelocity( baseVelocity ) ) );
+						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, -1, n->key(), n->midiVelocity( baseVelocity ) ) );
 					}
 					else if( m_noteEditMode == NoteEditPanning )
 					{
 						n->setPanning( pan );
-						MidiEvent evt( MidiMetaEvent, 0, n->key(), panningToMidi( pan ) );
+						MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
 						evt.setMetaEvent( MidiNotePanning );
 						m_pattern->instrumentTrack()->processInEvent( evt );
 					}
