@@ -23,11 +23,10 @@
  */
 
 
-#ifndef _DSP_EFFECT_LIBRARY_H
-#define _DSP_EFFECT_LIBRARY_H
+#ifndef DSP_EFFECT_LIBRARY_H
+#define DSP_EFFECT_LIBRARY_H
 
-#include <math.h>
-
+#include "lmms_math.h"
 #include "templates.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
@@ -213,8 +212,7 @@ namespace DspEffectLibrary
 		{
 			// TODO: somehow remove these horrible aliases...
 			m_cap = ( _in + m_cap*m_frequency ) * m_gain1;
-			return( /*saturate<sample_t>(*/ ( _in + m_cap*m_ratio ) *
-								m_gain2/* )*/ );
+			return( ( _in + m_cap*m_ratio ) * m_gain2 );
 		}
 
 		void setFrequency( const sample_t _frequency )
@@ -335,10 +333,10 @@ namespace DspEffectLibrary
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
 		{
-			const float toRad = 3.141592 / 180;
-
-			inLeft += inRight * sinf( m_wideCoeff * .5 * toRad);
-			inRight -= inLeft * sinf( m_wideCoeff * .5 * toRad);
+			const float toRad = F_PI / 180;
+			const sample_t tmp = inLeft;
+			inLeft += inRight * sinf( m_wideCoeff * ( .5 * toRad ) );
+			inRight -= tmp * sinf( m_wideCoeff * ( .5 * toRad ) );
 		}
 
 	private:
