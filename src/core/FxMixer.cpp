@@ -126,12 +126,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
 				// figure out if we're getting sample-exact input
-				ValueBuffer * sendBuf = sendModel->hasSampleExactData()
-					? sendModel->valueBuffer()
-					: NULL;
-				ValueBuffer * volBuf = sender->m_volumeModel.hasSampleExactData()
-					? sender->m_volumeModel.valueBuffer()
-					: NULL;
+				ValueBuffer * sendBuf = sendModel->valueBuffer();
+				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
 				sampleFrame * ch_buf = sender->m_buffer;
@@ -526,9 +522,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	//m_sendsMutex.unlock();
 
 	// handle sample-exact data in master volume fader
-	ValueBuffer * volBuf = m_fxChannels[0]->m_volumeModel.hasSampleExactData()
-		? m_fxChannels[0]->m_volumeModel.valueBuffer()
-		: NULL;
+	ValueBuffer * volBuf = m_fxChannels[0]->m_volumeModel.valueBuffer();
 
 	if( volBuf )
 	{

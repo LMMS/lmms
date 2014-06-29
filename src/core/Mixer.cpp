@@ -418,6 +418,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
+	AutomatableModel::incrementPeriodCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f *
 				processingSampleRate() / m_framesPerPeriod;

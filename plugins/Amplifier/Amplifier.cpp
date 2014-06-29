@@ -75,21 +75,10 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
-	ValueBuffer * volBuf = m_ampControls.m_volumeModel.hasSampleExactData() 
-		? m_ampControls.m_volumeModel.valueBuffer() 
-		: NULL;
-		
-	ValueBuffer * panBuf = m_ampControls.m_panModel.hasSampleExactData()
-		? m_ampControls.m_panModel.valueBuffer() 
-		: NULL;
-		
-	ValueBuffer * leftBuf = m_ampControls.m_leftModel.hasSampleExactData()
-		? m_ampControls.m_leftModel.valueBuffer() 
-		: NULL;
-
-	ValueBuffer * rightBuf = m_ampControls.m_rightModel.hasSampleExactData()
-		? m_ampControls.m_rightModel.valueBuffer() 
-		: NULL;
+	ValueBuffer * volBuf = m_ampControls.m_volumeModel.valueBuffer();
+	ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
+	ValueBuffer * leftBuf = m_ampControls.m_leftModel.valueBuffer();
+	ValueBuffer * rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
