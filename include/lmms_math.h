@@ -165,4 +165,29 @@ static inline float linearToLogScale( float min, float max, float value )
 	return powf( val, EXP ) * ( max - min ) + min;
 }
 
+
+
+
+//! @brief Converts linear amplitude (0-1.0) to dBV scale. 
+//! @param amp Linear amplitude, where 1.0 = 0dBV. 
+//! @return Amplitude in dBV. -inf for 0 amplitude.
+static inline float ampToDbv( float amp )
+{
+	return amp == 0.0f
+		? -INFINITY
+		: log10f( amp ) * 20.0f;
+}
+
+
+//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0
+//! @param dbv The dBV value to convert: all infinites are treated as -inf and result in 0
+//! @return Linear amplitude
+static inline float dbvToAmp( float dbv )
+{
+	return isinff( dbv )
+		? 0.0f
+		: powf( 10.0f, dbv * 0.05f );
+}
+
+
 #endif
