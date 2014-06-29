@@ -193,26 +193,22 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// is no problem for us since we just bypass the envelopes+LFOs
 	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) == false && n != NULL )
 	{
-		m_soundShaping.processAudioBuffer( buf, frames, n );
+		const f_cnt_t offset = n->noteOffset();
+		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
 		v_scale *= ( (float) n->getVolume() / DefaultVolume );
 	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	
-	int framesToMix = frames;
-	int offset = 0;
 	int panning = m_panningModel.value();
 
 	if( n )
 	{
-		framesToMix = qMin<f_cnt_t>( n->framesLeftForCurrentPeriod(), framesToMix );
-		offset = n->offset();
-
 		panning += n->getPanning();
 		panning = tLimit<int>( panning, PanningLeft, PanningRight );
 	}
 
-	engine::mixer()->bufferToPort( buf, framesToMix, offset, panningToVolumeVector( panning, v_scale ), &m_audioPort );
+	engine::mixer()->bufferToPort( buf, frames, panningToVolumeVector( panning, v_scale ), &m_audioPort );
 }
 
 

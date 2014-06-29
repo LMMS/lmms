@@ -317,6 +317,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = sid;
 	}
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
@@ -430,11 +431,11 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			_working_buffer[frame][ch] = s;
+			_working_buffer[frame+offset][ch] = s;
 		}
 	}
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

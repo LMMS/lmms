@@ -302,10 +302,11 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 	stringContainer * ps = static_cast<stringContainer *>(
 							_n->m_pluginData );
 
-	for( fpp_t i = 0; i < frames; ++i )
+	for( fpp_t i = offset; i < frames + offset; ++i )
 	{
 		_working_buffer[i][0] = 0.0f;
 		_working_buffer[i][1] = 0.0f;
@@ -324,7 +325,7 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 		}
 	}
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

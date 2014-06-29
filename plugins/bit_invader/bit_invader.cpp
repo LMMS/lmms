@@ -282,9 +282,10 @@ void bitInvader::playNote( NotePlayHandle * _n,
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
-	for( fpp_t frame = 0; frame < frames; ++frame )
+	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample();
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -295,7 +296,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 
 	applyRelease( _working_buffer, _n );
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

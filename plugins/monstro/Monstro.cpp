@@ -1245,13 +1245,15 @@ MonstroInstrument::~MonstroInstrument()
 void MonstroInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
+	fpp_t frames = _n->framesLeftForCurrentPeriod();
+	
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
+		_working_buffer += _n->offset();
+		frames -= _n->offset();
 		const sample_rate_t samplerate = m_samplerate;
 		_n->m_pluginData = new MonstroSynth( this, _n, samplerate, m_fpp );
 	}
-
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
 	MonstroSynth * ms = static_cast<MonstroSynth *>( _n->m_pluginData );
 

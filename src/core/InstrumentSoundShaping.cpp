@@ -133,7 +133,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	if( n->isReleased() == false )
 	{
-		envReleaseBegin += engine::mixer()->framesPerPeriod();
+		envReleaseBegin += frames;
 	}
 
 	// because of optimizations, there's special code for several cases:
