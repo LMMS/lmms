@@ -921,7 +921,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 		// envelope 1
 
 		// adjust phase for release
-		if( m_nph->isReleased() && m_env1_phase < 4.0f )
+		if( m_env1_phase < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
 		{
 			if( m_env1_phase < 1.0f ) m_env1_phase = 5.0f;
 			else if( m_env1_phase < 2.0f ) m_env1_phase = 5.0f - fraction( m_env1_phase );
@@ -973,7 +973,7 @@ void MonstroSynth::renderModulators( fpp_t _frames )
 
 
 		// adjust phase for release
-		if( m_nph->isReleased() && m_env2_phase < 4.0f )
+		if( m_env2_phase < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
 		{
 			if( m_env2_phase < 1.0f ) m_env2_phase = 5.0f;
 			else if( m_env2_phase < 2.0f ) m_env2_phase = 5.0f - fraction( m_env2_phase );
