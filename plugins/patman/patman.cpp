@@ -138,6 +138,7 @@ void patmanInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	if( !_n->m_pluginData )
 	{
@@ -148,12 +149,12 @@ void patmanInstrument::playNote( NotePlayHandle * _n,
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if( hdata->sample->play( _working_buffer, hdata->state, frames,
+	if( hdata->sample->play( _working_buffer + offset, hdata->state, frames,
 					play_freq, m_loopedModel.value() ? SampleBuffer::LoopOn : SampleBuffer::LoopOff ) )
 	{
 		applyRelease( _working_buffer, _n );
 		instrumentTrack()->processAudioBuffer( _working_buffer,
-								frames, _n );
+								frames + offset, _n );
 	}
 }
 

@@ -26,6 +26,7 @@
 #define AUTOMATABLE_MODEL_H
 
 #include <math.h>
+#include <QtCore/QMutex>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -103,9 +104,6 @@ public:
 	{
 		return isAutomated() || m_controllerConnection != NULL;
 	}
-	
-	bool hasSampleExactData() const;
-
 
 	ControllerConnection* controllerConnection() const
 	{
@@ -142,10 +140,8 @@ public:
 
 	float controllerValue( int frameOffset ) const;
 
-	// returns sample-exact data as a ValueBuffer
-	// should only be called when sample-exact data exists
-	// in other cases (eg. for automation), the receiving end should interpolate
-	// the values themselves
+	//! @brief Function that returns sample-exact data as a ValueBuffer
+	//! @return pointer to model's valueBuffer when s.ex.data exists, NULL otherwise
 	ValueBuffer * valueBuffer();
 
 	template<class T>
@@ -264,6 +260,16 @@ public:
 	{
 		m_hasStrictStepSize = b;
 	}
+	
+	static void incrementPeriodCounter()
+	{
+		++s_periodCounter;
+	}
+	
+	static void resetPeriodCounter()
+	{
+		s_periodCounter = 0;
+	}
 
 public slots:
 	virtual void reset();
@@ -332,6 +338,13 @@ private:
 	static float s_copiedValue;
 
 	ValueBuffer m_valueBuffer;
+	long m_lastUpdatedPeriod;
+	static long s_periodCounter;
+	
+	bool m_hasSampleExactData;
+	
+	// prevent several threads from attempting to write the same vb at the same time
+	QMutex m_valueBufferMutex;
 
 signals:
 	void initValueChanged( float val );

@@ -312,7 +312,6 @@ public:
 	// audio-buffer-mgm
 	void bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
-					const f_cnt_t _offset,
 					stereoVolumeVector _volume_vector,
 					AudioPort * _port );
 

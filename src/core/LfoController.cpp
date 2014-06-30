@@ -109,7 +109,7 @@ void LfoController::updateValueBuffer()
 			? m_sampleFunction( phase )
 			: m_userDefSampleBuffer->userWaveSample( phase );
 			
-		values[i] = m_baseModel.value() + ( m_amountModel.value() * currentSample / 2.0f );
+		values[i] = qBound( 0.0f, m_baseModel.value() + ( m_amountModel.value() * currentSample / 2.0f ), 1.0f );
 
 		phase += 1.0 / m_duration;
 	}

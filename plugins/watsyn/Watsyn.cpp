@@ -343,6 +343,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
+	sampleFrame * buffer = _working_buffer + offset;
 
 	WatsynObject * w = static_cast<WatsynObject *>( _n->m_pluginData );
 
@@ -424,9 +426,9 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 			const float amix = 1.0 - bmix;
 
 			// mix a/b streams according to mixing knob
-			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
+			buffer[f][0] = ( abuf[f][0] * amix ) +
 									( bbuf[f][0] * bmix );
-			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
+			buffer[f][1] = ( abuf[f][1] * amix ) +
 									( bbuf[f][1] * bmix );
 		}
 	}
@@ -440,16 +442,16 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 		for( fpp_t f=0; f < frames; f++ )
 		{
 			// mix a/b streams according to mixing knob
-			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
+			buffer[f][0] = ( abuf[f][0] * amix ) +
 									( bbuf[f][0] * bmix );
-			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
+			buffer[f][1] = ( abuf[f][1] * amix ) +
 									( bbuf[f][1] * bmix );
 		}
 	}
 
 	applyRelease( _working_buffer, _n );
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

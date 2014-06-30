@@ -163,6 +163,8 @@ typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
 void kickerInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 	const float decfr = m_decayModel.value() *
 		engine::mixer()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
@@ -187,10 +189,8 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 		_n->noteOff();
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-
 	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
-	so->update( _working_buffer, frames, engine::mixer()->processingSampleRate() );
+	so->update( _working_buffer + offset, frames, engine::mixer()->processingSampleRate() );
 
 	if( _n->isReleased() )
 	{
@@ -199,12 +199,12 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 		for( fpp_t f = 0; f < frames; ++f )
 		{
 			const float fac = ( done+f < desired ) ? ( 1.0f - ( ( done+f ) / desired ) ) : 0;
-			_working_buffer[f][0] *= fac;
-			_working_buffer[f][1] *= fac;
+			_working_buffer[f+offset][0] *= fac;
+			_working_buffer[f+offset][1] *= fac;
 		}
 	}
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

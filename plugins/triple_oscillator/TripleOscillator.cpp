@@ -358,13 +358,14 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData )->oscRight;
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
-	osc_l->update( _working_buffer, frames, 0 );
-	osc_r->update( _working_buffer, frames, 1 );
+	osc_l->update( _working_buffer + offset, frames, 0 );
+	osc_r->update( _working_buffer + offset, frames, 1 );
 
 	applyRelease( _working_buffer, _n );
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

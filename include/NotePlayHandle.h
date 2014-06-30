@@ -74,6 +74,16 @@ public:
 	{
 		return m_midiChannel;
 	}
+	
+	/*! convenience function that returns offset for the first period and zero otherwise,
+		used by instruments to handle the offset: instruments have to check this property and 
+		add the correct number of empty frames in the beginning of the period */
+	f_cnt_t noteOffset() const
+	{
+		return m_totalFramesPlayed == 0
+			? offset()
+			: 0;
+	}
 
 	const float& frequency() const
 	{
@@ -94,7 +104,7 @@ public:
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
 	virtual bool isFinished() const
 	{
-		return m_released && framesLeft() <= 0 && m_scheduledNoteOff < 0;
+		return m_released && framesLeft() <= 0;
 	}
 
 	/*! Returns number of frames left for playback */
@@ -264,7 +274,6 @@ private:
 											// played after release
 	f_cnt_t m_releaseFramesDone;			// number of frames done after
 											// release of note
-	f_cnt_t m_scheduledNoteOff;			// variable for scheduling noteoff at next period
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
 	bool m_hasParent;

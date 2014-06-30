@@ -418,6 +418,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
+	AutomatableModel::incrementPeriodCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f *
 				processingSampleRate() / m_framesPerPeriod;
@@ -451,44 +452,40 @@ void Mixer::clear()
 
 
 
-void Mixer::bufferToPort( const sampleFrame * _buf,
-					const fpp_t _frames,
-					const f_cnt_t _offset,
-					stereoVolumeVector _vv,
-						AudioPort * _port )
+void Mixer::bufferToPort( const sampleFrame * buf,
+					const fpp_t frames,
+					stereoVolumeVector vv,
+						AudioPort * port )
 {
-	const int start_frame = _offset % m_framesPerPeriod;
-	int end_frame = start_frame + _frames;
-	const int loop1_frame = qMin<int>( end_frame, m_framesPerPeriod );
+	const int loop1_frame = qMin<int>( frames, m_framesPerPeriod );
 
-	_port->lockFirstBuffer();
-	MixHelpers::addMultipliedStereo( _port->firstBuffer()+start_frame,	// dst
-										_buf,							// src
-										_vv.vol[0], _vv.vol[1],			// coeff left/right
-										loop1_frame - start_frame );	// frame count
-	_port->unlockFirstBuffer();
+	port->lockFirstBuffer();
+	MixHelpers::addMultipliedStereo( port->firstBuffer(),				// dst
+										buf,							// src
+										vv.vol[0], vv.vol[1],			// coeff left/right
+										loop1_frame );					// frame count
+	port->unlockFirstBuffer();
 
-	_port->lockSecondBuffer();
-	if( end_frame > m_framesPerPeriod )
+	if( frames > m_framesPerPeriod )
 	{
-		const int frames_done = m_framesPerPeriod - start_frame;
-		end_frame -= m_framesPerPeriod;
-		end_frame = qMin<int>( end_frame, m_framesPerPeriod );
+		port->lockSecondBuffer();
+	
+		const fpp_t framesLeft = qMin<int>( frames - m_framesPerPeriod, m_framesPerPeriod );
 
-		MixHelpers::addMultipliedStereo( _port->secondBuffer(),			// dst
-											_buf+frames_done,			// src
-											_vv.vol[0], _vv.vol[1],		// coeff left/right
-											end_frame );				// frame count
+		MixHelpers::addMultipliedStereo( port->secondBuffer(),			// dst
+											buf + m_framesPerPeriod,	// src
+											vv.vol[0], vv.vol[1],		// coeff left/right
+											framesLeft );					// frame count
 
 		// we used both buffers so set flags
-		_port->m_bufferUsage = AudioPort::BothBuffers;
+		port->m_bufferUsage = AudioPort::BothBuffers;
+		port->unlockSecondBuffer();
 	}
-	else if( _port->m_bufferUsage == AudioPort::NoUsage )
+	else if( port->m_bufferUsage == AudioPort::NoUsage )
 	{
 		// only first buffer touched
-		_port->m_bufferUsage = AudioPort::FirstBuffer;
+		port->m_bufferUsage = AudioPort::FirstBuffer;
 	}
-	_port->unlockSecondBuffer();
 }
 
 

@@ -556,21 +556,22 @@ NesInstrument::~NesInstrument()
 
 void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 {
+	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = n->noteOffset();
+	
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
 	{	
 		NesObject * nes = new NesObject( this, engine::mixer()->processingSampleRate(), n, engine::mixer()->framesPerPeriod() );
 		n->m_pluginData = nes;
 	}
 	
-	const fpp_t frames = n->framesLeftForCurrentPeriod();
-	
 	NesObject * nes = static_cast<NesObject *>( n->m_pluginData );
 	
-	nes->renderOutput( workingBuffer, frames );
+	nes->renderOutput( workingBuffer + offset, frames );
 	
 	applyRelease( workingBuffer, n );
 
-	instrumentTrack()->processAudioBuffer( workingBuffer, frames, n );
+	instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, n );
 }
 
 

@@ -227,6 +227,9 @@ QString organicInstrument::nodeName() const
 void organicInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
+	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		Oscillator * oscs_l[m_numOscillators];
@@ -296,10 +299,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
 	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData)->oscRight;
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-
-	osc_l->update( _working_buffer, frames, 0 );
-	osc_r->update( _working_buffer, frames, 1 );
+	osc_l->update( _working_buffer + offset, frames, 0 );
+	osc_r->update( _working_buffer + offset, frames, 1 );
 
 
 	// -- fx section --
@@ -317,7 +318,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	// -- --
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
