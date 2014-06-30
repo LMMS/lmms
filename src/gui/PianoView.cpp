@@ -472,7 +472,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
 			// set note on
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 			m_piano->setKeyState( key_num, true );
 			m_lastKey = key_num;
 
@@ -517,7 +517,7 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 	{
 		if( m_piano != NULL )
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, m_lastKey, 0 ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
 		}
 
@@ -578,7 +578,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	{
 		if( m_lastKey != -1 )
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, m_lastKey, 0 ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
 			m_lastKey = -1;
 		}
@@ -586,7 +586,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		{
 			if( _me->pos().y() > PIANO_BASE )
 			{
-				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
+				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 				m_piano->setKeyState( key_num, true );
 				m_lastKey = key_num;
 			}
@@ -600,7 +600,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_piano->isKeyPressed( key_num ) )
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, 0, key_num, velocity ) );
+		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, -1, key_num, velocity ) );
 	}
 
 }
@@ -697,7 +697,7 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// hang otherwise
 	for( int i = 0; i < NumKeys; ++i )
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, i, 0 ) );
+		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		m_piano->setKeyState( i, false );
 	}
 	update();
