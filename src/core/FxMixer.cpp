@@ -56,7 +56,7 @@ void FxRoute::updateName()
 {
 	if( m_amount)
 	{
-		m_amount->setDisplayName( 
+		m_amount->setDisplayName(
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
 	}
 }
@@ -242,7 +242,7 @@ void FxMixer::deleteChannel( int index )
 	// actually delete the channel
 	delete m_fxChannels[index];
 	m_fxChannels.remove(index);
-	
+
 	for( int i = index; i < m_fxChannels.size(); ++i )
 	{
 		validateChannelName( i, i + 1 );
@@ -292,7 +292,7 @@ void FxMixer::moveChannelLeft( int index )
 	FxChannel * tmpChannel = m_fxChannels[a];
 	m_fxChannels[a] = m_fxChannels[b];
 	m_fxChannels[b] = tmpChannel;
-	
+
 	validateChannelName( a, b );
 	validateChannelName( b, a );
 }
@@ -337,13 +337,13 @@ void FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	}
 	m_sendsMutex.lock();
 	FxRoute * route = new FxRoute( from, to, amount );
-	
+
 	// add us to from's sends
 	from->m_sends.append( route );
-	
+
 	// add us to to's receives
 	to->m_receives.append( route );
-	
+
 	// add us to fxmixer's list
 	engine::fxMixer()->m_fxRoutes.append( route );
 	m_sendsMutex.unlock();
@@ -398,13 +398,13 @@ bool FxMixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
 bool FxMixer::checkInfiniteLoop( FxChannel * from, FxChannel * to )
 {
 	// can't send master to anything
-	if( from == m_fxChannels[0] ) 
-	{ 
+	if( from == m_fxChannels[0] )
+	{
 		return true;
 	}
 
 	// can't send channel to itself
-	if( from == to ) 
+	if( from == to )
 	{
 		return true;
 	}
