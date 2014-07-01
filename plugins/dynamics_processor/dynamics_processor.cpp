@@ -30,15 +30,6 @@
 
 #include "embed.cpp"
 
-#if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) 
-#ifndef isnanf
-#define isnanf(x)	isnan(x)
-#endif
-#ifndef isinff
-#define isinff(x)	isinf(x)
-#endif
-#endif
-
 extern "C"
 {
 
