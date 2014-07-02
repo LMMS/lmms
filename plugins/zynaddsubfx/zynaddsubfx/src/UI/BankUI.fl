@@ -125,27 +125,27 @@ class BankUI {open : {public BankProcess_}
       } {
         Fl_Pack {} {
           xywh {10 39 150 481} box BORDER_FRAME
-          code0 {o->box(FL_NO_BOX);}
+          code0 {o->box(FL_FLAT_BOX);}
           code1 {for (int i=0;i<32;i++){bs[i]=new BankSlot (0,0,o->w(),15," ");bs[i]->init(i,&what,&slot,&BankProcess_::process,(BankProcess_ *)this,bank,&nselected);};}
         } {}
         Fl_Pack {} {
           xywh {163 39 150 481} box BORDER_FRAME
-          code0 {o->box(FL_NO_BOX);}
+          code0 {o->box(FL_FLAT_BOX);}
           code1 {for (int i=32;i<64;i++){bs[i]=new BankSlot (0,0,o->w(),15," ");bs[i]->init(i,&what,&slot,&BankProcess_::process,(BankProcess_ *)this,bank,&nselected);};}
         } {}
         Fl_Pack {} {
           xywh {316 39 150 481} box BORDER_FRAME
-          code0 {o->box(FL_NO_BOX);}
+          code0 {o->box(FL_FLAT_BOX);}
           code1 {for (int i=64;i<96;i++){bs[i]=new BankSlot (0,0,o->w(),15," ");bs[i]->init(i,&what,&slot,&BankProcess_::process,(BankProcess_ *)this,bank,&nselected);};}
         } {}
         Fl_Pack {} {
           xywh {469 39 150 481} box BORDER_FRAME
-          code0 {o->box(FL_NO_BOX);}
+          code0 {o->box(FL_FLAT_BOX);}
           code1 {for (int i=96;i<128;i++){bs[i]=new BankSlot (0,0,o->w(),15," ");bs[i]->init(i,&what,&slot,&BankProcess_::process,(BankProcess_ *)this,bank,&nselected);};}
         } {}
         Fl_Pack {} {
           xywh {622 39 150 481} box BORDER_FRAME
-          code0 {o->box(FL_NO_BOX);}
+          code0 {o->box(FL_FLAT_BOX);}
           code1 {for (int i=128;i<160;i++){bs[i]=new BankSlot (0,0,o->w(),15," ");bs[i]->init(i,&what,&slot,&BankProcess_::process,(BankProcess_ *)this,bank,&nselected);};}
         } {}
       }

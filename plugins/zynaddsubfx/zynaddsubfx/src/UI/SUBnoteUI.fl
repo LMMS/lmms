@@ -132,13 +132,13 @@ class SUBnoteUI {open : {public PresetsUI_}
         Fl_Value_Slider vol {
           label Vol
           callback {pars->PVolume=(int)o->value();}
-          tooltip Volume xywh {10 25 140 15} type {Horz Knob} box NO_BOX labelsize 11 align 8 maximum 127 step 1
+          tooltip Volume xywh {10 25 140 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
           code0 {o->value(pars->PVolume);}
         }
         Fl_Value_Slider vsns {
           label {V.Sns}
           callback {pars->PAmpVelocityScaleFunction=(int) o->value();}
-          tooltip {Velocity Sensing Function (rightmost to disable)} xywh {10 45 140 15} type {Horz Knob} box NO_BOX labelsize 11 align 8 maximum 127 step 1
+          tooltip {Velocity Sensing Function (rightmost to disable)} xywh {10 45 140 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
         }
         Fl_Dial pan {
@@ -256,7 +256,7 @@ pars->PCoarseDetune = k+
         Fl_Slider detune {
           callback {pars->PDetune=(int)o->value()+8192;
 detunevalueoutput->do_callback();}
-          tooltip {Fine Detune (cents)} xywh {495 25 230 15} type {Horz Knob} box NO_BOX minimum -8192 maximum 8191 step 1
+          tooltip {Fine Detune (cents)} xywh {495 25 230 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
         }
         Fl_Value_Output detunevalueoutput {
@@ -334,13 +334,13 @@ bandwidthsettingsui->redraw();}
         Fl_Value_Slider bandwidth {
           label {Band Width}
           callback {pars->Pbandwidth=(int) o->value();}
-          xywh {225 40 115 15} type {Horz Knob} box NO_BOX labelsize 10 align 1 maximum 127 step 1
+          xywh {225 40 115 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->Pbandwidth);}
         }
         Fl_Value_Slider bwidthscale {
           label {B.Width Scale}
           callback {pars->Pbwscale=(int) o->value()+64;}
-          tooltip {How much I increase the BandWidth according to lower/higher harmonics} xywh {345 40 90 15} type {Horz Knob} box NO_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+          tooltip {How much I increase the BandWidth according to lower/higher harmonics} xywh {345 40 90 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {o->value(pars->Pbwscale-64);}
         }
       }

@@ -252,7 +252,7 @@ class Oscilharmonic {: {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window harmonic {open
-      private xywh {338 259 100 225} type Double box NO_BOX
+      private xywh {338 259 100 225} type Double box FLAT_BOX
       class Fl_Group visible
     } {
       Fl_Slider mag {
@@ -278,7 +278,7 @@ if (cbwidget!=NULL) {
 	applybutton->color(FL_RED);
 	applybutton->redraw();
 };}
-        xywh {0 15 15 115} type {Vert Knob} box NO_BOX selection_color 222 maximum 127 step 1 value 64
+        xywh {0 15 15 115} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-oscil->Phmag[n]);}
         code1 {if (oscil->Phmag[n]==64) o->selection_color(0);}
         class PSlider
@@ -300,7 +300,7 @@ if (cbwidget!=NULL) {
 	applybutton->color(FL_RED);
 	applybutton->redraw();
 };}
-        xywh {0 135 15 75} type {Vert Knob} box NO_BOX selection_color 222 maximum 127 step 1 value 64
+        xywh {0 135 15 75} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(oscil->Phphase[n]);}
         class PSlider
       }
@@ -397,7 +397,7 @@ if (cbapplywidget!=NULL) {
           callback {oscil->Prand=(int)o->value()+64;
 oscildisplaygroup->redraw();
 oldosc->redraw();}
-          tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 10} type {Horz Knob} box NO_BOX labelsize 10 align 5 minimum -64 maximum 63 step 1
+          tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 10} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
         }
         Fl_Group {} {open
@@ -982,7 +982,7 @@ redrawoscil();}
         Fl_Slider adhrpar {
           callback {oscil->Padaptiveharmonicspar=(int)o->value();
 redrawoscil();}
-          xywh {670 445 55 10} type {Horz Knob} box NO_BOX maximum 100 step 1 value 50
+          xywh {670 445 55 10} type {Horz Knob} box FLAT_BOX maximum 100 step 1 value 50
         }
       }
       Fl_Group {} {
