@@ -47,7 +47,7 @@ class PartSysEffSend {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window syseffsend {
-      private xywh {589 129 100 100} type Double box NO_BOX
+      private xywh {589 129 100 100} type Double box FLAT_BOX
       class Fl_Group visible
     } {
       Fl_Dial {} {
@@ -88,7 +88,7 @@ class PartKitItem {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window partkititem {
-      private xywh {473 406 670 100} type Double box NO_BOX
+      private xywh {473 406 670 100} type Double box FLAT_BOX
       class Fl_Group visible
     } {
       Fl_Group partkititemgroup {
@@ -274,7 +274,7 @@ class PartUI {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {688 264 385 180} type Double box NO_BOX
+      private xywh {688 264 385 180} type Double box FLAT_BOX
       class Fl_Group visible
     } {
       Fl_Group partgroupui {open
@@ -452,7 +452,7 @@ if (part->Penabled==0) partgroupui->deactivate();
     }
     Fl_Window ctlwindow {
       label Controllers open
-      private xywh {777 261 500 130} type Double box NO_BOX visible
+      private xywh {777 261 500 130} type Double box FLAT_BOX visible
     } {
       Fl_Check_Button {} {
         label Expr
@@ -635,7 +635,7 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window partfx {
       label {Part's Insert Effects} selected
-      private xywh {554 660 390 145} type Double box NO_BOX visible
+      private xywh {554 660 390 145} type Double box FLAT_BOX visible
     } {
       Fl_Counter inseffnocounter {
         label {FX No.}
@@ -756,7 +756,7 @@ pthread_mutex_unlock(&master->mutex);}
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit} open
-      xywh {586 566 670 370} type Double box NO_BOX visible
+      xywh {586 566 670 370} type Double box FLAT_BOX visible
     } {
       Fl_Button {} {
         label {Close Window}
@@ -837,7 +837,7 @@ if (part->Pkitmode==0) {
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {182 214 395 360} type Double hide
+      xywh {247 621 395 360} type Double box FLAT_BOX visible
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box UP_FRAME

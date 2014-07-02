@@ -826,7 +826,7 @@ pars->PCoarseDetune = k+
             Fl_Slider detune {
               callback {pars->PDetune=(int)o->value()+8192;
 detunevalueoutput->do_callback();}
-              tooltip {Fine Detune (cents)} xywh {60 295 295 15} type {Horz Knob} box NO_BOX minimum -8192 maximum 8191 step 1
+              tooltip {Fine Detune (cents)} xywh {60 295 295 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
             }
             Fl_Value_Output detunevalueoutput {
@@ -868,13 +868,13 @@ if (x==0) fixedfreqetdial->deactivate();
             Fl_Value_Slider volume {
               label Vol
               callback {pars->PVolume=(int)o->value();}
-              tooltip Volume xywh {10 50 160 15} type {Horz Knob} box NO_BOX labelsize 11 align 8 maximum 127 step 1
+              tooltip Volume xywh {10 50 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
               code0 {o->value(pars->PVolume);}
             }
             Fl_Value_Slider vsns {
               label {V.Sns}
               callback {pars->PAmpVelocityScaleFunction=(int) o->value();}
-              tooltip {Velocity Sensing Function (rightmost to disable)} xywh {10 70 160 15} type {Horz Knob} box NO_BOX labelsize 11 align 8 maximum 127 step 1
+              tooltip {Velocity Sensing Function (rightmost to disable)} xywh {10 70 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
               code0 {o->value(pars->PAmpVelocityScaleFunction);}
             }
             Fl_Dial pan {
