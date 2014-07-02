@@ -837,7 +837,7 @@ if (part->Pkitmode==0) {
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {247 621 395 360} type Double box NO_BOX visible
+      xywh {182 214 395 360} type Double hide
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box UP_FRAME

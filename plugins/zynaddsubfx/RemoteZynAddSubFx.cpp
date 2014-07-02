@@ -174,7 +174,7 @@ private:
 
 void RemoteZynAddSubFx::guiThread()
 {
-	int exitProgram;
+	int exitProgram = 0;
 	MasterUI * ui = NULL;
 
 	while( !m_guiExit )
