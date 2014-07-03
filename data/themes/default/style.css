@@ -7,10 +7,6 @@ QLabel, QTreeWidget, QListWidget, QGroupBox {
 	color: #e0e0e0;
 }
 
-QWhatsThat {
-	color: black;
-}
-
 QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
@@ -48,6 +44,14 @@ QLineEdit:focus {
 
 
 QToolTip {
+	border-radius: 4px;
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
+	opacity: 175;
+	border: 1.0px solid rgba(0,0,0,255);
+	color: #4afd85;
+}
+
+textFloat {
 	border-radius: 4px;
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
@@ -748,5 +752,8 @@ LmmsPalette {
 	qproperty-brightText: #4afd85;
 	qproperty-highlight: #202020;
 	qproperty-highlightedText: #ffffff;
+	/* the next two are used for whatsthis dialogs */
+	qproperty-toolTipText: #000;
+	qproperty-toolTipBase: #c9c9c9;
 }
 

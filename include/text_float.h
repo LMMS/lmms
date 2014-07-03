@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TEXT_FLOAT
-#define _TEXT_FLOAT
+#ifndef TEXT_FLOAT_H
+#define TEXT_FLOAT_H
 
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
@@ -34,6 +34,7 @@
 
 class EXPORT textFloat : public QWidget
 {
+	Q_OBJECT
 public:
 	textFloat();
 	virtual ~textFloat()
@@ -76,7 +77,6 @@ private:
 	QString m_text;
 	QPixmap m_pixmap;
 
-} ;
-
+};
 
 #endif
