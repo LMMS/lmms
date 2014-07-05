@@ -15,7 +15,7 @@ INCLUDE(FindPkgConfig)
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "0")
-SET(VERSION_PATCH "91")
+SET(VERSION_PATCH "92")
 #SET(VERSION_SUFFIX "")
 SET(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 IF(VERSION_SUFFIX)
@@ -461,13 +461,16 @@ IF(LMMS_BUILD_WIN32)
 	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/QtCore4.dll"
 					"${MINGW_PREFIX}/bin/QtGui4.dll"
+					"${MINGW_PREFIX}/bin/QtSvg4.dll"
 					"${MINGW_PREFIX}/bin/QtXml4.dll"
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
 					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
+					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
+					"${MINGW_PREFIX}/lib/libfltk.dll"
 					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"

@@ -335,7 +335,7 @@ virkeys->take_focus();}
         label Vel
         callback {virkeys->midivel=(int) o->value();
 virkeys->take_focus();} selected
-        tooltip Velocity xywh {95 105 100 15} type {Horz Knob} box NO_BOX labelsize 10 align 5 minimum 1 maximum 127 step 1
+        tooltip Velocity xywh {95 105 100 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
       }
       Fl_Counter {} {

@@ -109,7 +109,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
-	fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
+	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
 
 	// This is just our starting instance of synth.  It is recreated
 	// everytime we load a new soundfont.
@@ -626,8 +626,6 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 
 
 
-// Could we get iph-based instruments support sample-exact models by using a
-// frame-length of 1 while rendering?
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();

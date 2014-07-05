@@ -270,7 +270,7 @@ private:
 	automatableButtonGroup * m_waveBtnGrp;
 
 	ledCheckBox * m_slideToggle;
-	ledCheckBox * m_accentToggle;
+	/*ledCheckBox * m_accentToggle;*/ // removed pending accent implementation
 	ledCheckBox * m_deadToggle;
 	ledCheckBox * m_db24Toggle;
 

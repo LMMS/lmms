@@ -315,7 +315,7 @@ class Panellistitem {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {608 711 100 260} type Double box NO_BOX
+      private xywh {608 711 100 260} type Double box FLAT_BOX
       class Fl_Group visible
     } {
       Fl_Group panellistitemgroup {open
@@ -344,7 +344,7 @@ bankui->show();}
         }
         Fl_Slider partvolume {
           callback {master->part[npart]->setPvolume((int) o->value());}
-          xywh {10 65 30 110} type {Vert Knob} box NO_BOX minimum 127 maximum 0 step 1 value 127
+          xywh {10 65 30 110} type {Vert Knob} box FLAT_BOX minimum 127 maximum 0 step 1 value 127
           code0 {o->value(master->part[npart]->Pvolume);}
         }
         Fl_Dial partpanning {
@@ -1243,7 +1243,7 @@ bankui->show();}
         Fl_Slider partpanning {
           label Pan
           callback {master->part[npart]->setPpanning((int) o->value());}
-          xywh {185 95 145 15} type {Horz Knob} box NO_BOX labelsize 11 maximum 127 step 1 value 64
+          xywh {185 95 145 15} type {Horz Knob} box FLAT_BOX labelsize 11 maximum 127 step 1 value 64
           code0 {o->value(master->part[npart]->Ppanning);}
         }
         Fl_Choice partrcv {
