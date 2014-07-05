@@ -837,12 +837,12 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_slideToggle = new ledCheckBox( "", this );
 	m_slideToggle->move( 10, 180 );
 
-	m_accentToggle = new ledCheckBox( "", this );
+/*	m_accentToggle = new ledCheckBox( "", this );
 	m_accentToggle->move( 10, 200 );
-	m_accentToggle->setDisabled(true);
+	m_accentToggle->setDisabled(true);*/ // accent removed pending real implementation - no need for non-functional buttons
 
 	m_deadToggle = new ledCheckBox( "", this );
-	m_deadToggle->move( 10, 220 );
+	m_deadToggle->move( 10, 200 );
 
 	m_db24Toggle = new ledCheckBox( "", this );
 	m_db24Toggle->setWhatsThis(
@@ -1025,7 +1025,7 @@ void lb302SynthView::modelChanged()
 	m_waveBtnGrp->setModel( &syn->wave_shape );
 
 	m_slideToggle->setModel( &syn->slideToggle );
-	m_accentToggle->setModel( &syn->accentToggle );
+	/*m_accentToggle->setModel( &syn->accentToggle );*/
 	m_deadToggle->setModel( &syn->deadToggle );
 	m_db24Toggle->setModel( &syn->db24Toggle );
 }
