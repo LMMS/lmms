@@ -263,9 +263,11 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
 	pthread_win32_process_attach_np();
 	pthread_win32_thread_attach_np();
+#endif
 #endif
 
 
@@ -278,8 +280,10 @@ int main( int _argc, char * * _argv )
 
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	pthread_win32_thread_detach_np();
 	pthread_win32_process_detach_np();
+#endif
 #endif
 
 	return 0;

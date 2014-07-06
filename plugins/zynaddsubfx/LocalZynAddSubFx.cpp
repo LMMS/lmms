@@ -25,6 +25,7 @@
 #include <lmmsconfig.h>
 
 #include <unistd.h>
+#include <ctime>
 
 #include "LocalZynAddSubFx.h"
 
@@ -46,9 +47,11 @@ LocalZynAddSubFx::LocalZynAddSubFx()
 	if( s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 		// (non-portable) initialization of statically linked pthread library
 		pthread_win32_process_attach_np();
 		pthread_win32_thread_attach_np();
+#endif
 #endif
 
 		initConfig();
