@@ -69,6 +69,9 @@ struct SF2PluginData
 	int lastPanning;
 	float lastVelocity;
 	fluid_voice_t * fluidVoice;
+	bool isNew;
+	f_cnt_t offset;
+	bool noteOffSent;
 } ;
 
 
@@ -526,112 +529,114 @@ void sf2Instrument::updateSampleRate()
 
 void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 {
-	const float LOG440 = 2.643452676f;
-
 	const f_cnt_t tfp = _n->totalFramesPlayed();
-
-	int midiNote = (int)floor( 12.0 * ( log2( _n->unpitchedFrequency() ) - LOG440 ) - 4.0 );
-
-	// out of range?
-	if( midiNote <= 0 || midiNote >= 128 )
-	{
-		return;
-	}
 
 	if( tfp == 0 )
 	{
+		const float LOG440 = 2.643452676f;
+
+		int midiNote = (int)floor( 12.0 * ( log2( _n->unpitchedFrequency() ) - LOG440 ) - 4.0 );
+
+		// out of range?
+		if( midiNote <= 0 || midiNote >= 128 )
+		{
+			return;
+		}
+		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
+		
 		SF2PluginData * pluginData = new SF2PluginData;
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
-		pluginData->lastVelocity = 127;
+		pluginData->lastVelocity = _n->midiVelocity( baseVelocity );
 		pluginData->fluidVoice = NULL;
+		pluginData->isNew = true;
+		pluginData->offset = _n->offset();
+		pluginData->noteOffSent = false;
 
 		_n->m_pluginData = pluginData;
-
-		m_synthMutex.lock();
-
-		// get list of current voice IDs so we can easily spot the new
-		// voice after the fluid_synth_noteon() call
-		const int poly = fluid_synth_get_polyphony( m_synth );
-		fluid_voice_t * voices[poly];
-		unsigned int id[poly];
-		fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
-		for( int i = 0; i < poly; ++i )
-		{
-			id[i] = 0;
-		}
-		for( int i = 0; i < poly && voices[i]; ++i )
-		{
-			id[i] = fluid_voice_get_id( voices[i] );
-		}
-
-		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
-
-		fluid_synth_noteon( m_synth, m_channel, midiNote, _n->midiVelocity( baseVelocity ) );
-
-		// get new voice and save it
-		fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
-		for( int i = 0; i < poly && voices[i]; ++i )
-		{
-			const unsigned int newID = fluid_voice_get_id( voices[i] );
-			if( id[i] != newID || newID == 0 )
-			{
-				pluginData->fluidVoice = voices[i];
-				break;
-			}
-		}
-
-		m_synthMutex.unlock();
-
-		m_notesRunningMutex.lock();
-		++m_notesRunning[midiNote];
-		m_notesRunningMutex.unlock();
+		
+		// insert the nph to the playing notes vector
+		m_playingNotesMutex.lock();
+		m_playingNotes.append( _n );
+		m_playingNotesMutex.unlock();
 	}
-
-/*	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
-							_n->m_pluginData );
-#ifdef SOMEONE_FIXED_PER_NOTE_PANNING
-	if( pluginData->fluidVoice &&
-			pluginData->lastPanning != _n->getPanning() )
+	else if( _n->isReleased() ) // note is released during this period
 	{
-		const float pan = -500 +
-			  ( (float)( _n->getPanning() - PanningLeft ) ) /
-			  ( (float)( PanningRight - PanningLeft ) ) * 1000;
+		SF2PluginData * pluginData = static_cast<SF2PluginData *>( _n->m_pluginData );
+		pluginData->offset = _n->framesBeforeRelease();
+		pluginData->isNew = false;
+		
+		m_playingNotesMutex.lock();
+		m_playingNotes.append( _n );
+		m_playingNotesMutex.unlock();
 
-		m_synthMutex.lock();
-		fluid_voice_gen_set( pluginData->fluidVoice, GEN_PAN, pan );
-		fluid_voice_update_param( pluginData->fluidVoice, GEN_PAN );
-		m_synthMutex.unlock();
-
-		pluginData->lastPanning = _n->getPanning();
 	}
-#endif
-
-	const float currentVelocity = _n->volumeLevel( tfp ) * instrumentTrack()->midiPort()->baseVelocity();
-	if( pluginData->fluidVoice &&
-			pluginData->lastVelocity != currentVelocity )
-	{
-		m_synthMutex.lock();
-		fluid_voice_gen_set( pluginData->fluidVoice, GEN_VELOCITY, currentVelocity );
-		fluid_voice_update_param( pluginData->fluidVoice, GEN_VELOCITY );
-		// make sure, FluidSynth modulates our changed GEN_VELOCITY via internal
-		// attenuation modulator, so changes take effect (7=Volume CC)
-		fluid_synth_cc( m_synth, m_channel, 7, 127 );
-		m_synthMutex.unlock();
-
-		pluginData->lastVelocity = currentVelocity;
-	}*/
 }
 
 
+void sf2Instrument::noteOn( SF2PluginData * n )
+{
+	m_synthMutex.lock();
+	
+	// get list of current voice IDs so we can easily spot the new
+	// voice after the fluid_synth_noteon() call
+	const int poly = fluid_synth_get_polyphony( m_synth );
+	fluid_voice_t * voices[poly];
+	unsigned int id[poly];
+	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+	for( int i = 0; i < poly; ++i )
+	{
+		id[i] = 0;
+	}
+	for( int i = 0; i < poly && voices[i]; ++i )
+	{
+		id[i] = fluid_voice_get_id( voices[i] );
+	}
+
+	fluid_synth_noteon( m_synth, m_channel, n->midiNote, n->lastVelocity );
+
+	// get new voice and save it
+	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+	for( int i = 0; i < poly && voices[i]; ++i )
+	{
+		const unsigned int newID = fluid_voice_get_id( voices[i] );
+		if( id[i] != newID || newID == 0 )
+		{
+			n->fluidVoice = voices[i];
+			break;
+		}
+	}
+
+	m_synthMutex.unlock();
+
+	m_notesRunningMutex.lock();
+	++m_notesRunning[ n->midiNote ];
+	m_notesRunningMutex.unlock();
+}
+
+
+void sf2Instrument::noteOff( SF2PluginData * n )
+{
+	n->noteOffSent = true;
+	m_notesRunningMutex.lock();
+	const int notes = --m_notesRunning[n->midiNote];
+	m_notesRunningMutex.unlock();
+
+	if( notes <= 0 )
+	{
+		m_synthMutex.lock();
+		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
+		m_synthMutex.unlock();
+	}
+	
+}
 
 
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
-	m_synthMutex.lock();
-
+	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
 	if( m_lastMidiPitch != currentMidiPitch )
 	{
@@ -645,7 +650,71 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 		m_lastMidiPitchRange = currentMidiPitchRange;
 		fluid_synth_pitch_wheel_sens( m_synth, m_channel, m_lastMidiPitchRange );
 	}
+	// if we have no new noteons/noteoffs, just render a period and call it a day
+	if( m_playingNotes.isEmpty() )
+	{
+		renderFrames( frames, _working_buffer );
+		instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+		return;
+	}
 
+	// processing loop
+	// go through noteplayhandles in processing order
+	f_cnt_t currentFrame = 0;
+
+	while( ! m_playingNotes.isEmpty() )
+	{
+		// find the note with lowest offset
+		NotePlayHandle * currentNote = m_playingNotes[0];
+		for( int i = 1; i < m_playingNotes.size(); ++i )
+		{
+			SF2PluginData * currentData = static_cast<SF2PluginData *>( currentNote->m_pluginData );
+			SF2PluginData * iData = static_cast<SF2PluginData *>( m_playingNotes[i]->m_pluginData );
+			if( currentData->offset > iData->offset )
+			{
+				currentNote = m_playingNotes[i];
+			}
+		}
+		
+		// process the current note:
+		// first see if we're synced in frame count
+		SF2PluginData * currentData = static_cast<SF2PluginData *>( currentNote->m_pluginData );
+		if( currentData->offset > currentFrame )
+		{
+			renderFrames( currentData->offset - currentFrame, _working_buffer + currentFrame );
+			currentFrame = currentData->offset;
+		}
+		if( currentData->isNew )
+		{
+			noteOn( currentData );
+			if( currentNote->isReleased() ) // if the note is released during the same period, we have to process it again for noteoff
+			{
+				currentData->isNew = false;
+				currentData->offset = currentNote->framesBeforeRelease();
+			}
+			else // otherwise remove the handle
+			{
+				m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
+			}
+		}
+		else
+		{
+			noteOff( currentData );
+			m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
+		}
+	}
+	
+	if( currentFrame < frames )
+	{
+		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
+	}
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+}
+
+	
+void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
+{
+	m_synthMutex.lock();
 	if( m_internalSampleRate < engine::mixer()->processingSampleRate() &&
 							m_srcState != NULL )
 	{
@@ -658,8 +727,8 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
 
 		SRC_DATA src_data;
-		src_data.data_in = tmp[0];
-		src_data.data_out = _working_buffer[0];
+		src_data.data_in = (float *)tmp;
+		src_data.data_out = (float *)buf;
 		src_data.input_frames = f;
 		src_data.output_frames = frames;
 		src_data.src_ratio = (double) frames / f;
@@ -679,11 +748,9 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	}
 	else
 	{
-		fluid_synth_write_float( m_synth, frames, _working_buffer, 0, 2, _working_buffer, 1, 2 );
+		fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
 	}
 	m_synthMutex.unlock();
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
 }
 
 
@@ -692,17 +759,11 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 void sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>( _n->m_pluginData );
-	m_notesRunningMutex.lock();
-	const int n = --m_notesRunning[pluginData->midiNote];
-	m_notesRunningMutex.unlock();
-
-	if( n <= 0 )
+	if( ! pluginData->noteOffSent ) // if we for some reason haven't noteoffed the note before it gets deleted,
+									// do it here
 	{
-		m_synthMutex.lock();
-		fluid_synth_noteoff( m_synth, m_channel, pluginData->midiNote );
-		m_synthMutex.unlock();
+		noteOff( pluginData );
 	}
-
 	delete pluginData;
 }
 

@@ -29,6 +29,7 @@
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "MidiEvent.h"
 #include "MidiPort.h"
 #include "song.h"
@@ -197,7 +198,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		instrumentTrack()->isSustainPedalPressed() == false &&
 		m_totalFramesPlayed + framesThisPeriod > m_frames )
 	{
-		noteOff( m_frames - m_totalFramesPlayed );
+		noteOff( m_totalFramesPlayed == 0
+			? ( m_frames + offset() ) // if we have noteon and noteoff during the same period, take offset in account for release frame
+			: ( m_frames - m_totalFramesPlayed ) ); // otherwise, the offset is already negated and can be ignored
 	}
 
 	// under some circumstances we're called even if there's nothing to play
@@ -206,7 +209,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	if( framesLeft() > 0 )
 	{
 		// clear offset frames if we're at the first period
-		if( m_totalFramesPlayed == 0 )
+		// skip for single-streamed instruments, because in their case NPH::play() could be called from an IPH without a buffer argument
+		// ... also, they don't actually render the sound in NPH's, which is an even better reason to skip...
+		if( m_totalFramesPlayed == 0 && ! ( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed ) )
 		{
 			memset( _working_buffer, 0, sizeof( sampleFrame ) * offset() );
 		}
