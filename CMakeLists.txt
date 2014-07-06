@@ -473,6 +473,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/zlib1.dll"
+					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
 				DESTINATION .)
 
 ELSE(LMMS_BUILD_WIN32)
