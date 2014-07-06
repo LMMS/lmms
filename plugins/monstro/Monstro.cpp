@@ -1246,7 +1246,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->offset();
+	const f_cnt_t offset = _n->noteOffset();
 
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{

@@ -45,6 +45,7 @@ class NotePlayHandle;
 class patchesDialog;
 class QLabel;
 
+struct SF2PluginData;
 
 class sf2Instrument : public Instrument
 {
@@ -149,9 +150,14 @@ private:
 	FloatModel m_chorusSpeed;
 	FloatModel m_chorusDepth;
 
+	QVector<NotePlayHandle *> m_playingNotes;
+	QMutex m_playingNotesMutex;
 
 private:
 	void freeFont();
+	void noteOn( SF2PluginData * n );
+	void noteOff( SF2PluginData * n );
+	void renderFrames( f_cnt_t frames, sampleFrame * buf );
 
 	friend class sf2InstrumentView;
 
