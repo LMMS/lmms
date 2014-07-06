@@ -36,7 +36,9 @@
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
         <translatorcomment>Se hai partecipato alla traduzione ed il tuo nome non è presente in questa lista, aggiungilo!</translatorcomment>
-        <translation>Roberto Giaconia &lt;derobyj@gmail.com&gt;</translation>
+        <translation>Roberto Giaconia &lt;derobyj@gmail.com&gt;
+
+Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, sei il benvenuto!</translation>
     </message>
     <message>
         <source>License</source>
@@ -3121,7 +3123,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     </message>
     <message>
         <source>Mix output of oscillator 1 &amp; 2</source>
-        <translation>Miscelare gli oscillatori 1 e 2</translation>
+        <translation>Miscelare gli oscillatori 1 &amp; 2</translation>
     </message>
     <message>
         <source>Synchronize oscillator 1 with oscillator 2</source>
@@ -3141,7 +3143,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     </message>
     <message>
         <source>Mix output of oscillator 2 &amp; 3</source>
-        <translation>Miscelare gli oscillatori 2 e 3</translation>
+        <translation>Miscelare gli oscillatori 2 &amp; 3</translation>
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
@@ -3256,7 +3258,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     <name>Ui</name>
     <message>
         <source>Contributors ordered by number of commits:</source>
-        <translation>Hanno collaborato: (ordinati per numero di contributi)</translation>
+        <translation>Hanno collaborato (ordinati per numero di contributi):</translation>
     </message>
     <message>
         <source>Involved</source>
@@ -4969,7 +4971,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
     <message>
         <source>Wave Channel Volume</source>
-        <translation>Volume wave del canale:</translation>
+        <translation>Volume wave del canale</translation>
     </message>
     <message>
         <source>Noise Channel Volume:</source>
@@ -5342,7 +5344,7 @@ la rotellina del mouse impostare il volume delle note</translation>
     </message>
     <message>
         <source>versatile kick- &amp; bassdrum-synthesizer</source>
-        <translation>sintetizzatore di colpo di cassa versatile</translation>
+        <translation>sintetizzatore di colpo di cassa &amp; di kick versatile</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
