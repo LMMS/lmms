@@ -3123,7 +3123,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     </message>
     <message>
         <source>Mix output of oscillator 1 &amp; 2</source>
-        <translation>Miscelare gli oscillatori 1 &amp; 2</translation>
+        <translation>Miscelare gli oscillatori 1 e 2</translation>
     </message>
     <message>
         <source>Synchronize oscillator 1 with oscillator 2</source>
@@ -3143,7 +3143,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     </message>
     <message>
         <source>Mix output of oscillator 2 &amp; 3</source>
-        <translation>Miscelare gli oscillatori 2 &amp; 3</translation>
+        <translation>Miscelare gli oscillatori 2 e 3</translation>
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
@@ -5344,7 +5344,7 @@ la rotellina del mouse impostare il volume delle note</translation>
     </message>
     <message>
         <source>versatile kick- &amp; bassdrum-synthesizer</source>
-        <translation>sintetizzatore di colpo di cassa &amp; di kick versatile</translation>
+        <translation>sintetizzatore di colpo di cassa e di kick versatile</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
