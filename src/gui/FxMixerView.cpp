@@ -60,6 +60,7 @@ FxMixerView::FxMixerView() :
 	//setPalette( pal );
 
 	setAutoFillBackground( true );
+	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 
 	setWindowTitle( tr( "FX-Mixer" ) );
 	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
@@ -150,7 +151,7 @@ FxMixerView::FxMixerView() :
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	layout()->setSizeConstraint( QLayout::SetMinAndMaxSize );
+	layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	subWin->layout()->setSizeConstraint( QLayout::SetMinAndMaxSize );
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
