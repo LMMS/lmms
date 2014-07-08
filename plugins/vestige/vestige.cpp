@@ -170,9 +170,10 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( QFileInfo( m_pluginDLL ).isAbsolute() )
 	{
-		QString relativePath;
-		if( !( relativePath = m_pluginDLL.section( configManager::
-					inst()->vstDir(), 1, 1 ) ).isEmpty() )
+		QString f = QString( m_pluginDLL ).replace( QDir::separator(), '/' );
+		QString vd = QString( configManager::inst()->vstDir() ).replace( QDir::separator(), '/' );
+        	QString relativePath;
+		if( !( relativePath = f.section( vd, 1, 1 ) ).isEmpty() )
 		{
 			m_pluginDLL = relativePath;
 		}
