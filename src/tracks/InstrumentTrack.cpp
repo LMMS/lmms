@@ -264,7 +264,6 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	engine::mixer()->lock();
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -275,20 +274,17 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				if( m_notes[event.key()] == NULL )
-				{
-					// create (timed) note-play-handle
-					NotePlayHandle* nph = new NotePlayHandle( this, offset,
+				NotePlayHandle* nph;
+				m_notes[event.key()].testAndSetOrdered( NULL, ( nph = new NotePlayHandle( this, offset,
 																typeInfo<f_cnt_t>::max() / 2,
 																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 																NULL, event.channel(),
-																NotePlayHandle::OriginMidiInput );
-					if( engine::mixer()->addPlayHandle( nph ) )
-					{
-						m_notes[event.key()] = nph;
-					}
+																NotePlayHandle::OriginMidiInput ) ) );
+				if( ! engine::mixer()->addPlayHandle( nph ) )
+				{
+					m_notes[event.key()].testAndSetOrdered( nph, NULL );
 				}
-
+				qDebug( "ok" );
 				eventHandled = true;
 				break;
 			}
@@ -369,7 +365,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
 	}
 
-	engine::mixer()->unlock();
 }
 
 
@@ -393,6 +388,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			if( key >= 0 && key < NumKeys )
 			{
+				
 				if( m_runningMidiNotes[key] > 0 )
 				{
 					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );

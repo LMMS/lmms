@@ -26,6 +26,9 @@
 #ifndef INSTRUMENT_TRACK_H
 #define INSTRUMENT_TRACK_H
 
+#include <QtCore/QAtomicPointer>
+#include <QtCore/QAtomicInt>
+
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
@@ -227,7 +230,7 @@ private:
 	AudioPort m_audioPort;
 	MidiPort m_midiPort;
 
-	NotePlayHandle* m_notes[NumKeys];
+	QAtomicPointer<NotePlayHandle> m_notes[NumKeys];
 	int m_runningMidiNotes[NumKeys];
 	bool m_sustainPedalPressed;
 
