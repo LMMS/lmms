@@ -264,7 +264,6 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	qDebug( "pIE" );
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -278,7 +277,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				NotePlayHandle* nph;
 				if( m_notes[event.key()] == NULL )
 				{
-					qDebug( "note on" );
 					m_notesMutex.lock();
 					nph = new NotePlayHandle( this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
@@ -382,7 +380,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	qDebug( "pOE" );
 	// do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if( m_instrument == NULL )
 	{
@@ -399,7 +396,6 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			if( key >= 0 && key < NumKeys )
 			{
-				qDebug( "poe noteon" );
 				if( m_runningMidiNotes[key] > 0 )
 				{
 					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
