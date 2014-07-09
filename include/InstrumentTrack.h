@@ -230,7 +230,9 @@ private:
 	AudioPort m_audioPort;
 	MidiPort m_midiPort;
 
-	QAtomicPointer<NotePlayHandle> m_notes[NumKeys];
+	NotePlayHandle* m_notes[NumKeys];
+	QMutex m_notesMutex;
+
 	int m_runningMidiNotes[NumKeys];
 	bool m_sustainPedalPressed;
 

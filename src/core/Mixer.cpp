@@ -341,6 +341,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// now we have to make sure no other thread does anything bad
 	// while we're acting...
 	lock();
+	// add all play-handles that have to be added
+	m_playHandleMutex.lock();
+	m_playHandles += m_newPlayHandles;
+	m_newPlayHandles.clear();
+	m_playHandleMutex.unlock();
 
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...

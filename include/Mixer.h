@@ -211,9 +211,9 @@ public:
 	{
 		if( criticalXRuns() == false )
 		{
-			lock();
-			m_playHandles.push_back( handle );
-			unlock();
+			m_playHandleMutex.lock();
+			m_newPlayHandles.append( handle );
+			m_playHandleMutex.unlock();
 			return true;
 		}
 
@@ -428,6 +428,8 @@ private:
 	int m_numWorkers;
 	QWaitCondition m_queueReadyWaitCond;
 
+	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
+	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
 
 	PlayHandleList m_playHandles;
 	ConstPlayHandleList m_playHandlesToRemove;

@@ -264,6 +264,7 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
+	qDebug( "pIE" );
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -275,16 +276,23 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			if( event.velocity() > 0 )
 			{
 				NotePlayHandle* nph;
-				m_notes[event.key()].testAndSetOrdered( NULL, ( nph = new NotePlayHandle( this, offset,
-																typeInfo<f_cnt_t>::max() / 2,
-																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
-																NULL, event.channel(),
-																NotePlayHandle::OriginMidiInput ) ) );
-				if( ! engine::mixer()->addPlayHandle( nph ) )
+				if( m_notes[event.key()] == NULL )
 				{
-					m_notes[event.key()].testAndSetOrdered( nph, NULL );
+					qDebug( "note on" );
+					m_notesMutex.lock();
+					nph = new NotePlayHandle( this, offset,
+								typeInfo<f_cnt_t>::max() / 2,
+								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								NULL, event.channel(),
+								NotePlayHandle::OriginMidiInput );
+					m_notes[event.key()] = nph;
+					if( ! engine::mixer()->addPlayHandle( nph ) )
+					{
+						m_notes[event.key()] = NULL;
+						delete nph;
+					}
+					m_notesMutex.unlock();
 				}
-				qDebug( "ok" );
 				eventHandled = true;
 				break;
 			}
@@ -292,10 +300,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOff:
 			if( m_notes[event.key()] != NULL )
 			{
+				m_notesMutex.lock();
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
+				m_notesMutex.unlock();
 			}
 			eventHandled = true;
 			break;
@@ -372,6 +382,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
+	qDebug( "pOE" );
 	// do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if( m_instrument == NULL )
 	{
@@ -388,7 +399,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			if( key >= 0 && key < NumKeys )
 			{
-				
+				qDebug( "poe noteon" );
 				if( m_runningMidiNotes[key] > 0 )
 				{
 					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
@@ -424,13 +435,15 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	engine::mixer()->lock();
+	m_notesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
+	m_notesMutex.unlock();
 
+	engine::mixer()->lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
 	engine::mixer()->removePlayHandles( this, removeIPH );
