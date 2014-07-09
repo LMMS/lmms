@@ -26,9 +26,6 @@
 #ifndef INSTRUMENT_TRACK_H
 #define INSTRUMENT_TRACK_H
 
-#include <QtCore/QAtomicPointer>
-#include <QtCore/QAtomicInt>
-
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
