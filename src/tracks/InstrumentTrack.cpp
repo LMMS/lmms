@@ -278,7 +278,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				if( m_notes[event.key()] == NULL )
 				{
 					// create (timed) note-play-handle
-					NotePlayHandle* nph = new NotePlayHandle( this, time.frames( engine::framesPerTick() ),
+					NotePlayHandle* nph = new NotePlayHandle( this, offset,
 																typeInfo<f_cnt_t>::max() / 2,
 																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 																NULL, event.channel(),
@@ -298,7 +298,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			{
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
-				m_notes[event.key()]->noteOff();
+				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
 			}
 			eventHandled = true;
