@@ -29,6 +29,7 @@
 #include "JournallingObject.h"
 #include "song.h"
 
+const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
 ProjectJournal::ProjectJournal() :
 	m_joIDs(),
@@ -109,6 +110,10 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		jo->saveState( dataFile, dataFile.content() );
 
 		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
+		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
+		{
+			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
+		}
 	}
 }
 
@@ -120,7 +125,7 @@ jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 	const jo_id_t EO_ID_MAX = (1 << 23)-1;
 	jo_id_t id;
 	while( m_joIDs.contains( id =
-			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() % 
+			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() %
 								 EO_ID_MAX ) ) )
 	{
 	}
