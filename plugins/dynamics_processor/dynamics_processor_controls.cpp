@@ -45,7 +45,7 @@ dynProcControls::dynProcControls( dynProcEffect * _eff ) :
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_stereomodeModel( 0, 0, 2, this, tr( "Stereo mode" ) )
 {
-	connect( &m_inputModel, SIGNAL( dataChanged() ),
+/*	connect( &m_inputModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeControl() ) );
 
 	connect( &m_outputModel, SIGNAL( dataChanged() ),
@@ -59,7 +59,7 @@ dynProcControls::dynProcControls( dynProcEffect * _eff ) :
 			
 	connect( &m_stereomodeModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeControl() ) );
-
+*/
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
 
@@ -72,7 +72,7 @@ dynProcControls::dynProcControls( dynProcEffect * _eff ) :
 
 void dynProcControls::changeControl()
 {
-	engine::getSong()->setModified();
+//	engine::getSong()->setModified();
 }
 
 void dynProcControls::samplesChanged( int _begin, int _end)
