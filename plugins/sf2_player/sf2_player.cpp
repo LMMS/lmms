@@ -529,6 +529,11 @@ void sf2Instrument::updateSampleRate()
 
 void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 {
+	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
+	{
+		return;
+	}
+	
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if( tfp == 0 )
