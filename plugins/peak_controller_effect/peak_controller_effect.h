@@ -48,14 +48,19 @@ public:
 		return m_lastSample;
 	}
 
-	float previousSample()
-	{
-		return m_previousSample;
-	}
-
 	PeakController * controller()
 	{
 		return m_autoController;
+	}
+	
+	FloatModel * attackModel()
+	{
+		return &( m_peakControls.m_attackModel );
+	}
+
+	FloatModel * decayModel()
+	{
+		return &( m_peakControls.m_decayModel );
 	}
 
 	int m_effectId;
@@ -64,9 +69,6 @@ private:
 	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;
-	float m_previousSample;
-	float m_lastRMS;
-	bool m_lastRMSavail;
 
 	PeakController * m_autoController;
 

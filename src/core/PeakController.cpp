@@ -23,7 +23,6 @@
  *
  */
 
-#include <math.h>
 #include <cstdio>
 #include <QtXml/QDomElement>
 #include <QtCore/QObject>
@@ -39,6 +38,9 @@
 #include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
+#include "lmms_math.h"
+#include "interpolation.h"
+
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -49,7 +51,8 @@ bool PeakController::m_buggedFile;
 PeakController::PeakController( Model * _parent, 
 		PeakControllerEffect * _peak_effect ) :
 	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
-	m_peakEffect( _peak_effect )
+	m_peakEffect( _peak_effect ),
+	m_currentSample( 0.0f )
 {
 	setSampleExact( true );
 	if( m_peakEffect )
@@ -79,7 +82,37 @@ void PeakController::updateValueBuffer()
 {
 	if( m_peakEffect )
 	{
-		m_valueBuffer.interpolate( m_peakEffect->previousSample(), m_peakEffect->lastSample() );
+		float targetSample = m_peakEffect->lastSample();
+		if( m_currentSample != targetSample )
+		{
+			const f_cnt_t frames = engine::mixer()->framesPerPeriod();
+			float * values = m_valueBuffer.values();
+
+			const float ratio = ( 44100.0 / 256.0 ) / engine::mixer()->processingSampleRate();
+			const float v = m_currentSample >= targetSample
+				? m_peakEffect->decayModel()->value()
+				: m_peakEffect->attackModel()->value();
+			const float diff = ( targetSample - m_currentSample ) * ratio;
+			const float a = ( 1.0f - sqrt_neg( sqrt_neg( v ) ) ) * diff;
+			const bool att = m_currentSample < targetSample;
+			
+			for( f_cnt_t f = 0; f < frames; ++f )
+			{
+				if( att ) // going up...
+				{
+					m_currentSample = qMin( targetSample, m_currentSample + a ); // qmin prevents overshoot
+				}
+				else
+				{
+					m_currentSample = qMax( targetSample, m_currentSample + a ); // qmax prevents overshoot
+				}
+				values[f] = m_currentSample;
+			}
+		}
+		else
+		{
+			m_valueBuffer.fill( m_currentSample );
+		}
 	}
 	else
 	{
