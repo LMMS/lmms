@@ -264,7 +264,6 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	engine::mixer()->lock();
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -275,20 +274,23 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
+				NotePlayHandle* nph;
 				if( m_notes[event.key()] == NULL )
 				{
-					// create (timed) note-play-handle
-					NotePlayHandle* nph = new NotePlayHandle( this, offset,
-																typeInfo<f_cnt_t>::max() / 2,
-																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
-																NULL, event.channel(),
-																NotePlayHandle::OriginMidiInput );
-					if( engine::mixer()->addPlayHandle( nph ) )
+					m_notesMutex.lock();
+					nph = new NotePlayHandle( this, offset,
+								typeInfo<f_cnt_t>::max() / 2,
+								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								NULL, event.channel(),
+								NotePlayHandle::OriginMidiInput );
+					m_notes[event.key()] = nph;
+					if( ! engine::mixer()->addPlayHandle( nph ) )
 					{
-						m_notes[event.key()] = nph;
+						m_notes[event.key()] = NULL;
+						delete nph;
 					}
+					m_notesMutex.unlock();
 				}
-
 				eventHandled = true;
 				break;
 			}
@@ -296,10 +298,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOff:
 			if( m_notes[event.key()] != NULL )
 			{
+				m_notesMutex.lock();
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
+				m_notesMutex.unlock();
 			}
 			eventHandled = true;
 			break;
@@ -369,7 +373,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
 	}
 
-	engine::mixer()->unlock();
 }
 
 
@@ -428,13 +431,15 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	engine::mixer()->lock();
+	m_notesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
+	m_notesMutex.unlock();
 
+	engine::mixer()->lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
 	engine::mixer()->removePlayHandles( this, removeIPH );

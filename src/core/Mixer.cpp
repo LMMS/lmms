@@ -337,7 +337,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 	unlockInputFrames();
 
-
 	// now we have to make sure no other thread does anything bad
 	// while we're acting...
 	lock();
@@ -375,6 +374,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// create play-handles for new notes, samples etc.
 	engine::getSong()->processNextBuffer();
 
+	// add all play-handles that have to be added
+	m_playHandleMutex.lock();
+	m_playHandles += m_newPlayHandles;
+	m_newPlayHandles.clear();
+	m_playHandleMutex.unlock();
 
 	// STAGE 1: run and render all play handles
 	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
