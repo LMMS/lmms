@@ -200,4 +200,19 @@ static inline float dbvToAmp( float dbv )
 }
 
 
+
+//! returns 1.0f if val >= 0.0f, -1.0 else
+static inline float sign( float val ) 
+{ 
+	return val >= 0.0f ? 1.0f : -1.0f; 
+}
+
+
+//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
+static inline float sqrt_neg( float val ) 
+{
+	return sqrtf( fabs( val ) ) * sign( val );
+}
+
+
 #endif

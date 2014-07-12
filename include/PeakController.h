@@ -72,6 +72,7 @@ protected:
 	friend class PeakControllerDialog;
 
 private:
+	float m_currentSample;
 	//backward compatibility for <= 0.4.15
 	static int m_getCount;
 	static int m_loadCount;
