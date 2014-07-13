@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PROJECT_JOURNAL_H
-#define _PROJECT_JOURNAL_H
+#ifndef PROJECT_JOURNAL_H
+#define PROJECT_JOURNAL_H
 
 #include <QtCore/QHash>
 #include <QtCore/QStack>
@@ -37,6 +37,8 @@ class JournallingObject;
 class ProjectJournal
 {
 public:
+	static const int MAX_UNDO_STATES;
+
 	ProjectJournal();
 	virtual ~ProjectJournal();
 
@@ -88,7 +90,7 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile&initData = DataFile( DataFile::JournalData ) ) :
+		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::JournalData ) ) :
 			joID( initID ),
 			data( initData )
 		{
