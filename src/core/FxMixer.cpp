@@ -506,7 +506,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	//m_sendsMutex.unlock();
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
-	MixHelpers::addMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
+	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
 	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::mixer()->masterGain();
