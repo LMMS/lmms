@@ -76,7 +76,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin )
 {
-	qDebug( "offset %d", _offset );
 	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
