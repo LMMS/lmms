@@ -853,27 +853,27 @@ void patternView::wheelEvent( QWheelEvent * _we )
 		{
 			vol = n->getVolume();
 			len = n->length();
-		}
 
-		if( len == 0 && _we->delta() > 0 )
-		{
-			n->setLength( -DefaultTicksPerTact );
-			n->setVolume( 5 );
-		}
-		else if( _we->delta() > 0 )
-		{
-			n->setVolume( qMin( 100, vol + 5 ) );
-		}
-		else
-		{
-			n->setVolume( qMax( 0, vol - 5 ) );
-		}
+			if( len == 0 && _we->delta() > 0 )
+			{
+				n->setLength( -DefaultTicksPerTact );
+				n->setVolume( 5 );
+			}
+			else if( _we->delta() > 0 )
+			{
+				n->setVolume( qMin( 100, vol + 5 ) );
+			}
+			else
+			{
+				n->setVolume( qMax( 0, vol - 5 ) );
+			}
 
-		engine::getSong()->setModified();
-		update();
-		if( engine::pianoRoll()->currentPattern() == m_pat )
-		{
-			engine::pianoRoll()->update();
+			engine::getSong()->setModified();
+			update();
+			if( engine::pianoRoll()->currentPattern() == m_pat )
+			{
+				engine::pianoRoll()->update();
+			}
 		}
 		_we->accept();
 	}

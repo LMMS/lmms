@@ -519,14 +519,7 @@ float Mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
-		if( _ab[f][0] > p )
-		{
-			p = _ab[f][0];
-		}
-		else if( -_ab[f][0] > p )
-		{
-			p = -_ab[f][0];
-		}
+		p = qMax( p, qAbs( _ab[f][0] ) );
 	}
 	return p;
 }
@@ -539,14 +532,7 @@ float Mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
-		if( _ab[f][1] > p )
-		{
-			p = _ab[f][1];
-		}
-		else if( -_ab[f][1] > p )
-		{
-			p = -_ab[f][1];
-		}
+		p = qMax( p, qAbs( _ab[f][1] ) );
 	}
 	return p;
 }
