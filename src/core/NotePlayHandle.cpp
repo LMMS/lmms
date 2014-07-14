@@ -187,6 +187,13 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	{
 		return;
 	}
+
+	// if the note offset falls over to next period, then don't start playback yet
+	if( offset() >= engine::mixer()->framesPerPeriod() )
+	{
+		setOffset( offset() - engine::mixer()->framesPerPeriod() );
+		return;
+	}
 	
 	// number of frames that can be played this period
 	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0 
