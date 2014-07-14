@@ -76,6 +76,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin )
 {
+	qDebug( "offset %d", _offset );
 	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
@@ -185,6 +186,13 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 {
 	if( m_muted )
 	{
+		return;
+	}
+
+	// if the note offset falls over to next period, then don't start playback yet
+	if( offset() >= engine::mixer()->framesPerPeriod() )
+	{
+		setOffset( offset() - engine::mixer()->framesPerPeriod() );
 		return;
 	}
 	
