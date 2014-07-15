@@ -350,7 +350,7 @@ static void runAddingBodeShifterCV(LADSPA_Handle instance, unsigned long sample_
 	  /* Perform the Hilbert FIR convolution
 	   * (probably FFT would be faster) */
 	  hilb = 0.0f;
-	  for (i = 0; i <= NZEROS/2; i++) {
+	  for (i = 0; i < NZEROS/2; i++) {
 	    hilb += (xcoeffs[i] * delay[(dptr - i*2) & (D_SIZE - 1)]);
 	  }
 
