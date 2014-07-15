@@ -111,7 +111,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	// apply offset for the first period
 	if( framesDone() == 0 )
 	{
-		buffer += offset();
+		workingBuffer += offset();
 		frames -= offset();
 	}
 
