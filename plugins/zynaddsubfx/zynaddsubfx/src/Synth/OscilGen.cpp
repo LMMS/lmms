@@ -504,10 +504,10 @@ void OscilGen::spectrumadjust()
                 par = powf(8.0f, par);
             break;
         case 2:
-            par = powf(10.0f, (1.0f - par) * 3.0f) * 0.25f;
+            par = powf(10.0f, (1.0f - par) * 3.0f) * 0.001f;
             break;
         case 3:
-            par = powf(10.0f, (1.0f - par) * 3.0f) * 0.25f;
+            par = powf(10.0f, (1.0f - par) * 3.0f) * 0.001f;
             break;
     }
 
@@ -516,7 +516,7 @@ void OscilGen::spectrumadjust()
 
     for(int i = 0; i < synth->oscilsize / 2; ++i) {
         float mag   = abs(oscilFFTfreqs, i);
-        float phase = arg(oscilFFTfreqs, i);
+        float phase = M_PI_2 - arg(oscilFFTfreqs, i);
 
         switch(Psatype) {
             case 1:

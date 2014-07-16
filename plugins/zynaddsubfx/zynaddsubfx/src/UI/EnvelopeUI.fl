@@ -50,7 +50,8 @@ pair=NULL;} {}
 oldx=-1;
 currentpoint=-1;
 cpx=0;
-lastpoint=-1;} {}
+lastpoint=-1;
+ctrldown=false;} {}
   }
   Function {setpair(Fl_Box *pair_)} {} {
     code {pair=pair_;} {}
@@ -140,22 +141,51 @@ if (env->Penvsustain>0){
 //Show the envelope duration and the current line duration
 fl_font(FL_HELVETICA|FL_BOLD,10);
 float time=0.0;
-if (currentpoint<=0){
+if (currentpoint<=0 && (!ctrldown||lastpoint <= 0)){
    fl_color(alb);
    for (int i=1;i<npoints;i++) time+=env->getdt(i);
 } else {
    fl_color(255,0,0);
-   time=env->getdt(currentpoint);
+   time=env->getdt(lastpoint);
 };
 char tmpstr[20];
 if (time<1000.0) snprintf((char *)&tmpstr,20,"%.1fms",time);
      else snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
-fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);} {}
+fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
+if (lastpoint>=0){
+    snprintf((char *)&tmpstr,20,"%d", env->Penvval[lastpoint]);
+    fl_draw(tmpstr,ox+lx-20,oy+ly-23,20,10,FL_ALIGN_RIGHT,NULL,0);
+}} {}
   }
   Function {handle(int event)} {return_type int
   } {
     code {int x_=Fl::event_x()-x();
 int y_=Fl::event_y()-y();
+
+// Some window magic makes us lose focus, so reassert it.
+if (event==FL_ENTER)
+    Fl::focus(this);
+
+if ((event==FL_KEYDOWN || event==FL_KEYUP)){
+   int key = Fl::event_key();
+   if (key==FL_Control_L || key==FL_Control_R){
+        ctrldown = (event==FL_KEYDOWN);
+        redraw();
+        if (pair!=NULL) pair->redraw();
+    }
+}
+
+if (event==FL_MOUSEWHEEL && lastpoint>=0) {
+    if (!ctrldown) {
+        int ny=env->Penvval[lastpoint] - Fl::event_dy();
+        env->Penvval[lastpoint]=ny < 0 ? 0 : ny > 127 ? 127 : ny;
+    } else if (lastpoint > 0) {
+        int newdt = Fl::event_dy() + env->Penvdt[lastpoint];
+        env->Penvdt[lastpoint] = newdt < 0 ? 0 : newdt > 127 ? 127 : newdt;
+    }
+    redraw();
+    if (pair!=NULL) pair->redraw();
+}
 
 if (event==FL_PUSH) {
   currentpoint=getnearest(x_,y_);
@@ -196,6 +226,7 @@ return(1);} {}
   decl {int currentpoint,cpx,cpdt;} {}
   decl {int lastpoint;} {public
   }
+  decl {bool ctrldown;} {}
 } 
 
 class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
@@ -281,7 +312,7 @@ sustaincounter->maximum(env->Penvpoints-2);}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
-      Fl_Light_Button freemodebutton {
+      Fl_Check_Button freemodebutton {
         label FreeMode
         callback {reinit();
 
@@ -329,12 +360,12 @@ envfree->redraw();}
       Fl_Button {} {
         label C
         callback {presetsui->copy(env);}
-        xywh {465 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {465 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
       }
       Fl_Button {} {
         label P
         callback {presetsui->paste(env,this);}
-        xywh {482 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {482 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
       }
     }
   }
@@ -408,12 +439,12 @@ freeedit->redraw();}
         Fl_Button {} {
           label C
           callback {presetsui->copy(env);}
-          xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
         Fl_Button {} {
           label P
           callback {presetsui->paste(env,this);}
-          xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
       }
     }
@@ -477,12 +508,12 @@ freeedit->redraw();}
         Fl_Button {} {
           label C
           callback {presetsui->copy(env);}
-          xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
         Fl_Button {} {
           label P
           callback {presetsui->paste(env,this);}
-          xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
       }
       Fl_Button {} {
@@ -572,12 +603,12 @@ freeedit->redraw();}
         Fl_Button {} {
           label C
           callback {presetsui->copy(env);}
-          xywh {220 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {220 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
         Fl_Button {} {
           label P
           callback {presetsui->paste(env,this);}
-          xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
       }
     }
@@ -642,12 +673,12 @@ freeedit->redraw();}
         Fl_Button {} {
           label C
           callback {presetsui->copy(env);}
-          xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
         Fl_Button {} {
           label P
           callback {presetsui->paste(env,this);}
-          xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
       }
       Fl_Button {} {
@@ -684,12 +715,12 @@ freeedit->redraw();}
         Fl_Button {} {
           label C
           callback {presetsui->copy(env);}
-          xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
         Fl_Button {} {
           label P
           callback {presetsui->paste(env,this);}
-          xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
       }
     }
@@ -781,9 +812,17 @@ if ((env->Pfreemode==0)||(env->Envmode>2)) linearenvelopecheck->hide();
 
 forcedreleasecheck->value(env->Pforcedrelease);
 if (env->Pfreemode==0) forcedreleasecheck->hide();
+	else forcedreleasecheck->show();
+
+if (env->Pfreemode==0){
+	addpoint->hide();
+	deletepoint->hide();
+} else {
+	addpoint->show();
+	deletepoint->show();
+}
 
 freeedit->redraw();
-
 
 if (env->Pfreemode==0){
    switch(env->Envmode){

@@ -333,12 +333,12 @@ pars->changed=true;} open
       Fl_Button {} {
         label C
         callback {presetsui->copyArray(pars);}
-        xywh {186 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {186 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
       }
       Fl_Button {} {
         label P
         callback {presetsui->pasteArray(pars,this);}
-        xywh {203 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {203 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
       }
     }
   }
@@ -508,12 +508,12 @@ pars->changed=true;}
       Fl_Button {} {
         label C
         callback {presetsui->copy(pars,nvowel);}
-        xywh {635 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {635 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Button {} {
         label P
         callback {presetsui->paste(pars,this,nvowel);}
-        xywh {665 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {665 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Box {} {
         label Vowel
@@ -539,8 +539,8 @@ vowel_counter->value(pars->Psequence[nseqpos].nvowel);} {}
     code {update_formant_window();
 formantfiltergraph->redraw();
 
-if (pars->Pcategory==0) svfiltertypechoice->value(pars->Ptype);
-if (pars->Pcategory==2) analogfiltertypechoice->value(pars->Ptype);
+if (pars->Pcategory==2) svfiltertypechoice->value(pars->Ptype);
+if (pars->Pcategory==0) analogfiltertypechoice->value(pars->Ptype);
 
 filtertype->value(pars->Pcategory);
 

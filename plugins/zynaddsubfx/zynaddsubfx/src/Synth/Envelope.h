@@ -42,6 +42,8 @@ class Envelope
          * @return returns 1 if the envelope is finished*/
         bool finished() const;
     private:
+        float env_rap2dB(float rap);
+        float env_dB2rap(float db);
         int   envpoints;
         int   envsustain;    //"-1" means disabled
         float envdt[MAX_ENVELOPE_POINTS]; //millisecons

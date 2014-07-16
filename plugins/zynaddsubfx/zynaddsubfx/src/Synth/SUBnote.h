@@ -91,6 +91,7 @@ class SUBnote:public SynthNote
                         float bw,
                         float amp,
                         float mag);
+        float computerolloff(float freq);
         void computefiltercoefs(bpfilter &filter,
                                 float freq,
                                 float bw,
@@ -98,6 +99,9 @@ class SUBnote:public SynthNote
         inline void filter(bpfilter &filter, float *smps);
 
         bpfilter *lfilter, *rfilter;
+
+        float overtone_rolloff[MAX_SUB_HARMONICS];
+        float overtone_freq[MAX_SUB_HARMONICS];
 
         Controller *ctl;
         int   oldpitchwheel, oldbandwidth;

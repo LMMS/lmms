@@ -364,6 +364,9 @@ float PADnoteParameters::getNhr(int n)
             tmp    = powf(par2 * 2.0f, 2.0f) + 0.1f;
             result = n0 * powf(1.0f + par1 * powf(n0 * 0.8f, tmp), tmp) + 1.0f;
             break;
+        case 7:
+            result = (n + Phrpos.par1 / 255.0f) / (Phrpos.par1 / 255.0f + 1);
+            break;
         default:
             result = n;
             break;

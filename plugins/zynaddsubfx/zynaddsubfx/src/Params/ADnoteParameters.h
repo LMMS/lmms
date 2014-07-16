@@ -133,6 +133,9 @@ struct ADnoteVoiceParam {
     /** How subvoices are spread */
     unsigned char Unison_frequency_spread;
 
+    /** How much phase randomization */
+    unsigned char Unison_phase_randomness;
+
     /** Stereo spread of the subvoices*/
     unsigned char Unison_stereo_spread;
 

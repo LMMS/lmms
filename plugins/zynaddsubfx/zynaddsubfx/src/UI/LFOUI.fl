@@ -144,12 +144,12 @@ hide();
         Fl_Button {} {
           label C
           callback {presetsui->copy(pars);}
-          xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
         Fl_Button {} {
           label P
           callback {presetsui->paste(pars,this);}
-          xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+          xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
         }
       }
     }

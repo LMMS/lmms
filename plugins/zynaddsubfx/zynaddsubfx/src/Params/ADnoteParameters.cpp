@@ -127,6 +127,7 @@ void ADnoteVoiceParam::defaults()
     Unison_vibratto = 64;
     Unison_vibratto_speed = 64;
     Unison_invert_phase   = 0;
+    Unison_phase_randomness = 127;
 
     Type = 0;
     Pfixedfreq    = 0;
@@ -351,6 +352,7 @@ void ADnoteVoiceParam::add2XML(XMLwrapper *xml, bool fmoscilused)
     xml->addpar("unison_vibratto", Unison_vibratto);
     xml->addpar("unison_vibratto_speed", Unison_vibratto_speed);
     xml->addpar("unison_invert_phase", Unison_invert_phase);
+    xml->addpar("unison_phase_randomness", Unison_phase_randomness);
 
     xml->addpar("delay", PDelay);
     xml->addparbool("resonance", Presonance);
@@ -664,6 +666,8 @@ void ADnoteVoiceParam::getfromXML(XMLwrapper *xml, unsigned nvoice)
                                            Unison_vibratto_speed);
     Unison_invert_phase = xml->getpar127("unison_invert_phase",
                                          Unison_invert_phase);
+    Unison_phase_randomness = xml->getpar127("unison_phase_randomness",
+						Unison_phase_randomness);
 
     Type       = xml->getpar127("type", Type);
     PDelay     = xml->getpar127("delay", PDelay);

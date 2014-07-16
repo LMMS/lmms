@@ -38,6 +38,7 @@ class SUBnoteParameters:public Presets
         void add2XML(XMLwrapper *xml);
         void defaults();
         void getfromXML(XMLwrapper *xml);
+        void updateFrequencyMultipliers(void);
 
         //Parameters
         //AMPLITUDE PARAMETRERS
@@ -74,6 +75,14 @@ class SUBnoteParameters:public Presets
            if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone */
         unsigned char PfixedfreqET;
 
+        // Overtone spread parameters
+        struct {
+            unsigned char type;
+            unsigned char par1;
+            unsigned char par2;
+            unsigned char par3;
+        } POvertoneSpread;
+        float POvertoneFreqMult[MAX_SUB_HARMONICS];
 
         //how many times the filters are applied
         unsigned char Pnumstages;
