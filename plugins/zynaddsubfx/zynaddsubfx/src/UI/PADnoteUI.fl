@@ -240,7 +240,7 @@ make_window();} {}
   } {
     Fl_Window padnotewindow {
       label {PAD synth Parameters} open
-      xywh {294 392 535 435} type Double visible
+      xywh {288 386 535 435} type Double visible
     } {
       Fl_Tabs {} {
         callback {if (o->value()!=harmonicstructuregroup) applybutton->hide();
@@ -500,6 +500,10 @@ cbwidget->do_callback();}
               MenuItem {} {
                 label Power
                 xywh {120 120 100 20} labelfont 1 labelsize 11
+              }
+              MenuItem {} {
+                label Shift selected
+                xywh {130 130 100 20} labelfont 1 labelsize 11
               }
             }
             Fl_Dial hrpospar1 {
@@ -980,12 +984,12 @@ if (resui!=NULL) {
       Fl_Button {} {
         label C
         callback {presetsui->copy(pars);}
-        xywh {65 400 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {65 400 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Button {} {
         label P
         callback {presetsui->paste(pars,this);}
-        xywh {95 400 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {95 400 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Button {} {
         label export

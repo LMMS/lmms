@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {private local
@@ -112,10 +112,10 @@ config.cfg.SoundBufferSize=strtoul(o->value(),&tmp,10);}
             code1 {snprintf(tmpbuf,100,"%d",config.cfg.SoundBufferSize);o->insert(tmpbuf);}
             code2 {delete []tmpbuf;}
           }
-          Fl_Light_Button {} {
+          Fl_Check_Button {} {
             label {Swap Stereo }
             callback {config.cfg.SwapStereo=(int) o->value();}
-            xywh {20 80 85 20} box THIN_UP_BOX labelsize 10
+            xywh {15 80 95 20} box NO_BOX labelsize 11
             code0 {o->value(config.cfg.SwapStereo);}
           }
           Fl_Choice {} {
@@ -178,7 +178,7 @@ config.cfg.SoundBufferSize=strtoul(o->value(),&tmp,10);}
               label {Dump notes}
               callback {config.cfg.DumpNotesToFile=(int) o->value();
 dump.startnow();//this has effect only if this option was disabled}
-              xywh {20 130 100 20} down_box DOWN_BOX
+              xywh {20 130 110 20} down_box DOWN_BOX
               code0 {o->value(config.cfg.DumpNotesToFile);}
             }
             Fl_Check_Button {} {
@@ -186,49 +186,6 @@ dump.startnow();//this has effect only if this option was disabled}
               callback {config.cfg.DumpAppend=(int) o->value();}
               xywh {160 130 80 20} down_box DOWN_BOX
               code0 {o->value(config.cfg.DumpAppend);}
-            }
-          }
-          Fl_Group {} {
-            xywh {255 45 245 260} box ENGRAVED_FRAME
-          } {
-            Fl_Box {} {
-              label {Note: Not all the following settings are used (this depends on the operating system, etc..)}
-              xywh {260 50 235 45} labelfont 1 labelsize 11 align 128
-            }
-            Fl_Group {} {
-              label Linux
-              xywh {260 110 235 115} box ENGRAVED_BOX labelfont 1 labelsize 13 align 5
-            } {
-              Fl_File_Input {} {
-                label {OSS Sequencer Device (/dev/...)}
-                callback {snprintf(config.cfg.LinuxOSSSeqInDev,config.maxstringsize,"%s",o->value());}
-                xywh {265 180 225 35} align 5
-                code0 {o->insert(config.cfg.LinuxOSSSeqInDev);}
-              }
-              Fl_File_Input {} {
-                label {OSS Wave Out Device (/dev/...)}
-                callback {snprintf(config.cfg.LinuxOSSWaveOutDev,config.maxstringsize,"%s",o->value());}
-                xywh {265 130 225 35} align 5
-                code0 {o->insert(config.cfg.LinuxOSSWaveOutDev);}
-              }
-            }
-            Fl_Group {} {
-              label Windows
-              xywh {260 250 235 50} box ENGRAVED_BOX labelfont 1 labelsize 13 align 5
-            } {
-              Fl_Counter {} {
-                label {Midi In Dev}
-                callback {config.cfg.WindowsMidiInId=(int) o->value();
-midiinputnamebox->label(config.winmididevices[config.cfg.WindowsMidiInId].name);}
-                xywh {270 270 65 20} type Simple labelsize 11 align 1 minimum 0 maximum 100 step 1
-                code0 {o->maximum(config.winmidimax-1);}
-                code1 {o->value(config.cfg.WindowsMidiInId);}
-              }
-              Fl_Box midiinputnamebox {
-                label {Midi input device name}
-                xywh {340 260 150 35} labelfont 1 labelsize 11 align 212
-                code0 {o->label(config.winmididevices[config.cfg.WindowsMidiInId].name);}
-              }
             }
           }
           Fl_Counter {} {
@@ -282,7 +239,7 @@ midiinputnamebox->label(config.winmididevices[config.cfg.WindowsMidiInId].name);
           Fl_Check_Button {} {
             label {Ignore MIDI Program Change}
             callback {config.cfg.IgnoreProgramChange=(int) o->value();}
-            xywh {10 255 230 20} down_box DOWN_BOX
+            xywh {10 255 220 20} down_box DOWN_BOX
             code0 {o->value(config.cfg.IgnoreProgramChange);}
           }
         }

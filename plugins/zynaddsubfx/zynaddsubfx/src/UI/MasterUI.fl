@@ -803,14 +803,14 @@ syseffectui->refresh(master->sysefx[nsyseff]);}
           Fl_Button {} {
             label C
             callback {presetsui->copy(master->sysefx[nsyseff]);}
-            xywh {180 187 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {180 187 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
           }
           Fl_Button {} {
             label P
             callback {pthread_mutex_lock(&master->mutex);
 presetsui->paste(master->sysefx[nsyseff],syseffectui);
 pthread_mutex_unlock(&master->mutex);}
-            xywh {210 187 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {210 187 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
           }
         }
         Fl_Group {} {
@@ -916,14 +916,14 @@ master->insefx[ninseff]->cleanup();} open
           Fl_Button {} {
             label C
             callback {presetsui->copy(master->insefx[ninseff]);}
-            xywh {180 185 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {180 185 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
           }
           Fl_Button {} {
             label P
             callback {pthread_mutex_lock(&master->mutex);
 presetsui->paste(master->insefx[ninseff],inseffectui);
 pthread_mutex_unlock(&master->mutex);}
-            xywh {210 185 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {210 185 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
           }
         }
       }
@@ -1438,7 +1438,7 @@ simplesyseffectui->refresh(master->sysefx[nsyseff]);}
               callback {pthread_mutex_lock(&master->mutex);
 presetsui->paste(master->sysefx[nsyseff],simplesyseffectui);
 pthread_mutex_unlock(&master->mutex);}
-              xywh {560 65 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+              xywh {560 65 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
             }
           }
           Fl_Group {} {
@@ -1546,7 +1546,7 @@ master->insefx[ninseff]->cleanup();} open
               callback {pthread_mutex_lock(&master->mutex);
 presetsui->paste(master->insefx[ninseff],simpleinseffectui);
 pthread_mutex_unlock(&master->mutex);}
-              xywh {560 65 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+              xywh {560 65 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
             }
           }
         }

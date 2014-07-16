@@ -1,3 +1,20 @@
+2.4.4 (28 Jun 2014)
+        - Add UI Mousewheel Support
+        - Add Spectral Adjust Parameter Rescaling
+        - Add Subnote filter smoothing
+        - Add Unison derandomization options
+        - Add NSM import/export
+        - Add NTK UI compatiability
+        - (re)Add OSX Support
+        - Enhance performance of ADnote and SUBnote
+        - Enhance Installer
+        - Fix JACK2 specific segfault
+        - Fix possible DSSI specific segfaults
+        - Fix Unison Regressions
+        - Documentation additions
+        - Misc bug fixes
+        
+
 2.4.3 (15 Jun 2012)
         - Non-session manager support
         - Midi aftertouch support

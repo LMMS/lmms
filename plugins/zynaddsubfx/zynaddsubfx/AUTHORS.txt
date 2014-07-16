@@ -25,7 +25,8 @@ Contributors:
         Jonathan Liles (NSM & NTK support)
         Johannes Lorenz (Effect Documentation)
         Ilario Glasgo (Italian Doc Translation)
-        Christopher Oliver (Unison + presets fix, mousewheel support)
+        Christopher Oliver (Unison + presets fix, mousewheel support,
+                            SUBnote overtones, unison enhancements, ...)
         Filipe Coelho (Globals Cleanup)
         Andre Sklenar (UI Pixmaps)
 

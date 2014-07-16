@@ -25,7 +25,7 @@
 #include "AudioOut.h"
 #include <string>
 #include <pthread.h>
-#include <semaphore.h>
+#include "ZynSema.h"
 #include "SafeQueue.h"
 
 class WavFile;
@@ -53,7 +53,7 @@ class WavEngine:public AudioOut
 
     private:
         WavFile *file;
-        sem_t    work;
+        ZynSema  work;
         SafeQueue<float> buffer;
 
         pthread_t *pThread;

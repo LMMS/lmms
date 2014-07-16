@@ -549,7 +549,7 @@ if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodula
             callback {oscil->Pbasefuncmodulation=(int) o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();}
-            tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
+            tooltip {Base function modulation} xywh {601 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
             MenuItem {} {
               label None
@@ -689,14 +689,14 @@ redrawoscil();}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {
-        xywh {135 308 150 30} box UP_FRAME
+        xywh {136 308 150 30} box UP_FRAME
       } {
         Fl_Choice wshbutton {
           label {Wsh.}
           callback {oscil->Pwaveshapingfunction=(int) o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();} open
-          tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textsize 10
+          tooltip {Waveshaping function} xywh {166 313 55 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
             label None
@@ -763,26 +763,26 @@ redrawoscil();} open
           callback {oscil->Pwaveshaping=(int)o->value()+64;
 wsparval->value(oscil->Pwaveshaping-64);
 redrawoscil();}
-          tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
+          tooltip {Waveshaping Parameter} xywh {261 313 20 20} minimum -64 maximum 63 step 1
           class WidgetPDial
         }
         Fl_Value_Output wsparval {
-          xywh {228 316 25 15} labelsize 12 minimum -63 maximum 63 step 1
+          xywh {229 316 25 15} labelsize 12 minimum -63 maximum 63 step 1
         }
       }
-      Fl_Light_Button autoclearbutton {
+      Fl_Check_Button autoclearbutton {
         label {Clr.}
-        tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10
+        tooltip {Auto clear when using the oscillator as base function} xywh {94 313 38 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10
       }
       Fl_Group {} {
-        xywh {285 308 155 30} box UP_FRAME
+        xywh {287 308 155 30} box UP_FRAME
       } {
         Fl_Choice fltbutton {
           label Filter
           callback {oscil->Pfiltertype=(int) o->value();
 
 redrawoscil();}
-          tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
+          tooltip {Oscillator's filter type} xywh {317 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
             label None
@@ -845,7 +845,7 @@ redrawoscil();}
           callback {oscil->Pfilterpar1=(int)o->value();
 
 redrawoscil();}
-          tooltip {Oscillator's filter parameter1} xywh {367 313 20 20} maximum 127 step 1
+          tooltip {Oscillator's filter parameter1} xywh {369 313 20 20} maximum 127 step 1
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
@@ -853,24 +853,24 @@ redrawoscil();}
           callback {oscil->Pfilterbeforews=(int)o->value();
 
 redrawoscil();}
-          tooltip {Apply the filter before the waveshaping} xywh {415 313 20 20} down_box DOWN_BOX labelsize 10 align 24
+          tooltip {Apply the filter before the waveshaping} xywh {417 313 20 20} down_box DOWN_BOX labelsize 10 align 24
         }
         Fl_Dial filtervalue2 {
           callback {oscil->Pfilterpar2=(int)o->value();
 
 redrawoscil();}
-          tooltip {Oscillator's filter parameter2} xywh {392 313 20 20} maximum 127 step 1
+          tooltip {Oscillator's filter parameter2} xywh {394 313 20 20} maximum 127 step 1
           class WidgetPDial
         }
       }
       Fl_Group {} {
-        xywh {590 308 135 30} box UP_FRAME
+        xywh {594 308 135 30} box UP_FRAME
       } {
         Fl_Choice sabutton {
           label {Sp.adj.}
           callback {oscil->Psatype=(int) o->value();
 redrawoscil();}
-          tooltip {Oscillator's spectrum adjust} xywh {630 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
+          tooltip {Oscillator's spectrum adjust} xywh {635 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
             label None
@@ -892,7 +892,7 @@ redrawoscil();}
         Fl_Dial sadjpar {
           callback {oscil->Psapar=(int)o->value();
 redrawoscil();}
-          tooltip {Oscillator's spectrum adjust parameter} xywh {695 313 20 20} maximum 127 step 1
+          tooltip {Oscillator's spectrum adjust parameter} xywh {702 313 20 20} maximum 127 step 1
           class WidgetPDial
         }
       }
@@ -986,14 +986,14 @@ redrawoscil();}
         }
       }
       Fl_Group {} {
-        xywh {440 308 150 30} box UP_FRAME
+        xywh {443 308 150 30} box UP_FRAME
       } {
         Fl_Choice modtype {
           label {Mod.}
           callback {oscil->Pmodulation=(int) o->value();
 
 redrawoscil();}
-          tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textsize 10
+          tooltip modulation xywh {476 315 50 15} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
             label None
@@ -1016,20 +1016,20 @@ redrawoscil();}
           callback {oscil->Pmodulationpar1=(int)o->value();
 
 redrawoscil();}
-          tooltip {Oscillator's modulation parameter 1} xywh {530 315 15 15} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 1} xywh {534 315 15 15} maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial modpar2 {
           callback {oscil->Pmodulationpar2=(int)o->value();
 
 redrawoscil();}
-          tooltip {Oscillator's modulation parameter 2} xywh {550 315 15 15} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 2} xywh {554 315 15 15} maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial modpar3 {
           callback {oscil->Pmodulationpar3=(int)o->value();
 redrawoscil();}
-          tooltip {Oscillator's modulation parameter 3} xywh {570 315 15 15} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 3} xywh {574 315 15 15} maximum 127 step 1
           class WidgetPDial
         }
       }
@@ -1048,12 +1048,12 @@ refresh();}
       Fl_Button {} {
         label C
         callback {presetsui->copy(oscil);}
-        xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Button {} {
         label P
         callback {presetsui->paste(oscil,this);}
-        xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Scroll _this_has_to_be_the_last {
         xywh {5 340 660 250} type HORIZONTAL box FLAT_BOX

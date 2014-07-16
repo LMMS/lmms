@@ -1,7 +1,7 @@
 <?xml version="1.0f" encoding="UTF-8"?>
 <!DOCTYPE ZynAddSubFX-data>
 <ZynAddSubFX-data version-major="2" version-minor="4"
-version-revision="3" ZynAddSubFX-author="Nasca Octavian Paul">
+version-revision="4" ZynAddSubFX-author="Nasca Octavian Paul">
 <INFORMATION>
 <par_bool name="PADsynth_used" value="yes" />
 </INFORMATION>
@@ -180,6 +180,7 @@ version-revision="3" ZynAddSubFX-author="Nasca Octavian Paul">
 <par name="unison_vibratto" value="64" />
 <par name="unison_vibratto_speed" value="64" />
 <par name="unison_invert_phase" value="0" />
+<par name="unison_phase_randomness" value="127" />
 <par name="delay" value="0" />
 <par_bool name="resonance" value="yes" />
 <par name="ext_oscil" value="-1" />
@@ -424,6 +425,7 @@ version-revision="3" ZynAddSubFX-author="Nasca Octavian Paul">
 <par name="unison_vibratto" value="64" />
 <par name="unison_vibratto_speed" value="64" />
 <par name="unison_invert_phase" value="0" />
+<par name="unison_phase_randomness" value="127" />
 <par name="delay" value="0" />
 <par_bool name="resonance" value="yes" />
 <par name="ext_oscil" value="0" />
@@ -506,6 +508,7 @@ version-revision="3" ZynAddSubFX-author="Nasca Octavian Paul">
 <par name="unison_vibratto" value="64" />
 <par name="unison_vibratto_speed" value="64" />
 <par name="unison_invert_phase" value="0" />
+<par name="unison_phase_randomness" value="127" />
 <par name="delay" value="0" />
 <par_bool name="resonance" value="yes" />
 <par name="ext_oscil" value="0" />
@@ -588,6 +591,7 @@ version-revision="3" ZynAddSubFX-author="Nasca Octavian Paul">
 <par name="unison_vibratto" value="64" />
 <par name="unison_vibratto_speed" value="64" />
 <par name="unison_invert_phase" value="0" />
+<par name="unison_phase_randomness" value="127" />
 <par name="delay" value="0" />
 <par_bool name="resonance" value="yes" />
 <par name="ext_oscil" value="-1" />
@@ -989,6 +993,10 @@ version-revision="3" ZynAddSubFX-author="Nasca Octavian Paul">
 <par name="fixed_freq_et" value="103" />
 <par name="detune" value="8192" />
 <par name="coarse_detune" value="0" />
+<par name="overtone_spread_type" value="0" />
+<par name="overtone_spread_par1" value="0" />
+<par name="overtone_spread_par2" value="0" />
+<par name="overtone_spread_par3" value="0" />
 <par name="detune_type" value="1" />
 <par name="bandwidth" value="40" />
 <par name="bandwidth_scale" value="38" />

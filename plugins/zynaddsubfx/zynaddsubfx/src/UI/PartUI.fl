@@ -744,14 +744,14 @@ if (x==2) part->partefx[ninseff]->setdryonly(true);
       Fl_Button {} {
         label C
         callback {presetsui->copy(part->partefx[ninseff]);}
-        xywh {90 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {90 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
       Fl_Button {} {
         label P
         callback {pthread_mutex_lock(&master->mutex);
 presetsui->paste(part->partefx[ninseff],inseffectui);
 pthread_mutex_unlock(&master->mutex);}
-        xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 55
       }
     }
     Fl_Window instrumentkitlist {
@@ -858,12 +858,12 @@ if (part->Pkitmode==0) {
 part->kit[0].Ppadenabled=x;
 if (x==0) padeditbutton->deactivate();
      else padeditbutton->activate();}
-            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box UP_BOX down_box DOWN_BOX color 51 selection_color 51 labelfont 1 labelsize 11
+            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box UP_BOX down_box DOWN_BOX color 51 selection_color 0 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
         }
         Fl_Group {} {
-          label ADDsynth
+          label ADsynth
           xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
@@ -872,7 +872,7 @@ if (x==0) padeditbutton->deactivate();
 part->kit[0].Padenabled=x;
 if (x==0) adeditbutton->deactivate();
      else adeditbutton->activate();}
-            tooltip {enable/disable ADsynth} xywh {15 255 80 20} box UP_BOX down_box DOWN_BOX color 51 selection_color 51 labelfont 1 labelsize 11
+            tooltip {enable/disable ADsynth} xywh {15 255 80 20} box UP_BOX down_box DOWN_BOX color 51 selection_color 0 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
           Fl_Button adeditbutton {
@@ -892,7 +892,7 @@ if (x==0) adeditbutton->deactivate();
 part->kit[0].Psubenabled=x;
 if (x==0) subeditbutton->deactivate();
      else subeditbutton->activate();}
-            tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box UP_BOX down_box DOWN_BOX color 51 selection_color 51 labelfont 1 labelsize 11
+            tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box UP_BOX down_box DOWN_BOX color 51 selection_color 0 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
           Fl_Button subeditbutton {
@@ -919,14 +919,14 @@ if (x==0) subeditbutton->deactivate();
         Fl_Input {} {
           label {Author and Copyright}
           callback {snprintf((char *)part->info.Pauthor,MAX_INFO_TEXT_SIZE,"%s",o->value());}
-          xywh {5 60 385 50} type Multiline color 26 labelsize 10 align 5
+          xywh {5 60 385 50} type Multiline color 124 labelsize 10 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value((char *) &part->info.Pauthor);}
         }
         Fl_Input {} {
           label Comments
           callback {snprintf((char *)part->info.Pcomments,MAX_INFO_TEXT_SIZE,"%s",o->value());}
-          xywh {5 125 385 90} type Multiline color 26 labelsize 11 align 5
+          xywh {5 125 385 90} type Multiline color 124 labelsize 11 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value((char *) &part->info.Pcomments);}
         }

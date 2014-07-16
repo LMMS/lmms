@@ -89,7 +89,7 @@ refresh();} {}
     code {if (bank->emptyslot(nslot))
     color(46);
 else if (bank->isPADsynth_used(nslot)) 
-    color(26);
+    color(124);
 else 
     color(51);
 
@@ -152,32 +152,32 @@ class BankUI {open : {public BankProcess_}
       Fl_Group modeselect {
         xywh {5 528 425 42} box ENGRAVED_BOX
       } {
-        Fl_Light_Button writebutton {
+        Fl_Check_Button writebutton {
           label WRITE
           callback {if (o->value()>0.5) mode=2;
 removeselection();}
-          xywh {116 534 99 30} type Radio down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {116 534 99 30} type Radio box UP_BOX down_box DOWN_BOX labelfont 1 labelsize 13
           code0 {if (bank->locked()) o->deactivate();}
         }
-        Fl_Light_Button readbutton {
-          label READ
+        Fl_Check_Button readbutton {
+          label READ selected
           callback {if (o->value()>0.5) mode=1;
 removeselection();}
-          xywh {11 534 99 30} type Radio down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {11 534 99 30} type Radio box UP_BOX down_box DOWN_BOX labelfont 1 labelsize 13
           code0 {o->value(1);}
         }
-        Fl_Light_Button clearbutton {
+        Fl_Check_Button clearbutton {
           label CLEAR
           callback {if (o->value()>0.5) mode=3;
 removeselection();}
-          xywh {221 534 99 30} type Radio down_box THIN_DOWN_BOX selection_color 0 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {221 534 99 30} type Radio box UP_BOX down_box DOWN_BOX labelfont 1 labelsize 13
           code0 {if (bank->locked()) o->deactivate();}
         }
-        Fl_Light_Button swapbutton {
+        Fl_Check_Button swapbutton {
           label SWAP
           callback {if (o->value()>0.5) mode=4;
 removeselection();}
-          xywh {325 534 99 30} type Radio down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {325 534 99 30} type Radio box UP_BOX down_box DOWN_BOX labelfont 1 labelsize 13
           code0 {if (bank->locked()) o->deactivate();}
         }
       }

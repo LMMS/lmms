@@ -44,13 +44,12 @@ InMgr::InMgr()
     :queue(100), master(Master::getInstance())
 {
     current = NULL;
-    sem_init(&work, PTHREAD_PROCESS_PRIVATE, 0);
+    work.init(PTHREAD_PROCESS_PRIVATE, 0);
 }
 
 InMgr::~InMgr()
 {
     //lets stop the consumer thread
-    sem_destroy(&work);
 }
 
 void InMgr::putEvent(MidiEvent ev)
@@ -58,17 +57,17 @@ void InMgr::putEvent(MidiEvent ev)
     if(queue.push(ev)) //check for error
         cerr << "ERROR: Midi Ringbuffer is FULL" << endl;
     else
-        sem_post(&work);
+        work.post();
 }
 
 void InMgr::flush(unsigned frameStart, unsigned frameStop)
 {
     MidiEvent ev;
-    while(!sem_trywait(&work)) {
+    while(!work.trywait()) {
         queue.peak(ev);
         if(ev.time < (int)frameStart || ev.time > (int)frameStop) {
             //Back out of transaction
-            sem_post(&work);
+            work.post();
             //printf("%d vs [%d..%d]\n",ev.time, frameStart, frameStop);
             break;
         }
@@ -102,8 +101,7 @@ void InMgr::flush(unsigned frameStart, unsigned frameStop)
 
 bool InMgr::empty(void) const
 {
-    int semvalue = 0;
-    sem_getvalue(&work, &semvalue);
+    int semvalue = work.getvalue();
     return semvalue <= 0;
 }
 

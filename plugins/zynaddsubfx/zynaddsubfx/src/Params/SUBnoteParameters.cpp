@@ -23,6 +23,7 @@
 #include "../globals.h"
 #include "SUBnoteParameters.h"
 #include <stdio.h>
+#include <cmath>
 
 SUBnoteParameters::SUBnoteParameters():Presets()
 {
@@ -62,6 +63,12 @@ void SUBnoteParameters::defaults()
     PDetuneType   = 1;
     PFreqEnvelopeEnabled      = 0;
     PBandWidthEnvelopeEnabled = 0;
+
+    POvertoneSpread.type = 0;
+    POvertoneSpread.par1 = 0;
+    POvertoneSpread.par2 = 0;
+    POvertoneSpread.par3 = 0;
+    updateFrequencyMultipliers();
 
     for(int n = 0; n < MAX_SUB_HARMONICS; ++n) {
         Phmag[n]   = 0;
@@ -127,6 +134,10 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
 
     xml->addpar("detune", PDetune);
     xml->addpar("coarse_detune", PCoarseDetune);
+    xml->addpar("overtone_spread_type", POvertoneSpread.type);
+    xml->addpar("overtone_spread_par1", POvertoneSpread.par1);
+    xml->addpar("overtone_spread_par2", POvertoneSpread.par2);
+    xml->addpar("overtone_spread_par3", POvertoneSpread.par3);
     xml->addpar("detune_type", PDetuneType);
 
     xml->addpar("bandwidth", Pbandwidth);
@@ -166,6 +177,66 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
     xml->endbranch();
 }
 
+
+
+void SUBnoteParameters::updateFrequencyMultipliers(void) {
+    float par1 = POvertoneSpread.par1 / 255.0f;
+    float par1pow = powf(10.0f,
+            -(1.0f - POvertoneSpread.par1 / 255.0f) * 3.0f);
+    float par2 = POvertoneSpread.par2 / 255.0f;
+    float par3 = 1.0f - POvertoneSpread.par3 / 255.0f;
+    float result;
+    float tmp = 0.0f;
+    int   thresh = 0;
+
+    for(int n = 0; n < MAX_SUB_HARMONICS; ++n) {
+        float n1     = n + 1.0f;
+        switch(POvertoneSpread.type) {
+            case 1:
+                thresh = (int)(100.0f * par2 * par2) + 1;
+                if (n1 < thresh)
+                    result = n1;
+                else
+                    result = n1 + 8.0f * (n1 - thresh) * par1pow;
+                break;
+            case 2:
+                thresh = (int)(100.0f * par2 * par2) + 1;
+                if (n1 < thresh)
+                    result = n1;
+                else
+                    result = n1 + 0.9f * (thresh - n1) * par1pow;
+                break;
+            case 3:
+                tmp = par1pow * 100.0f + 1.0f;
+                result = powf(n / tmp, 1.0f - 0.8f * par2) * tmp + 1.0f;
+                break;
+            case 4:
+                result = n * (1.0f - par1pow) +
+                    powf(0.1f * n, 3.0f * par2 + 1.0f) *
+                    10.0f * par1pow + 1.0f;
+                break;
+
+            case 5:
+                result = n1 + 2.0f * sinf(n * par2 * par2 * PI * 0.999f) *
+                    sqrt(par1pow);
+                break;
+            case 6:
+                tmp    = powf(2.0f * par2, 2.0f) + 0.1f;
+                result = n * powf(par1 * powf(0.8f * n, tmp) + 1.0f, tmp) +
+                    1.0f;
+                break;
+
+            case 7:
+                result = (n1 + par1) / (par1 + 1);
+                break;
+            default:
+                result = n1;
+        }
+        float iresult = floor(result + 0.5f);
+        POvertoneFreqMult[n] = iresult + par3 * (result - iresult);
+    }
+}
+
 void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 {
     Pnumstages = xml->getpar127("num_stages", Pnumstages);
@@ -203,6 +274,15 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 
         PDetune = xml->getpar("detune", PDetune, 0, 16383);
         PCoarseDetune = xml->getpar("coarse_detune", PCoarseDetune, 0, 16383);
+        POvertoneSpread.type =
+            xml->getpar127("overtone_spread_type", POvertoneSpread.type);
+        POvertoneSpread.par1 =
+            xml->getpar("overtone_spread_par1", POvertoneSpread.par1, 0, 255);
+        POvertoneSpread.par2 =
+            xml->getpar("overtone_spread_par2", POvertoneSpread.par2, 0, 255);
+        POvertoneSpread.par3 =
+            xml->getpar("overtone_spread_par3", POvertoneSpread.par3, 0, 255);
+        updateFrequencyMultipliers();
         PDetuneType   = xml->getpar127("detune_type", PDetuneType);
 
         Pbandwidth = xml->getpar127("bandwidth", Pbandwidth);

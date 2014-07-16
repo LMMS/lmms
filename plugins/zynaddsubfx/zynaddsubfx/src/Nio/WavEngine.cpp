@@ -28,13 +28,12 @@ using namespace std;
 WavEngine::WavEngine()
     :AudioOut(), file(NULL), buffer(synth->samplerate * 4), pThread(NULL)
 {
-    sem_init(&work, PTHREAD_PROCESS_PRIVATE, 0);
+    work.init(PTHREAD_PROCESS_PRIVATE, 0);
 }
 
 WavEngine::~WavEngine()
 {
     Stop();
-    sem_destroy(&work);
     destroyFile();
 }
 
@@ -65,7 +64,7 @@ void WavEngine::Stop()
     pthread_t *tmp = pThread;
     pThread = NULL;
 
-    sem_post(&work);
+    work.post();
     pthread_join(*tmp, NULL);
     delete pThread;
 }
@@ -81,7 +80,7 @@ void WavEngine::push(Stereo<float *> smps, size_t len)
         buffer.push(*smps.l++);
         buffer.push(*smps.r++);
     }
-    sem_post(&work);
+    work.post();
 }
 
 void WavEngine::newFile(WavFile *_file)
@@ -113,7 +112,7 @@ void *WavEngine::AudioThread()
 {
     short *recordbuf_16bit = new short[2 * synth->buffersize];
 
-    while(!sem_wait(&work) && pThread) {
+    while(!work.wait() && pThread) {
         for(int i = 0; i < synth->buffersize; ++i) {
             float left = 0.0f, right = 0.0f;
             buffer.pop(left);
