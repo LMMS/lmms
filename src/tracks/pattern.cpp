@@ -422,6 +422,7 @@ void pattern::loadSettings( const QDomElement & _this )
 
 void pattern::clear()
 {
+	addJournalCheckPoint();
 	clearNotes();
 	ensureBeatNotes();
 }
