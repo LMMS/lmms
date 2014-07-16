@@ -192,11 +192,18 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 {
 	if( m_scheduledNoteOff >= 0 ) // always trigger scheduled noteoffs, because they're only scheduled if the note is released
 	{
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-			MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
-			m_scheduledNoteOff );
-		m_scheduledNoteOff = -1;
+		if( m_scheduledNoteOff < engine::mixer()->framesPerPeriod() )
+		{
+			m_instrumentTrack->processOutEvent(
+				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+				MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
+				m_scheduledNoteOff );
+			m_scheduledNoteOff = -1;
+		}
+		else
+		{
+			m_scheduledNoteOff -= engine::mixer()->framesPerPeriod();
+		}
 	}
 	
 	if( m_muted )
