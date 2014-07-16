@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _EFFECT_H
-#define _EFFECT_H
+#ifndef EFFECT_H
+#define EFFECT_H
 
 #include "Plugin.h"
 #include "engine.h"
@@ -118,8 +118,7 @@ public:
 	inline float gate() const
 	{
 		const float level = m_gateModel.value();
-		return level*level * m_processors *
-				engine::mixer()->framesPerPeriod();
+		return level*level * m_processors;
 	}
 
 	inline f_cnt_t bufferCount() const

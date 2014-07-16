@@ -25,9 +25,6 @@
 
 #include <QtXml/QDomElement>
 
-#include <cstdio>
-#include <cfloat>
-
 #include "Effect.h"
 #include "engine.h"
 #include "EffectChain.h"
@@ -136,7 +133,7 @@ void Effect::checkGate( double _out_sum )
 {
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( _out_sum <= gate() + FLT_MIN )
+	if( _out_sum - gate() <= typeInfo<float>::minEps() )
 	{
 		incrementBufferCount();
 		if( bufferCount() > timeout() )
@@ -176,7 +173,7 @@ void Effect::reinitSRC()
 							libsrcInterpolation(),
 					DEFAULT_CHANNELS, &error ) ) == NULL )
 		{
-			fprintf( stderr, "Error: src_new() failed in effect.cpp!\n" );
+			qFatal( "Error: src_new() failed in effect.cpp!\n" );
 		}
 	}
 }
@@ -202,7 +199,7 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	int error;
 	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
 	{
-		fprintf( stderr, "Effect::resample(): error while resampling: %s\n",
+		qFatal( "Effect::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
 	}
 }

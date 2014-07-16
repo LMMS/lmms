@@ -137,9 +137,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 					_buf[f][1] += ch_buf[f][1] * v;
 				}
 			}
-
 			// if sender channel hasInput, then we hasInput too
-			if( sender->m_hasInput ) m_hasInput = true;
+			if( sender->m_hasInput ) { m_hasInput = true; }
 		}
 	}
 
@@ -150,10 +149,9 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 		// only start fxchain when we have input...
 		m_fxChain.startRunning();
 	}
-	if( m_hasInput || m_stillRunning )
-	{
-		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, m_hasInput );
-	}
+	
+	m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, m_hasInput );
+
 	m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
 	m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
 }
