@@ -289,6 +289,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( displayWaveform, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisplayWaveform( bool ) ) );
 
+	ledCheckBox * disableAutoquit = new ledCheckBox(
+				tr( "Keep effects running even without input" ),
+								misc_tw );
+	labelNumber++;
+	disableAutoquit->move( XDelta, YDelta*labelNumber );
+	disableAutoquit->setChecked( configManager::inst()->isAutoquitDisabled() );
+	connect( disableAutoquit, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisableAutoquit( bool ) ) );
+
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
 
@@ -813,6 +822,8 @@ void setupDialog::accept()
 					QString::number( m_printNoteLabels ) );
 	configManager::inst()->setValue( "ui", "displaywaveform",
 					QString::number( m_displayWaveform ) );
+	configManager::inst()->setValue( "ui", "disableautoquit",
+					QString::number( configManager::inst()->isAutoquitDisabled() ) );
 
 
 	configManager::inst()->setWorkingDir( m_workingDir );
@@ -999,6 +1010,12 @@ void setupDialog::toggleNoteLabels( bool en )
 void setupDialog::toggleDisplayWaveform( bool en )
 {
 	m_displayWaveform = en;
+}
+
+
+void setupDialog::toggleDisableAutoquit( bool en )
+{
+	configManager::inst()->setAutoquitDisabled( en );
 }
 
 
