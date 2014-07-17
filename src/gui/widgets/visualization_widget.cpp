@@ -74,12 +74,10 @@ void visualizationWidget::updateAudioBuffer()
 {
 	if( !engine::getSong()->isExporting() )
 	{
-		engine::mixer()->lock();
 		const surroundSampleFrame * c = engine::mixer()->
 							currentReadBuffer();
 		const fpp_t fpp = engine::mixer()->framesPerPeriod();
 		memcpy( m_buffer, c, sizeof( surroundSampleFrame ) * fpp );
-		engine::mixer()->unlock();
 	}
 }
 

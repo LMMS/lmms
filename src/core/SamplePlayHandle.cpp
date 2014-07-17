@@ -96,7 +96,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 
 
-void SamplePlayHandle::play( sampleFrame * _working_buffer )
+void SamplePlayHandle::play( sampleFrame * buffer )
 {
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
@@ -104,17 +104,28 @@ void SamplePlayHandle::play( sampleFrame * _working_buffer )
 		return;
 	}
 
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	sampleFrame * workingBuffer = buffer;
+	const fpp_t fpp = engine::mixer()->framesPerPeriod();
+	f_cnt_t frames = fpp;
+
+	// apply offset for the first period
+	if( framesDone() == 0 )
+	{
+		memset( buffer, 0, sizeof( sampleFrame ) * offset() );
+		workingBuffer += offset();
+		frames -= offset();
+	}
+
 	if( !( m_track && m_track->isMuted() )
 				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
 	{
 		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };
-		m_sampleBuffer->play( _working_buffer, &m_state, frames,
+		m_sampleBuffer->play( workingBuffer, &m_state, frames,
 								BaseFreq );
-		engine::mixer()->bufferToPort( _working_buffer, frames,
-						offset(), v, m_audioPort );
+		engine::mixer()->bufferToPort( buffer, fpp,
+						v, m_audioPort );
 	}
 
 	m_frame += frames;

@@ -211,9 +211,9 @@ public:
 	{
 		if( criticalXRuns() == false )
 		{
-			lock();
-			m_playHandles.push_back( handle );
-			unlock();
+			m_playHandleMutex.lock();
+			m_newPlayHandles.append( handle );
+			m_playHandleMutex.unlock();
 			return true;
 		}
 
@@ -312,7 +312,6 @@ public:
 	// audio-buffer-mgm
 	void bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
-					const f_cnt_t _offset,
 					stereoVolumeVector _volume_vector,
 					AudioPort * _port );
 
@@ -429,6 +428,8 @@ private:
 	int m_numWorkers;
 	QWaitCondition m_queueReadyWaitCond;
 
+	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
+	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
 
 	PlayHandleList m_playHandles;
 	ConstPlayHandleList m_playHandlesToRemove;

@@ -119,6 +119,7 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	// Magic key - a frequency < 20 (say, the bottom piano note if using
 	// a A4 base tuning) restarts the start point. The note is not actually
@@ -165,14 +166,14 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 
 	if( ! _n->isFinished() )
 	{
-		if( m_sampleBuffer.play( _working_buffer,
+		if( m_sampleBuffer.play( _working_buffer + offset,
 						(handleState *)_n->m_pluginData,
 						frames, _n->frequency(),
 						static_cast<SampleBuffer::LoopMode>( m_loopModel.value() ) ) )
 		{
 			applyRelease( _working_buffer, _n );
 			instrumentTrack()->processAudioBuffer( _working_buffer,
-									frames,_n );
+									frames + offset, _n );
 
 			emit isPlaying( ((handleState *)_n->m_pluginData)->frameIndex() );
 		}

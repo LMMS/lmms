@@ -174,7 +174,6 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 		new_note->quantizePos( engine::pianoRoll()->quantization() );
 	}
 
-	engine::mixer()->lock();
 	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
 		m_notes.push_back( new_note );
@@ -197,7 +196,6 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 		m_notes.insert( it, new_note );
 	}
-	engine::mixer()->unlock();
 
 	checkType();
 	changeLength( length() );

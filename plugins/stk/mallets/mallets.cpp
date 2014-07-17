@@ -265,6 +265,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
 	ps->setFrequency( freq );
@@ -274,7 +275,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	{
 		add_scale = static_cast<sample_t>( m_strikeModel.value() ) * freq * 2.5f;
 	}
-	for( fpp_t frame = 0; frame < frames; ++frame )
+	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		_working_buffer[frame][0] = ps->nextSampleLeft() * 
 				( m_scalers[m_presetsModel.value()] + add_scale );
@@ -282,7 +283,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 				( m_scalers[m_presetsModel.value()] + add_scale );
 	}
 	
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

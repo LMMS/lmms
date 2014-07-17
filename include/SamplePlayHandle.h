@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SAMPLE_PLAY_HANDLE_H
-#define _SAMPLE_PLAY_HANDLE_H
+#ifndef SAMPLE_PLAY_HANDLE_H
+#define SAMPLE_PLAY_HANDLE_H
 
 #include "Mixer.h"
 #include "SampleBuffer.h"
@@ -49,7 +49,7 @@ public:
 	}
 
 
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * buffer );
 	virtual bool isFinished() const;
 
 	virtual bool isFromTrack( const track * _track ) const;

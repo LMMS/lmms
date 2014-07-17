@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PEAK_CONTROLLER_H
-#define _PEAK_CONTROLLER_H
+#ifndef PEAK_CONTROLLER_H
+#define PEAK_CONTROLLER_H
 
 #include <QtGui/QWidget>
 
@@ -65,13 +65,14 @@ public slots:
 
 protected:
 	// The internal per-controller get-value function
-	virtual float value( int _offset );
+	virtual void updateValueBuffer();
 
 	PeakControllerEffect * m_peakEffect;
 
 	friend class PeakControllerDialog;
 
 private:
+	float m_currentSample;
 	//backward compatibility for <= 0.4.15
 	static int m_getCount;
 	static int m_loadCount;

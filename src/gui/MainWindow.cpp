@@ -236,7 +236,7 @@ void MainWindow::finalize()
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
 				embed::getIconPixmap( "project_open_recent" ),
-					tr( "Recently opened projects" ) );
+					tr( "&Recently opened projects" ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
 			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),

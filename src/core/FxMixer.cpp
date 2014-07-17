@@ -32,7 +32,7 @@
 
 #include "InstrumentTrack.h"
 #include "bb_track_container.h"
-
+#include "ValueBuffer.h"
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
@@ -70,7 +70,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_peakRight( 0.0f ),
 	m_buffer( new sampleFrame[engine::mixer()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
-	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
+	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
 	m_lock(),
 	m_channelIndex( idx ),
@@ -125,16 +125,32 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
-				// get the send level...
-				const float amt = sendModel->value();
+				// figure out if we're getting sample-exact input
+				ValueBuffer * sendBuf = sendModel->valueBuffer();
+				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
 				sampleFrame * ch_buf = sender->m_buffer;
-				const float v = sender->m_volumeModel.value() * amt;
-				for( f_cnt_t f = 0; f < fpp; ++f )
+
+				// use sample-exact mixing if sample-exact values are available
+				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
-					_buf[f][0] += ch_buf[f][0] * v;
-					_buf[f][1] += ch_buf[f][1] * v;
+					const float v = sender->m_volumeModel.value() * sendModel->value();
+					MixHelpers::addMultiplied( _buf, ch_buf, v, fpp );
+				}
+				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
+				{
+					MixHelpers::addMultipliedByBuffers( _buf, ch_buf, volBuf, sendBuf, fpp );					
+				}
+				else if( volBuf ) // volume has sample-exact data but send does not
+				{
+					const float v = sendModel->value();
+					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, volBuf, fpp );
+				}
+				else // vice versa
+				{
+					const float v = sender->m_volumeModel.value();
+					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, sendBuf, fpp );
 				}
 			}
 			// if sender channel hasInput, then we hasInput too
@@ -503,7 +519,21 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	}
 	//m_sendsMutex.unlock();
 
-	const float v = m_fxChannels[0]->m_volumeModel.value();
+	// handle sample-exact data in master volume fader
+	ValueBuffer * volBuf = m_fxChannels[0]->m_volumeModel.valueBuffer();
+
+	if( volBuf )
+	{
+		for( int f = 0; f < fpp; f++ )
+		{
+			m_fxChannels[0]->m_buffer[f][0] *= volBuf->values()[f];
+			m_fxChannels[0]->m_buffer[f][1] *= volBuf->values()[f];
+		}
+	}
+
+	const float v = volBuf
+		? 1.0f
+		: m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
 	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();

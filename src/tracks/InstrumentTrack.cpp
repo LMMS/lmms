@@ -76,7 +76,7 @@
 #include "tab_widget.h"
 #include "tooltip.h"
 #include "track_label_button.h"
-
+#include "ValueBuffer.h"
 
 
 const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
@@ -186,33 +186,58 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// now
 	m_audioPort.effects()->startRunning();
 
-	float v_scale = (float) getVolume() / DefaultVolume;
+	// get volume knob data
+	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
+	ValueBuffer * volBuf = m_volumeModel.valueBuffer();
+	float v_scale = volBuf
+		? 1.0f
+		: getVolume() * DefaultVolumeRatio;
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
 	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) == false && n != NULL )
 	{
-		m_soundShaping.processAudioBuffer( buf, frames, n );
-		v_scale *= ( (float) n->getVolume() / DefaultVolume );
+		const f_cnt_t offset = n->noteOffset();
+		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
+		v_scale *= ( (float) n->getVolume() * DefaultVolumeRatio );
 	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	
-	int framesToMix = frames;
-	int offset = 0;
-	int panning = m_panningModel.value();
+	// get panning knob data
+	ValueBuffer * panBuf = m_panningModel.valueBuffer();
+	int panning = panBuf
+		? 0
+		: m_panningModel.value();
 
 	if( n )
 	{
-		framesToMix = qMin<f_cnt_t>( n->framesLeftForCurrentPeriod(), framesToMix );
-		offset = n->offset();
-
 		panning += n->getPanning();
 		panning = tLimit<int>( panning, PanningLeft, PanningRight );
 	}
 
-	engine::mixer()->bufferToPort( buf, framesToMix, offset, panningToVolumeVector( panning, v_scale ), &m_audioPort );
+	// apply sample-exact volume/panning data
+	if( volBuf )
+	{
+		for( f_cnt_t f = 0; f < frames; ++f )
+		{
+			float v = volBuf->values()[ f ] * 0.01f;
+			buf[f][0] *= v;
+			buf[f][1] *= v;
+		}
+	}
+	if( panBuf )
+	{
+		for( f_cnt_t f = 0; f < frames; ++f )
+		{
+			float p = panBuf->values()[ f ] * 0.01f;
+			buf[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p );
+			buf[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p );
+		}
+	}
+
+	engine::mixer()->bufferToPort( buf, frames, panningToVolumeVector( panning, v_scale ), &m_audioPort );
 }
 
 
@@ -239,7 +264,6 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	engine::mixer()->lock();
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -250,20 +274,23 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
+				NotePlayHandle* nph;
 				if( m_notes[event.key()] == NULL )
 				{
-					// create (timed) note-play-handle
-					NotePlayHandle* nph = new NotePlayHandle( this, time.frames( engine::framesPerTick() ),
-																typeInfo<f_cnt_t>::max() / 2,
-																note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
-																NULL, event.channel(),
-																NotePlayHandle::OriginMidiInput );
-					if( engine::mixer()->addPlayHandle( nph ) )
+					m_notesMutex.lock();
+					nph = new NotePlayHandle( this, offset,
+								typeInfo<f_cnt_t>::max() / 2,
+								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								NULL, event.channel(),
+								NotePlayHandle::OriginMidiInput );
+					m_notes[event.key()] = nph;
+					if( ! engine::mixer()->addPlayHandle( nph ) )
 					{
-						m_notes[event.key()] = nph;
+						m_notes[event.key()] = NULL;
+						delete nph;
 					}
+					m_notesMutex.unlock();
 				}
-
 				eventHandled = true;
 				break;
 			}
@@ -271,10 +298,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOff:
 			if( m_notes[event.key()] != NULL )
 			{
+				m_notesMutex.lock();
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
-				m_notes[event.key()]->noteOff();
+				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
+				m_notesMutex.unlock();
 			}
 			eventHandled = true;
 			break;
@@ -344,7 +373,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
 	}
 
-	engine::mixer()->unlock();
 }
 
 
@@ -403,13 +431,15 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	engine::mixer()->lock();
+	m_notesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
+	m_notesMutex.unlock();
 
+	engine::mixer()->lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
 	engine::mixer()->removePlayHandles( this, removeIPH );

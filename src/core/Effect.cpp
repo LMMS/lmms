@@ -31,6 +31,8 @@
 #include "EffectControls.h"
 #include "EffectView.h"
 
+#include "config_mgr.h"
+
 
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
@@ -131,6 +133,11 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 void Effect::checkGate( double _out_sum )
 {
+	if( configManager::inst()->isAutoquitDisabled() )
+	{
+		return;
+	}
+
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
 	if( _out_sum - gate() <= typeInfo<float>::minEps() )

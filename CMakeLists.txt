@@ -164,7 +164,7 @@ IF(WANT_SDL)
 		SET(LMMS_HAVE_SDL TRUE)
 		SET(STATUS_SDL "OK")
 	ELSE(SDL_FOUND)
-		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similiar) "
+		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similar) "
 			"if you require SDL support")
 	ENDIF(SDL_FOUND)
 ENDIF(WANT_SDL)
@@ -185,7 +185,7 @@ IF(WANT_STK)
 		SET(STATUS_STK "OK")
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
-		SET(STATUS_STK "not found, please install libstk0-dev (or similiar) "
+		SET(STATUS_STK "not found, please install libstk0-dev (or similar) "
 			"if you require the Mallets instrument")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
@@ -198,7 +198,7 @@ IF(WANT_PORTAUDIO)
 		SET(LMMS_HAVE_PORTAUDIO TRUE)
 		SET(STATUS_PORTAUDIO "OK")
 	ELSE(PORTAUDIO_FOUND)
-		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similiar, version >= 1.9) "
+		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similar, version >= 1.9) "
 			"if you require PortAudio support")
 	ENDIF(PORTAUDIO_FOUND)
 ENDIF(WANT_PORTAUDIO)
@@ -211,7 +211,7 @@ IF(WANT_PULSEAUDIO)
 		SET(LMMS_HAVE_PULSEAUDIO TRUE)
 		SET(STATUS_PULSEAUDIO "OK")
 	ELSE(PULSEAUDIO_FOUND)
-		SET(STATUS_PULSEAUDIO "not found, please install libpulse-dev (or similiar) "
+		SET(STATUS_PULSEAUDIO "not found, please install libpulse-dev (or similar) "
 			"if you require PulseAudio support")
 	ENDIF(PULSEAUDIO_FOUND)
 ENDIF(WANT_PULSEAUDIO)
@@ -228,7 +228,7 @@ IF(WANT_OGGVORBIS)
 		SET(LMMS_HAVE_OGGVORBIS TRUE)
 		SET(STATUS_OGGVORBIS "OK")
 	ELSE(OGGVORBIS_FOUND)
-		SET(STATUS_OGGVORBIS "not found, libogg-dev and libvorbis-dev (or similiar) "
+		SET(STATUS_OGGVORBIS "not found, libogg-dev and libvorbis-dev (or similar) "
 			"is highly recommended")
 	ENDIF(OGGVORBIS_FOUND)
 ENDIF(WANT_OGGVORBIS)
@@ -250,7 +250,7 @@ IF(WANT_ALSA)
 		SET(LMMS_HAVE_ALSA TRUE)
 		SET(STATUS_ALSA "OK")
 	ELSE(ALSA_FOUND)
-		SET(STATUS_ALSA "not found, please install libasound2-dev (or similiar) "
+		SET(STATUS_ALSA "not found, please install libasound2-dev (or similar) "
 			"if you require ALSA support")
 	ENDIF(ALSA_FOUND)
 ENDIF(WANT_ALSA)
@@ -266,7 +266,7 @@ IF(WANT_JACK)
 		SET(LMMS_HAVE_JACK TRUE)
 		SET(STATUS_JACK "OK")
 	ELSE(JACK_FOUND)
-		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similiar) "
+		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 			"if you require JACK support")
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
@@ -283,7 +283,7 @@ IF(WANT_SF2)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		SET(STATUS_FLUIDSYNTH "OK")
 	ELSE(FLUIDSYNTH_FOUND)
-		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similiar)"
+		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
 	ENDIF(FLUIDSYNTH_FOUND)
 ENDIF(WANT_SF2)
@@ -300,7 +300,7 @@ IF(WANT_VST)
 		SET(LMMS_SUPPORT_VST TRUE)
 		SET(STATUS_VST "OK")
 	ELSE(WINE_FOUND)
-		SET(STATUS_VST "not found, please install (lib)wine-dev (or similiar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
+		SET(STATUS_VST "not found, please install (lib)wine-dev (or similar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
 	ENDIF(WINE_FOUND)
 ENDIF(WANT_VST)
 IF(LMMS_BUILD_WIN32)

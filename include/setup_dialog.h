@@ -110,6 +110,7 @@ private slots:
 	void toggleAnimateAFP( bool _enabled );
 	void toggleNoteLabels( bool en );
 	void toggleDisplayWaveform( bool en );
+	void toggleDisableAutoquit( bool en );
 
 
 private:

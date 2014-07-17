@@ -88,8 +88,8 @@ public:
 	virtual void play( sampleFrame* buffer ) = 0;
 	virtual bool isFinished( void ) const = 0;
 
-	// returns how many frames this play-handle is aligned ahead, i.e.
-	// at which position it is inserted in the according buffer
+	// returns the frameoffset at the start of the playhandle,
+	// ie. how many empty frames should be inserted at the start of the first period
 	f_cnt_t offset() const
 	{
 		return m_offset;

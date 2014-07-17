@@ -1245,21 +1245,22 @@ MonstroInstrument::~MonstroInstrument()
 void MonstroInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
+
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		const sample_rate_t samplerate = m_samplerate;
 		_n->m_pluginData = new MonstroSynth( this, _n, samplerate, m_fpp );
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-
 	MonstroSynth * ms = static_cast<MonstroSynth *>( _n->m_pluginData );
 
-	ms->renderOutput( frames, _working_buffer );
+	ms->renderOutput( frames, _working_buffer + offset );
 
 	//applyRelease( _working_buffer, _n ); // we have our own release
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 void MonstroInstrument::deleteNotePluginData( NotePlayHandle * _n )

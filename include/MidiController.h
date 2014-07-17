@@ -67,13 +67,14 @@ public slots:
 
 protected:
 	// The internal per-controller get-value function
-	virtual float value( int _offset );
+	virtual void updateValueBuffer();
 
 
 	MidiPort m_midiPort;
 
 
 	float m_lastValue;
+	float m_previousValue;
 
 	friend class ControllerConnectionDialog;
 	friend class AutoDetectMidiController;

@@ -79,7 +79,7 @@ public:
 
 	inline bool rubberBandActive() const
 	{
-		return( m_rubberBand->isVisible() );
+		return( m_rubberBand->isEnabled() && m_rubberBand->isVisible() );
 	}
 
 	inline QVector<selectableObject *> selectedObjects()

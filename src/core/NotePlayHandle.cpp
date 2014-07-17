@@ -29,6 +29,7 @@
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "MidiEvent.h"
 #include "MidiPort.h"
 #include "song.h"
@@ -61,7 +62,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
-	m_scheduledNoteOff( -1 ),
 	m_released( false ),
 	m_hasParent( parent != NULL  ),
 	m_hadChildren( false ),
@@ -119,13 +119,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 NotePlayHandle::~NotePlayHandle()
 {
 	noteOff( 0 );
-	if( m_scheduledNoteOff >= 0 ) // ensure that scheduled noteoffs get triggered if somehow the nph got destructed prematurely
-	{
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-			MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
-			m_scheduledNoteOff );
-	}
 	
 	if( hasParent() == false )
 	{
@@ -190,32 +183,31 @@ int NotePlayHandle::midiKey() const
 
 void NotePlayHandle::play( sampleFrame * _working_buffer )
 {
-	if( m_scheduledNoteOff >= 0 ) // always trigger scheduled noteoffs, because they're only scheduled if the note is released
-	{
-		if( m_scheduledNoteOff < engine::mixer()->framesPerPeriod() )
-		{
-			m_instrumentTrack->processOutEvent(
-				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-				MidiTime::fromFrames( m_scheduledNoteOff, engine::framesPerTick() ), 
-				m_scheduledNoteOff );
-			m_scheduledNoteOff = -1;
-		}
-		else
-		{
-			m_scheduledNoteOff -= engine::mixer()->framesPerPeriod();
-		}
-	}
-	
 	if( m_muted )
 	{
 		return;
 	}
 
+	// if the note offset falls over to next period, then don't start playback yet
+	if( offset() >= engine::mixer()->framesPerPeriod() )
+	{
+		setOffset( offset() - engine::mixer()->framesPerPeriod() );
+		return;
+	}
+	
+	// number of frames that can be played this period
+	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0 
+		? engine::mixer()->framesPerPeriod() - offset()
+		: engine::mixer()->framesPerPeriod();
+
+	// check if we start release during this period
 	if( m_released == false &&
 		instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() > m_frames )
+		m_totalFramesPlayed + framesThisPeriod > m_frames )
 	{
-		noteOff( m_frames - m_totalFramesPlayed );
+		noteOff( m_totalFramesPlayed == 0
+			? ( m_frames + offset() ) // if we have noteon and noteoff during the same period, take offset in account for release frame
+			: ( m_frames - m_totalFramesPlayed ) ); // otherwise, the offset is already negated and can be ignored
 	}
 
 	// under some circumstances we're called even if there's nothing to play
@@ -223,13 +215,20 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	// decreasing release of an instrument-track while the note is active
 	if( framesLeft() > 0 )
 	{
+		// clear offset frames if we're at the first period
+		// skip for single-streamed instruments, because in their case NPH::play() could be called from an IPH without a buffer argument
+		// ... also, they don't actually render the sound in NPH's, which is an even better reason to skip...
+		if( m_totalFramesPlayed == 0 && ! ( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed ) )
+		{
+			memset( _working_buffer, 0, sizeof( sampleFrame ) * offset() );
+		}
 		// play note!
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
 	if( m_released )
 	{
-		f_cnt_t todo = engine::mixer()->framesPerPeriod();
+		f_cnt_t todo = framesThisPeriod;
 
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
@@ -245,8 +244,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		{
 			// yes, then look whether these samples can be played
 			// within one audio-buffer
-			if( m_framesBeforeRelease <=
-				engine::mixer()->framesPerPeriod() )
+			if( m_framesBeforeRelease <= framesThisPeriod )
 			{
 				// yes, then we did less releaseFramesDone
 				todo -= m_framesBeforeRelease;
@@ -258,8 +256,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 				// and wait for next loop... (we're not in
 				// release-phase yet)
 				todo = 0;
-				m_framesBeforeRelease -=
-				engine::mixer()->framesPerPeriod();
+				m_framesBeforeRelease -= framesThisPeriod;
 			}
 		}
 		// look whether we're in release-phase
@@ -297,7 +294,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// update internal data
-	m_totalFramesPlayed += engine::mixer()->framesPerPeriod();
+	m_totalFramesPlayed += framesThisPeriod;
 }
 
 
@@ -325,6 +322,10 @@ f_cnt_t NotePlayHandle::framesLeft() const
 
 fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
+	if( m_totalFramesPlayed == 0 )
+	{
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(), engine::mixer()->framesPerPeriod() - offset() );
+	}
 	return (fpp_t) qMin<f_cnt_t>( framesLeft(), engine::mixer()->framesPerPeriod() );
 }
 
@@ -359,18 +360,10 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
 	{
 		// send MidiNoteOff event
-		f_cnt_t realOffset = offset() + _s; // get actual frameoffset of release, in global time
-		if( realOffset < engine::mixer()->framesPerPeriod() ) // if release happens during this period, trigger midievent
-		{
-			m_instrumentTrack->processOutEvent(
+		m_instrumentTrack->processOutEvent(
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-				MidiTime::fromFrames( realOffset, engine::framesPerTick() ), 
-				realOffset );
-		}
-		else // if release flows over to next period, use m_scheduledNoteOff to trigger it later
-		{
-			m_scheduledNoteOff = realOffset - engine::mixer()->framesPerPeriod();
-		}
+				MidiTime::fromFrames( _s, engine::framesPerTick() ), 
+				_s );
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)

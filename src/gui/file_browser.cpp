@@ -615,12 +615,12 @@ void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
 	}
 	else if( f->handling() != fileItem::NotSupported )
 	{
-		engine::mixer()->lock();
+//		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 					engine::getBBTrackContainer() ) );
 		handleFile( f, it );
-		engine::mixer()->unlock();
+//		engine::mixer()->unlock();
 	}
 }
 
@@ -632,11 +632,11 @@ void fileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 	if( m_contextMenuItem->handling() == fileItem::LoadAsPreset ||
 		m_contextMenuItem->handling() == fileItem::LoadByPlugin )
 	{
-		engine::mixer()->lock();
+//		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack, tc ) );
 		handleFile( m_contextMenuItem, it );
-		engine::mixer()->unlock();
+//		engine::mixer()->unlock();
 	}
 }
 

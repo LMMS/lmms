@@ -158,20 +158,40 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Wenn Sie diese Option aktivieren, wird das Sample über verschiedene Noten weitergespielt. Wenn Sie die Tonhöhe ändern oder die Note endet, bevor das Ende des Samples erreicht ist, dann fängt die nächste Note da an, wo aufgehört wurde. Um die Wiedergabe an den Anfang des Samples zurückzusetzen, fügen Sie eine Note am unteren Ende des Keyboards ein (&lt; 20Hz)</translation>
     </message>
     <message>
-        <source>Loop sample at start- and end-point</source>
-        <translation>Sample am Start- und Endpunkt wiederholen</translation>
+        <source>Disable loop</source>
+        <translation>Wiederholung deaktivieren</translation>
     </message>
     <message>
-        <source>Here you can set, whether looping-mode is enabled. If enabled, AudioFileProcessor loops between start and end-points of a sample until the whole note is played. This is useful for things like string and choir samples.</source>
-        <translation>Hier können Sie festlegen, ob der Wiederholungsmodus aktiviert ist. Wenn aktiviert, wiederholt AudioFileProcessor das Sample, bis die ganze Note gespielt wurde. Dies ist nützlich für Sachen, wie Streicher oder Chor Samples.</translation>
+        <source>This button disables looping. The sample plays only once from start to end. </source>
+        <translation>Dieser Knopf deaktiviert Wiederholung. Das Sample wird nur einmal vom Anfang bis zum Ende wiedergegeben .</translation>
     </message>
     <message>
-        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable looping-mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation>Mit diesem Knopf können Sie den Punkt festlegen, an dem AudioFileProcessor anfangen soll Ihr Sample abzuspielen. Wenn Sie den Wiederholungsmodus aktivieren, ist dies der Punkt, an dem AudioFileProcessor wieder anfängt zu spielen, wenn eine Note länger ist, als das Sample zwischen den Start- und Endpunkten.</translation>
+        <source>Enable loop</source>
+        <translation>Wiederholung aktivieren</translation>
     </message>
     <message>
-        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable looping-mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation>Mit diesem Knopf können Sie den Punkt festlegen, an dem AudioFileProcessor aufhören soll Ihr Sample abzuspielen. Wenn Sie den Wiederholungsmodus aktivieren, ist dies der Punkt, an dem AudioFileProcessor wieder von vorne anfängt zu spielen, wenn eine Note länger ist, als das Sample zwischen den Start- und Endpunkten.</translation>
+        <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
+        <translation>Dieser Knopf aktiviert Vorwärts-Wiederholung. Das Sample wird zwischen dem Endpunkt und dem Loop-Punkt wiederholt.</translation>
+    </message>
+    <message>
+        <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
+        <translation>Dieser Knopf aktiviert Ping-Pong-Wiederholung. Das Sample wird zwischen dem Endpunkt und dem Loop-Punkt rückwärts und vorwärts wiederholt.</translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
+        <translation>Mit diesem Knopf können Sie festlegen, wo AudioFileProcessor anfangen soll, Ihr Sample zu spielen. </translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
+        <translation>Mit diesem Knopf können Sie festlegen, wo AudioFileProcessor aufhören soll, Ihr Sample zu spielen. </translation>
+    </message>
+    <message>
+        <source>Loopback point:</source>
+        <translation>Wiederholungspunkt:</translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where the loop starts. </source>
+        <translation>Mit diesem Knopf können Sie festlegen, wo die Wiederholung beginnt.</translation>
     </message>
 </context>
 <context>
@@ -449,6 +469,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>&quot;%1&quot; trennen</translation>
+    </message>
+    <message>
+        <source>Set/clear record</source>
+        <translation>Aufnahme setzen/löschen</translation>
     </message>
 </context>
 <context>
@@ -1114,6 +1138,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation>Ziehen Sie ein Sample von irgendwo und lassen es in diesem Fenster fallen.</translation>
     </message>
+    <message>
+        <source>Click here for random wave.</source>
+        <translation>Klick für eine zufällige Welle.</translation>
+    </message>
 </context>
 <context>
     <name>ExportProjectDialog</name>
@@ -1253,13 +1281,48 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>Export as loop (remove end silence)</source>
         <translation>Als Schleife exportieren (Stille am Ende entfernen)</translation>
     </message>
+</context>
+<context>
+    <name>FxLine</name>
     <message>
-        <source>Sample-exact controllers</source>
-        <translation>Sample-exakte Regler</translation>
+        <source>Channel send amount</source>
+        <translation>Kanal Sendemenge</translation>
     </message>
     <message>
-        <source>Alias-free oscillators</source>
-        <translation>Unterschiedsfreie Oszillatoren</translation>
+        <source>The FX channel receives input from one or more instrument tracks.
+ It in turn can be routed to multiple other FX channels. LMMS automatically takes care of preventing infinite loops for you and doesn&apos;t allow making a connection that would result in an infinite loop.
+
+In order to route the channel to another channel, select the FX channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
+
+You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
+</source>
+        <translation>Der FX Kanal erhält von ein oder mehr Instrumentenspuren Eingabesignale.
+ Er kann wiederum durch mehrere andere FX Kanäle gesendet werden. LMMS verhindert Endlosschleifen automatisch für Sie und erlaubt es nicht eine Verbindung zu erstellen, die in einer Endlosschleife resultiert.
+
+Um den Kanal an einen anderen Kanal zu senden, wählen Sie den FX Kanal aus und klicken Sie auf den »Senden« Knopf in dem Kananl, an den Sie den Kanal senden möchten. Der Knopf unter dem Sendeknopf kontrolliert die Stärke des gesendeten Signals.
+
+Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch einen Rechtsklick auf dem FX Kanal aufgerufen wird.
+</translation>
+    </message>
+    <message>
+        <source>Move &amp;left</source>
+        <translation>Nach &amp;links verschieben</translation>
+    </message>
+    <message>
+        <source>Move &amp;right</source>
+        <translation>Nach &amp;rechts verschieben</translation>
+    </message>
+    <message>
+        <source>Rename &amp;channel</source>
+        <translation>&amp;Kanal umbenennen</translation>
+    </message>
+    <message>
+        <source>R&amp;emove channel</source>
+        <translation>Kanal &amp;Entfernen</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
     </message>
 </context>
 <context>
@@ -1271,6 +1334,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     <message>
         <source>FX %1</source>
         <translation>FX %1</translation>
+    </message>
+    <message>
+        <source>Amount to send</source>
+        <translation>Zu sendende Menge</translation>
     </message>
 </context>
 <context>
@@ -1287,6 +1354,9 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>FX-Mixer</source>
         <translation>FX-Mixer</translation>
     </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation>FX Schieber %1</translation>
@@ -1357,6 +1427,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     <message>
         <source>Sync</source>
         <translation>Synchron</translation>
+    </message>
+    <message>
+        <source>Down and up</source>
+        <translation>Hoch und runter</translation>
     </message>
 </context>
 <context>
@@ -1807,6 +1881,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     <message>
         <source>Half-Whole Diminished</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5</source>
+        <translation>5</translation>
     </message>
 </context>
 <context>
@@ -2640,6 +2718,14 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>Version %1</translation>
     </message>
     <message>
+        <source>Undo</source>
+        <translation>Rückgängig</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>Wiederholen</translation>
+    </message>
+    <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
     </message>
@@ -2765,6 +2851,499 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
 </context>
 <context>
+    <name>MonstroInstrument</name>
+    <message>
+        <source>Osc 1 Volume</source>
+        <translation>Oszillator 1 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Osc 1 Panning</source>
+        <translation>Oszillator 1 Balance</translation>
+    </message>
+    <message>
+        <source>Osc 1 Coarse detune</source>
+        <translation>Oszillator 1 Grob-Verstimmung</translation>
+    </message>
+    <message>
+        <source>Osc 1 Fine detune left</source>
+        <translation>Oszillator 1 Fein-Verstimmung links</translation>
+    </message>
+    <message>
+        <source>Osc 1 Fine detune right</source>
+        <translation>Oszillator 1 Fein-Verstimmung rechts</translation>
+    </message>
+    <message>
+        <source>Osc 1 Stereo phase offset</source>
+        <translation>Oszillator 1 Stereo Phasenverschiebung</translation>
+    </message>
+    <message>
+        <source>Osc 1 Pulse width</source>
+        <translation>Oszilator 1 Pulsweite</translation>
+    </message>
+    <message>
+        <source>Osc 1 Sync send on rise</source>
+        <translation>Oszillator 1 Sync beim Steigen senden</translation>
+    </message>
+    <message>
+        <source>Osc 1 Sync send on fall</source>
+        <translation>Oszillator 2 Sync beim Abfallen senden</translation>
+    </message>
+    <message>
+        <source>Osc 2 Volume</source>
+        <translation>Oszillator 2 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Osc 2 Panning</source>
+        <translation>Oszillator 2 Balance</translation>
+    </message>
+    <message>
+        <source>Osc 2 Coarse detune</source>
+        <translation>Oszillator 2 Grob-Verstimmung</translation>
+    </message>
+    <message>
+        <source>Osc 2 Fine detune left</source>
+        <translation>Oszillator 2 Fein-Verstimmung links</translation>
+    </message>
+    <message>
+        <source>Osc 2 Fine detune right</source>
+        <translation>Oszillator 2 Fein-Verstimmung rechts</translation>
+    </message>
+    <message>
+        <source>Osc 2 Stereo phase offset</source>
+        <translation>Oszillator 2 Stereo Phasenverschiebung</translation>
+    </message>
+    <message>
+        <source>Osc 2 Waveform</source>
+        <translation>Oszillator 2 Wellenform</translation>
+    </message>
+    <message>
+        <source>Osc 2 Sync Hard</source>
+        <translation>Oszillator 2 hart synchronisieren</translation>
+    </message>
+    <message>
+        <source>Osc 2 Sync Reverse</source>
+        <translation>Oszillator 2 rückwärts synchronisieren</translation>
+    </message>
+    <message>
+        <source>Osc 3 Volume</source>
+        <translation>Oszillator 3 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Osc 3 Panning</source>
+        <translation>Oszillator 3 Balance</translation>
+    </message>
+    <message>
+        <source>Osc 3 Coarse detune</source>
+        <translation>Oszillator 3 Grob-Verstimmung</translation>
+    </message>
+    <message>
+        <source>Osc 3 Stereo phase offset</source>
+        <translation>Oszillator 3 Stereo Phasenverschiebung</translation>
+    </message>
+    <message>
+        <source>Osc 3 Sub-oscillator mix</source>
+        <translation>Oszillator 3 Unter-Oszillator Mischung</translation>
+    </message>
+    <message>
+        <source>Osc 3 Waveform 1</source>
+        <translation>Oszillator 3 Wellenform 1</translation>
+    </message>
+    <message>
+        <source>Osc 3 Waveform 2</source>
+        <translation>Oszillator 3 Wellenform 2</translation>
+    </message>
+    <message>
+        <source>Osc 3 Sync Hard</source>
+        <translation>Oszillator 2 hart synchronisieren</translation>
+    </message>
+    <message>
+        <source>Osc 3 Sync Reverse</source>
+        <translation>Oszillator 2 rückwärts synchronisieren</translation>
+    </message>
+    <message>
+        <source>LFO 1 Waveform</source>
+        <translation>LFO 1 Wellenform</translation>
+    </message>
+    <message>
+        <source>LFO 1 Attack</source>
+        <translation>LFO 1 Anschwellzeit</translation>
+    </message>
+    <message>
+        <source>LFO 1 Rate</source>
+        <translation>LFO 1 Rate</translation>
+    </message>
+    <message>
+        <source>LFO 1 Phase</source>
+        <translation>LFO 1 Phase</translation>
+    </message>
+    <message>
+        <source>LFO 2 Waveform</source>
+        <translation>LFO 2 Wellenform</translation>
+    </message>
+    <message>
+        <source>LFO 2 Attack</source>
+        <translation>LFO 2 Anschwellzeit</translation>
+    </message>
+    <message>
+        <source>LFO 2 Rate</source>
+        <translation>LFO 2 Rate</translation>
+    </message>
+    <message>
+        <source>LFO 2 Phase</source>
+        <translation>Hüllkurve 2 Phase</translation>
+    </message>
+    <message>
+        <source>Env 1 Pre-delay</source>
+        <translation>Hüllkurve 1 Verzögerung</translation>
+    </message>
+    <message>
+        <source>Env 1 Attack</source>
+        <translation>Hüllkurve 1 Anschwellzeit</translation>
+    </message>
+    <message>
+        <source>Env 1 Hold</source>
+        <translation>Hüllkurve 1 Haltezeit</translation>
+    </message>
+    <message>
+        <source>Env 1 Decay</source>
+        <translation>Hüllkurve 1 Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Env 1 Sustain</source>
+        <translation>Hüllkurve 1 Dauerpegel</translation>
+    </message>
+    <message>
+        <source>Env 1 Release</source>
+        <translation>Hüllkurve 1 Ausklingzeit</translation>
+    </message>
+    <message>
+        <source>Env 1 Slope</source>
+        <translation>Hüllkurve 1 Neigung</translation>
+    </message>
+    <message>
+        <source>Env 2 Pre-delay</source>
+        <translation>Hüllkurve 2 Verzögerung</translation>
+    </message>
+    <message>
+        <source>Env 2 Attack</source>
+        <translation>Hüllkurve 2 Anschwellzeit</translation>
+    </message>
+    <message>
+        <source>Env 2 Hold</source>
+        <translation>Hüllkurve 2 Haltezeit</translation>
+    </message>
+    <message>
+        <source>Env 2 Decay</source>
+        <translation>Hüllkurve 2 Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Env 2 Sustain</source>
+        <translation>Hüllkurve 2 Dauerpegel</translation>
+    </message>
+    <message>
+        <source>Env 2 Release</source>
+        <translation>Hüllkurve 2 Ausklingzeit</translation>
+    </message>
+    <message>
+        <source>Env 2 Slope</source>
+        <translation>Hüllkurve 2 Neigung</translation>
+    </message>
+    <message>
+        <source>Osc2-3 modulation</source>
+        <translation>Oszillator2-3 Modulation</translation>
+    </message>
+    <message>
+        <source>Selected view</source>
+        <translation>Ausgewählte Ansicht</translation>
+    </message>
+    <message>
+        <source>Vol1-Env1</source>
+        <translation>Vol1-Env1</translation>
+    </message>
+    <message>
+        <source>Vol1-Env2</source>
+        <translation>Vol1-Env2</translation>
+    </message>
+    <message>
+        <source>Vol1-LFO1</source>
+        <translation>Vol1-LFO1</translation>
+    </message>
+    <message>
+        <source>Vol1-LFO2</source>
+        <translation>Vol1-LFO2</translation>
+    </message>
+    <message>
+        <source>Vol2-Env1</source>
+        <translation>Vol2-Env1</translation>
+    </message>
+    <message>
+        <source>Vol2-Env2</source>
+        <translation>Vol2-Env2</translation>
+    </message>
+    <message>
+        <source>Vol2-LFO1</source>
+        <translation>Vol2-LFO1</translation>
+    </message>
+    <message>
+        <source>Vol2-LFO2</source>
+        <translation>Vol2-LFO2</translation>
+    </message>
+    <message>
+        <source>Vol3-Env1</source>
+        <translation>Vol3-Env1</translation>
+    </message>
+    <message>
+        <source>Vol3-Env2</source>
+        <translation>Vol3-Env2</translation>
+    </message>
+    <message>
+        <source>Vol3-LFO1</source>
+        <translation>Vol3-LFO1</translation>
+    </message>
+    <message>
+        <source>Vol3-LFO2</source>
+        <translation>Vol3-LFO2</translation>
+    </message>
+    <message>
+        <source>Phs1-Env1</source>
+        <translation>Phs1-Env1</translation>
+    </message>
+    <message>
+        <source>Phs1-Env2</source>
+        <translation>Phs1-Env2</translation>
+    </message>
+    <message>
+        <source>Phs1-LFO1</source>
+        <translation>Phs1-LFO1</translation>
+    </message>
+    <message>
+        <source>Phs1-LFO2</source>
+        <translation>Phs1-LFO2</translation>
+    </message>
+    <message>
+        <source>Phs2-Env1</source>
+        <translation>Phs2-Env1</translation>
+    </message>
+    <message>
+        <source>Phs2-Env2</source>
+        <translation>Phs2-Env2</translation>
+    </message>
+    <message>
+        <source>Phs2-LFO1</source>
+        <translation>Phs2-LFO1</translation>
+    </message>
+    <message>
+        <source>Phs2-LFO2</source>
+        <translation>Phs2-LFO2</translation>
+    </message>
+    <message>
+        <source>Phs3-Env1</source>
+        <translation>Phs3-Env1</translation>
+    </message>
+    <message>
+        <source>Phs3-Env2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Phs3-LFO1</source>
+        <translation>Phs3-LFO1</translation>
+    </message>
+    <message>
+        <source>Phs3-LFO2</source>
+        <translation>Phs3-LFO2</translation>
+    </message>
+    <message>
+        <source>Pit1-Env1</source>
+        <translation>Pit1-Env1</translation>
+    </message>
+    <message>
+        <source>Pit1-Env2</source>
+        <translation>Pit1-Env2</translation>
+    </message>
+    <message>
+        <source>Pit1-LFO1</source>
+        <translation>Pit1-LFO1</translation>
+    </message>
+    <message>
+        <source>Pit1-LFO2</source>
+        <translation>Pit1-LFO2</translation>
+    </message>
+    <message>
+        <source>Pit2-Env1</source>
+        <translation>Pit2-Env1</translation>
+    </message>
+    <message>
+        <source>Pit2-Env2</source>
+        <translation>Pit2-Env2</translation>
+    </message>
+    <message>
+        <source>Pit2-LFO1</source>
+        <translation>Pit2-LFO1</translation>
+    </message>
+    <message>
+        <source>Pit2-LFO2</source>
+        <translation>Pit2-LFO2</translation>
+    </message>
+    <message>
+        <source>Pit3-Env1</source>
+        <translation>Pit3-Env1</translation>
+    </message>
+    <message>
+        <source>Pit3-Env2</source>
+        <translation>Pit3-Env2</translation>
+    </message>
+    <message>
+        <source>Pit3-LFO1</source>
+        <translation>Pit3-LFO1</translation>
+    </message>
+    <message>
+        <source>Pit3-LFO2</source>
+        <translation>Pit3-LFO2</translation>
+    </message>
+    <message>
+        <source>PW1-Env1</source>
+        <translation>PW1-Env1</translation>
+    </message>
+    <message>
+        <source>PW1-Env2</source>
+        <translation>PW1-Env2</translation>
+    </message>
+    <message>
+        <source>PW1-LFO1</source>
+        <translation>PW1-LFO1</translation>
+    </message>
+    <message>
+        <source>PW1-LFO2</source>
+        <translation>PW1-LFO2</translation>
+    </message>
+    <message>
+        <source>Sub3-Env1</source>
+        <translation>Sub3-Env1</translation>
+    </message>
+    <message>
+        <source>Sub3-Env2</source>
+        <translation>Sub3-Env2</translation>
+    </message>
+    <message>
+        <source>Sub3-LFO1</source>
+        <translation>Sub3-LFO1</translation>
+    </message>
+    <message>
+        <source>Sub3-LFO2</source>
+        <translation>Sub3-LFO2</translation>
+    </message>
+</context>
+<context>
+    <name>MonstroView</name>
+    <message>
+        <source>Operators view</source>
+        <translation>Operator-Ansicht</translation>
+    </message>
+    <message>
+        <source>Matrix view</source>
+        <translation>Matrix-Ansicht</translation>
+    </message>
+    <message>
+        <source>Mix Osc2 with Osc3</source>
+        <translation>Oszillator 2 mit Oszillator 3 Mischen</translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of Osc3 with Osc2</source>
+        <translation>Amplitude von Oszillator 3 mit Oszillator 2 modulieren</translation>
+    </message>
+    <message>
+        <source>Modulate frequency of Osc3 with Osc2</source>
+        <translation>Frequenz von Oszillator 3 mit Oszillator 2 modulieren</translation>
+    </message>
+    <message>
+        <source>Modulate phase of Osc3 with Osc2</source>
+        <translation>Phase von Oszillator 3 mit Oszillator 2 modulieren</translation>
+    </message>
+</context>
+<context>
+    <name>NesInstrument</name>
+    <message>
+        <source>Channel 1 Coarse detune</source>
+        <translation>Kanal 1 Grob-Verstimmung</translation>
+    </message>
+    <message>
+        <source>Channel 1 Volume</source>
+        <translation>Kanal 1 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Channel 1 Envelope length</source>
+        <translation>Kanal 1 Hüllkurvenlänge</translation>
+    </message>
+    <message>
+        <source>Channel 1 Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Sweep amount</source>
+        <translation>Kanal 1 Streichmenge</translation>
+    </message>
+    <message>
+        <source>Channel 1 Sweep rate</source>
+        <translation>Kanal 1 Streichrate</translation>
+    </message>
+    <message>
+        <source>Channel 2 Coarse detune</source>
+        <translation>Kanal 2 Grob-Verstimmung</translation>
+    </message>
+    <message>
+        <source>Channel 2 Volume</source>
+        <translation>Kanal 2 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Channel 2 Envelope length</source>
+        <translation>Kanal 2 Hüllkurvenlänge</translation>
+    </message>
+    <message>
+        <source>Channel 2 Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Sweep amount</source>
+        <translation>Kanal 2 Streichmenge</translation>
+    </message>
+    <message>
+        <source>Channel 2 Sweep rate</source>
+        <translation>Kanal 2 Streichrate</translation>
+    </message>
+    <message>
+        <source>Channel 3 Coarse detune</source>
+        <translation>Kanal 3 Grob-Verstimmung</translation>
+    </message>
+    <message>
+        <source>Channel 3 Volume</source>
+        <translation>Kanal 3 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Channel 4 Volume</source>
+        <translation>Kanal 4 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Channel 4 Envelope length</source>
+        <translation>Kanal 4 Hüllkurvenlänge</translation>
+    </message>
+    <message>
+        <source>Channel 4 Noise frequency</source>
+        <translation>Kanal 4 Rauschfrequenz</translation>
+    </message>
+    <message>
+        <source>Channel 4 Noise frequency sweep</source>
+        <translation>Kanal 4 Rauschfrequenz-Streichen</translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation>Master-Lautstärke</translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
+        <translation>Vibrato</translation>
+    </message>
+</context>
+<context>
     <name>OscillatorObject</name>
     <message>
         <source>Osc %1 volume</source>
@@ -2805,6 +3384,10 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>Osc %1 waveform</source>
         <translation>Oszillator %1 Wellenform</translation>
+    </message>
+    <message>
+        <source>Osc %1 harmonic</source>
+        <translation>Oszillator %1 Harmonie</translation>
     </message>
 </context>
 <context>
@@ -3095,6 +3678,26 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>No chord</source>
         <translation>Kein Akkord</translation>
+    </message>
+    <message>
+        <source>Volume: %1%</source>
+        <translation>Lautstärke: %1%</translation>
+    </message>
+    <message>
+        <source>Panning: %1% left</source>
+        <translation>Balance: %1% links</translation>
+    </message>
+    <message>
+        <source>Panning: %1% right</source>
+        <translation>Balance: %1% rechts</translation>
+    </message>
+    <message>
+        <source>Panning: center</source>
+        <translation>Balance: mittig</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
     </message>
 </context>
 <context>
@@ -4025,6 +4628,256 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
 </context>
 <context>
+    <name>WatsynInstrument</name>
+    <message>
+        <source>Volume A1</source>
+        <translation>Lautstärke A1</translation>
+    </message>
+    <message>
+        <source>Volume A2</source>
+        <translation>Lautstärke A2</translation>
+    </message>
+    <message>
+        <source>Volume B1</source>
+        <translation>Lautstärke B1</translation>
+    </message>
+    <message>
+        <source>Volume B2</source>
+        <translation>Lautstärke B2</translation>
+    </message>
+    <message>
+        <source>Panning A1</source>
+        <translation>Balance A1</translation>
+    </message>
+    <message>
+        <source>Panning A2</source>
+        <translation>Balance A2</translation>
+    </message>
+    <message>
+        <source>Panning B1</source>
+        <translation>Balance B1</translation>
+    </message>
+    <message>
+        <source>Panning B2</source>
+        <translation>Balance B2</translation>
+    </message>
+    <message>
+        <source>Freq. multiplier A1</source>
+        <translation>Frequenzmultiplikator-A1</translation>
+    </message>
+    <message>
+        <source>Freq. multiplier A2</source>
+        <translation>Frequenzmultiplikator-A2</translation>
+    </message>
+    <message>
+        <source>Freq. multiplier B1</source>
+        <translation>Frequenzmultiplikator-B1</translation>
+    </message>
+    <message>
+        <source>Freq. multiplier B2</source>
+        <translation>Frequenzmultiplikator-B2</translation>
+    </message>
+    <message>
+        <source>Left detune A1</source>
+        <translation>Links-Verstimmung A1</translation>
+    </message>
+    <message>
+        <source>Left detune A2</source>
+        <translation>Links-Verstimmung A2</translation>
+    </message>
+    <message>
+        <source>Left detune B1</source>
+        <translation>Links-Verstimmung B1</translation>
+    </message>
+    <message>
+        <source>Left detune B2</source>
+        <translation>Links-Verstimmung B2</translation>
+    </message>
+    <message>
+        <source>Right detune A1</source>
+        <translation>Rechts-Verstimmung A1</translation>
+    </message>
+    <message>
+        <source>Right detune A2</source>
+        <translation>Rechts-Verstimmung A2</translation>
+    </message>
+    <message>
+        <source>Right detune B1</source>
+        <translation>Rechts-Verstimmung B1</translation>
+    </message>
+    <message>
+        <source>Right detune B2</source>
+        <translation>Rechts-Verstimmung B2</translation>
+    </message>
+    <message>
+        <source>A-B Mix</source>
+        <translation>A-B Mischung</translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope amount</source>
+        <translation>A-B Mischung Hüllkurvenintensität</translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope attack</source>
+        <translation>A-B Mischung Hüllkurvenanschwellzeit</translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope hold</source>
+        <translation>A-B Mischung Hüllkurvenhaltezeit</translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope decay</source>
+        <translation>A-B Mischung Hüllkurvenabfallzeit</translation>
+    </message>
+    <message>
+        <source>A1-B2 Crosstalk</source>
+        <translation>A1-B2 Überlagerung</translation>
+    </message>
+    <message>
+        <source>A2-A1 modulation</source>
+        <translation>A2-A1 Modulation</translation>
+    </message>
+    <message>
+        <source>B2-B1 modulation</source>
+        <translation>B2-B1 Modulation</translation>
+    </message>
+    <message>
+        <source>Selected graph</source>
+        <translation>Ausgewählter Graph</translation>
+    </message>
+</context>
+<context>
+    <name>WatsynView</name>
+    <message>
+        <source>Select oscillator A1</source>
+        <translation>Oszilator A1 auswählen</translation>
+    </message>
+    <message>
+        <source>Select oscillator A2</source>
+        <translation>Oszilator A2 auswählen</translation>
+    </message>
+    <message>
+        <source>Select oscillator B1</source>
+        <translation>Oszilator B1 auswählen</translation>
+    </message>
+    <message>
+        <source>Select oscillator B2</source>
+        <translation>Oszilator B2 auswählen</translation>
+    </message>
+    <message>
+        <source>Mix output of A2 to A1</source>
+        <translation>Mische Ausgang von A2 zu A1</translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of A1 with output of A2</source>
+        <translation>Amplitude von A1 mit der Ausgabe von A2 modulieren</translation>
+    </message>
+    <message>
+        <source>Ring-modulate A1 and A2</source>
+        <translation>A1 und A2 ringmodulieren</translation>
+    </message>
+    <message>
+        <source>Modulate phase of A1 with output of A2</source>
+        <translation>Phase von A1 mit der Ausgabe von A2 modulieren</translation>
+    </message>
+    <message>
+        <source>Mix output of B2 to B1</source>
+        <translation>Mische Ausgang von B2 zu B1</translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of B1 with output of B2</source>
+        <translation>Amplitude von B1 mit der Ausgabe von B2 modulieren</translation>
+    </message>
+    <message>
+        <source>Ring-modulate B1 and B2</source>
+        <translation>B1 und B2 ringmodulieren</translation>
+    </message>
+    <message>
+        <source>Modulate phase of B1 with output of B2</source>
+        <translation>Phase von B1 mit der Ausgabe von B2 modulieren</translation>
+    </message>
+    <message>
+        <source>Draw your own waveform here by dragging your mouse on this graph.</source>
+        <translation>Zeichnen Sie heier eigene Wellenformen, indem Sie die Maus über den Graph ziehen.</translation>
+    </message>
+    <message>
+        <source>Load waveform</source>
+        <translation>Wellenform laden</translation>
+    </message>
+    <message>
+        <source>Click to load a waveform from a sample file</source>
+        <translation>Klicken Sie hier, um eine Wellenform aus einer Sampledatei zu laden</translation>
+    </message>
+    <message>
+        <source>Phase left</source>
+        <translation>Nach links verschieben</translation>
+    </message>
+    <message>
+        <source>Click to shift phase by -15 degrees</source>
+        <translation>Klicken Sie hier, um die Phase um -15 Grad zu verscheiben</translation>
+    </message>
+    <message>
+        <source>Phase right</source>
+        <translation>Nach rechts verschieben</translation>
+    </message>
+    <message>
+        <source>Click to shift phase by +15 degrees</source>
+        <translation>Klicken Sie hier, um die Phase um +15 Grad zu verscheiben</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Normalisieren</translation>
+    </message>
+    <message>
+        <source>Click to normalize</source>
+        <translation>Klicken zum Normalisieren</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation>Invertieren</translation>
+    </message>
+    <message>
+        <source>Click to invert</source>
+        <translation>Klicken zum Invertieren</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Glätten</translation>
+    </message>
+    <message>
+        <source>Click to smooth</source>
+        <translation>Klicken zum Glätten</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinus-Welle</translation>
+    </message>
+    <message>
+        <source>Click for sine wave</source>
+        <translation>Klicken für Sinus-Welle</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Dreiecks-Welle</translation>
+    </message>
+    <message>
+        <source>Click for triangle wave</source>
+        <translation>Klicken für Dreieckswelle</translation>
+    </message>
+    <message>
+        <source>Click for saw wave</source>
+        <translation>Klicken für Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Rechtecks-Welle</translation>
+    </message>
+    <message>
+        <source>Click for square wave</source>
+        <translation>Klicken für Rechtecks-Welle</translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxInstrument</name>
     <message>
         <source>Portamento</source>
@@ -4153,8 +5006,28 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
         <translation>Stottern</translation>
     </message>
     <message>
-        <source>Loop</source>
-        <translation>Wiederholen</translation>
+        <source>Loopback point</source>
+        <translation>Wiederholungspunkt</translation>
+    </message>
+    <message>
+        <source>Loop mode</source>
+        <translation>Wiederholungsmodus</translation>
+    </message>
+    <message>
+        <source>Interpolation mode</source>
+        <translation>Interpolationsmodus</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Keiner</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>Linear</translation>
+    </message>
+    <message>
+        <source>Sinc</source>
+        <translation>Sinc</translation>
     </message>
 </context>
 <context>
@@ -4514,12 +5387,40 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
         <translation>Gain</translation>
     </message>
     <message>
-        <source>Decay</source>
-        <translation>Abfallzeit</translation>
+        <source>Length</source>
+        <translation>Länge</translation>
     </message>
     <message>
-        <source>Distortion</source>
-        <translation>Verzerrung</translation>
+        <source>Distortion Start</source>
+        <translation>Verzerrungsanfang</translation>
+    </message>
+    <message>
+        <source>Distortion End</source>
+        <translation>Verzerrungsende</translation>
+    </message>
+    <message>
+        <source>Envelope Slope</source>
+        <translation>Hüllkurvenneigung</translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation>Rauschen</translation>
+    </message>
+    <message>
+        <source>Click</source>
+        <translation>Klick</translation>
+    </message>
+    <message>
+        <source>Frequency Slope</source>
+        <translation>Frequenzabfall</translation>
+    </message>
+    <message>
+        <source>Start from note</source>
+        <translation>Starte bei Note</translation>
+    </message>
+    <message>
+        <source>End to note</source>
+        <translation>Ende bei Note</translation>
     </message>
 </context>
 <context>
@@ -4537,12 +5438,32 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
         <translation>Gain:</translation>
     </message>
     <message>
-        <source>Decay:</source>
-        <translation>Abfallzeit:</translation>
+        <source>Frequency Slope:</source>
+        <translation>Frequenzabfall:</translation>
     </message>
     <message>
-        <source>Distortion:</source>
-        <translation>Verzerrung:</translation>
+        <source>Envelope Length:</source>
+        <translation>Hüllkurvenlänge:</translation>
+    </message>
+    <message>
+        <source>Envelope Slope:</source>
+        <translation>Hüllkurvenneigung:</translation>
+    </message>
+    <message>
+        <source>Click:</source>
+        <translation>Klick:</translation>
+    </message>
+    <message>
+        <source>Noise:</source>
+        <translation>Rauschen:</translation>
+    </message>
+    <message>
+        <source>Distortion Start:</source>
+        <translation>Verzerrungsanfang:</translation>
+    </message>
+    <message>
+        <source>Distortion End:</source>
+        <translation>Verzerrungsende:</translation>
     </message>
 </context>
 <context>
@@ -5429,8 +6350,24 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
         <translation>Lautstärke:</translation>
     </message>
     <message>
-        <source>Osc %1 fine detuning left:</source>
-        <translation>Oszillator %1 Fein-Verstimmung links:</translation>
+        <source>The distortion knob adds distortion to the output of the instrument. </source>
+        <translation>Der Verzerrungsregler fügt Verzerrung zur Ausgabe des Instruments hinzu.</translation>
+    </message>
+    <message>
+        <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
+        <translation>Der Lautstärkeknopf kontrolliert die Lautstärke des Instruments. Er ist gleich dem Lautstärkeregler des Instrumentenfensters. </translation>
+    </message>
+    <message>
+        <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
+        <translation>Der Zufallsknopf setzt alle Regler auf zufällige Werte, außer den Harmonien, der Hauptlautstärke und den Verzerrungsreglern. </translation>
+    </message>
+    <message>
+        <source>Osc %1 stereo detuning</source>
+        <translation>Oszillator %1 Stereo Verstimmung</translation>
+    </message>
+    <message>
+        <source>Osc %1 harmonic:</source>
+        <translation>Oszillator %1 Harmonie:</translation>
     </message>
 </context>
 <context>
@@ -5849,16 +6786,32 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
         <translation>Graphisches Spektrumanalyzer Plugin</translation>
     </message>
     <message>
+        <source>A NES-like synthesizer</source>
+        <translation>Ein NES ähnlicher Synthesizer</translation>
+    </message>
+    <message>
         <source>Boost your bass the fast and simple way</source>
         <translation>Verstärken Sie Ihren Bass auf schnellen und einfachen Wege</translation>
+    </message>
+    <message>
+        <source>4-oscillator modulatable wavetable synth</source>
+        <translation>4-Oszillator modulierbarer Wellenformtabellen Synth</translation>
     </message>
     <message>
         <source>plugin for waveshaping</source>
         <translation>Plugin für Wellenformen</translation>
     </message>
     <message>
+        <source>Monstrous 3-oscillator synth with modulation matrix</source>
+        <translation>Monströser 3-Oszillator Synth mit Modulationsmatrix</translation>
+    </message>
+    <message>
         <source>plugin for using arbitrary VST effects inside LMMS.</source>
         <translation>Plugin um beliebige VST-Effekte in LMMS zu benutzen.</translation>
+    </message>
+    <message>
+        <source>Versatile drum synthesizer</source>
+        <translation>Vielseitiger Trommel-Synthesizer</translation>
     </message>
     <message>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
@@ -5866,11 +6819,7 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation>Drei mächtige Oszillatoren, die Sie auf mehrere Arten modulieren können</translation>
-    </message>
-    <message>
-        <source>Versatile kick- &amp; bassdrum-synthesizer</source>
-        <translation>Vielseitiger Kick- &amp; Bassdrum-Synthesizer</translation>
+        <translation>Drei mächtige Oszillatoren, die Sie auf mehrere Weisen modulieren können</translation>
     </message>
 </context>
 <context>
@@ -6755,6 +7704,14 @@ Latenz: %2 ms</translation>
     <message>
         <source>Solo</source>
         <translation>Solo</translation>
+    </message>
+    <message>
+        <source>Turn all recording on</source>
+        <translation>Alle Aufnahmen einschalten</translation>
+    </message>
+    <message>
+        <source>Turn all recording off</source>
+        <translation>Alle Aufnahmen ausschalten</translation>
     </message>
 </context>
 <context>
