@@ -1405,6 +1405,14 @@ void trackOperationsWidget::cloneTrack()
 }
 
 
+/*! \brief Clear this track - clears all TCOs from the track */
+void trackOperationsWidget::clearTrack()
+{
+	engine::mixer()->lock();
+	m_trackView->getTrack()->deleteTCOs();
+	engine::mixer()->unlock();
+}
+
 
 
 /*! \brief Remove this track from the track list
@@ -1436,6 +1444,11 @@ void trackOperationsWidget::updateMenu()
 	to_menu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
+						
+	if( ! m_trackView->trackContainerView()->fixedTCOs() )
+	{
+		to_menu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
+	}
 
 	if( dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
@@ -1773,6 +1786,14 @@ void track::removeTCO( trackContentObject * _tco )
 }
 
 
+/*! \brief Remove all TCOs from this track */
+void track::deleteTCOs()
+{
+	while( ! m_trackContentObjects.isEmpty() )
+	{
+		delete m_trackContentObjects.first();
+	}
+}
 
 
 /*! \brief Return the number of trackContentObjects we contain
