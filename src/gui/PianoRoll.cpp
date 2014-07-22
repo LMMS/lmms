@@ -621,7 +621,7 @@ PianoRoll::PianoRoll() :
 	
         m_zoomingComboBox->setWhatsThis( tr( 
 		"This controls the magnification over time. " 
-		"It can be a help to choose a magnification for a specific task. "
+		"It can be useful choose a magnification for a specific task. "
 		"For ordinary editing, the magnification should be fitted to your "
 		"smallest used notes. "
 		"Most will use the default magnification of 100%, "
@@ -644,7 +644,7 @@ PianoRoll::PianoRoll() :
 	) );	
 	
 	m_noteLenComboBox->setWhatsThis( tr(
-		"This let you select the note you place in the score. " 
+		"This lets you select the note you place in the score. " 
 		"In most circumstances the best choice is 'Last Note'." 
 		"The choice 'Last Note' means that LMMS will use the note you last clicked, " 
 		"when you place the next note. " 
@@ -653,7 +653,7 @@ PianoRoll::PianoRoll() :
 	) );			
 	
 	m_scaleComboBox->setWhatsThis( tr(			
-		"This let you select a music scale that LMMS then will annotate. "
+		"This lets you select a music scale that LMMS then will annotate. "
 		"The feature is directly connected to the context-menu "
 		"on the virtual keyboard, to the left. "
 		"First you chose which scale you will use. "
@@ -671,7 +671,7 @@ PianoRoll::PianoRoll() :
 	) );
 	
 	m_chordComboBox->setWhatsThis( tr(
-		"This let you select a standard music chord. " 
+		"This lets you select a standard music chord. " 
 		"All notes that are played simultaneous, are 'chords'," 
 		"but a large number of simultaneous key combinations, has own names, " 
 		"and its own place in music. " 
