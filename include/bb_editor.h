@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _BB_EDITOR_H
-#define _BB_EDITOR_H
+#ifndef BB_EDITOR_H
+#define BB_EDITOR_H
 
 #include "TrackContainerView.h"
 
@@ -45,6 +45,8 @@ public:
 	{
 		return( true );
 	}
+	
+	virtual void dropEvent( QDropEvent * _de );
 
 	void removeBBView( int _bb );
 

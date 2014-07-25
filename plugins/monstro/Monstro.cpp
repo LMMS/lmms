@@ -1676,7 +1676,7 @@ MonstroView::MonstroView( Instrument * _instrument,
 	toolTip::add( m_opViewButton, tr( "Operators view" ) );
 	m_opViewButton -> setWhatsThis( tr( "The Operators view contains all the operators. These include both audible "
 										"operators (oscillators) and inaudible operators, or modulators: "
-										"Low-frequency oscillators and Envelopes. "
+										"Low-frequency oscillators and Envelopes. \n\n"
 										"Knobs and other widgets in the Operators view have their own what's this -texts, "
 										"so you can get more specific help for them that way. " ) );
 
@@ -1689,10 +1689,10 @@ MonstroView::MonstroView( Instrument * _instrument,
 										"the modulation relationships between the various operators: Each "
 										"audible operator (oscillators 1-3) has 3-4 properties that can be "
 										"modulated by any of the modulators. Using more modulations consumes "
-										"more CPU power. "
+										"more CPU power. \n\n"
 										"The view is divided to modulation targets, grouped by the target oscillator. "
 										"Available targets are volume, pitch, phase, pulse width and sub-osc ratio. "
-										"Note: some targets are specific to one oscillator only. "
+										"Note: some targets are specific to one oscillator only. \n\n"
 										"Each modulation target has 4 knobs, one for each modulator. By default "
 										"the knobs are at 0, which means no modulation. Turning a knob to 1 causes "
 										"that modulator to affect the modulation target as much as possible. Turning "
@@ -2040,27 +2040,27 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 										"can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied "
 										"to both sub-oscs/waveforms in the exact same way. " ) );
 	m_mixButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. "
+									"the output of oscillator 2. \n\n"
 									"Mix mode means no modulation: the outputs of the oscillators are simply mixed together. " ) );
 	m_amButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. "
+									"the output of oscillator 2. \n\n"
 									"AM means amplitude modulation: Oscillator 3's amplitude (volume) is modulated by oscillator 2. " ) );
 	m_fmButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. "
+									"the output of oscillator 2. \n\n"
 									"FM means frequency modulation: Oscillator 3's frequency (pitch) is modulated by oscillator 2. "
 									"The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch "
 									"than \"pure\" frequency modulation. " ) );
 	m_pmButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. "
+									"the output of oscillator 2. \n\n"
 									"PM means phase modulation: Oscillator 3's phase is modulated by oscillator 2. "
 									"It differs from frequency modulation in that the phase changes are not cumulative. " ) );
-	m_lfo1WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 1. "
+	m_lfo1WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 1. \n"
 										"\"Random\" and \"Random smooth\" are special waveforms: "
 										"they produce random output, where the rate of the LFO controls how often "
 										"the state of the LFO changes. The smooth version interpolates between these "
 										"states with cosine interpolation. These random modes can be used to give "
 										"\"life\" to your presets - add some of that analog unpredictability... " ) );
-	m_lfo2WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 2. "
+	m_lfo2WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 2. \n"
 										"\"Random\" and \"Random smooth\" are special waveforms: "
 										"they produce random output, where the rate of the LFO controls how often "
 										"the state of the LFO changes. The smooth version interpolates between these "

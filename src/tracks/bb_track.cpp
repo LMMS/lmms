@@ -477,7 +477,7 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 					engine::getBBEditor()->currentBB() );*/
 	if( s_infoMap[this] == 0 &&
 			_this.parentNode().parentNode().nodeName() != "clone" &&
-			_this.parentNode().nodeName() != "journaldata" )
+			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
 		( (JournallingObject *)( engine::getBBTrackContainer() ) )->
 						saveState( _doc, _this );

@@ -159,6 +159,7 @@ void configManager::addRecentlyOpenedProject( const QString & _file )
 		m_recentlyOpenedProjects.removeLast();
 	}
 	m_recentlyOpenedProjects.push_front( _file );
+	configManager::inst()->saveConfigFile();
 }
 
 

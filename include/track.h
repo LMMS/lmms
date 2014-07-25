@@ -379,6 +379,7 @@ private slots:
 	void updateMenu();
 	void recordingOn();
 	void recordingOff();
+	void clearTrack();
 
 private:
 	static QPixmap * s_grip;
@@ -461,6 +462,7 @@ public:
 	trackContentObject * addTCO( trackContentObject * _tco );
 	void removeTCO( trackContentObject * _tco );
 	// -------------------------------------------------------
+	void deleteTCOs();
 
 	int numOfTCOs();
 	trackContentObject * getTCO( int _tco_num );
