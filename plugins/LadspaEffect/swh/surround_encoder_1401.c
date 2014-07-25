@@ -228,7 +228,7 @@ static void runSurroundEncoder(LADSPA_Handle instance, unsigned long sample_coun
 	for (pos = 0; pos < sample_count; pos++) {
 	  delay[dptr] = s[pos];
 	  hilb = 0.0f;
-	  for (i = 0; i <= NZEROS/2; i++) {
+	  for (i = 0; i < NZEROS/2; i++) {
 	    hilb += (xcoeffs[i] * delay[(dptr - i*2) & (D_SIZE - 1)]);
 	  }
 	  dptr = (dptr + 1) & (D_SIZE - 1);
@@ -296,7 +296,7 @@ static void runAddingSurroundEncoder(LADSPA_Handle instance, unsigned long sampl
 	for (pos = 0; pos < sample_count; pos++) {
 	  delay[dptr] = s[pos];
 	  hilb = 0.0f;
-	  for (i = 0; i <= NZEROS/2; i++) {
+	  for (i = 0; i < NZEROS/2; i++) {
 	    hilb += (xcoeffs[i] * delay[(dptr - i*2) & (D_SIZE - 1)]);
 	  }
 	  dptr = (dptr + 1) & (D_SIZE - 1);
