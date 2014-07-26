@@ -286,7 +286,7 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
 					tr( "Redo" ),
 					this, SLOT( redo() ),
-					Qt::CTRL + Qt::Key_R );
+					Qt::CTRL + Qt::Key_Y );
 	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
