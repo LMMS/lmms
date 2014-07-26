@@ -133,7 +133,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 void Effect::checkGate( double _out_sum )
 {
-	if( configManager::inst()->isAutoquitDisabled() )
+	if( configManager::inst()->value( "ui", "disableautoquit").toInt() )
 	{
 		return;
 	}

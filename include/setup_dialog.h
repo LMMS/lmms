@@ -161,6 +161,7 @@ private:
 	bool m_animateAFP;
 	bool m_printNoteLabels;
 	bool m_displayWaveform;
+	bool m_disableAutoQuit;
 
 	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
