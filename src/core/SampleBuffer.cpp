@@ -915,7 +915,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const int h = _dr.height();
 
 	const int yb = h / 2 + _dr.y();
-	const float y_space = h*0.25f;
+	const float y_space = h*0.5f;
 	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
 
 	if( nb_frames < 60000 )
@@ -1381,7 +1381,7 @@ void SampleBuffer::setEndFrame( const f_cnt_t _e )
 void SampleBuffer::setAmplification( float _a )
 {
 	m_amplification = _a;
-	update( true );
+	emit sampleUpdated();
 }
 
 
