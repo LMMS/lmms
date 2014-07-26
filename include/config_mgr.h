@@ -163,16 +163,6 @@ public:
 		return( m_recentlyOpenedProjects );
 	}
 
-	const bool isAutoquitDisabled() const
-	{
-		return m_isAutoquitDisabled;
-	}
-
-	void setAutoquitDisabled( bool value )
-	{
-		m_isAutoquitDisabled = value;
-	}
-
 	void addRecentlyOpenedProject( const QString & _file );
 
 	const QString & value( const QString & _class,
@@ -218,8 +208,6 @@ private:
 #endif
 	QString m_backgroundArtwork;
 	QStringList m_recentlyOpenedProjects;
-
-	bool m_isAutoquitDisabled;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;

@@ -121,7 +121,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_printNoteLabels(configManager::inst()->value( "ui",
 						   "printnotelabels").toInt() ),
 	m_displayWaveform(configManager::inst()->value( "ui",
-						   "displaywaveform").toInt() )
+						   "displaywaveform").toInt() ),
+	m_disableAutoQuit(configManager::inst()->value( "ui",
+						   "disableautoquit").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -294,7 +296,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 								misc_tw );
 	labelNumber++;
 	disableAutoquit->move( XDelta, YDelta*labelNumber );
-	disableAutoquit->setChecked( configManager::inst()->isAutoquitDisabled() );
+	disableAutoquit->setChecked( m_disableAutoQuit );
 	connect( disableAutoquit, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableAutoquit( bool ) ) );
 
@@ -823,7 +825,7 @@ void setupDialog::accept()
 	configManager::inst()->setValue( "ui", "displaywaveform",
 					QString::number( m_displayWaveform ) );
 	configManager::inst()->setValue( "ui", "disableautoquit",
-					QString::number( configManager::inst()->isAutoquitDisabled() ) );
+					QString::number( m_disableAutoQuit ) );
 
 
 	configManager::inst()->setWorkingDir( m_workingDir );
@@ -1015,7 +1017,7 @@ void setupDialog::toggleDisplayWaveform( bool en )
 
 void setupDialog::toggleDisableAutoquit( bool en )
 {
-	configManager::inst()->setAutoquitDisabled( en );
+	m_disableAutoQuit = en;
 }
 
 
