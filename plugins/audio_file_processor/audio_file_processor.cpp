@@ -1000,13 +1000,14 @@ void AudioFileProcessorWaveView::updateGraph()
 	{
 		reverse();
 	}
-	else if( m_last_from == m_from && m_last_to == m_to )
+	else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
 	{
 		return;
 	}
 
 	m_last_from = m_from;
 	m_last_to = m_to;
+	m_last_amp = m_sampleBuffer.amplification();
 
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
