@@ -67,11 +67,6 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 					m_samplerate( _samplerate ),
 					m_fpp( _frames )
 {
-	m_env1_buf = new sample_t[_frames];
-	m_env2_buf = new sample_t[_frames];
-	m_lfo1_buf = new sample_t[_frames];
-	m_lfo2_buf = new sample_t[_frames];
-
 	m_osc1l_phase = 0.0f;
 	m_osc1r_phase = 0.0f;
 	m_osc2l_phase = 0.0f;
@@ -84,15 +79,14 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_ph3l_last = 0.0f;
 	m_ph3r_last = 0.0f;
 
-	m_env1_phase = 0.0f;
-	m_env2_phase = 0.0f;
+	m_env_phase[0] = 0.0f;
+	m_env_phase[1] = 0.0f;
+	m_lfo_phase[0] = 0.0f;
+	m_lfo_phase[1] = 0.0f;
 
-	m_lfo1_phase = 0.0f;
-	m_lfo2_phase = 0.0f;
-
-	m_lfo1_s = Oscillator::noiseSample( 0.0f );
-	m_lfo2_s = Oscillator::noiseSample( 0.0f );
-
+	m_lfo_next[0] = Oscillator::noiseSample( 0.0f );
+	m_lfo_next[1] = Oscillator::noiseSample( 0.0f );
+	
 	m_osc1l_last = 0.0f;
 	m_osc1r_last = 0.0f;
 
@@ -118,11 +112,6 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 
 MonstroSynth::~MonstroSynth()
 {
-	delete[] m_env1_buf;
-	delete[] m_env2_buf;
-	delete[] m_lfo1_buf;
-	delete[] m_lfo2_buf;
-
 }
 
 
@@ -132,39 +121,78 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
 		modtmp = 0.0f; \
-		if( mod##_e1 != 0.0f ) modtmp += m_env1_buf[f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) modtmp += m_env2_buf[f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) modtmp += m_lfo1_buf[f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) modtmp += m_lfo2_buf[f] * mod##_l2; \
+		if( mod##_e1 != 0.0f ) modtmp += m_env[0] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) modtmp += m_env[1] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1] * mod##_l2; \
 		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += m_env1_buf[f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += m_env2_buf[f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += m_lfo1_buf[f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += m_lfo2_buf[f] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += m_env[0] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += m_env[1] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += m_lfo[0] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += m_lfo[1] * mod##_l2;
 
 #define modulatephs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += m_env1_buf[f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += m_env2_buf[f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += m_lfo1_buf[f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += m_lfo2_buf[f] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += m_env[0] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += m_env[1] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += m_lfo[0] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += m_lfo[1] * mod##_l2;
 
 #define modulatevol( car, mod ) \
-		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * m_env1_buf[f] ); \
-		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * m_env1_buf[f] );	\
-		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * m_env2_buf[f] );	\
-		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * m_env2_buf[f] );	\
-		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * m_lfo1_buf[f] ); \
-		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * m_lfo2_buf[f] ); \
+		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * m_env[0] ); \
+		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * m_env[0] );	\
+		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * m_env[1] );	\
+		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * m_env[1] );	\
+		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * m_lfo[0] ); \
+		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * m_lfo[1] ); \
 		car = qBound( -MODCLIP, car, MODCLIP );
 
-	// pre-render env's and lfo's
-	renderModulators( _frames );
+
+
+	////////////////////
+	//                //
+	//   MODULATORS   //
+	//                //
+	////////////////////
+
+	// LFO phase offsets
+	const float lfo1_po = m_parent->m_lfo1Phs.value() / 360.0f;
+	const float lfo2_po = m_parent->m_lfo2Phs.value() / 360.0f;
+
+	// remove cruft from phase counters to prevent overflow, add phase offset
+	m_lfo_phase[0] = absFraction( m_lfo_phase[0] + lfo1_po );
+	m_lfo_phase[1] = absFraction( m_lfo_phase[1] + lfo2_po );
+
+	// LFO rates and increment
+	m_lfo_rate[0] = ( m_parent->m_lfo1Rate.value() * 0.001f * m_samplerate );
+	m_lfo_rate[1] = ( m_parent->m_lfo2Rate.value() * 0.001f * m_samplerate );
+	m_lfo_inc[0] = 1.0f / m_lfo_rate[0];
+	m_lfo_inc[1] = 1.0f / m_lfo_rate[1];
+
+	m_env_sus[0] = m_parent-> m_env1Sus.value();
+	m_env_sus[1] = m_parent-> m_env2Sus.value();
+
+	m_lfovalue[0] = m_parent->m_lfo1Wave.value();
+	m_lfovalue[1] = m_parent->m_lfo2Wave.value();
+	m_lfoatt[0] = m_parent->m_lfo1_att;
+	m_lfoatt[1] = m_parent->m_lfo2_att;
+
+	m_env_pre[0] = m_parent->m_env1_pre;
+	m_env_att[0] = m_parent->m_env1_att;
+	m_env_hold[0] = m_parent->m_env1_hold;
+	m_env_dec[0] = m_parent->m_env1_dec;
+	m_env_rel[0] = m_parent->m_env1_rel;
+	m_env_pre[1] = m_parent->m_env2_pre;
+	m_env_att[1] = m_parent->m_env2_att;
+	m_env_hold[1] = m_parent->m_env2_hold;
+	m_env_dec[1] = m_parent->m_env2_dec;
+	m_env_rel[1] = m_parent->m_env2_rel;
+
 
 	// get updated osc1 values
 	// get pulse width
-	const float pw = ( m_parent->m_osc1Pw.value() / 100.0f );
+	const float pw = ( m_parent->m_osc1Pw.value() * 0.01f );
 	const float o1pw_e1 = ( m_parent->m_pw1env1.value() );
 	const float o1pw_e2 = ( m_parent->m_pw1env2.value() );
 	const float o1pw_l1 = ( m_parent->m_pw1lfo1.value() * 0.5f );
@@ -322,7 +350,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// begin for loop
 	for( f_cnt_t f = 0; f < _frames; f++ )
 	{
-
+		// update modulators
+		updateModulators( f );
 
 /*	// debug code
 		if( f % 10 == 0 ) {
@@ -618,408 +647,122 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	m_osc3l_phase = absFraction( o3l_p - o3lpo );
 	m_osc3r_phase = absFraction( o3r_p - o3rpo );
 
+	m_lfo_phase[0] = absFraction( m_lfo_phase[0] - lfo1_po );
+	m_lfo_phase[1] = absFraction( m_lfo_phase[1] - lfo2_po );
 }
 
 
-void MonstroSynth::renderModulators( fpp_t _frames )
+inline void MonstroSynth::updateModulators( int frame )
 {
-	// LFO phase offsets
-	const float lfo1_po = m_parent->m_lfo1Phs.value() / 360.0f;
-	const float lfo2_po = m_parent->m_lfo2Phs.value() / 360.0f;
-
-	// remove cruft from phase counters to prevent overflow
-	m_lfo1_phase = fraction( m_lfo1_phase );
-	m_lfo2_phase = fraction( m_lfo2_phase );
-
-	// LFO rates
-	const float lfo1_r = m_parent->m_lfo1Rate.value() / 1000.0f * m_samplerate;
-	const float lfo2_r = m_parent->m_lfo2Rate.value() / 1000.0f * m_samplerate;
-
 	// frames played before
-	const f_cnt_t tfp = m_nph->totalFramesPlayed();
-
-	// LFOs
-	// LFO 1
-
-	switch( m_parent->m_lfo1Wave.value() )
+	const f_cnt_t tfp = m_nph->totalFramesPlayed() + frame;
+	
+	for( int i = 0; i < 2; ++i )
 	{
-		case WAVE_SINE:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::sinSample( ph );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_TRI:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::triangleSample( ph );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_SAW:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::sawSample( ph );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_RAMP:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::sawSample( ph ) * -1.0f;
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_SQR:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::squareSample( ph );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_SQRSOFT:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = oscillate( WAVE_SQRSOFT, ph, lfo1_r );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_MOOG:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::moogSawSample( ph );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_SINABS:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = oscillate( WAVE_SINABS, ph, lfo1_r );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_EXP:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo1_phase + lfo1_po;
-					m_lfo1_s = Oscillator::expSample( ph );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-					m_lfo1_phase += 1.0f / lfo1_r;
-				}
-				break;
-		case WAVE_RANDOM:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					if( t % static_cast<int>( lfo1_r ) == 0 ) m_lfo1_last = Oscillator::noiseSample( 0.0f );
-					m_lfo1_s = m_lfo1_last;
-					if( t < m_parent->m_lfo1_att ) m_lfo1_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-					m_lfo1_buf[f] = m_lfo1_s;
-				}
-				m_lfo1_phase += static_cast<float>( _frames ) / lfo1_r;
-				break;
-		case WAVE_RANDOM_SMOOTH:
-		default:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const f_cnt_t tm = t % static_cast<int>( lfo1_r );
-					const float p = static_cast<float>( tm ) / lfo1_r;
-					if( tm == 0 )
-					{
-						m_lfo1_last = m_lfo1_s;
-						m_lfo1_s = Oscillator::noiseSample( 0.0f );
-					}
-					m_lfo1_buf[f] = cosinusInterpolate( m_lfo1_last, m_lfo1_s, p );
-					if( t < m_parent->m_lfo1_att ) m_lfo1_buf[f] *= ( static_cast<sample_t>( t ) / m_parent->m_lfo1_att );
-				}
-				m_lfo1_phase += static_cast<float>( _frames ) / lfo1_r;
-				break;
-	}
-
-	// LFO 2
-
-	switch( m_parent->m_lfo2Wave.value() )
-	{
-		case WAVE_SINE:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::sinSample( ph );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_TRI:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::triangleSample( ph );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_SAW:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::sawSample( ph );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_RAMP:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::sawSample( ph ) * -1.0f;
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_SQR:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::squareSample( ph );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_SQRSOFT:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = oscillate( WAVE_SQRSOFT, ph, lfo2_r );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_MOOG:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::moogSawSample( ph );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_SINABS:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = oscillate( WAVE_SINABS, ph, lfo2_r );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_EXP:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const float ph = m_lfo2_phase + lfo2_po;
-					m_lfo2_s = Oscillator::expSample( ph );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent-> m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-					m_lfo2_phase += 1.0f / lfo2_r;
-				}
-				break;
-		case WAVE_RANDOM:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					if( t % static_cast<int>( lfo2_r ) == 0 ) m_lfo2_last = Oscillator::noiseSample( 0.0f );
-					m_lfo2_s = m_lfo2_last;
-					if( t < m_parent->m_lfo2_att ) m_lfo2_s *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-					m_lfo2_buf[f] = m_lfo2_s;
-				}
-				m_lfo2_phase += static_cast<float>( _frames ) / lfo2_r;
-				break;
-		case WAVE_RANDOM_SMOOTH:
-		default:
-				for( f_cnt_t f = 0; f < _frames; f++ )
-				{
-					const f_cnt_t t = f + tfp;
-					const f_cnt_t tm = t % static_cast<int>( lfo2_r );
-					const float p = static_cast<float>( tm ) / lfo2_r;
-					if( tm == 0 )
-					{
-						m_lfo2_last = m_lfo2_s;
-						m_lfo2_s = Oscillator::noiseSample( 0.0f );
-					}
-					m_lfo2_buf[f] = cosinusInterpolate( m_lfo2_last, m_lfo2_s, p );
-					if( t < m_parent->m_lfo2_att ) m_lfo2_buf[f] *= ( static_cast<sample_t>( t ) / m_parent->m_lfo2_att );
-				}
-				m_lfo2_phase += static_cast<float>( _frames ) / lfo2_r;
-				break;
-	}
-
-	/////////////////////////////////////////////
-	//
-	//
-	// 					envelopes
-	//
-	//
-	/////////////////////////////////////////////
-
-	const float env1_sus = m_parent-> m_env1Sus.value();
-	const float env2_sus = m_parent-> m_env2Sus.value();
-
-	for( f_cnt_t f = 0; f < _frames; f++ )
-	{
-		// envelope 1
-
-		// adjust phase for release
-		if( m_env1_phase < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
+		switch( m_lfovalue[i] )
 		{
-			if( m_env1_phase < 1.0f ) m_env1_phase = 5.0f;
-			else if( m_env1_phase < 2.0f ) m_env1_phase = 5.0f - fraction( m_env1_phase );
-			else if( m_env1_phase < 3.0f ) m_env1_phase = 4.0f;
-			else m_env1_phase = 4.0f + fraction( m_env1_phase );
+			case WAVE_SINE:
+				m_lfo[i] = Oscillator::sinSample( m_lfo_phase[i] );
+			break;
+			case WAVE_TRI:
+				m_lfo[i] = Oscillator::triangleSample( m_lfo_phase[i] );
+			break;
+			case WAVE_SAW:
+				m_lfo[i] = Oscillator::sawSample( m_lfo_phase[i] );
+			break;
+			case WAVE_RAMP:
+				m_lfo[i] = Oscillator::sawSample( m_lfo_phase[i] ) * -1.0f;
+			break;
+			case WAVE_SQR:
+				m_lfo[i] = Oscillator::squareSample( m_lfo_phase[i] );
+			break;
+			case WAVE_SQRSOFT:
+				m_lfo[i] = oscillate( WAVE_SQRSOFT, m_lfo_phase[i], 0 );
+			break;
+			case WAVE_MOOG:
+				m_lfo[i] = Oscillator::moogSawSample( m_lfo_phase[i] );
+			break;
+			case WAVE_SINABS:
+				m_lfo[i] = oscillate( WAVE_SINABS, m_lfo_phase[i], 0 );
+			break;
+			case WAVE_EXP:
+				m_lfo[i] = Oscillator::expSample( m_lfo_phase[i] );
+			break;
+			case WAVE_RANDOM:
+				if( tfp % static_cast<int>( m_lfo_rate[i] ) == 0 ) m_lfo_last[i] = Oscillator::noiseSample( 0.0f );
+				m_lfo[i] = m_lfo_last[i];
+			break;
+			case WAVE_RANDOM_SMOOTH:
+				const f_cnt_t tm = tfp % static_cast<int>( m_lfo_rate[i] );
+				if( tm == 0 )
+				{ 
+					m_lfo_last[i] = m_lfo_next[i];
+					m_lfo_next[i] = Oscillator::noiseSample( 0.0f );
+				}
+				m_lfo[i] = cosinusInterpolate( m_lfo_last[i], m_lfo_next[i], static_cast<float>( tm ) / m_lfo_rate[i] );
+			break;
+		}
+
+		// attack
+		if( tfp < m_lfoatt[i] ) m_lfo[i] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
+
+		// increment phase
+		m_lfo_phase[i] += m_lfo_inc[i];
+		
+		
+	/////////////////////////////////////////////
+	//                                         //
+	//                                         //
+	// 					envelopes              //
+	//                                         //
+	//                                         //
+	/////////////////////////////////////////////
+	
+		if( m_env_phase[i] < 4.0f && m_nph->isReleased() && frame >= m_nph->framesBeforeRelease() )
+		{
+			if( m_env_phase[i] < 1.0f ) m_env_phase[i] = 5.0f;
+			else if( m_env_phase[i] < 2.0f ) m_env_phase[i] = 5.0f - fraction( m_env_phase[i] );
+			else if( m_env_phase[i] < 3.0f ) m_env_phase[i] = 4.0f;
+			else m_env_phase[i] = 4.0f + fraction( m_env_phase[i] );
 		}
 
 		// process envelope
-		if( m_env1_phase < 1.0f ) // pre-delay phase
+		if( m_env_phase[i] < 1.0f ) // pre-delay phase
 		{
-			m_env1_buf[f] = 0.0f;
-			m_env1_phase = qMin( 1.0f, m_env1_phase + m_parent->m_env1_pre );
+			m_env[i] = 0.0f;
+			m_env_phase[i] = qMin( 1.0f, m_env_phase[i] + m_env_pre[i] );
 		}
-		else if( m_env1_phase < 2.0f ) // attack phase
+		else if( m_env_phase[i] < 2.0f ) // attack phase
 		{
-			m_env1_buf[f] = calcSlope1( fraction( m_env1_phase ) );
-			m_env1_phase = qMin( 2.0f, m_env1_phase + m_parent->m_env1_att );
+			m_env[i] = calcSlope1( fraction( m_env_phase[i] ) );
+			m_env_phase[i] = qMin( 2.0f, m_env_phase[i] + m_env_att[i] );
 		}
-		else if( m_env1_phase < 3.0f ) // hold phase
+		else if( m_env_phase[i] < 3.0f ) // hold phase
 		{
-			m_env1_buf[f] = 1.0f;
-			m_env1_phase = qMin( 3.0f, m_env1_phase + m_parent->m_env1_hold );
+			m_env[i] = 1.0f;
+			m_env_phase[i] = qMin( 3.0f, m_env_phase[i] + m_env_hold[i] );
 		}
-		else if( m_env1_phase < 4.0f ) // decay phase
+		else if( m_env_phase[i] < 4.0f ) // decay phase
 		{
-			const sample_t s = calcSlope1( 1.0f - fraction( m_env1_phase ) );
-			if( s <= env1_sus )
+			const sample_t s = calcSlope1( 1.0f - fraction( m_env_phase[i] ) );
+			if( s <= m_env_sus[i] )
 			{
-				m_env1_buf[f] = env1_sus;
+				m_env[i] = m_env_sus[i];
 			}
 			else
 			{
-				m_env1_buf[f] = s;
-				m_env1_phase = qMin( 4.0f - env1_sus, m_env1_phase + m_parent->m_env1_dec );
-				if( m_env1_phase == 4.0f ) m_env1_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
+				m_env[i] = s;
+				m_env_phase[i] = qMin( 4.0f - m_env_sus[i], m_env_phase[i] + m_env_dec[i] );
+				if( m_env_phase[i] == 4.0f ) m_env_phase[i] = 5.0f; // jump over release if sustain is zero - fix for clicking
 			}
 		}
-		else if( m_env1_phase < 5.0f ) // release phase
+		else if( m_env_phase[i] < 5.0f ) // release phase
 		{
-			m_env1_buf[f] = calcSlope1( 1.0f - fraction( m_env1_phase ) );
-			m_env1_phase += m_parent->m_env1_rel;
+			m_env[i] = calcSlope1( 1.0f - fraction( m_env_phase[i] ) );
+			m_env_phase[i] += m_env_rel[i];
 		}
-		else m_env1_buf[f] = 0.0f;
-
-//		qDebug( "env1 %f", m_env1_buf[f] );
-
-		// envelope 2
-
-
-
-		// adjust phase for release
-		if( m_env2_phase < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
-		{
-			if( m_env2_phase < 1.0f ) m_env2_phase = 5.0f;
-			else if( m_env2_phase < 2.0f ) m_env2_phase = 5.0f - fraction( m_env2_phase );
-			else if( m_env2_phase < 3.0f ) m_env2_phase = 4.0f;
-			else m_env2_phase = 4.0f + fraction( m_env2_phase );
-		}
-
-		// process envelope
-		if( m_env2_phase < 1.0f ) // pre-delay phase
-		{
-			m_env2_buf[f] = 0.0f;
-			m_env2_phase = qMin( 1.0f, m_env2_phase + m_parent->m_env2_pre );
-		}
-		else if( m_env2_phase < 2.0f ) // attack phase
-		{
-			m_env2_buf[f] = calcSlope2( fraction( m_env2_phase ) );
-			m_env2_phase = qMin( 2.0f, m_env2_phase + m_parent->m_env2_att );
-		}
-		else if( m_env2_phase < 3.0f ) // hold phase
-		{
-			m_env2_buf[f] = 1.0f;
-			m_env2_phase = qMin( 3.0f, m_env2_phase + m_parent->m_env2_hold );
-		}
-		else if( m_env2_phase < 4.0f ) // decay phase
-		{
-			const sample_t s = calcSlope2( 1.0f - fraction( m_env2_phase ) );
-			if( s <= env2_sus )
-			{
-				m_env2_buf[f] = env2_sus;
-			}
-			else
-			{
-				m_env2_buf[f] = s;
-				m_env2_phase = qMin( 4.0f - env2_sus, m_env2_phase + m_parent->m_env2_dec );
-				if( m_env2_phase == 4.0f ) m_env2_phase = 5.0f; // jump over release if sustain is zero - fix for clicking
-			}
-		}
-		else if( m_env2_phase < 5.0f ) // release phase
-		{
-			m_env2_buf[f] = calcSlope2( 1.0f - fraction( m_env2_phase) );
-			m_env2_phase += m_parent->m_env2_rel;
-		}
-		else m_env2_buf[f] = 0.0f;
-
+		else m_env[i] = 0.0f;
 	}
-
 }
 
 
@@ -2072,7 +1815,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_lfo2RateKnob -> setWhatsThis( tr( "Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. " ) );
 	m_lfo1PhsKnob -> setWhatsThis( tr( "PHS controls the phase offset of the LFO. " ) );
 	m_lfo2PhsKnob -> setWhatsThis( tr( "PHS controls the phase offset of the LFO. " ) );
-	
+
 	m_env1PreKnob -> setWhatsThis( tr( "PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. " ) );
 	m_env2PreKnob -> setWhatsThis( tr( "PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. " ) );
 	m_env1AttKnob -> setWhatsThis( tr( "ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. "

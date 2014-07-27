@@ -208,12 +208,10 @@ private:
 	const sample_rate_t m_samplerate;
 	fpp_t m_fpp;
 
-	sample_t * m_env1_buf;
-	sample_t * m_env2_buf;
-	sample_t * m_lfo1_buf;
-	sample_t * m_lfo2_buf;
+	sample_t m_env [2];
+	sample_t m_lfo [2];
 
-	void renderModulators( fpp_t _frames );
+	inline void updateModulators( int frame );
 
 	// linear interpolation
 /*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
@@ -307,17 +305,21 @@ private:
 	float m_osc3l_phase;
 	float m_osc3r_phase;
 
-	sample_t m_env1_phase;
-	sample_t m_env2_phase;
-	
-	float m_lfo1_phase;
-	float m_lfo2_phase;
+	sample_t m_env_phase [2];
+	float m_lfo_phase [2];
+	sample_t m_lfo_last [2];
+	sample_t m_lfo_next [2];
+	float m_lfo_inc [2];
+	float m_lfo_rate [2];	
+	float m_env_sus [2];
 
-	sample_t m_lfo1_last;
-	sample_t m_lfo2_last;
-	
-	sample_t m_lfo1_s;
-	sample_t m_lfo2_s;
+	int m_lfovalue[2];
+	int m_lfoatt[2];
+	float m_env_pre[2];
+	float m_env_att[2];
+	float m_env_hold[2];
+	float m_env_dec[2];
+	float m_env_rel[2];
 
 	sample_t m_osc1l_last;
 	sample_t m_osc1r_last;
