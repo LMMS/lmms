@@ -212,6 +212,8 @@ private:
 	FloatModel m_wetDryModel;
 	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
+	
+	bool m_autoQuitDisabled;
 
 	SRC_DATA m_srcData[2];
 	SRC_STATE * m_srcState[2];

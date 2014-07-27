@@ -48,10 +48,16 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
 	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Gate" ) ),
-	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) )
+	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
+	m_autoQuitDisabled( false )
 {
 	m_srcState[0] = m_srcState[1] = NULL;
 	reinitSRC();
+	
+	if( configManager::inst()->value( "ui", "disableautoquit").toInt() )
+	{
+		m_autoQuitDisabled = true;
+	}
 }
 
 
@@ -133,7 +139,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 void Effect::checkGate( double _out_sum )
 {
-	if( configManager::inst()->value( "ui", "disableautoquit").toInt() )
+	if( m_autoQuitDisabled )
 	{
 		return;
 	}
