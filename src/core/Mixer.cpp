@@ -337,13 +337,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 	unlockInputFrames();
 
-	// now we have to make sure no other thread does anything bad
-	// while we're acting...
-	lock();
-
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
+	lockPlayHandleRemoval();
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
@@ -357,6 +354,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
+	unlockPlayHandleRemoval();
+
+	// now we have to make sure no other thread does anything bad
+	// while we're acting...
+	lock();
 
 	// rotate buffers
 	m_writeBuffer = ( m_writeBuffer + 1 ) % m_poolDepth;
@@ -381,6 +383,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_playHandleMutex.unlock();
 
 	// STAGE 1: run and render all play handles
+	lockPlayHandleRemoval();
 	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
 	MixerWorkerThread::startAndWaitForJobs();
 
@@ -404,6 +407,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			++it;
 		}
 	}
+	unlockPlayHandleRemoval();
 
 
 	// STAGE 2: process effects of all instrument- and sampletracks
@@ -648,12 +652,12 @@ void Mixer::removeAudioPort( AudioPort * _port )
 
 void Mixer::removePlayHandle( PlayHandle * _ph )
 {
-	lock();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
 	if( _ph->affinityMatters() &&
 				_ph->affinity() == QThread::currentThread() )
 	{
+		lockPlayHandleRemoval();
 		PlayHandleList::Iterator it =
 				qFind( m_playHandles.begin(),
 						m_playHandles.end(), _ph );
@@ -662,12 +666,12 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 			m_playHandles.erase( it );
 			delete _ph;
 		}
+		unlockPlayHandleRemoval();
 	}
 	else
 	{
 		m_playHandlesToRemove.push_back( _ph );
 	}
-	unlock();
 }
 
 
@@ -675,7 +679,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 void Mixer::removePlayHandles( track * _track, bool removeIPHs )
 {
-	lock();
+	lockPlayHandleRemoval();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
@@ -689,7 +693,7 @@ void Mixer::removePlayHandles( track * _track, bool removeIPHs )
 			++it;
 		}
 	}
-	unlock();
+	unlockPlayHandleRemoval();
 }
 
 

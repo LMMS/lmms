@@ -399,8 +399,6 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
-	engine::mixer()->lock();
-
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 				engine::mixer()->processingSampleRate();
 	// TODO: Remove the expKnobVals, time should be linear
@@ -523,7 +521,6 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	emit dataChanged();
 
-	engine::mixer()->unlock();
 }
 
 

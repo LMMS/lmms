@@ -174,6 +174,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 		new_note->quantizePos( engine::pianoRoll()->quantization() );
 	}
 
+	instrumentTrack()->lock();
 	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
 		m_notes.push_back( new_note );
@@ -196,6 +197,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 		m_notes.insert( it, new_note );
 	}
+	instrumentTrack()->unlock();
 
 	checkType();
 	changeLength( length() );
@@ -212,7 +214,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 void pattern::removeNote( const note * _note_to_del )
 {
-	engine::mixer()->lock();
+	instrumentTrack()->lock();
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
@@ -224,7 +226,7 @@ void pattern::removeNote( const note * _note_to_del )
 		}
 		++it;
 	}
-	engine::mixer()->unlock();
+	instrumentTrack()->unlock();
 
 	checkType();
 	changeLength( length() );
@@ -274,14 +276,14 @@ void pattern::rearrangeAllNotes()
 
 void pattern::clearNotes()
 {
-	engine::mixer()->lock();
+	instrumentTrack()->lock();
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
 		delete *it;
 	}
 	m_notes.clear();
-	engine::mixer()->unlock();
+	instrumentTrack()->unlock();
 
 	checkType();
 	emit dataChanged();

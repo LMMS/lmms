@@ -231,6 +231,8 @@ private:
 	QMutex m_notesMutex;
 
 	int m_runningMidiNotes[NumKeys];
+	QMutex m_midiNotesMutex;
+
 	bool m_sustainPedalPressed;
 
 	bool m_silentBuffersProcessed;
