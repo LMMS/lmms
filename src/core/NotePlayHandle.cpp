@@ -62,8 +62,10 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
+	m_subNotes(),
 	m_released( false ),
 	m_hasParent( parent != NULL  ),
+	m_parent( parent ),
 	m_hadChildren( false ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
@@ -76,6 +78,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin )
 {
+	lock();
 	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
@@ -94,6 +97,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	updateFrequency();
 
 	setFrames( _frames );
+	unlock();
 }
 
 
@@ -109,6 +113,10 @@ NotePlayHandle::~NotePlayHandle()
 		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
 	}
+	else
+	{
+		m_parent->m_subNotes.removeOne( this );
+	}
 
 	if( m_pluginData != NULL )
 	{
@@ -120,9 +128,9 @@ NotePlayHandle::~NotePlayHandle()
 		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		delete *it;
+		delete n;
 	}
 	m_subNotes.clear();
 
@@ -286,17 +294,12 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// play sub-notes (e.g. chords)
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		( *it )->play( _working_buffer );
-		if( ( *it )->isFinished() )
+		n->play( _working_buffer );
+		if( n->isFinished() )
 		{
-			delete *it;
-			it = m_subNotes.erase( it );
-		}
-		else
-		{
-			++it;
+			delete n;
 		}
 	}
 
@@ -357,9 +360,9 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_released = true;
 
 	// first note-off all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		( *it )->noteOff( _s );
+		n->noteOff( _s );
 	}
 
 	// then set some variables indicating release-state
