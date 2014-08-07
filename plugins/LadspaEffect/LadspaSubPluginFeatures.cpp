@@ -158,7 +158,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 							const Key * _key )
 {
-	QString file = _key->attributes["file"].toLower();
+	QString file = _key->attributes["file"];
 	return( ladspa_key_t( file.remove( QRegExp( "\\.so$" ) ).
 				remove( QRegExp( "\\.dll$" ) ) +
 #ifdef LMMS_BUILD_WIN32
