@@ -103,6 +103,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new comboBox() ),
 	m_arpRangeKnob( new knob( knobBright_26 ) ),
+	m_arpSkipKnob( new knob( knobBright_26 ) ),
+	m_arpMissKnob( new knob( knobBright_26 ) ),
+	m_arpRepeatsKnob( new knob( knobBright_26 ) ),
+	m_arpScrambleKnob( new knob( knobBright_26 ) ),
+	m_arpCycleKnob( new knob( knobBright_26 ) ),
+	m_arpFloorKnob( new knob( knobBright_26 ) ),
+	m_arpCeilKnob( new knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
 	m_arpGateKnob( new knob( knobBright_26 ) ),
 	m_arpDirectionComboBox( new comboBox() ),
@@ -115,7 +122,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	QGridLayout* mainLayout = new QGridLayout( m_arpGroupBox );
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
-	mainLayout->setHorizontalSpacing( 20 );
+	mainLayout->setHorizontalSpacing( 8 );
 	mainLayout->setVerticalSpacing( 1 );
 
 	m_arpGroupBox->setWhatsThis(
@@ -129,12 +136,73 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 			"possible chords, you can select." ) );
 
 
-	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
+	m_arpRangeKnob->setLabel( tr( "RNG" ) );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " + tr( "octave(s)" ) );
 	m_arpRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
 			"number of octaves." ) );
+			
+	m_arpRepeatsKnob->setLabel( tr( "REPEATS" ) );
+	m_arpRepeatsKnob->setHintText( tr( "Note repeats:" ) + " ", " " + tr( "time(s)" ) );
+	m_arpRepeatsKnob->setWhatsThis(
+		tr( "Use this knob for setting the number of times every note "
+			"in the arpeggio will repeat." ) );
+
+	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
+	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
+	m_arpCycleKnob->setWhatsThis(
+		tr( "Changes the path the cycle takes." ) );
+
+
+	m_arpScrambleKnob->setLabel( tr( "SCR" ) );
+	m_arpScrambleKnob->setHintText( tr( "Scramble mode:" ) + " ", " " );
+	m_arpScrambleKnob->setWhatsThis(
+		tr( "Choose model to modify the pattern. \n "
+			"0 - Not active "
+			"1 - Start with second note "
+			"2 - Start with third note "
+			"3 - Start with fourth note "
+			"4 - Start with fifth note "
+			"5 - After cycle, add one if stuck " ) );
+
+
+	m_arpRepeatsKnob->setLabel( tr( "REP" ) );
+	m_arpRepeatsKnob->setHintText( tr( "Note repeats:" ) + " ", " " + tr( "time(s)" ) );
+	m_arpRepeatsKnob->setWhatsThis(
+		tr( "Use this knob for setting the number of times every note "
+			"in the arpeggio will repeat. This will effectively make "
+			"the pattern run longer overall for every increase in "
+			"number of repeats. In random direction mode this "
+			"function has no effect." ) );
+
+
+	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
+	m_arpSkipKnob->setHintText( tr( "Fail rate:" ) + " ", " " + tr( "%" ) );
+	m_arpSkipKnob->setWhatsThis(
+		tr( "The skip function will make the arpeggiator pause one step "
+			"randomly. From it's start in full counter clockwise "
+			"position and no effect it will gradually progress to "
+			"more or less full amnesia at maximum setting.") );
+
+
+	m_arpMissKnob->setLabel( tr( "MISS" ) );
+	m_arpMissKnob->setHintText( tr( "Fail rate:" ) + " ", " " + tr( "%" ) );
+	m_arpMissKnob->setWhatsThis(
+		tr( "The miss function will make the arpeggiator miss the "
+			"intended note.") );
+
+
+	m_arpFloorKnob->setLabel( tr( "FLOOR" ) );
+	m_arpFloorKnob->setHintText( tr( "Bottom note clamp:" ) + " ", " " );
+	m_arpFloorKnob->setWhatsThis(
+		tr( "Note gets stuck on same bottom key when they go below this amount of steps.") );
+
+
+	m_arpCeilKnob->setLabel( tr( "CEIL" ) );
+	m_arpCeilKnob->setHintText( tr( "Top note clamp:" ) + " ", " " );
+	m_arpCeilKnob->setWhatsThis(
+		tr( "Note gets stuck on same top-key after this amount of steps.") );
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
@@ -170,8 +238,15 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpTimeKnob, 3, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpRepeatsKnob, 0, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCycleKnob, 0, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpScrambleKnob, 0, 4, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpFloorKnob, 3, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCeilKnob, 3, 4, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpTimeKnob, 6, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpGateKnob, 6, 4, 2, 1, Qt::AlignHCenter );
 
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
@@ -194,6 +269,13 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
+	m_arpCycleKnob->setModel( &m_a->m_arpCycleModel );
+	m_arpScrambleKnob->setModel( &m_a->m_arpScrambleModel );
+	m_arpRepeatsKnob->setModel( &m_a->m_arpRepeatsModel );
+	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );
+	m_arpMissKnob->setModel( &m_a->m_arpMissModel );
+	m_arpFloorKnob->setModel( &m_a->m_arpFloorModel );
+	m_arpCeilKnob->setModel( &m_a->m_arpCeilModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
 	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );
