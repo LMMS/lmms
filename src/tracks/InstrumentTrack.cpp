@@ -275,9 +275,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			if( event.velocity() > 0 )
 			{
 				NotePlayHandle* nph;
+				m_notesMutex.lock();
 				if( m_notes[event.key()] == NULL )
 				{
-					m_notesMutex.lock();
 					nph = new NotePlayHandle( this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
@@ -287,24 +287,23 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					if( ! engine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = NULL;
-						delete nph;
 					}
-					m_notesMutex.unlock();
 				}
+				m_notesMutex.unlock();
 				eventHandled = true;
 				break;
 			}
 
 		case MidiNoteOff:
+			m_notesMutex.lock();
 			if( m_notes[event.key()] != NULL )
 			{
-				m_notesMutex.lock();
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
-				m_notesMutex.unlock();
 			}
+			m_notesMutex.unlock();
 			eventHandled = true;
 			break;
 

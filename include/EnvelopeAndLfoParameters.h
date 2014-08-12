@@ -138,6 +138,8 @@ private:
 	f_cnt_t m_rFrames;
 	sample_t * m_pahdEnv;
 	sample_t * m_rEnv;
+	f_cnt_t m_pahdBufSize;
+	f_cnt_t m_rBufSize;
 
 
 	FloatModel m_lfoPredelayModel;

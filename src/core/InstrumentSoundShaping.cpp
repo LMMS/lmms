@@ -93,7 +93,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterModel.addItem( tr( "RC LowPass 24dB" ), new PixmapLoader( "filter_lp" ) );
 	m_filterModel.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
 	m_filterModel.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );	
 }
 
 
@@ -146,6 +146,9 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	if( m_filterEnabledModel.value() )
 	{
+		float cutBuffer [frames];
+		float resBuffer [frames];
+
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
 
@@ -155,27 +158,13 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		}
 		n->m_filter->setFilterType( m_filterModel.value() );
 
-#ifdef __GNUC__
-		float cut_buf[frames];
-		float res_buf[frames];
-#else
-		float * cut_buf = NULL;
-		float * res_buf = NULL;
-#endif
-
 		if( m_envLfoParameters[Cut]->isUsed() )
 		{
-#ifndef __GNUC__
-			cut_buf = new float[frames];
-#endif
-			m_envLfoParameters[Cut]->fillLevel( cut_buf, envTotalFrames, envReleaseBegin, frames );
+			m_envLfoParameters[Cut]->fillLevel( cutBuffer, envTotalFrames, envReleaseBegin, frames );
 		}
 		if( m_envLfoParameters[Resonance]->isUsed() )
 		{
-#ifndef __GNUC__
-			res_buf = new float[frames];
-#endif
-			m_envLfoParameters[Resonance]->fillLevel( res_buf, envTotalFrames, envReleaseBegin, frames );
+			m_envLfoParameters[Resonance]->fillLevel( resBuffer, envTotalFrames, envReleaseBegin, frames );
 		}
 
 		const float fcv = m_filterCutModel.value();
@@ -186,10 +175,10 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				const float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cut_buf[frame] ) *
+				const float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cutBuffer[frame] ) *
 								CUT_FREQ_MULTIPLIER + fcv;
 
-				const float new_res_val = frv + RES_MULTIPLIER * res_buf[frame];
+				const float new_res_val = frv + RES_MULTIPLIER * resBuffer[frame];
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut ||
 					static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
@@ -207,7 +196,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cut_buf[frame] ) *
+				float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cutBuffer[frame] ) *
 								CUT_FREQ_MULTIPLIER + fcv;
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
@@ -224,7 +213,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				float new_res_val = frv + RES_MULTIPLIER * res_buf[frame];
+				float new_res_val = frv + RES_MULTIPLIER * resBuffer[frame];
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
@@ -246,32 +235,20 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
-
-#ifndef __GNUC__
-		delete[] cut_buf;
-		delete[] res_buf;
-#endif
 	}
 
 	if( m_envLfoParameters[Volume]->isUsed() )
 	{
-#ifdef __GNUC__
-		float vol_buf[frames];
-#else
-		float * vol_buf = new float[frames];
-#endif
-		m_envLfoParameters[Volume]->fillLevel( vol_buf, envTotalFrames, envReleaseBegin, frames );
+		float volBuffer [frames];
+		m_envLfoParameters[Volume]->fillLevel( volBuffer, envTotalFrames, envReleaseBegin, frames );
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
-			float vol_level = vol_buf[frame];
+			float vol_level = volBuffer[frame];
 			vol_level = vol_level * vol_level;
 			buffer[frame][0] = vol_level * buffer[frame][0];
 			buffer[frame][1] = vol_level * buffer[frame][1];
 		}
-#ifndef __GNUC__
-		delete[] vol_buf;
-#endif
 	}
 
 /*	else if( m_envLfoParameters[Volume]->isUsed() == false && m_envLfoParameters[PANNING]->isUsed() )
