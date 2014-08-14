@@ -26,7 +26,7 @@
 #ifndef _AUTOMATABLE_BUTTON_H
 #define _AUTOMATABLE_BUTTON_H
 
-#include <QtGui/QPushButton>
+#include <QPushButton>
 
 #include "AutomatableModelView.h"
 

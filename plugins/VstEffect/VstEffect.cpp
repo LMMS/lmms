@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "VstEffect.h"
 #include "song.h"

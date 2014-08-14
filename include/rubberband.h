@@ -27,7 +27,7 @@
 #ifndef _RUBBERBAND_H
 #define _RUBBERBAND_H
 
-#include <QtGui/QRubberBand>
+#include <QRubberBand>
 #include <QtCore/QVector>
 
 

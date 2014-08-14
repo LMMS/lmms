@@ -23,12 +23,12 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QWhatsThis>
+#include <QLabel>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
+#include <QWhatsThis>
 
 #include "EffectView.h"
 #include "caption_menu.h"
@@ -287,5 +287,5 @@ void EffectView::modelChanged()
 
 
 
-#include "moc_EffectView.cxx"
+
 

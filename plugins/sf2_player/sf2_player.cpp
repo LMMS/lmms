@@ -23,10 +23,10 @@
  *
  */
 
-#include <QtCore/QDebug>
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtXml/QDomDocument>
+#include <QDebug>
+#include <QLayout>
+#include <QLabel>
+#include <QDomDocument>
 
 #include "FileDialog.h"
 #include "sf2_player.h"
@@ -1052,7 +1052,7 @@ void sf2InstrumentView::showFileDialog()
 
 	QStringList types;
 	types << tr( "SoundFont2 Files (*.sf2)" );
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 
 	QString dir;
 	if( k->m_filename != "" )
@@ -1117,5 +1117,5 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 }
 
-#include "moc_sf2_player.cxx"
+
 

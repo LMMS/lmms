@@ -22,10 +22,10 @@
  *
  */
 
-#include <QtGui/QMenu>
-#include <QtGui/QToolButton>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
+#include <QMenu>
+#include <QToolButton>
+#include <QLabel>
+#include <QLayout>
 
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"

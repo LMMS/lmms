@@ -26,7 +26,7 @@
 #ifndef _TRACK_LABEL_BUTTON_H
 #define _TRACK_LABEL_BUTTON_H
 
-#include <QtGui/QToolButton>
+#include <QToolButton>
 
 
 class trackView;

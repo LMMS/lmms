@@ -23,7 +23,7 @@
  */
 
 
-#include <QtGui/QToolTip>
+#include <QToolTip>
 
 #include "tooltip.h"
 #include "config_mgr.h"

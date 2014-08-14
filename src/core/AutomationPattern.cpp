@@ -24,9 +24,9 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QDomElement>
+#include <QMouseEvent>
+#include <QPainter>
 
 #include "AutomationPattern.h"
 #include "AutomationPatternView.h"
@@ -783,4 +783,4 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 
 
 
-#include "moc_AutomationPattern.cxx"
+

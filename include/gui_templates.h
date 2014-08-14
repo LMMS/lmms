@@ -28,9 +28,9 @@
 
 #include "lmmsconfig.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QFont>
-#include <QtGui/QDesktopWidget>
+#include <QApplication>
+#include <QFont>
+#include <QDesktopWidget>
 
 
 

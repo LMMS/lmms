@@ -25,7 +25,7 @@
 #ifndef _EMBED_H
 #define _EMBED_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 #include <QtCore/QString>
 
 #include "export.h"
@@ -78,8 +78,7 @@ public:
 	{
 		if( !m_name.isEmpty() )
 		{
-			return( embed::getIconPixmap(
-					m_name.toAscii().constData() ) );
+			return( embed::getIconPixmap( m_name.toLatin1().constData() ) );
 		}
 		return( QPixmap() );
 	}
@@ -112,7 +111,7 @@ public:
 		if( !m_name.isEmpty() )
 		{
 			return( PLUGIN_NAME::getIconPixmap(
-					m_name.toAscii().constData() ) );
+					m_name.toLatin1().constData() ) );
 		}
 		return( QPixmap() );
 	}

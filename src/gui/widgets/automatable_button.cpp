@@ -25,8 +25,8 @@
 
 #include "automatable_button.h"
 
-#include <QtGui/QCursor>
-#include <QtGui/QMouseEvent>
+#include <QCursor>
+#include <QMouseEvent>
 
 #include "caption_menu.h"
 #include "engine.h"
@@ -269,5 +269,5 @@ void automatableButtonGroup::updateButtons()
 }
 
 
-#include "moc_automatable_button.cxx"
+
 

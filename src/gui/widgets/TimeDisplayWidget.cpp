@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
+#include <QMouseEvent>
 
 #include "TimeDisplayWidget.h"
 #include "MainWindow.h"
@@ -138,6 +138,6 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 
 
 
-#include "moc_TimeDisplayWidget.cxx"
+
 
 

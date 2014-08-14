@@ -27,8 +27,8 @@
 #define TRACK_CONTAINER_VIEW_H
 
 #include <QtCore/QVector>
-#include <QtGui/QScrollArea>
-#include <QtGui/QWidget>
+#include <QScrollArea>
+#include <QWidget>
 
 
 #include "track.h"

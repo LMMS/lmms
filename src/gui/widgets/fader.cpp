@@ -45,10 +45,10 @@
  */
 
 
-#include <QtGui/QInputDialog>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPaintEvent>
-#include <QtGui/QPainter>
+#include <QInputDialog>
+#include <QMouseEvent>
+#include <QPaintEvent>
+#include <QPainter>
 
 #include "fader.h"
 #include "embed.h"
@@ -174,7 +174,7 @@ void fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	bool ok;
 
 	// TODO: dbV handling
-	int newValue = QInputDialog::getInteger( this, windowTitle(),
+	int newValue = QInputDialog::getInt( this, windowTitle(),
 				tr( "Please enter a new value between %1 and %2:" ).
 						arg( model()->minValue()*100 ).
 						arg( model()->maxValue()*100 ),
@@ -344,5 +344,5 @@ void fader::setPeakRed( const QColor & c )
 	m_peakRed = c;
 }
 
-#include "moc_fader.cxx"
+
 

@@ -27,7 +27,7 @@
 #define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"

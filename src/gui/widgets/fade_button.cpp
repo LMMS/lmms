@@ -23,10 +23,10 @@
  */
  
 
-#include <QtCore/QTimer>
-#include <QtGui/QApplication>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmap>
+#include <QTimer>
+#include <QApplication>
+#include <QPainter>
+#include <QPixmap>
 
 #include "embed.h"
 #include "fade_button.h"
@@ -118,6 +118,6 @@ void fadeButton::signalUpdate()
 
 
 
-#include "moc_fade_button.cxx"
+
 
 

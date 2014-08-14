@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
+#include <QLineEdit>
+#include <QLabel>
 
 #include "AudioPulseAudio.h"
 

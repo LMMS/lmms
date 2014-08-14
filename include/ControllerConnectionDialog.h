@@ -27,9 +27,9 @@
 #ifndef _CONTROLLER_CONNECTION_DIALOG_H
 #define _CONTROLLER_CONNECTION_DIALOG_H
 
-#include <QtGui/QDialog>
-#include <QtGui/QSortFilterProxyModel>
-#include <QtGui/QStandardItemModel>
+#include <QDialog>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 
 #include "Controller.h"
 #include "AutomatableModel.h"

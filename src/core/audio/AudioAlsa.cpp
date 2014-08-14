@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
+#include <QLineEdit>
+#include <QLabel>
 
 #include "AudioAlsa.h"
 
@@ -53,7 +53,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	int err;
 
 	if( ( err = snd_pcm_open( &m_handle,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 						SND_PCM_STREAM_PLAYBACK,
 						0 ) ) < 0 )
 	{
@@ -208,7 +208,7 @@ void AudioAlsa::applyQualitySettings()
 
 		int err;
 		if( ( err = snd_pcm_open( &m_handle,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 						SND_PCM_STREAM_PLAYBACK,
 								0 ) ) < 0 )
 		{

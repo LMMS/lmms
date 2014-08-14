@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QPainter>
+#include <QApplication>
+#include <QFontMetrics>
+#include <QPainter>
 
 #include "SideBarWidget.h"
 #include "gui_templates.h"
@@ -85,5 +85,5 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 
 
 
-#include "moc_SideBarWidget.cxx"
+
 

@@ -26,11 +26,11 @@
 #include "SampleBuffer.h"
 
 
-#include <QtCore/QBuffer>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtGui/QMessageBox>
-#include <QtGui/QPainter>
+#include <QBuffer>
+#include <QFile>
+#include <QFileInfo>
+#include <QMessageBox>
+#include <QPainter>
 
 
 #include <cstring>
@@ -991,7 +991,7 @@ QString SampleBuffer::openAudioFile() const
 		<< tr( "RAW-Files (*.raw)" )
 		//<< tr( "MOD-Files (*.mod)" )
 		;
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 	if( !m_audioFile.isEmpty() )
 	{
 		// select previously opened file
@@ -1468,7 +1468,7 @@ SampleBuffer::handleState::~handleState()
 
 
 
-#include "moc_SampleBuffer.cxx"
+
 
 
 /* vim: set tw=0 noexpandtab: */

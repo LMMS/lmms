@@ -23,7 +23,7 @@
  */
 
 
-#include <QtGui/QImage>
+#include <QImage>
 #include <QHash>
 #include <QImageReader>
 #include <QList>

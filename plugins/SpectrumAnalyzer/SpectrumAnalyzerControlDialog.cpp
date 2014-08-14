@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLayout>
-#include <QtGui/QPainter>
+#include <QLayout>
+#include <QPainter>
 
 #include "SpectrumAnalyzer.h"
 #include "MainWindow.h"

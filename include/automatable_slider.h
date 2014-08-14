@@ -26,7 +26,7 @@
 #ifndef _AUTOMATABLE_SLIDER_H
 #define _AUTOMATABLE_SLIDER_H
 
-#include <QtGui/QSlider>
+#include <QSlider>
 
 #include "AutomatableModelView.h"
 

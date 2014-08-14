@@ -23,8 +23,8 @@
  */
 
 
-#include <QtGui/QFontMetrics>
-#include <QtGui/QPainter>
+#include <QFontMetrics>
+#include <QPainter>
 
 #include "led_checkbox.h"
 #include "embed.h"
@@ -132,5 +132,5 @@ void ledCheckBox::onTextUpdated()
 
 
 
-#include "moc_led_checkbox.cxx"
+
 

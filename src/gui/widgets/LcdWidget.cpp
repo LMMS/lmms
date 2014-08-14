@@ -25,12 +25,12 @@
 
 
 
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QStyleOptionFrameV2>
+#include <QApplication>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QFontMetrics>
+#include <QStyleOptionFrameV2>
 
 #include "LcdWidget.h"
 #include "engine.h"
@@ -257,5 +257,5 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 
 
-#include "moc_LcdWidget.cxx"
+
 

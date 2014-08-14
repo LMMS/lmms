@@ -27,7 +27,7 @@
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 
 #include "Instrument.h"
 #include "pixmap_button.h"

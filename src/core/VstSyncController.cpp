@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 #include "config_mgr.h"
 #include "engine.h"
@@ -196,5 +196,5 @@ void VstSyncController::updateSampleRate()
 
 
 
-#include "moc_VstSyncController.cxx"
+
 

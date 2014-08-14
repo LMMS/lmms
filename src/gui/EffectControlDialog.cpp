@@ -23,8 +23,8 @@
  *
  */
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QCloseEvent>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
@@ -57,5 +57,5 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-#include "moc_EffectControlDialog.cxx"
+
 

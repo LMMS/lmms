@@ -23,7 +23,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "BassBoosterControls.h"
 #include "BassBooster.h"
@@ -98,5 +98,5 @@ void BassBoosterControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 
 
 
-#include "moc_BassBoosterControls.cxx"
+
 

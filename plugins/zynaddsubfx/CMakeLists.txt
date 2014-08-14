@@ -102,6 +102,10 @@ SET(zynaddsubfx_core_SRCS
 
 ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
+IF(QT5)
+TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
+ENDIF()
+
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lws2_32)
 	INSTALL(TARGETS ZynAddSubFxCore RUNTIME DESTINATION "${PLUGIN_DIR}")

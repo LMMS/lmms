@@ -23,14 +23,14 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QTimer>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QProgressBar>
-#include <QtGui/QPushButton>
+#include <QDomElement>
+#include <QTimer>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QtAlgorithms>
 
 #include "pattern.h"
@@ -1157,6 +1157,6 @@ void patternView::paintEvent( QPaintEvent * )
 
 
 
-#include "moc_pattern.cxx"
+
 
 

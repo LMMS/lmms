@@ -27,9 +27,9 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QPixmap>
-#include <QtGui/QCursor>
+#include <QWidget>
+#include <QPixmap>
+#include <QCursor>
 
 #include "Model.h"
 #include "ModelView.h"

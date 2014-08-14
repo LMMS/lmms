@@ -28,8 +28,8 @@
 #include "ladspa_browser.h"
 
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QLabel>
 
 
 #include "gui_templates.h"
@@ -235,4 +235,4 @@ void ladspaBrowserView::showPorts( const ladspa_key_t & _key )
 
 
 
-#include "moc_ladspa_browser.cxx"
+

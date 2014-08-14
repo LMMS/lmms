@@ -126,5 +126,5 @@ void Piano::handleKeyRelease( int key )
 
 
 
-#include "moc_Piano.cxx"
+
 

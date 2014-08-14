@@ -23,7 +23,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "bit_invader.h"
 #include "engine.h"
@@ -590,4 +590,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 
-#include "moc_bit_invader.cxx"
+

@@ -24,7 +24,7 @@
 #ifndef _STRING_CONTAINER_H
 #define _STRING_CONTAINER_H
 
-#include <QtCore/QVector>
+#include <QVector>
 
 #include "vibrating_string.h"
 

@@ -26,7 +26,7 @@
 #ifndef INSTRUMENT_MIDI_IO_VIEW_H
 #define INSTRUMENT_MIDI_IO_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 

@@ -23,9 +23,9 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 
 #include "song.h"
 #include "engine.h"
@@ -157,5 +157,5 @@ ControllerDialog * MidiController::createDialog( QWidget * _parent )
 }
 
 
-#include "moc_MidiController.cxx"
+
 

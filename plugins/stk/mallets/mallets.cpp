@@ -25,8 +25,8 @@
 
 #include "mallets.h"
 
-#include <QtCore/QDir>
-#include <QtGui/QMessageBox>
+#include <QDir>
+#include <QMessageBox>
 
 #include "BandedWG.h"
 #include "ModalBar.h"
@@ -351,7 +351,7 @@ void malletsInstrumentView::setWidgetBackground( QWidget * _widget, const QStrin
 	_widget->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( _widget->backgroundRole(),
-		PLUGIN_NAME::getIconPixmap( _pic.toAscii().constData() ) );
+		PLUGIN_NAME::getIconPixmap( _pic.toLatin1().constData() ) );
 	_widget->setPalette( pal );
 }
 
@@ -534,7 +534,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( configManager::inst()->stkDir()
-						.toAscii().constData() );
+						.toLatin1().constData() );
 	
 		m_voice = new ModalBar();
 	
@@ -581,7 +581,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( configManager::inst()->stkDir()
-						.toAscii().constData() );
+						.toLatin1().constData() );
 	
 		m_voice = new TubeBell();
 	
@@ -626,7 +626,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( configManager::inst()->stkDir()
-						.toAscii().constData() );
+						.toLatin1().constData() );
 
 		m_voice = new BandedWG();
 	
@@ -670,6 +670,6 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 }
 
 
-#include "moc_mallets.cxx"
+
 
 

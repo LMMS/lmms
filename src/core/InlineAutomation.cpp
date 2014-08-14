@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "InlineAutomation.h"
 

@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "InstrumentFunctions.h"
 #include "embed.h"
@@ -523,4 +523,4 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 }
 
 
-#include "moc_InstrumentFunctions.cxx"
+

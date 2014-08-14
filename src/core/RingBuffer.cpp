@@ -321,4 +321,4 @@ void RingBuffer::updateSamplerate()
 	unlock();
 }
 
-#include "moc_RingBuffer.cxx"
+

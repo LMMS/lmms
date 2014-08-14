@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QCloseEvent>
+#include <QCloseEvent>
 
 #include "ControllerDialog.h"
 #include "Controller.h"
@@ -51,5 +51,5 @@ void ControllerDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-#include "moc_ControllerDialog.cxx"
+
 

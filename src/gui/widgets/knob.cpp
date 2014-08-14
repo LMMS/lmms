@@ -22,14 +22,14 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QBitmap>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QPalette>
-#include <QtGui/QWhatsThis>
+#include <QApplication>
+#include <QBitmap>
+#include <QFontMetrics>
+#include <QInputDialog>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPalette>
+#include <QWhatsThis>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -805,5 +805,5 @@ void knob::displayHelp()
 
 
 
-#include "moc_knob.cxx"
+
 

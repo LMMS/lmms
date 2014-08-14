@@ -23,7 +23,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "Monstro.h"
 #include "engine.h"
@@ -1597,7 +1597,7 @@ void MonstroView::setWidgetBackground( QWidget * _widget, const QString & _pic )
 	_widget->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( _widget->backgroundRole(),
-		PLUGIN_NAME::getIconPixmap( _pic.toAscii().constData() ) );
+		PLUGIN_NAME::getIconPixmap( _pic.toLatin1().constData() ) );
 	_widget->setPalette( pal );
 }
 
@@ -1925,4 +1925,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 
-#include "moc_Monstro.cxx"
+

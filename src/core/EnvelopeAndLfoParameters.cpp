@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "EnvelopeAndLfoParameters.h"
 #include "debug.h"
@@ -530,6 +530,6 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 
-#include "moc_EnvelopeAndLfoParameters.cxx"
+
 
 

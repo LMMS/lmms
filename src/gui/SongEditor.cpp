@@ -22,16 +22,16 @@
  *
  */
 
-#include <QtCore/QTimeLine>
-#include <QtGui/QAction>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QScrollBar>
+#include <QTimeLine>
+#include <QAction>
+#include <QButtonGroup>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QLayout>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
+#include <QScrollBar>
 
 #include <math.h>
 
@@ -134,7 +134,7 @@ SongEditor::SongEditor( song * _song ) :
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
-	hq_btn->setCheckable( TRUE );
+	hq_btn->setCheckable( true );
 	connect( hq_btn, SIGNAL( toggled( bool ) ),
 			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
@@ -145,7 +145,7 @@ SongEditor::SongEditor( song * _song ) :
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
 
-	m_timeSigDisplay = new MeterDialog( this, TRUE );
+	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_s->m_timeSigModel );
 	engine::mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
@@ -485,13 +485,13 @@ void SongEditor::stop()
 void SongEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		engine::mainWindow()->isShiftPressed() == TRUE &&
+		engine::mainWindow()->isShiftPressed() == true &&
 						_ke->key() == Qt::Key_Insert )
 	{
 		m_s->insertBar();
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			engine::mainWindow()->isShiftPressed() == TRUE &&
+			engine::mainWindow()->isShiftPressed() == true &&
 						_ke->key() == Qt::Key_Delete )
 	{
 		m_s->removeBar();
@@ -538,7 +538,7 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 
 void SongEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( engine::mainWindow()->isCtrlPressed() == TRUE )
+	if( engine::mainWindow()->isCtrlPressed() == true )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -562,7 +562,7 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( engine::mainWindow()->isShiftPressed() == TRUE )
+	else if( engine::mainWindow()->isShiftPressed() == true )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -581,7 +581,7 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 void SongEditor::masterVolumeChanged( int _new_val )
 {
 	masterVolumeMoved( _new_val );
-	if( m_mvsStatus->isVisible() == FALSE && m_s->m_loadingProject == FALSE
+	if( m_mvsStatus->isVisible() == false && m_s->m_loadingProject == false
 					&& m_masterVolumeSlider->showStatus() )
 	{
 		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
@@ -624,7 +624,7 @@ void SongEditor::masterVolumeReleased( void )
 void SongEditor::masterPitchChanged( int _new_val )
 {
 	masterPitchMoved( _new_val );
-	if( m_mpsStatus->isVisible() == FALSE && m_s->m_loadingProject == FALSE
+	if( m_mpsStatus->isVisible() == false && m_s->m_loadingProject == false
 					&& m_masterPitchSlider->showStatus() )
 	{
 		m_mpsStatus->moveGlobal( m_masterPitchSlider,
@@ -795,7 +795,7 @@ bool SongEditor::allowRubberband() const
 
 
 
-#include "moc_SongEditor.cxx"
+
 
 
 /* vim: set tw=0 noexpandtab: */

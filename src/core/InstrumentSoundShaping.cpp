@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "InstrumentSoundShaping.h"
 #include "basic_filters.h"
@@ -384,5 +384,5 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 
 
 
-#include "moc_InstrumentSoundShaping.cxx"
+
 

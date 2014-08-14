@@ -26,7 +26,7 @@
 #ifndef _MIDI_PORT_MENU_H
 #define _MIDI_PORT_MENU_H
 
-#include <QtGui/QMenu>
+#include <QMenu>
 
 #include "ModelView.h"
 #include "MidiPort.h"

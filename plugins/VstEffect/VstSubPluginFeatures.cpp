@@ -24,8 +24,8 @@
  *
  */
 
-#include <QtCore/QDir>
-#include <QtGui/QLabel>
+#include <QDir>
+#include <QLabel>
 
 #include "VstSubPluginFeatures.h"
 #include "config_mgr.h"

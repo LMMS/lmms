@@ -27,7 +27,7 @@
 #ifndef _EXPORT_PROJECT_DIALOG_H
 #define _EXPORT_PROJECT_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <vector>
 #include "ui_export_project.h"
 

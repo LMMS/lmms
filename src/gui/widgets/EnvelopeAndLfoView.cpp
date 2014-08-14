@@ -23,8 +23,8 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QMouseEvent>
+#include <QPainter>
 
 #include "EnvelopeAndLfoView.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -591,6 +591,6 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 
 
 
-#include "moc_EnvelopeAndLfoView.cxx"
+
 
 

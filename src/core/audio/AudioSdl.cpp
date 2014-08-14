@@ -26,8 +26,8 @@
 
 #ifdef LMMS_HAVE_SDL
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "engine.h"
 #include "debug.h"

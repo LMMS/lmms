@@ -26,7 +26,7 @@
 #ifndef _NSTATE_BUTTON_H
 #define _NSTATE_BUTTON_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 #include <QtCore/QVector>
 #include <QtCore/QPair>
 

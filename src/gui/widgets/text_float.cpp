@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtCore/QTimer>
-#include <QtGui/QPainter>
-#include <QtGui/QStyleOption>
+#include <QTimer>
+#include <QPainter>
+#include <QStyleOption>
 
 #include "text_float.h"
 #include "gui_templates.h"
@@ -200,4 +200,4 @@ void textFloat::updateSize()
 
 
 
-#include "moc_text_float.cxx"
+

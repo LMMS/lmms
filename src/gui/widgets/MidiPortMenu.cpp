@@ -100,5 +100,5 @@ void MidiPortMenu::updateMenu()
 
 
 
-#include "moc_MidiPortMenu.cxx"
+
 

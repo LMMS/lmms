@@ -25,7 +25,7 @@
 #ifndef PEAK_CONTROLLER_H
 #define PEAK_CONTROLLER_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "Model.h"
 #include "AutomatableModel.h"

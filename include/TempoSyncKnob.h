@@ -26,7 +26,7 @@
 #ifndef _TEMPO_SYNC_KNOB_H
 #define _TEMPO_SYNC_KNOB_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 #include <QtCore/QPointer>
 
 #include "knob.h"

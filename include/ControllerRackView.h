@@ -25,7 +25,7 @@
 #ifndef _CONTROLLER_RACK_VIEW_H
 #define _CONTROLLER_RACK_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "SerializingObject.h"
 #include "lmms_basics.h"

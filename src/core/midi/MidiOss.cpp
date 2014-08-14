@@ -28,8 +28,8 @@
 #ifdef LMMS_HAVE_OSS
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 
 #ifdef LMMS_HAVE_STDLIB_H

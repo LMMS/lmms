@@ -24,7 +24,7 @@
 
 
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "stereoenhancer_control_dialog.h"
 #include "stereoenhancer_controls.h"

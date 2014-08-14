@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "MidiWinMM.h"
 #include "config_mgr.h"
@@ -147,7 +147,7 @@ void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool
 {
 	if( subscribe && port->isInputEnabled() == false )
 	{
-		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
+		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toLatin1().constData() );
 		return;
 	}
 
@@ -165,7 +165,7 @@ void MidiWinMM::subscribeWritablePort( MidiPort* port, const QString& dest, bool
 {
 	if( subscribe && port->isOutputEnabled() == false )
 	{
-		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
+		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toLatin1().constData() );
 		return;
 	}
 
@@ -324,7 +324,7 @@ MidiWinMM::setupWidget::~setupWidget()
 
 
 
-#include "moc_MidiWinMM.cxx"
+
 
 
 #endif

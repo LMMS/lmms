@@ -24,7 +24,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "AmplifierControls.h"
 #include "Amplifier.h"
@@ -78,5 +78,5 @@ void AmplifierControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 
 
 
-#include "moc_AmplifierControls.cxx"
+
 

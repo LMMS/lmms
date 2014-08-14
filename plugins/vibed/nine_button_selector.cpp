@@ -26,7 +26,7 @@
 
 #include "nine_button_selector.h"
 
-#include <QtGui/QWhatsThis>
+#include <QWhatsThis>
 
 #include "caption_menu.h"
 #include "embed.h"
@@ -269,4 +269,4 @@ void nineButtonSelector::displayHelp()
 
 
 
-#include "moc_nine_button_selector.cxx"
+

@@ -24,13 +24,13 @@
 
 #include "vestige.h"
 
-#include <QtGui/QDropEvent>
-#include <QtGui/QMessageBox>
-#include <QtGui/QPainter>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMenu>
-#include <QtXml/QDomElement>
+#include <QDropEvent>
+#include <QMessageBox>
+#include <QPainter>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMenu>
+#include <QDomElement>
 
 #include "engine.h"
 #include "gui_templates.h"
@@ -552,7 +552,7 @@ void VestigeInstrumentView::managePlugin( void )
 	if ( m_vi->m_plugin != NULL && m_vi->m_subWindow == NULL ) {
 		m_vi->p_subWindow = new manageVestigeInstrumentView( _instrument2, _parent2, m_vi);
 	} else if (m_vi->m_subWindow != NULL) {
-		if (m_vi->m_subWindow->widget()->isVisible() == FALSE) {
+		if (m_vi->m_subWindow->widget()->isVisible() == false ) {
 			m_vi->m_scrollArea->show();
 			m_vi->m_subWindow->show();
 		} else {
@@ -634,7 +634,7 @@ void VestigeInstrumentView::openPlugin()
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
 		;
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 	if( m_vi->m_pluginDLL != "" )
 	{
 		// select previously opened file
@@ -1166,5 +1166,5 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 }
 
 
-#include "moc_vestige.cxx"
+
 

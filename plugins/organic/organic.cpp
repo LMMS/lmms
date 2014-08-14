@@ -26,8 +26,8 @@
 #include "organic.h"
 
 
-#include <QtXml/QDomElement>
-#include <QtGui/QPainter>
+#include <QDomElement>
+#include <QPainter>
 
 
 #include "engine.h"
@@ -661,4 +661,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 
-#include "moc_organic.cxx"
+

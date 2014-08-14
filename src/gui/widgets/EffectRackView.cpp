@@ -23,11 +23,11 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
+#include <QApplication>
+#include <QLayout>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QVBoxLayout>
 
 #include "EffectRackView.h"
 #include "EffectSelectDialog.h"
@@ -264,5 +264,5 @@ void EffectRackView::modelChanged()
 
 
 
-#include "moc_EffectRackView.cxx"
+
 

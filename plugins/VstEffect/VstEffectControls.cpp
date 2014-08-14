@@ -22,13 +22,13 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "VstEffectControls.h"
 #include "VstEffect.h"
 
 #include "MainWindow.h"
-#include <QtGui/QMdiArea>
+#include <QMdiArea>
 #include <QApplication>
 
 
@@ -161,7 +161,7 @@ void VstEffectControls::managePlugin( void )
 		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != NULL) {
-		if (m_subWindow->widget()->isVisible() == FALSE) { 
+		if (m_subWindow->widget()->isVisible() == false ) { 
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -541,5 +541,5 @@ manageVSTEffectView::~manageVSTEffectView()
 
 
 
-#include "moc_VstEffectControls.cxx"
+
 

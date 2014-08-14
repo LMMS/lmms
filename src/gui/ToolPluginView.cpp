@@ -26,8 +26,8 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
-#include <QtGui/QIcon>
-#include <QtGui/QMdiArea>
+#include <QIcon>
+#include <QMdiArea>
 
 #include "embed.h"
 #include "engine.h"

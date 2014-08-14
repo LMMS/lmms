@@ -27,18 +27,18 @@
 #include "lmmsversion.h"
 #include "versioninfo.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-#include <QtCore/QProcess>
-#include <QtCore/QTimer>
-#include <QtCore/QTranslator>
-#include <QtGui/QApplication>
-#include <QtGui/QBitmap>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QMessageBox>
-#include <QtGui/QPainter>
-#include <QtGui/QSplashScreen>
+#include <QDir>
+#include <QFileInfo>
+#include <QLocale>
+#include <QProcess>
+#include <QTimer>
+#include <QTranslator>
+#include <QApplication>
+#include <QBitmap>
+#include <QDesktopWidget>
+#include <QMessageBox>
+#include <QPainter>
+#include <QSplashScreen>
 
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>

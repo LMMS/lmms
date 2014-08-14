@@ -23,10 +23,10 @@
  *
  */
 
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QScrollArea>
+#include <QLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QScrollArea>
 #include <QMessageBox>
 
 #include "ControllerConnectionDialog.h"
@@ -432,5 +432,5 @@ void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 
 
 
-#include "moc_ControllerConnectionDialog.cxx"
+
 

@@ -25,7 +25,7 @@
 #ifndef _SETUP_DIALOG_H
 #define _SETUP_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QMap>
 
 #include "lmmsconfig.h"

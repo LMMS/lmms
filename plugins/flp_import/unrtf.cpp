@@ -25,8 +25,8 @@
 
 #include "lmmsconfig.h"
 
-#include <QtCore/QString>
-#include <QtCore/QBuffer>
+#include <QString>
+#include <QBuffer>
 
 #include <cstdio>
 

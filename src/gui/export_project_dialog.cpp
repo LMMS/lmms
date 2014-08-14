@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
-#include <QtGui/QMessageBox>
+#include <QFileInfo>
+#include <QDir>
+#include <QMessageBox>
 
 #include "export_project_dialog.h"
 #include "song.h"
@@ -343,7 +343,7 @@ void exportProjectDialog::updateTitleBar( int _prog )
 
 
 
-#include "moc_export_project_dialog.cxx"
+
 
 
 /* vim: set tw=0 noexpandtab: */

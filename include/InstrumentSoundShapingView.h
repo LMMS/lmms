@@ -25,7 +25,7 @@
 #ifndef _INSTRUMENT_SOUND_SHAPING_VIEW_H
 #define _INSTRUMENT_SOUND_SHAPING_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "InstrumentSoundShaping.h"
 #include "ModelView.h"

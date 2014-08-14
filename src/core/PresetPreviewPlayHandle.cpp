@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QMutexLocker>
+#include <QFileInfo>
+#include <QMutexLocker>
 
 #include "PresetPreviewPlayHandle.h"
 #include "debug.h"
@@ -47,9 +47,9 @@ public:
 		m_previewNote( NULL ),
 		m_dataMutex()
 	{
-		setJournalling( FALSE );
+		setJournalling( false );
 		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( track::create( track::InstrumentTrack, this ) );
-		m_previewInstrumentTrack->setJournalling( FALSE );
+		m_previewInstrumentTrack->setJournalling( false );
 	}
 
 	virtual ~PreviewTrackContainer()
@@ -124,7 +124,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 
 	const bool j = engine::projectJournal()->isJournalling();
-	engine::projectJournal()->setJournalling( FALSE );
+	engine::projectJournal()->setJournalling( false );
 
 	engine::setSuppressMessages( true );
 

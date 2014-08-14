@@ -24,8 +24,8 @@
  */
 
 
-#include <QtGui/QPainter>
-#include <QtXml/QDomElement>
+#include <QPainter>
+#include <QDomElement>
 #include "Basic_Gb_Apu.h"
 
 #include "papu_instrument.h"
@@ -744,4 +744,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 }
 
-#include "moc_papu_instrument.cxx"
+

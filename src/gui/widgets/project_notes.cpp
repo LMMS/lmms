@@ -25,17 +25,17 @@
 
 #include "project_notes.h"
 
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QColorDialog>
-#include <QtGui/QComboBox>
-#include <QtGui/QFontDatabase>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMdiArea>
-#include <QtGui/QTextCursor>
-#include <QtGui/QTextEdit>
-#include <QtGui/QToolBar>
-#include <QtXml/QDomCDATASection>
+#include <QAction>
+#include <QApplication>
+#include <QColorDialog>
+#include <QComboBox>
+#include <QFontDatabase>
+#include <QLineEdit>
+#include <QMdiArea>
+#include <QTextCursor>
+#include <QTextEdit>
+#include <QToolBar>
+#include <QDomCDATASection>
 
 #include "embed.h"
 #include "engine.h"
@@ -48,7 +48,7 @@ projectNotes::projectNotes() :
 	QMainWindow( engine::mainWindow()->workspace() )
 {
 	m_edit = new QTextEdit( this );
-	m_edit->setAutoFillBackground( TRUE );
+	m_edit->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_edit->setPalette( pal );
@@ -394,6 +394,6 @@ void projectNotes::loadSettings( const QDomElement & _this )
 }
 
 
-#include "moc_project_notes.cxx"
+
 
 

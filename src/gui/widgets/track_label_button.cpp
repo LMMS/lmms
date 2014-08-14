@@ -24,8 +24,8 @@
  */
 
 
-#include <QtGui/QApplication>
-#include <QtGui/QMouseEvent>
+#include <QApplication>
+#include <QMouseEvent>
 
 
 #include "track_label_button.h"
@@ -163,5 +163,5 @@ void trackLabelButton::paintEvent( QPaintEvent * _pe )
 
 
 
-#include "moc_track_label_button.cxx"
+
 

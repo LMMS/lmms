@@ -29,7 +29,7 @@
  */
 
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 
 #include "lb303.h"
 #include "engine.h"
@@ -41,7 +41,7 @@
 #include "audio_port.h"
 
 #include "embed.cpp"
-#include "moc_lb303.cxx"
+
 
 
 // Envelope Recalculation period

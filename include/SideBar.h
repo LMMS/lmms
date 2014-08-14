@@ -26,8 +26,8 @@
 #define _SIDE_BAR_H
 
 #include <QtCore/QMap>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QToolBar>
+#include <QButtonGroup>
+#include <QToolBar>
 
 class QToolButton;
 class SideBarWidget;

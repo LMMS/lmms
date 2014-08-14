@@ -23,13 +23,13 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QStyleOptionFrameV2>
-#include <QtGui/QInputDialog>
+#include <QApplication>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QFontMetrics>
+#include <QStyleOptionFrameV2>
+#include <QInputDialog>
 
 #include "LcdSpinBox.h"
 #include "caption_menu.h"
@@ -190,5 +190,5 @@ void LcdSpinBox::enterValue()
 	}
 }
 
-#include "moc_LcdSpinBox.cxx"
+
 

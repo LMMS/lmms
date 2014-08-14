@@ -37,11 +37,11 @@
  */
 
 
-#include <QtGui/QCursor>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QVBoxLayout>
+#include <QCursor>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QVBoxLayout>
 
 
 #include "PianoView.h"
@@ -918,5 +918,5 @@ void PianoView::paintEvent( QPaintEvent * )
 
 
 
-#include "moc_PianoView.cxx"
+
 

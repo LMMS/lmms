@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QMenu>
-#include <QtGui/QMouseEvent>
+#include <QMenu>
+#include <QMouseEvent>
 
 #include "AutomatableModelView.h"
 #include "AutomationPattern.h"
@@ -241,4 +241,4 @@ void AutomatableModelViewSlots::unlinkAllModels()
 }
 
 
-#include "moc_AutomatableModelView.cxx"
+

@@ -26,7 +26,7 @@
 #ifndef _TAB_WIDGET_H
 #define _TAB_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QtCore/QMap>
 
 

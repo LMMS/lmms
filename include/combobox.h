@@ -26,8 +26,8 @@
 #ifndef _COMBOBOX_H
 #define _COMBOBOX_H
 
-#include <QtGui/QMenu>
-#include <QtGui/QWidget>
+#include <QMenu>
+#include <QWidget>
 
 #include "ComboBoxModel.h"
 #include "AutomatableModelView.h"

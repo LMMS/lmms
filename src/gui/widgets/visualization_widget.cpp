@@ -23,8 +23,8 @@
  */
 
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QMouseEvent>
+#include <QPainter>
 
 #include "visualization_widget.h"
 #include "gui_templates.h"
@@ -190,6 +190,6 @@ void visualizationWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-#include "moc_visualization_widget.cxx"
+
 
 

@@ -24,12 +24,13 @@
  */
 
 
-#include <QtCore/QFile>
-#include <QtGui/QApplication>
-#include <QtGui/QFrame>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmapCache>
-#include <QtGui/QStyleOption>
+#include <QFile>
+#include <QApplication>
+#include <QFrame>
+#include <QPainter>
+#include <QPixmapCache>
+#include <QStyleFactory>
+#include <QStyleOption>
 
 #include "LmmsStyle.h"
 #include "LmmsPalette.h"
@@ -197,13 +198,19 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 
 LmmsStyle::LmmsStyle() :
-	QPlastiqueStyle()
+	QProxyStyle()
 {
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
 	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
+
+#if QT_VERSION >= 0x050000
+	setBaseStyle( QStyleFactory::create( "Fusion" ) );
+#else
+	setBaseStyle( QStyleFactory::create( "Plastique" ) );
+#endif
 }
 
 
@@ -213,7 +220,7 @@ QPalette LmmsStyle::standardPalette( void ) const
 {
 	if( s_palette != NULL) { return * s_palette; }
 
-	QPalette pal = QPlastiqueStyle::standardPalette();
+	QPalette pal = QProxyStyle::standardPalette();
 
 	return( pal );
 }
@@ -402,7 +409,7 @@ void LmmsStyle::drawControl( ControlElement element, const QStyleOption* option,
 		break;
 
 	default:
-		QPlastiqueStyle::drawControl( element, option, painter, widget );
+		QProxyStyle::drawControl( element, option, painter, widget );
 		break;
 	}
 }
@@ -429,7 +436,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 						QColor( 192, 192, 192 ) );
 			so.palette.setColor( QPalette::Text,
 							QColor( 64, 64, 64 ) );
-			QPlastiqueStyle::drawComplexControl( control, &so,
+			QProxyStyle::drawComplexControl( control, &so,
 							painter, widget );
 			return;
 		}
@@ -440,7 +447,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 							QPalette::Background ) );
 
 	}*/
-	QPlastiqueStyle::drawComplexControl( control, option, painter, widget );
+	QProxyStyle::drawComplexControl( control, option, painter, widget );
 }
 
 
@@ -551,8 +558,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 	}
 	else
 	{
-		QPlastiqueStyle::drawPrimitive( element, option, painter,
-								widget );
+		QProxyStyle::drawPrimitive( element, option, painter, widget );
 	}
 
 }
@@ -579,8 +585,7 @@ int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 			return 24;
 
 		default:
-			return QPlastiqueStyle::pixelMetric( _metric, _option,
-								_widget );
+			return QProxyStyle::pixelMetric( _metric, _option, _widget );
 	}
 }
 
@@ -605,13 +610,13 @@ QSize LmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option
 		}
 	}
 
-	return QPlastiqueStyle::sizeFromContents( type, option, size, widget );
+	return QProxyStyle::sizeFromContents( type, option, size, widget );
 }
 */
 /*
 QRect LmmsStyle::subControlRect( ComplexControl control, const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
 {
-	QRect rect = QPlastiqueStyle::subControlRect( control, option, subControl, widget );
+	QRect rect = QProxyStyle::subControlRect( control, option, subControl, widget );
 
 	switch( control )
 	{

@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "LadspaEffect.h"
 
@@ -183,5 +183,5 @@ void LadspaControls::updateLinkStatesFromGlobal()
 }
 
 
-#include "moc_LadspaControls.cxx"
+
 

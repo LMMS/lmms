@@ -25,17 +25,17 @@
 #include <QtGlobal>
 #include <QDebug>
 
-#include <QtGui/QButtonGroup>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QPushButton>
-#include <QtGui/QToolButton>
-#include <QtGui/QScrollArea>
-#include <QtGui/QStyle>
-#include <QtGui/QKeyEvent>
+#include <QButtonGroup>
+#include <QInputDialog>
+#include <QLayout>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
+#include <QPushButton>
+#include <QToolButton>
+#include <QScrollArea>
+#include <QStyle>
+#include <QKeyEvent>
 
 #include "FxMixerView.h"
 #include "knob.h"
@@ -506,5 +506,5 @@ void FxMixerView::updateFaders()
 
 
 
-#include "moc_FxMixerView.cxx"
+
 

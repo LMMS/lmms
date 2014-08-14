@@ -27,10 +27,10 @@
 #define PATTERN_H
 
 #include <QtCore/QVector>
-#include <QtGui/QWidget>
-#include <QtGui/QDialog>
+#include <QWidget>
+#include <QDialog>
 #include <QtCore/QThread>
-#include <QtGui/QPixmap>
+#include <QPixmap>
 
 
 #include "note.h"

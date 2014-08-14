@@ -96,4 +96,4 @@ QPalette LmmsPalette::palette() const
 }
 
 
-#include "moc_LmmsPalette.cxx"
+

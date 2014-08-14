@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtGui/QLabel>
+#include <QLabel>
 
 #include "InstrumentSoundShapingView.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -163,5 +163,5 @@ void InstrumentSoundShapingView::modelChanged()
 
 
 
-#include "moc_InstrumentSoundShapingView.cxx"
+
 	

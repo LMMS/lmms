@@ -25,9 +25,9 @@
  */
 
 
-#include <QtCore/QMimeData>
-#include <QtGui/QDragEnterEvent>
-#include <QtGui/QDropEvent>
+#include <QMimeData>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 
 
 #include "string_pair_drag.h"
@@ -52,7 +52,7 @@ stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( mimeType(), txt.toAscii() );
+	m->setData( mimeType(), txt.toLatin1() );
 	setMimeData( m );
 	start( Qt::IgnoreAction );
 }
@@ -78,16 +78,16 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 {
 	if( !_dee->mimeData()->hasFormat( mimeType() ) )
 	{
-		return( FALSE );
+		return( false );
 	}
 	QString txt = _dee->mimeData()->data( mimeType() );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
-		return( TRUE );
+		return( true );
 	}
 	_dee->ignore();
-	return( FALSE );
+	return( false );
 }
 
 

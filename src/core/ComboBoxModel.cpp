@@ -66,5 +66,5 @@ int ComboBoxModel::findText( const QString& txt ) const
 
 
 
-#include "moc_ComboBoxModel.cxx"
+
 

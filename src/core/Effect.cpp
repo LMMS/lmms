@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "Effect.h"
 #include "engine.h"

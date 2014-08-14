@@ -26,7 +26,7 @@
 #ifndef _GROUP_BOX_H
 #define _GROUP_BOX_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "AutomatableModelView.h"
 #include "pixmap_button.h"

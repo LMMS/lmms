@@ -1,7 +1,7 @@
 /*
  * VstPlugin.cpp - implementation of VstPlugin class
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,20 +24,22 @@
 
 #include "VstPlugin.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-#include <QtCore/QTemporaryFile>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
+#include <QDir>
+#include <QFileInfo>
+#include <QLocale>
+#include <QTemporaryFile>
+#include <QCloseEvent>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 #ifdef LMMS_BUILD_LINUX
-#include <QtGui/QX11EmbedContainer>
-#include <QtGui/QX11Info>
-#else
-#include <QtGui/QLayout>
+#if QT_VERSION < 0x050000
+#include <QX11EmbedContainer>
+#include <QX11Info>
 #endif
-#include <QtXml/QDomDocument>
+#else
+#include <QLayout>
+#endif
+#include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -49,7 +51,7 @@
 #include "song.h"
 #include "templates.h"
 #include "FileDialog.h"
-#include <QtGui/QLayout>
+#include <QLayout>
 
 
 class vstSubWin : public QMdiSubWindow
@@ -241,22 +243,25 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 			sw->setAttribute( Qt::WA_TranslucentBackground );
 			sw->setWindowFlags( Qt::FramelessWindowHint );
 			sw->setWidget( m_pluginWidget );
-
+#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->show();
+#endif
 		} 
 		else
 		{
 			sw->setWindowFlags( Qt::WindowCloseButtonHint );
 			sw->setWidget( m_pluginWidget );
 
+#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->move( 4, 24 );
 			xe->show();
+#endif
 		}
 	}
 
@@ -662,5 +667,5 @@ QByteArray VstPlugin::saveChunk()
 }
 
 
-#include "moc_VstPlugin.cxx"
+
 

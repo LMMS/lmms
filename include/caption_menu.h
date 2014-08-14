@@ -26,7 +26,7 @@
 #ifndef _CAPTION_MENU_H
 #define _CAPTION_MENU_H
 
-#include <QtGui/QMenu>
+#include <QMenu>
 
 #include "export.h"
 

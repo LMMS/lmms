@@ -24,13 +24,13 @@
  */
 
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMenu>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
+#include <QHBoxLayout>
+#include <QKeyEvent>
+#include <QLineEdit>
+#include <QMenu>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 
 #include "file_browser.h"
 #include "bb_track_container.h"
@@ -1053,5 +1053,5 @@ QString fileItem::extension( const QString & _file )
 
 
 
-#include "moc_file_browser.cxx"
+
 

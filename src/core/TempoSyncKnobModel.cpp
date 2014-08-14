@@ -23,8 +23,8 @@
  *
  */
 
-#include <QtGui/QAction>
-#include <QtXml/QDomElement>
+#include <QAction>
+#include <QDomElement>
 
 #include "TempoSyncKnobModel.h"
 #include "engine.h"
@@ -181,6 +181,6 @@ void TempoSyncKnobModel::updateCustom()
 
 
 
-#include "moc_TempoSyncKnobModel.cxx"
+
 
 

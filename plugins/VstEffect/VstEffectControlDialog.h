@@ -30,7 +30,7 @@
 
 #include <QObject>
 #include <QPainter>
-#include <QtGui/QLabel>
+#include <QLabel>
 
 
 class VstEffectControls;

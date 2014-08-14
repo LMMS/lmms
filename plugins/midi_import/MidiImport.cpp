@@ -23,11 +23,11 @@
  */
 
 
-#include <QtXml/QDomDocument>
-#include <QtCore/QDir>
-#include <QtGui/QApplication>
-#include <QtGui/QMessageBox>
-#include <QtGui/QProgressDialog>
+#include <QDomDocument>
+#include <QDir>
+#include <QApplication>
+#include <QMessageBox>
+#include <QProgressDialog>
 
 #include "MidiImport.h"
 #include "TrackContainer.h"

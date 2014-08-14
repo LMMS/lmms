@@ -23,9 +23,9 @@
  *
  */
 
-#include <QtGui/QPaintEvent>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QPainter>
+#include <QPaintEvent>
+#include <QFontMetrics>
+#include <QPainter>
 
 #include "graph.h"
 #include "string_pair_drag.h"
@@ -701,4 +701,4 @@ void graphModel::drawSampleAt( int x, float val )
 
 
 
-#include "moc_graph.cxx"
+

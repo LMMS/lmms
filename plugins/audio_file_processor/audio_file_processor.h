@@ -27,7 +27,7 @@
 #ifndef AUDIO_FILE_PROCESSOR_H
 #define AUDIO_FILE_PROCESSOR_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 
 #include "Instrument.h"
 #include "InstrumentView.h"

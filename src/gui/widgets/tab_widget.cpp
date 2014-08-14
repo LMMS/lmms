@@ -25,10 +25,10 @@
 
 #include "tab_widget.h"
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmap>
-#include <QtGui/QWheelEvent>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPixmap>
+#include <QWheelEvent>
 
 #include "gui_templates.h"
 
@@ -229,6 +229,6 @@ void tabWidget::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "moc_tab_widget.cxx"
+
 
 

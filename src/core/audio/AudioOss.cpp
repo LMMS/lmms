@@ -26,9 +26,9 @@
 
 #ifdef LMMS_HAVE_OSS
 
-#include <QtCore/QFileInfo>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QFileInfo>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
@@ -80,7 +80,7 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 {
 	_success_ful = false;
 
-	m_audioFD = open( probeDevice().toAscii().constData(), O_WRONLY, 0 );
+	m_audioFD = open( probeDevice().toLatin1().constData(), O_WRONLY, 0 );
 
 	if( m_audioFD == -1 )
 	{

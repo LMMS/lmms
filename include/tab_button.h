@@ -26,7 +26,7 @@
 #ifndef _TAB_BUTTON_H
 #define _TAB_BUTTON_H
 
-#include <QtGui/QPushButton>
+#include <QPushButton>
 
 
 class tabButton : public QPushButton

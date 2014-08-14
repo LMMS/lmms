@@ -24,8 +24,8 @@
  */
 
 
-#include <QtXml/QDomDocument>
-#include <QtGui/QPainter>
+#include <QDomDocument>
+#include <QPainter>
 
 #include "kicker.h"
 #include "engine.h"
@@ -375,5 +375,5 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 }
 
 
-#include "moc_kicker.cxx"
+
 

@@ -27,7 +27,7 @@
 #ifndef _SID_H
 #define _SID_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"

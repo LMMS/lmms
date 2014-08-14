@@ -26,7 +26,7 @@
 #ifndef KNOB_H
 #define KNOB_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QtCore/QPoint>
 
 #include "AutomatableModelView.h"

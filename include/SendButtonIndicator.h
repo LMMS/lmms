@@ -2,8 +2,8 @@
 #define SENDBUTTONINDICATOR_H
 
 #include <QDebug>
-#include <QtGui/QLabel>
-#include <QtGui/QPixmap>
+#include <QLabel>
+#include <QPixmap>
 
 #include "FxLine.h"
 #include "FxMixerView.h"

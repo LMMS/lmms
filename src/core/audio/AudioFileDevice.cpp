@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "AudioFileDevice.h"
 #include "export_project_dialog.h"

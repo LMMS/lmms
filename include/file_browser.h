@@ -28,7 +28,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
-#include <QtGui/QTreeWidget>
+#include <QTreeWidget>
 
 
 #include "SideBarWidget.h"

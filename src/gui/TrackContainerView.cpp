@@ -23,12 +23,12 @@
  */
 
 
-#include <QtGui/QApplication>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QProgressDialog>
-#include <QtGui/QScrollBar>
-#include <QtGui/QWheelEvent>
+#include <QApplication>
+#include <QLayout>
+#include <QMdiArea>
+#include <QProgressDialog>
+#include <QScrollBar>
+#include <QWheelEvent>
 
 
 #include "TrackContainerView.h"
@@ -458,5 +458,5 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "moc_TrackContainerView.cxx"
+
 

@@ -25,7 +25,7 @@
 #ifndef LFO_CONTROLLER_H
 #define LFO_CONTROLLER_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "Model.h"
 #include "AutomatableModel.h"

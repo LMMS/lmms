@@ -24,7 +24,7 @@
  */
 
 
-#include <QtGui/QMdiArea>
+#include <QMdiArea>
 
 #include "TempoSyncKnob.h"
 #include "engine.h"
@@ -304,6 +304,6 @@ void TempoSyncKnob::showCustom()
 
 
 
-#include "moc_TempoSyncKnob.cxx"
+
 
 

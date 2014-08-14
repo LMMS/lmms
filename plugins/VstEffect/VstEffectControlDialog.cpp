@@ -22,10 +22,10 @@
  *
  */
 
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMenu>
-#include <QtGui/QPushButton>
+#include <QLayout>
+#include <QMdiArea>
+#include <QMenu>
+#include <QPushButton>
 
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
@@ -35,10 +35,10 @@
 #include "tooltip.h"
 
 #include <QObject>
-#include <QtGui/QPainter>
+#include <QPainter>
 #include "gui_templates.h"
-#include <QtGui/QToolBar>
-#include <QtGui/QLabel>
+#include <QToolBar>
+#include <QLabel>
 
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :

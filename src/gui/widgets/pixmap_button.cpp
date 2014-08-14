@@ -24,8 +24,8 @@
  */
  
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QMouseEvent>
+#include <QPainter>
 
 #include "pixmap_button.h"
 #include "MainWindow.h"
@@ -133,6 +133,6 @@ void pixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 
 
-#include "moc_pixmap_button.cxx"
+
 
 

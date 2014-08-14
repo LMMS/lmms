@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
+#include <QLabel>
+#include <QLayout>
 
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
@@ -202,5 +202,5 @@ void InstrumentFunctionArpeggioView::modelChanged()
 
 
 
-#include "moc_InstrumentFunctionViews.cxx"
+
 

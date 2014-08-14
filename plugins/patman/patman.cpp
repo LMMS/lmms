@@ -25,9 +25,9 @@
 
 #include "patman.h"
 
-#include <QtGui/QDragEnterEvent>
-#include <QtGui/QPainter>
-#include <QtXml/QDomElement>
+#include <QDragEnterEvent>
+#include <QPainter>
+#include <QDomElement>
 
 #include "endian_handling.h"
 #include "engine.h"
@@ -105,7 +105,7 @@ void patmanInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void patmanInstrument::loadSettings( const QDomElement & _this )
 {
-	setFile( _this.attribute( "src" ), FALSE );
+	setFile( _this.attribute( "src" ), false );
 	m_loopedModel.loadSettings( _this, "looped" );
 	m_tunedModel.loadSettings( _this, "tuned" );
 }
@@ -441,7 +441,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentView( _instrument, _parent ),
 	m_pi( NULL )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
@@ -466,7 +466,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");
-	m_loopButton->setCheckable( TRUE );
+	m_loopButton->setCheckable( true );
 	m_loopButton->move( 195, 138 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_on" ) );
@@ -480,7 +480,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_tuneButton = new pixmapButton( this, tr( "Tune" ) );
 	m_tuneButton->setObjectName("tuneButton");
-	m_tuneButton->setCheckable( TRUE );
+	m_tuneButton->setCheckable( true );
 	m_tuneButton->move( 223, 138 );
 	m_tuneButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_on" ) );
@@ -494,7 +494,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_displayFilename = tr( "No file selected" );
 
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 }
 
 
@@ -514,7 +514,7 @@ void PatmanView::openFile( void )
 
 	QStringList types;
 	types << tr( "Patch-Files (*.pat)" );
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 
 	if( m_pi->m_patchFile == "" )
 	{
@@ -532,7 +532,7 @@ void PatmanView::openFile( void )
 	{
 		QString f = configManager::inst()->userSamplesDir()
 							+ m_pi->m_patchFile;
-		if( QFileInfo( f ).exists() == FALSE )
+		if( QFileInfo( f ).exists() == false )
 		{
 			f = configManager::inst()->factorySamplesDir()
 							+ m_pi->m_patchFile;
@@ -652,4 +652,4 @@ void PatmanView::modelChanged( void )
 
 
 
-#include "moc_patman.cxx"
+

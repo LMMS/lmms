@@ -28,8 +28,8 @@
 #include "base64.h"
 #include "lmms_basics.h"
 
-#include <QtCore/QBuffer>
-#include <QtCore/QVariant>
+#include <QBuffer>
+#include <QVariant>
 
 namespace base64
 {

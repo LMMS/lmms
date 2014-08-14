@@ -23,7 +23,7 @@
  */
 
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "ProjectRenderer.h"
 #include "song.h"
@@ -228,5 +228,5 @@ void ProjectRenderer::updateConsoleProgress()
 
 
 
-#include "moc_ProjectRenderer.cxx"
+
 

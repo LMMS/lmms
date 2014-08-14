@@ -27,7 +27,7 @@
 
 #include "ModelView.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class QLabel;
 class comboBox;

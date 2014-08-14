@@ -27,7 +27,7 @@
 #define _LCD_WIDGET_H
 
 #include <QtCore/QMap>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "export.h"
 

@@ -242,7 +242,7 @@ bool tabBar::allHidden()
 
 
 
-#include "moc_tab_bar.cxx"
-#include "moc_tab_button.cxx"
+
+
 
 

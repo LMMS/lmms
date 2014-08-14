@@ -23,13 +23,13 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPushButton>
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QMdiArea>
+#include <QApplication>
+#include <QLayout>
+#include <QMdiSubWindow>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QMdiArea>
 #include <QMessageBox>
 
 #include "song.h"
@@ -194,5 +194,5 @@ void ControllerRackView::addController()
 
 
 
-#include "moc_ControllerRackView.cxx"
+
 

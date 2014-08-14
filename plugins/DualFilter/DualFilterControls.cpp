@@ -24,7 +24,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "DualFilterControls.h"
 #include "DualFilter.h"
@@ -163,5 +163,5 @@ void DualFilterControls::saveSettings( QDomDocument& _doc, QDomElement& _this )
 
 
 
-#include "moc_DualFilterControls.cxx"
+
 

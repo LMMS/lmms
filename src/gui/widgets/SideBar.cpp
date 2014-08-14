@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtGui/QStyleOptionToolButton>
-#include <QtGui/QStylePainter>
-#include <QtGui/QToolButton>
+#include <QStyleOptionToolButton>
+#include <QStylePainter>
+#include <QToolButton>
 
 #include "SideBar.h"
 #include "SideBarWidget.h"
@@ -159,5 +159,5 @@ void SideBar::toggleButton( QAbstractButton * _btn )
 }
 
 
-#include "moc_SideBar.cxx"
+
 

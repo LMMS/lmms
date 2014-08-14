@@ -24,7 +24,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "EffectChain.h"
 #include "Effect.h"
@@ -255,5 +255,5 @@ void EffectChain::clear()
 
 
 
-#include "moc_EffectChain.cxx"
+
 

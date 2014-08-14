@@ -24,9 +24,9 @@
  */
 
 
-#include <QtGui/QApplication>
-#include <QtGui/QProgressDialog>
-#include <QtXml/QDomElement>
+#include <QApplication>
+#include <QProgressDialog>
+#include <QDomElement>
 
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
@@ -241,5 +241,5 @@ DummyTrackContainer::DummyTrackContainer() :
 
 
 
-#include "moc_TrackContainer.cxx"
+
 

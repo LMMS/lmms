@@ -26,7 +26,7 @@
 #ifndef _LADSPA_CONTROL_VIEW_H
 #define _LADSPA_CONTROL_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 

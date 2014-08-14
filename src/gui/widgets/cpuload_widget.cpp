@@ -24,7 +24,7 @@
  */
 
 
-#include <QtGui/QPainter>
+#include <QPainter>
 
 #include "cpuload_widget.h"
 #include "embed.h"
@@ -103,6 +103,6 @@ void cpuloadWidget::updateCpuLoad()
 
 
 
-#include "moc_cpuload_widget.cxx"
+
 
 

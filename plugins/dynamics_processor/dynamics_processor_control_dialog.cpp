@@ -24,7 +24,7 @@
  */
 
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "dynamics_processor_control_dialog.h"
 #include "dynamics_processor_controls.h"

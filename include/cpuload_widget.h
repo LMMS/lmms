@@ -28,8 +28,8 @@
 #define _CPULOAD_WIDGET_H
 
 #include <QtCore/QTimer>
-#include <QtGui/QPixmap>
-#include <QtGui/QWidget>
+#include <QPixmap>
+#include <QWidget>
 
 #include "lmms_basics.h"
 

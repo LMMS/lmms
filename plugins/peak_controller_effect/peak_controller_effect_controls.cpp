@@ -24,7 +24,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "PeakController.h"
 #include "peak_controller_effect_controls.h"
@@ -106,5 +106,5 @@ void PeakControllerEffectControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "moc_peak_controller_effect_controls.cxx"
+
 

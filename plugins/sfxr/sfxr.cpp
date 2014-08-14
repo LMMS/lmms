@@ -36,7 +36,7 @@ float frnd(float range)
 }
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "sfxr.h"
 #include "engine.h"
@@ -1126,4 +1126,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model*, void* data )
 
 
 
-#include "moc_sfxr.cxx"
+

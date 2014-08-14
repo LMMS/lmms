@@ -26,7 +26,7 @@
 #ifndef _EFFECT_RACK_VIEW_H
 #define _EFFECT_RACK_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "EffectChain.h"
 #include "ModelView.h"

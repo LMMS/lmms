@@ -25,12 +25,12 @@
 #ifndef _VST_PLUGIN_H
 #define _VST_PLUGIN_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
-#include <QtCore/QPointer>
-#include <QtCore/QString>
-#include <QtCore/QTimer>
-#include <QtGui/QWidget>
+#include <QMap>
+#include <QMutex>
+#include <QPointer>
+#include <QString>
+#include <QTimer>
+#include <QWidget>
 
 #include "Mixer.h"
 #include "JournallingObject.h"

@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "LadspaControl.h"
 #include "LadspaControlView.h"
@@ -124,5 +124,5 @@ LadspaControlView::~LadspaControlView()
 
 
 
-#include "moc_LadspaControlView.cxx"
+
 

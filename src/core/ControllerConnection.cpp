@@ -24,9 +24,9 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 
 
 #include "song.h"
@@ -222,5 +222,5 @@ void ControllerConnection::deleteConnection()
 }
 
 
-#include "moc_ControllerConnection.cxx"
+
 

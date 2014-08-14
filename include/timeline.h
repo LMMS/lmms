@@ -26,7 +26,7 @@
 #ifndef _TIMELINE_H
 #define _TIMELINE_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "song.h"
 

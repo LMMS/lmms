@@ -27,10 +27,10 @@
 #define _VESTIGE_H
 
 
-#include <QtCore/QMutex>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QScrollArea>
+#include <QMutex>
+#include <QLayout>
+#include <QMdiSubWindow>
+#include <QScrollArea>
 
 #include "Instrument.h"
 #include "InstrumentView.h"

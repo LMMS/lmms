@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "BassBoosterControlDialog.h"
 #include "BassBoosterControls.h"

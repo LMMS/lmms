@@ -28,7 +28,7 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QColor>
 #include <QMimeData>
 

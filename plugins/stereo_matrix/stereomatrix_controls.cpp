@@ -23,7 +23,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "stereomatrix_controls.h"
 #include "stereo_matrix.h"
@@ -79,5 +79,5 @@ void stereoMatrixControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "moc_stereomatrix_controls.cxx"
+
 

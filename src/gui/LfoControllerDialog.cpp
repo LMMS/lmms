@@ -23,11 +23,11 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
+#include <QLabel>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
 
 #include "caption_menu.h"
 #include "gui_templates.h"

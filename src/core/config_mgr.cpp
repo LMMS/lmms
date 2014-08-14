@@ -22,11 +22,11 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtGui/QMessageBox>
-#include <QtGui/QApplication>
+#include <QDomElement>
+#include <QDir>
+#include <QFile>
+#include <QMessageBox>
+#include <QApplication>
 
 #include "lmmsversion.h"
 #include "config_mgr.h"
@@ -210,7 +210,7 @@ void configManager::setValue( const QString & _class,
 
 
 #ifdef LMMS_BUILD_WIN32
-#include <QtCore/QLibrary>
+#include <QLibrary>
 #include <shlobj.h>
 
 // taken from qt-win-opensource-src-4.2.2/src/corelib/io/qsettings.cpp

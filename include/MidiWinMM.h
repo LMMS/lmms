@@ -30,7 +30,6 @@
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #include <mmsystem.h>
-#endif
 
 #include "MidiClient.h"
 #include "MidiPort.h"
@@ -150,6 +149,8 @@ signals:
 	void writablePortsChanged();
 
 } ;
+
+#endif
 
 #endif
 

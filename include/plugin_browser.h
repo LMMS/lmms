@@ -26,7 +26,7 @@
 #define _PLUGIN_BROWSER_H
 
 #include <QtCore/QTimer>
-#include <QtGui/QPixmap>
+#include <QPixmap>
 
 #include "SideBarWidget.h"
 #include "Plugin.h"

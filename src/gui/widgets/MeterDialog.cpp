@@ -24,9 +24,9 @@
  */
 
 
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QLabel>
+#include <QLayout>
+#include <QPushButton>
+#include <QLabel>
 
 #include "MeterDialog.h"
 #include "MeterModel.h"

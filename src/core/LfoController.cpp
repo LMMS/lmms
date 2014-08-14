@@ -24,9 +24,9 @@
  */
 
 #include <math.h>
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 
 
 #include "song.h"
@@ -229,6 +229,6 @@ ControllerDialog * LfoController::createDialog( QWidget * _parent )
 }
 
 
-#include "moc_LfoController.cxx"
+
 
 

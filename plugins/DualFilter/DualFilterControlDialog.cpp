@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"

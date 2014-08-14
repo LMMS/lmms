@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtXml/QDomDocument>
-#include <QtCore/QMap>
-#include <QtGui/QWhatsThis>
+#include <QDomDocument>
+#include <QMap>
+#include <QWhatsThis>
 
 #include "vibed.h"
 #include "engine.h"
@@ -785,5 +785,5 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 }
 
-#include "moc_vibed.cxx"
+
 

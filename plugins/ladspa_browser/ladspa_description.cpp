@@ -24,11 +24,11 @@
 
 #include "ladspa_description.h"
 
-#include <QtGui/QGroupBox>
-#include <QtGui/QLabel>
-#include <QtGui/QListWidget>
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QListWidget>
+#include <QScrollArea>
+#include <QVBoxLayout>
 
 #include "AudioDevice.h"
 #include "engine.h"
@@ -217,4 +217,4 @@ void ladspaDescription::onDoubleClicked( QListWidgetItem * _item )
 
 
 
-#include "moc_ladspa_description.cxx"
+

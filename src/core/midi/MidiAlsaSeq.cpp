@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "MidiAlsaSeq.h"
 #include "config_mgr.h"
@@ -82,7 +82,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 {
 	int err;
 	if( ( err = snd_seq_open( &m_seqHandle,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 						SND_SEQ_OPEN_DUPLEX, 0 ) ) < 0 )
 	{
 		fprintf( stderr, "cannot open sequencer: %s\n",
@@ -378,7 +378,7 @@ void MidiAlsaSeq::subscribeReadablePort( MidiPort * _port,
 
 	snd_seq_addr_t sender;
 	if( snd_seq_parse_address( m_seqHandle, &sender,
-			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
+			_dest.section( ' ', 0, 0 ).toLatin1().constData() ) )
 	{
 		fprintf( stderr, "error parsing sender-address!\n" );
 
@@ -429,7 +429,7 @@ void MidiAlsaSeq::subscribeWritablePort( MidiPort * _port,
 
 	snd_seq_addr_t dest;
 	if( snd_seq_parse_address( m_seqHandle, &dest,
-			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
+			_dest.section( ' ', 0, 0 ).toLatin1().constData() ) )
 	{
 		fprintf( stderr, "error parsing dest-address!\n" );
 		m_seqMutex.unlock();
@@ -735,7 +735,7 @@ void MidiAlsaSeq::setupWidget::saveSettings()
 }
 
 
-#include "moc_MidiAlsaSeq.cxx"
+
 
 
 #endif

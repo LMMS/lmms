@@ -22,14 +22,14 @@
  *
  */
 
-#include <QtGui/QComboBox>
-#include <QtGui/QImageReader>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMessageBox>
-#include <QtGui/QSlider>
-#include <QtGui/QWhatsThis>
+#include <QComboBox>
+#include <QImageReader>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QSlider>
+#include <QWhatsThis>
 
 #include "setup_dialog.h"
 #include "tab_bar.h"
@@ -620,7 +620,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
-		m_audioIfaceNames[tr( it.key().toAscii())] = it.key();
+		m_audioIfaceNames[tr( it.key().toLatin1())] = it.key();
 	}
 	for( trMap::iterator it = m_audioIfaceNames.begin();
 				it != m_audioIfaceNames.end(); ++it )
@@ -631,7 +631,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-			tr( engine::mixer()->audioDevName().toAscii() ) ) );
+			tr( engine::mixer()->audioDevName().toLatin1() ) ) );
 	m_audioIfaceSetupWidgets[engine::mixer()->audioDevName()]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
@@ -700,7 +700,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
-		m_midiIfaceNames[tr( it.key().toAscii())] = it.key();
+		m_midiIfaceNames[tr( it.key().toLatin1())] = it.key();
 	}
 	for( trMap::iterator it = m_midiIfaceNames.begin();
 				it != m_midiIfaceNames.end(); ++it )
@@ -712,7 +712,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	}
 
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-		tr( engine::mixer()->midiClientName().toAscii() ) ) );
+		tr( engine::mixer()->midiClientName().toLatin1() ) ) );
 	m_midiIfaceSetupWidgets[engine::mixer()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
@@ -1302,5 +1302,5 @@ void setupDialog::displayMIDIHelp()
 
 
 
-#include "moc_setup_dialog.cxx"
+
 

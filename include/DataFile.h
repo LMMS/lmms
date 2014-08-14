@@ -27,7 +27,7 @@
 #ifndef DATA_FILE_H
 #define DATA_FILE_H
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 #include <QTextStream>
 
 #include "export.h"

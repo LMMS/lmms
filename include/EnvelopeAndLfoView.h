@@ -26,7 +26,7 @@
 #ifndef ENVELOPE_AND_LFO_VIEW_H
 #define ENVELOPE_AND_LFO_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 

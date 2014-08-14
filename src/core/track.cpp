@@ -40,11 +40,11 @@
 #include <assert.h>
 #include <cstdio>
 
-#include <QtGui/QLayout>
-#include <QtGui/QMenu>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QStyleOption>
+#include <QLayout>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QStyleOption>
 
 
 #include "AutomationPattern.h"
@@ -487,7 +487,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 	}
 
 	// Don't allow pasting a tco into itself.
-	QWidget * qwSource = _de->source();
+	QObject* qwSource = _de->source();
 	if( qwSource != NULL &&
 	    dynamic_cast<trackContentObjectView *>( qwSource ) == this )
 	{
@@ -2718,6 +2718,6 @@ void trackView::createTCOView( trackContentObject * _tco )
 
 
 
-#include "moc_track.cxx"
+
 
 

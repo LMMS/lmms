@@ -27,7 +27,7 @@
 #ifndef KICKER_H
 #define KICKER_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"

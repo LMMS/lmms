@@ -26,9 +26,9 @@
 
 #ifdef LMMS_HAVE_JACK
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
-#include <QtGui/QMessageBox>
+#include <QLineEdit>
+#include <QLabel>
+#include <QMessageBox>
 
 #include <stdlib.h>
 
@@ -140,7 +140,7 @@ bool AudioJack::initJackClient()
 
 	const char * serverName = NULL;
 	jack_status_t status;
-	m_client = jack_client_open( clientName.toAscii().constData(),
+	m_client = jack_client_open( clientName.toLatin1().constData(),
 						JackNullOption, &status,
 								serverName );
 	if( m_client == NULL )
@@ -156,7 +156,7 @@ bool AudioJack::initJackClient()
 	{
 		printf( "there's already a client with name '%s', so unique "
 			"name '%s' was assigned\n", clientName.
-							toAscii().constData(),
+							toLatin1().constData(),
 					jack_get_client_name( m_client ) );
 	}
 
@@ -179,7 +179,7 @@ bool AudioJack::initJackClient()
 				( ( ch % 2 ) ? "R" : "L" ) +
 				QString::number( ch / 2 + 1 );
 		m_outputPorts.push_back( jack_port_register( m_client,
-						name.toAscii().constData(),
+						name.toLatin1().constData(),
 						JACK_DEFAULT_AUDIO_TYPE,
 						JackPortIsOutput, 0 ) );
 		if( m_outputPorts.back() == NULL )
@@ -284,7 +284,7 @@ void AudioJack::registerPort( AudioPort * _port )
 	for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 	{
 		m_portMap[_port].ports[ch] = jack_port_register( m_client,
-						name[ch].toAscii().constData(),
+						name[ch].toLatin1().constData(),
 						JACK_DEFAULT_AUDIO_TYPE,
 							JackPortIsOutput, 0 );
 	}
@@ -325,7 +325,7 @@ void AudioJack::renamePort( AudioPort * _port )
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			jack_port_set_name( m_portMap[_port].ports[ch],
-					name[ch].toAscii().constData() );
+					name[ch].toLatin1().constData() );
 		}
 	}
 #endif
@@ -479,7 +479,7 @@ void AudioJack::setupWidget::saveSettings()
 
 
 
-#include "moc_AudioJack.cxx"
+
 
 #endif
 

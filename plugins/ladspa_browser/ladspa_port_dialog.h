@@ -27,7 +27,7 @@
 #define _LADSPA_PORT_DIALOG_H
 
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 #include "ladspa_manager.h"
 

@@ -24,7 +24,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "dynamics_processor_controls.h"
 #include "dynamics_processor.h"
@@ -168,5 +168,5 @@ void dynProcControls::subOneClicked()
 }
 
 
-#include "moc_dynamics_processor_controls.cxx"
+
 

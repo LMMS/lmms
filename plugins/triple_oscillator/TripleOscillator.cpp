@@ -23,9 +23,9 @@
  */
  
 
-#include <QtXml/QDomDocument>
-#include <QtGui/QBitmap>
-#include <QtGui/QPainter>
+#include <QDomDocument>
+#include <QBitmap>
+#include <QPainter>
 
 #include "TripleOscillator.h"
 #include "automatable_button.h"
@@ -798,5 +798,5 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 }
 
 
-#include "moc_TripleOscillator.cxx"
+
 

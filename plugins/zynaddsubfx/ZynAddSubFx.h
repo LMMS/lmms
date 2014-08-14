@@ -25,8 +25,8 @@
 #ifndef ZYNADDSUBFX_H
 #define ZYNADDSUBFX_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <QMap>
+#include <QMutex>
 
 #include "AutomatableModel.h"
 #include "Instrument.h"

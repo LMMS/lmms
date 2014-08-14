@@ -28,7 +28,7 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QList>
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 class QAction;
 class QDomElement;

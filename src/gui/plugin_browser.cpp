@@ -22,10 +22,10 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QPainter>
-#include <QtGui/QCursor>
-#include <QtGui/QMouseEvent>
+#include <QLabel>
+#include <QPainter>
+#include <QCursor>
+#include <QMouseEvent>
 
 #include "plugin_browser.h"
 #include "embed.h"
@@ -224,6 +224,6 @@ void pluginDescWidget::updateHeight()
 
 
 
-#include "moc_plugin_browser.cxx"
+
 
 

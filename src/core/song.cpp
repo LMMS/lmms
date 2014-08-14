@@ -22,10 +22,10 @@
  *
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtGui/QMessageBox>
+#include <QCoreApplication>
+#include <QFile>
+#include <QFileInfo>
+#include <QMessageBox>
 #include <QApplication>
 
 #include <math.h>
@@ -1182,7 +1182,7 @@ void song::exportProject(bool multiExport)
 			types << tr( __fileEncodeDevices[idx].m_description );
 			++idx;
 		}
-		efd.setFilters( types );
+		efd.setNameFilters( types );
 		QString base_filename;
 		if( !m_fileName.isEmpty() )
 		{
@@ -1282,6 +1282,6 @@ void song::removeController( Controller * _controller )
 }
 
 
-#include "moc_song.cxx"
+
 
 

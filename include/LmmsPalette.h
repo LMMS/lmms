@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "export.h"
 
 #ifndef LMMSPALETTE_H

@@ -26,7 +26,7 @@
 #ifndef _PIXMAP_BUTTON_H
 #define _PIXMAP_BUTTON_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 
 #include "automatable_button.h"
 

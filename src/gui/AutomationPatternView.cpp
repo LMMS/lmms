@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QMenu>
 
 #include "AutomationPatternView.h"
 #include "AutomationEditor.h"
@@ -433,5 +433,5 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 
 
 
-#include "moc_AutomationPatternView.cxx"
+
 

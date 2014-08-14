@@ -23,7 +23,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "stereoenhancer_controls.h"
 #include "stereo_enhancer.h"
@@ -65,5 +65,5 @@ void stereoEnhancerControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "moc_stereoenhancer_controls.cxx"
+
 

@@ -49,7 +49,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 
 #include "opl.h"
 #include "temuopl.h"
@@ -713,4 +713,4 @@ void opl2instrumentView::modelChanged()
 }
 
 
-#include "moc_opl2instrument.cxx"
+

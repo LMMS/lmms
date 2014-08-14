@@ -26,7 +26,7 @@
 #ifndef _PAPU_H
 #define _PAPU_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"

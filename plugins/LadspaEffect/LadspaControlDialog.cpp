@@ -25,8 +25,8 @@
  */
 
 
-#include <QtGui/QGroupBox>
-#include <QtGui/QLayout>
+#include <QGroupBox>
+#include <QLayout>
 
 #include "LadspaEffect.h"
 #include "LadspaControlDialog.h"
@@ -143,5 +143,5 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 }
 
 
-#include "moc_LadspaControlDialog.cxx"
+
 

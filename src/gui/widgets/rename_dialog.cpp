@@ -23,8 +23,8 @@
  */
 
 
-#include <QtGui/QKeyEvent>
-#include <QtGui/QLineEdit>
+#include <QKeyEvent>
+#include <QLineEdit>
 
 #include "rename_dialog.h"
 
@@ -76,5 +76,5 @@ void renameDialog::textChanged( const QString & _new_string )
 
 
 
-#include "moc_rename_dialog.cxx"
+
 

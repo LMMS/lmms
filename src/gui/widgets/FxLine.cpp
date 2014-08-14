@@ -26,10 +26,10 @@
 #include "FxLine.h"
 
 #include <QDebug>
-#include <QtGui/QInputDialog>
-#include <QtGui/QPainter>
-#include <QtGui/QLineEdit>
-#include <QtGui/QWhatsThis>
+#include <QInputDialog>
+#include <QPainter>
+#include <QLineEdit>
+#include <QWhatsThis>
 
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -261,5 +261,5 @@ void FxLine::setBackgroundActive( const QBrush & c )
 	m_backgroundActive = c;
 }
 
-#include "moc_FxLine.cxx"
+
 

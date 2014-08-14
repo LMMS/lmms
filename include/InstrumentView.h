@@ -48,7 +48,7 @@ public:
 		return( castModel<Instrument>() );
 	}
 
-	virtual void setModel( Model * _model, bool = FALSE );
+	virtual void setModel( Model * _model, bool = false );
 
 	InstrumentTrackWindow * instrumentTrackWindow();
 

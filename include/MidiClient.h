@@ -112,7 +112,7 @@ public:
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
 			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-					tr( _caption.toAscii() ) ).toUpper(),
+					tr( _caption.toLatin1() ) ).toUpper(),
 								_parent )
 		{
 		}

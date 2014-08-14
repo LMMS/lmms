@@ -26,8 +26,8 @@
 #ifndef TEXT_FLOAT_H
 #define TEXT_FLOAT_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QPixmap>
+#include <QWidget>
+#include <QPixmap>
 
 #include "export.h"
 

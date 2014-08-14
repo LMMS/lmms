@@ -26,7 +26,7 @@
 #ifndef FILEDIALOG_H
 #define FILEDIALOG_H
 
-#include <QtGui/QFileDialog>
+#include <QFileDialog>
 
 #include "export.h"
 

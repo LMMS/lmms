@@ -26,7 +26,7 @@
 #ifndef _PROJECT_NOTES_H
 #define _PROJECT_NOTES_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 #include "JournallingObject.h"
 

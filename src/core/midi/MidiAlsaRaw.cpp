@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "MidiAlsaRaw.h"
 #include "config_mgr.h"
@@ -41,7 +41,7 @@ MidiAlsaRaw::MidiAlsaRaw() :
 {
 	int err;
 	if( ( err = snd_rawmidi_open( m_inputp, m_outputp,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 								0 ) ) < 0 )
 	{
 		printf( "cannot open MIDI-device: %s\n", snd_strerror( err ) );

@@ -24,13 +24,13 @@
  */
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QInputDialog>
-#include <QtGui/QWhatsThis>
+#include <QLabel>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
+#include <QInputDialog>
+#include <QWhatsThis>
 
 #include "ControllerView.h"
 
@@ -198,5 +198,5 @@ void ControllerView::displayHelp()
 
 
 
-#include "moc_ControllerView.cxx"
+
 

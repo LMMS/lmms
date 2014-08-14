@@ -24,7 +24,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "waveshaper_controls.h"
 #include "waveshaper.h"
@@ -167,5 +167,5 @@ void waveShaperControls::subOneClicked()
 }
 
 
-#include "moc_waveshaper_controls.cxx"
+
 

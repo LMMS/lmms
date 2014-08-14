@@ -23,10 +23,10 @@
  */
 
 
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QLineEdit>
+#include <QLayout>
+#include <QPushButton>
+#include <QFontMetrics>
+#include <QLineEdit>
 
 #include "VersionedSaveDialog.h"
 
@@ -136,4 +136,4 @@ void VersionedSaveDialog::decrementVersion()
 	selectFile( file );
 }
 
-#include "moc_VersionedSaveDialog.cxx"
+

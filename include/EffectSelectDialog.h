@@ -25,9 +25,9 @@
 #ifndef _EFFECT_SELECT_DIALOG_H
 #define _EFFECT_SELECT_DIALOG_H
 
-#include <QtGui/QDialog>
-#include <QtGui/QSortFilterProxyModel>
-#include <QtGui/QStandardItemModel>
+#include <QDialog>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 
 #include "EffectChain.h"
 #include "Effect.h"

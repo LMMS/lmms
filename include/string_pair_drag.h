@@ -26,9 +26,9 @@
 #ifndef _STRING_PAIR_DRAG_H
 #define _STRING_PAIR_DRAG_H
 
-#include <QtGui/QDrag>
-#include <QtGui/QDragEnterEvent>
-#include <QtGui/QDropEvent>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QMimeData>
 
 #include "export.h"

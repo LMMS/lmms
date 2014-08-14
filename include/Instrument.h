@@ -26,7 +26,7 @@
 #ifndef INSTRUMENT_H
 #define INSTRUMENT_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "Plugin.h"
 #include "Mixer.h"

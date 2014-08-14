@@ -25,8 +25,8 @@
  *
  */
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QLabel>
 
 #include "LadspaSubPluginFeatures.h"
 #include "AudioDevice.h"

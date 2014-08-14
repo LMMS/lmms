@@ -212,5 +212,5 @@ void EffectSelectDialog::updateSelection()
 
 
 
-#include "moc_EffectSelectDialog.cxx"
+
 

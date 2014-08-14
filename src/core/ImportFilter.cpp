@@ -23,7 +23,7 @@
  */
 
 
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "ImportFilter.h"
 #include "engine.h"

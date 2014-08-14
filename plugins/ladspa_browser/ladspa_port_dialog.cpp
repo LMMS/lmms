@@ -25,8 +25,8 @@
 
 #include "ladspa_port_dialog.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QTableWidget>
+#include <QLayout>
+#include <QTableWidget>
 
 #include "embed.h"
 #include "engine.h"
@@ -172,5 +172,4 @@ ladspaPortDialog::~ladspaPortDialog()
 
 
 
-#include  "moc_ladspa_port_dialog.cxx"
 

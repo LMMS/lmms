@@ -26,8 +26,8 @@
 #ifndef _VISUALIZATION_WIDGET
 #define _VISUALIZATION_WIDGET
 
-#include <QtGui/QWidget>
-#include <QtGui/QPixmap>
+#include <QWidget>
+#include <QPixmap>
 
 #include "Mixer.h"
 

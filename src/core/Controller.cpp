@@ -24,9 +24,9 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 
 
 #include "song.h"
@@ -346,6 +346,6 @@ int Controller::connectionCount() const{
 
 
 
-#include "moc_Controller.cxx"
+
 
 

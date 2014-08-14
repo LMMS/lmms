@@ -26,7 +26,7 @@
 #ifndef _ABOUT_DIALOG_H
 #define _ABOUT_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 #include "ui_about_dialog.h"
 

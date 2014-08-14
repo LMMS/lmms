@@ -25,7 +25,7 @@
 #define COMPILE_REMOTE_PLUGIN_BASE
 //#define DEBUG_REMOTE_PLUGIN
 #ifdef DEBUG_REMOTE_PLUGIN
-#include <QtCore/QDebug>
+#include <QDebug>
 #endif
 
 #include "RemotePlugin.h"
@@ -33,7 +33,7 @@
 #include "engine.h"
 #include "config_mgr.h"
 
-#include <QtCore/QDir>
+#include <QDir>
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -395,5 +395,5 @@ bool RemotePlugin::processMessage( const message & _m )
 
 
 
-#include "moc_RemotePlugin.cxx"
+
 

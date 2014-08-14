@@ -22,8 +22,8 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QMouseEvent>
+#include <QPainter>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -140,6 +140,6 @@ void groupBox::updatePixmap()
 
 
 
-#include "moc_group_box.cxx"
+
 
 

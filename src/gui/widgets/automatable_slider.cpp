@@ -25,8 +25,8 @@
 
 #include "automatable_slider.h"
 
-#include <QtGui/QCursor>
-#include <QtGui/QMouseEvent>
+#include <QCursor>
+#include <QMouseEvent>
 
 #include "caption_menu.h"
 #include "embed.h"
@@ -144,5 +144,5 @@ void automatableSlider::updateSlider()
 
 
 
-#include "moc_automatable_slider.cxx"
+
 

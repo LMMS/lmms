@@ -49,8 +49,8 @@
 #define FADER_H
 
 #include <QtCore/QTime>
-#include <QtGui/QWidget>
-#include <QtGui/QPixmap>
+#include <QWidget>
+#include <QPixmap>
 
 #include "AutomatableModelView.h"
 

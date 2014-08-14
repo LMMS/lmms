@@ -23,7 +23,7 @@
  */
  
 
-#include <QtGui/QMouseEvent>
+#include <QMouseEvent>
 
 #include "nstate_button.h"
 #include "embed.h"
@@ -100,6 +100,6 @@ void nStateButton::mousePressEvent( QMouseEvent * _me )
 
 
 
-#include "moc_nstate_button.cxx"
+
 
 

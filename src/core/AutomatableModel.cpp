@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "AutomatableModel.h"
 #include "AutomationPattern.h"
@@ -715,5 +715,5 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 }
 
 
-#include "moc_AutomatableModel.cxx"
+
 

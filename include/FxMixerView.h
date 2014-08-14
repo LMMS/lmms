@@ -25,10 +25,10 @@
 #ifndef FX_MIXER_VIEW_H
 #define FX_MIXER_VIEW_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QStackedLayout>
-#include <QtGui/QScrollArea>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QStackedLayout>
+#include <QScrollArea>
 
 #include "FxLine.h"
 #include "FxMixer.h"

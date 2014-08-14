@@ -24,7 +24,7 @@
  */
 
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "waveshaper_control_dialog.h"
 #include "waveshaper_controls.h"

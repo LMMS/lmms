@@ -25,7 +25,7 @@
 #ifndef MIDI_CONTROLLER_H
 #define MIDI_CONTROLLER_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "AutomatableModel.h"
 #include "Controller.h"

@@ -46,5 +46,5 @@ QString Model::fullDisplayName() const
 
 
 
-#include "moc_Model.cxx"
+
 

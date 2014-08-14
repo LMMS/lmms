@@ -25,7 +25,7 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 
 #include "Effect.h"
 #include "VstPlugin.h"

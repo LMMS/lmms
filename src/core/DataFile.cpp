@@ -28,11 +28,11 @@
 
 #include <math.h>
 
-#include <QtCore/QDebug>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QTextStream>
-#include <QtGui/QMessageBox>
+#include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
+#include <QMessageBox>
 
 
 #include "config_mgr.h"

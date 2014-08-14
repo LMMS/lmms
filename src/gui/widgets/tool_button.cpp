@@ -102,6 +102,6 @@ void toolButton::toggledBool( bool _on )
 
 
 
-#include "moc_tool_button.cxx"
+
 
 

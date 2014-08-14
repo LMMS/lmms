@@ -24,9 +24,9 @@
  */
 
 #include <cstdio>
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 #include <QMessageBox>
 
 
@@ -252,5 +252,5 @@ ControllerDialog * PeakController::createDialog( QWidget * _parent )
 }
 
 
-#include "moc_PeakController.cxx"
+
 

@@ -22,10 +22,10 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtGui/QColorDialog>
-#include <QtGui/QMenu>
-#include <QtGui/QPainter>
+#include <QDomElement>
+#include <QColorDialog>
+#include <QMenu>
+#include <QPainter>
 
 #include "bb_editor.h"
 #include "bb_track.h"
@@ -629,6 +629,6 @@ void bbTrackView::clickedTrackLabel()
 
 
 
-#include "moc_bb_track.cxx"
+
 
 

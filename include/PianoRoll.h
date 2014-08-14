@@ -27,8 +27,8 @@
 #ifndef PIANO_ROLL_H
 #define PIANO_ROLL_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QInputDialog>
+#include <QWidget>
+#include <QInputDialog>
 
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"

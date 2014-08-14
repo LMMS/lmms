@@ -24,17 +24,17 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QClipboard>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QPainter>
-#include <QtGui/QScrollBar>
-#include <QtGui/QStyleOption>
-#include <QtGui/QWheelEvent>
+#include <QApplication>
+#include <QButtonGroup>
+#include <QClipboard>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QLayout>
+#include <QMdiArea>
+#include <QPainter>
+#include <QScrollBar>
+#include <QStyleOption>
+#include <QWheelEvent>
 #include <QString>
 #include <QSignalMapper>
 
@@ -4255,6 +4255,6 @@ note * PianoRoll::noteUnderMouse()
 
 
 
-#include "moc_PianoRoll.cxx"
+
 
 

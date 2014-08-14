@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "MidiPort.h"
 #include "MidiClient.h"
@@ -405,5 +405,5 @@ void MidiPort::updateOutputProgram()
 
 
 
-#include "moc_MidiPort.cxx"
+
 

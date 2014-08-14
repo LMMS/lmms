@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 

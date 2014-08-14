@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "AmplifierControlDialog.h"
 #include "AmplifierControls.h"

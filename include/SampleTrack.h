@@ -25,7 +25,7 @@
 #ifndef SAMPLE_TRACK_H
 #define SAMPLE_TRACK_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 #include "AudioPort.h"
 #include "track.h"

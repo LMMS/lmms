@@ -23,19 +23,19 @@
  *
  */
 
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QQueue>
-#include <QtGui/QApplication>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
+#include <QDir>
+#include <QFile>
+#include <QQueue>
+#include <QApplication>
+#include <QCloseEvent>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QMdiArea>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMdiSubWindow>
+#include <QPainter>
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
@@ -1579,6 +1579,6 @@ void InstrumentTrackWindow::loadSettings( const QDomElement& thisElement )
 
 
 
-#include "moc_InstrumentTrack.cxx"
+
 
 

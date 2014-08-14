@@ -26,13 +26,13 @@
 
 #include "combobox.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QCursor>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmap>
-#include <QtGui/QStyleOptionFrame>
+#include <QApplication>
+#include <QCursor>
+#include <QDesktopWidget>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPixmap>
+#include <QStyleOptionFrame>
 
 #include "caption_menu.h"
 #include "engine.h"
@@ -254,6 +254,6 @@ void comboBox::setItem( QAction* item )
 
 
 
-#include "moc_combobox.cxx"
+
 
 

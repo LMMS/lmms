@@ -25,8 +25,8 @@
 #ifndef _PIANO_VIEW_H
 #define _PIANO_VIEW_H
 
-#include <QtGui/QPixmap>
-#include <QtGui/QScrollBar>
+#include <QPixmap>
+#include <QScrollBar>
 
 #include "ModelView.h"
 

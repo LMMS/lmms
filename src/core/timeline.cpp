@@ -23,12 +23,12 @@
  */
 
 
-#include <QtXml/QDomElement>
-#include <QtCore/QTimer>
-#include <QtGui/QApplication>
-#include <QtGui/QLayout>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QDomElement>
+#include <QTimer>
+#include <QApplication>
+#include <QLayout>
+#include <QMouseEvent>
+#include <QPainter>
 
 
 #include "timeline.h"
@@ -391,6 +391,6 @@ void timeLine::mouseReleaseEvent( QMouseEvent* event )
 
 
 
-#include "moc_timeline.cxx"
+
 
 

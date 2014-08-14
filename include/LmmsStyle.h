@@ -27,11 +27,11 @@
 #ifndef LMMS_STYLE_H
 #define LMMS_STYLE_H
 
-#include <QtGui/QPlastiqueStyle>
+#include <QProxyStyle>
 
 
 
-class LmmsStyle : public QPlastiqueStyle
+class LmmsStyle : public QProxyStyle
 {
 public:
 	enum ColorRole
