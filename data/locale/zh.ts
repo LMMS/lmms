@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.0" language="zh">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>LMMS (Linux MultiMedia Studio)</source>
-        <translation></translation>
+        <translation>LMMS (Linux 多媒体工作室)</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
@@ -35,9 +35,14 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>当前语言是中文（中国）
+        <translation type="unfinished">当前语言是中文（中国）
 
-请联系开发者改进中文翻译</translation>
+请联系译者改进翻译
+翻译：
+TonyChyi，邮箱：tonychee1989@gmail.com
+Min Zhang ，邮箱：zm1990s@gmail.com
+校对：
+Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>License</source>
@@ -45,11 +50,65 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation></translation>
+        <translation>Copyright (c) 2004-2014, LMMS 开发者</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>AmplifierControlDialog</name>
+    <message>
+        <source>VOL</source>
+        <translation>VOL</translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation>音量：</translation>
+    </message>
+    <message>
+        <source>PAN</source>
+        <translation>PAN</translation>
+    </message>
+    <message>
+        <source>Panning:</source>
+        <translation>声相：</translation>
+    </message>
+    <message>
+        <source>LEFT</source>
+        <translation>左</translation>
+    </message>
+    <message>
+        <source>Left gain:</source>
+        <translation>左增益：</translation>
+    </message>
+    <message>
+        <source>RIGHT</source>
+        <translation>右</translation>
+    </message>
+    <message>
+        <source>Right gain:</source>
+        <translation>右增益：</translation>
+    </message>
+</context>
+<context>
+    <name>AmplifierControls</name>
+    <message>
+        <source>Volume</source>
+        <translation>音量</translation>
+    </message>
+    <message>
+        <source>Panning</source>
+        <translation>声相</translation>
+    </message>
+    <message>
+        <source>Left gain</source>
+        <translation>左增益</translation>
+    </message>
+    <message>
+        <source>Right gain</source>
+        <translation>右增益</translation>
     </message>
 </context>
 <context>
@@ -60,7 +119,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>通道</translation>
+        <translation>声道数</translation>
     </message>
 </context>
 <context>
@@ -71,54 +130,74 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。诸如环回模式(looping-mode)，起始/结束点，放大值(amplify-value)之类的值不会被重置。因此听起来会和源采样有差异。</translation>
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation type="unfinished"></translation>
+        <translation>反转采样</translation>
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loop sample at start- and end-point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Here you can set, whether looping-mode is enabled. If enabled, AudioFileProcessor loops between start and end-points of a sample until the whole note is played. This is useful for things like string and choir samples.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果点击此按钮，整个采样将会被反转。能用于制作很酷的效果，例如reversed crash.</translation>
     </message>
     <message>
         <source>Amplify:</source>
-        <translation type="unfinished"></translation>
+        <translation>放大: </translation>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation type="unfinished"></translation>
+        <translation>此旋钮用于调整放大比率。当设为100% 时采样不会变化。除此之外，不是放大就是减弱(原始的采样文件不会被改变)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable looping-mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation type="unfinished"></translation>
+        <translation>起始点 </translation>
     </message>
     <message>
         <source>Endpoint:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable looping-mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation type="unfinished"></translation>
+        <translation>终点:</translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
-        <translation type="unfinished"></translation>
+        <translation>跨音符继续播放采样</translation>
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable loop</source>
+        <translation>禁用循环</translation>
+    </message>
+    <message>
+        <source>This button disables looping. The sample plays only once from start to end. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable loop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loopback point:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where the loop starts. </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -156,7 +235,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>通道</translation>
+        <translation>声道数</translation>
     </message>
 </context>
 <context>
@@ -167,7 +246,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>通道</translation>
+        <translation>声道数</translation>
     </message>
 </context>
 <context>
@@ -189,7 +268,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>通道</translation>
+        <translation>声道数</translation>
     </message>
 </context>
 <context>
@@ -258,11 +337,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里播放片段。编辑时很有用，片段会自动循环播放。</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里停止播放片段。</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
@@ -274,11 +353,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里启用绘制模式。在此模式下你可以增加或移动单个值。  大部分时间下默认使用此模式。你也可以按键盘上的 ‘Shift+D’激活此模式。</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击启用擦除模式。此模式下你可以擦除单个值。你可以按键盘上的 &apos;Shift+E&apos; 启用此模式。</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
@@ -294,11 +373,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里，选择的值将会被剪切到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里，选择的值将会被复制到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
@@ -367,16 +446,20 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
         <translation>按住&lt;Ctrl&gt;拖动控制器</translation>
     </message>
+    <message>
+        <source>Model is already connected to this pattern.</source>
+        <translation>模型已连接到此片段。</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation type="unfinished"></translation>
+        <translation>双击在自动编辑器中打开此片段</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation type="unfinished"></translation>
+        <translation>在自动编辑器（ Automation editor）中打开</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -398,12 +481,58 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Disconnect &quot;%1&quot;</source>
         <translation>断开“%1”的连接</translation>
     </message>
+    <message>
+        <source>Set/clear record</source>
+        <translation>设置/清除录制</translation>
+    </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
         <translation>自动控制轨道</translation>
+    </message>
+</context>
+<context>
+    <name>BassBoosterControlDialog</name>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>增益</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>增益：</translation>
+    </message>
+    <message>
+        <source>RATIO</source>
+        <translation>比率</translation>
+    </message>
+    <message>
+        <source>Ratio:</source>
+        <translation>比率：</translation>
+    </message>
+</context>
+<context>
+    <name>BassBoosterControls</name>
+    <message>
+        <source>Frequency</source>
+        <translation>频率</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>增益</translation>
+    </message>
+    <message>
+        <source>Ratio</source>
+        <translation>比率</translation>
     </message>
 </context>
 <context>
@@ -445,7 +574,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
-        <translation type="unfinished"></translation>
+        <translation>用来接收 MIDI 事件的MIDI 设备</translation>
     </message>
     <message>
         <source>USER CONTROLLER</source>
@@ -465,7 +594,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>LMMS</source>
-        <translation></translation>
+        <translation>LMMS</translation>
     </message>
     <message>
         <source>Cycle Detected.</source>
@@ -495,11 +624,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>ControllerView</name>
     <message>
         <source>Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>控制器</translation>
     </message>
     <message>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
-        <translation type="unfinished"></translation>
+        <translation>控制器可以自动控制旋钮，滑块和其他控件的值。</translation>
     </message>
     <message>
         <source>Rename controller</source>
@@ -516,6 +645,132 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>&amp;Help</source>
         <translation>帮助（&amp;H）</translation>
+    </message>
+</context>
+<context>
+    <name>DualFilterControlDialog</name>
+    <message>
+        <source>Filter 1 enabled</source>
+        <translation>已启用过滤器 1</translation>
+    </message>
+    <message>
+        <source>Filter 2 enabled</source>
+        <translation>已启用过滤器 2</translation>
+    </message>
+    <message>
+        <source>Click to enable/disable Filter 1</source>
+        <translation>点击启用/禁用过滤器 1</translation>
+    </message>
+    <message>
+        <source>Click to enable/disable Filter 2</source>
+        <translation>点击启用/禁用过滤器 2</translation>
+    </message>
+</context>
+<context>
+    <name>DualFilterControls</name>
+    <message>
+        <source>Filter 1 enabled</source>
+        <translation>过滤器1 已启用</translation>
+    </message>
+    <message>
+        <source>Filter 1 type</source>
+        <translation>过滤器 1 类型</translation>
+    </message>
+    <message>
+        <source>Cutoff 1 frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Q/Resonance 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter 2 enabled</source>
+        <translation type="unfinished">已启用过滤器 2</translation>
+    </message>
+    <message>
+        <source>Filter 2 type</source>
+        <translation type="unfinished">过滤器 1 类型 {2 ?}</translation>
+    </message>
+    <message>
+        <source>Cutoff 2 frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Q/Resonance 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LowPass</source>
+        <translation>低通</translation>
+    </message>
+    <message>
+        <source>HiPass</source>
+        <translation>高通</translation>
+    </message>
+    <message>
+        <source>BandPass csg</source>
+        <translation>带通 csg</translation>
+    </message>
+    <message>
+        <source>BandPass czpg</source>
+        <translation>带通 czpg</translation>
+    </message>
+    <message>
+        <source>Notch</source>
+        <translation>凹口滤波器</translation>
+    </message>
+    <message>
+        <source>Allpass</source>
+        <translation>全通</translation>
+    </message>
+    <message>
+        <source>Moog</source>
+        <translation>Moog</translation>
+    </message>
+    <message>
+        <source>2x LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RC LowPass 12dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RC BandPass 12dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RC HighPass 12dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RC LowPass 24dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RC BandPass 24dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RC HighPass 24dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vocal Formant Filter</source>
+        <translation>人声移除过滤器</translation>
     </message>
 </context>
 <context>
@@ -570,15 +825,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>EffectView</name>
     <message>
         <source>Toggles the effect on or off.</source>
-        <translation type="unfinished"></translation>
+        <translation>打开或关闭效果</translation>
     </message>
     <message>
         <source>On/Off</source>
-        <translation type="unfinished"></translation>
+        <translation>开/关</translation>
     </message>
     <message>
         <source>W/D</source>
-        <translation type="unfinished"></translation>
+        <translation>W/D</translation>
     </message>
     <message>
         <source>Wet Level:</source>
@@ -590,11 +845,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>DECAY</source>
-        <translation type="unfinished"></translation>
+        <translation>衰减</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>时间：</translation>
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
@@ -602,11 +857,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>GATE</source>
-        <translation type="unfinished"></translation>
+        <translation>门限</translation>
     </message>
     <message>
         <source>Gate:</source>
-        <translation type="unfinished"></translation>
+        <translation>门限：</translation>
     </message>
     <message>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
@@ -614,7 +869,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>控制</translation>
     </message>
     <message>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
@@ -634,70 +889,70 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Move &amp;up</source>
-        <translation type="unfinished"></translation>
+        <translation>向上移 (&amp;u)</translation>
     </message>
     <message>
         <source>Move &amp;down</source>
-        <translation type="unfinished"></translation>
+        <translation>向下移 (&amp;d)</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>移除此插件 (&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助(&amp;H)</translation>
     </message>
 </context>
 <context>
     <name>EnvelopeAndLfoParameters</name>
     <message>
         <source>Predelay</source>
-        <translation type="unfinished"></translation>
+        <translation>预延迟</translation>
     </message>
     <message>
         <source>Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>打进声</translation>
     </message>
     <message>
         <source>Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>保持</translation>
     </message>
     <message>
         <source>Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>衰减</translation>
     </message>
     <message>
         <source>Sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>持续</translation>
     </message>
     <message>
         <source>Release</source>
-        <translation type="unfinished"></translation>
+        <translation>释放</translation>
     </message>
     <message>
         <source>Modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>调制</translation>
     </message>
     <message>
         <source>LFO Predelay</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 预延迟</translation>
     </message>
     <message>
         <source>LFO Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 打进声（attack）</translation>
     </message>
     <message>
         <source>LFO speed</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 速度</translation>
     </message>
     <message>
         <source>LFO Modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 调制</translation>
     </message>
     <message>
         <source>LFO Wave Shape</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 波形形状</translation>
     </message>
     <message>
         <source>Freq x 100</source>
@@ -728,7 +983,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">打进声</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
@@ -752,7 +1007,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">衰减：</translation>
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
@@ -876,10 +1131,14 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">提示</translation>
     </message>
     <message>
         <source>Drag a sample from somewhere and drop it in this window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for random wave.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -887,87 +1146,87 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>ExportProjectDialog</name>
     <message>
         <source>Export project</source>
-        <translation type="unfinished"></translation>
+        <translation>导出工程</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>File format:</source>
-        <translation type="unfinished"></translation>
+        <translation>文件格式：</translation>
     </message>
     <message>
         <source>Samplerate:</source>
-        <translation type="unfinished"></translation>
+        <translation>采样率：</translation>
     </message>
     <message>
         <source>44100 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>44100 Hz</translation>
     </message>
     <message>
         <source>48000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>48000 Hz</translation>
     </message>
     <message>
         <source>88200 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>88200 Hz</translation>
     </message>
     <message>
         <source>96000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>96000 Hz</translation>
     </message>
     <message>
         <source>192000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>192000 Hz</translation>
     </message>
     <message>
         <source>Bitrate:</source>
-        <translation type="unfinished"></translation>
+        <translation>码率：</translation>
     </message>
     <message>
         <source>64 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>64 KBit/s</translation>
     </message>
     <message>
         <source>128 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>128 KBit/s</translation>
     </message>
     <message>
         <source>160 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>160 KBit/s</translation>
     </message>
     <message>
         <source>192 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>192 KBit/s</translation>
     </message>
     <message>
         <source>256 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>256 KBit/s</translation>
     </message>
     <message>
         <source>320 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>320 KBit/s</translation>
     </message>
     <message>
         <source>Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>位深：</translation>
     </message>
     <message>
         <source>16 Bit Integer</source>
-        <translation type="unfinished"></translation>
+        <translation>16 位整形</translation>
     </message>
     <message>
         <source>32 Bit Float</source>
-        <translation type="unfinished"></translation>
+        <translation>32 位浮点型</translation>
     </message>
     <message>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation type="unfinished"></translation>
+        <translation>请注意上面的参数不一定适用于所有文件格式。</translation>
     </message>
     <message>
         <source>Quality settings</source>
-        <translation type="unfinished"></translation>
+        <translation>质量设置</translation>
     </message>
     <message>
         <source>Interpolation:</source>
@@ -995,38 +1254,67 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>1x (None)</source>
-        <translation type="unfinished"></translation>
+        <translation>1x (无)</translation>
     </message>
     <message>
         <source>2x</source>
-        <translation type="unfinished"></translation>
+        <translation>2x</translation>
     </message>
     <message>
         <source>4x</source>
-        <translation type="unfinished"></translation>
+        <translation>4x</translation>
     </message>
     <message>
         <source>8x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sample-exact controllers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alias-free oscillators</source>
-        <translation type="unfinished"></translation>
+        <translation>8x</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>Export as loop (remove end silence)</source>
+        <translation>导出为回环loop（移除结尾的静音）</translation>
+    </message>
+</context>
+<context>
+    <name>FxLine</name>
+    <message>
+        <source>Channel send amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The FX channel receives input from one or more instrument tracks.
+ It in turn can be routed to multiple other FX channels. LMMS automatically takes care of preventing infinite loops for you and doesn&apos;t allow making a connection that would result in an infinite loop.
+
+In order to route the channel to another channel, select the FX channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
+
+You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename &amp;channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R&amp;emove channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1038,7 +1326,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>FX %1</source>
-        <translation></translation>
+        <translation>FX %1</translation>
     </message>
 </context>
 <context>
@@ -1053,11 +1341,14 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>FX-Mixer</source>
-        <translation type="unfinished"></translation>
+        <translation>效果混合器</translation>
     </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
-        <translation type="unfinished"></translation>
+        <translation>FX 衰减器 %1</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -1066,6 +1357,13 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Mute this FX channel</source>
         <translation>静音此效果通道</translation>
+    </message>
+</context>
+<context>
+    <name>FxRoute</name>
+    <message>
+        <source>Amount to send from channel %1 to channel %2</source>
+        <translation>从通道 %1 发送到通道 %2 的量</translation>
     </message>
 </context>
 <context>
@@ -1100,15 +1398,15 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation>向上</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation>向下</translation>
     </message>
     <message>
         <source>Up and down</source>
-        <translation type="unfinished"></translation>
+        <translation>上和下</translation>
     </message>
     <message>
         <source>Random</source>
@@ -1116,7 +1414,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>自由</translation>
     </message>
     <message>
         <source>Sort</source>
@@ -1125,6 +1423,10 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Sync</source>
         <translation>同步</translation>
+    </message>
+    <message>
+        <source>Down and up</source>
+        <translation>下和上</translation>
     </message>
 </context>
 <context>
@@ -1139,7 +1441,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>RANGE</source>
-        <translation type="unfinished"></translation>
+        <translation>范围</translation>
     </message>
     <message>
         <source>Arpeggio range:</source>
@@ -1155,7 +1457,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>TIME</source>
-        <translation type="unfinished"></translation>
+        <translation>时长</translation>
     </message>
     <message>
         <source>Arpeggio time:</source>
@@ -1163,7 +1465,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation>毫秒</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
@@ -1171,7 +1473,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>GATE</source>
-        <translation type="unfinished"></translation>
+        <translation>门限</translation>
     </message>
     <message>
         <source>Arpeggio gate:</source>
@@ -1187,294 +1489,294 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Chord:</source>
-        <translation type="unfinished"></translation>
+        <translation>和弦：</translation>
     </message>
     <message>
         <source>Direction:</source>
-        <translation type="unfinished"></translation>
+        <translation>方向：</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>模式：</translation>
     </message>
 </context>
 <context>
     <name>InstrumentFunctionNoteStacking</name>
     <message>
         <source>octave</source>
-        <translation></translation>
+        <translation>octave</translation>
     </message>
     <message>
         <source>Major</source>
-        <translation></translation>
+        <translation>Major</translation>
     </message>
     <message>
         <source>Majb5</source>
-        <translation></translation>
+        <translation>Majb5</translation>
     </message>
     <message>
         <source>minor</source>
-        <translation></translation>
+        <translation>minor</translation>
     </message>
     <message>
         <source>minb5</source>
-        <translation></translation>
+        <translation>minb5</translation>
     </message>
     <message>
         <source>sus2</source>
-        <translation></translation>
+        <translation>sus2</translation>
     </message>
     <message>
         <source>sus4</source>
-        <translation></translation>
+        <translation>sus4</translation>
     </message>
     <message>
         <source>aug</source>
-        <translation></translation>
+        <translation>aug</translation>
     </message>
     <message>
         <source>augsus4</source>
-        <translation></translation>
+        <translation>augsus4</translation>
     </message>
     <message>
         <source>tri</source>
-        <translation></translation>
+        <translation>tri</translation>
     </message>
     <message>
         <source>6</source>
-        <translation></translation>
+        <translation>6</translation>
     </message>
     <message>
         <source>6sus4</source>
-        <translation></translation>
+        <translation>6sus4</translation>
     </message>
     <message>
         <source>6add9</source>
-        <translation></translation>
+        <translation>6add9</translation>
     </message>
     <message>
         <source>m6</source>
-        <translation></translation>
+        <translation>m6</translation>
     </message>
     <message>
         <source>m6add9</source>
-        <translation></translation>
+        <translation>m6add9</translation>
     </message>
     <message>
         <source>7</source>
-        <translation></translation>
+        <translation>7</translation>
     </message>
     <message>
         <source>7sus4</source>
-        <translation></translation>
+        <translation>7sus4</translation>
     </message>
     <message>
         <source>7#5</source>
-        <translation></translation>
+        <translation>7#5</translation>
     </message>
     <message>
         <source>7b5</source>
-        <translation></translation>
+        <translation>7b5</translation>
     </message>
     <message>
         <source>7#9</source>
-        <translation></translation>
+        <translation>7#9</translation>
     </message>
     <message>
         <source>7b9</source>
-        <translation></translation>
+        <translation>7b9</translation>
     </message>
     <message>
         <source>7#5#9</source>
-        <translation></translation>
+        <translation>7#5#9</translation>
     </message>
     <message>
         <source>7#5b9</source>
-        <translation></translation>
+        <translation>7#5b9</translation>
     </message>
     <message>
         <source>7b5b9</source>
-        <translation></translation>
+        <translation>7b5b9</translation>
     </message>
     <message>
         <source>7add11</source>
-        <translation></translation>
+        <translation>7add11</translation>
     </message>
     <message>
         <source>7add13</source>
-        <translation></translation>
+        <translation>7add13</translation>
     </message>
     <message>
         <source>7#11</source>
-        <translation></translation>
+        <translation>7#11</translation>
     </message>
     <message>
         <source>Maj7</source>
-        <translation></translation>
+        <translation>Maj7</translation>
     </message>
     <message>
         <source>Maj7b5</source>
-        <translation></translation>
+        <translation>Maj7b5</translation>
     </message>
     <message>
         <source>Maj7#5</source>
-        <translation></translation>
+        <translation>Maj7#5</translation>
     </message>
     <message>
         <source>Maj7#11</source>
-        <translation></translation>
+        <translation>Maj7#11</translation>
     </message>
     <message>
         <source>Maj7add13</source>
-        <translation></translation>
+        <translation>Maj7add13</translation>
     </message>
     <message>
         <source>m7</source>
-        <translation></translation>
+        <translation>m7</translation>
     </message>
     <message>
         <source>m7b5</source>
-        <translation></translation>
+        <translation>m7b5</translation>
     </message>
     <message>
         <source>m7b9</source>
-        <translation></translation>
+        <translation>m7b9</translation>
     </message>
     <message>
         <source>m7add11</source>
-        <translation></translation>
+        <translation>m7add11</translation>
     </message>
     <message>
         <source>m7add13</source>
-        <translation></translation>
+        <translation>m7add13</translation>
     </message>
     <message>
         <source>m-Maj7</source>
-        <translation></translation>
+        <translation>m-Maj7</translation>
     </message>
     <message>
         <source>m-Maj7add11</source>
-        <translation></translation>
+        <translation>m-Maj7add11</translation>
     </message>
     <message>
         <source>m-Maj7add13</source>
-        <translation></translation>
+        <translation>m-Maj7add13</translation>
     </message>
     <message>
         <source>9</source>
-        <translation></translation>
+        <translation>9</translation>
     </message>
     <message>
         <source>9sus4</source>
-        <translation></translation>
+        <translation>9sus4</translation>
     </message>
     <message>
         <source>add9</source>
-        <translation></translation>
+        <translation>add9</translation>
     </message>
     <message>
         <source>9#5</source>
-        <translation></translation>
+        <translation>9#5</translation>
     </message>
     <message>
         <source>9b5</source>
-        <translation></translation>
+        <translation>9b5</translation>
     </message>
     <message>
         <source>9#11</source>
-        <translation></translation>
+        <translation>9#11</translation>
     </message>
     <message>
         <source>9b13</source>
-        <translation></translation>
+        <translation>9b13</translation>
     </message>
     <message>
         <source>Maj9</source>
-        <translation></translation>
+        <translation>Maj9</translation>
     </message>
     <message>
         <source>Maj9sus4</source>
-        <translation></translation>
+        <translation>Maj9sus4</translation>
     </message>
     <message>
         <source>Maj9#5</source>
-        <translation></translation>
+        <translation>Maj9#5</translation>
     </message>
     <message>
         <source>Maj9#11</source>
-        <translation></translation>
+        <translation>Maj9#11</translation>
     </message>
     <message>
         <source>m9</source>
-        <translation></translation>
+        <translation>m9</translation>
     </message>
     <message>
         <source>madd9</source>
-        <translation></translation>
+        <translation>madd9</translation>
     </message>
     <message>
         <source>m9b5</source>
-        <translation></translation>
+        <translation>m9b5</translation>
     </message>
     <message>
         <source>m9-Maj7</source>
-        <translation></translation>
+        <translation>m9-Maj7</translation>
     </message>
     <message>
         <source>11</source>
-        <translation></translation>
+        <translation>11</translation>
     </message>
     <message>
         <source>11b9</source>
-        <translation></translation>
+        <translation>11b9</translation>
     </message>
     <message>
         <source>Maj11</source>
-        <translation></translation>
+        <translation>Maj11</translation>
     </message>
     <message>
         <source>m11</source>
-        <translation></translation>
+        <translation>m11</translation>
     </message>
     <message>
         <source>m-Maj11</source>
-        <translation></translation>
+        <translation>m-Maj11</translation>
     </message>
     <message>
         <source>13</source>
-        <translation></translation>
+        <translation>13</translation>
     </message>
     <message>
         <source>13#9</source>
-        <translation></translation>
+        <translation>13#9</translation>
     </message>
     <message>
         <source>13b9</source>
-        <translation></translation>
+        <translation>13b9</translation>
     </message>
     <message>
         <source>13b5b9</source>
-        <translation></translation>
+        <translation>13b5b9</translation>
     </message>
     <message>
         <source>Maj13</source>
-        <translation></translation>
+        <translation>Maj13</translation>
     </message>
     <message>
         <source>m13</source>
-        <translation></translation>
+        <translation>m13</translation>
     </message>
     <message>
         <source>m-Maj13</source>
-        <translation></translation>
+        <translation>m-Maj13</translation>
     </message>
     <message>
         <source>Harmonic minor</source>
-        <translation></translation>
+        <translation>Harmonic minor</translation>
     </message>
     <message>
         <source>Melodic minor</source>
-        <translation></translation>
+        <translation>Melodic minor</translation>
     </message>
     <message>
         <source>Whole tone</source>
@@ -1482,55 +1784,55 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Diminished</source>
-        <translation></translation>
+        <translation>Diminished</translation>
     </message>
     <message>
         <source>Major pentatonic</source>
-        <translation></translation>
+        <translation>Major pentatonic</translation>
     </message>
     <message>
         <source>Minor pentatonic</source>
-        <translation></translation>
+        <translation>Minor pentatonic</translation>
     </message>
     <message>
         <source>Jap in sen</source>
-        <translation></translation>
+        <translation>Jap in sen</translation>
     </message>
     <message>
         <source>Major bebop</source>
-        <translation></translation>
+        <translation>Major bebop</translation>
     </message>
     <message>
         <source>Dominant bebop</source>
-        <translation></translation>
+        <translation>Dominant bebop</translation>
     </message>
     <message>
         <source>Blues</source>
-        <translation></translation>
+        <translation>Blues</translation>
     </message>
     <message>
         <source>Arabic</source>
-        <translation></translation>
+        <translation>Arabic</translation>
     </message>
     <message>
         <source>Enigmatic</source>
-        <translation></translation>
+        <translation>Enigmatic</translation>
     </message>
     <message>
         <source>Neopolitan</source>
-        <translation></translation>
+        <translation>Neopolitan</translation>
     </message>
     <message>
         <source>Neopolitan minor</source>
-        <translation></translation>
+        <translation>Neopolitan minor</translation>
     </message>
     <message>
         <source>Hungarian minor</source>
-        <translation></translation>
+        <translation>Hungarian minor</translation>
     </message>
     <message>
         <source>Dorian</source>
-        <translation></translation>
+        <translation>Dorian</translation>
     </message>
     <message>
         <source>Phrygolydian</source>
@@ -1538,46 +1840,58 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Lydian</source>
-        <translation></translation>
+        <translation>Lydian</translation>
     </message>
     <message>
         <source>Mixolydian</source>
-        <translation></translation>
+        <translation>Mixolydian</translation>
     </message>
     <message>
         <source>Aeolian</source>
-        <translation></translation>
+        <translation>Aeolian</translation>
     </message>
     <message>
         <source>Locrian</source>
-        <translation></translation>
+        <translation>Locrian</translation>
     </message>
     <message>
         <source>Chords</source>
-        <translation></translation>
+        <translation>Chords</translation>
     </message>
     <message>
         <source>Chord type</source>
-        <translation></translation>
+        <translation>Chord type</translation>
     </message>
     <message>
         <source>Chord range</source>
-        <translation></translation>
+        <translation>Chord range</translation>
     </message>
     <message>
         <source>Minor</source>
+        <translation>Minor</translation>
+    </message>
+    <message>
+        <source>Chromatic</source>
+        <translation>Chromatic</translation>
+    </message>
+    <message>
+        <source>Half-Whole Diminished</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>5</source>
+        <translation>5</translation>
     </message>
 </context>
 <context>
     <name>InstrumentFunctionNoteStackingView</name>
     <message>
         <source>RANGE</source>
-        <translation type="unfinished"></translation>
+        <translation>范围</translation>
     </message>
     <message>
         <source>Chord range:</source>
-        <translation type="unfinished"></translation>
+        <translation>和弦范围：</translation>
     </message>
     <message>
         <source>octave(s)</source>
@@ -1593,7 +1907,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Chord:</source>
-        <translation type="unfinished"></translation>
+        <translation>和弦：</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1944,18 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>NOTE</source>
         <translation>音符</translation>
     </message>
+    <message>
+        <source>CUSTOM BASE VELOCITY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BASE VELOCITY</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstrumentSoundShaping</name>
@@ -1643,11 +1969,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>CUTOFF</source>
-        <translation type="unfinished"></translation>
+        <translation>切除</translation>
     </message>
     <message>
         <source>Cutoff frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>切除频率</translation>
     </message>
     <message>
         <source>RESO</source>
@@ -1655,7 +1981,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Resonance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">共鸣</translation>
     </message>
     <message>
         <source>Envelopes/LFOs</source>
@@ -1663,7 +1989,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Filter type</source>
-        <translation type="unfinished"></translation>
+        <translation>过滤器类型</translation>
     </message>
     <message>
         <source>Q/Resonance</source>
@@ -1671,31 +1997,31 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LowPass</source>
-        <translation type="unfinished"></translation>
+        <translation>低通</translation>
     </message>
     <message>
         <source>HiPass</source>
-        <translation type="unfinished"></translation>
+        <translation>高通</translation>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation type="unfinished"></translation>
+        <translation>带通 csg</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation type="unfinished"></translation>
+        <translation>带通 czpg</translation>
     </message>
     <message>
         <source>Notch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">凹口滤波器</translation>
     </message>
     <message>
         <source>Allpass</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">全通</translation>
     </message>
     <message>
         <source>Moog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moog</translation>
     </message>
     <message>
         <source>2x LowPass</source>
@@ -1727,7 +2053,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>人声移除过滤器</translation>
     </message>
 </context>
 <context>
@@ -1776,6 +2102,10 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>cutoff frequency:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstrumentTrack</name>
@@ -1793,7 +2123,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Pitch</source>
-        <translation>弯音</translation>
+        <translation>音高</translation>
     </message>
     <message>
         <source>FX channel</source>
@@ -1813,7 +2143,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Pitch range</source>
-        <translation>弯音范围</translation>
+        <translation>音域范围</translation>
     </message>
 </context>
 <context>
@@ -1828,7 +2158,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>VOL</source>
-        <translation></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -1840,11 +2170,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>PAN</source>
-        <translation></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>MIDI</source>
-        <translation></translation>
+        <translation>MIDI</translation>
     </message>
     <message>
         <source>Input</source>
@@ -1875,7 +2205,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>VOL</source>
-        <translation></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -1887,19 +2217,19 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>PAN</source>
-        <translation></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Pitch</source>
-        <translation>弯音</translation>
+        <translation>音高</translation>
     </message>
     <message>
         <source>Pitch:</source>
-        <translation>弯音：</translation>
+        <translation>音高：</translation>
     </message>
     <message>
         <source>cents</source>
-        <translation></translation>
+        <translation>音分 cents</translation>
     </message>
     <message>
         <source>PITCH</source>
@@ -1923,7 +2253,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>MIDI</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -1931,7 +2261,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>XML preset file (*.xpf)</source>
-        <translation type="unfinished"></translation>
+        <translation>XML 预设文件 (*.xpf)</translation>
     </message>
     <message>
         <source>PLUGIN</source>
@@ -1939,11 +2269,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Save current channel settings in a preset-file</source>
-        <translation type="unfinished"></translation>
+        <translation>在预设文件中保存当前通道设置</translation>
     </message>
     <message>
         <source>Pitch range (semitones)</source>
-        <translation>弯音范围（半音）</translation>
+        <translation>音域范围（半音）</translation>
     </message>
     <message>
         <source>RANGE</source>
@@ -1954,14 +2284,14 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>LadspaControl</name>
     <message>
         <source>Link channels</source>
-        <translation type="unfinished"></translation>
+        <translation>关联通道</translation>
     </message>
 </context>
 <context>
     <name>LadspaControlDialog</name>
     <message>
         <source>Link Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>连接通道</translation>
     </message>
     <message>
         <source>Channel </source>
@@ -1972,7 +2302,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>LadspaControlView</name>
     <message>
         <source>Link channels</source>
-        <translation type="unfinished"></translation>
+        <translation>连接通道</translation>
     </message>
     <message>
         <source>Value:</source>
@@ -1991,6 +2321,13 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Unknown LADSPA plugin %1 requested.</source>
+        <translation>已请求未知 LADSPA 插件 %1.</translation>
+    </message>
+</context>
+<context>
+    <name>LcdSpinBox</name>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2279,7 +2616,7 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <source>Click here to show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里显示或隐藏工程注释窗。在此窗口中你可以写下工程的注释。</translation>
     </message>
     <message>
         <source>Show/hide controller rack</source>
@@ -2291,7 +2628,7 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <source>LMMS %1</source>
-        <translation></translation>
+        <translation>LMMS %1</translation>
     </message>
     <message>
         <source>Project not saved</source>
@@ -2353,11 +2690,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>LMMS (*.mmp *.mmpz)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>LMMS Project (*.mmp *.mmpz);;LMMS Project Template (*.mpt)</source>
-        <translation>LMMS 工程 (*.mmp *.mmpz);;LMMS 工程模版 (*.mpt)</translation>
+        <translation>LMMS (*.mmp *.mmpz)</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -2378,6 +2711,18 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>Error while parsing configuration file at line %1:%2: %3</source>
         <translation>解析配置文件发生错误（行%1:%2:%3）</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>撤销</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>重做</translation>
+    </message>
+    <message>
+        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <translation>LMMS 工程 (*.mmpz *.mmp);;LMMS 工程模板 (*.mpt)</translation>
     </message>
 </context>
 <context>
@@ -2410,14 +2755,14 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>MidiAlsaRaw::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">设备</translation>
     </message>
 </context>
 <context>
     <name>MidiAlsaSeq::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>设备</translation>
     </message>
 </context>
 <context>
@@ -2450,26 +2795,26 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>MidiOss::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>设备</translation>
     </message>
 </context>
 <context>
     <name>MidiPort</name>
     <message>
         <source>Input channel</source>
-        <translation type="unfinished"></translation>
+        <translation>输入通道</translation>
     </message>
     <message>
         <source>Output channel</source>
-        <translation type="unfinished"></translation>
+        <translation>输出通道</translation>
     </message>
     <message>
         <source>Input controller</source>
-        <translation type="unfinished"></translation>
+        <translation>输入控制器</translation>
     </message>
     <message>
         <source>Output controller</source>
-        <translation type="unfinished"></translation>
+        <translation>输出控制器</translation>
     </message>
     <message>
         <source>Fixed input velocity</source>
@@ -2493,6 +2838,647 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Fixed output note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base velocity</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MonstroInstrument</name>
+    <message>
+        <source>Osc 1 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Fine detune left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Fine detune right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Pulse width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Sync send on rise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Sync send on fall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Fine detune left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Fine detune right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Sync Hard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Sync Reverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Sub-oscillator mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Waveform 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Waveform 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Sync Hard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Sync Reverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Pre-delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Sustain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Slope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Pre-delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Sustain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Slope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc2-3 modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MonstroView</name>
+    <message>
+        <source>Operators view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
+
+Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matrix view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
+
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
+
+Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix Osc2 with Osc3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of Osc3 with Osc2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate frequency of Osc3 with Osc2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate phase of Osc3 with Osc2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 1 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 2 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 3 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FTL and FTR change the finetuning of the oscillator for left and right channels respectively. These can add stereo-detuning to the oscillator which widens the stereo image and causes an illusion of space. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The SPO knob modifies the difference in phase between left and right channels. Higher difference creates a wider stereo image. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The PW knob controls the pulse width, also known as duty cycle, of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, it doesn&apos;t produce bandlimited output, which means that you can use it as an audible oscillator but it will cause aliasing. You can also use it as an inaudible source of a sync signal, which can be used to synchronize oscillators 2 and 3. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 2. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 3&apos;s first sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 3&apos;s second sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. Each sub-osc can be set to produce a different waveform, and oscillator 3 can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied to both sub-oscs/waveforms in the exact same way. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the waveform for LFO 1. 
+&quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the waveform for LFO 2. 
+&quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack causes the LFO to come on gradually from the start of the note. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PHS controls the phase offset of the LFO. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. A value of 0 means instant. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HOLD controls how long the envelope stays at peak after the attack phase. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds it would take to go from peak to zero. The actual decay may be shorter if sustain is used. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NesInstrument</name>
+    <message>
+        <source>Channel 1 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Sweep amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Sweep rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Sweep amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Sweep rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 3 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 3 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Noise frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Noise frequency sweep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation type="unfinished">主音量</translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2538,52 +3524,56 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <source>Osc %1 waveform</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Osc %1 harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PatmanView</name>
     <message>
         <source>Open other patch</source>
-        <translation type="unfinished"></translation>
+        <translation>打开其他音色</translation>
     </message>
     <message>
         <source>Click here to open another patch-file. Loop and Tune settings are not reset.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里打开另一个音色文件。循环和调音设置不会被重设。</translation>
     </message>
     <message>
         <source>Loop</source>
-        <translation type="unfinished"></translation>
+        <translation>循环</translation>
     </message>
     <message>
         <source>Loop mode</source>
-        <translation type="unfinished"></translation>
+        <translation>循环模式</translation>
     </message>
     <message>
         <source>Here you can toggle the Loop mode. If enabled, PatMan will use the loop information available in the file.</source>
-        <translation type="unfinished"></translation>
+        <translation>在这里你可以开关循环模式。如果启用，PatMan 会使用文件中的循环信息。</translation>
     </message>
     <message>
         <source>Tune</source>
-        <translation type="unfinished"></translation>
+        <translation>调音</translation>
     </message>
     <message>
         <source>Tune mode</source>
-        <translation type="unfinished"></translation>
+        <translation>调音模式</translation>
     </message>
     <message>
         <source>Here you can toggle the Tune mode. If enabled, PatMan will tune the sample to match the note&apos;s frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>这里可以开关调音模式。如果启用，PatMan 会将采样调成和音符一样的频率。</translation>
     </message>
     <message>
         <source>No file selected</source>
-        <translation type="unfinished"></translation>
+        <translation>未选择文件</translation>
     </message>
     <message>
         <source>Open patch file</source>
-        <translation type="unfinished"></translation>
+        <translation>打开音色文件</translation>
     </message>
     <message>
         <source>Patch-Files (*.pat)</source>
-        <translation type="unfinished"></translation>
+        <translation>音色文件 (*.pat)</translation>
     </message>
 </context>
 <context>
@@ -2628,7 +3618,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">打进声</translation>
     </message>
     <message>
         <source>Release:</source>
@@ -2671,11 +3661,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Attack</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">打进声</translation>
     </message>
     <message>
         <source>Release</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">释放</translation>
     </message>
     <message>
         <source>Abs Value</source>
@@ -2684,6 +3674,169 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>Amount Multiplicator</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PianoRoll</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>播放/暂停当前片段（空格）</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>停止当前片段（空格）</translation>
+    </message>
+    <message>
+        <source>Cut selected notes (Ctrl+X)</source>
+        <translation>剪切选定音符 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected notes (Ctrl+C)</source>
+        <translation>复制选定音符 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <translation>从剪贴板粘贴音符 (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Piano-Roll - no pattern</source>
+        <translation>钢琴窗 - 没有片段</translation>
+    </message>
+    <message>
+        <source>Piano-Roll - %1</source>
+        <translation>钢琴窗 - %1</translation>
+    </message>
+    <message>
+        <source>Please open a pattern by double-clicking on it!</source>
+        <translation>双击打开片段！</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano</source>
+        <translation>从 MIDI 设备/通道钢琴(channel-piano) 录制音符</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>绘制模式 (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>擦除模式 (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>选择模式 （Shift+S）</translation>
+    </message>
+    <message>
+        <source>Last note</source>
+        <translation>上一个音符</translation>
+    </message>
+    <message>
+        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to stop playback of current pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note Volume</source>
+        <translation>音符音量</translation>
+    </message>
+    <message>
+        <source>Note Panning</source>
+        <translation>音符声相偏移</translation>
+    </message>
+    <message>
+        <source>Detune mode (Shift+T)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark/unmark current semitone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark current scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark current chord</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unmark all</source>
+        <translation>取消标记所有</translation>
+    </message>
+    <message>
+        <source>No scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No chord</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume: %1%</source>
+        <translation>音量：%1%</translation>
+    </message>
+    <message>
+        <source>Panning: %1% left</source>
+        <translation>声相：%1% 偏左</translation>
+    </message>
+    <message>
+        <source>Panning: %1% right</source>
+        <translation>声相：%1% 偏右</translation>
+    </message>
+    <message>
+        <source>Panning: center</source>
+        <translation>声相：居中</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>请输入一个介于 %1 和 %2 的值：</translation>
     </message>
 </context>
 <context>
@@ -2718,11 +3871,11 @@ Reason: &quot;%2&quot;</source>
     <name>ProjectRenderer</name>
     <message>
         <source>WAV-File (*.wav)</source>
-        <translation type="unfinished"></translation>
+        <translation>WAV-文件 (*.wav)</translation>
     </message>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩的 OGG 文件(*.ogg)</translation>
     </message>
 </context>
 <context>
@@ -2730,87 +3883,87 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>C</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>Db</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Db</translation>
     </message>
     <message>
         <source>C#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>C#</translation>
     </message>
     <message>
         <source>D</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>D</translation>
     </message>
     <message>
         <source>Eb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Eb</translation>
     </message>
     <message>
         <source>D#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>D#</translation>
     </message>
     <message>
         <source>E</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>Fb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Fb</translation>
     </message>
     <message>
         <source>Gb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Gb</translation>
     </message>
     <message>
         <source>F#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>F#</translation>
     </message>
     <message>
         <source>G</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>G</translation>
     </message>
     <message>
         <source>Ab</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ab</translation>
     </message>
     <message>
         <source>G#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>G#</translation>
     </message>
     <message>
         <source>A</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>Bb</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Bb</translation>
     </message>
     <message>
         <source>A#</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>A#</translation>
     </message>
     <message>
         <source>B</source>
         <comment>Note name</comment>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
 </context>
 <context>
@@ -2829,7 +3982,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Requires Real Time: </source>
-        <translation type="unfinished"></translation>
+        <translation>需要实时：</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -2841,7 +3994,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Real Time Capable: </source>
-        <translation type="unfinished"></translation>
+        <translation>是否支持实时：</translation>
     </message>
     <message>
         <source>In Place Broken: </source>
@@ -2859,112 +4012,259 @@ Reason: &quot;%2&quot;</source>
         <source>File: </source>
         <translation>文件：</translation>
     </message>
+    <message>
+        <source>File: %1</source>
+        <translation>文件：%1</translation>
+    </message>
 </context>
 <context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</source>
-        <translation type="unfinished"></translation>
+        <translation>打开音频文件</translation>
     </message>
     <message>
         <source>Wave-Files (*.wav)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wave波形文件 (*.wav)</translation>
     </message>
     <message>
         <source>OGG-Files (*.ogg)</source>
-        <translation type="unfinished"></translation>
+        <translation>OGG-文件 (*.ogg)</translation>
     </message>
     <message>
         <source>DrumSynth-Files (*.ds)</source>
-        <translation type="unfinished"></translation>
+        <translation>DrumSynth-文件 (*.ds)</translation>
     </message>
     <message>
         <source>FLAC-Files (*.flac)</source>
-        <translation type="unfinished"></translation>
+        <translation>FLAC-文件 (*.flac)</translation>
     </message>
     <message>
         <source>SPEEX-Files (*.spx)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MP3-Files (*.mp3)</source>
-        <translation type="unfinished"></translation>
+        <translation>SPEEX-文件 (*.spx)</translation>
     </message>
     <message>
         <source>VOC-Files (*.voc)</source>
-        <translation type="unfinished"></translation>
+        <translation>VOC-文件 (*.voc)</translation>
     </message>
     <message>
         <source>AIFF-Files (*.aif *.aiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>AIFF-文件 (*.aif *.aiff)</translation>
     </message>
     <message>
         <source>AU-Files (*.au)</source>
-        <translation type="unfinished"></translation>
+        <translation>AU-文件 (*.au)</translation>
     </message>
     <message>
         <source>RAW-Files (*.raw)</source>
-        <translation type="unfinished"></translation>
+        <translation>RAW-文件 (*.raw)</translation>
+    </message>
+    <message>
+        <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
+        <translation>所有音频文件 (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
 </context>
 <context>
     <name>SampleTCOView</name>
     <message>
         <source>double-click to select sample</source>
-        <translation type="unfinished"></translation>
+        <translation>双击选择采样</translation>
     </message>
     <message>
         <source>Delete (middle mousebutton)</source>
-        <translation type="unfinished"></translation>
+        <translation>删除 (鼠标中键)</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>复制</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished"></translation>
+        <translation>静音/取消静音 (&lt;Ctrl&gt; + 鼠标中键)</translation>
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation type="unfinished"></translation>
+        <translation>设置/清除录制</translation>
     </message>
 </context>
 <context>
     <name>SampleTrack</name>
     <message>
         <source>Sample track</source>
-        <translation type="unfinished"></translation>
+        <translation>采样轨道</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>音量</translation>
     </message>
 </context>
 <context>
     <name>SampleTrackView</name>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>轨道音量</translation>
     </message>
     <message>
         <source>Channel volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>通道音量：</translation>
     </message>
     <message>
         <source>VOL</source>
+        <translation>VOL</translation>
+    </message>
+</context>
+<context>
+    <name>SongEditor</name>
+    <message>
+        <source>Song-Editor</source>
+        <translation>歌曲编辑器</translation>
+    </message>
+    <message>
+        <source>Play song (Space)</source>
+        <translation>播放歌曲（空格）</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
+        <translation>点击这里完整播放歌曲。将从绿色歌曲标记开始播放。在播放的同时可以对它进行移动。</translation>
+    </message>
+    <message>
+        <source>Stop song (Space)</source>
+        <translation>停止歌曲（空格）</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
+        <translation>点击这里停止播放，歌曲位置标记会跳到歌曲的开头。</translation>
+    </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation>添加节拍/低音线</translation>
+    </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation>添加采样轨道</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>无法打开文件</translation>
+    </message>
+    <message>
+        <source>Could not write file</source>
+        <translation>无法写入文件</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation>添加自动化轨道</translation>
+    </message>
+    <message>
+        <source>Draw mode</source>
+        <translation>绘制模式</translation>
+    </message>
+    <message>
+        <source>Edit mode (select and move)</source>
+        <translation>编辑模式（选定和移动）</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device</source>
+        <translation>从音频设备录制样本</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device while playing song or BB track</source>
+        <translation>在播放歌曲或BB轨道时从音频设备录入样本</translation>
+    </message>
+    <message>
+        <source>Could not open file %1. You probably have no permissions to read this file.
+ Please make sure to have at least read permissions to the file and try again.</source>
+        <translation>无法打开 %1 。或许没有权限读此文件。
+请确保您拥有对此文件的读权限，然后重试。</translation>
+    </message>
+    <message>
+        <source>Error in file</source>
+        <translation>文件错误</translation>
+    </message>
+    <message>
+        <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
+        <translation>文件 %1 似乎包含错误，无法被加载。</translation>
+    </message>
+    <message>
+        <source>Tempo</source>
+        <translation>节奏</translation>
+    </message>
+    <message>
+        <source>TEMPO/BPM</source>
+        <translation>节奏/BPM</translation>
+    </message>
+    <message>
+        <source>tempo of song</source>
+        <translation>歌曲的节奏</translation>
+    </message>
+    <message>
+        <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every measure has four beats, so the tempo in BPM specifies, how many measures / 4 should be played within a minute (or how many measures should be played within four minutes).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High quality mode</source>
+        <translation>高质量模式</translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation>主音量</translation>
+    </message>
+    <message>
+        <source>master volume</source>
+        <translation>主音量</translation>
+    </message>
+    <message>
+        <source>Master pitch</source>
+        <translation>主音高</translation>
+    </message>
+    <message>
+        <source>master pitch</source>
+        <translation>主音高</translation>
+    </message>
+    <message>
+        <source>Value: %1%</source>
+        <translation>值: %1%</translation>
+    </message>
+    <message>
+        <source>Value: %1 semitones</source>
+        <translation>值: %1 半音程</translation>
+    </message>
+    <message>
+        <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
+        <translation>无法打开 %1 写入数据。或许没有权限修改此文件。请确保您拥有对此文件的写权限，然后重试。</translation>
+    </message>
+</context>
+<context>
+    <name>SpectrumAnalyzerControlDialog</name>
+    <message>
+        <source>Linear spectrum</source>
+        <translation>线性频谱图</translation>
+    </message>
+    <message>
+        <source>Linear Y axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SpectrumAnalyzerControls</name>
+    <message>
+        <source>Linear spectrum</source>
+        <translation>线性频谱图</translation>
+    </message>
+    <message>
+        <source>Linear Y axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3051,7 +4351,7 @@ Reason: &quot;%2&quot;</source>
     <name>TimeDisplayWidget</name>
     <message>
         <source>click to change time units</source>
-        <translation type="unfinished"></translation>
+        <translation>点击改变时间单位</translation>
     </message>
 </context>
 <context>
@@ -3171,7 +4471,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>cents</source>
-        <translation type="unfinished"></translation>
+        <translation>音分 cents</translation>
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the left channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
@@ -3324,7 +4624,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存预置</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
@@ -3391,7 +4691,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存预置</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
@@ -3410,20 +4710,7 @@ Please make sure you have read-permission to the file and the directory containi
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait while loading VST-plugin...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed loading VST-plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The VST-plugin %1 could not be loaded for some reason.
-If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">载入插件</translation>
     </message>
     <message>
         <source>Open Preset</source>
@@ -3465,6 +4752,268 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
         <source>.fxb</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Please wait while loading VST plugin...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed loading VST plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The VST plugin %1 could not be loaded for some reason.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WatsynInstrument</name>
+    <message>
+        <source>Volume A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A1-B2 Crosstalk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A2-A1 modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B2-B1 modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WatsynView</name>
+    <message>
+        <source>Select oscillator A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix output of A2 to A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of A1 with output of A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ring-modulate A1 and A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate phase of A1 with output of A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix output of B2 to B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of B1 with output of B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ring-modulate B1 and B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate phase of B1 with output of B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw your own waveform here by dragging your mouse on this graph.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to load a waveform from a sample file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phase left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to shift phase by -15 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phase right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to shift phase by +15 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation type="unfinished">标准化</translation>
+    </message>
+    <message>
+        <source>Click to normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation type="unfinished">平滑</translation>
+    </message>
+    <message>
+        <source>Click to smooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation type="unfinished">方波</translation>
+    </message>
+    <message>
+        <source>Click for square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ZynAddSubFxInstrument</name>
@@ -3482,11 +5031,11 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>带宽</translation>
     </message>
     <message>
         <source>FM Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>FM 增益</translation>
     </message>
     <message>
         <source>Resonance Center Frequency</source>
@@ -3537,7 +5086,7 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Bandwidth:</source>
-        <translation type="unfinished"></translation>
+        <translation>带宽：</translation>
     </message>
     <message>
         <source>BW</source>
@@ -3588,56 +5137,34 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loop</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">反转采样</translation>
     </message>
     <message>
         <source>Stutter</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>bassBoosterControlDialog</name>
     <message>
-        <source>FREQ</source>
+        <source>Loopback point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Frequency:</source>
+        <source>Loop mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>GAIN</source>
+        <source>Interpolation mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Gain:</source>
+        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RATIO</source>
+        <source>Linear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ratio:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>bassBoosterControls</name>
-    <message>
-        <source>Frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Gain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ratio</source>
+        <source>Sinc</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3645,83 +5172,87 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     <name>bbEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>节拍+低音线编辑器</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>播放/暂停当前节拍/低音线（空格）</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation type="unfinished"></translation>
+        <translation>添加节拍/低音线</translation>
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation type="unfinished"></translation>
+        <translation>添加自动轨道</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>停止播放当前节拍/低音线(空格)</translation>
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里停止播放当前节拍/低音线。当结束时节拍/低音线会自动循环播放。</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里停止播发当前节拍/低音线。</translation>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation type="unfinished"></translation>
+        <translation>移除音阶</translation>
     </message>
     <message>
         <source>Add steps</source>
-        <translation type="unfinished"></translation>
+        <translation>添加音阶</translation>
     </message>
 </context>
 <context>
     <name>bbTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>在节拍+低音线编辑器中打开</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished"></translation>
+        <translation>重置名称</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>修改名称</translation>
     </message>
     <message>
         <source>Change color</source>
-        <translation type="unfinished"></translation>
+        <translation>改变颜色</translation>
+    </message>
+    <message>
+        <source>Reset color to default</source>
+        <translation>重置颜色</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="unfinished"></translation>
+        <translation>节拍/低音线 %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 的副本</translation>
     </message>
 </context>
 <context>
     <name>bitInvader</name>
     <message>
         <source>Samplelength</source>
-        <translation type="unfinished"></translation>
+        <translation>采样长度</translation>
     </message>
 </context>
 <context>
     <name>bitInvaderView</name>
     <message>
         <source>Sample Length</source>
-        <translation type="unfinished"></translation>
+        <translation>采样长度</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -3733,27 +5264,27 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">锯齿波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方波</translation>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">白噪音</translation>
     </message>
     <message>
         <source>User defined wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">用户自定义波形</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">平滑</translation>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">点击这里平滑波形。</translation>
     </message>
     <message>
         <source>Interpolation</source>
@@ -3761,7 +5292,7 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">标准化</translation>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -3793,38 +5324,153 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
 </context>
 <context>
+    <name>dynProcControlDialog</name>
+    <message>
+        <source>INPUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OUTPUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATTACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak attack time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RELEASE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak release time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to reset the wavegraph back to default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to apply smoothing to wavegraph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase wavegraph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to increase wavegraph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease wavegraph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to decrease wavegraph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereomode Maximum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Process based on the maximum of both stereo channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereomode Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Process based on the average of both stereo channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereomode Unlinked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Process each stereo channel independently</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>dynProcControls</name>
+    <message>
+        <source>Input gain</source>
+        <translation type="unfinished">输入增益</translation>
+    </message>
+    <message>
+        <source>Output gain</source>
+        <translation type="unfinished">输出增益</translation>
+    </message>
+    <message>
+        <source>Attack time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>exportProjectDialog</name>
     <message>
         <source>Could not open file</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开文件</translation>
     </message>
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开文件 %1 写入数据。
+请确保你拥有对文件以及存储文件的目录的写权限，然后重试！</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation type="unfinished"></translation>
+        <translation>寻找文件编码设备时出错。请使用另外一种输出格式。</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染中：%1%</translation>
     </message>
     <message>
         <source>Export project to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>导出项目到 %1</translation>
     </message>
 </context>
 <context>
     <name>fader</name>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished"></translation>
+        <translation>请输入一个介于 %1 和 %2 之间的值：</translation>
     </message>
 </context>
 <context>
@@ -3838,80 +5484,128 @@ Please make sure you have write-permission to the file and the directory contain
     <name>fileBrowserTreeWidget</name>
     <message>
         <source>Send to active instrument-track</source>
-        <translation type="unfinished"></translation>
+        <translation>发送到活跃的乐器轨道</translation>
     </message>
     <message>
         <source>Open in new instrument-track/Song-Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>在新乐器轨道/歌曲编辑器中打开</translation>
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>在新乐器轨道/B+B 编辑器中打开</translation>
     </message>
     <message>
         <source>Loading sample</source>
-        <translation type="unfinished"></translation>
+        <translation>加载采样中</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
-        <translation type="unfinished"></translation>
+        <translation>请稍候，加载采样中...</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished"></translation>
+        <translation>---软件自带文件---</translation>
     </message>
 </context>
 <context>
     <name>graphModel</name>
     <message>
         <source>Graph</source>
-        <translation type="unfinished"></translation>
+        <translation>图形</translation>
     </message>
 </context>
 <context>
     <name>kickerInstrument</name>
     <message>
         <source>Start frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>起始频率</translation>
     </message>
     <message>
         <source>End frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>结束频率</translation>
     </message>
     <message>
         <source>Gain</source>
+        <translation>增益</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>长度</translation>
+    </message>
+    <message>
+        <source>Distortion Start</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distortion End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Envelope Slope</source>
+        <translation>包络线倾斜度</translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation>噪音</translation>
+    </message>
+    <message>
+        <source>Click</source>
+        <translation>力度</translation>
+    </message>
+    <message>
+        <source>Frequency Slope</source>
+        <translation>频率倾斜度</translation>
+    </message>
+    <message>
+        <source>Start from note</source>
+        <translation>从哪个音符开始</translation>
+    </message>
+    <message>
+        <source>End to note</source>
+        <translation>到哪个音符结束</translation>
     </message>
 </context>
 <context>
     <name>kickerInstrumentView</name>
     <message>
         <source>Start frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>起始频率：</translation>
     </message>
     <message>
         <source>End frequency:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decay:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>结束频率：</translation>
     </message>
     <message>
         <source>Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>增益：</translation>
+    </message>
+    <message>
+        <source>Frequency Slope:</source>
+        <translation>频率倾斜度：</translation>
+    </message>
+    <message>
+        <source>Envelope Length:</source>
+        <translation>包络长度：</translation>
+    </message>
+    <message>
+        <source>Envelope Slope:</source>
+        <translation>包络线倾斜度：</translation>
+    </message>
+    <message>
+        <source>Click:</source>
+        <translation>力度：</translation>
+    </message>
+    <message>
+        <source>Noise:</source>
+        <translation>噪音：</translation>
+    </message>
+    <message>
+        <source>Distortion Start:</source>
+        <translation>起始失真度：</translation>
+    </message>
+    <message>
+        <source>Distortion End:</source>
+        <translation>结束失真度：</translation>
     </message>
 </context>
 <context>
@@ -4027,11 +5721,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">输入</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">输出</translation>
     </message>
     <message>
         <source>Toggled</source>
@@ -4047,7 +5741,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">是</translation>
     </message>
 </context>
 <context>
@@ -4070,11 +5764,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>失真</translation>
     </message>
     <message>
         <source>Waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>波形</translation>
     </message>
     <message>
         <source>Slide Decay</source>
@@ -4113,7 +5807,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">衰减：</translation>
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
@@ -4129,7 +5823,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">锯齿波</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
@@ -4145,7 +5839,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方波</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
@@ -4177,7 +5871,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>White noise wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">白噪音</translation>
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
@@ -4185,6 +5879,38 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for white-noise.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited saw wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited square wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited triangle wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited moog saw wave.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4208,11 +5934,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>失真</translation>
     </message>
     <message>
         <source>Waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>波形</translation>
     </message>
     <message>
         <source>Slide Decay</source>
@@ -4263,7 +5989,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">衰减：</translation>
     </message>
     <message>
         <source>DEC</source>
@@ -4580,7 +6306,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>    Close    </source>
-        <translation>关闭</translation>
+        <translation>    关闭 </translation>
     </message>
     <message>
         <source>Close VST effect knob-controller window.</source>
@@ -4611,7 +6337,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>    Close    </source>
-        <translation>关闭</translation>
+        <translation>    关闭 </translation>
     </message>
     <message>
         <source>Close VST plugin knob-controller window.</source>
@@ -4748,22 +6474,22 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>organicInstrument</name>
     <message>
         <source>Distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>失真</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>音量</translation>
     </message>
 </context>
 <context>
     <name>organicInstrumentView</name>
     <message>
         <source>Distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>失真：</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>音量：</translation>
     </message>
     <message>
         <source>Randomise</source>
@@ -4782,11 +6508,27 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Osc %1 fine detuning left:</source>
+        <source>cents</source>
+        <translation>音分 cents</translation>
+    </message>
+    <message>
+        <source>The distortion knob adds distortion to the output of the instrument. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>cents</source>
+        <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc %1 stereo detuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc %1 harmonic:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4834,7 +6576,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Right Output level</source>
-        <translation type="unfinished"></translation>
+        <translation>右声道输出电平</translation>
     </message>
     <message>
         <source>Left Output level</source>
@@ -4878,7 +6620,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Bass</source>
-        <translation type="unfinished"></translation>
+        <translation>低音</translation>
     </message>
     <message>
         <source>Shift Register width</source>
@@ -5057,212 +6799,36 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>pattern</name>
-    <message>
-        <source>Cannot freeze pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The pattern currently cannot be freezed because you&apos;re in play-mode. Please stop and try again!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>patternFreezeStatusDialog</name>
-    <message>
-        <source>Freezing pattern...</source>
-        <translation>冻结片段...</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>取消</translation>
-    </message>
-</context>
-<context>
     <name>patternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
-        <translation type="unfinished"></translation>
+        <translation>双击在钢琴窗中打开此片段
+使用鼠标滑轮设置此音阶的音量</translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
-        <translation type="unfinished"></translation>
+        <translation>在钢琴窗中打开</translation>
     </message>
     <message>
         <source>Clear all notes</source>
-        <translation type="unfinished"></translation>
+        <translation>清除所有音符</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished"></translation>
+        <translation>重置名称</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Refreeze</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Freeze</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unfreeze</source>
-        <translation type="unfinished"></translation>
+        <translation>修改名称</translation>
     </message>
     <message>
         <source>Add steps</source>
-        <translation type="unfinished"></translation>
+        <translation>添加音阶</translation>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PianoRoll</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>播放/暂停当前片段（空格）</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>停止当前片段（空格）</translation>
-    </message>
-    <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation>剪切选定音符 (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation>复制选定音符 (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation>从剪贴板粘贴音符 (Ctrl+V)</translation>
-    </message>
-    <message>
-        <source>Piano-Roll - no pattern</source>
-        <translation>钢琴窗 - 没有片段</translation>
-    </message>
-    <message>
-        <source>Piano-Roll - %1</source>
-        <translation>钢琴窗 - %1</translation>
-    </message>
-    <message>
-        <source>Please open a pattern by double-clicking on it!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record notes from MIDI-device/channel-piano</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>绘制模式 (Shift+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>擦除模式 (Shift+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>选择模式 （Shift+S）</translation>
-    </message>
-    <message>
-        <source>Last note</source>
-        <translation>上一个音符</translation>
-    </message>
-    <message>
-        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here to stop playback of current pattern.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Note lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Note Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Note Panning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Detune mode (Shift+T)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mark/unmark current semitone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mark current scale</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mark current chord</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unmark all</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No scale</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No chord</source>
-        <translation type="unfinished"></translation>
+        <translation>移除音阶</translation>
     </message>
 </context>
 <context>
@@ -5296,15 +6862,7 @@ use mouse wheel to set volume of a step</source>
         <translation>列出已安装的 LADSPA 插件</translation>
     </message>
     <message>
-        <source>three powerful oscillators you can modulate in several ways</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>versatile kick- &amp; bassdrum-synthesizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5312,23 +6870,11 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>plugin for using arbitrary VST-effects inside LMMS.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Additive Synthesizer for organ-like sounds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>plugin for boosting bass</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuneful things to bang on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5388,6 +6934,54 @@ This chip was used in the Commodore 64 computer.</source>
         <source>LMMS port of sfxr</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>plugin for processing dynamics in a flexible way</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin for waveshaping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Versatile drum synthesizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4-oscillator modulatable wavetable synth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A native amplifier plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary VST effects inside LMMS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monstrous 3-oscillator synth with modulation matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Three powerful oscillators you can modulate in several ways</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Boost your bass the fast and simple way</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A NES-like synthesizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Graphical spectrum analyzer plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>projectNotes</name>
@@ -5409,7 +7003,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+Z</source>
-        <translation></translation>
+        <translation>Ctrl+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
@@ -5417,7 +7011,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+Y</source>
-        <translation></translation>
+        <translation>Ctrl+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
@@ -5425,7 +7019,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+C</source>
-        <translation></translation>
+        <translation>Ctrl+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
@@ -5433,7 +7027,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+X</source>
-        <translation></translation>
+        <translation>Ctrl+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
@@ -5441,7 +7035,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+V</source>
-        <translation></translation>
+        <translation>Ctrl+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5453,7 +7047,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation></translation>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
@@ -5461,7 +7055,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation></translation>
+        <translation>Ctrl+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
@@ -5469,7 +7063,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+U</source>
-        <translation></translation>
+        <translation>Ctrl+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
@@ -5477,7 +7071,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+L</source>
-        <translation></translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
@@ -5485,7 +7079,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+E</source>
-        <translation></translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
@@ -5493,7 +7087,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+R</source>
-        <translation></translation>
+        <translation>Ctrl+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
@@ -5501,7 +7095,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Ctrl+J</source>
-        <translation></translation>
+        <translation>Ctrl+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
@@ -5523,7 +7117,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>General settings</source>
-        <translation>一般设置</translation>
+        <translation>常规设置</translation>
     </message>
     <message>
         <source>BUFFER SIZE</source>
@@ -5543,7 +7137,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Show restart warning after changing settings</source>
-        <translation type="unfinished"></translation>
+        <translation>在改变设置后显示重启警告</translation>
     </message>
     <message>
         <source>Display volume as dBV </source>
@@ -5551,7 +7145,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Compress project files per default</source>
-        <translation type="unfinished"></translation>
+        <translation>默认压缩项目文件</translation>
     </message>
     <message>
         <source>HQ-mode for output audio-device</source>
@@ -5575,7 +7169,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>STK rawwave directory</source>
-        <translation type="unfinished"></translation>
+        <translation>STK rawwave 目录</translation>
     </message>
     <message>
         <source>Performance settings</source>
@@ -5583,7 +7177,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>UI effects vs. performance</source>
-        <translation type="unfinished"></translation>
+        <translation>界面特效 vs 性能</translation>
     </message>
     <message>
         <source>Audio settings</source>
@@ -5620,7 +7214,8 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <source>Frames: %1
 Latency: %2 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>帧数: %1
+延迟: %2 毫秒</translation>
     </message>
     <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
@@ -5648,7 +7243,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose STK rawwave directory</source>
-        <translation type="unfinished"></translation>
+        <translation>选择 STK rawwave 文件夹</translation>
     </message>
     <message>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
@@ -5672,7 +7267,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Background artwork</source>
-        <translation>背景插图</translation>
+        <translation>背景图片</translation>
     </message>
     <message>
         <source>Choose default SoundFont</source>
@@ -5680,7 +7275,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose background artwork</source>
-        <translation>选择默认背景插图</translation>
+        <translation>选择背景图片</translation>
     </message>
     <message>
         <source>One instrument track window mode</source>
@@ -5688,23 +7283,23 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Compact track buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>紧凑化轨道图标</translation>
     </message>
     <message>
         <source>Sync VST plugins to host playback</source>
-        <translation type="unfinished"></translation>
+        <translation>同步 VST 插件和主机回放</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation type="unfinished"></translation>
+        <translation>在钢琴窗中显示音号</translation>
     </message>
     <message>
         <source>Enable waveform display by default</source>
-        <translation type="unfinished"></translation>
+        <translation>默认启用波形图</translation>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>歌曲编辑器中启用平滑滚动</translation>
     </message>
     <message>
         <source>Enable auto save feature</source>
@@ -5712,14 +7307,14 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
-        <translation type="unfinished"></translation>
+        <translation>在 AudioFileProcessor 中显示回放光标</translation>
     </message>
 </context>
 <context>
     <name>sf2Instrument</name>
     <message>
         <source>Bank</source>
-        <translation type="unfinished"></translation>
+        <translation>库</translation>
     </message>
     <message>
         <source>Patch</source>
@@ -5727,31 +7322,31 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Reverb</source>
-        <translation type="unfinished"></translation>
+        <translation>混响</translation>
     </message>
     <message>
         <source>Reverb Roomsize</source>
-        <translation type="unfinished"></translation>
+        <translation>混响空间大小</translation>
     </message>
     <message>
         <source>Reverb Damping</source>
-        <translation type="unfinished"></translation>
+        <translation>混响阻尼</translation>
     </message>
     <message>
         <source>Reverb Width</source>
-        <translation type="unfinished"></translation>
+        <translation>混响宽度</translation>
     </message>
     <message>
         <source>Reverb Level</source>
-        <translation type="unfinished"></translation>
+        <translation>混响级别</translation>
     </message>
     <message>
         <source>Chorus</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱</translation>
     </message>
     <message>
         <source>Chorus Lines</source>
@@ -5759,15 +7354,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Chorus Level</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱电平</translation>
     </message>
     <message>
         <source>Chorus Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱速度</translation>
     </message>
     <message>
         <source>Chorus Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱深度</translation>
     </message>
 </context>
 <context>
@@ -5786,39 +7381,39 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Apply reverb (if supported)</source>
-        <translation type="unfinished"></translation>
+        <translation>应用混响（如果支持）</translation>
     </message>
     <message>
         <source>This button enables the reverb effect. This is useful for cool effects, but only works on files that support it.</source>
-        <translation type="unfinished"></translation>
+        <translation>此按钮会启用混响效果器。可以制作出很酷的效果，但仅对支持的文件有效。</translation>
     </message>
     <message>
         <source>Reverb Roomsize:</source>
-        <translation type="unfinished"></translation>
+        <translation>混响空间大小：</translation>
     </message>
     <message>
         <source>Reverb Damping:</source>
-        <translation type="unfinished"></translation>
+        <translation>混响阻尼：</translation>
     </message>
     <message>
         <source>Reverb Width:</source>
-        <translation type="unfinished"></translation>
+        <translation>混响宽度：</translation>
     </message>
     <message>
         <source>Reverb Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>混响级别：</translation>
     </message>
     <message>
         <source>Apply chorus (if supported)</source>
-        <translation type="unfinished"></translation>
+        <translation>应用合唱 (如果支持)</translation>
     </message>
     <message>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">此按钮会启用合唱效果器。</translation>
     </message>
     <message>
         <source>Chorus Lines:</source>
@@ -5830,11 +7425,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Chorus Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱速度：</translation>
     </message>
     <message>
         <source>Chorus Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱深度：</translation>
     </message>
     <message>
         <source>Open SoundFont file</source>
@@ -5842,29 +7437,29 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>SoundFont2 Files (*.sf2)</source>
-        <translation type="unfinished"></translation>
+        <translation>SoundFont2 Files (*.sf2)</translation>
     </message>
 </context>
 <context>
     <name>sfxrInstrument</name>
     <message>
         <source>Wave Form</source>
-        <translation type="unfinished"></translation>
+        <translation>波形</translation>
     </message>
 </context>
 <context>
     <name>sidInstrument</name>
     <message>
         <source>Cutoff</source>
-        <translation type="unfinished"></translation>
+        <translation>切除</translation>
     </message>
     <message>
         <source>Resonance</source>
-        <translation type="unfinished"></translation>
+        <translation>共鸣</translation>
     </message>
     <message>
         <source>Filter type</source>
-        <translation type="unfinished"></translation>
+        <translation>过滤器类型</translation>
     </message>
     <message>
         <source>Voice 3 off</source>
@@ -5872,7 +7467,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Chip model</source>
@@ -5883,7 +7478,7 @@ Latency: %2 ms</source>
     <name>sidInstrumentView</name>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>音量：</translation>
     </message>
     <message>
         <source>Resonance:</source>
@@ -5895,15 +7490,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>High-Pass filter </source>
-        <translation type="unfinished"></translation>
+        <translation>高通滤波器</translation>
     </message>
     <message>
         <source>Band-Pass filter </source>
-        <translation type="unfinished"></translation>
+        <translation>带通滤波器</translation>
     </message>
     <message>
         <source>Low-Pass filter </source>
-        <translation type="unfinished"></translation>
+        <translation>低通滤波器</translation>
     </message>
     <message>
         <source>Voice3 Off </source>
@@ -5919,7 +7514,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished"></translation>
+        <translation>打进声</translation>
     </message>
     <message>
         <source>Attack rate determines how rapidly the output of Voice %1 rises from zero to peak amplitude.</source>
@@ -5927,7 +7522,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">衰减：</translation>
     </message>
     <message>
         <source>Decay rate determines how rapidly the output falls from the peak amplitude to the selected Sustain level.</source>
@@ -5979,11 +7574,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Noise</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">噪音</translation>
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">同步</translation>
     </message>
     <message>
         <source>Sync synchronizes the fundamental frequency of Oscillator %1 with the fundamental frequency of Oscillator %2 producing &quot;Hard Sync&quot; effects.</source>
@@ -6018,7 +7613,7 @@ Latency: %2 ms</source>
     <name>song</name>
     <message>
         <source>Tempo</source>
-        <translation>节拍</translation>
+        <translation>节奏</translation>
     </message>
     <message>
         <source>Master volume</source>
@@ -6026,7 +7621,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Master pitch</source>
-        <translation>主音调</translation>
+        <translation>主音高</translation>
     </message>
     <message>
         <source>Project saved</source>
@@ -6086,152 +7681,6 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>SongEditor</name>
-    <message>
-        <source>Song-Editor</source>
-        <translation>歌曲编辑器</translation>
-    </message>
-    <message>
-        <source>Play song (Space)</source>
-        <translation>播放歌曲（空格）</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop song (Space)</source>
-        <translation>停止歌曲（空格）</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add sample-track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not write file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add automation-track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Draw mode</source>
-        <translation>绘制模式</translation>
-    </message>
-    <message>
-        <source>Edit mode (select and move)</source>
-        <translation>编辑模式（选定和移动）</translation>
-    </message>
-    <message>
-        <source>Record samples from Audio-device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open file %1. You probably have no permissions to read this file.
- Please make sure to have at least read permissions to the file and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error in file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tempo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TEMPO/BPM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>tempo of song</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every measure has four beats, so the tempo in BPM specifies, how many measures / 4 should be played within a minute (or how many measures should be played within four minutes).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>High quality mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Master volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>master volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Master pitch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>master pitch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value: %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value: %1 semitones</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>spectrumAnalyzerControlDialog</name>
-    <message>
-        <source>Linear spectrum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Linear Y axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>spectrumAnalyzerControls</name>
-    <message>
-        <source>Linear spectrum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Linear Y-axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>stereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
@@ -6253,73 +7702,74 @@ Latency: %2 ms</source>
     <name>stereoMatrixControlDialog</name>
     <message>
         <source>Left to Left Vol:</source>
-        <translation type="unfinished"></translation>
+        <translation>从左到左音量：</translation>
     </message>
     <message>
         <source>Left to Right Vol:</source>
-        <translation type="unfinished"></translation>
+        <translation>从左到右音量：</translation>
     </message>
     <message>
         <source>Right to Left Vol:</source>
-        <translation type="unfinished"></translation>
+        <translation>从右到左音量：</translation>
     </message>
     <message>
         <source>Right to Right Vol:</source>
-        <translation type="unfinished"></translation>
+        <translation>从右到右音量：</translation>
     </message>
 </context>
 <context>
     <name>stereoMatrixControls</name>
     <message>
         <source>Left to Left</source>
-        <translation type="unfinished"></translation>
+        <translation>从左到左</translation>
     </message>
     <message>
         <source>Left to Right</source>
-        <translation type="unfinished"></translation>
+        <translation>从左到右</translation>
     </message>
     <message>
         <source>Right to Left</source>
-        <translation type="unfinished"></translation>
+        <translation>从右到左</translation>
     </message>
     <message>
         <source>Right to Right</source>
-        <translation type="unfinished"></translation>
+        <translation>从右到右</translation>
     </message>
 </context>
 <context>
     <name>timeLine</name>
     <message>
         <source>Enable/disable auto-scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>启用/禁用自动滚动</translation>
     </message>
     <message>
         <source>Enable/disable loop-points</source>
-        <translation type="unfinished"></translation>
+        <translation>启用/禁用循环点</translation>
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>停止后前往开头</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="unfinished"></translation>
+        <translation>停止后前往播放开始的地方</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
-        <translation type="unfinished"></translation>
+        <translation>停止后保持位置不变</translation>
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished"></translation>
+        <translation>提示</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>磁性吸附是指在一个完整音符的边缘吸附。</translatorcomment>
+        <translation>按住 &lt;Ctrl&gt; 禁用磁性吸附。</translation>
     </message>
     <message>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
+        <translation>按住 &lt;Shift&gt; 移动起始循环点；按住 &lt;Ctrl&gt; 禁用磁性吸附。</translation>
     </message>
 </context>
 <context>
@@ -6344,78 +7794,91 @@ Latency: %2 ms</source>
     <name>trackContentObjectView</name>
     <message>
         <source>Current position</source>
-        <translation type="unfinished"></translation>
+        <translation>当前位置</translation>
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished"></translation>
+        <translation>提示</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>按住 &lt;Ctrl&gt; 并拖动以创建副本。</translation>
     </message>
     <message>
         <source>Current length</source>
-        <translation type="unfinished"></translation>
+        <translation>当前长度</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation type="unfinished"></translation>
+        <translation>按住 &lt;Ctrl&gt; 自由调整大小。</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1:%2 (%3:%4 到 %5:%6)</translation>
     </message>
     <message>
         <source>Delete (middle mousebutton)</source>
-        <translation type="unfinished"></translation>
+        <translation>删除 (鼠标中键)</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>复制</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished"></translation>
+        <translation>静音/取消静音 (&lt;Ctrl&gt; + 鼠标中键)</translation>
     </message>
 </context>
 <context>
     <name>trackOperationsWidget</name>
     <message>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>未按照原文翻译，因为实际操作就是按住ctrl复制并移动此通道</translatorcomment>
+        <translation>按住 &lt;Ctrl&gt; 的同时拖动移动柄复制并移动此轨道。</translation>
     </message>
     <message>
         <source>Actions for this track</source>
-        <translation type="unfinished"></translation>
+        <translation>对此轨道可进行的操作</translation>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>静音</translation>
     </message>
     <message>
         <source>Mute this track</source>
-        <translation type="unfinished"></translation>
+        <translation>静音此轨道</translation>
     </message>
     <message>
         <source>Solo</source>
-        <translation type="unfinished"></translation>
+        <translation>独奏</translation>
     </message>
     <message>
         <source>Clone this track</source>
-        <translation type="unfinished"></translation>
+        <translation>克隆此轨道</translation>
     </message>
     <message>
         <source>Remove this track</source>
-        <translation type="unfinished"></translation>
+        <translation>移除此轨道</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation>清除此轨道</translation>
+    </message>
+    <message>
+        <source>Turn all recording on</source>
+        <translation>打开所有录制</translation>
+    </message>
+    <message>
+        <source>Turn all recording off</source>
+        <translation>关闭所有录制</translation>
     </message>
 </context>
 <context>
@@ -6459,11 +7922,11 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Pan %1</source>
-        <translation type="unfinished"></translation>
+        <translation>声相 %1</translation>
     </message>
     <message>
         <source>Detune %1</source>
-        <translation type="unfinished"></translation>
+        <translation>去谐 %1</translation>
     </message>
     <message>
         <source>Fuzziness %1 </source>
@@ -6471,7 +7934,7 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Length %1</source>
-        <translation type="unfinished"></translation>
+        <translation>长度 %1</translation>
     </message>
     <message>
         <source>Impulse %1</source>
@@ -6479,14 +7942,14 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Octave %1</source>
-        <translation type="unfinished"></translation>
+        <translation>八度音 %1</translation>
     </message>
 </context>
 <context>
     <name>vibedView</name>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>音量：</translation>
     </message>
     <message>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
@@ -6526,7 +7989,7 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Detune:</source>
-        <translation type="unfinished"></translation>
+        <translation>去谐：</translation>
     </message>
     <message>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
@@ -6598,7 +8061,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Click here to enable/disable waveform.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里启用/禁用波形。</translation>
     </message>
     <message>
         <source>String</source>
@@ -6618,39 +8081,39 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>锯齿波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>方波</translation>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation type="unfinished"></translation>
+        <translation>白噪音</translation>
     </message>
     <message>
         <source>User defined wave</source>
-        <translation type="unfinished"></translation>
+        <translation>用户自定义波形</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished"></translation>
+        <translation>平滑</translation>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里平滑波形。</translation>
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished"></translation>
+        <translation>标准化</translation>
     </message>
     <message>
         <source>Click here to normalize waveform.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里标准化波形。</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助(&amp;H)</translation>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
@@ -6681,11 +8144,11 @@ The LED in the lower right corner of the waveform editor determines whether the 
     <name>visualizationWidget</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
-        <translation type="unfinished"></translation>
+        <translation>点击启用/禁用视觉化主输出</translation>
     </message>
     <message>
         <source>Click to enable</source>
-        <translation type="unfinished"></translation>
+        <translation>点击启用</translation>
     </message>
 </context>
 <context>
@@ -6733,6 +8196,76 @@ The LED in the lower right corner of the waveform editor determines whether the 
     <message>
         <source>Voice %1 test</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>waveShaperControlDialog</name>
+    <message>
+        <source>INPUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OUTPUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to reset the wavegraph back to default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to apply smoothing to wavegraph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase graph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to increase wavegraph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease graph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to decrease wavegraph amplitude by 1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clip input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clip input signal to 0dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>waveShaperControls</name>
+    <message>
+        <source>Input gain</source>
+        <translation>输入增益</translation>
+    </message>
+    <message>
+        <source>Output gain</source>
+        <translation>输出增益</translation>
     </message>
 </context>
 </TS>
