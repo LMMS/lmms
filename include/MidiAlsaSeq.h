@@ -29,7 +29,6 @@
 
 #ifdef LMMS_HAVE_ALSA
 #include <alsa/asoundlib.h>
-#endif
 
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
@@ -158,6 +157,8 @@ signals:
 	void writablePortsChanged();
 
 } ;
+
+#endif
 
 #endif
 

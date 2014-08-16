@@ -29,7 +29,6 @@
 
 #ifdef LMMS_HAVE_JACK
 #include <jack/jack.h>
-#endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
@@ -75,7 +74,6 @@ private slots:
 	void restartAfterZombified();
 
 
-#ifdef LMMS_HAVE_JACK
 private:
 	bool initJackClient();
 
@@ -118,11 +116,12 @@ private:
 	typedef QMap<AudioPort *, StereoPort> JackPortMap;
 	JackPortMap m_portMap;
 #endif
-#endif
 
 signals:
 	void zombified();
 
 } ;
+
+#endif
 
 #endif

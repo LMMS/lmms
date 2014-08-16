@@ -63,7 +63,6 @@ public:
 	virtual void removePort( MidiPort * _port );
 
 
-#ifdef LMMS_BUILD_WIN32
 	// list devices as ports
 	virtual QStringList readablePorts() const
 	{
@@ -74,7 +73,6 @@ public:
 	{
 		return m_outputDevices.values();
 	}
-#endif
 
 	// return name of port which specified MIDI event came from
 	virtual QString sourcePortName( const MidiEvent & ) const;
@@ -127,7 +125,6 @@ private:
 	void openDevices();
 	void closeDevices();
 
-#ifdef LMMS_BUILD_WIN32
 	static void WINAPI CALLBACK inputCallback( HMIDIIN _hm, UINT _msg,
 						DWORD_PTR _inst,
 						DWORD_PTR _param1,
@@ -136,7 +133,6 @@ private:
 
 	QMap<HMIDIIN, QString> m_inputDevices;
 	QMap<HMIDIOUT, QString> m_outputDevices;
-#endif
 
 	// subscriptions
 	typedef QMap<QString, MidiPortList> SubMap;
