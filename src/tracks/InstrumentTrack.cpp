@@ -593,7 +593,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 							const f_cnt_t _offset, int _tco_num )
 {
-	if( ! tryLock() )
+	if( ! tryLock() || ! m_instrument )
 	{
 		return false;
 	}
