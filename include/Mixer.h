@@ -308,6 +308,16 @@ public:
 	{
 		m_inputFramesMutex.unlock();
 	}
+	
+	void lockPlayHandleRemoval()
+	{
+		m_playHandleRemovalMutex.lock();
+	}
+	
+	void unlockPlayHandleRemoval()
+	{
+		m_playHandleRemovalMutex.unlock();
+	}
 
 	// audio-buffer-mgm
 	void bufferToPort( const sampleFrame * _buf,
@@ -449,7 +459,8 @@ private:
 
 	QMutex m_globalMutex;
 	QMutex m_inputFramesMutex;
-
+	
+	QMutex m_playHandleRemovalMutex;
 
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;

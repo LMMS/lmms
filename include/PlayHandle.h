@@ -27,6 +27,7 @@
 
 #include <QtCore/QThread>
 #include <QtCore/QVector>
+#include <QtCore/QMutex>
 
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
@@ -84,7 +85,18 @@ public:
 		return !isFinished();
 	}
 
-
+	void lock()
+	{
+		m_processingLock.lock();
+	}
+	void unlock()
+	{
+		m_processingLock.unlock();
+	}
+	bool tryLock()
+	{
+		return m_processingLock.tryLock();
+	}
 	virtual void play( sampleFrame* buffer ) = 0;
 	virtual bool isFinished( void ) const = 0;
 
@@ -108,6 +120,7 @@ private:
 	Type m_type;
 	f_cnt_t m_offset;
 	const QThread* m_affinity;
+	QMutex m_processingLock;
 
 } ;
 

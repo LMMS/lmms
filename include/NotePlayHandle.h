@@ -276,7 +276,8 @@ private:
 											// release of note
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
-	bool m_hasParent;
+	bool m_hasParent;						// indicates whether note has parent
+	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
 	track* m_bbTrack;						// related BB track

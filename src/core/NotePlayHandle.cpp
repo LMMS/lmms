@@ -62,8 +62,10 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
+	m_subNotes(),
 	m_released( false ),
 	m_hasParent( parent != NULL  ),
+	m_parent( parent ),
 	m_hadChildren( false ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
@@ -76,6 +78,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin )
 {
+	lock();
 	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
@@ -94,23 +97,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	updateFrequency();
 
 	setFrames( _frames );
-
-	// inform attached components about new MIDI note (used for recording in Piano Roll)
-	if( m_origin == OriginMidiInput )
-	{
-		m_instrumentTrack->midiNoteOn( *this );
-	}
-
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
-	{
-		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
-
-		// send MidiNoteOn event
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
-			offset() );
-	}
+	unlock();
 }
 
 
@@ -118,12 +105,17 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 
 NotePlayHandle::~NotePlayHandle()
 {
+	lock();
 	noteOff( 0 );
 	
 	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
+	}
+	else
+	{
+		m_parent->m_subNotes.removeOne( this );
 	}
 
 	if( m_pluginData != NULL )
@@ -136,13 +128,14 @@ NotePlayHandle::~NotePlayHandle()
 		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		delete *it;
+		delete n;
 	}
 	m_subNotes.clear();
 
 	delete m_filter;
+	unlock();
 }
 
 
@@ -195,6 +188,28 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		return;
 	}
 	
+	lock();
+	
+	if( m_totalFramesPlayed == 0 )
+	{
+		// inform attached components about new MIDI note (used for recording in Piano Roll)
+		if( m_origin == OriginMidiInput )
+		{
+			m_instrumentTrack->midiNoteOn( *this );
+		}
+
+		if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
+		{
+			const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+			// send MidiNoteOn event
+			m_instrumentTrack->processOutEvent(
+				MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
+				MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
+				offset() );
+		}
+	}
+
 	// number of frames that can be played this period
 	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0 
 		? engine::mixer()->framesPerPeriod() - offset()
@@ -279,22 +294,18 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// play sub-notes (e.g. chords)
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		( *it )->play( _working_buffer );
-		if( ( *it )->isFinished() )
+		n->play( _working_buffer );
+		if( n->isFinished() )
 		{
-			delete *it;
-			it = m_subNotes.erase( it );
-		}
-		else
-		{
-			++it;
+			delete n;
 		}
 	}
 
 	// update internal data
 	m_totalFramesPlayed += framesThisPeriod;
+	unlock();
 }
 
 
@@ -346,11 +357,12 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	{
 		return;
 	}
+	m_released = true;
 
 	// first note-off all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		( *it )->noteOff( _s );
+		n->noteOff( _s );
 	}
 
 	// then set some variables indicating release-state
@@ -372,8 +384,6 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
 		m_instrumentTrack->midiNoteOff( *this );
 	}
-
-	m_released = true;
 }
 
 

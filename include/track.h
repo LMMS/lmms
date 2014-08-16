@@ -119,7 +119,7 @@ public:
 	{
 		return m_length;
 	}
-
+	
 	virtual void movePosition( const MidiTime & _pos );
 	virtual void changeLength( const MidiTime & _length );
 
@@ -508,6 +508,18 @@ public:
 	  m_height = _height;
 	}
 
+	void lock()
+	{
+		m_processingLock.lock();
+	}
+	void unlock()
+	{
+		m_processingLock.unlock();
+	}
+	bool tryLock()
+	{
+		return m_processingLock.tryLock();
+	}
 
 public slots:
 	virtual void setName( const QString & _new_name )
@@ -533,6 +545,7 @@ private:
 
 	tcoVector m_trackContentObjects;
 
+	QMutex m_processingLock;
 
 	friend class trackView;
 

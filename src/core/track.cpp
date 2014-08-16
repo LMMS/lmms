@@ -1697,18 +1697,17 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
  */
 void trackOperationsWidget::cloneTrack()
 {
-	engine::mixer()->lock();
 	m_trackView->getTrack()->clone();
-	engine::mixer()->unlock();
 }
 
 
 /*! \brief Clear this track - clears all TCOs from the track */
 void trackOperationsWidget::clearTrack()
 {
-	engine::mixer()->lock();
-	m_trackView->getTrack()->deleteTCOs();
-	engine::mixer()->unlock();
+	track * t = m_trackView->getTrack();
+	t->lock();
+	t->deleteTCOs();
+	t->unlock();
 }
 
 
@@ -1839,6 +1838,7 @@ track::track( TrackTypes _type, TrackContainer * _tc ) :
  */
 track::~track()
 {
+	lock();
 	emit destroyedTrack();
 
 	while( !m_trackContentObjects.isEmpty() )
@@ -1847,6 +1847,7 @@ track::~track()
 	}
 
 	m_trackContainer->removeTrack( this );
+	unlock();
 }
 
 
@@ -2534,9 +2535,9 @@ void trackView::dropEvent( QDropEvent * _de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		engine::mixer()->lock();
+		m_track->lock();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		engine::mixer()->unlock();
+		m_track->unlock();
 		_de->accept();
 	}
 }

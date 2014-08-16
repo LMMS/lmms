@@ -138,8 +138,8 @@ void song::masterVolumeChanged()
 
 void song::setTempo()
 {
+	engine::mixer()->lockPlayHandleRemoval();
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
-	engine::mixer()->lock();
 	PlayHandleList & playHandles = engine::mixer()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
@@ -147,10 +147,12 @@ void song::setTempo()
 		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( *it );
 		if( nph && !nph->isReleased() )
 		{
+			nph->lock();
 			nph->resize( tempo );
+			nph->unlock();
 		}
 	}
-	engine::mixer()->unlock();
+	engine::mixer()->unlockPlayHandleRemoval();
 
 	engine::updateFramesPerTick();
 
@@ -670,10 +672,8 @@ void song::removeBar()
 
 void song::addBBTrack()
 {
-	engine::mixer()->lock();
 	track * t = track::create( track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
-	engine::mixer()->unlock();
 }
 
 
@@ -681,9 +681,7 @@ void song::addBBTrack()
 
 void song::addSampleTrack()
 {
-	engine::mixer()->lock();
 	(void) track::create( track::SampleTrack, this );
-	engine::mixer()->unlock();
 }
 
 
@@ -691,9 +689,7 @@ void song::addSampleTrack()
 
 void song::addAutomationTrack()
 {
-	engine::mixer()->lock();
 	(void) track::create( track::AutomationTrack, this );
-	engine::mixer()->unlock();
 }
 
 

@@ -157,7 +157,7 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( n && n->isBbTrackMuted() ) )
+	if( isMuted() || ( n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
@@ -275,9 +275,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			if( event.velocity() > 0 )
 			{
 				NotePlayHandle* nph;
+				m_notesMutex.lock();
 				if( m_notes[event.key()] == NULL )
 				{
-					m_notesMutex.lock();
 					nph = new NotePlayHandle( this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
@@ -287,24 +287,23 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					if( ! engine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = NULL;
-						delete nph;
 					}
-					m_notesMutex.unlock();
 				}
+				m_notesMutex.unlock();
 				eventHandled = true;
 				break;
 			}
 
 		case MidiNoteOff:
+			m_notesMutex.lock();
 			if( m_notes[event.key()] != NULL )
 			{
-				m_notesMutex.lock();
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
-				m_notesMutex.unlock();
 			}
+			m_notesMutex.unlock();
 			eventHandled = true;
 			break;
 
@@ -392,6 +391,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 	switch( event.type() )
 	{
 		case MidiNoteOn:
+			m_midiNotesMutex.lock();
 			m_piano.setKeyState( event.key(), true );	// event.key() = original key
 
 			if( key >= 0 && key < NumKeys )
@@ -402,19 +402,20 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				}
 				++m_runningMidiNotes[key];
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
-
 				emit newNote();
 			}
+			m_midiNotesMutex.unlock();
 			break;
 
 		case MidiNoteOff:
+			m_midiNotesMutex.lock();
 			m_piano.setKeyState( event.key(), false );	// event.key() = original key
 
 			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
 			{
-				m_runningMidiNotes[key] = qMax( 0, m_runningMidiNotes[key] );
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 			}
+			m_midiNotesMutex.unlock();
 			break;
 
 		default:
@@ -432,18 +433,20 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
 	m_notesMutex.lock();
+	m_midiNotesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
 	m_notesMutex.unlock();
+	m_midiNotesMutex.unlock();
 
-	engine::mixer()->lock();
+	lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
 	engine::mixer()->removePlayHandles( this, removeIPH );
-	engine::mixer()->unlock();
+	unlock();
 }
 
 
@@ -532,13 +535,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
-	engine::mixer()->lock();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
+		( *it )->lock();
 		( *it )->updateFrequency();
+		( *it )->unlock();
 	}
-	engine::mixer()->unlock();
 }
 
 
@@ -590,6 +593,10 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 							const f_cnt_t _offset, int _tco_num )
 {
+	if( ! tryLock() || ! m_instrument )
+	{
+		return false;
+	}
 	const float frames_per_tick = engine::framesPerTick();
 
 	tcoVector tcos;
@@ -615,6 +622,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	if ( tcos.size() == 0 )
 	{
+		unlock();
 		return false;
 	}
 
@@ -678,6 +686,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 			++nit;
 		}
 	}
+	unlock();
 	return played_a_note;
 }
 
@@ -731,7 +740,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 {
 	silenceAllNotes( true );
 
-	engine::mixer()->lock();
+	lock();
 
 	m_volumeModel.loadSettings( thisElement, "vol" );
 	m_panningModel.loadSettings( thisElement, "pan" );
@@ -797,7 +806,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 		}
 		node = node.nextSibling();
 	}
-	engine::mixer()->unlock();
+	unlock();
 }
 
 
@@ -807,10 +816,10 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 {
 	silenceAllNotes( true );
 
-	engine::mixer()->lock();
+	lock();
 	delete m_instrument;
 	m_instrument = Instrument::instantiate( _plugin_name, this );
-	engine::mixer()->unlock();
+	unlock();
 
 	setName( m_instrument->displayName() );
 	emit instrumentChanged();
