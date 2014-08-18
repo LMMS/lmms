@@ -689,16 +689,19 @@ void DataFile::upgrade()
 	documentElement().setAttribute( "creator", "LMMS" );
 	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
 
-	// Time-signature
-	if ( !m_head.hasAttribute( "timesig_numerator" ) )
+	if( type() == SongProject || type() == SongProjectTemplate )
 	{
-		m_head.setAttribute( "timesig_numerator", 4 );
-		m_head.setAttribute( "timesig_denominator", 4 );
-	}
+		// Time-signature
+		if ( !m_head.hasAttribute( "timesig_numerator" ) )
+		{
+			m_head.setAttribute( "timesig_numerator", 4 );
+			m_head.setAttribute( "timesig_denominator", 4 );
+		}
 
-	if( !m_head.hasAttribute( "mastervol" ) )
-	{
-		m_head.setAttribute( "mastervol", 100 );
+		if( !m_head.hasAttribute( "mastervol" ) )
+		{
+			m_head.setAttribute( "mastervol", 100 );
+		}
 	}
 //printf("%s\n", toString( 2 ).toUtf8().constData());
 }
