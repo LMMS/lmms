@@ -1,49 +1,49 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <!DOCTYPE multimedia-project>
-<multimedia-project version="1.0" creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.4.0-rc3" type="instrumenttracksettings" >
+<multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
-  <instrumenttracksettings muted="0" type="0" name="STrash" >
-    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="81" vol="88" >
-      <instrument name="lb302" >
-        <lb302 db24="0" vcf_res="1.01" vcf_dec="0.1" dead="0" vcf_cut="0.18" vcf_mod="1" dist="1" slide_dec="0.5" slide="1" shape="0" />
+  <instrumenttracksettings muted="0" type="0" name="STrash">
+    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="81" vol="88">
+      <instrument name="lb302">
+        <lb302 db24="0" vcf_res="1.01" vcf_dec="0.1" dead="0" vcf_cut="0.18" vcf_mod="1" dist="1" slide_dec="0.5" slide="1" shape="0"/>
       </instrument>
-      <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
-        <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
-        <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
-        <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+      <eldata fres="0.5" ftype="0" fcut="14000" fwet="0">
+        <elvol lspd_denominator="4" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>
-      <chordcreator chord="0" chordrange="3" chord-enabled="0" />
-      <arpeggiator arptime="166" arprange="1" arptime_denominator="4" syncmode="0" arpmode="1" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="3" arpgate="100" />
-      <midiport inputcontroller="0" fixedoutputvelocity="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="0" outputprogram="1" readable="0" />
-      <fxchain numofeffects="6" enabled="1" >
-        <effect autoquit="1" gate="0" name="stereomatrix" wet="1" on="1" >
-          <stereomatrixcontrols l-l="0" l-r="0.96" r-l="0.98" r-r="0" />
+      <chordcreator chord="0" chordrange="3" chord-enabled="0"/>
+      <arpeggiator arptime="166" arprange="1" arptime_denominator="4" syncmode="0" arpmode="1" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="3" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="0" outputprogram="1" readable="0"/>
+      <fxchain numofeffects="6" enabled="1">
+        <effect autoquit="1" gate="0" name="stereomatrix" wet="1" on="1">
+          <stereomatrixcontrols l-l="0" l-r="0.96" r-l="0.98" r-r="0"/>
           <key/>
         </effect>
-        <effect autoquit="1" gate="0" name="ladspaeffect" wet="0.5" on="1" >
-          <ladspacontrols port11="0.1" port01="0.1" port12="1" port02="1" port13="3.14159" port03="3.14159" port14="0.74925" port04="0.74925" port04link="1" port02link="1" port03link="1" link="0" ports="8" port01link="0" />
+        <effect autoquit="1" gate="0" name="ladspaeffect" wet="0.5" on="1">
+          <ladspacontrols port11="0.1" port01="0.1" port12="1" port02="1" port13="3.14159" port03="3.14159" port14="0.74925" port04="0.74925" port04link="1" port02link="1" port03link="1" link="0" ports="8" port01link="0"/>
           <key>
-            <attribute value="caps" name="file" />
-            <attribute value="PhaserI" name="plugin" />
+            <attribute value="caps" name="file"/>
+            <attribute value="PhaserI" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit="1" gate="0" name="stereoenhancer" wet="1" on="1" >
-          <stereoenhancercontrols width="177" />
+        <effect autoquit="1" gate="0" name="stereoenhancer" wet="1" on="1">
+          <stereoenhancercontrols width="177"/>
           <key/>
         </effect>
-        <effect autoquit="1" gate="0" name="stereomatrix" wet="1" on="1" >
-          <stereomatrixcontrols l-l="1" l-r="0" r-l="0" r-r="-1" />
+        <effect autoquit="1" gate="0" name="stereomatrix" wet="1" on="1">
+          <stereomatrixcontrols l-l="1" l-r="0" r-l="0" r-r="-1"/>
           <key/>
         </effect>
-        <effect autoquit="1" gate="0" name="stereomatrix" wet="0.38" on="1" >
-          <stereomatrixcontrols l-l="-0.5" l-r="-0.5" r-l="-0.5" r-r="-0.5" />
+        <effect autoquit="1" gate="0" name="stereomatrix" wet="0.38" on="1">
+          <stereomatrixcontrols l-l="-0.5" l-r="-0.5" r-l="-0.5" r-r="-0.5"/>
           <key/>
         </effect>
-        <effect autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1" >
-          <ladspacontrols link="1" ports="0" />
+        <effect autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols link="1" ports="0"/>
           <key>
-            <attribute value="dc_remove_1207" name="file" />
-            <attribute value="dcRemove" name="plugin" />
+            <attribute value="dc_remove_1207" name="file"/>
+            <attribute value="dcRemove" name="plugin"/>
           </key>
         </effect>
       </fxchain>

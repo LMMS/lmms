@@ -1,16 +1,16 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <!DOCTYPE lmms-project>
-<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.0" type="instrumenttracksettings">
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Old Computer Games" solo="0">
     <instrumenttrack pan="-7" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="86">
       <instrument name="tripleoscillator">
-        <tripleoscillator phoffset2="0" userwavefile0="" finer0="-4" userwavefile1="" finer1="2" userwavefile2="" finer2="-2" coarse0="0" coarse1="0" coarse2="0" finel0="4" finel1="-2" modalgo1="2" modalgo2="0" finel2="2" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="3" stphdetun2="0" wavetype1="3" wavetype2="2" vol0="33" vol1="30" phoffset0="0" phoffset1="0" vol2="33"/>
+        <tripleoscillator phoffset2="0" userwavefile0="" userwavefile1="" finer0="-4" userwavefile2="" finer1="2" finer2="-2" coarse0="0" coarse1="0" coarse2="0" finel0="4" finel1="-2" modalgo1="2" finel2="2" modalgo2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="3" stphdetun2="0" wavetype1="3" wavetype2="2" vol0="33" vol1="30" phoffset0="0" phoffset1="0" vol2="33"/>
       </instrument>
       <eldata fres="1.01" ftype="0" fcut="5320" fwet="1">
-        <elvol lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.4" lamt="0" syncmode="0" latt="0" rel="0.1" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
-        <elcut lspd_denominator="4" sustain="0" pdel="0" userwavefile="" dec="0.48" lamt="0" syncmode="0" latt="0" rel="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
-        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elvol lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.4" lamt="0" syncmode="0" latt="0" rel="0.1" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0" userwavefile="" pdel="0" dec="0.48" lamt="0" syncmode="0" latt="0" rel="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>
       <chordcreator chord="0" chordrange="2" chord-enabled="1"/>
       <arpeggiator arptime="105" arprange="1" arptime_denominator="4" syncmode="0" arpmode="2" arp-enabled="1" arp="3" arptime_numerator="4" arpdir="0" arpgate="34"/>
