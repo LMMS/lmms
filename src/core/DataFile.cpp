@@ -61,6 +61,38 @@ DataFile::typeDescStruct
 
 
 
+DataFile::LocaleHelper::LocaleHelper( Mode mode )
+{
+	switch( mode )
+	{
+		case ModeLoad:
+			// set a locale for which QString::fromFloat() returns valid values if
+			// floating point separator is a comma - otherwise we would fail to load
+			// older projects made by people from various countries due to their
+			// locale settings
+		    QLocale::setDefault( QLocale::German );
+			break;
+
+		case ModeSave:
+			// set default locale to C so that floating point decimals are rendered to
+			// strings with periods as decimal point instead of commas in some countries
+			QLocale::setDefault( QLocale::C );
+
+		default: break;
+	}
+}
+
+
+
+DataFile::LocaleHelper::~LocaleHelper()
+{
+	// revert to original locale
+	QLocale::setDefault( QLocale::system() );
+}
+
+
+
+
 DataFile::DataFile( Type type ) :
 	QDomDocument( "lmms-project" ),
 	m_content(),
