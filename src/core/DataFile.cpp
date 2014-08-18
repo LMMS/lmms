@@ -683,6 +683,12 @@ void DataFile::upgrade()
 
 	}
 
+	// update document meta data
+	documentElement().setAttribute( "version", LDF_VERSION_STRING );
+	documentElement().setAttribute( "type", typeName( type() ) );
+	documentElement().setAttribute( "creator", "LMMS" );
+	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
+
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )
 	{
