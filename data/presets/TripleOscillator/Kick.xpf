@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack width="250" baseoct="6" x="213" y="95" surpos="134219776" fxch="0" height="436" visible="1" basetone="9" vol="53" name="kick" tab="0">
+    <instrumenttrack fxch="0" vol="53" name="kick" tab="0">
       <tripleoscillator phoffset2="0" userwavefile0="" userwavefile1="" finer0="0" userwavefile2="" finer1="0" finer2="0" coarse0="-13" coarse1="-21" coarse2="-22" finel0="0" finel1="0" modalgo1="2" finel2="0" modalgo2="0" pan0="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" stphdetun2="0" wavetype0="0" wavetype1="0" wavetype2="3" vol0="100" vol1="100" phoffset0="0" vol2="100" phoffset1="0"/>
       <eldata fres="8.67" ftype="0" fcut="2080" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.155" latt="0" sus="0.638" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.172" x100="0" lshp="0" hold="0"/>

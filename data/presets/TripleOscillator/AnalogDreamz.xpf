@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack baseoct="4" surpos="134219776" muted="0" fxch="0" tbidx="1" basetone="9" vol="25" name="Analog Dreamz">
+    <instrumenttrack muted="0" fxch="0" vol="25" name="Analog Dreamz">
       <tripleoscillator phoffset2="0" userwavefile0="" userwavefile1="" finer0="15" userwavefile2="" finer1="-5" finer2="0" coarse0="-12" coarse1="-12" coarse2="-24" finel0="-18" finel1="14" modalgo1="2" finel2="0" modalgo2="2" pan0="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" stphdetun2="0" wavetype0="2" wavetype1="2" wavetype2="2" vol0="100" vol1="100" phoffset0="0" vol2="100" phoffset1="0"/>
       <eldata fres="4.73" ftype="1" fcut="95" fwet="1">
         <elvol lpdel="0" amt="1" rel="0.211" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0"/>

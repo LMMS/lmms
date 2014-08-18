@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack baseoct="4" surpos="135792616" fxch="0" basetone="9" vol="59" name="Play some rock" tab="3">
+    <instrumenttrack fxch="0" vol="59" name="Play some rock" tab="3">
       <tripleoscillator phoffset2="82" userwavefile0="samples/empty.wav" userwavefile1="samples/empty.wav" finer0="0" userwavefile2="samples/empty.wav" finer1="0" finer2="13" coarse0="0" coarse1="0" coarse2="-12" finel0="0" finel1="0" modalgo1="0" finel2="-14" modalgo2="0" pan0="0" pan1="0" stphdetun0="247" pan2="0" stphdetun1="109" stphdetun2="334" wavetype0="3" wavetype1="4" wavetype2="5" vol0="100" vol1="54" phoffset0="0" vol2="26" phoffset1="271"/>
       <eldata fres="0.33" ftype="0" fcut="0" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.277" latt="0" sus="0" lspd="0.0917" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.296" x100="0" lshp="0" hold="0"/>
