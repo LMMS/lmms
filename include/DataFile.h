@@ -77,6 +77,24 @@ public:
 		return m_type;
 	}
 
+	// small helper class for adjusting application's locale settings
+	// when loading or saving floating point values rendered to strings
+	class LocaleHelper
+	{
+	public:
+		enum Modes
+		{
+			ModeLoad,
+			ModeSave,
+			ModeCount
+		};
+		typedef Modes Mode;
+
+		LocaleHelper( Mode mode );
+		~LocaleHelper();
+
+	};
+
 
 private:
 	static Type type( const QString& typeName );

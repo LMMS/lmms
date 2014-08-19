@@ -1,30 +1,18 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.4-cvs20060405" type="instrumenttracksettings" version="1.0" >
+<multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack width="250" x="517" y="256" surpos="134219776" fxch="0" height="436" baseoct="4" vol="102" name="snare" basetone="9" tab="1" visible="1" >
-      <tripleoscillator userwavefile1="" wavetype1="6" coarse1="-24" userwavefile2="" wavetype2="6" coarse2="-12" vol0="100" vol1="100" finel0="-28" vol2="100" finel1="-6" finel2="0" modalgo1="1" stphdetun0="184" pan0="0" modalgo2="0" stphdetun1="183" pan1="0" stphdetun2="0" pan2="0" phoffset0="180" phoffset1="49" phoffset2="74" finer0="28" finer1="6" finer2="0" userwavefile0="" wavetype0="6" coarse0="-24" >
-        <journal entries="0" metadata="1" id="914388" curentry="0" />
-      </tripleoscillator>
-      <eldata fres="1.68" ftype="0" fcut="1760" fwet="1" >
-        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.207" ctlenvamt="0" latt="0" sus="0.656" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.082" userwavefile="" x100="0" lshp="0" hold="0.012" >
-          <journal entries="0" metadata="1" id="746487" curentry="0" />
-        </elvol>
-        <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" >
-          <journal entries="0" metadata="1" id="684811" curentry="0" />
-        </elcut>
-        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" >
-          <journal entries="0" metadata="1" id="147155" curentry="0" />
-        </elres>
-        <journal entries="0" metadata="1" id="935669" curentry="0" />
+    <instrumenttrack fxch="0" vol="60" name="snare" tab="1">
+      <tripleoscillator phoffset2="74" userwavefile0="" userwavefile1="" finer0="28" userwavefile2="" finer1="6" finer2="0" coarse0="-24" coarse1="-24" coarse2="-12" finel0="-28" finel1="-6" modalgo1="1" finel2="0" modalgo2="0" pan0="0" pan1="0" stphdetun0="184" pan2="0" stphdetun1="183" stphdetun2="0" wavetype0="6" wavetype1="6" wavetype2="6" vol0="100" vol1="100" phoffset0="180" vol2="100" phoffset1="49"/>
+      <eldata fres="1.68" ftype="0" fcut="1760" fwet="1">
+        <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.207" latt="0" sus="0.656" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.082" x100="0" lshp="0" hold="0.012"/>
+        <elcut userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
+        <elres userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
       </eldata>
-      <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" >
-        <journal entries="0" metadata="1" id="230532" curentry="0" />
-      </arpandchords>
-      <midi defvelout="0" inputchannel="0" outputchannel="1" receive="0" send="0" defvelin="0" >
-        <journal entries="0" metadata="1" id="498245" curentry="0" />
-      </midi>
+      <arpeggiator chorddisabled="1" arptime="100" arprange="1" arpsyncmode="0" arpmode="0" chord="0" chordrange="1" arp="0" arp-enabled="0" chord-enabled="0" arpdisabled="1" arpdir="0" arpgate="100"/>
+      <midiport inputchannel="0" outputchannel="1" send="0" defvelout="0" receive="0" defvelin="0"/>
+      <chordcreator chorddisabled="1" arptime="100" arprange="1" arpsyncmode="0" arpmode="0" chord="0" chordrange="1" arp="0" arp-enabled="0" chord-enabled="0" arpdisabled="1" arpdir="0" arpgate="100"/>
     </instrumenttrack>
   </instrumenttracksettings>
 </multimediaproject>

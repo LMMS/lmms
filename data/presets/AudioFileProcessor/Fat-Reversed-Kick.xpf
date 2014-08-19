@@ -1,17 +1,18 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.4-cvs20060605" type="instrumenttracksettings" version="1.0" >
+<multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack width="250" x="1094" y="0" surpos="134219776" fxch="0" height="436" baseoct="4" vol="100" name="Fat Reversed Kick" basetone="9" tab="0" visible="1" >
-      <audiofileprocessor reversed="1" looped="1" eframe="0.999949" sframe="0" amp="100" src="drums/bassdrum01.ogg" />
-      <eldata fres="3" ftype="0" fcut="193" fwet="1" >
-        <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-        <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+    <instrumenttrack fxch="0" vol="59" name="Fat Reversed Kick" tab="0">
+      <audiofileprocessor reversed="1" looped="1" eframe="0.999949" sframe="0" amp="100" src="drums/bassdrum01.ogg"/>
+      <eldata fres="3" ftype="0" fcut="193" fwet="1">
+        <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
+        <elcut userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
+        <elres userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
       </eldata>
-      <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
-      <midi defvelout="0" inputchannel="0" outputchannel="1" receive="0" send="0" defvelin="0" />
+      <arpeggiator chorddisabled="0" arptime="100" arprange="1" arpsyncmode="0" arpmode="0" chord="0" chordrange="1" arp="0" arp-enabled="0" chord-enabled="1" arpdisabled="1" arpdir="0" arpgate="100"/>
+      <midiport inputchannel="0" outputchannel="1" send="0" defvelout="0" receive="0" defvelin="0"/>
+      <chordcreator chorddisabled="0" arptime="100" arprange="1" arpsyncmode="0" arpmode="0" chord="0" chordrange="1" arp="0" arp-enabled="0" chord-enabled="1" arpdisabled="1" arpdir="0" arpgate="100"/>
     </instrumenttrack>
   </instrumenttracksettings>
 </multimediaproject>

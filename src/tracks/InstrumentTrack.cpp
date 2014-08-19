@@ -1244,11 +1244,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
-	toolTip::add( saveSettingsBtn, tr( "Save current channel settings in a preset-file" ) );
+	toolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
 	saveSettingsBtn->setWhatsThis(
-		tr( "Click here, if you want to save current channel settings "
-			"in a preset-file. Later you can load this preset by "
-			"double-clicking it in the preset-browser." ) );
+		tr( "Click here, if you want to save current instrument track settings in a preset file. "
+			"Later you can load this preset by double-clicking it in the preset-browser." ) );
 
 	basicControlsLayout->addWidget( saveSettingsBtn );
 
@@ -1408,6 +1407,8 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
+		DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeSave );
+
 		DataFile dataFile( DataFile::InstrumentTrackSettings );
 		m_track->setSimpleSerializing();
 		m_track->saveSettings( dataFile, dataFile.content() );
