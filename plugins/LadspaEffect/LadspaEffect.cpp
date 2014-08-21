@@ -143,11 +143,12 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 
 	int frames = _frames;
 	sampleFrame * o_buf = NULL;
+	sampleFrame sBuf [_frames];
 
 	if( m_maxSampleRate < engine::mixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = new sampleFrame[_frames];
+		_buf = &sBuf[0];
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
 				engine::mixer()->processingSampleRate();
@@ -250,7 +251,6 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( o_buf != NULL )
 	{
 		sampleBack( _buf, o_buf, m_maxSampleRate );
-		delete[] _buf;
 	}
 
 	checkGate( out_sum / frames );
