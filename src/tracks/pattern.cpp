@@ -651,6 +651,8 @@ patternView::~patternView()
 {
 	if( engine::pianoRoll()->currentPattern() == m_pat )
 	{
+		engine::pianoRoll()->disconnect( this );
+
 		engine::pianoRoll()->setCurrentPattern( NULL );
 		// we have to have the song-editor to stop playing if it played
 		// us before

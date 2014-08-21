@@ -186,7 +186,9 @@ private:
 		const int margin = 64;
 		
 		// copy to temp array
-		float * tmp = new float [ GRAPHLEN + margin ];
+		float tmps [ GRAPHLEN + margin ]; // temp array in stack
+		float * tmp = &tmps[0];
+
 		memcpy( tmp, _src, sizeof( float ) * GRAPHLEN );
 		memcpy( tmp + GRAPHLEN, _src, sizeof( float ) * margin );
 		SRC_STATE * src_state = src_new( SRC_SINC_FASTEST, 1, &err );
@@ -200,8 +202,6 @@ private:
 		err = src_process( src_state, &src_data ); 
 		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
 		src_delete( src_state );
-		
-		delete tmp;
 	}
 
 	// memcpy utilizing cubic interpolation
