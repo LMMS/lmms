@@ -38,6 +38,7 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "Mixer.h"
+#include "MemoryManager.h"
 
 
 class QPainter;
@@ -59,6 +60,7 @@ public:
 	};
 	class EXPORT handleState
 	{
+		MM_OPERATORS
 	public:
 		handleState( bool _varying_pitch = false, int interpolation_mode = SRC_LINEAR );
 		virtual ~handleState();

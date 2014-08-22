@@ -30,7 +30,7 @@
 #include "note.h"
 #include "PlayHandle.h"
 #include "track.h"
-
+#include "MemoryManager.h"
 
 class InstrumentTrack;
 class NotePlayHandle;
@@ -42,6 +42,7 @@ typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 class EXPORT NotePlayHandle : public PlayHandle, public note
 {
+	MM_OPERATORS
 public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;

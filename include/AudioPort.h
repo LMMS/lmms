@@ -22,19 +22,21 @@
  *
  */
 
-#ifndef _AUDIO_PORT_H
-#define _AUDIO_PORT_H
+#ifndef AUDIO_PORT_H
+#define AUDIO_PORT_H
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
 #include "Mixer.h"
+#include "MemoryManager.h"
 
 class EffectChain;
 
 class AudioPort : public ThreadableJob
 {
+	MM_OPERATORS
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true );
 	virtual ~AudioPort();

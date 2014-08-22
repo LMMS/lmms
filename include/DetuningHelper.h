@@ -23,14 +23,15 @@
  *
  */
 
-#ifndef _DETUNING_HELPER_H
-#define _DETUNING_HELPER_H
+#ifndef DETUNING_HELPER_H
+#define DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
-
+#include "MemoryManager.h"
 
 class DetuningHelper : public InlineAutomation
 {
+	MM_OPERATORS
 public:
 	DetuningHelper() :
 		InlineAutomation()

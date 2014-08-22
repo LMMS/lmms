@@ -29,9 +29,11 @@
 #include "Midi.h"
 #include "panning_constants.h"
 #include "volume.h"
+#include "MemoryManager.h"
 
 class MidiEvent
 {
+	MM_OPERATORS
 public:
 	MidiEvent( MidiEventTypes type = MidiActiveSensing,
 				int8_t channel = 0,

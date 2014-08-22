@@ -34,7 +34,7 @@
 #include <QtCore/QVector>
 
 #include "export.h"
-
+#include "MemoryManager.h"
 
 class engine;
 
@@ -49,6 +49,7 @@ const QString LOCALE_PATH = "locale/";
 
 class EXPORT ConfigManager
 {
+	MM_OPERATORS
 public:
 	static inline ConfigManager * inst()
 	{

@@ -61,6 +61,7 @@
 #include "templates.h"
 
 #include "FileDialog.h"
+#include "MemoryManager.h"
 
 
 SampleBuffer::SampleBuffer( const QString & _audio_file,
@@ -106,7 +107,7 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 {
 	if( _frames > 0 )
 	{
-		m_origData = new sampleFrame[_frames];
+		m_origData = MM_ALLOC( sampleFrame, _frames );
 		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
@@ -133,7 +134,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 {
 	if( _frames > 0 )
 	{
-		m_origData = new sampleFrame[_frames];
+		m_origData = MM_ALLOC( sampleFrame, _frames );
 		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
@@ -145,8 +146,8 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 
 SampleBuffer::~SampleBuffer()
 {
-	delete[] m_origData;
-	delete[] m_data;
+	MM_FREE( m_origData );
+	MM_FREE( m_data );
 }
 
 
@@ -160,14 +161,14 @@ void SampleBuffer::update( bool _keep_settings )
 	if( lock )
 	{
 		engine::mixer()->lock();
-		delete[] m_data;
+		MM_FREE( m_data );
 	}
 
 	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
-		m_data = new sampleFrame[m_origFrames];
+		m_data = MM_ALLOC( sampleFrame, m_origFrames );
 		memcpy( m_data, m_origData, m_origFrames * BYTES_PER_FRAME );
 		if( _keep_settings == false )
 		{
@@ -232,7 +233,7 @@ void SampleBuffer::update( bool _keep_settings )
 			{
 				// sample couldn't be decoded, create buffer containing
 				// one sample-frame
-				m_data = new sampleFrame[1];
+				m_data = MM_ALLOC( sampleFrame, 1 );
 				memset( m_data, 0, sizeof( *m_data ) );
 				m_frames = 1;
 				m_loopStartFrame = m_startFrame = 0;
@@ -252,7 +253,7 @@ void SampleBuffer::update( bool _keep_settings )
 	{
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
-		m_data = new sampleFrame[1];
+		m_data = MM_ALLOC( sampleFrame, 1 );
 		memset( m_data, 0, sizeof( *m_data ) );
 		m_frames = 1;
 		m_loopStartFrame = m_startFrame = 0;
@@ -273,7 +274,7 @@ void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 			// following code transforms int-samples into
 			// float-samples and does amplifying & reversing
 			const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-			m_data = new sampleFrame[_frames];
+			m_data = MM_ALLOC( sampleFrame, _frames );
 			const int ch = ( _channels > 1 ) ? 1 : 0;
 
 			// if reversing is on, we also reverse when
@@ -313,7 +314,7 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 
 {
 
-		m_data = new sampleFrame[_frames];
+		m_data = MM_ALLOC( sampleFrame, _frames );
 		const int ch = ( _channels > 1 ) ? 1 : 0;
 
 			// if reversing is on, we also reverse when
@@ -356,9 +357,9 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	{
 		SampleBuffer * resampled = resample( this, _src_sr,
 					engine::mixer()->baseSampleRate() );
-		delete[] m_data;
+		MM_FREE( m_data );
 		m_frames = resampled->frames();
-		m_data = new sampleFrame[m_frames];
+		m_data = MM_ALLOC( sampleFrame, m_frames );
 		memcpy( m_data, resampled->data(), m_frames *
 							sizeof( sampleFrame ) );
 		delete resampled;
@@ -1336,15 +1337,15 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 	printf("%d\n", (int) orig_data.size() );
 
 	m_origFrames = orig_data.size() / sizeof( sampleFrame );
-	delete[] m_origData;
-	m_origData = new sampleFrame[m_origFrames];
+	MM_FREE( m_origData );
+	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
 	m_origFrames = dsize / sizeof( sampleFrame );
-	delete[] m_origData;
-	m_origData = new sampleFrame[m_origFrames];
+	MM_FREE( m_origData );
+	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
 	memcpy( m_origData, dst, dsize );
 
 #endif

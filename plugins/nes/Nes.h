@@ -32,6 +32,7 @@
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
 #include "pixmap_button.h"
+#include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
@@ -80,6 +81,7 @@ class NesInstrument;
 
 class NesObject
 {
+	MM_OPERATORS
 public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject();
