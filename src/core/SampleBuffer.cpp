@@ -753,7 +753,10 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-	if( tmp != NULL ) delete[] tmp;
+	if( tmp != NULL ) 
+	{
+		MM_FREE( tmp );
+	}
 
 	_state->setBackwards( is_backwards );
 	_state->setFrameIndex( play_frame );
@@ -795,7 +798,7 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 		return m_data + _index;
 	}
 
-	*_tmp = new sampleFrame[_frames];
+	*_tmp = MM_ALLOC( sampleFrame, _frames );
 
 	if( _loopmode == LoopOff )
 	{

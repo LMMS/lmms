@@ -29,9 +29,11 @@
 #include <QtGlobal>
 #include "interpolation.h"
 #include <string.h>
+#include "MemoryManager.h"
 
 class ValueBuffer
 {
+	MM_OPERATORS
 public:
 	ValueBuffer()
 	{

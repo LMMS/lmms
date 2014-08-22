@@ -32,10 +32,11 @@
 
 #include "export.h"
 #include "lmms_basics.h"
-
+#include "MemoryManager.h"
 
 class EXPORT DataFile : public QDomDocument
 {
+	MM_OPERATORS
 public:
 	enum Types
 	{

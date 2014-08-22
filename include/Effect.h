@@ -39,6 +39,7 @@ class EffectControls;
 
 class EXPORT Effect : public Plugin
 {
+	MM_OPERATORS
 public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,

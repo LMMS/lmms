@@ -52,6 +52,7 @@ const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 class EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
+	MM_OPERATORS
 public:
 	enum LoopMode {
 		LoopOff = 0,

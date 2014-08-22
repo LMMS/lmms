@@ -75,6 +75,7 @@ const float CENT = 1.0f / 1200.0f;
 class OscillatorObject : public Model
 {
 	Q_OBJECT
+	MM_OPERATORS
 private:
 	int m_numOscillators;
 	IntModel m_waveShape;

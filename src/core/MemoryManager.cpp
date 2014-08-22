@@ -106,7 +106,7 @@ void MemoryManager::free( void * ptr )
 	s_pointerMutex.lock();
 	if( ! s_pointerInfo.contains( ptr ) ) // if we have no info on ptr, fail loudly
 	{
-		qFatal( "MemoryManager.cpp: Couldn't find pointer info for pointer: %d", (int)ptr );
+		qFatal( "MemoryManager.cpp: Couldn't find pointer info for pointer: %d", (intptr_t)ptr );
 	}
 	PtrInfo p = s_pointerInfo[ptr];
 	s_pointerInfo.remove( ptr );
@@ -198,7 +198,7 @@ void MemoryPool::releaseChunks( void * ptr, int chunks )
 {
 	m_mutex.lock();
 	
-	int start = ( (int)ptr - (int)m_pool ) / MM_CHUNK_SIZE;
+	int start = ( (intptr_t)ptr - (intptr_t)m_pool ) / MM_CHUNK_SIZE;
 	if( start < 0 )
 	{
 		qFatal( "MemoryManager: error at releaseChunks() - corrupt pointer info?" );
