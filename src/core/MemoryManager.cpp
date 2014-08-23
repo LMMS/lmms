@@ -61,6 +61,7 @@ void * MemoryManager::alloc( size_t size )
 		{
 			mp = &( *it );
 		}
+		++it;
 	}
 	s_poolMutex.unlock();
 
@@ -68,8 +69,8 @@ void * MemoryManager::alloc( size_t size )
 	{
 		s_pointerMutex.lock();
 		PtrInfo p;
-		p.chunks = requiredChunks;
-		p.memPool = mp;
+			p.chunks = requiredChunks;
+			p.memPool = mp;
 		s_pointerInfo[ptr] = p;
 		s_pointerMutex.unlock();
 		return ptr;
@@ -86,8 +87,8 @@ void * MemoryManager::alloc( size_t size )
 	{
 		s_pointerMutex.lock();
 		PtrInfo p;
-		p.chunks = requiredChunks;
-		p.memPool = mp;
+			p.chunks = requiredChunks;
+			p.memPool = mp;
 		s_pointerInfo[ptr] = p;
 		s_pointerMutex.unlock();
 		return ptr;
@@ -100,13 +101,17 @@ void * MemoryManager::alloc( size_t size )
 
 void MemoryManager::free( void * ptr )
 {
-	if( ptr == NULL ) return; // let's not try to deallocate null pointers, ok?
+	if( ptr == NULL ) 
+	{
+		qDebug( "MemoryManager: Null pointer deallocation attempted" );
+		return; // let's not try to deallocate null pointers, ok?
+	}
 
 	// fetch info on the ptr and remove
 	s_pointerMutex.lock();
 	if( ! s_pointerInfo.contains( ptr ) ) // if we have no info on ptr, fail loudly
 	{
-		qFatal( "MemoryManager.cpp: Couldn't find pointer info for pointer: %d", (intptr_t)ptr );
+		qFatal( "MemoryManager: Couldn't find pointer info for pointer: %p", ptr );
 	}
 	PtrInfo p = s_pointerInfo[ptr];
 	s_pointerInfo.remove( ptr );
@@ -151,8 +156,8 @@ void * MemoryPool::getChunks( int chunksNeeded )
 	
 	// now find out if we have a long enough sequence of chunks in this pool
 	char last = 0;
-	int n = 0;
-	int index = -1;
+	intptr_t n = 0;
+	intptr_t index = -1;
 	bool found = false;
 	
 	for( int i = 0; i < m_chunks; ++i )
@@ -182,7 +187,7 @@ void * MemoryPool::getChunks( int chunksNeeded )
 	if( found ) // if enough chunks found, return pointer to chunks
 	{
 		// set chunk flags to false so we know the chunks are in use
-		for( int i = 0; i < chunksNeeded; ++i )
+		for( intptr_t i = 0; i < chunksNeeded; ++i )
 		{
 			m_free[ index + i ] = 0;
 		}
@@ -198,7 +203,7 @@ void MemoryPool::releaseChunks( void * ptr, int chunks )
 {
 	m_mutex.lock();
 	
-	int start = ( (intptr_t)ptr - (intptr_t)m_pool ) / MM_CHUNK_SIZE;
+	intptr_t start = ( (intptr_t)ptr - (intptr_t)m_pool ) / MM_CHUNK_SIZE;
 	if( start < 0 )
 	{
 		qFatal( "MemoryManager: error at releaseChunks() - corrupt pointer info?" );
