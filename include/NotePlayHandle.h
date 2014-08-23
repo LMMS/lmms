@@ -91,8 +91,6 @@ public:
 		return m_frequency;
 	}
 
-	void updateFrequency();
-
 	/*! Returns frequency without pitch wheel influence */
 	float unpitchedFrequency() const
 	{
@@ -240,10 +238,15 @@ public:
 		return m_songGlobalParentOffset;
 	}
 
+	void setFrequencyUpdate()
+	{
+		m_frequencyNeedsUpdate = true;
+	}
 
 private:
 	class BaseDetuning
 	{
+		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -262,6 +265,8 @@ private:
 		float m_value;
 
 	} ;
+
+	void updateFrequency();
 
 	InstrumentTrack* m_instrumentTrack;		// needed for calling
 											// InstrumentTrack::playNote
@@ -298,6 +303,7 @@ private:
 	const int m_midiChannel;
 	const Origin m_origin;
 
+	bool m_frequencyNeedsUpdate;				// used to update pitch
 } ;
 
 #endif

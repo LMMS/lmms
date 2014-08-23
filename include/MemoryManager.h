@@ -127,4 +127,32 @@ static void operator delete[] ( void * ptr )	\
 // and just for symmetry...
 #define MM_FREE( ptr ) MemoryManager::free( ptr )
 
+
+
+// for debugging purposes
+
+#define MM_OPERATORS_DEBUG												\
+public: 																\
+static void * operator new ( size_t size )							\
+{																		\
+	qDebug( "MM_OPERATORS_DEBUG: new called for %d bytes", size );		\
+	return MemoryManager::alloc( size );								\
+}																		\
+static void * operator new[] ( size_t size )							\
+{																		\
+	qDebug( "MM_OPERATORS_DEBUG: new[] called for %d bytes", size );	\
+	return MemoryManager::alloc( size );								\
+}																		\
+static void operator delete ( void * ptr )							\
+{																		\
+	qDebug( "MM_OPERATORS_DEBUG: delete called for %p", ptr );			\
+	MemoryManager::free( ptr );										\
+}																		\
+static void operator delete[] ( void * ptr )						\
+{																		\
+	qDebug( "MM_OPERATORS_DEBUG: delete[] called for %p", ptr );		\
+	MemoryManager::free( ptr );										\
+}
+
+
 #endif

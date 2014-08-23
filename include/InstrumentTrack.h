@@ -60,6 +60,7 @@ class trackLabelButton;
 class EXPORT InstrumentTrack : public track, public MidiEventProcessor
 {
 	Q_OBJECT
+	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	InstrumentTrack( TrackContainer* tc );

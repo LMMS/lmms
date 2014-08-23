@@ -76,7 +76,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_baseDetuning( NULL ),
 	m_songGlobalParentOffset( 0 ),
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
-	m_origin( origin )
+	m_origin( origin ),
+	m_frequencyNeedsUpdate( false )
 {
 	lock();
 	if( hasParent() == false )
@@ -97,6 +98,24 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	updateFrequency();
 
 	setFrames( _frames );
+	
+	// inform attached components about new MIDI note (used for recording in Piano Roll)
+	if( m_origin == OriginMidiInput )
+	{
+		m_instrumentTrack->midiNoteOn( *this );
+	}
+
+	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
+	{
+		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+		// send MidiNoteOn event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
+			MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
+			offset() );
+	}
+	
 	unlock();
 }
 
@@ -189,25 +208,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 	
 	lock();
-	
-	if( m_totalFramesPlayed == 0 )
+	if( m_frequencyNeedsUpdate )
 	{
-		// inform attached components about new MIDI note (used for recording in Piano Roll)
-		if( m_origin == OriginMidiInput )
-		{
-			m_instrumentTrack->midiNoteOn( *this );
-		}
-
-		if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
-		{
-			const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
-
-			// send MidiNoteOn event
-			m_instrumentTrack->processOutEvent(
-				MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-				MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
-				offset() );
-		}
+		updateFrequency();
 	}
 
 	// number of frames that can be played this period

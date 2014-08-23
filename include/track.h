@@ -76,6 +76,7 @@ const int TCO_BORDER_WIDTH = 2;
 class trackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
+	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
@@ -406,6 +407,7 @@ signals:
 class EXPORT track : public Model, public JournallingObject
 {
 	Q_OBJECT
+	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:

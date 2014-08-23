@@ -26,6 +26,7 @@
 
 #include "MemoryManager.h"
 #include <QtGlobal>
+#include <stdint.h>
 
 
 MemoryPoolVector MemoryManager::s_memoryPools; 

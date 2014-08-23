@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _OSCILLATOR_H
-#define _OSCILLATOR_H
+#ifndef OSCILLATOR_H
+#define OSCILLATOR_H
 
 #include "lmmsconfig.h"
 
@@ -43,6 +43,7 @@ class IntModel;
 
 class EXPORT Oscillator
 {
+	MM_OPERATORS
 public:
 	enum WaveShapes
 	{

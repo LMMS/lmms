@@ -150,6 +150,7 @@ private:
 
 	struct oscPtr
 	{
+		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
 	} ;
@@ -181,6 +182,7 @@ private:
 
 	struct OscillatorKnobs
 	{
+		MM_OPERATORS
 		OscillatorKnobs( 
 					knob * h,
 					knob * v,

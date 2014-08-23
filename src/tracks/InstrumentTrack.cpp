@@ -148,7 +148,7 @@ InstrumentTrack::~InstrumentTrack()
 	silenceAllNotes( true );
 
 	// now we're save deleting the instrument
-	delete m_instrument;
+	if( m_instrument ) delete m_instrument;
 }
 
 
@@ -538,9 +538,7 @@ void InstrumentTrack::updateBaseNote()
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
-		( *it )->lock();
-		( *it )->updateFrequency();
-		( *it )->unlock();
+		( *it )->setFrequencyUpdate();
 	}
 }
 
