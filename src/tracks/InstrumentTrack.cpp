@@ -278,7 +278,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				m_notesMutex.lock();
 				if( m_notes[event.key()] == NULL )
 				{
-					nph = new NotePlayHandle( this, offset,
+					nph = NotePlayHandleManager::acquire( this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
@@ -668,7 +668,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					cur_note->length().frames(
 							frames_per_tick );
 
-				NotePlayHandle* notePlayHandle = new NotePlayHandle( this, _offset, note_frames, *cur_note );
+				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
 				notePlayHandle->setBBTrack( bb_track );
 				// are we playing global song?
 				if( _tco_num < 0 )

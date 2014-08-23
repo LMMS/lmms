@@ -260,7 +260,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				new NotePlayHandle( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
+				NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking );
 			}
 		}
@@ -471,7 +471,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		new NotePlayHandle( _n->instrumentTrack(),
+		NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							( ( m_arpModeModel.value() != FreeMode ) ?  cnphv.first()->offset() : _n->offset() ) + frames_processed,
 							gated_frames,
 							note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),

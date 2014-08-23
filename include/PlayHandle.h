@@ -55,6 +55,14 @@ public:
 	{
 	}
 
+	PlayHandle & operator = ( PlayHandle & p )
+	{
+		m_type = p.m_type;
+		m_offset = p.m_offset;
+		m_affinity = p.m_affinity;
+		return *this;
+	}
+
 	virtual ~PlayHandle()
 	{
 	}
@@ -119,7 +127,7 @@ public:
 private:
 	Type m_type;
 	f_cnt_t m_offset;
-	const QThread* m_affinity;
+	QThread* m_affinity;
 	QMutex m_processingLock;
 
 } ;

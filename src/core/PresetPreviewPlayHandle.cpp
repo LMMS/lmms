@@ -160,7 +160,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 				midiPort()->setMode( MidiPort::Disabled );
 
 	// create note-play-handle for it
-	m_previewNote = new NotePlayHandle(
+	m_previewNote = NotePlayHandleManager::acquire(
 			s_previewTC->previewInstrumentTrack(), 0,
 			typeInfo<f_cnt_t>::max() / 2,
 				note( 0, 0, DefaultKey, 100 ) );
@@ -184,7 +184,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 		// then set according state
 		s_previewTC->setPreviewNote( NULL );
 	}
-	delete m_previewNote;
+	NotePlayHandleManager::release( m_previewNote );
 	s_previewTC->unlockData();
 }
 

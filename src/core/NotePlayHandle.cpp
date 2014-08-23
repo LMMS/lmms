@@ -120,9 +120,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 }
 
 
-
-
-NotePlayHandle::~NotePlayHandle()
+void NotePlayHandle::done()
 {
 	lock();
 	noteOff( 0 );
@@ -149,7 +147,7 @@ NotePlayHandle::~NotePlayHandle()
 
 	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		delete n;
+		NotePlayHandleManager::release( n );
 	}
 	m_subNotes.clear();
 
@@ -302,7 +300,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		n->play( _working_buffer );
 		if( n->isFinished() )
 		{
-			delete n;
+			NotePlayHandleManager::release( n );
 		}
 	}
 
@@ -548,3 +546,78 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 }
 
 
+NotePlayHandleList NotePlayHandleManager::s_nphCache;
+NotePlayHandleList NotePlayHandleManager::s_available;
+QMutex NotePlayHandleManager::s_mutex;
+
+
+void NotePlayHandleManager::init()
+{
+	// make sure the containers have more room than we need so that they don't need to do reallocations
+	s_nphCache.reserve( 1024 );
+	s_available.reserve( 1024 );
+
+	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, INITIAL_NPH_CACHE );
+
+	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
+	{
+		s_nphCache += n;
+		s_available += n;
+		++n;
+	}
+}
+
+
+NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrack,
+				const f_cnt_t offset,
+				const f_cnt_t frames,
+				const note& noteToPlay,
+				NotePlayHandle* parent,
+				int midiEventChannel,
+				NotePlayHandle::Origin origin )
+{
+	if( s_available.isEmpty() )
+	{
+		extend( NPH_CACHE_INCREMENT );
+	}
+	
+	s_mutex.lock();
+		NotePlayHandle * nph = s_available.takeFirst();
+	s_mutex.unlock();
+	
+	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
+	return nph;
+}
+
+
+void NotePlayHandleManager::release( NotePlayHandle * nph )
+{
+	nph->done();
+	s_mutex.lock();
+		s_available += nph;
+	s_mutex.unlock();
+}
+
+
+void NotePlayHandleManager::extend( int i )
+{
+	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, i );
+
+	s_mutex.lock();
+	for( int j=0; j < i; ++j )
+	{
+		s_nphCache += n;
+		s_available += n;
+		++n;
+	}
+	s_mutex.unlock();
+}
+
+	
+void NotePlayHandleManager::cleanup()
+{
+	foreach( NotePlayHandle * n, s_nphCache )
+	{
+		delete n;
+	}
+}

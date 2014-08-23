@@ -216,20 +216,7 @@ public:
 
 
 	// play-handle stuff
-	bool addPlayHandle( PlayHandle* handle )
-	{
-		if( criticalXRuns() == false )
-		{
-			m_playHandleMutex.lock();
-			m_newPlayHandles.append( handle );
-			m_playHandleMutex.unlock();
-			return true;
-		}
-
-		delete handle;
-
-		return false;
-	}
+	bool addPlayHandle( PlayHandle* handle );
 
 	void removePlayHandle( PlayHandle* handle );
 

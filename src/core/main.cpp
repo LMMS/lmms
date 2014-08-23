@@ -66,6 +66,7 @@
 
 #include "MemoryManager.h"
 #include "ConfigManager.h"
+#include "NotePlayHandle.h"
 #include "embed.h"
 #include "engine.h"
 #include "LmmsStyle.h"
@@ -98,8 +99,9 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
-	// initialize memory manager
+	// initialize memory managers
 	MemoryManager::init();
+	NotePlayHandleManager::init();
 	
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
@@ -534,8 +536,9 @@ int main( int argc, char * * argv )
 	const int ret = app->exec();
 	delete app;
 	
-	// cleanup memory manager
+	// cleanup memory managers
 	MemoryManager::cleanup();
+	NotePlayHandleManager::cleanup();
 	
 	return( ret );
 }
