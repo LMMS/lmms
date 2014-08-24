@@ -60,12 +60,9 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 
 
 
-MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
-					const sample_rate_t _samplerate, fpp_t _frames ) :
+MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 					m_parent( _i ),
-					m_nph( _nph ),
-					m_samplerate( _samplerate ),
-					m_fpp( _frames )
+					m_nph( _nph )
 {
 	m_osc1l_phase = 0.0f;
 	m_osc1r_phase = 0.0f;
@@ -98,15 +95,10 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
 	m_invert3l = false;
 	m_invert3r = false;
 
-	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
-
 	m_counter2l = 0;
 	m_counter2r = 0;
 	m_counter3l = 0;
 	m_counter3r = 0;
-	m_counterMax = ( m_samplerate * 10 ) / 44100;
-
-	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
 }
 
 
@@ -121,31 +113,31 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
 		modtmp = 0.0f; \
-		if( mod##_e1 != 0.0f ) modtmp += m_env[0] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) modtmp += m_env[1] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1] * mod##_l2; \
+		if( mod##_e1 != 0.0f ) modtmp += env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) modtmp += env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) modtmp += lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) modtmp += lfo[1][f] * mod##_l2; \
 		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += m_env[0] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += m_env[1] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += m_lfo[0] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += m_lfo[1] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += lfo[1][f] * mod##_l2;
 
 #define modulatephs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += m_env[0] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += m_env[1] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += m_lfo[0] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += m_lfo[1] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += lfo[1][f] * mod##_l2;
 
 #define modulatevol( car, mod ) \
-		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * m_env[0] ); \
-		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * m_env[0] );	\
-		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * m_env[1] );	\
-		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * m_env[1] );	\
-		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * m_lfo[0] ); \
-		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * m_lfo[1] ); \
+		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * env[0][f] ); \
+		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * env[0][f] );	\
+		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * env[1][f] );	\
+		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * env[1][f] );	\
+		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * lfo[0][f] ); \
+		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * lfo[1][f] ); \
 		car = qBound( -MODCLIP, car, MODCLIP );
 
 
@@ -165,8 +157,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	m_lfo_phase[1] = absFraction( m_lfo_phase[1] + lfo2_po );
 
 	// LFO rates and increment
-	m_lfo_rate[0] = ( m_parent->m_lfo1Rate.value() * 0.001f * m_samplerate );
-	m_lfo_rate[1] = ( m_parent->m_lfo2Rate.value() * 0.001f * m_samplerate );
+	m_lfo_rate[0] = ( m_parent->m_lfo1Rate.value() * 0.001f * m_parent->m_samplerate );
+	m_lfo_rate[1] = ( m_parent->m_lfo2Rate.value() * 0.001f * m_parent->m_samplerate );
 	m_lfo_inc[0] = 1.0f / m_lfo_rate[0];
 	m_lfo_inc[1] = 1.0f / m_lfo_rate[1];
 
@@ -347,12 +339,22 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o3r_p = m_osc3r_phase + o3rpo;
 	float sub;
 
-	// begin for loop
-	for( f_cnt_t f = 0; f < _frames; f++ )
+	// modulators
+	float lfo[2][ m_parent->m_fpp ];
+	float env[2][ m_parent->m_fpp ];
+	
+	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
-		// update modulators
 		updateModulators( f );
+		lfo[0][f] = m_lfo[0];
+		lfo[1][f] = m_lfo[1];
+		env[0][f] = m_env[0];
+		env[1][f] = m_env[1];
+	}
 
+	// begin for loop
+	for( f_cnt_t f = 0; f < _frames; ++f )
+	{
 /*	// debug code
 		if( f % 10 == 0 ) {
 			qDebug( "env1 %f -- env1 phase %f", m_env1_buf[f], m_env1_phase );
@@ -403,24 +405,24 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			// hard sync
 			if( o2sync )
 			{
-				if( O1L > m_osc1l_last ) { o2l_p = o2lpo; m_counter2l = m_counterMax; }
-				if( O1R > m_osc1r_last ) { o2r_p = o2rpo; m_counter2r = m_counterMax; }
+				if( O1L > m_osc1l_last ) { o2l_p = o2lpo; m_counter2l = m_parent->m_counterMax; }
+				if( O1R > m_osc1r_last ) { o2r_p = o2rpo; m_counter2r = m_parent->m_counterMax; }
 			}
 			if( o3sync )
 			{
-				if( O1L > m_osc1l_last ) { o3l_p = o3lpo; m_counter3l = m_counterMax; }
-				if( O1R > m_osc1r_last ) { o3r_p = o3rpo; m_counter3r = m_counterMax; }
+				if( O1L > m_osc1l_last ) { o3l_p = o3lpo; m_counter3l = m_parent->m_counterMax; }
+				if( O1R > m_osc1r_last ) { o3r_p = o3rpo; m_counter3r = m_parent->m_counterMax; }
 			}
 			// reverse sync
 			if( o2syncr )
 			{
-				if( O1L > m_osc1l_last ) { m_invert2l = !m_invert2l; m_counter2l = m_counterMax; }
-				if( O1R > m_osc1r_last ) { m_invert2r = !m_invert2r; m_counter2r = m_counterMax; }
+				if( O1L > m_osc1l_last ) { m_invert2l = !m_invert2l; m_counter2l = m_parent->m_counterMax; }
+				if( O1R > m_osc1r_last ) { m_invert2r = !m_invert2r; m_counter2r = m_parent->m_counterMax; }
 			}
 			if( o3syncr )
 			{
-				if( O1L > m_osc1l_last ) { m_invert3l = !m_invert3l; m_counter3l = m_counterMax; }
-				if( O1R > m_osc1r_last ) { m_invert3r = !m_invert3r; m_counter3r = m_counterMax; }
+				if( O1L > m_osc1l_last ) { m_invert3l = !m_invert3l; m_counter3l = m_parent->m_counterMax; }
+				if( O1R > m_osc1r_last ) { m_invert3r = !m_invert3r; m_counter3r = m_parent->m_counterMax; }
 			}
 		}
 		// sync on fall
@@ -429,24 +431,24 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 			// hard sync
 			if( o2sync )
 			{
-				if( O1L < m_osc1l_last ) { o2l_p = o2lpo; m_counter2l = m_counterMax; }
-				if( O1R < m_osc1r_last ) { o2r_p = o2rpo; m_counter2r = m_counterMax; }
+				if( O1L < m_osc1l_last ) { o2l_p = o2lpo; m_counter2l = m_parent->m_counterMax; }
+				if( O1R < m_osc1r_last ) { o2r_p = o2rpo; m_counter2r = m_parent->m_counterMax; }
 			}
 			if( o3sync )
 			{
-				if( O1L < m_osc1l_last ) { o3l_p = o3lpo; m_counter3l = m_counterMax; }
-				if( O1R < m_osc1r_last ) { o3r_p = o3rpo; m_counter3r = m_counterMax; }
+				if( O1L < m_osc1l_last ) { o3l_p = o3lpo; m_counter3l = m_parent->m_counterMax; }
+				if( O1R < m_osc1r_last ) { o3r_p = o3rpo; m_counter3r = m_parent->m_counterMax; }
 			}
 			// reverse sync
 			if( o2syncr )
 			{
-				if( O1L < m_osc1l_last ) { m_invert2l = !m_invert2l; m_counter2l = m_counterMax; }
-				if( O1R < m_osc1r_last ) { m_invert2r = !m_invert2r; m_counter2r = m_counterMax; }
+				if( O1L < m_osc1l_last ) { m_invert2l = !m_invert2l; m_counter2l = m_parent->m_counterMax; }
+				if( O1R < m_osc1r_last ) { m_invert2r = !m_invert2r; m_counter2r = m_parent->m_counterMax; }
 			}
 			if( o3syncr )
 			{
-				if( O1L < m_osc1l_last ) { m_invert3l = !m_invert3l; m_counter3l = m_counterMax; }
-				if( O1R < m_osc1r_last ) { m_invert3r = !m_invert3r; m_counter3r = m_counterMax; }
+				if( O1L < m_osc1l_last ) { m_invert3l = !m_invert3l; m_counter3l = m_parent->m_counterMax; }
+				if( O1R < m_osc1r_last ) { m_invert3r = !m_invert3r; m_counter3r = m_parent->m_counterMax; }
 			}
 		}
 
@@ -471,8 +473,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 
 		// update osc1 phase working variable
-		o1l_p += 1.0f / ( static_cast<float>( m_samplerate ) / o1l_f );
-		o1r_p += 1.0f / ( static_cast<float>( m_samplerate ) / o1r_f );
+		o1l_p += 1.0f / ( static_cast<float>( m_parent->m_samplerate ) / o1l_f );
+		o1r_p += 1.0f / ( static_cast<float>( m_parent->m_samplerate ) / o1r_f );
 
 		/////////////////////////////
 		//				           //
@@ -530,8 +532,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// update osc2 phases
 		m_ph2l_last = leftph;
 		m_ph2r_last = rightph;
-		o2l_p += 1.0f / ( static_cast<float>( m_samplerate ) / o2l_f );
-		o2r_p += 1.0f / ( static_cast<float>( m_samplerate ) / o2r_f );
+		o2l_p += 1.0f / ( static_cast<float>( m_parent->m_samplerate ) / o2l_f );
+		o2r_p += 1.0f / ( static_cast<float>( m_parent->m_samplerate ) / o2r_f );
 
 		/////////////////////////////
 		//				           //
@@ -617,13 +619,13 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		// update osc3 phases
 		m_ph3l_last = leftph;
 		m_ph3r_last = rightph;
-		len_l = 1.0f / ( static_cast<float>( m_samplerate ) / o3l_f );
-		len_r = 1.0f / ( static_cast<float>( m_samplerate ) / o3r_f );
+		len_l = 1.0f / ( static_cast<float>( m_parent->m_samplerate ) / o3l_f );
+		len_r = 1.0f / ( static_cast<float>( m_parent->m_samplerate ) / o3r_f );
 		// handle FM as PM
 		if( omod == MOD_FM )
 		{
-			len_l += O2L * m_fmCorrection;
-			len_r += O2R * m_fmCorrection;
+			len_l += O2L * m_parent->m_fmCorrection;
+			len_r += O2R * m_parent->m_fmCorrection;
 		}
 		o3l_p += len_l;
 		o3r_p += len_r;
@@ -632,8 +634,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		_buf[f][0] = linearInterpolate( L, m_l_last, m_integrator );
-		_buf[f][1] = linearInterpolate( R, m_r_last, m_integrator );
+		_buf[f][0] = linearInterpolate( L, m_l_last, m_parent->m_integrator );
+		_buf[f][1] = linearInterpolate( R, m_r_last, m_parent->m_integrator );
 
 		m_l_last = L;
 		m_r_last = R;
@@ -993,8 +995,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		const sample_rate_t samplerate = m_samplerate;
-		_n->m_pluginData = new MonstroSynth( this, _n, samplerate, m_fpp );
+		_n->m_pluginData = new MonstroSynth( this, _n );
 	}
 
 	MonstroSynth * ms = static_cast<MonstroSynth *>( _n->m_pluginData );
@@ -1376,6 +1377,11 @@ void MonstroInstrument::updateLFOAtts()
 void MonstroInstrument::updateSamplerate()
 {
 	m_samplerate = engine::mixer()->processingSampleRate();
+	
+	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
+	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
+	m_counterMax = ( m_samplerate * 5 ) / 44100;
+
 	updateEnvelope1();
 	updateEnvelope2();
 	updateLFOAtts();
