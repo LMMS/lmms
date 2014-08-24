@@ -37,6 +37,7 @@
 #include "EffectChain.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
+#include "MemoryManager.h"
 
 #include "embed.cpp"
 
@@ -155,9 +156,7 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
-	// the control ports.  Need to change this to handle non-in-place-broken
-	// plugins--would speed things up to use the same buffer for both
-	// LMMS and LADSPA.
+	// the control ports.  
 	ch_cnt_t channel = 0;
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
 	{
@@ -207,6 +206,7 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 			}
 		}
 	}
+
 
 	// Process the buffers.
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
@@ -287,9 +287,15 @@ void LadspaEffect::pluginInstantiation()
 	int effect_channels = manager->getDescription( m_key )->inputChannels;
 	setProcessorCount( lmms_chnls / effect_channels );
 
+	// get inPlaceBroken property
+	m_inPlaceBroken = manager->isInplaceBroken( m_key );
+
 	// Categorize the ports, and create the buffers.
 	m_portCount = manager->getPortCount( m_key );
 
+	int inputch = 0;
+	int outputch = 0;
+	LADSPA_Data * inbuf [2];
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
 		multi_proc_t ports;
@@ -301,39 +307,47 @@ void LadspaEffect::pluginInstantiation()
 			p->proc = proc;
 			p->port_id = port;
 			p->control = NULL;
+			p->buffer = NULL;
 
 			// Determine the port's category.
 			if( manager->isPortAudio( m_key, port ) )
 			{
-				// Nasty manual memory management--was having difficulty
-				// with some prepackaged plugins that were segfaulting
-				// during cleanup.  It was easier to troubleshoot with the
-				// memory management all taking place in one file.
-				p->buffer = 
-					new LADSPA_Data[engine::mixer()->framesPerPeriod()];
-
 				if( p->name.toUpper().contains( "IN" ) &&
 					manager->isPortInput( m_key, port ) )
 				{
 					p->rate = CHANNEL_IN;
+					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+					inbuf[ inputch ] = p->buffer;
+					inputch++;
 				}
 				else if( p->name.toUpper().contains( "OUT" ) &&
 					manager->isPortOutput( m_key, port ) )
 				{
 					p->rate = CHANNEL_OUT;
+					if( ! m_inPlaceBroken )
+					{
+						p->buffer = inbuf[ outputch ];
+						outputch++;
+					}
+					else
+					{
+						p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+					}
 				}
 				else if( manager->isPortInput( m_key, port ) )
 				{
 					p->rate = AUDIO_RATE_INPUT;
+					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
 				}
 				else
 				{
 					p->rate = AUDIO_RATE_OUTPUT;
+					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
 				}
 			}
 			else
 			{
-				p->buffer = new LADSPA_Data[1];
+				p->buffer = MM_ALLOC( LADSPA_Data, 1 );
 
 				if( manager->isPortInput( m_key, port ) )
 				{
@@ -526,7 +540,10 @@ void LadspaEffect::pluginDestruction()
 		for( int port = 0; port < m_portCount; port++ )
 		{
 			port_desc_t * pp = m_ports.at( proc ).at( port );
-			delete[] pp->buffer;
+			if( m_inPlaceBroken || pp->rate != CHANNEL_OUT )
+			{
+				if( pp->buffer) MM_FREE( pp->buffer );
+			}
 			delete pp;
 		}
 		m_ports[proc].clear();

@@ -76,6 +76,7 @@ private:
 	sample_rate_t m_maxSampleRate;
 	ladspa_key_t m_key;
 	int m_portCount;
+	bool m_inPlaceBroken;
 
 	const LADSPA_Descriptor * m_descriptor;
 	QVector<LADSPA_Handle> m_handles;
