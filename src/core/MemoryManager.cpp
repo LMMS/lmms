@@ -29,10 +29,10 @@
 #include <stdint.h>
 
 
-MemoryPoolVector MemoryManager::s_memoryPools; 
-QReadWriteLock MemoryManager::s_poolMutex; 
-PointerInfoMap MemoryManager::s_pointerInfo; 
-QMutex MemoryManager::s_pointerMutex; 
+MemoryPoolVector MemoryManager::s_memoryPools;
+QReadWriteLock MemoryManager::s_poolMutex;
+PointerInfoMap MemoryManager::s_pointerInfo;
+QMutex MemoryManager::s_pointerMutex;
 
 
 bool MemoryManager::init()
@@ -50,12 +50,12 @@ bool MemoryManager::init()
 void * MemoryManager::alloc( size_t size )
 {
 	int requiredChunks = size / MM_CHUNK_SIZE + ( size % MM_CHUNK_SIZE > 0 ? 1 : 0 );
-	
+
 	MemoryPool * mp = NULL;
 	void * ptr = NULL;
-	
+
 	MemoryPoolVector::iterator it = s_memoryPools.begin();
-	
+
 	s_poolMutex.lockForRead();
 	while( it != s_memoryPools.end() && !ptr )
 	{
@@ -68,7 +68,7 @@ void * MemoryManager::alloc( size_t size )
 	}
 	s_poolMutex.unlock();
 
-	if( ptr ) 
+	if( ptr )
 	{
 		s_pointerMutex.lock();
 		PtrInfo p;
@@ -78,15 +78,15 @@ void * MemoryManager::alloc( size_t size )
 		s_pointerMutex.unlock();
 		return ptr;
 	}
-	
-	// can't find enough chunks in existing pools, so 
+
+	// can't find enough chunks in existing pools, so
 	// create a new pool that is guaranteed to have enough chunks
 	int moreChunks = qMax( requiredChunks, MM_INCREMENT_CHUNKS );
 	int i = MemoryManager::extend( moreChunks );
-	
+
 	mp = &s_memoryPools[i];
 	ptr = s_memoryPools[i].getChunks( requiredChunks );
-	if( ptr ) 
+	if( ptr )
 	{
 		s_pointerMutex.lock();
 		PtrInfo p;
@@ -104,7 +104,7 @@ void * MemoryManager::alloc( size_t size )
 
 void MemoryManager::free( void * ptr )
 {
-	if( ptr == NULL ) 
+	if( ptr == NULL )
 	{
 		qDebug( "MemoryManager: Null pointer deallocation attempted" );
 		return; // let's not try to deallocate null pointers, ok?
@@ -119,7 +119,7 @@ void MemoryManager::free( void * ptr )
 	PtrInfo p = s_pointerInfo[ptr];
 	s_pointerInfo.remove( ptr );
 	s_pointerMutex.unlock();
-	
+
 	p.memPool->releaseChunks( ptr, p.chunks );
 }
 
@@ -128,12 +128,12 @@ int MemoryManager::extend( int chunks )
 {
 	MemoryPool m ( chunks );
 	m.m_pool = MemoryHelper::alignedMalloc( chunks * MM_CHUNK_SIZE );
-	
+
 	s_poolMutex.lockForWrite();
 	s_memoryPools.append( m );
 	int i = s_memoryPools.size() - 1;
 	s_poolMutex.unlock();
-	
+
 	return i;
 }
 
@@ -154,15 +154,15 @@ void * MemoryPool::getChunks( int chunksNeeded )
 	{
 		return NULL;
 	}
-	
+
 	m_mutex.lock();
-	
+
 	// now find out if we have a long enough sequence of chunks in this pool
 	char last = 0;
 	intptr_t n = 0;
 	intptr_t index = -1;
 	bool found = false;
-	
+
 	for( int i = 0; i < m_chunks; ++i )
 	{
 		if( m_free[i] )
@@ -183,10 +183,10 @@ void * MemoryPool::getChunks( int chunksNeeded )
 		{
 			n = 0;
 		}
-		
+
 		last = m_free[i];
 	}
-	
+
 	if( found ) // if enough chunks found, return pointer to chunks
 	{
 		// set chunk flags to false so we know the chunks are in use
@@ -205,13 +205,13 @@ void * MemoryPool::getChunks( int chunksNeeded )
 void MemoryPool::releaseChunks( void * ptr, int chunks )
 {
 	m_mutex.lock();
-	
+
 	intptr_t start = ( (intptr_t)ptr - (intptr_t)m_pool ) / MM_CHUNK_SIZE;
 	if( start < 0 )
 	{
 		qFatal( "MemoryManager: error at releaseChunks() - corrupt pointer info?" );
 	}
-	
+
 	memset( &m_free[ start ], 1, chunks );
 
 	m_mutex.unlock();

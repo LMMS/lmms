@@ -34,7 +34,7 @@
 #include "MemoryHelper.h"
 
 
-const int MM_CHUNK_SIZE = 64; // granularity of managed memory 
+const int MM_CHUNK_SIZE = 64; // granularity of managed memory
 const int MM_INITIAL_CHUNKS = 1024 * 1024; // how many chunks to allocate at startup - TODO: make configurable
 const int MM_INCREMENT_CHUNKS = 16 * 1024; // min. amount of chunks to increment at a time
 
@@ -44,27 +44,27 @@ struct MemoryPool
 	char * m_free;
 	int m_chunks;
 	QMutex m_mutex;
-	
+
 	MemoryPool() :
 		m_pool( NULL ),
 		m_free( NULL ),
 		m_chunks( 0 )
 	{}
-	
-	MemoryPool( int chunks ) : 
+
+	MemoryPool( int chunks ) :
 		m_chunks( chunks )
 	{
 		m_free = (char*) MemoryHelper::alignedMalloc( chunks );
 		memset( m_free, 1, chunks );
 	}
-	
+
 	MemoryPool( const MemoryPool & mp ) :
 		m_pool( mp.m_pool ),
 		m_free( mp.m_free ),
 		m_chunks( mp.m_chunks ),
 		m_mutex()
 	{}
-	
+
 	MemoryPool & operator = ( const MemoryPool & mp )
 	{
 		m_pool = mp.m_pool;
@@ -72,7 +72,7 @@ struct MemoryPool
 		m_chunks = mp.m_chunks;
 		return *this;
 	}
-	
+
 	void * getChunks( int chunksNeeded );
 	void releaseChunks( void * ptr, int chunks );
 };
@@ -86,7 +86,7 @@ struct PtrInfo
 typedef QVector<MemoryPool> MemoryPoolVector;
 typedef QHash<void*, PtrInfo> PointerInfoMap;
 
-class MemoryManager 
+class MemoryManager
 {
 public:
 	static bool init();
@@ -98,7 +98,7 @@ public:
 private:
 	static MemoryPoolVector s_memoryPools;
 	static QReadWriteLock s_poolMutex;
-	
+
 	static PointerInfoMap s_pointerInfo;
 	static QMutex s_pointerMutex;
 };
