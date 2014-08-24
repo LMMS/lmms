@@ -29,6 +29,7 @@
 #include <new>
 #include <QtCore/QVector>
 #include <QtCore/QMutex>
+#include <QtCore/QReadWriteLock>
 #include <QtCore/QHash>
 #include "MemoryHelper.h"
 
@@ -96,7 +97,7 @@ public:
 
 private:
 	static MemoryPoolVector s_memoryPools;
-	static QMutex s_poolMutex;
+	static QReadWriteLock s_poolMutex;
 	
 	static PointerInfoMap s_pointerInfo;
 	static QMutex s_pointerMutex;

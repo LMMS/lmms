@@ -30,7 +30,7 @@
 
 
 MemoryPoolVector MemoryManager::s_memoryPools; 
-QMutex MemoryManager::s_poolMutex; 
+QReadWriteLock MemoryManager::s_poolMutex; 
 PointerInfoMap MemoryManager::s_pointerInfo; 
 QMutex MemoryManager::s_pointerMutex; 
 
@@ -56,7 +56,7 @@ void * MemoryManager::alloc( size_t size )
 	
 	MemoryPoolVector::iterator it = s_memoryPools.begin();
 	
-	s_poolMutex.lock();
+	s_poolMutex.lockForRead();
 	while( it != s_memoryPools.end() && !ptr )
 	{
 		ptr = ( *it ).getChunks( requiredChunks );
@@ -129,7 +129,7 @@ int MemoryManager::extend( int chunks )
 	MemoryPool m ( chunks );
 	m.m_pool = MemoryHelper::alignedMalloc( chunks * MM_CHUNK_SIZE );
 	
-	s_poolMutex.lock();
+	s_poolMutex.lockForWrite();
 	s_memoryPools.append( m );
 	int i = s_memoryPools.size() - 1;
 	s_poolMutex.unlock();
