@@ -190,23 +190,15 @@ class MonstroView;
 class MonstroSynth
 {
 public:
-	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
-					const sample_rate_t _samplerate, fpp_t _frames );
+	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth();
 
 	void renderOutput( fpp_t _frames, sampleFrame * _buf );
-
-	inline sample_rate_t samplerate() const
-	{
-		return m_samplerate;
-	}
 
 private:
 
 	MonstroInstrument * m_parent;
 	NotePlayHandle * m_nph;
-	const sample_rate_t m_samplerate;
-	fpp_t m_fpp;
 
 	sample_t m_env [2];
 	sample_t m_lfo [2];
@@ -338,15 +330,10 @@ private:
 	bool m_invert2r;
 	bool m_invert3r;
 	
-	float m_integrator;
-	
 	int m_counter2l;
 	int m_counter2r;
 	int m_counter3l;
 	int m_counter3r;
-	int m_counterMax;
-	
-	float m_fmCorrection;
 };
 
 class MonstroInstrument : public Instrument
@@ -434,6 +421,10 @@ protected:
 
 	sample_rate_t m_samplerate;
 	fpp_t m_fpp;
+	
+	float m_integrator;
+	float m_fmCorrection;
+	int m_counterMax;
 
 private:
 	inline float leftCh( float _vol, float _pan )
