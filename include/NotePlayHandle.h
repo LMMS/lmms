@@ -32,6 +32,7 @@
 #include "track.h"
 #include "MemoryManager.h"
 #include <QtCore/QAtomicInt>
+#include <QtCore/QReadWriteLock>
 
 class InstrumentTrack;
 class NotePlayHandle;
@@ -333,10 +334,10 @@ public:
 	static void extend( int i );
 
 private:
-	static NotePlayHandleList s_nphCache;
-	static NotePlayHandleList s_available;
-	static QMutex s_mutex;
+	static NotePlayHandle ** s_available;
+	static QReadWriteLock s_mutex;
 	static QAtomicInt s_availableIndex;
+	static int s_size;
 };
 
 

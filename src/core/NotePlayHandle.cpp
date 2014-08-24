@@ -545,26 +545,25 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 }
 
 
-NotePlayHandleList NotePlayHandleManager::s_nphCache;
-NotePlayHandleList NotePlayHandleManager::s_available;
-QMutex NotePlayHandleManager::s_mutex;
+NotePlayHandle ** NotePlayHandleManager::s_available;
+QReadWriteLock NotePlayHandleManager::s_mutex;
 QAtomicInt NotePlayHandleManager::s_availableIndex;
+int NotePlayHandleManager::s_size;
+
 
 void NotePlayHandleManager::init()
 {
-	// make sure the containers have more room than we need so that they don't need to do reallocations
-	s_nphCache.reserve( 1024 );
-	s_available.reserve( 1024 );
+	s_available = MM_ALLOC( NotePlayHandle*, INITIAL_NPH_CACHE );
 
 	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, INITIAL_NPH_CACHE );
 
 	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
 	{
-		s_nphCache += n;
-		s_available += n;
+		s_available[ i ] = n;
 		++n;
 	}
 	s_availableIndex = INITIAL_NPH_CACHE - 1;
+	s_size = INITIAL_NPH_CACHE;
 }
 
 
@@ -578,10 +577,13 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 {
 	if( s_availableIndex < 0 )
 	{
-		extend( NPH_CACHE_INCREMENT );
+		s_mutex.lockForWrite();
+		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
+		s_mutex.unlock();
 	}
-	
-	NotePlayHandle * nph = s_available.at( s_availableIndex.fetchAndAddOrdered( -1 ) );
+	s_mutex.lockForRead();
+	NotePlayHandle * nph = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
+	s_mutex.unlock();
 	
 	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
 	return nph;
@@ -591,19 +593,24 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 void NotePlayHandleManager::release( NotePlayHandle * nph )
 {
 	nph->done();
+	s_mutex.lockForRead();
 	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
+	s_mutex.unlock();
 }
 
 
-void NotePlayHandleManager::extend( int i )
+void NotePlayHandleManager::extend( int c )
 {
-	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, i );
+	s_size += c;
+	NotePlayHandle ** tmp = MM_ALLOC( NotePlayHandle*, s_size );
+	MM_FREE( s_available );
+	s_available = tmp;
+	
+	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, c );
 
-	for( int j=0; j < i; ++j )
+	for( int i=0; i < c; ++i )
 	{
-		s_nphCache += n;
-		s_available += n;
-		s_availableIndex.ref();
+		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = n;
 		++n;
 	}
 }
