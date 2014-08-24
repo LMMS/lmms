@@ -145,10 +145,6 @@ void NotePlayHandle::done()
 		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
-	foreach( NotePlayHandle * n, m_subNotes )
-	{
-		NotePlayHandleManager::release( n );
-	}
 	m_subNotes.clear();
 
 	delete m_filter;
@@ -295,14 +291,15 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// play sub-notes (e.g. chords)
-	foreach( NotePlayHandle * n, m_subNotes )
+	// handled by mixer now
+/*	foreach( NotePlayHandle * n, m_subNotes )
 	{
 		n->play( _working_buffer );
 		if( n->isFinished() )
 		{
 			NotePlayHandleManager::release( n );
 		}
-	}
+	}*/
 
 	// update internal data
 	m_totalFramesPlayed += framesThisPeriod;
@@ -363,7 +360,9 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	// first note-off all sub-notes
 	foreach( NotePlayHandle * n, m_subNotes )
 	{
+		n->lock();
 		n->noteOff( _s );
+		n->unlock();
 	}
 
 	// then set some variables indicating release-state
@@ -549,7 +548,7 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 NotePlayHandleList NotePlayHandleManager::s_nphCache;
 NotePlayHandleList NotePlayHandleManager::s_available;
 QMutex NotePlayHandleManager::s_mutex;
-
+QAtomicInt NotePlayHandleManager::s_availableIndex;
 
 void NotePlayHandleManager::init()
 {
@@ -565,6 +564,7 @@ void NotePlayHandleManager::init()
 		s_available += n;
 		++n;
 	}
+	s_availableIndex = INITIAL_NPH_CACHE - 1;
 }
 
 
@@ -576,14 +576,12 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
-	if( s_available.isEmpty() )
+	if( s_availableIndex < 0 )
 	{
 		extend( NPH_CACHE_INCREMENT );
 	}
 	
-	s_mutex.lock();
-		NotePlayHandle * nph = s_available.takeFirst();
-	s_mutex.unlock();
+	NotePlayHandle * nph = s_available.at( s_availableIndex.fetchAndAddOrdered( -1 ) );
 	
 	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
 	return nph;
@@ -593,9 +591,7 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 void NotePlayHandleManager::release( NotePlayHandle * nph )
 {
 	nph->done();
-	s_mutex.lock();
-		s_available += nph;
-	s_mutex.unlock();
+	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
 }
 
 
@@ -603,12 +599,11 @@ void NotePlayHandleManager::extend( int i )
 {
 	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, i );
 
-	s_mutex.lock();
 	for( int j=0; j < i; ++j )
 	{
 		s_nphCache += n;
 		s_available += n;
+		s_availableIndex.ref();
 		++n;
 	}
-	s_mutex.unlock();
 }

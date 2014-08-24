@@ -31,6 +31,7 @@
 #include "PlayHandle.h"
 #include "track.h"
 #include "MemoryManager.h"
+#include <QtCore/QAtomicInt>
 
 class InstrumentTrack;
 class NotePlayHandle;
@@ -335,6 +336,7 @@ private:
 	static NotePlayHandleList s_nphCache;
 	static NotePlayHandleList s_available;
 	static QMutex s_mutex;
+	static QAtomicInt s_availableIndex;
 };
 
 
