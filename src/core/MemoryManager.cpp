@@ -37,6 +37,8 @@ QMutex MemoryManager::s_pointerMutex;
 
 bool MemoryManager::init()
 {
+	s_memoryPools.reserve( 64 );
+	s_pointerInfo.reserve( 4096 );
 	// construct first MemoryPool and allocate memory
 	MemoryPool m ( MM_INITIAL_CHUNKS );
 	m.m_pool = MemoryHelper::alignedMalloc( MM_INITIAL_CHUNKS * MM_CHUNK_SIZE );

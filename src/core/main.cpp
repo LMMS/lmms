@@ -538,7 +538,6 @@ int main( int argc, char * * argv )
 	
 	// cleanup memory managers
 	MemoryManager::cleanup();
-	NotePlayHandleManager::cleanup();
 	
 	return( ret );
 }

@@ -29,7 +29,7 @@
 #include <new>
 #include <QtCore/QVector>
 #include <QtCore/QMutex>
-#include <QtCore/QMap>
+#include <QtCore/QHash>
 #include "MemoryHelper.h"
 
 
@@ -83,7 +83,7 @@ struct PtrInfo
 };
 
 typedef QVector<MemoryPool> MemoryPoolVector;
-typedef QMap<void*, PtrInfo> PointerInfoMap;
+typedef QHash<void*, PtrInfo> PointerInfoMap;
 
 class MemoryManager 
 {

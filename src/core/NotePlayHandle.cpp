@@ -612,12 +612,3 @@ void NotePlayHandleManager::extend( int i )
 	}
 	s_mutex.unlock();
 }
-
-	
-void NotePlayHandleManager::cleanup()
-{
-	foreach( NotePlayHandle * n, s_nphCache )
-	{
-		delete n;
-	}
-}

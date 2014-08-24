@@ -330,7 +330,6 @@ public:
 					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
-	static void cleanup();
 
 private:
 	static NotePlayHandleList s_nphCache;
