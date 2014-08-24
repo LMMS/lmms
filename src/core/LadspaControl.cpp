@@ -130,6 +130,25 @@ LADSPA_Data LadspaControl::value()
 }
 
 
+ValueBuffer * LadspaControl::valueBuffer()
+{
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+		case INTEGER:
+			return NULL;
+		case FLOATING:
+			return m_knobModel.valueBuffer();
+		case TIME:
+			return m_tempoSyncKnobModel.valueBuffer();
+		default:
+			qWarning( "LadspaControl::valueBuffer(): BAD BAD BAD\n" );
+			break;
+	}
+
+	return NULL;
+}
+
 
 
 void LadspaControl::setValue( LADSPA_Data _value )

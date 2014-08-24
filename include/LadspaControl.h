@@ -30,6 +30,7 @@
 
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
+#include "ValueBuffer.h"
 
 
 typedef struct PortDescription port_desc_t;
@@ -44,6 +45,7 @@ public:
 	~LadspaControl();
 
 	LADSPA_Data value();
+	ValueBuffer * valueBuffer();
 	void setValue( LADSPA_Data _value );
 	void setLink( bool _state );
 

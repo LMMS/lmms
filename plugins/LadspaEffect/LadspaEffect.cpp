@@ -38,6 +38,7 @@
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
 #include "MemoryManager.h"
+#include "ValueBuffer.h"
 
 #include "embed.cpp"
 
@@ -175,18 +176,28 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					++channel;
 					break;
 				case AUDIO_RATE_INPUT:
-					pp->value = static_cast<LADSPA_Data>( 
-										pp->control->value() / pp->scale );
-					// This only supports control rate ports, so the audio rates are
-					// treated as though they were control rate by setting the
-					// port buffer to all the same value.
-					for( fpp_t frame = 0; 
-						frame < frames; ++frame )
+				{
+					ValueBuffer * vb = pp->control->valueBuffer();
+					if( vb )
 					{
-						pp->buffer[frame] = 
-							pp->value;
+						memcpy( pp->buffer, vb->values(), frames * sizeof(float) );
+					}
+					else
+					{
+						pp->value = static_cast<LADSPA_Data>( 
+											pp->control->value() / pp->scale );
+						// This only supports control rate ports, so the audio rates are
+						// treated as though they were control rate by setting the
+						// port buffer to all the same value.
+						for( fpp_t frame = 0; 
+							frame < frames; ++frame )
+						{
+							pp->buffer[frame] = 
+								pp->value;
+						}
 					}
 					break;
+				}
 				case CONTROL_RATE_INPUT:
 					if( pp->control == NULL )
 					{
