@@ -26,7 +26,6 @@
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
-#include <new>
 #include <QtCore/QVector>
 #include <QtCore/QMutex>
 #include <QtCore/QReadWriteLock>

@@ -22,18 +22,16 @@
  *
  */
 
-#ifndef _MIDI_EVENT_H
-#define _MIDI_EVENT_H
+#ifndef MIDI_EVENT_H
+#define MIDI_EVENT_H
 
 #include <cstdlib>
 #include "Midi.h"
 #include "panning_constants.h"
 #include "volume.h"
-#include "MemoryManager.h"
 
 class MidiEvent
 {
-	MM_OPERATORS
 public:
 	MidiEvent( MidiEventTypes type = MidiActiveSensing,
 				int8_t channel = 0,
