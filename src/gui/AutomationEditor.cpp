@@ -733,6 +733,10 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			}
 			_ke->accept();
 			break;
+		
+		case Qt::Key_Enter:
+			play();
+			break;
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );

@@ -523,6 +523,10 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 			play();
 		}
 	}
+	else if( _ke->key() == Qt::Key_Enter )
+	{
+		play();
+	}
 	else if( _ke->key() == Qt::Key_Home )
 	{
 		m_s->setPlayPos( 0, song::Mode_PlaySong );

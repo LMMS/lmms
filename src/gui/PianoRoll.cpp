@@ -1368,6 +1368,10 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 			}
 			event->accept();
 			break;
+		
+		case Qt::Key_Enter:
+			play();
+			break;
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );
