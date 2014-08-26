@@ -1641,19 +1641,19 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>CUTOFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SEŘÍZNUTÍ</translation>
     </message>
     <message>
         <source>Cutoff frequency</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frekvence seříznutí</translation>
     </message>
     <message>
         <source>RESO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">REZO</translation>
     </message>
     <message>
         <source>Resonance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rezonance</translation>
     </message>
     <message>
         <source>Envelopes/LFOs</source>
@@ -2342,11 +2342,11 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save as new &amp;version</source>
+        <source>Uložit jako novou &amp;verzi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E&amp;xport tracks...</source>
+        <source>E&amp;xportovat stopy...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5700,35 +5700,35 @@ Zpoždění %2 ms</translation>
     </message>
     <message>
         <source>One instrument track window mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Režim jedné stopy pro nástroje</translation>
     </message>
     <message>
         <source>Compact track buttons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Malá tlačítka u stop</translation>
     </message>
     <message>
         <source>Sync VST plugins to host playback</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synchronizace VST pluginů s hostujícím přehráváním</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit názvy tónů v piano rollu</translation>
     </message>
     <message>
         <source>Enable waveform display by default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit zobrazení waveformu ve výchozím nastavení</translation>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plynulé posouvání v Song Editoru</translation>
     </message>
     <message>
         <source>Enable auto save feature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit automatické ukládání</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazit přehrávací kurzor v AudioFileProcessoru</translation>
     </message>
 </context>
 <context>
@@ -6162,15 +6162,16 @@ Zpoždění %2 ms</translation>
     <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nelze otevřít soubor %1. Pravděpodobně nemáte oprávnění číst tento soubor.
+ Ujistěte se prosím, že mát oprávnění alespoň číst tento soubor a zkuste to znovu.</translation>
     </message>
     <message>
         <source>Error in file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chyba v souboru</translation>
     </message>
     <message>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Soubor %1 nejspíše obsahuje chyby a nemohl být načten.</translation>
     </message>
     <message>
         <source>Tempo</source>
@@ -6218,33 +6219,33 @@ Zpoždění %2 ms</translation>
     </message>
     <message>
         <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nelze zapisovat do souboru %1. Pravděpodobně nemáte oprávnění zapisovat do tohoto souboru. Ujistěte se prosím, že máte oprávnění zapisovat do tohoto souboru a zkuse to znovu.</translation>
     </message>
 </context>
 <context>
     <name>spectrumAnalyzerControlDialog</name>
     <message>
         <source>Linear spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární spektrum</translation>
     </message>
     <message>
         <source>Linear Y axis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární osa Y</translation>
     </message>
 </context>
 <context>
     <name>spectrumAnalyzerControls</name>
     <message>
         <source>Linear spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární spektrum</translation>
     </message>
     <message>
         <source>Linear Y-axis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární osa Y</translation>
     </message>
     <message>
         <source>Channel mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Režim kanálu</translation>
     </message>
 </context>
 <context>
