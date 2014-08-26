@@ -138,7 +138,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
 {
 	// Connect the plugin to the mixer...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	engine::mixer()->addPlayHandle( iph );
 
 	// Voices are laid out in a funny way...

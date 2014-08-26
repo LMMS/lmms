@@ -38,13 +38,13 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new AudioPort( "SamplePlayHandle", false ) ),
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
+	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
 }
 
 
@@ -55,13 +55,13 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new AudioPort( "SamplePlayHandle", false ) ),
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
+	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
 }
 
 
@@ -72,13 +72,13 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() ),
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( tco->getTrack() ),
 	m_bbTrack( NULL )
 {
+	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
 }
 
 
@@ -89,7 +89,7 @@ SamplePlayHandle::~SamplePlayHandle()
 	sharedObject::unref( m_sampleBuffer );
 	if( m_ownAudioPort )
 	{
-		delete m_audioPort;
+		delete audioPort();
 	}
 }
 
@@ -119,13 +119,11 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	if( !( m_track && m_track->isMuted() )
 				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
 	{
-		stereoVolumeVector v =
+/*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
-				m_volumeModel->value() / DefaultVolume } };
+				m_volumeModel->value() / DefaultVolume } };*/
 		m_sampleBuffer->play( workingBuffer, &m_state, frames,
 								BaseFreq );
-		engine::mixer()->bufferToPort( buffer, fpp,
-						v, m_audioPort );
 	}
 
 	m_frame += frames;

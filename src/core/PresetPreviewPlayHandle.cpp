@@ -165,6 +165,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 			typeInfo<f_cnt_t>::max() / 2,
 				note( 0, 0, DefaultKey, 100 ) );
 
+	setAudioPort( s_previewTC->previewInstrumentTrack()->audioPort() );
 
 	s_previewTC->setPreviewNote( m_previewNote );
 

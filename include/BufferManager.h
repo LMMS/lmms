@@ -34,8 +34,8 @@
 #include <QtCore/QReadWriteLock>
 
 
-const int BM_INITIAL_BUFFERS = 256;
-const int BM_INCREMENT = 16;
+const int BM_INITIAL_BUFFERS = 512;
+//const int BM_INCREMENT = 64;
 
 class BufferManager
 {
@@ -43,12 +43,16 @@ public:
 	static void init();
 	static sampleFrame * acquire();
 	static void release( sampleFrame * buf );
-	static void extend( int c );
+	static void refresh();
+//	static void extend( int c );
 	
 private:
 	static sampleFrame ** s_available;
 	static QAtomicInt s_availableIndex;
-	static QReadWriteLock s_mutex;
+	
+	static sampleFrame ** s_released;
+	static QAtomicInt s_releasedIndex;
+//	static QReadWriteLock s_mutex;
 	static int s_size;
 };
 

@@ -93,6 +93,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		parent->m_hadChildren = true;
 
 		m_bbTrack = parent->m_bbTrack;
+		
+		parent->setUsesBuffer( false );
 	}
 
 	updateFrequency();
@@ -115,6 +117,13 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 			MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
 			offset() );
 	}
+
+	if( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed )
+	{
+		setUsesBuffer( false );
+	}
+	
+	setAudioPort( instrumentTrack->audioPort() );
 	
 	unlock();
 }
@@ -148,6 +157,9 @@ void NotePlayHandle::done()
 	m_subNotes.clear();
 
 	delete m_filter;
+	
+	if( buffer() ) releaseBuffer();
+
 	unlock();
 }
 

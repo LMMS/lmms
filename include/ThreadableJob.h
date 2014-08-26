@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _THREADABLE_JOB_H
-#define _THREADABLE_JOB_H
+#ifndef THREADABLE_JOB_H
+#define THREADABLE_JOB_H
 
 #include <QtCore/QAtomicInt>
 
@@ -67,11 +67,11 @@ public:
 		m_state = Done;
 	}
 
-	void process( sampleFrame* workingBuffer = NULL )
+	void process()
 	{
 		if( m_state.testAndSetOrdered( Queued, InProgress ) )
 		{
-			doProcessing( workingBuffer );
+			doProcessing();
 			m_state = Done;
 		}
 	}
@@ -80,7 +80,7 @@ public:
 
 
 protected:
-	virtual void doProcessing( sampleFrame* workingBuffer) = 0;
+	virtual void doProcessing() = 0;
 
 	QAtomicInt m_state;
 

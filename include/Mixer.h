@@ -321,11 +321,6 @@ public:
 	}
 
 	// audio-buffer-mgm
-	void bufferToPort( const sampleFrame * _buf,
-					const fpp_t _frames,
-					stereoVolumeVector _volume_vector,
-					AudioPort * _port );
-
 	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );

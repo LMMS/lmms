@@ -118,7 +118,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	engine::mixer()->addPlayHandle( iph );
 
 	loadFile( ConfigManager::inst()->defaultSoundfont() );

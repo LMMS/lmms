@@ -116,18 +116,9 @@ void FxChannel::unmuteForSolo()
 
 
 
-void FxChannel::doProcessing( sampleFrame * _buf )
+void FxChannel::doProcessing()
 {
 	const fpp_t fpp = engine::mixer()->framesPerPeriod();
-
-	// <tobydox> ignore the passed _buf
-	// <tobydox> always use m_buffer
-	// <tobydox> this is just an auxilliary buffer if doProcessing()
-	//			 needs one for processing while running
-	// <tobydox> particularly important for playHandles, so Instruments
-	//			 can operate on this buffer the whole time
-	// <tobydox> this improves cache hit rate
-	_buf = m_buffer;
 
 	if( m_muted == false )
 	{
@@ -150,21 +141,21 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * sendModel->value();
-					MixHelpers::addMultiplied( _buf, ch_buf, v, fpp );
+					MixHelpers::addMultiplied( m_buffer, ch_buf, v, fpp );
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					MixHelpers::addMultipliedByBuffers( _buf, ch_buf, volBuf, sendBuf, fpp );					
+					MixHelpers::addMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp );					
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, volBuf, fpp );
+					MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp );
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, sendBuf, fpp );
+					MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
 				}
 				m_hasInput = true;
 			}

@@ -237,7 +237,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 		}
 	}
 
-	engine::mixer()->bufferToPort( buf, frames, panningToVolumeVector( panning, v_scale ), &m_audioPort );
+	//engine::mixer()->bufferToPort( buf, frames, panningToVolumeVector( panning, v_scale ), &m_audioPort );
 }
 
 

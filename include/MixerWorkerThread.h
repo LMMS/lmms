@@ -63,7 +63,7 @@ public:
 
 		void addJob( ThreadableJob * _job );
 
-		void run( sampleFrame * _buffer );
+		void run();
 		void wait();
 
 	private:
@@ -115,7 +115,6 @@ private:
 	static QWaitCondition * queueReadyWaitCond;
 	static QList<MixerWorkerThread *> workerThreads;
 
-	sampleFrame * m_workingBuf;
 	volatile bool m_quit;
 
 } ;

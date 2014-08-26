@@ -129,7 +129,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	connect( &m_resBandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateResBandwidth() ) );
 
 	// now we need a play-handle which cares for calling play()
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
 	engine::mixer()->addPlayHandle( iph );
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),

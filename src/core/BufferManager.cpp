@@ -28,13 +28,16 @@
 
 sampleFrame ** BufferManager::s_available;
 QAtomicInt BufferManager::s_availableIndex = 0;
-QReadWriteLock BufferManager::s_mutex;
+sampleFrame ** BufferManager::s_released;
+QAtomicInt BufferManager::s_releasedIndex = 0;
+//QReadWriteLock BufferManager::s_mutex;
 int BufferManager::s_size;
 
 
 void BufferManager::init()
 {
 	s_available = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
+	s_released = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
 
 	int c = engine::mixer()->framesPerPeriod() * BM_INITIAL_BUFFERS;
 	sampleFrame * b = MM_ALLOC( sampleFrame, c );
@@ -53,29 +56,42 @@ sampleFrame * BufferManager::acquire()
 {
 	if( s_availableIndex < 0 )
 	{
-		s_mutex.lockForWrite();
-		if( s_availableIndex < 0 ) extend( BM_INCREMENT );
-		s_mutex.unlock();
+		qFatal( "BufferManager: out of buffers" );
 	}
-	s_mutex.lockForRead();
 	
-	sampleFrame * b = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
+	int i = s_availableIndex.fetchAndAddOrdered( -1 );
+	sampleFrame * b = s_available[ i ];
 	
-	//qDebug( "acquired buffer: %p - index %d", b, int(s_availableIndex) );
-	s_mutex.unlock();
+	//qDebug( "acquired buffer: %p - index %d", b, i );
 	return b;
 }
 
 
 void BufferManager::release( sampleFrame * buf )
 {
-	s_mutex.lockForRead();
-	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = buf;
-	//qDebug( "released buffer: %p - index %d", buf, int(s_availableIndex) );
-	s_mutex.unlock();
+	int i = s_releasedIndex.fetchAndAddOrdered( 1 );
+	s_released[ i ] = buf;
+	//qDebug( "released buffer: %p - index %d", buf, i );
 }
 
 
+void BufferManager::refresh() // non-threadsafe, hence it's called periodically from mixer at a time when no other threads can interfere
+{
+	if( s_releasedIndex == 0 ) return;
+	//qDebug( "refresh: %d buffers", int( s_releasedIndex ) );
+	
+	int j = s_availableIndex;
+	for( int i = 0; i < s_releasedIndex; ++i )
+	{
+		++j;
+		s_available[ j ] = s_released[ i ];
+	}
+	s_availableIndex = j;
+	s_releasedIndex = 0;
+}
+
+
+/* // non-extensible for now
 void BufferManager::extend( int c )
 {
 	s_size += c;
@@ -91,4 +107,4 @@ void BufferManager::extend( int c )
 		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = b;
 		b += engine::mixer()->framesPerPeriod();
 	}
-}
+}*/

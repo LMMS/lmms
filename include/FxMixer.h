@@ -76,7 +76,7 @@ class FxChannel : public ThreadableJob
 		void processed();
 		
 	private:
-		virtual void doProcessing( sampleFrame * _working_buffer );
+		virtual void doProcessing();
 };
 
 
