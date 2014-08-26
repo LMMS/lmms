@@ -1,18 +1,21 @@
-<?xml version='1.0'?>
-<!DOCTYPE multimedia-project>
-<multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
-  <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="94" name="Move your body" tab="1">
-      <tripleoscillator phoffset2="87" userwavefile0="" userwavefile1="" finer0="0" userwavefile2="" finer1="32" finer2="-16" coarse0="0" coarse1="0" coarse2="-12" finel0="0" finel1="-28" modalgo1="2" finel2="12" modalgo2="2" pan0="0" pan1="33" stphdetun0="130" pan2="-33" stphdetun1="261" stphdetun2="94" wavetype0="2" wavetype1="2" wavetype2="2" vol0="33" vol1="33" phoffset0="0" vol2="33" phoffset1="244"/>
-      <eldata fres="1.64" ftype="0" fcut="8003" fwet="1">
-        <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.117" latt="0" sus="0.77" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.23" x100="0" lshp="0" hold="0.058"/>
-        <elcut userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0.499" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
-        <elres userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0.499" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
+  <instrumenttracksettings muted="0" type="0" name="Move your body" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="94">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="87" userwavefile0="" finer0="0" userwavefile1="" finer1="32" userwavefile2="" finer2="-16" coarse0="0" coarse1="0" coarse2="-12" finel0="0" finel1="-28" modalgo1="2" modalgo2="2" finel2="12" pan0="0" modalgo3="2" pan1="33" stphdetun0="130" pan2="-33" stphdetun1="261" wavetype0="2" stphdetun2="94" wavetype1="2" wavetype2="2" vol0="33" vol1="33" phoffset0="0" phoffset1="244" vol2="33"/>
+      </instrument>
+      <eldata fres="0.64" ftype="0" fcut="8003" fwet="1">
+        <elvol lspd_denominator="4" sustain="0.23" pdel="0" userwavefile="" dec="0.159" lamt="0" syncmode="0" latt="0" rel="0.117" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.501" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0.499" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.501" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0.499" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>
-      <arpeggiator chorddisabled="0" arptime="107" arprange="3" arpsyncmode="6" chord="0" chordrange="2" arp="0" arp-enabled="1" chord-enabled="1" arpdisabled="0" arpdir="0" arpgate="1"/>
-      <midiport inports="80:0 CS46XX:CS46XX" inputchannel="0" outputchannel="0" send="0" receive="1"/>
-      <chordcreator chorddisabled="0" arptime="107" arprange="3" arpsyncmode="6" chord="0" chordrange="2" arp="0" arp-enabled="1" chord-enabled="1" arpdisabled="0" arpdir="0" arpgate="1"/>
+      <chordcreator chord="0" chordrange="2" chord-enabled="0"/>
+      <arpeggiator arptime="107" arprange="3" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="4" arpdir="0" arpgate="8"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
+      <fxchain numofeffects="0" enabled="0"/>
     </instrumenttrack>
   </instrumenttracksettings>
-</multimediaproject>
+</lmms-project>
