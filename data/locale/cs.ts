@@ -5,15 +5,15 @@
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">O LMMS</translation>
     </message>
     <message>
         <source>LMMS (Linux MultiMedia Studio)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LMMS (Linux MultiMedia Studio)</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verze %1 (%2/%3, Qt %4, %5)</translation>
     </message>
     <message>
         <source>About</source>
@@ -21,15 +21,15 @@
     </message>
     <message>
         <source>LMMS - easy music production for everyone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LMMS - jednoduchá hudební produkce pro každého</translation>
     </message>
     <message>
         <source>Authors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Autoři</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Překlad</translation>
     </message>
     <message>
         <source>Current language not translated (or native English).
@@ -39,15 +39,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licence</translation>
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copyright (c) 2004-2014, vývojáři</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -69,7 +69,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kliknutím sem můžete otevřít jiný audio soubor. Ukáže se dialog, pomocí kterého si soubor můžete vybrat. Nastavení jako režim smyčkování, počáteční a koncové body, hodnota zesílení apod. zůstanou stejná, takže to nemusí znít jako původní sampl.</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -77,7 +77,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation type="unfinished">Zapnete-li toto tlačítko, celý sampl bude přehráván pozpátku. Tato volba je užitečná pro zajímavé efekty např. pozpátku přehraná srážka.</translation>
+        <translation type="unfinished">Zapnete-li toto tlačítko, celý sampl bude přehráván pozpátku. Tato volba je užitečná pro zajímavé efekty jako např. pozpátku přehraná srážka.</translation>
     </message>
     <message>
         <source>Loop sample at start- and end-point</source>
@@ -85,7 +85,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Here you can set, whether looping-mode is enabled. If enabled, AudioFileProcessor loops between start and end-points of a sample until the whole note is played. This is useful for things like string and choir samples.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tímto můžete nastavit smyčkování. Pokud je povoleno, AudioFileProcessor smyčkuje mezi počátečním a koncovým bodem, dokud je přehráván celý tón. Toto je užitečné např. pro smyčcové a sborové samply.</translation>
     </message>
     <message>
         <source>Amplify:</source>
@@ -93,7 +93,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tímto ovladačem můžete nastavit poměr zesílení. Pokud nastavíte hodnotu 100%, sampl se nezmění. Jinak se zesílí nebo ztiší (soubor samplu se tím vůbec nezmění!)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -101,7 +101,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable looping-mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tímto ovladačem můžete nastavit bod, od kterého by AudioFileProcessor měl začít přehrávat váš sampl. Pokud povolíte smyčkování, toto bude bod, do kterého se AudioFileProcessor vrátí, když bude tón delší než sampl mezi počátečními a koncovými body.</translation>
     </message>
     <message>
         <source>Endpoint:</source>
@@ -109,22 +109,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable looping-mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tímto ovladačem můžete nastavit bod, na kterém by měl AudioFileProcessor skončit s přehráváním samplu. Pokud je povoleno smyčkování, toto bude bod, do kterího se AudioFileProcessor vrátí, když bude tón delší než sampl mezi počátečními a koncovými body.</translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přehrávat sampl napříč tóny</translation>
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolení této možnosti způsobí, že se sampl bude přehrávat přes různé tóny - pokud změníte ladění (pitch), nebo když tón skončí před koncem samplu, tak bude další přehrávaný tón pokračovat kde přestal. Pro obnovení přehrávání na začátek samplu, vložte tón do spodní části kláves (&lt; 20 Hz)</translation>
     </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>
     <message>
         <source>Sample length:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Délka samplu:</translation>
     </message>
 </context>
 <context>
@@ -237,11 +237,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Remove song-global automation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Odebrat obecnou automatizaci</translation>
     </message>
     <message>
         <source>Remove all linked controls</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Odebrat všechny propjené ovladače</translation>
     </message>
 </context>
 <context>
@@ -256,7 +256,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation type="unfinished">Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci neboť pattern je automaticky přehráván ve smyčce.</translation>
+        <translation type="unfinished">Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci, neboť pattern je automaticky přehráván ve smyčce.</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
@@ -324,39 +324,39 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Discrete progression</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Oddělený vývoj</translation>
     </message>
     <message>
         <source>Linear progression</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární vývoj</translation>
     </message>
     <message>
         <source>Cubic Hermite progression</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cubic Hermite vývoj</translation>
     </message>
     <message>
         <source>Tension: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Napětí: </translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kliknutím sem vyberete oddělený vývoj pro tento automatizační pattern.  Hodnota připojeného objektu zůstane konstantní mezi ovládacími body a okamžitě nastavena na novou hodnotu když se dosáhne každého ovládacího bodu.</translation>
     </message>
     <message>
         <source>Click here to choose linear progressions for this automation pattern.  The value of the connected object will change at a steady rate over time between control points to reach the correct value at each control point without a sudden change.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kliknutím sem vyberete lineární vývoj pro tento automatizační pattern.  Hodnota připojeného objektu se změní ve stabilní frekvenci mezi ovládacími body, aby postupně došlo k dosažení dalšího kontrolního bodu.</translation>
     </message>
     <message>
         <source>Click here to choose cubic hermite progressions for this automation pattern.  The value of the connected object will change in a smooth curve and ease in to the peaks and valleys.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kliknutím sem vyberte cubic hermite vývoj pro tento automatizační pattern.  Hodnota připojeného objektu se změní po plynulé křivce a lehce přejde do vrchních a spodních bodů.</translation>
     </message>
     <message>
         <source>Tension value for spline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hodnota napětí pro spline</translation>
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values.  A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Větší hodnota napětí vytvoří plynulejší křivku ale překročí některé hodnoty.  Malá hodnota napětí způsobí vyrovnání sklonu křivky na každém ovládacím bodě.</translation>
     </message>
 </context>
 <context>
@@ -482,11 +482,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Confirm Delete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Potvrdit Smazání</translation>
     </message>
     <message>
         <source>Confirm delete? There are existing connection(s) associted with this controller. There is no way to undo.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opravdu smazat? Tento kontrolér má jedno nebo více existujících připojení. Tento krok nelze vrátit zpět.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nápověda</translation>
     </message>
 </context>
 <context>
@@ -524,7 +524,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Wet/Dry mix</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wet/Dry mix</translation>
     </message>
     <message>
         <source>Gate</source>
@@ -532,7 +532,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Decay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání</translation>
     </message>
 </context>
 <context>
@@ -561,7 +561,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Plugin description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Popis pluginu</translation>
     </message>
 </context>
 <context>
@@ -580,15 +580,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wet Hodnota:</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wet/Dry ovladač nastavuje poměr mezi vstupním signálem a signálem efektu, který formuje výstup.</translation>
     </message>
     <message>
         <source>DECAY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DOZNÍVÁNÍ</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -596,7 +596,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ovladač Doznívání ovládá, kolik bufferů ticha musí projít před tím, než plugin přestane zpracovávat.  Menší hodnoty zredukují využití CPU, ale můžou způsobit uříznutí ozvěn.</translation>
     </message>
     <message>
         <source>GATE</source>
@@ -644,7 +644,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nápověda</translation>
     </message>
 </context>
 <context>
@@ -663,7 +663,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Decay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání</translation>
     </message>
     <message>
         <source>Sustain</source>
@@ -750,7 +750,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání:</translation>
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
@@ -3049,7 +3049,7 @@ Důvod: &quot;%2&quot;</translation>
     <name>TimeDisplayWidget</name>
     <message>
         <source>click to change time units</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">kliknutí změní časové jednotky</translation>
     </message>
 </context>
 <context>
@@ -3890,7 +3890,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a příslu�
     </message>
     <message>
         <source>Decay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání</translation>
     </message>
 </context>
 <context>
@@ -3913,7 +3913,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a příslu�
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání:</translation>
     </message>
 </context>
 <context>
@@ -4127,7 +4127,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání:</translation>
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
@@ -4277,7 +4277,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání:</translation>
     </message>
     <message>
         <source>DEC</source>
@@ -5951,7 +5951,7 @@ Zpoždění %2 ms</translation>
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doznívání:</translation>
     </message>
     <message>
         <source>Decay rate determines how rapidly the output falls from the peak amplitude to the selected Sustain level.</source>
