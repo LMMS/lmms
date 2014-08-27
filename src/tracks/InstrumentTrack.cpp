@@ -77,6 +77,7 @@
 #include "tooltip.h"
 #include "track_label_button.h"
 #include "ValueBuffer.h"
+#include "volume.h"
 
 
 const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
@@ -94,7 +95,6 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	track( track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
-	m_audioPort( tr( "unnamed_track" ) ),
 	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
 								this, this ),
 	m_notes(),
@@ -104,6 +104,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
+	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
@@ -188,10 +189,10 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
-	ValueBuffer * volBuf = m_volumeModel.valueBuffer();
+	/*ValueBuffer * volBuf = m_volumeModel.valueBuffer();
 	float v_scale = volBuf
 		? 1.0f
-		: getVolume() * DefaultVolumeRatio;
+		: getVolume() * DefaultVolumeRatio;*/
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
@@ -200,44 +201,19 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	{
 		const f_cnt_t offset = n->noteOffset();
 		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
-		v_scale *= ( (float) n->getVolume() * DefaultVolumeRatio );
+		const float vol = ( (float) n->getVolume() * DefaultVolumeRatio );
+		const panning_t pan = qBound( PanningLeft, n->getPanning(), PanningRight );
+		stereoVolumeVector vv = panningToVolumeVector( pan, vol );
+		for( f_cnt_t f = offset; f < frames; ++f )
+		{
+			for( int c = 0; c < 2; ++c )
+			{
+				buf[f][c] *= vv.vol[c];
+			}
+		}
 	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
-	
-	// get panning knob data
-	ValueBuffer * panBuf = m_panningModel.valueBuffer();
-	int panning = panBuf
-		? 0
-		: m_panningModel.value();
-
-	if( n )
-	{
-		panning += n->getPanning();
-		panning = tLimit<int>( panning, PanningLeft, PanningRight );
-	}
-
-	// apply sample-exact volume/panning data
-	if( volBuf )
-	{
-		for( f_cnt_t f = 0; f < frames; ++f )
-		{
-			float v = volBuf->values()[ f ] * 0.01f;
-			buf[f][0] *= v;
-			buf[f][1] *= v;
-		}
-	}
-	if( panBuf )
-	{
-		for( f_cnt_t f = 0; f < frames; ++f )
-		{
-			float p = panBuf->values()[ f ] * 0.01f;
-			buf[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p );
-			buf[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p );
-		}
-	}
-
-	//engine::mixer()->bufferToPort( buf, frames, panningToVolumeVector( panning, v_scale ), &m_audioPort );
 }
 
 

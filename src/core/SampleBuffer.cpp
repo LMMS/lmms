@@ -160,7 +160,7 @@ void SampleBuffer::update( bool _keep_settings )
 	const bool lock = ( m_data != NULL );
 	if( lock )
 	{
-		engine::mixer()->lock();
+		m_varLock.lockForWrite();
 		MM_FREE( m_data );
 	}
 
@@ -262,7 +262,7 @@ void SampleBuffer::update( bool _keep_settings )
 
 	if( lock )
 	{
-		engine::mixer()->unlock();
+		m_varLock.unlock();
 	}
 
 	emit sampleUpdated();
@@ -598,7 +598,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const float _freq,
 					const LoopMode _loopmode )
 {
-	QMutexLocker ml( &m_varLock );
+	m_varLock.lockForRead();
 
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
@@ -607,6 +607,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( endFrame == 0 || _frames == 0 )
 	{
+		m_varLock.unlock();
 		return false;
 	}
 
@@ -623,6 +624,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( total_frames_for_current_pitch == 0 )
 	{
+		m_varLock.unlock();
 		return false;
 	}
 
@@ -639,6 +641,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		if( play_frame >= endFrame )
 		{
+			m_varLock.unlock();
 			return false;
 		}
 
@@ -655,6 +658,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		play_frame = getPingPongIndex( play_frame, loopStartFrame, loopEndFrame );
 	}
 
+	f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN[ _state->interpolationMode() ];
 
 	sampleFrame * tmp = NULL;
 
@@ -663,7 +667,6 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		SRC_DATA src_data;
 		// Generate output
-		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN[ _state->interpolationMode() ];
 		src_data.data_in =
 			getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
 			loopStartFrame, loopEndFrame, endFrame )[0];
@@ -767,8 +770,8 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		_ab[i][1] *= m_amplification;
 	}
 
+	m_varLock.unlock();
 	return true;
-
 }
 
 
@@ -1364,7 +1367,7 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 
 void SampleBuffer::setStartFrame( const f_cnt_t _s )
 {
-	m_varLock.lock();
+	m_varLock.lockForWrite();
 	m_startFrame = _s;
 	m_varLock.unlock();
 }
@@ -1374,7 +1377,7 @@ void SampleBuffer::setStartFrame( const f_cnt_t _s )
 
 void SampleBuffer::setEndFrame( const f_cnt_t _e )
 {
-	m_varLock.lock();
+	m_varLock.lockForWrite();
 	m_endFrame = _e;
 	m_varLock.unlock();
 }

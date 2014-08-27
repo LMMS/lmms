@@ -179,6 +179,7 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 		}
 		else
 		{
+			memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
 			emit isPlaying( 0 );
 		}
 	}

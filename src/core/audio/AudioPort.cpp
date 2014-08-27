@@ -29,15 +29,20 @@
 #include "engine.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
+#include "ValueBuffer.h"
+#include "panning.h"
 
 
-AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
+AudioPort::AudioPort( const QString & _name, bool _has_effect_chain, 
+		FloatModel * volumeModel, FloatModel * panningModel ) :
 	m_bufferUsage( false ),
 	m_portBuffer( NULL ),
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL )
+	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL ),
+	m_volumeModel( volumeModel ),
+	m_panningModel( panningModel )
 {
 	engine::mixer()->addAudioPort( this );
 	setExtOutputEnabled( true );
@@ -120,10 +125,100 @@ void AudioPort::doProcessing()
 		}
 	}
 	
+	if( m_bufferUsage )
+	{
+		// handle volume and panning
+		// has both vol and pan models
+		if( m_volumeModel && m_panningModel )
+		{
+			ValueBuffer * volBuf = m_volumeModel->valueBuffer();
+			ValueBuffer * panBuf = m_panningModel->valueBuffer();
+			
+			// both vol and pan have s.ex.data:
+			if( volBuf && panBuf )
+			{
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					float v = volBuf->values()[ f ] * 0.01f;
+					float p = panBuf->values()[ f ] * 0.01f;
+					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
+					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
+				}
+			}
+			
+			// only vol has s.ex.data:
+			else if( volBuf )
+			{
+				float p = m_panningModel->value() * 0.01f;
+				float l = ( p <= 0 ? 1.0f : 1.0f - p );
+				float r = ( p >= 0 ? 1.0f : 1.0f + p );
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					float v = volBuf->values()[ f ] * 0.01f;
+					m_portBuffer[f][0] *= v * l;
+					m_portBuffer[f][1] *= v * r;
+				}
+			}
+			
+			// only pan has s.ex.data:
+			else if( panBuf )
+			{
+				float v = m_volumeModel->value() * 0.01f;
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					float p = panBuf->values()[ f ] * 0.01f;
+					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
+					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
+				}
+			}
+			
+			// neither has s.ex.data:
+			else
+			{
+				float p = m_panningModel->value() * 0.01f;
+				float v = m_volumeModel->value() * 0.01f;
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					m_portBuffer[f][0] *= ( p <= 0 ? 1.0f : 1.0f - p ) * v;
+					m_portBuffer[f][1] *= ( p >= 0 ? 1.0f : 1.0f + p ) * v;
+				}
+			}
+		}
+		
+		// has vol model only
+		else if( m_volumeModel )
+		{
+			ValueBuffer * volBuf = m_volumeModel->valueBuffer();
+			
+			if( volBuf )
+			{
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					float v = volBuf->values()[ f ] * 0.01f;
+					m_portBuffer[f][0] *= v;
+					m_portBuffer[f][1] *= v;
+				}
+			}
+			else
+			{
+				float v = m_volumeModel->value() * 0.01f;
+				for( f_cnt_t f = 0; f < fpp; ++f )
+				{
+					m_portBuffer[f][0] *= v;
+					m_portBuffer[f][1] *= v;
+				}
+			}
+		}
+	}
+	// as of now there's no situation where we only have panning model but no volume model
+	// if we have neither, we don't have to do anything here - just pass the audio as is
+	
+	// handle effects
 	const bool me = processEffects();
 	if( me || m_bufferUsage )
 	{
-		engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel );
+		engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to fx mixer
+																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}
 	

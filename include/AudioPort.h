@@ -34,12 +34,14 @@
 #include "PlayHandle.h"
 
 class EffectChain;
+class FloatModel;
 
 class AudioPort : public ThreadableJob
 {
 	MM_OPERATORS
 public:
-	AudioPort( const QString & _name, bool _has_effect_chain = true );
+	AudioPort( const QString & _name, bool _has_effect_chain = true, 
+		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL );
 	virtual ~AudioPort();
 
 	inline sampleFrame * buffer()
@@ -120,6 +122,9 @@ private:
 
 	PlayHandleList m_playHandles;
 	QMutex m_playHandleLock;
+	
+	FloatModel * m_volumeModel;
+	FloatModel * m_panningModel;
 
 	friend class Mixer;
 	friend class MixerWorkerThread;
