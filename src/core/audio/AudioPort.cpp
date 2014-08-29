@@ -104,8 +104,6 @@ void AudioPort::doProcessing()
 {
 	const fpp_t fpp = engine::mixer()->framesPerPeriod();
 
-	if( m_playHandles.isEmpty() ) return; // skip processing if no playhandles are connected
-
 	m_portBuffer = BufferManager::acquire(); // get buffer for processing
 
 	engine::mixer()->clearAudioBuffer( m_portBuffer, fpp ); // clear the audioport buffer so we can use it

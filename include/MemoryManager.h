@@ -31,7 +31,7 @@
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QHash>
 #include "MemoryHelper.h"
-
+#include "export.h"
 
 const int MM_CHUNK_SIZE = 64; // granularity of managed memory
 const int MM_INITIAL_CHUNKS = 1024 * 1024; // how many chunks to allocate at startup - TODO: make configurable
@@ -85,7 +85,7 @@ struct PtrInfo
 typedef QVector<MemoryPool> MemoryPoolVector;
 typedef QHash<void*, PtrInfo> PointerInfoMap;
 
-class MemoryManager
+class EXPORT MemoryManager
 {
 public:
 	static bool init();
