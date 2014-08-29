@@ -64,6 +64,14 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 #endif
 	urls << QUrl::fromLocalFile( configManager::inst()->workingDir() );
 
+	// Add `/Volumes` directory on OS X systems, this allows the user to browse
+	// external disk drives.
+#ifdef LMMS_BUILD_APPLE
+	QDir volumesDir( QDir("/Volumes") );
+	if ( volumesDir.exists() )
+		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+#endif
+
 	setSidebarUrls(urls);
 }
 
