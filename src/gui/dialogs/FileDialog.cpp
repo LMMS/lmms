@@ -52,6 +52,12 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::MusicLocation ) );
 	urls << QUrl::fromLocalFile( configManager::inst()->workingDir() );
 
+	#ifdef LMMS_BUILD_APPLE
+		QDir volumesDir( QDir("/Volumes") );
+		if ( volumesDir.exists() )
+			urls << volumesDir;
+	#endif
+
 	setSidebarUrls(urls);
 }
 
