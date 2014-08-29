@@ -1,7 +1,7 @@
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -314,7 +314,7 @@ void configManager::loadConfigFile()
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
-		else
+		else if( QApplication::type() == QApplication::GuiClient )
 		{
 			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
 									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
@@ -372,19 +372,18 @@ void configManager::loadConfigFile()
 	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
 						<< defaultArtworkDir() );
 
-	if( !QDir( m_workingDir ).exists() )
-	{
-		if( QMessageBox::question( 0,
+	if( !QDir( m_workingDir ).exists() &&
+		QApplication::type() == QApplication::GuiClient &&
+		QMessageBox::question( 0,
 			MainWindow::tr( "Working directory" ),
 			MainWindow::tr( "The LMMS working directory %1 does not "
 				"exist. Create it now? You can change the directory "
 				"later via Edit -> Settings." ).arg( m_workingDir ),
-					QMessageBox::Yes, QMessageBox::No ) ==
-								QMessageBox::Yes )
-		{
-			QDir().mkpath( m_workingDir );
-		}
+					QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+	{
+		QDir().mkpath( m_workingDir );
 	}
+
 	if( QDir( m_workingDir ).exists() )
 	{
 		QDir().mkpath( userProjectsDir() );
