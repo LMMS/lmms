@@ -28,9 +28,9 @@
 #include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
+#include "export.h"
 
-
-class InstrumentPlayHandle : public PlayHandle
+class EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
