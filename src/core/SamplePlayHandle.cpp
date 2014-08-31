@@ -122,8 +122,11 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 /*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq );
+		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
+								BaseFreq ) )
+		{
+			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
+		}
 	}
 
 	m_frame += frames;

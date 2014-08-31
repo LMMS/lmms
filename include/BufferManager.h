@@ -37,7 +37,7 @@
 const int BM_INITIAL_BUFFERS = 512;
 //const int BM_INCREMENT = 64;
 
-class BufferManager
+class EXPORT BufferManager
 {
 public:
 	static void init();

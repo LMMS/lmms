@@ -50,13 +50,13 @@ void PlayHandle::doProcessing()
 	}
 	else
 	{
-		play( m_playHandleBuffer );
+		play( NULL );
 	}
 }
 
 
 void PlayHandle::releaseBuffer()
 {
-	BufferManager::release( m_playHandleBuffer );
+	if( m_playHandleBuffer ) BufferManager::release( m_playHandleBuffer );
 	m_playHandleBuffer = NULL;
 }
