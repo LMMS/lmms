@@ -4,7 +4,6 @@
  * details.  THERE IS ABSOLUTELY NO WARRANTY FOR THIS SOFTWARE.
  */
 
-static char const	ident[] = "$Header: /home/cvs/giga/ladspa-swh/gsm/gsm_create.c,v 1.1 2001/06/10 21:36:51 swh Exp $";
 
 #include	"config.h"
 

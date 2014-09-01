@@ -97,7 +97,6 @@ static void activateTransient(LADSPA_Handle instance) {
 	medi_track = 0.1;
 	slow_track = 0.1;
 	count = 0;
-	sample_rate = sample_rate;
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_pos = buffer_pos;
 	plugin_data->count = count;

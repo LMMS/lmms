@@ -86,7 +86,6 @@ static void activateFadDelay(LADSPA_Handle instance) {
 	phase = 0;
 	last_phase = 0;
 	last_in = 0.0f;
-	sample_rate = sample_rate;
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
 	plugin_data->buffer_size = buffer_size;

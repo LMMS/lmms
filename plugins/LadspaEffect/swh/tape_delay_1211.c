@@ -116,7 +116,6 @@ static void activateTapeDelay(LADSPA_Handle instance) {
 	last_in = 0.0f;
 	last2_in = 0.0f;
 	last3_in = 0.0f;
-	sample_rate = sample_rate;
 	z0 = 0.0f;
 	z1 = 0.0f;
 	z2 = 0.0f;
