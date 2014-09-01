@@ -156,8 +156,7 @@ void Plugin::getDescriptorsOfAvailPlugins( DescriptorList & _plugin_descs )
 		{
 			continue;
 		}
-		QString desc_name = f.fileName().section( '.', 0, 0 ) +
-							"_plugin_descriptor";
+		QString desc_name = f.baseName() + "_plugin_descriptor";
 		if( desc_name.left( 3 ) == "lib" )
 		{
 			desc_name = desc_name.mid( 3 );
