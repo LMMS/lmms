@@ -24,6 +24,7 @@
  *
  */
 
+#include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QtGui/QMessageBox>
@@ -166,10 +167,8 @@ void Plugin::getDescriptorsOfAvailPlugins( DescriptorList & _plugin_descs )
 					desc_name.toUtf8().constData() );
 		if( plugin_desc == NULL )
 		{
-			printf( "LMMS plugin %s does not have a "
-				"plugin descriptor named %s!\n",
-				f.absoluteFilePath().toUtf8().constData(),
-					desc_name.toUtf8().constData() );
+			qWarning() << tr( "LMMS plugin %1 does not have a plugin descriptor named %2!" ).
+								arg( f.absoluteFilePath() ).arg( desc_name );
 			continue;
 		}
 		_plugin_descs.push_back( *plugin_desc );
