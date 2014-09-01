@@ -81,7 +81,7 @@ class NesInstrument;
 class NesObject
 {
 public:
-	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph, fpp_t frames );
+	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject();
 	
 	void renderOutput( sampleFrame * buf, fpp_t frames );
@@ -149,7 +149,6 @@ private:
 	NesInstrument * m_parent;
 	const sample_rate_t m_samplerate;
 	NotePlayHandle * m_nph;
-	fpp_t m_fpp;
 	
 	int m_pitchUpdateCounter;
 	int m_pitchUpdateFreq;

@@ -57,11 +57,10 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 }
 
 
-NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph, fpp_t frames ) :
+NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph ) :
 	m_parent( nes ),
 	m_samplerate( samplerate ),
-	m_nph( nph ),
-	m_fpp( frames )
+	m_nph( nph )
 {
 	m_pitchUpdateCounter = 0;
 	m_pitchUpdateFreq = wavelength( 60.0f );	
@@ -558,7 +557,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 {
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
 	{	
-		NesObject * nes = new NesObject( this, engine::mixer()->processingSampleRate(), n, engine::mixer()->framesPerPeriod() );
+		NesObject * nes = new NesObject( this, engine::mixer()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	
