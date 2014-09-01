@@ -22,18 +22,15 @@
  *
  */
 
-#ifndef _PLUGIN_H
-#define _PLUGIN_H
+#ifndef PLUGIN_H
+#define PLUGIN_H
 
-#include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QList>
+#include <QtCore/QMap>
 #include <QtXml/QDomDocument>
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "base64.h"
-
 
 
 class QWidget;

@@ -28,6 +28,7 @@
 
 #include "waveshaper_controls.h"
 #include "waveshaper.h"
+#include "base64.h"
 #include "graph.h"
 #include "engine.h"
 #include "song.h"
