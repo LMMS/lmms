@@ -160,7 +160,6 @@ private:
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
-	float m_harmonics [18];
 
 private slots:
 	void updateAllDetuning();
