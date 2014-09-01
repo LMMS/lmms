@@ -1,7 +1,7 @@
 /*
  * Plugin.h - class plugin, the base-class and generic interface for all plugins
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -72,12 +72,12 @@ public:
 		PluginTypes type;
 		const PixmapLoader * logo;
 		const char * supportedFileTypes;
-		inline bool supportsFileType( const QString & _ext ) const
+
+		inline bool supportsFileType( const QString& extension ) const
 		{
-			return QString( supportedFileTypes ).
-						split( QChar( ',' ) ).
-							contains( _ext );
+			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
 		}
+
 		class EXPORT SubPluginFeatures
 		{
 		public:
@@ -101,11 +101,10 @@ public:
 
 				inline bool isValid() const
 				{
-					return desc != NULL &&
-							name != QString::null;
+					return desc != NULL && name.isNull() == false;
 				}
 
-				const Plugin::Descriptor * desc;
+				const Plugin::Descriptor* desc;
 				QString name;
 				AttributeMap attributes;
 			} ;
@@ -113,8 +112,8 @@ public:
 			typedef QList<Key> KeyList;
 
 
-			SubPluginFeatures( Plugin::PluginTypes _type ) :
-				m_type( _type )
+			SubPluginFeatures( Plugin::PluginTypes type ) :
+				m_type( type )
 			{
 			}
 
@@ -126,8 +125,7 @@ public:
 			{
 			}
 
-			virtual void listSubPluginKeys( const Plugin::Descriptor *,
-															KeyList & ) const
+			virtual void listSubPluginKeys( const Plugin::Descriptor *, KeyList & ) const
 			{
 			}
 
@@ -144,15 +142,13 @@ public:
 	typedef QList<Descriptor> DescriptorList;
 
 	// contructor of a plugin
-	Plugin( const Descriptor * _descriptor, Model * _parent );
+	Plugin( const Descriptor* descriptor, Model* parent );
 	virtual ~Plugin();
 
 	// returns display-name out of descriptor
 	virtual QString displayName() const
 	{
-		return Model::displayName().isEmpty() ?
-					m_descriptor->displayName :
-							Model::displayName();
+		return Model::displayName().isEmpty() ?  m_descriptor->displayName : Model::displayName();
 	}
 
 	// return plugin-type
@@ -162,41 +158,40 @@ public:
 	}
 
 	// return plugin-descriptor for further information
-	inline const Descriptor * descriptor() const
+	inline const Descriptor* descriptor() const
 	{
 		return m_descriptor;
 	}
 
 	// can be called if a file matching supportedFileTypes should be
 	// loaded/processed with the help of this plugin
-	virtual void loadFile( const QString & _file );
+	virtual void loadFile( const QString& file );
 
 	// Called if external source needs to change something but we cannot
 	// reference the class header.  Should return null if not key not found.
-	virtual AutomatableModel * childModel( const QString & _modelName );
+	virtual AutomatableModel* childModel( const QString& modelName );
 
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const QString & _plugin_name,
-									Model * _parent, void * _data );
+	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
 
 	// fills given list with descriptors of all available plugins
-	static void getDescriptorsOfAvailPlugins( DescriptorList & _plugin_descs );
+	static void getDescriptorsOfAvailPlugins( DescriptorList& pluginDescriptors );
 
 	// create a view for the model 
-	PluginView * createView( QWidget * _parent );
+	PluginView * createView( QWidget* parent );
 
 
 protected:
 	// create a view for the model 
-	virtual PluginView * instantiateView( QWidget * ) = 0;
+	virtual PluginView* instantiateView( QWidget* ) = 0;
 
 
 private:
-	const Descriptor * m_descriptor;
+	const Descriptor* m_descriptor;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * instantiationHook )( Model *, void * );
+	typedef Plugin * ( * InstantiationHook )( Model*, void* );
 
 } ;
 
