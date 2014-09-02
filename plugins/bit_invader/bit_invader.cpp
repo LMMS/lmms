@@ -26,6 +26,7 @@
 #include <QDomElement>
 
 #include "bit_invader.h"
+#include "base64.h"
 #include "engine.h"
 #include "graph.h"
 #include "InstrumentTrack.h"

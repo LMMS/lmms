@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Fat TB303 Arp" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="28.7">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="-12" coarse1="-24" coarse2="-24" finel0="0" finel1="0" modalgo1="0" modalgo2="1" finel2="0" pan0="10" modalgo3="2" pan1="0" stphdetun0="84" pan2="6" stphdetun1="263" wavetype0="5" stphdetun2="0" wavetype1="0" wavetype2="2" vol0="72" vol1="64" phoffset0="183" phoffset1="106" vol2="52"/>
+      </instrument>
+      <eldata fres="7.93" ftype="0" fcut="480" fwet="1">
+        <elvol lspd_denominator="4" sustain="0.458" pdel="0" userwavefile="" dec="0.058" lamt="0" syncmode="0" latt="0" rel="0.291" amt="1" x100="0" att="0.078" lpdel="0" hold="0.217" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="1" pdel="0" userwavefile="" dec="0.294" lamt="1" syncmode="0" latt="0" rel="0.357" amt="1" x100="0" att="0.111" lpdel="0" hold="0.296" lshp="0" lspd="0.1714" ctlenvamt="1" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.501" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="214" arprange="2" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="4" arpdir="0" arpgate="55"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
+      <fxchain numofeffects="0" enabled="0"/>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Garfunkel" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" modalgo1="0" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="1" stphdetun2="0" wavetype1="1" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33"/>
+      </instrument>
+      <eldata fres="6.1" ftype="14" fcut="1" fwet="1">
+        <elvol lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.35" lamt="0" syncmode="0" latt="0" rel="0.16" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0" pdel="0" userwavefile="" dec="1" lamt="0" syncmode="0" latt="0" rel="1" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.3" pdel="0" userwavefile="" dec="0.59" lamt="0" syncmode="0" latt="0" rel="0.73" amt="0.34" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
+      <fxchain numofeffects="4" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="1">
+            <port00 data="2"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="cmt" name="file"/>
+            <attribute value="amp_stereo" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols link="1" ports="6">
+            <port00 link="1" data="-16"/>
+            <port01 link="1" data="1"/>
+            <port02 link="1" data="0"/>
+            <port10 data="-16"/>
+            <port11 data="1"/>
+            <port12 data="0"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="hard_limiter_1413" name="file"/>
+            <attribute value="hardLimiter" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="4">
+            <port02 data="0.99897"/>
+            <port03 data="0.3745"/>
+            <port04 data="0.169915"/>
+            <port05 data="0.25"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps" name="file"/>
+            <attribute value="Plate2x2" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols link="1" ports="6">
+            <port01 link="1" data="2.12"/>
+            <port02 link="1" data="0.313425"/>
+            <port03 link="1" data="0.9999"/>
+            <port11 data="2.12"/>
+            <port12 data="0.313425"/>
+            <port13 data="0.9999"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps" name="file"/>
+            <attribute value="AmpIII" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

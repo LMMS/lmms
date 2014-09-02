@@ -95,7 +95,7 @@ int main( int argc, char * * argv )
 	bool core_only = false;
 	bool fullscreen = true;
 	bool exit_after_import = false;
-	QString file_to_load, file_to_save, file_to_import, render_out;
+	QString file_to_load, file_to_save, file_to_import, render_out, profilerOutputFile;
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -341,6 +341,11 @@ int main( int argc, char * * argv )
 				exit_after_import = true;
 			}
 		}
+		else if( argc > i && ( QString( argv[i] ) == "--profile" || QString( argv[i] ) == "-p" ) )
+		{
+			profilerOutputFile = argv[i+1];
+			++i;
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -495,6 +500,11 @@ int main( int argc, char * * argv )
 		r->connect( t, SIGNAL( timeout() ),
 				SLOT( updateConsoleProgress() ) );
 		t->start( 200 );
+
+		if( profilerOutputFile.isEmpty() == false )
+		{
+			engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+		}
 
 		// start now!
 		r->startProcessing();

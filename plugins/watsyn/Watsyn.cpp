@@ -25,6 +25,7 @@
 #include <QDomElement>
 
 #include "Watsyn.h"
+#include "base64.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "templates.h"

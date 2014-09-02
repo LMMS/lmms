@@ -29,6 +29,7 @@
 #include "Basic_Gb_Apu.h"
 
 #include "papu_instrument.h"
+#include "base64.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "NotePlayHandle.h"

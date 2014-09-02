@@ -40,6 +40,12 @@
 #ifndef isinff
 #define isinff(x)	isinf(x)
 #endif
+#ifndef _isnanf
+#define _isnanf(x) isnan(x)
+#endif
+#ifndef _isinff
+#define _isinff(x) isinf(x)
+#endif
 #endif
 
 #ifdef __INTEL_COMPILER

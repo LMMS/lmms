@@ -40,6 +40,7 @@
 #include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
+#include "base64.h"
 
 // bbTCO::defaultColor()
 #include "bb_track.h"

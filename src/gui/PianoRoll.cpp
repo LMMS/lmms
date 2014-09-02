@@ -619,70 +619,53 @@ PianoRoll::PianoRoll() :
 	tb_layout->addWidget( m_chordComboBox );
 	tb_layout->addStretch();
 	
-        m_zoomingComboBox->setWhatsThis( tr( 
-		"This controls the magnification over time. " 
-		"It can be useful choose a magnification for a specific task. "
-		"For ordinary editing, the magnification should be fitted to your "
-		"smallest used notes. "
-		"Most will use the default magnification of 100%, "
-		"when the shortest notes are 1/16. "
-		"If you have used shorter notes, your editing will be easier, "
-		"with a magnification of 200%, or more. "
-		"You should use low magnification, if you need to move a block "
-		"of notes many bars, or just to get an overview of the score."
-	) );
-	
-	m_quantizeComboBox->setWhatsThis( tr(
-		"This 'Q' stands for quantification, and controls the minimum spacing "
-		"between notes. " 
-		"In piano-roll this is very important, when you make syncopated patterns, " 
-		"and an absolute must, for swing-notes! " 
-		"Observe that the score segmentation also changes, depending on the selected Q. "
-		"You should not use a Q-value that does not fit your chosen time-signature! " 
-		"The default value is 1/16, and that fits the default 4/4 timing. " 
-		"A Q of 1/16 will also work well in most editing."
-	) );	
-	
-	m_noteLenComboBox->setWhatsThis( tr(
-		"This lets you select the note you place in the score. " 
-		"In most circumstances the best choice is 'Last Note'." 
-		"The choice 'Last Note' means that LMMS will use the note you last clicked, " 
-		"when you place the next note. " 
-		"But you can choose any note-length from this drop-down, " 
-		"and your choice will be the note, that you can draw in the score."
-	) );			
-	
-	m_scaleComboBox->setWhatsThis( tr(			
-		"This lets you select a music scale that LMMS then will annotate. "
-		"The feature is directly connected to the context-menu "
-		"on the virtual keyboard, to the left. "
-		"First you chose which scale you will use. "
-		"You do that in this very dropdown! "
-		"Then you choose the key of your composition. "
-		"Right mouse click on the selected key in the virtual keyboard, "
-		"and then choose 'Mark current Scale' "
-		"LMMS will annotate all notes that belongs to the chosen scale, "
-		"and in the key you have selected! "
-		"LMMS will not only annotate in the score you have open, "
-		"but all scores in your project, will be correctly annotated. "
-		"This will help you avoid using bum-notes, as you compose. "
-		"You should know about principle scales in music. "
-		"Search the net, if you do not! "
-	) );
-	
-	m_chordComboBox->setWhatsThis( tr(
-		"This lets you select a standard music chord. " 
-		"All notes that are played simultaneous, are 'chords'," 
-		"but a large number of simultaneous key combinations, has own names, " 
-		"and its own place in music. " 
-		"They are standard chords, and it is these chords, " 
-		"you can find in this drop-down. " 
-		"After you have selected a chord, any click in the score, " 
-		"will place that chord, musically correctly, " 
-		"and with the Left mouse clicked note, as the root-note in the chord! " 
-		"To return to single note placement, you need to choose 'No chord' " 
-		"in this drop-down!"
-	) );
+        m_zoomingComboBox->setWhatsThis(
+		tr( 
+			"This controls the magnification of an axis. " 
+			"It can be helpful to choose magnification for a specific "
+			"task. For ordinary editing, the magnification should be " 
+			"fitted to your smallest notes. "
+		) );
+		
+		m_quantizeComboBox->setWhatsThis(
+		tr(
+			"The 'Q' stands for quantization, and controls the grid size " 
+			"notes and control points snap to. " 
+			"With smaller quantization values, you can draw shorter notes " 
+			"in Piano Roll, and more exact control points in the " 
+			"Automation Editor." 
+
+		) );	
+		
+		m_noteLenComboBox->setWhatsThis(
+		tr(
+			"This lets you select the length of new notes. " 
+			"'Last Note' means that LMMS will use the note length of " 
+                        "the note you last edited" 
+		) );			
+		
+		m_scaleComboBox->setWhatsThis(
+		tr(
+			"The feature is directly connected to the context-menu " 
+			"on the virtual keyboard, to the left in Piano Roll. " 
+			"After you have chosen the scale you want " 
+			"in this drop-down menu, " 
+			"you can right click on a desired key in the virtual keyboard, " 
+			"and then choose 'Mark current Scale'. " 
+			"LMMS will highlight all notes that belongs to the chosen scale, " 
+			"and in the key you have selected!" 
+					) );
+		
+
+		m_chordComboBox->setWhatsThis(
+		tr(
+			"Let you select a chord which LMMS then can draw or highlight." 
+			"You can find the most common chords in this drop-down menu. " 
+			"After you have selected a chord, click anywhere to place the chord, and right " 
+			"click on the virtual keyboard to open context menu and highlight the chord. " 
+			"To return to single note placement, you need to choose 'No chord' " 
+			"in this drop-down menu." 
+		) );	  
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );

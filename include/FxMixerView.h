@@ -1,7 +1,7 @@
 /*
  * FxMixerView.h - effect-mixer-view for LMMS
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,8 +48,9 @@ class EXPORT FxMixerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	struct FxChannelView
+	class FxChannelView
 	{
+	public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
 		FxLine * m_fxLine;

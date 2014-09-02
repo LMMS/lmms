@@ -28,6 +28,8 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
+#include <algorithm>
+
 #include "basics.h"
 
 #include "SweepVF.h"
@@ -85,7 +87,7 @@ SweepVFI::one_cycle (int frames)
 		modulation *= scale * f;
 		svf.set_f_Q (max (.001, f + modulation), Q);
 
-		int n = min (frames, BLOCK_SIZE);
+		int n = std::min<int> (frames, BLOCK_SIZE);
 		
 		for (int i = 0; i < n; ++i)
 			F (d, i, svf.process (s[i] + normal), adding_gain);
@@ -231,7 +233,7 @@ SweepVFII::one_cycle (int frames)
 		
 		svf.set_f_Q (max (.001, f + modulation1), q);
 
-		int n = min (frames, BLOCK_SIZE);
+		int n = std::min<int> (frames, BLOCK_SIZE);
 		
 		for (int i = 0; i < n; ++i)
 			F (d, i, svf.process (s[i] + normal), adding_gain);
@@ -385,7 +387,7 @@ AutoWah::one_cycle (int frames)
 		m *= scale * .08;
 		svf.set_f_Q (max (.001, f + m), Q);
 
-		int n = min (frames, BLOCK_SIZE);
+		int n = std::min<int> (frames, BLOCK_SIZE);
 		
 		for (int i = 0; i < n; ++i)
 		{

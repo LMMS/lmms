@@ -28,6 +28,7 @@
 
 #include "dynamics_processor_controls.h"
 #include "dynamics_processor.h"
+#include "base64.h"
 #include "graph.h"
 #include "engine.h"
 #include "song.h"

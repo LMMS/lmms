@@ -207,8 +207,6 @@ static void activateRingmod_1i1o1l(LADSPA_Handle instance) {
 
 static void cleanupRingmod_1i1o1l(LADSPA_Handle instance) {
 #line 93 "ringmod_1188.xml"
-	Ringmod_1i1o1l *plugin_data = (Ringmod_1i1o1l *)instance;
-	plugin_data = plugin_data;
 	if (--refcount == 0) {
 	        free(sin_tbl);
 	        free(tri_tbl);
