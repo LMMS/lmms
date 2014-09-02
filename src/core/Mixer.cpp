@@ -38,7 +38,6 @@
 #include "config_mgr.h"
 #include "SamplePlayHandle.h"
 #include "PianoRoll.h"
-#include "MicroTimer.h"
 #include "atomic_int.h"
 
 // platform-specific audio-interface-classes
@@ -69,7 +68,6 @@ Mixer::Mixer() :
 	m_inputBufferWrite( 1 ),
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
-	m_cpuLoad( 0 ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_queueReadyWaitCond(),
@@ -77,7 +75,8 @@ Mixer::Mixer() :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
-	m_globalMutex( QMutex::Recursive )
+	m_globalMutex( QMutex::Recursive ),
+	m_profiler()
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -277,7 +276,7 @@ sample_rate_t Mixer::processingSampleRate() const
 
 bool Mixer::criticalXRuns() const
 {
-	return m_cpuLoad >= 99 && engine::getSong()->isExporting() == false;
+	return cpuLoad() >= 99 && engine::getSong()->isExporting() == false;
 }
 
 
@@ -315,7 +314,8 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 const surroundSampleFrame * Mixer::renderNextBuffer()
 {
-	MicroTimer timer;
+	m_profiler.startPeriod();
+
 	static song::playPos last_metro_pos = -1;
 
 	song::playPos p = engine::getSong()->getPlayPos(
@@ -419,10 +419,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 
-	const float new_cpu_load = timer.elapsed() / 10000.0f *
-				processingSampleRate() / m_framesPerPeriod;
-	m_cpuLoad = tLimit( (int) ( new_cpu_load * 0.1f + m_cpuLoad * 0.9f ), 0,
-									100 );
+	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
 
 	return m_readBuf;
 }

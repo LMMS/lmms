@@ -47,6 +47,7 @@
 #include "lmms_basics.h"
 #include "note.h"
 #include "fifo_buffer.h"
+#include "MixerProfiler.h"
 
 
 class AudioDevice;
@@ -246,9 +247,14 @@ public:
 	}
 
 
-	inline int cpuLoad() const
+	MixerProfiler& profiler()
 	{
-		return m_cpuLoad;
+		return m_profiler;
+	}
+
+	int cpuLoad() const
+	{
+		return m_profiler.cpuLoad();
 	}
 
 	const qualitySettings & currentQualitySettings() const
@@ -424,7 +430,6 @@ private:
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
-	int m_cpuLoad;
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
 	QWaitCondition m_queueReadyWaitCond;
@@ -453,6 +458,7 @@ private:
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
+	MixerProfiler m_profiler;
 
 	friend class engine;
 	friend class MixerWorkerThread;
