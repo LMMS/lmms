@@ -40,7 +40,7 @@ const int BM_INITIAL_BUFFERS = 512;
 class EXPORT BufferManager
 {
 public:
-	static void init();
+	static void init( fpp_t framesPerPeriod );
 	static sampleFrame * acquire();
 	static void release( sampleFrame * buf );
 	static void refresh();

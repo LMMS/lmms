@@ -34,18 +34,18 @@ QAtomicInt BufferManager::s_releasedIndex = 0;
 int BufferManager::s_size;
 
 
-void BufferManager::init()
+void BufferManager::init( fpp_t framesPerPeriod )
 {
 	s_available = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
 	s_released = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
 
-	int c = engine::mixer()->framesPerPeriod() * BM_INITIAL_BUFFERS;
+	int c = framesPerPeriod * BM_INITIAL_BUFFERS;
 	sampleFrame * b = MM_ALLOC( sampleFrame, c );
 	
 	for( int i = 0; i < BM_INITIAL_BUFFERS; ++i )
 	{
 		s_available[ i ] = b;
-		b += engine::mixer()->framesPerPeriod();
+		b += framesPerPeriod;
 	}
 	s_availableIndex = BM_INITIAL_BUFFERS - 1;
 	s_size = BM_INITIAL_BUFFERS;

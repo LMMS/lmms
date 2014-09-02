@@ -118,6 +118,9 @@ Mixer::Mixer() :
 		m_fifo = new fifo( 1 );
 	}
 
+	// now that framesPerPeriod is fixed initialize global BufferManager
+	BufferManager::init( m_framesPerPeriod );
+
 	m_workingBuf = (sampleFrame*) MemoryHelper::alignedMalloc( m_framesPerPeriod *
 							sizeof( sampleFrame ) );
 	for( int i = 0; i < 3; i++ )
