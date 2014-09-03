@@ -95,27 +95,27 @@ MainWindow::MainWindow() :
 
 	QString wdir = configManager::inst()->workingDir();
 	sideBar->appendTab( new pluginBrowser( splitter ) );
-	sideBar->appendTab( new fileBrowser(
+	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userProjectsDir() + "*" +
 				configManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	sideBar->appendTab( new fileBrowser(
+	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userSamplesDir() + "*" +
 				configManager::inst()->factorySamplesDir(),
 					"*", tr( "My samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	sideBar->appendTab( new fileBrowser(
+	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userPresetsDir() + "*" +
 				configManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	sideBar->appendTab( new fileBrowser( QDir::homePath(), "*",
+	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
@@ -130,7 +130,7 @@ MainWindow::MainWindow() :
 		root_paths += drive.absolutePath();
 	}
 #endif
-	sideBar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
+	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
 							tr( "My computer" ),
 #endif

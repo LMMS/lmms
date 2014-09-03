@@ -1511,7 +1511,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	}
 	else if( type == "pluginpresetfile" )
 	{
-		const QString ext = fileItem::extension( value );
+		const QString ext = FileItem::extension( value );
 		Instrument * i = m_track->instrument();
 
 		if( !i->descriptor()->supportsFileType( ext ) )

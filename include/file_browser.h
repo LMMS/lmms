@@ -1,5 +1,5 @@
 /*
- * file_browser.h - include file for fileBrowser
+ * file_browser.h - include file for FileBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _FILE_BROWSER_H
-#define _FILE_BROWSER_H
+#ifndef FILE_BROWSER_H
+#define FILE_BROWSER_H
 
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
@@ -36,36 +36,36 @@
 
 class QLineEdit;
 
-class fileItem;
+class FileItem;
 class InstrumentTrack;
-class fileBrowserTreeWidget;
+class FileBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
 
 
-class fileBrowser : public SideBarWidget
+class FileBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
-	fileBrowser( const QString & _directories, const QString & _filter,
-			const QString & _title, const QPixmap & _pm,
-			QWidget * _parent, bool _dirs_as_items = false );
-	virtual ~fileBrowser();
+	FileBrowser( const QString & directories, const QString & filter,
+			const QString & title, const QPixmap & pm,
+			QWidget * parent, bool dirs_as_items = false );
+	virtual ~FileBrowser();
 
 
 public slots:
-	void filterItems( const QString & _filter );
+	void filterItems( const QString & filter );
 	void reloadTree( void );
 
 
 private:
-	bool filterItems( QTreeWidgetItem * _item, const QString & _filter );
-	virtual void keyPressEvent( QKeyEvent * _ke );
+	bool filterItems( QTreeWidgetItem * item, const QString & filter );
+	virtual void keyPressEvent( QKeyEvent * ke );
 
-	void addItems( const QString & _path );
+	void addItems( const QString & path );
 
-	fileBrowserTreeWidget * m_l;
+	FileBrowserTreeWidget * m_l;
 
 	QLineEdit * m_filterEdit;
 
@@ -79,23 +79,23 @@ private:
 
 
 
-class fileBrowserTreeWidget : public QTreeWidget
+class FileBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
 public:
-	fileBrowserTreeWidget( QWidget * _parent );
-	virtual ~fileBrowserTreeWidget();
+	FileBrowserTreeWidget( QWidget * parent );
+	virtual ~FileBrowserTreeWidget();
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void contextMenuEvent( QContextMenuEvent * e );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void mouseMoveEvent( QMouseEvent * me );
+	virtual void mouseReleaseEvent( QMouseEvent * me );
 
 
 private:
-	void handleFile( fileItem * _fi, InstrumentTrack * _it );
+	void handleFile( FileItem * fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc );
 
 
@@ -105,53 +105,53 @@ private:
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
 
-	fileItem * m_contextMenuItem;
+	FileItem * m_contextMenuItem;
 
 
 private slots:
-	void activateListItem( QTreeWidgetItem * _item, int _column );
+	void activateListItem( QTreeWidgetItem * item, int column );
 	void openInNewInstrumentTrackBBE( void );
 	void openInNewInstrumentTrackSE( void );
 	void sendToActiveInstrumentTrack( void );
-	void updateDirectory( QTreeWidgetItem * _item );
+	void updateDirectory( QTreeWidgetItem * item );
 
 } ;
 
 
 
 
-class directory : public QTreeWidgetItem
+class Directory : public QTreeWidgetItem
 {
 public:
-	directory( const QString & _filename, const QString & _path,
-						const QString & _filter );
+	Directory( const QString & filename, const QString & path,
+						const QString & filter );
 
 	void update( void );
 
-	inline QString fullName( QString _path = QString::null )
+	inline QString fullName( QString path = QString::null )
 	{
-		if( _path == QString::null )
+		if( path == QString::null )
 		{
-			_path = m_directories[0];
+			path = m_directories[0];
 		}
-		if( _path != QString::null )
+		if( path != QString::null )
 		{
-			_path += QDir::separator();
+			path += QDir::separator();
 		}
-		return( QDir::cleanPath( _path + text( 0 ) ) +
+		return( QDir::cleanPath( path + text( 0 ) ) +
 							QDir::separator() );
 	}
 
-	inline void addDirectory( const QString & _dir )
+	inline void addDirectory( const QString & dir )
 	{
-		m_directories.push_back( _dir );
+		m_directories.push_back( dir );
 	}
 
 
 private:
 	void initPixmaps( void );
 
-	bool addItems( const QString & _path );
+	bool addItems( const QString & path );
 
 
 	static QPixmap * s_folderPixmap;
@@ -166,7 +166,7 @@ private:
 
 
 
-class fileItem : public QTreeWidgetItem
+class FileItem : public QTreeWidgetItem
 {
 public:
 	enum FileTypes
@@ -193,9 +193,9 @@ public:
 	} ;
 
 
-	fileItem( QTreeWidget * _parent, const QString & _name,
-							const QString & _path );
-	fileItem( const QString & _name, const QString & _path );
+	FileItem( QTreeWidget * parent, const QString & name,
+							const QString & path );
+	FileItem( const QString & name, const QString & path );
 
 	inline QString fullName( void ) const
 	{
@@ -214,7 +214,7 @@ public:
 	}
 
 	QString extension( void );
-	static QString extension( const QString & _file );
+	static QString extension( const QString & file );
 
 
 private:

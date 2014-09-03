@@ -342,7 +342,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				track::create( track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
-			engine::pluginFileHandling()[fileItem::extension(
+			engine::pluginFileHandling()[FileItem::extension(
 								value )]);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
