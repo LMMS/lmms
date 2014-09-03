@@ -1,5 +1,5 @@
 /*
- * file_browser.h - include file for FileBrowser
+ * FileBrowser.h - include file for FileBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

@@ -1,5 +1,5 @@
 /*
- * file_browser.cpp - implementation of the project-, preset- and
+ * FileBrowser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -32,7 +32,7 @@
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 
-#include "file_browser.h"
+#include "FileBrowser.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
 #include "debug.h"
@@ -1053,5 +1053,5 @@ QString FileItem::extension(const QString & file )
 
 
 
-#include "moc_file_browser.cxx"
+#include "moc_FileBrowser.cxx"
 
