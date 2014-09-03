@@ -49,7 +49,7 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "engine.h"
-#include "file_browser.h"
+#include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "InstrumentSoundShaping.h"

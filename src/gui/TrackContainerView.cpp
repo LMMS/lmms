@@ -36,7 +36,7 @@
 #include "bb_track.h"
 #include "MainWindow.h"
 #include "debug.h"
-#include "file_browser.h"
+#include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"

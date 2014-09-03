@@ -48,7 +48,7 @@
 #include "PianoView.h"
 #include "about_dialog.h"
 #include "ControllerRackView.h"
-#include "file_browser.h"
+#include "FileBrowser.h"
 #include "plugin_browser.h"
 #include "SideBar.h"
 #include "config_mgr.h"
