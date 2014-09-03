@@ -31,7 +31,6 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "base64.h"
 #include "MemoryManager.h"
 
 
