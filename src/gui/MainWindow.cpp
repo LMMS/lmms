@@ -119,15 +119,23 @@ MainWindow::MainWindow() :
 							tr( "My home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	QFileInfoList drives = QDir::drives();
+
 	QStringList root_paths;
+#ifdef LMMS_BUILD_APPLE
+	root_paths += "/Volumes";
+#else
+	QFileInfoList drives = QDir::drives();
 	foreach( const QFileInfo & drive, drives )
 	{
 		root_paths += drive.absolutePath();
 	}
+#endif
 	sideBar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
 							tr( "My computer" ),
+#endif
+#ifdef LMMS_BUILD_APPLE
+							tr( "Volumes" ),
 #else
 							tr( "Root directory" ),
 #endif
