@@ -482,9 +482,9 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_loopOffButton->setCheckable( TRUE );
 	m_loopOffButton->move( 190, 105 );
 	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_off_on" ) );
-	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_off_off" ) );
+	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"loop_off_on" ) );
 	toolTip::add( m_loopOffButton, tr( "Disable loop" ) );
 	m_loopOffButton->setWhatsThis(
 		tr( "This button disables looping. "
