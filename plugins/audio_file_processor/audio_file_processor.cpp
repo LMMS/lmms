@@ -373,6 +373,12 @@ void audioFileProcessor::startPointChanged( void )
 	{
 		m_loopPointModel.setValue( m_startPointModel.value() );
 	}
+
+	// nudge loop point with end
+	if( m_loopPointModel.value() > m_endPointModel.value() )
+	{
+		m_loopPointModel.setValue( m_endPointModel.value() );
+	}
 	
 	pointChanged();
 
@@ -380,7 +386,7 @@ void audioFileProcessor::startPointChanged( void )
 
 void audioFileProcessor::endPointChanged( void )
 {
-	// same as start
+	// same as start, for now
 	startPointChanged();
 
 }
