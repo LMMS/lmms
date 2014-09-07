@@ -88,9 +88,9 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
 				this, SLOT( ampModelChanged() ) );
 	connect( &m_startPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( loopPointChanged() ) );
+				this, SLOT( startPointChanged() ) );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( loopPointChanged() ) );
+				this, SLOT( endPointChanged() ) );
 	connect( &m_loopPointModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
@@ -102,7 +102,7 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_interpolationModel.addItem( tr( "Sinc" ) );
 	m_interpolationModel.setValue( 1 );
 	
-	loopPointChanged();
+	pointChanged();
 }
 
 
@@ -266,7 +266,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 		m_interpolationModel.setValue( 1 ); //linear by default
 	}
 
-	loopPointChanged();
+	pointChanged();
 }
 
 
@@ -352,9 +352,7 @@ void audioFileProcessor::stutterModelChanged()
 }
 
 
-
-
-void audioFileProcessor::loopPointChanged( void )
+void audioFileProcessor::startPointChanged( void ) 
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -370,6 +368,26 @@ void audioFileProcessor::loopPointChanged( void )
 		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
 
+	// nudge loop point with start
+	if( m_loopPointModel.value() < m_startPointModel.value() )
+	{
+		m_loopPointModel.setValue( m_startPointModel.value() );
+	}
+	
+	pointChanged();
+
+}
+
+void audioFileProcessor::endPointChanged( void )
+{
+	// same as start
+	startPointChanged();
+
+}
+
+void audioFileProcessor::loopPointChanged( void )
+{
+
 	// check that loop point is between start-end points and not overlapping with endpoint
 	// ...and move start/end points ahead if loop point is moved over them
 	if( m_loopPointModel.value() >= m_endPointModel.value() )
@@ -380,11 +398,18 @@ void audioFileProcessor::loopPointChanged( void )
 			m_loopPointModel.setValue( 1.0f - 0.001f );
 		}
 	}
+
+	// nudge start point with loop
 	if( m_loopPointModel.value() < m_startPointModel.value() )
 	{
 		m_startPointModel.setValue( m_loopPointModel.value() );
 	}
 
+	pointChanged();
+}
+
+void audioFileProcessor::pointChanged( void )
+{
 	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *	( m_sampleBuffer.frames()-1 ) );
 	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() * ( m_sampleBuffer.frames()-1 ) );
 	const f_cnt_t f_loop = static_cast<f_cnt_t>( m_loopPointModel.value() * ( m_sampleBuffer.frames()-1 ) );
@@ -395,6 +420,8 @@ void audioFileProcessor::loopPointChanged( void )
 	m_sampleBuffer.setAllPointFrames( f_start, f_end, f_loop, f_end );
 	emit dataChanged();
 }
+
+
 
 
 
@@ -999,13 +1026,14 @@ void AudioFileProcessorWaveView::updateGraph()
 	{
 		reverse();
 	}
-	else if( m_last_from == m_from && m_last_to == m_to )
+	else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
 	{
 		return;
 	}
 
 	m_last_from = m_from;
 	m_last_to = m_to;
+	m_last_amp = m_sampleBuffer.amplification();
 
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );

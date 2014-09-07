@@ -75,6 +75,9 @@ private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
 	void loopPointChanged();
+	void startPointChanged();
+	void endPointChanged();
+	void pointChanged();
 	void stutterModelChanged();
 
 
@@ -239,6 +242,7 @@ private:
 	f_cnt_t m_to;
 	f_cnt_t m_last_from;
 	f_cnt_t m_last_to;
+	float m_last_amp;
 	knob * m_startKnob;
 	knob * m_endKnob;
 	knob * m_loopKnob;
