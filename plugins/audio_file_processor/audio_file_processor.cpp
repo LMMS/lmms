@@ -362,10 +362,10 @@ void audioFileProcessor::startPointChanged( void )
 		m_startPointModel.setValue( tmp );
 	}
 
-	// check if start & end overlap and nudge end up if so
-	if( m_startPointModel.value() == m_endPointModel.value() )
+	// nudge loop point with end
+	if( m_loopPointModel.value() >= m_endPointModel.value() )
 	{
-		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
+		m_loopPointModel.setValue( qMax( m_endPointModel.value() - 0.001f, 0.0f ) );
 	}
 
 	// nudge loop point with start
@@ -374,10 +374,10 @@ void audioFileProcessor::startPointChanged( void )
 		m_loopPointModel.setValue( m_startPointModel.value() );
 	}
 
-	// nudge loop point with end
-	if( m_loopPointModel.value() > m_endPointModel.value() )
+	// check if start & end overlap and nudge end up if so
+	if( m_startPointModel.value() == m_endPointModel.value() )
 	{
-		m_loopPointModel.setValue( m_endPointModel.value() );
+		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
 	
 	pointChanged();
