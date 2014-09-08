@@ -533,6 +533,9 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
+#ifdef LMMS_BUILD_APPLE
+	m_toggleUIButton->setEnabled( false );
+#endif
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
