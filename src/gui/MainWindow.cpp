@@ -133,7 +133,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
 							tr( "My computer" ),
-#elif LMMS_BUILD_APPLE
+#elif defined(LMMS_BUILD_APPLE)
 							tr( "Volumes" ),
 #else
 							tr( "Root directory" ),
