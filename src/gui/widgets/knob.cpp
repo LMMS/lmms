@@ -592,7 +592,9 @@ void knob::mouseReleaseEvent( QMouseEvent* event )
 		AutomatableModel *thisModel = model();
 		if( thisModel )
 		{
-			thisModel->restoreJournallingState();
+			if(!thisModel->isEmpty()) {
+				thisModel->restoreJournallingState();
+			}
 		}
 	}
 

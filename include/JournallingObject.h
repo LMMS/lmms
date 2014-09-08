@@ -77,6 +77,9 @@ public:
 		return oldJournalling;
 	}
 
+	inline bool isEmpty() {
+		return m_journallingStateStack.isEmpty();
+	}
 
 protected:
 	void changeID( jo_id_t _id );
