@@ -77,7 +77,8 @@ public:
 		return oldJournalling;
 	}
 
-	inline bool isEmpty() {
+	inline bool isEmpty() const
+	{
 		return m_journallingStateStack.isEmpty();
 	}
 
