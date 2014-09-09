@@ -50,7 +50,8 @@ public:
 
 	void restoreJournallingState()
 	{
-		if( !isJournallingStackEmpty()) {
+		if( !isJournallingStackEmpty()) 
+		{
 			m_journalling = m_journallingStateStack.pop();
 		}
 	}
