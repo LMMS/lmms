@@ -50,7 +50,7 @@ public:
 
 	void restoreJournallingState()
 	{
-		if( !isJournallingStackEmpty()) 
+		if( !isJournallingStateStackEmpty()) 
 		{
 			m_journalling = m_journallingStateStack.pop();
 		}
@@ -80,7 +80,7 @@ public:
 		return oldJournalling;
 	}
 
-	inline bool isJournallingStackEmpty() const
+	bool isJournallingStateStackEmpty() const
 	{
 		return m_journallingStateStack.isEmpty();
 	}
