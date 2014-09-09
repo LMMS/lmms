@@ -36,7 +36,7 @@
 #include "bb_track.h"
 #include "MainWindow.h"
 #include "debug.h"
-#include "file_browser.h"
+#include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
@@ -340,7 +340,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				track::create( track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
-			engine::pluginFileHandling()[fileItem::extension(
+			engine::pluginFileHandling()[FileItem::extension(
 								value )]);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );

@@ -50,7 +50,10 @@ public:
 
 	void restoreJournallingState()
 	{
-		m_journalling = m_journallingStateStack.pop();
+		if( !isJournallingStateStackEmpty()) 
+		{
+			m_journalling = m_journallingStateStack.pop();
+		}
 	}
 
 	void addJournalCheckPoint();
@@ -77,6 +80,10 @@ public:
 		return oldJournalling;
 	}
 
+	bool isJournallingStateStackEmpty() const
+	{
+		return m_journallingStateStack.isEmpty();
+	}
 
 protected:
 	void changeID( jo_id_t _id );

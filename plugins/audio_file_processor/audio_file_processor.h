@@ -75,6 +75,9 @@ private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
 	void loopPointChanged();
+	void startPointChanged();
+	void endPointChanged();
+	void pointChanged();
 	void stutterModelChanged();
 
 
