@@ -87,9 +87,9 @@ class FxRoute : public QObject
 		return m_to->m_channelIndex;
 	}
 	
-	FloatModel * amount() const
+	FloatModel * amount()
 	{
-		return m_amount;
+		return &m_amount;
 	}
 	
 	FxChannel * sender() const
@@ -107,7 +107,7 @@ class FxRoute : public QObject
 	private:
 		FxChannel * m_from;
 		FxChannel * m_to;
-		FloatModel * m_amount;
+		FloatModel m_amount;
 };
 
 
@@ -137,9 +137,9 @@ public:
 
 	// make the output of channel fromChannel go to the input of channel toChannel
 	// it is safe to call even if the send already exists
-	void createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
+	FxRoute * createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
 						   float amount = 1.0f);
-	void createRoute( FxChannel * from, FxChannel * to, float amount );
+	FxRoute * createRoute( FxChannel * from, FxChannel * to, float amount );
 
 	// delete the connection made by createChannelSend
 	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
