@@ -36,29 +36,24 @@
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
-	m_to( to )
+	m_to( to ),
+	m_amount( amount, 0, 1, 0.001, NULL,
+			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
-	m_amount = new FloatModel( amount, 0, 1, 0.001, NULL,
-			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
 }
 
 
 FxRoute::~FxRoute()
 {
-	// remove send model
-	delete m_amount;
 }
 
 
 void FxRoute::updateName()
 {
-	if( m_amount)
-	{
-		m_amount->setDisplayName(
+	m_amount.setDisplayName(
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
-	}
 }
 
 
@@ -304,7 +299,7 @@ void FxMixer::moveChannelRight( int index )
 
 
 
-void FxMixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
+FxRoute * FxMixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
 								float amount )
 {
 //	qDebug( "requested: %d to %d", fromChannel, toChannel );
@@ -318,20 +313,20 @@ void FxMixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
 		{
 			// simply adjust the amount
 			from->m_sends[i]->amount()->setValue( amount );
-			return;
+			return from->m_sends[i];
 		}
 	}
 
 	// connection does not exist. create a new one
-	createRoute( from, to, amount );
+	return createRoute( from, to, amount );
 }
 
 
-void FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
+FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 {
 	if( from == to )
 	{
-		return;
+		return NULL;
 	}
 	m_sendsMutex.lock();
 	FxRoute * route = new FxRoute( from, to, amount );
@@ -345,6 +340,8 @@ void FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	// add us to fxmixer's list
 	engine::fxMixer()->m_fxRoutes.append( route );
 	m_sendsMutex.unlock();
+	
+	return route;
 }
 
 
@@ -567,6 +564,7 @@ void FxMixer::clearChannel(fx_ch_t index)
 
 void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	// save channels
 	for( int i = 0; i < m_fxChannels.size(); ++i )
 	{
 		FxChannel * ch = m_fxChannels[i];
@@ -590,7 +588,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
 		}
 	}
-}
+} 
 
 // make sure we have at least num channels
 void FxMixer::allocateChannelsTo(int num)
@@ -638,8 +636,8 @@ void FxMixer::loadSettings( const QDomElement & _this )
 				thereIsASend = true;
 				int sendTo = chDataItem.attribute( "channel" ).toInt();
 				allocateChannelsTo( sendTo ) ;
-				float amount = chDataItem.attribute( "amount" ).toFloat();
-				createChannelSend( num, sendTo, amount );
+				FxRoute * fxr = createChannelSend( num, sendTo, 1.0f );
+				if( fxr ) fxr->amount()->loadSettings( chDataItem, "amount" );
 			}
 		}
 
