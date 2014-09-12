@@ -1053,5 +1053,3 @@ QString FileItem::extension(const QString & file )
 
 
 
-
-#include "moc_FileBrowser.cxx"
