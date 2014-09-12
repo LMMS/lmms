@@ -66,7 +66,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_hasParent( parent != NULL  ),
 	m_hadChildren( false ),
 	m_muted( false ),
-	m_bbTrack( NULL ),
 	m_origTempo( engine::getSong()->getTempo() ),
 	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
@@ -87,8 +86,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 
 		parent->m_subNotes.push_back( this );
 		parent->m_hadChildren = true;
-
-		m_bbTrack = parent->m_bbTrack;
 	}
 
 	updateFrequency();
@@ -333,7 +330,7 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 
 bool NotePlayHandle::isFromTrack( const track * _track ) const
 {
-	return m_instrumentTrack == _track || m_bbTrack == _track;
+	return m_instrumentTrack == _track;
 }
 
 
