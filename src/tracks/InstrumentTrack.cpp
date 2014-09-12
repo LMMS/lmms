@@ -563,12 +563,10 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	const float frames_per_tick = engine::framesPerTick();
 
 	tcoVector tcos;
-	bbTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
 		trackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = bbTrack::findBBTrack( _tco_num );
 	}
 	else
 	{
@@ -633,7 +631,6 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 							frames_per_tick );
 
 				NotePlayHandle* notePlayHandle = new NotePlayHandle( this, _offset, note_frames, *cur_note );
-				notePlayHandle->setBBTrack( bb_track );
 				// are we playing global song?
 				if( _tco_num < 0 )
 				{
