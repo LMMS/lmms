@@ -25,7 +25,7 @@
 #include "carla.h"
 
 #define REAL_BUILD // FIXME this shouldn't be needed
-#include "CarlaDefines.h"
+#include "CarlaHost.h"
 
 #include "engine.h"
 #include "InstrumentPlayHandle.h"
@@ -115,9 +115,17 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
       fMidiEventCount(0)
 {
     fHost.handle      = this;
-    fHost.resourceDir = strdup("/usr/share/carla/resources/"); // TODO
     fHost.uiName      = NULL;
     fHost.uiParentId  = 0;
+
+    // figure out prefix from dll filename
+    QString dllName(carla_get_library_filename());
+
+#if defined(CARLA_OS_LINUX)
+    fHost.resourceDir = strdup(QString(dllName.split("/lib/carla")[0] + "/share/carla/resources/").toUtf8().constData());
+#else
+    fHost.resourceDir = NULL;
+#endif
 
     fHost.get_buffer_size        = host_get_buffer_size;
     fHost.get_sample_rate        = host_get_sample_rate;
@@ -421,7 +429,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     : InstrumentView(instrument, parent),
       fHandle(instrument->fHandle),
       fDescriptor(instrument->fDescriptor),
-      fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(50) : 0)
+      fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0)
 {
     setAutoFillBackground(true);
 
