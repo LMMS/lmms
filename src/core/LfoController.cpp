@@ -36,7 +36,6 @@
 #include "ControllerDialog.h"
 #include "lmms_math.h"
 
-//const float TWO_PI = 6.28318531f;
 
 LfoController::LfoController( Model * _parent ) :
 	Controller( Controller::LfoController, _parent, tr( "LFO Controller" ) ),
@@ -98,7 +97,7 @@ void LfoController::updateValueBuffer()
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
-		phase += static_cast<float>( engine::framesPerTick() * diff ) / m_duration;
+		phase += static_cast<float>( engine::framesPerPeriod() * diff ) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
 
