@@ -97,7 +97,7 @@ void LfoController::updateValueBuffer()
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
-		phase += static_cast<float>( engine::framesPerPeriod() * diff ) / m_duration;
+		phase += static_cast<float>( engine::mixer()->framesPerPeriod() * diff ) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
 
