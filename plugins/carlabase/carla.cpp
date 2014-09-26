@@ -39,6 +39,18 @@
 
 #include <cstring>
 
+/*
+ * Current TODO items:
+ *  - get plugin instance name (to use in external window title)
+ *  - buffer-size change callback
+ *  - offline mode change callback
+ *  - set time info
+ *  - midi output
+ *  - background artwork
+ *
+ * All other items are to be done in Carla itself.
+ */
+
 // -----------------------------------------------------------------------
 
 #define handlePtr ((CarlaInstrument*)handle)
