@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _CARLA_H
-#define _CARLA_H
+#ifndef CARLA_H
+#define CARLA_H
 
 #include "CarlaNative.h"
 

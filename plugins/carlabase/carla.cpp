@@ -46,7 +46,6 @@ static const double ticksPerBeat = 48.0;
 /*
  * Current TODO items:
  *  - get plugin instance name (to use in external window title)
- *  - buffer-size change callback
  *  - offline mode change callback
  *  - midi output
  *  - background artwork
@@ -330,7 +329,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     song* const s = engine::getSong();
     fTimeInfo.playing  = s->isPlaying();
     fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(engine::framesPerTick());
-    fTimeInfo.usecs    = s->getMilliseconds()/1000;
+    fTimeInfo.usecs    = s->getMilliseconds()*1000;
     fTimeInfo.bbt.bar  = s->getTacts() + 1;
     fTimeInfo.bbt.beat = s->getBeat() + 1;
     fTimeInfo.bbt.tick = s->getBeatTicks();
