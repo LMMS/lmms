@@ -28,6 +28,7 @@
 #include "CarlaHost.h"
 
 #include "engine.h"
+#include "song.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
@@ -39,12 +40,14 @@
 
 #include <cstring>
 
+// this doesn't seem to be defined anywhere
+static const double ticksPerBeat = 48.0;
+
 /*
  * Current TODO items:
  *  - get plugin instance name (to use in external window title)
  *  - buffer-size change callback
  *  - offline mode change callback
- *  - set time info
  *  - midi output
  *  - background artwork
  *
@@ -167,6 +170,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fHost.dispatcher             = host_dispatcher;
 
     std::memset(&fTimeInfo, 0, sizeof(NativeTimeInfo));
+    fTimeInfo.bbt.valid = true; // always valid
 
     fHandle = fDescriptor->instantiate(&fHost);
     Q_ASSERT(fHandle != NULL);
@@ -322,7 +326,19 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
         return;
     }
 
-    // TODO - set time info
+    // set time info
+    song* const s = engine::getSong();
+    fTimeInfo.playing  = s->isPlaying();
+    fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(engine::framesPerTick());
+    fTimeInfo.usecs    = s->getMilliseconds()/1000;
+    fTimeInfo.bbt.bar  = s->getTacts() + 1;
+    fTimeInfo.bbt.beat = s->getBeat() + 1;
+    fTimeInfo.bbt.tick = s->getBeatTicks();
+    fTimeInfo.bbt.barStartTick   = ticksPerBeat*s->getTimeSigModel().getNumerator()*s->getTacts();
+    fTimeInfo.bbt.beatsPerBar    = s->getTimeSigModel().getNumerator();
+    fTimeInfo.bbt.beatType       = s->getTimeSigModel().getDenominator();
+    fTimeInfo.bbt.ticksPerBeat   = ticksPerBeat;
+    fTimeInfo.bbt.beatsPerMinute = s->getTempo();
 
     float buf1[bufsize];
     float buf2[bufsize];
