@@ -31,9 +31,12 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
+#include <QApplication>
+#include <QFileDialog>
 #include <QPushButton>
 #include <QTimerEvent>
 #include <QVBoxLayout>
+
 #include <cstring>
 
 // -----------------------------------------------------------------------
@@ -62,7 +65,7 @@ static const NativeTimeInfo* host_get_time_info(NativeHostHandle handle)
 
 static bool host_write_midi_event(NativeHostHandle, const NativeMidiEvent*)
 {
-    return false; // unsupported
+    return false; // unsupported?
 }
 
 static void host_ui_parameter_changed(NativeHostHandle handle, uint32_t index, float value)
@@ -72,22 +75,12 @@ static void host_ui_parameter_changed(NativeHostHandle handle, uint32_t index, f
 
 static void host_ui_custom_data_changed(NativeHostHandle handle, const char* key, const char* value)
 {
-    handlePtr->handleUiCustomDataChanged(key, value);
+    // unused
 }
 
 static void host_ui_closed(NativeHostHandle handle)
 {
     handlePtr->handleUiClosed();
-}
-
-static const char* host_ui_open_file(NativeHostHandle handle, bool isDir, const char* title, const char* filter)
-{
-    return handlePtr->handleUiOpenFile(isDir, title, filter);
-}
-
-static const char* host_ui_save_file(NativeHostHandle handle, bool isDir, const char* title, const char* filter)
-{
-    return handlePtr->handleUiSaveFile(isDir, title, filter);
 }
 
 static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt)
@@ -96,6 +89,28 @@ static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpc
 }
 
 #undef handlePtr
+
+// -----------------------------------------------------------------------
+
+static const char* host_ui_open_file(NativeHostHandle, bool isDir, const char* title, const char* filter)
+{
+    static QByteArray retStr;
+    const QFileDialog::Options options(isDir ? QFileDialog::ShowDirsOnly : 0x0);
+
+    retStr = QFileDialog::getOpenFileName(QApplication::activeWindow(), title, "", filter, NULL, options).toUtf8();
+
+    return retStr.isEmpty() ? NULL : retStr.constData();
+}
+
+static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* title, const char* filter)
+{
+    static QByteArray retStr;
+    const QFileDialog::Options options(isDir ? QFileDialog::ShowDirsOnly : 0x0);
+
+    retStr = QFileDialog::getSaveFileName(QApplication::activeWindow(), title, "", filter, NULL, options).toUtf8();
+
+    return retStr.isEmpty() ? NULL : retStr.constData();
+}
 
 // -----------------------------------------------------------------------
 
@@ -158,11 +173,17 @@ CarlaInstrument::~CarlaInstrument()
 {
     engine::mixer()->removePlayHandles( instrumentTrack() );
 
-    std::free((char*)fHost.resourceDir);
-    fHost.resourceDir = NULL;
+    if (fHost.resourceDir != NULL)
+    {
+        std::free((char*)fHost.resourceDir);
+        fHost.resourceDir = NULL;
+    }
 
-    std::free((char*)fHost.uiName);
-    fHost.uiName = NULL;
+    if (fHost.uiName != NULL)
+    {
+        std::free((char*)fHost.uiName);
+        fHost.uiName = NULL;
+    }
 
     if (fHandle == NULL)
         return;
@@ -202,25 +223,9 @@ void CarlaInstrument::handleUiParameterChanged(const uint32_t /*index*/, const f
 {
 }
 
-void CarlaInstrument::handleUiCustomDataChanged(const char* const /*key*/, const char* const /*value*/) const
-{
-}
-
 void CarlaInstrument::handleUiClosed()
 {
     emit uiClosed();
-}
-
-const char* CarlaInstrument::handleUiOpenFile(const bool /*isDir*/, const char* const /*title*/, const char* const /*filter*/) const
-{
-    // TODO
-    return NULL;
-}
-
-const char* CarlaInstrument::handleUiSaveFile(const bool /*isDir*/, const char* const /*title*/, const char* const /*filter*/) const
-{
-    // TODO
-    return NULL;
 }
 
 intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt)
@@ -284,7 +289,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 
 void CarlaInstrument::loadSettings(const QDomElement& elem)
 {
-    if (fHandle == NULL || fDescriptor->get_state == NULL)
+    if (fHandle == NULL || fDescriptor->set_state == NULL)
         return;
 
     QDomDocument carlaDoc("carla");
@@ -304,6 +309,8 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
         instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
         return;
     }
+
+    // TODO - set time info
 
     float buf1[bufsize];
     float buf2[bufsize];
@@ -413,7 +420,10 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
         fHost.uiParentId = 0;
 
     std::free((char*)fHost.uiName);
-    fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
+
+    // TODO - get plugin instance name
+    //fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
+    fHost.uiName = strdup(kIsPatchbay ? "CarlaPatchbay-LMMS" : "CarlaRack-LMMS");
 
     return new CarlaInstrumentView(this, parent);
 }

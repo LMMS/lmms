@@ -48,10 +48,7 @@ public:
     bool handleIsOffline() const;
     const NativeTimeInfo* handleGetTimeInfo() const;
     void handleUiParameterChanged(const uint32_t index, const float value) const;
-    void handleUiCustomDataChanged(const char* const key, const char* const value) const;
     void handleUiClosed();
-    const char* handleUiOpenFile(const bool isDir, const char* const title, const char* const filter) const;
-    const char* handleUiSaveFile(const bool isDir, const char* const title, const char* const filter) const;
     intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
 
     // LMMS functions
