@@ -1,12 +1,19 @@
-Linux MultiMedia Studio
+![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) Linux MultiMedia Studio (LMMS)
 =======================
 [![Build Status](https://travis-ci.org/LMMS/lmms.png)](https://travis-ci.org/LMMS/lmms)
 
 What is LMMS?
 --------------
 
-LMMS is a free cross-platform alternative to commercial programs like FL Studio (R), which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
+LMMS is a free cross-platform alternative to commercial programs like FL Studio®, which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
 
+[Homepage](http://lmms.sf.net)<br>
+[Downloads/Releases](https://github.com/LMMS/lmms/releases)<br>
+[Developer Wiki](https://github.com/LMMS/lmms/wiki)<br>
+[Artist & User Wiki/Documentation](http://lmms.sourceforge.net/wiki/index.php/Main_Page) This still has some useful pages.<br>
+[Screenshots](http://lmms.sourceforge.net/screenshots.php)<br>
+[Sound Demos](http://lmms.sourceforge.net/demos.php)<br>
+[LMMS Sharing Platform](http://lmms.sourceforge.net/lsp/index.php) Share your songs!
 
 Features
 ---------
@@ -18,8 +25,15 @@ Features
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
-* Import of MIDI and FLP (Fruityloops(R) Project) files
+* Import of MIDI and FLP (FL Studio®/Fruityloops® Project) files
 
+[Latest Stable Release (1.0.3)](https://github.com/LMMS/lmms/releases/tag/v1.0.3)
+---------------------
+* Fix zyn GUI crash on win32
+* Fix SF2 note volume
+* Localization updates
+* Updated LADSPA search paths
+* Bugfixes in plugins
 
 Building
 ---------
