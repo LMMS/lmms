@@ -29,6 +29,7 @@ INCLUDE(DetectMachine)
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
+OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
@@ -155,6 +156,18 @@ SET(STATUS_TAP "OK")
 ELSE(WANT_TAP)
 SET(STATUS_TAP "not built as requested")
 ENDIF(WANT_TAP)
+
+
+# check for CARLA
+IF(WANT_CARLA)
+	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	IF(CARLA_FOUND)
+		SET(LMMS_HAVE_CARLA TRUE)
+		SET(STATUS_CARLA "OK")
+	ELSE(CARLA_FOUND)
+		SET(STATUS_CARLA "not found, please install the latest carla")
+	ENDIF(CARLA_FOUND)
+ENDIF(WANT_CARLA)
 
 
 # check for SDL
@@ -606,6 +619,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
