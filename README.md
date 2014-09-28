@@ -1,5 +1,4 @@
-![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) Linux MultiMedia Studio (LMMS)
-=======================
+![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
 [![Build Status](https://travis-ci.org/LMMS/lmms.png)](https://travis-ci.org/LMMS/lmms)
 
 What is LMMS?

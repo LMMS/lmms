@@ -38,6 +38,10 @@ IF(MINGW_PREFIX)
 	SET(FLTK_FLUID_EXECUTABLE "${MINGW_PREFIX}/bin/fluid")
 ENDIF()
 
+IF(NOT EXISTS ${FLTK_FLUID_EXECUTABLE})
+	MESSAGE(FATAL_ERROR "Please install the fluid binary which is part of FLTK.")
+ENDIF()
+
 INCLUDE_DIRECTORIES("${FLTK_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_SOURCE_DIR}"
                     ${FFTW3F_INCLUDE_DIRS}
