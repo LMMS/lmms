@@ -536,6 +536,17 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
 </context>
 <context>
+    <name>CarlaInstrumentView</name>
+    <message>
+        <source>Show GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Controller</name>
     <message>
         <source>Controller %1</source>
@@ -1279,6 +1290,40 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Export as loop (remove end silence)</source>
         <translation>导出为回环loop（移除结尾的静音）</translation>
+    </message>
+</context>
+<context>
+    <name>FileBrowser</name>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished">浏览器</translation>
+    </message>
+</context>
+<context>
+    <name>FileBrowserTreeWidget</name>
+    <message>
+        <source>Send to active instrument-track</source>
+        <translation type="unfinished">发送到活跃的乐器轨道</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation type="unfinished">在新乐器轨道/歌曲编辑器中打开</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation type="unfinished">在新乐器轨道/B+B 编辑器中打开</translation>
+    </message>
+    <message>
+        <source>Loading sample</source>
+        <translation type="unfinished">加载采样中</translation>
+    </message>
+    <message>
+        <source>Please wait, loading sample for preview...</source>
+        <translation type="unfinished">请稍候，加载采样中...</translation>
+    </message>
+    <message>
+        <source>--- Factory files ---</source>
+        <translation type="unfinished">---软件自带文件---</translation>
     </message>
 </context>
 <context>
@@ -2192,10 +2237,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>一般设置</translation>
     </message>
     <message>
-        <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Instrument volume</source>
         <translation>乐器音量</translation>
     </message>
@@ -2268,16 +2309,20 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>插件</translation>
     </message>
     <message>
-        <source>Save current channel settings in a preset-file</source>
-        <translation>在预设文件中保存当前通道设置</translation>
-    </message>
-    <message>
         <source>Pitch range (semitones)</source>
         <translation>音域范围（半音）</translation>
     </message>
     <message>
         <source>RANGE</source>
         <translation>范围</translation>
+    </message>
+    <message>
+        <source>Save current instrument track settings in a preset file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2723,6 +2768,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
         <translation>LMMS 工程 (*.mmpz *.mmp);;LMMS 工程模板 (*.mpt)</translation>
+    </message>
+    <message>
+        <source>Volumes</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3577,6 +3626,39 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
+    <name>PatternView</name>
+    <message>
+        <source>double-click to open this pattern in piano-roll
+use mouse wheel to set volume of a step</source>
+        <translation>双击在钢琴窗中打开此片段
+使用鼠标滑轮设置此音阶的音量</translation>
+    </message>
+    <message>
+        <source>Open in piano-roll</source>
+        <translation>在钢琴窗中打开</translation>
+    </message>
+    <message>
+        <source>Clear all notes</source>
+        <translation>清除所有音符</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation>重置名称</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation>修改名称</translation>
+    </message>
+    <message>
+        <source>Add steps</source>
+        <translation>添加音阶</translation>
+    </message>
+    <message>
+        <source>Remove steps</source>
+        <translation>移除音阶</translation>
+    </message>
+</context>
+<context>
     <name>PeakController</name>
     <message>
         <source>Peak Controller</source>
@@ -3838,6 +3920,26 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>Please enter a new value between %1 and %2:</source>
         <translation>请输入一个介于 %1 和 %2 的值：</translation>
     </message>
+    <message>
+        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -3865,6 +3967,10 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Failed to load plugin &quot;%1&quot;!</source>
         <translation>载入插件“%1”失败！</translation>
+    </message>
+    <message>
+        <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5149,7 +5255,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Loop mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">循环模式</translation>
     </message>
     <message>
         <source>Interpolation mode</source>
@@ -5471,40 +5577,6 @@ Please make sure you have write-permission to the file and the directory contain
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>请输入一个介于 %1 和 %2 之间的值：</translation>
-    </message>
-</context>
-<context>
-    <name>fileBrowser</name>
-    <message>
-        <source>Browser</source>
-        <translation>浏览器</translation>
-    </message>
-</context>
-<context>
-    <name>fileBrowserTreeWidget</name>
-    <message>
-        <source>Send to active instrument-track</source>
-        <translation>发送到活跃的乐器轨道</translation>
-    </message>
-    <message>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation>在新乐器轨道/歌曲编辑器中打开</translation>
-    </message>
-    <message>
-        <source>Open in new instrument-track/B+B Editor</source>
-        <translation>在新乐器轨道/B+B 编辑器中打开</translation>
-    </message>
-    <message>
-        <source>Loading sample</source>
-        <translation>加载采样中</translation>
-    </message>
-    <message>
-        <source>Please wait, loading sample for preview...</source>
-        <translation>请稍候，加载采样中...</translation>
-    </message>
-    <message>
-        <source>--- Factory files ---</source>
-        <translation>---软件自带文件---</translation>
     </message>
 </context>
 <context>
@@ -6723,7 +6795,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Bass</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">低音</translation>
     </message>
     <message>
         <source>Sweep Direction</source>
@@ -6796,39 +6868,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <message>
         <source>Draw the wave here</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PatternView</name>
-    <message>
-        <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
-        <translation>双击在钢琴窗中打开此片段
-使用鼠标滑轮设置此音阶的音量</translation>
-    </message>
-    <message>
-        <source>Open in piano-roll</source>
-        <translation>在钢琴窗中打开</translation>
-    </message>
-    <message>
-        <source>Clear all notes</source>
-        <translation>清除所有音符</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>重置名称</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>修改名称</translation>
-    </message>
-    <message>
-        <source>Add steps</source>
-        <translation>添加音阶</translation>
-    </message>
-    <message>
-        <source>Remove steps</source>
-        <translation>移除音阶</translation>
     </message>
 </context>
 <context>
@@ -6980,6 +7019,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Carla Rack Instrument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Carla Patchbay Instrument</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

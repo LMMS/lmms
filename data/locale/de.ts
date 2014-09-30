@@ -158,20 +158,40 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Wenn Sie diese Option aktivieren, wird das Sample über verschiedene Noten weitergespielt. Wenn Sie die Tonhöhe ändern oder die Note endet, bevor das Ende des Samples erreicht ist, dann fängt die nächste Note da an, wo aufgehört wurde. Um die Wiedergabe an den Anfang des Samples zurückzusetzen, fügen Sie eine Note am unteren Ende des Keyboards ein (&lt; 20Hz)</translation>
     </message>
     <message>
-        <source>Loop sample at start- and end-point</source>
-        <translation>Sample am Start- und Endpunkt wiederholen</translation>
+        <source>Disable loop</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Here you can set, whether looping-mode is enabled. If enabled, AudioFileProcessor loops between start and end-points of a sample until the whole note is played. This is useful for things like string and choir samples.</source>
-        <translation>Hier können Sie festlegen, ob der Wiederholungsmodus aktiviert ist. Wenn aktiviert, wiederholt AudioFileProcessor das Sample, bis die ganze Note gespielt wurde. Dies ist nützlich für Sachen, wie Streicher oder Chor Samples.</translation>
+        <source>This button disables looping. The sample plays only once from start to end. </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable looping-mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation>Mit diesem Knopf können Sie den Punkt festlegen, an dem AudioFileProcessor anfangen soll Ihr Sample abzuspielen. Wenn Sie den Wiederholungsmodus aktivieren, ist dies der Punkt, an dem AudioFileProcessor wieder anfängt zu spielen, wenn eine Note länger ist, als das Sample zwischen den Start- und Endpunkten.</translation>
+        <source>Enable loop</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable looping-mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
-        <translation>Mit diesem Knopf können Sie den Punkt festlegen, an dem AudioFileProcessor aufhören soll Ihr Sample abzuspielen. Wenn Sie den Wiederholungsmodus aktivieren, ist dies der Punkt, an dem AudioFileProcessor wieder von vorne anfängt zu spielen, wenn eine Note länger ist, als das Sample zwischen den Start- und Endpunkten.</translation>
+        <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loopback point:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where the loop starts. </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -419,6 +439,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
         <translation>Ein Steuerelement mit &lt;Strg&gt; hier her ziehen</translation>
     </message>
+    <message>
+        <source>Model is already connected to this pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
@@ -449,6 +473,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>&quot;%1&quot; trennen</translation>
+    </message>
+    <message>
+        <source>Set/clear record</source>
+        <translation type="unfinished">Aufnahme setzen/löschen</translation>
     </message>
 </context>
 <context>
@@ -498,6 +526,17 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Ratio</source>
         <translation>Verhältnis</translation>
+    </message>
+</context>
+<context>
+    <name>CarlaInstrumentView</name>
+    <message>
+        <source>Show GUI</source>
+        <translation type="unfinished">GUI anzeigen</translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1114,6 +1153,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation>Ziehen Sie ein Sample von irgendwo und lassen es in diesem Fenster fallen.</translation>
     </message>
+    <message>
+        <source>Click here for random wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ExportProjectDialog</name>
@@ -1253,13 +1296,76 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>Export as loop (remove end silence)</source>
         <translation>Als Schleife exportieren (Stille am Ende entfernen)</translation>
     </message>
+</context>
+<context>
+    <name>FileBrowser</name>
     <message>
-        <source>Sample-exact controllers</source>
-        <translation>Sample-exakte Regler</translation>
+        <source>Browser</source>
+        <translation type="unfinished">Browser</translation>
+    </message>
+</context>
+<context>
+    <name>FileBrowserTreeWidget</name>
+    <message>
+        <source>Send to active instrument-track</source>
+        <translation type="unfinished">An aktive Instrumentspur senden</translation>
     </message>
     <message>
-        <source>Alias-free oscillators</source>
-        <translation>Unterschiedsfreie Oszillatoren</translation>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation type="unfinished">In neuer Instrumentspur im Song-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation type="unfinished">In neuer Instrumentspur im B+B-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Loading sample</source>
+        <translation type="unfinished">Lade Sample</translation>
+    </message>
+    <message>
+        <source>Please wait, loading sample for preview...</source>
+        <translation type="unfinished">Bitte warten, lade Sample für Vorschau…</translation>
+    </message>
+    <message>
+        <source>--- Factory files ---</source>
+        <translation type="unfinished">--- Mitgelieferte Dateien ---</translation>
+    </message>
+</context>
+<context>
+    <name>FxLine</name>
+    <message>
+        <source>Channel send amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The FX channel receives input from one or more instrument tracks.
+ It in turn can be routed to multiple other FX channels. LMMS automatically takes care of preventing infinite loops for you and doesn&apos;t allow making a connection that would result in an infinite loop.
+
+In order to route the channel to another channel, select the FX channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
+
+You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename &amp;channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R&amp;emove channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation type="unfinished">&amp;Hilfe</translation>
     </message>
 </context>
 <context>
@@ -1287,17 +1393,27 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>FX-Mixer</source>
         <translation>FX-Mixer</translation>
     </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
-        <translation>FX Schieber %1</translation>
+        <translation type="unfinished">FX Schieber %1</translation>
     </message>
     <message>
         <source>Mute</source>
-        <translation>Stumm</translation>
+        <translation type="unfinished">Stumm</translation>
     </message>
     <message>
         <source>Mute this FX channel</source>
-        <translation>Diesen FX-Kanal stummschalten</translation>
+        <translation type="unfinished">Diesen FX-Kanal stummschalten</translation>
+    </message>
+</context>
+<context>
+    <name>FxRoute</name>
+    <message>
+        <source>Amount to send from channel %1 to channel %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1357,6 +1473,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     <message>
         <source>Sync</source>
         <translation>Synchron</translation>
+    </message>
+    <message>
+        <source>Down and up</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1808,6 +1928,10 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <source>Half-Whole Diminished</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>5</source>
+        <translation type="unfinished">5</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionNoteStackingView</name>
@@ -2118,10 +2242,6 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <translation>GRUNDLEGENDE EINSTELLUNGEN</translation>
     </message>
     <message>
-        <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation>Klicken Sie hier, wenn Sie die aktuellen Kanal-Einstellungen in einer Preset-Datei speichern wollen. Spätern können Sie dieses Preset laden, indem Sie es im Preset-Browser doppelt anklicken.</translation>
-    </message>
-    <message>
         <source>Instrument volume</source>
         <translation>Instrument-Lautstärke</translation>
     </message>
@@ -2194,16 +2314,20 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
         <translation>PLUGIN</translation>
     </message>
     <message>
-        <source>Save current channel settings in a preset-file</source>
-        <translation>Aktuelle Instrumenteinstellungen in einer Presetdatei speichern</translation>
-    </message>
-    <message>
         <source>Pitch range (semitones)</source>
         <translation>Tonhöhenbereich (Halbtöne)</translation>
     </message>
     <message>
         <source>RANGE</source>
         <translation>RANGE</translation>
+    </message>
+    <message>
+        <source>Save current instrument track settings in a preset file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2643,6 +2767,18 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
     </message>
+    <message>
+        <source>Volumes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -2765,6 +2901,643 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
 </context>
 <context>
+    <name>MonstroInstrument</name>
+    <message>
+        <source>Osc 1 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Fine detune left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Fine detune right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Pulse width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Sync send on rise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 1 Sync send on fall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Fine detune left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Fine detune right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Sync Hard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 2 Sync Reverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Sub-oscillator mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Waveform 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Waveform 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Sync Hard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc 3 Sync Reverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 1 Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO 2 Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Pre-delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Sustain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 1 Slope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Pre-delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Sustain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env 2 Slope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc2-3 modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol2-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vol3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs2-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phs3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit2-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pit3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PW1-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-Env1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-Env2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-LFO1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3-LFO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MonstroView</name>
+    <message>
+        <source>Operators view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
+
+Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matrix view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
+
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
+
+Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix Osc2 with Osc3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of Osc3 with Osc2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate frequency of Osc3 with Osc2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate phase of Osc3 with Osc2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 1 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 2 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 3 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FTL and FTR change the finetuning of the oscillator for left and right channels respectively. These can add stereo-detuning to the oscillator which widens the stereo image and causes an illusion of space. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The SPO knob modifies the difference in phase between left and right channels. Higher difference creates a wider stereo image. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The PW knob controls the pulse width, also known as duty cycle, of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, it doesn&apos;t produce bandlimited output, which means that you can use it as an audible oscillator but it will cause aliasing. You can also use it as an inaudible source of a sync signal, which can be used to synchronize oscillators 2 and 3. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 2. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 3&apos;s first sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 3&apos;s second sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. Each sub-osc can be set to produce a different waveform, and oscillator 3 can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied to both sub-oscs/waveforms in the exact same way. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the waveform for LFO 1. 
+&quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the waveform for LFO 2. 
+&quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack causes the LFO to come on gradually from the start of the note. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PHS controls the phase offset of the LFO. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. A value of 0 means instant. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HOLD controls how long the envelope stays at peak after the attack phase. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds it would take to go from peak to zero. The actual decay may be shorter if sustain is used. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NesInstrument</name>
+    <message>
+        <source>Channel 1 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Sweep amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1 Sweep rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Sweep amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2 Sweep rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 3 Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 3 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Noise frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 4 Noise frequency sweep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation type="unfinished">Master-Lautstärke</translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
+        <translation type="unfinished">Vibrato</translation>
+    </message>
+</context>
+<context>
     <name>OscillatorObject</name>
     <message>
         <source>Osc %1 volume</source>
@@ -2805,6 +3578,10 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>Osc %1 waveform</source>
         <translation>Oszillator %1 Wellenform</translation>
+    </message>
+    <message>
+        <source>Osc %1 harmonic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2852,6 +3629,39 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>Patch-Files (*.pat)</source>
         <translation>Patch-Dateien (*.pat)</translation>
+    </message>
+</context>
+<context>
+    <name>PatternView</name>
+    <message>
+        <source>double-click to open this pattern in piano-roll
+use mouse wheel to set volume of a step</source>
+        <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
+Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
+    </message>
+    <message>
+        <source>Open in piano-roll</source>
+        <translation>Im Piano-Roll öffnen</translation>
+    </message>
+    <message>
+        <source>Clear all notes</source>
+        <translation>Alle Noten löschen</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation>Name zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation>Name ändern</translation>
+    </message>
+    <message>
+        <source>Add steps</source>
+        <translation>Schritte hinzufügen</translation>
+    </message>
+    <message>
+        <source>Remove steps</source>
+        <translation>Schritte entfernen</translation>
     </message>
 </context>
 <context>
@@ -3096,6 +3906,46 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <source>No chord</source>
         <translation>Kein Akkord</translation>
     </message>
+    <message>
+        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning: %1% left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning: %1% right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning: center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation type="unfinished">Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -3123,6 +3973,10 @@ Grund: &quot;%2&quot;</translation>
     <message>
         <source>Failed to load plugin &quot;%1&quot;!</source>
         <translation>Das Plugin &quot;%1&quot; konnte nicht geladen werden!</translation>
+    </message>
+    <message>
+        <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4025,6 +4879,256 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
 </context>
 <context>
+    <name>WatsynInstrument</name>
+    <message>
+        <source>Volume A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panning B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freq. multiplier B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix envelope decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A1-B2 Crosstalk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A2-A1 modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B2-B1 modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WatsynView</name>
+    <message>
+        <source>Select oscillator A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix output of A2 to A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of A1 with output of A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ring-modulate A1 and A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate phase of A1 with output of A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix output of B2 to B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of B1 with output of B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ring-modulate B1 and B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulate phase of B1 with output of B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw your own waveform here by dragging your mouse on this graph.</source>
+        <translation type="unfinished">Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen.</translation>
+    </message>
+    <message>
+        <source>Load waveform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to load a waveform from a sample file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phase left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to shift phase by -15 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phase right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to shift phase by +15 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation type="unfinished">Normalisieren</translation>
+    </message>
+    <message>
+        <source>Click to normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation type="unfinished">Glätten</translation>
+    </message>
+    <message>
+        <source>Click to smooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation type="unfinished">Sinus-Welle</translation>
+    </message>
+    <message>
+        <source>Click for sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation type="unfinished">Dreiecks-Welle</translation>
+    </message>
+    <message>
+        <source>Click for triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation type="unfinished">Rechtecks-Welle</translation>
+    </message>
+    <message>
+        <source>Click for square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxInstrument</name>
     <message>
         <source>Portamento</source>
@@ -4153,8 +5257,28 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
         <translation>Stottern</translation>
     </message>
     <message>
-        <source>Loop</source>
-        <translation>Wiederholen</translation>
+        <source>Loopback point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loop mode</source>
+        <translation type="unfinished">Modus beim Wiederholen</translation>
+    </message>
+    <message>
+        <source>Interpolation mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4213,6 +5337,10 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <message>
         <source>Change color</source>
         <translation>Farbe ändern</translation>
+    </message>
+    <message>
+        <source>Reset color to default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4459,40 +5587,6 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
 </context>
 <context>
-    <name>fileBrowser</name>
-    <message>
-        <source>Browser</source>
-        <translation>Browser</translation>
-    </message>
-</context>
-<context>
-    <name>fileBrowserTreeWidget</name>
-    <message>
-        <source>Send to active instrument-track</source>
-        <translation>An aktive Instrumentspur senden</translation>
-    </message>
-    <message>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation>In neuer Instrumentspur im Song-Editor öffnen</translation>
-    </message>
-    <message>
-        <source>Open in new instrument-track/B+B Editor</source>
-        <translation>In neuer Instrumentspur im B+B-Editor öffnen</translation>
-    </message>
-    <message>
-        <source>Loading sample</source>
-        <translation>Lade Sample</translation>
-    </message>
-    <message>
-        <source>Please wait, loading sample for preview...</source>
-        <translation>Bitte warten, lade Sample für Vorschau…</translation>
-    </message>
-    <message>
-        <source>--- Factory files ---</source>
-        <translation>--- Mitgelieferte Dateien ---</translation>
-    </message>
-</context>
-<context>
     <name>graphModel</name>
     <message>
         <source>Graph</source>
@@ -4514,12 +5608,40 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
         <translation>Gain</translation>
     </message>
     <message>
-        <source>Decay</source>
-        <translation>Abfallzeit</translation>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Distortion</source>
-        <translation>Verzerrung</translation>
+        <source>Distortion Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distortion End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Envelope Slope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation type="unfinished">Rauschen</translation>
+    </message>
+    <message>
+        <source>Click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency Slope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start from note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End to note</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4537,12 +5659,32 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
         <translation>Gain:</translation>
     </message>
     <message>
-        <source>Decay:</source>
-        <translation>Abfallzeit:</translation>
+        <source>Frequency Slope:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Distortion:</source>
-        <translation>Verzerrung:</translation>
+        <source>Envelope Length:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Envelope Slope:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distortion Start:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distortion End:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4829,6 +5971,38 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     <message>
         <source>Click here for white-noise.</source>
         <translation>Klick für weißes Rauschen.</translation>
+    </message>
+    <message>
+        <source>Bandlimited saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited saw wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited square wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited triangle wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited moog saw wave.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5429,8 +6603,24 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
         <translation>Lautstärke:</translation>
     </message>
     <message>
-        <source>Osc %1 fine detuning left:</source>
-        <translation>Oszillator %1 Fein-Verstimmung links:</translation>
+        <source>The distortion knob adds distortion to the output of the instrument. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc %1 stereo detuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Osc %1 harmonic:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5700,39 +6890,6 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
 </context>
 <context>
-    <name>PatternView</name>
-    <message>
-        <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
-        <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
-Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
-    </message>
-    <message>
-        <source>Open in piano-roll</source>
-        <translation>Im Piano-Roll öffnen</translation>
-    </message>
-    <message>
-        <source>Clear all notes</source>
-        <translation>Alle Noten löschen</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>Name zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>Name ändern</translation>
-    </message>
-    <message>
-        <source>Add steps</source>
-        <translation>Schritte hinzufügen</translation>
-    </message>
-    <message>
-        <source>Remove steps</source>
-        <translation>Schritte entfernen</translation>
-    </message>
-</context>
-<context>
     <name>pluginBrowser</name>
     <message>
         <source>Instrument plugins</source>
@@ -5869,8 +7026,28 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
         <translation>Drei mächtige Oszillatoren, die Sie auf mehrere Arten modulieren können</translation>
     </message>
     <message>
-        <source>Versatile kick- &amp; bassdrum-synthesizer</source>
-        <translation>Vielseitiger Kick- &amp; Bassdrum-Synthesizer</translation>
+        <source>Monstrous 3-oscillator synth with modulation matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Carla Rack Instrument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4-oscillator modulatable wavetable synth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Versatile drum synthesizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Carla Patchbay Instrument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A NES-like synthesizer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6755,6 +7932,18 @@ Latenz: %2 ms</translation>
     <message>
         <source>Solo</source>
         <translation>Solo</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn all recording on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn all recording off</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
