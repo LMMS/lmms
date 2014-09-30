@@ -439,6 +439,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
         <translation>Ein Steuerelement mit &lt;Strg&gt; hier her ziehen</translation>
     </message>
+    <message>
+        <source>Model is already connected to this pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
@@ -522,6 +526,17 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Ratio</source>
         <translation>Verhältnis</translation>
+    </message>
+</context>
+<context>
+    <name>CarlaInstrumentView</name>
+    <message>
+        <source>Show GUI</source>
+        <translation type="unfinished">GUI anzeigen</translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1283,6 +1298,40 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
 </context>
 <context>
+    <name>FileBrowser</name>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished">Browser</translation>
+    </message>
+</context>
+<context>
+    <name>FileBrowserTreeWidget</name>
+    <message>
+        <source>Send to active instrument-track</source>
+        <translation type="unfinished">An aktive Instrumentspur senden</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation type="unfinished">In neuer Instrumentspur im Song-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation type="unfinished">In neuer Instrumentspur im B+B-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Loading sample</source>
+        <translation type="unfinished">Lade Sample</translation>
+    </message>
+    <message>
+        <source>Please wait, loading sample for preview...</source>
+        <translation type="unfinished">Bitte warten, lade Sample für Vorschau…</translation>
+    </message>
+    <message>
+        <source>--- Factory files ---</source>
+        <translation type="unfinished">--- Mitgelieferte Dateien ---</translation>
+    </message>
+</context>
+<context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
@@ -1335,10 +1384,6 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <source>FX %1</source>
         <translation>FX %1</translation>
     </message>
-    <message>
-        <source>Amount to send</source>
-        <translation>Zu sendende Menge</translation>
-    </message>
 </context>
 <context>
     <name>FxMixerView</name>
@@ -1368,6 +1413,13 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     <message>
         <source>Mute this FX channel</source>
         <translation>Diesen FX-Kanal stummschalten</translation>
+    </message>
+</context>
+<context>
+    <name>FxRoute</name>
+    <message>
+        <source>Amount to send from channel %1 to channel %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2196,10 +2248,6 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <translation>GRUNDLEGENDE EINSTELLUNGEN</translation>
     </message>
     <message>
-        <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation>Klicken Sie hier, wenn Sie die aktuellen Kanal-Einstellungen in einer Preset-Datei speichern wollen. Spätern können Sie dieses Preset laden, indem Sie es im Preset-Browser doppelt anklicken.</translation>
-    </message>
-    <message>
         <source>Instrument volume</source>
         <translation>Instrument-Lautstärke</translation>
     </message>
@@ -2272,16 +2320,20 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <translation>PLUGIN</translation>
     </message>
     <message>
-        <source>Save current channel settings in a preset-file</source>
-        <translation>Aktuelle Instrumenteinstellungen in einer Presetdatei speichern</translation>
-    </message>
-    <message>
         <source>Pitch range (semitones)</source>
         <translation>Tonhöhenbereich (Halbtöne)</translation>
     </message>
     <message>
         <source>RANGE</source>
         <translation>RANGE</translation>
+    </message>
+    <message>
+        <source>Save current instrument track settings in a preset file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2494,10 +2546,6 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
     <message>
         <source>&amp;Open...</source>
         <translation>Ö&amp;ffnen...</translation>
-    </message>
-    <message>
-        <source>Recently opened projects</source>
-        <translation>Zuletzt geöffnete Projekte</translation>
     </message>
     <message>
         <source>&amp;Save</source>
@@ -2728,6 +2776,14 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
+    </message>
+    <message>
+        <source>Volumes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Recently opened projects</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3259,6 +3315,150 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <source>Modulate phase of Osc3 with Osc2</source>
         <translation>Phase von Oszillator 3 mit Oszillator 2 modulieren</translation>
     </message>
+    <message>
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
+
+Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
+
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
+
+Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 1 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 2 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The CRS knob changes the tuning of oscillator 3 in semitone steps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FTL and FTR change the finetuning of the oscillator for left and right channels respectively. These can add stereo-detuning to the oscillator which widens the stereo image and causes an illusion of space. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The SPO knob modifies the difference in phase between left and right channels. Higher difference creates a wider stereo image. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The PW knob controls the pulse width, also known as duty cycle, of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, it doesn&apos;t produce bandlimited output, which means that you can use it as an audible oscillator but it will cause aliasing. You can also use it as an inaudible source of a sync signal, which can be used to synchronize oscillators 2 and 3. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 2. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 3&apos;s first sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose waveform for oscillator 3&apos;s second sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. Each sub-osc can be set to produce a different waveform, and oscillator 3 can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied to both sub-oscs/waveforms in the exact same way. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+
+PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the waveform for LFO 1. 
+&quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the waveform for LFO 2. 
+&quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack causes the LFO to come on gradually from the start of the note. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PHS controls the phase offset of the LFO. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. A value of 0 means instant. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HOLD controls how long the envelope stays at peak after the attack phase. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds it would take to go from peak to zero. The actual decay may be shorter if sustain is used. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NesInstrument</name>
@@ -3435,6 +3635,39 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>Patch-Files (*.pat)</source>
         <translation>Patch-Dateien (*.pat)</translation>
+    </message>
+</context>
+<context>
+    <name>PatternView</name>
+    <message>
+        <source>double-click to open this pattern in piano-roll
+use mouse wheel to set volume of a step</source>
+        <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
+Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
+    </message>
+    <message>
+        <source>Open in piano-roll</source>
+        <translation>Im Piano-Roll öffnen</translation>
+    </message>
+    <message>
+        <source>Clear all notes</source>
+        <translation>Alle Noten löschen</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation>Name zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation>Name ändern</translation>
+    </message>
+    <message>
+        <source>Add steps</source>
+        <translation>Schritte hinzufügen</translation>
+    </message>
+    <message>
+        <source>Remove steps</source>
+        <translation>Schritte entfernen</translation>
     </message>
 </context>
 <context>
@@ -3699,6 +3932,26 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
     </message>
+    <message>
+        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -3726,6 +3979,10 @@ Grund: &quot;%2&quot;</translation>
     <message>
         <source>Failed to load plugin &quot;%1&quot;!</source>
         <translation>Das Plugin &quot;%1&quot; konnte nicht geladen werden!</translation>
+    </message>
+    <message>
+        <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5087,6 +5344,10 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
         <source>Change color</source>
         <translation>Farbe ändern</translation>
     </message>
+    <message>
+        <source>Reset color to default</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>bbTrack</name>
@@ -5329,40 +5590,6 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
-    </message>
-</context>
-<context>
-    <name>fileBrowser</name>
-    <message>
-        <source>Browser</source>
-        <translation>Browser</translation>
-    </message>
-</context>
-<context>
-    <name>fileBrowserTreeWidget</name>
-    <message>
-        <source>Send to active instrument-track</source>
-        <translation>An aktive Instrumentspur senden</translation>
-    </message>
-    <message>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation>In neuer Instrumentspur im Song-Editor öffnen</translation>
-    </message>
-    <message>
-        <source>Open in new instrument-track/B+B Editor</source>
-        <translation>In neuer Instrumentspur im B+B-Editor öffnen</translation>
-    </message>
-    <message>
-        <source>Loading sample</source>
-        <translation>Lade Sample</translation>
-    </message>
-    <message>
-        <source>Please wait, loading sample for preview...</source>
-        <translation>Bitte warten, lade Sample für Vorschau…</translation>
-    </message>
-    <message>
-        <source>--- Factory files ---</source>
-        <translation>--- Mitgelieferte Dateien ---</translation>
     </message>
 </context>
 <context>
@@ -5750,6 +5977,38 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     <message>
         <source>Click here for white-noise.</source>
         <translation>Klick für weißes Rauschen.</translation>
+    </message>
+    <message>
+        <source>Bandlimited saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited saw wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited square wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited triangle wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for bandlimited moog saw wave.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6637,39 +6896,6 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
 </context>
 <context>
-    <name>PatternView</name>
-    <message>
-        <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
-        <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
-Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
-    </message>
-    <message>
-        <source>Open in piano-roll</source>
-        <translation>Im Piano-Roll öffnen</translation>
-    </message>
-    <message>
-        <source>Clear all notes</source>
-        <translation>Alle Noten löschen</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>Name zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>Name ändern</translation>
-    </message>
-    <message>
-        <source>Add steps</source>
-        <translation>Schritte hinzufügen</translation>
-    </message>
-    <message>
-        <source>Remove steps</source>
-        <translation>Schritte entfernen</translation>
-    </message>
-</context>
-<context>
     <name>pluginBrowser</name>
     <message>
         <source>Instrument plugins</source>
@@ -6820,6 +7046,14 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
         <translation>Drei mächtige Oszillatoren, die Sie auf mehrere Weisen modulieren können</translation>
+    </message>
+    <message>
+        <source>Carla Rack Instrument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Carla Patchbay Instrument</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7147,6 +7381,10 @@ Latenz: %2 ms</translation>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
         <translation>Wiedergabe-Courser im AudioFileProcessor anzeigen</translation>
+    </message>
+    <message>
+        <source>Keep effects running even without input</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7712,6 +7950,10 @@ Latenz: %2 ms</translation>
     <message>
         <source>Turn all recording off</source>
         <translation>Alle Aufnahmen ausschalten</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
