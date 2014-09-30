@@ -794,6 +794,14 @@ void PianoRoll::setCurrentPattern( pattern * _new_pattern )
 		m_pattern->instrumentTrack()->disconnect( this );
 	}
 
+	// force the song-editor to stop playing if it played pattern before
+	if( engine::getSong()->isPlaying() &&
+		engine::getSong()->playMode() == song::Mode_PlayPattern )
+	{
+		engine::getSong()->playPattern( NULL );
+	}
+
+	// set new data
 	m_pattern = _new_pattern;
 	m_currentPosition = 0;
 	m_currentNote = NULL;
@@ -840,6 +848,9 @@ void PianoRoll::setCurrentPattern( pattern * _new_pattern )
 	// of start-notes and so on...)
 	resizeEvent( NULL );
 
+	// make sure to always get informed about the pattern being destroyed
+	connect( m_pattern, SIGNAL( destroyedPattern( pattern* ) ), this, SLOT( hidePattern( pattern* ) ) );
+
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const note& ) ), this, SLOT( startRecordNote( const note& ) ) );
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const note& ) ), this, SLOT( finishRecordNote( const note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
@@ -850,6 +861,15 @@ void PianoRoll::setCurrentPattern( pattern * _new_pattern )
 	emit currentPatternChanged();
 }
 
+
+
+void PianoRoll::hidePattern( pattern* p )
+{
+	if( m_pattern == p )
+	{
+		setCurrentPattern( NULL );
+	}
+}
 
 
 

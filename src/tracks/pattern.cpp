@@ -89,6 +89,8 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 
 pattern::~pattern()
 {
+	emit destroyedPattern( this );
+
 	for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
@@ -649,20 +651,6 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 
 patternView::~patternView()
 {
-	if( engine::pianoRoll()->currentPattern() == m_pat )
-	{
-		engine::pianoRoll()->disconnect( this );
-
-		engine::pianoRoll()->setCurrentPattern( NULL );
-		// we have to have the song-editor to stop playing if it played
-		// us before
-		if( engine::getSong()->isPlaying() &&
-			engine::getSong()->playMode() ==
-							song::Mode_PlayPattern )
-		{
-			engine::getSong()->playPattern( NULL );
-		}
-	}
 }
 
 

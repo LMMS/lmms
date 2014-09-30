@@ -164,6 +164,9 @@ protected slots:
 	void changeNoteEditMode( int i );
 	void markSemiTone( int i );
 
+	void hidePattern( pattern* p );
+
+
 signals:
 	void currentPatternChanged();
 	void semiToneMarkerMenuScaleSetEnabled(bool);

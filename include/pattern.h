@@ -140,6 +140,10 @@ private:
 	friend class patternView;
 	friend class bbEditor;
 
+
+signals:
+	void destroyedPattern( pattern* );
+
 } ;
 
 
