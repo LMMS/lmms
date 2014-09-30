@@ -46,7 +46,7 @@ class QSignalMapper;
 
 class comboBox;
 class NotePlayHandle;
-class pattern;
+class Pattern;
 class timeLine;
 class toolButton;
 
@@ -61,7 +61,7 @@ public:
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
 
-	void setCurrentPattern( pattern * _new_pattern );
+	void setCurrentPattern( Pattern* newPattern );
 
 	inline void stopRecording()
 	{
@@ -73,12 +73,12 @@ public:
 		return m_recording;
 	}
 
-	inline const pattern * currentPattern() const
+	const Pattern* currentPattern() const
 	{
 		return m_pattern;
 	}
 
-	inline bool validPattern() const
+	bool hasValidPattern() const
 	{
 		return m_pattern != NULL;
 	}
@@ -163,6 +163,9 @@ protected slots:
 
 	void changeNoteEditMode( int i );
 	void markSemiTone( int i );
+
+	void hidePattern( Pattern* pattern );
+
 
 signals:
 	void currentPatternChanged();
@@ -291,7 +294,7 @@ private:
 
 
 
-	pattern * m_pattern;
+	Pattern* m_pattern;
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 

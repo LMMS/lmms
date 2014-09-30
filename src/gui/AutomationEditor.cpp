@@ -1932,7 +1932,7 @@ void AutomationEditor::play()
 		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
 		{
 			engine::getSong()->stop();
-			engine::getSong()->playPattern( (pattern *) engine::pianoRoll()->currentPattern() );
+			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
 		}
 		else if( engine::getSong()->isStopped() == false )
 		{
@@ -1940,7 +1940,7 @@ void AutomationEditor::play()
 		}
 		else
 		{
-			engine::getSong()->playPattern( (pattern *) engine::pianoRoll()->currentPattern() );
+			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )

@@ -68,7 +68,7 @@
 #include "MixHelpers.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
 #include "song.h"
@@ -514,7 +514,7 @@ void InstrumentTrack::setName( const QString & _new_name )
 	// which have the same name as the instrument-track
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
-		pattern * p = dynamic_cast<pattern *>( getTCO( i ) );
+		Pattern* p = dynamic_cast<Pattern*>( getTCO( i ) );
 		if( ( p != NULL && p->name() == name() ) || p->name() == "" )
 		{
 			p->setName( _new_name );
@@ -630,7 +630,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
-		pattern * p = dynamic_cast<pattern *>( *it );
+		Pattern* p = dynamic_cast<Pattern*>( *it );
 		// everything which is not a pattern or muted won't be played
 		if( p == NULL || ( *it )->isMuted() )
 		{
@@ -695,7 +695,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 trackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 {
-	return new pattern( this );
+	return new Pattern( this );
 }
 
 

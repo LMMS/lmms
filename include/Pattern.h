@@ -1,5 +1,5 @@
 /*
- * pattern.h - declaration of class pattern, which contains all informations
+ * Pattern.h - declaration of class Pattern, which contains all information
  *             about a pattern
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -46,7 +46,7 @@ class SampleBuffer;
 
 
 
-class EXPORT pattern : public trackContentObject
+class EXPORT Pattern : public trackContentObject
 {
 	Q_OBJECT
 public:
@@ -56,9 +56,9 @@ public:
 		MelodyPattern
 	} ;
 
-	pattern( InstrumentTrack * _instrument_track );
-	pattern( const pattern & _pat_to_copy );
-	virtual ~pattern();
+	Pattern( InstrumentTrack* instrumentTrack );
+	Pattern( const Pattern& other );
+	virtual ~Pattern();
 
 	void init();
 
@@ -137,14 +137,18 @@ private:
 	NoteVector m_notes;
 	int m_steps;
 
-	friend class patternView;
+	friend class PatternView;
 	friend class bbEditor;
+
+
+signals:
+	void destroyedPattern( Pattern* );
 
 } ;
 
 
 
-class patternView : public trackContentObjectView
+class PatternView : public trackContentObjectView
 {
 	Q_OBJECT
 
@@ -152,8 +156,8 @@ class patternView : public trackContentObjectView
 	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 public:
-	patternView( pattern * _pattern, trackView * _parent );
-	virtual ~patternView();
+	PatternView( Pattern* pattern, trackView* parent );
+	virtual ~PatternView();
 
 
 public slots:
@@ -186,7 +190,7 @@ private:
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
-	pattern * m_pat;
+	Pattern* m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
 } ;

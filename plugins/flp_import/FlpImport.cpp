@@ -48,7 +48,7 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "knob.h"
 #include "Oscillator.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "Piano.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -1542,8 +1542,7 @@ else
 		{
 			const int pat = *jt / 256;
 			const int pos = *jt % 256;
-			pattern * p =
-				dynamic_cast<pattern *>( t->getTCO( pat ) );
+			Pattern* p = dynamic_cast<Pattern*>( t->getTCO( pat ) );
 			if( p == NULL )
 			{
 				continue;
@@ -1567,7 +1566,7 @@ else
 			{
 				continue;
 			}
-			pattern * p = dynamic_cast<pattern *>( t->getTCO( pat ) );
+			Pattern* p = dynamic_cast<Pattern*>( t->getTCO( pat ) );
 			if( p != NULL )
 			{
 				p->addNote( jt->second, false );

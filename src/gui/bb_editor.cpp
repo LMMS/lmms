@@ -39,7 +39,7 @@
 #include "string_pair_drag.h"
 
 #include "TrackContainer.h"
-#include "pattern.h"
+#include "Pattern.h"
 
 
 
@@ -256,8 +256,7 @@ void bbEditor::addSteps()
 	{
 		if( ( *it )->type() == track::InstrumentTrack )
 		{
-			pattern * p = static_cast<pattern *>(
-				( *it )->getTCO( m_bbtc->currentBB() ) );
+			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			p->addSteps();
 		}
 	}
@@ -275,8 +274,7 @@ void bbEditor::removeSteps()
 	{
 		if( ( *it )->type() == track::InstrumentTrack )
 		{
-			pattern * p = static_cast<pattern *>(
-				( *it )->getTCO( m_bbtc->currentBB() ) );
+			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			p->removeSteps();
 		}
 	}

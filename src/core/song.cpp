@@ -51,7 +51,7 @@
 #include "MidiClient.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -473,14 +473,14 @@ void song::playBB()
 
 
 
-void song::playPattern( pattern * _patternToPlay, bool _loop )
+void song::playPattern( Pattern* patternToPlay, bool _loop )
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_patternToPlay = _patternToPlay;
+	m_patternToPlay = patternToPlay;
 	m_loopPattern = _loop;
 
 	if( m_patternToPlay != NULL )

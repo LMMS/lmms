@@ -33,7 +33,6 @@
 #include "SampleBuffer.h"
 
 class bbTrack;
-class pattern;
 class SampleTCO;
 class track;
 

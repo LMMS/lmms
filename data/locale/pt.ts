@@ -5400,7 +5400,7 @@ Clicando duas vezes com o mouse em qualquer plugin, voc6e terá informações so
     </message>
 </context>
 <context>
-    <name>patternView</name>
+    <name>PatternView</name>
     <message>
         <source>Open in piano-roll</source>
         <translation>Abrir no Editor de Notas MIDI</translation>

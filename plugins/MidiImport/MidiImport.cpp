@@ -35,7 +35,7 @@
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
 #include "config_mgr.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "Instrument.h"
 #include "MainWindow.h"
 #include "MidiTime.h"
@@ -209,7 +209,7 @@ public:
 	{ }
 	
 	InstrumentTrack * it;
-	pattern * p;
+	Pattern* p;
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
@@ -249,7 +249,7 @@ public:
 		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
 		{
 			MidiTime pPos = MidiTime( n.pos().getTact(), 0 );
-			p = dynamic_cast<pattern *>( it->createTCO( 0 ) );
+			p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
 			p->movePosition( pPos );
 		}
 		hasNotes = true;
