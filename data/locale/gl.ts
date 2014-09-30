@@ -504,7 +504,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ganancia:</translation>
     </message>
     <message>
         <source>RATIO</source>

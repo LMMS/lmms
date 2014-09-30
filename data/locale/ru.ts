@@ -1415,7 +1415,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Заглушить</translation>
     </message>
     <message>
         <source>Mute this FX channel</source>
