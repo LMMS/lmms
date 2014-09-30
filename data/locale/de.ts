@@ -5700,7 +5700,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
 </context>
 <context>
-    <name>patternView</name>
+    <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>

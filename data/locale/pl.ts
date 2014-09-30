@@ -5112,7 +5112,7 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
 </context>
 <context>
-    <name>patternView</name>
+    <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>

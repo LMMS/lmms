@@ -13,7 +13,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "note.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "track.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
@@ -270,7 +270,7 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + nbb;
 				pattern_id[sName] = pattern_count - 1;
-				pattern *p = dynamic_cast<pattern *>( drum_track[instrId]->getTCO( i ) );
+				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getTCO( i ) );
 				note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 

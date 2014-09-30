@@ -35,7 +35,7 @@
 #include "ladspa_2_lmms.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "PianoRoll.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"

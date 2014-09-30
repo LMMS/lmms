@@ -517,7 +517,7 @@ TrackContainerView QLabel
 /* Patterns */
 
 /* instrument pattern */
-patternView {
+PatternView {
 	color: rgb( 119, 199, 216 );
 	qproperty-fgColor: rgb( 187, 227, 236 );
 	qproperty-textColor: rgb( 255, 255, 255 );

@@ -5075,7 +5075,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>patternView</name>
+    <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
