@@ -145,7 +145,7 @@ int AudioAlsa::handleError( int _err )
 		// under-run
 		_err = snd_pcm_prepare( m_handle );
 		if( _err < 0 )
-			printf( "Can't recovery from underrun, prepare "
+			printf( "Can't recover from underrun, prepare "
 					"failed: %s\n", snd_strerror( _err ) );
 		return ( 0 );
 	}
@@ -162,7 +162,7 @@ int AudioAlsa::handleError( int _err )
 		{
 			_err = snd_pcm_prepare( m_handle );
 			if( _err < 0 )
-				printf( "Can't recovery from suspend, prepare "
+				printf( "Can't recover from suspend, prepare "
 					"failed: %s\n", snd_strerror( _err ) );
 		}
 		return ( 0 );
