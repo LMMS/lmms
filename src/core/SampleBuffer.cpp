@@ -84,6 +84,7 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 	{
 		loadFromBase64( _audio_file );
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -111,6 +112,7 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -138,6 +140,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -152,7 +155,10 @@ SampleBuffer::~SampleBuffer()
 
 
 
-
+void SampleBuffer::sampleRateChanged()
+{
+	update();
+}
 
 
 void SampleBuffer::update( bool _keep_settings )

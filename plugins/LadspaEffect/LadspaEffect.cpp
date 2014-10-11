@@ -307,6 +307,8 @@ void LadspaEffect::pluginInstantiation()
 	int inputch = 0;
 	int outputch = 0;
 	LADSPA_Data * inbuf [2];
+	inbuf[0] = NULL;
+	inbuf[1] = NULL;
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
 		multi_proc_t ports;
@@ -335,7 +337,7 @@ void LadspaEffect::pluginInstantiation()
 					manager->isPortOutput( m_key, port ) )
 				{
 					p->rate = CHANNEL_OUT;
-					if( ! m_inPlaceBroken )
+					if( ! m_inPlaceBroken && inbuf[ outputch ] )
 					{
 						p->buffer = inbuf[ outputch ];
 						outputch++;
@@ -343,6 +345,7 @@ void LadspaEffect::pluginInstantiation()
 					else
 					{
 						p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+						m_inPlaceBroken = true;
 					}
 				}
 				else if( manager->isPortInput( m_key, port ) )

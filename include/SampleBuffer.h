@@ -267,7 +267,7 @@ public slots:
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
 	void setReversed( bool _on );
-
+	void sampleRateChanged();
 
 private:
 	void update( bool _keep_settings = false );
