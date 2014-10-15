@@ -131,9 +131,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 					_buf[f][0] += ch_buf[f][0] * v;
 					_buf[f][1] += ch_buf[f][1] * v;
 				}
+				m_hasInput = true;
 			}
-			// if sender channel hasInput, then we hasInput too
-			if( sender->m_hasInput ) { m_hasInput = true; }
 		}
 	}
 
