@@ -119,6 +119,7 @@ void FxChannel::unmuteForSolo()
 void FxChannel::doProcessing()
 {
 	const fpp_t fpp = engine::mixer()->framesPerPeriod();
+	const bool exporting = engine::getSong()->isExporting();
 
 	if( m_muted == false )
 	{
@@ -141,21 +142,25 @@ void FxChannel::doProcessing()
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * sendModel->value();
-					MixHelpers::addMultiplied( m_buffer, ch_buf, v, fpp );
+					if( exporting ) { MixHelpers::addSanitizedMultiplied( m_buffer, ch_buf, v, fpp ); }
+					else { MixHelpers::addMultiplied( m_buffer, ch_buf, v, fpp ); }
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					MixHelpers::addMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp );					
+					if( exporting ) { MixHelpers::addSanitizedMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp ); }
+					else { MixHelpers::addMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp ); }
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp );
+					if( exporting ) { MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp ); }
+					else { MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp ); }
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
+					if( exporting ) { MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp ); }
+					else { MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp ); }
 				}
 				m_hasInput = true;
 			}
