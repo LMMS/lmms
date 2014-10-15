@@ -49,6 +49,7 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 {
 	setStyle( stylearg );
 	stylearg->polish( this );
+	ensurePolished();
 }
 
 LmmsPalette::~LmmsPalette()

@@ -982,7 +982,6 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget->setAutoFillBackground(true);
 
 	m_vi->m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
-	m_vi->m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_vi->m_scrollArea->setPalette( QApplication::palette( m_vi->m_scrollArea ) );
 	m_vi->m_scrollArea->setMinimumHeight( 64 );
 

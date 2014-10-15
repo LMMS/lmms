@@ -1,7 +1,7 @@
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -145,10 +145,11 @@ int AudioAlsa::handleError( int _err )
 		// under-run
 		_err = snd_pcm_prepare( m_handle );
 		if( _err < 0 )
-			printf( "Can't recovery from underrun, prepare "
+			printf( "Can't recover from underrun, prepare "
 					"failed: %s\n", snd_strerror( _err ) );
 		return ( 0 );
 	}
+#ifdef ESTRPIPE
 	else if( _err == -ESTRPIPE )
 	{
 		while( ( _err = snd_pcm_resume( m_handle ) ) == -EAGAIN )
@@ -161,11 +162,12 @@ int AudioAlsa::handleError( int _err )
 		{
 			_err = snd_pcm_prepare( m_handle );
 			if( _err < 0 )
-				printf( "Can't recovery from suspend, prepare "
+				printf( "Can't recover from suspend, prepare "
 					"failed: %s\n", snd_strerror( _err ) );
 		}
 		return ( 0 );
 	}
+#endif
 	return _err;
 }
 

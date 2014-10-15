@@ -399,8 +399,6 @@ int main( int argc, char * * argv )
 		QApplication::setStyle( lmmsstyle );
 		
 		LmmsPalette * lmmspal = new LmmsPalette( NULL, lmmsstyle );
-		lmmspal->show();	// necessary to get properties
-		lmmspal->hide();		
 		QPalette lpal = lmmspal->palette();
 
 		QApplication::setPalette( lpal );

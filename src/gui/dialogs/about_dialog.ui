@@ -43,7 +43,7 @@
           <string notr="true" >font:12pt; font-weight:bold;</string>
          </property>
          <property name="text" >
-          <string>LMMS (Linux MultiMedia Studio)</string>
+          <string>LMMS</string>
          </property>
         </widget>
        </item>
