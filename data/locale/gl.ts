@@ -8,10 +8,6 @@
         <translation>Sobre o LMMS</translation>
     </message>
     <message>
-        <source>LMMS (Linux MultiMedia Studio)</source>
-        <translation>LMMS (Estudio Multimedia de Linux)</translation>
-    </message>
-    <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
         <translation>Versión %1 (%2/%3, Qt %4, %5)</translation>
     </message>
@@ -50,6 +46,10 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS</source>
+        <translation type="unfinished">LMMS</translation>
     </message>
 </context>
 <context>
@@ -504,7 +504,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ganancia:</translation>
     </message>
     <message>
         <source>RATIO</source>

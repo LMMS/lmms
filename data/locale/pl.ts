@@ -8,10 +8,6 @@
         <translation>O programie LMMS</translation>
     </message>
     <message>
-        <source>LMMS (Linux MultiMedia Studio)</source>
-        <translation>LMMS (Linux MultiMedia Studio)</translation>
-    </message>
-    <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
         <translation>Wersja %1 (%2/%3, Qt %4, %5)</translation>
     </message>
@@ -54,6 +50,10 @@ Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail:
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS</source>
+        <translation type="unfinished">LMMS</translation>
     </message>
 </context>
 <context>
