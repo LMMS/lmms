@@ -178,7 +178,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
         fDescriptor->activate(fHandle);
 
     // we need a play-handle which cares for calling play()
-    InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
+    InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
     engine::mixer()->addPlayHandle( iph );
 
     connect(engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
