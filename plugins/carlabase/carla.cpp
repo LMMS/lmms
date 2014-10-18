@@ -525,3 +525,4 @@ void CarlaInstrumentView::timerEvent(QTimerEvent* event)
 
 // -------------------------------------------------------------------
 
+#include "moc_carla.cxx"
