@@ -5,7 +5,7 @@
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LMMS について</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
