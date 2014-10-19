@@ -4346,11 +4346,11 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Value: %1%</source>
-        <translation type="unfinished">ボリウム %1%</translation>
+        <translation type="unfinished">音量: %1%</translation>
     </message>
     <message>
         <source>Value: %1 semitones</source>
-        <translation type="unfinished">ボリウム %1 半音</translation>
+        <translation type="unfinished">音量: %1 半音</translation>
     </message>
     <message>
         <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
@@ -4387,7 +4387,7 @@ Reason: &quot;%2&quot;</source>
     <name>TempoSyncKnob</name>
     <message>
         <source>Tempo Sync</source>
-        <translation type="unfinished">テンポ同期</translation>
+        <translation type="unfinished">テンポの同期</translation>
     </message>
     <message>
         <source>No Sync</source>
@@ -4395,7 +4395,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Eight beats</source>
-        <translation type="unfinished">エイトビート</translation>
+        <translation type="unfinished">8ビート</translation>
     </message>
     <message>
         <source>Whole note</source>
@@ -4423,19 +4423,19 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Custom...</source>
-        <translation type="unfinished">カスタム</translation>
+        <translation>カスタム...</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished">ヘルプ(&amp;H)</translation>
+        <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
         <source>Custom </source>
-        <translation type="unfinished">カスタム</translation>
+        <translation>カスタム</translation>
     </message>
     <message>
         <source>Synced to Eight Beats</source>
-        <translation type="unfinished">エイトビートに同期</translation>
+        <translation type="unfinished">8ビートに同期</translation>
     </message>
     <message>
         <source>Synced to Whole Note</source>
@@ -4473,27 +4473,27 @@ Reason: &quot;%2&quot;</source>
     <name>TrackContainer</name>
     <message>
         <source>Couldn&apos;t import file</source>
-        <translation type="unfinished">ファイルをインポートできません</translation>
+        <translation type="unfinished">ファイルをインポートすることができませんでした</translation>
     </message>
     <message>
         <source>Couldn&apos;t find a filter for importing file %1.
 You should convert this file into a format supported by LMMS using another software.</source>
-        <translation type="unfinished">ファイル %1をインポート中フィルターが見つかりませんでした。
-ほかのソフトウェアで、このファイルをLMMSでサポートしてるフォーマットに変換してください。</translation>
+        <translation type="unfinished">インポート中のファイル %1のフィルターが見つかりませんでした。
+他のソフトウェアで、このファイルをLMMSがサポートしてるフォーマットに変換してください。</translation>
     </message>
     <message>
         <source>Couldn&apos;t open file</source>
-        <translation type="unfinished">ファイルをオープンできません。</translation>
+        <translation type="unfinished">ファイルを開くことができませんでした</translation>
     </message>
     <message>
         <source>Couldn&apos;t open file %1 for reading.
 Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished">ファイル %1 を読み込み用にオープンできません。
-ファイルとファイルの入ってるディレクトリが読み込み可能かチェックしてもう一度読み込んでください。</translation>
+        <translation type="unfinished">ファイル %1 を読み込み用に開くことができませんでした。
+ファイルとファイルのディレクトリが読み込み可能かチェックしてから再度読み込んでください!</translation>
     </message>
     <message>
         <source>Loading project...</source>
-        <translation type="unfinished">プロジェクトロード中</translation>
+        <translation type="unfinished">プロジェクトをロードしています...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -4505,11 +4505,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Importing MIDI-file...</source>
-        <translation type="unfinished">MIDI-ファイルをインポート中...</translation>
+        <translation type="unfinished">MIDI-ファイルをインポートしています...</translation>
     </message>
     <message>
         <source>Importing FLP-file...</source>
-        <translation type="unfinished">FLP-ファイルをインポート中...</translation>
+        <translation type="unfinished">FLP-ファイルをインポートしています...</translation>
     </message>
 </context>
 <context>
@@ -4681,19 +4681,19 @@ Please make sure you have read-permission to the file and the directory containi
     <name>VestigeInstrumentView</name>
     <message>
         <source>Open other VST-plugin</source>
-        <translation type="unfinished">ほかの VST-プラグインをオープン</translation>
+        <translation type="unfinished">他の VST-プラグインを開く</translation>
     </message>
     <message>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
-        <translation type="unfinished">ほかの VST-プラグインをオープンしたいならクリック。このボタンをクリックするとファイルオープンダイアログが現れてファイルを選べます。</translation>
+        <translation type="unfinished">他の VST-プラグインを開くときはここをクリックします。クリックすると「ファイルを開く」ダイアログが表示され、ファイルを選択することができます。</translation>
     </message>
     <message>
         <source>Show/hide GUI</source>
-        <translation type="unfinished">GUIの表示/非表示</translation>
+        <translation type="unfinished">GUIを表示/非表示</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
-        <translation type="unfinished">ここをクリックすると　VST-プラグインのグラフィカルユーザーインターフェース（GUI)が表示されたり非表示になったりします。</translation>
+        <translation type="unfinished">ここをクリックするとVST-プラグインのグラフィカルユーザーインターフェース（GUI)の表示/非表示を切り替えます。</translation>
     </message>
     <message>
         <source>Turn off all notes</source>
@@ -7535,7 +7535,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">ボリウム</translation>
+        <translation type="unfinished">音量</translation>
     </message>
     <message>
         <source>Chip model</source>
@@ -7685,7 +7685,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Master volume</source>
-        <translation type="unfinished">マスターボリウム</translation>
+        <translation type="unfinished">マスター音量</translation>
     </message>
     <message>
         <source>Master pitch</source>
@@ -7697,7 +7697,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>The project %1 is now saved.</source>
-        <translation type="unfinished">プロジェクト %1 をセーブしました</translation>
+        <translation type="unfinished">プロジェクト %1 を保存しました</translation>
     </message>
     <message>
         <source>Project NOT saved.</source>
