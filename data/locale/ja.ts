@@ -4125,58 +4125,58 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>File: </source>
-        <translation type="unfinished">ファイル</translation>
+        <translation type="unfinished">ファイル:</translation>
     </message>
     <message>
         <source>File: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイル: %1</translation>
     </message>
 </context>
 <context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">オーディオファイルを開く</translation>
     </message>
     <message>
         <source>Wave-Files (*.wav)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">WAV ファイル (*.wav)</translation>
     </message>
     <message>
         <source>OGG-Files (*.ogg)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OGG ファイル (*.ogg)</translation>
     </message>
     <message>
         <source>DrumSynth-Files (*.ds)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DrumSynth ファイル (*.ds)</translation>
     </message>
     <message>
         <source>FLAC-Files (*.flac)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FLAC ファイル (*.flac)</translation>
     </message>
     <message>
         <source>SPEEX-Files (*.spx)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SPEEX ファイル (*.spx)</translation>
     </message>
     <message>
         <source>VOC-Files (*.voc)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VOC ファイル (*.voc)</translation>
     </message>
     <message>
         <source>AIFF-Files (*.aif *.aiff)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AIFF ファイル (*.aif *.aiff)</translation>
     </message>
     <message>
         <source>AU-Files (*.au)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AU ファイル (*.au)</translation>
     </message>
     <message>
         <source>RAW-Files (*.raw)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RAW ファイル (*.raw)</translation>
     </message>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">すべてのオーディオファイル (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</translation>
     </message>
 </context>
 <context>
@@ -4187,11 +4187,11 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Delete (middle mousebutton)</source>
-        <translation type="unfinished">消去（マウス中ボタン）</translation>
+        <translation type="unfinished">削除 (マウス中ボタン)</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished">カット</translation>
+        <translation type="unfinished">切り取り</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -4199,7 +4199,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished">ペースト</translation>
+        <translation type="unfinished">貼り付け</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
@@ -6895,23 +6895,23 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>pluginBrowser</name>
     <message>
         <source>no description</source>
-        <translation type="unfinished">記述なし</translation>
+        <translation type="unfinished">説明なし</translation>
     </message>
     <message>
         <source>Instrument plugins</source>
-        <translation type="unfinished">楽器プラグイン</translation>
+        <translation type="unfinished">Instrument Plugins</translation>
     </message>
     <message>
         <source>Incomplete monophonic imitation tb303</source>
-        <translation type="unfinished">tb303の不完全なモノフォニックイミテーション</translation>
+        <translation type="unfinished">不完全なモノフォニック イミテーション tb303</translation>
     </message>
     <message>
         <source>Plugin for freely manipulating stereo output</source>
-        <translation type="unfinished">ステレオ出力を自由にいじるプラグイン</translation>
+        <translation type="unfinished">ステレオ出力を自由に操作するプラグイン</translation>
     </message>
     <message>
         <source>Plugin for controlling knobs with sound peaks</source>
-        <translation type="unfinished">サウンドのピークでつまみをコントロールするプラグイン</translation>
+        <translation type="unfinished">サウンドのピークをつまみでコントロールするプラグイン</translation>
     </message>
     <message>
         <source>Plugin for enhancing stereo separation of a stereo input file</source>
@@ -6919,57 +6919,57 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>List installed LADSPA plugins</source>
-        <translation type="unfinished">インストールされてる LADSPA プラグインのリスト</translation>
+        <translation type="unfinished">インストールされている LADSPA プラグインのリスト</translation>
     </message>
     <message>
         <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation type="unfinished">FL Studio のプロジェクトをLMMSにインポートするフィルター</translation>
+        <translation type="unfinished">FL Studio プロジェクトを LMMS にインポートするためのフィルター</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
-        <translation type="unfinished">GUS互換パッチの楽器</translation>
+        <translation type="unfinished">GUS互換パッチのインストゥルメント</translation>
     </message>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
-        <translation type="unfinished">オルガンみたいなサウンドのための付加的シンセサイザー</translation>
+        <translation type="unfinished">オルガン風サウンドのアディティブ シンセサイザー</translation>
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation type="unfinished">どんどんたたく音楽的な音をだすもの</translation>
+        <translation type="unfinished">打楽器風の音色を奏でるインストゥルメント</translation>
     </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
-        <translation type="unfinished"> VST(i)プラグインをLMMSでつかうためのVSTホスト</translation>
+        <translation type="unfinished">VST(i)プラグインを LMMS で使用するためのVSTホスト</translation>
     </message>
     <message>
         <source>Vibrating string modeler</source>
-        <translation type="unfinished">バイブレーティングストリングモジュレータ</translation>
+        <translation type="unfinished">バイブレーティング ストリング モジュレーター</translation>
     </message>
     <message>
         <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
-        <translation type="unfinished">任意のLADSPAエフェクトをLMMSで使うためのプラグイン</translation>
+        <translation type="unfinished">任意の LADSPA エフェクトを LMMS で使うためのプラグイン</translation>
     </message>
     <message>
         <source>Filter for importing MIDI-files into LMMS</source>
-        <translation type="unfinished">MIDIファイルをLMMSにインポートするためのフィルタ</translation>
+        <translation type="unfinished">MIDI ファイルを LMMS にインポートするためのフィルター</translation>
     </message>
     <message>
         <source>Instrument browser</source>
-        <translation type="unfinished">楽器ブラウザ</translation>
+        <translation type="unfinished">Instrument Browser</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation type="unfinished">楽器を　ソングエディタまたはビート＋ベースラインエディタまたは存在する楽器トラックにドラッグできます。</translation>
+        <translation type="unfinished">インストゥルメントをSong-EditorやBeat+Bassline Editorまたは存在する Instrument Trackにドラッグしてください。</translation>
     </message>
     <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
 This chip was used in the Commodore 64 computer.</source>
-        <translation type="unfinished">MOS6581 and MOS8580 SIDのエミュレーション。
-このチップはコモドール64コンピュータで採用されていた。</translation>
+        <translation type="unfinished">MOS6581やMOS8580 SIDのエミュレーション。
+このチップはCommodore 64 computerで採用されていました。</translation>
     </message>
     <message>
         <source>Player for SoundFont files</source>
-        <translation type="unfinished">サウンドフォントファイルのプレイヤー</translation>
+        <translation type="unfinished">サウンドフォント ファイル用プレイヤー</translation>
     </message>
     <message>
         <source>Emulation of GameBoy (TM) APU</source>
@@ -6977,11 +6977,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Customizable wavetable synthesizer</source>
-        <translation type="unfinished">カストマイズ可能なウエーブテーブルシンセサイザー</translation>
+        <translation type="unfinished">カスタマイズ可能なウェーブテーブルシンセサイザー</translation>
     </message>
     <message>
         <source>Embedded ZynAddSubFX</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">埋め込み ZynAddSubFX</translation>
     </message>
     <message>
         <source>2-operator FM Synth</source>
@@ -7001,7 +7001,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">様々な方法でモジュレートできる3つのパワフルなオシレータ群</translation>
     </message>
     <message>
         <source>A native amplifier plugin</source>
@@ -7056,19 +7056,19 @@ This chip was used in the Commodore 64 computer.</source>
     <name>projectNotes</name>
     <message>
         <source>Project notes</source>
-        <translation type="unfinished">プロジェクトノート</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Put down your project notes here.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ここにプロジェクトに関するメモを記入してください。</translation>
     </message>
     <message>
         <source>Edit Actions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">編集機能</translation>
     </message>
     <message>
         <source>&amp;Undo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">元に戻す(&amp;U)</translation>
     </message>
     <message>
         <source>Ctrl+Z</source>
@@ -7076,7 +7076,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Redo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">やり直し(&amp;R)</translation>
     </message>
     <message>
         <source>Ctrl+Y</source>
@@ -7084,7 +7084,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">コピー(&amp;C)</translation>
     </message>
     <message>
         <source>Ctrl+C</source>
@@ -7092,7 +7092,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">切り取り(&amp;t)</translation>
     </message>
     <message>
         <source>Ctrl+X</source>
@@ -7100,7 +7100,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">貼り付け(&amp;P)</translation>
     </message>
     <message>
         <source>Ctrl+V</source>
@@ -7108,11 +7108,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Format Actions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">フォーマット機能</translation>
     </message>
     <message>
         <source>&amp;Bold</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">太字(&amp;B)</translation>
     </message>
     <message>
         <source>Ctrl+B</source>
@@ -7120,7 +7120,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Italic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">斜体(&amp;I)</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
@@ -7128,7 +7128,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Underline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">下線(&amp;U)</translation>
     </message>
     <message>
         <source>Ctrl+U</source>
@@ -7136,7 +7136,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">左揃え(&amp;L)</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
@@ -7144,7 +7144,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>C&amp;enter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">中央揃え(&amp;e)</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
@@ -7152,7 +7152,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">右揃え(&amp;R)</translation>
     </message>
     <message>
         <source>Ctrl+R</source>
@@ -7160,7 +7160,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Justify</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">両端揃え(&amp;J)</translation>
     </message>
     <message>
         <source>Ctrl+J</source>
@@ -7168,14 +7168,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&amp;Color...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">文字の色(&amp;C)...</translation>
     </message>
 </context>
 <context>
     <name>renameDialog</name>
     <message>
         <source>Rename...</source>
-        <translation type="unfinished">リネーム</translation>
+        <translation type="unfinished">名前の変更...</translation>
     </message>
 </context>
 <context>
@@ -7202,15 +7202,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Enable tooltips</source>
-        <translation type="unfinished">ツールチップを有効</translation>
+        <translation type="unfinished">ツールチップを有効にする</translation>
     </message>
     <message>
         <source>Show restart warning after changing settings</source>
-        <translation type="unfinished">設定変更後に「再起動警告」を表示</translation>
+        <translation type="unfinished">設定変更後に「再起動警告」を表示する</translation>
     </message>
     <message>
         <source>Display volume as dBV </source>
-        <translation type="unfinished">音量を dBV で表示</translation>
+        <translation type="unfinished">音量を dBV で表示する</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
@@ -7364,15 +7364,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Enable waveform display by default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">デフォルトで波形表示を有効にする</translation>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Song Editor でスムーズ スクロールする</translation>
     </message>
     <message>
         <source>Enable auto save feature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">自動保存機能を有効にする</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
@@ -7383,19 +7383,19 @@ Latency: %2 ms</source>
     <name>sf2Instrument</name>
     <message>
         <source>Bank</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">バンク</translation>
     </message>
     <message>
         <source>Patch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">パッチ</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ゲイン</translation>
     </message>
     <message>
         <source>Reverb</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">リバーブ</translation>
     </message>
     <message>
         <source>Reverb Roomsize</source>
@@ -7809,23 +7809,23 @@ Latency: %2 ms</source>
     <name>timeLine</name>
     <message>
         <source>Enable/disable auto-scrolling</source>
-        <translation type="unfinished">オートスクロールの ON/OFF</translation>
+        <translation type="unfinished">オートスクロールを有効/無効</translation>
     </message>
     <message>
         <source>Enable/disable loop-points</source>
-        <translation type="unfinished">ループポイントの ON/OFF</translation>
+        <translation type="unfinished">ループポイントを有効/無効</translation>
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="unfinished">終了後　開始位置にもどる</translation>
+        <translation type="unfinished">終了後、開始位置に戻る</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="unfinished">終了後　再生が開始された位置にもどる</translation>
+        <translation type="unfinished">終了後、再生が開始された位置に戻る</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
-        <translation type="unfinished">終了後　その位置のまま</translation>
+        <translation type="unfinished">終了後、位置を保持する</translation>
     </message>
     <message>
         <source>Hint</source>
@@ -7833,7 +7833,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">マグネティック ループポイントを無効化するには&lt;Ctrl&gt;を押してください。</translation>
     </message>
     <message>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
@@ -7890,7 +7890,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished">カット</translation>
+        <translation type="unfinished">切り取り</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -7898,7 +7898,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished">ペースト</translation>
+        <translation type="unfinished">貼り付け</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
@@ -7909,7 +7909,7 @@ Latency: %2 ms</source>
     <name>trackOperationsWidget</name>
     <message>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished">移動グリップをクリック中に &lt;Ctl &gt;を押せば　新しいドラッグ＆ドロップアクションを始められます。</translation>
+        <translation type="unfinished">新しいドラッグ＆ドロップアクションを開始するには、移動グリップをクリック中に &lt;Ctrl&gt;を押してください。</translation>
     </message>
     <message>
         <source>Actions for this track</source>
@@ -7929,15 +7929,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Clone this track</source>
-        <translation type="unfinished">トラックを複製</translation>
+        <translation type="unfinished">このトラックを複製</translation>
     </message>
     <message>
         <source>Remove this track</source>
-        <translation type="unfinished">トラックを消去</translation>
+        <translation type="unfinished">このトラックを削除</translation>
     </message>
     <message>
         <source>Clear this track</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">このトラックをクリア</translation>
     </message>
     <message>
         <source>Turn all recording on</source>
@@ -7952,32 +7952,32 @@ Latency: %2 ms</source>
     <name>vestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
-        <translation type="unfinished">プラグインをロード中</translation>
+        <translation type="unfinished">プラグインをロードしています</translation>
     </message>
     <message>
         <source>Please wait while loading VST-plugin...</source>
-        <translation type="unfinished">VST-プラグインをロードする間お待ちください</translation>
+        <translation type="unfinished">VST-プラグインをロードする間お待ちください...</translation>
     </message>
     <message>
         <source>Failed loading VST-plugin</source>
-        <translation type="unfinished">VST-プラグインのロード失敗</translation>
+        <translation type="unfinished">VST-プラグインのロードに失敗しました</translation>
     </message>
     <message>
         <source>The VST-plugin %1 could not be loaded for some reason.
 If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
-        <translation type="unfinished">VST-plugin %1　がいくつかの理由でロードできませんでした。
-もしそのVSTがLinuxのほかのVST-ソフトウェアで動くなら LMMS の開発者に連絡してください。</translation>
+        <translation type="unfinished">VST-plugin %1 がいくつかの理由でロードできませんでした。
+もしその VST が Linuxの他のVST-ソフトウェアで動作するならば LMMS の開発者に連絡してください!</translation>
     </message>
 </context>
 <context>
     <name>vibed</name>
     <message>
         <source>String %1 volume</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストリング %1 の音量</translation>
     </message>
     <message>
         <source>String %1 stiffness</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストリング %1 のスティフネス</translation>
     </message>
     <message>
         <source>Pick %1 position</source>
@@ -8016,67 +8016,67 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     <name>vibedView</name>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">音量:</translation>
     </message>
     <message>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
-        <translation type="unfinished">V つまみで選択したストリングのボリウムをセットします。</translation>
+        <translation type="unfinished">V つまみでは選択したストリングの音量を設定します。</translation>
     </message>
     <message>
         <source>String stiffness:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストリングのスティフネス:</translation>
     </message>
     <message>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
-        <translation type="unfinished">S つまみで選択したストリングのスチフネス（堅さ）をセットします。　ストリングのスチフネスはストリングがどれだけ長くなり響くかに影響します。値をちいさくするとストリングは長く鳴り響きます。</translation>
+        <translation type="unfinished">S つまみで選択したストリングのスティフネス（堅さ）を設定します。ストリングのスティフネスはストリングがどれだけ長く鳴り響くかに影響します。値を小さくするほどストリングは長く鳴り響きます。</translation>
     </message>
     <message>
         <source>Pick position:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ピック位置:</translation>
     </message>
     <message>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
-        <translation type="unfinished">P つまみでストリングがピッキングされる位置をセットします。値が小さいほどブリッジに近いところがピッキングされます。</translation>
+        <translation type="unfinished">P つまみでは、選択したストリングをピッキングする位置を指定します。指定した値が小さいほど、ブリッジに近い箇所がピッキングされます。</translation>
     </message>
     <message>
         <source>Pickup position:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ピックアップ位置:</translation>
     </message>
     <message>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
-        <translation type="unfinished">PUつまみで選択したストリングのどの位置で振動をモニターするかをセットします。　小さい値ほどブリッジとピックアップの位置がちかいことになります。</translation>
+        <translation type="unfinished">PU つまみでは選択したストリングのどの位置で振動をモニターするかを設定します。値が小さくなるほどブリッジとピックアップの位置が近くなります。</translation>
     </message>
     <message>
         <source>Pan:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">パン:</translation>
     </message>
     <message>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
-        <translation type="unfinished">Pan つまみはステレオ音場中の選択したストリングの位置を指定します。</translation>
+        <translation type="unfinished">Pan つまみではステレオ音場中の選択したストリングの位置を指定します。</translation>
     </message>
     <message>
         <source>Detune:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ディチューン:</translation>
     </message>
     <message>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
-        <translation type="unfinished">Detune つまみは選択したストリングのピッチを変更します。ゼロより小さい値を設定するとフラットになります。ゼロより大きい値を指定するとシャープになります。</translation>
+        <translation type="unfinished">Detune つまみでは選択したストリングのピッチを変更します。ゼロより小さい値を指定すると音がフラットになります。ゼロより大きい値を指定すると音がシャープになります。</translation>
     </message>
     <message>
         <source>Fuzziness:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファジネス:</translation>
     </message>
     <message>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
-        <translation type="unfinished">Slapつまみは選択されたストリングに少しだけファズを加えます。アタック期間にもっとも明確な影響があります。ストリングを金属ぽい音にするのにつかえます。</translation>
+        <translation type="unfinished">Slap つまみでは選択したストリングに少しだけファズを追加します。アタックの際にとてもはっきりとこの効果を理解できます。ストリングを金属風の音にするのに使用できます。</translation>
     </message>
     <message>
         <source>Length:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">長さ:</translation>
     </message>
     <message>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
-        <translation type="unfinished">Length つまみで選択されたストリングの長さをセットします。より長いストリングは、より長い間鳴って、より明るく聞こえるでしょう、しかし、よりCPUサイクルを食います。</translation>
+        <translation type="unfinished">Length つまみでは選択したストリングの長さを指定します。ストリングを長くすれば、長い時間鳴り、より明るく聞こえます。しかし、よりCPUサイクルを消費します。</translation>
     </message>
     <message>
         <source>Impulse or initial state</source>
@@ -8084,15 +8084,15 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
-        <translation type="unfinished">Imp セレクタは　グラフの波形がピッキングによってストリングに与えられるインパルスとして扱われるかストリングの初期状態として扱われるかをきめます。</translation>
+        <translation type="unfinished">Imp セレクタは、グラフの波形がピッキングによってストリングに与えられるインパルスとして扱われるのか、ストリングの初期状態として扱われるのかを指定します。</translation>
     </message>
     <message>
         <source>Octave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">オクターブ</translation>
     </message>
     <message>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
-        <translation type="unfinished">オクターブセレクタはストリングでノートのどの倍音が鳴るかをを選べます。&apos;-2&apos;は基音のしたオクターブまで鳴ることを意味します。&apos;F&apos;はストリングが基音で鳴ることを意味します。&apos;6&apos;はストリングが基本から６オクターブの間でなることを意味します。</translation>
+        <translation type="unfinished">オクターブセレクタは、ストリングをノートのどの倍音で鳴らすかを選択するために使用します。例えば、'-2'は基音の2オクターブ下まで鳴ることを意味し、'F'は、ストリングが基音で鳴ることを意味します。そして'6'は、ストリングが基本から6オクターブ上で鳴ることを意味します。</translation>
     </message>
     <message>
         <source>Impulse Editor</source>
@@ -8106,14 +8106,13 @@ The waveform can also be drawn in the graph.
 The &apos;S&apos; button will smooth the waveform.
 
 The &apos;N&apos; button will normalize the waveform.</source>
-        <translation type="unfinished">The waveform editor provides control over the initial state or impulse that is used to start the string vibrating.  The buttons to the right of the graph will initialize the waveform to the selected type.  The &apos;?&apos; button will load a waveform from a file--only the first 128 samples will be loaded.
-波形エディタは、ストリングの振動開始字に使われる初期状態またはインパルスのコントロールに使います。グラフの右側のボタンで波形をを選択したタイプに初期化します。&apos;?&apos; ぼたんでファイルから波形をロードします--最初の128個のサンプルだけがロードされます。
+        <translation type="unfinished">波形エディターは、ストリングの振動開始時に使われる初期状態またはインパルスのコントロールに使用します。グラフの右側のボタンで波形を選択した種類に初期化します。'?' ボタンでファイルから波形を--最初の128個のサンプルのみ読み込みます。
 
-波形をグラフの中にかけます
+波形はグラフ内に描くこともできます。
 
-&apos;S&apos;ボタンで波形を平滑化します。
+&apos;S&apos;ボタンは、波形を平滑化します。
 
-&apos;N&apos; ボタンで波形をノーマライズします。</translation>
+&apos;N&apos; ボタンは、波形をノーマライズ化します。</translation>
     </message>
     <message>
         <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
@@ -8127,112 +8126,112 @@ The &apos;V&apos; knob controls the volume.  The &apos;S&apos; knob controls the
 The &apos;Length&apos; knob controls the length of the string.
 
 The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
-        <translation type="unfinished">Vibed は７個までの独立して振動しているストリングをモデル化します。　&apos;String&apos;セレクタで現在エディットしているストリングを選べます。&apos;Imp&apos; セレクタで　グラフがインパルスをあらわしてるのがストリングの初期状態を表しているのか選ぶことができます。&apos;Octavve&apos; セレクタでどの倍音でストリングが振動するのかが選べます。
+        <translation type="unfinished">Vibed は独立して振動しているストリングを9つまでモデル化します。&apos;String&apos;セレクタでは、現在編集しているストリングを選ぶことができます。&apos;Imp&apos; セレクタでは、インパルスと、ストリングの初期状態のどちらをグラフで表すのかを選択します。'Octave' セレクタでは、どの倍音でストリングを振動させるのかを選択します。
 
-グラフで初期状態またはストリングを動かすときにつかうインパルスをコントールできます。
+グラフでは、動作中のストリングを設定する際に使用する、初期状態またはインパルスをコントールすることができます。
 
-’V’つまみでボリュームをコントロール　&apos;S&apos;つまみでスチフネス（堅さ）をコントロール　’P&apos;つまみで引く位置　’PU&apos;つまみで録音ピックアップの位置
+&apos;V&apos; つまみでは音量を、&apos;S&apos; つまみではスティフネス（堅さ）をコントロールします。&apos;P&apos; つまみでは弾く位置を、&apos;PU&apos; つまみではピックアップの位置をコントロールします。
 
-&apos;Pan&apos; と　&apos;Detune&apos; の説明はいらないでしょう。　&apos;Slap&apos;のつまみは　ストリングの音にファズを多少加えます。
+&apos;Pan&apos; と &apos;Detune&apos; の説明は不要でしょう。&apos;Slap&apos;のつまみは、ストリングの音にファズを少し加えます。
 
-&apos;length&apos; つまみはストリングの長さをコントロールします
+&apos;Length&apos; つまみでは、ストリングの長さをコントロールします。
 
-波形エディタの右下すみのLEDは現在の楽器でどのストリングがアクティブなのか表しています。</translation>
+波形エディターの右下隅のLEDは、現在のインストゥルメントのストリングがアクティブなのかどうかを示しています。</translation>
     </message>
     <message>
         <source>Enable waveform</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">波形を有効</translation>
     </message>
     <message>
         <source>Click here to enable/disable waveform.</source>
-        <translation type="unfinished">クリックすると　波形の有効/無効の切換</translation>
+        <translation type="unfinished">ここをクリックすると波形の有効/無効を切り替えます。</translation>
     </message>
     <message>
         <source>String</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストリング</translation>
     </message>
     <message>
         <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
-        <translation type="unfinished">ストリングセレクタはコントローラーが編集しているストリングを選ぶのにつかいます。Vibed 楽器は 9本までの独立した振動してるストリングを含んでいます。波形エディタの右下すみのLEDはどのストリングがアクティブかを示しています。</translation>
+        <translation type="unfinished">ストリングセレクタはコントローラーが編集しているストリングを選択するのに使用します。Vibed インストゥルメントは 最大9本の独立した振動したストリングを含むことができます。波形エディターの右下隅のLEDはどのストリングがアクティブかを示しています。</translation>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サイン波形</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">三角波形</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">のこぎり波形</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方形波形</translation>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ホワイトノイズ波形</translation>
     </message>
     <message>
         <source>User defined wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ユーザー定義波形</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">平滑化</translation>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation type="unfinished">クリックすると波形をスムーズ化</translation>
+        <translation type="unfinished">ここをクリックすると波形を平滑化します。</translation>
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ノーマライズ</translation>
     </message>
     <message>
         <source>Click here to normalize waveform.</source>
-        <translation type="unfinished">クリックすると波形をノーマライズ</translation>
+        <translation type="unfinished">ここをクリックすると波形をノーマライズ化します。</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished">ヘルプ(&amp;H)</translation>
+        <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
-        <translation type="unfinished">サイン波を現在のオシレータで使用</translation>
+        <translation type="unfinished">サイン波形を現在のオシレータで使用する。</translation>
     </message>
     <message>
         <source>Use a triangle-wave for current oscillator.</source>
-        <translation type="unfinished">三角波を現在のオシレータで使用</translation>
+        <translation type="unfinished">三角波形を現在のオシレータで使用する。</translation>
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
-        <translation type="unfinished">のこぎり波を現在のオシレータで使用</translation>
+        <translation type="unfinished">のこぎり波形を現在のオシレータで使用する。</translation>
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation type="unfinished">方形波を現在のオシレータで使用</translation>
+        <translation type="unfinished">方形波形を現在のオシレータで使用する。</translation>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
-        <translation type="unfinished">ホワイトノイズを現在のオシレータで使用</translation>
+        <translation type="unfinished">ホワイトノイズ波形を現在のオシレータで使用する。</translation>
     </message>
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
-        <translation type="unfinished">ユーザー定義波形を現在のオシレータで使用</translation>
+        <translation type="unfinished">ユーザー定義波形を現在のオシレータで使用する。</translation>
     </message>
 </context>
 <context>
     <name>visualizationWidget</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
-        <translation type="unfinished">クリックするとマスターアウトプットの表/示非表示　切換</translation>
+        <translation type="unfinished">ここをクリックするとマスター出力の表示/非表示を切り替えます</translation>
     </message>
     <message>
         <source>Click to enable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">有効にするにはここをクリック</translation>
     </message>
 </context>
 <context>
