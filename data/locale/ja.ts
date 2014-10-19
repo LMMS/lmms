@@ -60,7 +60,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">音量:</translation>
     </message>
     <message>
         <source>PAN</source>
@@ -125,31 +125,31 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation type="unfinished">クリックすると、ほかのオーディオファイルをひらきます。ファイルを選べる場所にアイアログが表示されます。ループモード・開始点と終了点・倍率などの設定はリセットされません。オリジナルのサンプルとは異なる音になるかもしれません。</translation>
+        <translation type="unfinished">ここをクリックすると、他のオーディオファイルを開きます。ファイルを選択することができるダイアログが表示されます。ループモード・開始点と終了点・増幅率などの設定はリセットされませんが、オリジナルのサンプルとは異なる音になるかもしれません。</translation>
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation type="unfinished">サンプル逆回転</translation>
+        <translation type="unfinished">サンプルを逆回転</translation>
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation type="unfinished">このボタンを有効にすれば、すべてのサンプルが逆回転されます。リバースドクラッシュというかっこいいエフェクトに使えます。</translation>
+        <translation type="unfinished">このボタンを有効にすると、すべてのサンプルが逆回転されます。例えばリバースドクラッシュといったクールなエフェクトで役立ちます。</translation>
     </message>
     <message>
         <source>Amplify:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">増幅:</translation>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation type="unfinished">このつまみで増幅率を調整できます。この値を100%にするとサンプルは変化しません。そうでないときは増幅率が上下します（実際のサンプルファイルそのままで）。</translation>
+        <translation type="unfinished">このつまみでは増幅率を設定することができます。この値を100%にするとサンプルは変化しません。そうでないときは増幅率が上下します（実際のサンプルファイルは変更されません!）</translation>
     </message>
     <message>
         <source>Startpoint:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">開始点:</translation>
     </message>
     <message>
         <source>Endpoint:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">終了点:</translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
@@ -226,22 +226,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
-        <translation type="unfinished">クライアント名</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">チャンネル</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>AudioOss::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">デバイス</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">チャンネル</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -252,25 +252,25 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">デバイス</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">デバイス</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">チャンネル</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>AudioSdl::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">デバイス</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -285,11 +285,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>&amp;Paste value (%1%2)</source>
-        <translation type="unfinished">値をペースト(&amp;P) (%1%2)</translation>
+        <translation type="unfinished">値を貼り付け(&amp;P) (%1%2)</translation>
     </message>
     <message>
         <source>Edit song-global automation</source>
-        <translation type="unfinished">歌全体のオートメーションを編集</translation>
+        <translation type="unfinished">曲全体のオートメーションを編集</translation>
     </message>
     <message>
         <source>Connected to %1</source>
@@ -301,15 +301,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Edit connection...</source>
-        <translation type="unfinished">接続を編集</translation>
+        <translation type="unfinished">接続を編集...</translation>
     </message>
     <message>
         <source>Remove connection</source>
-        <translation type="unfinished">接続を消去</translation>
+        <translation type="unfinished">接続を削除</translation>
     </message>
     <message>
         <source>Connect to controller...</source>
-        <translation type="unfinished">コントローラに接続</translation>
+        <translation type="unfinished">コントローラーに接続...</translation>
     </message>
     <message>
         <source>Remove song-global automation</source>
@@ -356,7 +356,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">選択した値をカット (Shift+M)</translation>
+        <translation type="unfinished">選択した値を切り取り (Shift+M)</translation>
     </message>
     <message>
         <source>Copy selected values (Ctrl+C)</source>
@@ -364,7 +364,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">値をクリップボードからペースト (Ctrl+V)</translation>
+        <translation type="unfinished">クリップボードから値を貼り付け (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -380,23 +380,23 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">オートメーションエディタ - パターンなし</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation type="unfinished">オートメーションエディタ - %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation type="unfinished">コントロールのコンテクストメニューでオートメーションパターンを選んでください</translation>
+        <translation type="unfinished">コントロールのコンテキストメニューでオートメーションパターンを選択してください!</translation>
     </message>
     <message>
         <source>Values copied</source>
-        <translation type="unfinished">値はコピーされました</translation>
+        <translation type="unfinished">値をコピーしました</translation>
     </message>
     <message>
         <source>All selected values were copied to the clipboard.</source>
-        <translation type="unfinished">選択された値はすべてクリップボードにコピーされました</translation>
+        <translation type="unfinished">選択された値はすべてクリップボードにコピーされました。</translation>
     </message>
     <message>
         <source>Discrete progression</source>
