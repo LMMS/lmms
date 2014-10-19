@@ -12,10 +12,6 @@
         <translation>Licença</translation>
     </message>
     <message>
-        <source>LMMS (Linux MultiMedia Studio)</source>
-        <translation>LMMS (Linux MultiMedia Studio)</translation>
-    </message>
-    <message>
         <source>Authors</source>
         <translation>Autores</translation>
     </message>
@@ -52,6 +48,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 Qualquer sugestão para tradução, entre em contato pela lista de desenvolvedores do LMMS ou pelo meu email: &lt;emviveros/arroba/users/ponto/sourceforge/ponto/net&gt;. Sua contribuição é muito bem vinda!
 
 Esteban Viveros</translation>
+    </message>
+    <message>
+        <source>LMMS</source>
+        <translation type="unfinished">LMMS</translation>
     </message>
 </context>
 <context>

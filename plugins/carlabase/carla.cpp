@@ -29,6 +29,7 @@
 
 #include "engine.h"
 #include "song.h"
+#include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
@@ -40,6 +41,8 @@
 
 #include <cstring>
 
+#include "embed.cpp"
+
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
 
@@ -48,7 +51,6 @@ static const double ticksPerBeat = 48.0;
  *  - get plugin instance name (to use in external window title)
  *  - offline mode change callback
  *  - midi output
- *  - background artwork
  *
  * All other items are to be done in Carla itself.
  */
@@ -470,19 +472,19 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 {
     setAutoFillBackground(true);
 
-    //QPalette pal;
-    //pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
-    //setPalette(pal);
+    QPalette pal;
+    pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
+    setPalette(pal);
 
     QVBoxLayout * l = new QVBoxLayout( this );
-    l->setContentsMargins( 20, 80, 10, 10 );
+    l->setContentsMargins( 20, 180, 10, 10 );
     l->setSpacing( 10 );
 
     m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
-    //m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-    //m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
+    m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+    m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
     m_toggleUIButton->setWhatsThis(

@@ -147,9 +147,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 					const float v = sender->m_volumeModel.value();
 					MixHelpers::addMultipliedByBuffer( _buf, ch_buf, v, sendBuf, fpp );
 				}
+				m_hasInput = true;
 			}
-			// if sender channel hasInput, then we hasInput too
-			if( sender->m_hasInput ) { m_hasInput = true; }
 		}
 	}
 

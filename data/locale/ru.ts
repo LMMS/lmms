@@ -9,11 +9,6 @@
         <translation>О программе LMMS</translation>
     </message>
     <message>
-        <source>LMMS (Linux MultiMedia Studio)</source>
-        <translatorcomment>Линукс-МультиМедия-Студия</translatorcomment>
-        <translation>LMMS (Линукс-МультиМедийная-Студия)</translation>
-    </message>
-    <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
         <translation>Версия %1 (%2/%3, Qt %4, %5)</translation>
     </message>
@@ -52,6 +47,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sf.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sf.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>LMMS</source>
+        <translation type="unfinished">ЛММС</translation>
     </message>
 </context>
 <context>
