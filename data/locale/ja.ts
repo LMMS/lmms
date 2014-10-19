@@ -5,7 +5,7 @@
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
-        <translation type="unfinished">LMMS について</translation>
+        <translation>LMMS について</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS について</translation>
     </message>
     <message>
         <source>LMMS - easy music production for everyone</source>
@@ -21,21 +21,23 @@
     </message>
     <message>
         <source>Authors</source>
-        <translation type="unfinished"></translation>
+        <translation>製作者</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"></translation>
+        <translation>翻訳</translation>
     </message>
     <message>
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation type="unfinished"></translation>
+        <translation>現在、この言語では翻訳されていません（もしくは英語のままです）。
+
+もし、あなたがLMMSを他の言語に翻訳することや既に存在する翻訳を改善することに興味があるならば、ぜひとも私たちを助けてください! ただ Maintainer にコンタクトを取るだけです!</translation>
     </message>
     <message>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス</translation>
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
@@ -89,7 +91,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AmplifierControls</name>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">ボリウム</translation>
+        <translation type="unfinished">音量</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -322,7 +324,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditor</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished">現在のパターンの再生/ポーズ (Space)</translation>
+        <translation type="unfinished">現在のパターンの再生/一時停止 (Space)</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
@@ -452,7 +454,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation type="unfinished">オートメーションエディタ中に開く</translation>
+        <translation type="unfinished">オートメーションエディタで開く</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -1384,7 +1386,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>FxMixerView</name>
     <message>
         <source>Rename FX channel</source>
-        <translation type="unfinished">エフェクトチャンネルの改名</translation>
+        <translation type="unfinished">エフェクトチャンネル名の変更</translation>
     </message>
     <message>
         <source>Enter the new name for this FX channel</source>
@@ -3638,7 +3640,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
         <translation type="unfinished">ダプルクリックでこのパターンをピアノロールに開きます。
-マウスホイールでステップのボリウムをセットします。</translation>
+マウスホイールでステップの音量をセットします。</translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
@@ -3769,35 +3771,35 @@ use mouse wheel to set volume of a step</source>
     <name>PianoRoll</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished">現在のパターンの再生/ポーズ (Space)</translation>
+        <translation>現在のパターンの再生/一時停止 (Space)</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished">現在のパターンの演奏停止 (Space)</translation>
+        <translation>現在のパターンの再生を停止 (Space)</translation>
     </message>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">選択ノートの切り取り (Ctrl+X)</translation>
+        <translation>選択したノートの切り取り (Ctrl+X)</translation>
     </message>
     <message>
         <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">選択ノートのコピー (Ctrl+C)</translation>
+        <translation>選択したノートのコピー (Ctrl+C)</translation>
     </message>
     <message>
         <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">クリップボードからノートをペースト (Ctrl+V)</translation>
+        <translation>クリップボードからノートを貼り付け (Ctrl+V)</translation>
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
-        <translation type="unfinished">ピアノロール - パターンなし</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
-        <translation type="unfinished">ピアノロール - %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Please open a pattern by double-clicking on it!</source>
-        <translation type="unfinished">”パターン”！の上でダブルクリックして”パターン”を開いてください</translation>
+        <translation>パターン上でダブルクリックして、パターンを開いてください!</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano</source>
@@ -3805,79 +3807,79 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
-        <translation type="unfinished">曲やBBトラックを再生中に　MIDI-デバイス/チャンネル-ピアノからノートを録音</translation>
+        <translation type="unfinished">曲やBBトラックを再生中に MIDI-デバイス/チャンネル-ピアノからノートを録音</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished">ドローモード (shift+D)</translation>
+        <translation>ドローモード (shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished">消去 モード (shift+E)</translation>
+        <translation>消去モード (shift+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished">選択モード (Shift+S)</translation>
+        <translation>選択モード (Shift+S)</translation>
     </message>
     <message>
         <source>Last note</source>
-        <translation type="unfinished">最後のノート</translation>
+        <translation>最後に使用したノート</translation>
     </message>
     <message>
         <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation type="unfinished">クリックすると現在のパターンを再生。これはパターン編集中に便利。パターンの最後で自動的にループします。</translation>
+        <translation type="unfinished">ここをクリックすると現在のパターンを再生します。これはパターン編集する際に便利です。パターンの最後で自動的にループします。</translation>
     </message>
     <message>
         <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation type="unfinished">クリックすると　MIDIデバイスまたは対応するチャンネルウインドウのバーチャルテストピアノからのノートを現在のパターンに録音します。録音の際再生したすべてのノートは現在のパターンに書き込まれます。書き込まれたノートは後から再生/編集できます。</translation>
+        <translation type="unfinished">ここをクリックすると、MIDIデバイスまたは対応するチャンネルウィンドウのバーチャルテストピアノからノートを現在のパターンに録音します。録音の際、再生したすべてのノートは現在のパターンに書き込まれます。書き込まれたノートは後から再生/編集できます。</translation>
     </message>
     <message>
         <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
-        <translation type="unfinished">クリックすると　MIDIデバイスまたは対応するチャンネルウインドウのバーチャルテストピアノからのノートを現在のパターンに録音します。録音の際再生したすべてのノートは現在のパターンに書き込まれます。曲またはBBトラックがバックグラウンドで演奏されます。</translation>
+        <translation type="unfinished">ここをクリックすると　MIDIデバイスまたは対応するチャンネルウィンドウのバーチャルテストピアノから、ノートを現在のパターンに録音します。録音の際、再生したすべてのノートは現在のパターンに書き込まれます。曲またはBBトラックがバックグラウンドで演奏されます。</translation>
     </message>
     <message>
         <source>Click here to stop playback of current pattern.</source>
-        <translation type="unfinished">クリックすると 現在のパターンのプレイバックを停止します。</translation>
+        <translation type="unfinished">ここをクリックすると現在のパターンの録音再生を停止します。</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">クリックすると選択しているノートがクリップボードにカットされます。ペーストボタンを押すと任意のパターンのどこにでもカットしたノートをペーストできます。</translation>
+        <translation type="unfinished">ここをクリックすると選択しているノートをクリップボードへ切り取ります。貼り付けボタンを押すと任意のパターンの任意の場所に切り取ったノートを貼り付けることができます。</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">クリックすると選択しているノートがクリップボードにコピーされます。ペーストボタンを押すと任意のパターンのどこにでもコピーしたノートをペーストできます。</translation>
+        <translation type="unfinished">ここをクリックすると選択しているノートをクリップボードへコピーします。貼り付けボタンを押すと任意のパターンの任意の場所にコピーしたノートを貼り付けることができます。</translation>
     </message>
     <message>
         <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished">クリックするとクリップボードの中のノートが最初の表示されてる小節にペーストされます。</translation>
+        <translation type="unfinished">ここをクリックするとクリップボード内のノートが最初に表示されている小節に貼り付けられます。</translation>
     </message>
     <message>
         <source>Note lock</source>
-        <translation type="unfinished">ノート　ロック</translation>
+        <translation type="unfinished">ノートをロック</translation>
     </message>
     <message>
         <source>Note Volume</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ノートの音量</translation>
     </message>
     <message>
         <source>Note Panning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ノートのパンニング</translation>
     </message>
     <message>
         <source>Detune mode (Shift+T)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ディチューン モード (Shift+T)</translation>
     </message>
     <message>
         <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ここをクリックするとドローモードになります。ドローモードでは個々のノートを追加・リサイズ・移動することができます。普段このモードをデフォルトで使用します。'Shift+D' を押してもこのモードになります。このモードではCtrlを長押しすることで一時的に選択モードにすることができます。</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ここをクリックすると消去モードになります。消去モードでは個々のノートを消去することができます。'Shift+E' を押してもこのモードにすることができます。</translation>
     </message>
     <message>
         <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ここをクリックすると選択モードになります。選択モードでは個々のノートを選択することができます。また、ドローモード中にCtrlを長押しすることで一時的に選択モードを使用することができます。</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
@@ -4216,18 +4218,18 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">ボリウム</translation>
+        <translation type="unfinished">音量</translation>
     </message>
 </context>
 <context>
     <name>SampleTrackView</name>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished">トラック　ボリウム</translation>
+        <translation type="unfinished">トラック音量</translation>
     </message>
     <message>
         <source>Channel volume:</source>
-        <translation type="unfinished">チャンネルボリウム</translation>
+        <translation type="unfinished">チャンネル音量:</translation>
     </message>
     <message>
         <source>VOL</source>
@@ -4238,43 +4240,43 @@ Reason: &quot;%2&quot;</source>
     <name>SongEditor</name>
     <message>
         <source>Song-Editor</source>
-        <translation type="unfinished">ソングエディタ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Play song (Space)</source>
-        <translation type="unfinished">ソング再生 (Space)</translation>
+        <translation type="unfinished">曲を再生 (Space)</translation>
     </message>
     <message>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation type="unfinished">クリックすると曲全体を演奏します。ソングポジションマーカー（緑色）の位置から再生開始します。再生中にマーカーを移動さすこともできます。</translation>
+        <translation type="unfinished">ここをクリックすると曲全体を再生します。ソングポジションマーカー（緑色）の位置から再生開始します。再生中にマーカーを移動させることもできます。</translation>
     </message>
     <message>
         <source>Stop song (Space)</source>
-        <translation type="unfinished">ソング停止 (Space)</translation>
+        <translation type="unfinished">曲を停止 (Space)</translation>
     </message>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation type="unfinished">クリックすると　曲の再生を停止します。　再生後ソングポジションマーカーは曲の最初にセットされます。</translation>
+        <translation type="unfinished">ここをクリックすると曲の再生を停止します。再生後、ソングポジションマーカーは曲の最初にセットされます。</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation type="unfinished">beat/bassline 追加</translation>
+        <translation type="unfinished">Beat/Bassline を追加</translation>
     </message>
     <message>
         <source>Add sample-track</source>
-        <translation type="unfinished">sample-track 追加</translation>
+        <translation type="unfinished">Sample-Track を追加</translation>
     </message>
     <message>
         <source>Could not open file</source>
-        <translation type="unfinished">ファイルをオープンできません</translation>
+        <translation type="unfinished">ファイルを開くことができませんでした</translation>
     </message>
     <message>
         <source>Could not write file</source>
-        <translation type="unfinished">ファイルに書き込めません</translation>
+        <translation type="unfinished">ファイルに書き込むことができませんでした</translation>
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation type="unfinished">automation-track　追加</translation>
+        <translation type="unfinished">Automation-Track を追加</translation>
     </message>
     <message>
         <source>Draw mode</source>
@@ -4282,7 +4284,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Edit mode (select and move)</source>
-        <translation type="unfinished">編集モード　(選択等）</translation>
+        <translation type="unfinished">編集モード (選択と移動)</translation>
     </message>
     <message>
         <source>Record samples from Audio-device</source>
@@ -4290,20 +4292,21 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation type="unfinished">ソングまたはBBトラックを再生中にオーディオデバイスからサンプルを録音</translation>
+        <translation type="unfinished">曲またはBBトラックを再生中にオーディオデバイスからサンプルを録音</translation>
     </message>
     <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイル %1 を開くことができませんでした。おそらくこのファイルの読み込み権限がありません。
+ファイルが読み込み可能か確認してから再度読み込んでください。</translation>
     </message>
     <message>
         <source>Error in file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイルの内部エラー</translation>
     </message>
     <message>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイル %1 は内部エラーを含んでいるか、読み込むことができません。</translation>
     </message>
     <message>
         <source>Tempo</source>
@@ -4327,11 +4330,11 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Master volume</source>
-        <translation type="unfinished">マスターボリウム</translation>
+        <translation type="unfinished">マスター音量</translation>
     </message>
     <message>
         <source>master volume</source>
-        <translation type="unfinished">マスターボリウム</translation>
+        <translation type="unfinished">マスター音量</translation>
     </message>
     <message>
         <source>Master pitch</source>
@@ -8341,11 +8344,11 @@ The LED in the lower right corner of the waveform editor determines whether the 
     <name>waveShaperControls</name>
     <message>
         <source>Input gain</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ゲイン</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ゲイン</translation>
     </message>
 </context>
 </TS>
