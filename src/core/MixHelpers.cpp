@@ -69,6 +69,25 @@ bool isSilent( const sampleFrame* src, int frames )
 }
 
 
+/*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
+bool sanitize( sampleFrame * src, int frames )
+{
+	bool found = false;
+	for( int f = 0; f < frames; ++f )
+	{
+		for( int c = 0; c < 2; ++c )
+		{
+			if( isinff( src[f][c] ) || isnanf( src[f][c] ) )
+			{
+				src[f][c] = 0.0f;
+				found = true;
+			}
+		}
+	}
+	return found;
+}
+
+
 struct AddOp
 {
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
