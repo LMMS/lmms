@@ -28,6 +28,7 @@
  *
  */
 
+#include <cstring>
 #include <QDebug>
 #include <QLayout>
 #include <QLabel>
@@ -189,7 +190,7 @@ QString gigInstrument::nodeName() const
 
 void gigInstrument::freeInstance()
 {
-	m_synthMutex.lock();
+	m_synthMutex.lockForWrite();
 
 	if ( m_instance != NULL )
 	{
@@ -229,7 +230,7 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 	// free reference to gig file if one is selected
 	freeInstance();
 
-	m_synthMutex.lock();
+	m_synthMutex.lockForWrite();
 	s_instancesMutex.lock();
 
 	// Increment Reference
@@ -292,7 +293,7 @@ void gigInstrument::updatePatch()
 
 QString gigInstrument::getCurrentPatchName()
 {
-	m_synthMutex.lock();
+	m_synthMutex.lockForWrite();
 
 	if( !m_instance )
 	{
@@ -566,8 +567,46 @@ gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote,
 	if( !pSample || pSample->Channels == 0 )
 		return gigNote();
 
-	gig::buffer_t buf = pSample->LoadSampleData();
-	gigNote note( pSample->SamplesTotal, release, releaseTime );
+	// Thread-safe gig::Sample::LoadSampleData() based on:
+	//   gig::Sample::LoadSampleDataWithNullSamplesExtension
+	gig::buffer_t buf;
+	unsigned long samples = pSample->SamplesTotal;
+	unsigned long allocationsize = samples * pSample->FrameSize;
+
+	// Generate decompression buffer
+	int8_t* decompressData = NULL;
+	gig::buffer_t decompress;
+
+	if (pSample->Compressed)
+	{
+		// Based on: gig::Sample::GuessSize
+		unsigned long WorstCaseFrameSize =
+			((pSample->BitDepth == 24)?256:2048) * pSample->FrameSize + pSample->Channels;
+		unsigned long decompressionSize =
+			pSample->BitDepth == 24 ? samples + (samples >> 1) + (samples >> 8) * 13
+				: samples + (samples >> 10) * 5;
+		if (pSample->Channels == 2)
+			decompressionSize <<= 1;
+		decompressionSize += WorstCaseFrameSize;
+		decompressData = new int8_t[decompressionSize];
+
+		decompress.pStart = decompressData;
+		decompress.Size = decompressionSize;
+		decompress.NullExtensionSize = 0;
+	}
+
+	// Read into buffer
+	pSample->SetPos(0); // TODO: is this thread safe?
+	buf.pStart = new int8_t[allocationsize];
+	if (pSample->Compressed)
+		buf.Size = pSample->Read(buf.pStart, samples, &decompress) * pSample->FrameSize;
+	else
+		buf.Size = pSample->Read(buf.pStart, samples) * pSample->FrameSize;
+	buf.NullExtensionSize = allocationsize - buf.Size;
+	std::memset((int8_t*)buf.pStart + buf.Size, 0, buf.NullExtensionSize);
+
+	// Convert from 16 or 24 bit into 32 bit float
+	gigNote note( samples, release, releaseTime );
 	note.midiNote = midiNote;
 
 	if( pSample->Channels > 2 )
@@ -578,7 +617,7 @@ gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote,
 	{
 		uint8_t* pInt = static_cast<uint8_t*>( buf.pStart );
 
-		for( int i = 0; i < pSample->SamplesTotal/pSample->Channels; ++i )
+		for( int i = 0; i < samples/pSample->Channels; ++i )
 		{
 			int32_t valueLeft = (pInt[3*pSample->Channels*i]<<8) |
 						(pInt[3*pSample->Channels*i+1]<<16) |
@@ -605,7 +644,7 @@ gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote,
 	{
 		int16_t* pInt = static_cast<int16_t*>( buf.pStart );
 
-		for( int i = 0; i < pSample->SamplesTotal/pSample->Channels; ++i )
+		for( int i = 0; i < samples/pSample->Channels; ++i )
 		{
 			note.note[i][0] = 1.0/0x10000*pInt[pSample->Channels*i] * attenuation;
 
@@ -616,7 +655,10 @@ gigNote gigInstrument::sampleToNote( gig::Sample* pSample, int midiNote,
 		}
 	}
 
-	pSample->ReleaseSampleData();
+	delete[] (int8_t*)buf.pStart;
+
+	if (pSample->Compressed)
+		delete[] (int8_t*)decompressData;
 
 	// Convert sample rate
 	int sampleRate = pSample->SamplesPerSecond;
@@ -641,7 +683,7 @@ void gigInstrument::getInstrument()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	m_synthMutex.lock();
+	m_synthMutex.lockForWrite();
 
 	if( m_instance )
 	{
@@ -722,7 +764,11 @@ void gigInstrument::updateSampleRate()
 // Find the sample we want to play (based on velocity, etc.)
 void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 {
-	m_synthMutex.lock();
+	// TODO: we can't quite use ForRead here, we still end up skipping notes
+	// and having other odd issues. Possibly has to do with the
+	// pSample->SetPos(0) call
+	//m_synthMutex.lockForRead();
+	m_synthMutex.lockForWrite();
 
 	if( m_instrument )
 	{

@@ -28,6 +28,7 @@
 #define GIG_PLAYER_H
 
 #include <QMutex>
+#include <QReadWriteLock>
 #include <list>
 
 #include "Instrument.h"
@@ -172,7 +173,7 @@ private:
 	QString m_filename;
 
 	// Protect synth when we are re-creating it.
-	QMutex m_synthMutex;
+	QReadWriteLock m_synthMutex;
 	QMutex m_loadMutex;
 	QMutex m_srcMutex;
 	QMutex m_notesMutex;
