@@ -1,6 +1,6 @@
 if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
-    INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS}{)
+	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 
 	# Required for not crashing loading files with libgig
 	SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions -std=c++11")

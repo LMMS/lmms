@@ -98,8 +98,10 @@ public:
 	int midiNote;
 	sampleFrame* note;
 	int size; // Don't try changing this...
+	int noteEnd; // Delete note before end of note if released and faded out early
 	bool release; // Whether to trigger a release sample on key up
 	float releaseTime; // After letting up, time to fade out
+	bool fadeOut; // Whether we have started fading out yet
 };
 
 
@@ -173,6 +175,7 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 	QMutex m_srcMutex;
+	QMutex m_notesMutex;
 
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
