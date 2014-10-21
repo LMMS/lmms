@@ -200,7 +200,12 @@ void gigInstrument::freeInstance()
 		if( m_instance->refCount <= 0 )
 		{
 			s_instances.remove( m_filename );
+			qDebug() << "gigInstrument: deleting instance of" << m_filename;
 			delete m_instance;
+		}
+		else
+		{
+			qDebug() << "gigInstrument: decreasing reference count for" << m_filename;
 		}
 
 		s_instancesMutex.unlock();
@@ -232,6 +237,8 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 	{
 		m_instance = s_instances[ relativePath ];
 		m_instance->refCount++;
+		qDebug() << "gigInstrument: increasing reference count for" << relativePath;
+		succeeded = true;
 	}
 
 	// Add to map, if doesn't exist.
@@ -243,6 +250,7 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 			m_instance = new gigInstance( _gigFile );
 			s_instances.insert( relativePath, m_instance );
 			succeeded = true;
+			qDebug() << "gigInstrument: adding instance of" << relativePath;
 		}
 		catch( ... )
 		{
