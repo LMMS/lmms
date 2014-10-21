@@ -31,8 +31,8 @@
 #include "gig_player.h"
 
 #include <fluidsynth.h>
-#include <QtGui/QWidget>
-#include <QtGui/QLabel>
+#include <QWidget>
+#include <QLabel>
 
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.

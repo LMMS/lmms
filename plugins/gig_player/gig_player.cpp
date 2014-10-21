@@ -28,10 +28,10 @@
  *
  */
 
-#include <QtCore/QDebug>
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtXml/QDomDocument>
+#include <QDebug>
+#include <QLayout>
+#include <QLabel>
+#include <QDomDocument>
 
 #include "FileDialog.h"
 #include "gig_player.h"
@@ -1081,6 +1081,3 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 }
-
-#include "moc_gig_player.cxx"
-

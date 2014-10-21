@@ -25,7 +25,7 @@
 
 #include "patches_dialog.h"
 
-#include <QtGui/QHeaderView>
+#include <QHeaderView>
 //#include <QFileInfo>
 
 
@@ -75,7 +75,11 @@ patchesDialog::patchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 //	pHeader->setResizeMode(QHeaderView::Custom);
 	pHeader->setDefaultAlignment(Qt::AlignLeft);
 //	pHeader->setDefaultSectionSize(200);
+#if QT_VERSION >= 0x050000
+	pHeader->setSectionsMovable(false);
+#else
 	pHeader->setMovable(false);
+#endif
 	pHeader->setStretchLastSection(true);
 
 	m_progListView->resizeColumnToContents(0);	// Prog.
@@ -379,6 +383,3 @@ void patchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 	// Stabilize the form.
 	stabilizeForm();
 }
-
-
-#include "moc_patches_dialog.cxx"

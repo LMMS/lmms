@@ -24,10 +24,10 @@
  */
 
 
-#ifndef _GIG_PLAYER_H
-#define _GIG_PLAYER_H
+#ifndef GIG_PLAYER_H
+#define GIG_PLAYER_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 #include <list>
 
 #include "Instrument.h"
@@ -140,7 +140,7 @@ public:
 
 	virtual Flags flags() const
 	{
-		return IsSingleStreamed | IsMidiBased;
+		return IsSingleStreamed;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
