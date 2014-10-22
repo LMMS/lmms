@@ -3,6 +3,9 @@
  *
  * original file by ???
  * modified and enhanced by Tobias Doerffel
+ * 
+ * Lowpass_SV code originally from Nekobee, Copyright (C) 2004 Sean Bolton and others
+ * adapted & modified for use in LMMS
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -65,12 +68,13 @@ public:
 		Bandpass_RC24,
 		Highpass_RC24,
 		Formantfilter,
+		Lowpass_SV,
 		NumFilters
 	} ;
 
 	static inline float minFreq()
 	{
-		return( 3.0f );
+		return( 5.0f );
 	}
 
 	static inline float minQ()
@@ -108,6 +112,9 @@ public:
 		m_rca( 0.0f ),
 		m_rcb( 1.0f ),
 		m_rcc( 0.0f ),
+		m_svf1( 0.0f ),
+		m_svf2( 0.0f ),
+		m_svq( 0.0f ),
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
 		m_subFilter( NULL )
@@ -140,6 +147,13 @@ public:
 
 			for(int i=0; i<6; i++)
 			   m_vfbp[i][_chnl] = m_vfhp[i][_chnl] = m_vflast[i][_chnl] = 0.0f;
+			   
+			// reset in/out history for Lowpass_SV
+			m_delay1[_chnl] = 0.0f;
+			m_delay2[_chnl] = 0.0f;
+			m_delay3[_chnl] = 0.0f;
+			m_delay4[_chnl] = 0.0f;
+			m_sva[_chnl] = 0.0f;
 		}
 	}
 
@@ -177,6 +191,26 @@ public:
 				m_oldy3[_chnl] = m_y3[_chnl];
 				out = m_y4[_chnl] - m_y4[_chnl] * m_y4[_chnl] *
 						m_y4[_chnl] * ( 1.0f / 6.0f );
+				break;
+			}
+			
+			// 4-pole state-variant lowpass filter, adapted from Nekobee source code
+			// /* Hal Chamberlin's state variable filter */
+			
+			case Lowpass_SV:
+			{
+				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
+				
+				m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
+				float highpass = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+				m_delay1[_chnl] = m_svf1 * highpass + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
+
+				m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
+				highpass = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
+				m_delay3[_chnl] = m_svf2 * highpass + m_delay3[_chnl];
+ 
+				/* mix filter output into output buffer */
+				out = atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] );
 				break;
 			}
 
@@ -351,8 +385,8 @@ public:
 
 					m_vflast[2][_chnl] = in;
 					m_vfhp[2][_chnl] = hp;
-					m_vfbp[2][_chnl] = bp;  
-			      
+					m_vfbp[2][_chnl] = bp;
+
 					in = bp + m_vfbp[4][_chnl] * m_vfq;
 					in = qBound( -1.0f, in, 1.0f );
 
@@ -364,7 +398,7 @@ public:
 
 					m_vflast[4][_chnl] = in;
 					m_vfhp[4][_chnl] = hp;
-					m_vfbp[4][_chnl] = bp;  
+					m_vfbp[4][_chnl] = bp;
 
 					out += bp;
 
@@ -393,7 +427,7 @@ public:
 
 					m_vflast[3][_chnl] = in;
 					m_vfhp[3][_chnl] = hp;
-					m_vfbp[3][_chnl] = bp;  
+					m_vfbp[3][_chnl] = bp;
 
 					in = bp + m_vfbp[5][_chnl] * m_vfq;
 					in = qBound( -1.0f, in, 1.0f );
@@ -406,7 +440,7 @@ public:
 
 					m_vflast[5][_chnl] = in;
 					m_vfhp[5][_chnl] = hp;
-					m_vfbp[5][_chnl] = bp;  
+					m_vfbp[5][_chnl] = bp;
 
 					out += bp;
 				}
@@ -508,7 +542,7 @@ public:
 
 		if( m_type == Moog )
 		{
-			_freq = qBound( minFreq(), _freq, 20000.0f ); 
+			_freq = qBound( minFreq(), _freq, 20000.0f );
 
 			// [ 0 - 0.5 ]
 			const float f = _freq / m_sampleRate;
@@ -526,8 +560,17 @@ public:
 			return;
 		}
 
+		if( m_type == Lowpass_SV )
+		{
+			m_svf1 = qBound( 0.0001f, _freq * 0.00004125f, 0.825f );
+			m_svf2 = qBound( 0.0001f, _freq * 0.00008250f, 0.825f );
+			m_svq = qMax( 0.0001f, 2.0f - ( _q * 0.1995f ) );
+			m_svsr = 2025.0f / m_sampleRate;
+			return;
+		}
+
 		// other filters
-		_freq = qBound( minFreq(), _freq, 20000.0f ); 
+		_freq = qBound( minFreq(), _freq, 20000.0f );
 		const float omega = F_2PI * _freq / m_sampleRate;
 		const float tsin = sinf( omega );
 		const float tcos = cosf( omega );
@@ -604,6 +647,9 @@ private:
 	// coeffs for formant-filters
 	float m_vfa[4], m_vfb[4], m_vfc[4], m_vfq;
 
+	// coeffs for Lowpass_SV (state-variant lowpass)
+	float m_svf1, m_svf2, m_svq, m_svsr;
+
 	typedef sample_t frame[CHANNELS];
 
 	// in/out history
@@ -618,7 +664,10 @@ private:
 
 	// in/out history for Formant-filters
 	frame m_vfbp[6], m_vfhp[6], m_vflast[6];
-	
+
+	// in/out history for Lowpass_SV (state-variant lowpass)
+	frame m_delay1, m_delay2, m_delay3, m_delay4, m_sva;
+
 	FilterTypes m_type;
 	bool m_doubleFilter;
 

@@ -94,6 +94,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterModel.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
 	m_filterModel.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
 	m_filterModel.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );	
+	m_filterModel.addItem( tr( "SV LowPass" ), new PixmapLoader( "filter_lp" ) );	
 }
 
 

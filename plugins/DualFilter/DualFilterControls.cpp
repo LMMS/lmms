@@ -74,6 +74,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	m_filter1Model.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
 	m_filter1Model.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
 	m_filter1Model.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );
+	m_filter1Model.addItem( tr( "SV Lowpass" ), new PixmapLoader( "filter_lp" ) );
 
 	m_filter2Model.addItem( tr( "LowPass" ), new PixmapLoader( "filter_lp" ) );
 	m_filter2Model.addItem( tr( "HiPass" ), new PixmapLoader( "filter_hp" ) );
@@ -90,6 +91,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	m_filter2Model.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
 	m_filter2Model.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );
+	m_filter2Model.addItem( tr( "SV Lowpass" ), new PixmapLoader( "filter_lp" ) );
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateFilters() ) );
 }
