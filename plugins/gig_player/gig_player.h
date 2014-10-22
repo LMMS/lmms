@@ -28,7 +28,6 @@
 #define GIG_PLAYER_H
 
 #include <QMutex>
-#include <QReadWriteLock>
 #include <list>
 
 #include "Instrument.h"
@@ -85,24 +84,21 @@ class gigNote
 {
 public:
 	gigNote();
-	gigNote(int size, bool release, float releaseTime );
+	gigNote( gig::Sample* pSample, int midiNote, float attenuation,
+			bool release, float releaseTime );
 	gigNote( const gigNote& g );
-	~gigNote();
 
-	// Move constructor
-	gigNote( gigNote&& g );
-
-	// Move assignment
-	gigNote& operator=( gigNote&& g );
-
-	int position;
+	// Data for the note
+	gig::Sample* sample;
 	int midiNote;
-	sampleFrame* note;
-	int size; // Don't try changing this...
-	int noteEnd; // Delete note before end of note if released and faded out early
+	float attenuation;
 	bool release; // Whether to trigger a release sample on key up
-	float releaseTime; // After letting up, time to fade out
+	float releaseTime; // After letting up, time to fade out (seconds)
+
+	int pos; // Position in sample
 	bool fadeOut; // Whether we have started fading out yet
+	int fadeOutPos; // Position in fade out
+	int fadeOutLen; // Length of fade out
 };
 
 
@@ -173,7 +169,7 @@ private:
 	QString m_filename;
 
 	// Protect synth when we are re-creating it.
-	QReadWriteLock m_synthMutex;
+	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 	QMutex m_srcMutex;
 	QMutex m_notesMutex;
@@ -188,12 +184,16 @@ private:
 
 	FloatModel m_gain;
 
+	// Buffer for note samples
+	sampleFrame* m_noteData;
+	unsigned int m_noteDataSize;
+
 private:
 	void freeInstance();
 	void getInstrument();
-	gigNote sampleToNote( gig::Sample* pSample, int midiNote, float attenuation, bool release, float releaseTime );
 	Dimension getDimensions( gig::Region* pRegion, int velocity, bool release );
-	gigNote convertSampleRate( gigNote& old, int oldRate, int newRate );
+	bool convertSampleRate( sampleFrame& oldBuf, sampleFrame& newBuf,
+		int oldSize, int newSize, int oldRate, int newRate );
 	void addNotes( int midiNote, int velocity, bool release ); // Locks m_synthMutex internally
 
 	friend class gigInstrumentView;
