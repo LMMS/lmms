@@ -78,11 +78,6 @@ struct GIGPluginData
 
 
 
-// Static map of current GIG instances
-QMap<QString, gigInstance*> gigInstrument::s_instances;
-QMutex gigInstrument::s_instancesMutex;
-
-
 
 gigInstrument::gigInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
@@ -201,22 +196,7 @@ void gigInstrument::freeInstance()
 
 	if ( m_instance != NULL )
 	{
-		s_instancesMutex.lock();
-		--(m_instance->refCount);
-
-		// No more references
-		if( m_instance->refCount <= 0 )
-		{
-			s_instances.remove( m_filename );
-			qDebug() << "gigInstrument: deleting instance of" << m_filename;
-			delete m_instance;
-		}
-		else
-		{
-			qDebug() << "gigInstrument: decreasing reference count for" << m_filename;
-		}
-
-		s_instancesMutex.unlock();
+		delete m_instance;
 		m_instance = NULL;
 	}
 
@@ -228,7 +208,6 @@ void gigInstrument::freeInstance()
 void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 {
 	emit fileLoading();
-	bool succeeded = false;
 
 	// Used for loading file
 	char * gigAscii = qstrdup( qPrintable( SampleBuffer::tryToMakeAbsolute( _gigFile ) ) );
@@ -238,42 +217,19 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 	freeInstance();
 
 	m_synthMutex.lock();
-	s_instancesMutex.lock();
 
-	// Increment Reference
-	if( s_instances.contains( relativePath ) )
+	try
 	{
-		m_instance = s_instances[ relativePath ];
-		m_instance->refCount++;
-		qDebug() << "gigInstrument: increasing reference count for" << relativePath;
-		succeeded = true;
-	}
-
-	// Add to map, if doesn't exist.
-	else
-	{
-		try
-		{
-			// Grab this sf from the top of the stack and add to list
-			m_instance = new gigInstance( _gigFile );
-			s_instances.insert( relativePath, m_instance );
-			succeeded = true;
-			qDebug() << "gigInstrument: adding instance of" << relativePath;
-		}
-		catch( ... )
-		{
-			m_instance = NULL;
-			succeeded = false;
-		}
-	}
-
-	s_instancesMutex.unlock();
-	m_synthMutex.unlock();
-
-	if( succeeded )
+		m_instance = new gigInstance( _gigFile );
 		m_filename = relativePath;
-	else
+	}
+	catch( ... )
+	{
+		m_instance = NULL;
 		m_filename = "";
+	}
+
+	m_synthMutex.unlock();
 
 	emit fileChanged();
 
@@ -551,7 +507,11 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	// Convert sample rate if needed
 	if( sampleConvert )
 	{
-		convertSampleRate(*convertBuf, *_working_buffer, samples, frames, oldRate, newRate);
+		// If an error occured, it's better to render nothing than have some
+		// screetching high-volume noise
+		if (!convertSampleRate(*convertBuf, *_working_buffer, samples, frames, oldRate, newRate))
+			std::memset(&_working_buffer[0][0], 0, 2*frames*sizeof(float)); // *2 for channels
+
 		delete[] convertBuf;
 	}
 
@@ -603,7 +563,7 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 			float fadeOut = i->releaseTime;
 			int samples = i->sample->SamplesTotal;
-			int len = std::min( int( std::floor( fadeOut * engine::mixer()->processingSampleRate() ) ),
+			int len = std::min( int( floor( fadeOut * engine::mixer()->processingSampleRate() ) ),
 					samples - i->pos );
 
 			// TODO: not sample exact? What about in the middle of us writing out the sample?
@@ -705,7 +665,7 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 				dim.DimValues[i] = 0;
 				break;
 			default:
-				qDebug() << "gigInstrument: Unknown dimension";
+				// Warning: unknown dimension
 				dim.DimValues[i] = 0;
 		}
 	}

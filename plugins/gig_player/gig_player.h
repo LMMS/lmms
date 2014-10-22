@@ -51,8 +51,7 @@ class gigInstance
 public:
 	gigInstance( QString filename ) :
 		riff( filename.toUtf8().constData() ),
-		gig( &riff ),
-		refCount( 1 )
+		gig( &riff )
 	{}
 
 private:
@@ -60,7 +59,6 @@ private:
 
 public:
 	gig::File gig;
-	int refCount;
 };
 
 
