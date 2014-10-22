@@ -117,8 +117,10 @@ public:
 		m_svq( 0.0f ),
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
+		m_sampleRatio( 1.0f / m_sampleRate ),
 		m_subFilter( NULL )
 	{
+		m_svsr = 1.0f - expf( -4646.39874051f / m_sampleRate );
 		clearHistory();
 	}
 
@@ -475,8 +477,7 @@ public:
 	}
 
 
-	inline void calcFilterCoeffs( float _freq, float _q
-				/*, const bool _q_is_bandwidth = false*/ )
+	inline void calcFilterCoeffs( float _freq, float _q )
 	{
 		// temp coef vars
 		_q = qMax( _q, minQ() );
@@ -545,7 +546,7 @@ public:
 			_freq = qBound( minFreq(), _freq, 20000.0f );
 
 			// [ 0 - 0.5 ]
-			const float f = _freq / m_sampleRate;
+			const float f = _freq * m_sampleRatio;
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
@@ -562,16 +563,16 @@ public:
 
 		if( m_type == Lowpass_SV )
 		{
-			m_svf1 = qBound( 0.0001f, _freq * 0.00004125f, 0.825f );
-			m_svf2 = qBound( 0.0001f, _freq * 0.00008250f, 0.825f );
+			const float f = qMax( minFreq(), _freq ) * m_sampleRatio;
+			m_svf1 = qMin( f * 2.0f, 0.825f );
+			m_svf2 = qMin( f * 4.0f, 0.825f );
 			m_svq = qMax( 0.0001f, 2.0f - ( _q * 0.1995f ) );
-			m_svsr = 2025.0f / m_sampleRate;
 			return;
 		}
 
 		// other filters
 		_freq = qBound( minFreq(), _freq, 20000.0f );
-		const float omega = F_2PI * _freq / m_sampleRate;
+		const float omega = F_2PI * _freq * m_sampleRatio;
 		const float tsin = sinf( omega );
 		const float tcos = cosf( omega );
 		//float alpha;
@@ -672,6 +673,7 @@ private:
 	bool m_doubleFilter;
 
 	float m_sampleRate;
+	float m_sampleRatio;
 	basicFilters<CHANNELS> * m_subFilter;
 
 } ;
