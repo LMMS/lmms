@@ -68,7 +68,10 @@ public:
 		Bandpass_RC24,
 		Highpass_RC24,
 		Formantfilter,
+		DoubleMoog,
 		Lowpass_SV,
+		Bandpass_SV,
+		Highpass_SV,
 		NumFilters
 	} ;
 
@@ -84,7 +87,7 @@ public:
 
 	inline void setFilterType( const int _idx )
 	{
-		m_doubleFilter = _idx == DoubleLowPass;
+		m_doubleFilter = _idx == DoubleLowPass || _idx == DoubleMoog;
 		if( !m_doubleFilter )
 		{
 			m_type = static_cast<FilterTypes>( _idx );
@@ -93,7 +96,9 @@ public:
 
 		// Double lowpass mode, backwards-compat for the goofy
 		// Add-NumFilters to signify doubleFilter stuff
-		m_type = static_cast<FilterTypes>( LowPass );
+		m_type = _idx == DoubleLowPass 
+			? LowPass
+			: Moog;
 		if( m_subFilter == NULL )
 		{
 			m_subFilter = new basicFilters<CHANNELS>(
@@ -150,7 +155,7 @@ public:
 			for(int i=0; i<6; i++)
 			   m_vfbp[i][_chnl] = m_vfhp[i][_chnl] = m_vflast[i][_chnl] = 0.0f;
 			   
-			// reset in/out history for Lowpass_SV
+			// reset in/out history for SV-filters
 			m_delay1[_chnl] = 0.0f;
 			m_delay2[_chnl] = 0.0f;
 			m_delay3[_chnl] = 0.0f;
@@ -200,6 +205,7 @@ public:
 			// /* Hal Chamberlin's state variable filter */
 			
 			case Lowpass_SV:
+			case Bandpass_SV:
 			{
 				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				
@@ -212,7 +218,21 @@ public:
 				m_delay3[_chnl] = m_svf2 * highpass + m_delay3[_chnl];
  
 				/* mix filter output into output buffer */
-				out = atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] );
+				out = m_type == Lowpass_SV 
+					? atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] )
+					: atanf( 3.0f * m_delay3[_chnl] * m_sva[_chnl] );
+				break;
+			}
+			
+			case Highpass_SV:
+			{
+				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
+				
+				m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];
+				float hp = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+				m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
+				
+				out = atanf( 3.0f * hp * m_sva[_chnl] );
 				break;
 			}
 
@@ -541,7 +561,8 @@ public:
 			return;
 		}
 
-		if( m_type == Moog )
+		if( m_type == Moog ||
+			m_type == DoubleMoog )
 		{
 			_freq = qBound( minFreq(), _freq, 20000.0f );
 
@@ -561,7 +582,9 @@ public:
 			return;
 		}
 
-		if( m_type == Lowpass_SV )
+		if( m_type == Lowpass_SV || 
+			m_type == Bandpass_SV ||
+			m_type == Highpass_SV )
 		{
 			const float f = qMax( minFreq(), _freq ) * m_sampleRatio;
 			m_svf1 = qMin( f * 2.0f, 0.825f );
