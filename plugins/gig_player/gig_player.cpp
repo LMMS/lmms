@@ -810,7 +810,7 @@ gigInstrumentView::gigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
 	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
-	m_fileDialogButton->move( 217, 107 );
+	m_fileDialogButton->move( 223, 68 );
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
@@ -824,7 +824,7 @@ gigInstrumentView::gigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
 	m_patchDialogButton->setEnabled( false );
-	m_patchDialogButton->move( 217, 125 );
+	m_patchDialogButton->move( 223, 94 );
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
@@ -832,21 +832,21 @@ gigInstrumentView::gigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
-	m_bankNumLcd->move(131, 62);
+	m_bankNumLcd->move(111, 150);
 
 	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
-	m_patchNumLcd->move(190, 62);
+	m_patchNumLcd->move(161, 150);
 
 	// Next row
 	m_filenameLabel = new QLabel( this );
-	m_filenameLabel->setGeometry( 58, 109, 156, 11 );
+	m_filenameLabel->setGeometry( 61, 70, 156, 14 );
 	m_patchLabel = new QLabel( this );
-	m_patchLabel->setGeometry( 58, 127, 156, 11 );
+	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
 	// Gain
 	m_gainKnob = new gigKnob( this );
 	m_gainKnob->setHintText( tr("Gain") + " ", "" );
-	m_gainKnob->move( 86, 55 );
+	m_gainKnob->move( 32, 140 );
 
 	setAutoFillBackground( true );
 	QPalette pal;
