@@ -27,9 +27,9 @@
 #ifndef GIG_PLAYER_H
 #define GIG_PLAYER_H
 
+#include <QList>
 #include <QMutex>
 #include <QMutexLocker>
-#include <list>
 
 #include "Instrument.h"
 #include "pixmap_button.h"
@@ -179,7 +179,7 @@ public slots:
 private:
 	static QMutex s_instancesMutex;
 	static QMap<QString, gigInstance*> s_instances;
-	std::list<gigNote> m_notes;
+	QList<gigNote> m_notes;
 
 	SRC_STATE * m_srcState;
 

@@ -362,7 +362,7 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 
 	m_synthMutex.lock();
 
-	for( std::list<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	for( QList<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 	{
 		if( note->sample )
 		{
@@ -412,7 +412,7 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Fill with portions of the note samples
-	for( std::list<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	for( QList<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 	{
 		if( note->sample )
 		{
@@ -541,7 +541,7 @@ void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 	bool noteRelease = false;
 
 	// Fade out the note we want to end
-	for( std::list<gigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
+	for( QList<gigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
 	{
 		if( i->midiNote == pluginData->midiNote)
 		{
