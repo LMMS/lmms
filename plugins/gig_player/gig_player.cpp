@@ -115,7 +115,7 @@ gigInstrument::gigInstrument( InstrumentTrack * _instrument_track ) :
 
 gigInstrument::~gigInstrument()
 {
-	if( m_noteData )
+	if( m_noteData != NULL )
 		delete[] m_noteData;
 
 	engine::mixer()->removePlayHandles( instrumentTrack() );
@@ -192,15 +192,19 @@ QString gigInstrument::nodeName() const
 
 void gigInstrument::freeInstance()
 {
-	m_synthMutex.lock();
+	QMutexLocker locker(&m_synthMutex);
 
-	if ( m_instance != NULL )
+	if( m_instance != NULL )
 	{
 		delete m_instance;
 		m_instance = NULL;
-	}
 
-	m_synthMutex.unlock();
+		// If we're changing instruments, we got to make sure that we
+		// remove all pointers to the old samples and don't try accessing
+		// that instrument again
+		m_instrument = NULL;
+		m_notes.clear();
+	}
 }
 
 
@@ -216,20 +220,20 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 	// free reference to gig file if one is selected
 	freeInstance();
 
-	m_synthMutex.lock();
-
-	try
 	{
-		m_instance = new gigInstance( _gigFile );
-		m_filename = relativePath;
-	}
-	catch( ... )
-	{
-		m_instance = NULL;
-		m_filename = "";
-	}
+		QMutexLocker locker(&m_synthMutex);
 
-	m_synthMutex.unlock();
+		try
+		{
+			m_instance = new gigInstance( _gigFile );
+			m_filename = relativePath;
+		}
+		catch( ... )
+		{
+			m_instance = NULL;
+			m_filename = "";
+		}
+	}
 
 	emit fileChanged();
 
@@ -256,11 +260,10 @@ void gigInstrument::updatePatch()
 
 QString gigInstrument::getCurrentPatchName()
 {
-	m_synthMutex.lock();
+	QMutexLocker locker(&m_synthMutex);
 
 	if( !m_instance )
 	{
-		m_synthMutex.unlock();
 		return "";
 	}
 
@@ -281,14 +284,12 @@ QString gigInstrument::getCurrentPatchName()
 			if( name == "" )
 				name = "<no name>";
 
-			m_synthMutex.unlock();
 			return name;
 		}
 
 		pInstrument = m_instance->gig.GetNextInstrument();
 	}
 
-	m_synthMutex.unlock();
 	return "";
 }
 
@@ -316,9 +317,18 @@ void gigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->lastVelocity = 127;
 		_n->m_pluginData = pluginData;
 
-		if( m_instance )
+		bool instance = false;
+		bool instrument = false;
+
 		{
-			if( !m_instrument )
+			QMutexLocker locker(&m_synthMutex);
+			instance = m_instance;
+			instrument = m_instrument;
+		}
+
+		if( instance )
+		{
+			if( !instrument )
 				getInstrument();
 
 			const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
@@ -350,28 +360,37 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	// How many frames we'll be grabbing from the sample
 	int samples = frames;
 
-	m_notesMutex.lock();
+	m_synthMutex.lock();
 
-	// Verify all the samples have the same rate
 	for( std::list<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 	{
 		if( note->sample )
 		{
+			// Verify all the samples have the same rate
 			int currentRate = note->sample->SamplesPerSecond;
 
-			if (oldRate == -1)
+			if( oldRate == -1 )
 			{
 				oldRate = currentRate;
 			}
-			else if (oldRate != currentRate)
+			else if( oldRate != currentRate )
 			{
 				qCritical() << "gigInstrument: not all samples are the same rate, not converting";
 				sampleError = true;
 			}
+
+			// Delete ended notes
+			if( note->adsr.done() || note->pos >= note->sample->SamplesTotal-1 )
+			{
+				note = m_notes.erase(note);
+
+				if( note == m_notes.end() )
+					break;
+			}
 		}
 	}
 
-	if (oldRate != -1 && !sampleError && oldRate != newRate)
+	if( oldRate != -1 && !sampleError && oldRate != newRate )
 	{
 		sampleConvert = true;
 
@@ -385,7 +404,7 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Recreate buffer if it is of a different size
-	if (m_noteDataSize != samples)
+	if( m_noteDataSize != samples )
 	{
 		delete[] m_noteData;
 		m_noteData = new sampleFrame[samples];
@@ -458,28 +477,12 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 			// Cleanup
 			delete[] (int8_t*)buf.pStart;
 
-			// Fade out note and if it ends before our buffer ends, set the
-			// rest of the samples to zero
-			if( note->fadeOut )
+			// Apply ADSR
+			for( int i = 0; i < samples; ++i )
 			{
-				int i = 0;
-
-				for( int pos = note->fadeOutPos; i < samples && pos < note->fadeOutLen; ++i, ++pos )
-				{
-					m_noteData[i][0] *= 1.0-1.0/note->fadeOutLen*note->fadeOutPos;
-					m_noteData[i][1] *= 1.0-1.0/note->fadeOutLen*note->fadeOutPos;
-				}
-
-				for( ; i < samples; ++i )
-				{
-					m_noteData[i][0] = 0;
-					m_noteData[i][1] = 0;
-				}
-
-				// We fade out [0, samples) but we only want to advance the
-				// fade out as if we rendered out [0, frames) to base the fade
-				// out on actual time instead of the time in the sample
-				note->fadeOutPos += frames;
+				double amplitude = note->adsr.value();
+				m_noteData[i][0] *= amplitude;
+				m_noteData[i][1] *= amplitude;
 			}
 
 			// Save to output buffer
@@ -502,14 +505,14 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 		}
 	}
 
-	m_notesMutex.unlock();
+	m_synthMutex.unlock();
 
 	// Convert sample rate if needed
 	if( sampleConvert )
 	{
 		// If an error occured, it's better to render nothing than have some
 		// screetching high-volume noise
-		if (!convertSampleRate(*convertBuf, *_working_buffer, samples, frames, oldRate, newRate))
+		if( !convertSampleRate(*convertBuf, *_working_buffer, samples, frames, oldRate, newRate) )
 			std::memset(&_working_buffer[0][0], 0, 2*frames*sizeof(float)); // *2 for channels
 
 		delete[] convertBuf;
@@ -523,23 +526,6 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
-
-	m_notesMutex.lock();
-
-	// Delete ended notes
-	for( std::list<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
-	{
-		if( (note->fadeOut && note->fadeOutPos >= note->fadeOutLen-1) ||
-				note->pos >= note->sample->SamplesTotal-1 )
-		{
-			note = m_notes.erase(note);
-
-			if (note == m_notes.end())
-				break;
-		}
-	}
-
-	m_notesMutex.unlock();
 }
 
 
@@ -548,36 +534,25 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	GIGPluginData * pluginData = static_cast<GIGPluginData *>( _n->m_pluginData );
-	m_notesMutex.lock();
+
+	m_synthMutex.lock();
 
 	// Is the note supposed to have a release sample played?
 	bool noteRelease = false;
 
 	// Fade out the note we want to end
-	// TODO: implement proper ADSR from GIG specs
 	for( std::list<gigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
 	{
-		if( i->midiNote == pluginData->midiNote && !i->fadeOut )
+		if( i->midiNote == pluginData->midiNote)
 		{
 			noteRelease = i->release;
-
-			float fadeOut = i->releaseTime;
-			int samples = i->sample->SamplesTotal;
-			int len = std::min( int( floor( fadeOut * engine::mixer()->processingSampleRate() ) ),
-					samples - i->pos );
+			i->adsr.keyup();
 
 			// TODO: not sample exact? What about in the middle of us writing out the sample?
-
-			i->fadeOutPos = 0;
-			i->fadeOutLen = len;
-			i->fadeOut = true;
-
-			if (len < 0)
-				continue;
 		}
 	}
 
-	m_notesMutex.unlock();
+	m_synthMutex.unlock();
 
 	if( noteRelease )
 	{
@@ -613,7 +588,7 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 		switch( pRegion->pDimensionDefinitions[i].dimension )
 		{
 			case gig::dimension_layer:
-				//DimValues[i] = iLayer;
+				// TODO: implement this
 				dim.DimValues[i] = 0;
 				break;
 			case gig::dimension_velocity:
@@ -628,13 +603,14 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 				break;
 			case gig::dimension_roundrobin:
 			case gig::dimension_roundrobinkeyboard:
-				//dim.DimValues[i] = (uint) pEngineChannel->pMIDIKeyInfo[MIDIKey].RoundRobinIndex; // incremented for each note on
-				dim.DimValues[i] = 0;
 				// TODO: implement this
+				dim.DimValues[i] = 0;
 				break;
 			case gig::dimension_random:
-				m_RandomSeed   = m_RandomSeed * 1103515245 + 12345; // classic pseudo random number generator
-				dim.DimValues[i] = (uint) m_RandomSeed >> (32 - pRegion->pDimensionDefinitions[i].bits); // highest bits are most random
+				// From LinuxSampler, untested
+				m_RandomSeed = m_RandomSeed * 1103515245 + 12345;
+				dim.DimValues[i] = uint(
+					m_RandomSeed / 4294967296.0f * pRegion->pDimensionDefinitions[i].bits);
 				break;
 			case gig::dimension_samplechannel:
 			case gig::dimension_channelaftertouch:
@@ -662,11 +638,9 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 			case gig::dimension_effect4depth:
 			case gig::dimension_effect5depth:
 			case gig::dimension_none:
+			default:
 				dim.DimValues[i] = 0;
 				break;
-			default:
-				// Warning: unknown dimension
-				dim.DimValues[i] = 0;
 		}
 	}
 
@@ -682,7 +656,7 @@ void gigInstrument::getInstrument()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	m_synthMutex.lock();
+	QMutexLocker locker(&m_synthMutex);
 
 	if( m_instance )
 	{
@@ -701,8 +675,6 @@ void gigInstrument::getInstrument()
 
 		m_instrument = pInstrument;
 	}
-
-	m_synthMutex.unlock();
 }
 
 
@@ -742,18 +714,17 @@ bool gigInstrument::convertSampleRate( sampleFrame& oldBuf, sampleFrame& newBuf,
 
 void gigInstrument::updateSampleRate()
 {
-	m_srcMutex.lock();
+	QMutexLocker locker(&m_srcMutex);
 
 	if( m_srcState != NULL )
 		src_delete( m_srcState );
 
 	int error;
-	m_srcState = src_new( engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
+	m_srcState = src_new( engine::mixer()->currentQualitySettings().libsrcInterpolation(),
+		DEFAULT_CHANNELS, &error );
 
 	if( m_srcState == NULL || error )
 		qCritical( "error while creating libsamplerate data structure in gigInstrument::updateSampleRate()" );
-
-	m_srcMutex.unlock();
 }
 
 
@@ -761,19 +732,18 @@ void gigInstrument::updateSampleRate()
 // Find the sample we want to play (based on velocity, etc.)
 void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 {
+	QMutexLocker synthLock(&m_synthMutex);
+
 	if( m_instrument )
 	{
 		// Change key dimension, e.g. change samples based on what key is pressed
-		// in a certain range.
+		// in a certain range. From LinuxSampler
 		if( midiNote >= m_instrument->DimensionKeyRange.low && midiNote
 				<= m_instrument->DimensionKeyRange.high )
 			m_currentKeyDimension = float( midiNote -
 					m_instrument->DimensionKeyRange.low ) / (
 						m_instrument->DimensionKeyRange.high -
 						m_instrument->DimensionKeyRange.low + 1 );
-
-		m_synthMutex.lock();
-		m_notesMutex.lock();
 
 		gig::Region* pRegion = m_instrument->GetFirstRegion();
 
@@ -783,7 +753,7 @@ void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 			gig::DimensionRegion* pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
 			gig::Sample* pSample = pDimRegion->pSample;
 
-			if( pSample && pDimRegion->pSample->SamplesTotal != 0 )
+			if( pSample && pSample->SamplesTotal != 0 )
 			{
 				int keyLow = pRegion->KeyRange.low;
 				int keyHigh = pRegion->KeyRange.high;
@@ -795,23 +765,19 @@ void gigInstrument::addNotes( int midiNote, int velocity, bool release )
 
 					// TODO: sample panning? looping? crossfade different layers?
 
-					if (release)
+					if( release )
+						// From LinuxSampler, not sure how it was created
 						attenuation *= 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
 					else
 						attenuation *= pDimRegion->SampleAttenuation;
 
 					m_notes.push_back(gigNote(pSample, midiNote, attenuation, dim.release,
-						pDimRegion->EG1Release));
-
-					break; // Only grab one sample to play
+						ADSR(pDimRegion, pSample->SamplesPerSecond)));
 				}
 			}
 
 			pRegion = m_instrument->GetNextRegion();
 		}
-
-		m_notesMutex.unlock();
-		m_synthMutex.unlock();
 	}
 }
 
@@ -1017,30 +983,14 @@ void gigInstrumentView::showPatchDialog()
 
 
 
-gigNote::gigNote() :
-	sample( NULL ),
-	midiNote( -1 ),
-	attenuation( 1 ),
-	release( false ),
-	releaseTime( 0 ),
-	pos( 0 ),
-	fadeOut( false ),
-	fadeOutPos( 0 ),
-	fadeOutLen( 0 )
-{
-}
-
 gigNote::gigNote( gig::Sample* pSample, int midiNote, float attenuation,
-		bool release, float releaseTime ) :
+		bool release, const ADSR& adsr ) :
 	sample( pSample ),
 	midiNote( midiNote ),
 	attenuation( attenuation ),
 	release( release ),
-	releaseTime( releaseTime ),
-	pos( 0 ),
-	fadeOut( false ),
-	fadeOutPos( 0 ),
-	fadeOutLen( 0 )
+	adsr( adsr ),
+	pos( 0 )
 {
 }
 
@@ -1049,13 +999,94 @@ gigNote::gigNote( const gigNote& g ) :
 	midiNote( g.midiNote ),
 	attenuation( g.attenuation ),
 	release( g.release ),
-	releaseTime( g.releaseTime ),
-	pos( g.pos ),
-	fadeOut( g.fadeOut ),
-	fadeOutPos( g.fadeOutPos ),
-	fadeOutLen( g.fadeOutLen )
+	adsr( g.adsr ),
+	pos( g.pos )
 {
 }
+
+ADSR::ADSR( gig::DimensionRegion* region, int sampleRate )
+	: preattack(0), attack(0), decay1(0), decay2(0), infiniteSustain(false),
+	  sustain(0), release(0),
+	  amplitude(0), isAttack(true), isRelease(false), isDone(false),
+	  attackPosition(0), attackLength(0), decayLength(0),
+	  releasePosition(0), releaseLength(0)
+{
+	if( region )
+	{
+		// Parameters from GIG file
+		preattack = 1.0*region->EG1PreAttack/1000; // EG1PreAttack is 0-1000 permille
+		attack = region->EG1Attack;
+		decay1 = region->EG1Decay1;
+		decay2 = region->EG1Decay2;
+		infiniteSustain = region->EG1InfiniteSustain;
+		sustain = 1.0*region->EG1Sustain/1000; // EG1Sustain is 0-1000 permille
+		release = region->EG1Release;
+
+		// Simple ADSR using positions in sample
+		amplitude = preattack;
+		attackLength = attack*sampleRate;
+		decayLength = decay1*sampleRate; // TODO: ignoring decay2 for now
+		releaseLength = release*sampleRate;
+	}
+}
+
+// Next time we get the amplitude, we'll be releasing the note
+void ADSR::keyup()
+{
+	isRelease = true;
+}
+
+// Can we delete the note now?
+bool ADSR::done()
+{
+	return isDone;
+}
+
+// Return the current amplitude and increment
+double ADSR::value()
+{
+	double currentAmplitude = amplitude;
+
+	// If we're done, don't output any signal
+	if( isDone )
+	{
+		return 0;
+	}
+	// If we're still in the attack phase, release from the current volume
+	// instead of jumping to the sustain volume and fading out
+	else if( isAttack && isRelease )
+	{
+		sustain = amplitude;
+		isAttack = false;
+	}
+
+	// If we're in the attack phase, start at the preattack amplitude and
+	// increase to the full before decreasing to sustain
+	if( isAttack )
+	{
+		if( attackPosition < attackLength )
+			amplitude = preattack + (attack - preattack)/attackLength*attackPosition;
+		else if( attackPosition < attackLength+decayLength )
+			amplitude = 1.0 - (1.0-sustain)/decayLength*(attackPosition-attackLength);
+		else
+			isAttack = false;
+
+		++attackPosition;
+	}
+	// If we're in the sustain phase, decrease from sustain to zero
+	else if( isRelease )
+	{
+		if( releasePosition < releaseLength )
+			amplitude = sustain*(1.0-1.0/releaseLength*releasePosition);
+		else
+			isDone = true;
+
+		++releasePosition;
+	}
+
+	return currentAmplitude;
+}
+
 
 extern "C"
 {

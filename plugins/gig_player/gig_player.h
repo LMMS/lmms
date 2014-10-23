@@ -28,6 +28,7 @@
 #define GIG_PLAYER_H
 
 #include <QMutex>
+#include <QMutexLocker>
 #include <list>
 
 #include "Instrument.h"
@@ -77,26 +78,49 @@ struct Dimension
 };
 
 
+class ADSR
+{
+	// From the file
+	double preattack; // initial amplitude (0-1)
+	double attack; // 0-60s
+	double decay1; // 0-60s
+	double decay2; // 0-60s
+	bool infiniteSustain; // i.e., no decay2
+	double sustain; // sustain amplitude (0-1)
+	double release; // 0-60s
+
+	// Used to calculate current amplitude
+	double amplitude;
+	bool isAttack;
+	bool isRelease;
+	bool isDone;
+	int attackPosition;
+	int attackLength;
+	int decayLength;
+	int releasePosition;
+	int releaseLength;
+
+public:
+	ADSR( gig::DimensionRegion* region, int sampleRate );
+	void keyup(); // We will begin releasing starting now
+	bool done(); // Are we done?
+	double value(); // What's the current amplitude
+};
+
 
 class gigNote
 {
 public:
-	gigNote();
 	gigNote( gig::Sample* pSample, int midiNote, float attenuation,
-			bool release, float releaseTime );
+		bool release, const ADSR& adsr );
 	gigNote( const gigNote& g );
 
-	// Data for the note
 	gig::Sample* sample;
 	int midiNote;
 	float attenuation;
 	bool release; // Whether to trigger a release sample on key up
-	float releaseTime; // After letting up, time to fade out (seconds)
-
+	ADSR adsr;
 	int pos; // Position in sample
-	bool fadeOut; // Whether we have started fading out yet
-	int fadeOutPos; // Position in fade out
-	int fadeOutLen; // Length of fade out
 };
 
 
@@ -135,7 +159,7 @@ public:
 
 	virtual Flags flags() const
 	{
-		return IsSingleStreamed;
+		return IsSingleStreamed|IsNotBendable;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
@@ -170,7 +194,6 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 	QMutex m_srcMutex;
-	QMutex m_notesMutex;
 
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
