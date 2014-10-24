@@ -50,7 +50,7 @@ public:
 	virtual ~patchesDialog();
 
 
-	void setup(gigInstance * pSynth, int iChan, const QString & _chanName,
+	void setup(GigInstance * pSynth, int iChan, const QString & _chanName,
 			LcdSpinBoxModel * _bankModel, LcdSpinBoxModel * _progModel, QLabel *_patchLabel );
 
 public slots:
@@ -76,7 +76,7 @@ protected:
 private:
 
 	// Instance variables.
-	gigInstance *m_pSynth;
+	GigInstance *m_pSynth;
 
 	int m_iChan;
 	int m_iBank;

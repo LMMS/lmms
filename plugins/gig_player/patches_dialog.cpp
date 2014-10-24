@@ -115,7 +115,7 @@ patchesDialog::~patchesDialog()
 
 
 // Dialog setup loader.
-void patchesDialog::setup ( gigInstance * pSynth, int iChan,
+void patchesDialog::setup ( GigInstance * pSynth, int iChan,
 						const QString & _chanName,
 						LcdSpinBoxModel * _bankModel,
 						LcdSpinBoxModel * _progModel,

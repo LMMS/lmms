@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * Based partially on some code from LinuxSampler (also GPL):
+ * A few lines of code taken from LinuxSampler (also GPLv2) where noted:
  * Copyright (C) 2003,2004 by Benno Senoner and Christian Schoenebeck
  * Copyright (C) 2005-2008 Christian Schoenebeck
  * Copyright (C) 2009-2010 Christian Schoenebeck and Grigor Iliev
@@ -72,10 +72,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 struct GIGPluginData
 {
 	int midiNote;
-	int lastPanning;
-	float lastVelocity;
 } ;
-
 
 
 
@@ -84,17 +81,14 @@ gigInstrument::gigInstrument( InstrumentTrack * _instrument_track ) :
 	m_srcState( NULL ),
 	m_instance( NULL ),
 	m_instrument( NULL ),
-	m_RandomSeed( 0 ),
-	m_currentKeyDimension( 0 ),
 	m_filename( "" ),
-	m_lastMidiPitch( -1 ),
-	m_lastMidiPitchRange( -1 ),
-	m_channel( 1 ),
 	m_bankNum( 0, 0, 999, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
-	m_noteData( NULL ),
-	m_noteDataSize( 0 )
+	m_sampleData( NULL ),
+	m_sampleDataSize( 0 ),
+	m_RandomSeed( 0 ),
+	m_currentKeyDimension( 0 )
 {
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::mixer()->addPlayHandle( iph );
@@ -107,16 +101,16 @@ gigInstrument::gigInstrument( InstrumentTrack * _instrument_track ) :
 
 	// Buffer for reading samples
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
-	m_noteData = new sampleFrame[frames];
-	m_noteDataSize = frames;
+	m_sampleData = new sampleFrame[frames];
+	m_sampleDataSize = frames;
 }
 
 
 
 gigInstrument::~gigInstrument()
 {
-	if( m_noteData != NULL )
-		delete[] m_noteData;
+	if( m_sampleData != NULL )
+		delete[] m_sampleData;
 
 	engine::mixer()->removePlayHandles( instrumentTrack() );
 	freeInstance();
@@ -138,7 +132,6 @@ void gigInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-
 void gigInstrument::loadSettings( const QDomElement & _this )
 {
 	openFile( _this.attribute( "src" ), false );
@@ -149,7 +142,6 @@ void gigInstrument::loadSettings( const QDomElement & _this )
 
 	updatePatch();
 }
-
 
 
 
@@ -165,18 +157,15 @@ void gigInstrument::loadFile( const QString & _file )
 
 
 
-
 AutomatableModel * gigInstrument::childModel( const QString & _modelName )
 {
 	if( _modelName == "bank" )
-	{
 		return &m_bankNum;
-	}
 	else if( _modelName == "patch" )
-	{
 		return &m_patchNum;
-	}
+
 	qCritical() << "requested unknown model " << _modelName;
+
 	return NULL;
 }
 
@@ -189,10 +178,10 @@ QString gigInstrument::nodeName() const
 
 
 
-
 void gigInstrument::freeInstance()
 {
-	QMutexLocker locker(&m_synthMutex);
+	QMutexLocker synthLock(&m_synthMutex);
+	QMutexLocker notesLock(&m_notesMutex);
 
 	if( m_instance != NULL )
 	{
@@ -213,11 +202,7 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 {
 	emit fileLoading();
 
-	// Used for loading file
-	char * gigAscii = qstrdup( qPrintable( SampleBuffer::tryToMakeAbsolute( _gigFile ) ) );
-	QString relativePath = SampleBuffer::tryToMakeRelative( _gigFile );
-
-	// free reference to gig file if one is selected
+	// Remove the current instrument if one is selected
 	freeInstance();
 
 	{
@@ -225,8 +210,8 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 		try
 		{
-			m_instance = new gigInstance( _gigFile );
-			m_filename = relativePath;
+			m_instance = new GigInstance( _gigFile );
+			m_filename = SampleBuffer::tryToMakeRelative( _gigFile );
 		}
 		catch( ... )
 		{
@@ -237,8 +222,6 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 	emit fileChanged();
 
-	delete[] gigAscii;
-
 	if( updateTrackName )
 	{
 		instrumentTrack()->setName( QFileInfo( _gigFile ).baseName() );
@@ -248,13 +231,11 @@ void gigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 
 
-
 void gigInstrument::updatePatch()
 {
 	if( m_bankNum.value() >= 0 && m_patchNum.value() >= 0 )
 		getInstrument();
 }
-
 
 
 
@@ -295,6 +276,7 @@ QString gigInstrument::getCurrentPatchName()
 
 
 
+// A key has been pressed
 void gigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 {
 	const float LOG440 = 2.643452676f;
@@ -313,44 +295,38 @@ void gigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	{
 		GIGPluginData * pluginData = new GIGPluginData;
 		pluginData->midiNote = midiNote;
-		pluginData->lastPanning = -1;
-		pluginData->lastVelocity = 127;
 		_n->m_pluginData = pluginData;
 
-		bool instance = false;
-		bool instrument = false;
+		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
+		const uint velocity = _n->midiVelocity( baseVelocity );
 
-		{
-			QMutexLocker locker(&m_synthMutex);
-			instance = m_instance;
-			instrument = m_instrument;
-		}
-
-		if( instance )
-		{
-			if( !instrument )
-				getInstrument();
-
-			const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
-			const uint velocity = _n->midiVelocity( baseVelocity );
-			addNotes( midiNote, velocity, false );
-		}
+		QMutexLocker locker(&m_notesMutex);
+		m_notes.push_back(GigNote(midiNote, velocity));
 	}
 }
 
 
 
-
-// Could we get iph-based instruments support sample-exact models by using a
-// frame-length of 1 while rendering?
+// Process the notes and output a certain number of frames (e.g. 256, set in
+// the preferences)
 void gigInstrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
 	// Initialize to zeros
-	std::memset(&_working_buffer[0][0], 0, 2*frames*sizeof(float)); // *2 for channels
+	std::memset(&_working_buffer[0][0], 0, DEFAULT_CHANNELS*frames*sizeof(float));
 
-	// Determine if we need to convert sample rates
+	m_synthMutex.lock();
+	m_notesMutex.lock();
+
+	if( !m_instance || !m_instrument )
+	{
+		m_synthMutex.unlock();
+		m_notesMutex.unlock();
+		return;
+	}
+
+	// Data for converting sample rate
 	int oldRate = -1;
 	int newRate = engine::mixer()->processingSampleRate();
 	bool sampleError = false;
@@ -360,102 +336,152 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 	// How many frames we'll be grabbing from the sample
 	int samples = frames;
 
-	m_synthMutex.lock();
-
-	for( QList<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 	{
-		if( note->sample )
+		// Process notes in the KeyUp state, adding release samples if desired
+		if( note->state == KeyUp )
 		{
-			// Verify all the samples have the same rate
-			int currentRate = note->sample->SamplesPerSecond;
-
-			if( oldRate == -1 )
+			// If there are no samples, we're done
+			if( note->samples.empty() )
 			{
-				oldRate = currentRate;
+				note->state = Completed;
 			}
-			else if( oldRate != currentRate )
+			else
 			{
-				qCritical() << "gigInstrument: not all samples are the same rate, not converting";
-				sampleError = true;
+				note->state = PlayingKeyUp;
+
+				// Notify each sample that the key has been released
+				for( QList<GigSample>::iterator sample = note->samples.begin();
+						sample != note->samples.end(); ++sample )
+					sample->adsr.keyup();
+
+				// Add release samples if available
+				if( note->release )
+					addSamples(*note, true);
 			}
+		}
+		// Process notes in the KeyDown state, adding samples for the notes
+		else if( note->state == KeyDown )
+		{
+			note->state = PlayingKeyDown;
+			addSamples(*note, false);
+		}
 
-			// Delete ended notes
-			if( note->adsr.done() || note->pos >= note->sample->SamplesTotal-1 )
+		for( QList<GigSample>::iterator sample = note->samples.begin();
+				sample != note->samples.end(); ++sample )
+		{
+			// Delete ended samples
+			if( !sample->sample || sample->adsr.done() || sample->pos >= sample->sample->SamplesTotal-1 )
 			{
-				note = m_notes.erase(note);
+				sample = note->samples.erase(sample);
 
-				if( note == m_notes.end() )
+				if( sample == note->samples.end() )
 					break;
 			}
+			// Verify all the samples have the same rate
+			else
+			{
+				int currentRate = sample->sample->SamplesPerSecond;
+
+				if( oldRate == -1 )
+				{
+					oldRate = currentRate;
+				}
+				else if( oldRate != currentRate )
+				{
+					qCritical() << "gigInstrument: not all samples are the same rate, not converting";
+					sampleError = true;
+				}
+			}
+		}
+
+		// Delete ended notes (either in the completed state or all the samples ended)
+		if( note->state == Completed || note->samples.empty() )
+		{
+			note = m_notes.erase(note);
+
+			if( note == m_notes.end() )
+				break;
 		}
 	}
 
+	// If all samples have the same sample rate and it's not the output sample
+	// rate, then we'll convert sample rates
 	if( oldRate != -1 && !sampleError && oldRate != newRate )
 	{
 		sampleConvert = true;
 
-		// At a higher sample rate, we'll go output the samples slightly
-		// faster while maintaining the same note
+		// Read a different number of samples depending on the sample rate, but
+		// resample it to always output the right number of frames
 		samples = frames*oldRate/newRate;
 
 		// Buffer for the resampled data
 		convertBuf = new sampleFrame[samples];
-		std::memset(&convertBuf[0][0], 0, 2*samples*sizeof(float)); // *2 for channels
+		std::memset(&convertBuf[0][0], 0, DEFAULT_CHANNELS*samples*sizeof(float));
 	}
 
 	// Recreate buffer if it is of a different size
-	if( m_noteDataSize != samples )
+	if( m_sampleDataSize != samples )
 	{
-		delete[] m_noteData;
-		m_noteData = new sampleFrame[samples];
-		m_noteDataSize = samples;
+		delete[] m_sampleData;
+		m_sampleData = new sampleFrame[samples];
+		m_sampleDataSize = samples;
 	}
 
-	// Fill with portions of the note samples
-	for( QList<gigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	// Fill buffer with portions of the note samples
+	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 	{
-		if( note->sample )
+		// Only process the notes if we're in a playing state
+		if( !(note->state == PlayingKeyDown ||
+				note->state == PlayingKeyUp) )
+			continue;
+
+		for( QList<GigSample>::iterator sample = note->samples.begin();
+				sample != note->samples.end(); ++sample )
 		{
+			if( !sample->sample )
+				continue;
+
 			// Set the position to where we currently are in the sample
-			note->sample->SetPos(note->pos); // Note: not thread safe
+			sample->sample->SetPos(sample->pos); // Note: not thread safe
 
 			// Load the next portion of the sample
 			gig::buffer_t buf;
-			unsigned long allocationsize = samples * note->sample->FrameSize;
+			unsigned long allocationsize = samples * sample->sample->FrameSize;
 			buf.pStart = new int8_t[allocationsize];
-			buf.Size = note->sample->Read(buf.pStart, samples) * note->sample->FrameSize;
+			buf.Size = sample->sample->Read(buf.pStart, samples) * sample->sample->FrameSize;
 			buf.NullExtensionSize = allocationsize - buf.Size;
 			std::memset((int8_t*)buf.pStart + buf.Size, 0, buf.NullExtensionSize);
 
 			// Save the new position in the sample
-			note->pos = note->sample->GetPos();
+			sample->pos = sample->sample->GetPos();
 
 			// Convert from 16 or 24 bit into 32-bit float
-			if( note->sample->BitDepth == 24 ) // 24 bit
+			if( sample->sample->BitDepth == 24 ) // 24 bit
 			{
 				uint8_t* pInt = static_cast<uint8_t*>( buf.pStart );
 
 				for( int i = 0; i < samples; ++i )
 				{
-					int32_t valueLeft = (pInt[3*note->sample->Channels*i]<<8) |
-								(pInt[3*note->sample->Channels*i+1]<<16) |
-								(pInt[3*note->sample->Channels*i+2]<<24);
+					int32_t valueLeft = (pInt[3*sample->sample->Channels*i]<<8) |
+								(pInt[3*sample->sample->Channels*i+1]<<16) |
+								(pInt[3*sample->sample->Channels*i+2]<<24);
 
 					// Store the notes to this buffer before saving to output
 					// so we can fade them out as needed
-					m_noteData[i][0] = 1.0/0x100000000*note->attenuation*valueLeft;
+					m_sampleData[i][0] = 1.0/0x100000000*sample->attenuation*valueLeft;
 
-					if( note->sample->Channels == 1 )
+					if( sample->sample->Channels == 1 )
 					{
-						m_noteData[i][1] = m_noteData[i][0];
+						m_sampleData[i][1] = m_sampleData[i][0];
 					}
 					else
 					{
-						int32_t valueRight = (pInt[3*note->sample->Channels*i+3]<<8) |
-									(pInt[3*note->sample->Channels*i+4]<<16) |
-									(pInt[3*note->sample->Channels*i+5]<<24);
+						int32_t valueRight = (pInt[3*sample->sample->Channels*i+3]<<8) |
+									(pInt[3*sample->sample->Channels*i+4]<<16) |
+									(pInt[3*sample->sample->Channels*i+5]<<24);
 
-						m_noteData[i][1] = 1.0/0x100000000*note->attenuation*valueRight;
+						m_sampleData[i][1] = 1.0/0x100000000*sample->attenuation*valueRight;
 					}
 				}
 			}
@@ -465,12 +491,12 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 
 				for( int i = 0; i < samples; ++i )
 				{
-					m_noteData[i][0] = 1.0/0x10000*pInt[note->sample->Channels*i] * note->attenuation;
+					m_sampleData[i][0] = 1.0/0x10000*pInt[sample->sample->Channels*i] * sample->attenuation;
 
-					if( note->sample->Channels == 1 )
-						m_noteData[i][1] = m_noteData[i][0];
+					if( sample->sample->Channels == 1 )
+						m_sampleData[i][1] = m_sampleData[i][0];
 					else
-						m_noteData[i][1] = 1.0/0x10000*pInt[note->sample->Channels*i+1] * note->attenuation;
+						m_sampleData[i][1] = 1.0/0x10000*pInt[sample->sample->Channels*i+1] * sample->attenuation;
 				}
 			}
 
@@ -480,9 +506,9 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 			// Apply ADSR
 			for( int i = 0; i < samples; ++i )
 			{
-				double amplitude = note->adsr.value();
-				m_noteData[i][0] *= amplitude;
-				m_noteData[i][1] *= amplitude;
+				double amplitude = sample->adsr.value();
+				m_sampleData[i][0] *= amplitude;
+				m_sampleData[i][1] *= amplitude;
 			}
 
 			// Save to output buffer
@@ -490,22 +516,20 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 			{
 				for( int i = 0; i < samples; ++i )
 				{
-					convertBuf[i][0] += m_noteData[i][0];
-					convertBuf[i][1] += m_noteData[i][1];
+					convertBuf[i][0] += m_sampleData[i][0];
+					convertBuf[i][1] += m_sampleData[i][1];
 				}
 			}
 			else
 			{
 				for( int i = 0; i < frames; ++i )
 				{
-					_working_buffer[i][0] += m_noteData[i][0];
-					_working_buffer[i][1] += m_noteData[i][1];
+					_working_buffer[i][0] += m_sampleData[i][0];
+					_working_buffer[i][1] += m_sampleData[i][1];
 				}
 			}
 		}
 	}
-
-	m_synthMutex.unlock();
 
 	// Convert sample rate if needed
 	if( sampleConvert )
@@ -517,6 +541,9 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 
 		delete[] convertBuf;
 	}
+
+	m_notesMutex.unlock();
+	m_synthMutex.unlock();
 
 	// Set gain properly based on volume control
 	for( int i = 0; i < frames; ++i)
@@ -530,41 +557,23 @@ void gigInstrument::play( sampleFrame * _working_buffer )
 
 
 
-
+// A key has been released
 void gigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	GIGPluginData * pluginData = static_cast<GIGPluginData *>( _n->m_pluginData );
+	QMutexLocker locker(&m_notesMutex);
 
-	m_synthMutex.lock();
+	// Mark the note as being released, but only if it was playing or was just
+	// pressed (i.e., not if the key was already released)
+	for( QList<GigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
+		if( i->midiNote == pluginData->midiNote &&
+				( i->state == KeyDown || i->state == PlayingKeyDown ) )
+			i->state = KeyUp;
 
-	// Is the note supposed to have a release sample played?
-	bool noteRelease = false;
-
-	// Fade out the note we want to end
-	for( QList<gigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
-	{
-		if( i->midiNote == pluginData->midiNote)
-		{
-			noteRelease = i->release;
-			i->adsr.keyup();
-
-			// TODO: not sample exact? What about in the middle of us writing out the sample?
-		}
-	}
-
-	m_synthMutex.unlock();
-
-	if( noteRelease )
-	{
-		// Add the release notes if available
-		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
-		const uint velocity = _n->midiVelocity( baseVelocity );
-		addNotes( pluginData->midiNote , velocity, true );
-	}
+	// TODO: not sample exact? What about in the middle of us writing out the sample?
 
 	delete pluginData;
 }
-
 
 
 
@@ -575,7 +584,68 @@ PluginView * gigInstrument::instantiateView( QWidget * _parent )
 
 
 
+// Add the desired samples (either the normal samples or the release samples)
+// to the GigNote
+//
+// Note: not thread safe since libgig stores current region position data in
+// the instrument object
+void gigInstrument::addSamples(GigNote& note, bool wantReleaseSample)
+{
+	// Change key dimension, e.g. change samples based on what key is pressed
+	// in a certain range. From LinuxSampler
+	if( !wantReleaseSample &&
+			note.midiNote >= m_instrument->DimensionKeyRange.low &&
+			note.midiNote <= m_instrument->DimensionKeyRange.high )
+		m_currentKeyDimension = float( note.midiNote -
+				m_instrument->DimensionKeyRange.low ) / (
+					m_instrument->DimensionKeyRange.high -
+					m_instrument->DimensionKeyRange.low + 1 );
 
+	gig::Region* pRegion = m_instrument->GetFirstRegion();
+
+	while( pRegion )
+	{
+		Dimension dim = getDimensions( pRegion, note.velocity, wantReleaseSample );
+		gig::DimensionRegion* pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
+		gig::Sample* pSample = pDimRegion->pSample;
+
+		// Does this note have release samples? Set this only on the original
+		// notes and not when we get the release samples.
+		if( !wantReleaseSample )
+			note.release = dim.release;
+
+		if( pSample && pSample->SamplesTotal != 0 )
+		{
+			int keyLow = pRegion->KeyRange.low;
+			int keyHigh = pRegion->KeyRange.high;
+
+			if( note.midiNote >= keyLow && note.midiNote <= keyHigh )
+			{
+				float attenuation = pDimRegion->GetVelocityAttenuation( note.velocity );;
+				float length = (double) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
+
+				// TODO: sample panning? looping? crossfade different layers?
+
+				if( wantReleaseSample )
+					// From LinuxSampler, not sure how it was created
+					attenuation *= 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
+				else
+					attenuation *= pDimRegion->SampleAttenuation;
+
+				note.samples.push_back(GigSample(pSample, attenuation,
+					ADSR(pDimRegion, pSample->SamplesPerSecond)));
+			}
+		}
+
+		pRegion = m_instrument->GetNextRegion();
+	}
+}
+
+
+
+// Based on our input parameters, generate a "dimension" that specifies which
+// note we wish to select from the GIG file with libgig. libgig will use this
+// information to select the sample.
 Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool release )
 {
 	Dimension dim;
@@ -649,7 +719,8 @@ Dimension gigInstrument::getDimensions( gig::Region* pRegion, int velocity, bool
 
 
 
-
+// Get the selected instrument from the GIG file we opened if we haven't gotten
+// it already. This is based on the bank and patch numbers.
 void gigInstrument::getInstrument()
 {
 	// Find instrument
@@ -711,7 +782,6 @@ bool gigInstrument::convertSampleRate( sampleFrame& oldBuf, sampleFrame& newBuf,
 
 
 
-
 void gigInstrument::updateSampleRate()
 {
 	QMutexLocker locker(&m_srcMutex);
@@ -729,62 +799,6 @@ void gigInstrument::updateSampleRate()
 
 
 
-// Find the sample we want to play (based on velocity, etc.)
-void gigInstrument::addNotes( int midiNote, int velocity, bool release )
-{
-	QMutexLocker synthLock(&m_synthMutex);
-
-	if( m_instrument )
-	{
-		// Change key dimension, e.g. change samples based on what key is pressed
-		// in a certain range. From LinuxSampler
-		if( midiNote >= m_instrument->DimensionKeyRange.low && midiNote
-				<= m_instrument->DimensionKeyRange.high )
-			m_currentKeyDimension = float( midiNote -
-					m_instrument->DimensionKeyRange.low ) / (
-						m_instrument->DimensionKeyRange.high -
-						m_instrument->DimensionKeyRange.low + 1 );
-
-		gig::Region* pRegion = m_instrument->GetFirstRegion();
-
-		while( pRegion )
-		{
-			Dimension dim = getDimensions( pRegion, velocity, release );
-			gig::DimensionRegion* pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
-			gig::Sample* pSample = pDimRegion->pSample;
-
-			if( pSample && pSample->SamplesTotal != 0 )
-			{
-				int keyLow = pRegion->KeyRange.low;
-				int keyHigh = pRegion->KeyRange.high;
-
-				if( midiNote >= keyLow && midiNote <= keyHigh )
-				{
-					float attenuation = pDimRegion->GetVelocityAttenuation( velocity );;
-					float length = (double) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
-
-					// TODO: sample panning? looping? crossfade different layers?
-
-					if( release )
-						// From LinuxSampler, not sure how it was created
-						attenuation *= 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
-					else
-						attenuation *= pDimRegion->SampleAttenuation;
-
-					m_notes.push_back(gigNote(pSample, midiNote, attenuation, dim.release,
-						ADSR(pDimRegion, pSample->SamplesPerSecond)));
-				}
-			}
-
-			pRegion = m_instrument->GetNextRegion();
-		}
-	}
-}
-
-
-
-
-
 class gigKnob : public knob
 {
 public:
@@ -793,7 +807,7 @@ public:
 	{
 		setFixedSize( 31, 38 );
 	}
-};
+} ;
 
 
 
@@ -859,12 +873,9 @@ gigInstrumentView::gigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-
 gigInstrumentView::~gigInstrumentView()
 {
 }
-
-
 
 
 
@@ -881,7 +892,6 @@ void gigInstrumentView::modelChanged()
 
 	updateFilename();
 }
-
 
 
 
@@ -902,7 +912,6 @@ void gigInstrumentView::updateFilename()
 
 
 
-
 void gigInstrumentView::updatePatchName()
 {
 	gigInstrument * i = castModel<gigInstrument>();
@@ -915,12 +924,10 @@ void gigInstrumentView::updatePatchName()
 
 
 
-
 void gigInstrumentView::invalidateFile()
 {
 	m_patchDialogButton->setEnabled( false );
 }
-
 
 
 
@@ -972,7 +979,6 @@ void gigInstrumentView::showFileDialog()
 
 
 
-
 void gigInstrumentView::showPatchDialog()
 {
 	gigInstrument * k = castModel<gigInstrument>();
@@ -983,27 +989,18 @@ void gigInstrumentView::showPatchDialog()
 
 
 
-gigNote::gigNote( gig::Sample* pSample, int midiNote, float attenuation,
-		bool release, const ADSR& adsr ) :
-	sample( pSample ),
-	midiNote( midiNote ),
-	attenuation( attenuation ),
-	release( release ),
-	adsr( adsr ),
-	pos( 0 )
+// Store information related to playing a sample from the GIG file
+GigSample::GigSample( gig::Sample* pSample, float attenuation, const ADSR& adsr )
+	: sample( pSample ),
+	  attenuation( attenuation ),
+	  adsr( adsr ),
+	  pos( 0 )
 {
 }
 
-gigNote::gigNote( const gigNote& g ) :
-	sample( g.sample ),
-	midiNote( g.midiNote ),
-	attenuation( g.attenuation ),
-	release( g.release ),
-	adsr( g.adsr ),
-	pos( g.pos )
-{
-}
 
+
+// Create the ADSR envelope from the settings in the GIG file
 ADSR::ADSR( gig::DimensionRegion* region, int sampleRate )
 	: preattack(0), attack(0), decay1(0), decay2(0), infiniteSustain(false),
 	  sustain(0), release(0),
@@ -1030,19 +1027,25 @@ ADSR::ADSR( gig::DimensionRegion* region, int sampleRate )
 	}
 }
 
+
+
 // Next time we get the amplitude, we'll be releasing the note
 void ADSR::keyup()
 {
 	isRelease = true;
 }
 
-// Can we delete the note now?
+
+
+// Can we delete the sample now?
 bool ADSR::done()
 {
 	return isDone;
 }
 
-// Return the current amplitude and increment
+
+
+// Return the current amplitude and increment internal positions
 double ADSR::value()
 {
 	double currentAmplitude = amplitude;
@@ -1086,6 +1089,7 @@ double ADSR::value()
 
 	return currentAmplitude;
 }
+
 
 
 extern "C"

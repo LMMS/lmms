@@ -1,5 +1,5 @@
 /*
- * gig_player.h - a gig player using libgig
+ * gig_player.h - a gig player using libgig (based on sf2 player plugin)
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -41,16 +41,16 @@
 #include "gig.h"
 
 class gigInstrumentView;
-class gigInstance;
 class NotePlayHandle;
 
 class patchesDialog;
 class QLabel;
 
-class gigInstance
+// Load a GIG file using libgig
+class GigInstance
 {
 public:
-	gigInstance( QString filename ) :
+	GigInstance( QString filename ) :
 		riff( filename.toUtf8().constData() ),
 		gig( &riff )
 	{}
@@ -60,10 +60,10 @@ private:
 
 public:
 	gig::File gig;
-};
+} ;
 
 
-
+// Stores options for the notes, e.g. velocity and release time
 struct Dimension
 {
 	Dimension() :
@@ -75,9 +75,12 @@ struct Dimension
 
 	uint DimValues[8];
 	bool release;
-};
+} ;
 
 
+// Takes information from the GIG file for a certain note and provides the
+// amplitude (0-1) to multiply the signal by (internally incrementing the
+// position in the envelope when asking for the amplitude).
 class ADSR
 {
 	// From the file
@@ -103,25 +106,51 @@ class ADSR
 public:
 	ADSR( gig::DimensionRegion* region, int sampleRate );
 	void keyup(); // We will begin releasing starting now
-	bool done(); // Are we done?
+	bool done(); // Is this sample done playing?
 	double value(); // What's the current amplitude
-};
+} ;
 
 
-class gigNote
+// The sample from the GIG file with our current position in both the sample
+// and the envelope
+class GigSample
 {
 public:
-	gigNote( gig::Sample* pSample, int midiNote, float attenuation,
-		bool release, const ADSR& adsr );
-	gigNote( const gigNote& g );
+	GigSample( gig::Sample* pSample, float attenuation, const ADSR& adsr );
 
 	gig::Sample* sample;
-	int midiNote;
 	float attenuation;
-	bool release; // Whether to trigger a release sample on key up
 	ADSR adsr;
 	int pos; // Position in sample
-};
+} ;
+
+
+// What portion of a note are we in?
+enum GigState
+{
+	KeyDown,        // We just pressed the key
+	PlayingKeyDown, // The note is currently playing
+	KeyUp,          // We just released the key
+	PlayingKeyUp,   // The note is being released, e.g. a release sample is playing
+	Completed       // The note is done playing, you can delete this note now
+} ;
+
+
+// Corresponds to a certain midi note pressed, but may contain multiple samples
+class GigNote
+{
+public:
+	int midiNote;
+	int velocity;
+	bool release; // Whether to trigger a release sample on key up
+	GigState state;
+	QList<GigSample> samples;
+
+	GigNote( int midiNote, int velocity )
+		: midiNote(midiNote), velocity(velocity), release(false), state(KeyDown)
+	{
+	}
+} ;
 
 
 
@@ -177,45 +206,55 @@ public slots:
 
 
 private:
-	static QMutex s_instancesMutex;
-	static QMap<QString, gigInstance*> s_instances;
-	QList<gigNote> m_notes;
-
+	// Used to convert sample rates
 	SRC_STATE * m_srcState;
 
-	gigInstance* m_instance;
+	// The GIG file and instrument we're using
+	GigInstance* m_instance;
 	gig::Instrument* m_instrument;
-	uint32_t m_RandomSeed;
-	float m_currentKeyDimension;
 
+	// Part of the UI
 	QString m_filename;
-
-	// Protect synth when we are re-creating it.
-	QMutex m_synthMutex;
-	QMutex m_loadMutex;
-	QMutex m_srcMutex;
-
-	sample_rate_t m_internalSampleRate;
-	int m_lastMidiPitch;
-	int m_lastMidiPitchRange;
-	int m_channel;
 
 	LcdSpinBoxModel m_bankNum;
 	LcdSpinBoxModel m_patchNum;
 
 	FloatModel m_gain;
 
+	// Locking for the data
+	QMutex m_synthMutex;
+	QMutex m_srcMutex;
+	QMutex m_notesMutex;
+
+	// List of all the currently playing notes
+	QList<GigNote> m_notes;
+
 	// Buffer for note samples
-	sampleFrame* m_noteData;
-	unsigned int m_noteDataSize;
+	sampleFrame* m_sampleData;
+	unsigned int m_sampleDataSize;
+
+	// Used when determining which samples to use
+	uint32_t m_RandomSeed;
+	float m_currentKeyDimension;
 
 private:
+	// Delete the current GIG instance if one is open
 	void freeInstance();
+
+	// Open the instrument in the currently-open GIG file
 	void getInstrument();
+
+	// Create "dimension" to select desired samples from GIG file based on
+	// parameters such as velocity
 	Dimension getDimensions( gig::Region* pRegion, int velocity, bool release );
+
+	// Add the desired samples to the note, either normal samples or release
+	// samples
+	void addSamples( GigNote& note, bool wantReleaseSample );
+
+	// Convert sample rates
 	bool convertSampleRate( sampleFrame& oldBuf, sampleFrame& newBuf,
 		int oldSize, int newSize, int oldRate, int newRate );
-	void addNotes( int midiNote, int velocity, bool release ); // Locks m_synthMutex internally
 
 	friend class gigInstrumentView;
 
