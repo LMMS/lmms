@@ -31,6 +31,7 @@
 #include <QtGui/QWhatsThis>
 
 #include "EffectView.h"
+#include "DummyEffect.h"
 #include "caption_menu.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
@@ -270,8 +271,14 @@ void EffectView::paintEvent( QPaintEvent * )
 
 	p.setPen( palette().shadow().color() );
 	p.drawText( 6, 55, model()->displayName() );
-	p.setPen( palette().text().color() );
-	p.drawText( 5, 54, model()->displayName() );
+
+	// Make dummy effects stand out	
+	if( dynamic_cast<DummyEffect *>( effect() ) ) {
+		p.setPen( Qt::red );	
+	} else {
+		p.setPen( palette().text().color() );
+	}
+	p.drawText( 5, 54, model()->displayName() );	
 }
 
 
