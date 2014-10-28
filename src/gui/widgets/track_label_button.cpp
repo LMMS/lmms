@@ -45,7 +45,7 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAcceptDrops( true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 
 	if( configManager::inst()->value( "ui",
