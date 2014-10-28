@@ -44,7 +44,7 @@ fadeButton::fadeButton( const QColor & _normal_color,
 	m_activatedColor( _activated_color )
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setFocusPolicy( Qt::NoFocus );
 }
 
