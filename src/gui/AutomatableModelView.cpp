@@ -41,7 +41,7 @@ AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	m_unit( QString::null )
 {
 	widget()->setAcceptDrops( true );
-	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 }
 
 
