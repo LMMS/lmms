@@ -519,6 +519,8 @@ void sf2Instrument::updateSampleRate()
 	}
 	updateReverb();
 	updateChorus();
+	updateReverbOn();
+	updateChorusOn();
 }
 
 
