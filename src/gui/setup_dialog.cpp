@@ -92,7 +92,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_warnAfterSetup( !configManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
 	m_displaydBV( configManager::inst()->value( "app", 
-		      				"displaydbv" ).toInt() ),
+						"displaydbv" ).toInt() ),
 	m_MMPZ( !configManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_hqAudioDev( configManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
@@ -123,7 +123,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(configManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(configManager::inst()->value( "ui",
-						   "disableautoquit").toInt() )
+						   "disableautoquit").toInt() ),
+	m_playStartSound(configManager::inst()->value( "ui",
+						   "playstartsound").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -300,6 +302,16 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( disableAutoquit, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableAutoquit( bool ) ) );
 
+	ledCheckBox * playStartSound = new ledCheckBox(
+				tr( "Enable startup sound" ),
+								misc_tw );
+	labelNumber++;
+	playStartSound->move( XDelta, YDelta*labelNumber);
+	playStartSound->setChecked( m_playStartSound );
+	connect( playStartSound, SIGNAL( toggled( bool ) ),
+				this, SLOT( togglePlayStartSound( bool ) ) );
+
+
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
 
@@ -433,7 +445,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_ladLineEdit = new QLineEdit( m_ladDir, lad_tw );
 	m_ladLineEdit->setGeometry( 10, 20, 300, 16 );
 	connect( m_ladLineEdit, SIGNAL( textChanged( const QString & ) ), this,
-		 		SLOT( setLADSPADir( const QString & ) ) );
+				SLOT( setLADSPADir( const QString & ) ) );
 
 	QPushButton * laddir_select_btn = new QPushButton(
 				embed::getIconPixmap( "project_open", 16, 16 ),
@@ -441,7 +453,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	laddir_select_btn->setFixedSize( 24, 24 );
 	laddir_select_btn->move( 320, 16 );
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
-				 		SLOT( openLADSPADir() ) );
+						SLOT( openLADSPADir() ) );
 
 #ifdef LMMS_HAVE_STK
 	// STK-dir
@@ -473,7 +485,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_sfLineEdit = new QLineEdit( m_defaultSoundfont, sf_tw );
 	m_sfLineEdit->setGeometry( 10, 20, 300, 16 );
 	connect( m_sfLineEdit, SIGNAL( textChanged( const QString & ) ), this,
-		 		SLOT( setDefaultSoundfont( const QString & ) ) );
+				SLOT( setDefaultSoundfont( const QString & ) ) );
 
 	QPushButton * sf_select_btn = new QPushButton(
 				embed::getIconPixmap( "project_open", 16, 16 ),
@@ -481,7 +493,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	sf_select_btn->setFixedSize( 24, 24 );
 	sf_select_btn->move( 320, 16 );
 	connect( sf_select_btn, SIGNAL( clicked() ), this,
-				 		SLOT( openDefaultSoundfont() ) );
+						SLOT( openDefaultSoundfont() ) );
 #endif	
 
 
@@ -826,7 +838,8 @@ void setupDialog::accept()
 					QString::number( m_displayWaveform ) );
 	configManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
-
+	configManager::inst()->setValue( "ui", "playstartsound",
+					QString::number( m_playStartSound ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -1018,6 +1031,11 @@ void setupDialog::toggleDisplayWaveform( bool en )
 void setupDialog::toggleDisableAutoquit( bool en )
 {
 	m_disableAutoQuit = en;
+}
+
+void setupDialog::togglePlayStartSound( bool en )
+{
+	m_playStartSound = en;
 }
 
 

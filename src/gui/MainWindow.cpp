@@ -225,7 +225,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::playStartSound()
 {
-	if (configManager::inst()->value("app","playstartsound").toInt()) {
+	if (configManager::inst()->value("ui","playstartsound").toInt()) {
 		SamplePlayHandle * s = new SamplePlayHandle(
 				qApp->applicationDirPath() + "/../share/lmms/samples/misc/startsound.ogg" );
 

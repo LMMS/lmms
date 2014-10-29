@@ -208,7 +208,6 @@ private:
 #endif
 	QString m_backgroundArtwork;
 	QStringList m_recentlyOpenedProjects;
-	QString m_playStartSound;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;

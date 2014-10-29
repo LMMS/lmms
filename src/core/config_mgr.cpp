@@ -390,10 +390,6 @@ void configManager::loadConfigFile()
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
 	}
-
-	if (m_playStartSound.isEmpty()) {
-		m_playStartSound = "1";
-	}
 }
 
 
@@ -413,8 +409,6 @@ void configManager::saveConfigFile()
 	setValue( "paths", "defaultsf2", m_defaultSoundfont );
 #endif
 	setValue( "paths", "backgroundartwork", m_backgroundArtwork );
-
-	setValue( "app", "playstartsound", m_playStartSound );
 
 	QDomDocument doc( "lmms-config-file" );
 
