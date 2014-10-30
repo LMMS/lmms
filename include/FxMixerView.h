@@ -55,6 +55,7 @@ public:
 
 		FxLine * m_fxLine;
 		pixmapButton * m_muteBtn;
+		pixmapButton * m_soloBtn;
 		fader * m_fader;
 		EffectRackView * m_rackView;
 	};
@@ -77,6 +78,7 @@ public:
 	{
 		return m_fxChannelViews[index];
 	}
+
 
 	void setCurrentFxLine( FxLine * _line );
 	void setCurrentFxLine( int _line );
@@ -101,6 +103,7 @@ public:
 private slots:
 	void updateFaders();
 	void addNewChannel();
+	void toggledSolo();
 
 private:
 
