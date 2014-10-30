@@ -192,6 +192,7 @@ void FxMixerView::refreshDisplay()
 		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
 		delete m_fxChannelViews[i]->m_fader;
 		delete m_fxChannelViews[i]->m_muteBtn;
+		delete m_fxChannelViews[i]->m_soloBtn;
 		delete m_fxChannelViews[i]->m_fxLine;
 		delete m_fxChannelViews[i];
 		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );
@@ -276,13 +277,32 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_muteBtn->setInactiveGraphic(
 				embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( true );
-	m_muteBtn->move( 9,  m_fader->y()-16);
+	m_muteBtn->move( 9,  m_fader->y()-11);
 	toolTip::add( m_muteBtn, tr( "Mute this FX channel" ) );
+
+	m_soloBtn = new pixmapButton( m_fxLine, tr( "Solo" ) );
+	m_soloBtn->setModel( &m->effectChannel(_chIndex)->m_soloModel );
+	m_soloBtn->setActiveGraphic(
+				embed::getIconPixmap( "led_red" ) );
+	m_soloBtn->setInactiveGraphic(
+				embed::getIconPixmap( "led_off" ) );
+	m_soloBtn->setCheckable( true );
+	m_soloBtn->move( 9,  m_fader->y()-21);
+	connect(&m->effectChannel(_chIndex)->m_soloModel, SIGNAL( dataChanged() ),
+			_mv, SLOT ( toggledSolo() ) );
+	toolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
 	
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &m->effectChannel(_chIndex)->m_fxChain, _mv->m_racksWidget );
 	m_rackView->setFixedSize( 245, FxLine::FxLineHeight );
 }
+
+
+void FxMixerView::toggledSolo()
+{
+	engine::fxMixer()->toggledSolo();
+}
+
 
 
 void FxMixerView::setCurrentFxLine( FxLine * _line )
@@ -341,6 +361,7 @@ void FxMixerView::deleteChannel(int index)
 	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
 	delete m_fxChannelViews[index]->m_fader;
 	delete m_fxChannelViews[index]->m_muteBtn;
+	delete m_fxChannelViews[index]->m_soloBtn;
 	delete m_fxChannelViews[index]->m_fxLine;
 	delete m_fxChannelViews[index];
 	m_channelAreaWidget->adjustSize();
@@ -389,6 +410,7 @@ void FxMixerView::moveChannelLeft(int index)
 		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
 		delete m_fxChannelViews[i]->m_fader;
 		delete m_fxChannelViews[i]->m_muteBtn;
+		delete m_fxChannelViews[i]->m_soloBtn;
 		delete m_fxChannelViews[i]->m_fxLine;
 		delete m_fxChannelViews[i];
 		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );

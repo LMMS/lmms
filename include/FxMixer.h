@@ -51,7 +51,9 @@ class FxChannel : public ThreadableJob
 		float m_peakLeft;
 		float m_peakRight;
 		sampleFrame * m_buffer;
+		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
+		BoolModel m_soloModel;
 		FloatModel m_volumeModel;
 		QString m_name;
 		QMutex m_lock;
@@ -65,6 +67,7 @@ class FxChannel : public ThreadableJob
 		FxRouteVector m_receives;
 
 		virtual bool requiresProcessing() const { return true; }
+		void unmuteForSolo();
 
 	private:
 		virtual void doProcessing( sampleFrame * _working_buffer );
@@ -174,6 +177,10 @@ public:
 	// rename channels when moving etc. if they still have their original name
 	void validateChannelName( int index, int oldIndex );
 
+	void toggledSolo();
+	void activateSolo();
+	void deactivateSolo();
+
 	inline fx_ch_t numChannels() const
 	{
 		return m_fxChannels.size();
@@ -190,6 +197,8 @@ private:
 	QMutex m_sendsMutex;
 
 	void addChannelLeaf( FxChannel * ch, sampleFrame * buf );
+
+	int m_lastSoloed;
 
 	friend class MixerWorkerThread;
 	friend class FxMixerView;
