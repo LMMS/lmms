@@ -219,7 +219,7 @@ void FxMixer::activateSolo()
 	for (int i = 0; i < m_fxChannels.size(); ++i)
 	{
 		m_fxChannels[i]->m_muteBeforeSolo = m_fxChannels[i]->m_muteModel.value();
-		m_fxChannels[i]->m_muteModel.setValue(true);
+		m_fxChannels[i]->m_muteModel.setValue( true );
 	}
 }
 
@@ -227,7 +227,7 @@ void FxMixer::deactivateSolo()
 {
 	for (int i = 0; i < m_fxChannels.size(); ++i)
 	{
-		m_fxChannels[i]->m_muteModel.setValue(m_fxChannels[i]->m_muteBeforeSolo);
+		m_fxChannels[i]->m_muteModel.setValue( m_fxChannels[i]->m_muteBeforeSolo );
 	}
 }
 
@@ -238,7 +238,7 @@ void FxMixer::toggledSolo()
 	//untoggle if lastsoloed is entered
 	if (resetSolo)
 	{
-		m_fxChannels[m_lastSoloed]->m_soloModel.setValue(false);
+		m_fxChannels[m_lastSoloed]->m_soloModel.setValue( false );
 	}
 	//determine the soloed channel
 	for (int i = 0; i < m_fxChannels.size(); ++i)
@@ -251,15 +251,15 @@ void FxMixer::toggledSolo()
 	{
 		if (resetSolo)
 		{
-			this->deactivateSolo();
-			this->activateSolo();
+			deactivateSolo();
+			activateSolo();
 		} else {
-			this->activateSolo();
+			activateSolo();
 		}
 		// unmute the soloed chan and every channel it sends to
 		m_fxChannels[soloedChan]->unmuteForSolo();
 	} else {
-		this->deactivateSolo();
+		deactivateSolo();
 	}
 	m_lastSoloed = soloedChan;
 }
