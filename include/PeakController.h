@@ -61,7 +61,8 @@ public:
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
-	void handleDestroyedEffect( ); 
+	void handleDestroyedEffect( );
+	void updateCoeffs();
 
 protected:
 	// The internal per-controller get-value function
@@ -77,6 +78,10 @@ private:
 	static int m_getCount;
 	static int m_loadCount;
 	static bool m_buggedFile;
+	
+	float m_attackCoeff;
+	float m_decayCoeff;
+	bool m_coeffNeedsUpdate;
 } ;
 
 
