@@ -322,10 +322,17 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 						song::Mode_PlayPattern );
 	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
 		engine::pianoRoll()->isRecording() == true &&
-		p != last_metro_pos && p.getTicks() %
-					(DefaultTicksPerTact / 4 ) == 0 )
+		p != last_metro_pos )
 	{
-		addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
+		if ( p.getTicks() % (MidiTime::ticksPerTact() / 1 ) == 0 )
+		{
+			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
+		}
+		else if ( p.getTicks() % (MidiTime::ticksPerTact() /
+			engine::getSong()->getTimeSigModel().getNumerator() ) == 0 )
+		{
+			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
+		}
 		last_metro_pos = p;
 	}
 
