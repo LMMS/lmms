@@ -37,9 +37,9 @@ static inline QString ensureTrailingSlash( const QString & _s )
 {
 	if( _s.right( 1 ) != QDir::separator() )
 	{
-		return( _s + QDir::separator() );
+		return _s + QDir::separator();
 	}
-	return( _s );
+	return _s;
 }
 
 
@@ -177,12 +177,12 @@ const QString & configManager::value( const QString & _class,
 		{
 			if( ( *it ).first == _attribute )
 			{
-				return( ( *it ).second );
+				return ( *it ).second ;
 			}
 		}
 	}
 	static QString empty;
-	return( empty );
+	return empty;
 }
 
 

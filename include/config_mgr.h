@@ -2,7 +2,7 @@
  * config_mgr.h - class configManager, a class for managing LMMS-configuration
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _CONFIG_MGR_H
-#define _CONFIG_MGR_H
+#ifndef CONFIG_MGR_H
+#define CONFIG_MGR_H
 
 #include "lmmsconfig.h"
 
@@ -56,87 +56,87 @@ public:
 		{
 			s_instanceOfMe = new configManager();
 		}
-		return( s_instanceOfMe );
+		return s_instanceOfMe;
 	}
 
 	const QString & dataDir() const
 	{
-		return( m_dataDir );
+		return m_dataDir;
 	}
 
 	const QString & workingDir() const
 	{
-		return( m_workingDir );
+		return m_workingDir;
 	}
 
 	QString userProjectsDir() const
 	{
-		return( workingDir() + PROJECTS_PATH );
+		return workingDir() + PROJECTS_PATH;
 	}
 
 	QString userPresetsDir() const
 	{
-		return( workingDir() + PRESETS_PATH );
+		return workingDir() + PRESETS_PATH;
 	}
 
 	QString userSamplesDir() const
 	{
-		return( workingDir() + SAMPLES_PATH );
+		return workingDir() + SAMPLES_PATH;
 	}
 
 	QString factoryProjectsDir() const
 	{
-		return( dataDir() + PROJECTS_PATH );
+		return dataDir() + PROJECTS_PATH;
 	}
 
 	QString factoryPresetsDir() const
 	{
-		return( dataDir() + PRESETS_PATH );
+		return dataDir() + PRESETS_PATH;
 	}
 
 	QString factorySamplesDir() const
 	{
-		return( dataDir() + SAMPLES_PATH );
+		return dataDir() + SAMPLES_PATH;
 	}
 
 	QString defaultArtworkDir() const
 	{
-		return( m_dataDir + DEFAULT_THEME_PATH );
+		return m_dataDir + DEFAULT_THEME_PATH;
 	}
 
 	QString artworkDir() const
 	{
-		return( m_artworkDir );
+		return m_artworkDir;
 	}
 
 	QString trackIconsDir() const
 	{
-		return( m_dataDir + TRACK_ICON_PATH );
+		return m_dataDir + TRACK_ICON_PATH;
 	}
 
 	QString localeDir() const
 	{
-		return( m_dataDir + LOCALE_PATH );
+		return m_dataDir + LOCALE_PATH;
 	}
 
 	const QString & pluginDir() const
 	{
-		return( m_pluginDir );
+		return m_pluginDir;
 	}
 
 	const QString & vstDir() const
 	{
-		return( m_vstDir );
+		return m_vstDir;
 	}
 
 	const QString & flDir() const
 	{
-		return( m_flDir );
+		return m_flDir;
 	}
 
 	const QString & ladspaDir() const
 	{
-		return( m_ladDir );
+		return m_ladDir;
 	}
 
 	const QString & recoveryFile() const
@@ -147,25 +147,25 @@ public:
 #ifdef LMMS_HAVE_STK
 	const QString & stkDir() const
 	{
-		return( m_stkDir );
+		return m_stkDir;
 	}
 #endif
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	const QString & defaultSoundfont() const
 	{
-		return( m_defaultSoundfont );
+		return m_defaultSoundfont;
 	}
 #endif
 
 	const QString & backgroundArtwork() const
 	{
-		return( m_backgroundArtwork );
+		return m_backgroundArtwork;
 	}
 
 	inline const QStringList & recentlyOpenedProjects() const
 	{
-		return( m_recentlyOpenedProjects );
+		return m_recentlyOpenedProjects;
 	}
 
 	void addRecentlyOpenedProject( const QString & _file );
