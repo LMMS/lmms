@@ -127,6 +127,7 @@ private:
 	virtual ~MainWindow();
 
 	void finalize();
+	void playStartSound();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
 

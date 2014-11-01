@@ -396,7 +396,7 @@ void configManager::loadConfigFile()
 
 
 void configManager::saveConfigFile()
-{
+{   
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );

@@ -64,7 +64,7 @@
 #include "templates.h"
 #include "FileDialog.h"
 #include "VersionedSaveDialog.h"
-
+#include "SamplePlayHandle.h"
 
 
 
@@ -223,6 +223,19 @@ MainWindow::~MainWindow()
 
 
 
+void MainWindow::playStartSound()
+{
+	if (configManager::inst()->value("ui","playstartsound").toInt()) {
+		SamplePlayHandle * s = new SamplePlayHandle(
+				qApp->applicationDirPath() + "/../share/lmms/samples/misc/startsound.ogg" );
+
+		engine::mixer()->addPlayHandle(s);
+	}
+}
+
+
+
+
 void MainWindow::finalize()
 {
 	resetWindowTitle();
@@ -345,7 +358,7 @@ void MainWindow::finalize()
 
 	help_menu->addSeparator();
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
-			      this, SLOT( aboutLMMS() ) );
+				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
@@ -529,6 +542,7 @@ void MainWindow::finalize()
 		setupDialog sd( setupDialog::AudioSettings );
 		sd.exec();
 	}
+	this->playStartSound();
 }
 
 

@@ -111,6 +111,7 @@ private slots:
 	void toggleNoteLabels( bool en );
 	void toggleDisplayWaveform( bool en );
 	void toggleDisableAutoquit( bool en );
+	void togglePlayStartSound( bool en );
 
 
 private:
@@ -162,6 +163,7 @@ private:
 	bool m_printNoteLabels;
 	bool m_displayWaveform;
 	bool m_disableAutoQuit;
+	bool m_playStartSound;
 
 	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
