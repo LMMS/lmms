@@ -65,6 +65,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_peakRight( 0.0f ),
 	m_buffer( new sampleFrame[engine::mixer()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
+	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
 	m_lock(),
@@ -83,6 +84,13 @@ FxChannel::~FxChannel()
 	delete[] m_buffer;
 }
 
+
+
+void FxChannel::unmuteForSolo()
+{
+	//TODO: Recursively activate every channel, this channel sends to
+	m_muteModel.setValue(false);
+}
 
 
 
@@ -175,6 +183,7 @@ FxMixer::FxMixer() :
 {
 	// create master channel
 	createChannel();
+	m_lastSoloed = -1;
 }
 
 
@@ -204,6 +213,57 @@ int FxMixer::createChannel()
 
 	return index;
 }
+
+void FxMixer::activateSolo()
+{
+	for (int i = 0; i < m_fxChannels.size(); ++i)
+	{
+		m_fxChannels[i]->m_muteBeforeSolo = m_fxChannels[i]->m_muteModel.value();
+		m_fxChannels[i]->m_muteModel.setValue( true );
+	}
+}
+
+void FxMixer::deactivateSolo()
+{
+	for (int i = 0; i < m_fxChannels.size(); ++i)
+	{
+		m_fxChannels[i]->m_muteModel.setValue( m_fxChannels[i]->m_muteBeforeSolo );
+	}
+}
+
+void FxMixer::toggledSolo()
+{
+	int soloedChan = -1;
+	bool resetSolo = m_lastSoloed != -1;
+	//untoggle if lastsoloed is entered
+	if (resetSolo)
+	{
+		m_fxChannels[m_lastSoloed]->m_soloModel.setValue( false );
+	}
+	//determine the soloed channel
+	for (int i = 0; i < m_fxChannels.size(); ++i)
+	{
+		if (m_fxChannels[i]->m_soloModel.value() == true)
+			soloedChan = i;
+	}
+	// if no channel is soloed, unmute everything, else mute everything
+	if (soloedChan != -1)
+	{
+		if (resetSolo)
+		{
+			deactivateSolo();
+			activateSolo();
+		} else {
+			activateSolo();
+		}
+		// unmute the soloed chan and every channel it sends to
+		m_fxChannels[soloedChan]->unmuteForSolo();
+	} else {
+		deactivateSolo();
+	}
+	m_lastSoloed = soloedChan;
+}
+
 
 
 void FxMixer::deleteChannel( int index )
@@ -568,6 +628,7 @@ void FxMixer::clearChannel(fx_ch_t index)
 	ch->m_fxChain.clear();
 	ch->m_volumeModel.setValue( 1.0f );
 	ch->m_muteModel.setValue( false );
+	ch->m_soloModel.setValue( false );
 	ch->m_name = ( index == 0 ) ? tr( "Master" ) : tr( "FX %1" ).arg( index );
 	ch->m_volumeModel.setDisplayName( ch->m_name );
 
@@ -604,6 +665,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_fxChain.saveState( _doc, fxch );
 		ch->m_volumeModel.saveSettings( _doc, fxch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, fxch, "muted" );
+		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
 
@@ -650,6 +712,7 @@ void FxMixer::loadSettings( const QDomElement & _this )
 
 		m_fxChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
+		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
