@@ -882,8 +882,6 @@ void song::loadProject( const QString & _file_name )
 
 	m_loadingProject = true;
 
-	clearProject();
-
 	engine::projectJournal()->setJournalling( false );
 
 	m_fileName = _file_name;
@@ -894,9 +892,10 @@ void song::loadProject( const QString & _file_name )
 	// new project
 	if( dataFile.head().isNull() )
 	{
-		createNewProject();
 		return;
 	}
+
+	clearProject();
 
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
 
