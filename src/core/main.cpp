@@ -422,7 +422,7 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.dataFile");
+		QString recoveryFile = configManager::inst()->recoveryFile();
 		if( QFileInfo(recoveryFile).exists() &&
 			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "

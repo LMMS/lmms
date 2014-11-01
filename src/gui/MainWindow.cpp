@@ -1000,8 +1000,7 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject() )
 	{
 		// delete recovery file
-		QDir working(configManager::inst()->workingDir());
-		working.remove("recover.mmp");
+		QFile::remove(configManager::inst()->recoveryFile());
 		_ce->accept();
 	}
 	else
@@ -1146,8 +1145,7 @@ void MainWindow::autoSave()
 	if( !( engine::getSong()->isPlaying() ||
 			engine::getSong()->isExporting() ) )
 	{
-		QDir work(configManager::inst()->workingDir());
-		engine::getSong()->saveProjectFile(work.absoluteFilePath("recover.mmp"));
+		engine::getSong()->saveProjectFile(configManager::inst()->recoveryFile());
 	}
 	else
 	{

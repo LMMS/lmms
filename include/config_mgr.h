@@ -139,6 +139,11 @@ public:
 		return( m_ladDir );
 	}
 
+	const QString & recoveryFile() const
+	{
+		return m_recoveryFile;
+	}
+
 #ifdef LMMS_HAVE_STK
 	const QString & stkDir() const
 	{
@@ -200,6 +205,7 @@ private:
 	QString m_vstDir;
 	QString m_flDir;
 	QString m_ladDir;
+	QString m_recoveryFile;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
