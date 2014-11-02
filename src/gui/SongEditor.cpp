@@ -38,7 +38,7 @@
 #include "SongEditor.h"
 #include "automatable_slider.h"
 #include "combobox.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "cpuload_widget.h"
 #include "embed.h"
 #include "LcdSpinBox.h"
@@ -52,7 +52,6 @@
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
-#include "config_mgr.h"
 
 
 

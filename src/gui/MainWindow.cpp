@@ -51,7 +51,7 @@
 #include "FileBrowser.h"
 #include "plugin_browser.h"
 #include "SideBar.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "Mixer.h"
 #include "PluginView.h"
 #include "project_notes.h"

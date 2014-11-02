@@ -36,7 +36,7 @@
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "combobox.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 #include "Effect.h"
 #include "engine.h"

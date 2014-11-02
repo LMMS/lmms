@@ -27,7 +27,7 @@
 #include "AutomationEditor.h"
 #include "bb_editor.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"

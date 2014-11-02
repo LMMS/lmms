@@ -25,7 +25,7 @@
 #include <cstring>
 
 #include "AudioDevice.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 
 

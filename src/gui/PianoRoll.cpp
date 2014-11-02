@@ -45,7 +45,7 @@
 #include <math.h>
 #include <algorithm>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "PianoRoll.h"
 #include "bb_track_container.h"
 #include "Clipboard.h"

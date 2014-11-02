@@ -26,7 +26,7 @@
 #include <QLineEdit>
 
 #include "MidiAlsaRaw.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 
 

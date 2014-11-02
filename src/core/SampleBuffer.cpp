@@ -52,7 +52,7 @@
 
 
 #include "base64.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 #include "drumsynth.h"
 #include "endian_handling.h"

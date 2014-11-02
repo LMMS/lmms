@@ -36,7 +36,7 @@
 #include "engine.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"

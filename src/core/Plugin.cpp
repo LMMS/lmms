@@ -31,7 +31,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "Mixer.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 

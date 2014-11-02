@@ -54,7 +54,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "caption_menu.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "text_float.h"
 #include "MainWindow.h"
 

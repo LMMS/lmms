@@ -35,7 +35,7 @@
 #include <QMessageBox>
 
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "project_version.h"
 #include "SongEditor.h"
 #include "Effect.h"

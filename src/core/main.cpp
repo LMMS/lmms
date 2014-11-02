@@ -56,7 +56,7 @@
 #include <unistd.h>
 #endif
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "embed.h"
 #include "engine.h"
 #include "LmmsStyle.h"

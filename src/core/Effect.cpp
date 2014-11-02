@@ -31,7 +31,7 @@
 #include "EffectControls.h"
 #include "EffectView.h"
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 Effect::Effect( const Plugin::Descriptor * _desc,

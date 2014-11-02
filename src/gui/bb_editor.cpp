@@ -34,7 +34,7 @@
 #include "MainWindow.h"
 #include "song.h"
 #include "tool_button.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "DataFile.h"
 #include "string_pair_drag.h"
 

@@ -46,7 +46,7 @@
 #include "MainWindow.h"
 #include "EffectRackView.h"
 #include "track_label_button.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 SampleTCO::SampleTCO( track * _track ) :

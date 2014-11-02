@@ -58,7 +58,7 @@
 #endif
 
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 #ifndef _PATH_DEV_DSP

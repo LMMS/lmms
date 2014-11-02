@@ -31,7 +31,7 @@
 #include "RemotePlugin.h"
 #include "Mixer.h"
 #include "engine.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 #include <QDir>
 

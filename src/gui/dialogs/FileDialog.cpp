@@ -27,7 +27,7 @@
 #include <QDesktopServices>
 #include <QListView>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "FileDialog.h"
 
 

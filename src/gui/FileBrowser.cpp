@@ -34,7 +34,7 @@
 
 #include "FileBrowser.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 #include "embed.h"
 #include "engine.h"

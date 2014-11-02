@@ -38,7 +38,7 @@
 #include "gui_templates.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "embed.h"
 #include "engine.h"
 #include "debug.h"

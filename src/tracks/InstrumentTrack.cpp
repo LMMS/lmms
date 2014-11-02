@@ -42,7 +42,7 @@
 #include "AudioPort.h"
 #include "AutomationPattern.h"
 #include "bb_track.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "debug.h"
 #include "EffectChain.h"

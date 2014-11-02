@@ -30,7 +30,7 @@
 #ifdef LMMS_HAVE_ALSA
 
 #include "endian_handling.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 #include "LcdSpinBox.h"
 #include "gui_templates.h"

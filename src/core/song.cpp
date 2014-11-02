@@ -36,7 +36,7 @@
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "embed.h"

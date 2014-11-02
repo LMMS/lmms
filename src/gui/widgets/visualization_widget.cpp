@@ -34,7 +34,7 @@
 #include "tooltip.h"
 #include "song.h"
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 

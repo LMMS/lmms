@@ -38,7 +38,7 @@
 #include "lmms_math.h"
 #include "knob.h"
 #include "caption_menu.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "engine.h"

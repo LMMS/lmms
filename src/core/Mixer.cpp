@@ -35,7 +35,7 @@
 #include "InstrumentTrack.h"
 #include "debug.h"
 #include "engine.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "PianoRoll.h"
 #include "atomic_int.h"

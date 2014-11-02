@@ -25,7 +25,7 @@
 
 #include <QDebug>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 #include "lmmsconfig.h"
 #include "Mixer.h"

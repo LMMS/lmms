@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ladspa_manager.h"
 
 

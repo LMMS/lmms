@@ -33,7 +33,7 @@
 #include "rename_dialog.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 
 

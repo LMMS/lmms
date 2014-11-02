@@ -34,7 +34,7 @@
 #include "InstrumentTrack.h"
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "Pattern.h"
 #include "Instrument.h"
 #include "MainWindow.h"

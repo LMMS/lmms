@@ -26,7 +26,7 @@
 #include <QLineEdit>
 
 #include "MidiAlsaSeq.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 #include "gui_templates.h"
 #include "song.h"
