@@ -754,11 +754,14 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
-	const QString & f = _action->text();
-	setCursor( Qt::WaitCursor );
-	engine::getSong()->loadProject( f );
-	ConfigManager::inst()->addRecentlyOpenedProject( f );
-	setCursor( Qt::ArrowCursor );
+	if ( mayChangeProject() )
+	{
+		const QString & f = _action->text();
+		setCursor( Qt::WaitCursor );
+		engine::getSong()->loadProject( f );
+		configManager::inst()->addRecentlyOpenedProject( f );
+		setCursor( Qt::ArrowCursor );
+	}
 }
 
 

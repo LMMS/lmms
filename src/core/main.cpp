@@ -423,6 +423,7 @@ int main( int argc, char * * argv )
 
 		// recover a file?
 		QString recoveryFile = ConfigManager::inst()->recoveryFile();
+
 		if( QFileInfo(recoveryFile).exists() &&
 			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "
