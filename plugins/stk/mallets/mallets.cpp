@@ -77,8 +77,8 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_strikeModel( false, this, tr( "Bowed" ) ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
-	m_filesMissing( !QDir( configManager::inst()->stkDir() ).exists() ||
-		!QFileInfo( configManager::inst()->stkDir() + QDir::separator()
+	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
+		!QFileInfo( ConfigManager::inst()->stkDir() + QDir::separator()
 						+ "sinewave.raw" ).exists() )
 {
 	// try to inform user about missing Stk-installation
@@ -533,7 +533,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( configManager::inst()->stkDir()
+		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
 						.toLatin1().constData() );
 	
 		m_voice = new ModalBar();
@@ -580,7 +580,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( configManager::inst()->stkDir()
+		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
 						.toLatin1().constData() );
 	
 		m_voice = new TubeBell();
@@ -625,7 +625,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( configManager::inst()->stkDir()
+		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
 						.toLatin1().constData() );
 
 		m_voice = new BandedWG();

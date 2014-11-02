@@ -1,5 +1,5 @@
 /*
- * config_mgr.h - class ConfigManager, a class for managing LMMS-configuration
+ * ConfigManager.h - class ConfigManager, a class for managing LMMS-configuration
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

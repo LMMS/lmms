@@ -171,7 +171,7 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( QFileInfo( m_pluginDLL ).isAbsolute() )
 	{
 		QString f = QString( m_pluginDLL ).replace( QDir::separator(), '/' );
-		QString vd = QString( configManager::inst()->vstDir() ).replace( QDir::separator(), '/' );
+		QString vd = QString( ConfigManager::inst()->vstDir() ).replace( QDir::separator(), '/' );
         	QString relativePath;
 		if( !( relativePath = f.section( vd, 1, 1 ) ).isEmpty() )
 		{
@@ -623,7 +623,7 @@ void VestigeInstrumentView::openPlugin()
 	}
 	else
 	{
-		dir = configManager::inst()->vstDir();
+		dir = ConfigManager::inst()->vstDir();
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );

@@ -45,7 +45,7 @@
 #include <windows.h>
 #endif
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 #include "MainWindow.h"
 #include "song.h"
@@ -174,7 +174,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 	QString p = m_plugin;
 	if( QFileInfo( p ).dir().isRelative() )
 	{
-		p = configManager::inst()->vstDir() + QDir::separator() + p;
+		p = ConfigManager::inst()->vstDir() + QDir::separator() + p;
 	}
 
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
