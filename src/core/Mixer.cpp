@@ -35,7 +35,7 @@
 #include "InstrumentTrack.h"
 #include "debug.h"
 #include "engine.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "PianoRoll.h"
 #include "atomic_int.h"
@@ -92,11 +92,11 @@ Mixer::Mixer() :
 		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		m_fifo = new fifo( 1 );
 	}
-	else if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
+	else if( ConfigManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
 	{
 		m_framesPerPeriod =
-			(fpp_t) configManager::inst()->value( "mixer",
+			(fpp_t) ConfigManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt();
 
 		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
@@ -112,7 +112,7 @@ Mixer::Mixer() :
 	}
 	else
 	{
-		configManager::inst()->setValue( "mixer",
+		ConfigManager::inst()->setValue( "mixer",
 							"framesperaudiobuffer",
 				QString::number( m_framesPerPeriod ) );
 		m_fifo = new fifo( 1 );
@@ -237,7 +237,7 @@ void Mixer::stopProcessing()
 sample_rate_t Mixer::baseSampleRate() const
 {
 	sample_rate_t sr =
-		configManager::inst()->value( "mixer", "samplerate" ).toInt();
+		ConfigManager::inst()->value( "mixer", "samplerate" ).toInt();
 	if( sr < 44100 )
 	{
 		sr = 44100;
@@ -720,7 +720,7 @@ AudioDevice * Mixer::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = NULL;
-	QString dev_name = configManager::inst()->value( "mixer", "audiodev" );
+	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
 
 	if( dev_name == AudioDummy::name() )
 	{
@@ -833,7 +833,7 @@ AudioDevice * Mixer::tryAudioDevices()
 
 MidiClient * Mixer::tryMidiClients()
 {
-	QString client_name = configManager::inst()->value( "mixer",
+	QString client_name = ConfigManager::inst()->value( "mixer",
 								"mididev" );
 
 #ifdef LMMS_HAVE_ALSA

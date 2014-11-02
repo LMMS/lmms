@@ -52,7 +52,7 @@
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "Clipboard.h"
 #include "embed.h"
 #include "engine.h"
@@ -1587,7 +1587,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
 
-	if( configManager::inst()->value( "ui",
+	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		m_muteBtn->move( 46, 0 );
@@ -2443,7 +2443,7 @@ trackView::~trackView()
  */
 void trackView::resizeEvent( QResizeEvent * _re )
 {
-	if( configManager::inst()->value( "ui",
+	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH_COMPACT, height() - 1 );

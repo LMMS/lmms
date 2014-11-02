@@ -54,7 +54,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "caption_menu.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "text_float.h"
 #include "MainWindow.h"
 
@@ -265,7 +265,7 @@ void fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void fader::updateTextFloat()
 {
-	if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
+	if( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		s_textFloat->setText( QString("Volume: %1 dBV").
 				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );

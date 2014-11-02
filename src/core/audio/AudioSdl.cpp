@@ -31,7 +31,7 @@
 
 #include "engine.h"
 #include "debug.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 #include "templates.h"
 
@@ -205,7 +205,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioSdl::name(), _parent )
 {
-	QString dev = configManager::inst()->value( "audiosdl", "device" );
+	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
@@ -227,7 +227,7 @@ AudioSdl::setupWidget::~setupWidget()
 
 void AudioSdl::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiosdl", "device",
+	ConfigManager::inst()->setValue( "audiosdl", "device",
 							m_device->text() );
 }
 

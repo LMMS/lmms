@@ -25,7 +25,7 @@
 
 #include <QDebug>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 #include "lmmsconfig.h"
 #include "Mixer.h"
@@ -52,7 +52,7 @@ VstSyncController::VstSyncController() :
 	m_shmID( -1 ),
 	m_shm( "/usr/bin/lmms" )
 {
-	if( configManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
+	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
 		connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 

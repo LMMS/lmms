@@ -34,7 +34,7 @@
 #include "tooltip.h"
 #include "song.h"
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 
@@ -47,7 +47,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setActive( configManager::inst()->value( "ui", "displaywaveform").toInt() );
+	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];

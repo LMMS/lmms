@@ -36,7 +36,7 @@
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -795,7 +795,7 @@ void song::clearProject()
 // create new file
 void song::createNewProject()
 {
-	QString default_template = configManager::inst()->userProjectsDir()
+	QString default_template = ConfigManager::inst()->userProjectsDir()
 						+ "templates/default.mpt";
 
 	if( QFile::exists( default_template ) )
@@ -804,7 +804,7 @@ void song::createNewProject()
 		return;
 	}
 
-	default_template = configManager::inst()->factoryProjectsDir()
+	default_template = ConfigManager::inst()->factoryProjectsDir()
 						+ "templates/default.mpt";
 	if( QFile::exists( default_template ) )
 	{
@@ -989,7 +989,7 @@ void song::loadProject( const QString & _file_name )
 
 	engine::mixer()->unlock();
 
-	configManager::inst()->addRecentlyOpenedProject( _file_name );
+	ConfigManager::inst()->addRecentlyOpenedProject( _file_name );
 
 	engine::projectJournal()->setJournalling( true );
 
@@ -1049,7 +1049,7 @@ bool song::guiSaveProject()
 							).arg( m_fileName ),
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
-		configManager::inst()->addRecentlyOpenedProject( m_fileName );
+		ConfigManager::inst()->addRecentlyOpenedProject( m_fileName );
 		m_modified = false;
 		engine::mainWindow()->resetWindowTitle();
 	}
@@ -1090,7 +1090,7 @@ bool song::guiSaveProjectAs( const QString & _file_name )
 void song::importProject()
 {
 	FileDialog ofd( NULL, tr( "Import file" ),
-			configManager::inst()->userProjectsDir(),
+			ConfigManager::inst()->userProjectsDir(),
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
 			tr("FL Studio projects") +
@@ -1191,7 +1191,7 @@ void song::exportProject(bool multiExport)
 		}
 		else
 		{
-			efd.setDirectory( configManager::inst()->userProjectsDir() );
+			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 			base_filename = tr( "untitled" );
 		}
 		efd.selectFile( base_filename + __fileEncodeDevices[0].m_extension );

@@ -525,16 +525,16 @@ void PatmanView::openFile( void )
 		else
 		{
 			ofd.setDirectory(
-				configManager::inst()->userSamplesDir() );
+				ConfigManager::inst()->userSamplesDir() );
 		}
 	}
 	else if( QFileInfo( m_pi->m_patchFile ).isRelative() )
 	{
-		QString f = configManager::inst()->userSamplesDir()
+		QString f = ConfigManager::inst()->userSamplesDir()
 							+ m_pi->m_patchFile;
 		if( QFileInfo( f ).exists() == false )
 		{
-			f = configManager::inst()->factorySamplesDir()
+			f = ConfigManager::inst()->factorySamplesDir()
 							+ m_pi->m_patchFile;
 		}
 

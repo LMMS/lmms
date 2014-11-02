@@ -36,7 +36,7 @@
 #include "engine.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
@@ -45,7 +45,7 @@
 
 
 AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<int>( configManager::inst()->value(
+	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
@@ -131,7 +131,7 @@ void AudioJack::restartAfterZombified()
 
 bool AudioJack::initJackClient()
 {
-	QString clientName = configManager::inst()->value( "audiojack",
+	QString clientName = ConfigManager::inst()->value( "audiojack",
 								"clientname" );
 	if( clientName.isEmpty() )
 	{
@@ -434,7 +434,7 @@ void AudioJack::shutdownCallback( void * _udata )
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioJack::name(), _parent )
 {
-	QString cn = configManager::inst()->value( "audiojack", "clientname" );
+	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )
 	{
 		cn = "lmms";
@@ -449,7 +449,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audiojack",
+	m->setValue( ConfigManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -471,9 +471,9 @@ AudioJack::setupWidget::~setupWidget()
 
 void AudioJack::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiojack", "clientname",
+	ConfigManager::inst()->setValue( "audiojack", "clientname",
 							m_clientName->text() );
-	configManager::inst()->setValue( "audiojack", "channels",
+	ConfigManager::inst()->setValue( "audiojack", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 

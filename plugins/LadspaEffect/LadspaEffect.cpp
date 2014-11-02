@@ -29,7 +29,7 @@
 #include "LadspaEffect.h"
 #include "DataFile.h"
 #include "AudioDevice.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ladspa_2_lmms.h"
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"

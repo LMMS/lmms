@@ -36,7 +36,7 @@
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "combobox.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 #include "Effect.h"
 #include "engine.h"
@@ -1070,16 +1070,16 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 								f.mid( 12 );
 				}*/
 				f.replace( '\\', QDir::separator() );
-				if( QFileInfo( configManager::inst()->flDir() +
+				if( QFileInfo( ConfigManager::inst()->flDir() +
 						"/Data/" ).exists() )
 				{
-					f = configManager::inst()->flDir() +
+					f = ConfigManager::inst()->flDir() +
 								"/Data/" + f;
 				}
 				else
 				{
 					// FL 3 compat
-					f = configManager::inst()->flDir() +
+					f = ConfigManager::inst()->flDir() +
 							"/Samples/" + f;
 				}
 				cc->sampleFileName = f;

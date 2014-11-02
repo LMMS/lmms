@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ladspa_manager.h"
 
 
@@ -41,9 +41,9 @@ ladspaManager::ladspaManager()
 {
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );
-	ladspaDirectories += configManager::inst()->ladspaDir().split( ',' );
+	ladspaDirectories += ConfigManager::inst()->ladspaDir().split( ',' );
 
-	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );
+	ladspaDirectories.push_back( ConfigManager::inst()->pluginDir() + "ladspa" );
 #ifndef LMMS_BUILD_WIN32
 	ladspaDirectories.push_back( qApp->applicationDirPath() + '/' + LIB_DIR + "ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );

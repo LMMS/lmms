@@ -34,7 +34,7 @@
 #include "InstrumentTrack.h"
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "Pattern.h"
 #include "Instrument.h"
 #include "MainWindow.h"
@@ -97,7 +97,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	if( engine::hasGUI() &&
-		configManager::inst()->defaultSoundfont().isEmpty() )
+		ConfigManager::inst()->defaultSoundfont().isEmpty() )
 	{
 		QMessageBox::information( engine::mainWindow(),
 			tr( "Setup incomplete" ),
@@ -226,7 +226,7 @@ public:
 			if( it_inst )
 			{
 				isSF2 = true;
-				it_inst->loadFile( configManager::inst()->defaultSoundfont() );
+				it_inst->loadFile( ConfigManager::inst()->defaultSoundfont() );
 				it_inst->childModel( "bank" )->setValue( 0 );
 				it_inst->childModel( "patch" )->setValue( 0 );
 			}

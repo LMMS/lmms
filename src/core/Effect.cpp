@@ -31,7 +31,7 @@
 #include "EffectControls.h"
 #include "EffectView.h"
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 Effect::Effect( const Plugin::Descriptor * _desc,
@@ -54,7 +54,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_srcState[0] = m_srcState[1] = NULL;
 	reinitSRC();
 	
-	if( configManager::inst()->value( "ui", "disableautoquit").toInt() )
+	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
 	{
 		m_autoQuitDisabled = true;
 	}

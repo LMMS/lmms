@@ -27,7 +27,7 @@
 #include "AutomationEditor.h"
 #include "bb_editor.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -137,14 +137,14 @@ void engine::destroy()
 
 	deleteHelper( &s_ladspaManager );
 
-	//delete configManager::inst();
+	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );
 
 	s_mainWindow = NULL;
 
 	deleteHelper( &s_song );
 
-	delete configManager::inst();
+	delete ConfigManager::inst();
 }
 
 

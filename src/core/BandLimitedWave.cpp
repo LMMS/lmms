@@ -66,7 +66,7 @@ void BandLimitedWave::generateWaves()
 	int i;
 
 // set wavetable directory
-	s_wavetableDir = configManager::inst()->dataDir() + "wavetables/";
+	s_wavetableDir = ConfigManager::inst()->dataDir() + "wavetables/";
 
 // set wavetable files
 	QFile saw_file( s_wavetableDir + "saw.bin" );

@@ -38,7 +38,7 @@
 #include "gui_templates.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "embed.h"
 #include "engine.h"
 #include "debug.h"
@@ -85,44 +85,44 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 
 
 setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
-	m_bufferSize( configManager::inst()->value( "mixer",
+	m_bufferSize( ConfigManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt() ),
-	m_toolTips( !configManager::inst()->value( "tooltips",
+	m_toolTips( !ConfigManager::inst()->value( "tooltips",
 							"disabled" ).toInt() ),
-	m_warnAfterSetup( !configManager::inst()->value( "app",
+	m_warnAfterSetup( !ConfigManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
-	m_displaydBV( configManager::inst()->value( "app", 
+	m_displaydBV( ConfigManager::inst()->value( "app", 
 		      				"displaydbv" ).toInt() ),
-	m_MMPZ( !configManager::inst()->value( "app", "nommpz" ).toInt() ),
-	m_hqAudioDev( configManager::inst()->value( "mixer",
+	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
+	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
-	m_workingDir( configManager::inst()->workingDir() ),
-	m_vstDir( configManager::inst()->vstDir() ),
-	m_artworkDir( configManager::inst()->artworkDir() ),
-	m_flDir( configManager::inst()->flDir() ),
-	m_ladDir( configManager::inst()->ladspaDir() ),
+	m_workingDir( ConfigManager::inst()->workingDir() ),
+	m_vstDir( ConfigManager::inst()->vstDir() ),
+	m_artworkDir( ConfigManager::inst()->artworkDir() ),
+	m_flDir( ConfigManager::inst()->flDir() ),
+	m_ladDir( ConfigManager::inst()->ladspaDir() ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_defaultSoundfont( configManager::inst()->defaultSoundfont() ),
+	m_defaultSoundfont( ConfigManager::inst()->defaultSoundfont() ),
 #endif
 #ifdef LMMS_HAVE_STK
-	m_stkDir( configManager::inst()->stkDir() ),
+	m_stkDir( ConfigManager::inst()->stkDir() ),
 #endif
-	m_backgroundArtwork( configManager::inst()->backgroundArtwork() ),
-	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_enableAutoSave( configManager::inst()->value( "ui", "enableautosave" ).toInt() ),
-	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
+	m_backgroundArtwork( ConfigManager::inst()->backgroundArtwork() ),
+	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
+	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
+	m_oneInstrumentTrackWindow( ConfigManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
-	m_compactTrackButtons( configManager::inst()->value( "ui",
+	m_compactTrackButtons( ConfigManager::inst()->value( "ui",
 					"compacttrackbuttons" ).toInt() ),
-	m_syncVSTPlugins( configManager::inst()->value( "ui",
+	m_syncVSTPlugins( ConfigManager::inst()->value( "ui",
 							"syncvstplugins" ).toInt() ),
-	m_animateAFP(configManager::inst()->value( "ui",
+	m_animateAFP(ConfigManager::inst()->value( "ui",
 						   "animateafp").toInt() ),
-	m_printNoteLabels(configManager::inst()->value( "ui",
+	m_printNoteLabels(ConfigManager::inst()->value( "ui",
 						   "printnotelabels").toInt() ),
-	m_displayWaveform(configManager::inst()->value( "ui",
+	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
-	m_disableAutoQuit(configManager::inst()->value( "ui",
+	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
 						   "disableautoquit").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
@@ -792,54 +792,54 @@ setupDialog::~setupDialog()
 
 void setupDialog::accept()
 {
-	configManager::inst()->setValue( "mixer", "framesperaudiobuffer",
+	ConfigManager::inst()->setValue( "mixer", "framesperaudiobuffer",
 					QString::number( m_bufferSize ) );
-	configManager::inst()->setValue( "mixer", "audiodev",
+	ConfigManager::inst()->setValue( "mixer", "audiodev",
 			m_audioIfaceNames[m_audioInterfaces->currentText()] );
-	configManager::inst()->setValue( "mixer", "mididev",
+	ConfigManager::inst()->setValue( "mixer", "mididev",
 			m_midiIfaceNames[m_midiInterfaces->currentText()] );
-	configManager::inst()->setValue( "tooltips", "disabled",
+	ConfigManager::inst()->setValue( "tooltips", "disabled",
 					QString::number( !m_toolTips ) );
-	configManager::inst()->setValue( "app", "nomsgaftersetup",
+	ConfigManager::inst()->setValue( "app", "nomsgaftersetup",
 					QString::number( !m_warnAfterSetup ) );
-	configManager::inst()->setValue( "app", "displaydbv",
+	ConfigManager::inst()->setValue( "app", "displaydbv",
 					QString::number( m_displaydBV ) );
-	configManager::inst()->setValue( "app", "nommpz",
+	ConfigManager::inst()->setValue( "app", "nommpz",
 						QString::number( !m_MMPZ ) );
-	configManager::inst()->setValue( "mixer", "hqaudio",
+	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
-	configManager::inst()->setValue( "ui", "smoothscroll",
+	ConfigManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
-	configManager::inst()->setValue( "ui", "enableautosave",
+	ConfigManager::inst()->setValue( "ui", "enableautosave",
 					QString::number( m_enableAutoSave ) );
-	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
+	ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
-	configManager::inst()->setValue( "ui", "compacttrackbuttons",
+	ConfigManager::inst()->setValue( "ui", "compacttrackbuttons",
 					QString::number( m_compactTrackButtons ) );
-	configManager::inst()->setValue( "ui", "syncvstplugins",
+	ConfigManager::inst()->setValue( "ui", "syncvstplugins",
 					QString::number( m_syncVSTPlugins ) );
-	configManager::inst()->setValue( "ui", "animateafp",
+	ConfigManager::inst()->setValue( "ui", "animateafp",
 					QString::number( m_animateAFP ) );
-	configManager::inst()->setValue( "ui", "printnotelabels",
+	ConfigManager::inst()->setValue( "ui", "printnotelabels",
 					QString::number( m_printNoteLabels ) );
-	configManager::inst()->setValue( "ui", "displaywaveform",
+	ConfigManager::inst()->setValue( "ui", "displaywaveform",
 					QString::number( m_displayWaveform ) );
-	configManager::inst()->setValue( "ui", "disableautoquit",
+	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
 
 
-	configManager::inst()->setWorkingDir( m_workingDir );
-	configManager::inst()->setVSTDir( m_vstDir );
-	configManager::inst()->setArtworkDir( m_artworkDir );
-	configManager::inst()->setFLDir( m_flDir );
-	configManager::inst()->setLADSPADir( m_ladDir );
+	ConfigManager::inst()->setWorkingDir( m_workingDir );
+	ConfigManager::inst()->setVSTDir( m_vstDir );
+	ConfigManager::inst()->setArtworkDir( m_artworkDir );
+	ConfigManager::inst()->setFLDir( m_flDir );
+	ConfigManager::inst()->setLADSPADir( m_ladDir );
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	configManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
+	ConfigManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
 #endif
 #ifdef LMMS_HAVE_STK
-	configManager::inst()->setSTKDir( m_stkDir );
+	ConfigManager::inst()->setSTKDir( m_stkDir );
 #endif	
-	configManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
+	ConfigManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
 
 	// tell all audio-settings-widget to save their settings
 	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -854,7 +854,7 @@ void setupDialog::accept()
 		it.value()->saveSettings();
 	}
 
-	configManager::inst()->saveConfigFile();
+	ConfigManager::inst()->saveConfigFile();
 
 	QDialog::accept();
 	if( m_warnAfterSetup )

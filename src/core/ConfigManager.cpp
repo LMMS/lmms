@@ -1,5 +1,5 @@
 /*
- * config_mgr.cpp - implementation of class configManager
+ * ConfigManager.cpp - implementation of class ConfigManager
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -29,7 +29,7 @@
 #include <QApplication>
 
 #include "lmmsversion.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "MainWindow.h"
 
 
@@ -37,16 +37,16 @@ static inline QString ensureTrailingSlash( const QString & _s )
 {
 	if( _s.right( 1 ) != QDir::separator() )
 	{
-		return( _s + QDir::separator() );
+		return _s + QDir::separator();
 	}
-	return( _s );
+	return _s;
 }
 
 
-configManager * configManager::s_instanceOfMe = NULL;
+ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
-configManager::configManager() :
+ConfigManager::ConfigManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() + QDir::separator() +
 								".lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
@@ -66,14 +66,15 @@ configManager::configManager() :
 	m_pluginDir( qApp->applicationDirPath() + '/' + PLUGIN_DIR ),
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
-	m_flDir( QDir::home().absolutePath() )
+	m_flDir( QDir::home().absolutePath() ),
+	m_recoveryFile( QDir(m_workingDir).absoluteFilePath("recover.mmp") )
 {
 }
 
 
 
 
-configManager::~configManager()
+ConfigManager::~ConfigManager()
 {
 	saveConfigFile();
 }
@@ -81,7 +82,7 @@ configManager::~configManager()
 
 
 
-void configManager::setWorkingDir( const QString & _wd )
+void ConfigManager::setWorkingDir( const QString & _wd )
 {
 	m_workingDir = ensureTrailingSlash( _wd );
 }
@@ -89,7 +90,7 @@ void configManager::setWorkingDir( const QString & _wd )
 
 
 
-void configManager::setVSTDir( const QString & _vd )
+void ConfigManager::setVSTDir( const QString & _vd )
 {
 	m_vstDir = ensureTrailingSlash( _vd );
 }
@@ -97,7 +98,7 @@ void configManager::setVSTDir( const QString & _vd )
 
 
 
-void configManager::setArtworkDir( const QString & _ad )
+void ConfigManager::setArtworkDir( const QString & _ad )
 {
 	m_artworkDir = ensureTrailingSlash( _ad );
 }
@@ -105,7 +106,7 @@ void configManager::setArtworkDir( const QString & _ad )
 
 
 
-void configManager::setFLDir( const QString & _fd )
+void ConfigManager::setFLDir( const QString & _fd )
 {
 	m_flDir = ensureTrailingSlash( _fd );
 }
@@ -113,7 +114,7 @@ void configManager::setFLDir( const QString & _fd )
 
 
 
-void configManager::setLADSPADir( const QString & _fd )
+void ConfigManager::setLADSPADir( const QString & _fd )
 {
 	m_ladDir = _fd;
 }
@@ -121,7 +122,7 @@ void configManager::setLADSPADir( const QString & _fd )
 
 
 
-void configManager::setSTKDir( const QString & _fd )
+void ConfigManager::setSTKDir( const QString & _fd )
 {
 #ifdef LMMS_HAVE_STK
 	m_stkDir = ensureTrailingSlash( _fd );
@@ -131,7 +132,7 @@ void configManager::setSTKDir( const QString & _fd )
 
 
 
-void configManager::setDefaultSoundfont( const QString & _sf )
+void ConfigManager::setDefaultSoundfont( const QString & _sf )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont = _sf;
@@ -141,7 +142,7 @@ void configManager::setDefaultSoundfont( const QString & _sf )
 
 
 
-void configManager::setBackgroundArtwork( const QString & _ba )
+void ConfigManager::setBackgroundArtwork( const QString & _ba )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
@@ -151,7 +152,7 @@ void configManager::setBackgroundArtwork( const QString & _ba )
 
 
 
-void configManager::addRecentlyOpenedProject( const QString & _file )
+void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 {
 	m_recentlyOpenedProjects.removeAll( _file );
 	if( m_recentlyOpenedProjects.size() > 15 )
@@ -159,13 +160,13 @@ void configManager::addRecentlyOpenedProject( const QString & _file )
 		m_recentlyOpenedProjects.removeLast();
 	}
 	m_recentlyOpenedProjects.push_front( _file );
-	configManager::inst()->saveConfigFile();
+	ConfigManager::inst()->saveConfigFile();
 }
 
 
 
 
-const QString & configManager::value( const QString & _class,
+const QString & ConfigManager::value( const QString & _class,
 					const QString & _attribute ) const
 {
 	if( m_settings.contains( _class ) )
@@ -176,18 +177,18 @@ const QString & configManager::value( const QString & _class,
 		{
 			if( ( *it ).first == _attribute )
 			{
-				return( ( *it ).second );
+				return ( *it ).second ;
 			}
 		}
 	}
 	static QString empty;
-	return( empty );
+	return empty;
 }
 
 
 
 
-void configManager::setValue( const QString & _class,
+void ConfigManager::setValue( const QString & _class,
 				const QString & _attribute,
 				const QString & _value )
 {
@@ -234,7 +235,7 @@ static QString windowsConfigPath( int _type )
 
 
 
-void configManager::loadConfigFile()
+void ConfigManager::loadConfigFile()
 {
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
@@ -395,7 +396,7 @@ void configManager::loadConfigFile()
 
 
 
-void configManager::saveConfigFile()
+void ConfigManager::saveConfigFile()
 {
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );

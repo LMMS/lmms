@@ -31,7 +31,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "Mixer.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 
@@ -93,7 +93,7 @@ AutomatableModel * Plugin::childModel( const QString & )
 Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 								void * data )
 {
-	QLibrary pluginLibrary( configManager::inst()->pluginDir() + pluginName );
+	QLibrary pluginLibrary( ConfigManager::inst()->pluginDir() + pluginName );
 	if( pluginLibrary.load() == false )
 	{
 		if( engine::hasGUI() )
@@ -129,7 +129,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 
 void Plugin::getDescriptorsOfAvailPlugins( DescriptorList& pluginDescriptors )
 {
-	QDir directory( configManager::inst()->pluginDir() );
+	QDir directory( ConfigManager::inst()->pluginDir() );
 #ifdef LMMS_BUILD_WIN32
 	QFileInfoList list = directory.entryInfoList( QStringList( "*.dll" ) );
 #else

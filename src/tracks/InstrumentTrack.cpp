@@ -42,7 +42,7 @@
 #include "AudioPort.h"
 #include "AutomationPattern.h"
 #include "bb_track.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "debug.h"
 #include "EffectChain.h"
@@ -860,7 +860,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	// creation of widgets for track-settings-widget
 	int widgetWidth;
-	if( configManager::inst()->value( "ui",
+	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
@@ -983,7 +983,7 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 	{
 		m_lastPos = m_window->parentWidget()->pos();
 
-		if( configManager::inst()->value( "ui",
+		if( ConfigManager::inst()->value( "ui",
 										"oneinstrumenttrackwindow" ).toInt() ||
 						s_windowCache.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
 		{
@@ -1033,7 +1033,7 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 		m_window->updateInstrumentView();
 		model()->setHook( m_window );
 
-		if( configManager::inst()->
+		if( ConfigManager::inst()->
 							value( "ui", "oneinstrumenttrackwindow" ).toInt() )
 		{
 			s_windowCache << m_window;
@@ -1046,7 +1046,7 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 	else
 	{
 		m_window = new InstrumentTrackWindow( this );
-		if( configManager::inst()->
+		if( ConfigManager::inst()->
 							value( "ui", "oneinstrumenttrackwindow" ).toInt() )
 		{
 			// first time, an InstrumentTrackWindow is opened
@@ -1389,7 +1389,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
 	FileDialog sfd( this, tr( "Save preset" ), "", tr( "XML preset file (*.xpf)" ) );
 
-	QString presetRoot = configManager::inst()->userPresetsDir();
+	QString presetRoot = ConfigManager::inst()->userPresetsDir();
 	if( !QDir( presetRoot ).exists() )
 	{
 		QDir().mkdir( presetRoot );

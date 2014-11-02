@@ -121,7 +121,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::mixer()->addPlayHandle( iph );
 
-	loadFile( configManager::inst()->defaultSoundfont() );
+	loadFile( ConfigManager::inst()->defaultSoundfont() );
 
 	updateSampleRate();
 	updateReverbOn();
@@ -1060,10 +1060,10 @@ void sf2InstrumentView::showFileDialog()
 		QString f = k->m_filename;
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = configManager::inst()->userSamplesDir() + f;
+			f = ConfigManager::inst()->userSamplesDir() + f;
 			if( QFileInfo( f ).exists() == false )
 			{
-				f = configManager::inst()->factorySamplesDir() + k->m_filename;
+				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
 			}
 		}
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
@@ -1071,7 +1071,7 @@ void sf2InstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( configManager::inst()->userSamplesDir() );
+		ofd.setDirectory( ConfigManager::inst()->userSamplesDir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );

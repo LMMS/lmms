@@ -34,7 +34,7 @@
 #include "MainWindow.h"
 #include "song.h"
 #include "tool_button.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "DataFile.h"
 #include "string_pair_drag.h"
 
@@ -66,7 +66,7 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	// TODO: Use style sheet
-	if( configManager::inst()->value( "ui",
+	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT

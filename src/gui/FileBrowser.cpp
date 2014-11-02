@@ -34,7 +34,7 @@
 
 #include "FileBrowser.h"
 #include "bb_track_container.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 #include "embed.h"
 #include "engine.h"
@@ -768,7 +768,7 @@ void Directory::update( void )
 			int top_index = childCount();
 			if( addItems( fullName( *it ) ) &&
 				( *it ).contains(
-					configManager::inst()->dataDir() ) )
+					ConfigManager::inst()->dataDir() ) )
 			{
 				QTreeWidgetItem * sep = new QTreeWidgetItem;
 				sep->setText( 0,

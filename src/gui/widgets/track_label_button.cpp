@@ -33,7 +33,7 @@
 #include "rename_dialog.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 
 
@@ -48,7 +48,7 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 
-	if( configManager::inst()->value( "ui",
+	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setFixedSize( 32, 29 );
@@ -148,7 +148,7 @@ void trackLabelButton::paintEvent( QPaintEvent * _pe )
 			}
 		}
 	}
-	if( configManager::inst()->value( "ui",
+	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setText("");

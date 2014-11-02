@@ -30,7 +30,7 @@
 #include <QDataStream>
 #include <QFile>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"

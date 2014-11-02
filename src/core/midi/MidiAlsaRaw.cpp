@@ -26,7 +26,7 @@
 #include <QLineEdit>
 
 #include "MidiAlsaRaw.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 
 
@@ -80,7 +80,7 @@ MidiAlsaRaw::~MidiAlsaRaw()
 
 QString MidiAlsaRaw::probeDevice()
 {
-	QString dev = configManager::inst()->value( "MidiAlsaRaw", "Device" );
+	QString dev = ConfigManager::inst()->value( "MidiAlsaRaw", "Device" );
 	if( dev == "" )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -199,7 +199,7 @@ MidiAlsaRaw::setupWidget::~setupWidget()
 
 void MidiAlsaRaw::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "MidiAlsaRaw", "Device",
+	ConfigManager::inst()->setValue( "MidiAlsaRaw", "Device",
 							m_device->text() );
 }
 

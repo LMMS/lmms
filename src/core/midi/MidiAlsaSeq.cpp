@@ -26,7 +26,7 @@
 #include <QLineEdit>
 
 #include "MidiAlsaSeq.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "engine.h"
 #include "gui_templates.h"
 #include "song.h"
@@ -146,7 +146,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 
 QString MidiAlsaSeq::probeDevice()
 {
-	QString dev = configManager::inst()->value( "Midialsaseq", "device" );
+	QString dev = ConfigManager::inst()->value( "Midialsaseq", "device" );
 	if( dev.isEmpty() )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -730,7 +730,7 @@ MidiAlsaSeq::setupWidget::~setupWidget()
 
 void MidiAlsaSeq::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "Midialsaseq", "device",
+	ConfigManager::inst()->setValue( "Midialsaseq", "device",
 							m_device->text() );
 }
 
