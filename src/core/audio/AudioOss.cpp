@@ -73,7 +73,7 @@
 
 AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audiooss", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_convertEndian( false )
@@ -202,7 +202,7 @@ AudioOss::~AudioOss()
 
 QString AudioOss::probeDevice()
 {
-	QString dev = configManager::inst()->value( "AudioOss", "Device" );
+	QString dev = ConfigManager::inst()->value( "AudioOss", "Device" );
 	if( dev.isEmpty() )
 	{
 		char * adev = getenv( "AUDIODEV" );	// Is there a standard
@@ -341,7 +341,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audiooss",
+	m->setValue( ConfigManager::inst()->value( "audiooss",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -364,9 +364,9 @@ AudioOss::setupWidget::~setupWidget()
 
 void AudioOss::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiooss", "device",
+	ConfigManager::inst()->setValue( "audiooss", "device",
 							m_device->text() );
-	configManager::inst()->setValue( "audiooss", "channels",
+	ConfigManager::inst()->setValue( "audiooss", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 

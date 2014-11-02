@@ -137,14 +137,14 @@ void engine::destroy()
 
 	deleteHelper( &s_ladspaManager );
 
-	//delete configManager::inst();
+	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );
 
 	s_mainWindow = NULL;
 
 	deleteHelper( &s_song );
 
-	delete configManager::inst();
+	delete ConfigManager::inst();
 }
 
 

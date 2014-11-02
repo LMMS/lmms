@@ -47,7 +47,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audiopa", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_s( NULL ),
@@ -76,7 +76,7 @@ AudioPulseAudio::~AudioPulseAudio()
 
 QString AudioPulseAudio::probeDevice()
 {
-	QString dev = configManager::inst()->value( "audiopa", "device" );
+	QString dev = ConfigManager::inst()->value( "audiopa", "device" );
 	if( dev.isEmpty() )
 	{
 		if( getenv( "AUDIODEV" ) != NULL )
@@ -292,7 +292,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audiopa",
+	m->setValue( ConfigManager::inst()->value( "audiopa",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -315,9 +315,9 @@ AudioPulseAudio::setupWidget::~setupWidget()
 
 void AudioPulseAudio::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiopa", "device",
+	ConfigManager::inst()->setValue( "audiopa", "device",
 							m_device->text() );
-	configManager::inst()->setValue( "audiopa", "channels",
+	ConfigManager::inst()->setValue( "audiopa", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 

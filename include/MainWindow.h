@@ -35,7 +35,7 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
-class configManager;
+class ConfigManager;
 class PluginView;
 class toolButton;
 

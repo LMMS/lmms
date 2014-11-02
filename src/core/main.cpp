@@ -75,7 +75,7 @@ static inline QString baseName( const QString & _file )
 
 
 inline void loadTranslation( const QString & _tname,
-	const QString & _dir = configManager::inst()->localeDir() )
+	const QString & _dir = ConfigManager::inst()->localeDir() )
 {
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = _tname + ".qm";
@@ -363,7 +363,7 @@ int main( int argc, char * * argv )
 
 #ifdef LMMS_BUILD_WIN32
 #undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR configManager::inst()->localeDir()
+#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
 #endif
 
 #ifdef QT_TRANSLATIONS_DIR
@@ -390,7 +390,7 @@ int main( int argc, char * * argv )
 #endif
 #endif
 
-	configManager::inst()->loadConfigFile();
+	ConfigManager::inst()->loadConfigFile();
 
 	if( render_out.isEmpty() )
 	{
@@ -422,7 +422,7 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = configManager::inst()->recoveryFile();
+		QString recoveryFile = ConfigManager::inst()->recoveryFile();
 		if( QFileInfo(recoveryFile).exists() &&
 			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "

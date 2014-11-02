@@ -747,7 +747,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_isDragging( false ),
 	m_reversed( false ),
 	m_framesPlayed( 0 ),
-	m_animation(configManager::inst()->value("ui", "animateafp").toInt())
+	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
 {
 	setFixedSize( _w, _h );
 	setMouseTracking( true );

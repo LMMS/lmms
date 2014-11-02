@@ -79,7 +79,7 @@ SongEditor::SongEditor( song * _song ) :
 	TrackContainerView( _song ),
 	m_s( _song ),
 	m_scrollBack( false ),
-	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() )
+	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
@@ -88,7 +88,7 @@ SongEditor::SongEditor( song * _song ) :
 	setFocus();
 
 	// create time-line
-	int widgetTotal = configManager::inst()->value( "ui",
+	int widgetTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
@@ -706,7 +706,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 void SongEditor::updatePosition( const MidiTime & _t )
 {
 	int widgetWidth, trackOpWidth;
-	if( configManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
+	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
 		trackOpWidth = TRACK_OP_WIDTH_COMPACT;

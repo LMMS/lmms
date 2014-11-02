@@ -1,5 +1,5 @@
 /*
- * config_mgr.h - class configManager, a class for managing LMMS-configuration
+ * config_mgr.h - class ConfigManager, a class for managing LMMS-configuration
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -47,14 +47,14 @@ const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
-class EXPORT configManager
+class EXPORT ConfigManager
 {
 public:
-	static inline configManager * inst()
+	static inline ConfigManager * inst()
 	{
 		if( s_instanceOfMe == NULL )
 		{
-			s_instanceOfMe = new configManager();
+			s_instanceOfMe = new ConfigManager();
 		}
 		return s_instanceOfMe;
 	}
@@ -190,11 +190,11 @@ public:
 
 
 private:
-	static configManager * s_instanceOfMe;
+	static ConfigManager * s_instanceOfMe;
 
-	configManager();
-	configManager( const configManager & _c );
-	~configManager();
+	ConfigManager();
+	ConfigManager( const ConfigManager & _c );
+	~ConfigManager();
 
 
 	const QString m_lmmsRcFile;

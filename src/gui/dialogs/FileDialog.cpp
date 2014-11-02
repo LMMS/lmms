@@ -62,7 +62,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 #else
 	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::MusicLocation ) );
 #endif
-	urls << QUrl::fromLocalFile( configManager::inst()->workingDir() );
+	urls << QUrl::fromLocalFile( ConfigManager::inst()->workingDir() );
 
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.

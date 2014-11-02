@@ -130,7 +130,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 		reset( new shmFifo(), new shmFifo() );
 		m_failed = false;
 	}
-	QString exec = configManager::inst()->pluginDir() +
+	QString exec = ConfigManager::inst()->pluginDir() +
 					QDir::separator() + pluginExecutable;
 
 	QStringList args;

@@ -52,7 +52,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audioportaudio", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_paStream( NULL ),
@@ -78,8 +78,8 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 		return;
 	}
 	
-	const QString& backend = configManager::inst()->value( "audioportaudio", "backend" );
-	const QString& device = configManager::inst()->value( "audioportaudio", "device" );
+	const QString& backend = ConfigManager::inst()->value( "audioportaudio", "backend" );
+	const QString& device = ConfigManager::inst()->value( "audioportaudio", "device" );
 		
 	PaDeviceIndex inDevIdx = -1;
 	PaDeviceIndex outDevIdx = -1;
@@ -408,7 +408,7 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 /*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audioportaudio",
+	m->setValue( ConfigManager::inst()->value( "audioportaudio",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -434,9 +434,9 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	Pa_Terminate();
 
 
-	const QString& backend = configManager::inst()->value( "audioportaudio",
+	const QString& backend = ConfigManager::inst()->value( "audioportaudio",
 		"backend" );
-	const QString& device = configManager::inst()->value( "audioportaudio",
+	const QString& device = ConfigManager::inst()->value( "audioportaudio",
 		"device" );
 	
 	int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
@@ -475,11 +475,11 @@ AudioPortAudio::setupWidget::~setupWidget()
 void AudioPortAudio::setupWidget::saveSettings()
 {
 
-	configManager::inst()->setValue( "audioportaudio", "backend",
+	ConfigManager::inst()->setValue( "audioportaudio", "backend",
 							m_setupUtil.m_backendModel.currentText() );
-	configManager::inst()->setValue( "audioportaudio", "device",
+	ConfigManager::inst()->setValue( "audioportaudio", "device",
 							m_setupUtil.m_deviceModel.currentText() );
-/*	configManager::inst()->setValue( "audioportaudio", "channels",
+/*	ConfigManager::inst()->setValue( "audioportaudio", "channels",
 				QString::number( m_channels->value<int>() ) );*/
 
 }

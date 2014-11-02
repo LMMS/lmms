@@ -93,24 +93,24 @@ MainWindow::MainWindow() :
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( false );
 
-	QString wdir = configManager::inst()->workingDir();
+	QString wdir = ConfigManager::inst()->workingDir();
 	sideBar->appendTab( new pluginBrowser( splitter ) );
 	sideBar->appendTab( new FileBrowser(
-				configManager::inst()->userProjectsDir() + "*" +
-				configManager::inst()->factoryProjectsDir(),
+				ConfigManager::inst()->userProjectsDir() + "*" +
+				ConfigManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser(
-				configManager::inst()->userSamplesDir() + "*" +
-				configManager::inst()->factorySamplesDir(),
+				ConfigManager::inst()->userSamplesDir() + "*" +
+				ConfigManager::inst()->factorySamplesDir(),
 					"*", tr( "My samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser(
-				configManager::inst()->userPresetsDir() + "*" +
-				configManager::inst()->factoryPresetsDir(),
+				ConfigManager::inst()->userPresetsDir() + "*" +
+				ConfigManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
@@ -151,7 +151,7 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
-	QString bgArtwork = configManager::inst()->backgroundArtwork();
+	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
 	QImage bgImage;
 	if( !bgArtwork.isEmpty() )
 	{
@@ -192,7 +192,7 @@ MainWindow::MainWindow() :
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
-	if( configManager::inst()->value( "ui", "enableautosave" ).toInt() )
+	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
@@ -515,9 +515,9 @@ void MainWindow::finalize()
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
-	if( !configManager::inst()->value( "app", "configured" ).toInt() )
+	if( !ConfigManager::inst()->value( "app", "configured" ).toInt() )
 	{
-		configManager::inst()->setValue( "app", "configured", "1" );
+		ConfigManager::inst()->setValue( "app", "configured", "1" );
 		// no, so show it that user can setup everything
 		setupDialog sd;
 		sd.exec();
@@ -706,8 +706,8 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 	{
 		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
 						>= m_custom_templates_count ?
-				configManager::inst()->factoryProjectsDir() :
-				configManager::inst()->userProjectsDir();
+				ConfigManager::inst()->factoryProjectsDir() :
+				ConfigManager::inst()->userProjectsDir();
 		engine::getSong()->createNewProjectFromTemplate(
 			dir_base + "templates/" + _idx->text() + ".mpt" );
 	}
@@ -722,7 +722,7 @@ void MainWindow::openProject()
 	{
 		FileDialog ofd( this, tr( "Open project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
 
-		ofd.setDirectory( configManager::inst()->userProjectsDir() );
+		ofd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
@@ -741,7 +741,7 @@ void MainWindow::openProject()
 void MainWindow::updateRecentlyOpenedProjectsMenu()
 {
 	m_recentlyOpenedProjectsMenu->clear();
-	QStringList rup = configManager::inst()->recentlyOpenedProjects();
+	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		m_recentlyOpenedProjectsMenu->addAction(
@@ -757,7 +757,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 	const QString & f = _action->text();
 	setCursor( Qt::WaitCursor );
 	engine::getSong()->loadProject( f );
-	configManager::inst()->addRecentlyOpenedProject( f );
+	ConfigManager::inst()->addRecentlyOpenedProject( f );
 	setCursor( Qt::ArrowCursor );
 }
 
@@ -793,7 +793,7 @@ bool MainWindow::saveProjectAs()
 	}
 	else
 	{
-		sfd.setDirectory( configManager::inst()->userProjectsDir() );
+		sfd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 	}
 
 	if( sfd.exec () == FileDialog::Accepted &&
@@ -1000,7 +1000,7 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject() )
 	{
 		// delete recovery file
-		QFile::remove(configManager::inst()->recoveryFile());
+		QFile::remove(ConfigManager::inst()->recoveryFile());
 		_ce->accept();
 	}
 	else
@@ -1084,7 +1084,7 @@ void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
-	QDir user_d( configManager::inst()->userProjectsDir() + "templates" );
+	QDir user_d( ConfigManager::inst()->userProjectsDir() + "templates" );
 	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
 						QDir::Files | QDir::Readable );
 
@@ -1097,7 +1097,7 @@ void MainWindow::fillTemplatesMenu()
 					( *it ).left( ( *it ).length() - 4 ) );
 	}
 
-	QDir d( configManager::inst()->factoryProjectsDir() + "templates" );
+	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 	templates = d.entryList( QStringList( "*.mpt" ),
 						QDir::Files | QDir::Readable );
 
@@ -1145,7 +1145,7 @@ void MainWindow::autoSave()
 	if( !( engine::getSong()->isPlaying() ||
 			engine::getSong()->isExporting() ) )
 	{
-		engine::getSong()->saveProjectFile(configManager::inst()->recoveryFile());
+		engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 	}
 	else
 	{

@@ -713,7 +713,7 @@ void knob::enterValue()
 	bool ok;
 	float new_val;
 	if( isVolumeKnob() &&
-		configManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
 			this, windowTitle(),
@@ -768,7 +768,7 @@ void knob::friendlyUpdate()
 QString knob::displayValue() const
 {
 	if( isVolumeKnob() &&
-		configManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		return m_description.trimmed() + QString( " %1 dBV" ).
 				arg( 20.0 * log10( model()->value() / volumeRatio() ),

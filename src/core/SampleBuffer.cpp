@@ -957,10 +957,10 @@ QString SampleBuffer::openAudioFile() const
 		QString f = m_audioFile;
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = configManager::inst()->userSamplesDir() + f;
+			f = ConfigManager::inst()->userSamplesDir() + f;
 			if( QFileInfo( f ).exists() == false )
 			{
-				f = configManager::inst()->factorySamplesDir() +
+				f = ConfigManager::inst()->factorySamplesDir() +
 								m_audioFile;
 			}
 		}
@@ -968,7 +968,7 @@ QString SampleBuffer::openAudioFile() const
 	}
 	else
 	{
-		dir = configManager::inst()->userSamplesDir();
+		dir = ConfigManager::inst()->userSamplesDir();
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );
@@ -1030,7 +1030,7 @@ QString SampleBuffer::openAndSetWaveformFile()
 {
 	if( m_audioFile.isEmpty() )
 	{
-		m_audioFile = configManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
+		m_audioFile = ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
 	}
 
 	QString fileName = this->openAudioFile();
@@ -1401,8 +1401,8 @@ QString SampleBuffer::tryToMakeRelative( const QString & _file )
 	if( QFileInfo( _file ).isRelative() == false )
 	{
 		QString f = QString( _file ).replace( QDir::separator(), '/' );
-		QString fsd = configManager::inst()->factorySamplesDir();
-		QString usd = configManager::inst()->userSamplesDir();
+		QString fsd = ConfigManager::inst()->factorySamplesDir();
+		QString usd = ConfigManager::inst()->userSamplesDir();
 		fsd.replace( QDir::separator(), '/' );
 		usd.replace( QDir::separator(), '/' );
 		if( f.startsWith( fsd ) )
@@ -1427,13 +1427,13 @@ QString SampleBuffer::tryToMakeAbsolute( const QString & _file )
 		return _file;
 	}
 
-	QString f = configManager::inst()->userSamplesDir() + _file;
+	QString f = ConfigManager::inst()->userSamplesDir() + _file;
 	if( QFileInfo( f ).exists() )
 	{
 		return f;
 	}
 
-	return configManager::inst()->factorySamplesDir() + _file;
+	return ConfigManager::inst()->factorySamplesDir() + _file;
 }
 
 

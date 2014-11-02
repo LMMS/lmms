@@ -768,7 +768,7 @@ void Directory::update( void )
 			int top_index = childCount();
 			if( addItems( fullName( *it ) ) &&
 				( *it ).contains(
-					configManager::inst()->dataDir() ) )
+					ConfigManager::inst()->dataDir() ) )
 			{
 				QTreeWidgetItem * sep = new QTreeWidgetItem;
 				sep->setText( 0,
