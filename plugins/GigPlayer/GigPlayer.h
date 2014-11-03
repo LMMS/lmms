@@ -1,5 +1,5 @@
 /*
- * gig_player.h - a gig player using libgig (based on sf2 player plugin)
+ * GigPlayer.h - a GIG player using libgig (based on Sf2 player plugin)
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -40,11 +40,12 @@
 #include "SampleBuffer.h"
 #include "gig.h"
 
-class gigInstrumentView;
+class GigInstrumentView;
 class NotePlayHandle;
 
-class patchesDialog;
+class PatchesDialog;
 class QLabel;
+
 
 // Load a GIG file using libgig
 class GigInstance
@@ -63,19 +64,25 @@ public:
 } ;
 
 
+
+
 // Stores options for the notes, e.g. velocity and release time
 struct Dimension
 {
 	Dimension() :
 		release( false )
 	{
-		for( int i = 0; i < 8; ++i)
+		for( int i = 0; i < 8; ++i )
+		{
 			DimValues[i] = 0;
+		}
 	}
 
 	uint DimValues[8];
 	bool release;
 } ;
+
+
 
 
 // Takes information from the GIG file for a certain note and provides the
@@ -104,11 +111,13 @@ class ADSR
 	int releaseLength;
 
 public:
-	ADSR( gig::DimensionRegion* region, int sampleRate );
+	ADSR( gig::DimensionRegion * region, int sampleRate );
 	void keyup(); // We will begin releasing starting now
 	bool done(); // Is this sample done playing?
 	double value(); // What's the current amplitude
 } ;
+
+
 
 
 // The sample from the GIG file with our current position in both the sample
@@ -116,24 +125,33 @@ public:
 class GigSample
 {
 public:
-	GigSample( gig::Sample* pSample, float attenuation, const ADSR& adsr );
+	GigSample( gig::Sample * pSample, float attenuation, const ADSR & adsr );
 
-	gig::Sample* sample;
+	gig::Sample * sample;
 	float attenuation;
 	ADSR adsr;
 	int pos; // Position in sample
 } ;
 
 
+
+
 // What portion of a note are we in?
 enum GigState
 {
-	KeyDown,        // We just pressed the key
-	PlayingKeyDown, // The note is currently playing
-	KeyUp,          // We just released the key
-	PlayingKeyUp,   // The note is being released, e.g. a release sample is playing
-	Completed       // The note is done playing, you can delete this note now
+	// We just pressed the key
+	KeyDown,
+	// The note is currently playing
+	PlayingKeyDown,
+	// We just released the key
+	KeyUp,
+	// The note is being released, e.g. a release sample is playing
+	PlayingKeyUp,
+	// The note is done playing, you can delete this note now
+	Completed
 } ;
+
+
 
 
 // Corresponds to a certain midi note pressed, but may contain multiple samples
@@ -147,7 +165,8 @@ public:
 	QList<GigSample> samples;
 
 	GigNote( int midiNote, int velocity )
-		: midiNote(midiNote), velocity(velocity), release(false), state(KeyDown)
+		: midiNote( midiNote ), velocity( velocity ),
+		  release( false ), state( KeyDown )
 	{
 	}
 } ;
@@ -155,15 +174,15 @@ public:
 
 
 
-class gigInstrument : public Instrument
+class GigInstrument : public Instrument
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,getBank,setBank,m_bankNum);
-	mapPropertyFromModel(int,getPatch,setPatch,m_patchNum);
+	mapPropertyFromModel( int, getBank, setBank, m_bankNum );
+	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
 
 public:
-	gigInstrument( InstrumentTrack * _instrument_track );
-	virtual ~gigInstrument();
+	GigInstrument( InstrumentTrack * _instrument_track );
+	virtual ~GigInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );
 
@@ -210,8 +229,8 @@ private:
 	SRC_STATE * m_srcState;
 
 	// The GIG file and instrument we're using
-	GigInstance* m_instance;
-	gig::Instrument* m_instrument;
+	GigInstance * m_instance;
+	gig::Instrument * m_instrument;
 
 	// Part of the UI
 	QString m_filename;
@@ -230,7 +249,7 @@ private:
 	QList<GigNote> m_notes;
 
 	// Buffer for note samples
-	sampleFrame* m_sampleData;
+	sampleFrame * m_sampleData;
 	unsigned int m_sampleDataSize;
 
 	// Used when determining which samples to use
@@ -246,17 +265,17 @@ private:
 
 	// Create "dimension" to select desired samples from GIG file based on
 	// parameters such as velocity
-	Dimension getDimensions( gig::Region* pRegion, int velocity, bool release );
+	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Add the desired samples to the note, either normal samples or release
 	// samples
-	void addSamples( GigNote& note, bool wantReleaseSample );
+	void addSamples( GigNote & note, bool wantReleaseSample );
 
 	// Convert sample rates
-	bool convertSampleRate( sampleFrame& oldBuf, sampleFrame& newBuf,
+	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
 		int oldSize, int newSize, int oldRate, int newRate );
 
-	friend class gigInstrumentView;
+	friend class GigInstrumentView;
 
 signals:
 	void fileLoading();
@@ -267,13 +286,14 @@ signals:
 
 
 
-class gigInstrumentView : public InstrumentView
+
+class GigInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	gigInstrumentView( Instrument * _instrument,
+	GigInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~gigInstrumentView();
+	virtual ~GigInstrumentView();
 
 private:
 	virtual void modelChanged();
@@ -287,9 +307,9 @@ private:
 	QLabel * m_filenameLabel;
 	QLabel * m_patchLabel;
 
-	knob	* m_gainKnob;
+	knob * m_gainKnob;
 
-	static patchesDialog * s_patchDialog;
+	static PatchesDialog * s_patchDialog;
 
 protected slots:
 	void invalidateFile();
@@ -298,7 +318,6 @@ protected slots:
 	void updateFilename();
 	void updatePatchName();
 } ;
-
 
 
 #endif

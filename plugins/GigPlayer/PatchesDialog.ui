@@ -19,8 +19,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 </comment>
- <class>patchesDialog</class>
- <widget class="QDialog" name="patchesDialog" >
+ <class>PatchesDialog</class>
+ <widget class="QDialog" name="PatchesDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
