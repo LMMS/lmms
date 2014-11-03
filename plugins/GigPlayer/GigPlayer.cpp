@@ -42,7 +42,7 @@
 #include "NotePlayHandle.h"
 #include "knob.h"
 #include "song.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 #include "PatchesDialog.h"
 #include "tooltip.h"
@@ -1030,10 +1030,10 @@ void GigInstrumentView::showFileDialog()
 		QString f = k->m_filename;
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = configManager::inst()->userSamplesDir() + f;
+			f = ConfigManager::inst()->userSamplesDir() + f;
 			if( QFileInfo( f ).exists() == false )
 			{
-				f = configManager::inst()->factorySamplesDir() + k->m_filename;
+				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
 			}
 		}
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
@@ -1041,7 +1041,7 @@ void GigInstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( configManager::inst()->userSamplesDir() );
+		ofd.setDirectory( ConfigManager::inst()->userSamplesDir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );
