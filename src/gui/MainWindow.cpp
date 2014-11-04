@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -754,11 +754,14 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
-	const QString & f = _action->text();
-	setCursor( Qt::WaitCursor );
-	engine::getSong()->loadProject( f );
-	configManager::inst()->addRecentlyOpenedProject( f );
-	setCursor( Qt::ArrowCursor );
+	if ( mayChangeProject() )
+	{
+		const QString & f = _action->text();
+		setCursor( Qt::WaitCursor );
+		engine::getSong()->loadProject( f );
+		configManager::inst()->addRecentlyOpenedProject( f );
+		setCursor( Qt::ArrowCursor );
+	}
 }
 
 

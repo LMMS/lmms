@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -58,9 +58,20 @@ public:
 	void addSpacingToToolBar( int _size );
 
 
-	// every function that replaces current file (e.g. creates new file,
-	// opens another file...) has to call this before and may only process
-	// if this function returns true
+	///
+	/// \brief	Asks whether changes made to the project are to be saved.
+	///
+	/// Opens a dialog giving the user the choice to (a) confirm his choice
+	/// (such as opening a new file), (b) save the current project before
+	/// proceeding or (c) cancel the process.
+	///
+	/// Every function that replaces the current file (e.g. creates new file,
+	/// opens another file...) must call this before and may only proceed if
+	/// this function returns true.
+	///
+	/// \return	true if the user allows the software to proceed, false if they
+	///         cancel the action.
+	///
 	bool mayChangeProject();
 
 
