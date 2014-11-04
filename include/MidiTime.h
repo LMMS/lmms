@@ -62,6 +62,11 @@ public:
 		return getTact() * s_ticksPerTact;
 	}
 
+	MidiTime toAbsoluteTact() const
+	{
+		return getTact() * s_ticksPerTact;
+	}
+
 	MidiTime& operator=( const MidiTime& time )
 	{
 		m_ticks = time.m_ticks;
