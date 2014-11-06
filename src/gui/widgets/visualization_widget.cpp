@@ -65,6 +65,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 visualizationWidget::~visualizationWidget()
 {
 	delete[] m_buffer;
+	delete[] m_points;
 }
 
 

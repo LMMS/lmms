@@ -93,6 +93,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 		oldflags |= FD_CLOEXEC;
 		fcntl( fd, F_SETFD, oldflags );
 	}
+	delete[] ufds;
 	_success_ful = true;
 }
 

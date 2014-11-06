@@ -163,6 +163,10 @@ FxMixerView::FxMixerView() :
 
 FxMixerView::~FxMixerView()
 {
+	for (int i=0; i<m_fxChannelViews.size(); i++)
+	{
+		delete m_fxChannelViews.at(i);
+	}
 }
 
 

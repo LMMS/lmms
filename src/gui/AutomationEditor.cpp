@@ -458,6 +458,8 @@ AutomationEditor::~AutomationEditor()
 	m_zoomingYModel.disconnect();
 	m_quantizeModel.disconnect();
 	m_tensionModel->disconnect();
+
+	delete m_tensionModel;
 }
 
 
