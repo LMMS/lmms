@@ -103,6 +103,7 @@ inline float linearInterpolate( float v0, float v1, float x )
 	#else
 		return fma( x, v1-v0, v0 );
 	#endif
+#else
 	return x * (v1-v0) + v0;
 #endif	
 }
