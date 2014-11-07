@@ -450,7 +450,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 		// Read a different number of samples depending on the sample rate, but
 		// resample it to always output the right number of frames
-		samples = frames * oldRate / newRate;
+		samples = round( (double) frames * oldRate / newRate );
 
 		// Buffer for the resampled data
 		convertBuf = new sampleFrame[samples];
@@ -532,7 +532,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 				for( int i = 0; i < samples; ++i )
 				{
-					m_sampleData[i][0] = 1.0 / 0x10000 * pInt[ sample->sample->Channels * i ] * sample->attenuation;
+					m_sampleData[i][0] = 1.0 / 0x10000 *
+						pInt[ sample->sample->Channels * i ] * sample->attenuation;
 
 					if( sample->sample->Channels == 1 )
 					{
@@ -540,7 +541,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 					}
 					else
 					{
-						m_sampleData[i][1] = 1.0 / 0x10000 * pInt[ sample->sample->Channels * i + 1 ] * sample->attenuation;
+						m_sampleData[i][1] = 1.0 / 0x10000 *
+							pInt[ sample->sample->Channels * i + 1 ] * sample->attenuation;
 					}
 				}
 			}
@@ -557,7 +559,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Save to output buffer
-			if( sampleConvert )
+			if( sampleConvert == true )
 			{
 				for( int i = 0; i < samples; ++i )
 				{
@@ -577,10 +579,10 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Convert sample rate if needed
-	if( sampleConvert )
+	if( sampleConvert == true )
 	{
-		// If an error occured, it's better to render nothing than have some
-		// screetching high-volume noise
+		// If an error occurred, it's better to render nothing than have some
+		// screeching high-volume noise
 		if( !convertSampleRate( *convertBuf, *_working_buffer, samples, frames, oldRate, newRate ) )
 		{
 			std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -843,6 +845,12 @@ bool GigInstrument::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBu
 	if( src_data.output_frames_gen > newSize )
 	{
 		qCritical( "GigInstrument: not enough frames: %ld / %d", src_data.output_frames_gen, newSize );
+		return false;
+	}
+
+	if( src_data.input_frames_used == 0 || src_data.output_frames_gen == 0 )
+	{
+		qCritical( "GigInstrument: could not resample, no frames generated" );
 		return false;
 	}
 
