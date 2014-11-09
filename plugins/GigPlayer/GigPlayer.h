@@ -249,10 +249,6 @@ private:
 	// List of all the currently playing notes
 	QList<GigNote> m_notes;
 
-	// Buffer for note samples
-	sampleFrame * m_sampleData;
-	unsigned int m_sampleDataSize;
-
 	// Used when determining which samples to use
 	uint32_t m_RandomSeed;
 	float m_currentKeyDimension;

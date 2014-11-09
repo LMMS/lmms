@@ -95,8 +95,6 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_bankNum( 0, 0, 999, this, tr( "Bank" ) ),
 	m_patchNum( 0, 0, 127, this, tr( "Patch" ) ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
-	m_sampleData( NULL ),
-	m_sampleDataSize( 0 ),
 	m_RandomSeed( 0 ),
 	m_currentKeyDimension( 0 )
 {
@@ -108,11 +106,6 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
-
-	// Buffer for reading samples
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
-	m_sampleData = new sampleFrame[frames];
-	m_sampleDataSize = frames;
 }
 
 
@@ -120,11 +113,6 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	if( m_sampleData != NULL )
-	{
-		delete[] m_sampleData;
-	}
-
 	engine::mixer()->removePlayHandles( instrumentTrack() );
 	freeInstance();
 
@@ -366,7 +354,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	int newRate = engine::mixer()->processingSampleRate();
 	bool sampleError = false;
 	bool sampleConvert = false;
-	sampleFrame * convertBuf = NULL;
 
 	// How many frames we'll be grabbing from the sample
 	int samples = frames;
@@ -464,19 +451,12 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 		// We need a bit of margin so we don't get glitching
 		samples += GIGMARGIN[interpolation];
-
-		// Buffer for the resampled data
-		convertBuf = new sampleFrame[samples];
-		std::memset( &convertBuf[0][0], 0, DEFAULT_CHANNELS * samples * sizeof( float ) );
 	}
 
-	// Recreate buffer if it is of a different size
-	if( m_sampleDataSize != samples )
-	{
-		delete[] m_sampleData;
-		m_sampleData = new sampleFrame[samples];
-		m_sampleDataSize = samples;
-	}
+	// Create buffers
+	sampleFrame sampleData[samples]; // Individual note signal, overwritten for each note
+	sampleFrame convertBuf[samples]; // Sum of note signals
+	std::memset( &convertBuf[0][0], 0, DEFAULT_CHANNELS * samples * sizeof( float ) );
 
 	// Fill buffer with portions of the note samples
 	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
@@ -520,11 +500,11 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 					// Store the notes to this buffer before saving to output
 					// so we can fade them out as needed
-					m_sampleData[i][0] = 1.0 / 0x100000000 * sample->attenuation * valueLeft;
+					sampleData[i][0] = 1.0 / 0x100000000 * sample->attenuation * valueLeft;
 
 					if( sample->sample->Channels == 1 )
 					{
-						m_sampleData[i][1] = m_sampleData[i][0];
+						sampleData[i][1] = sampleData[i][0];
 					}
 					else
 					{
@@ -532,7 +512,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 									( pInt[ 3 * sample->sample->Channels * i + 4 ] << 16 ) |
 									( pInt[ 3 * sample->sample->Channels * i + 5 ] << 24 );
 
-						m_sampleData[i][1] = 1.0 / 0x100000000 * sample->attenuation * valueRight;
+						sampleData[i][1] = 1.0 / 0x100000000 * sample->attenuation * valueRight;
 					}
 				}
 			}
@@ -542,16 +522,16 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 				for( int i = 0; i < samples; ++i )
 				{
-					m_sampleData[i][0] = 1.0 / 0x10000 *
+					sampleData[i][0] = 1.0 / 0x10000 *
 						pInt[ sample->sample->Channels * i ] * sample->attenuation;
 
 					if( sample->sample->Channels == 1 )
 					{
-						m_sampleData[i][1] = m_sampleData[i][0];
+						sampleData[i][1] = sampleData[i][0];
 					}
 					else
 					{
-						m_sampleData[i][1] = 1.0 / 0x10000 *
+						sampleData[i][1] = 1.0 / 0x10000 *
 							pInt[ sample->sample->Channels * i + 1 ] * sample->attenuation;
 					}
 				}
@@ -567,8 +547,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			for( int i = 0; i < samples; ++i )
 			{
 				double amplitude = copy.value();
-				m_sampleData[i][0] *= amplitude;
-				m_sampleData[i][1] *= amplitude;
+				sampleData[i][0] *= amplitude;
+				sampleData[i][1] *= amplitude;
 			}
 
 			// Save to output buffer
@@ -576,16 +556,16 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			{
 				for( int i = 0; i < samples; ++i )
 				{
-					convertBuf[i][0] += m_sampleData[i][0];
-					convertBuf[i][1] += m_sampleData[i][1];
+					convertBuf[i][0] += sampleData[i][0];
+					convertBuf[i][1] += sampleData[i][1];
 				}
 			}
 			else
 			{
 				for( int i = 0; i < frames; ++i )
 				{
-					_working_buffer[i][0] += m_sampleData[i][0];
-					_working_buffer[i][1] += m_sampleData[i][1];
+					_working_buffer[i][0] += sampleData[i][0];
+					_working_buffer[i][1] += sampleData[i][1];
 				}
 			}
 		}
@@ -602,8 +582,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			std::memset( &_working_buffer[0][0], 0,
 					DEFAULT_CHANNELS * frames * sizeof( float ) );
 		}
-
-		delete[] convertBuf;
 	}
 
 	// Update the note positions with how many samples we actually used
