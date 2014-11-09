@@ -270,7 +270,7 @@ private:
 
 	// Add the desired samples to the note, either normal samples or release
 	// samples
-	void addSamples( GigNote & note, bool wantReleaseSample );
+	void addSamples( GigNote & gignote, bool wantReleaseSample );
 
 	// Convert sample rates
 	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,

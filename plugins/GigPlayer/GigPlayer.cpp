@@ -374,51 +374,51 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	// How many we actually used from the sample
 	int used = frames;
 
-	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
 		// Process notes in the KeyUp state, adding release samples if desired
-		if( note->state == KeyUp )
+		if( it->state == KeyUp )
 		{
 			// If there are no samples, we're done
-			if( note->samples.empty() )
+			if( it->samples.empty() )
 			{
-				note->state = Completed;
+				it->state = Completed;
 			}
 			else
 			{
-				note->state = PlayingKeyUp;
+				it->state = PlayingKeyUp;
 
 				// Notify each sample that the key has been released
-				for( QList<GigSample>::iterator sample = note->samples.begin();
-						sample != note->samples.end(); ++sample )
+				for( QList<GigSample>::iterator sample = it->samples.begin();
+						sample != it->samples.end(); ++sample )
 				{
 					sample->adsr.keyup();
 				}
 
 				// Add release samples if available
-				if( note->release == true )
+				if( it->release == true )
 				{
-					addSamples( *note, true );
+					addSamples( *it, true );
 				}
 			}
 		}
 		// Process notes in the KeyDown state, adding samples for the notes
-		else if( note->state == KeyDown )
+		else if( it->state == KeyDown )
 		{
-			note->state = PlayingKeyDown;
-			addSamples( *note, false );
+			it->state = PlayingKeyDown;
+			addSamples( *it, false );
 		}
 
-		for( QList<GigSample>::iterator sample = note->samples.begin();
-				sample != note->samples.end(); ++sample )
+		for( QList<GigSample>::iterator sample = it->samples.begin();
+				sample != it->samples.end(); ++sample )
 		{
 			// Delete ended samples
 			if( sample->sample == NULL || sample->adsr.done() ||
 					sample->pos >= sample->sample->SamplesTotal - 1 )
 			{
-				sample = note->samples.erase( sample );
+				sample = it->samples.erase( sample );
 
-				if( sample == note->samples.end() )
+				if( sample == it->samples.end() )
 				{
 					break;
 				}
@@ -441,11 +441,11 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		}
 
 		// Delete ended notes (either in the completed state or all the samples ended)
-		if( note->state == Completed || note->samples.empty() )
+		if( it->state == Completed || it->samples.empty() )
 		{
-			note = m_notes.erase( note );
+			it = m_notes.erase( it );
 
-			if( note == m_notes.end() )
+			if( it == m_notes.end() )
 			{
 				break;
 			}
@@ -479,17 +479,17 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Fill buffer with portions of the note samples
-	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
 		// Only process the notes if we're in a playing state
-		if( !( note->state == PlayingKeyDown ||
-				note->state == PlayingKeyUp ) )
+		if( !( it->state == PlayingKeyDown ||
+				it->state == PlayingKeyUp ) )
 		{
 			continue;
 		}
 
-		for( QList<GigSample>::iterator sample = note->samples.begin();
-				sample != note->samples.end(); ++sample )
+		for( QList<GigSample>::iterator sample = it->samples.begin();
+				sample != it->samples.end(); ++sample )
 		{
 			if( sample->sample == NULL )
 			{
@@ -607,17 +607,17 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Update the note positions with how many samples we actually used
-	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
 		// Only process the notes if we're in a playing state
-		if( !( note->state == PlayingKeyDown ||
-				note->state == PlayingKeyUp ) )
+		if( !( it->state == PlayingKeyDown ||
+				it->state == PlayingKeyUp ) )
 		{
 			continue;
 		}
 
-		for( QList<GigSample>::iterator sample = note->samples.begin();
-				sample != note->samples.end(); ++sample )
+		for( QList<GigSample>::iterator sample = it->samples.begin();
+				sample != it->samples.end(); ++sample )
 		{
 			if( sample->sample != NULL )
 			{
@@ -681,15 +681,15 @@ PluginView * GigInstrument::instantiateView( QWidget * _parent )
 //
 // Note: not thread safe since libgig stores current region position data in
 // the instrument object
-void GigInstrument::addSamples( GigNote & note, bool wantReleaseSample )
+void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 {
 	// Change key dimension, e.g. change samples based on what key is pressed
 	// in a certain range. From LinuxSampler
 	if( wantReleaseSample == true &&
-			note.midiNote >= m_instrument->DimensionKeyRange.low &&
-			note.midiNote <= m_instrument->DimensionKeyRange.high )
+			gignote.midiNote >= m_instrument->DimensionKeyRange.low &&
+			gignote.midiNote <= m_instrument->DimensionKeyRange.high )
 	{
-		m_currentKeyDimension = float( note.midiNote -
+		m_currentKeyDimension = float( gignote.midiNote -
 				m_instrument->DimensionKeyRange.low ) / (
 					m_instrument->DimensionKeyRange.high -
 					m_instrument->DimensionKeyRange.low + 1 );
@@ -699,7 +699,7 @@ void GigInstrument::addSamples( GigNote & note, bool wantReleaseSample )
 
 	while( pRegion != NULL )
 	{
-		Dimension dim = getDimensions( pRegion, note.velocity, wantReleaseSample );
+		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
 		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
 		gig::Sample * pSample = pDimRegion->pSample;
 
@@ -707,7 +707,7 @@ void GigInstrument::addSamples( GigNote & note, bool wantReleaseSample )
 		// notes and not when we get the release samples.
 		if( wantReleaseSample != true )
 		{
-			note.release = dim.release;
+			gignote.release = dim.release;
 		}
 
 		if( pSample != NULL && pSample->SamplesTotal != 0 )
@@ -715,9 +715,9 @@ void GigInstrument::addSamples( GigNote & note, bool wantReleaseSample )
 			int keyLow = pRegion->KeyRange.low;
 			int keyHigh = pRegion->KeyRange.high;
 
-			if( note.midiNote >= keyLow && note.midiNote <= keyHigh )
+			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
-				float attenuation = pDimRegion->GetVelocityAttenuation( note.velocity );;
+				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );;
 				float length = (double) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
 
 				// TODO: sample panning? looping? crossfade different layers?
@@ -732,7 +732,7 @@ void GigInstrument::addSamples( GigNote & note, bool wantReleaseSample )
 					attenuation *= pDimRegion->SampleAttenuation;
 				}
 
-				note.samples.push_back( GigSample( pSample, attenuation,
+				gignote.samples.push_back( GigSample( pSample, attenuation,
 					ADSR( pDimRegion, pSample->SamplesPerSecond ) ) );
 			}
 		}
