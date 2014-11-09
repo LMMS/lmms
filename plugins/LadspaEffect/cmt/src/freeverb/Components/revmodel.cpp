@@ -6,33 +6,34 @@
 
 #include "revmodel.h"
 
-revmodel::revmodel()
+revmodel::revmodel( float sampleRatio ) :
+		m_sampleRatio( sampleRatio )
 {
 	// Tie the components to their buffers
-	combL[0].setbuffer(bufcombL1,combtuningL1);
-	combR[0].setbuffer(bufcombR1,combtuningR1);
-	combL[1].setbuffer(bufcombL2,combtuningL2);
-	combR[1].setbuffer(bufcombR2,combtuningR2);
-	combL[2].setbuffer(bufcombL3,combtuningL3);
-	combR[2].setbuffer(bufcombR3,combtuningR3);
-	combL[3].setbuffer(bufcombL4,combtuningL4);
-	combR[3].setbuffer(bufcombR4,combtuningR4);
-	combL[4].setbuffer(bufcombL5,combtuningL5);
-	combR[4].setbuffer(bufcombR5,combtuningR5);
-	combL[5].setbuffer(bufcombL6,combtuningL6);
-	combR[5].setbuffer(bufcombR6,combtuningR6);
-	combL[6].setbuffer(bufcombL7,combtuningL7);
-	combR[6].setbuffer(bufcombR7,combtuningR7);
-	combL[7].setbuffer(bufcombL8,combtuningL8);
-	combR[7].setbuffer(bufcombR8,combtuningR8);
-	allpassL[0].setbuffer(bufallpassL1,allpasstuningL1);
-	allpassR[0].setbuffer(bufallpassR1,allpasstuningR1);
-	allpassL[1].setbuffer(bufallpassL2,allpasstuningL2);
-	allpassR[1].setbuffer(bufallpassR2,allpasstuningR2);
-	allpassL[2].setbuffer(bufallpassL3,allpasstuningL3);
-	allpassR[2].setbuffer(bufallpassR3,allpasstuningR3);
-	allpassL[3].setbuffer(bufallpassL4,allpasstuningL4);
-	allpassR[3].setbuffer(bufallpassR4,allpasstuningR4);
+	combL[0].setbuffer(bufcombL1,static_cast<int>( combtuningL1 * m_sampleRatio ));
+	combR[0].setbuffer(bufcombR1,static_cast<int>( combtuningR1 * m_sampleRatio ));
+	combL[1].setbuffer(bufcombL2,static_cast<int>( combtuningL2 * m_sampleRatio ));
+	combR[1].setbuffer(bufcombR2,static_cast<int>( combtuningR2 * m_sampleRatio ));
+	combL[2].setbuffer(bufcombL3,static_cast<int>( combtuningL3 * m_sampleRatio ));
+	combR[2].setbuffer(bufcombR3,static_cast<int>( combtuningR3 * m_sampleRatio ));
+	combL[3].setbuffer(bufcombL4,static_cast<int>( combtuningL4 * m_sampleRatio ));
+	combR[3].setbuffer(bufcombR4,static_cast<int>( combtuningR4 * m_sampleRatio ));
+	combL[4].setbuffer(bufcombL5,static_cast<int>( combtuningL5 * m_sampleRatio ));
+	combR[4].setbuffer(bufcombR5,static_cast<int>( combtuningR5 * m_sampleRatio ));
+	combL[5].setbuffer(bufcombL6,static_cast<int>( combtuningL6 * m_sampleRatio ));
+	combR[5].setbuffer(bufcombR6,static_cast<int>( combtuningR6 * m_sampleRatio ));
+	combL[6].setbuffer(bufcombL7,static_cast<int>( combtuningL7 * m_sampleRatio ));
+	combR[6].setbuffer(bufcombR7,static_cast<int>( combtuningR7 * m_sampleRatio ));
+	combL[7].setbuffer(bufcombL8,static_cast<int>( combtuningL8 * m_sampleRatio ));
+	combR[7].setbuffer(bufcombR8,static_cast<int>( combtuningR8 * m_sampleRatio ));
+	allpassL[0].setbuffer(bufallpassL1,static_cast<int>( allpasstuningL1 * m_sampleRatio ));
+	allpassR[0].setbuffer(bufallpassR1,static_cast<int>( allpasstuningR1 * m_sampleRatio ));
+	allpassL[1].setbuffer(bufallpassL2,static_cast<int>( allpasstuningL2 * m_sampleRatio ));
+	allpassR[1].setbuffer(bufallpassR2,static_cast<int>( allpasstuningR2 * m_sampleRatio ));
+	allpassL[2].setbuffer(bufallpassL3,static_cast<int>( allpasstuningL3 * m_sampleRatio ));
+	allpassR[2].setbuffer(bufallpassR3,static_cast<int>( allpasstuningR3 * m_sampleRatio ));
+	allpassL[3].setbuffer(bufallpassL4,static_cast<int>( allpasstuningL4 * m_sampleRatio ));
+	allpassR[3].setbuffer(bufallpassR4,static_cast<int>( allpasstuningR4 * m_sampleRatio ));
 
 	// Set default values
 	allpassL[0].setfeedback(0.5f);
