@@ -72,6 +72,12 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 
+// Margins for extra samples to provide to libsamplerate to reduce glitching
+const f_cnt_t GIGMARGIN[] = { 128, 64, 64, 4, 4 };
+
+
+
+
 struct GIGPluginData
 {
 	int midiNote;
@@ -340,6 +346,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const int interpolation = engine::mixer()->currentQualitySettings().libsrcInterpolation();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -363,6 +370,9 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 	// How many frames we'll be grabbing from the sample
 	int samples = frames;
+
+	// How many we actually used from the sample
+	int used = frames;
 
 	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
 	{
@@ -450,7 +460,10 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 		// Read a different number of samples depending on the sample rate, but
 		// resample it to always output the right number of frames
-		samples = round( (double) frames * oldRate / newRate );
+		samples = frames * oldRate / newRate;
+
+		// We need a bit of margin so we don't get glitching
+		samples += GIGMARGIN[interpolation];
 
 		// Buffer for the resampled data
 		convertBuf = new sampleFrame[samples];
@@ -493,9 +506,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			buf.Size = sample->sample->Read( buf.pStart, samples ) * sample->sample->FrameSize;
 			buf.NullExtensionSize = allocationsize - buf.Size;
 			std::memset( (int8_t*) buf.pStart + buf.Size, 0, buf.NullExtensionSize );
-
-			// Save the new position in the sample
-			sample->pos = sample->sample->GetPos();
 
 			// Convert from 16 or 24 bit into 32-bit float
 			if( sample->sample->BitDepth == 24 ) // 24 bit
@@ -550,10 +560,13 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Cleanup
 			delete[] (int8_t*) buf.pStart;
 
-			// Apply ADSR
+			// Apply ADSR using a copy so if we don't use these samples when
+			// resampling, the ADSR doesn't get messed up
+			ADSR copy = sample->adsr;
+
 			for( int i = 0; i < samples; ++i )
 			{
-				double amplitude = sample->adsr.value();
+				double amplitude = copy.value();
 				m_sampleData[i][0] *= amplitude;
 				m_sampleData[i][1] *= amplitude;
 			}
@@ -583,12 +596,35 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	{
 		// If an error occurred, it's better to render nothing than have some
 		// screeching high-volume noise
-		if( !convertSampleRate( *convertBuf, *_working_buffer, samples, frames, oldRate, newRate ) )
+		if( !convertSampleRate( *convertBuf, *_working_buffer, samples, frames,
+					oldRate, newRate, used ) )
 		{
-			std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
+			std::memset( &_working_buffer[0][0], 0,
+					DEFAULT_CHANNELS * frames * sizeof( float ) );
 		}
 
 		delete[] convertBuf;
+	}
+
+	// Update the note positions with how many samples we actually used
+	for( QList<GigNote>::iterator note = m_notes.begin(); note != m_notes.end(); ++note )
+	{
+		// Only process the notes if we're in a playing state
+		if( !( note->state == PlayingKeyDown ||
+				note->state == PlayingKeyUp ) )
+		{
+			continue;
+		}
+
+		for( QList<GigSample>::iterator sample = note->samples.begin();
+				sample != note->samples.end(); ++sample )
+		{
+			if( sample->sample != NULL )
+			{
+				sample->pos += used;
+				sample->adsr.inc( used );
+			}
+		}
 	}
 
 	m_notesMutex.unlock();
@@ -822,19 +858,21 @@ void GigInstrument::getInstrument()
 
 
 bool GigInstrument::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		int oldSize, int newSize, int oldRate, int newRate )
+		int oldSize, int newSize, int oldRate, int newRate, int& used )
 {
 	SRC_DATA src_data;
 	src_data.data_in = &oldBuf[0];
 	src_data.data_out = &newBuf[0];
 	src_data.input_frames = oldSize;
 	src_data.output_frames = newSize;
-	src_data.src_ratio = (double) newSize / oldSize;
+	src_data.src_ratio = (double) newRate / oldRate;
 	src_data.end_of_input = 0;
 
 	m_srcMutex.lock();
 	int error = src_process( m_srcState, &src_data );
 	m_srcMutex.unlock();
+
+	used = src_data.input_frames_used;
 
 	if( error != 0 )
 	{
@@ -848,7 +886,7 @@ bool GigInstrument::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBu
 		return false;
 	}
 
-	if( src_data.input_frames_used == 0 || src_data.output_frames_gen == 0 )
+	if( src_data.output_frames_gen == 0 )
 	{
 		qCritical( "GigInstrument: could not resample, no frames generated" );
 		return false;
@@ -1194,6 +1232,15 @@ double ADSR::value()
 	}
 
 	return currentAmplitude;
+}
+
+// Increment internal positions a certain number of times
+void ADSR::inc( int num )
+{
+	for( int i = 0; i < num; ++i )
+	{
+		value();
+	}
 }
 
 

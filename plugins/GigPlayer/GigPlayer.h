@@ -115,6 +115,7 @@ public:
 	void keyup(); // We will begin releasing starting now
 	bool done(); // Is this sample done playing?
 	double value(); // What's the current amplitude
+	void inc( int num ); // Increment internal positions by num
 } ;
 
 
@@ -273,7 +274,7 @@ private:
 
 	// Convert sample rates
 	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		int oldSize, int newSize, int oldRate, int newRate );
+		int oldSize, int newSize, int oldRate, int newRate, int& used );
 
 	friend class GigInstrumentView;
 
