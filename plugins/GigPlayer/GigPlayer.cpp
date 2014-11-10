@@ -1204,7 +1204,15 @@ double ADSR::value()
 	{
 		if( releasePosition < releaseLength )
 		{
-			amplitude = sustain * ( 1.0 - 1.0 / releaseLength * releasePosition );
+			// Maybe not the best way of doing this, but it appears to be about right
+			amplitude = sustain * exp( -5.0 / releaseLength * releasePosition ) - 1e-5;
+
+			// Don't have an infinite exponential decay
+			if( amplitude < 0 )
+			{
+				amplitude = 0;
+				isDone = true;
+			}
 		}
 		else
 		{
