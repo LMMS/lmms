@@ -346,7 +346,7 @@ void MainWindow::finalize()
 
 	help_menu->addSeparator();
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
-			      this, SLOT( aboutLMMS() ) );
+				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
