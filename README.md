@@ -10,9 +10,9 @@ LMMS is a free cross-platform alternative to commercial programs like FL StudioÂ
 [Downloads/Releases](https://github.com/LMMS/lmms/releases)<br>
 [Developer Wiki](https://github.com/LMMS/lmms/wiki)<br>
 [Artist & User Wiki/Documentation](http://lmms.sourceforge.net/wiki/index.php/Main_Page) This still has some useful pages.<br>
-[Screenshots](http://lmms.sourceforge.net/screenshots.php)<br>
-[Sound Demos](http://lmms.sourceforge.net/demos.php)<br>
-[LMMS Sharing Platform](http://lmms.sourceforge.net/lsp/index.php) Share your songs!
+[Screenshots](http://lmms.io/screenshots/)<br>
+[Sound Demos](http://lmms.io/showcase/)<br>
+[LMMS Sharing Platform](http://lmms.io/lsp/) Share your songs!
 
 Features
 ---------
