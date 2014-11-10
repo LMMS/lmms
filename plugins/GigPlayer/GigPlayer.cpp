@@ -43,6 +43,7 @@
 #include "knob.h"
 #include "song.h"
 #include "ConfigManager.h"
+#include "endian_handling.h"
 
 #include "PatchesDialog.h"
 #include "tooltip.h"
@@ -494,9 +495,12 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 				for( int i = 0; i < samples; ++i )
 				{
-					int32_t valueLeft = ( pInt[ 3 * sample->sample->Channels * i ] << 8 ) |
+					// libgig gives 24-bit data as little endian, so we must
+					// convert if on a big endian system
+					int32_t valueLeft = swap32IfBE(
+								( pInt[ 3 * sample->sample->Channels * i ] << 8 ) |
 								( pInt[ 3 * sample->sample->Channels * i + 1 ] << 16 ) |
-								( pInt[ 3 * sample->sample->Channels * i + 2 ] << 24 );
+								( pInt[ 3 * sample->sample->Channels * i + 2 ] << 24 ) );
 
 					// Store the notes to this buffer before saving to output
 					// so we can fade them out as needed
@@ -508,9 +512,10 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 					}
 					else
 					{
-						int32_t valueRight = ( pInt[ 3 * sample->sample->Channels * i + 3 ] << 8 ) |
+						int32_t valueRight = swap32IfBE(
+									( pInt[ 3 * sample->sample->Channels * i + 3 ] << 8 ) |
 									( pInt[ 3 * sample->sample->Channels * i + 4 ] << 16 ) |
-									( pInt[ 3 * sample->sample->Channels * i + 5 ] << 24 );
+									( pInt[ 3 * sample->sample->Channels * i + 5 ] << 24 ) );
 
 						sampleData[i][1] = 1.0 / 0x100000000 * sample->attenuation * valueRight;
 					}
