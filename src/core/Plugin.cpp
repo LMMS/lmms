@@ -62,6 +62,7 @@ Plugin::Plugin( const Descriptor * _descriptor, Model * parent ) :
 	{
 		m_descriptor = &dummy_plugin_descriptor;
 	}
+	m_errorReport = NULL;
 }
 
 
@@ -124,6 +125,18 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 	return inst;
 }
 
+QList<QString>* Plugin::getErrorReport()
+{
+	return m_errorReport;
+}
+
+void Plugin::logError( QString err_msg )
+{
+	if ( m_errorReport == NULL ) {
+		m_errorReport = new QList<QString>();
+	}
+	m_errorReport->append( err_msg );
+}
 
 
 

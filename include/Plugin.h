@@ -178,6 +178,8 @@ public:
 	// create a view for the model 
 	PluginView * createView( QWidget* parent );
 
+	QList<QString> * getErrorReport();
+
 
 protected:
 	// create a view for the model 
@@ -185,6 +187,9 @@ protected:
 
 
 private:
+	QList<QString> * m_errorReport;
+	void logError( QString err_msg );
+
 	const Descriptor* m_descriptor;
 
 	// pointer to instantiation-function in plugin

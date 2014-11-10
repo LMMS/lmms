@@ -135,10 +135,7 @@ void VstEffect::openPlugin( const QString & _plugin )
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
-		QMessageBox::information( NULL,
-			VstPlugin::tr( "Failed loading VST plugin" ),
-			VstPlugin::tr( "The VST plugin %1 could not be loaded for some reason." ).arg( _plugin ),
-			QMessageBox::Ok );
+		logError( VstPlugin::tr( "The VST plugin %1 could not be loaded." ) );
 		return;
 	}
 
