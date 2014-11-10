@@ -130,7 +130,9 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	float curRMS = sqrt_neg( sum / _frames );
+	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
+	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;
 	m_lastSample = qBound( 0.0f, c.m_baseModel.value() + amount * curRMS, 1.0f );
 
 	return isRunning();

@@ -65,6 +65,7 @@ private:
 	FloatModel m_amountModel;
 	FloatModel m_attackModel;
 	FloatModel m_decayModel;
+	FloatModel m_tresholdModel;
 	BoolModel m_muteModel;
 	BoolModel m_absModel;
 	FloatModel m_amountMultModel;

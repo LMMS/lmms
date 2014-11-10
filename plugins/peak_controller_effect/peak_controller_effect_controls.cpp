@@ -41,6 +41,7 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Modulation amount" ) ),
 	m_attackModel( 0, 0, 0.999, 0.001, this, tr( "Attack" ) ),
 	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
+	m_tresholdModel( 0, 0, 1.0, 0.001, this, tr( "Treshold" ) ),
 	m_muteModel( false, this, tr( "Mute output" ) ),
 	m_absModel( true, this, tr("Abs Value") ),
 	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount Multiplicator") )
@@ -61,6 +62,8 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 
 	m_absModel.loadSettings( _this, "abs" );
 	m_amountMultModel.loadSettings( _this, "amountmult" );
+	
+	m_tresholdModel.loadSettings( _this, "treshold" );
 
 	/*If the peak controller effect is NOT loaded from project,
 	 * m_effectId stored is useless.
@@ -102,6 +105,8 @@ void PeakControllerEffectControls::saveSettings( QDomDocument & _doc,
 
 	m_absModel.saveSettings( _doc,  _this, "abs" );
 	m_amountMultModel.saveSettings( _doc, _this, "amountmult" );
+	
+	m_tresholdModel.saveSettings( _doc, _this, "treshold" );
 }
 
 

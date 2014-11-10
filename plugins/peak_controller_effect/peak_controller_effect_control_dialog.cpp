@@ -46,7 +46,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setPalette( pal );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
-	tl->setContentsMargins( 5, 30, 8, 8 );
+	tl->setContentsMargins( 5, 30, 5, 8 );
 
 	QHBoxLayout * l = new QHBoxLayout;
 	l->setSpacing( 4 );
@@ -74,12 +74,18 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_decayKnob->setLabel( tr( "DCAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release:" ) + " ", "" );
+	
+	m_tresholdKnob = new knob( knobBright_26, this );
+	m_tresholdKnob->setLabel( tr( "TRES" ) );
+	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
+	m_tresholdKnob->setHintText( tr( "Treshold:" ) + " ", "" );
 
 	l->addWidget( m_baseKnob );
 	l->addWidget( m_amountKnob );
 	l->addWidget( m_amountMultKnob );
 	l->addWidget( m_attackKnob );
 	l->addWidget( m_decayKnob );
+	l->addWidget( m_tresholdKnob );
 	l->addStretch(); // expand, so other widgets have minimum width
 	tl->addLayout( l );
 
