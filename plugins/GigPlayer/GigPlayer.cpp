@@ -391,10 +391,10 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			addSamples( *it, false );
 		}
 
+		// Delete ended samples
 		for( QList<GigSample>::iterator sample = it->samples.begin();
 				sample != it->samples.end(); ++sample )
 		{
-			// Delete ended samples
 			if( sample->sample == NULL || sample->adsr.done() ||
 					sample->pos >= sample->sample->SamplesTotal - 1 )
 			{
@@ -403,21 +403,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				if( sample == it->samples.end() )
 				{
 					break;
-				}
-			}
-			// Verify all the samples have the same rate
-			else
-			{
-				int currentRate = sample->sample->SamplesPerSecond;
-
-				if( oldRate == -1 )
-				{
-					oldRate = currentRate;
-				}
-				else if( oldRate != currentRate )
-				{
-					qCritical() << "GigInstrument: not all samples are the same rate, not converting";
-					sampleError = true;
 				}
 			}
 		}
@@ -430,6 +415,23 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			if( it == m_notes.end() )
 			{
 				break;
+			}
+		}
+
+		// Verify all the samples have the same rate
+		for( QList<GigSample>::iterator sample = it->samples.begin();
+				sample != it->samples.end(); ++sample )
+		{
+			int currentRate = sample->sample->SamplesPerSecond;
+
+			if( oldRate == -1 )
+			{
+				oldRate = currentRate;
+			}
+			else if( oldRate != currentRate )
+			{
+				qCritical() << "GigInstrument: not all samples are the same rate, not converting";
+				sampleError = true;
 			}
 		}
 	}
@@ -863,7 +865,7 @@ bool GigInstrument::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBu
 		return false;
 	}
 
-	if( src_data.output_frames_gen == 0 )
+	if( oldSize != 0 && src_data.output_frames_gen == 0 )
 	{
 		qCritical( "GigInstrument: could not resample, no frames generated" );
 		return false;
@@ -1183,7 +1185,7 @@ double ADSR::value()
 	{
 		if( attackPosition < attackLength )
 		{
-			amplitude = preattack + ( attack - preattack ) / attackLength * attackPosition;
+			amplitude = preattack + ( 1.0 - preattack ) / attackLength * attackPosition;
 		}
 		else if( attackPosition < attackLength + decayLength )
 		{
@@ -1199,20 +1201,14 @@ double ADSR::value()
 	// If we're in the sustain phase, decrease from sustain to zero
 	else if( isRelease == true )
 	{
-		if( releasePosition < releaseLength )
-		{
-			// Maybe not the best way of doing this, but it appears to be about right
-			amplitude = sustain * exp( -5.0 / releaseLength * releasePosition ) - 1e-5;
+		// Maybe not the best way of doing this, but it appears to be about right
+		// Satisfies f(0) = sustain and f(releaseLength) = very small
+		amplitude = ( sustain + 1e-3 ) * exp( -5.0 / releaseLength * releasePosition ) - 1e-3;
 
-			// Don't have an infinite exponential decay
-			if( amplitude < 0 )
-			{
-				amplitude = 0;
-				isDone = true;
-			}
-		}
-		else
+		// Don't have an infinite exponential decay
+		if( amplitude < 0 )
 		{
+			amplitude = 0;
 			isDone = true;
 		}
 
