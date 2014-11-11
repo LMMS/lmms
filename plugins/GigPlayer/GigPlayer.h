@@ -246,6 +246,9 @@ private:
 	QMutex m_srcMutex;
 	QMutex m_notesMutex;
 
+	// Used for resampling
+	int m_interpolation;
+
 	// List of all the currently playing notes
 	QList<GigNote> m_notes;
 

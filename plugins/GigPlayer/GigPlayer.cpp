@@ -73,12 +73,6 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 
-// Margins for extra samples to provide to libsamplerate to reduce glitching
-const f_cnt_t GIGMARGIN[] = { 128, 64, 64, 4, 4 };
-
-
-
-
 struct GIGPluginData
 {
 	int midiNote;
@@ -96,6 +90,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_bankNum( 0, 0, 999, this, tr( "Bank" ) ),
 	m_patchNum( 0, 0, 127, this, tr( "Patch" ) ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
+	m_interpolation( SRC_LINEAR ),
 	m_RandomSeed( 0 ),
 	m_currentKeyDimension( 0 )
 {
@@ -335,7 +330,6 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
-	const int interpolation = engine::mixer()->currentQualitySettings().libsrcInterpolation();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -451,7 +445,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		samples = frames * oldRate / newRate;
 
 		// We need a bit of margin so we don't get glitching
-		samples += GIGMARGIN[interpolation];
+		samples += MARGIN[m_interpolation];
 	}
 
 	// Create buffers
@@ -881,6 +875,10 @@ bool GigInstrument::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBu
 
 
 
+// Recreate the libsamplerate instance each time the sample rate is changed.
+// We could also create it once and then reset it whenever the sample rate
+// changes. However, if we ever switch to changing interpolations, you have to
+// recreate it.
 void GigInstrument::updateSampleRate()
 {
 	QMutexLocker locker( &m_srcMutex );
@@ -891,8 +889,7 @@ void GigInstrument::updateSampleRate()
 	}
 
 	int error;
-	m_srcState = src_new( engine::mixer()->currentQualitySettings().libsrcInterpolation(),
-		DEFAULT_CHANNELS, &error );
+	m_srcState = src_new( m_interpolation, DEFAULT_CHANNELS, &error );
 
 	if( m_srcState == NULL || error != 0 )
 	{
