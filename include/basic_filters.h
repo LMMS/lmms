@@ -72,6 +72,8 @@ public:
 		Lowpass_SV,
 		Bandpass_SV,
 		Highpass_SV,
+		Notch_SV,
+		FastFormant,
 		NumFilters
 	} ;
 
@@ -202,21 +204,26 @@ public:
 			}
 			
 			// 4-pole state-variant lowpass filter, adapted from Nekobee source code
+			// and extended to other SV filter types
 			// /* Hal Chamberlin's state variable filter */
 			
 			case Lowpass_SV:
 			case Bandpass_SV:
 			{
 				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
+				float highpass;
 				
-				m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
-				float highpass = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
-				m_delay1[_chnl] = m_svf1 * highpass + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
+				for( int i = 0; i < 2; ++i ) // 2x oversample
+				{
+					m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
+					highpass = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+					m_delay1[_chnl] = m_svf1 * highpass + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
 
-				m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
-				highpass = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
-				m_delay3[_chnl] = m_svf2 * highpass + m_delay3[_chnl];
- 
+					m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
+					highpass = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
+					m_delay3[_chnl] = m_svf2 * highpass + m_delay3[_chnl];
+				}
+
 				/* mix filter output into output buffer */
 				out = m_type == Lowpass_SV 
 					? atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] )
@@ -227,12 +234,37 @@ public:
 			case Highpass_SV:
 			{
 				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
-				
-				m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];
-				float hp = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
-				m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
+				float hp;
+
+				for( int i = 0; i < 2; ++i ) // 2x oversample
+				{				
+					m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];
+					hp = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+					m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
+				}
 				
 				out = atanf( 3.0f * hp * m_sva[_chnl] );
+				break;
+			}
+			
+			case Notch_SV:
+			{
+				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
+				float hp1, hp2;
+				
+				for( int i = 0; i < 2; ++i ) // 2x oversample
+				{
+					m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
+					hp1 = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+					m_delay1[_chnl] = m_svf1 * hp1 + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
+
+					m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
+					hp2 = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
+					m_delay3[_chnl] = m_svf2 * hp2 + m_delay3[_chnl];
+				}
+
+				/* mix filter output into output buffer */
+				out = atanf( 1.5f * ( m_delay4[_chnl] + hp2 ) * m_sva[_chnl] );
 				break;
 			}
 
@@ -376,11 +408,13 @@ public:
 			}
 
 			case Formantfilter:
+			case FastFormant:
 			{
 				sample_t hp, bp, in;
 
 				out = 0;
-				for(int o=0; o<4; o++)
+				const int os = m_type == FastFormant ? 1 : 4; // no oversampling for fast formant
+				for( int o = 0; o < os; ++o )
 				{
 					// first formant
 					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
@@ -466,7 +500,7 @@ public:
 
 					out += bp;
 				}
-            	return( out/2.0f );
+            	return( out * 0.5f );
 				break;
 			}
 
@@ -511,16 +545,17 @@ public:
 		{
 			_freq = qBound( 50.0f, _freq, 20000.0f );
 
-			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
+			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*F_PI)) + (1.0f/(m_sampleRate*4)) );
 			m_rcb = 1.0f - m_rca;
-			m_rcc = (1.0f/(_freq*2.0f*M_PI)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
+			m_rcc = (1.0f/(_freq*2.0f*F_PI)) / ( (1.0f/(_freq*2.0f*F_PI)) + (1.0f/(m_sampleRate*4)) );
 
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
 			m_rcq = _q * 0.25f;
 			return;
 		}
 
-		if( m_type == Formantfilter )
+		if( m_type == Formantfilter ||
+			m_type == FastFormant )
 		{
 			_freq = qBound( minFreq(), _freq, 20000.0f ); // limit freq and q for not getting bad noise out of the filter...
 
@@ -543,21 +578,19 @@ public:
 			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract );
 			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract );
 
-			m_vfa[0] = 1.0f - (1.0f/(m_sampleRate*4)) /
-						( (1.0f/(f0*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
-			m_vfb[0] = 1.0f - m_vfa[0];
-			m_vfc[0] = (1.0f/(f0*2.0f*M_PI)) /
-						( (1.0f/(f0*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
+			// samplerate coeff: depends on oversampling
+			const float sr = m_type == FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;
 
-			m_vfa[1] = 1.0f - (1.0f/(m_sampleRate*4)) /
-						( (1.0f/(f1*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
+			m_vfa[0] = 1.0f - sr /
+						( ( 1.0f / ( f0 * 2.0f * F_PI ) ) + sr );
+			m_vfb[0] = 1.0f - m_vfa[0];
+			m_vfc[0] = ( 1.0f / ( f0 * 2.0f * F_PI ) ) /
+						( ( 1.0f / ( f0 *2.0f * F_PI ) ) + sr );
+			m_vfa[1] = 1.0f - sr /
+						( ( 1.0f / ( f1 * 2.0f * F_PI ) ) + sr );
 			m_vfb[1] = 1.0f - m_vfa[1];
-			m_vfc[1] = (1.0f/(f1*2.0f*M_PI)) /
-					( (1.0f/(f1*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
+			m_vfc[1] = ( 1.0f / ( f1 * 2.0f * F_PI ) ) /
+					( ( 1.0f / ( f1 * 2.0f * F_PI ) ) + sr );
 			return;
 		}
 
@@ -584,11 +617,12 @@ public:
 
 		if( m_type == Lowpass_SV || 
 			m_type == Bandpass_SV ||
-			m_type == Highpass_SV )
+			m_type == Highpass_SV ||
+			m_type == Notch_SV )
 		{
-			const float f = qMax( minFreq(), _freq ) * m_sampleRatio;
-			m_svf1 = qMin( f * 2.0f, 0.825f );
-			m_svf2 = qMin( f * 4.0f, 0.825f );
+			const float f = sinf( qMax( minFreq(), _freq ) * m_sampleRatio * F_PI );
+			m_svf1 = qMin( f, 0.825f );
+			m_svf2 = qMin( f * 2.0f, 0.825f );
 			m_svq = qMax( 0.0001f, 2.0f - ( _q * 0.1995f ) );
 			return;
 		}
@@ -598,12 +632,7 @@ public:
 		const float omega = F_2PI * _freq * m_sampleRatio;
 		const float tsin = sinf( omega );
 		const float tcos = cosf( omega );
-		//float alpha;
 
-		//if (q_is_bandwidth)
-		//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/
-		//					tsin);
-		//else
 		const float alpha = 0.5f * tsin / _q;
 
 		const float a0 = 1.0f / ( 1.0f + alpha );

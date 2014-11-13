@@ -98,6 +98,8 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterModel.addItem( tr( "SV LowPass" ), new PixmapLoader( "filter_lp" ) );
 	m_filterModel.addItem( tr( "SV BandPass" ), new PixmapLoader( "filter_bp" ) );
 	m_filterModel.addItem( tr( "SV HighPass" ), new PixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "SV Notch" ), new PixmapLoader( "filter_notch" ) );
+	m_filterModel.addItem( tr( "Fast Formant" ), new PixmapLoader( "filter_hp" ) );
 }
 
 
