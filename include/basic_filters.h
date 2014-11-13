@@ -72,8 +72,11 @@ public:
 		Lowpass_SV,
 		Bandpass_SV,
 		Highpass_SV,
+		Notch_SV,
+		FastFormant,
+		Tripole,
 		NumFilters
-	} ;
+	};
 
 	static inline float minFreq()
 	{
@@ -147,6 +150,9 @@ public:
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
 					m_oldx[_chnl] = m_oldy1[_chnl] =
 					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
+			
+			// tripole
+			m_last[_chnl] = 0.0f;
 
 			// reset in/out history for RC-filters
 			m_rclp0[_chnl] = m_rcbp0[_chnl] = m_rchp0[_chnl] = m_rclast0[_chnl] = 0.0f;
@@ -175,22 +181,22 @@ public:
 
 				// four cascaded onepole filters
 				// (bilinear transform)
-				m_y1[_chnl] = tLimit(
+				m_y1[_chnl] = qBound( -10.0f,
 						( x + m_oldx[_chnl] ) * m_p
 							- m_k * m_y1[_chnl],
-								-10.0f, 10.0f );
-				m_y2[_chnl] = tLimit(
+								10.0f );
+				m_y2[_chnl] = qBound( -10.0f,
 					( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
 							- m_k * m_y2[_chnl],
-								-10.0f, 10.0f );
-				m_y3[_chnl] = tLimit(
+								10.0f );
+				m_y3[_chnl] = qBound( -10.0f,
 					( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
 							- m_k * m_y3[_chnl],
-								-10.0f, 10.0f );
-				m_y4[_chnl] = tLimit(
+								10.0f );
+				m_y4[_chnl] = qBound( -10.0f,
 					( m_y3[_chnl] + m_oldy3[_chnl] ) * m_p
 							- m_k * m_y4[_chnl],
-								-10.0f, 10.0f );
+								10.0f );
 
 				m_oldx[_chnl] = x;
 				m_oldy1[_chnl] = m_y1[_chnl];
@@ -201,22 +207,61 @@ public:
 				break;
 			}
 			
+			// 3x onepole filters with 4x oversampling and interpolation of oversampled signal:
+			// input signal is linear-interpolated after oversampling, output signal is averaged from oversampled outputs
+			case Tripole:
+			{
+				out = 0.0f;
+				float ip = 0.0f;
+				for( int i = 0; i < 4; ++i )
+				{
+					ip += 0.25f;
+					sample_t x = linearInterpolate( m_last[_chnl], _in0, ip ) - m_r * m_y3[_chnl];
+					
+					m_y1[_chnl] = qBound( -10.0f,
+						( x + m_oldx[_chnl] ) * m_p
+							- m_k * m_y1[_chnl],
+								10.0f );
+					m_y2[_chnl] = qBound( -10.0f,
+						( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
+								- m_k * m_y2[_chnl],
+									10.0f );
+					m_y3[_chnl] = qBound( -10.0f,
+						( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
+								- m_k * m_y3[_chnl],
+									10.0f );
+					m_oldx[_chnl] = x;
+					m_oldy1[_chnl] = m_y1[_chnl];
+					m_oldy2[_chnl] = m_y2[_chnl];
+					
+					out += ( m_y3[_chnl] - m_y3[_chnl] * m_y3[_chnl] * m_y3[_chnl] * ( 1.0f / 6.0f ) );
+				}
+				out *= 0.25f;
+				m_last[_chnl] = _in0;
+				break;
+			}
+			
 			// 4-pole state-variant lowpass filter, adapted from Nekobee source code
+			// and extended to other SV filter types
 			// /* Hal Chamberlin's state variable filter */
 			
 			case Lowpass_SV:
 			case Bandpass_SV:
 			{
 				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
+				float highpass;
 				
-				m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
-				float highpass = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
-				m_delay1[_chnl] = m_svf1 * highpass + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
+				for( int i = 0; i < 2; ++i ) // 2x oversample
+				{
+					m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
+					highpass = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+					m_delay1[_chnl] = m_svf1 * highpass + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
 
-				m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
-				highpass = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
-				m_delay3[_chnl] = m_svf2 * highpass + m_delay3[_chnl];
- 
+					m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
+					highpass = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
+					m_delay3[_chnl] = m_svf2 * highpass + m_delay3[_chnl];
+				}
+
 				/* mix filter output into output buffer */
 				out = m_type == Lowpass_SV 
 					? atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] )
@@ -227,12 +272,37 @@ public:
 			case Highpass_SV:
 			{
 				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
-				
-				m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];
-				float hp = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
-				m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
+				float hp;
+
+				for( int i = 0; i < 2; ++i ) // 2x oversample
+				{				
+					m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];
+					hp = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+					m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
+				}
 				
 				out = atanf( 3.0f * hp * m_sva[_chnl] );
+				break;
+			}
+			
+			case Notch_SV:
+			{
+				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
+				float hp1, hp2;
+				
+				for( int i = 0; i < 2; ++i ) // 2x oversample
+				{
+					m_delay2[_chnl] = m_delay2[_chnl] + m_svf1 * m_delay1[_chnl];				/* delay2/4 = lowpass output */
+					hp1 = _in0 - m_delay2[_chnl] - m_svq * m_delay1[_chnl];
+					m_delay1[_chnl] = m_svf1 * hp1 + m_delay1[_chnl];           			/* delay1/3 = bandpass output */
+
+					m_delay4[_chnl] = m_delay4[_chnl] + m_svf2 * m_delay3[_chnl];
+					hp2 = m_delay2[_chnl] - m_delay4[_chnl] - m_svq * m_delay3[_chnl];
+					m_delay3[_chnl] = m_svf2 * hp2 + m_delay3[_chnl];
+				}
+
+				/* mix filter output into output buffer */
+				out = atanf( 1.5f * ( m_delay4[_chnl] + hp1 ) * m_sva[_chnl] );
 				break;
 			}
 
@@ -376,11 +446,13 @@ public:
 			}
 
 			case Formantfilter:
+			case FastFormant:
 			{
 				sample_t hp, bp, in;
 
 				out = 0;
-				for(int o=0; o<4; o++)
+				const int os = m_type == FastFormant ? 1 : 4; // no oversampling for fast formant
+				for( int o = 0; o < os; ++o )
 				{
 					// first formant
 					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
@@ -466,7 +538,7 @@ public:
 
 					out += bp;
 				}
-            	return( out/2.0f );
+            	return( out * 0.5f );
 				break;
 			}
 
@@ -510,25 +582,29 @@ public:
 			m_type == Highpass_RC24 )
 		{
 			_freq = qBound( 50.0f, _freq, 20000.0f );
-
-			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
+			const float sr = m_sampleRatio * 0.25f;
+			const float f = ( _freq * 2.0f * F_PI );
+			
+			m_rca = 1.0f - sr / ( ( 1.0f / f ) + sr );
 			m_rcb = 1.0f - m_rca;
-			m_rcc = (1.0f/(_freq*2.0f*M_PI)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
+			m_rcc = ( 1.0f / f ) / ( ( 1.0f / f ) + sr );
 
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
 			m_rcq = _q * 0.25f;
 			return;
 		}
 
-		if( m_type == Formantfilter )
+		if( m_type == Formantfilter ||
+			m_type == FastFormant )
 		{
 			_freq = qBound( minFreq(), _freq, 20000.0f ); // limit freq and q for not getting bad noise out of the filter...
 
 			// formats for a, e, i, o, u, a
-			static const float _f[5][2] = { { 1000, 1400 }, { 500, 2300 },
+			static const float _f[6][2] = { { 1000, 1400 }, { 500, 2300 },
 							{ 320, 3200 },
 							{ 500, 1000 },
-							{ 320, 800 } };
+							{ 320, 800 },
+							{ 1000, 1400 } };
 			static const float freqRatio = 4.0f / 14000.0f;
 
 			// Stretch Q/resonance
@@ -540,24 +616,22 @@ public:
 			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract );
-			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract );
+			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * 2.0f * F_PI;
+			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * 2.0f * F_PI;
 
-			m_vfa[0] = 1.0f - (1.0f/(m_sampleRate*4)) /
-						( (1.0f/(f0*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
+			// samplerate coeff: depends on oversampling
+			const float sr = m_type == FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;
+
+			m_vfa[0] = 1.0f - sr /
+						( ( 1.0f / f0 ) + sr );
 			m_vfb[0] = 1.0f - m_vfa[0];
-			m_vfc[0] = (1.0f/(f0*2.0f*M_PI)) /
-						( (1.0f/(f0*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
-
-			m_vfa[1] = 1.0f - (1.0f/(m_sampleRate*4)) /
-						( (1.0f/(f1*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
+			m_vfc[0] = ( 1.0f / f0 ) /
+						( ( 1.0f / f0 ) + sr );
+			m_vfa[1] = 1.0f - sr /
+						( ( 1.0f / f1 ) + sr );
 			m_vfb[1] = 1.0f - m_vfa[1];
-			m_vfc[1] = (1.0f/(f1*2.0f*M_PI)) /
-					( (1.0f/(f1*2.0f*M_PI)) +
-						(1.0f/(m_sampleRate*4)) );
+			m_vfc[1] = ( 1.0f / f1 ) /
+					( ( 1.0f / f1 ) + sr );
 			return;
 		}
 
@@ -571,7 +645,7 @@ public:
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
-			m_r = _q * powf( M_E, ( 1 - m_p ) * 1.386249f );
+			m_r = _q * powf( F_E, ( 1 - m_p ) * 1.386249f );
 
 			if( m_doubleFilter )
 			{
@@ -581,14 +655,26 @@ public:
 			}
 			return;
 		}
+		
+		if( m_type == Tripole )
+		{
+			const float f = qBound( 20.0f, _freq, 20000.0f ) * m_sampleRatio * 0.25f;
+			
+			m_p = ( 3.6f - 3.2f * f ) * f;
+			m_k = 2.0f * m_p - 1.0f;
+			m_r = _q * 0.1f * powf( F_E, ( 1 - m_p ) * 1.386249f );
+			
+			return;
+		}
 
 		if( m_type == Lowpass_SV || 
 			m_type == Bandpass_SV ||
-			m_type == Highpass_SV )
+			m_type == Highpass_SV ||
+			m_type == Notch_SV )
 		{
-			const float f = qMax( minFreq(), _freq ) * m_sampleRatio;
-			m_svf1 = qMin( f * 2.0f, 0.825f );
-			m_svf2 = qMin( f * 4.0f, 0.825f );
+			const float f = sinf( qMax( minFreq(), _freq ) * m_sampleRatio * F_PI );
+			m_svf1 = qMin( f, 0.825f );
+			m_svf2 = qMin( f * 2.0f, 0.825f );
 			m_svq = qMax( 0.0001f, 2.0f - ( _q * 0.1995f ) );
 			return;
 		}
@@ -598,12 +684,7 @@ public:
 		const float omega = F_2PI * _freq * m_sampleRatio;
 		const float tsin = sinf( omega );
 		const float tcos = cosf( omega );
-		//float alpha;
 
-		//if (q_is_bandwidth)
-		//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/
-		//					tsin);
-		//else
 		const float alpha = 0.5f * tsin / _q;
 
 		const float a0 = 1.0f / ( 1.0f + alpha );
@@ -681,6 +762,8 @@ private:
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
+	// additional one for Tripole filter
+	frame m_last;
 
 	// in/out history for RC-type-filters
 	frame m_rcbp0, m_rclp0, m_rchp0, m_rclast0;
