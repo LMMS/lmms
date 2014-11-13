@@ -43,6 +43,7 @@
 #include "templates.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
+#include "MemoryManager.h"
 
 //#include <iostream>
 //#include <cstdlib>
@@ -50,6 +51,7 @@
 template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
 class basicFilters
 {
+	MM_OPERATORS
 public:
 	enum FilterTypes
 	{
@@ -74,8 +76,9 @@ public:
 		Highpass_SV,
 		Notch_SV,
 		FastFormant,
+		Tripole,
 		NumFilters
-	} ;
+	};
 
 	static inline float minFreq()
 	{
@@ -149,6 +152,9 @@ public:
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
 					m_oldx[_chnl] = m_oldy1[_chnl] =
 					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
+			
+			// tripole
+			m_last[_chnl] = 0.0f;
 
 			// reset in/out history for RC-filters
 			m_rclp0[_chnl] = m_rcbp0[_chnl] = m_rchp0[_chnl] = m_rclast0[_chnl] = 0.0f;
@@ -177,22 +183,22 @@ public:
 
 				// four cascaded onepole filters
 				// (bilinear transform)
-				m_y1[_chnl] = tLimit(
+				m_y1[_chnl] = qBound( -10.0f,
 						( x + m_oldx[_chnl] ) * m_p
 							- m_k * m_y1[_chnl],
-								-10.0f, 10.0f );
-				m_y2[_chnl] = tLimit(
+								10.0f );
+				m_y2[_chnl] = qBound( -10.0f,
 					( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
 							- m_k * m_y2[_chnl],
-								-10.0f, 10.0f );
-				m_y3[_chnl] = tLimit(
+								10.0f );
+				m_y3[_chnl] = qBound( -10.0f,
 					( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
 							- m_k * m_y3[_chnl],
-								-10.0f, 10.0f );
-				m_y4[_chnl] = tLimit(
+								10.0f );
+				m_y4[_chnl] = qBound( -10.0f,
 					( m_y3[_chnl] + m_oldy3[_chnl] ) * m_p
 							- m_k * m_y4[_chnl],
-								-10.0f, 10.0f );
+								10.0f );
 
 				m_oldx[_chnl] = x;
 				m_oldy1[_chnl] = m_y1[_chnl];
@@ -200,6 +206,40 @@ public:
 				m_oldy3[_chnl] = m_y3[_chnl];
 				out = m_y4[_chnl] - m_y4[_chnl] * m_y4[_chnl] *
 						m_y4[_chnl] * ( 1.0f / 6.0f );
+				break;
+			}
+			
+			// 3x onepole filters with 4x oversampling and interpolation of oversampled signal:
+			// input signal is linear-interpolated after oversampling, output signal is averaged from oversampled outputs
+			case Tripole:
+			{
+				out = 0.0f;
+				float ip = 0.0f;
+				for( int i = 0; i < 4; ++i )
+				{
+					ip += 0.25f;
+					sample_t x = linearInterpolate( m_last[_chnl], _in0, ip ) - m_r * m_y3[_chnl];
+					
+					m_y1[_chnl] = qBound( -10.0f,
+						( x + m_oldx[_chnl] ) * m_p
+							- m_k * m_y1[_chnl],
+								10.0f );
+					m_y2[_chnl] = qBound( -10.0f,
+						( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
+								- m_k * m_y2[_chnl],
+									10.0f );
+					m_y3[_chnl] = qBound( -10.0f,
+						( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
+								- m_k * m_y3[_chnl],
+									10.0f );
+					m_oldx[_chnl] = x;
+					m_oldy1[_chnl] = m_y1[_chnl];
+					m_oldy2[_chnl] = m_y2[_chnl];
+					
+					out += ( m_y3[_chnl] - m_y3[_chnl] * m_y3[_chnl] * m_y3[_chnl] * ( 1.0f / 6.0f ) );
+				}
+				out *= 0.25f;
+				m_last[_chnl] = _in0;
 				break;
 			}
 			
@@ -264,7 +304,7 @@ public:
 				}
 
 				/* mix filter output into output buffer */
-				out = atanf( 1.5f * ( m_delay4[_chnl] + hp2 ) * m_sva[_chnl] );
+				out = atanf( 1.5f * ( m_delay4[_chnl] + hp1 ) * m_sva[_chnl] );
 				break;
 			}
 
@@ -560,10 +600,11 @@ public:
 			_freq = qBound( minFreq(), _freq, 20000.0f ); // limit freq and q for not getting bad noise out of the filter...
 
 			// formats for a, e, i, o, u, a
-			static const float _f[5][2] = { { 1000, 1400 }, { 500, 2300 },
+			static const float _f[6][2] = { { 1000, 1400 }, { 500, 2300 },
 							{ 320, 3200 },
 							{ 500, 1000 },
-							{ 320, 800 } };
+							{ 320, 800 },
+							{ 1000, 1400 } };
 			static const float freqRatio = 4.0f / 14000.0f;
 
 			// Stretch Q/resonance
@@ -604,7 +645,7 @@ public:
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
-			m_r = _q * powf( M_E, ( 1 - m_p ) * 1.386249f );
+			m_r = _q * powf( F_E, ( 1 - m_p ) * 1.386249f );
 
 			if( m_doubleFilter )
 			{
@@ -612,6 +653,17 @@ public:
 				m_subFilter->m_p = m_p;
 				m_subFilter->m_k = m_k;
 			}
+			return;
+		}
+		
+		if( m_type == Tripole )
+		{
+			const float f = qBound( 20.0f, _freq, 20000.0f ) * m_sampleRatio * 0.25f;
+			
+			m_p = ( 3.6f - 3.2f * f ) * f;
+			m_k = 2.0f * m_p - 1.0f;
+			m_r = _q * 0.1f * powf( F_E, ( 1 - m_p ) * 1.386249f );
+			
 			return;
 		}
 
@@ -710,6 +762,8 @@ private:
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
+	// additional one for Tripole filter
+	frame m_last;
 
 	// in/out history for RC-type-filters
 	frame m_rcbp0, m_rclp0, m_rchp0, m_rclast0;
