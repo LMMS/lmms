@@ -582,10 +582,12 @@ public:
 			m_type == Highpass_RC24 )
 		{
 			_freq = qBound( 50.0f, _freq, 20000.0f );
-
-			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*F_PI)) + (1.0f/(m_sampleRate*4)) );
+			const float sr = m_sampleRatio * 0.25f;
+			const float f = ( _freq * 2.0f * F_PI );
+			
+			m_rca = 1.0f - sr / ( ( 1.0f / f ) + sr );
 			m_rcb = 1.0f - m_rca;
-			m_rcc = (1.0f/(_freq*2.0f*F_PI)) / ( (1.0f/(_freq*2.0f*F_PI)) + (1.0f/(m_sampleRate*4)) );
+			m_rcc = ( 1.0f / f ) / ( ( 1.0f / f ) + sr );
 
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
 			m_rcq = _q * 0.25f;
@@ -614,22 +616,22 @@ public:
 			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract );
-			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract );
+			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * 2.0f * F_PI;
+			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * 2.0f * F_PI;
 
 			// samplerate coeff: depends on oversampling
 			const float sr = m_type == FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;
 
 			m_vfa[0] = 1.0f - sr /
-						( ( 1.0f / ( f0 * 2.0f * F_PI ) ) + sr );
+						( ( 1.0f / f0 ) + sr );
 			m_vfb[0] = 1.0f - m_vfa[0];
-			m_vfc[0] = ( 1.0f / ( f0 * 2.0f * F_PI ) ) /
-						( ( 1.0f / ( f0 *2.0f * F_PI ) ) + sr );
+			m_vfc[0] = ( 1.0f / f0 ) /
+						( ( 1.0f / f0 ) + sr );
 			m_vfa[1] = 1.0f - sr /
-						( ( 1.0f / ( f1 * 2.0f * F_PI ) ) + sr );
+						( ( 1.0f / f1 ) + sr );
 			m_vfb[1] = 1.0f - m_vfa[1];
-			m_vfc[1] = ( 1.0f / ( f1 * 2.0f * F_PI ) ) /
-					( ( 1.0f / ( f1 * 2.0f * F_PI ) ) + sr );
+			m_vfc[1] = ( 1.0f / f1 ) /
+					( ( 1.0f / f1 ) + sr );
 			return;
 		}
 
