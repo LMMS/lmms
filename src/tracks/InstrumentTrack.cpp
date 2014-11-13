@@ -767,6 +767,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 		}
 		node = node.nextSibling();
 	}
+	updatePitchRange();
 	engine::mixer()->unlock();
 }
 
