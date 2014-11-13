@@ -28,6 +28,7 @@
  *
  */
 
+
 #include <cstring>
 #include <QDebug>
 #include <QLayout>
@@ -477,17 +478,16 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			sample->sample->SetPos( sample->pos ); // Note: not thread safe
 
 			// Load the next portion of the sample
-			gig::buffer_t buf;
 			unsigned long allocationsize = samples * sample->sample->FrameSize;
-			buf.pStart = new int8_t[allocationsize];
-			buf.Size = sample->sample->Read( buf.pStart, samples ) * sample->sample->FrameSize;
-			buf.NullExtensionSize = allocationsize - buf.Size;
-			std::memset( (int8_t*) buf.pStart + buf.Size, 0, buf.NullExtensionSize );
+			int8_t buffer[allocationsize];
+			unsigned long size = sample->sample->Read( &buffer, samples ) * sample->sample->FrameSize;
+			unsigned long nullExtensionSize = allocationsize - size;
+			std::memset( (int8_t*) &buffer + size, 0, nullExtensionSize );
 
 			// Convert from 16 or 24 bit into 32-bit float
 			if( sample->sample->BitDepth == 24 ) // 24 bit
 			{
-				uint8_t * pInt = static_cast<uint8_t*>( buf.pStart );
+				uint8_t * pInt = reinterpret_cast<uint8_t*>( &buffer );
 
 				for( int i = 0; i < samples; ++i )
 				{
@@ -519,7 +519,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 			else // 16 bit
 			{
-				int16_t * pInt = static_cast<int16_t*>( buf.pStart );
+				int16_t * pInt = reinterpret_cast<int16_t*>( &buffer );
 
 				for( int i = 0; i < samples; ++i )
 				{
@@ -537,9 +537,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 					}
 				}
 			}
-
-			// Cleanup
-			delete[] (int8_t*) buf.pStart;
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
@@ -588,20 +585,16 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	// Update the note positions with how many samples we actually used
 	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
-		// Only process the notes if we're in a playing state
-		if( !( it->state == PlayingKeyDown ||
-				it->state == PlayingKeyUp ) )
+		if( it->state == PlayingKeyDown || it->state == PlayingKeyUp )
 		{
-			continue;
-		}
-
-		for( QList<GigSample>::iterator sample = it->samples.begin();
-				sample != it->samples.end(); ++sample )
-		{
-			if( sample->sample != NULL )
+			for( QList<GigSample>::iterator sample = it->samples.begin();
+					sample != it->samples.end(); ++sample )
 			{
-				sample->pos += used;
-				sample->adsr.inc( used );
+				if( sample->sample != NULL )
+				{
+					sample->pos += used;
+					sample->adsr.inc( used );
+				}
 			}
 		}
 	}
@@ -1217,6 +1210,9 @@ double ADSR::value()
 
 	return currentAmplitude;
 }
+
+
+
 
 // Increment internal positions a certain number of times
 void ADSR::inc( int num )
