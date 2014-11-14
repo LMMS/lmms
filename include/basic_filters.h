@@ -238,6 +238,7 @@ public:
 				}
 				out *= 0.25f;
 				m_last[_chnl] = _in0;
+				return out;
 				break;
 			}
 			
@@ -263,7 +264,7 @@ public:
 				}
 
 				/* mix filter output into output buffer */
-				out = m_type == Lowpass_SV 
+				return m_type == Lowpass_SV 
 					? atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] )
 					: atanf( 3.0f * m_delay3[_chnl] * m_sva[_chnl] );
 				break;
@@ -281,7 +282,7 @@ public:
 					m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
 				}
 				
-				out = atanf( 3.0f * hp * m_sva[_chnl] );
+				return atanf( 3.0f * hp * m_sva[_chnl] );
 				break;
 			}
 			
@@ -302,7 +303,7 @@ public:
 				}
 
 				/* mix filter output into output buffer */
-				out = atanf( 1.5f * ( m_delay4[_chnl] + hp1 ) * m_sva[_chnl] );
+				return atanf( 1.5f * ( m_delay4[_chnl] + hp1 ) * m_sva[_chnl] );
 				break;
 			}
 
@@ -538,7 +539,7 @@ public:
 
 					out += bp;
 				}
-            	return( out * 0.5f );
+            	return m_type == FastFormant ? out * 2.0f : out * 0.5f;
 				break;
 			}
 
