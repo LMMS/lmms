@@ -112,17 +112,6 @@ public:
 	}
 
 	inline basicFilters( const sample_rate_t _sample_rate ) :
-		m_b0a0( 0.0f ),
-		m_b1a0( 0.0f ),
-		m_b2a0( 0.0f ),
-		m_a1a0( 0.0f ),
-		m_a2a0( 0.0f ),
-		m_rca( 0.0f ),
-		m_rcb( 1.0f ),
-		m_rcc( 0.0f ),
-		m_svf1( 0.0f ),
-		m_svf2( 0.0f ),
-		m_svq( 0.0f ),
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
 		m_sampleRatio( 1.0f / m_sampleRate ),
@@ -143,8 +132,7 @@ public:
 		for( ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl )
 		{
 			// reset in/out history for simple filters
-			m_ou1[_chnl] = m_ou2[_chnl] = m_in1[_chnl] =
-					m_in2[_chnl] = 0.0f;
+			m_z1[_chnl] = m_z2[_chnl] = 0.0f;
 
 			// reset in/out history for moog-filter
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
@@ -544,19 +532,10 @@ public:
 			}
 
 			default:
-				// filter
-				out = m_b0a0*_in0 +
-						m_b1a0*m_in1[_chnl] +
-						m_b2a0*m_in2[_chnl] -
-						m_a1a0*m_ou1[_chnl] -
-						m_a2a0*m_ou2[_chnl];
-
-				// push in/out buffers
-				m_in2[_chnl] = m_in1[_chnl];
-				m_in1[_chnl] = _in0;
-				m_ou2[_chnl] = m_ou1[_chnl];
-
-				m_ou1[_chnl] = out;
+				// biquad filter in transposed form
+				out = m_z1[_chnl] + m_b0a0 * _in0;
+				m_z1[_chnl] = m_b1a0 * _in0 + m_z2[_chnl] - m_a1a0 * out;
+				m_z2[_chnl] = m_b2a0 * _in0 - m_a2a0 * out;
 				break;
 		}
 
@@ -584,11 +563,11 @@ public:
 		{
 			_freq = qBound( 50.0f, _freq, 20000.0f );
 			const float sr = m_sampleRatio * 0.25f;
-			const float f = ( _freq * 2.0f * F_PI );
+			const float f = 1.0f / ( _freq * F_2PI );
 			
-			m_rca = 1.0f - sr / ( ( 1.0f / f ) + sr );
+			m_rca = 1.0f - sr / ( f + sr );
 			m_rcb = 1.0f - m_rca;
-			m_rcc = ( 1.0f / f ) / ( ( 1.0f / f ) + sr );
+			m_rcc = f / ( f + sr );
 
 			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
 			m_rcq = _q * 0.25f;
@@ -617,32 +596,26 @@ public:
 			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * 2.0f * F_PI;
-			const float f1 = linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * 2.0f * F_PI;
+			const float f0 = 1.0f / ( linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * F_2PI );
+			const float f1 = 1.0f / ( linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * F_2PI );
 
 			// samplerate coeff: depends on oversampling
 			const float sr = m_type == FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;
 
-			m_vfa[0] = 1.0f - sr /
-						( ( 1.0f / f0 ) + sr );
+			m_vfa[0] = 1.0f - sr / ( f0 + sr );
 			m_vfb[0] = 1.0f - m_vfa[0];
-			m_vfc[0] = ( 1.0f / f0 ) /
-						( ( 1.0f / f0 ) + sr );
-			m_vfa[1] = 1.0f - sr /
-						( ( 1.0f / f1 ) + sr );
+			m_vfc[0] = f0 /	( f0 + sr );
+			m_vfa[1] = 1.0f - sr / ( f1 + sr );
 			m_vfb[1] = 1.0f - m_vfa[1];
-			m_vfc[1] = ( 1.0f / f1 ) /
-					( ( 1.0f / f1 ) + sr );
+			m_vfc[1] = f1 /	( f1 + sr );
 			return;
 		}
 
 		if( m_type == Moog ||
 			m_type == DoubleMoog )
 		{
-			_freq = qBound( minFreq(), _freq, 20000.0f );
-
 			// [ 0 - 0.5 ]
-			const float f = _freq * m_sampleRatio;
+			const float f = qBound( minFreq(), _freq, 20000.0f ) * m_sampleRatio;
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
@@ -683,10 +656,10 @@ public:
 		// other filters
 		_freq = qBound( minFreq(), _freq, 20000.0f );
 		const float omega = F_2PI * _freq * m_sampleRatio;
-		const float tsin = sinf( omega );
+		const float tsin = sinf( omega ) * 0.5f;
 		const float tcos = cosf( omega );
 
-		const float alpha = 0.5f * tsin / _q;
+		const float alpha = tsin / _q;
 
 		const float a0 = 1.0f / ( 1.0f + alpha );
 
@@ -707,7 +680,7 @@ public:
 				break;
 			case BandPass_CSG:
 				m_b1a0 = 0.0f;
-				m_b0a0 = tsin * 0.5f * a0;
+				m_b0a0 = tsin * a0;
 				m_b2a0 = -m_b0a0;
 				break;
 			case BandPass_CZPG:
@@ -759,7 +732,7 @@ private:
 	typedef sample_t frame[CHANNELS];
 
 	// in/out history
-	frame m_ou1, m_ou2, m_in1, m_in2;
+	frame m_z1, m_z2;
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
