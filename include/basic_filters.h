@@ -43,6 +43,7 @@
 #include "templates.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
+#include "MemoryManager.h"
 
 //#include <iostream>
 //#include <cstdlib>
@@ -50,6 +51,7 @@
 template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
 class basicFilters
 {
+	MM_OPERATORS
 public:
 	enum FilterTypes
 	{
@@ -75,7 +77,6 @@ public:
 		Notch_SV,
 		FastFormant,
 		Tripole,
-		HexLP,
 		NumFilters
 	};
 
@@ -597,8 +598,8 @@ public:
 			const float fract = vowelf - vowel;
 
 			// interpolate between formant frequencies
-			const float f0 = 1.0f / linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * F_2PI;
-			const float f1 = 1.0f / linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * F_2PI;
+			const float f0 = 1.0f / ( linearInterpolate( _f[vowel+0][0], _f[vowel+1][0], fract ) * F_2PI );
+			const float f1 = 1.0f / ( linearInterpolate( _f[vowel+0][1], _f[vowel+1][1], fract ) * F_2PI );
 
 			// samplerate coeff: depends on oversampling
 			const float sr = m_type == FastFormant ? m_sampleRatio : m_sampleRatio * 0.25f;
