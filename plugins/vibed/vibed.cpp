@@ -755,9 +755,8 @@ void vibedView::normalizeClicked()
 void vibedView::contextMenuEvent( QContextMenuEvent * )
 {
 
-	captionMenu contextMenu( model()->displayName() );
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-					this, SLOT( displayHelp() ) );
+	captionMenu contextMenu( model()->displayName(), this );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 
 }

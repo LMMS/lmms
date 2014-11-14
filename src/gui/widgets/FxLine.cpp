@@ -183,7 +183,7 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	FxMixer * mix = engine::fxMixer();
-	QPointer<captionMenu> contextMenu = new captionMenu( mix->effectChannel( m_channelIndex )->m_name );
+	QPointer<captionMenu> contextMenu = new captionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master 
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
@@ -199,9 +199,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addSeparator();
 	}
 	
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }

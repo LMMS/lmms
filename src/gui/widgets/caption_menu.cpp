@@ -24,6 +24,7 @@
 
 
 #include "caption_menu.h"
+#include "embed.h"
 
 
 
@@ -40,6 +41,27 @@ captionMenu::captionMenu( const QString & _title, QWidget * _parent ) :
 
 captionMenu::~captionMenu()
 {
+}
+
+
+
+
+void captionMenu::addHelpAction()
+{
+	QWidget* parent = (QWidget*) this->parent();
+
+	if (parent == NULL)
+		return;
+
+	if (! parent->whatsThis().isEmpty()) {
+		addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
+							parent, SLOT( displayHelp() ) );
+	}
+	else {
+		QAction* helpAction = new QAction( embed::getIconPixmap("help"), tr("Help (not available)"), NULL);
+		helpAction->setDisabled(true);
+		addAction(helpAction);
+	}
 }
 
 
