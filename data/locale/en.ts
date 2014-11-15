@@ -42,11 +42,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>LMMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -648,6 +648,60 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>&amp;Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DelayControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Ammount</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DelayControlsDialog</name>
+    <message>
+		<source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Time Samples:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Ammount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Hz:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Amt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Amt:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7014,6 +7068,10 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A NES-like synthesizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A native delay plugin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
