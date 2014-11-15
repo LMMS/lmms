@@ -394,11 +394,9 @@ void FxMixer::deleteChannelSend( FxRoute * route )
 bool FxMixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
 {
 	if( sendFrom == sendTo ) return true;
-	//m_sendsMutex.lock();
 	FxChannel * from = m_fxChannels[sendFrom];
 	FxChannel * to = m_fxChannels[sendTo];
 	bool b = checkInfiniteLoop( from, to );
-	//m_sendsMutex.unlock();
 	return b;
 }
 
@@ -480,26 +478,30 @@ void FxMixer::masterMix( sampleFrame * _buf )
 {
 	const int fpp = engine::mixer()->framesPerPeriod();
 
-	// add the channels that have no dependencies (no incoming senders, ie. no receives)
-	// to the jobqueue. The channels that have receives get added when their senders get processed, which
-	// is detected by dependency counting.
-	// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
-	// their recipients right away.
-	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
-	foreach( FxChannel * ch, m_fxChannels )
+	if( m_sendsMutex.tryLock() )
 	{
-		ch->m_muted = ch->m_muteModel.value();
-		if( ch->m_receives.size() == 0 || ch->m_muted )
+		// add the channels that have no dependencies (no incoming senders, ie. no receives)
+		// to the jobqueue. The channels that have receives get added when their senders get processed, which
+		// is detected by dependency counting.
+		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
+		// their recipients right away.
+		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
+		foreach( FxChannel * ch, m_fxChannels )
 		{
-			ch->m_queued = true;
-			MixerWorkerThread::addJob( ch );
+			ch->m_muted = ch->m_muteModel.value();
+			if( ch->m_receives.size() == 0 || ch->m_muted )
+			{
+				ch->m_queued = true;
+				MixerWorkerThread::addJob( ch );
+			}
 		}
+		while( m_fxChannels[0]->state() != ThreadableJob::Done )
+		{
+			MixerWorkerThread::startAndWaitForJobs();
+		}
+		m_sendsMutex.unlock();
 	}
-	while( m_fxChannels[0]->state() != ThreadableJob::Done )
-	{
-		MixerWorkerThread::startAndWaitForJobs();
-	}
-
+	
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
