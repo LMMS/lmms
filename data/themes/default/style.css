@@ -83,13 +83,11 @@ QMenu::item:selected {
 	color: white;
 	font-weight:bold;
 	background-color: #747474;
-	margin:3px;
 }
 
 QMenu::item:disabled {
 	color: #747474;
 	background-color: #c9c9c9;
-	margin:0px;
 	font-size:12px;
 	font-weight: normal;
 	padding: 4px 32px 4px 20px;

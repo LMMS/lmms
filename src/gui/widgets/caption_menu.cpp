@@ -58,9 +58,8 @@ void captionMenu::addHelpAction()
 							parent, SLOT( displayHelp() ) );
 	}
 	else {
-		QAction* helpAction = new QAction( embed::getIconPixmap("help"), tr("Help (not available)"), NULL);
+		QAction* helpAction = addAction( embed::getIconPixmap("help"), tr("Help (not available)") );
 		helpAction->setDisabled(true);
-		addAction(helpAction);
 	}
 }
 
