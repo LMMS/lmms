@@ -175,10 +175,10 @@ void FxChannel::doProcessing()
 			m_fxChain.startRunning();
 		}
 		
-		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, m_hasInput );
+		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
-		m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
+		m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( m_buffer, fpp ) * v );
+		m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( m_buffer, fpp ) * v );
 	}
 	else
 	{
