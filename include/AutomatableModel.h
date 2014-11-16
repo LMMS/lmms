@@ -25,7 +25,7 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
-#include <math.h>
+#include "lmms_math.h"
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -70,7 +70,8 @@ public:
 	enum ScaleType
 	{
 		Linear,
-		Logarithmic
+		Logarithmic,
+		Decibel
 	};
 
 	enum DataType
@@ -239,6 +240,15 @@ public:
 		return m_hasLinkedModels;
 	}
 
+	bool isValueChanged()
+	{
+		if( m_valueChanged )
+		{
+			m_valueChanged = false;
+			return true;
+		}
+	}
+
 	float globalAutomationValueAt( const MidiTime& time );
 
 public slots:
@@ -288,6 +298,8 @@ private:
 	float m_step;
 	float m_range;
 	float m_centerValue;
+	
+	bool m_valueChanged;
 
 	// most objects will need this temporarily (until sampleExact is
 	// standard)
