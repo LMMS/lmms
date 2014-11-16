@@ -43,7 +43,7 @@ BassBoosterControls::BassBoosterControls( BassBoosterEffect* effect ) :
 
 void BassBoosterControls::changeFrequency()
 {
-	m_effect->changeFrequency();
+	m_effect->m_frequencyChangeNeeded = true;
 }
 
 

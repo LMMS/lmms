@@ -44,11 +44,14 @@ public:
 	}
 
 
-private:
+protected:
 	void changeFrequency();
 	void changeGain();
 	void changeRatio();
 
+	bool m_frequencyChangeNeeded;
+
+private:
 	DspEffectLibrary::MonoToStereoAdaptor<DspEffectLibrary::FastBassBoost> m_bbFX;
 
 	BassBoosterControls m_bbControls;
