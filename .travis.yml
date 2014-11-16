@@ -19,3 +19,14 @@ script:
     - if [ $TARGET_OS == win64 ]; then ../build_mingw64 || ../build_mingw64; fi
     - if [ $TARGET_OS == linux ]; then cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j4 VERBOSE=1; fi
     - if [ $TARGET_OS != linux ]; then make; fi
+before_deploy: make package
+deploy:
+    provider: releases
+    api_key:
+        secure: d4a+x4Gugpss7JK2DcHjyBZDmEFFh4iVfKDfITSD50T6Mc6At4LMgojvEu+6qT6IyOY2vm3UVT6fhyeuWDTRDwW9tfFlaHVA0h8aTRD+eAXOA7pQ8rEMwQO3+WCKuKTfEqUkpL4wxhww8dpkv54tqeIs0S4TBqz9tk8UhzU7XbE=
+    file: lmms-*-win*.exe
+    on:
+        tags: true
+        all_branches: true
+        condition: "$TARGET_OS != linux"
+    repo: LMMS/lmms
