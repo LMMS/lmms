@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIXER_WORKER_THREAD_H
-#define _MIXER_WORKER_THREAD_H
+#ifndef MIXER_WORKER_THREAD_H
+#define MIXER_WORKER_THREAD_H
 
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QThread>
