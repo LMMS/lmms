@@ -202,13 +202,8 @@ private:
 	void allocateChannelsTo(int num);
 	QMutex m_sendsMutex;
 
-<<<<<<< HEAD
-	void addChannelLeaf( FxChannel * ch, sampleFrame * buf );
-
 	int m_lastSoloed;
 
-=======
->>>>>>> stable-1.1
 	friend class MixerWorkerThread;
 	friend class FxMixerView;
 
