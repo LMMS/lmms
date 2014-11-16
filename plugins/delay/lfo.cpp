@@ -23,7 +23,7 @@
  */
 
 #include "lfo.h"
-#include <math.h>
+#include "lmms_math.h"
 
 
 
@@ -31,31 +31,7 @@
 Lfo::Lfo( int samplerate )
 {
     m_samplerate = samplerate;
-    m_twoPiOverSr = TWOPI / samplerate;
-}
-
-
-
-void Lfo::setFrequency( double frequency )
-{
-    if( frequency < 0 || frequency > ( m_samplerate / 2.0 ) || frequency == m_frequency )
-    {
-        return;
-    }
-    m_frequency = frequency;
-    m_increment = m_frequency * m_twoPiOverSr;
-}
-
-
-
-
-void Lfo::setAmplitude( float amplitude )
-{
-    if( amplitude < 0.0 || amplitude > 1.0 )
-    {
-        return;
-    }
-    m_amplitude = amplitude;
+    m_twoPiOverSr = F_2PI / samplerate;
 }
 
 
@@ -63,15 +39,12 @@ void Lfo::setAmplitude( float amplitude )
 
 float Lfo::tick()
 {
-    float output = ( float )sin( m_phase );
+    float output = sinf( m_phase );
     m_phase += m_increment;
-    if( m_phase >= TWOPI )
-    {
-        m_phase -= TWOPI;
-    }
+
     if( m_amplitude > 0.0001 )
     {
-        return ( ( output + 1.0 ) / 2.0 ) * m_amplitude;
+        return ( ( output + 1.0 ) * 0.5 ) * m_amplitude;
     } else
     {
         return 1;

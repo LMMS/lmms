@@ -25,10 +25,7 @@
 #ifndef LFO_H
 #define LFO_H
 
-#ifndef M_PI
-#define M_PI (3.14159265358979321 )
-#endif
-#define TWOPI ( 2.0 * M_PI )
+#include "lmms_math.h"
 
 class Lfo
 {
@@ -37,8 +34,50 @@ public:
     ~Lfo()
     {
     }
-    void setFrequency( double frequency );
-    void setAmplitude( float amplitude );
+
+
+
+
+    inline void setFrequency( double frequency )
+    {
+        if( frequency < 0 || frequency > ( m_samplerate / 2.0 ) || frequency == m_frequency )
+        {
+            return;
+        }
+        m_frequency = frequency;
+        m_increment = m_frequency * m_twoPiOverSr;
+
+        if( m_phase >= F_2PI )
+        {
+            m_phase -= F_2PI;
+        }
+    }
+
+
+
+
+    inline void setAmplitude( float amplitude )
+    {
+        if( amplitude < 0.0 || amplitude > 1.0 )
+        {
+            return;
+        }
+        m_amplitude = amplitude;
+    }
+
+
+
+
+    inline void setSamplerate ( int samplerate )
+    {
+        m_samplerate = samplerate;
+        m_twoPiOverSr = F_2PI / samplerate;
+        m_increment = m_frequency * m_twoPiOverSr;
+    }
+
+
+
+
     float tick();
 
 private:

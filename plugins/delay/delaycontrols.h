@@ -61,9 +61,9 @@ private slots:
 private:
     DelayEffect* m_effect;
     TempoSyncKnobModel m_delayTimeModel;
-    FloatModel m_feebackModel;
+    FloatModel m_feedbackModel;
     TempoSyncKnobModel m_lfoTimeModel;
-    FloatModel m_lfoAmmountModel;
+    FloatModel m_lfoAmountModel;
 
     friend class DelayControlsDialog;
     friend class DelayEffect;

@@ -666,7 +666,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lfo Ammount</source>
+		<source>Lfo Amount</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -685,7 +685,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Feedback Ammount:</source>
+		<source>Feedback Amount:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

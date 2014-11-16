@@ -40,6 +40,10 @@ public:
     {
         return &m_delayControls;
     }
+
+private slots:
+    void sampleRateChanged();
+
 private:
     DelayControls m_delayControls;
     StereoDelay* m_delay;

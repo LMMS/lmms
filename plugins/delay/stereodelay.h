@@ -25,16 +25,29 @@
 #ifndef STEREODELAY_H
 #define STEREODELAY_H
 
+#include "lmms_basics.h"
+
 class StereoDelay
 {
 public:
     StereoDelay( int maxLength );
     ~StereoDelay();
-    void setLength( int length );
-    void setFeedback( float feedback );
-    void tick( float* left, float* right );
+    inline void setLength( int length )
+    {
+        if( length <= m_maxLength && length >= 0 )
+        {
+            m_length = length;
+        }
+    }
+
+    inline void setFeedback( float feedback )
+    {
+        m_feedback = feedback;
+    }
+
+    void tick( sampleFrame frame );
 private:
-    float *m_buffer;
+    sampleFrame* m_buffer;
     int m_maxLength;
     int m_length;
     int m_index;

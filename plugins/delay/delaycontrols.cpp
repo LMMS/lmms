@@ -33,11 +33,11 @@ DelayControls::DelayControls(DelayEffect* effect):
     EffectControls( effect ),
     m_effect ( effect ),
     m_delayTimeModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
-    m_feebackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
+    m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
     m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
-    m_lfoAmmountModel(0.0f,0.0f,0.5f,0.01f, this, tr ( "Lfo Ammount" ) )
+    m_lfoAmountModel(0.0f,0.0f,0.5f,0.01f, this, tr ( "Lfo Amount" ) )
 {
-
+    //used to setup the controls
 }
 
 
@@ -54,9 +54,9 @@ void DelayControls::changeControl()
 void DelayControls::loadSettings(const QDomElement &_this)
 {
     m_delayTimeModel.loadSettings(_this, "DelayTimeSamples" );
-    m_feebackModel.loadSettings( _this, "FeebackAmmount" );
+    m_feedbackModel.loadSettings( _this, "FeebackAmount" );
     m_lfoTimeModel.loadSettings( _this , "LfoFrequency");
-    m_lfoAmmountModel.loadSettings( _this, "LfoAmmount");
+    m_lfoAmountModel.loadSettings( _this, "LfoAmount");
 }
 
 
@@ -65,9 +65,9 @@ void DelayControls::loadSettings(const QDomElement &_this)
 void DelayControls::saveSettings(QDomDocument& doc, QDomElement& _this)
 {
     m_delayTimeModel.saveSettings( doc, _this, "DelayTimeSamples");
-    m_feebackModel.saveSettings( doc, _this ,"FeebackAmmount");
+    m_feedbackModel.saveSettings( doc, _this ,"FeebackAmount");
     m_lfoTimeModel.saveSettings( doc, _this, "LfoFrequency");
-    m_lfoAmmountModel.saveSettings( doc, _this ,"LfoAmmount");
+    m_lfoAmountModel.saveSettings( doc, _this ,"LfoAmount");
 }
 
 #include "moc_delaycontrols.cxx"
