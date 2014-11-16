@@ -49,15 +49,16 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 
 }
 
-
+const float DYN_NOISE_FLOOR = 0.00001f; // -100dBV noise floor
+const double DNF_LOG = 5.0;
 
 dynProcEffect::dynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
 	m_dpControls( this )
 {
-	currentPeak[0] = 0.0f;
-	currentPeak[1] = 0.0f;
+	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
+	m_needsUpdate = true;
 }
 
 
@@ -68,6 +69,15 @@ dynProcEffect::~dynProcEffect()
 }
 
 
+inline void dynProcEffect::calcAttack()
+{
+	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
+}
+
+inline void dynProcEffect::calcRelease()
+{
+	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
+}
 
 
 bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
@@ -76,27 +86,10 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 	if( !isEnabled() || !isRunning () )
 	{
 //apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
-		currentPeak[0] = 0.0f;
-		currentPeak[1] = 0.0f;
+		m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
 		return( false );
-		
-/*		if( currentPeak[0] == 0.0f && currentPeak[1] == 0.0f ) return( false );
-		else 
-		{
-			if( currentPeak[0] != 0.0f ) 
-			{ 
-				currentPeak[0] = qMax ( currentPeak[0] - 
-				(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
-			}
-			if( currentPeak[1] != 0.0f ) 
-			{ 
-				currentPeak[1] = qMax ( currentPeak[1] - 
-				(( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate()), 0.0f );
-			}
-			
-			return( true );
-		}	*/
 	}
+	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
 // variables for effect
 	int i = 0;
@@ -107,100 +100,103 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
+	
+	const int stereoMode = m_dpControls.m_stereomodeModel.value();
+	const float inputGain = m_dpControls.m_inputModel.value();
+	const float outputGain = m_dpControls.m_outputModel.value();
+	
+	const float * samples = m_dpControls.m_wavegraphModel.samples();
 
-// debug code	
-//	qDebug( "peaks %f %f", currentPeak[0], currentPeak[1] );
-	
-	float att_tmp = ( 1.0f / ( m_dpControls.m_attackModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate();
-	float rel_tmp = ( 1.0f / ( m_dpControls.m_releaseModel.value() / 1000.0f ) ) / engine::mixer()->processingSampleRate();
-	
+// debug code
+//	qDebug( "peaks %f %f", m_currentPeak[0], m_currentPeak[1] );
+
+	if( m_dpControls.m_attackModel.isValueChanged() || m_needsUpdate )
+	{
+		calcAttack();
+	}
+	if( m_dpControls.m_releaseModel.isValueChanged() || m_needsUpdate )
+	{
+		calcRelease();
+	}
+	m_needsUpdate = false;
+
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		sample_t s[2] = { _buf[f][0], _buf[f][1] };
+		double s[2] = { _buf[f][0], _buf[f][1] };
 
-// check for nan/inf because they may cause errors?
-		if( isnanf( s[0] ) ) s[0] = 0.0f;
-		if( isnanf( s[1] ) ) s[1] = 0.0f;
-		if( isinff( s[0] ) ) s[0] = 0.0f;
-		if( isinff( s[1] ) ) s[1] = 0.0f;
-		
+// apply input gain
+		s[0] *= inputGain;
+		s[1] *= inputGain;
 
 // update peak values
 		for ( i=0; i <= 1; i++ )
 		{
-			if( qAbs( s[i] ) > currentPeak[i] )
+			if( qAbs( s[i] ) > m_currentPeak[i] )
 			{
-				currentPeak[i] = qMin ( currentPeak[i] + att_tmp, qAbs( s[i] ) );
+				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, qAbs( s[i] ) );
 			}
-			else 
-			if( qAbs( s[i] ) < currentPeak[i] )
+			else
+			if( qAbs( s[i] ) < m_currentPeak[i] )
 			{
-				currentPeak[i] = qMax ( currentPeak[i] - rel_tmp, qAbs( s[i] ) );
+				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, qAbs( s[i] ) );
 			}
-			
-			currentPeak[i] = qBound( 0.0f, currentPeak[i], 1.0f );
-			
+
+			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
 		}
 
 // account for stereo mode
-		switch( m_dpControls.m_stereomodeModel.value() )
+		switch( stereoMode )
 		{
 			case dynProcControls::SM_Maximum:
 			{
-				sm_peak[0] = qMax( currentPeak[0], currentPeak[1] );
-				sm_peak[1] = qMax( currentPeak[0], currentPeak[1] );
+				sm_peak[0] = sm_peak[1] = qMax( m_currentPeak[0], m_currentPeak[1] );
 				break;
 			}
 			case dynProcControls::SM_Average:
 			{
-				sm_peak[0] = ( currentPeak[0] + currentPeak[1] ) / 2;
-				sm_peak[1] = ( currentPeak[0] + currentPeak[1] ) / 2;
+				sm_peak[0] = sm_peak[1] = ( m_currentPeak[0] + m_currentPeak[1] ) * 0.5;
 				break;
 			}
 			case dynProcControls::SM_Unlinked:
 			{
-				sm_peak[0] = currentPeak[0];
-				sm_peak[1] = currentPeak[1];
+				sm_peak[0] = m_currentPeak[0];
+				sm_peak[1] = m_currentPeak[1];
 				break;
 			}
 		}
-
-// apply input gain
-		s[0] *= m_dpControls.m_inputModel.value();
-		s[1] *= m_dpControls.m_inputModel.value();
-
 
 // start effect
 
 		for ( i=0; i <= 1; i++ )
 		{
 			const int lookup = static_cast<int>( sm_peak[i] * 200.0f );
-			const float frac = fraction( sm_peak[i] * 200.0f ); 
-			
-			if( sm_peak[i] > 0 ) 
-			{ 
+			const float frac = fraction( sm_peak[i] * 200.0f );
+
+			if( sm_peak[i] > DYN_NOISE_FLOOR )
+			{
 				if ( lookup < 1 )
 				{
-					gain = frac * m_dpControls.m_wavegraphModel.samples()[0];
+					gain = frac * samples[0];
 				}
 				else
 				if ( lookup < 200 )
 				{
-					gain = linearInterpolate( m_dpControls.m_wavegraphModel.samples()[ lookup - 1 ],
-							m_dpControls.m_wavegraphModel.samples()[ lookup ], frac );
+					gain = linearInterpolate( samples[ lookup - 1 ],
+							samples[ lookup ], frac );
 				}
 				else
 				{
-					gain = m_dpControls.m_wavegraphModel.samples()[199];
+					gain = samples[199];
 				};
-				
-				s[i] *= ( gain / sm_peak[i] ); 
+
+				s[i] *= gain; 
+				s[i] /= sm_peak[i];
 			}
 		}
 
 // apply output gain
-		s[0] *= m_dpControls.m_outputModel.value();
-		s[1] *= m_dpControls.m_outputModel.value();
+		s[0] *= outputGain;
+		s[1] *= outputGain;
 
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _WAVESHAPER_CONTROLS_H
-#define _WAVESHAPER_CONTROLS_H
+#ifndef DYNPROC_CONTROLS_H
+#define DYNPROC_CONTROLS_H
 
 #include "EffectControls.h"
 #include "dynamics_processor_control_dialog.h"
@@ -73,6 +73,7 @@ public:
 private slots:
 	void changeControl();
 	void samplesChanged( int, int );
+	void sampleRateChanged();
 
 	void resetClicked();
 	void smoothClicked();
