@@ -31,7 +31,8 @@
 #include "lmmsconfig.h"
 #include <QtCore/QtGlobal>
 
-#include <math.h>
+#include <cmath>
+using namespace std;
 
 #if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) 
 #ifndef isnanf
