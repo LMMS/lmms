@@ -43,14 +43,6 @@ DelayControls::DelayControls(DelayEffect* effect):
 
 
 
-void DelayControls::changeControl()
-{
-    //engine::getSong()->setModified();
-}
-
-
-
-
 void DelayControls::loadSettings(const QDomElement &_this)
 {
     m_delayTimeModel.loadSettings(_this, "DelayTimeSamples" );

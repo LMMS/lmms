@@ -55,9 +55,6 @@ public:
         return new DelayControlsDialog( this );
     }
 
-private slots:
-    void changeControl();
-
 private:
     DelayEffect* m_effect;
     TempoSyncKnobModel m_delayTimeModel;
