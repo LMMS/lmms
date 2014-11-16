@@ -483,11 +483,19 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 
 	captionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
+	contextMenu.addAction( QPixmap(), 
+		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
+
+void knob::toggleScale()
+{
+	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+}
 
 
 
