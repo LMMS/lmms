@@ -98,7 +98,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 }
 
 
-void BassBoosterEffect::changeFrequency()
+inline void BassBoosterEffect::changeFrequency()
 {
 	const sample_t fac = engine::mixer()->processingSampleRate() / 44100.0f;
 
@@ -109,7 +109,7 @@ void BassBoosterEffect::changeFrequency()
 
 
 
-void BassBoosterEffect::changeGain()
+inline void BassBoosterEffect::changeGain()
 {
 	m_bbFX.leftFX().setGain( m_bbControls.m_gainModel.value() );
 	m_bbFX.rightFX().setGain( m_bbControls.m_gainModel.value() );
@@ -118,7 +118,7 @@ void BassBoosterEffect::changeGain()
 
 
 
-void BassBoosterEffect::changeRatio()
+inline void BassBoosterEffect::changeRatio()
 {
 	m_bbFX.leftFX().setRatio( m_bbControls.m_ratioModel.value() );
 	m_bbFX.rightFX().setRatio( m_bbControls.m_ratioModel.value() );
