@@ -25,7 +25,7 @@
 
 #include "fft_helpers.h"
 
-#include <math.h>
+#include <lmms_math.h>
 
 
 /* returns biggest value from abs_spectrum[spec_size] array
