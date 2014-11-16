@@ -62,8 +62,6 @@ public:
 
 
 private slots:
-	void updateFilter1();
-	void updateFilter2();
 	void updateFilters();
 	
 private:

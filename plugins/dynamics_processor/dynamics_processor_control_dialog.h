@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _DYNPROC_CONTROL_DIALOG_H
-#define _DYNPROC_CONTROL_DIALOG_H
+#ifndef DYNPROC_CONTROL_DIALOG_H
+#define DYNPROC_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 

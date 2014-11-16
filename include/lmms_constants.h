@@ -25,10 +25,15 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-const float F_PI = 3.1415926535f;
-const float F_E =  2.718281828459045f;
-const float F_2PI = 2*F_PI;
-const float F_PI_2 = F_PI*0.5;
+const double D_PI = 3.14159265358979323846;
+const double D_2PI = D_PI * 2.0;
+const double D_PI_2 = D_PI * 0.5;
+const double D_E = 2.71828182845904523536; 
+
+const float F_PI = (float) D_PI;
+const float F_2PI = (float) D_2PI;
+const float F_PI_2 = (float) D_PI_2;
+const float F_E = (float) D_E;
+
 
 #endif
-
