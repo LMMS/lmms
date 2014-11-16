@@ -61,6 +61,11 @@ public:
 	{
 		m_state = Queued;
 	}
+	
+	inline void done()
+	{
+		m_state = Done;
+	}
 
 	void process( sampleFrame* workingBuffer = NULL )
 	{
