@@ -71,7 +71,6 @@ public:
 
 
 private slots:
-	void changeControl();
 	void samplesChanged( int, int );
 	void sampleRateChanged();
 
