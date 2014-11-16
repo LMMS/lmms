@@ -49,6 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 
 BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &bassbooster_plugin_descriptor, parent, key ),
+	m_frequencyChangeNeeded( false ),
 	m_bbFX( DspEffectLibrary::FastBassBoost( 70.0f, 1.0f, 2.8f ) ),
 	m_bbControls( this )
 {
@@ -74,7 +75,11 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		return( false );
 	}
 	// check out changed controls
-	if( m_bbControls.m_freqModel.isValueChanged() ) { changeFrequency(); }
+	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
+	{
+		changeFrequency();
+		m_frequencyChangeNeeded = false;
+	}
 	if( m_bbControls.m_gainModel.isValueChanged() ) { changeGain(); }
 	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
 
