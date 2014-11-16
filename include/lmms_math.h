@@ -31,7 +31,12 @@
 #include "lmmsconfig.h"
 #include <QtCore/QtGlobal>
 
-#include <math.h>
+#include <cmath>
+using namespace std;
+
+#ifndef M_PI
+#	define M_PI 3.14159265358979323846
+#endif
 
 #if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) 
 #ifndef isnanf
