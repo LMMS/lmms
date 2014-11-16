@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _DYNPROC_H
-#define _DYNPROC_H
+#ifndef DYNPROC_H
+#define DYNPROC_H
 
 #include "Effect.h"
 #include "dynamics_processor_controls.h"
@@ -48,11 +48,17 @@ public:
 
 
 private:
+	void calcAttack();
+	void calcRelease();
 
 	dynProcControls m_dpControls;
 
 // this member array is needed for peak detection 
-	float currentPeak[2];
+	float m_currentPeak[2];
+	double m_attCoeff;
+	double m_relCoeff;
+	
+	bool m_needsUpdate;
 
 	friend class dynProcControls;
 
