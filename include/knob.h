@@ -136,7 +136,7 @@ private slots:
 	virtual void enterValue();
 	void displayHelp();
 	void friendlyUpdate();
-
+	void toggleScale();
 
 private:
 	QString displayValue() const;

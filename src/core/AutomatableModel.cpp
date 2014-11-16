@@ -87,8 +87,6 @@ bool AutomatableModel::isAutomated() const
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
-	bool automatedOrControlled = false;
-
 	if( isAutomated() )
 	{
 		// automation needs tuple of data (name, id, value)
@@ -97,8 +95,6 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		me.setAttribute( "id", id() );
 		me.setAttribute( "value", m_value );
 		element.appendChild( me );
-
-		automatedOrControlled = true;
 	}
 	else
 	{
@@ -126,16 +122,15 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		m_controllerConnection->saveSettings( doc, element );
 
 		controllerElement.appendChild( element );
-
-		automatedOrControlled = true;
 	}
 
-	if( automatedOrControlled && ( m_scaleType != Linear ) )
-	{	// note: if we have more scale types than two, make
-		// a mapper function enums <-> string
-		if(m_scaleType == Logarithmic) {
-			element.setAttribute( "scale_type", "log" );
-		}
+	if( m_scaleType == Logarithmic ) 
+	{
+		element.setAttribute( "scale_type", "log" );
+	}
+	if( m_scaleType == Linear ) 
+	{
+		element.setAttribute( "scale_type", "linear" );
 	}
 }
 
@@ -148,7 +143,13 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( element.hasAttribute("scale_type") ) // wrong in most cases
 	{
 		if( element.attribute("scale_type") == "log" )
-		 setScaleType( Logarithmic );
+		{
+			setScaleType( Logarithmic );
+		}
+		if( element.attribute("scale_type") == "linear" )
+		{
+			setScaleType( Linear );
+		}
 	}
 	else {
 		setScaleType( Linear );
