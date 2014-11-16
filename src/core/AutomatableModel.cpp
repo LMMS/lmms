@@ -47,6 +47,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_step( step ),
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
+	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
 	m_hasLinkedModels( false ),
@@ -240,6 +241,7 @@ void AutomatableModel::setValue( const float value )
 				(*it)->setJournalling( journalling );
 			}
 		}
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 	else
@@ -334,6 +336,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 				(*it)->setAutomatedValue( value );
 			}
 		}
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 	--m_setValueDepth;
@@ -478,6 +481,7 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	{
 		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ), this, SIGNAL( dataChanged() ) );
 		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 }

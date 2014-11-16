@@ -481,11 +481,10 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName() );
+	captionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 

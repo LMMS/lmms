@@ -176,14 +176,12 @@ void ControllerView::modelChanged()
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName() );
+	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }

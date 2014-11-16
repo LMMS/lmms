@@ -245,7 +245,7 @@ void EffectView::closeEffects()
 
 void EffectView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName() );
+	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
@@ -257,9 +257,7 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 						tr( "&Remove this plugin" ),
 						this, SLOT( deletePlugin() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }

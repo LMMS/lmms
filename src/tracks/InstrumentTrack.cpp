@@ -806,6 +806,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 		}
 		node = node.nextSibling();
 	}
+	updatePitchRange();
 	unlock();
 }
 
@@ -1585,10 +1586,3 @@ void InstrumentTrackWindow::loadSettings( const QDomElement& thisElement )
 		m_itv->m_tlb->setChecked( true );
 	}
 }
-
-
-
-
-
-
-

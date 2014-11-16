@@ -83,7 +83,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName() );
+	captionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	
@@ -147,9 +147,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	}
 
-	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 	
 	delete syncMenu;

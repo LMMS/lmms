@@ -1044,7 +1044,7 @@ void trackContentWidget::updateBackground()
 	// draw lines
 	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
 	// horizontal line
-	pmp.drawLine( 0, 0, w*2, 0 );
+	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	// vertical lines
 	for( float x = 0; x < w * 2; x += ppt )

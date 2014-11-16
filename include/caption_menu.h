@@ -38,6 +38,12 @@ public:
 	captionMenu( const QString & _title, QWidget * _parent = 0 );
 	virtual ~captionMenu();
 
+	///
+	/// \brief Adds a "Help" action displaying the Menu's parent's WhatsThis
+	///		   text when selected.
+	///
+	void addHelpAction();
+
 } ;
 
 
