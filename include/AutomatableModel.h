@@ -240,6 +240,9 @@ public:
 		return m_hasLinkedModels;
 	}
 
+	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
+	// note that this method should only be called once per period since it resets the state of the variable - so if your model
+	// has to be accessed by more than one object, then this function shouldn't be used.
 	bool isValueChanged()
 	{
 		if( m_valueChanged )
@@ -247,6 +250,7 @@ public:
 			m_valueChanged = false;
 			return true;
 		}
+		return false;
 	}
 
 	float globalAutomationValueAt( const MidiTime& time );

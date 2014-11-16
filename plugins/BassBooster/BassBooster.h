@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _BASS_BOOSTER_H
-#define _BASS_BOOSTER_H
+#ifndef BASS_BOOSTER_H
+#define BASS_BOOSTER_H
 
 #include "Effect.h"
 #include "DspEffectLibrary.h"
@@ -45,6 +45,10 @@ public:
 
 
 private:
+	void changeFrequency();
+	void changeGain();
+	void changeRatio();
+
 	DspEffectLibrary::MonoToStereoAdaptor<DspEffectLibrary::FastBassBoost> m_bbFX;
 
 	BassBoosterControls m_bbControls;
