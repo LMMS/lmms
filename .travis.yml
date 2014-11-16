@@ -1,6 +1,18 @@
 language: cpp
 compiler: gcc
-before_install: sudo apt-get update
-install: sudo apt-get install libqt4-dev libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libasound2-dev libjack-dev libsdl-dev libsamplerate0-dev libstk0-dev libfluidsynth-dev portaudio19-dev wine-dev g++-multilib libfltk1.3-dev
-before_script: mkdir build && cd build
-script: cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j8 VERBOSE=1
+env:
+#    - TARGET_OS=linux
+    - TARGET_OS=win32
+before_install:
+    - if [ $TARGET_OS != linux ]; then sudo add-apt-repository ppa:tobydox/mingw -y; fi
+    - sudo apt-get update -qq
+install:
+    - if [ $TARGET_OS != linux ]; then sudo apt-get install -y cloog-isl libmpc2 mingw32; fi
+    - if [ $TARGET_OS == win32 ]; then sudo apt-get install -y mingw32-x-qt mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x-stk mingw32-x-glib2 mingw32-x-portaudio mingw32-x-libsndfile mingw32-x-fftw mingw32-x-flac mingw32-x-fltk mingw32-x-libsamplerate mingw32-x-pkgconfig mingw32-x-binutils mingw32-x-gcc mingw32-x-runtime; fi
+    - if [ $TARGET_OS == linux ]; then sudo apt-get install -y libqt4-dev libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libasound2-dev libjack-dev libsdl-dev libsamplerate0-dev libstk0-dev libfluidsynth-dev portaudio19-dev wine-dev g++-multilib libfltk1.3-dev; fi
+before_script:
+    - mkdir build && cd build
+script:
+    - if [ $TARGET_OS == win32 ]; then ../build_mingw32 || ../build_mingw32; fi
+    - if [ $TARGET_OS == linux ]; then cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..; fi
+    - make VERBOSE=1
