@@ -305,7 +305,7 @@ void knob::setarcColor( const QColor & _c )
 
 QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * M_PI / 180.0;
+	const float rarc = m_angle * F_PI / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
