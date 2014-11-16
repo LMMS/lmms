@@ -85,6 +85,17 @@ FxChannel::~FxChannel()
 }
 
 
+inline void FxChannel::processed()
+{
+	foreach( FxRoute * receiverRoute, m_sends )
+	{
+		if( receiverRoute->receiver()->m_muted == false )
+		{
+			receiverRoute->receiver()->incrementDeps();
+		}
+	}
+}
+
 void FxChannel::incrementDeps()
 {
 	m_dependenciesMet.ref();
@@ -155,13 +166,7 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 	}
 	
 	// increment dependency counter of all receivers 
-	foreach( FxRoute * receiverRoute, m_sends )
-	{
-		if( receiverRoute->receiver()->m_muteModel.value() == false )
-		{
-			receiverRoute->receiver()->incrementDeps();
-		}
-	}
+	processed();
 }
 
 
@@ -489,7 +494,12 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		foreach( FxChannel * ch, m_fxChannels )
 		{
 			ch->m_muted = ch->m_muteModel.value();
-			if( ch->m_receives.size() == 0 || ch->m_muted )
+			if( ch->m_muted ) // instantly "process" muted channels
+			{
+				ch->processed();
+				ch->done();
+			}
+			else if( ch->m_receives.size() == 0 )
 			{
 				ch->m_queued = true;
 				MixerWorkerThread::addJob( ch );

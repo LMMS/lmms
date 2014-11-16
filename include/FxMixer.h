@@ -69,6 +69,7 @@ class FxChannel : public ThreadableJob
 		
 		QAtomicInt m_dependenciesMet;
 		void incrementDeps();
+		void processed();
 		
 	private:
 		virtual void doProcessing( sampleFrame * _working_buffer );
