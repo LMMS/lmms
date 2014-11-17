@@ -51,9 +51,8 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
     m_delayControls( this )
 {
     m_delay = 0;
-    m_delay = new StereoDelay( 192000 * 20 );
+    m_delay = new StereoDelay( 20, engine::mixer()->processingSampleRate() );
     m_lfo = new Lfo( engine::mixer()->processingSampleRate() );
-    connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
 
@@ -74,7 +73,7 @@ DelayEffect::~DelayEffect()
 
 
 
-bool DelayEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 {
     if( !isEnabled() || !isRunning () )
     {
@@ -103,12 +102,10 @@ bool DelayEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
     return isRunning();
 }
 
-
-
-
-void DelayEffect::sampleRateChanged()
+void DelayEffect::changeSampleRate()
 {
-    m_lfo->setSamplerate(engine::mixer()->processingSampleRate());
+    m_lfo->setSampleRate( engine::mixer()->processingSampleRate() );
+    m_delay->setSampleRate( engine::mixer()->processingSampleRate() );
 }
 
 

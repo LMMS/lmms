@@ -27,15 +27,15 @@
 #include "lmms_basics.h"
 
 
-StereoDelay::StereoDelay( int maxLength )
+StereoDelay::StereoDelay( int maxLength, int sampleRate )
 {
     m_buffer = 0;
-    m_buffer = new sampleFrame[maxLength];
-    m_maxLength = maxLength;
+    m_maxLength = maxLength * sampleRate;
     m_length = m_maxLength;
+
     m_index = 0;
     m_feedback = 0.0f;
-//    setLength( 0 );
+    setSampleRate( sampleRate );
 }
 
 
@@ -62,6 +62,20 @@ void StereoDelay::tick( sampleFrame frame )
     frame[0] = oldFrame[0];
     frame[1] = oldFrame[1];
     m_index = m_index + 1 < m_length ? m_index + 1 : 0;
+}
+
+
+
+
+void StereoDelay::setSampleRate( int sampleRate )
+{
+   if( m_buffer )
+   {
+       delete m_buffer;
+   }
+
+
+   m_buffer = new sampleFrame[sampleRate * m_maxLength];
 }
 
 

@@ -30,7 +30,7 @@
 
 
 
-DelayControlsDialog::DelayControlsDialog(DelayControls *controls) :
+DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
     EffectControlDialog( controls )
 {
     setAutoFillBackground( true );
@@ -46,25 +46,25 @@ DelayControlsDialog::DelayControlsDialog(DelayControls *controls) :
     sampleDelayKnob->setLabel( tr( "Delay" ) );
     sampleDelayKnob->setHintText( tr( "Delay Time Samples:" ) + " ", "" );
 
-    knob * feedbackKnob = new knob( knobBright_26, this);
+    knob * feedbackKnob = new knob( knobBright_26, this );
     feedbackKnob->move( 60,30 );
-    feedbackKnob->setVolumeKnob(true);
+    feedbackKnob->setVolumeKnob( true) ;
     feedbackKnob->setModel( &controls->m_feedbackModel);
     feedbackKnob->setLabel( tr( "Feedback" ) );
-    feedbackKnob->setHintText( tr ( "Feedback Amount:" ) + " ", "");
+    feedbackKnob->setHintText( tr ( "Feedback Amount:" ) + " ", "" );
 
-    TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this);
+    TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
     lfoFreqKnob->move( 20,80 );
-    lfoFreqKnob->setVolumeKnob(false);
-    lfoFreqKnob->setModel( &controls->m_lfoTimeModel);
+    lfoFreqKnob->setVolumeKnob( false );
+    lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
     lfoFreqKnob->setLabel( tr( "Lfo Hz" ) );
-    lfoFreqKnob->setHintText( tr ( "Lfo Hz:" ) + " ", "");
+    lfoFreqKnob->setHintText( tr ( "Lfo Hz:" ) + " ", "" );
 
-    knob * lfoAmtKnob = new knob( knobBright_26, this);
+    knob * lfoAmtKnob = new knob( knobBright_26, this );
     lfoAmtKnob->move( 60,80 );
-    lfoAmtKnob->setVolumeKnob(true);
-    lfoAmtKnob->setModel( &controls->m_lfoAmountModel);
+    lfoAmtKnob->setVolumeKnob( true );
+    lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
     lfoAmtKnob->setLabel( tr( "Lfo Amt" ) );
-    lfoAmtKnob->setHintText( tr ( "Lfo Amt:" ) + " ", "");
+    lfoAmtKnob->setHintText( tr ( "Lfo Amt:" ) + " ", "" );
 
 }

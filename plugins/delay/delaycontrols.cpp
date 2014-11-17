@@ -29,21 +29,21 @@
 #include "engine.h"
 #include "song.h"
 
-DelayControls::DelayControls(DelayEffect* effect):
+DelayControls::DelayControls( DelayEffect* effect ):
     EffectControls( effect ),
     m_effect ( effect ),
     m_delayTimeModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
     m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
     m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
-    m_lfoAmountModel(0.0f,0.0f,0.5f,0.01f, this, tr ( "Lfo Amount" ) )
+    m_lfoAmountModel(0.0f,0.0f,0.1f,0.0001f, this, tr ( "Lfo Amount" ) )
 {
-    //used to setup the controls
+    connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
 }
 
 
 
 
-void DelayControls::loadSettings(const QDomElement &_this)
+void DelayControls::loadSettings( const QDomElement &_this )
 {
     m_delayTimeModel.loadSettings(_this, "DelayTimeSamples" );
     m_feedbackModel.loadSettings( _this, "FeebackAmount" );
@@ -54,12 +54,19 @@ void DelayControls::loadSettings(const QDomElement &_this)
 
 
 
-void DelayControls::saveSettings(QDomDocument& doc, QDomElement& _this)
+void DelayControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 {
-    m_delayTimeModel.saveSettings( doc, _this, "DelayTimeSamples");
-    m_feedbackModel.saveSettings( doc, _this ,"FeebackAmount");
-    m_lfoTimeModel.saveSettings( doc, _this, "LfoFrequency");
-    m_lfoAmountModel.saveSettings( doc, _this ,"LfoAmount");
+    m_delayTimeModel.saveSettings( doc, _this, "DelayTimeSamples" );
+    m_feedbackModel.saveSettings( doc, _this ,"FeebackAmount" );
+    m_lfoTimeModel.saveSettings( doc, _this, "LfoFrequency" );
+    m_lfoAmountModel.saveSettings( doc, _this ,"LfoAmount" );
+}
+
+
+
+void DelayControls::changeSampleRate()
+{
+    m_effect->changeSampleRate();
 }
 
 #include "moc_delaycontrols.cxx"

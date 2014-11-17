@@ -35,14 +35,12 @@ class DelayEffect : public Effect
 public:
     DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
     virtual ~DelayEffect();
-    virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames);
+    virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
     virtual EffectControls* controls()
     {
         return &m_delayControls;
     }
-
-private slots:
-    void sampleRateChanged();
+    void changeSampleRate();
 
 private:
     DelayControls m_delayControls;

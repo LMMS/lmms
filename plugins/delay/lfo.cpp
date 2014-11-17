@@ -44,7 +44,7 @@ float Lfo::tick()
 
     if( m_amplitude > 0.0001 )
     {
-        return ( ( output + 1.0 ) * 0.5 ) * m_amplitude;
+        return ( ( output * m_amplitude + 1.0 ) * 0.5 ) ;
     } else
     {
         return 1;

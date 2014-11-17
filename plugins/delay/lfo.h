@@ -68,7 +68,7 @@ public:
 
 
 
-    inline void setSamplerate ( int samplerate )
+    inline void setSampleRate ( int samplerate )
     {
         m_samplerate = samplerate;
         m_twoPiOverSr = F_2PI / samplerate;

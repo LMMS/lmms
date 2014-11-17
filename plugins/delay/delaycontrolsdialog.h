@@ -32,7 +32,7 @@ class DelayControls;
 class DelayControlsDialog : public EffectControlDialog
 {
 public:
-    DelayControlsDialog(DelayControls* controls );
+    DelayControlsDialog( DelayControls* controls );
     virtual ~DelayControlsDialog()
     {
     }
