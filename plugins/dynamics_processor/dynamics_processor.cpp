@@ -69,7 +69,8 @@ dynProcEffect::dynProcEffect( Model * _parent,
 
 dynProcEffect::~dynProcEffect()
 {
-	delete[] m_rms;
+	delete m_rms[0];
+	delete m_rms[1];
 }
 
 
