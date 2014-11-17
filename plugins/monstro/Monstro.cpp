@@ -835,6 +835,37 @@ inline sample_t MonstroSynth::calcSlope2( sample_t s )
 MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		Instrument( _instrument_track, &monstro_plugin_descriptor ),
 
+#define setwavemodel( name ) 												\
+		name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
+		name .addItem( tr( "Bandlimited Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+		name .addItem( tr( "Bandlimited Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+		name .addItem( tr( "Bandlimited Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+		name .addItem( tr( "Bandlimited Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+		name .addItem( tr( "Bandlimited Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+		name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
+		name .addItem( tr( "Absolute sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
+		name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
+		name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );	\
+		name .addItem( tr( "Digital Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+		name .addItem( tr( "Digital Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+		name .addItem( tr( "Digital Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+		name .addItem( tr( "Digital Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+		name .addItem( tr( "Digital Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );
+
+
+#define setlfowavemodel( name ) 												\
+		name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
+		name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+		name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+		name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+		name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+		name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+		name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
+		name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
+		name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
+		name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );	\
+		name .addItem( tr( "Random smooth" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
+
 		m_osc1Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 1 Volume" ) ),
 		m_osc1Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 1 Panning" ) ),
 		m_osc1Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 1 Coarse detune" ) ),
