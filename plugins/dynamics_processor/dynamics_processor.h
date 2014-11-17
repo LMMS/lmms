@@ -29,7 +29,7 @@
 
 #include "Effect.h"
 #include "dynamics_processor_controls.h"
-
+#include "RmsHelper.h"
 
 
 class dynProcEffect : public Effect
@@ -59,6 +59,8 @@ private:
 	double m_relCoeff;
 	
 	bool m_needsUpdate;
+	
+	RmsHelper * m_rms [2];
 
 	friend class dynProcControls;
 
