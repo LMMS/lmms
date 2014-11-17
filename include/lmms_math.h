@@ -209,7 +209,7 @@ static inline float dbvToAmp( float dbv )
 {
 	return isinff( dbv )
 		? 0.0f
-		: powf( 10.0f, dbv * 0.05f );
+		: exp10f( dbv * 0.05f );
 }
 
 
