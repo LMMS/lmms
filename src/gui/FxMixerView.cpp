@@ -412,12 +412,12 @@ void FxMixerView::moveChannelLeft(int index)
 		int replaceIndex = chLayout->indexOf(m_fxChannelViews[i]->m_fxLine);
 
 		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
+		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );
 		delete m_fxChannelViews[i]->m_fader;
 		delete m_fxChannelViews[i]->m_muteBtn;
 		delete m_fxChannelViews[i]->m_soloBtn;
 		delete m_fxChannelViews[i]->m_fxLine;
 		delete m_fxChannelViews[i];
-		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );
 
 		// add it again
 		m_fxChannelViews[i] = new FxChannelView( m_channelAreaWidget, this, i );

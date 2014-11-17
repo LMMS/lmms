@@ -58,7 +58,10 @@ dynProcEffect::dynProcEffect( Model * _parent,
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_needsUpdate = true;
+	m_rms[0] = new RmsHelper( 64 * engine::mixer()->processingSampleRate() / 44100 );
+	m_rms[1] = new RmsHelper( 64 * engine::mixer()->processingSampleRate() / 44100 );
+	calcAttack();
+	calcRelease();
 }
 
 
@@ -66,17 +69,19 @@ dynProcEffect::dynProcEffect( Model * _parent,
 
 dynProcEffect::~dynProcEffect()
 {
+	delete m_rms[0];
+	delete m_rms[1];
 }
 
 
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
+	m_attCoeff = pow( 10, ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
+	m_relCoeff = pow( 10, ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
 }
 
 
@@ -110,15 +115,25 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 // debug code
 //	qDebug( "peaks %f %f", m_currentPeak[0], m_currentPeak[1] );
 
-	if( m_dpControls.m_attackModel.isValueChanged() || m_needsUpdate )
+	if( m_needsUpdate )
 	{
+		m_rms[0]->setSize( 64 * engine::mixer()->processingSampleRate() / 44100 );
+		m_rms[1]->setSize( 64 * engine::mixer()->processingSampleRate() / 44100 );
 		calcAttack();
-	}
-	if( m_dpControls.m_releaseModel.isValueChanged() || m_needsUpdate )
-	{
 		calcRelease();
+		m_needsUpdate = false;
 	}
-	m_needsUpdate = false;
+	else
+	{
+		if( m_dpControls.m_attackModel.isValueChanged() )
+		{
+			calcAttack();
+		}
+		if( m_dpControls.m_releaseModel.isValueChanged() )
+		{
+			calcRelease();
+		}
+	}
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
@@ -131,14 +146,15 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 // update peak values
 		for ( i=0; i <= 1; i++ )
 		{
-			if( qAbs( s[i] ) > m_currentPeak[i] )
+			const double t = m_rms[i]->update( s[i] );
+			if( t > m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, qAbs( s[i] ) );
+				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, t );
 			}
 			else
-			if( qAbs( s[i] ) < m_currentPeak[i] )
+			if( t < m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, qAbs( s[i] ) );
+				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, t );
 			}
 
 			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
