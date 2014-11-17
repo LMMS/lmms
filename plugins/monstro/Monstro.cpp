@@ -1439,14 +1439,14 @@ void MonstroInstrument::updateSamplerate()
 void MonstroInstrument::updateSlope1()
 {
 	const float slope = m_env1Slope.value();
-	m_slope1 = powf( 10.0f, slope * -1.0f );
+	m_slope1 = exp10f( slope * -1.0f );
 }
 
 
 void MonstroInstrument::updateSlope2()
 {
 	const float slope = m_env2Slope.value();
-	m_slope2 = powf( 10.0f, slope * -1.0f );
+	m_slope2 = exp10f( slope * -1.0f );
 }
 
 
