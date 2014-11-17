@@ -44,39 +44,14 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_clipModel( false, this )
 {
-/*	connect( &m_inputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeInput() ) );
-
-	connect( &m_outputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeOutput() ) );
-	
-	connect( &m_clipModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeClip() ) );
-*/
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
 
-
 	setDefaultShape();
-
 }
 
 
 
-void waveShaperControls::changeInput()
-{
-//	engine::getSong()->setModified();
-}
-
-void waveShaperControls::changeOutput()
-{
-//	engine::getSong()->setModified();
-}
-
-void waveShaperControls::changeClip()
-{
-//	engine::getSong()->setModified();
-}
 
 void waveShaperControls::samplesChanged( int _begin, int _end)
 {
