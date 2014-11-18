@@ -91,16 +91,16 @@ struct Dimension
 class ADSR
 {
 	// From the file
-	double preattack; // initial amplitude (0-1)
-	double attack; // 0-60s
-	double decay1; // 0-60s
-	double decay2; // 0-60s
+	float preattack; // initial amplitude (0-1)
+	float attack; // 0-60s
+	float decay1; // 0-60s
+	float decay2; // 0-60s
 	bool infiniteSustain; // i.e., no decay2
-	double sustain; // sustain amplitude (0-1)
-	double release; // 0-60s
+	float sustain; // sustain amplitude (0-1)
+	float release; // 0-60s
 
 	// Used to calculate current amplitude
-	double amplitude;
+	float amplitude;
 	bool isAttack;
 	bool isRelease;
 	bool isDone;
@@ -111,10 +111,11 @@ class ADSR
 	int releaseLength;
 
 public:
+	ADSR();
 	ADSR( gig::DimensionRegion * region, int sampleRate );
 	void keyup(); // We will begin releasing starting now
 	bool done(); // Is this sample done playing?
-	double value(); // What's the current amplitude
+	float value(); // What's the current amplitude
 	void inc( int num ); // Increment internal positions by num
 } ;
 
@@ -126,12 +127,38 @@ public:
 class GigSample
 {
 public:
-	GigSample( gig::Sample * pSample, float attenuation, const ADSR & adsr );
+	GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
+			float attenuation, int interpolation, float desiredFreq );
+	~GigSample();
+
+	// Needed when initially creating in QList
+	GigSample( const GigSample& g );
+	GigSample& operator=( const GigSample& g );
+
+	// Needed since libsamplerate stores data internally between calls
+	void updateSampleRate();
+	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+		int oldSize, int newSize, float freq_factor, int& used );
 
 	gig::Sample * sample;
 	float attenuation;
 	ADSR adsr;
-	int pos; // Position in sample
+
+	// The position in sample
+	int pos;
+
+	// Whether to change the pitch of the samples, e.g. if there's only one
+	// sample per octave and you want that sample pitch shifted for the rest of
+	// the notes in the octave, this will be true
+	bool pitchtrack;
+
+	// Used to convert sample rates
+	int interpolation;
+	SRC_STATE * srcState;
+
+	// Used changing the pitch of the note if desired
+	float sampleFreq;
+	float freqFactor;
 } ;
 
 
@@ -163,11 +190,12 @@ public:
 	int velocity;
 	bool release; // Whether to trigger a release sample on key up
 	GigState state;
+	float frequency;
 	QList<GigSample> samples;
 
-	GigNote( int midiNote, int velocity )
+	GigNote( int midiNote, int velocity, float frequency )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), state( KeyDown )
+		  release( false ), state( KeyDown ), frequency( frequency )
 	{
 	}
 } ;
@@ -226,9 +254,6 @@ public slots:
 
 
 private:
-	// Used to convert sample rates
-	SRC_STATE * m_srcState;
-
 	// The GIG file and instrument we're using
 	GigInstance * m_instance;
 	gig::Instrument * m_instrument;
@@ -243,7 +268,6 @@ private:
 
 	// Locking for the data
 	QMutex m_synthMutex;
-	QMutex m_srcMutex;
 	QMutex m_notesMutex;
 
 	// Used for resampling
@@ -270,10 +294,6 @@ private:
 	// Add the desired samples to the note, either normal samples or release
 	// samples
 	void addSamples( GigNote & gignote, bool wantReleaseSample );
-
-	// Convert sample rates
-	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		int oldSize, int newSize, int oldRate, int newRate, int& used );
 
 	friend class GigInstrumentView;
 

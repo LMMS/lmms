@@ -84,7 +84,6 @@ struct GIGPluginData
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
-	m_srcState( NULL ),
 	m_instance( NULL ),
 	m_instrument( NULL ),
 	m_filename( "" ),
@@ -112,11 +111,6 @@ GigInstrument::~GigInstrument()
 {
 	engine::mixer()->removePlayHandles( instrumentTrack() );
 	freeInstance();
-
-	if( m_srcState != NULL )
-	{
-		src_delete( m_srcState );
-	}
 }
 
 
@@ -319,7 +313,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		const uint velocity = _n->midiVelocity( baseVelocity );
 
 		QMutexLocker locker( &m_notesMutex );
-		m_notes.push_back( GigNote( midiNote, velocity ) );
+		m_notes.push_back( GigNote( midiNote, velocity, _n->unpitchedFrequency() ) );
 	}
 }
 
@@ -331,6 +325,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const int rate = engine::mixer()->processingSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -344,18 +339,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		m_notesMutex.unlock();
 		return;
 	}
-
-	// Data for converting sample rate
-	int oldRate = -1;
-	int newRate = engine::mixer()->processingSampleRate();
-	bool sampleError = false;
-	bool sampleConvert = false;
-
-	// How many frames we'll be grabbing from the sample
-	int samples = frames;
-
-	// How many we actually used from the sample
-	int used = frames;
 
 	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
@@ -418,43 +401,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				break;
 			}
 		}
-
-		// Verify all the samples have the same rate
-		for( QList<GigSample>::iterator sample = it->samples.begin();
-				sample != it->samples.end(); ++sample )
-		{
-			int currentRate = sample->sample->SamplesPerSecond;
-
-			if( oldRate == -1 )
-			{
-				oldRate = currentRate;
-			}
-			else if( oldRate != currentRate )
-			{
-				qCritical() << "GigInstrument: not all samples are the same rate, not converting";
-				sampleError = true;
-			}
-		}
 	}
-
-	// If all samples have the same sample rate and it's not the output sample
-	// rate, then we'll convert sample rates
-	if( oldRate != -1 && sampleError != true && oldRate != newRate )
-	{
-		sampleConvert = true;
-
-		// Read a different number of samples depending on the sample rate, but
-		// resample it to always output the right number of frames
-		samples = frames * oldRate / newRate;
-
-		// We need a bit of margin so we don't get glitching
-		samples += MARGIN[m_interpolation];
-	}
-
-	// Create buffers
-	sampleFrame sampleData[samples]; // Individual note signal, overwritten for each note
-	sampleFrame convertBuf[samples]; // Sum of note signals
-	std::memset( &convertBuf[0][0], 0, DEFAULT_CHANNELS * samples * sizeof( float ) );
 
 	// Fill buffer with portions of the note samples
 	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
@@ -473,6 +420,35 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			{
 				continue;
 			}
+
+			// Will change if resampling
+			bool resample = false;
+			int samples = frames; // How many to grab
+			int used = frames; // How many we used
+			float freq_factor = 1.0; // How to resample
+
+			// Resample to be the correct pitch when the sample provided isn't
+			// solely for this one note (e.g. one or two samples per octave) or
+			// we are processing at a different sample rate
+			if( sample->pitchtrack == true || rate != sample->sample->SamplesPerSecond )
+			{
+				resample = true;
+
+				// Factor just for resampling
+				freq_factor = 1.0 * rate / sample->sample->SamplesPerSecond;
+
+				// Factor for pitch shifting as well as resampling
+				if( sample->pitchtrack == true )
+				{
+					freq_factor *= sample->freqFactor;
+				}
+
+				// We need a bit of margin so we don't get glitching
+				samples = frames / freq_factor + MARGIN[m_interpolation];
+			}
+
+			// This note's data
+			sampleFrame sampleData[samples];
 
 			// Set the position to where we currently are in the sample
 			sample->sample->SetPos( sample->pos ); // Note: not thread safe
@@ -544,18 +520,25 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 			for( int i = 0; i < samples; ++i )
 			{
-				double amplitude = copy.value();
+				float amplitude = copy.value();
 				sampleData[i][0] *= amplitude;
 				sampleData[i][1] *= amplitude;
 			}
 
-			// Save to output buffer
-			if( sampleConvert == true )
+			// Output the data resampling if needed
+			if( resample == true )
 			{
-				for( int i = 0; i < samples; ++i )
+				sampleFrame convertBuf[frames];
+
+				// Only output if resampling is successful (note that "used" is output)
+				if( sample->convertSampleRate( *sampleData, *convertBuf, samples, frames,
+							freq_factor, used ) )
 				{
-					convertBuf[i][0] += sampleData[i][0];
-					convertBuf[i][1] += sampleData[i][1];
+					for( int i = 0; i < frames; ++i )
+					{
+						_working_buffer[i][0] += convertBuf[i][0];
+						_working_buffer[i][1] += convertBuf[i][1];
+					}
 				}
 			}
 			else
@@ -566,36 +549,10 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 					_working_buffer[i][1] += sampleData[i][1];
 				}
 			}
-		}
-	}
 
-	// Convert sample rate if needed
-	if( sampleConvert == true )
-	{
-		// If an error occurred, it's better to render nothing than have some
-		// screeching high-volume noise
-		if( !convertSampleRate( *convertBuf, *_working_buffer, samples, frames,
-					oldRate, newRate, used ) )
-		{
-			std::memset( &_working_buffer[0][0], 0,
-					DEFAULT_CHANNELS * frames * sizeof( float ) );
-		}
-	}
-
-	// Update the note positions with how many samples we actually used
-	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
-	{
-		if( it->state == PlayingKeyDown || it->state == PlayingKeyUp )
-		{
-			for( QList<GigSample>::iterator sample = it->samples.begin();
-					sample != it->samples.end(); ++sample )
-			{
-				if( sample->sample != NULL )
-				{
-					sample->pos += used;
-					sample->adsr.inc( used );
-				}
-			}
+			// Update note position with how many samples we actually used
+			sample->pos += used;
+			sample->adsr.inc( used );
 		}
 	}
 
@@ -690,7 +647,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );;
-				float length = (double) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
 
 				// TODO: sample panning? looping? crossfade different layers?
 
@@ -704,8 +661,8 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					attenuation *= pDimRegion->SampleAttenuation;
 				}
 
-				gignote.samples.push_back( GigSample( pSample, attenuation,
-					ADSR( pDimRegion, pSample->SamplesPerSecond ) ) );
+				gignote.samples.push_back( GigSample( pSample, pDimRegion,
+							attenuation, m_interpolation, gignote.frequency ) );
 			}
 		}
 
@@ -829,67 +786,13 @@ void GigInstrument::getInstrument()
 
 
 
-bool GigInstrument::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		int oldSize, int newSize, int oldRate, int newRate, int& used )
-{
-	SRC_DATA src_data;
-	src_data.data_in = &oldBuf[0];
-	src_data.data_out = &newBuf[0];
-	src_data.input_frames = oldSize;
-	src_data.output_frames = newSize;
-	src_data.src_ratio = (double) newRate / oldRate;
-	src_data.end_of_input = 0;
-
-	m_srcMutex.lock();
-	int error = src_process( m_srcState, &src_data );
-	m_srcMutex.unlock();
-
-	used = src_data.input_frames_used;
-
-	if( error != 0 )
-	{
-		qCritical( "GigInstrument: error while resampling: %s", src_strerror( error ) );
-		return false;
-	}
-
-	if( src_data.output_frames_gen > newSize )
-	{
-		qCritical( "GigInstrument: not enough frames: %ld / %d", src_data.output_frames_gen, newSize );
-		return false;
-	}
-
-	if( oldSize != 0 && src_data.output_frames_gen == 0 )
-	{
-		qCritical( "GigInstrument: could not resample, no frames generated" );
-		return false;
-	}
-
-	return true;
-}
-
-
-
-
-// Recreate the libsamplerate instance each time the sample rate is changed.
-// We could also create it once and then reset it whenever the sample rate
-// changes. However, if we ever switch to changing interpolations, you have to
-// recreate it.
+// Since the sample rate changes when we start an export, clear all the
+// currently-playing notes when we get this signal. Then, the export won't
+// include leftover notes that were playing in the program.
 void GigInstrument::updateSampleRate()
 {
-	QMutexLocker locker( &m_srcMutex );
-
-	if( m_srcState != NULL )
-	{
-		src_delete( m_srcState );
-	}
-
-	int error;
-	m_srcState = src_new( m_interpolation, DEFAULT_CHANNELS, &error );
-
-	if( m_srcState == NULL || error != 0 )
-	{
-		qCritical( "error while creating libsamplerate data structure in GigInstrument::updateSampleRate()" );
-	}
+	QMutexLocker locker( &m_notesMutex );
+	m_notes.clear();
 }
 
 
@@ -1095,11 +998,160 @@ void GigInstrumentView::showPatchDialog()
 
 
 // Store information related to playing a sample from the GIG file
-GigSample::GigSample( gig::Sample * pSample, float attenuation, const ADSR & adsr )
-	: sample( pSample ),
-	  attenuation( attenuation ),
-	  adsr( adsr ),
-	  pos( 0 )
+GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
+		float attenuation, int interpolation, float desiredFreq )
+	: sample( pSample ), attenuation( attenuation ), pos( 0 ),
+	  pitchtrack( false ), interpolation( interpolation ),
+	  srcState( NULL ), sampleFreq( 0 ), freqFactor( 1 )
+{
+	if( pSample != NULL && pDimRegion != NULL )
+	{
+		// Note: we don't create the libsamplerate object here since we always
+		// also call the copy constructor when appending to the end of the
+		// QList. We'll create it only in the copy constructor so we only have
+		// to create it once.
+
+		pitchtrack = pDimRegion->PitchTrack;
+
+		// Calculate note pitch and frequency factor only if we're actually
+		// going to be changing the pitch of the notes
+		if( pitchtrack == true )
+		{
+			// Calculate what frequency the provided sample is
+			float semitones = 1.0 * pSample->FineTune / 0xFFFFFFFF;
+			sampleFreq = 440.0 * powf( 2, 1.0 / 12 * (
+						1.0 * pDimRegion->UnityNote - 69 ) + semitones );
+			freqFactor = sampleFreq / desiredFreq;
+		}
+
+		// The sample rate we pass in is affected by how we are going to be
+		// resampling the note so that a 1.5 second release ends up being 1.5
+		// seconds after resampling
+		adsr = ADSR( pDimRegion, pSample->SamplesPerSecond / freqFactor );
+	}
+}
+
+
+
+
+GigSample::~GigSample()
+{
+	if( srcState != NULL )
+	{
+		src_delete( srcState );
+	}
+}
+
+
+
+
+GigSample::GigSample( const GigSample& g )
+	: sample( g.sample ), attenuation( g.attenuation ), adsr( g.adsr ),
+	  pos( g.pos ), pitchtrack( g.pitchtrack ), interpolation( g.interpolation ),
+	  srcState( NULL ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
+{
+	// On the copy, we want to create the object
+	updateSampleRate();
+}
+
+
+
+
+GigSample& GigSample::operator=( const GigSample& g )
+{
+	sample = g.sample;
+	attenuation = g.attenuation;
+	adsr = g.adsr;
+	pos = g.pos;
+	pitchtrack = g.pitchtrack;
+	interpolation = g.interpolation;
+	srcState = NULL;
+	sampleFreq = g.sampleFreq;
+	freqFactor = g.freqFactor;
+
+	if( g.srcState != NULL )
+	{
+		updateSampleRate();
+	}
+
+	return *this;
+}
+
+
+
+
+void GigSample::updateSampleRate()
+{
+	if( srcState != NULL )
+	{
+		src_delete( srcState );
+	}
+
+	int error = 0;
+	srcState = src_new( interpolation, DEFAULT_CHANNELS, &error );
+
+	if( srcState == NULL || error != 0 )
+	{
+		qCritical( "error while creating libsamplerate data structure in GigSample" );
+	}
+}
+
+
+
+
+bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+		int oldSize, int newSize, float freq_factor, int& used )
+{
+	if( srcState == NULL )
+	{
+		return false;
+	}
+
+	SRC_DATA src_data;
+	src_data.data_in = &oldBuf[0];
+	src_data.data_out = &newBuf[0];
+	src_data.input_frames = oldSize;
+	src_data.output_frames = newSize;
+	src_data.src_ratio = freq_factor;
+	src_data.end_of_input = 0;
+
+	// We don't need to lock this assuming that we're only outputting the
+	// samples in one thread
+	int error = src_process( srcState, &src_data );
+
+	used = src_data.input_frames_used;
+
+	if( error != 0 )
+	{
+		qCritical( "GigInstrument: error while resampling: %s", src_strerror( error ) );
+		return false;
+	}
+
+	if( oldSize != 0 && src_data.output_frames_gen == 0 )
+	{
+		qCritical( "GigInstrument: could not resample, no frames generated" );
+		return false;
+	}
+
+	if( src_data.output_frames_gen > 0 && src_data.output_frames_gen < newSize )
+	{
+		qCritical() << "GigInstrument: not enough frames, wanted"
+			<< newSize << "generated" << src_data.output_frames_gen;
+		return false;
+	}
+
+	return true;
+}
+
+
+
+
+ADSR::ADSR()
+	: preattack( 0 ), attack( 0 ), decay1( 0 ), decay2( 0 ), infiniteSustain( false ),
+	  sustain( 0 ), release( 0 ),
+	  amplitude( 0 ), isAttack( true ), isRelease( false ), isDone( false ),
+	  attackPosition( 0 ), attackLength( 0 ), decayLength( 0 ),
+	  releasePosition( 0 ), releaseLength( 0 )
 {
 }
 
@@ -1130,6 +1182,12 @@ ADSR::ADSR( gig::DimensionRegion * region, int sampleRate )
 		attackLength = attack * sampleRate;
 		decayLength = decay1 * sampleRate; // TODO: ignoring decay2 for now
 		releaseLength = release * sampleRate;
+
+		// If there is no attack, start at the full amplitude
+		if( attackLength == 0 )
+		{
+			amplitude = 1.0;
+		}
 	}
 }
 
@@ -1155,9 +1213,9 @@ bool ADSR::done()
 
 
 // Return the current amplitude and increment internal positions
-double ADSR::value()
+float ADSR::value()
 {
-	double currentAmplitude = amplitude;
+	float currentAmplitude = amplitude;
 
 	// If we're done, don't output any signal
 	if( isDone == true )
