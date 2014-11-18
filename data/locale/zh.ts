@@ -130,7 +130,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。诸如环回模式(looping-mode)，起始/结束点，放大值(amplify-value)之类的值不会被重置。因此听起来会和源采样有差异。</translation>
+        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。  诸如环回模式(looping-mode)、起始/结束点、放大值(amplify-value)之类的值不会被重置。因此音频听起来会和原采样有差异。</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -146,7 +146,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>此旋钮用于调整放大比率。当设为100% 时采样不会变化。除此之外，不是放大就是减弱(原始的采样文件不会被改变)</translation>
+        <translation>此旋钮用于调整振幅放大比率。当设为100%时采样不会变化。除此之外，振幅不是放大就是减弱    (原始的采样文件不会被改变)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -170,11 +170,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>This button disables looping. The sample plays only once from start to end. </source>
-        <translation type="unfinished"></translation>
+        <translation>点击此按钮可以禁止循环播放。</translation>
     </message>
     <message>
         <source>Enable loop</source>
-        <translation type="unfinished"></translation>
+        <translation>开启循环</translation>
     </message>
     <message>
         <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
@@ -216,7 +216,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation>LMMS由于某些原因与JACK断开连接，这可能是因为LMMS的JACK后端重启导致的，你需要手动重新连接。</translation>
+        <translation>LMMS由于某些原因与JACK断开连接。  这可能是因为LMMS的JACK后端重启导致的，你需要手动重新连接。</translation>
     </message>
     <message>
         <source>JACK server down</source>
@@ -224,7 +224,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation>JACK服务好像崩溃了而且未能正常启动，LMMS不能正常工作，你需要保存你的工作然后重启JACK和LMMS。</translation>
+        <translation>JACK服务好像崩溃了，而且未能正常启动。  LMMS不能正常工作，你需要保存你的工作然后重启JACK和LMMS。</translation>
     </message>
 </context>
 <context>
@@ -322,7 +322,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Remove all linked controls</source>
-        <translation>删除所有已连接的控制器</translation>
+        <translation>移除所有已连接的控制器</translation>
     </message>
 </context>
 <context>
@@ -401,7 +401,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>All selected values were copied to the clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有选中的值已复制</translation>
     </message>
     <message>
         <source>Discrete progression</source>
@@ -681,15 +681,15 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>DualFilterControls</name>
     <message>
         <source>Filter 1 enabled</source>
-        <translation>过滤器1 已启用</translation>
+        <translation>过滤器 1 已启用</translation>
     </message>
     <message>
         <source>Filter 1 type</source>
-        <translation>过滤器 1 类型</translation>
+        <translation>过滤器 1 的类型</translation>
     </message>
     <message>
         <source>Cutoff 1 frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>频谱刀 1 的频率</translation>
     </message>
     <message>
         <source>Q/Resonance 1</source>
@@ -697,7 +697,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Gain 1</source>
-        <translation type="unfinished"></translation>
+        <translation>增益 1</translation>
     </message>
     <message>
         <source>Mix</source>
@@ -709,11 +709,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Filter 2 type</source>
-        <translation type="unfinished">过滤器 1 类型 {2 ?}</translation>
+        <translation type="unfinished">过滤器 2 的类型</translation>
     </message>
     <message>
         <source>Cutoff 2 frequency</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">频谱刀 2 的频率</translation>
     </message>
     <message>
         <source>Q/Resonance 2</source>
@@ -721,7 +721,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Gain 2</source>
-        <translation type="unfinished"></translation>
+        <translation>增益 2</translation>
     </message>
     <message>
         <source>LowPass</source>
@@ -788,7 +788,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
-        <translation>启用效果器</translation>
+        <translation>效果器已启用</translation>
     </message>
     <message>
         <source>Wet/Dry mix</source>
@@ -807,7 +807,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>EffectChain</name>
     <message>
         <source>Effects enabled</source>
-        <translation>启用效果器</translation>
+        <translation>效果器已启用</translation>
     </message>
 </context>
 <context>
@@ -829,14 +829,14 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Plugin description</source>
-        <translation>插件描述</translation>
+        <translation>插件说明</translation>
     </message>
 </context>
 <context>
     <name>EffectView</name>
     <message>
         <source>Toggles the effect on or off.</source>
-        <translation>打开或关闭效果</translation>
+        <translation>打开/关闭效果</translation>
     </message>
     <message>
         <source>On/Off</source>
@@ -844,15 +844,15 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>W/D</source>
-        <translation>W/D</translation>
+        <translation>干/湿</translation>
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>湿度</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation type="unfinished"></translation>
+        <translation>旋转干湿度旋钮以调整原信号与有效果的信号的比例。</translation>
     </message>
     <message>
         <source>DECAY</source>
@@ -990,23 +990,23 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>ATT</source>
-        <translation type="unfinished"></translation>
+        <translation>ATT</translation>
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished">打进声</translation>
+        <translation type="unfinished">打进：</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(ADSR Attack)</translation>
     </message>
     <message>
         <source>HOLD</source>
-        <translation type="unfinished"></translation>
+        <translation type=>HOLD</translation>
     </message>
     <message>
         <source>Hold:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">持续：</translation>
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
@@ -1014,7 +1014,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>DEC</source>
-        <translation type="unfinished"></translation>
+        <translation>DEC</translation>
     </message>
     <message>
         <source>Decay:</source>
@@ -1022,31 +1022,31 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(ADSR Decay)</translation>
     </message>
     <message>
         <source>SUST</source>
-        <translation type="unfinished"></translation>
+        <translation>SUST</translation>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">持幅：</translation>
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(ADSR Sustain)</translation>
     </message>
     <message>
         <source>REL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">REL</translation>
     </message>
     <message>
         <source>Release:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">消退：</translation>
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(ADSR Release)</translation>
     </message>
     <message>
         <source>AMT</source>
@@ -1233,7 +1233,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>请注意上面的参数不一定适用于所有文件格式。</translation>
+        <translation>请注意：上面的参数不一定适用于所有文件格式。</translation>
     </message>
     <message>
         <source>Quality settings</source>
