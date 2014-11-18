@@ -2745,7 +2745,7 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     </message>
     <message>
         <source>E&amp;xport tracks...</source>
-        <translation>E&amp;sporta traccie...</translation>
+        <translation type="unfinished">E&amp;sporta tracce...</translation>
     </message>
     <message>
         <source>LMMS (*.mmp *.mmpz)</source>
