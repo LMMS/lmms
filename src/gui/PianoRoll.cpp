@@ -68,7 +68,7 @@
 #include "timeline.h"
 #include "tool_button.h"
 #include "text_float.h"
-
+#include "AutomationPattern.h"
 
 typedef AutomationPattern::timeMap timeMap;
 

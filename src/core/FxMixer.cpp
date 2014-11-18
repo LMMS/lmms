@@ -40,6 +40,7 @@ FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_amount( amount, 0, 1, 0.001, NULL,
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
 {
+	m_amount.setSampleExact( true );
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
 }
@@ -73,6 +74,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_queued( false ),
 	m_dependenciesMet( 0 )
 {
+	m_volumeModel.setSampleExact( true );
 	engine::mixer()->clearAudioBuffer( m_buffer,
 					engine::mixer()->framesPerPeriod() );
 }

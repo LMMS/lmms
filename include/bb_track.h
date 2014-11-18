@@ -135,6 +135,8 @@ public:
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+	
+	virtual ProcessHandle * getProcessHandle();
 
 	static bbTrack * findBBTrack( int _bb_num );
 	static void swapBBTracks( track * _track1, track * _track2 );

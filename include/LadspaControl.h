@@ -78,6 +78,8 @@ public:
 	{
 		return "port";
 	}
+	
+	void setSampleExact( bool s );
 
 
 signals:

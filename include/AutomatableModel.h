@@ -285,6 +285,13 @@ public:
 	{
 		s_periodCounter = 0;
 	}
+	
+	void setSampleExact( bool s );
+	
+	bool isSampleExact() const
+	{
+		return m_isSampleExact;
+	}
 
 public slots:
 	virtual void reset();
@@ -358,6 +365,7 @@ private:
 	long m_lastUpdatedPeriod;
 	static long s_periodCounter;
 	
+	bool m_isSampleExact;
 	bool m_hasSampleExactData;
 	
 	// prevent several threads from attempting to write the same vb at the same time

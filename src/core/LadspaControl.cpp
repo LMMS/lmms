@@ -150,6 +150,23 @@ ValueBuffer * LadspaControl::valueBuffer()
 }
 
 
+void LadspaControl::setSampleExact( bool s )
+{
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+		case INTEGER:
+			return;
+		case FLOATING:
+			m_knobModel.setSampleExact( s );
+		case TIME:
+			m_tempoSyncKnobModel.setSampleExact( s );
+		default:
+			qWarning( "LadspaControl::setSampleExact: BAD BAD BAD\n" );
+			break;
+	}
+}
+
 
 void LadspaControl::setValue( LADSPA_Data _value )
 {

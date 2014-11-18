@@ -112,14 +112,16 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 {
 	JournallingObject * j = engine::projectJournal()->
 				journallingObject( _a->data().toInt() );
-	if( j && dynamic_cast<AutomatableModel *>( j ) )
+
+	AutomationTrack * at = dynamic_cast<AutomationTrack *>( m_pat->getTrack() );
+	AutomatableModel * am = dynamic_cast<AutomatableModel *>( j );
+
+	if( j && am && at )
 	{
 		float oldMin = m_pat->getMin();
 		float oldMax = m_pat->getMax();
 
-		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
-					m_pat->m_objects.end(),
-				dynamic_cast<AutomatableModel *>( j ) ) );
+		at->objects()->erase( qFind( at->objects()->begin(), at->objects()->end(), am ) );
 		update();
 
 		//If automation editor is opened, update its display after disconnection
@@ -128,8 +130,8 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 			engine::automationEditor()->updateAfterPatternChange();
 		}
 
-		//if there is no more connection connected to the AutomationPattern
-		if( m_pat->m_objects.size() == 0 )
+		//if there is no more connection connected to the AutomationTrack
+		if( at->objects()->size() == 0 )
 		{
 			//scale the points to fit the new min. and max. value
 			this->scaleTimemapToFit( oldMin, oldMax );
@@ -147,6 +149,7 @@ void AutomationPatternView::toggleRecording()
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
+	AutomationTrack * at = dynamic_cast<AutomationTrack *>( m_pat->getTrack() );
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
@@ -168,14 +171,14 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "record" ),
 						tr( "Set/clear record" ),
 						this, SLOT( toggleRecording() ) );
-	if( !m_pat->m_objects.isEmpty() )
+	if( at && !at->objects()->isEmpty() )
 	{
 		_cm->addSeparator();
 		QMenu * m = new QMenu( tr( "%1 Connections" ).
-				arg( m_pat->m_objects.count() ), _cm );
-		for( AutomationPattern::objectVector::iterator it =
-						m_pat->m_objects.begin();
-					it != m_pat->m_objects.end(); ++it )
+				arg( at->objects()->count() ), _cm );
+		for( objectVector::iterator it =
+						at->objects()->begin();
+					at->objects()->end(); ++it )
 		{
 			if( *it )
 			{

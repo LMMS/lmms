@@ -70,9 +70,6 @@ tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 song::song() :
 	TrackContainer(),
-	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
-				track::create( track::HiddenAutomationTrack,
-								this ) ) ),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerTact( DefaultTicksPerTact ),
@@ -96,6 +93,7 @@ song::song() :
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
+	m_trackList.reserve( 1000 );
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
@@ -121,7 +119,6 @@ song::song() :
 song::~song()
 {
 	m_playing = false;
-	delete m_globalAutomationTrack;
 }
 
 
@@ -197,13 +194,15 @@ void song::processNextBuffer()
 		return;
 	}
 
-	TrackList track_list;
-	int tco_num = -1;
+	m_trackList.clear();
+	int m_playingTcoNum = -1;
+	
+	m_ticksThisPeriod.clear();
 
 	switch( m_playMode )
 	{
 		case Mode_PlaySong:
-			track_list = tracks();
+			m_trackList = tracks();
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
 			{
@@ -212,25 +211,25 @@ void song::processNextBuffer()
 			break;
 
 		case Mode_PlayTrack:
-			track_list.push_back( m_trackToPlay );
+			m_trackList.push_back( m_trackToPlay );
 			break;
 
 		case Mode_PlayBB:
 			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
 			{
-				tco_num = engine::getBBTrackContainer()->
+				m_playingTcoNum = engine::getBBTrackContainer()->
 								currentBB();
-				track_list.push_back( bbTrack::findBBTrack(
-								tco_num ) );
+				m_trackList.push_back( bbTrack::findBBTrack(
+								m_playingTcoNum ) );
 			}
 			break;
 
 		case Mode_PlayPattern:
 			if( m_patternToPlay != NULL )
 			{
-				tco_num = m_patternToPlay->getTrack()->
+				m_playingTcoNum = m_patternToPlay->getTrack()->
 						getTCONum( m_patternToPlay );
-				track_list.push_back(
+				m_trackList.push_back(
 						m_patternToPlay->getTrack() );
 			}
 			break;
@@ -239,8 +238,11 @@ void song::processNextBuffer()
 			return;
 
 	}
+	
+	// save the starting position of the period for further use
+	m_periodStartPos[m_playMode] = m_playPos[m_playMode];
 
-	if( track_list.empty() == true )
+	if( m_trackList.empty() == true )
 	{
 		return;
 	}
@@ -261,7 +263,7 @@ void song::processNextBuffer()
 	}
 
 	f_cnt_t total_frames_played = 0;
-	const float frames_per_tick = engine::framesPerTick();
+	const float frames_per_tick = engine::framesPerTick(); // TODO 2.0: when we have tempo track, look this up from it
 
 	while( total_frames_played
 				< engine::mixer()->framesPerPeriod() )
@@ -359,21 +361,8 @@ void song::processNextBuffer()
 
 		if( (f_cnt_t) current_frame == 0 )
 		{
-			if( m_playMode == Mode_PlaySong )
-			{
-				m_globalAutomationTrack->play(
-						m_playPos[m_playMode],
-						played_frames,
-						total_frames_played, tco_num );
-			}
-
-			// loop through all tracks and play them
-			for( int i = 0; i < track_list.size(); ++i )
-			{
-				track_list[i]->play( m_playPos[m_playMode],
-						played_frames,
-						total_frames_played, tco_num );
-			}
+			// save the tick's frame offset into a hash so tracks can read it and know which ticks to play
+			m_ticksThisPeriod[ m_playPos[m_playMode].getTicks() ] = total_frames_played;
 		}
 
 		// update frame-counters
@@ -705,7 +694,7 @@ bpm_t song::getTempo()
 
 AutomationPattern * song::tempoAutomationPattern()
 {
-	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
+	return NULL;
 }
 
 
@@ -759,12 +748,6 @@ void song::clearProject()
 	m_masterVolumeModel.reset();
 	m_masterPitchModel.reset();
 	m_timeSigModel.reset();
-
-	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
-									clear();
-	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
-									clear();
 
 	engine::mixer()->unlock();
 
@@ -913,12 +896,6 @@ void song::loadProject( const QString & _file_name )
 		m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
 	}
 
-	if( !dataFile.content().firstChildElement( "track" ).isNull() )
-	{
-		m_globalAutomationTrack->restoreState( dataFile.content().
-						firstChildElement( "track" ) );
-	}
-
 	// Load mixer first to be able to set the correct range for FX channels
 	node = dataFile.content().firstChildElement( engine::fxMixer()->nodeName() );
 	if( !node.isNull() )
@@ -980,7 +957,7 @@ void song::loadProject( const QString & _file_name )
 	ControllerConnection::finalizeConnections();
 
 	// resolve all IDs so that autoModels are automated
-	AutomationPattern::resolveAllIDs();
+	AutomationTrack::resolveAllIDs();
 
 
 	engine::mixer()->unlock();
@@ -1015,7 +992,6 @@ bool song::saveProjectFile( const QString & _filename )
 
 	saveState( dataFile, dataFile.content() );
 
-	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	engine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( engine::hasGUI() )
 	{

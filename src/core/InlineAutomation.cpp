@@ -25,6 +25,55 @@
 #include <QDomElement>
 
 #include "InlineAutomation.h"
+#include "AutomationPattern.h"
+
+InlineAutomation::InlineAutomation() :
+		FloatModel(),
+		sharedObject(),
+		m_autoPattern( NULL )
+{
+}
+
+
+InlineAutomation::~InlineAutomation()
+{
+	if( m_autoPattern )
+	{
+		delete m_autoPattern;
+	}
+}
+
+
+bool InlineAutomation::hasAutomation() const
+{
+	if( m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false )
+	{
+		// prevent saving inline automation if there's just one value which equals value
+		// of model which is going to be saved anyways
+		if( isAtInitValue() &&
+			m_autoPattern->getTimeMap().size() == 1 &&
+			m_autoPattern->getTimeMap().keys().first() == 0 &&
+			m_autoPattern->getTimeMap().values().first() == value() )
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
+AutomationPattern * InlineAutomation::automationPattern()
+{
+	if( m_autoPattern == NULL )
+	{
+		m_autoPattern = new AutomationPattern( NULL );
+		m_autoPattern->addInlineObject( this );
+	}
+	return m_autoPattern;
+}
 
 
 void InlineAutomation::saveSettings( QDomDocument & _doc,
@@ -54,6 +103,7 @@ void InlineAutomation::loadSettings( const QDomElement & _this )
 		{
 			automationPattern()->loadSettings(
 							node.toElement() );
+			automationPattern()->addInlineObject( this );
 		}
 	}
 }

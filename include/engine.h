@@ -158,6 +158,12 @@ public:
 	{
 		return s_pluginFileHandling;
 	}
+	
+	// returns the max polyphony for instruments
+	static inline int polyphony() 
+	{
+		return 64; // TODO 2.0: make configurable in prefs
+	}
 
 
 private:

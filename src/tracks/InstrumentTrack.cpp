@@ -114,6 +114,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_noteStacking( this ),
 	m_piano( this )
 {
+	m_volumeModel.setSampleExact( true );
+	m_panningModel.setSampleExact( true );
+	
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
@@ -133,6 +136,12 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	setName( tr( "Default preset" ) );
 
+}
+
+
+ProcessHandle * InstrumentTrack::getProcessHandle()
+{
+	return NULL;
 }
 
 

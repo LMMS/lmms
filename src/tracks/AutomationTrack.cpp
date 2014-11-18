@@ -32,21 +32,162 @@
 #include "string_pair_drag.h"
 #include "TrackContainerView.h"
 #include "track_label_button.h"
+#include "song.h"
+#include "text_float.h"
+#include "bb_track_container.h"
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, tc )
+	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, tc ),
+	m_processHandle( new AutomationProcessHandle( this ) ),
+	m_objects()
 {
 	setName( tr( "Automation track" ) );
 }
-
-
 
 
 AutomationTrack::~AutomationTrack()
 {
 }
 
+
+ProcessHandle * AutomationTrack::getProcessHandle()
+{
+	return static_cast<ProcessHandle *>( m_processHandle );
+}
+
+
+void AutomationProcessHandle::doProcessing()
+{
+	int tcoNum = engine::getSong()->playingTcoNum();
+	const tick_t start = engine::getSong()->periodStartTick();
+	const tick_t end = engine::getSong()->getTicks();
+	// TickOffsetHash * ticks = engine::getSong()->ticksThisPeriod(); // not yet...
+	
+	if( m_track->isMuted() )
+	{
+		return;
+	}
+	
+	tcoVector tcos;
+	if( tcoNum >= 0 )
+	{
+		trackContentObject * tco = m_track->getTCO( tcoNum );
+		tcos.push_back( tco );
+	}
+	else
+	{
+		m_track->getTCOsInRange( tcos, start, end );
+	}
+	
+	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+	{
+		AutomationPattern * p = dynamic_cast<AutomationPattern *>( *it );
+		if( p == NULL || ( *it )->isMuted() )
+		{
+			continue;
+		}
+		MidiTime cur_start = MidiTime( start );
+		if( tcoNum < 0 )
+		{
+			cur_start -= p->startPosition();
+		}
+		p->processMidiTime( cur_start );
+	}
+}
+
+
+void AutomationTrack::addObject( AutomatableModel * obj, bool search_dup )
+{
+	if( search_dup )
+	{
+		for( objectVector::iterator it = m_objects.begin();
+					it != m_objects.end(); ++it )
+		{
+			if( *it == obj )
+			{
+				textFloat::displayMessage( obj->displayName(), tr( "Model is already connected "
+												"to this track." ), embed::getIconPixmap( "automation" ), 2000 );
+				return;
+			}
+		}
+	}
+
+	m_objects += obj;
+
+	connect( obj, SIGNAL( destroyed( jo_id_t ) ),
+			this, SLOT( objectDestroyed( jo_id_t ) ),
+						Qt::DirectConnection );
+
+	emit dataChanged();
+}
+
+
+const AutomatableModel * AutomationTrack::firstObject() const
+{
+	AutomatableModel * m;
+	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
+	{
+		return m;
+	}
+
+	static FloatModel _fm( 0, AutomationPattern::DEFAULT_MIN_VALUE, AutomationPattern::DEFAULT_MAX_VALUE, 0.001 );
+	return &_fm;
+}
+
+
+void AutomationTrack::objectDestroyed( jo_id_t id )
+{
+	// TODO: distict between temporary removal (e.g. LADSPA controls
+	// when switching samplerate) and real deletions 
+	m_idsToResolve += id;
+
+	for( objectVector::Iterator objIt = m_objects.begin();
+		objIt != m_objects.end(); objIt++ )
+	{
+		Q_ASSERT( !(*objIt).isNull() );
+		if( (*objIt)->id() == id )
+		{
+			//Assign to objIt so that this loop work even break; is removed.
+			objIt = m_objects.erase( objIt );
+			break;
+		}
+	}
+
+	emit dataChanged();
+}
+
+
+
+void AutomationTrack::resolveAllIDs()
+{
+	TrackContainer::TrackList l = engine::getSong()->tracks() +
+				engine::getBBTrackContainer()->tracks();
+	for( TrackContainer::TrackList::iterator it = l.begin();
+							it != l.end(); ++it )
+	{
+		if( ( *it )->type() == track::AutomationTrack ||
+			 ( *it )->type() == track::HiddenAutomationTrack )
+		{
+			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
+			if( at )
+			{
+				for( QVector<jo_id_t>::Iterator k = at->m_idsToResolve.begin();
+								k != at->m_idsToResolve.end(); ++k )
+				{
+					JournallingObject * o = engine::projectJournal()->
+													journallingObject( *k );
+					if( o && dynamic_cast<AutomatableModel *>( o ) )
+					{
+						at->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+					}
+				}
+				at->m_idsToResolve.clear();
+				at->dataChanged();
+			}
+		}
+	}
+}
 
 
 
@@ -109,6 +250,16 @@ trackContentObject * AutomationTrack::createTCO( const MidiTime & )
 void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
+	for( objectVector::const_iterator it = m_objects.begin();
+						it != m_objects.end(); ++it )
+	{
+		if( *it )
+		{
+			QDomElement element = _doc.createElement( "object" );
+			element.setAttribute( "id", ( *it )->id() );
+			_this.appendChild( element );
+		}
+	}
 }
 
 
@@ -120,6 +271,19 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	if( type() == HiddenAutomationTrack )
 	{
 		setMuted( false );
+	}
+	for( QDomNode node = _this.firstChild(); !node.isNull();
+						node = node.nextSibling() )
+	{
+		QDomElement element = node.toElement();
+		if( element.isNull()  )
+		{
+			continue;
+		}
+		if( element.tagName() == "object" )
+		{
+			m_idsToResolve << element.attribute( "id" ).toInt();
+		}
 	}
 }
 

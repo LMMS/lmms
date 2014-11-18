@@ -53,8 +53,6 @@ void MeterModel::reset()
 	m_numeratorModel.setValue( 4 );
 	m_denominatorModel.setValue( 4 );
 
-	AutomationPattern::globalAutomationPattern( &m_numeratorModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_denominatorModel )->clear();
 }
 
 

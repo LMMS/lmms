@@ -30,7 +30,7 @@
 #include "note.h"
 #include "DetuningHelper.h"
 #include "templates.h"
-
+#include "AutomationPattern.h"
 
 
 

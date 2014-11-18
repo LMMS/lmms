@@ -500,7 +500,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
-	AutomationPattern::resolveAllIDs();
+	AutomationTrack::resolveAllIDs();
 	_de->accept();
 }
 
@@ -1402,7 +1402,7 @@ bool trackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
 		}
 	}
 
-	AutomationPattern::resolveAllIDs();
+	AutomationTrack::resolveAllIDs();
 
 	return true;
 }
@@ -1766,8 +1766,8 @@ void trackOperationsWidget::recordingOn()
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		const tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( true ); }
@@ -1782,8 +1782,8 @@ void trackOperationsWidget::recordingOff()
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		const tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( false ); }
@@ -2414,7 +2414,7 @@ trackView::trackView( track * _track, TrackContainerView * _tcv ) :
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ) );
 	// create views for already existing TCOs
-	for( track::tcoVector::iterator it =
+	for( tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
 			it != m_track->m_trackContentObjects.end(); ++it )
 	{

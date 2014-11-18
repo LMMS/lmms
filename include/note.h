@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _NOTE_H
-#define _NOTE_H
+#ifndef NOTE_H
+#define NOTE_H
 
 #include <QtCore/QVector>
 

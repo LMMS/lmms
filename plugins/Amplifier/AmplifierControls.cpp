@@ -40,10 +40,10 @@ AmplifierControls::AmplifierControls( AmplifierEffect* effect ) :
 	m_leftModel( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Left gain" ) ),
 	m_rightModel( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Right gain" ) )
 {
-/*	connect( &m_volumeModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_panModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_leftModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_rightModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );*/
+	m_volumeModel.setSampleExact( true );
+	m_panModel.setSampleExact( true );
+	m_leftModel.setSampleExact( true );
+	m_rightModel.setSampleExact( true );
 }
 
 

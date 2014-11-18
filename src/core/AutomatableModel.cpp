@@ -52,7 +52,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_hasStrictStepSize( false ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
-	m_valueBuffer( static_cast<int>( engine::mixer()->framesPerPeriod() ) ),
+	m_valueBuffer( 0 ),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData( false )
 
@@ -81,6 +81,15 @@ AutomatableModel::~AutomatableModel()
 	emit destroyed( id() );
 }
 
+
+void AutomatableModel::setSampleExact( bool s )
+{
+	m_isSampleExact = s;
+	if( s )
+	{
+		m_valueBuffer = ValueBuffer( engine::mixer()->framesPerPeriod() );
+	}
+}
 
 
 

@@ -43,15 +43,15 @@ const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
 const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
 
-AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
-	trackContentObject( _auto_track ),
-	m_autoTrack( _auto_track ),
-	m_objects(),
+AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
+	trackContentObject( auto_track ),
+	m_autoTrack( auto_track ),
 	m_tension( 1.0 ),
 	m_progressionType( DiscreteProgression ),
 	m_dragging( false ),
 	m_isRecording( false ),
-	m_lastRecordedValue( 0 )
+	m_lastRecordedValue( 0 ),
+	m_inlineObject( NULL )
 {
 	changeLength( MidiTime( 1, 0 ) );
 }
@@ -62,7 +62,6 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
-	m_objects( _pat_to_copy.m_objects ),
 	m_tension( _pat_to_copy.m_tension ),
 	m_progressionType( _pat_to_copy.m_progressionType )
 {
@@ -89,40 +88,27 @@ AutomationPattern::~AutomationPattern()
 
 
 
-void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
+void AutomationPattern::addObject( AutomatableModel * obj, bool search_dup )
 {
-	if( _search_dup )
-	{
-		for( objectVector::iterator it = m_objects.begin();
-					it != m_objects.end(); ++it )
-		{
-			if( *it == _obj )
-			{
-				textFloat::displayMessage( _obj->displayName(), tr( "Model is already connected "
-												"to this pattern." ), embed::getIconPixmap( "automation" ), 2000 );
-				return;
-			}
-		}
-	}
-
-	// the automation track is unconnected and there is nothing in the track
-	if( m_objects.isEmpty() && hasAutomation() == false )
+	m_autoTrack->addObject( obj, search_dup );
+	
+	// if there is nothing in the pattern..
+	if( hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
+		putValue( MidiTime(0), obj->inverseScaledValue( obj->value<float>() ), false );
 	}
-
-	m_objects += _obj;
-
-	connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
-			this, SLOT( objectDestroyed( jo_id_t ) ),
-						Qt::DirectConnection );
-
-	emit dataChanged();
-
 }
 
 
+void AutomationPattern::addInlineObject( InlineAutomation * i )
+{
+	m_inlineObject = i;
+	if( hasAutomation() == false )
+	{
+		putValue( MidiTime(0), i->inverseScaledValue( i->value() ), false );
+	}
+}
 
 
 void AutomationPattern::setProgressionType(
@@ -156,14 +142,7 @@ void AutomationPattern::setTension( QString _new_tension )
 
 const AutomatableModel * AutomationPattern::firstObject() const
 {
-	AutomatableModel * m;
-	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
-	{
-		return m;
-	}
-
-	static FloatModel _fm( 0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001 );
-	return &_fm;
+	return m_autoTrack->firstObject();
 }
 
 
@@ -184,8 +163,6 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 							const float _value,
 							const bool _quant_pos )
 {
-	cleanObjects();
-
 	MidiTime newTime = _quant_pos && engine::automationEditor() ?
 		note::quantized( _time,
 			engine::automationEditor()->quantization() ) :
@@ -217,8 +194,6 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 void AutomationPattern::removeValue( const MidiTime & _time,
 									 const bool _quant_pos )
 {
-	cleanObjects();
-
 	MidiTime newTime = _quant_pos && engine::automationEditor() ?
 		note::quantized( _time,
 			engine::automationEditor()->quantization() ) :
@@ -391,7 +366,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
-
+	
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
 	{
@@ -399,17 +374,6 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		element.setAttribute( "pos", it.key() );
 		element.setAttribute( "value", it.value() );
 		_this.appendChild( element );
-	}
-
-	for( objectVector::const_iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
-	{
-		if( *it )
-		{
-			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id", ( *it )->id() );
-			_this.appendChild( element );
-		}
 	}
 }
 
@@ -439,10 +403,6 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 			m_timeMap[element.attribute( "pos" ).toInt()]
 				= element.attribute( "value" ).toFloat();
 		}
-		else if( element.tagName() == "object" )
-		{
-			m_idsToResolve << element.attribute( "id" ).toInt();
-		}
 	}
 
 	int len = _this.attribute( "len" ).toInt();
@@ -459,13 +419,14 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 const QString AutomationPattern::name() const
 {
-	if( !trackContentObject::name().isEmpty() )
+	if( ! trackContentObject::name().isEmpty() )
 	{
 		return trackContentObject::name();
 	}
-	if( !m_objects.isEmpty() && m_objects.first() != NULL )
+	
+	if( ! m_autoTrack->objects()->isEmpty() && m_autoTrack->objects()->first() )
 	{
-		return m_objects.first()->fullDisplayName();
+		return m_autoTrack->objects()->first()->fullDisplayName();
 	}
 	return tr( "Drag a control while pressing <Ctrl>" );
 }
@@ -480,8 +441,12 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 		if( time >= 0 && hasAutomation() )
 		{
 			const float val = valueAt( time );
-			for( objectVector::iterator it = m_objects.begin();
-							it != m_objects.end(); ++it )
+			if( m_inlineObject )
+			{
+				m_inlineObject->setAutomatedValue( val );
+			}
+			else for( objectVector::iterator it = m_autoTrack->objects()->begin();
+							it != m_autoTrack->objects()->end(); ++it )
 			{
 				if( *it )
 				{
@@ -493,9 +458,9 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 	}
 	else
 	{
-		if( time >= 0 && ! m_objects.isEmpty() )
+		if( time >= 0 && ! m_autoTrack->objects()->isEmpty() )
 		{
-			const float value = static_cast<float>( firstObject()->value<float>() );
+			const float value = firstObject()->value<float>();
 			if( value != m_lastRecordedValue ) 
 			{
 				putValue( time, value, true );
@@ -520,30 +485,25 @@ trackContentObjectView * AutomationPattern::createView( trackView * _tv )
 
 
 
-bool AutomationPattern::isAutomated( const AutomatableModel * _m )
+bool AutomationPattern::isAutomated( const AutomatableModel * m )
 {
 	TrackContainer::TrackList l;
 	l += engine::getSong()->tracks();
 	l += engine::getBBTrackContainer()->tracks();
-	l += engine::getSong()->globalAutomationTrack();
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		if( ( *it )->type() == track::AutomationTrack ||
 			( *it )->type() == track::HiddenAutomationTrack )
 		{
-			const track::tcoVector & v = ( *it )->getTCOs();
-			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
+			if( at )
 			{
-				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>( *j );
-				if( a && a->hasAutomation() )
+				for( objectVector::const_iterator k = at->objects()->begin(); k != at->objects()->end(); ++k )
 				{
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					if( *k == m )
 					{
-						if( *k == _m )
-						{
-							return true;
-						}
+						return true;
 					}
 				}
 			}
@@ -553,7 +513,7 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 }
 
 
-/*! \brief returns a list of all the automation patterns everywhere that are connected to a specific model
+/*! \brief returns a list of all the automation patterns of the track that are connected to a specific model
  *  \param _m the model we want to look for
  */
 QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
@@ -562,7 +522,6 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 	TrackContainer::TrackList l;
 	l += engine::getSong()->tracks();
 	l += engine::getBBTrackContainer()->tracks();
-	l += engine::getSong()->globalAutomationTrack();
 	
 	// go through all tracks...
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
@@ -571,101 +530,33 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 		if( ( *it )->type() == track::AutomationTrack ||
 			( *it )->type() == track::HiddenAutomationTrack )
 		{
-			// get patterns in those tracks....
-			const track::tcoVector & v = ( *it )->getTCOs();
-			// go through all the patterns...
-			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
+			if( at )
 			{
-				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
-				// check that the pattern has automation
-				if( a && a->hasAutomation() )
+				// check the track for the object we want
+				for( objectVector::const_iterator k = at->objects()->begin(); k != at->objects()->end(); ++k )
 				{
-					// now check is the pattern is connected to the model we want by going through all the connections
-					// of the pattern
-					bool has_object = false;
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					if( *k == _m )
 					{
-						if( *k == _m )
+						// found, so return patterns of the track
+						const tcoVector & v = ( *it )->getTCOs();
+						for( tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 						{
-							has_object = true;
+							AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
+							// check that the pattern has automation
+							if( a && a->hasAutomation() )
+							{
+								patterns += a;
+							}
 						}
+						break;
 					}
-					// if the patterns is connected to the model, add it to the list
-					if( has_object ) { patterns += a; }
 				}
 			}
 		}
 	}
 	return patterns;
 }
-
-
-
-AutomationPattern * AutomationPattern::globalAutomationPattern(
-							AutomatableModel * _m )
-{
-	AutomationTrack * t = engine::getSong()->globalAutomationTrack();
-	track::tcoVector v = t->getTCOs();
-	for( track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
-	{
-		AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
-		if( a )
-		{
-			for( objectVector::const_iterator k = a->m_objects.begin();
-												k != a->m_objects.end(); ++k )
-			{
-				if( *k == _m )
-				{
-					return a;
-				}
-			}
-		}
-	}
-
-	AutomationPattern * a = new AutomationPattern( t );
-	a->addObject( _m, false );
-	return a;
-}
-
-
-
-
-void AutomationPattern::resolveAllIDs()
-{
-	TrackContainer::TrackList l = engine::getSong()->tracks() +
-				engine::getBBTrackContainer()->tracks();
-	l += engine::getSong()->globalAutomationTrack();
-	for( TrackContainer::TrackList::iterator it = l.begin();
-							it != l.end(); ++it )
-	{
-		if( ( *it )->type() == track::AutomationTrack ||
-			 ( *it )->type() == track::HiddenAutomationTrack )
-		{
-			track::tcoVector v = ( *it )->getTCOs();
-			for( track::tcoVector::iterator j = v.begin();
-							j != v.end(); ++j )
-			{
-				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
-				if( a )
-				{
-					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-									k != a->m_idsToResolve.end(); ++k )
-					{
-						JournallingObject * o = engine::projectJournal()->
-														journallingObject( *k );
-						if( o && dynamic_cast<AutomatableModel *>( o ) )
-						{
-							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
-						}
-					}
-					a->m_idsToResolve.clear();
-					a->dataChanged();
-				}
-			}
-		}
-	}
-}
-
 
 
 
@@ -691,50 +582,6 @@ void AutomationPattern::openInAutomationEditor()
 	engine::automationEditor()->setCurrentPattern( this );
 	engine::automationEditor()->parentWidget()->show();
 	engine::automationEditor()->setFocus();
-}
-
-
-
-
-void AutomationPattern::objectDestroyed( jo_id_t _id )
-{
-	// TODO: distict between temporary removal (e.g. LADSPA controls
-	// when switching samplerate) and real deletions because in the latter
-	// case we had to remove ourselves if we're the global automation
-	// pattern of the destroyed object
-	m_idsToResolve += _id;
-
-	for( objectVector::Iterator objIt = m_objects.begin();
-		objIt != m_objects.end(); objIt++ )
-	{
-		Q_ASSERT( !(*objIt).isNull() );
-		if( (*objIt)->id() == _id )
-		{
-			//Assign to objIt so that this loop work even break; is removed.
-			objIt = m_objects.erase( objIt );
-			break;
-		}
-	}
-
-	emit dataChanged();
-}
-
-
-
-
-void AutomationPattern::cleanObjects()
-{
-	for( objectVector::iterator it = m_objects.begin(); it != m_objects.end(); )
-	{
-		if( *it )
-		{
-			++it;
-		}
-		else
-		{
-			it = m_objects.erase( it );
-		}
-	}
 }
 
 

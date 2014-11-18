@@ -29,16 +29,20 @@
 
 #include "track.h"
 
+class AutomationProcessHandle;
+typedef QVector<QPointer<AutomatableModel> > objectVector;
 
 class AutomationTrack : public track
 {
+	Q_OBJECT
+	MM_OPERATORS
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
 	virtual ~AutomationTrack();
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
-
+						
 	virtual QString nodeName() const
 	{
 		return "automationtrack";
@@ -50,10 +54,27 @@ public:
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+	
+	virtual ProcessHandle * getProcessHandle();
+	
+	void addObject( AutomatableModel * _obj, bool _search_dup = true );
+	const AutomatableModel * firstObject() const;
+	static void resolveAllIDs();
+	
+	objectVector * objects()
+	{
+		return &m_objects;
+	}
+
+public slots:
+	void objectDestroyed( jo_id_t );
 
 private:
 	friend class AutomationTrackView;
-
+	
+	AutomationProcessHandle * m_processHandle;
+	objectVector m_objects;
+	QVector<jo_id_t> m_idsToResolve;
 } ;
 
 
@@ -68,6 +89,23 @@ public:
 	virtual void dropEvent( QDropEvent * _de );
 
 } ;
+
+
+// threadable processhandle for processing automation tracks
+class AutomationProcessHandle : public ProcessHandle
+{
+public:
+	AutomationProcessHandle( AutomationTrack * at ) :
+	ProcessHandle( ProcessHandle::AutomationProcessHandle ),
+	m_track( at )
+	{ }
+	virtual ~AutomationProcessHandle() {}
+	
+	virtual void doProcessing();
+	
+private:
+	AutomationTrack * m_track;
+};
 
 
 #endif

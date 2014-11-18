@@ -135,6 +135,8 @@ public:
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+	
+	virtual ProcessHandle * getProcessHandle();
 
 	using track::setJournalling;
 

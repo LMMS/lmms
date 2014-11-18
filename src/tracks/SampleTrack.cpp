@@ -419,6 +419,11 @@ SampleTrack::~SampleTrack()
 }
 
 
+ProcessHandle * SampleTrack::getProcessHandle()
+{
+	return NULL;
+}
+
 
 
 bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,

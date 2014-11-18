@@ -49,7 +49,7 @@ public:
 
 	virtual QString displayName() const
 	{
-		return tr( "Note detuning" );
+		return AutomatableModel::tr( "Note detuning" );
 	}
 
 	inline virtual QString nodeName() const

@@ -130,6 +130,7 @@ public:
 	virtual trackView * createView( TrackContainerView* tcv );
 	virtual trackContentObject * createTCO( const MidiTime & _pos );
 
+	virtual ProcessHandle * getProcessHandle();
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );

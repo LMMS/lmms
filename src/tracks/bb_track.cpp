@@ -377,6 +377,11 @@ bbTrack::bbTrack( TrackContainer* tc ) :
 
 
 
+ProcessHandle * bbTrack::getProcessHandle()
+{
+	return NULL;
+}
+
 
 bbTrack::~bbTrack()
 {

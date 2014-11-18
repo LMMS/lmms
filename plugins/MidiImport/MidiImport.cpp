@@ -286,10 +286,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiChannel chs[256];
 
 	MeterModel & timeSigMM = engine::getSong()->getTimeSigModel();
-	AutomationPattern * timeSigNumeratorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
-	AutomationPattern * timeSigDenominatorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
 	
 	// TODO: adjust these to Time.Sig changes
 	double beatsPerTact = 4; 

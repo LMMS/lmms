@@ -33,7 +33,7 @@
 #include "MidiEvent.h"
 #include "MidiPort.h"
 #include "song.h"
-
+#include "AutomationPattern.h"
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )

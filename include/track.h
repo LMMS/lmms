@@ -39,7 +39,7 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 #include "DataFile.h"
-
+#include "ProcessHandle.h"
 
 class QMenu;
 class QPushButton;
@@ -401,7 +401,7 @@ signals:
 
 
 
-
+typedef QVector<trackContentObject *> tcoVector;
 
 // base-class for all tracks
 class EXPORT track : public Model, public JournallingObject
@@ -411,7 +411,6 @@ class EXPORT track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<trackContentObject *> tcoVector;
 
 	enum TrackTypes
 	{
@@ -439,6 +438,8 @@ public:
 	{
 		return m_type;
 	}
+
+	virtual ProcessHandle * getProcessHandle() = 0;
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) = 0;

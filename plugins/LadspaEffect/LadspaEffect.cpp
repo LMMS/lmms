@@ -124,7 +124,7 @@ void LadspaEffect::changeSampleRate()
 
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
-	AutomationPattern::resolveAllIDs();
+	AutomationTrack::resolveAllIDs();
 
 	// make sure, connections are ok
 	ControllerConnection::finalizeConnections();
@@ -351,6 +351,7 @@ void LadspaEffect::pluginInstantiation()
 				else if( manager->isPortInput( m_key, port ) )
 				{
 					p->rate = AUDIO_RATE_INPUT;
+					p->control->setSampleExact( true );
 					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
 				}
 				else

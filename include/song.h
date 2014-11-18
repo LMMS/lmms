@@ -44,6 +44,7 @@ const bpm_t DefaultTempo = 140;
 const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
+typedef QHash< tick_t, f_cnt_t > TickOffsetHash;
 
 class EXPORT song : public TrackContainer
 {
@@ -203,11 +204,6 @@ public:
 	bpm_t getTempo();
 	virtual AutomationPattern * tempoAutomationPattern();
 
-	AutomationTrack * globalAutomationTrack()
-	{
-		return m_globalAutomationTrack;
-	}
-
 	// file management
 	void createNewProject();
 	void createNewProjectFromTemplate( const QString & _template );
@@ -254,6 +250,36 @@ public:
 	MeterModel & getTimeSigModel()
 	{
 		return m_timeSigModel;
+	}
+
+	// returns the tick position at the start of current period
+	tick_t periodStartTick() const
+	{
+		return m_periodStartPos[ m_playMode ].getTicks();
+	}
+	
+	// returns the frame offset of the tick position at the start of current period
+	float periodStartTickFrame() const
+	{
+		return m_periodStartPos[ m_playMode ].currentFrame();
+	}
+	
+	// returns a hash of the ticks happening during current period, paired with their respective frameoffsets
+	TickOffsetHash * ticksThisPeriod()
+	{
+		return &m_ticksThisPeriod;
+	}
+	
+	// returns the tco number to play, for tracks
+	int playingTcoNum() const
+	{
+		return m_playingTcoNum;
+	}
+	
+	// tracks that need playing
+	TrackList * playingTrackList()
+	{
+		return &m_trackList;
 	}
 
 
@@ -326,8 +352,6 @@ private:
 	void restoreControllerStates( const QDomElement & _this );
 
 
-	AutomationTrack * m_globalAutomationTrack;
-
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;
 	int m_oldTicksPerTact;
@@ -350,8 +374,14 @@ private:
 	bool m_loadingProject;
 
 	PlayModes m_playMode;
-	playPos m_playPos[Mode_Count];
+	playPos m_playPos [Mode_Count];
+	playPos m_periodStartPos [Mode_Count];
 	tact_t m_length;
+	
+	TickOffsetHash m_ticksThisPeriod;
+	
+	volatile int m_playingTcoNum;	// tco num parameter for tracks when playing a single tco
+	TrackList m_trackList;
 
 	track * m_trackToPlay;
 	Pattern* m_patternToPlay;
