@@ -91,7 +91,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
     {
         dryS[0] = buf[f][0];
         dryS[1] = buf[f][1];
-        m_delay->setLength( length * m_lfo->tick() );
+        m_delay->setLength( ( float )length * ( float )m_lfo->tick() );
         m_delay->tick( buf[f] );
 
         buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );

@@ -25,12 +25,15 @@
 #include "stereodelay.h"
 #include <cstdlib>
 #include "lmms_basics.h"
+#include "interpolation.h"
+#include "lmms_math.h"
 
 
-StereoDelay::StereoDelay( int maxLength, int sampleRate )
+StereoDelay::StereoDelay( int maxTime, int sampleRate )
 {
     m_buffer = 0;
-    m_maxLength = maxLength * sampleRate;
+    m_maxTime = maxTime;
+    m_maxLength = maxTime * sampleRate;
     m_length = m_maxLength;
 
     m_index = 0;
@@ -52,16 +55,26 @@ StereoDelay::~StereoDelay()
 
 
 
-sampleFrame oldFrame;
 void StereoDelay::tick( sampleFrame frame )
 {
-    oldFrame[0] = m_buffer[m_index][0];
-    oldFrame[1] = m_buffer[m_index][1];
-    m_buffer[m_index][0] = frame[0] + ( oldFrame[0] * m_feedback );
-    m_buffer[m_index][1] = frame[1] + ( oldFrame[1] * m_feedback );
-    frame[0] = oldFrame[0];
-    frame[1] = oldFrame[1];
-    m_index = m_index + 1 < m_length ? m_index + 1 : 0;
+    m_buffer[m_index][0] = frame[0];
+    m_buffer[m_index][1] = frame[1];
+
+    int readIndex = m_index - ( int )m_length;
+    if( readIndex < 0 )
+    {
+        readIndex += m_maxLength;
+    }
+    float fract = fraction( m_length );
+    frame[0] = linearInterpolate( m_buffer[readIndex][0] ,
+            m_buffer[( readIndex+1) % m_maxLength][0], fract );
+    frame[1] = linearInterpolate( m_buffer[readIndex][1] ,
+            m_buffer[( readIndex+1) % m_maxLength][1], fract );
+
+    m_buffer[m_index][0] += frame[0] * m_feedback;
+    m_buffer[m_index][1] += frame[1] * m_feedback;
+
+    m_index = ( m_index + 1) % m_maxLength;
 }
 
 
@@ -75,7 +88,7 @@ void StereoDelay::setSampleRate( int sampleRate )
    }
 
 
-   m_buffer = new sampleFrame[sampleRate * m_maxLength];
+   m_buffer = new sampleFrame[( int )( sampleRate * m_maxTime )];
 }
 
 

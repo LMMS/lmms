@@ -32,7 +32,7 @@ class StereoDelay
 public:
     StereoDelay( int maxLength, int sampleRate );
     ~StereoDelay();
-    inline void setLength( int length )
+    inline void setLength( float length )
     {
         if( length <= m_maxLength && length >= 0 )
         {
@@ -51,9 +51,10 @@ public:
 private:
     sampleFrame* m_buffer;
     int m_maxLength;
-    int m_length;
+    float m_length;
     int m_index;
     float m_feedback;
+    float m_maxTime;
 };
 
 #endif // STEREODELAY_H
