@@ -914,15 +914,6 @@ Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
 	m_fifo( _fifo ),
 	m_writing( true )
 {
-	// set denormal protection for this thread
-	#ifdef __SSE3__
-	/* DAZ flag */
-	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
-	#endif
-	#ifdef __SSE__
-	/* FTZ flag */
-	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
-	#endif
 }
 
 
@@ -938,6 +929,16 @@ void Mixer::fifoWriter::finish()
 
 void Mixer::fifoWriter::run()
 {
+// set denormal protection for this thread
+#ifdef __SSE3__
+/* DAZ flag */
+	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
+#endif
+#ifdef __SSE__
+/* FTZ flag */
+	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
+#endif	
+	
 #if 0
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
