@@ -74,14 +74,6 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 
-struct GIGPluginData
-{
-	int midiNote;
-} ;
-
-
-
-
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
 	m_instance( NULL ),
@@ -313,7 +305,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		const uint velocity = _n->midiVelocity( baseVelocity );
 
 		QMutexLocker locker( &m_notesMutex );
-		m_notes.push_back( GigNote( midiNote, velocity, _n->unpitchedFrequency() ) );
+		m_notes.push_back( GigNote( midiNote, velocity, _n->unpitchedFrequency(), pluginData ) );
 	}
 }
 
@@ -686,7 +678,8 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 	// pressed (i.e., not if the key was already released)
 	for( QList<GigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
 	{
-		if( i->midiNote == pluginData->midiNote &&
+		// Find the note by matching pointers to the plugin data
+		if( i->handle == pluginData &&
 				( i->state == KeyDown || i->state == PlayingKeyDown ) )
 		{
 			i->state = KeyUp;

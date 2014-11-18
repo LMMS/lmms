@@ -48,6 +48,16 @@ class PatchesDialog;
 class QLabel;
 
 
+
+
+struct GIGPluginData
+{
+	int midiNote;
+} ;
+
+
+
+
 // Load a GIG file using libgig
 class GigInstance
 {
@@ -195,9 +205,15 @@ public:
 	float frequency;
 	QList<GigSample> samples;
 
-	GigNote( int midiNote, int velocity, float frequency )
+	// Used to determine which note should be released on key up
+	//
+	// Note: if accessing the data, be careful not to access it after the key
+	// has been released since that's when it is deleted
+	GIGPluginData * handle;
+
+	GigNote( int midiNote, int velocity, float frequency, GIGPluginData * handle )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), state( KeyDown ), frequency( frequency )
+		  release( false ), state( KeyDown ), frequency( frequency ), handle( handle )
 	{
 	}
 } ;
