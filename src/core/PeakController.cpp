@@ -60,6 +60,10 @@ PeakController::PeakController( Model * _parent,
 		connect( m_peakEffect, SIGNAL( destroyed( ) ),
 			this, SLOT( handleDestroyedEffect( ) ) );
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	m_coeffNeedsUpdate = true;
 }
 
 
@@ -80,6 +84,14 @@ PeakController::~PeakController()
 
 void PeakController::updateValueBuffer()
 {
+	if( m_coeffNeedsUpdate )
+	{
+		const float ratio = 44100.0f / engine::mixer()->processingSampleRate();
+		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
+		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
+		m_coeffNeedsUpdate = false;
+	}
+
 	if( m_peakEffect )
 	{
 		float targetSample = m_peakEffect->lastSample();
@@ -87,24 +99,17 @@ void PeakController::updateValueBuffer()
 		{
 			const f_cnt_t frames = engine::mixer()->framesPerPeriod();
 			float * values = m_valueBuffer.values();
-
-			const float ratio = ( 44100.0 / 256.0 ) / engine::mixer()->processingSampleRate();
-			const float v = m_currentSample >= targetSample
-				? m_peakEffect->decayModel()->value()
-				: m_peakEffect->attackModel()->value();
-			const float diff = ( targetSample - m_currentSample ) * ratio;
-			const float a = ( 1.0f - sqrt_neg( sqrt_neg( v ) ) ) * diff;
-			const bool att = m_currentSample < targetSample;
 			
 			for( f_cnt_t f = 0; f < frames; ++f )
 			{
-				if( att ) // going up...
+				const float diff = ( targetSample - m_currentSample );
+				if( m_currentSample < targetSample ) // going up...
 				{
-					m_currentSample = qMin( targetSample, m_currentSample + a ); // qmin prevents overshoot
+					m_currentSample += diff * m_attackCoeff;
 				}
-				else
+				else if( m_currentSample > targetSample ) // going down
 				{
-					m_currentSample = qMax( targetSample, m_currentSample + a ); // qmax prevents overshoot
+					m_currentSample += diff * m_decayCoeff;
 				}
 				values[f] = m_currentSample;
 			}
@@ -119,6 +124,12 @@ void PeakController::updateValueBuffer()
 		m_valueBuffer.fill( 0 );
 	}
 	m_bufferLastUpdated = s_periods;
+}
+
+
+void PeakController::updateCoeffs()
+{
+	m_coeffNeedsUpdate = true;
 }
 
 

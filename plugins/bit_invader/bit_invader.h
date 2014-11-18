@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _BIT_INVADER_H
-#define _BIT_INVADER_H
+#ifndef BIT_INVADER_H
+#define BIT_INVADER_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -33,12 +33,14 @@
 #include "knob.h"
 #include "pixmap_button.h"
 #include "led_checkbox.h"
+#include "MemoryManager.h"
 
 class oscillator;
 class bitInvaderView;
 
 class bSynth
 {
+	MM_OPERATORS
 public:
 	bSynth( float * sample, int length, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 

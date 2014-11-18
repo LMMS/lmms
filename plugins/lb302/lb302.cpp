@@ -353,7 +353,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	filterChanged();
 
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
 	engine::mixer()->addPlayHandle( iph );
 }
 

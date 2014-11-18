@@ -48,6 +48,7 @@ protected:
 	knob * m_amountKnob;
 	knob * m_attackKnob;
 	knob * m_decayKnob;
+	knob * m_tresholdKnob;
 	ledCheckBox * m_muteLed;
 
 	ledCheckBox * m_absLed;

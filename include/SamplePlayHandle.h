@@ -82,7 +82,6 @@ private:
 	f_cnt_t m_frame;
 	SampleBuffer::handleState m_state;
 
-	AudioPort * m_audioPort;
 	const bool m_ownAudioPort;
 
 	FloatModel m_defaultVolumeModel;

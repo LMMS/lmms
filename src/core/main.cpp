@@ -64,7 +64,9 @@
 #include <unistd.h>
 #endif
 
+#include "MemoryManager.h"
 #include "ConfigManager.h"
+#include "NotePlayHandle.h"
 #include "embed.h"
 #include "engine.h"
 #include "LmmsStyle.h"
@@ -97,6 +99,10 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
+	// initialize memory managers
+	MemoryManager::init();
+	NotePlayHandleManager::init();
+	
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
@@ -432,7 +438,7 @@ int main( int argc, char * * argv )
 
 		// init central engine which handles all components of LMMS
 		engine::init();
-
+		
 		splashScreen.hide();
 
 		// re-intialize RNG - shared libraries might have srand() or
@@ -499,6 +505,7 @@ int main( int argc, char * * argv )
 	{
 		// we're going to render our song
 		engine::init( false );
+
 		printf( "loading project...\n" );
 		engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );
@@ -529,6 +536,10 @@ int main( int argc, char * * argv )
 
 	const int ret = app->exec();
 	delete app;
+	
+	// cleanup memory managers
+	MemoryManager::cleanup();
+	
 	return( ret );
 }
 

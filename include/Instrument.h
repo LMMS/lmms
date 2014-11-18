@@ -43,6 +43,7 @@ class track;
 
 class EXPORT Instrument : public Plugin
 {
+	MM_OPERATORS
 public:
 	enum Flag
 	{

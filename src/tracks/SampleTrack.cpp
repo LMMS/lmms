@@ -403,9 +403,9 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 
 SampleTrack::SampleTrack( TrackContainer* tc ) :
 	track( track::SampleTrack, tc ),
-	m_audioPort( tr( "Sample track" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
-							tr( "Volume" ) )
+							tr( "Volume" ) ),
+	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, NULL )
 {
 	setName( tr( "Sample track" ) );
 }

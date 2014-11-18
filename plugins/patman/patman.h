@@ -23,14 +23,14 @@
  */
 
 
-#ifndef _PATMAN_H_
-#define _PATMAN_H_
+#ifndef PATMAN_H_
+#define PATMAN_H_
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
-
+#include "MemoryManager.h"
 
 class pixmapButton;
 
@@ -79,6 +79,7 @@ public slots:
 private:
 	typedef struct
 	{
+		MM_OPERATORS
 		SampleBuffer::handleState* state;
 		bool tuned;
 		SampleBuffer* sample;

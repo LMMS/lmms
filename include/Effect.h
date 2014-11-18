@@ -31,7 +31,7 @@
 #include "Mixer.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-
+#include "MemoryManager.h"
 
 class EffectChain;
 class EffectControls;
@@ -39,6 +39,7 @@ class EffectControls;
 
 class EXPORT Effect : public Plugin
 {
+	MM_OPERATORS
 public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,

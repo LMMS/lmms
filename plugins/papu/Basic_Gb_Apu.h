@@ -8,8 +8,10 @@
 
 #include "gb_apu/Gb_Apu.h"
 #include "gb_apu/Multi_Buffer.h"
+#include "MemoryManager.h"
 
 class Basic_Gb_Apu {
+	MM_OPERATORS
 public:
 	Basic_Gb_Apu();
 	~Basic_Gb_Apu();

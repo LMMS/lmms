@@ -57,14 +57,13 @@ class Freeverb3 : public CMT_PluginInstance, public revmodel {
 public:
 
   Freeverb3(const LADSPA_Descriptor *, unsigned long lSampleRate)
-    : CMT_PluginInstance(FV_NumPorts) {
-    /* Richard's note 17/5/2000. Hmm - not sure I like the fact that
-       lSampleRate isn't actually used in this function! */
-  }
+    : CMT_PluginInstance(FV_NumPorts),
+    revmodel( (float) lSampleRate / 44100.0f )
+  {}
+
   friend void activateFreeverb3(LADSPA_Handle Instance);
   friend void runFreeverb3(LADSPA_Handle Instance, 
 			   unsigned long SampleCount);
-
 };
 
 /*****************************************************************************/

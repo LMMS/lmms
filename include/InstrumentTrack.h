@@ -60,6 +60,7 @@ class trackLabelButton;
 class EXPORT InstrumentTrack : public track, public MidiEventProcessor
 {
 	Q_OBJECT
+	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	InstrumentTrack( TrackContainer* tc );
@@ -224,7 +225,6 @@ protected slots:
 
 
 private:
-	AudioPort m_audioPort;
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -243,6 +243,9 @@ private:
 
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
+	
+	AudioPort m_audioPort;
+	
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;

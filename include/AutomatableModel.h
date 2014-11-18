@@ -32,7 +32,7 @@
 #include "Model.h"
 #include "MidiTime.h"
 #include "ValueBuffer.h"
-
+#include "MemoryManager.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -66,6 +66,7 @@ class ControllerConnection;
 class EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
+	MM_OPERATORS
 public:
 	typedef QVector<AutomatableModel *> AutoModelVector;
 

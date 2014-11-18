@@ -26,7 +26,7 @@
 #ifndef SAMPLE_BUFFER_H
 #define SAMPLE_BUFFER_H
 
-#include <QtCore/QMutex>
+#include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 
@@ -38,6 +38,7 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "Mixer.h"
+#include "MemoryManager.h"
 
 
 class QPainter;
@@ -51,6 +52,7 @@ const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 class EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
+	MM_OPERATORS
 public:
 	enum LoopMode {
 		LoopOff = 0,
@@ -59,6 +61,7 @@ public:
 	};
 	class EXPORT handleState
 	{
+		MM_OPERATORS
 	public:
 		handleState( bool _varying_pitch = false, int interpolation_mode = SRC_LINEAR );
 		virtual ~handleState();
@@ -148,21 +151,21 @@ public:
 
 	void setLoopStartFrame( f_cnt_t _start )
 	{
-		m_varLock.lock();
+		m_varLock.lockForWrite();
 		m_loopStartFrame = _start;
 		m_varLock.unlock();
 	}
 
 	void setLoopEndFrame( f_cnt_t _end )
 	{
-		m_varLock.lock();
+		m_varLock.lockForWrite();
 		m_loopEndFrame = _end;
 		m_varLock.unlock();
 	}
 
 	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
 	{
-		m_varLock.lock();
+		m_varLock.lockForWrite();
 		m_startFrame = _start;
 		m_endFrame = _end;
 		m_loopStartFrame = _loopstart;
@@ -202,14 +205,14 @@ public:
 
 	inline void setFrequency( float _freq )
 	{
-		m_varLock.lock();
+		m_varLock.lockForWrite();
 		m_frequency = _freq;
 		m_varLock.unlock();
 	}
 
 	inline void setSampleRate( sample_rate_t _rate )
 	{
-		m_varLock.lock();
+		m_varLock.lockForWrite();
 		m_sampleRate = _rate;
 		m_varLock.unlock();
 	}
@@ -264,7 +267,7 @@ public slots:
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
 	void setReversed( bool _on );
-
+	void sampleRateChanged();
 
 private:
 	void update( bool _keep_settings = false );
@@ -288,7 +291,7 @@ private:
 	sampleFrame * m_origData;
 	f_cnt_t m_origFrames;
 	sampleFrame * m_data;
-	QMutex m_varLock;
+	QReadWriteLock m_varLock;
 	f_cnt_t m_frames;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;

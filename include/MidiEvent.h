@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_EVENT_H
-#define _MIDI_EVENT_H
+#ifndef MIDI_EVENT_H
+#define MIDI_EVENT_H
 
 #include <cstdlib>
 #include "Midi.h"

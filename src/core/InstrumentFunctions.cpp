@@ -260,8 +260,10 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				new NotePlayHandle( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
-									_n, -1, NotePlayHandle::OriginNoteStacking );
+				engine::mixer()->addPlayHandle( 
+						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
+									_n, -1, NotePlayHandle::OriginNoteStacking )
+						);
 			}
 		}
 	}
@@ -377,7 +379,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 						cnphv.first()->totalFramesPlayed() :
 						_n->totalFramesPlayed() ) + arp_frames - 1;
 	// used for loop
-	f_cnt_t frames_processed = 0;
+	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
 	while( frames_processed < engine::mixer()->framesPerPeriod() )
 	{
@@ -471,12 +473,14 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		new NotePlayHandle( _n->instrumentTrack(),
-							( ( m_arpModeModel.value() != FreeMode ) ?  cnphv.first()->offset() : _n->offset() ) + frames_processed,
+		engine::mixer()->addPlayHandle(
+				NotePlayHandleManager::acquire( _n->instrumentTrack(),
+							frames_processed,
 							gated_frames,
 							note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),
 									_n->getPanning(), _n->detuning() ),
-							_n, -1, NotePlayHandle::OriginArpeggio );
+							_n, -1, NotePlayHandle::OriginArpeggio )
+				);
 
 		// update counters
 		frames_processed += arp_frames;

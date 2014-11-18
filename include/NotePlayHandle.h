@@ -30,7 +30,9 @@
 #include "note.h"
 #include "PlayHandle.h"
 #include "track.h"
-
+#include "MemoryManager.h"
+#include <QtCore/QAtomicInt>
+#include <QtCore/QReadWriteLock>
 
 class InstrumentTrack;
 class NotePlayHandle;
@@ -42,6 +44,7 @@ typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 class EXPORT NotePlayHandle : public PlayHandle, public note
 {
+	MM_OPERATORS
 public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
@@ -56,7 +59,7 @@ public:
 		OriginCount
 	};
 	typedef Origins Origin;
-
+	
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
@@ -64,7 +67,13 @@ public:
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle();
+	virtual ~NotePlayHandle() {}
+	void done();
+
+	void * operator new ( size_t size, void * p )
+	{
+		return p;
+	}
 
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
@@ -89,8 +98,6 @@ public:
 	{
 		return m_frequency;
 	}
-
-	void updateFrequency();
 
 	/*! Returns frequency without pitch wheel influence */
 	float unpitchedFrequency() const
@@ -239,10 +246,15 @@ public:
 		return m_songGlobalParentOffset;
 	}
 
+	void setFrequencyUpdate()
+	{
+		m_frequencyNeedsUpdate = true;
+	}
 
 private:
 	class BaseDetuning
 	{
+		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -261,6 +273,8 @@ private:
 		float m_value;
 
 	} ;
+
+	void updateFrequency();
 
 	InstrumentTrack* m_instrumentTrack;		// needed for calling
 											// InstrumentTrack::playNote
@@ -286,7 +300,7 @@ private:
 	bpm_t m_origTempo;						// original tempo
 	f_cnt_t m_origFrames;					// original m_frames
 
-	const int m_origBaseNote;
+	int m_origBaseNote;
 
 	float m_frequency;
 	float m_unpitchedFrequency;
@@ -294,9 +308,37 @@ private:
 	BaseDetuning* m_baseDetuning;
 	MidiTime m_songGlobalParentOffset;
 
-	const int m_midiChannel;
-	const Origin m_origin;
+	int m_midiChannel;
+	Origin m_origin;
 
+	bool m_frequencyNeedsUpdate;				// used to update pitch
 } ;
+
+
+const int INITIAL_NPH_CACHE = 256;
+const int NPH_CACHE_INCREMENT = 16;
+
+class NotePlayHandleManager
+{
+	MM_OPERATORS
+public:
+	static void init();
+	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
+					const f_cnt_t offset,
+					const f_cnt_t frames,
+					const note& noteToPlay,
+					NotePlayHandle* parent = NULL,
+					int midiEventChannel = -1,
+					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+	static void release( NotePlayHandle * nph );
+	static void extend( int i );
+
+private:
+	static NotePlayHandle ** s_available;
+	static QReadWriteLock s_mutex;
+	static QAtomicInt s_availableIndex;
+	static int s_size;
+};
+
 
 #endif

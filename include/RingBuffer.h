@@ -31,10 +31,12 @@
 #include <QObject>
 #include "lmms_basics.h"
 #include "lmms_math.h"
+#include "MemoryManager.h"
 
 class RingBuffer : public QObject
 {
 	Q_OBJECT
+	MM_OPERATORS
 public:
 /** \brief Constructs a ringbuffer of specified size, will not care about samplerate changes
  * 	\param size The size of the buffer in frames. The actual size will be size + period size

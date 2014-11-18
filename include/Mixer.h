@@ -216,20 +216,7 @@ public:
 
 
 	// play-handle stuff
-	bool addPlayHandle( PlayHandle* handle )
-	{
-		if( criticalXRuns() == false )
-		{
-			m_playHandleMutex.lock();
-			m_newPlayHandles.append( handle );
-			m_playHandleMutex.unlock();
-			return true;
-		}
-
-		delete handle;
-
-		return false;
-	}
+	bool addPlayHandle( PlayHandle* handle );
 
 	void removePlayHandle( PlayHandle* handle );
 
@@ -334,11 +321,6 @@ public:
 	}
 
 	// audio-buffer-mgm
-	void bufferToPort( const sampleFrame * _buf,
-					const fpp_t _frames,
-					stereoVolumeVector _volume_vector,
-					AudioPort * _port );
-
 	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );

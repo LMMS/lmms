@@ -61,6 +61,7 @@
 #include "templates.h"
 
 #include "FileDialog.h"
+#include "MemoryManager.h"
 
 
 SampleBuffer::SampleBuffer( const QString & _audio_file,
@@ -83,6 +84,7 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 	{
 		loadFromBase64( _audio_file );
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -106,10 +108,11 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 {
 	if( _frames > 0 )
 	{
-		m_origData = new sampleFrame[_frames];
+		m_origData = MM_ALLOC( sampleFrame, _frames );
 		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -133,10 +136,11 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 {
 	if( _frames > 0 )
 	{
-		m_origData = new sampleFrame[_frames];
+		m_origData = MM_ALLOC( sampleFrame, _frames );
 		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -145,13 +149,16 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 
 SampleBuffer::~SampleBuffer()
 {
-	delete[] m_origData;
-	delete[] m_data;
+	MM_FREE( m_origData );
+	MM_FREE( m_data );
 }
 
 
 
-
+void SampleBuffer::sampleRateChanged()
+{
+	update();
+}
 
 
 void SampleBuffer::update( bool _keep_settings )
@@ -159,15 +166,15 @@ void SampleBuffer::update( bool _keep_settings )
 	const bool lock = ( m_data != NULL );
 	if( lock )
 	{
-		engine::mixer()->lock();
-		delete[] m_data;
+		m_varLock.lockForWrite();
+		MM_FREE( m_data );
 	}
 
 	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
-		m_data = new sampleFrame[m_origFrames];
+		m_data = MM_ALLOC( sampleFrame, m_origFrames );
 		memcpy( m_data, m_origData, m_origFrames * BYTES_PER_FRAME );
 		if( _keep_settings == false )
 		{
@@ -232,7 +239,7 @@ void SampleBuffer::update( bool _keep_settings )
 			{
 				// sample couldn't be decoded, create buffer containing
 				// one sample-frame
-				m_data = new sampleFrame[1];
+				m_data = MM_ALLOC( sampleFrame, 1 );
 				memset( m_data, 0, sizeof( *m_data ) );
 				m_frames = 1;
 				m_loopStartFrame = m_startFrame = 0;
@@ -252,7 +259,7 @@ void SampleBuffer::update( bool _keep_settings )
 	{
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
-		m_data = new sampleFrame[1];
+		m_data = MM_ALLOC( sampleFrame, 1 );
 		memset( m_data, 0, sizeof( *m_data ) );
 		m_frames = 1;
 		m_loopStartFrame = m_startFrame = 0;
@@ -261,7 +268,7 @@ void SampleBuffer::update( bool _keep_settings )
 
 	if( lock )
 	{
-		engine::mixer()->unlock();
+		m_varLock.unlock();
 	}
 
 	emit sampleUpdated();
@@ -273,7 +280,7 @@ void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 			// following code transforms int-samples into
 			// float-samples and does amplifying & reversing
 			const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-			m_data = new sampleFrame[_frames];
+			m_data = MM_ALLOC( sampleFrame, _frames );
 			const int ch = ( _channels > 1 ) ? 1 : 0;
 
 			// if reversing is on, we also reverse when
@@ -313,7 +320,7 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 
 {
 
-		m_data = new sampleFrame[_frames];
+		m_data = MM_ALLOC( sampleFrame, _frames );
 		const int ch = ( _channels > 1 ) ? 1 : 0;
 
 			// if reversing is on, we also reverse when
@@ -356,9 +363,9 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	{
 		SampleBuffer * resampled = resample( this, _src_sr,
 					engine::mixer()->baseSampleRate() );
-		delete[] m_data;
+		MM_FREE( m_data );
 		m_frames = resampled->frames();
-		m_data = new sampleFrame[m_frames];
+		m_data = MM_ALLOC( sampleFrame, m_frames );
 		memcpy( m_data, resampled->data(), m_frames *
 							sizeof( sampleFrame ) );
 		delete resampled;
@@ -597,7 +604,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const float _freq,
 					const LoopMode _loopmode )
 {
-	QMutexLocker ml( &m_varLock );
+	m_varLock.lockForRead();
 
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
@@ -606,6 +613,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( endFrame == 0 || _frames == 0 )
 	{
+		m_varLock.unlock();
 		return false;
 	}
 
@@ -622,6 +630,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( total_frames_for_current_pitch == 0 )
 	{
+		m_varLock.unlock();
 		return false;
 	}
 
@@ -638,6 +647,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		if( play_frame >= endFrame )
 		{
+			m_varLock.unlock();
 			return false;
 		}
 
@@ -654,6 +664,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		play_frame = getPingPongIndex( play_frame, loopStartFrame, loopEndFrame );
 	}
 
+	f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN[ _state->interpolationMode() ];
 
 	sampleFrame * tmp = NULL;
 
@@ -662,7 +673,6 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		SRC_DATA src_data;
 		// Generate output
-		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor ) + MARGIN[ _state->interpolationMode() ];
 		src_data.data_in =
 			getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
 			loopStartFrame, loopEndFrame, endFrame )[0];
@@ -752,7 +762,10 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-	if( tmp != NULL ) delete[] tmp;
+	if( tmp != NULL ) 
+	{
+		MM_FREE( tmp );
+	}
 
 	_state->setBackwards( is_backwards );
 	_state->setFrameIndex( play_frame );
@@ -763,8 +776,8 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		_ab[i][1] *= m_amplification;
 	}
 
+	m_varLock.unlock();
 	return true;
-
 }
 
 
@@ -794,7 +807,7 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 		return m_data + _index;
 	}
 
-	*_tmp = new sampleFrame[_frames];
+	*_tmp = MM_ALLOC( sampleFrame, _frames );
 
 	if( _loopmode == LoopOff )
 	{
@@ -1336,15 +1349,15 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 	printf("%d\n", (int) orig_data.size() );
 
 	m_origFrames = orig_data.size() / sizeof( sampleFrame );
-	delete[] m_origData;
-	m_origData = new sampleFrame[m_origFrames];
+	MM_FREE( m_origData );
+	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
 	m_origFrames = dsize / sizeof( sampleFrame );
-	delete[] m_origData;
-	m_origData = new sampleFrame[m_origFrames];
+	MM_FREE( m_origData );
+	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
 	memcpy( m_origData, dst, dsize );
 
 #endif
@@ -1360,7 +1373,7 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 
 void SampleBuffer::setStartFrame( const f_cnt_t _s )
 {
-	m_varLock.lock();
+	m_varLock.lockForWrite();
 	m_startFrame = _s;
 	m_varLock.unlock();
 }
@@ -1370,7 +1383,7 @@ void SampleBuffer::setStartFrame( const f_cnt_t _s )
 
 void SampleBuffer::setEndFrame( const f_cnt_t _e )
 {
-	m_varLock.lock();
+	m_varLock.lockForWrite();
 	m_endFrame = _e;
 	m_varLock.unlock();
 }

@@ -147,8 +147,8 @@ public:
 
 
 private:
-	AudioPort m_audioPort;
 	FloatModel m_volumeModel;
+	AudioPort m_audioPort;
 
 
 	friend class SampleTrackView;
