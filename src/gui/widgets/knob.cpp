@@ -734,7 +734,7 @@ void knob::enterValue()
 		}
 		else
 		{
-			new_val = pow( 10.0, ( new_val / 20.0 ) ) * 100.0;
+			new_val = dbvToAmp( new_val ) * 100.0;
 		}
 	}
 	else

@@ -5057,7 +5057,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Load waveform</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">波形の読み込み</translation>
     </message>
     <message>
         <source>Click to load a waveform from a sample file</source>
@@ -5171,7 +5171,7 @@ Please make sure you have read-permission to the file and the directory containi
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI を表示</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
@@ -5289,11 +5289,11 @@ Please make sure you have read-permission to the file and the directory containi
     <name>bbEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation type="unfinished">ビート＋ベースライン　エディタ</translation>
+        <translation>Beat+Bassline-Editor</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation type="unfinished">現在の beat/bassline を 再生/ポーズ (Space)</translation>
+        <translation type="unfinished">現在の beat/bassline を 再生/一時停止 (Space)</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
@@ -5328,7 +5328,7 @@ Please make sure you have read-permission to the file and the directory containi
     <name>bbTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation type="unfinished">ビート+ベースライン-エディタを開く</translation>
+        <translation>Beat+Bassline-Editor を開く</translation>
     </message>
     <message>
         <source>Reset name</source>
@@ -5373,19 +5373,19 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>サイン波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>のこぎり波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -5429,7 +5429,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation type="unfinished">クリックすると方形波</translation>
+        <translation type="unfinished">クリックすると矩形波</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -5448,7 +5448,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Input gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ゲイン:</translation>
     </message>
     <message>
         <source>OUTPUT</source>
@@ -5456,7 +5456,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Output gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ゲイン:</translation>
     </message>
     <message>
         <source>ATTACK</source>
@@ -5476,7 +5476,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Reset waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>波形をリセット</translation>
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
@@ -5535,11 +5535,11 @@ Please make sure you have read-permission to the file and the directory containi
     <name>dynProcControls</name>
     <message>
         <source>Input gain</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ゲイン</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ゲイン</translation>
     </message>
     <message>
         <source>Attack time</source>
@@ -7956,20 +7956,20 @@ Latency: %2 ms</source>
     <name>vestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
-        <translation type="unfinished">プラグインをロードしています</translation>
+        <translation type="unfinished">プラグインを読み込んでいます</translation>
     </message>
     <message>
         <source>Please wait while loading VST-plugin...</source>
-        <translation type="unfinished">VST-プラグインをロードする間お待ちください...</translation>
+        <translation type="unfinished">VST-プラグインを読み込む間お待ちください...</translation>
     </message>
     <message>
         <source>Failed loading VST-plugin</source>
-        <translation type="unfinished">VST-プラグインのロードに失敗しました</translation>
+        <translation type="unfinished">VST-プラグインの読み込みに失敗しました</translation>
     </message>
     <message>
         <source>The VST-plugin %1 could not be loaded for some reason.
 If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
-        <translation type="unfinished">VST-plugin %1 がいくつかの理由でロードできませんでした。
+        <translation type="unfinished">VST-plugin %1 がいくつかの理由で読み込みできませんでした。
 もしその VST が Linuxの他のVST-ソフトウェアで動作するならば LMMS の開発者に連絡してください!</translation>
     </message>
 </context>

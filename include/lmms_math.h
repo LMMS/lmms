@@ -47,6 +47,12 @@ using namespace std;
 #ifndef _isinff
 #define _isinff(x) isinf(x)
 #endif
+#ifndef exp10
+#define exp10(x) pow( 10, x )
+#endif
+#ifndef exp10f
+#define exp10f(x) powf( 10, x )
+#endif
 #endif
 
 #ifdef __INTEL_COMPILER
@@ -203,7 +209,7 @@ static inline float dbvToAmp( float dbv )
 {
 	return isinff( dbv )
 		? 0.0f
-		: powf( 10.0f, dbv * 0.05f );
+		: exp10f( dbv * 0.05f );
 }
 
 

@@ -109,7 +109,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->value<float>(), false );
+		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
 	m_objects += _obj;
