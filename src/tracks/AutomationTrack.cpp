@@ -192,4 +192,4 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 }
 
 
-#include "moc_AutomationTrack.cxx"
+

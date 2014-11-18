@@ -252,7 +252,6 @@ private:
 
 class lb302SynthView : public InstrumentView
 {
-	Q_OBJECT
 public:
 	lb302SynthView( Instrument * _instrument,
 	                QWidget * _parent );

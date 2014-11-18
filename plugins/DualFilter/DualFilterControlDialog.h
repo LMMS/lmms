@@ -34,7 +34,6 @@ class DualFilterControls;
 
 class DualFilterControlDialog : public EffectControlDialog
 {
-	Q_OBJECT
 public:
 	DualFilterControlDialog( DualFilterControls* controls );
 	virtual ~DualFilterControlDialog()

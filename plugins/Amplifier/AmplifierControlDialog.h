@@ -34,7 +34,6 @@ class AmplifierControls;
 
 class AmplifierControlDialog : public EffectControlDialog
 {
-	Q_OBJECT
 public:
 	AmplifierControlDialog( AmplifierControls* controls );
 	virtual ~AmplifierControlDialog()
