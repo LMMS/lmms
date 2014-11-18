@@ -38,6 +38,7 @@
 #include "LcdSpinBox.h"
 #include "led_checkbox.h"
 #include "SampleBuffer.h"
+#include "MemoryManager.h"
 #include "gig.h"
 
 class GigInstrumentView;
@@ -207,6 +208,8 @@ public:
 class GigInstrument : public Instrument
 {
 	Q_OBJECT
+	MM_OPERATORS
+
 	mapPropertyFromModel( int, getBank, setBank, m_bankNum );
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
 

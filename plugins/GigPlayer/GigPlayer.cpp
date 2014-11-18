@@ -94,7 +94,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_RandomSeed( 0 ),
 	m_currentKeyDimension( 0 )
 {
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	engine::mixer()->addPlayHandle( iph );
 
 	updateSampleRate();
