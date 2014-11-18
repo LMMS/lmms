@@ -379,8 +379,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		for( QList<GigSample>::iterator sample = it->samples.begin();
 				sample != it->samples.end(); ++sample )
 		{
-			if( sample->sample == NULL || sample->adsr.done() ||
-					sample->pos >= sample->sample->SamplesTotal - 1 )
+			if( sample->sample == NULL || sample->adsr.done() )
 			{
 				sample = it->samples.erase( sample );
 
@@ -416,21 +415,21 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		for( QList<GigSample>::iterator sample = it->samples.begin();
 				sample != it->samples.end(); ++sample )
 		{
-			if( sample->sample == NULL )
+			if( sample->sample == NULL || sample->region == NULL )
 			{
 				continue;
 			}
 
 			// Will change if resampling
 			bool resample = false;
-			int samples = frames; // How many to grab
-			int used = frames; // How many we used
+			f_cnt_t samples = frames; // How many to grab
+			f_cnt_t used = frames; // How many we used
 			float freq_factor = 1.0; // How to resample
 
 			// Resample to be the correct pitch when the sample provided isn't
 			// solely for this one note (e.g. one or two samples per octave) or
 			// we are processing at a different sample rate
-			if( sample->pitchtrack == true || rate != sample->sample->SamplesPerSecond )
+			if( sample->region->PitchTrack == true || rate != sample->sample->SamplesPerSecond )
 			{
 				resample = true;
 
@@ -438,7 +437,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				freq_factor = 1.0 * rate / sample->sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
-				if( sample->pitchtrack == true )
+				if( sample->region->PitchTrack == true )
 				{
 					freq_factor *= sample->freqFactor;
 				}
@@ -447,78 +446,15 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				samples = frames / freq_factor + MARGIN[m_interpolation];
 			}
 
-			// This note's data
+			// Load this note's data
 			sampleFrame sampleData[samples];
-
-			// Set the position to where we currently are in the sample
-			sample->sample->SetPos( sample->pos ); // Note: not thread safe
-
-			// Load the next portion of the sample
-			unsigned long allocationsize = samples * sample->sample->FrameSize;
-			int8_t buffer[allocationsize];
-			unsigned long size = sample->sample->Read( &buffer, samples ) * sample->sample->FrameSize;
-			unsigned long nullExtensionSize = allocationsize - size;
-			std::memset( (int8_t*) &buffer + size, 0, nullExtensionSize );
-
-			// Convert from 16 or 24 bit into 32-bit float
-			if( sample->sample->BitDepth == 24 ) // 24 bit
-			{
-				uint8_t * pInt = reinterpret_cast<uint8_t*>( &buffer );
-
-				for( int i = 0; i < samples; ++i )
-				{
-					// libgig gives 24-bit data as little endian, so we must
-					// convert if on a big endian system
-					int32_t valueLeft = swap32IfBE(
-								( pInt[ 3 * sample->sample->Channels * i ] << 8 ) |
-								( pInt[ 3 * sample->sample->Channels * i + 1 ] << 16 ) |
-								( pInt[ 3 * sample->sample->Channels * i + 2 ] << 24 ) );
-
-					// Store the notes to this buffer before saving to output
-					// so we can fade them out as needed
-					sampleData[i][0] = 1.0 / 0x100000000 * sample->attenuation * valueLeft;
-
-					if( sample->sample->Channels == 1 )
-					{
-						sampleData[i][1] = sampleData[i][0];
-					}
-					else
-					{
-						int32_t valueRight = swap32IfBE(
-									( pInt[ 3 * sample->sample->Channels * i + 3 ] << 8 ) |
-									( pInt[ 3 * sample->sample->Channels * i + 4 ] << 16 ) |
-									( pInt[ 3 * sample->sample->Channels * i + 5 ] << 24 ) );
-
-						sampleData[i][1] = 1.0 / 0x100000000 * sample->attenuation * valueRight;
-					}
-				}
-			}
-			else // 16 bit
-			{
-				int16_t * pInt = reinterpret_cast<int16_t*>( &buffer );
-
-				for( int i = 0; i < samples; ++i )
-				{
-					sampleData[i][0] = 1.0 / 0x10000 *
-						pInt[ sample->sample->Channels * i ] * sample->attenuation;
-
-					if( sample->sample->Channels == 1 )
-					{
-						sampleData[i][1] = sampleData[i][0];
-					}
-					else
-					{
-						sampleData[i][1] = 1.0 / 0x10000 *
-							pInt[ sample->sample->Channels * i + 1 ] * sample->attenuation;
-					}
-				}
-			}
+			loadSample( *sample, sampleData, samples );
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample->adsr;
 
-			for( int i = 0; i < samples; ++i )
+			for( f_cnt_t i = 0; i < samples; ++i )
 			{
 				float amplitude = copy.value();
 				sampleData[i][0] *= amplitude;
@@ -534,7 +470,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				if( sample->convertSampleRate( *sampleData, *convertBuf, samples, frames,
 							freq_factor, used ) )
 				{
-					for( int i = 0; i < frames; ++i )
+					for( f_cnt_t i = 0; i < frames; ++i )
 					{
 						_working_buffer[i][0] += convertBuf[i][0];
 						_working_buffer[i][1] += convertBuf[i][1];
@@ -543,7 +479,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 			else
 			{
-				for( int i = 0; i < frames; ++i )
+				for( f_cnt_t i = 0; i < frames; ++i )
 				{
 					_working_buffer[i][0] += sampleData[i][0];
 					_working_buffer[i][1] += sampleData[i][1];
@@ -560,13 +496,181 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	m_synthMutex.unlock();
 
 	// Set gain properly based on volume control
-	for( int i = 0; i < frames; ++i)
+	for( f_cnt_t i = 0; i < frames; ++i)
 	{
 		_working_buffer[i][0] *= m_gain.value();
 		_working_buffer[i][1] *= m_gain.value();
 	}
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+}
+
+
+
+
+void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples )
+{
+	if( sampleData == NULL || samples < 1 )
+	{
+		return;
+	}
+
+	// Determine if we need to loop part of this sample
+	bool loop = false;
+	gig::loop_type_t loopType = gig::loop_type_normal;
+	f_cnt_t loopStart = 0;
+	f_cnt_t loopLength = 0;
+
+	if( sample.region->pSampleLoops != NULL )
+	{
+		for( uint32_t i = 0; i < sample.region->SampleLoops; ++i )
+		{
+			loop = true;
+			loopType = static_cast<gig::loop_type_t>(sample.region->pSampleLoops[i].LoopType);
+			loopStart = sample.region->pSampleLoops[i].LoopStart;
+			loopLength = sample.region->pSampleLoops[i].LoopLength;
+
+			// Currently only support at max one loop
+			break;
+		}
+	}
+
+	unsigned long allocationsize = samples * sample.sample->FrameSize;
+	int8_t buffer[allocationsize];
+
+	// Load the sample in different ways depending on if we're looping or not
+	if( loop == true && ( sample.pos >= loopStart || sample.pos + samples > loopStart ) )
+	{
+		// Calculate the new position based on the type of loop
+		if( loopType == gig::loop_type_bidirectional )
+		{
+			sample.pos = getPingPongIndex( sample.pos, loopStart, loopStart + loopLength );
+		}
+		else
+		{
+			sample.pos = getLoopedIndex( sample.pos, loopStart, loopStart + loopLength );
+			// TODO: also implement loop_type_backward support
+		}
+
+		sample.sample->SetPos( sample.pos );
+
+		// Load the samples (based on gig::Sample::ReadAndLoop) even around the end
+		// of a loop boundary wrapping to the beginning of the loop region
+		long samplestoread = samples;
+		long samplestoloopend = 0;
+		long readsamples = 0;
+		long totalreadsamples = 0;
+		long loopEnd = loopStart + loopLength;
+
+		do
+		{
+			samplestoloopend = loopEnd - sample.sample->GetPos();
+			readsamples = sample.sample->Read( &buffer[totalreadsamples * sample.sample->FrameSize],
+					min( samplestoread, samplestoloopend ) );
+			samplestoread -= readsamples;
+			totalreadsamples += readsamples;
+
+			if( readsamples >= samplestoloopend )
+			{
+				sample.sample->SetPos( loopStart );
+			}
+		}
+		while( samplestoread > 0 && readsamples > 0 );
+	}
+	else
+	{
+		sample.sample->SetPos( sample.pos );
+
+		unsigned long size = sample.sample->Read( &buffer, samples ) * sample.sample->FrameSize;
+		std::memset( (int8_t*) &buffer + size, 0, allocationsize - size );
+	}
+
+	// Convert from 16 or 24 bit into 32-bit float
+	if( sample.sample->BitDepth == 24 ) // 24 bit
+	{
+		uint8_t * pInt = reinterpret_cast<uint8_t*>( &buffer );
+
+		for( f_cnt_t i = 0; i < samples; ++i )
+		{
+			// libgig gives 24-bit data as little endian, so we must
+			// convert if on a big endian system
+			int32_t valueLeft = swap32IfBE(
+						( pInt[ 3 * sample.sample->Channels * i ] << 8 ) |
+						( pInt[ 3 * sample.sample->Channels * i + 1 ] << 16 ) |
+						( pInt[ 3 * sample.sample->Channels * i + 2 ] << 24 ) );
+
+			// Store the notes to this buffer before saving to output
+			// so we can fade them out as needed
+			sampleData[i][0] = 1.0 / 0x100000000 * sample.attenuation * valueLeft;
+
+			if( sample.sample->Channels == 1 )
+			{
+				sampleData[i][1] = sampleData[i][0];
+			}
+			else
+			{
+				int32_t valueRight = swap32IfBE(
+							( pInt[ 3 * sample.sample->Channels * i + 3 ] << 8 ) |
+							( pInt[ 3 * sample.sample->Channels * i + 4 ] << 16 ) |
+							( pInt[ 3 * sample.sample->Channels * i + 5 ] << 24 ) );
+
+				sampleData[i][1] = 1.0 / 0x100000000 * sample.attenuation * valueRight;
+			}
+		}
+	}
+	else // 16 bit
+	{
+		int16_t * pInt = reinterpret_cast<int16_t*>( &buffer );
+
+		for( f_cnt_t i = 0; i < samples; ++i )
+		{
+			sampleData[i][0] = 1.0 / 0x10000 *
+				pInt[ sample.sample->Channels * i ] * sample.attenuation;
+
+			if( sample.sample->Channels == 1 )
+			{
+				sampleData[i][1] = sampleData[i][0];
+			}
+			else
+			{
+				sampleData[i][1] = 1.0 / 0x10000 *
+					pInt[ sample.sample->Channels * i + 1 ] * sample.attenuation;
+			}
+		}
+	}
+}
+
+
+
+
+// These two loop index functions taken from SampleBuffer.cpp
+f_cnt_t GigInstrument::getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const
+{
+	if( index < endf )
+	{
+		return index;
+	}
+
+	return startf + ( index - startf )
+				% ( endf - startf );
+}
+
+
+
+
+f_cnt_t GigInstrument::getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const
+{
+	if( index < endf )
+	{
+		return index;
+	}
+
+	const f_cnt_t looplen = endf - startf;
+	const f_cnt_t looppos = ( index - endf ) % ( looplen * 2 );
+
+	return ( looppos < looplen )
+		? endf - looppos
+		: startf + ( looppos - looplen );
 }
 
 
@@ -649,7 +753,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );;
 				float length = (float) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
 
-				// TODO: sample panning? looping? crossfade different layers?
+				// TODO: sample panning? crossfade different layers?
 
 				if( wantReleaseSample == true )
 				{
@@ -1000,34 +1104,32 @@ void GigInstrumentView::showPatchDialog()
 // Store information related to playing a sample from the GIG file
 GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 		float attenuation, int interpolation, float desiredFreq )
-	: sample( pSample ), attenuation( attenuation ), pos( 0 ),
-	  pitchtrack( false ), interpolation( interpolation ),
-	  srcState( NULL ), sampleFreq( 0 ), freqFactor( 1 )
+	: sample( pSample ), region( pDimRegion ), attenuation( attenuation ),
+	  pos( 0 ), interpolation( interpolation ), srcState( NULL ),
+	  sampleFreq( 0 ), freqFactor( 1 )
 {
-	if( pSample != NULL && pDimRegion != NULL )
+	if( sample != NULL && region != NULL )
 	{
 		// Note: we don't create the libsamplerate object here since we always
 		// also call the copy constructor when appending to the end of the
 		// QList. We'll create it only in the copy constructor so we only have
 		// to create it once.
 
-		pitchtrack = pDimRegion->PitchTrack;
-
 		// Calculate note pitch and frequency factor only if we're actually
 		// going to be changing the pitch of the notes
-		if( pitchtrack == true )
+		if( region->PitchTrack == true )
 		{
 			// Calculate what frequency the provided sample is
-			float semitones = 1.0 * pSample->FineTune / 0xFFFFFFFF;
 			sampleFreq = 440.0 * powf( 2, 1.0 / 12 * (
-						1.0 * pDimRegion->UnityNote - 69 ) + semitones );
+						1.0 * region->UnityNote - 69 -
+						0.01 * region->FineTune ) );
 			freqFactor = sampleFreq / desiredFreq;
 		}
 
 		// The sample rate we pass in is affected by how we are going to be
 		// resampling the note so that a 1.5 second release ends up being 1.5
 		// seconds after resampling
-		adsr = ADSR( pDimRegion, pSample->SamplesPerSecond / freqFactor );
+		adsr = ADSR( region, sample->SamplesPerSecond / freqFactor );
 	}
 }
 
@@ -1046,8 +1148,8 @@ GigSample::~GigSample()
 
 
 GigSample::GigSample( const GigSample& g )
-	: sample( g.sample ), attenuation( g.attenuation ), adsr( g.adsr ),
-	  pos( g.pos ), pitchtrack( g.pitchtrack ), interpolation( g.interpolation ),
+	: sample( g.sample ), region( g.region ), attenuation( g.attenuation ),
+	  adsr( g.adsr ), pos( g.pos ), interpolation( g.interpolation ),
 	  srcState( NULL ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
 {
 	// On the copy, we want to create the object
@@ -1060,10 +1162,10 @@ GigSample::GigSample( const GigSample& g )
 GigSample& GigSample::operator=( const GigSample& g )
 {
 	sample = g.sample;
+	region= g.region;
 	attenuation = g.attenuation;
 	adsr = g.adsr;
 	pos = g.pos;
-	pitchtrack = g.pitchtrack;
 	interpolation = g.interpolation;
 	srcState = NULL;
 	sampleFreq = g.sampleFreq;
@@ -1100,7 +1202,7 @@ void GigSample::updateSampleRate()
 
 
 bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		int oldSize, int newSize, float freq_factor, int& used )
+		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == NULL )
 	{
@@ -1183,8 +1285,13 @@ ADSR::ADSR( gig::DimensionRegion * region, int sampleRate )
 		decayLength = decay1 * sampleRate; // TODO: ignoring decay2 for now
 		releaseLength = release * sampleRate;
 
+		// If there is no attack or decay, start at the sustain amplitude
+		if( attackLength == 0 && decayLength == 0 )
+		{
+			amplitude = sustain;
+		}
 		// If there is no attack, start at the full amplitude
-		if( attackLength == 0 )
+		else if( attackLength == 0 )
 		{
 			amplitude = 1.0;
 		}
@@ -1254,10 +1361,10 @@ float ADSR::value()
 	{
 		// Maybe not the best way of doing this, but it appears to be about right
 		// Satisfies f(0) = sustain and f(releaseLength) = very small
-		amplitude = ( sustain + 1e-3 ) * exp( -5.0 / releaseLength * releasePosition ) - 1e-3;
+		amplitude = ( sustain + 1e-3 ) * expf( -5.0 / releaseLength * releasePosition ) - 1e-3;
 
 		// Don't have an infinite exponential decay
-		if( amplitude < 0 )
+		if( amplitude <= 0 || releasePosition >= releaseLength )
 		{
 			amplitude = 0;
 			isDone = true;
@@ -1273,9 +1380,9 @@ float ADSR::value()
 
 
 // Increment internal positions a certain number of times
-void ADSR::inc( int num )
+void ADSR::inc( f_cnt_t num )
 {
-	for( int i = 0; i < num; ++i )
+	for( f_cnt_t i = 0; i < num; ++i )
 	{
 		value();
 	}

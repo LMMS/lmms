@@ -104,11 +104,11 @@ class ADSR
 	bool isAttack;
 	bool isRelease;
 	bool isDone;
-	int attackPosition;
-	int attackLength;
-	int decayLength;
-	int releasePosition;
-	int releaseLength;
+	f_cnt_t attackPosition;
+	f_cnt_t attackLength;
+	f_cnt_t decayLength;
+	f_cnt_t releasePosition;
+	f_cnt_t releaseLength;
 
 public:
 	ADSR();
@@ -116,7 +116,7 @@ public:
 	void keyup(); // We will begin releasing starting now
 	bool done(); // Is this sample done playing?
 	float value(); // What's the current amplitude
-	void inc( int num ); // Increment internal positions by num
+	void inc( f_cnt_t num ); // Increment internal positions by num
 } ;
 
 
@@ -138,14 +138,15 @@ public:
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
 	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		int oldSize, int newSize, float freq_factor, int& used );
+		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
+	gig::DimensionRegion * region;
 	float attenuation;
 	ADSR adsr;
 
 	// The position in sample
-	int pos;
+	f_cnt_t pos;
 
 	// Whether to change the pitch of the samples, e.g. if there's only one
 	// sample per octave and you want that sample pitch shifted for the rest of
@@ -290,6 +291,11 @@ private:
 	// Create "dimension" to select desired samples from GIG file based on
 	// parameters such as velocity
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
+
+	// Load sample data from the Gig file, looping the sample where needed
+	void loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples );
+	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
+	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 
 	// Add the desired samples to the note, either normal samples or release
 	// samples
