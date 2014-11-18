@@ -761,22 +761,6 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 
 				emit instrumentChanged();
 			}
-			// compat code - if node-name doesn't match any known
-			// one, we assume that it is an instrument-plugin
-			// which we'll try to load
-			else if( AutomationPattern::classNodeName() != node.nodeName() &&
-					ControllerConnection::classNodeName() != node.nodeName() &&
-					!node.toElement().hasAttribute( "id" ) )
-			{
-				delete m_instrument;
-				m_instrument = NULL;
-				m_instrument = Instrument::instantiate( node.nodeName(), this );
-				if( m_instrument->nodeName() == node.nodeName() )
-				{
-					m_instrument->restoreState( node.toElement() );
-				}
-				emit instrumentChanged();
-			}
 		}
 		node = node.nextSibling();
 	}

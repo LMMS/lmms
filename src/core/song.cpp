@@ -919,9 +919,6 @@ void song::loadProject( const QString & _file_name )
 						firstChildElement( "track" ) );
 	}
 
-	//Backward compatibility for LMMS <= 0.4.15
-	PeakController::initGetControllerBySetting();
-
 	// Load mixer first to be able to set the correct range for FX channels
 	node = dataFile.content().firstChildElement( engine::fxMixer()->nodeName() );
 	if( !node.isNull() )

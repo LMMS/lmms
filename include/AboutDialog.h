@@ -1,5 +1,5 @@
 /*
- * about_dialog.h - declaration of class aboutDialog
+ * AboutDialog.h - declaration of class aboutDialog
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _ABOUT_DIALOG_H
-#define _ABOUT_DIALOG_H
+#ifndef ABOUT_DIALOG_H
+#define ABOUT_DIALOG_H
 
 #include <QDialog>
 

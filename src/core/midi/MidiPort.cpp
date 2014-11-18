@@ -256,14 +256,6 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 		}
 		emit writablePortsChanged();
 	}
-
-	if( thisElement.hasAttribute( "basevelocity" ) == false )
-	{
-		// for projects created by LMMS < 0.9.92 there's no value for the base
-		// velocity and for compat reasons we have to stick with maximum velocity
-		// which did not allow note volumes > 100%
-		m_baseVelocityModel.setValue( MidiMaxVelocity );
-	}
 }
 
 

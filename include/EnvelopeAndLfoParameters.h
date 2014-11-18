@@ -122,12 +122,12 @@ private:
 	bool m_used;
 
 
-	FloatModel m_predelayModel;
-	FloatModel m_attackModel;
-	FloatModel m_holdModel;
-	FloatModel m_decayModel;
+	TempoSyncKnobModel m_predelayModel;
+	TempoSyncKnobModel m_attackModel;
+	TempoSyncKnobModel m_holdModel;
+	TempoSyncKnobModel m_decayModel;
 	FloatModel m_sustainModel;
-	FloatModel m_releaseModel;
+	TempoSyncKnobModel m_releaseModel;
 	FloatModel m_amountModel;
 
 	float  m_sustainLevel;

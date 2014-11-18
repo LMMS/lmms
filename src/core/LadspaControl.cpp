@@ -216,15 +216,6 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 	QString linkModelName = "link";
 	QDomElement e = parent.namedItem( name ).toElement();
 
-	// COMPAT < 1.0.0: detect old data format where there's either no dedicated sub
-	// element or there's a direct sub element with automation link information
-	if( e.isNull() || e.hasAttribute( "id" ) )
-	{
-		dataModelName = name;
-		linkModelName = name + "link";
-		e = parent;
-	}
-
 	if( m_link )
 	{
 		m_linkEnabledModel.loadSettings( e, linkModelName );

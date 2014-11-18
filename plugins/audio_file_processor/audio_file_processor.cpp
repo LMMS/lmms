@@ -244,17 +244,9 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_ampModel.loadSettings( _this, "amp" );
 	m_endPointModel.loadSettings( _this, "eframe" );
 
-	// compat code for not having a separate loopback point
-	if( _this.hasAttribute( "lframe" ) )
-	{
-		m_loopPointModel.loadSettings( _this, "lframe" );
-		m_startPointModel.loadSettings( _this, "sframe" );
-	}
-	else
-	{
-		m_loopPointModel.loadSettings( _this, "sframe" );
-		m_startPointModel.setValue( m_loopPointModel.value() );
-	}
+
+	m_loopPointModel.loadSettings( _this, "lframe" );
+	m_startPointModel.loadSettings( _this, "sframe" );
 
 	m_reverseModel.loadSettings( _this, "reversed" );
 

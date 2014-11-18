@@ -114,35 +114,18 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	m_endFreqModel.loadSettings( _this, "endfreq" );
 	m_decayModel.loadSettings( _this, "decay" );
 	m_distModel.loadSettings( _this, "dist" );
-	if( _this.hasAttribute( "distend" ) )
-	{
-		m_distEndModel.loadSettings( _this, "distend" );
-	}
-	else
-	{
-		m_distEndModel.setValue( m_distModel.value() );
-	}
+
+	m_distEndModel.loadSettings( _this, "distend" );
+
 	m_gainModel.loadSettings( _this, "gain" );
 	m_envModel.loadSettings( _this, "env" );
 	m_noiseModel.loadSettings( _this, "noise" );
 	m_clickModel.loadSettings( _this, "click" );
 	m_slopeModel.loadSettings( _this, "slope" );
 	m_startNoteModel.loadSettings( _this, "startnote" );
-	if( m_versionModel.value() < 1 )
-	{
-		m_startNoteModel.setValue( false );
-	}
+
 	m_endNoteModel.loadSettings( _this, "endnote" );
 
-	// Try to maintain backwards compatibility
-	if( !_this.hasAttribute( "version" ) )
-	{
-
-		m_decayModel.setValue( m_decayModel.value() * 1.33f );
-		m_envModel.setValue( 1.0f );
-		m_slopeModel.setValue( 1.0f );
-		m_clickModel.setValue( 0.0f );
-	}
 	m_versionModel.setValue( KICKER_PRESET_VERSION );
 }
 

@@ -30,9 +30,8 @@
 #include "Mixer.h"
 #include "Oscillator.h"
 
-
-// how long should be each envelope-segment maximal (e.g. attack)?
-extern const float SECS_PER_ENV_SEGMENT = 5.0f;
+// envelope phase max length
+extern const float SECS_PER_ENV_PHASE = 10.0f;
 // how long should be one LFO-oscillation maximal?
 extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
 
@@ -92,12 +91,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 							Model * _parent ) :
 	Model( _parent ),
 	m_used( false ),
-	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Predelay" ) ),
-	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Attack" ) ),
-	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Hold" ) ),
-	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Decay" ) ),
+	m_predelayModel( 0.0, 0.0, 1.0, 0.0001, SECS_PER_ENV_PHASE * 1000.0, this, tr( "Predelay" ) ),
+	m_attackModel( 0.0, 0.0, 1.0, 0.0001, SECS_PER_ENV_PHASE * 1000.0, this, tr( "Attack" ) ),
+	m_holdModel( 0.5, 0.0, 1.0, 0.0001, SECS_PER_ENV_PHASE * 1000.0, this, tr( "Hold" ) ),
+	m_decayModel( 0.5, 0.0, 1.0, 0.0001, SECS_PER_ENV_PHASE * 1000.0, this, tr( "Decay" ) ),
 	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Sustain" ) ),
-	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Release" ) ),
+	m_releaseModel( 0.1, 0.0, 1.0, 0.0001, SECS_PER_ENV_PHASE * 1000.0, this, tr( "Release" ) ),
 	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Modulation" ) ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
@@ -373,26 +372,6 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	m_lfoAmountModel.loadSettings( _this, "lamt" );
 	m_x100Model.loadSettings( _this, "x100" );
 	m_controlEnvAmountModel.loadSettings( _this, "ctlenvamt" );
-
-/*	 ### TODO:
-	Old reversed sustain kept for backward compatibility
-	with 4.15 file format*/
-
-	if( _this.hasAttribute( "sus" ) )
-	{	
-		m_sustainModel.loadSettings( _this, "sus" );
-		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
-	}
-
-	// ### TODO:
-/*	// Keep compatibility with version 2.1 file format
-	if( _this.hasAttribute( "lfosyncmode" ) )
-	{
-		m_lfoSpeedKnob->setSyncMode(
-		( TempoSyncKnob::TtempoSyncMode ) _this.attribute(
-						"lfosyncmode" ).toInt() );
-	}*/
-	
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
 	updateSampleVars();
@@ -403,22 +382,16 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
-	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				engine::mixer()->processingSampleRate();
-	// TODO: Remove the expKnobVals, time should be linear
-	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
-					expKnobVal( m_predelayModel.value() ) );
+	const float framesPerEnv = SECS_PER_ENV_PHASE * engine::mixer()->processingSampleRate();
 
-	const f_cnt_t attack_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) );
+	const f_cnt_t predelay_frames = static_cast<f_cnt_t>( framesPerEnv * m_predelayModel.value() );
 
-	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_holdModel.value() ) );
+	const f_cnt_t attack_frames = static_cast<f_cnt_t>( framesPerEnv * m_attackModel.value() );
 
-	const f_cnt_t decay_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_decayModel.value() *
-						( 1 - m_sustainModel.value() ) ) );
+	const f_cnt_t hold_frames = static_cast<f_cnt_t>( framesPerEnv * m_holdModel.value() );
+
+	const f_cnt_t decay_frames = static_cast<f_cnt_t>( framesPerEnv * m_decayModel.value() *
+						( 1 - m_sustainModel.value() ) );
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -431,10 +404,8 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 		m_amountAdd = m_valueForZeroAmount;
 	}
 
-	m_pahdFrames = predelay_frames + attack_frames + hold_frames +
-								decay_frames;
-	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_releaseModel.value() ) );
+	m_pahdFrames = predelay_frames + attack_frames + hold_frames + decay_frames;
+	m_rFrames = static_cast<f_cnt_t>( framesPerEnv * m_releaseModel.value() );
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 	{
@@ -482,19 +453,13 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	const float dfI = ( 1.0 / decay_frames ) * ( m_sustainLevel -1 ) * m_amount;
 	for( f_cnt_t i = 0; i < decay_frames; ++i )
 	{
-/*
-		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
-						(float)i / decay_frames ) *
-						( 1.0f - m_sustainLevel ) ) *
-							m_amount + m_amountAdd;
-*/
 		m_pahdEnv[add + i] = amsum + i*dfI;
 	}
 
 	const float rfI = ( 1.0f / m_rFrames ) * m_amount;
 	for( f_cnt_t i = 0; i < m_rFrames; ++i )
 	{
-		m_rEnv[i] = (float)( m_rFrames - i ) * rfI;
+		m_rEnv[i] = (float)( m_rFrames - i ) * rfI + amsum;
 	}
 
 	// save this calculation in real-time-part

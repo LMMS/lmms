@@ -48,7 +48,7 @@
 //#include <iostream>
 //#include <cstdlib>
 
-template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
+template<ch_cnt_t CHANNELS>
 class basicFilters
 {
 	MM_OPERATORS
@@ -61,8 +61,10 @@ public:
 		BandPass_CZPG,
 		Notch,
 		AllPass,
-		Moog,
 		DoubleLowPass,
+		Moog,
+		DoubleMoog,
+		Tripole,
 		Lowpass_RC12,
 		Bandpass_RC12,
 		Highpass_RC12,
@@ -70,15 +72,91 @@ public:
 		Bandpass_RC24,
 		Highpass_RC24,
 		Formantfilter,
-		DoubleMoog,
+		FastFormant,
 		Lowpass_SV,
 		Bandpass_SV,
 		Highpass_SV,
 		Notch_SV,
-		FastFormant,
-		Tripole,
 		NumFilters
 	};
+	
+	static inline char * filterName( FilterTypes type )
+	{
+		switch( type )
+		{
+			default:
+			case LowPass:
+				return "BQ Lowpass";
+				break;
+			case HiPass:
+				return "BQ Highpass";
+				break;
+			case BandPass_CSG:
+				return "BQ Bandpass CSG";
+				break;
+			case BandPass_CZPG:
+				return "BQ Bandpass CZPG";
+				break;
+			case Notch:
+				return "BQ Notch";
+				break;
+			case AllPass:
+				return "BQ Allpass";
+				break;
+			case DoubleLowPass:
+				return "BQ Lowpass x2";
+				break;
+			case Moog:
+				return "Moog Lowpass";
+				break;
+			case DoubleMoog:
+				return "Moog Lowpass x2";
+				break;
+			case Tripole:
+				return "Tripole Lowpass";
+				break;
+			case Lowpass_RC12:
+				return "RC Lowpass 12dB/oct";
+				break;
+			case Bandpass_RC12:
+				return "RC Bandpass 12dB/oct";
+				break;
+			case Highpass_RC12:
+				return "RC Highpass 12dB/oct";
+				break;
+			case Lowpass_RC24:
+				return "RC Lowpass 24dB/oct";
+				break;
+			case Bandpass_RC24:
+				return "RC Bandpass 24dB/oct";
+				break;
+			case Highpass_RC24:
+				return "RC Highpass 24dB/oct";
+				break;
+			case Formantfilter:
+				return "Vocal Formant";
+				break;
+			case FastFormant:
+				return "Fast Formant";
+				break;
+			case Lowpass_SV:
+				return "SV Lowpass";
+				break;
+			case Bandpass_SV:
+				return "SV Bandpass";
+				break;
+			case Highpass_SV:
+				return "SV Highpass";
+				break;
+			case Notch_SV:
+				return "SV Notch";
+				break;
+			case NumFilters:
+				return "";
+				break;
+		}
+		return "";
+	}
 
 	static inline float minFreq()
 	{

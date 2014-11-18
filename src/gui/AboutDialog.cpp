@@ -24,7 +24,7 @@
 
 
 #include "lmmsversion.h"
-#include "about_dialog.h"
+#include "AboutDialog.h"
 #include "embed.h"
 #include "engine.h"
 #include "MainWindow.h"

@@ -46,7 +46,7 @@
 #include "FxMixerView.h"
 #include "InstrumentTrack.h"
 #include "PianoView.h"
-#include "about_dialog.h"
+#include "AboutDialog.h"
 #include "ControllerRackView.h"
 #include "FileBrowser.h"
 #include "plugin_browser.h"

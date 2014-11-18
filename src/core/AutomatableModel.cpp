@@ -145,41 +145,13 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
 	// read scale type and overwrite default scale type
-	if( element.hasAttribute("scale_type") ) // wrong in most cases
+	if( element.attribute( "scale_type" ) == "log" )
 	{
-		if( element.attribute("scale_type") == "log" )
-		{
-			setScaleType( Logarithmic );
-		}
-		if( element.attribute("scale_type") == "linear" )
-		{
-			setScaleType( Linear );
-		}
+		setScaleType( Logarithmic );
 	}
-	else {
+	if( element.attribute( "scale_type" ) == "linear" )
+	{
 		setScaleType( Linear );
-	}
-
-	// compat code
-	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
-	if( node.isElement() )
-	{
-		node = node.namedItem( name );
-		if( node.isElement() )
-		{
-			AutomationPattern * p = AutomationPattern::globalAutomationPattern( this );
-			p->loadSettings( node.toElement() );
-			setValue( p->valueAt( 0 ) );
-			// in older projects we sometimes have odd automations
-			// with just one value in - eliminate if necessary
-			if( !p->hasAutomation() )
-			{
-				delete p;
-			}
-			return;
-		}
-		// logscales were not existing at this point of time
-		// so they can be ignored
 	}
 
 	QDomNode connectionNode = element.namedItem( "connection" );
@@ -200,7 +172,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	//   <port00 value="4.41" id="4249278"/>
 	// </ladspacontrols>
 	// element => there is automation data
-	node = element.namedItem( name );
+	QDomNode node = element.namedItem( name );
         if( node.isElement() )
         {
                 changeID( node.toElement().attribute( "id" ).toInt() );
