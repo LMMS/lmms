@@ -35,6 +35,7 @@ class LcdSpinBox;
 
 class MeterDialog : public QWidget, public ModelView
 {
+	Q_OBJECT
 public:
 	MeterDialog( QWidget * _parent, bool _simple = false );
 	virtual ~MeterDialog();
