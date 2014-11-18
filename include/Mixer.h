@@ -25,6 +25,14 @@
 #ifndef _MIXER_H
 #define _MIXER_H
 
+// denormals stripping
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
+
 #include "lmmsconfig.h"
 
 #ifndef LMMS_USE_3RDPARTY_LIBSRC
