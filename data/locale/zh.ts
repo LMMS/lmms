@@ -31,10 +31,11 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation type="unfinished">当前语言是中文（中国）
+        <translation>当前语言是中文（中国）
 
-请联系译者改进翻译
-翻译：
+您可以帮助我们改进翻译：https://github.com/LMMS/lmms/wiki/Creating-a-localization
+
+主要译者：
 TonyChyi，邮箱：tonychee1989@gmail.com
 Min Zhang ，邮箱：zm1990s@gmail.com
 校对：
@@ -130,7 +131,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。  诸如环回模式(looping-mode)、起始/结束点、放大值(amplify-value)之类的值不会被重置。因此音频听起来会和原采样有差异。</translation>
+        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。    诸如环回模式(looping-mode)、起始/结束点、放大值(amplify-value)之类的值不会被重置，因此音频听起来会和原采样有差异。</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -138,7 +139,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation>如果点击此按钮，整个采样将会被反转。能用于制作很酷的效果，例如reversed crash.</translation>
+        <translation type="unfinished">如果点击此按钮，整个采样将会被反转。反转处理能用于制作很酷的效果，例如reversed crash。</translation>
     </message>
     <message>
         <source>Amplify:</source>
@@ -146,15 +147,15 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>此旋钮用于调整振幅放大比率。当设为100%时采样不会变化。除此之外，振幅不是放大就是减弱    (原始的采样文件不会被改变)</translation>
+        <translation>此旋钮用于调整振幅放大比率。当设为100%时采样不会变化。除此之外，振幅不是放大就是减弱。    （原始的采样文件不会被更改）</translation>
     </message>
     <message>
         <source>Startpoint:</source>
-        <translation>起始点 </translation>
+        <translation>起始点： </translation>
     </message>
     <message>
         <source>Endpoint:</source>
-        <translation>终点:</translation>
+        <translation>终止点： </translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
@@ -178,19 +179,19 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">点击此按钮后，Forwards-looping 会被打开，采样将在终止点（End Point）和循环点（Loop Point）之间播放。</translation>
     </message>
     <message>
         <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">点击此按钮后，Ping-pong-looping 会被打开，采样将在终止点（End Point）和循环点（Loop Point）之间来回播放。</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
-        <translation type="unfinished"></translation>
+        <translation>调节此旋钮，以告诉 AudioFileProcessor 在哪里开始播放。</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
-        <translation type="unfinished"></translation>
+        <translation>调节此旋钮，以告诉 AudioFileProcessor 在哪里停止播放。</translation>
     </message>
     <message>
         <source>Loopback point:</source>
@@ -198,7 +199,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>With this knob you can set the point where the loop starts. </source>
-        <translation type="unfinished"></translation>
+        <translation>调节此旋钮，以设置循环开始的地方。</translation>
     </message>
 </context>
 <context>
@@ -294,7 +295,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Edit song-global automation</source>
-        <translation>编辑歌曲全局自动控制</translation>
+        <translation>编辑歌曲全局自动控制选项</translation>
     </message>
     <message>
         <source>Connected to %1</source>
@@ -401,7 +402,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>All selected values were copied to the clipboard.</source>
-        <translation>所有选中的值已复制</translation>
+        <translation>所有选中的值已复制。</translation>
     </message>
     <message>
         <source>Discrete progression</source>
@@ -455,11 +456,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation>双击在自动编辑器中打开此片段</translation>
+        <translation>双击以在自动编辑器中打开此片段</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation>在自动编辑器（ Automation editor）中打开</translation>
+        <translation>在自动编辑器（Automation editor）中打开</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -497,11 +498,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>BassBoosterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation type="unfinished"></translation>
+        <translation>频率</translation>
     </message>
     <message>
         <source>Frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>频率：</translation>
     </message>
     <message>
         <source>GAIN</source>
@@ -539,11 +540,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>CarlaInstrumentView</name>
     <message>
         <source>Show GUI</source>
-        <translation type="unfinished"></translation>
+        <translation>显示图形界面</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处可以显示或隐藏 Carla 的图形界面。</translation>
     </message>
 </context>
 <context>
@@ -585,7 +586,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
-        <translation>用来接收 MIDI 事件的MIDI 设备</translation>
+        <translation>用来接收 MIDI 事件的 MIDI 设备</translation>
     </message>
     <message>
         <source>USER CONTROLLER</source>
@@ -705,15 +706,15 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation type="unfinished">已启用过滤器 2</translation>
+        <translation>已启用过滤器 2</translation>
     </message>
     <message>
         <source>Filter 2 type</source>
-        <translation type="unfinished">过滤器 2 的类型</translation>
+        <translation>过滤器 2 的类型</translation>
     </message>
     <message>
         <source>Cutoff 2 frequency</source>
-        <translation type="unfinished">频谱刀 2 的频率</translation>
+        <translation>频谱刀 2 的频率</translation>
     </message>
     <message>
         <source>Q/Resonance 2</source>
@@ -836,7 +837,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>EffectView</name>
     <message>
         <source>Toggles the effect on or off.</source>
-        <translation>打开/关闭效果</translation>
+        <translation type="unfinished">打开/关闭效果。</translation>
     </message>
     <message>
         <source>On/Off</source>
@@ -848,7 +849,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation>湿度</translation>
+        <translation type="unfinished">湿度：</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
@@ -1002,7 +1003,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>HOLD</source>
-        <translation type=>HOLD</translation>
+        <translation>HOLD</translation>
     </message>
     <message>
         <source>Hold:</source>
@@ -7168,7 +7169,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>BUFFER SIZE</source>
-        <translation>缓冲大小</translation>
+        <translation type="unfinished">缓冲区大小</translation>
     </message>
     <message>
         <source>Reset to default-value</source>
@@ -7266,15 +7267,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在这里，你可以设置 LMMS 所用缓冲区的大小。缓冲区越小，延迟越小，但声音质量和性能可能会受影响。</translation>
     </message>
     <message>
         <source>Choose LMMS working directory</source>
-        <translation>选择LMMS工作目录</translation>
+        <translation>选择 LMMS 工作目录</translation>
     </message>
     <message>
         <source>Choose your VST-plugin directory</source>
-        <translation>选择VST插件目录</translation>
+        <translation>选择 VST 插件目录</translation>
     </message>
     <message>
         <source>Choose artwork-theme directory</source>
@@ -7282,15 +7283,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose FL Studio installation directory</source>
-        <translation>选择FL Studio安装目录</translation>
+        <translation>选择 FL Studio 安装目录</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
-        <translation>选择LADSPA插件目录</translation>
+        <translation>选择 LADSPA 插件目录</translation>
     </message>
     <message>
         <source>Choose STK rawwave directory</source>
-        <translation>选择 STK rawwave 文件夹</translation>
+        <translation>选择 STK rawwave 目录</translation>
     </message>
     <message>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
@@ -7306,11 +7307,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>LADSPA plugin paths</source>
-        <translation>LADSPA插件目录</translation>
+        <translation>LADSPA 插件路径</translation>
     </message>
     <message>
         <source>Default Soundfont File</source>
-        <translation>默认SoundFont文件</translation>
+        <translation>默认 SoundFont 文件</translation>
     </message>
     <message>
         <source>Background artwork</source>
@@ -7318,7 +7319,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose default SoundFont</source>
-        <translation>选择默认SoundFont</translation>
+        <translation>选择默认的 SoundFont</translation>
     </message>
     <message>
         <source>Choose background artwork</source>
@@ -7498,7 +7499,7 @@ Latency: %2 ms</source>
     <name>sidInstrument</name>
     <message>
         <source>Cutoff</source>
-        <translation>切除</translation>
+        <translation type="unfinished">切频谱</translation>
     </message>
     <message>
         <source>Resonance</source>
@@ -7510,7 +7511,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Voice 3 off</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">声音 3 关</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -7529,11 +7530,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Resonance:</source>
-        <translation type="unfinished"></translation>
+        <translation>共鸣：</translation>
     </message>
     <message>
         <source>Cutoff frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>频谱刀频率：</translation>
     </message>
     <message>
         <source>High-Pass filter </source>
@@ -7549,7 +7550,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Voice3 Off </source>
-        <translation type="unfinished"></translation>
+        <translation>声音 3 关</translation>
     </message>
     <message>
         <source>MOS6581 SID </source>
@@ -7561,7 +7562,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Attack:</source>
-        <translation>打进声</translation>
+        <translation type="unfinished">打进声：</translation>
     </message>
     <message>
         <source>Attack rate determines how rapidly the output of Voice %1 rises from zero to peak amplitude.</source>
@@ -7577,7 +7578,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">振幅持平：</translation>
     </message>
     <message>
         <source>Output of Voice %1 will remain at the selected Sustain amplitude as long as the note is held.</source>
@@ -7585,7 +7586,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Release:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">声音消失：</translation>
     </message>
     <message>
         <source>The output of of Voice %1 will fall from Sustain amplitude to zero amplitude at the selected Release rate.</source>
@@ -7676,11 +7677,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>The project %1 is now saved.</source>
-        <translation>工程%1已保存。</translation>
+        <translation>工程 %1 已保存。</translation>
     </message>
     <message>
         <source>Project NOT saved.</source>
-        <translation>工程没有保存。</translation>
+        <translation>工程 **没有** 保存。</translation>
     </message>
     <message>
         <source>The project %1 was not saved!</source>
@@ -7692,7 +7693,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>untitled</source>
-        <translation>未标题</translation>
+        <translation>有标题</translation>
     </message>
     <message>
         <source>Select file for project-export...</source>
@@ -7708,11 +7709,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>MIDI sequences</source>
-        <translation>MIDI音序器</translation>
+        <translation>MIDI 音序器</translation>
     </message>
     <message>
         <source>FL Studio projects</source>
-        <translation>FL Studio工程</translation>
+        <translation>FL Studio 工程</translation>
     </message>
     <message>
         <source>All file types</source>
