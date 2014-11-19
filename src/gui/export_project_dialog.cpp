@@ -196,10 +196,10 @@ void exportProjectDialog::multiRender()
 
 	int x = 1;
 
-	const TrackContainer::TrackList & tl = engine::getSong()->tracks();
+	const TrackList & tl = engine::getSong()->tracks();
 
 	// Check for all unmuted tracks. Remember list.
-	for( TrackContainer::TrackList::ConstIterator it = tl.begin();
+	for( TrackList::ConstIterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
 		track* tk = (*it);
@@ -223,8 +223,8 @@ void exportProjectDialog::multiRender()
 
 	}
 
-	const TrackContainer::TrackList t2 = engine::getBBTrackContainer()->tracks();
-	for( TrackContainer::TrackList::ConstIterator it = t2.begin(); it != t2.end(); ++it )
+	const TrackList t2 = engine::getBBTrackContainer()->tracks();
+	for( TrackList::ConstIterator it = t2.begin(); it != t2.end(); ++it )
 	{
 		track* tk = (*it);
 		if ( tk->isMuted() == false )

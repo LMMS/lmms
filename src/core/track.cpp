@@ -1285,7 +1285,7 @@ bool trackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
 	const int initialTrackIndex = tiAttr.value().toInt();
 
 	// Get the current track's index
-	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
+	const TrackList tracks = t->trackContainer()->tracks();
 	const int currentTrackIndex = tracks.indexOf( t );
 
 	// Don't paste if we're on the same tact
@@ -1356,7 +1356,7 @@ bool trackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
 	MidiTime grabbedTCOTact = MidiTime( grabbedTCOPos.getTact(), 0 );
 
 	// Snap the mouse position to the beginning of the dropped tact, in ticks
-	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
+	const TrackList tracks = getTrack()->trackContainer()->tracks();
 	const int currentTrackIndex = tracks.indexOf( getTrack() );
 
 	bool allowRubberband = m_trackView->trackContainerView()->allowRubberband();
@@ -2313,10 +2313,10 @@ tact_t track::length() const
  */
 void track::toggleSolo()
 {
-	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
+	const TrackList & tl = m_trackContainer->tracks();
 
 	bool solo_before = false;
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
+	for( TrackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
 		if( *it != this )
@@ -2330,7 +2330,7 @@ void track::toggleSolo()
 	}
 
 	const bool solo = m_soloModel.value();
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
+	for( TrackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
 		if( solo )

@@ -249,9 +249,9 @@ void bbEditor::addAutomationTrack()
 
 void bbEditor::addSteps()
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	TrackList tl = model()->tracks();
 
-	for( TrackContainer::TrackList::iterator it = tl.begin();
+	for( TrackList::iterator it = tl.begin();
 		it != tl.end(); ++it )
 	{
 		if( ( *it )->type() == track::InstrumentTrack )
@@ -267,9 +267,9 @@ void bbEditor::addSteps()
 
 void bbEditor::removeSteps()
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	TrackList tl = model()->tracks();
 
-	for( TrackContainer::TrackList::iterator it = tl.begin();
+	for( TrackList::iterator it = tl.begin();
 		it != tl.end(); ++it )
 	{
 		if( ( *it )->type() == track::InstrumentTrack )

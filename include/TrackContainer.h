@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TRACK_CONTAINER_H
-#define _TRACK_CONTAINER_H
+#ifndef TRACK_CONTAINER_H
+#define TRACK_CONTAINER_H
 
 #include <QtCore/QReadWriteLock>
 
@@ -36,13 +36,10 @@ class AutomationPattern;
 class InstrumentTrack;
 class TrackContainerView;
 
-
 class EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<track *> TrackList;
-
 	TrackContainer();
 	virtual ~TrackContainer();
 

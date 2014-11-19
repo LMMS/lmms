@@ -290,7 +290,7 @@ void FxMixer::deleteChannel( int index )
 	FxChannel * ch = m_fxChannels[index];
 
 	// go through every instrument and adjust for the channel index change
-	TrackContainer::TrackList tracks;
+	TrackList tracks;
 	tracks += engine::getSong()->tracks();
 	tracks += engine::getBBTrackContainer()->tracks();
 

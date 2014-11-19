@@ -169,6 +169,7 @@ public:
 public slots:
 	void clear();
 	void openInAutomationEditor();
+	void scaleTimemapToFit( float oldMin, float oldMax );
 
 private:
 	void generateTangents();

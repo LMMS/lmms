@@ -71,8 +71,6 @@ private:
 	bool m_needsUpdate;
 	
 	static QPixmap * s_pat_rec;
-
-	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;
 
 

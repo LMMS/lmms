@@ -118,23 +118,13 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 
 	if( j && am && at )
 	{
-		float oldMin = m_pat->getMin();
-		float oldMax = m_pat->getMax();
-
-		at->objects()->erase( qFind( at->objects()->begin(), at->objects()->end(), am ) );
+		at->removeObject( am );
 		update();
 
 		//If automation editor is opened, update its display after disconnection
 		if( engine::automationEditor() )
 		{
 			engine::automationEditor()->updateAfterPatternChange();
-		}
-
-		//if there is no more connection connected to the AutomationTrack
-		if( at->objects()->size() == 0 )
-		{
-			//scale the points to fit the new min. and max. value
-			this->scaleTimemapToFit( oldMin, oldMax );
 		}
 	}
 }
@@ -178,7 +168,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 				arg( at->objects()->count() ), _cm );
 		for( objectVector::iterator it =
 						at->objects()->begin();
-					at->objects()->end(); ++it )
+					! at->objects()->end(); ++it )
 		{
 			if( *it )
 			{
@@ -400,41 +390,3 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		trackContentObjectView::dropEvent( _de );
 	}
 }
-
-
-
-
-/**
- * @brief Preserves the auto points over different scale
- */
-void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
-{
-	float newMin = m_pat->getMin();
-	float newMax = m_pat->getMax();
-
-	if( oldMin == newMin && oldMax == newMax )
-	{
-		return;
-	}
-
-	for( AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
-		it != m_pat->m_timeMap.end(); ++it )
-	{
-		if( *it < oldMin )
-		{
-			*it = oldMin;
-		}
-		else if( *it > oldMax )
-		{
-			*it = oldMax;
-		}
-		*it = (*it-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin;
-	}
-
-	m_pat->generateTangents();
-}
-
-
-
-
-

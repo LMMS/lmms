@@ -54,6 +54,12 @@ AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
 	m_inlineObject( NULL )
 {
 	changeLength( MidiTime( 1, 0 ) );
+	
+	if( m_autoTrack && ! m_autoTrack->objects()->isEmpty() )
+	{
+		const AutomatableModel * obj = firstObject();
+		putValue( MidiTime(0), obj->inverseScaledValue( obj->value<float>() ), false );
+	}
 }
 
 
@@ -424,9 +430,9 @@ const QString AutomationPattern::name() const
 		return trackContentObject::name();
 	}
 	
-	if( ! m_autoTrack->objects()->isEmpty() && m_autoTrack->objects()->first() )
+	if( m_autoTrack->name() != m_autoTrack->defaultName() )
 	{
-		return m_autoTrack->objects()->first()->fullDisplayName();
+		return m_autoTrack->name();
 	}
 	return tr( "Drag a control while pressing <Ctrl>" );
 }
@@ -487,11 +493,11 @@ trackContentObjectView * AutomationPattern::createView( trackView * _tv )
 
 bool AutomationPattern::isAutomated( const AutomatableModel * m )
 {
-	TrackContainer::TrackList l;
+	TrackList l;
 	l += engine::getSong()->tracks();
 	l += engine::getBBTrackContainer()->tracks();
 
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for( TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		if( ( *it )->type() == track::AutomationTrack ||
 			( *it )->type() == track::HiddenAutomationTrack )
@@ -519,12 +525,12 @@ bool AutomationPattern::isAutomated( const AutomatableModel * m )
 QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
 {
 	QVector<AutomationPattern *> patterns;
-	TrackContainer::TrackList l;
+	TrackList l;
 	l += engine::getSong()->tracks();
 	l += engine::getBBTrackContainer()->tracks();
 	
 	// go through all tracks...
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for( TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		// we want only automation tracks...
 		if( ( *it )->type() == track::AutomationTrack ||
@@ -629,5 +635,33 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 
 
 
+/**
+ * @brief Preserves the auto points over different scale
+ */
+void AutomationPattern::scaleTimemapToFit( float oldMin, float oldMax )
+{
+	float newMin = getMin();
+	float newMax = getMax();
 
+	if( oldMin == newMin && oldMax == newMax )
+	{
+		return;
+	}
+
+	for( timeMap::iterator it = m_timeMap.begin();
+		it != m_timeMap.end(); ++it )
+	{
+		if( *it < oldMin )
+		{
+			*it = oldMin;
+		}
+		else if( *it > oldMax )
+		{
+			*it = oldMax;
+		}
+		*it = (*it-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin;
+	}
+
+	generateTangents();
+}
 

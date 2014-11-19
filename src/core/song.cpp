@@ -195,7 +195,7 @@ void song::processNextBuffer()
 	}
 
 	m_trackList.clear();
-	int m_playingTcoNum = -1;
+	m_playingTcoNum = -1;
 	
 	m_ticksThisPeriod.clear();
 

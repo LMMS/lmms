@@ -47,6 +47,11 @@ public:
 	{
 		return "automationtrack";
 	}
+	
+	QString defaultName() const
+	{
+		return tr( "Automation track" ); 
+	}
 
 	virtual trackView * createView( TrackContainerView* );
 	virtual trackContentObject * createTCO( const MidiTime & _pos );
@@ -58,12 +63,23 @@ public:
 	virtual ProcessHandle * getProcessHandle();
 	
 	void addObject( AutomatableModel * _obj, bool _search_dup = true );
+	void removeObject( AutomatableModel * obj );
 	const AutomatableModel * firstObject() const;
 	static void resolveAllIDs();
 	
 	objectVector * objects()
 	{
 		return &m_objects;
+	}
+	
+	inline float getMin() const
+	{
+		return firstObject()->minValue<float>();
+	}
+
+	inline float getMax() const
+	{
+		return firstObject()->maxValue<float>();
 	}
 
 public slots:

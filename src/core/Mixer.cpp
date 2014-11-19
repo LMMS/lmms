@@ -387,8 +387,25 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// prepare master mix (clear internal buffers etc.)
 	engine::fxMixer()->prepareMasterMix();
 
-	// create play-handles for new notes, samples etc.
+	// increment the song ahead by one period
 	engine::getSong()->processNextBuffer();
+	
+	// now process the tracks and controllers, everything that produces control data.
+	TrackList * tl = engine::getSong()->playingTrackList();
+	
+	if( tl->size() > 0 )
+	{
+		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Static );
+		for( int i = 0; i < tl->size(); ++i )
+		{
+			ProcessHandle * ph = tl->at(i)->getProcessHandle();
+			if( ph )
+			{
+				MixerWorkerThread::addJob( ph );
+			}
+		}
+		MixerWorkerThread::startAndWaitForJobs();
+	}
 
 	// add all play-handles that have to be added
 	m_playHandleMutex.lock();

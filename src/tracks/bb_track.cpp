@@ -508,11 +508,11 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
 		engine::getBBTrackContainer()->createTCOsForBB( dst );
-		TrackContainer::TrackList tl =
+		TrackList tl =
 					engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination
 		// TCOs (which are created if they do not exist yet)
-		for( TrackContainer::TrackList::iterator it = tl.begin();
+		for( TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
 			( *it )->getTCO( src )->copy();

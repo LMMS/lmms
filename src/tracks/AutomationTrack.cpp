@@ -42,7 +42,7 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	m_processHandle( new AutomationProcessHandle( this ) ),
 	m_objects()
 {
-	setName( tr( "Automation track" ) );
+	setName( defaultName() );
 }
 
 
@@ -119,7 +119,55 @@ void AutomationTrack::addObject( AutomatableModel * obj, bool search_dup )
 			this, SLOT( objectDestroyed( jo_id_t ) ),
 						Qt::DirectConnection );
 
+	// if the track hasn't been named with a custom name, name it with the model name
+	if( name() == defaultName() )
+	{
+		setName( obj->fullDisplayName() );
+	}
+
 	emit dataChanged();
+}
+
+
+void AutomationTrack::removeObject( AutomatableModel * obj )
+{
+	foreach( AutomatableModel * o, m_objects )
+	{
+		if( o == obj )
+		{
+			float oldMin = getMin();
+			float oldMax = getMax();
+
+			m_objects.remove( m_objects.indexOf( obj ) );
+
+			// if the last object was removed, scale the values of all patterns to fit the 0..1 scale
+			if( m_objects.isEmpty() )
+			{
+				tcoVector tcos = getTCOs();
+				for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+				{
+					AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+					if( ap )
+					{
+						ap->scaleTimemapToFit( oldMin, oldMax );
+					}
+				}
+			}
+		}
+	}
+	// reset name of track if it was named after this object
+	if( name() == obj->fullDisplayName() )
+	{
+		if( m_objects.isEmpty() )
+		{
+			// no more objects, default to default name
+			setName( defaultName() );
+		}
+		else // name by next in line
+		{
+			setName( firstObject()->fullDisplayName() );
+		}
+	}
 }
 
 
@@ -161,9 +209,9 @@ void AutomationTrack::objectDestroyed( jo_id_t id )
 
 void AutomationTrack::resolveAllIDs()
 {
-	TrackContainer::TrackList l = engine::getSong()->tracks() +
+	TrackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
-	for( TrackContainer::TrackList::iterator it = l.begin();
+	for( TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
 		if( ( *it )->type() == track::AutomationTrack ||
