@@ -144,7 +144,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-	int wsHeight = 336;
+	int wsHeight = 370;
 #ifdef LMMS_HAVE_STK
 	wsHeight += 50;
 #endif
@@ -311,7 +311,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * paths = new QWidget( ws );
-	int pathsHeight = 356;
+	int pathsHeight = 370;
 #ifdef LMMS_HAVE_STK
 	pathsHeight += 55;
 #endif
