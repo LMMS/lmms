@@ -1181,7 +1181,8 @@ void MainWindow::clearErrors()
 
 
 void MainWindow::showErrors( const QString message )
-{   if ( m_errors->length() != 0 )
+{
+    if ( m_errors->length() != 0 )
 	{   QString* errors = new QString();
 		for ( int i = 0 ; i < m_errors->length() ; i++ )
 		{

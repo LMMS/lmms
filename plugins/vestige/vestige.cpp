@@ -262,15 +262,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
-		QMessageBox::information( 0,
-				tr( "Failed loading VST-plugin" ),
-				tr( "The VST-plugin %1 could not "
-					"be loaded for some reason.\n"
-					"If it runs with other VST-"
-					"software under Linux, please "
-					"contact an LMMS-developer!"
-					).arg( m_pluginDLL ),
-						QMessageBox::Ok );
+		logError( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( m_pluginDLL ) );
 		return;
 	}
 

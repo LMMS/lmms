@@ -820,11 +820,8 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 	delete m_instrument;
 	m_instrument = Instrument::instantiate( _plugin_name, this );
 	unlock();
-
-	if ( m_instrument->getErrorReport() != NULL )
-		engine::mainWindow()->collectErrors( m_instrument->getErrorReport() );
-
 	setName( m_instrument->displayName() );
+
 	emit instrumentChanged();
 
 	return m_instrument;
