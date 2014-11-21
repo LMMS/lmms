@@ -38,7 +38,6 @@
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "PianoRoll.h"
-#include "atomic_int.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
