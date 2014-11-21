@@ -53,12 +53,7 @@
 #endif
 
 #include <QtCore/QtGlobal>
-
-#if QT_VERSION >= 0x040400
 #include <QtCore/QSystemSemaphore>
-#else
-#error building LMMS on this platform requires at least Qt 4.4.0
-#endif
 
 #else /* USE_QT_SEMAPHORES */
 
@@ -76,12 +71,7 @@
 #ifdef USE_QT_SHMEM
 
 #include <QtCore/QtGlobal>
-
-#if QT_VERSION >= 0x040400
 #include <QtCore/QSharedMemory>
-#else
-#error building LMMS on this platform requires at least Qt 4.4.0
-#endif
 
 typedef int32_t key_t;
 
