@@ -335,7 +335,7 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 		}
 		else
 		{
-			logError( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).arg( QFileInfo( _sf2File ).baseName() ) );
+			collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).arg( QFileInfo( _sf2File ).baseName() ) );
 			// TODO: Why is the filename missing when the file does not exist?
 		}
 	}

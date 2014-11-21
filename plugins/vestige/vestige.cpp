@@ -262,7 +262,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
-		logError( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( m_pluginDLL ) );
+		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( m_pluginDLL ) );
 		return;
 	}
 

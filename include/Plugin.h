@@ -182,7 +182,7 @@ public:
 protected:
 	// create a view for the model 
 	virtual PluginView* instantiateView( QWidget* ) = 0;
-	void logError( QString err_msg );
+	void collectErrorForUI( QString err_msg );
 
 
 private:

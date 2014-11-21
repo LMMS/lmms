@@ -125,7 +125,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 	return inst;
 }
 
-void Plugin::logError( QString err_msg )
+void Plugin::collectErrorForUI( QString err_msg )
 {
     engine::mainWindow()->collectError( err_msg );
 }
