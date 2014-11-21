@@ -54,8 +54,8 @@ static Plugin::Descriptor dummy_plugin_descriptor =
 
 
 Plugin::Plugin( const Descriptor * _descriptor, Model * parent ) :
-	JournallingObject(),
 	Model( parent ),
+	JournallingObject(),
 	m_descriptor( _descriptor )
 {
 	if( m_descriptor == NULL )
@@ -216,4 +216,4 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 	return e;
 }
 
-
+#include "moc_Plugin.cxx"

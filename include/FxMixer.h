@@ -78,6 +78,7 @@ class FxChannel : public ThreadableJob
 
 class FxRoute : public QObject
 {
+	Q_OBJECT
 	public:		
 		FxRoute( FxChannel * from, FxChannel * to, float amount );
 		virtual ~FxRoute();
@@ -116,8 +117,9 @@ class FxRoute : public QObject
 };
 
 
-class EXPORT FxMixer : public JournallingObject, public Model
+class EXPORT FxMixer : public Model, public JournallingObject
 {
+	Q_OBJECT
 public:
 	FxMixer();
 	virtual ~FxMixer();
