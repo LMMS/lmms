@@ -92,18 +92,20 @@ bool AutomatableModel::isAutomated() const
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
-	if( isAutomated() )
+	if( isAutomated() || m_scaleType != Linear )
 	{
 		// automation needs tuple of data (name, id, value)
+		// scale type also needs an extra value
 		// => it must be appended as a node
 		QDomElement me = doc.createElement( name );
 		me.setAttribute( "id", id() );
 		me.setAttribute( "value", m_value );
+		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
 		element.appendChild( me );
 	}
 	else
 	{
-		// non automation => can be saved as attribute
+		// non automation, linear scale (default), can be saved as attribute
 		element.setAttribute( name, m_value );
 	}
 
@@ -128,15 +130,6 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 
 		controllerElement.appendChild( element );
 	}
-
-	if( m_scaleType == Logarithmic ) 
-	{
-		element.setAttribute( "scale_type", "log" );
-	}
-	if( m_scaleType == Linear ) 
-	{
-		element.setAttribute( "scale_type", "linear" );
-	}
 }
 
 
@@ -144,22 +137,6 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
-	// read scale type and overwrite default scale type
-	if( element.hasAttribute("scale_type") ) // wrong in most cases
-	{
-		if( element.attribute("scale_type") == "log" )
-		{
-			setScaleType( Logarithmic );
-		}
-		if( element.attribute("scale_type") == "linear" )
-		{
-			setScaleType( Linear );
-		}
-	}
-	else {
-		setScaleType( Linear );
-	}
-
 	// compat code
 	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
 	if( node.isElement() )
@@ -199,14 +176,25 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	// <ladspacontrols port10="4.41">
 	//   <port00 value="4.41" id="4249278"/>
 	// </ladspacontrols>
-	// element => there is automation data
+	// element => there is automation data, or scaletype information
 	node = element.namedItem( name );
-        if( node.isElement() )
-        {
-                changeID( node.toElement().attribute( "id" ).toInt() );
-                setValue( node.toElement().attribute( "value" ).toFloat() );
-        }
-        else if( element.hasAttribute( name ) )
+	if( node.isElement() )
+	{
+			changeID( node.toElement().attribute( "id" ).toInt() );
+			setValue( node.toElement().attribute( "value" ).toFloat() );
+			if( node.toElement().hasAttribute( "scale_type" ) )
+			{
+				if( node.toElement().attribute( "scale_type" ) == "linear" )
+				{
+					setScaleType( Linear );
+				}
+				else if( node.toElement().attribute( "scale_type" ) == "log" )
+				{
+					setScaleType( Logarithmic );
+				}
+			}
+	}
+	else if( element.hasAttribute( name ) )
 	// attribute => read the element's value from the attribute list
 	{
 		setInitValue( element.attribute( name ).toFloat() );
