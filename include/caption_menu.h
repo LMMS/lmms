@@ -30,7 +30,9 @@
 
 #include "export.h"
 
-
+///
+/// \brief A context menu with a caption
+///
 class EXPORT captionMenu : public QMenu
 {
 	Q_OBJECT
