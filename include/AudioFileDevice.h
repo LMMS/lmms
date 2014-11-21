@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_FILE_DEVICE_H
-#define _AUDIO_FILE_DEVICE_H
+#ifndef AUDIO_FILE_DEVICE_H
+#define AUDIO_FILE_DEVICE_H
 
 #include <QtCore/QFile>
 

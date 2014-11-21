@@ -129,17 +129,6 @@ SongEditor::SongEditor( song * _song ) :
 
 	int tempoSpinBoxCol = engine::mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
-#if 0
-	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
-						tr( "High quality mode" ),
-						NULL, NULL, tb );
-	hq_btn->setCheckable( true );
-	connect( hq_btn, SIGNAL( toggled( bool ) ),
-			this, SLOT( setHighQuality( bool ) ) );
-	hq_btn->setFixedWidth( 42 );
-	engine::mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
-#endif
-
 	engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );

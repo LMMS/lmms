@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _AEFFECTX_H
-#define _AEFFECTX_H
+#ifndef AEFFECTX_H
+#define AEFFECTX_H
 
 #define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
 				( ( (int) b ) << 16 ) |		\

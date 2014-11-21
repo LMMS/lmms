@@ -55,19 +55,6 @@ using namespace std;
 #endif
 #endif
 
-#ifdef __INTEL_COMPILER
-
-static inline float absFraction( const float _x )
-{
-	return( _x - ( _x >= 0.0f ? floorf( _x ) : floorf( _x ) - 1 ) );
-}
-
-static inline float fraction( const float _x )
-{
-	return( _x - floorf( _x ) );
-}
-
-#else
 
 static inline float absFraction( const float _x )
 {
@@ -81,44 +68,6 @@ static inline float fraction( const float _x )
 }
 
 
-#if 0
-// SSE3-version
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"ftst\n\t"
-		"sahf\n\t"
-		"jae 1f\n\t"
-		"fld1\n\t"
-		"fsubrp %%st, %%st(1)\n\t"
-	"1:\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)", "cc" );
-	return( _x );
-}
-
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)" );
-	return( _x );
-}
-#endif
-
-#endif
 
 
 

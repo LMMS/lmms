@@ -142,8 +142,8 @@ private:
 	f_cnt_t m_rBufSize;
 
 
-	FloatModel m_lfoPredelayModel;
-	FloatModel m_lfoAttackModel;
+	TempoSyncKnobModel m_lfoPredelayModel;
+	TempoSyncKnobModel m_lfoAttackModel;
 	TempoSyncKnobModel m_lfoSpeedModel;
 	FloatModel m_lfoAmountModel;
 	IntModel m_lfoWaveModel;

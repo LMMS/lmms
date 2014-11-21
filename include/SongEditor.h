@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _SONG_EDITOR_H
-#define _SONG_EDITOR_H
+#ifndef SONG_EDITOR_H
+#define SONG_EDITOR_H
 
 #include "TrackContainerView.h"
 

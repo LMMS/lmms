@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_FILE_OGG_H
-#define _AUDIO_FILE_OGG_H
+#ifndef AUDIO_FILE_OGG_H
+#define AUDIO_FILE_OGG_H
 
 #include "lmmsconfig.h"
 

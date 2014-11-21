@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _MIDI_TIME_H
-#define _MIDI_TIME_H
+#ifndef MIDI_TIME_H
+#define MIDI_TIME_H
 
 #include "lmms_basics.h"
 #include "export.h"

@@ -113,12 +113,12 @@ public:
 
 	inline float getMin() const
 	{
-		return firstObject()->minValue<float>();
+		return m_autoTrack->getMin();
 	}
 
 	inline float getMax() const
 	{
-		return firstObject()->maxValue<float>();
+		return m_autoTrack->getMax();
 	}
 
 	inline bool hasAutomation() const

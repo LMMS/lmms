@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_JACK_H
-#define _AUDIO_JACK_H
+#ifndef AUDIO_JACK_H
+#define AUDIO_JACK_H
 
 #include "lmmsconfig.h"
 

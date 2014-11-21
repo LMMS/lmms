@@ -60,26 +60,20 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::reset()
 {
-	lock();
-
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
 	m_position = 0;
-
-	unlock();
 }
 
 
 void RingBuffer::changeSize( f_cnt_t size )
 {
-	lock();
-
-	delete m_buffer;
-	m_size = size + m_fpp;
+	size += m_fpp;
+	sampleFrame * tmp = m_buffer;
+	m_size = size;
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
 	m_position = 0;
-	
-	unlock();
+	delete tmp;
 }
 
 
@@ -104,11 +98,7 @@ void RingBuffer::setSamplerateAware( bool b )
 
 void RingBuffer::advance()
 {
-	lock();
-		
 	m_position = ( m_position + m_fpp ) % m_size;
-	
-	unlock();
 }
 
 
@@ -126,8 +116,6 @@ void RingBuffer::movePosition( float amount )
 
 void RingBuffer::pop( sampleFrame * dst )
 {
-	lock();
-	
 	if( m_position + m_fpp <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
 		memcpy( dst, m_buffer + ( m_position * sizeof( sampleFrame ) ), m_fpp * sizeof( sampleFrame ) );
@@ -146,15 +134,11 @@ void RingBuffer::pop( sampleFrame * dst )
 	}
 	
 	m_position = ( m_position + m_fpp ) % m_size;
-	
-	unlock();
 }
 
 
 void RingBuffer::read( sampleFrame * dst, f_cnt_t offset )
 {
-	lock();
-	
 	f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( pos < 0 ) { pos += m_size; }
 	
@@ -171,8 +155,6 @@ void RingBuffer::read( sampleFrame * dst, f_cnt_t offset )
 		
 		memcpy( dst + ( first * sizeof( sampleFrame ) ), m_buffer, second * sizeof( sampleFrame ) );
 	}
-	
-	unlock();
 }
 
 
@@ -184,8 +166,6 @@ void RingBuffer::read( sampleFrame * dst, float offset )
 
 void RingBuffer::read( sampleFrame * dst, f_cnt_t offset, f_cnt_t length )
 {
-	lock();
-	
 	f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( pos < 0 ) { pos += m_size; }
 	
@@ -202,8 +182,6 @@ void RingBuffer::read( sampleFrame * dst, f_cnt_t offset, f_cnt_t length )
 		
 		memcpy( dst + ( first * sizeof( sampleFrame ) ), m_buffer, second * sizeof( sampleFrame ) );
 	}
-	
-	unlock();
 }
 
 
@@ -215,8 +193,6 @@ void RingBuffer::read( sampleFrame * dst, float offset, f_cnt_t length )
 
 void RingBuffer::write( sampleFrame * src, f_cnt_t offset, f_cnt_t length )
 {
-	lock();
-	
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
 	
@@ -233,8 +209,6 @@ void RingBuffer::write( sampleFrame * src, f_cnt_t offset, f_cnt_t length )
 		
 		memcpy( m_buffer, src + ( first * sizeof( sampleFrame ) ), second * sizeof( sampleFrame ) );
 	}
-	
-	unlock();
 }
 
 
@@ -246,8 +220,6 @@ void RingBuffer::write( sampleFrame * src, float offset, f_cnt_t length )
 
 void RingBuffer::writeAdding( sampleFrame * src, f_cnt_t offset, f_cnt_t length )
 {
-	lock();
-	
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
 	
@@ -264,8 +236,6 @@ void RingBuffer::writeAdding( sampleFrame * src, f_cnt_t offset, f_cnt_t length 
 		
 		MixHelpers::add( m_buffer, src + ( first * sizeof( sampleFrame ) ), second );
 	}
-	
-	unlock();
 }
 
 
@@ -277,8 +247,6 @@ void RingBuffer::writeAdding( sampleFrame * src, float offset, f_cnt_t length )
 
 void RingBuffer::writeAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt_t length, float level )
 {
-	lock();
-	
 	const f_cnt_t pos = ( m_position + offset ) % m_size;
 	if( length == 0 ) { length = m_fpp; }
 	
@@ -295,8 +263,6 @@ void RingBuffer::writeAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt
 		
 		MixHelpers::addMultiplied( m_buffer, src + ( first * sizeof( sampleFrame ) ), level, second );
 	}
-	
-	unlock();
 }
 
 
@@ -308,8 +274,6 @@ void RingBuffer::writeAddingMultiplied( sampleFrame * src, float offset, f_cnt_t
 
 void RingBuffer::updateSamplerate()
 {
-	lock();
-	
 	float newsize = static_cast<float>( ( m_size - m_fpp ) * engine::mixer()->processingSampleRate() ) / m_samplerate;
 	m_size = static_cast<f_cnt_t>( ceilf( newsize ) ) + m_fpp;
 	m_samplerate = engine::mixer()->processingSampleRate();
@@ -317,8 +281,6 @@ void RingBuffer::updateSamplerate()
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
 	m_position = 0;
-	
-	unlock();
 }
 
 

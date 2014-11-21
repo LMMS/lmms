@@ -29,6 +29,7 @@
 #include <QtCore/QPointer>
 
 #include "export.h"
+#include "MemoryManager.h"
 
 
 class EXPORT Model : public QObject

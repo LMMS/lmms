@@ -43,20 +43,20 @@ public:
 	
 	ValueBuffer( int length )
 	{
-		m_values = new float[length];
+		m_values = MM_ALLOC( float, length );
 		m_length = length;
 	}
 
 	ValueBuffer( float * values, int length )
 	{
-		m_values = new float[length];
+		m_values = MM_ALLOC( float, length );
 		m_length = length;		
 		memcpy( m_values, values, sizeof(float) * length );
 	}
 
 	ValueBuffer( float value, int length )
 	{
-		m_values = new float[length];
+		m_values = MM_ALLOC( float, length );
 		m_length = length;
 		for( int i = 0; i < length; i++ )
 		{
@@ -66,12 +66,13 @@ public:
 
 	virtual ~ValueBuffer() 
 	{
-		delete[] m_values;
+		if( m_values ) MM_FREE( m_values );
+		m_values = NULL;
 	}
 
 	void clear()
 	{
-		delete[] m_values;
+		if( m_values ) MM_FREE( m_values );
 		m_values = NULL;
 		m_length = 0;
 	}

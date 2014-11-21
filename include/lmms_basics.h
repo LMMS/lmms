@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TYPES_H
-#define _TYPES_H
+#ifndef LMMS_BASICS_H
+#define LMMS_BASICS_H
 
 #include <limits>
 

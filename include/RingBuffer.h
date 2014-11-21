@@ -26,8 +26,7 @@
  
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
- 
-#include <QMutex>
+
 #include <QObject>
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -50,17 +49,6 @@ public:
 	virtual ~RingBuffer();
 
 
-// thread safety functions - for internal use only, unless you know what you're doing!
-
-	inline void lock()
-	{
-		m_ringBufferMutex.lock();
-	}
-
-	inline void unlock()
-	{
-		m_ringBufferMutex.unlock();
-	}
 
 
 ////////////////////////////////////
@@ -205,7 +193,6 @@ private:
 	sample_rate_t m_samplerate;
 	f_cnt_t m_size;
 	sampleFrame * m_buffer;
-	QMutex m_ringBufferMutex;
 	f_cnt_t m_position;
 
 };

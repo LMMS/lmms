@@ -54,8 +54,10 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_controllerConnection( NULL ),
 	m_valueBuffer( 0 ),
 	m_lastUpdatedPeriod( -1 ),
-	m_hasSampleExactData( false )
-
+	m_hasSampleExactData( false ),
+	m_stepType( NormalStep ),
+	m_automationEnabled( true ),
+	m_automationTrack( NULL )
 {
 	setInitValue( val );
 }
@@ -75,8 +77,6 @@ AutomatableModel::~AutomatableModel()
 	{
 		delete m_controllerConnection;
 	}
-	
-	m_valueBuffer.clear();
 
 	emit destroyed( id() );
 }
@@ -368,9 +368,26 @@ float AutomatableModel::fittedValue( float value, bool forceStep ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
 
-	if( m_step != 0 && ( m_hasStrictStepSize || forceStep ) )
+	if( m_hasStrictStepSize || forceStep )
 	{
-		value = nearbyintf( value / m_step ) * m_step;
+		switch( m_stepType )
+		{
+			default:
+			case NormalStep:
+				value = m_step > 0.0f ? nearbyintf( value / m_step ) * m_step : value;
+				break;
+			case PowerOfTwoStep:
+				int v = (int) value;
+				--v;
+				v |= v >> 1;
+				v |= v >> 2;
+				v |= v >> 4;
+				v |= v >> 8;
+				v |= v >> 16;
+				++v;
+				value = (float) v;
+				break;
+		}
 	}
 
 	roundAt( value, m_maxValue );
@@ -458,20 +475,51 @@ void AutomatableModel::unlinkAllModels()
 
 void AutomatableModel::setControllerConnection( ControllerConnection* c )
 {
-	m_controllerConnection = c;
-	if( c )
+	if( m_automationEnabled )
 	{
-		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ), this, SIGNAL( dataChanged() ) );
-		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
-		m_valueChanged = true;
-		emit dataChanged();
+		m_controllerConnection = c;
+		if( c )
+		{
+			// no simultaneous automation and controller
+			if( m_automationTrack )
+			{
+				m_automationTrack->removeObject( this );
+			}
+			QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ), this, SIGNAL( dataChanged() ) );
+			QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+			m_valueChanged = true;
+			emit dataChanged();
+		}
 	}
 }
 
 
+void AutomatableModel::setAutomation( AutomationTrack * at )
+{
+	if( ! m_automationEnabled )
+	{
+		return;
+	}
+	if( m_automationTrack ) // only one automation per model
+	{
+		m_automationTrack->removeObject( this );
+	}
+	if( m_controllerConnection ) // no simultaneous automation and controller
+	{
+		unlinkControllerConnection();
+	}
+	m_automationTrack = at;
+}
 
 
-float AutomatableModel::controllerValue( int frameOffset ) const
+void AutomatableModel::removeAutomation() // don't use this to disconnect automation - use AutomationTrack::removeObject instead
+{
+	m_automationTrack = NULL;
+}
+
+
+
+float AutomatableModel::controllerValue() const
 {
 	if( m_controllerConnection )
 	{
@@ -479,14 +527,14 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 		switch(m_scaleType)
 		{
 		case Linear:
-			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
+			v = minValue<float>() + ( range() * controllerConnection()->currentValue( 0 ) );
 			break;
 		case Logarithmic:
 			v = logToLinearScale(
-				controllerConnection()->currentValue( frameOffset ));
+				controllerConnection()->currentValue( 0 ));
 			break;
 		default:
-			qFatal("AutomatableModel::controllerValue(int)"
+			qFatal("AutomatableModel::controllerValue()"
 				"lacks implementation for a scale type");
 			break;
 		}
@@ -500,7 +548,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 	AutomatableModel* lm = m_linkedModels.first();
 	if( lm->controllerConnection() )
 	{
-		return fittedValue( lm->controllerValue( frameOffset ) );
+		return fittedValue( lm->controllerValue() );
 	}
 
 	return fittedValue( lm->m_value );
@@ -510,13 +558,6 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 ValueBuffer * AutomatableModel::valueBuffer()
 {
 	// if we've already calculated the valuebuffer this period, return the cached buffer
-	if( m_lastUpdatedPeriod == s_periodCounter )
-	{
-		return m_hasSampleExactData
-			? &m_valueBuffer
-			: NULL;
-	}
-	QMutexLocker m( &m_valueBufferMutex );
 	if( m_lastUpdatedPeriod == s_periodCounter )
 	{
 		return m_hasSampleExactData
@@ -563,18 +604,21 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	{
 		lm = m_linkedModels.first();
 	}
-	if( lm && lm->controllerConnection() && lm->controllerConnection()->getController()->isSampleExact() )
+	if( lm )
 	{
 		vb = lm->valueBuffer();
-		float * values = vb->values();
-		float * nvalues = m_valueBuffer.values();
-		for( int i = 0; i < vb->length(); i++ )
+		if( vb )
 		{
-			nvalues[i] = fittedValue( values[i], false );
+			float * values = vb->values();
+			float * nvalues = m_valueBuffer.values();
+			for( int i = 0; i < vb->length(); i++ )
+			{
+				nvalues[i] = fittedValue( values[i], false );
+			}
+			m_lastUpdatedPeriod = s_periodCounter;
+			m_hasSampleExactData = true;
+			return &m_valueBuffer;
 		}
-		m_lastUpdatedPeriod = s_periodCounter;
-		m_hasSampleExactData = true;
-		return &m_valueBuffer;
 	}
 	
 	if( m_oldValue != val )
@@ -587,7 +631,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	}
 	
 	// if we have no sample-exact source for a ValueBuffer, return NULL to signify that no data is available at the moment
-	// in which case the recipient knows to use the static value() instead
+	// in which case the recipient knows to use the value() instead
 	m_lastUpdatedPeriod = s_periodCounter;
 	m_hasSampleExactData = false;
 	return NULL;

@@ -99,6 +99,10 @@ void AutomationProcessHandle::doProcessing()
 
 void AutomationTrack::addObject( AutomatableModel * obj, bool search_dup )
 {
+	if( ! obj->automationEnabled() )
+	{
+		return;
+	}
 	if( search_dup )
 	{
 		for( objectVector::iterator it = m_objects.begin();
@@ -114,6 +118,7 @@ void AutomationTrack::addObject( AutomatableModel * obj, bool search_dup )
 	}
 
 	m_objects += obj;
+	obj->setAutomation( this );
 
 	connect( obj, SIGNAL( destroyed( jo_id_t ) ),
 			this, SLOT( objectDestroyed( jo_id_t ) ),
@@ -139,6 +144,7 @@ void AutomationTrack::removeObject( AutomatableModel * obj )
 			float oldMax = getMax();
 
 			m_objects.remove( m_objects.indexOf( obj ) );
+			obj->removeAutomation();
 
 			// if the last object was removed, scale the values of all patterns to fit the 0..1 scale
 			if( m_objects.isEmpty() )

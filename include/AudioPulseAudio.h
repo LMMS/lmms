@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_PULSEAUDIO_H
-#define _AUDIO_PULSEAUDIO_H
+#ifndef AUDIO_PULSEAUDIO_H
+#define AUDIO_PULSEAUDIO_H
 
 #include "lmmsconfig.h"
 

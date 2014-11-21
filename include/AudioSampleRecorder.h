@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_SAMPLE_RECORDER_H
-#define _AUDIO_SAMPLE_RECORDER_H
+#ifndef AUDIO_SAMPLE_RECORDER_H
+#define AUDIO_SAMPLE_RECORDER_H
 
 #include <QtCore/QList>
 #include <QtCore/QPair>

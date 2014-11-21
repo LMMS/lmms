@@ -101,6 +101,10 @@ song::song() :
 	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
 					this, SLOT( setTimeSignature() ) );
 
+	m_tempoModel.setAutomationEnabled( false );
+	m_timeSigModel.numeratorModel().setAutomationEnabled( false );
+	m_timeSigModel.denominatorModel().setAutomationEnabled( false );
+	m_timeSigModel.denominatorModel().setStepType( AutomatableModel::PowerOfTwoStep );
 
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );

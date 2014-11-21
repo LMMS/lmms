@@ -72,12 +72,12 @@ public:
 		return &m_objects;
 	}
 	
-	inline float getMin() const
+	virtual inline float getMin() const
 	{
 		return firstObject()->minValue<float>();
 	}
 
-	inline float getMax() const
+	virtual inline float getMax() const
 	{
 		return firstObject()->maxValue<float>();
 	}
@@ -110,6 +110,7 @@ public:
 // threadable processhandle for processing automation tracks
 class AutomationProcessHandle : public ProcessHandle
 {
+	MM_OPERATORS
 public:
 	AutomationProcessHandle( AutomationTrack * at ) :
 	ProcessHandle( ProcessHandle::AutomationProcessHandle ),

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_DEVICE_H
-#define _AUDIO_DEVICE_H
+#ifndef AUDIO_DEVICE_H
+#define AUDIO_DEVICE_H
 
 #include <QtCore/QPair>
 #include <QtCore/QMutex>

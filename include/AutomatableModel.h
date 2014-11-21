@@ -59,8 +59,8 @@
 				modelname.setValue( (float) val );				\
 			}
 
-
-
+class AutomationTrack;
+class AutomationConnection;
 class ControllerConnection;
 
 class EXPORT AutomatableModel : public Model, public JournallingObject
@@ -73,8 +73,7 @@ public:
 	enum ScaleType
 	{
 		Linear,
-		Logarithmic,
-		Decibel
+		Logarithmic
 	};
 
 	enum DataType
@@ -82,7 +81,14 @@ public:
 		Float,
 		Integer,
 		Bool
-	} ;
+	};
+	
+	enum StepType
+	{
+		NormalStep,
+		PowerOfTwoStep
+	};
+	
 
 	AutomatableModel( DataType type,
 						const float val = 0,
@@ -114,7 +120,9 @@ public:
 
 
 	void setControllerConnection( ControllerConnection* c );
-
+	
+	void setAutomation( AutomationTrack * at );
+	void removeAutomation();
 
 	template<class T>
 	static T castValue( const float v )
@@ -130,17 +138,17 @@ public:
 
 
 	template<class T>
-	inline T value( int frameOffset = 0 ) const
+	inline T value() const
 	{
 		if( unlikely( m_hasLinkedModels || m_controllerConnection != NULL ) )
 		{
-			return castValue<T>( controllerValue( frameOffset ) );
+			return castValue<T>( controllerValue() );
 		}
 
 		return castValue<T>( m_value );
 	}
 
-	float controllerValue( int frameOffset ) const;
+	float controllerValue() const;
 
 	//! @brief Function that returns sample-exact data as a ValueBuffer
 	//! @return pointer to model's valueBuffer when s.ex.data exists, NULL otherwise
@@ -172,6 +180,10 @@ public:
 	template<class T>
 	T step() const
 	{
+		if( m_stepType == PowerOfTwoStep )
+		{
+			return castValue<T>( qMax( m_value * 0.5f, 1.0f ) );
+		}
 		return castValue<T>( m_step );
 	}
 	
@@ -187,7 +199,16 @@ public:
 
 	void incValue( int steps )
 	{
-		setValue( m_value + steps * m_step );
+		switch( m_stepType )
+		{
+			default:
+			case NormalStep:
+				setValue( m_value + steps * m_step );
+				break;
+			case PowerOfTwoStep:
+				setValue( steps > 0 ? m_value * ( 1 << steps ) : m_value / ( 1 << -steps ) );
+				break;
+		}
 	}
 
 	float range() const
@@ -292,6 +313,26 @@ public:
 	{
 		return m_isSampleExact;
 	}
+	
+	void setStepType( StepType s )
+	{
+		m_stepType = s;
+	}
+	
+	StepType stepType() const
+	{
+		return m_stepType;
+	}
+	
+	void setAutomationEnabled( bool b )
+	{
+		m_automationEnabled = b;
+	}
+	
+	bool automationEnabled() const
+	{
+		return m_automationEnabled;
+	}
 
 public slots:
 	virtual void reset();
@@ -368,8 +409,10 @@ private:
 	bool m_isSampleExact;
 	bool m_hasSampleExactData;
 	
-	// prevent several threads from attempting to write the same vb at the same time
-	QMutex m_valueBufferMutex;
+	StepType m_stepType;
+	
+	bool m_automationEnabled;
+	AutomationTrack * m_automationTrack;
 
 signals:
 	void initValueChanged( float val );
@@ -384,7 +427,7 @@ signals:
 #define defaultTypedMethods(type)								\
 	type value( int frameOffset = 0 ) const						\
 	{															\
-		return AutomatableModel::value<type>( frameOffset );	\
+		return AutomatableModel::value<type>();	\
 	}															\
 																\
 	type initValue() const										\
