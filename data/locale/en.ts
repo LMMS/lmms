@@ -42,11 +42,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>LMMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -776,6 +776,34 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Vocal Formant Filter</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>2x Moog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV BandPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV HighPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV Notch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Formant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tripole</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Effect</name>
@@ -1320,6 +1348,29 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
+    <name>FlangerControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
@@ -1394,6 +1445,14 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Mute this FX channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Solo FX channel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2091,6 +2150,34 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Vocal Formant Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x Moog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV BandPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV HighPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV Notch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Formant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tripole</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7014,6 +7101,10 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A NES-like synthesizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A native flanger plugin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
