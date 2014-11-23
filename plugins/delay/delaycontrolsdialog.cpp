@@ -37,34 +37,34 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
     QPalette pal;
     pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
     setPalette( pal );
-    setFixedSize( 100,125 );
+    setFixedSize( 200, 75 );
 
     TempoSyncKnob* sampleDelayKnob = new TempoSyncKnob( knobBright_26, this );
-    sampleDelayKnob->move( 20,30 );
+    sampleDelayKnob->move( 20,10 );
     sampleDelayKnob->setVolumeKnob( false );
     sampleDelayKnob->setModel( &controls->m_delayTimeModel );
     sampleDelayKnob->setLabel( tr( "Delay" ) );
-    sampleDelayKnob->setHintText( tr( "Delay Time Samples:" ) + " ", "" );
+    sampleDelayKnob->setHintText( tr( "Delay Time Seconds:" ) + " ", "" );
 
     knob * feedbackKnob = new knob( knobBright_26, this );
-    feedbackKnob->move( 60,30 );
+    feedbackKnob->move( 63,10 );
     feedbackKnob->setVolumeKnob( true) ;
     feedbackKnob->setModel( &controls->m_feedbackModel);
-    feedbackKnob->setLabel( tr( "Feedback" ) );
+    feedbackKnob->setLabel( tr( "Regen" ) );
     feedbackKnob->setHintText( tr ( "Feedback Amount:" ) + " ", "" );
 
     TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
-    lfoFreqKnob->move( 20,80 );
+    lfoFreqKnob->move( 106,10 );
     lfoFreqKnob->setVolumeKnob( false );
     lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
-    lfoFreqKnob->setLabel( tr( "Lfo Hz" ) );
-    lfoFreqKnob->setHintText( tr ( "Lfo Hz:" ) + " ", "" );
+    lfoFreqKnob->setLabel( tr( "Rate" ) );
+    lfoFreqKnob->setHintText( tr ( "Lfo Seconds:" ) + " ", "" );
 
     knob * lfoAmtKnob = new knob( knobBright_26, this );
-    lfoAmtKnob->move( 60,80 );
+    lfoAmtKnob->move( 150,10 );
     lfoAmtKnob->setVolumeKnob( true );
     lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
-    lfoAmtKnob->setLabel( tr( "Lfo Amt" ) );
+    lfoAmtKnob->setLabel( tr( "Lfo" ) );
     lfoAmtKnob->setHintText( tr ( "Lfo Amt:" ) + " ", "" );
 
 }
