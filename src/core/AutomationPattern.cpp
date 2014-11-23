@@ -24,9 +24,9 @@
  *
  */
 
-#include <QDomElement>
-#include <QMouseEvent>
-#include <QPainter>
+#include <QtXml/QDomElement>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 
 #include "AutomationPattern.h"
 #include "AutomationPatternView.h"
@@ -109,7 +109,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
+		putValue( MidiTime(0), _obj->value<float>(), false );
 	}
 
 	m_objects += _obj;
@@ -379,6 +379,88 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 	}
 
 	return ret;
+}
+
+
+
+
+void AutomationPattern::flipY( int min, int max )
+{
+	timeMap tempMap = m_timeMap;
+	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	float tempValue = 0;
+
+	int numPoints = 0;
+
+	//(iterate+1).key() - iterate.key(); gets the number of values until the next point
+
+	for( int i = 0; (iterate + i + 1) != m_timeMap.end() && (iterate + i ) != m_timeMap.end() ; i++)
+	{
+		numPoints++;
+	}
+	
+	for( int i = 0; i <= numPoints; i++ )
+	{
+
+		if (min < 0)
+		{
+			tempValue = valueAt((iterate + i).key()) * -1;
+			//removeValue((iterate + i).key(), false);
+			putValue( MidiTime((iterate + i).key()) , tempValue, false);
+		}
+		else
+		{
+			tempValue = max - valueAt((iterate + i).key());
+			//removeValue((iterate).key(), false);
+			putValue( MidiTime((iterate + i).key()) , tempValue, false);
+		}
+	}
+
+	generateTangents();
+	engine::automationEditor()->update();
+	emit dataChanged();
+
+//MidiTime AutomationPattern::putValue( const MidiTime & _time, const float _value, const bool _quant_pos )
+}
+
+
+
+
+void AutomationPattern::flipX()
+{
+	timeMap tempMap;
+
+	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	float tempValue = 0;
+	int numPoints = 0;
+
+	//(iterate+1).key() - iterate.key(); gets the number of values until the next point
+
+	for( int i = 0; (iterate + i + 1) != m_timeMap.end() && (iterate + i ) != m_timeMap.end() ; i++)
+	{
+		numPoints++;
+	}
+
+	float realLength = (iterate + numPoints).key();
+	
+	for( int i = 0; i <= numPoints; i++ )
+	{
+		tempValue = valueAt((iterate + i).key());
+
+		cleanObjects();
+
+		MidiTime newTime = MidiTime( realLength - (iterate + i).key() );
+
+		tempMap[newTime] = tempValue;
+	}
+	
+	m_timeMap.clear();
+
+	m_timeMap = tempMap;
+
+	generateTangents();
+	engine::automationEditor()->update();
+	emit dataChanged();
 }
 
 
@@ -783,4 +865,4 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 
 
 
-
+#include "moc_AutomationPattern.cxx"

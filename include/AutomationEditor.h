@@ -27,7 +27,7 @@
 #define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
-#include <QWidget>
+#include <QtGui/QWidget>
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
@@ -130,6 +130,8 @@ protected slots:
 	void eraseButtonToggled();
 	void selectButtonToggled();
 	void moveButtonToggled();
+	void flipYButtonPressed();
+	void flipXButtonPressed();
 
 	void discreteButtonToggled();
 	void linearButtonToggled();
@@ -166,7 +168,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 860;
+	static const int INITIAL_WIDTH = 900;
 	static const int INITIAL_HEIGHT = 480;
 
 	static const int SCROLLBAR_SIZE = 16;
@@ -187,6 +189,8 @@ private:
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
+	static QPixmap * s_toolYFlip;
+	static QPixmap * s_toolXFlip;
 
 
 	QWidget * m_toolBar;
@@ -198,6 +202,8 @@ private:
 	toolButton * m_eraseButton;
 	toolButton * m_selectButton;
 	toolButton * m_moveButton;
+	toolButton * m_flipYButton;
+	toolButton * m_flipXButton;
 
 	toolButton * m_discreteButton;
 	toolButton * m_linearButton;

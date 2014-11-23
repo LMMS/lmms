@@ -27,16 +27,16 @@
 
 #include "AutomationEditor.h"
 
-#include <QApplication>
-#include <QButtonGroup>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QLayout>
-#include <QMdiArea>
-#include <QPainter>
-#include <QScrollBar>
-#include <QStyleOption>
-#include <QWheelEvent>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QMdiArea>
+#include <QtGui/QPainter>
+#include <QtGui/QScrollBar>
+#include <QtGui/QStyleOption>
+#include <QtGui/QWheelEvent>
 #include <QToolTip>
 
 
@@ -69,6 +69,8 @@ QPixmap * AutomationEditor::s_toolDraw = NULL;
 QPixmap * AutomationEditor::s_toolErase = NULL;
 QPixmap * AutomationEditor::s_toolSelect = NULL;
 QPixmap * AutomationEditor::s_toolMove = NULL;
+QPixmap * AutomationEditor::s_toolYFlip = NULL;
+QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 
 
@@ -94,9 +96,9 @@ AutomationEditor::AutomationEditor() :
 	m_drawLastTick( 0 ),
 	m_ppt( DEFAULT_PPT ),
 	m_y_delta( DEFAULT_Y_DELTA ),
-	m_y_auto( true ),
+	m_y_auto( TRUE ),
 	m_editMode( DRAW ),
-	m_scrollBack( false ),
+	m_scrollBack( FALSE ),
 	m_gridColor( 0,0,0 ),
 	m_graphColor(),
 	m_vertexColor( 0,0,0 ),
@@ -128,6 +130,16 @@ AutomationEditor::AutomationEditor() :
 		s_toolMove = new QPixmap( embed::getIconPixmap(
 							"edit_move" ) );
 	}
+	if( s_toolYFlip == NULL )
+	{
+		s_toolYFlip = new QPixmap( embed::getIconPixmap(
+							"flip_y" ) );
+	}
+	if( s_toolXFlip == NULL )
+	{
+		s_toolXFlip = new QPixmap( embed::getIconPixmap(
+							"flip_x" ) );
+	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -143,9 +155,9 @@ AutomationEditor::AutomationEditor() :
 
 
 	m_toolBar = new QWidget( this );
-	m_toolBar->setFixedHeight( 32 );
+	m_toolBar->setFixedHeight( 40 );
 	m_toolBar->move( 0, 0 );
-	m_toolBar->setAutoFillBackground( true );
+	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
@@ -197,14 +209,25 @@ AutomationEditor::AutomationEditor() :
 					tr( "Draw mode (Shift+D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
-	m_drawButton->setCheckable( true );
-	m_drawButton->setChecked( true );
+	m_drawButton->setCheckable( TRUE );
+	m_drawButton->setChecked( TRUE );
 
 	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
 					tr( "Erase mode (Shift+E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
-	m_eraseButton->setCheckable( true );
+	m_eraseButton->setCheckable( TRUE );
+
+	m_flipYButton = new toolButton( embed::getIconPixmap( "flip_y" ),
+					tr( "Flip Vertically" ),
+					this, SLOT( flipYButtonPressed() ),
+					m_toolBar );
+
+	m_flipXButton = new toolButton( embed::getIconPixmap( "flip_x" ),
+					tr( "Flip Horizontally" ),
+					this, SLOT( flipXButtonPressed() ),
+					m_toolBar );
+
 
 	//TODO: m_selectButton and m_moveButton are broken.
 	/*m_selectButton = new toolButton( embed::getIconPixmap(
@@ -212,20 +235,22 @@ AutomationEditor::AutomationEditor() :
 					tr( "Select mode (Shift+S)" ),
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
-	m_selectButton->setCheckable( true );
+	m_selectButton->setCheckable( TRUE );
 
 	m_moveButton = new toolButton( embed::getIconPixmap( "edit_move" ),
 					tr( "Move selection mode (Shift+M)" ),
 					this, SLOT( moveButtonToggled() ),
 					m_toolBar );
-	m_moveButton->setCheckable( true );*/
+	m_moveButton->setCheckable( TRUE );*/
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
 	tool_button_group->addButton( m_eraseButton );
+	tool_button_group->addButton( m_flipYButton );
+	tool_button_group->addButton( m_flipXButton );
 	//tool_button_group->addButton( m_selectButton );
 	//tool_button_group->addButton( m_moveButton );
-	tool_button_group->setExclusive( true );
+	tool_button_group->setExclusive( TRUE );
 
 	m_drawButton->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
@@ -237,6 +262,12 @@ AutomationEditor::AutomationEditor() :
 		tr( "Click here and erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
+	m_flipYButton->setWhatsThis(
+		tr( "Click here and the pattern will be inverted."
+			"The points are flipped in the y direction. " ) );
+	m_flipXButton->setWhatsThis(
+		tr( "Click here and the pattern will be reversed. "
+			"The points are flipped in the x direction." ) );
 	/*m_selectButton->setWhatsThis(
 		tr( "Click here and select-mode will be activated. In this "
 			"mode you can select values. This is necessary "
@@ -394,6 +425,9 @@ AutomationEditor::AutomationEditor() :
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_drawButton );
 	tb_layout->addWidget( m_eraseButton );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_flipYButton );
+	tb_layout->addWidget( m_flipXButton );
 	//tb_layout->addWidget( m_selectButton );
 	//tb_layout->addWidget( m_moveButton );
 	tb_layout->addSpacing( 10 );
@@ -430,7 +464,7 @@ AutomationEditor::AutomationEditor() :
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setCurrentPattern( NULL );
 
-	setMouseTracking( true );
+	setMouseTracking( TRUE );
 
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
@@ -680,7 +714,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 		/*case Qt::Key_A:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
-				m_selectButton->setChecked( true );
+				m_selectButton->setChecked( TRUE );
 				selectAll();
 				update();
 				_ke->accept();
@@ -690,7 +724,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_D:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_drawButton->setChecked( true );
+				m_drawButton->setChecked( TRUE );
 				_ke->accept();
 			}
 			break;
@@ -698,7 +732,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_E:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_eraseButton->setChecked( true );
+				m_eraseButton->setChecked( TRUE );
 				_ke->accept();
 			}
 			break;
@@ -706,7 +740,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 		/*case Qt::Key_S:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_selectButton->setChecked( true );
+				m_selectButton->setChecked( TRUE );
 				_ke->accept();
 			}
 			break;
@@ -714,7 +748,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_M:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_moveButton->setChecked( true );
+				m_moveButton->setChecked( TRUE );
 				_ke->accept();
 			}
 			break;*/
@@ -941,7 +975,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 			{
 				// when clicking right in select-move, we
 				// switch to move-mode
-				m_moveButton->setChecked( true );
+				m_moveButton->setChecked( TRUE );
 			}
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == MOVE )
@@ -961,7 +995,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 			{
 				// when clicking right in select-move, we
 				// switch to draw-mode
-				m_drawButton->setChecked( true );
+				m_drawButton->setChecked( TRUE );
 			}
 
 			update();
@@ -1144,7 +1178,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			m_selectedTick = pos_ticks - m_selectStartTick;
 			if( (int) m_selectStartTick + m_selectedTick < 0 )
 			{
-				m_selectedTick = -m_selectStartTick;
+				m_selectedTick = -qRound( m_selectStartTick );
 			}
 			m_selectedLevels = level - m_selectStartLevel;
 			if( level <= m_selectStartLevel )
@@ -1256,7 +1290,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
 						it.value () + level_diff,
-									false )]
+									FALSE )]
 						= it.value() + level_diff;
 			}
 			m_selValuesForMove = new_selValuesForMove;
@@ -1306,7 +1340,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			if( (int) m_selectStartTick + m_selectedTick <
 									0 )
 			{
-				m_selectedTick = -m_selectStartTick;
+				m_selectedTick = -qRound( m_selectStartTick );
 			}
 
 			float level = getLevel( _me->y() );
@@ -1599,7 +1633,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 					break;
 				}
 
-				bool is_selected = false;
+				bool is_selected = FALSE;
 				// if we're in move-mode, we may only draw
 				// values in selected area, that have originally
 				// been selected and not values that are now in
@@ -1608,7 +1642,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 				{
 					if( m_selValuesForMove.contains( it.key() ) )
 					{
-						is_selected = true;
+						is_selected = TRUE;
 					}
 				}
 				else if( it.value() >= selLevel_start &&
@@ -1616,7 +1650,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 					it.key() >= sel_pos_start &&
 					it.key() + len_ticks <= sel_pos_end )
 				{
-					is_selected = true;
+					is_selected = TRUE;
 				}
 				
 				float *values = m_pattern->valuesAfter( it.key() );
@@ -1649,7 +1683,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	else
 	{
 		QFont f = p.font();
-		f.setBold( true );
+		f.setBold( TRUE );
 		p.setFont( pointSize<14>( f ) );
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
@@ -1983,7 +2017,7 @@ void AutomationEditor::stop()
 	{
 		engine::getSong()->stop();
 	}
-	m_scrollBack = true;
+	m_scrollBack = TRUE;
 }
 
 
@@ -2024,6 +2058,18 @@ void AutomationEditor::eraseButtonToggled()
 	m_editMode = ERASE;
 	removeSelection();
 	update();
+}
+
+
+
+
+void AutomationEditor::flipYButtonPressed()
+{
+	m_pattern->flipY(m_minLevel, m_maxLevel);
+}
+void AutomationEditor::flipXButtonPressed()
+{
+	m_pattern->flipX();
 }
 
 
@@ -2294,7 +2340,7 @@ void AutomationEditor::deleteSelectedValues()
 		m_pattern->removeValue( it.key() );
 	}
 
-	if( update_after_delete == true )
+	if( update_after_delete == TRUE )
 	{
 		engine::getSong()->setModified();
 		update();
@@ -2310,7 +2356,7 @@ void AutomationEditor::updatePosition( const MidiTime & _t )
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
 					song::Mode_PlayAutomationPattern ) ||
-							m_scrollBack == true )
+							m_scrollBack == TRUE )
 	{
 		const int w = width() - VALUES_WIDTH;
 		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() / m_ppt )
@@ -2325,7 +2371,7 @@ void AutomationEditor::updatePosition( const MidiTime & _t )
 			m_leftRightScroll->setValue( t.getTact() *
 							MidiTime::ticksPerTact() );
 		}
-		m_scrollBack = false;
+		m_scrollBack = FALSE;
 	}
 }
 
@@ -2422,6 +2468,6 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 
-
+#include "moc_AutomationEditor.cxx"
 
 
