@@ -133,12 +133,12 @@ AutomationEditor::AutomationEditor() :
 	if( s_toolYFlip == NULL )
 	{
 		s_toolYFlip = new QPixmap( embed::getIconPixmap(
-							"arp_up_and_down" ) );
+							"flip_Y" ) );
 	}
 	if( s_toolXFlip == NULL )
 	{
 		s_toolXFlip = new QPixmap( embed::getIconPixmap(
-							"loop_points_on" ) );
+							"flip_X" ) );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -218,12 +218,12 @@ AutomationEditor::AutomationEditor() :
 					m_toolBar );
 	m_eraseButton->setCheckable( TRUE );
 
-	m_flipYButton = new toolButton( embed::getIconPixmap( "arp_up_and_down" ),
+	m_flipYButton = new toolButton( embed::getIconPixmap( "flip_Y" ),
 					tr( "Flip Vertically" ),
 					this, SLOT( flipYButtonPressed() ),
 					m_toolBar );
 
-	m_flipXButton = new toolButton( embed::getIconPixmap( "loop_points_on" ),
+	m_flipXButton = new toolButton( embed::getIconPixmap( "flip_X" ),
 					tr( "Flip Horizontally" ),
 					this, SLOT( flipXButtonPressed() ),
 					m_toolBar );

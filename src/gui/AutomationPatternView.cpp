@@ -186,10 +186,10 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "record" ),
 						tr( "Set/clear record" ),
 						this, SLOT( toggleRecording() ) );
-	_cm->addAction( embed::getIconPixmap( "arp_up_and_down" ),
+	_cm->addAction( embed::getIconPixmap( "flip_Y" ),
 						tr( "Flip Y" ),
 						this, SLOT( flipY() ) );
-	_cm->addAction( embed::getIconPixmap( "loop_points_on" ),
+	_cm->addAction( embed::getIconPixmap( "flip_X" ),
 						tr( "Flip X" ),
 						this, SLOT( flipX() ) );
 	if( !m_pat->m_objects.isEmpty() )
