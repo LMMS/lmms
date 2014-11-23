@@ -488,7 +488,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	m_synthMutex.unlock();
 
 	// Set gain properly based on volume control
-	for( f_cnt_t i = 0; i < frames; ++i)
+	for( f_cnt_t i = 0; i < frames; ++i )
 	{
 		_working_buffer[i][0] *= m_gain.value();
 		_working_buffer[i][1] *= m_gain.value();
@@ -518,7 +518,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 		for( uint32_t i = 0; i < sample.region->SampleLoops; ++i )
 		{
 			loop = true;
-			loopType = static_cast<gig::loop_type_t>(sample.region->pSampleLoops[i].LoopType);
+			loopType = static_cast<gig::loop_type_t>( sample.region->pSampleLoops[i].LoopType );
 			loopStart = sample.region->pSampleLoops[i].LoopStart;
 			loopLength = sample.region->pSampleLoops[i].LoopLength;
 
@@ -743,7 +743,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
-				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );;
+				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
 				float length = (float) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
@@ -941,6 +941,8 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
 
+	m_patchDialogButton->setWhatsThis( tr( "Click here to change which patch of the GIG file to use" ) );
+
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_bankNumLcd->move( 111, 150 );
@@ -948,16 +950,23 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move( 161, 150 );
 
+	m_bankNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
+	m_patchNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
+
 	// Next row
 	m_filenameLabel = new QLabel( this );
 	m_filenameLabel->setGeometry( 61, 70, 156, 14 );
 	m_patchLabel = new QLabel( this );
 	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
+	m_filenameLabel->setWhatsThis( tr( "Which GIG file is currently being used" ) );
+	m_patchLabel->setWhatsThis( tr( "Which patch of the GIG file is currently being used" ) );
+
 	// Gain
 	m_gainKnob = new gigKnob( this );
 	m_gainKnob->setHintText( tr( "Gain" ) + " ", "" );
 	m_gainKnob->move( 32, 140 );
+	m_gainKnob->setWhatsThis( tr( "Factor to multiply samples by" ) );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -965,7 +974,6 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-
 }
 
 
@@ -1049,14 +1057,17 @@ void GigInstrumentView::showFileDialog()
 	if( k->m_filename != "" )
 	{
 		QString f = k->m_filename;
+
 		if( QFileInfo( f ).isRelative() )
 		{
 			f = ConfigManager::inst()->userSamplesDir() + f;
+
 			if( QFileInfo( f ).exists() == false )
 			{
 				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
 			}
 		}
+
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1070,6 +1081,7 @@ void GigInstrumentView::showFileDialog()
 	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{
 		QString f = ofd.selectedFiles()[0];
+
 		if( f != "" )
 		{
 			k->openFile( f );
