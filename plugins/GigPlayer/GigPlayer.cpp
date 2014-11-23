@@ -371,7 +371,12 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		for( QList<GigSample>::iterator sample = it->samples.begin();
 				sample != it->samples.end(); ++sample )
 		{
-			if( sample->sample == NULL || sample->adsr.done() )
+			// Delete if the ADSR for a sample is complete for normal
+			// notes, or if a release sample, then if we've reached
+			// the end of the sample
+			if( sample->sample == NULL || sample->adsr.done() ||
+				( it->isRelease == true &&
+				  sample->pos >= sample->sample->SamplesTotal - 1 ) )
 			{
 				sample = it->samples.erase( sample );
 
@@ -728,6 +733,10 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
 		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
 		gig::Sample * pSample = pDimRegion->pSample;
+
+		// If this is a release sample, the note won't ever be
+		// released, so we handle it differently
+		gignote.isRelease = wantReleaseSample;
 
 		// Does this note have release samples? Set this only on the original
 		// notes and not when we get the release samples.

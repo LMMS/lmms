@@ -201,6 +201,7 @@ public:
 	int midiNote;
 	int velocity;
 	bool release; // Whether to trigger a release sample on key up
+	bool isRelease; // Whether this is a release sample, changes when we delete it
 	GigState state;
 	float frequency;
 	QList<GigSample> samples;
@@ -213,7 +214,8 @@ public:
 
 	GigNote( int midiNote, int velocity, float frequency, GIGPluginData * handle )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), state( KeyDown ), frequency( frequency ), handle( handle )
+		  release( false ), isRelease( false ), state( KeyDown ),
+		  frequency( frequency ), handle( handle )
 	{
 	}
 } ;
