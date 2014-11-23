@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -68,7 +68,7 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
@@ -77,8 +77,6 @@ protected slots:
 
 private:
 	void closePlugin( void );
-
-	int m_runningNotes[NumKeys];
 
 
 	VstPlugin * m_plugin;

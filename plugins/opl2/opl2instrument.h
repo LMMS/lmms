@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 Raine M. Ekman <raine/at/iki/fi>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -53,7 +53,7 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
 	virtual void play( sampleFrame * _working_buffer );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this );

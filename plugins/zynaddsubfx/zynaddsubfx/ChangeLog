@@ -1,0 +1,1038 @@
+6 Mar 2002  -(dupamasa - in jur de ora 4) Mi-a venit ideea exact cum sa fac cand ma plimbam pe strada Pandurilor
+7/8 Mar 2002 - Started to do diagrams
+10 Mar 2002 - Started to write "voice"
+11 Mar 2002 - Heard first sound
+12 Mar 2002 - tested with 200 voices
+16 Mar 2002 - made "Note" the main class
+    	    - added vibratto
+	    - added glissando
+20 Mar 2002 - started to write the Envelope class
+21 Mar 2002 - Envelope written (almost)
+              Volume envelope almost written
+23 Mar 2002 - Scris relasenote(putin)
+	      Envelope-ul este si in dB
+	      "glissando" este inlocuit cu "Envelope" de frecventa
+	      started to write the LFO class
+24 Mar 2002 - Corrected a bug that could crashed the synth (forgotten to disable the amp/freq envelopeenabled when killed it)	      
+25 Mar 2002 - Started to write the Filter class (wrote only few lines)
+27 Mar 2002 - Scris filtrul(putin), si FilterEnvelope
+28 Mar 2002 - Adaugat la LFO si tipul "rampup" si "rampdown"
+    	      Scris filterLFO si amplitudeLFO(termollo)
+	      redenumiti si aranjati parametrii
+    	      Adaugat LFO delay
+	      Scris FilterEnvelope(corect) si FilterLFO(corect)
+29 Mar 2002 - Adaugat RingModulation 
+	      Adaugat FM/RM Amplitude si Frequency Envelope
+	      Corectat un bug minor la Envelope-ASRinit();
+	      Adaugat FM
+01 Apr 2002 - Corectat un bug care facea sa se auda paraituri la sunetele care incepeau co o faza!=0
+	      Scris cativa dintre parametrii globali Envelop-ulire,LFO,Filter,..  
+02 Apr 2002 - Curatat putin ADnote
+	      Adaugat VelocityScale la amplitudine, la FM si la Filtru Global
+03 Apr 2002 - Aranjati toti parametrii ADnote in structuri
+04 Apr 2002 - Mutati multi parametrii in ADnoteParameters
+	      Inceput sa scriu ADnoteParameters
+05 Apr 2002 - Inceput sa scriu clase speciale pentru parametrii(midi) (LFO..)	      		     
+06 Apr 2002 - Continuat sa scriu clasele speciale pentru parametrii 
+	      Teoretic merge sinteza multitimbrala(Adica se poate aplea ADnote(canal,note,vel))
+07 Apr 2002 - Completat(aproape) transferul de parametri midi la cei reali
+08 Apr 2002 - Added FM oscil at parameters and corrected a small FM bug
+09 Apr 2002 - Inceput sa-l fac real-time
+10 Apr 2002 - Merge la keyboard-ul MIDI, polifonic
+27 Apr 2002 - Scris interfata la OSS, la latenta scazuta
+	      Corectat un bug care facea ca sa se execute calcule inutile, ceea ce facea ca polifonia maxima sa scada de 10 ori
+29 Apr 2002 - Inceput sa scriu interfata midi(obiect)
+30 Apr 2002 - Continuat putin interfata midi (dar nu am terminat)	      
+02 Mai 2002 - Merge in timp real cu latenta scazuta, dar se mai auda niste "pacanaituri"
+03 Mai 2002 - Inceput sa scriu Reverb (acum este doar ecou) 
+	      "Pacanaiturile" au fost eliminate.
+09 Mai 2002 - Reverb-ul suna a reverberatie
+11 Mai 2002 - Adaugat cativa parametrii midi la Reverb
+18 Mai 2002 - Adaugat filtrul AllPass la Reverb si adaugat parametrul Plohidamp
+19 Mai 2002 - Adaugat InitialDelay (idelay) la Reverb
+24 Iun 2002 - Clasa Filtru nu mai este dependenta de FilterParams(pot sa-l folosesc in alte scopuri)
+	      Corectat un bug la filtru care facea ca la rezomante scazute sa amplifice f. mult basii
+	      Adaugat High Pass Filter
+	      Rezonanta filtrului este exponentiala
+	      Adauga LPF+HPF la Reverb
+	      Inceput sa scriu Generatorul de Functii (OscilGen)
+25 Iun 2002 - Scris cateva forme de unda (functii)
+	      Reverb-ul are volumul in dB si daca este zero(ca parametru) atunci se dezactiveaza	      
+02 Iul 2002 - Adaugat inca o functie la generatorul de functii
+03 Iul 2002 - Inceput sa scriu generarea de functii la OscilGen pe baza de FFT
+	      Inlaturat DC-ul de la OscilGen	      
+04 Iul 2002 - Adaugat ANTI-ALIASING la ADnote si insumarea armonicelor se face in domeniul frecventa
+              Corectat un bug care facea sa sune rau dac OSCIL_SIZE!=512 (era declarat de 2 ori)
+12 Iul 2002 - Adaugat posibilitatea de a folosi ca modulator alta voce
+              Adaugat parametrii MIDI la OscilGen 
+13 Iul 2002 - Adaugat Randomness la clasa OscilGen
+15 Iul 2002 - Adaugat si Panning(incl. Randomness) => instrumentul este acum stereo	      
+16 Iul 2002 - Adaugat Randomness la LFO (faza 0 => random)
+              Inlaturat o eroare care facea ca amplitudinea sa nu fie interpolata
+17 Iul 2002 - Volumul FM-ului este exponential
+              Adaugat atenuare la volumul FM-ului la note inalte	      
+23 Iul 2002 - Adaugat EnvelopeStretch
+	      Corectata o eroare care facea ca uneori sunetul sa se auda foarte tare la inceput
+	      Adaugat fade-in (f. scurt) si fade out in caz ca envelop-ul are A=0 sau R=0, a.i. sa nu se auda pacanaituri
+24 Iul 2002 - Corectat Relase-ul la Envelope si adaugat ForcedRelase    
+25 Iul 2002 - Adaugat posibilitatea de a nu folosi AntiAliasing-ul
+	      Adaugat Frequency Modulation (nu phase modulation)
+              Adaugat Delay la fiecare voce    
+	      Adaugat Morphing la modulatie
+26 Iul 2002 - Inceput sa scriu clasa Part
+27 Iul 2002 - Se face controlul Midi folosind clasa Part si nu ADnote
+28 Iul 2002 - Corectata o eroare care facea sa se instantieze clasa ADnoteParameters pt. fiecare nota => memoria era ocupata excesiv si "manca" din procesor. Cauza erorii este ca trimiteam obiectul ADnoteParameters ca parametru si nu referinta lui. Asta era cauza pacanaiturilor ce se auzeau daca apasam multe clape simultan.
+29 Iul 2002 - Adaugat clasa Master (Permite acum mai multe instr. simultan => multitimbral)
+	      Observat o eroare la Envelope
+30 Iul 2002 - Adaugat EnvelopeStretch si Forcedrelase la instantierea unui obiect EnvelopeParams
+	      Durata Sustainul-ui fortat este acceeasi indiferent de paramentrul EnvelopeStretch
+              Adaugat Ecou
+31 Iul 2002 - Daca VelocityScaleFunction=127 atunci orice vel. va face amplitudinea maxima (ca si cand vel.=127)
+	      Inceput sa scriu Interfata Utilizator
+01 Aug 2002 - Toti parametrii sunt convertiti in REALTYPE direct de ADnote,de LFO
+	      Inlataurate mici probleme de AntiAliasing daca detune-ul era prea sus si la unele moduri FM
+              Programul incepe sa fie controlabil de Interfata
+02 Aug 2002 - Inlaturat o eroare stupida care facea ca sa se seteze valorile EnvelopeParams la -1 (scria din Master:: prea mult)
+03 Aug 2002 - Terminata interfata pentru ADnoteParameters.GlobalPars
+	      Adaugat inca un parametru la lfo (continous LFO) care faca ca LFO-ul sa nu inceapa la fiecare NoteOn
+              Corectat doua erori la ...[nvoice].AmpEnvelope  si ...[nvoice].FreqEnvelope
+	      Scrisa interfata pentru ADnoteParameters.VoicePars (fara FM+OSCIL...)
+04 Aug 2002 - Scrisa interfata cu FM (fara Oscil)
+	      Corectate doua erori cu provire la FMampenv si FMfreqenv
+	      Inlaturat aliasing-ul la vocea FM
+	      Modificata interfata (Voice si FM-ul sunt intr-o singura fereastra)      
+	      Inceput sa scriu schimbare voce curenta.
+05 Aug 2002 - Adaugat interfata pentru cei mai importanti parametrii ai ADnote_VoicePar[nvoice]	    
+              Inceput sa scriu interfata pentru OscilGen	
+06 Aug 2002 - Este mult mai usoara schimbarea vocii curente.
+              Inceput sa scriu OscilEditor
+              Nu mai este necesara changebasefunc() la oscil pentru a schimba basefunction, se apeleaza automat.
+              OscilEditor este (aproape) complet
+	      Toti parametrii ADnoteParameters au UI
+              Corectate cateva erori (cauzate de faptul ca nu am verificat daca ADnote::...Enabled!=0)
+07 Aug 2002 - Corectata o eroare la envelope	      	      
+              Adaugat afisaj spectrum la OscilEdit
+	      Adaugat parametrii noi: extenal oscillator (voice si FM) si oscilphase(si FM) si interfata pentru ei
+	      Gasite mai multe erori care apar daca misc widget-urile in timp ce cant la clape (probabil este vorba de thread-uri care trebuie sa fie sincronizate sau ceva cam asa sau memory leaks)
+              Inceput sa scriu interfata pentru Part
+	      Adaugat bypass la filtrul global
+              Adaugat conversia oscil-ului in basefunction
+              Corectata o mica eroare la calcularea oscil-ului referitor la faze 
+08 Aug 2002 - In VoiceList valorile sunt actualizate la fiecare apasare a butonului "ShowVoiceList" si formele de unda sunt afisate corect.
+              Corectate niste mici erori la FM
+              Daca se foloseste ca modulator o alta voce, interfata dezativeaza unii parametrii FM daca sunt inutili
+              Inceput sa scriu interfata si parametrii Master/Part
+              Schimbat putin Master si Part (atentie sa nu se instantieza ADnoteParameters la fiecare apasare de tasta)
+              Inceput sa scriu control-ul pentru Master/Parts
+09 Aug 2002 - Scris parametrii Part si Master
+              Inceput sa scriu sincronizarea intre thread-uri
+10 Aug 2002 - Adaugat o noua forma de unda la OscilGen
+              Adaugat sincronizarea intre thread-uri=>programul nu mai crapa daca in timp ce apas clapele, modific forma de unda
+              Adaugat enable/disable ADnote
+              Inceput sa scriu SUBnote/SUBnoteParameters
+              Se poate canta si la SUBnote(inceput sa scriu UI pt. el)
+11 Aug 2002 - Scris controlul armonicelor
+              Adugati cativa parametrii la SUBnote
+	      Adaugat AmpEnvelope la SUBnote(si UI)
+12 Aug 2002 - Adaugat Detune la SUBnote si schimbat Detune-ul la ADnote
+              Adaugat FreqEnvelope la SUBnote
+16 Aug 2002 - Corectata o eroare care facea ca VoiceOut sa fie inlaturat chiar daca era inca folosit(de alte voci)
+	      Daca "Forced Relase" este off atunci se face relase-ul liniar
+              Adaugat BandWidth Envelope
+17 Aug 2002 - Inceput sa pregatesc pentru EffectManager
+18 Aug 2002 - Adaugat inca un parametru la Reverb: initial delay fb
+	      Scris efectele de insertie
+              Inceput sa scriu efectele de sistem
+19 Aug 2002 - Continuat sa scriu efectele de sistem
+	      Inceput sa scriu interfata la Efecte (Reverb - terminat, aproape)
+22 Aug 2002 - Corectata o eroare la Echo
+              Se poate schimba efectul de insertie
+	      Gasita o eroare care "crapa" programul daca schimb efectul de le Reverb (rezolvata temporar, dar cu "memory leak")
+23 Aug 2002 - Corectata eroarea la Reverb (a fost din cauza ca am pus ">" in loc de ">=" :-p )
+              Terminat efectele de insertie(si interfata)
+	      Adaugat Effect cleanup
+              Scrisa interfata pentru efectele sistem (cu exceptia sendto another sys eff)
+24 Aug 2002 - Adaugate doua noi efecte: Chorus si Phaser
+25 Aug 2002 - Nu se mai aude tacanit la Chorus daca schimb Delay/Depth
+              Corectat o mica eroare care facea ca sa nu se afiseze Pinsparts corect
+	      Adaugat un nou efect: AlienWah
+	      Nu se mai aude tacanit la Phaser si la AlienWah la frecvente LFO f. mari
+27 Aug 2002 - Adaugata o noua forma de unda: Chirp
+	      Adaugat Waveshaping la OscilGen
+	      Se poate compila si fara UI
+	      Inceput sa scriu Salvarea/Incarcarea Parametrilor
+28 Aug 2002 - In ADnoteVoiceListUI se afisaza corect daca vocea este activata/dezactivata
+	      Scrisa Salvarea/Incarcarea parametrilor (cu exceptia la OSCIL::UseAsBaseFunction)
+              Adaugat File Save/Open
+29 Aug 2002 - Se poate salva si oscil::useasbase
+              Se afiseaza corect valorile dupa incarcare
+01 Sep 2002 - Adaugat "codul de intrare" sa saveload 0xfe pt. a sti de unde incepe o noua "ramura"
+              "Codul de intrare" este folosit pentru a nu incarca "ramurile" care nu se potrivesc cu specificatiile (ex. nr. de voce sau nr. part prea mare)
+              Adaugat header la fisier
+	      Imbunatatit OscilUI::useasbase
+03 Sep 2002 - Modificat codurile de parmetrii: indicele par. sunt >= 0x80, parametrii <0x80 , controlerii speciali(urcare/coborare creanga) >=0xf0; Este util la versiunile viitoare, la forward/reverse compatibility.
+	      Inceput sa scriu clasa Microtonal si interfata pt. Microtonal
+04 Sep 2002 - Adaugat Pfilterbypass la salvare (am uitat sa o pun pana acum)
+              Aproape terminat Microtonal-ul (cu exceptia importului din fisiere .scl)
+05 Sep 2002 - Facut cateva mici modificari la Microtonal si Echo
+	      Adaugat un nou parametru la ADnote: PVolumeminus
+	      Adaudat parametrii noi de Detune: Pcoarsedetune(coarse+octave) si Pdetunetype
+	      Adaugat cateva tipuri de detune
+06 Sep 2002 - Adaugat posibilitatea de a folosi ADnotepars:Globalpars.Pdetudetype in loc de Pdetunetype (0 = default detunetype), asa ca nu mai trebuie sa mai modific la fiecare voce detunetype: setez la 0 si modific global-ul
+	      Facut mici modificari la MidiInput(OSS)
+07 Sep 2002 - Corectata o eroare cu privire la detune si daca freq. > Nyquist
+	      Modificat driver-ul OSSmidiin
+	      Adaugat driver Alsa cu port virtual
+	      Se poate salva doar instrumentele/microtonal.
+	      Adaugata un nou fel de waveshaping(Zigzag)
+08 Sep 2002 - Psysefxvol[][] sunt scalate in dB
+	      Nu mai este periculos sa inchid fereastra principala
+09 Sep 2002 - Se actualizeaza corect la incarcare la Master:Psysefxvol[][],Pvolume,Pkeyshift; si alti parametrii la Part
+	      Adaugat nume la Part
+	      Panic-ul (Shut-up-ul) se aplica si la efecte
+	      Part->Penable controleaza de fapt daca Part-ul este activat/complet dezactivat. Daca se dezactiveaza un part toate notele+ efectele insertion sunt oprite. Nu mai consuma CPU daca folosesc multe part-uri.
+	      Adaugat un nou parametru la part: Pnoteon care controleaza daca part-ul primeste mesaje NoteOn
+	      Adaugarea extensiei se face automat.
+	      Adaugat LFO exp_up 1 si 2
+	      Curatat putin de memory leaks (mai am de curatat si interfata)
+10 Sep 2002 - Adaugat filtrul HPF cu un pol    
+	      Interfata se inchide corect.
+	      Adaugat textul cu Copyright in interfata
+	      Traduse toate comentariile in limba engleza
+	      Adaugat licenta in fiecare fisier
+11 Sep 2002 - Adaugat descriere la fiecare fisier
+              Corectata o eroare care facea ca SUBnote sa aiba amplitudini f. mari la freq. f. inalte
+	      Adaugat cateva macro-uri la interpolarea amplitudinii
+12 Sep 2002 - Modificat extensiile (*.mas.zyn ---> *.mas_zyn, la fel si celelalte) pentru a nu aparea fisiere *.mas.mas.zyn
+13 Sep 2002 - Am decis numele programului: "ZynAddSubFX" (Zyn de la synthetizer (inlocuit S cu Z), Add de la additive, Sub de la substractive, FX de la effects)
+14 Sep 2002 - Volumul din ADvoicelist se afiseaza corect
+15 Sep 2002 - Adaugat inca 3 moduri de waveshaping Limiter, UpperLimiter, LowerLimiter
+16 Sep 2002 - Adaugat Makefile
+17 Sep 2002 - Corectata o mica eroare care facea ca sa nu se incarce fisierele cu data intotdeauna
+	      Nu se amplifica freq. f. inalte daca freq. filtrului este mare.
+	      Inceput sa scriu documentatia.
+18 Sep 2002 - Adaugat functia de resetare a tuturor parametrilor(master si instrument)
+23 Sep 2002 - Adaugat posibilitatea de a conecta efectele de insertie la iesire Master
+	      Lfo-ul la frecventa incepe de la 0 pt. startphase=0
+24 Sep 2002 - Corectate niste mici erori la Chorus/Phaser
+	      Adaugat si "substract" la Chorus si Phaser
+	      Limitat tipul detune-ului la valoarea maxima
+25 Sep 2002 - LANSAT PE INTERNET - PRIMA VERSIUNE (1.0.0)
+--------------------------------------------------------------------------------------------------
+01 Dec 2002 - Corectat niste comentarii
+	    - Inlaturat o eroare care facea ca ZynAddSubFX sa crape daca dezactivez un part utilizat
+	    - Inceput sa scriu Rezonanta
+02 Dec 2002 - Terminat de scris Rezonante
+            - Adaugat filtru trecer-banda (BPF)
+	    - Scris Recording
+03 Dec 2002 - Adaugat Gain la Resonance
+            - Adaugat "New Instrument" la meniu	    	    
+06 Dec 2002 - LANSAT PE INTERNET - VERSIUNEA (1.0.1)
+--------------------------------------------------------------------------------------------------
+08 Dec 2002 - Inceput sa scriu Bank si interfata pentru Bank
+09 Dec 2002 - adaugat si "make debug"
+            - Continuat sa scriu Bank/UI; acum se poate folosi (dar nu salva pe HDD) 
+10 Dec 2002 - Terminat Bank (mai trebuie scris un "config" file pentru a alege automat ultima banka folosita)
+11 Dec 2002 - Am mai lucrat ceva la Bank si am adaugat "config file"
+12 Dec 2002 - Filtrul BPF suna mai tare
+	    - Nu mai ar trebui sa fie probleme la compilarea FFTwrapper.h (fftw.h)
+13 Dec 2002 - LANSAT PE INTERNET - VERSIUNEA (1.0.2)
+--------------------------------------------------------------------------------------------------
+	    - Corectat o eroare care facea ca programul sa crape daca salvam parametrii in timp ce cantam
+	    - LANSAT PE INTERNET - VERSIUNEA (1.0.2-1) - de acasa
+--------------------------------------------------------------------------------------------------
+21 Dec 2002 - Corectate mici erori (nu mai dispare "Bypass Global Filter", inlaturat zgomotul de mica amplitudine - cauzat de reverb,nu mai apare intarzierea foarte lunga de la inceput a notelor muzicale daca conectam la aseqview)
+	    - Adaugat filtru de rejectie banda (Notch)
+	    - adugat randomize la Resonance
+	    - Inceput sa scriu VU-meter-ul	    
+22 Dec 2002 - Terminat VU-meter-ul
+            - Schimbat modul in care efectele de insertie se calculeaza (suna mai tare un pic)
+            - Adaugata o noua functie la OscilGen
+23 Dec 2002 - LANSAT PE INTERNET - VERSIUNEA (1.0.3)
+--------------------------------------------------------------------------------------------------
+24 Dec 2002 - Adaugata posibilitatea de a incarca fisiere ".scl" (la Microtonal)
+26 Dec 2002 - Adaugata optiunea de a folosi numai OSS-ul (fara ALSA)
+27 Dec 2002 - Corectate cateva erori si modificate cateva lucruri marunte la Microtonal
+28 Dec 2002 - Mici modificari la Microtonal
+            - Panic-ul la Reverb functioneaza OK 
+            - Inceput sa scriu Scale Degree Mapping la Microtonal
+29 Dec 2002 - Continuat Scale Degree Mapping la Microtonal (dar nu am terminat)
+30 Dec 2002 - Corectat lucrul cu ScaleShift-ul
+	    - schimbat modul in care se face keyshift-ul (nu se mai schimba armonia, indiferent de sistem)
+31 Dec 2002 - Terminat Mapping-ul la Microtonal(incl. incarcarea/salvarea)
+              Corectat eroarea care facea ca la Microtonal sa nu se incarce de fiecare data din scl_zyn unele date
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+01 Ian 2003 - Corectata o eroare la Microtonal (erau probleme la InvertKeys daca era folosit key mapping)
+	    - Adaugata un nou tip de waveshaping (Inverse Limiter)
+02 Ian 2003 - Adaugat afisaj al acordului fin (cents)	    
+    	    - Butoanele arata f. frumos (am adaugat un nou widget in loc de Fl_Dial)
+03 Ian 2003 - Schimbate butoanele (putin)
+            - Nu se mai aude un tacanit la ShutUp sau AllNotesOff
+            - Corectat putin waveshaper-quantisize si butoanele
+	    - Inlaturata o eroare care facea ca programul sa crape daca schimbam unii parametri ale efectelor
+07 Ian 2003 - LANSAT PE INTERNET - VERSIUNEA (1.0.4)	    
+--------------------------------------------------------------------------------------------------
+08 Ian 2003 - Am inlaturat de-a binelea eroarea (cu efectele - 3 Ian)
+11 Ian 2003 - Corectate o mica eroare care facea ca volumul sa fie negativ la ADnote::voice[].PVolume <64
+13 Ian 2003 - Corectata o mica eroare la VU-Meter
+            - Corectata o mica eroare cu privire la panning la Reverb
+15 Ian 2003 - Adaugat min/max keyresponse limits la Part
+	    - Adaugat Filtru si FiltreEnvelope la SubNote
+16 Ian 2003 - Curatat codul sursa (ADnote) prin inlaturarea unor variabile
+	    - Durata fadein-ul este aleasa automat (a.i. sa nu rezulte click-uri la notele joase si nici fadein-ul audibil la notele inalte sau cu freqcvente inalte)
+	    - Corectata o mica eroare care faca ca uneori instrumentul sa nu fie salvat/sters la Bank slot-ul cerut 
+	    - Imbunatatita putin interfata: La ADnote si SUBnote, butoanele care controleaza amplitudinea armonicelor sunt colorate diferit daca au amplitudinea 0
+17 Ian 2003 - Corectate erori la Chorus si la Phaser care faceau ca sa sune prea 'sec' (din cauza ca wet-ul era la 50% din volum)
+18 Ian 2003 - Inceput sa scriu Preset-uri la efecte
+19 Ian 2003 - Adaugat Preset-urile la efecte
+20 Ian 2003 - Schimbat putin HPF-ul la Reverb
+21 Ian 2003 - Adaugat tuning-ul la Reverb (si Freeverb) si Roomsize
+	    - Schimata putin interfata si modificat putin widgetul Pdial
+22 Ian 2003 - Amplificat volumul Reverb-ului cu 6 dB
+	    - Buffer-ul foloseste liste simplu-inlantuite, asa ca nu-i mai problema la "configuratii mari" (multe part-uri)
+24 Ian 2003 - LANSAT PE INTERNET - VERSIUNEA (1.0.5)	    
+--------------------------------------------------------------------------------------------------
+26 Ian 2003 - Inceput sa scriu GetAudioOutSamples, care ar putea fi apelat in modul callback
+27 Ian 2003 - Adaugat o noua fuctie la waveshaping (clip)
+	    - Adaugat suportul pentru Jack (adica programul poate rula in modul call-back ;-) )
+	    - Inlaturata o eroare care facea ca npart sa fie foarte mare si ca programul sa crape
+29 Ian 2003 - Schimbari foarte minore la OscilGen::waveshape (la clip)
+            - Daca dau "clear" la OscilEdit, butoanele care au amplitudinea zero, sunt colorate corect
+30 Ian 2003 - LANSAT PE INTERNET - VERSIUNEA (1.0.6)	    
+--------------------------------------------------------------------------------------------------
+31 Ian 2003 - Inceput sa adaug optiuni la linia de comanda 
+            - Rata de esantionare (SAMPLE_RATE) este setata la rulare si nu la compilare
+01 Feb 2003 - Inca 2 variabile sunt setate la rulare (SOUND_BUFFER_SIZE si OSCIL_SIZE)
+            - Volumul la Part se aplica doar dupa efecte de insertie
+	    - Inceput sa scriu Distorsionarea (fara filtre)
+02 Feb 2003 - Schimbate modurile de distorsionare (exp -> asym1 si pow -> pow ( altul ) )
+	    - Terminat Distorsionarea
+03 Feb 2003 - Adaugata inca o functie la waveshape (asym2)
+	    - Inceput sa scriu Controller-ii
+	    - Adaugat controller-i PitchWheel,Expression,Panning,Filter Cutoff, Filter Q, BandWidth, Modulation Wheel
+	    - Panning-ul si volumul sunt interpolate
+	    - Inceput sa scriu un nou program (Controller) care timite mesaje midi (controller) catre un port ALSA
+	    - Panning-ul la Part se aplica doar dupa efecte de insertie
+	    - Panning-ul la efecte se aplica inainte de procesare 
+04 Feb 2003 - Adaugat posibilitatea de a seta intensitatea/dezactiva la controlleri(incl. UI)
+            - Adaugat controler-ul FMmodulationAmplitude
+	    - Corectat o eroare la Buffer (care facea ca Buffer-ul sa nu se reseteze :-P )
+05 Feb 2003 - Corectata o eroare care facea ca programul sa consume mult din procesor (denormalisation)
+	    - Nu mai este permisa o valoare a lui OSCIL_SIZE care sa nu fie putere a lui 2 (este ajustata automat)
+	    - Adaugat controller-i Volume si Sustain Pedal, AllNotesOff, AllSoundOff, ResetAllControllers
+	    - Adaugat NRPN, adica toti parametrii efectelor pot fi controlati prin controlleri
+06 Feb 2003 - Pus limite la parametrii efectelor a.i. sa nu se seteze (datorita controllerilor) la valori nevalide
+	    - Inlaturata o mica eroare la controller-ul BandWidth
+	    - Schimbat putin EffectLFO::updateparams
+	    - Controler-ul BandWidth afecteaza doar FineDetune-ul
+	    - Schimbat putin identificare controlerilor si adaugat controlleri la OSS
+	    - Schimbat putin interfata utilizator la controlleri
+07 Feb 2003 - LANSAT PE INTERNET - VERSIUNEA (1.0.7)
+--------------------------------------------------------------------------------------------------
+08 Feb 2003 - Adaugat modul "mono"(monofonic) la part
+	    - Inceput sa scriu portamento-ul
+09 Feb 2003 - Terminat portamento-ul
+10 Feb 2003 - Inceput sa scriu Equaliser-ul
+	    - Inlaturata o eroare care facea ca la parametrii efectelor care sunt 0 sa nu fie incarcati
+11 Feb 2003 - Terminat Equaliser-ul (adica adaugat vizualizator freq response)
+	    - Corectata o mica eroare care facea ca part-ul 0 sa fie activ chiar daca cel salvat era inactiv
+12 Feb 2003 - Mici modificari la EQ (UI)
+	    - Adaugata posibilitatea de swap (stanga <--> dreapta)
+	    - Adaugat Q la filtrele shelf
+13 Feb 2003 - Adaugat inca un parametru la Phaser (phase)
+	    - Curatit putin codul sursa la efecte
+	    - Adaugat system effect send to next systems effects
+14 Feb 2003 - LANSAT PE INTERNET - VERSIUNEA (1.0.8)
+--------------------------------------------------------------------------------------------------
+            - cateva mici modificari (de la un patch primit de pe Internet)	    	    
+	    - adaugat keylimit la Part (si first note priority)
+15 Feb 2003 - Corectata o foarte mica eroare la Part 	    
+16 Feb 2003 - Se poate aplica filtrul inainte de distorsion	    
+	    - Adaugat filter stages (adica filtrul se poate aplica de mai multe ori)
+17 Feb 2003 - Corectata o mica eroare la Reverb si modificat putin filter-ul si UI
+18 Feb 2003 - Corectata o eroare care facea ca semnalul la voice sa fie intre [-4.0..4.0] si sa faca probleme la RingModulation
+	    - Adaugat modul Noise la ADsynth(voice) pentru a putea produce si tobe
+	    - Adaugat parametrul fixed frequency la 440Hz
+19 Feb 2003 - Corectata o mica eroare la ADnote (aparea un fadein nedorit)
+            - Facute inca cateva mici modificari la ADnoteUI
+20 Feb 2003 - Imbunatatit foarte mult Controller-ul si adaugat la ZynAddSubFX ca program extern
+            - Modificat putin Waveshaper-ul (fct. L/U limit)
+	    - Corectata o eroare la SUBnote (care facea probleme la glissando)
+	    - Adaugat un nou parametru Punch la ADnote care face ca sa sune ca si cum ar fi o lovitura (f. util la Rhodes)
+21 Feb 2003 - Adaugata inca o functie de distorsionare x(1-x)
+23 Feb 2003 - Corectata o eroare (cu mutex) care facea ca sunetul sa fie extrem de tare, daca in timp ce cantam, modificam unii parametrii de sunet la ADnote
+24 Feb 2003 - LANSAT PE INTERNET - VERSIUNEA (1.0.9)
+--------------------------------------------------------------------------------------------------
+            - Adaugata posibilitatea de a tipari notele si timpul in care au fost produse (optiunea -D)
+26 Feb 2003 - Adaugat inca 2 controlleri (Resonance Center Freq. (relative) si Resonace Bandwidth(relative))
+27 Feb 2003 - Adaugata posibilitatea de a modifica parametrii (in mod direct) al oscilatorului extern
+07 Mar 2003 - Portat partial(doar interfata) programul sub Windows 
+08 Mar 2003 - Adaugat Virtual Keyboard
+            - Cateva mici modificari in vederea portarii pt. windows
+	    - Adaugat si controller la Virtual Keyboard
+09 Mar 2003 - Adaugat pitch wheel la Virtual Keyboard si modificat putin controller-ul la VK
+10 Mar 2003 - Adaugat Filter Frequency Tracking (adica modificarea frecventei filtrului in functie de frecventa notei)
+	    - Marite eficienta la LFOparams - update lfotime
+	    - Adaugat mod de normalize prin RMS
+	    - Corectate doua erori la Distorsion (negate si mono+prefiltering)
+11 Mar 2003 - In Windows, nu mai este necesar functiile getopt (scrisa o functie proprie)
+12 Mar 2003 - Adaugat filtru la OscilGen
+13 Mar 2003 - Adaugat mai multe filtre la OscilGen
+	    - Facute optimzari la ADnote (adaugarea unui element la oscilsmp si fmsmp,etc.) si curatat putin codul sursa
+	    - Corectata o eroare care amplifica fm-ul la rate de esantionare inalte
+	    - Optimizat si curatat reverb-ul
+16 Mar 2003 - Modificate optiunile de compilare in Makefile.inc si coduri sursa a.i. sa se realizeze portarea pe windows mai usor
+17 Mar 2003 - Inregistrarea se face in formatul WAV si nu RAW
+	    - Adaugat trigger la recorder (se incepe inregistrarea doar cand este apasata o nota)
+	    - Adaugat interfata PortAudio
+	    - Corectata eroarea care facea ca UI sa nu ruleze pt. Windows (trebuia dat show() la UI in thread-ul 3) si corectate alte erori din windows
+	    - Si audio-ul functioneaza sub Windows
+	    - Corectata o eroare care se manifesta foarte rar(Resonance, i era de la 0 si nu de la 1)
+18 Mar 2003 - Adaugat interpolare la filtru (nu se mai aud tacanaituri, daca frecventa filtrului se schimba foarte rapid si semnalul contine putine armonice)
+	    - Adaugat interfata Midi in Windows => consider ca programul este portat in Windows
+19 Mar 2003 - Adaugat interfata de configurare 
+	    - Corectata o eroare la OscilGen care facea ca in loc ca amplitudinile sa fie reduse la -40,..,-100dB, sa fie setate la 1 si unde era intensitate mare sa file amplificate
+20 Mar 2003 - Corectata o mica eroare la interfata (uneori disparea butonul ON de la ADvoice)
+21 Mar 2003 - LANSAT PE INTERNET - VERSIUNEA (1.2.0)
+--------------------------------------------------------------------------------------------------
+	    - Se interpoleaza filtrul si cand se trece peste pragul Nyquist (in sus sau in jos)
+22 Mar 2003 - Corectata o eroare care facea ca nr. de esantioane scrise in headerul fisierului WAV sa nu fie initializat
+26 Mar 2003 - Nu mai este permisa alegerea unui fisier wav in timpul pauzei de la record
+	    - Gasita si corectata o eroare stupida (am pus la NRPN 0x98 in loc de 98 zecimal)
+28 Mar 2003 - Inceput sa portez programul sub VST
+29 Mar 2003 - Adaugat Master fine detune (-64.0 .. 63.0 cents)
+01 Apr 2003 - Functioneaza portarea sub VST, dar mai este de lucru...
+02 Apr 2003 - Modificat synth-ul a.i. sa se poate apela in mai multe instante in VST
+	    - Continuata portarea in VST
+03 Apr 2003 - Continuata portarea in VST (este limitat la o singura instanta)
+05 Apr 2003 - Adaugata posibilitatea de a interschimba/copia parametrii efectelor
+	    - Mici modificari la Makefile (ignora headerele inexistente la deps)
+06 Apr 2003 - Adaugat posibilitatea de protectie impotriva atenuarii a notei fundamentale la rezonanta	    
+	    - Pitch bend-ul merge bine in Windows
+07 Apr 2003 - LANSAT PE INTERNET - VERSIUNEA (1.2.1)
+--------------------------------------------------------------------------------------------------
+	    - Adaugat efect la part (adica efect care face parte din instrument ;-) )
+08 Apr 2003 - Adaugata interpolare la Resonance (peak-urile le interpoleaza)
+09 Apr 2003 - Interfata la Envelope este o singura clasa
+	    - Adaugat Envelope free mode (adica de orice forma)
+	    - Adaugata posibilitatea de a copia de la o voce la alta la ADnote
+	    - Release-ul este liniar (in loc de dB)
+10 Apr 2003 - Adaugata afisarea ultimului fisier master salvat/incarcat
+	    - Adaugata setarea notei minime/maxime la ultima nota
+	    - Pot alege daca release-ul sa fie liniar
+	    - Facute cateva corecturi la envelope
+11 Apr 2003 - Curatat codul sursa la UI si impartit in mai multe fisiere .fl
+	    - Corectate niste erori la Envelope si adaugat modul liniar/logaritmic la amplitudine
+12 Apr 2003 - Inceput sa scriu kit-ul la part
+13 Apr 2003 - Terminat de scris kit-ul la part+UI
+14 Apr 2003 - Copierea vocilor este sub forma de clipboard
+	    - ADsyn su SUBsyn check-urile de la PartUI sunt actualizate
+15 Apr 2003 - LANSAT PE INTERNET - VERSIUNEA (1.4.0)
+--------------------------------------------------------------------------------------------------
+16 Apr 2003 - Adaugat modul "Single" la instrument kit, care face ca sa sune doar primul instrument din kit disponibil
+21 Apr 2003 - Adaugat realtime priority, care seteaza prioritatea mare la sintetizator, daca are posibilitate; merge numai pe Linux
+	    - Gasite multe erori mici(dar potential periculoase) cu ajutorul programului Valgrind
+30 Apr 2003 - Adaugat "Spectrum adjust" la OscilGen, care ajusteaza intensitatile armonicelor
+03 Mai 2003 - Normalizat spectrul inaintea adjust-ului la OscilGen
+04 Mai 2003 - Adaugat mod "egal temperat" la fixed frequency (440Hz), util la tobe
+05 Mai 2003 - Adaugat modul "Drum mode", unde sistemul este intotdeauna temperat (12tET), toate notele sunt mapate si transpose-ul este ignorat
+08 Mai 2003 - LANSAT PE INTERNET - VERSIUNEA (1.4.1)
+--------------------------------------------------------------------------------------------------
+09 Iun 2003 - Am schimbat <FL/... .h> in .H in fisierele .fl (ca sa se poate compila si pe Debian)
+10 Iun 2003 - Inceput sa modific interfata la filtru a.i. sa pot adauga filtrul formantic usor
+	    - Interfata pentru filtru este o singura clasa
+12 Iun 2003 - Inceput sa scriu panoul de part-uri (care afiseaza parametrii importanti ale part-urilor)
+	    - VU-meter-ul poate afisa si intensitatea part-ului dorit (folosit la panou de part-uri)
+13 Iun 2003 - Terminat panoul de part-uri
+	    - Adaugat posibilitatea de a inchide automat fereastra bancii de instrumente, cand se incarca un instrument
+19 Iun 2003 - Modificat modul cum se calculeaza frecventa filtrului (se fac doar adunari si doar la urma se ridica la putere)
+22 Iun 2003 - Aproape terminat filtrul formantic (fara UI)
+24 Iun 2003 - Merge mai multe instante in jack (alege porturi diferite)
+26 Iun 2003 - Continuat de scris filtrul formantic
+29 Iun 2003 - Adaugat vu-meter fals la Panel (in caz ca partul este dezactivat si primeste note on). De asemenea se arata daca in partul dezactivat s-a cantat ceva (apare o liniuta).
+09 Iul 2003 - Inceput sa scriu interfata pentru filtrul formantic
+10 Iul 2003 - Continuat filtrul formantic (interfata)
+11 Iul 2003 - Eroarea vine de la Makefile pt. ca nu recompileaza si clasele care folosesc o anumita clasa, daca aceasta din urma se schimba
+	    - Continuat filtrul formantic (interfata+adaugarea interpolarii la Q)
+12 Iul 2003 - Adaugat la filtrul formantic setarile de amplitudine formanti si interpolarea acestora
+	    - Adaugat grafic la UI-ul filtrului formantic si alti paramatrii la filtrul formantic
+13 Iul 2003 - Corectata eroarea la FormantFilter care facea ca sa nu se interpoleze intre vocale
+	    - Adaugat parametrul VowelClearness la FormantFilter care face ca sa se evite vocalele mixte
+14 Iul 2003 - Inlaturat parametrul Psequence[].pos, pt. ca era confuz => fiecare vocala are zona egala
+	    - Adaugat parametrii Psequencestretch si Psequencereversed la FormantFilter
+	    - Adaugat parametrul Pgain la filtru (-30...30 dB)
+	    - Terminat de scris Filtrul Formantic
+	    - Corectata o eroare care facea ca sa nu se salveze oscilatorul la o ADnote_voce, daca vocea este dezactivata, chiar daca era folosita de o alta voce
+	    - Prima data se cauta fisierul "default.bnk_zyn" si in dir "/usr/share/zynaddsubfx" sau "/usr/local/share/zynaddsubfx"
+15 Iul 2003 - Setat Pkeylimit prestabilit la 15 la Part 
+	    - Activarea unui Part din interfata Panel schimba automat part-ul curent la acela
+	    - Se poate alege ca un instrument din Kit sa fie procesat incepand cu un anumit efect; si se mai poate alege ca un efect din Part sa fie trimis in afara
+17 Iul 2003 - LANSAT PE INTERNET - VERSIUNEA (1.4.2)
+--------------------------------------------------------------------------------------------------
+21 Iul 2003 - Corectata o eroare la FilterUI care facea ca la fiecare afisare sa se initializeze FilterParames::Pgain la 64
+25 Iul 2003 - Corectata o eroare care facea ca modulatia in faza/frecventa sa sune diferit la diferite rate de esantionare/oscilsize
+26 Iul 2003 - Afisat corect - valoarea OSCIL_SIZE ajustata (in caz ca a fost data optiunea "-o" incorect)
+	    - In windows arata si numele la midi_in_device
+04 Aug 2003 - Adaugat filtrele Peak,LowShelf,HighSelf la filtru si foloseste parametrul Gain de la interfata filtrelor
+30 Aug 2003 - Adaugat un nou tip de filtru: State Variable Filter
+31 Aug 2003 - LANSAT PE INTERNET - VERSIUNEA (1.4.3)
+--------------------------------------------------------------------------------------------------
+02 Sep 2003 - Adaugata posibilitatea de a incarca de la inceput un fisier .mas_zyn "-l"
+	    - Se poate lansa programul fara interfata utilizator ("-U")
+17 Sep 2003 - Adaugat niste simple patch-uri de Frank Neumann
+02 Oct 2003 - Corectata o eroare la SUBsynth care facea ca la freq inalte si Q foarte mici sa se produca filtre instabile
+30 Oct 2003 - Adaugate posibilitatea (+interfata in config) de Dump (avansat)
+	    - Adaugat ModWheel liniar si facut prestabilit (si posibilitatea de a alege in interfata modul de modwheel)
+04 Nov 2003 - Modificat putin interfata la ResonanceUI
+05 Nov 2003 - Marita viteza prin inlocuirea de (int) cu cod de asamblare (cu.10-50% la FM,chorus,etc.)
+10 Nov 2003 - Inceput sa adaug posibilitatea de a adauga comentarii la instrumente
+11 Nov 2003 - Terminat de adaugat comentariile/autor/tipuri la instrumente
+12 Nov 2003 - Adaugat intefata pentru FFTW3 la fftwrapper
+18 Nov 2003 - Inceput sa scriu Sequencer-ul
+19 Nov 2003 - Adaugat un buton "i" pt. instrument info si facut ca instrument info sa se afiseze automat daca se schimba partul (sau se incarca instrumente,etc)
+20 Nov 2003 - Continuat de scris Sequencer-ul si inceput sa ii scriu interfata 
+	    - Mici modificari la preset-urile de la Echo
+26 Nov 2003 - Continuat de scris sequencerul - inceput sa scriu inregistrarea (fara timer)
+27 Nov 2003 - Se poate inregistra (dar nu rula) - adaugat timerul de inregistrat
+	    - Frecventa maxima al filtrelor este de Nyquist-500.0 pentru a evita instabilitatea filtrelor
+28 Nov 2003 - Adaugata favorizarea portamento-ului in sus sau un jos; ex. se poate face ca portamento-ul sa fie doar in sus, sau portamento-ul in jos sa fie mai scurt decat cel in jos
+	    - Inceput sa pun pe cvs la cvs.sourceforge.net
+01 Dec 2003 - Am facut niste mici modificari ca urmare a unui bug-report
+05 Dec 2003 - Facute cateva modificari la jack
+08 Dec 2003 - Inceput sa incerc sa fac rt-safe sub jack, dar in stadiul actual suportul jack este nefunctional
+11 Dec 2003 - Adaugat aleatorism la amplitudinile armonicelor
+13 Dec 2003 - Adaugat LFO frequency randomness
+14 Dec 2003 - Imbunatatit LFO frequency randomness
+15 Dec 2003 - Corectata o mica eroare la ADnoteParameters (lipseau niste break-uri la salvarea/incarcarea parametrilor)
+16 Dec 2003 - Eroarea cu break-urile se dovedeste a fi o eroare majora :( ; adica corectarea ei, necesita resalvarea tuturor instrumentelor
+	    - Am revenit la suportul vechi de JACK, dar cel nou este disponiblil ca JACK_RT (nefunctional inca)
+17 Dec 2003 - Inceput sa restucturez Part-ul (am adaugat clasele Instrument,InstrumentParams) - programul nu mai este compatibil cu versiunile anterioare
+	    - RMS normalize este prestabilit la OscilGen
+18 Dec 2003 - Continuat de restructurat Part-ul
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+01 Feb 2004 - Revenit la versiunea din 16 Dec. 2003
+	    - Pus iarasi RMS normalize prestabilit la OscilGen
+	    - M-am razgandit ;) nu mai restructurez part-ul; mai bine pun acolo o functie separata pentru salvari/incarcari par instrumente
+	    - Inceput sa adaug suportul XML
+02 Feb 2004 - Corectata o eroare care facea ca numele la instrumentele din bank sa fie aratate gresit (nu era pus un \0 )
+	    - Continuat suportul de XML
+03 Feb 2004 - Continuat de scris suportul XML - inceput sa salvezi cativa parametrii
+04 Feb 2004 - Se salveaza parametrii XML la master, part, filter, lfo, envelope, resonance si adnote (partial)
+05 Feb 2004 - Se salveaza toti parametrii in XML
+06 Feb 2004 - Adaugat salvarea de instrument in XML
+	    - Adaugat export la bank intr-un director XML si decis ca bank-ul sa fie un director cu mai multe fisiere xml de forma XXXX-nume.xml sau XXXX-nume.xml.gz
+07 Feb 2004 - Adaugat functii de initializare si renuntat la masterdefaultbuf si instrumentdefaultbuf (adica salvarea la inceput si incarcarea bufferelor cu instrumentele prestabilite)
+	    - Corectata o mica eroare care facea ca sa se incarce subnotepars la adnotepars (eroarea a aparut azi)
+08 Feb 2004 - Modificat putin formatul XML
+10 Feb 2004 - Adaugata salvarea parametrilor pt. basefunction la OscilGen
+	    - Inceput sa scriu incarcarea parametrilor
+11 Feb 2004 - Se pot incarca cativa parametrii de la master
+12 Feb 2004 - Continuat incarcarea parametrilor XML si la part (neterminat)
+13 Feb 2004 - Terminat de adaugat parametrii la incarcarea XML
+14 Feb 2004 - Se poate incarca si instrumente
+	    - Rezolvata o problema la coarse detune
+	    - Corectate cateva erori la incarcarea XML-ului
+	    - Frecventa LFO-ul de la instrumente are valoare reala intre 0..1
+	    - Corectata eroarea care facea ca functia de rezonanta sa fie trasata incorect
+	    - Adaugata compresie gzip la fisiere si decompresie automata la incarcare (folosesc biblioteca zlib)
+15 Feb 2004 - O mica modificare la envelope parameters in sensul ca envelope-ul prestabilit la FM nu mai este liniar
+22 Feb 2004 - Adaugat normalize Full RMS la Oscil
+23 Feb 2004 - Inceput sa fac ca sa pot adauga Bank bazat pe XML (adaugat temporar clasa OldBank)
+24 Feb 2004 - Continuat la Bank
+25 Feb 2004 - La Bank - inceput sa scriu partea ca sa arate instrumentele din banca
+26 Feb 2004 - Continuat la Bank
+27 Feb 2004 - Corectate erori la snprintf (nu dadeam parametru "%s" inainte de string si daca acel string continea ceva %, era periculos) si alte erori
+	    - Micsorat timpul de marire amplitudine la ADnote (doar in cazul cand amplitudinea creste brusc ca la un LFO expdown)
+	    - Corectata o eroare foarte veche la LFO amplitudine (amplitudinea nu scadea corespunzator)
+28 Feb 2004 - Se poate incarca si salva instrumente in Bank
+01 Mar 2004 - Se pot schimba bancile de instrumente
+	    - Introduse si celelalte functii la Bank (cu exceptia salvarii/incarcarii locului bancii folosite)
+	    - Se poate importa banci din bnk_zyn
+03 Mar 2004 - Terminat (teoretic) partea de XML
+05 Mar 2004 - Actualizat Copyright-ul la 2004 in fisiere
+08 Mar 2004 - Corectat o mica eroare la OscilGen (se aplica gain-ul rezonantei incorect)
+09 Mar 2004 - Adaugata posibilitatea de stretch la LFO in functie de frecventa notei
+12 Mar 2004 - Adaugata modulatie la OscilGen (functia de baza)
+13 Mar 2004 - Adaugat HarmonicShift la oscilgen
+15 Mar 2004 - Inceput sa scriu partea de incarcare MIDI
+	    - Inlaturata partea de recording din Sequencer
+16 Mar 2004 - Inceput sa scriu partea de analiza midi
+25 Mar 2004 - Continuat partea de analiza midi
+28 Mar 2004 - Scris partea de incarcat fisier midi 	    
+	    - Merge partial playerul
+26 Mai 2004 - Playerul merge bine cu un canal midi (rezolvata problema cu timing-ul)
+03 Iun 2004 - Adaugata partea de play speed la interfata
+06 Iun 2004 - Adaugata functia sigmoid la distorsionare
+12 Iun 2004 - Modificat modul cum este realizat bank-urile, adica directoarele de bank-uri exista in anumite directoare si aceste directoare sunt cautate automat de bankuri; adaugat optiunea de a se folosi mai multe bank-uri
+13 Iun 2004 - Adaugat filtrul "sinus" la OscilGen
+	    - Managementul bancilor de instrumente este complet
+	    - Se cauta bancile si in '/usr/share/zynaddsubfx/banks' si '/usr/local/share/zynaddsubfx/banks'
+	    - Corectata o eroare la filter la OscilGen care filtra diferit componentele sin si cos
+	    - Adaugat posibilitatea de swap la instrumentele din bank
+14 Iun 2004 - Adaugat __DATE__ si __TIME__ sa stiu cand s-a compilat
+	    - Modificat interfata la PartUI
+	    - Imbunatatit modulatia basefunc la OscilGen (adaugat inca un parametru si inca un tip de modulatie ("power"))
+	    - Adaugat inca o noua functie basefunc la OscilGen (sqr=atan(sin(x)*a))
+15 Iun 2004 - Adaugat posibilitatea de a face armonicele ca sa depinda de frecventa ("adaptive") si rezultatul suna foarte frumos pentru ca tendinta este de pastrare a frecventelor armonicelor si nu a numarului de ordine al lor
+16 Iun 2004 - Inceput sa trec configul pe XML
+17 Iun 2004 - Adaugat tipul threshUp la spectrum adjust
+	    - Terminat de trecut config-ul pe XML (inclusiv setarile bancilor de instrumente)
+18 Iun 2004 - Incercata interpolarea cubica dar am vazut ca nu merita pentru ca OSCIL_SIZE e suficient de mare si pentru o interpolare liniara
+	    - Separat OscilGenUI din ADnoteUI
+	    - Inceput sa scriu modulul de sinteza PADnote
+19 Iun 2004 - Adaugat modul liniar de controller bandwidth si modificat modul liniar la controllerul modulation wheel
+	    - Adaugata modulatia in frecventa la OsciGen
+20 Iun 2004 - Nu se mai deschide automat fereastra de instrumente daca a fost deschisa si s-a descarcat un instrument
+	    - Facute mici modificari la FM-ul de la Oscil
+21 Iun 2004 - Inceput sa scriu conversia in sinus
+22 Iun 2004 - Continuat conversia in sinus si facut teste pentru posibilitatea de "draw" cu sliderele
+23 Iun 2004 - Modificat modul in care parametrii se afiseaza la OscilGen (este o functie "refresh" care face asta)
+	    - Adaugata posibilitatea de draw la armonicele OscilGen daca se apasa tasta Shift
+	    - Corectata o mica eroare care facea imposibila modificarea amplitudinii armonicelor cu tastatura
+	    - Adaugat randomness de grup (adica se aplica acelasi randomness la toate vocile care folosesc acelasi oscilator)
+24 Iun 2004 - Inlaturata setara de normalize la OscilGen. Intotdeauna normalize este Full RMS
+	    - Facute cateva imbunatatiri la interfata unde sunt inlocuite comuter-urile cu setari mai usor de inteles de catre utilizator (ex. la efectele de insertie se arata "insert to Master Out" in loc de "-2")
+29 Iun 2004 - Inlaturata setarea cu gain la Resonance pentru ca este inutil (datorita faptului ca normalize este Full RMS intotdeauna)
+30 Iun 2004 - Inlaturata o eroare recenta la EffectUI si modificat EffectUI in sensul ca nu trebuie sters si reinstantiat pentru a se reincarca valorile curente de efecte
+	    - Inceput sa scriu un nou efect (DynamicFilter)	    
+01 Iul 2004 - Corectata o mica eroare la EffectUI care facea ca efectele sa nu apara activate
+	    - Continuat de scris la DynamicFiter (mai este doar de salvat parametrii si de auto-update la filtru)
+02 Iul 2004 - Continuat la DynamicFilter (adaugata auto-update, adaugat preset-uri)
+	    - Terminat DynamicFilter
+	    - Corectata o eroare la EQui care facea ca sa nu se actualizeze efectul curent si sa nu se obtina graficul egalizatorului
+03 Iul 2004 - Corectata o mica eroare care nu activa la EffectUI daca efectul anterior era dezactivat
+	    - Actualizat Swap/Copy la efecte ca sa proceseze si parametrii la filtre
+	    - Adaugat Bypass la efectele de instrument
+	    - Imbunatatit interfata utilizator (eliminate setarile "-1",etc.)
+	    - Scris calcularea profilului la PADsynth
+	    - Adaugat OscilGen si Resonance la PADsynth si inceput sa scriu interfata utilizator la PADsynth
+04 Iul 2004 - Adaugata calcularea automata a largimii de banda echivalente si afisarea ei
+	    - Inceput sa scriu partea de sinteza la PADsynth
+	    - Auzit primul sunet la PADsynth
+05 Iul 2004 - Nu mai face urat daca schimb parametrii in timp ce cant si apas apply
+	    - Adaugat harmonic scale si position la PADsynth
+	    - Se calculeaza corect si armonicele cu largime de banda mare
+06 Iul 2004 - Inceput sa adaug filtre,lfo,envelopes,etc. la PADsynth
+07 Iul 2004 - Corectate cateva mici erori si adaugat autoscale
+	    - Modificata putin interfata de la filtru
+	    - Adaugata interfata si parametrii la LFOs,Envelopes,Filter la PADsynth
+	    - Adaugata fereastra care arata pozitiile armonicelor si continuat de lucru la acestea
+08 Iul 2004 - La pozitiile armonicelor sunt aratate si valorile lor reale in dB
+	    - Alte adaugiri minore la PADsynth
+	    - Adaugat interpolare cubica la PADsynth
+09 Iul 2004 - Modificat modul cum se calculeaza profilul armonicelor la PADsynth (nu se mai ridica la patrat)
+	    - Corectate cateva erori la PADsynth
+	    - Modific amplitudinea in functie de sqrt(largime de banda) => amplitudinile armonicelor sunt echivalente cu oscil
+11 Iul 2004 - Acum nu se mai intrerupe sunetul la notele care canta in timp ce sunt aplicate modificarile la parametrii
+	    - Se poate alege marimea sample-lui
+	    - Adaugat multisampling la PADsynth
+	    - Cand se incarca parametrii ADsynth se da volumul ceva mai incet ca sa corecteze faptul ca normalize-ul este doar RMS
+12 Iul 2004 - Inlocuit codul de D/W sau Volume de la efecte cu un cod unic in EffectMgr
+	    - Se poate face efecte la instrumente la care doar semnalul Wet e procesat de efectele urmatoare
+	    - Modificat modul cum se calculeaza intensitatea Wet la Reverb si Echo
+	    - Corectata eroarea la FM care facea ca daca Adaptive Harmonics!=0 sa se calculeze FM-ul gresit
+13 Iul 2004 - Rezonanta la PADsynth se face in functie de armonica reala si nu de numarul de ordine al armonicei
+	    - LFO,Envelope, Filters, etc. merg la PADnote
+	    - Inceput sa fac partea de aratare ca parametrii au fost schimbati (butonul "Apply" se coloreaza in rosu)
+14 Iul 2004 - Butonul Apply la PADsynth se coloreaza in rosu cand se modifica ceva
+	    - Adaugat fixed freq. la PADsynth
+	    - Sunt salvati si parametrii PADsynth => consider in mod oficial ca PADsynth este complet
+15 Iul 2004 - Facuta o modificare la PADnoteUI care arata foarte frumos
+	    - Completata partea de save/load si stabilite noile extensii ale fisierelor: master - .XMZ, instrument - .XIZ, microtonal - .XSZ
+	    - Inlocuit memset cu un macro (ZERO) pentru ca memset nu seteaza toate valorile ci uneori doar prima valoare cu 0 (e o optimizare la gcc care face asta)
+	    - Corectate niste erori la makefile care aveau legatura cu compilarea in windows
+	    - Corectate 2 erori referitor la Banci de instrumente
+16 Iul 2004 - Adaugat inca noi tipuri de harmonic bandwidth scale
+	    - Adaugat inca un parametru la filter la OscilGen si inca un nou tip de filtru
+17 Iul 2004 - Corectata o eroare care facea sa crape programul uneori dupa ce scria instrumentul in banca
+	    - Modificata optiunea -l ca sa incarce un .xmz
+            - LANSAT PE INTERNET - VERSIUNEA (2.0.0pre1)
+--------------------------------------------------------------------------------------------------
+18 Iul 2004 - Corectata o mica eroare la afisare care facea ca la PADnoteUI sa fie trasate liniile in mod gresit
+19 Iul 2004 - Corectata doua mici erori (se incarca gresit parametrii filtrului de la OscilGen)
+	    - Corectata inca o mica eroare care facea ca sa nu se coloreze butonul PAD_Synth Apply in rosu la anumiti parametrii de la oscilgen
+	    - Se dezactiveaza butoanele Edit de la PartUI ca sa nu se poata edita module de sinteza inactive
+20 Iul 2004 - Corectate cateva erori cu compilare pe windows
+21 Iul 2004 - Corectata o mica eroare la Bank si alte erori
+26 Iul 2004 - Acum este folosita biblioteca mxml-2
+	    - Corectata o eroare care facea ca sample-ul la PADnote sa nu fie ales in functie de frecventa reala de baza (cu detune)
+	    - Mutat functiile de waveshaping in Distorsion.C/.h
+27 Iul 2004 - Corectata o eroare foarte suparatoare care bloca uneori calculatorul
+	    - Adaugat inca un nou parametru la PADsynth la base function
+	    - Nu se mai arata butonul de apply parameters la PADsynth cand nu este necesar	    
+	    - Eliminate blocarile de cateva secunde din threadul de sunet in momentul cand se incarca un nou instrument care contine parametrii PADsynth
+	    - Adaugata schimbarea titlului ferestrei principale la load XML
+29 Iul 2004 - Modificat modul cum este stocat lista de banci root dir
+	    - Gasita o eroare care facea ca sa se stearga denormalkillbuffer inaintea lui master
+30 Iul 2004 - Gasite si corectate o gramada de erori (eu stergeam elemente din ferestre si fltk le stergea din nou)
+	    - Eliminate warning-urile pentru -Wall
+31 Iul 2004 - Eliminate complet stergerile in plus de la UI din destructorele obiecte
+            - LANSAT PE INTERNET - VERSIUNEA (2.0.0pre2)
+--------------------------------------------------------------------------------------------------
+01 Aug 2004 - Adaugat un nou tip de OvertonesPosition la PADsynth
+02 Aug 2004 - Am pus din nou schimbarea schedule-ului la valoare corecta (l-am scos dintr-o greseala)
+04 Aug 2004 - Am corectat niste erori la VST
+	    - Merge VST, dar nu intotdeauna stabil (merge stabil pe vsthost.exe)
+	    - Corectata eroare care facea ca sa nu mearga MIDI
+            - LANSAT PE INTERNET - VERSIUNEA (2.0.0pre2 VST)
+--------------------------------------------------------------------------------------------------
+13 Aug 2004 - Inceput sa scriu modurile continous si discrete la PADnote
+14 Aug 2004 - Terminat modul continous la PADnote
+	    - Corectata o mica eroare la OscilGen care facea daca adaptive harmonics e activ si phase randomness>0 sa rezulte si aleatorism in amplitudinile armonicelor
+	    - Inceput sa scriu Presets/Clipboard (Clipboardul, in stadiu actual va putea copia doar parametrii folositi si nu cei dezactivati)
+	    - Merge partial partea de Copy in clipboard
+15 Aug 2004 - Corectata o eroare in main.c la pitch bend
+	    - Scos Swap/Copy la efecte si la PartUI si vechiul Copy/Paste de la ADnote voice
+	    - Merge clipboardul la Oscil, Resonance, Filter si partial la ADsynth,SUBSynth si PADsynth
+16 Aug 2004 - Corectata inca o eroare la pitch bend (aratata de Krzysztof Korpiela)
+	    - Adaugat refresh si la Filtru si paste la ADnote, SUBnote si PADsynth sunt complete
+17 Aug 2004 - Adaugat clipboard la LFO, Envelope, ADnoteVoice si Filter Vowel
+18 Aug 2004 - In clipboard se salveaza toti parametrii (chiar si cei dezactivati)
+	    - Corectata o eroare care facea ca instrumentul sa fie incarcat la fiecare salvare in banca
+	    - Tipurile de lfo sunt compatibile intre ele la clipboard
+19 Aug 2004 - Corectata o mica eroare la XMLwrapper care facea ca sa se salveze fortat toti parametrii (chiar si cei nefolositi)
+	    - Adaugata partea de salvare/incarcare a listei directoarelor unde se afla presetarile
+21 Aug 2004 - Am lucrat putin la salvare/incarcare a listei dir. cu presetari
+22 Aug 2004 - Corectata o eroare de compilare
+	    - Makefile-ul modificat, a.i. make-ul sa se opreasca in caz de eroare
+	    - Terminat managerul de preset-uri
+23 Aug 2004 - Adaugata posibilitatea de a se vedea direct din lista cu bancile de instrumente
+24 Aug 2004 - Inlaturat complet suportul pentru formatele *.mas_zyn, *.ins_zyn, *.bnk_zyn si *.scl_zyn
+	    - Ascuns Sequencer-ul de utilizator (o sa il continui mai incolo)
+25 Aug 2004 - Listele de banci si de preset-uri sunt sortate
+	    - Corectate niste erori la Oscilgen care faceau ca sa se calculeze randomness chiar daca este folosit de PADsynth si pus automat parametrul randomness daca PADsynth este folosit (in caz ca se va importa la un ADsynth)
+	    - Gasita o eroare care face sa crape daca lucrez mult cu bancile de instrumente
+27 Aug 2004 - Adaugata posibilitatea de a dezactiva aratarea starii PADsynth din instrumente
+            - LANSAT PE INTERNET - VERSIUNEA (2.0.0)
+--------------------------------------------------------------------------------------------------
+05 Sep 2004 - Corectata o mica eroare de la SUBnote (legat de pitch wheel)	    
+06 Sep 2004 - Eliminata variabila "disablekitloading" din Part si din UI
+07 Sep 2004 - Modificat id-ul vst in 'zasf' (inainte era de 5 litere si poate cauza un crash la host)
+27 Sep 2004 - Corectat un mic bug la salvare in xml la parametrul FMcoarseDetune din adnote
+	    - La VST, daca incerc sa inchid fereastra principala, se minimizeaza	    
+	    - Eliminate setarile cu indice '0' (zero) 
+28 Sep 2004 - Adaugata salvarea tuturor parametrilor in hostul VST (trebuie testat)
+	    - Adaugat installer pt. windows (cu NSIS)
+29 Sep 2004 - Inceput sa scriu interfata utilizator pt. incepatori
+30 Sep 2004 - Terminat de scris interfata utilizator pt. incepatori si se selecteaza la pornire modul dorit
+	    - Adaugata posibilitatea de a compila cu suport jack si oss simultan si sa se aleaga runtime ce doresc (jack/oss)
+01 Oct 2004 - Corectata o mica eroare care facea ca sa nu se inchida ferestrele cu instrumente cand incarc din banca
+            - LANSAT PE INTERNET - VERSIUNEA (2.1.0)
+--------------------------------------------------------------------------------------------------
+02 Oct 2004 - Corectata o eroare grava care facea ca sa nu pot schimba partul curent in interfata utilizator obisnuita	    
+03 Oct 2004 - LANSAT PE INTERNET - VERSIUNEA (2.1.1)
+--------------------------------------------------------------------------------------------------
+04 Oct 2004 - Corectata o eroare care face ca in modul simple UI, sa se inverseze panning-ul	    
+	    - Adaugat un icon la ZynAddSubFX
+10 Oct 2004 - Si controllerul de Resonance se aplica la toate item-urile din kit
+12 Oct 2004 - Corectata o eroare care facea ca butoanele Addpoint si Delpoint de la Envelope sa nu fie afisate
+16 Oct 2004 - Corectata o eroare care facea ca partUI-ul sa nu se actualizeze intotdeauna cand incarcam un instrument
+20 Oct 2004 - Corectata o mica eroare asemanetoare cu cea din 16 Oct, dar care afecta meniul new
+07 Nov 2004 - Corectata o mica eroare care facea ca sa nu se incarce corect instrumentele in linia de comanda (-l)
+14 Nov 2004 - Nu mai verific in bank daca este un director sau fisier simplu, pt. ca poate sa aiba probleme
+28 Nov 2004 - Curatat codul la OscilGen (acum datele sunt stocate mai bine si nu in functie de biblioteca FFTW)
+	    - Corectata o mica eroare la OscilGen cu adaptive harmonics care facea ca energia vechilor armonice sa nu se adauge in mod corect la noile armonice (la note inalte)
+	    - Sortarea nu mai este quicksort la bank si la presets pt. ca am vazut ca nu merge in windows intotdeauna
+	    - Corectata o eroare la egalizator care facea ca sa se aplice si la el par. D/W
+29 Nov 2004 - Marita zona de valori la adaptive harmonics power din OscilGen 
+	    - Adaugata posibilitate de a post-procesa la adaptive harmonics(adica a adauga sau a amplifica anumite armonice)
+05 Dec 2004 - Corectata o eroare care facea ca functiile getChunk si setChunk sa fie supraincarcate in loc de suprascrise (dar nu am testat)
+	    - Corectata o eroare care returna gresit la canDo in vst (netestat)
+17 Dec 2004 - Inceput sa folosesc Dvorak pt. VK
+18 Dec 2004 - Continuat putin la VK
+20 Dec 2004 - Se poate selecta la VK dintre "qwerty" si "Dvorak"
+	    - Corectata o mica erare care facea sa nu arate BWprofile dezactivat la PADnote
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+
+04 Ian 2005 - Corectata o mica eroare care facea ca sa nu arate Force Release la Freemode Envelope
+15 Ian 2005 - Corectata o eroare la controllerul bandwidth care facea ca sa ajunga la valoarea 0 si sa dea peste cap SUBsynth
+22 Ian 2005 - Inceput sa scriu suportul pt. DSSI
+27 Ian 2005 - Corectata eroare care facea ca in cazul in care sunt 2 banci cu acelasi nume (sau aceeasi bank root dir sa fie selectat de 2 ori) sa produca confuzie
+03 Feb 2005 - Inceput sa scriu la Microtonal ca sa se faca butonul apply de culoare rosie cand se schimba ceva
+06 Feb 2005 - Facuta o mica modificare care interzice punera notelor "0" in dump si alta modificare care mareste nr. de octave calculate la PADsynth
+	    - Renuntat sa fac modificarea la Microtonal inceputa din 03 Feb, pentru ca nu am gasit cum pot schimba culoarea butonului automat cand modific un text
+07 Feb 2005 - Corectata o eroare care facea ca la microtonal mapping sa nu se calculeze corect (adica sa se stocheze valoarea corecta)
+12 Feb 2005 - Controllerul prestabilit la Virtual Keyboard este Filter Cutoff in loc de BandWidth
+	    - Modificate cateva preseturi la DynamicFilter
+	    - Adaugata posibilitatea de a mari sau micsora cu un parametru detune-ul vocilor de la ADnote	    
+17 Feb 2005 - Corectate cateva erori la PADsynth care faceau ca sa se citeasca date din zone de memorie nealocata
+	    - Corectata o eroare la Bank care facea ca uneori sa crape programul cand umblam mult cu bankuri
+19 Feb 2005 - Corectata o eroare care facea ca uneori sa fie calculata frecventa la ADnote=nan si programul sa crape pentru ca era folosit parametrul bandwidthDetuneMultiplier inainte de a fi calculat
+21 Feb 2005 - Se afiseaza corect numele fisierului proaspat salvat in fereastra principala
+26 Feb 2005 - Corectata eroarea la windows si la OSS care facea ca pitch bend sa nu fie mapat corect (trebuie verificat)
+27 Feb 2005 - Se afiseaza corect valoarea lui detune in centi 
+28 Feb 2005 - Corectata o mica eroare care facea ca sa nu se afiseze intotdeauna corect detune-ul la ADvoice
+	    - Afisajul VU-meter la Master nu mai prezinta variatii mari in timp scurt
+	    - Adaugata afisajul RMS la VU-meter
+06 Mar 2005 - Facute cateva mici modificari referitoare in special la warning-uri    
+	    - Corectata o mica eroare care facea ca la un Paste sa nu se actulizeze unii parametrii ai filtrului in interfata
+12 Mar 2005 - Imbunatatiri la interfata PADsynth, adica se poate da "apply" direct din OscilGenUI sau ResonanceUI
+13 Mar 2005 - Facute cateva compilari in Makefile pt. compilare pt. Windows (standalone exe si vst)
+	    - Se compileaza in mod cross-compile pt. windows din linux 
+14 Mar 2005 - Mici modificari la afisarea RMS-ului
+	    - Actualizat textul copyright-ului la anul 2005
+22 Mar 2005 - Corectata o mica eroare care facea ca la schimbari foarte lente al parametrilor sa nu se actualizeze Format Filter
+25 Mar 2005 - Corectata o eroare care facea ca uneori, la anumite setari ale lui SepctrumAdjust din OscilGen sa rezulte semnal zero
+	      Corectata o mica eroare care facea ca daca se foloseste setarea 440Hz la Padsynth sa se aleaga sample-ul incorect
+06 Apr 2005 - Modificat installerul pt. windows si pregatit pt. installer (folosit cross-compiling si nsis&wine)
+	    - Adaugat icon in format windows (si la installer)
+	    - Adaugat parametrul '-Y' la linia de comanda, care este folosit doar pentru installerul NSIS (parametrul este necesar pentru ca NSIS ma forteaza sa dau un parametru la program pentru ca sa adauge un icon la shortcut; zynaddsubfx ignora acest parametru)
+07 Apr 2005 - Pregatit pentru release
+08 Apr 2005 - Corectata o mica eroare care facea ca sa nu se incarce configul la inceput
+            - LANSAT PE INTERNET - VERSIUNEA (2.2.0)
+--------------------------------------------------------------------------------------------------
+12 Apr 2005 - Actualizat pentru MXML 2.2 (nu o sa mearga pe vers. mai vechi de mxml) 
+27 Apr 2005 - Adaugata posibilitatea de a inlatura complet interfata grafica in Makefile.inc (in acest caz nu mai sunt necesare bibliotecile grafice ca fltk)
+	    - Adaugata posibilitatea de a incarca direct un instrument cu -L (deocamdata se poate incarca doar in part-ul 0)
+            - LANSAT PE INTERNET - VERSIUNEA (2.2.1)
+--------------------------------------------------------------------------------------------------
+28 Apr 2005 - Corectata o eroare care facea ca uneori sa fie frecventa prea mare la LFO daca era folosit random
+	    - Nu mai afiseaza optionea -A in help daca nu este compilat si OSS si JACK
+29 Mai 2005 - Corectata o eroare care facea ca sa nu se tina minte ultimul bank	    
+27 Aug 2005 - Corectata o eroare care facea ca sa nu mearga functia Dump (se initializa inainte de citirea configurarilor)
+21 Sep 2005 - Imbunatatit modul de scalare al profilei unei armonice la PADsynth
+27 Sep 2005 - Gasita si rezolvata o posibila problema la PADsynth care facea ca sa nu se foloseasca mutex la stergerea de sample-uri (daca se aleg mai putine sample-uri decat initial)
+09 Oct 2005 - Rezolvat un memory-leak la FFTwrapper
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+16 Apr 2006 - Corectata o eroare care facea ca sa nu se foloseasca insertion effect la master
+20 Aug 2006 - Adaugat 88200 ca rata de esantionare
+14 Sep 2006 - Se afiseaza spectrul la nota cu frecventa de 440 Hz la Oscil si pentru parametru Adaptive Harmonics
+30 Oct 2006 - Adaugat un patch "standalone zombie fix stripped from Lars" 
+	    - Adaugat un patch "Extended mono" si "font resizing stuff" de Gerald Folcher
+31 Oct 2006 - Adaugat un patch "Extended mono v.3" de Gerald Folcher
+	    - Inlocuit fl_ask cu fl_choice in fisierele .fl
+	    - In mod prestabilit nu se mai seteaza volumul la efectul 0
+	    - Efectele sunt numerotare de la 1 si in la "send to" din partui
+01 Nov 2006 - Adaugat patch-urile de Jack Midi si LASH de Lars Luthman
+06 Nov 2006 - Aplicat un patch "Fix for ALSA system lockup" de Lars Luthman
+10 Nov 2006 - Aplicat un patch "zyn-extendedmono_v4_update-061110.diff.gz" de Gerald Folcher
+14 Nov 2006 - Aplicat un patch "zyn-CVS-extendedmono_v5_update-061113.diff.gz" de Gerald Folcher
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+19 Mar 2007 - Aplicat un patch mic de la Daniel Clemente care este un workaround la bug-ul X11 cand tin tastele apasate mai mult timp
+01 Apr 2007 - O mica modificare cu xclass zynaddsubfx in MasterUI.fl
+09 Sep 2007 - Schimbata licenta la GPL 2 or other later
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+02 Ian 2008 - Corectate cateva mici erori la dezalocarea memoriei
+	    - Codul de recorder wav a fost rescris
+	    - Adaugata functia de export la sample-urile din PADsynth
+
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+20 Feb 2009 (Mark McCurry)
+	    - Made several functions accept 'constant char' over 'char' to
+	      prevent warnings
+	    - Changed several 'delete' operations to 'delete []' based upon
+	      the usage of 'new []'
+	    - Gave external programs Makefiles
+	    - Gave dials tooltips showing their value when they are being
+	      moved
+	    - Gave dials the ability to have normal tooltips when the mouse
+	      hovers over them
+	    - Created tooltips for the effects knobs
+	    - Standardized the code, so it could compile with pedantic without
+	      errors [it looks like some errors may have been missed]
+
+22 Feb 2009 (Mark McCurry)
+	    - Fix improper deallocation in PresetsStore
+	    - Fixed errors with drawing of the Oscillator as reported with
+	      valgrind
+
+07 Mar 2009 (Mark McCurry)
+	    - Added start of DocBook documentation
+	    - Incorperated JACK output patch by Emmanuel Saracco
+	    - Incorperated QUERTZ layout by Achim Settelmeier
+
+29 Mar 2009 (Mark McCurry)
+	    - Started to use Doxygen within the Effects
+	    - Started to use const within Effects
+	    - Changing tabs->four spaces in hopes of generating a bit more
+	      consitancy
+	    - Began to use Initialization Lists
+	    - Almost all changes contained in Effects until further
+	      discussion on the style, so consistancy can be reached
+
+28 May 2009 (Mark McCurry)
+	    - Added some more Doxygen comments
+	    - Added Audio Samples classes
+	    - Added Stereo template
+	    - Added Control class
+	    - Added DelayCtl class
+
+20 Iun 2009 (Paul Nasca)
+	    - Bugfix: WAV export of PADsynth
+	    
+10 Iul 2009 (Paul Nasca)
+	    - Update copyright info
+
+11 Jul 2009 (Mark McCurry)
+	    - Added Proportinal Portamento
+	    - Replaced Docbook with AsciiDoc
+
+18 Jul 2009 (Mark McCurry)
+	    - Enabled volume controller by default
+
+20 Jul 2009 (Mark McCurry)
+	    - Incorperated AZERTY layout by sourceforge user jimee
+
+02 Sep 2009 (Mark McCurry)
+	    - Incorperated const char* <-> string mismatch by Alexis Ballier 
+	    
+04 Sep 2009 (Mark McCurry)
+	    - Incorperated NULLMidiIn function prototype fix by Alexis Ballier
+
+07 Sep 2009 (Mark McCurry)
+	    - Fixed glitch in XMLwrapper, which would prevent file loading
+
+11 Sep 2009 (Mark McCurry)
+	    - Moved PADsynth_used from public struct to has/set methods in 
+	      XMLwrapper
+	    - Created wrapper functions, so that XMLwrapper can be somewhat
+	      usable when const
+	    - Removed multiple addparam methods and replaced it with one
+	      variable argument function
+	    - Replaced int2str, real2str, str2int, and str2real from XMLwrapper
+	      with stringTo<T> and stringFrom<T> function templates in Util.
+	    - Moved newFFTFREQS and deleteFFTFREQS from Util to FFTwrapper
+	    - Removed unneeded stack from XMLwrapper
+
+18 Sep 2009 (Mark McCurry)
+	    - Started to use versioning information in XMLwrapper
+	    - Remove last of stack helper functions in XMLwrapper
+	    - Added std::string retreval to XMLwrapper
+
+20 Sep 2009 (Paul Nasca)
+	    - Started to implement the Unison effect for ADsynth
+	    
+22 Sep 2009 (Paul Nasca)
+	    - Added vibratto and other features to Unison effect
+
+22 Sep 2009 (Mark McCurry)
+	    - Changed temporary data for Oscilgen from static to instance
+	      recommended by Tobias Doerffel
+	    - Fixed Memory leaks in UI based upon James Morris' patch
+
+23 Sep 2009 (Paul Nasca)
+	    - Added unison invert phase
+	    - Made unison frequency spread to depend on Bandwidth controllers and parameters
+	    - Added unison vibratto speed control and other improvements
+	    - bugfixes: Voice Amplitude Envelope and FM	    
+
+24 Sep 2009 (Paul Nasca)
+	    - Small enhancements and bugfixes to Unison
+	    - Started to implement Bandwidth to the Reverb effect
+		    
+25 Sep 2009 (Mark McCurry)
+	    - Allowed for XMLwrapper to retrieve strings stored in mxml TEXT
+	      fields
+29 Sep 2009 (Paul Nasca)
+	    - Remove the old (FFT based) Bandwidth effect to Reverb and started rewrite it (based on multivoice chorus/unison effect)
+
+01 Oct 2009 (Paul Nasca)
+	    - Corrected the ADsynth unison LFO rounding function 
+	    - Made Unison based on Bandwidth (in cents) parameter
+
+02 Oct 2009 (Mark McCurry)
+	    - Added OSS failsafe by Jérémie Andréi
+
+04 Oct 2009 (Mark McCurry)
+	    - fixed Ctest issues
+
+06 Oct 2009 (Mark McCurry)
+	    - Added first simple profiling test
+
+08 Oct 2009 (Mark McCurry)
+	    - Started to see if memset/memcpy offer performance benifits when
+	      widely used
+	    - Added basic SUBnote test
+
+09 Oct 2009 (Mark McCurry)
+	    - Restylized codebase with uncrustify
+
+28 Oct 2009 (Paul Nasca)
+	    - Disable "bw" control on Reverb when Bandwidth mode is not enabled
+
+30 Oct 2009 (Mark McCurry)
+	    - Commited first stage of Nio (New IO) WIP
+
+18 Nov 2009 (Mark McCurry)
+	    - Fixed segfault in VirKeyBoard
+
+02 Dec 2009 (Paul Nasca)
+		- Fixed a small typo on Virtual Keyboard
+
+10 Dec 2009 (Mark McCurry)
+	    - Separated out Presets and arrayed Presets to reduce warnings from
+	      the Wextra flag
+	    - Minor change to Filter_ and FormantFilter to reduce unwanted warnings
+
+13 Dec 2009 (Mark McCurry)
+	    - Deprecating Output system for the Nio system
+	    - General Code Cleanup
+	    - Adding OpenGL linking for proper compiles
+
+14 Jan 2010 (Mark McCurry)
+	    - Fixed No UI Flag "-U" as it was previously partially initializing
+	      the gui
+
+14 Feb 2010 (Stephen Parry)
+	    - DSSI Support Repaired
+
+14 Feb 2010 (Mark McCurry)
+	    - Made the Echo attempt to adjust the delay instead of erasing it
+	      when length is changed
+
+02 May 2010 (Mark McCurry)
+	    - Merging in cleanup from effects and adding APhaser by Ryan Billing
+
+27 Jun 2010 (Mark McCurry)
+	   - Aphaser and Phaser are within same effect now
+
+17 Aug 2010 (Paul Nasca)
+	   - small bugix on adsynth.cpp
+
+22 May 2010 (Mark McCurry)
+	  - Mergin Nio backend
+
+18 Aug 2011 (Mark McCurry)
+	  - Fixing DSSI subsystem
+
+29 Oct 2011 (Damien Goutte-Gattat)
+	  - Added Bank select midi support
+
+05 Feb 2012 (Liven Moors)
+	  - Added spike waveform to oscilator options
+
+06 Feb 2012 (Mark McCurry)
+	  - Adding --exec-after-init option
+
+22 Feb 2012 (Liven Moors)
+	  - Added circle waveform to oscilator options
+
+26 Mar 2012 (Mark McCurry)
+	  - Fixed Segfault in Oscillgen
+
+27 Mar 2012 (Mark McCurry)
+	  - Fixed chorus noise bug
+
+14 Apr 2012 (Mark McCurry)
+	  - Removed Nio debugging code
+
+18 Apr 2012 (Jonathan Liles)
+	  - Added Non-session-manager support
+
+31 Mar 2012 (Olaf Schulz)
+	  - Added Midi aftertouch support
+
+Please See git log For future information

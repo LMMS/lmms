@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -315,23 +315,19 @@ f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 
 f_cnt_t InstrumentSoundShaping::releaseFrames() const
 {
-	f_cnt_t ret_val = m_envLfoParameters[Volume]->isUsed() ?
-				m_envLfoParameters[Volume]->releaseFrames() : 0;
-	if( m_instrumentTrack->instrument() &&
-		m_instrumentTrack->instrument()->desiredReleaseFrames() > ret_val )
+	if( m_envLfoParameters[Volume]->isUsed() )
 	{
-		ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
+		return m_envLfoParameters[Volume]->releaseFrames();
 	}
+	f_cnt_t ret_val = m_instrumentTrack->instrument() 
+		? m_instrumentTrack->instrument()->desiredReleaseFrames()
+		: 0;
 
-	if( m_envLfoParameters[Volume]->isUsed() == false )
+	for( int i = Volume+1; i < NumTargets; ++i )
 	{
-		for( int i = Volume+1; i < NumTargets; ++i )
+		if( m_envLfoParameters[i]->isUsed() )
 		{
-			if( m_envLfoParameters[i]->isUsed() &&
-				m_envLfoParameters[i]->releaseFrames() > ret_val )
-			{
-				ret_val = m_envLfoParameters[i]->releaseFrames();
-			}
+			ret_val = qMax( ret_val, m_envLfoParameters[i]->releaseFrames() );
 		}
 	}
 	return ret_val;

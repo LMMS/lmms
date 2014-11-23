@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,45 +37,14 @@ BassBoosterControls::BassBoosterControls( BassBoosterEffect* effect ) :
 	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
 	m_ratioModel( 2.0f, 0.1f, 10.0f, 0.1f, this, tr( "Ratio" ) )
 {
-	connect( &m_freqModel, SIGNAL( dataChanged() ), this, SLOT( changeFrequency() ) );
-	connect( &m_gainModel, SIGNAL( dataChanged() ), this, SLOT( changeGain() ) );
-	connect( &m_ratioModel, SIGNAL( dataChanged() ), this, SLOT( changeRatio() ) );
 	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeFrequency() ) );
-
-	changeFrequency();
-	changeGain();
-	changeRatio();
 }
-
-
 
 
 void BassBoosterControls::changeFrequency()
 {
-	const sample_t fac = engine::mixer()->processingSampleRate() / 44100.0f;
-
-	m_effect->m_bbFX.leftFX().setFrequency( m_freqModel.value() * fac );
-	m_effect->m_bbFX.rightFX().setFrequency( m_freqModel.value() * fac );
+	m_effect->m_frequencyChangeNeeded = true;
 }
-
-
-
-
-void BassBoosterControls::changeGain()
-{
-	m_effect->m_bbFX.leftFX().setGain( m_gainModel.value() );
-	m_effect->m_bbFX.rightFX().setGain( m_gainModel.value() );
-}
-
-
-
-
-void BassBoosterControls::changeRatio()
-{
-	m_effect->m_bbFX.leftFX().setRatio( m_ratioModel.value() );
-	m_effect->m_bbFX.rightFX().setRatio( m_ratioModel.value() );
-}
-
 
 
 

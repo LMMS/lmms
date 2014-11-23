@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
+#include <QtGui/QStyleOption>
 
 #include "text_float.h"
 #include "gui_templates.h"
@@ -41,6 +42,8 @@ textFloat::textFloat() :
 	resize( 20, 20 );
 	hide();
 
+	setAttribute( Qt::WA_TranslucentBackground, true );
+	setStyle( QApplication::style() );
 	setFont( pointSize<8>( font() ) );
 }
 
@@ -125,35 +128,38 @@ textFloat * textFloat::displayMessage( const QString & _title,
 
 void textFloat::paintEvent( QPaintEvent * _pe )
 {
+	QStyleOption opt;
+    opt.init( this );
 	QPainter p( this );
+	p.fillRect( 0, 0, width(), height(), QColor( 0, 0, 0, 0 ) );
 
-	p.setPen( QColor( 0, 0, 0 ) );
-
-	p.setBrush( QColor( 224, 224, 224 ) );
+/*	p.setPen( p.pen().brush().color() );
+	p.setBrush( p.background() );*/
 
 	p.setFont( pointSize<8>( p.font() ) );
+	
+	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+/*	p.drawRect( 0, 0, rect().right(), rect().bottom() );*/
 
-//	p.setPen( Qt::black );
-	// small message?
 	if( m_title.isEmpty() )
 	{
-		p.drawText( 2, p.fontMetrics().height()-2, m_text );
+		p.drawText( opt.rect, Qt::AlignCenter, m_text );
 	}
 	else
 	{
-		int text_x = 2;
+		int text_x = opt.rect.left() + 2;
+		int text_y = opt.rect.top() + 12;
 		if( m_pixmap.isNull() == false )
 		{
-			p.drawPixmap( 5, 5, m_pixmap );
+			p.drawPixmap( opt.rect.topLeft() + QPoint( 5, 5 ), m_pixmap );
 			text_x += m_pixmap.width() + 8;
 		}
-		p.drawText( text_x, 28, m_text );
+		p.drawText( text_x, text_y + 16, m_text );
 		QFont f = p.font();
 		f.setBold( true );
 		p.setFont( f );
-		p.drawText( text_x, 12, m_title );
+		p.drawText( text_x, text_y, m_title );
 	}
 }
 
@@ -194,4 +200,4 @@ void textFloat::updateSize()
 
 
 
-
+#include "moc_text_float.cxx"

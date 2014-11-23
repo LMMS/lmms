@@ -1,9 +1,9 @@
 /*
  * InstrumentSoundShapingView.h - view for InstrumentSoundShaping class
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,8 @@
 
 #include "InstrumentSoundShaping.h"
 #include "ModelView.h"
+
+class QLabel;
 
 class EnvelopeAndLfoView;
 class comboBox;
@@ -60,6 +62,8 @@ private:
 	comboBox * m_filterComboBox;
 	knob * m_filterCutKnob;
 	knob * m_filterResKnob;
+
+	QLabel* m_singleStreamInfoLabel;
 
 } ;
 

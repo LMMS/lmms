@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -51,6 +51,14 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::MusicLocation ) );
 	urls << QUrl::fromLocalFile( configManager::inst()->workingDir() );
+
+	// Add `/Volumes` directory on OS X systems, this allows the user to browse
+	// external disk drives.
+#ifdef LMMS_BUILD_APPLE
+	QDir volumesDir( QDir("/Volumes") );
+	if ( volumesDir.exists() )
+		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+#endif
 
 	setSidebarUrls(urls);
 }

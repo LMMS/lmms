@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 #include "Basic_Gb_Apu.h"
 
 #include "papu_instrument.h"
+#include "base64.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "NotePlayHandle.h"

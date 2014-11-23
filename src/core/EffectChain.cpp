@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -56,12 +56,19 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "enabled", m_enabledModel.value() );
 	_this.setAttribute( "numofeffects", m_effects.count() );
-	for( EffectList::Iterator it = m_effects.begin(); 
-					it != m_effects.end(); it++ )
+
+	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); it++ )
 	{
-		QDomElement ef = ( *it )->saveState( _doc, _this );
-		ef.setAttribute( "name", ( *it )->descriptor()->name );
-		ef.appendChild( ( *it )->key().saveXML( _doc ) );
+		if( dynamic_cast<DummyEffect *>( *it ) )
+		{
+			_this.appendChild( dynamic_cast<DummyEffect *>( *it )->originalPluginData() );
+		}
+		else
+		{
+			QDomElement ef = ( *it )->saveState( _doc, _this );
+			ef.setAttribute( "name", ( *it )->descriptor()->name );
+			ef.appendChild( ( *it )->key().saveXML( _doc ) );
+		}
 	}
 }
 
@@ -82,26 +89,23 @@ void EffectChain::loadSettings( const QDomElement & _this )
 	{
 		if( node.isElement() && node.nodeName() == "effect" )
 		{
-			QDomElement cn = node.toElement();
-			const QString name = cn.attribute( "name" );
-			EffectKey key( cn.elementsByTagName( "key" ).
-							item( 0 ).toElement() );
-			Effect * e = Effect::instantiate( name, this, &key );
-			if( e->isOkay() )
+			QDomElement effectData = node.toElement();
+
+			const QString name = effectData.attribute( "name" );
+			EffectKey key( effectData.elementsByTagName( "key" ).item( 0 ).toElement() );
+
+			Effect* e = Effect::instantiate( name, this, &key );
+
+			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
 			{
-				if( node.isElement() )
-				{
-					if( e->nodeName() == node.nodeName() )
-					{
-						e->restoreState( node.toElement() );
-					}
-				}
+				e->restoreState( effectData );
 			}
 			else
 			{
 				delete e;
-				e = new DummyEffect( parentModel() );
+				e = new DummyEffect( parentModel(), effectData );
 			}
+
 			m_effects.push_back( e );
 			++fx_loaded;
 		}

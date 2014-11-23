@@ -1,9 +1,10 @@
 /********************
  * LMMS style sheet *
  ********************/
-
-QWhatsThat {
-	color: black;
+ 
+/* most foreground text items */
+QLabel, QTreeWidget, QListWidget, QGroupBox {
+	color: #e0e0e0;
 }
 
 QMdiArea {
@@ -12,6 +13,18 @@ QMdiArea {
 
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
+	color: #e0e0e0;
+	qproperty-vertexColor: #ff77af;
+	qproperty-gridColor: #808080;
+	
+	qproperty-graphColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0, x2:0, y2:1,
+                     stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
+	/*#99afff;*/
+	qproperty-scaleColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #333, stop:1 #202020);
+	/*rgb( 32, 32, 32 );*/
 }
 
 /* text box */
@@ -31,6 +44,14 @@ QLineEdit:focus {
 
 
 QToolTip {
+	border-radius: 4px;
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
+	opacity: 175;
+	border: 1.0px solid rgba(0,0,0,255);
+	color: #4afd85;
+}
+
+textFloat {
 	border-radius: 4px;
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
@@ -62,13 +83,11 @@ QMenu::item:selected {
 	color: white;
 	font-weight:bold;
 	background-color: #747474;
-	margin:3px;
 }
 
 QMenu::item:disabled {
 	color: #747474;
 	background-color: #c9c9c9;
-	margin:0px;
 	font-size:12px;
 	font-weight: normal;
 	padding: 4px 32px 4px 20px;
@@ -92,6 +111,10 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: rgb(0, 0, 0);
+	qproperty-gridColor: rgb( 128, 128, 128 );
+	qproperty-noteModeColor: rgb( 255, 255, 255 );
+	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-barColor: #4afd85;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
@@ -238,12 +261,21 @@ TrackContainerView QFrame{
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-nStateButton {	
+nStateButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
 	min-width: 26px;
 }
+
+/* track background colors */
+trackContentWidget {
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
+}
+
 
 /* gear button in tracks */
 
@@ -366,7 +398,7 @@ toolButton#playButton {
 
 toolButton#stopButton {
 	border-top-right-radius: 5px 15px;
-	border-bottom-right-radius: 5px 15px;	
+	border-bottom-right-radius: 5px 15px;
 }
 
 /* record and record-accompany can be styled with #recordButton and #recordAccompanyButton respectively */
@@ -454,6 +486,19 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 	font-size: 10px;
 }
 
+FxLine {
+	background: #5b6571;
+	color: #e0e0e0;
+	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0, 
+								stop:0 #7b838d, stop:1 #6b7581 );
+}
+
+/* persistent peak markers for fx peak meters */
+fader {
+	qproperty-peakGreen: rgb( 74, 253, 133);
+	qproperty-peakRed: rgb( 255, 100, 100);
+}
+
 timeLine {
 	font-size: 8px;
 }
@@ -470,18 +515,30 @@ TrackContainerView QLabel
 /* Patterns */
 
 /* instrument pattern */
-patternView {
+PatternView {
 	color: rgb( 119, 199, 216 );
+	qproperty-fgColor: rgb( 187, 227, 236 );
+	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
 /* sample track pattern */
 SampleTCOView {
 	color: rgb( 74, 253, 133 );
+	qproperty-fgColor: rgb( 187, 227, 236 );
+	qproperty-textColor: rgb( 255, 60, 60 );	
 }
 
 /* automation pattern */
 AutomationPatternView {
 	color: #99afff;
+	qproperty-fgColor: rgb( 204, 215, 255 );
+	qproperty-textColor: rgb( 255, 255, 255 );
+}
+
+/* bb-pattern */
+bbTCOView {
+	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
+	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
 /* Plugins */
@@ -497,13 +554,24 @@ TripleOscillatorView knob {
 }
 
 
-kickerInstrumentView knob {
-	color: rgb(240, 147, 14);
-	qproperty-outerColor: rgb(30, 35, 37);
-	qproperty-innerRadius: 4;
-	qproperty-outerRadius: 11.2;
-	qproperty-centerPointX: 18.5;
-	qproperty-centerPointY: 13.5;
+kickerInstrumentView knob#smallKnob {
+	color: #595959;
+	qproperty-outerColor: black;
+	qproperty-innerRadius: 3;
+	qproperty-outerRadius: 11.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+
+kickerInstrumentView knob#largeKnob {
+	color: #0c3b89;
+	qproperty-outerColor: #519fff;
+	qproperty-innerRadius: 12.0;
+	qproperty-outerRadius: 14.5;
+	qproperty-centerPointX: 17.0;
+	qproperty-centerPointY: 17.0;
 	qproperty-lineWidth: 3;
 }
 
@@ -519,24 +587,29 @@ AudioFileProcessorView knob {
 }
 
 organicInstrumentView knob {
-	color: rgb(205, 16, 216);
-	qproperty-outerColor: rgb(23, 9, 24);
-	/*qproperty-outerColor: rgb(64, 21, 67);*/
+	color: rgb(124, 207, 98);
+	qproperty-outerColor: rgb(13, 42, 4);
 	qproperty-innerRadius: 2;
-	qproperty-outerRadius: 8.7;
+	qproperty-outerRadius: 7.5;
 	qproperty-centerPointX: 10.5;
 	qproperty-centerPointY: 10.5;
-	qproperty-lineWidth: 2;
+	qproperty-lineWidth: 1.5;
 }
 
+organicInstrumentView knob#harmKnob {
+	color: rgb(205, 98, 216);
+	qproperty-outerColor: rgb(18, 4, 18);
+}
 
 organicInstrumentView knob#fx1Knob,
 organicInstrumentView knob#volKnob {
+	color: rgb(157, 157, 157);
+	qproperty-outerColor: rgb(37, 37, 37);
 	qproperty-innerRadius: 4;
-	qproperty-outerRadius: 11.2;
+	qproperty-outerRadius: 10.0;
 	qproperty-centerPointX: 18.5;
 	qproperty-centerPointY: 13.8;
-	qproperty-lineWidth: 3;
+	qproperty-lineWidth: 2;
 }
 
 sf2InstrumentView knob {
@@ -608,17 +681,77 @@ sidInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-/* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
- * colour codes MUST be of the form #RRGGBB */
+WatsynView knob {
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;
+	qproperty-lineWidth: 2;
+}
 
-palette:background {color: #5b6571}
-palette:windowtext {color: #f0f0f0}
-palette:base {color: #808080}
-palette:text {color: #e0e0e0}
-palette:button {color: #c9c9c9}
-palette:shadow {color: #000000}
-palette:buttontext {color: #000000}
-palette:brighttext {color: #4afd85}
-palette:highlight {color: #202020}
-palette:highlightedtext {color: #ffffff}
+WatsynView knob#aKnob {
+	color: #43b2ff;
+	qproperty-outerColor: #43b2ff;
+}
+
+WatsynView knob#bKnob {
+	color: #fc5431;
+	qproperty-outerColor: #fc5431;
+}
+
+WatsynView knob#mixKnob {
+	color: #43ff82;
+	qproperty-outerColor: #43ff82;
+	qproperty-outerRadius: 13;
+	qproperty-centerPointX: 15.5;
+	qproperty-centerPointY: 15.5;
+}
+
+WatsynView knob#mixenvKnob {
+	color: #43ff82;
+	qproperty-outerColor: #43ff82;
+}
+
+WatsynView knob#xtalkKnob {
+	color: #fb50fb;
+	qproperty-outerColor: #fb50fb;
+}
+
+MonstroView knob {
+	color: #ffffff;
+	qproperty-outerColor: #aaaaaa;
+	qproperty-outerRadius: 9;
+	qproperty-innerRadius: 6;
+	qproperty-centerPointX: 10;
+	qproperty-centerPointY: 10;
+	qproperty-lineWidth: 2.5;
+}
+
+NesInstrumentView knob {
+	color: #e7231b;
+	qproperty-outerColor: #fff;
+	qproperty-outerRadius: 11.0;
+	qproperty-innerRadius: 8.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+/* palette information  */
+
+LmmsPalette {
+	qproperty-background: #5b6571;
+	qproperty-windowText: #f0f0f0;
+	qproperty-base: #808080;
+	qproperty-text: #e0e0e0;
+	qproperty-button: #c9c9c9;
+	qproperty-shadow: #000;
+	qproperty-buttonText: #000;
+	qproperty-brightText: #4afd85;
+	qproperty-highlight: #202020;
+	qproperty-highlightedText: #ffffff;
+	/* the next two are used for whatsthis dialogs */
+	qproperty-toolTipText: #000;
+	qproperty-toolTipBase: #c9c9c9;
+}
 

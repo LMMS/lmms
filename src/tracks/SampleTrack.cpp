@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -231,6 +231,11 @@ void SampleTCOView::updateSample()
 
 void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	if( _cme->modifiers() )
+	{
+		return;
+	}
+
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
 	{
@@ -358,7 +363,7 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	}
 	else
 	{
-		p.setPen( c.lighter( 200 ) );
+		p.setPen( fgColor() );
 	}
 	QRect r = QRect( 1, 1,
 			qMax( static_cast<int>( m_tco->sampleLength() *
@@ -383,10 +388,10 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 
 		p.setPen( QColor( 0, 0, 0 ) );	
 		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( QColor( 255, 60, 60 ) );	
+		p.setPen( textColor() );	
 		p.drawText( 9, p.fontMetrics().height(), "Rec" );
 		
-		p.setBrush( QBrush( QColor( 255, 60, 60 ) ) );
+		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}
 }

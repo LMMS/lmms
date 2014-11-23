@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 
 
 #include "caption_menu.h"
+#include "embed.h"
 
 
 
@@ -40,6 +41,26 @@ captionMenu::captionMenu( const QString & _title, QWidget * _parent ) :
 
 captionMenu::~captionMenu()
 {
+}
+
+
+
+
+void captionMenu::addHelpAction()
+{
+	QWidget* parent = (QWidget*) this->parent();
+
+	if (parent == NULL)
+		return;
+
+	if (! parent->whatsThis().isEmpty()) {
+		addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
+							parent, SLOT( displayHelp() ) );
+	}
+	else {
+		QAction* helpAction = addAction( embed::getIconPixmap("help"), tr("Help (not available)") );
+		helpAction->setDisabled(true);
+	}
 }
 
 

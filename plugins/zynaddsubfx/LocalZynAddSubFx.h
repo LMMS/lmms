@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 #include "note.h"
 
 class Master;
+class NulEngine;
 
 class LocalZynAddSubFx
 {
@@ -68,6 +69,7 @@ protected:
 
 	int m_runningNotes[NumKeys];
 	Master * m_master;
+	NulEngine* m_ioEngine;
 
 } ;
 

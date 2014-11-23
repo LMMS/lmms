@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 #include <QtGui/QProgressDialog>
 #include <QtCore/QDir>
 #include <QtCore/QBuffer>
+#include <QtCore/QDebug>
 
 #include "FlpImport.h"
 #include "NotePlayHandle.h"
@@ -40,13 +41,14 @@
 #include "Effect.h"
 #include "engine.h"
 #include "FxMixer.h"
+#include "FxMixerView.h"
 #include "group_box.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "knob.h"
 #include "Oscillator.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "Piano.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -96,7 +98,7 @@ extern QString outstring;
 
 }
 
-
+const int NumFLFxChannels = 64;
 
 static void dump_mem( const void * buffer, uint n_bytes )
 {
@@ -537,7 +539,7 @@ struct FL_Project
 	int currentPattern;
 	int activeEditPattern;
 
-	FL_EffectChannel effectChannels[NumFxChannels+1];
+	FL_EffectChannel effectChannels[NumFLFxChannels+1];
 	int currentEffectChannel;
 
 	QString projectNotes;
@@ -887,7 +889,7 @@ bool FlpImport::tryImport( TrackContainer* tc )
 				break;
 
 			case FLP_EffectChannelMuted:
-if( p.currentEffectChannel <= NumFxChannels )
+if( p.currentEffectChannel <= NumFLFxChannels )
 {
 	p.effectChannels[p.currentEffectChannel].isMuted =
 					( data & 0x08 ) > 0 ? false : true;
@@ -980,6 +982,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 
 			case FLP_LayerChans:
 				p.channels[data].layerParent = cur_channel;
+				break;
 
 			// DWORD EVENTS
 			case FLP_Color:
@@ -1124,7 +1127,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 
 			case FLP_Text_EffectChanName:
 				++p.currentEffectChannel;
-				if( p.currentEffectChannel <= NumFxChannels )
+				if( p.currentEffectChannel <= NumFLFxChannels )
 				{
 					p.effectChannels[p.currentEffectChannel].name = text;
 				}
@@ -1347,7 +1350,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 					const int param = pi[i*3+1] & 0xffff;
 					const int ch = ( pi[i*3+1] >> 22 )
 									& 0x7f;
-					if( ch < 0 || ch > NumFxChannels )
+					if( ch < 0 || ch > NumFLFxChannels )
 					{
 						continue;
 					}
@@ -1408,8 +1411,14 @@ else
 
 
 	// now create a project from FL_Project data structure
-
 	engine::getSong()->clearProject();
+
+	// configure the mixer
+	for( int i=0; i<NumFLFxChannels; ++i )
+	{
+		engine::fxMixer()->createChannel();
+	}
+	engine::fxMixerView()->refreshDisplay();
 
 	// set global parameters
 	engine::getSong()->setMasterVolume( p.mainVolume );
@@ -1533,8 +1542,7 @@ else
 		{
 			const int pat = *jt / 256;
 			const int pos = *jt % 256;
-			pattern * p =
-				dynamic_cast<pattern *>( t->getTCO( pat ) );
+			Pattern* p = dynamic_cast<Pattern*>( t->getTCO( pat ) );
 			if( p == NULL )
 			{
 				continue;
@@ -1558,7 +1566,7 @@ else
 			{
 				continue;
 			}
-			pattern * p = dynamic_cast<pattern *>( t->getTCO( pat ) );
+			Pattern* p = dynamic_cast<Pattern*>( t->getTCO( pat ) );
 			if( p != NULL )
 			{
 				p->addNote( jt->second, false );
@@ -1647,7 +1655,7 @@ p->putValue( jt->pos, value, false );
 		}
 	}
 
-	for( int fx_ch = 0; fx_ch <= NumFxChannels ; ++fx_ch )
+	for( int fx_ch = 0; fx_ch <= NumFLFxChannels ; ++fx_ch )
 	{
 		FxChannel * ch = engine::fxMixer()->effectChannel( fx_ch );
 		if( !ch )
@@ -1707,7 +1715,7 @@ p->putValue( jt->pos, value, false );
 				break;
 		}
 		if( effName.isEmpty() || it->fxChannel < 0 ||
-						it->fxChannel > NumFxChannels )
+						it->fxChannel > NumFLFxChannels )
 		{
 			continue;
 		}

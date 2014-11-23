@@ -1,10 +1,10 @@
 /*
  * AutomationEditor.h - declaration of class AutomationEditor which is a window
- *                      where you can edit dynamic values in an easy way
+ *					  where you can edit dynamic values in an easy way
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUTOMATION_EDITOR_H
-#define _AUTOMATION_EDITOR_H
+#ifndef AUTOMATION_EDITOR_H
+#define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>
@@ -50,6 +50,10 @@ class toolButton;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
+	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor vertexColor READ vertexColor WRITE setVertexColor )
+	Q_PROPERTY( QBrush scaleColor READ scaleColor WRITE setScaleColor )
+	Q_PROPERTY( QBrush graphColor READ graphColor WRITE setGraphColor )	
 public:
 	void setCurrentPattern( AutomationPattern * _new_pattern );
 
@@ -75,6 +79,15 @@ public:
 
 	void setPauseIcon( bool pause );
 
+	// qproperty access methods
+	QColor gridColor() const;
+	QBrush graphColor() const;
+	QColor vertexColor() const;
+	QBrush scaleColor() const;
+	void setGridColor( const QColor & c );
+	void setGraphColor( const QBrush & c );
+	void setVertexColor( const QColor & c );
+	void setScaleColor( const QBrush & c );
 
 public slots:
 	void update();
@@ -252,7 +265,10 @@ private:
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 
-
+	QColor m_gridColor;
+	QBrush m_graphColor;
+	QColor m_vertexColor;
+	QBrush m_scaleColor;
 
 	friend class engine;
 

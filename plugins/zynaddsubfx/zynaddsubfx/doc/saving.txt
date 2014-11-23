@@ -1,0 +1,55 @@
+Persistence
+-----------
+
+As with most applications ZynAddSubFX allows for one to ave your work and reload
+it.
+
+Saving it all
+~~~~~~~~~~~~~
+
+One of the simplest ways to save your work is to save the entire session.
+This can be done through the File menu and will result in the creation of an
+.xmz file.
+Once created, this file will hold the settings for all settings within that
+session, such as microtonal tunings, all patches, system effects, insertion
+effects, etc...
+
+Saving Parts
+~~~~~~~~~~~~
+
+In many cases saving everything is not what is desired.
+Saving a patch later on is one such example.
+
+Patches
+^^^^^^^
+In order to save a patch, one can either save it from the instruments menu or
+through the bank window.
+
+With the instrument menu, one can just save the file to any given location with
+the .xiz extension.
+
+With the banks menu, one can assign a patch to a given slot with a bank.
+This instrument will remain here for future use until it is deleted.
+To see the physical location of the .xiz file, one should check the
+File->Settings->Bank_Root_Dirs window to see the paths for banks.
+
+NOTE: You need to have write permissions to add instruments to the bank.
+
+Presets
+^^^^^^^
+Have a favorite setting for an envelope, a difficult to reproduce oscillator?
+Then presets are for you.
+Presets allow for one to save the settings for any of the components which
+support copy/paste operations.
+This is done with preset files (.xpz), which get stored in the folders indicated
+by File->Settings->Preset_Root_Dirs.
+
+Summary
+~~~~~~~
+
+.Extension Summary
+[literal]
+xmz Everything
+xiz Instrument
+xsz Scale Settings
+xpz Presets

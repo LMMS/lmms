@@ -1,17 +1,31 @@
 <?xml version="1.0"?>
-<!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.1-cvs20051208" type="channelsettings" version="1.0" >
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
-  <channelsettings>
-    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="48" name="The Master" basetone="9" tab="1" >
-      <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="2" coarse1="0" userwavefile2="samples/empty.wav" wavetype2="0" coarse2="0" vol0="160" vol1="132" finel0="-12" vol2="68" finel1="0" finel2="0" modalgo1="0" stphdetun0="235" pan0="0" modalgo2="1" stphdetun1="185" pan1="0" stphdetun2="209" pan2="0" phoffset0="98" phoffset1="58" phoffset2="235" finer0="12" finer1="0" finer2="0" userwavefile0="shapes/micro.wav" wavetype0="7" coarse0="0" />
-      <eldata fres="1.35" ftype="0" fcut="3200" fwet="1" >
-        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.384" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.039" pdel="0" lamt="0" dec="0" x100="0" lshp="0" hold="0" />
-        <elcut lfosyncmode="0" lpdel="0.019" amt="1" rel="0" ctlenvamt="0" latt="0" sus="0.999" lspd="0.2384" att="0.037" pdel="0" lamt="0.345" dec="0.221" x100="0" lshp="0" hold="0" />
-        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499" />
+  <instrumenttracksettings muted="0" type="0" name="The Master" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="50">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="235" userwavefile0="shapes/micro.wav" finer0="12" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="0" coarse0="0" coarse1="0" coarse2="0" finel0="-12" finel1="0" modalgo1="0" modalgo2="1" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="235" pan2="0" stphdetun1="185" wavetype0="7" stphdetun2="209" wavetype1="2" wavetype2="0" vol0="160" vol1="132" phoffset0="98" phoffset1="58" vol2="68"/>
+      </instrument>
+      <eldata fres="1.35" ftype="0" fcut="3200" fwet="1">
+        <elvol lspd_denominator="4" sustain="1" pdel="0" userwavefile="" dec="0" lamt="0" syncmode="0" latt="0" rel="0.384" amt="1" x100="0" att="0.039" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.001" pdel="0" userwavefile="" dec="0.221" lamt="0.345" syncmode="0" latt="0" rel="0" amt="1" x100="0" att="0.037" lpdel="0.019" hold="0" lshp="0" lspd="0.2384" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.501" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>
-      <arpandchords chordrange="3" arprange="3" arpdisabled="1" chord="0" chorddisabled="0" arpgate="68" arp="0" arpsyncmode="6" arptime="107" arpdir="3" />
-      <midi inputchannel="0" outputchannel="0" receive="0" send="0" />
-    </channeltrack>
-  </channelsettings>
-</multimediaproject>
+      <chordcreator chord="0" chordrange="3" chord-enabled="1"/>
+      <arpeggiator arptime="107" arprange="3" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="1" arpgate="68"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
+      <fxchain numofeffects="1" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="1">
+            <port00 data="0.25"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="cmt" name="file"/>
+            <attribute value="amp_stereo" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

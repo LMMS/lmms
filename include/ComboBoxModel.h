@@ -1,9 +1,9 @@
 /*
  * ComboBoxModel.h - declaration of class ComboBoxModel
  *
- * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,11 +38,10 @@ class EXPORT ComboBoxModel : public IntModel
 {
 	Q_OBJECT
 public:
-	ComboBoxModel( Model * _parent = NULL,
-			const QString & _display_name = QString(),
-				bool _default_constructed = false ) :
-		IntModel( 0, 0, 0, _parent, _display_name,
-							_default_constructed )
+	ComboBoxModel( Model* parent = NULL,
+					const QString& displayName = QString(),
+					bool isDefaultConstructed = false ) :
+		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
 	{
 	}
 
@@ -51,36 +50,37 @@ public:
 		clear();
 	}
 
-	void addItem( const QString & _item, PixmapLoader * _loader = NULL );
+	void addItem( const QString& item, PixmapLoader* loader = NULL );
 
 	void clear();
 
-	int findText( const QString & _txt ) const;
+	int findText( const QString& txt ) const;
 
-	inline QString currentText() const
+	QString currentText() const
 	{
 		return ( size() > 0 && value() < size() ) ? m_items[value()].first : QString();
 	}
 
-	inline const PixmapLoader * currentData() const
+	const PixmapLoader* currentData() const
 	{
 		return m_items[value()].second;
 	}
 
-	inline const QString & itemText( int _i ) const
+	const QString & itemText( int i ) const
 	{
-		return m_items[tLimit<int>( _i, minValue(), maxValue() )].first;
+		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
 	}
 
-	inline const PixmapLoader * itemPixmap( int _i ) const
+	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[tLimit<int>( _i, minValue(), maxValue() )].second;
+		return m_items[qBound<int>( minValue(), i, maxValue() )].second;
 	}
 
-	inline int size() const
+	int size() const
 	{
 		return m_items.size();
 	}
+
 
 private:
 	typedef QPair<QString, PixmapLoader *> Item;

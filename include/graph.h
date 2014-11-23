@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *               2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _GRAPH_H
-#define _GRAPH_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
@@ -71,7 +71,7 @@ public:
 	{
 		return m_graphStyle;
 	}
-	
+
 
 	inline void setGraphStyle( graphStyle _s )
 	{
@@ -101,10 +101,9 @@ private:
 
 	QPixmap m_foreground;
 	QColor m_graphColor;
-	
-	graphModel * m_graphModel;
+
 	graphStyle m_graphStyle;
-	
+
 	bool m_mouseDown;
 	int m_lastCursorX;
 
@@ -125,7 +124,7 @@ public:
 	virtual ~graphModel();
 
 	// TODO: saveSettings, loadSettings?
-	
+
 	inline float minValue() const
 	{
 		return( m_minValue );
@@ -140,7 +139,7 @@ public:
 	{
 		return( m_samples.count() );
 	}
-	
+
 	inline const float * samples() const
 	{
 		return( m_samples.data() );
@@ -151,7 +150,7 @@ public slots:
 
 	void setLength( int _size );
 
-	void setSampleAt( int _samplePos, float _value );
+	void setSampleAt( int x, float val );
 	void setSamples( const float * _value );
 
 	void setWaveToSine();
@@ -160,10 +159,12 @@ public slots:
 	void setWaveToSquare();
 	void setWaveToNoise();
 	QString setWaveToUser( );
-	
+
 	void smooth();
 	void smoothNonCyclic();
 	void normalize();
+	void invert();
+	void shiftPhase( int _deg );
 
 signals:
 	void lengthChanged();
@@ -171,6 +172,7 @@ signals:
 	void rangeChanged();
 
 private:
+	void drawSampleAt( int x, float val );
 
 	QVector<float> m_samples;
 	float m_minValue;

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtGui/QWidget>
+#include <QColor>
 
 #include "lmms_basics.h"
 #include "MidiTime.h"
@@ -129,11 +130,6 @@ public slots:
 	void toggleMute();
 
 
-protected:
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
-
-
 signals:
 	void lengthChanged();
 	void positionChanged();
@@ -167,6 +163,11 @@ private:
 class trackContentObjectView : public selectableObject, public ModelView
 {
 	Q_OBJECT
+
+// theming qproperties
+	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+
 public:
 	trackContentObjectView( trackContentObject * _tco, trackView * _tv );
 	virtual ~trackContentObjectView();
@@ -177,7 +178,11 @@ public:
 	{
 		return m_tco;
 	}
-
+// qproperty access func
+	QColor fgColor() const;
+	QColor textColor() const;
+	void setFgColor( const QColor & _c );
+	void setTextColor( const QColor & _c );
 
 public slots:
 	virtual bool close();
@@ -232,6 +237,9 @@ private:
 
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
+// qproperty fields
+	QColor m_fgColor;
+	QColor m_textColor;
 } ;
 
 
@@ -241,6 +249,11 @@ private:
 class trackContentWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
+
+	// qproperties for track background gradients
+	Q_PROPERTY( QBrush darkerColor READ darkerColor WRITE setDarkerColor )
+	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
+
 public:
 	trackContentWidget( trackView * _parent );
 	virtual ~trackContentWidget();
@@ -260,6 +273,14 @@ public:
 
 	MidiTime endPosition( const MidiTime & _pos_start );
 
+	// qproperty access methods
+
+	QBrush darkerColor() const;
+	QBrush lighterColor() const;
+
+	void setDarkerColor( const QBrush & _c );
+	void setLighterColor( const QBrush & _c );
+
 public slots:
 	void update();
 	void changePosition( const MidiTime & _new_pos = MidiTime( -1 ) );
@@ -277,17 +298,19 @@ protected:
 		return "trackcontentwidget";
 	}
 
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	{
+		Q_UNUSED(doc)
+		Q_UNUSED(element)
+	}
+
+	virtual void loadSettings( const QDomElement& element )
+	{
+		Q_UNUSED(element)
+	}
 
 
 private:
-	enum Actions
-	{
-		AddTrackContentObject,
-		RemoveTrackContentObject
-	} ;
-
 	track * getTrack();
 	MidiTime getPosition( int _mouse_x );
 
@@ -296,10 +319,11 @@ private:
 	typedef QVector<trackContentObjectView *> tcoViewVector;
 	tcoViewVector m_tcoViews;
 
-	int m_pixelsPerTact;
-
 	QPixmap m_background;
 
+	// qproperty fields
+	QBrush m_darkerColor;
+	QBrush m_lighterColor;
 } ;
 
 
@@ -323,7 +347,9 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-
+	void recordingOn();
+	void recordingOff();
+	void clearTrack();
 
 private:
 	static QPixmap * s_grip;
@@ -406,6 +432,7 @@ public:
 	trackContentObject * addTCO( trackContentObject * _tco );
 	void removeTCO( trackContentObject * _tco );
 	// -------------------------------------------------------
+	void deleteTCOs();
 
 	int numOfTCOs();
 	trackContentObject * getTCO( int _tco_num );
@@ -541,8 +568,17 @@ public slots:
 
 protected:
 	virtual void modelChanged();
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
+
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	{
+		Q_UNUSED(doc)
+		Q_UNUSED(element)
+	}
+
+	virtual void loadSettings( const QDomElement& element )
+	{
+		Q_UNUSED(element)
+	}
 
 	virtual QString nodeName() const
 	{

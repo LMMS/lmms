@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -41,7 +41,7 @@ AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	m_unit( QString::null )
 {
 	widget()->setAcceptDrops( true );
-	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 }
 
 

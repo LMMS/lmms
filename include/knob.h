@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -46,6 +46,8 @@ enum knobTypes
 class EXPORT knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
+	Q_ENUMS( knobTypes )
+
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
 
@@ -57,11 +59,19 @@ class EXPORT knob : public QWidget, public FloatModelView
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
+	Q_PROPERTY(QColor lineColor READ lineColor WRITE setlineColor)
+	Q_PROPERTY(QColor arcColor READ arcColor WRITE setarcColor)
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
+	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
+
+	void initUi( const QString & _name ); //!< to be called by ctors
+	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
+
 public:
-	knob( int _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
+	knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
+	knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
 	virtual ~knob();
 
 	// TODO: remove
@@ -82,6 +92,9 @@ public:
 	float outerRadius() const;
 	void setOuterRadius( float _r );
 
+	knobTypes knobNum() const;
+	void setknobNum( knobTypes _k );
+
 	QPointF centerPoint() const;
 	float centerPointX() const;
 	void setCenterPointX( float _c );
@@ -93,6 +106,10 @@ public:
 
 	QColor outerColor() const;
 	void setOuterColor( const QColor & _c );
+	QColor lineColor() const;
+	void setlineColor( const QColor & _c );
+	QColor arcColor() const;
+	void setarcColor( const QColor & _c );
 
 
 signals:
@@ -119,7 +136,7 @@ private slots:
 	virtual void enterValue();
 	void displayHelp();
 	void friendlyUpdate();
-
+	void toggleScale();
 
 private:
 	QString displayValue() const;
@@ -146,7 +163,6 @@ private:
 
 	static textFloat * s_textFloat;
 
-	int m_knobNum;
 	QString m_label;
 
 	QPixmap * m_knobPixmap;
@@ -167,7 +183,11 @@ private:
 	float m_innerRadius;
 	float m_outerRadius;
 	float m_lineWidth;
-	QColor * m_outerColor;
+	QColor m_outerColor;
+	QColor m_lineColor; //!< unused yet
+	QColor m_arcColor; //!< unused yet
+
+	knobTypes m_knobNum;
 
 } ;
 

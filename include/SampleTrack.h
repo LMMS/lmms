@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -88,6 +88,11 @@ signals:
 class SampleTCOView : public trackContentObjectView
 {
 	Q_OBJECT
+	
+// theming qproperties
+	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+
 public:
 	SampleTCOView( SampleTCO * _tco, trackView * _tv );
 	virtual ~SampleTCOView();
@@ -108,7 +113,6 @@ protected:
 
 private:
 	SampleTCO * m_tco;
-
 } ;
 
 

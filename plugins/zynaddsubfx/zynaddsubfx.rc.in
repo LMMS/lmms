@@ -1,4 +1,4 @@
-zynaddsubfx_icon ICON zynaddsubfx_icon.ico
+zynaddsubfx_icon ICON zynaddsubfx/zynaddsubfx.ico
 #include <windows.h>
 
 VS_VERSION_INFO	VERSIONINFO
@@ -13,7 +13,7 @@ BEGIN
     BLOCK "040904E4"
     //language ID = U.S. English, charset = Windows, Multilingual
     BEGIN
-      VALUE "Comments",		"ZynAddSubFX Plugin - Linux MultiMedia Studio (http://lmms.sf.net)\0"
+      VALUE "Comments",		"ZynAddSubFX Plugin - LMMS (http://lmms.sf.net)\0"
       VALUE "CompanyName",	"LMMS Developers\0"
       VALUE "FileDescription",	"ZynAddSubFX LMMS Plugin\0"
       VALUE "FileVersion",	"2.3.0/@VERSION@\0"

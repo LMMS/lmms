@@ -49,14 +49,13 @@ namespace pink_full {
 	Voss-McCartney algorithm described at www.firstpr.com.au/dsp/pink-noise/ */
     class Plugin : public CMT_PluginInstance {
     private:
-	LADSPA_Data sample_rate;
 	PinkNoise noise_source;
     public:
 	
         Plugin(const LADSPA_Descriptor *,
 	       unsigned long s_rate) : 
-	    CMT_PluginInstance(n_ports), 
-	    sample_rate(s_rate) {
+	    CMT_PluginInstance(n_ports) 
+    {
 	}
 	
 	~Plugin() {

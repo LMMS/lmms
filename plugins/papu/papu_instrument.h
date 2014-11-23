@@ -4,7 +4,7 @@
  * Copyright (c) 2008 <Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -129,15 +129,12 @@ private:
 	pixmapButton * m_ch2VolSweepDirButton;
 	knob * m_ch2SweepStepLengthKnob;
 
-	pixmapButton * m_ch3OnButton;
 	knob * m_ch3VolumeKnob;
 
 	knob * m_ch4VolumeKnob;
 	pixmapButton * m_ch4VolSweepDirButton;
 	knob * m_ch4SweepStepLengthKnob;
-	knob * m_ch4ShiftClockFreqKnob;
 	pixmapButton * m_ch4ShiftRegWidthButton;
-	knob * m_ch4FreqDivRatioKnob;
 
 	knob * m_so1VolumeKnob;
 	knob * m_so2VolumeKnob;

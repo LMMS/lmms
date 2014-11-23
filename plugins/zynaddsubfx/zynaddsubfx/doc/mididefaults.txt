@@ -1,0 +1,22 @@
+Appendex A: MIDI Defaults
+-------------------------
+
+.Default MIDI Connections
+[literal]
+001 - Modulation Wheel
+007 - Volume
+010 - Pan
+011 - Expression
+064 - Sustain
+065 - Portamento Enable
+071 - Filter Q
+074 - Filter Cutoff
+075 - Bandwidth(*)
+076 - Modulation Amplitude(*)
+077 - Resonance Center Frequency(*)
+078 - Resonance Bandwidth(*)
+120 - All Sounds Off
+121 - Reset All Controllers
+123 - All Notes Off
+
+The entries with `(*)` are not within the General Midi specification

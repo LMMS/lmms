@@ -153,7 +153,7 @@ void copy_buf(T &dest_buf, const U &src_buf, T scale = 1, T add = 0) {
     typedef typename T::data_type data_type;
     data_type *dest = dest_buf.data();
     const data_type *src = src_buf.data();
-    int size = src.size();
+    int size = src_buf.size();
     for (int i=0; i<size; i++) 
         *dest++ = (*src++) * scale + add;
 }

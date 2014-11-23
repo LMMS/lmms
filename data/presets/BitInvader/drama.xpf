@@ -1,17 +1,18 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20060123" type="channelsettings" version="1.0" >
+<multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
-  <channelsettings>
-    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="100" name="drama" basetone="9" tab="0" >
-      <bitinvader sampleLength="128" interpolation="1" version="0.1" normalize="0" sampleShape="kNtHv4tFRb+EOUK/ftM+v3Y1O79vaTe/Z3Mzv19tL79Xdyu/T4Mnv0e1I79ACSC/OaEcvzNnGb8tbRa/J70TvyNNEb8eNQ+/G10NvxjRC78Vlwq/E58JvxLxCL8Rgwi/EU8IvxFZCL8RkQi/Eu0IvxN3Cb8UHwq/FucKvxexC78ZlQy/G3cNvx1bDr8fRw+/ICsQvyLxEL8jsxG/JWcSvyYHE78ngRO/KOETvygpFL8pWRS/KXEUvylnFL8pSxS/KBUUvyjHE78naxO/JusSvyVhEr8jvRG/IgkRvyFDEL8fdw+/HaMOvxu9Db8azQy/GN8LvxbnCr8U6wm/Eu8IvxD5B78O/wa/DAUGvwoXBb8IKwS/B0MDvwVbAr8DdwG/AZsAv/+N/7787f2++Vn8vvbF+r7yQfm+8NX3vu119r7qDfW+553zvuRB8r7i2fC+34nvvtwp7r7Zvey+12HrvtQZ6r7Szei+z23nvswV5r7KzeS+x1XjvsTZ4b7BXeC+vs3evrtF3b63mdu+tBHavrGF2L6u9da+q2XVvqjN076kMdK+oZnQvp7lzr6aLc2+l33LvpO9yb6Q8ce+jCXGvoldxL6FmcK+gsHAvn7tvr56Cb2+d027vnNxub5vpbe+bMm1vmj1s75kIbK+YVGwvl2Frr5Zpay+Vs2qvlINqb4=" />
-      <eldata fres="0.43" ftype="6" fcut="1120" fwet="0" >
-        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.351" ctlenvamt="0" latt="0" sus="0" lspd="0.7311" att="0.058" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="1" lshp="0" hold="0" />
-        <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.274" ctlenvamt="1" latt="0" sus="0" lspd="0.01" att="0.494" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0" />
-        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+  <instrumenttracksettings>
+    <instrumenttrack fxch="0" vol="59" name="drama" tab="0">
+      <bitinvader sampleLength="128" version="0.1" normalize="0" sampleShape="kNtHv4tFRb+EOUK/ftM+v3Y1O79vaTe/Z3Mzv19tL79Xdyu/T4Mnv0e1I79ACSC/OaEcvzNnGb8tbRa/J70TvyNNEb8eNQ+/G10NvxjRC78Vlwq/E58JvxLxCL8Rgwi/EU8IvxFZCL8RkQi/Eu0IvxN3Cb8UHwq/FucKvxexC78ZlQy/G3cNvx1bDr8fRw+/ICsQvyLxEL8jsxG/JWcSvyYHE78ngRO/KOETvygpFL8pWRS/KXEUvylnFL8pSxS/KBUUvyjHE78naxO/JusSvyVhEr8jvRG/IgkRvyFDEL8fdw+/HaMOvxu9Db8azQy/GN8LvxbnCr8U6wm/Eu8IvxD5B78O/wa/DAUGvwoXBb8IKwS/B0MDvwVbAr8DdwG/AZsAv/+N/7787f2++Vn8vvbF+r7yQfm+8NX3vu119r7qDfW+553zvuRB8r7i2fC+34nvvtwp7r7Zvey+12HrvtQZ6r7Szei+z23nvswV5r7KzeS+x1XjvsTZ4b7BXeC+vs3evrtF3b63mdu+tBHavrGF2L6u9da+q2XVvqjN076kMdK+oZnQvp7lzr6aLc2+l33LvpO9yb6Q8ce+jCXGvoldxL6FmcK+gsHAvn7tvr56Cb2+d027vnNxub5vpbe+bMm1vmj1s75kIbK+YVGwvl2Frr5Zpay+Vs2qvlINqb4=" interpolation="1"/>
+      <eldata fres="0.43" ftype="6" fcut="1120" fwet="0">
+        <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.351" latt="0" sus="0" lspd="0.7311" att="0.058" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="1" lshp="0" hold="0"/>
+        <elcut userwavefile="" lpdel="0" ctlenvamt="1" amt="0" rel="0.274" latt="0" sus="0" lspd="0.01" att="0.494" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0"/>
+        <elres userwavefile="" lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>
       </eldata>
-      <arpandchords arpmode="1" chordrange="4" arprange="1" arpdisabled="0" chord="0" chorddisabled="1" arpgate="100" arp="74" arpsyncmode="6" arptime="107" arpdir="1" />
-      <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-    </channeltrack>
-  </channelsettings>
+      <arpeggiator chorddisabled="1" arptime="107" arprange="1" arpsyncmode="6" arpmode="1" chord="0" chordrange="4" arp="74" arp-enabled="1" chord-enabled="0" arpdisabled="0" arpdir="0" arpgate="100"/>
+      <midiport inputchannel="0" outputchannel="1" send="0" receive="0"/>
+      <chordcreator chorddisabled="1" arptime="107" arprange="1" arpsyncmode="6" arpmode="1" chord="0" chordrange="4" arp="74" arp-enabled="1" chord-enabled="0" arpdisabled="0" arpdir="0" arpgate="100"/>
+    </instrumenttrack>
+  </instrumenttracksettings>
 </multimediaproject>

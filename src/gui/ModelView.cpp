@@ -1,9 +1,9 @@
 /*
- * ModelView.cpp - implementation of ModelView.cpp
+ * ModelView.cpp - implementation of ModelView
  *
- * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,9 +28,9 @@
 
 
 
-ModelView::ModelView( Model * _model, QWidget * _this ) :
-	m_widget( _this ),
-	m_model( _model )
+ModelView::ModelView( Model* model, QWidget* widget ) :
+	m_widget( widget ),
+	m_model( model )
 {
 }
 
@@ -39,7 +39,7 @@ ModelView::ModelView( Model * _model, QWidget * _this ) :
 
 ModelView::~ModelView()
 {
-	if( m_model != NULL && m_model->defaultConstructed() )
+	if( m_model != NULL && m_model->isDefaultConstructed() )
 	{
 		delete m_model;
 	}
@@ -48,11 +48,11 @@ ModelView::~ModelView()
 
 
 
-void ModelView::setModel( Model * _model, bool _old_model_valid )
+void ModelView::setModel( Model* model, bool isOldModelValid )
 {
-	if( _old_model_valid && m_model != NULL )
+	if( isOldModelValid && m_model != NULL )
 	{
-		if( m_model->defaultConstructed() )
+		if( m_model->isDefaultConstructed() )
 		{
 			delete m_model;
 		}
@@ -61,7 +61,8 @@ void ModelView::setModel( Model * _model, bool _old_model_valid )
 			m_model->disconnect( widget() );
 		}
 	}
-	m_model = _model;
+
+	m_model = model;
 
 	doConnections();
 
@@ -77,11 +78,8 @@ void ModelView::doConnections()
 {
 	if( m_model != NULL )
 	{
-		QObject::connect( m_model, SIGNAL( dataChanged() ),
-					widget(), SLOT( update() ) );
-
-		QObject::connect( m_model, SIGNAL( propertiesChanged() ),
-					widget(), SLOT( update() ) );
+		QObject::connect( m_model, SIGNAL( dataChanged() ), widget(), SLOT( update() ) );
+		QObject::connect( m_model, SIGNAL( propertiesChanged() ), widget(), SLOT( update() ) );
 	}
 }
 

@@ -1,9 +1,9 @@
 /*
  * note.cpp - implementation of class note
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -50,13 +50,14 @@ note::note( const MidiTime & _length, const MidiTime & _pos,
 	m_pos( _pos ),
 	m_detuning( NULL )
 {
-	//saveJournallingState( false );
-//	setJournalling( false );
 	if( _detuning )
 	{
 		m_detuning = sharedObject::ref( _detuning );
 	}
-	//restoreJournallingState();
+	else
+	{
+		createDetuning();
+	}
 }
 
 
@@ -98,7 +99,6 @@ note::~note()
 
 void note::setLength( const MidiTime & _length )
 {
-//	addJournalEntry( journalEntry( ChangeLength, m_length - _length ) );
 	m_length = _length;
 }
 
@@ -107,7 +107,6 @@ void note::setLength( const MidiTime & _length )
 
 void note::setPos( const MidiTime & _pos )
 {
-//	addJournalEntry( journalEntry( ChangePosition, m_pos - _pos ) );
 	m_pos = _pos;
 }
 
@@ -117,7 +116,6 @@ void note::setPos( const MidiTime & _pos )
 void note::setKey( const int _key )
 {
 	const int k = qBound( 0, _key, NumKeys );
-//	addJournalEntry( journalEntry( ChangeKey, m_key - k ) );
 	m_key = k;
 }
 
@@ -127,7 +125,6 @@ void note::setKey( const int _key )
 void note::setVolume( volume_t _volume )
 {
 	const volume_t v = qBound( MinVolume, _volume, MaxVolume );
-//	addJournalEntry( journalEntry( ChangeVolume, (int) m_volume - v ) );
 	m_volume = v;
 }
 
@@ -137,7 +134,6 @@ void note::setVolume( volume_t _volume )
 void note::setPanning( panning_t _panning )
 {
 	const panning_t p = qBound( PanningLeft, _panning, PanningRight );
-//	addJournalEntry( journalEntry( ChangePanning, (int) m_panning - p ) );
 	m_panning = p;
 }
 
@@ -209,46 +205,6 @@ void note::loadSettings( const QDomElement & _this )
 		m_detuning->loadSettings( _this );
 	}
 }
-
-
-
-
-/*void note::undoStep( journalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( static_cast<Actions>( _je.actionID() ) )
-	{
-		case ChangeKey:
-			setKey( key() - _je.data().toInt() );
-			break;
-
-		case ChangeVolume:
-			setVolume( getVolume() - _je.data().toInt() );
-			break;
-
-		case ChangePanning:
-			setPanning( getPanning() - _je.data().toInt() );
-			break;
-
-		case ChangeLength:
-			setLength( length() - _je.data().toInt() );
-			break;
-
-		case ChangePosition:
-			setPos( pos() - _je.data().toInt() );
-			break;
-	}
-	restoreJournallingState();
-}
-
-
-
-
-void note::redoStep( journalEntry & _je )
-{
-	journalEntry je( _je.actionID(), -_je.data().toInt() );
-	undoStep( je );
-}*/
 
 
 

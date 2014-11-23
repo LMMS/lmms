@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
-<!DOCTYPE multimedia-project>
-<multimedia-project version="1.0" creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.4.0-beta" type="instrumenttracksettings" >
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
-  <instrumenttracksettings muted="0" type="0" name="Jupiter" >
-    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="81" vol="20" >
-      <instrument name="tripleoscillator" >
-        <tripleoscillator phoffset2="80" userwavefile0="" finer0="0" userwavefile1="" finer1="13" userwavefile2="samples/shapes/smooth_inv_saw.ogg" finer2="0" coarse0="0" coarse1="0" coarse2="12" finel0="0" finel1="-16" modalgo1="2" modalgo2="0" finel2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="121" pan2="0" stphdetun1="259" wavetype0="2" stphdetun2="92" wavetype1="2" wavetype2="3" vol0="100" vol1="100" phoffset0="0" phoffset1="266" vol2="63" />
+  <instrumenttracksettings muted="0" type="0" name="Jupiter" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="81" vol="20">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="80" userwavefile0="" finer0="0" userwavefile1="" finer1="13" userwavefile2="samples/shapes/smooth_inv_saw.ogg" finer2="0" coarse0="0" coarse1="0" coarse2="12" finel0="0" finel1="-16" modalgo1="2" modalgo2="0" finel2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="121" pan2="0" stphdetun1="259" wavetype0="2" stphdetun2="92" wavetype1="2" wavetype2="3" vol0="100" vol1="100" phoffset0="0" phoffset1="266" vol2="63"/>
       </instrument>
-      <eldata fres="1.26" ftype="7" fcut="1754" fwet="1" >
-        <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.598" lamt="0" syncmode="0" latt="0" rel="0.329" sus="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
-        <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.137" lamt="0.63" syncmode="0" latt="0" rel="0.016" sus="0.999" amt="0.82" x100="0" att="0" lpdel="0" hold="0" lshp="1" lspd="0.2918" ctlenvamt="0" lspd_numerator="1" />
-        <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+      <eldata fres="1.26" ftype="7" fcut="1754" fwet="1">
+        <elvol lspd_denominator="1" sustain="1" pdel="0" userwavefile="" dec="0.598" lamt="0" syncmode="0" latt="0" rel="0.329" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1"/>
+        <elcut lspd_denominator="1" sustain="0.001" pdel="0" userwavefile="" dec="0.137" lamt="0.63" syncmode="0" latt="0" rel="0.016" amt="0.82" x100="0" att="0" lpdel="0" hold="0" lshp="1" lspd="0.2918" ctlenvamt="0" lspd_numerator="1"/>
+        <elres lspd_denominator="1" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1"/>
       </eldata>
-      <chordcreator chord="0" chordrange="1" chord-enabled="1" />
-      <arpeggiator arptime="158" arprange="3" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="1" arpdir="0" arpgate="100" />
-      <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
-      <fxchain numofeffects="0" enabled="0" />
+      <chordcreator chord="0" chordrange="1" chord-enabled="1"/>
+      <arpeggiator arptime="143" arprange="3" arptime_denominator="3" syncmode="8" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="1" arpdir="0" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
+      <fxchain numofeffects="0" enabled="0"/>
     </instrumenttrack>
   </instrumenttracksettings>
-</multimedia-project>
+</lmms-project>

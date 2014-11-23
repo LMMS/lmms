@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -54,7 +54,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -79,7 +79,6 @@ static void activatePitchScale(LADSPA_Handle instance) {
 	memset(buffers->gAnaFreq, 0, FRAME_LENGTH*sizeof(float));
 	memset(buffers->gAnaMagn, 0, FRAME_LENGTH*sizeof(float));
 	buffers->gRover = 0;
-	sample_rate = sample_rate;
 
 	/* do one run to make sure the plans are set up */
 	pitch_scale(buffers, 1.0, FRAME_LENGTH, 4, FRAME_LENGTH, sample_rate, buffers->gInFIFO, buffers->gOutFIFO, 0, 0.0f);
@@ -241,7 +240,7 @@ static void runAddingPitchScale(LADSPA_Handle instance, unsigned long sample_cou
 	                                OVER_SAMP);
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -327,7 +326,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (pitchScaleDescriptor) {
 		free((LADSPA_PortDescriptor *)pitchScaleDescriptor->PortDescriptors);
 		free((char **)pitchScaleDescriptor->PortNames);

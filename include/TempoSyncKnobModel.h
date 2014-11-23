@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2008 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -53,11 +53,8 @@ public:
 				const QString & _display_name = QString() );
 	virtual ~TempoSyncKnobModel();
 
-	virtual void saveSettings( QDomDocument & _doc,
-						QDomElement & _this,
-						const QString & _name );
-	virtual void loadSettings( const QDomElement & _this,
-						const QString & _name );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name );
+	void loadSettings( const QDomElement & _this, const QString& name );
 
 	TempoSyncMode syncMode() const
 	{

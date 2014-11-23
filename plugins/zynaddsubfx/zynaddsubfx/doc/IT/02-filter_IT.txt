@@ -1,0 +1,61 @@
+Filters
+-------
+:Author: Mark McCurry
+:Date: June 24, 2012
+
+ZynAddSubFX offre diversi tipi di filtri, che possono essere usati per modellare
+lo spettro di un segnale. I parametri primari che influenzano le caratteristiche
+del filtro sono 'cutoff', 'resonance', 'filter stages' e il tipo di filtro '(filter type)'.
+
+* *Cutoff (frequenza di taglio)*: Questo valore determina quale frequenza segna
+                                  il punto di cambiamento per il filtro.
+                                  In un filtro 'low-pass' (passa-bassi) questo
+                                  valore segna il punto da cui le frequenze alte
+                                  verranno attenuate.
+* *Resonance*: La Resonance di un filtro determina l'enfatizzazione del filtro
+               sulla frequenza di taglio. In ZynAddSubFX è rappresentata dal
+               fattore 'Q', che è definito come la frequenza di taglio diviso
+               la larghezza di banda '(bandwidth)'. In altre parole un più alto
+               valore di Q causa un picco molto più stretto e risonante.
+* *Stages*: Il numero di fasi di filtrazione in un dato filtro descrive quanto
+            bruscamente è in grado di applicare cambiamenti nella risposta in
+            frequenza.
+
+I filtri analogici di base '(analog)' che ZynAddSubFX offre sono mostrati di
+seguito, con la frequenza centrale segnata con una linea rossa. I filtri a stato
+variabile '(state variable)' dovrebbero essere molto simili.
+
+image:images/filter0.png[]
+
+Come detto in precedenza, il valore Q di un filtro influenza quanto concentrata è
+l'energia del segnale nella frequenza di taglio; il risultato di differenti valori
+di Q sono mostrati sotto.
+
+TIP: Per molti suoni analogici classici, alti valori di Q sono ussati sugli
+'sweeping filters'. Un semplice low-pass filter con Q alto modulato da un forte
+'envelope' solitamente è sufficiente per avere un buon suono.
+
+image:images/filter1.png[]
+
+Infine, l'effetto dell'ordine del filtro può essere visto sotto. Questo è
+approssimativamente il numero di fasi del filtro '(filter stages)'. Per patches
+più complesse è importante capire che la nitidezza in più nel filtro non è gratuita,
+in quanto richiede molti più calcoli in corso di esecuzione; questo fenomeno
+è più facilmente visibile nel 'subsynth', dove è facile avere bisogno di centinaia
+di 'filter stages' per produrre una certa nota.
+
+image:images/filter2.png[]
+
+User Interface
+~~~~~~~~~~~~~~
+
+image:images/uifilter.png[]
+
+* *C.freq*: Cutoff frequency
+* *Q*: Level of resonance for the filter
+* *V.SnsA.*: Velocity sensing amount for filter cutoff
+* *V.Sns.*: Velocity sensing function
+* *freq.tr*: Frequency tracking amount. When this parameter is positive, higher
+             note frequencies shift the filter's cutoff frequency higher.
+* *gain*: Additional gain/attenuation for filter
+* *St*: Filter stages

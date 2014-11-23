@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -45,8 +45,8 @@
  */
 
 
-#ifndef _FADER_H
-#define _FADER_H
+#ifndef FADER_H
+#define FADER_H
 
 #include <QtCore/QTime>
 #include <QtGui/QWidget>
@@ -61,6 +61,8 @@ class fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
+	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
+	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
 	fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	virtual ~fader();
 
@@ -70,6 +72,10 @@ public:
 	void setPeak_R( float fPeak );
 	float getPeak_R() {	return m_fPeakValue_R;	}
 
+	QColor peakGreen() const;
+	QColor peakRed() const;
+	void setPeakGreen( const QColor & c );
+	void setPeakRed( const QColor & c );
 
 private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
@@ -85,7 +91,7 @@ private:
 		float fRange = m_model->maxValue() - m_model->minValue();
 		float realVal = m_model->value() - m_model->minValue();
 
-		return height() - ( ( height() - m_knob.height() ) * ( realVal / fRange ) );
+		return height() - ( ( height() - ( *s_knob ).height() ) * ( realVal / fRange ) );
 	}
 
 	FloatModel * m_model;
@@ -103,9 +109,9 @@ private:
 	QTime m_lastPeakTime_L;
 	QTime m_lastPeakTime_R;
 
-	QPixmap m_back;
-	QPixmap m_leds;
-	QPixmap m_knob;
+	static QPixmap * s_back;
+	static QPixmap * s_leds;
+	static QPixmap * s_knob;
 
 	int m_moveStartPoint;
 	float m_startValue;
@@ -113,6 +119,8 @@ private:
 	static textFloat * s_textFloat;
 	void updateTextFloat();
 
+	QColor m_peakGreen;
+	QColor m_peakRed;
 } ;
 
 

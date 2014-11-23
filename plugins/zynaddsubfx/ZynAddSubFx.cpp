@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,12 @@
 
 #include "lmmsconfig.h"
 
+#ifndef LMMS_BUILD_APPLE
 #include <Qt/QtXml>
+#endif
+#ifdef LMMS_BUILD_APPLE 
+#include <QtXml>
+#endif
 #include <QtCore/QTemporaryFile>
 #include <QtGui/QDropEvent>
 #include <QtGui/QGridLayout>
@@ -338,7 +343,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 
 
 
-bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
+bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	// do not forward external MIDI Control Change events if the according
 	// LED is not checked
@@ -528,6 +533,9 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
+#ifdef LMMS_BUILD_APPLE
+	m_toggleUIButton->setEnabled( false );
+#endif
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );

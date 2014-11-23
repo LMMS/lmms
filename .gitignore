@@ -3,3 +3,7 @@
 .*.sw?
 *~
 /CMakeLists.txt.user
+/plugins/zynaddsubfx/zynaddsubfx/ExternalPrograms/Controller/Makefile
+/plugins/zynaddsubfx/zynaddsubfx/ExternalPrograms/Spliter/Makefile
+/plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
+/plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile

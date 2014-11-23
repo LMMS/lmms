@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,6 +37,12 @@ class EXPORT captionMenu : public QMenu
 public:
 	captionMenu( const QString & _title, QWidget * _parent = 0 );
 	virtual ~captionMenu();
+
+	///
+	/// \brief Adds a "Help" action displaying the Menu's parent's WhatsThis
+	///		   text when selected.
+	///
+	void addHelpAction();
 
 } ;
 

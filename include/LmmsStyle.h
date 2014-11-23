@@ -3,8 +3,8 @@
  *                interface
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,10 +24,11 @@
  */
 
 
-#ifndef _LMMS_STYLE_H
-#define _LMMS_STYLE_H
+#ifndef LMMS_STYLE_H
+#define LMMS_STYLE_H
 
 #include <QtGui/QPlastiqueStyle>
+
 
 
 class LmmsStyle : public QPlastiqueStyle
@@ -81,17 +82,19 @@ public:
 					const QWidget *widget = 0 ) const;
 
 	virtual int pixelMetric( PixelMetric metric,
-					const QStyleOption * option = 0, 
+					const QStyleOption * option = 0,
 					const QWidget * widget = 0 ) const;
 
 //	QSize sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const;
 //	QRect subControlRect( ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget ) const;
+
+	static QPalette * s_palette;
 
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
 	QColor m_colors[ LmmsStyle::NumColorRoles ];
 
-} ;
+};
 
 #endif

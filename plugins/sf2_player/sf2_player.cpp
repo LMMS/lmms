@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -109,7 +109,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
-	fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
+	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
 
 	// This is just our starting instance of synth.  It is recreated
 	// everytime we load a new soundfont.
@@ -352,9 +352,9 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 	delete[] sf2Ascii;
 
-	if( updateTrackName )
+	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
-		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+   		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
 	}
 }
 
@@ -519,6 +519,8 @@ void sf2Instrument::updateSampleRate()
 	}
 	updateReverb();
 	updateChorus();
+	updateReverbOn();
+	updateChorusOn();
 }
 
 
@@ -542,7 +544,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	{
 		SF2PluginData * pluginData = new SF2PluginData;
 		pluginData->midiNote = midiNote;
-		pluginData->lastPanning = -1;
+		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = 127;
 		pluginData->fluidVoice = NULL;
 
@@ -588,7 +590,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_notesRunningMutex.unlock();
 	}
 
-	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
+/*	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
 #ifdef SOMEONE_FIXED_PER_NOTE_PANNING
 	if( pluginData->fluidVoice &&
@@ -607,7 +609,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	}
 #endif
 
-	const float currentVelocity = _n->volumeLevel( tfp ) * MidiMaxVelocity * DefaultVolume / MaxVolume;
+	const float currentVelocity = _n->volumeLevel( tfp ) * instrumentTrack()->midiPort()->baseVelocity();
 	if( pluginData->fluidVoice &&
 			pluginData->lastVelocity != currentVelocity )
 	{
@@ -620,14 +622,12 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_synthMutex.unlock();
 
 		pluginData->lastVelocity = currentVelocity;
-	}
+	}*/
 }
 
 
 
 
-// Could we get iph-based instruments support sample-exact models by using a
-// frame-length of 1 while rendering?
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::mixer()->framesPerPeriod();

@@ -70,7 +70,7 @@ seed()
 extern "C" {
 
 __attribute__ ((constructor)) 
-void _init()
+void caps_so_init()
 {
 	DescriptorStub ** d = descriptors;
 
@@ -126,7 +126,7 @@ void _init()
 }
 
 __attribute__ ((destructor)) 
-void _fini()
+void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
 		delete descriptors[i];

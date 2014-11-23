@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -129,7 +129,7 @@ const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
 const int MidiDefaultVelocity = MidiMaxVelocity / 2;
 const int MidiMaxControllerValue = 127;
-const int MidiMaxNote = 127;
+const int MidiMaxKey = 127;
 
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;

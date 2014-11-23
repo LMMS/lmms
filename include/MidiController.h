@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_CONTROLLER_H
-#define _MIDI_CONTROLLER_H
+#ifndef MIDI_CONTROLLER_H
+#define MIDI_CONTROLLER_H
 
 #include <QtGui/QWidget>
 
@@ -44,10 +44,10 @@ public:
 	virtual ~MidiController();
 
 	virtual void processInEvent( const MidiEvent & _me,
-					const MidiTime & _time );
+					const MidiTime & _time, f_cnt_t offset = 0 );
 
 	virtual void processOutEvent( const MidiEvent& _me,
-					const MidiTime & _time)
+					const MidiTime & _time, f_cnt_t offset = 0 )
 	{
 		// No output yet
 	}

@@ -1,0 +1,950 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ZynAddSubFX-data>
+<ZynAddSubFX-data version-major="1" version-minor="1">
+<INFORMATION>
+<par name="PADsynth_used" value="0" />
+</INFORMATION>
+<BASE_PARAMETERS>
+<par name="max_midi_parts" value="16" />
+<par name="max_kit_items_per_instrument" value="16" />
+<par name="max_system_effects" value="4" />
+<par name="max_insertion_effects" value="8" />
+<par name="max_instrument_effects" value="3" />
+<par name="max_addsynth_voices" value="8" />
+</BASE_PARAMETERS>
+<INSTRUMENT>
+<INFO>
+<string name="name">Wind Pipes</string>
+<string name="author">Will J Godfrey
+GPL V 2 or later</string>
+<string name="comments"></string>
+<par name="type" value="10" />
+</INFO>
+<INSTRUMENT_KIT>
+<par name="kit_mode" value="1" />
+<par_bool name="drum_mode" value="no" />
+<INSTRUMENT_KIT_ITEM id="0">
+<par_bool name="enabled" value="yes" />
+<string name="name"></string>
+<par_bool name="muted" value="no" />
+<par name="min_key" value="0" />
+<par name="max_key" value="127" />
+<par name="send_to_instrument_effect" value="0" />
+<par_bool name="add_enabled" value="no" />
+<par_bool name="sub_enabled" value="yes" />
+<SUB_SYNTH_PARAMETERS>
+<par name="num_stages" value="2" />
+<par name="harmonic_mag_type" value="0" />
+<par name="start" value="1" />
+<HARMONICS>
+<HARMONIC id="0">
+<par name="mag" value="60" />
+<par name="relbw" value="90" />
+</HARMONIC>
+<HARMONIC id="1">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="6" />
+<par name="relbw" value="109" />
+</HARMONIC>
+<HARMONIC id="3">
+<par name="mag" value="4" />
+<par name="relbw" value="113" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="4" />
+<par name="relbw" value="119" />
+</HARMONIC>
+<HARMONIC id="5">
+<par name="mag" value="4" />
+<par name="relbw" value="127" />
+</HARMONIC>
+<HARMONIC id="6">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="7">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="8">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="9">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="10">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="11">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="12">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="13">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="14">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="15">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="16">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="17">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="18">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="19">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="20">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="21">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="22">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="23">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="24">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="25">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="26">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="27">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="28">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="29">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="30">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="31">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="32">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="33">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="34">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="35">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="36">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="37">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="38">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="39">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="40">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="41">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="42">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="43">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="44">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="45">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="46">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="47">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="48">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="49">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="50">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="51">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="52">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="53">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="54">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="55">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="56">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="57">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="58">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="59">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="60">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="61">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="62">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="63">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+</HARMONICS>
+<AMPLITUDE_PARAMETERS>
+<par_bool name="stereo" value="yes" />
+<par name="volume" value="96" />
+<par name="panning" value="45" />
+<par name="velocity_sensing" value="90" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="83" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="42" />
+<par name="D_dt" value="97" />
+<par name="R_dt" value="57" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="32" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="42" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="97" />
+<par name="val" value="32" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="57" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="8192" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="1" />
+<par name="bandwidth" value="40" />
+<par name="bandwidth_scale" value="64" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<FREQUENCY_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="64" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="50" />
+<par name="D_dt" value="10" />
+<par name="R_dt" value="60" />
+<par name="A_val" value="30" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="30" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="50" />
+<par name="val" value="64" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="60" />
+<par name="val" value="64" />
+</POINT>
+</FREQUENCY_ENVELOPE>
+<par_bool name="band_width_envelope_enabled" value="no" />
+<BANDWIDTH_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="64" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="70" />
+<par name="D_dt" value="10" />
+<par name="R_dt" value="60" />
+<par name="A_val" value="100" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="100" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="70" />
+<par name="val" value="64" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="60" />
+<par name="val" value="64" />
+</POINT>
+</BANDWIDTH_ENVELOPE>
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par_bool name="enabled" value="no" />
+<FILTER>
+<par name="category" value="0" />
+<par name="type" value="2" />
+<par name="freq" value="80" />
+<par name="q" value="40" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="64" />
+<par name="octaves_freq" value="64" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="126" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="4" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="97" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="86" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="59" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="45" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="34" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="80" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="55" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="43" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="22" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="82" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="118" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="22" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="49" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="102" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="57" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="13" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="10" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="32" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="59" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="67" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="54" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="55" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="80" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="26" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="2" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="89" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="38" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="53" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="120" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="94" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="84" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="29" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="101" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="85" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="63" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="27" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="26" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="57" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="27" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="114" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="82" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par name="filter_velocity_sensing" value="64" />
+<par name="filter_velocity_sensing_amplitude" value="64" />
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="40" />
+<par name="D_dt" value="70" />
+<par name="R_dt" value="60" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="64" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="40" />
+<par name="val" value="64" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="70" />
+<par name="val" value="64" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="60" />
+<par name="val" value="64" />
+</POINT>
+</FILTER_ENVELOPE>
+</FILTER_PARAMETERS>
+</SUB_SYNTH_PARAMETERS>
+<par_bool name="pad_enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="1">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="2">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="3">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="4">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="5">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="6">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="7">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="8">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="9">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="10">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="11">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="12">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="13">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="14">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="15">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+</INSTRUMENT_KIT>
+<INSTRUMENT_EFFECTS>
+<INSTRUMENT_EFFECT id="0">
+<EFFECT>
+<par name="type" value="1" />
+<par name="preset" value="0" />
+<EFFECT_PARAMETERS>
+<par_no id="0">
+<par name="par" value="43" />
+</par_no>
+<par_no id="1">
+<par name="par" value="66" />
+</par_no>
+<par_no id="2">
+<par name="par" value="39" />
+</par_no>
+<par_no id="3">
+<par name="par" value="24" />
+</par_no>
+<par_no id="7">
+<par name="par" value="85" />
+</par_no>
+<par_no id="8">
+<par name="par" value="5" />
+</par_no>
+<par_no id="9">
+<par name="par" value="83" />
+</par_no>
+<par_no id="10">
+<par name="par" value="1" />
+</par_no>
+<par_no id="11">
+<par name="par" value="64" />
+</par_no>
+</EFFECT_PARAMETERS>
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="1">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="2">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+</INSTRUMENT_EFFECTS>
+</INSTRUMENT>
+</ZynAddSubFX-data>

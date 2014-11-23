@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,7 @@
 #include "AutomatableModel.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
-
+#include "lmms_math.h"
 
 float AutomatableModel::s_copiedValue = 0;
 
@@ -39,6 +39,7 @@ AutomatableModel::AutomatableModel( DataType type,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
 	m_dataType( type ),
+	m_scaleType( Linear ),
 	m_value( val ),
 	m_initValue( val ),
 	m_minValue( min ),
@@ -46,7 +47,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_step( step ),
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
-	m_journalEntryReady( false ),
+	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
@@ -86,21 +87,28 @@ bool AutomatableModel::isAutomated() const
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
-	if( isAutomated() )
+	if( isAutomated() || m_scaleType != Linear )
 	{
+		// automation needs tuple of data (name, id, value)
+		// scale type also needs an extra value
+		// => it must be appended as a node
 		QDomElement me = doc.createElement( name );
 		me.setAttribute( "id", id() );
 		me.setAttribute( "value", m_value );
+		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
 		element.appendChild( me );
 	}
 	else
 	{
+		// non automation, linear scale (default), can be saved as attribute
 		element.setAttribute( name, m_value );
 	}
 
 	if( m_controllerConnection )
 	{
 		QDomElement controllerElement;
+
+		// get "connection" element (and create it if needed)
 		QDomNode node = element.namedItem( "connection" );
 		if( node.isElement() )
 		{
@@ -142,9 +150,12 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 			}
 			return;
 		}
+		// logscales were not existing at this point of time
+		// so they can be ignored
 	}
 
 	QDomNode connectionNode = element.namedItem( "connection" );
+	// reads controller connection
 	if( connectionNode.isElement() )
 	{
 		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
@@ -155,14 +166,31 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 			//m_controllerConnection->setTargetName( displayName() );
 		}
 	}
-
+	
+	// models can be stored as elements (port00) or attributes (port10):
+	// <ladspacontrols port10="4.41">
+	//   <port00 value="4.41" id="4249278"/>
+	// </ladspacontrols>
+	// element => there is automation data, or scaletype information
 	node = element.namedItem( name );
 	if( node.isElement() )
 	{
-		changeID( node.toElement().attribute( "id" ).toInt() );
-		setValue( node.toElement().attribute( "value" ).toFloat() );
+			changeID( node.toElement().attribute( "id" ).toInt() );
+			setValue( node.toElement().attribute( "value" ).toFloat() );
+			if( node.toElement().hasAttribute( "scale_type" ) )
+			{
+				if( node.toElement().attribute( "scale_type" ) == "linear" )
+				{
+					setScaleType( Linear );
+				}
+				else if( node.toElement().attribute( "scale_type" ) == "log" )
+				{
+					setScaleType( Logarithmic );
+				}
+			}
 	}
 	else if( element.hasAttribute( name ) )
+	// attribute => read the element's value from the attribute list
 	{
 		setInitValue( element.attribute( name ).toFloat() );
 	}
@@ -184,7 +212,7 @@ void AutomatableModel::setValue( const float value )
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
-		addJournalEntry( JournalEntry( 0, m_value - old_val ) );
+		addJournalCheckPoint();
 
 		// notify linked models
 		for( AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it )
@@ -196,6 +224,7 @@ void AutomatableModel::setValue( const float value )
 				(*it)->setJournalling( journalling );
 			}
 		}
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 	else
@@ -208,12 +237,74 @@ void AutomatableModel::setValue( const float value )
 
 
 
+template<class T> T AutomatableModel::logToLinearScale( T value ) const
+{
+	return castValue<T>( ::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
+}
+
+
+float AutomatableModel::scaledValue( float value ) const
+{
+	return m_scaleType == Linear
+		? value
+		: logToLinearScale<float>( ( value - minValue<float>() ) / m_range );
+}
+
+
+float AutomatableModel::inverseScaledValue( float value ) const
+{
+	return m_scaleType == Linear
+		? value
+		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
+}
+
+
+
+QString AutomatableModel::displayValue( const float val ) const
+{
+	switch( m_dataType )
+	{
+		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
+		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
+		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
+	}
+	return "0";
+}
+
+
+
+//! @todo: this should be moved into a maths header
+template<class T>
+void roundAt( T& value, const T& where, const T& step_size )
+{
+	if( qAbs<float>( value - where )
+		< typeInfo<float>::minEps() * qAbs<float>( step_size ) )
+	{
+		value = where;
+	}
+}
+
+
+
+
+template<class T>
+void AutomatableModel::roundAt( T& value, const T& where ) const
+{
+	::roundAt(value, where, m_step);
+}
+
+
+
+
 void AutomatableModel::setAutomatedValue( const float value )
 {
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
-	m_value = fittedValue( value );
+	const float scaled_value = scaledValue( value );
+
+	m_value = fittedValue( scaled_value );
+
 	if( oldValue != m_value )
 	{
 		// notify linked models
@@ -224,9 +315,10 @@ void AutomatableModel::setAutomatedValue( const float value )
 				!(*it)->fittedValue( m_value ) !=
 							 (*it)->m_value )
 			{
-				(*it)->setAutomatedValue( m_value );
+				(*it)->setAutomatedValue( value );
 			}
 		}
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 	--m_setValueDepth;
@@ -281,17 +373,9 @@ float AutomatableModel::fittedValue( float value ) const
 		value = nearbyintf( value / m_step ) * m_step;
 	}
 
-	// correct rounding error at the border
-	if( qAbs<float>( value - m_maxValue ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
-	{
-		value = m_maxValue;
-	}
-
-	// correct rounding error if value = 0
-	if( qAbs<float>( value ) < typeInfo<float>::minEps() * qAbs<float>( m_step ) )
-	{
-		value = 0;
-	}
+	roundAt( value, m_maxValue );
+	roundAt( value, m_minValue );
+	roundAt( value, 0.0f );
 
 	if( value < m_minValue )
 	{
@@ -309,54 +393,9 @@ float AutomatableModel::fittedValue( float value ) const
 
 
 
-void AutomatableModel::redoStep( JournalEntry& je )
-{
-	bool journalling = testAndSetJournalling( false );
-	setValue( value<float>() + (float) je.data().toDouble() );
-	setJournalling( journalling );
-}
-
-
-
-
-void AutomatableModel::undoStep( JournalEntry& je )
-{
-	JournalEntry inv( je.actionID(), -je.data().toDouble() );
-	redoStep( inv );
-}
-
-
-
-
-void AutomatableModel::prepareJournalEntryFromOldVal()
-{
-	m_oldValue = value<float>();
-	saveJournallingState( false );
-	m_journalEntryReady = true;
-}
-
-
-
-
-void AutomatableModel::addJournalEntryFromOldToCurVal()
-{
-	if( m_journalEntryReady )
-	{
-		restoreJournallingState();
-		if( value<float>() != m_oldValue )
-		{
-			addJournalEntry( JournalEntry( 0, value<float>() - m_oldValue ) );
-		}
-		m_journalEntryReady = false;
-	}
-}
-
-
-
-
 void AutomatableModel::linkModel( AutomatableModel* model )
 {
-	if( !m_linkedModels.contains( model ) )
+	if( !m_linkedModels.contains( model ) && model != this )
 	{
 		m_linkedModels.push_back( model );
 		m_hasLinkedModels = true;
@@ -388,8 +427,8 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	model1->linkModel( model2 );
-	model2->linkModel( model1 );
+		model1->linkModel( model2 );
+		model2->linkModel( model1 );
 }
 
 
@@ -424,9 +463,11 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	{
 		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ), this, SIGNAL( dataChanged() ) );
 		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 }
+
 
 
 
@@ -434,7 +475,21 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 {
 	if( m_controllerConnection )
 	{
-		const float v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
+		float v = 0;
+		switch(m_scaleType)
+		{
+		case Linear:
+			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
+			break;
+		case Logarithmic:
+			v = logToLinearScale(
+				controllerConnection()->currentValue( frameOffset ));
+			break;
+		default:
+			qFatal("AutomatableModel::controllerValue(int)"
+				"lacks implementation for a scale type");
+			break;
+		}
 		if( typeInfo<float>::isEqual( m_step, 1 ) )
 		{
 			return qRound( v );
@@ -445,10 +500,10 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 	AutomatableModel* lm = m_linkedModels.first();
 	if( lm->controllerConnection() )
 	{
-		return lm->controllerValue( frameOffset );
+		return fittedValue( lm->controllerValue( frameOffset ) );
 	}
 
-	return lm->m_value;
+	return fittedValue( lm->m_value );
 }
 
 
@@ -495,12 +550,70 @@ void AutomatableModel::copyValue()
 
 
 
-void AutomatableModel::pasteValue()	
+void AutomatableModel::pasteValue()
 {
 	setValue( copiedValue() );
 }
 
 
+
+float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
+{
+	// get patterns that connect to this model
+	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
+	if( patterns.isEmpty() )
+	{
+		// if no such patterns exist, return current value
+		return m_value;
+	}
+	else
+	{
+		// of those patterns:
+		// find the patterns which overlap with the miditime position
+		QVector<AutomationPattern *> patternsInRange;
+		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+		{
+			int s = ( *it )->startPosition();
+			int e = ( *it )->endPosition();
+			if( s <= time && e >= time ) { patternsInRange += ( *it ); } 
+		}
+		
+		AutomationPattern * latestPattern = NULL;
+		
+		if( ! patternsInRange.isEmpty() )
+		{
+			// if there are more than one overlapping patterns, just use the first one because
+			// multiple pattern behaviour is undefined anyway
+			latestPattern = patternsInRange[0];
+		}
+		else
+		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
+		{
+			int latestPosition = 0;
+			
+			for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+			{
+				int e = ( *it )->endPosition();
+				if( e <= time && e > latestPosition )
+				{
+					latestPosition = e;
+					latestPattern = ( *it );
+				}
+			}
+		}
+		
+		if( latestPattern )
+		{
+			// scale/fit the value appropriately and return it
+			const float value = latestPattern->valueAt( time - latestPattern->startPosition() );
+			const float scaled_value = scaledValue( value );
+			return fittedValue( scaled_value );
+		}
+		// if we still find no pattern, the value at that time is undefined so 
+		// just return current value as the best we can do
+		else return m_value;
+	}
+}
 
 
 #include "moc_AutomatableModel.cxx"

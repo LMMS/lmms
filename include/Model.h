@@ -1,9 +1,9 @@
 /*
  * Model.h - declaration of Model base class
  *
- * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MODEL_H
-#define _MODEL_H
+#ifndef MODEL_H
+#define MODEL_H
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
@@ -47,12 +47,12 @@ public:
 	{
 	}
 
-	inline bool defaultConstructed()
+	bool isDefaultConstructed()
 	{
 		return m_defaultConstructed;
 	}
 
-	inline Model * parentModel() const
+	Model* parentModel() const
 	{
 		return static_cast<Model *>( parent() );
 	}
@@ -62,9 +62,9 @@ public:
 		return m_displayName;
 	}
 
-	virtual void setDisplayName( const QString & _display_name )
+	virtual void setDisplayName( const QString& displayName )
 	{
-		m_displayName = _display_name;
+		m_displayName = displayName;
 	}
 
 	virtual QString fullDisplayName() const;

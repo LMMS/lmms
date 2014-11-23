@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,7 +44,7 @@ fadeButton::fadeButton( const QColor & _normal_color,
 	m_activatedColor( _activated_color )
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setFocusPolicy( Qt::NoFocus );
 }
 

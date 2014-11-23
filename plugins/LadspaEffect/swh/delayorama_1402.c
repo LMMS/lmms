@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -90,7 +90,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -668,7 +668,7 @@ static void runAddingDelayorama(LADSPA_Handle instance, unsigned long sample_cou
 	plugin_data->last_out = out;
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -847,7 +847,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (delayoramaDescriptor) {
 		free((LADSPA_PortDescriptor *)delayoramaDescriptor->PortDescriptors);
 		free((char **)delayoramaDescriptor->PortNames);

@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,7 +36,7 @@
 
 
 
-TempoSyncKnob::TempoSyncKnob( int _knob_num, QWidget * _parent,
+TempoSyncKnob::TempoSyncKnob( knobTypes _knob_num, QWidget * _parent,
 						const QString & _name ) :
 	knob( _knob_num, _parent, _name ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
@@ -83,7 +83,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName() );
+	captionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	
@@ -147,9 +147,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	}
 
-	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 	
 	delete syncMenu;

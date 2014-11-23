@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,8 @@
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 
-#include "src/UI/MasterUI.h"
+#include "zynaddsubfx/src/Nio/Nio.h"
+#include "zynaddsubfx/src/UI/MasterUI.h"
 
 #include <FL/x.H>
 
@@ -49,6 +50,8 @@ public:
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
+		Nio::start();
+
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
@@ -65,6 +68,8 @@ public:
 #else
 		usleep( m_guiSleepTime * 2 * 1000 );
 #endif
+
+		Nio::stop();
 	}
 
 	virtual void updateSampleRate()
@@ -169,7 +174,7 @@ private:
 
 void RemoteZynAddSubFx::guiThread()
 {
-	int exitProgram;
+	int exitProgram = 0;
 	MasterUI * ui = NULL;
 
 	while( !m_guiExit )
@@ -263,9 +268,11 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
 	pthread_win32_process_attach_np();
 	pthread_win32_thread_attach_np();
+#endif
 #endif
 
 
@@ -278,11 +285,32 @@ int main( int _argc, char * * _argv )
 
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	pthread_win32_thread_detach_np();
 	pthread_win32_process_detach_np();
+#endif
 #endif
 
 	return 0;
 }
 
+
+#ifdef NTK_GUI
+static Fl_Tiled_Image *module_backdrop;
+#endif
+
+void set_module_parameters ( Fl_Widget *o )
+{
+#ifdef NTK_GUI
+	o->box( FL_DOWN_FRAME );
+	o->align( o->align() | FL_ALIGN_IMAGE_BACKDROP );
+	o->color( FL_BLACK );
+	o->image( module_backdrop );
+	o->labeltype( FL_SHADOW_LABEL );
+#else
+	o->box( FL_PLASTIC_UP_BOX );
+	o->color( FL_CYAN );
+	o->labeltype( FL_EMBOSSED_LABEL );
+#endif
+}
 

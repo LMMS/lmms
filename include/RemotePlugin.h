@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -52,7 +52,7 @@
 #include <process.h>
 #endif
 
-#include <Qt/qglobal.h>
+#include <QtCore/QtGlobal>
 
 #if QT_VERSION >= 0x040400
 #include <QtCore/QSystemSemaphore>
@@ -75,7 +75,7 @@
 
 #ifdef USE_QT_SHMEM
 
-#include <Qt/qglobal.h>
+#include <QtCore/QtGlobal>
 
 #if QT_VERSION >= 0x040400
 #include <QtCore/QSharedMemory>
@@ -474,7 +474,6 @@ private:
 #else
 	int m_shmID;
 #endif
-	size_t m_shmSize;
 	shmData * m_data;
 #ifdef USE_QT_SEMAPHORES
 	QSystemSemaphore m_dataSem;
@@ -780,7 +779,6 @@ private:
 	void resizeSharedProcessingMemory();
 
 
-	bool m_initialized;
 	bool m_failed;
 
 	QProcess m_process;

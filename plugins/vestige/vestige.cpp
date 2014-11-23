@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -170,9 +170,10 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( QFileInfo( m_pluginDLL ).isAbsolute() )
 	{
-		QString relativePath;
-		if( !( relativePath = m_pluginDLL.section( configManager::
-					inst()->vstDir(), 1, 1 ) ).isEmpty() )
+		QString f = QString( m_pluginDLL ).replace( QDir::separator(), '/' );
+		QString vd = QString( configManager::inst()->vstDir() ).replace( QDir::separator(), '/' );
+        	QString relativePath;
+		if( !( relativePath = f.section( vd, 1, 1 ) ).isEmpty() )
 		{
 			m_pluginDLL = relativePath;
 		}
@@ -237,9 +238,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != NULL &&
-		instrumentTrack()->name() == m_plugin->name() ) ||
-			instrumentTrack()->name() ==
-				InstrumentTrack::tr( "Default preset" );
+        	instrumentTrack()->name() == m_plugin->name() ) ||
+            	instrumentTrack()->name() == InstrumentTrack::tr( "Default preset" ) ||
+            	instrumentTrack()->name() == displayName();
+
 	m_pluginMutex.unlock();
 
 	if ( m_plugin != NULL )
@@ -310,12 +312,12 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->processMidiEvent( event, time );
+		m_plugin->processMidiEvent( event, offset );
 	}
 	m_pluginMutex.unlock();
 
@@ -776,7 +778,7 @@ void VestigeInstrumentView::noteOffAll( void )
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
 	{
-		for( int key = 0; key <= MidiMaxNote; ++key )
+		for( int key = 0; key <= MidiMaxKey; ++key )
 		{
 			m_vi->m_plugin->processMidiEvent( MidiEvent( MidiNoteOff, 0, key, 0 ), 0 );
 		}
@@ -881,8 +883,9 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 
 	m_vi->m_subWindow = engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-	m_vi->m_subWindow->setFixedSize( 960, 300);
+	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
+	m_vi->m_subWindow->setFixedWidth( 960 );
+	m_vi->m_subWindow->setMinimumHeight( 300 );
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
@@ -979,7 +982,6 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget->setAutoFillBackground(true);
 
 	m_vi->m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
-	m_vi->m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_vi->m_scrollArea->setPalette( QApplication::palette( m_vi->m_scrollArea ) );
 	m_vi->m_scrollArea->setMinimumHeight( 64 );
 

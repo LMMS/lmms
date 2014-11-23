@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,8 +34,8 @@
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
-#include <math.h>
 
+#include "lmms_math.h"
 #include "knob.h"
 #include "caption_menu.h"
 #include "config_mgr.h"
@@ -55,17 +55,37 @@ textFloat * knob::s_textFloat = NULL;
 
 
 
-knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
-	QWidget( _parent ),
-	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
-	m_knobNum( _knob_num ),
-	m_label( "" ),
-	m_knobPixmap( NULL ),
-	m_volumeKnob( false ),
-	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false ),
-	m_angle( -10 ),
-	m_outerColor( NULL )
+//! @todo: in C++11, we can use delegating ctors
+#define DEFAULT_KNOB_INITIALIZER_LIST \
+	QWidget( _parent ), \
+	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ), \
+	m_label( "" ), \
+	m_knobPixmap( NULL ), \
+	m_volumeKnob( false ), \
+	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
+	m_buttonPressed( false ), \
+	m_angle( -10 )
+
+knob::knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
+	DEFAULT_KNOB_INITIALIZER_LIST,
+	m_knobNum( _knob_num )
+{
+	initUi( _name );
+}
+
+knob::knob( QWidget * _parent, const QString & _name ) :
+	DEFAULT_KNOB_INITIALIZER_LIST,
+	m_knobNum( knobBright_26 )
+{
+	initUi( _name );
+}
+
+#undef DEFAULT_KNOB_INITIALIZER_LIST
+
+
+
+
+void knob::initUi( const QString & _name )
 {
 	if( s_textFloat == NULL )
 	{
@@ -74,6 +94,19 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 
 	setWindowTitle( _name );
 
+	onKnobNumUpdated();
+	setTotalAngle( 270.0f );
+	setInnerRadius( 1.0f );
+	setOuterRadius( 10.0f );
+	setFocusPolicy( Qt::ClickFocus );
+	doConnections();
+}
+
+
+
+
+void knob::onKnobNumUpdated()
+{
 	if( m_knobNum != knobStyled )
 	{
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
@@ -81,11 +114,6 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
-	setTotalAngle( 270.0f );
-	setInnerRadius( 1.0f );
-	setOuterRadius( 10.0f );
-	setFocusPolicy( Qt::ClickFocus );
-	doConnections();
 }
 
 
@@ -162,6 +190,27 @@ void knob::setOuterRadius( float _r )
 
 
 
+
+knobTypes knob::knobNum() const
+{
+	return m_knobNum;
+}
+
+
+
+
+void knob::setknobNum( knobTypes _k )
+{
+	if( m_knobNum != _k )
+	{
+		m_knobNum = _k;
+		onKnobNumUpdated();
+	}
+}
+
+
+
+
 QPointF knob::centerPoint() const
 {
 	return m_centerPoint;
@@ -213,28 +262,42 @@ void knob::setLineWidth( float _w )
 
 QColor knob::outerColor() const
 {
-	if( m_outerColor )
-	{
-		return *m_outerColor;
-	}
-	else
-	{
-		return QColor();
-	}
+	return m_outerColor;
 }
 
 
 
 void knob::setOuterColor( const QColor & _c )
 {
-	if( m_outerColor )
-	{
-		*m_outerColor = _c;
-	}
-	else
-	{
-		m_outerColor = new QColor( _c );
-	}
+	m_outerColor = _c;
+}
+
+
+
+QColor knob::lineColor() const
+{
+	return m_lineColor;
+}
+
+
+
+void knob::setlineColor( const QColor & _c )
+{
+	m_lineColor = _c;
+}
+
+
+
+QColor knob::arcColor() const
+{
+	return m_arcColor;
+}
+
+
+
+void knob::setarcColor( const QColor & _c )
+{
+	m_arcColor = _c;
 }
 
 
@@ -242,7 +305,7 @@ void knob::setOuterColor( const QColor & _c )
 
 QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * M_PI / 180.0;
+	const float rarc = m_angle * F_PI / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
@@ -257,7 +320,7 @@ bool knob::updateAngle()
 	int angle = 0;
 	if( model() && model()->maxValue() != model()->minValue() )
 	{
-		angle = angleFromValue( model()->value(), model()->minValue(), model()->maxValue(), m_totalAngle );
+		angle = angleFromValue( model()->inverseScaledValue( model()->value() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 	}
 	if( qAbs( angle - m_angle ) > 3 )
 	{
@@ -290,11 +353,11 @@ void knob::drawKnob( QPainter * _p )
 		p.setRenderHint( QPainter::Antialiasing );
 
 		// Perhaps this can move to setOuterRadius()
-		if( m_outerColor )
+		if( m_outerColor.isValid() )
 		{
 			QRadialGradient gradient( centerPoint(), outerRadius() );
-			gradient.setColorAt(0.4, _p->pen().brush().color() );
-			gradient.setColorAt(1, *m_outerColor );
+			gradient.setColorAt( 0.4, _p->pen().brush().color() );
+			gradient.setColorAt( 1, m_outerColor );
 
 			p.setPen( QPen( gradient, lineWidth(),
 						Qt::SolidLine, Qt::RoundCap ) );
@@ -325,7 +388,7 @@ void knob::drawKnob( QPainter * _p )
 
 	p.setRenderHint( QPainter::Antialiasing );
 
-	const int centerAngle = angleFromValue( model()->centerValue(), model()->minValue(), model()->maxValue(), m_totalAngle );
+	const int centerAngle = angleFromValue( model()->inverseScaledValue( model()->centerValue() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
@@ -380,6 +443,8 @@ void knob::drawKnob( QPainter * _p )
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
+		case knobStyled:
+			break;
 	}
 
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
@@ -416,14 +481,21 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName() );
+	captionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
+	contextMenu.addAction( QPixmap(), 
+		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
+
+void knob::toggleScale()
+{
+	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+}
 
 
 
@@ -467,7 +539,12 @@ void knob::mousePressEvent( QMouseEvent * _me )
 			! ( _me->modifiers() & Qt::ControlModifier ) &&
 			! ( _me->modifiers() & Qt::ShiftModifier ) )
 	{
-		model()->prepareJournalEntryFromOldVal();
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -515,9 +592,16 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
+void knob::mouseReleaseEvent( QMouseEvent* event )
 {
-	model()->addJournalEntryFromOldToCurVal();
+	if( event && event->button() == Qt::LeftButton )
+	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->restoreJournallingState();
+		}
+	}
 
 	m_buttonPressed = false;
 
@@ -592,15 +676,39 @@ void knob::setPosition( const QPoint & _p )
 {
 	const float value = getValue( _p ) + m_leftOver;
 	const float step = model()->step<float>();
-	
-	if( qAbs( value ) >= step )
+	const float oldValue = model()->value();
+
+
+	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
-		model()->setValue( model()->value() - value );
-		m_leftOver = 0.0f;
+		const float pos = model()->minValue() < 0 
+			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
+			: ( oldValue - model()->minValue() ) / model()->range();
+		const float ratio = 0.1f + qAbs( pos ) * 15.f;
+		float newValue = value * ratio;
+		if( qAbs( newValue ) >= step )
+		{
+			model()->setValue( oldValue - newValue );
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = value;
+		}
 	}
-	else
+
+		
+	else // linear code
 	{
-		m_leftOver = value;
+		if( qAbs( value ) >= step )
+		{	
+			model()->setValue( oldValue - value );
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = value;
+		}
 	}
 }
 
@@ -626,7 +734,7 @@ void knob::enterValue()
 		}
 		else
 		{
-			new_val = pow( 10.0, ( new_val / 20.0 ) ) * 100.0;
+			new_val = dbvToAmp( new_val ) * 100.0;
 		}
 	}
 	else

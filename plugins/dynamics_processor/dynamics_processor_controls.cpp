@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,6 +28,7 @@
 
 #include "dynamics_processor_controls.h"
 #include "dynamics_processor.h"
+#include "base64.h"
 #include "graph.h"
 #include "engine.h"
 #include "song.h"
@@ -45,35 +46,20 @@ dynProcControls::dynProcControls( dynProcEffect * _eff ) :
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_stereomodeModel( 0, 0, 2, this, tr( "Stereo mode" ) )
 {
-	connect( &m_inputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeControl() ) );
-
-	connect( &m_outputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeControl() ) );
-			
-	connect( &m_attackModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeControl() ) );
-			
-	connect( &m_releaseModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeControl() ) );
-			
-	connect( &m_stereomodeModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeControl() ) );
-
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
-
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 
 	setDefaultShape();
 
 }
 
 
-
-void dynProcControls::changeControl()
+void dynProcControls::sampleRateChanged()
 {
-	engine::getSong()->setModified();
+	m_effect->m_needsUpdate = true;
 }
+
 
 void dynProcControls::samplesChanged( int _begin, int _end)
 {

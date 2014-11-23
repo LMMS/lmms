@@ -2,9 +2,9 @@
  * shared_object.h - class sharedObject for use among other objects
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,8 @@
  *
  */
 
-
-#ifndef _SHARED_OBJECT_H
-#define _SHARED_OBJECT_H
-
+#ifndef SHARED_OBJECT_H
+#define SHARED_OBJECT_H
 
 #include <QtCore/QMutex>
 
@@ -45,27 +43,33 @@ public:
 	}
 
 	template<class T>
-	static T * ref( T * _object )
+	static T* ref( T* object )
 	{
-		_object->m_lock.lock();
+		object->m_lock.lock();
 		// TODO: Use QShared
-		++_object->m_referenceCount;
-		_object->m_lock.unlock();
-		return( _object );
+		++object->m_referenceCount;
+		object->m_lock.unlock();
+		return object;
 	}
 
 	template<class T>
-	static void unref( T * _object )
+	static void unref( T* object )
 	{
-		_object->m_lock.lock();
-		bool delete_object = --_object->m_referenceCount <= 0;
-		_object->m_lock.unlock();
-		if ( delete_object )
+		object->m_lock.lock();
+		bool deleteObject = --object->m_referenceCount <= 0;
+		object->m_lock.unlock();
+
+		if ( deleteObject )
 		{
-			delete _object;
+			delete object;
 		}
 	}
 
+	// keep clang happy which complaines about unused member variable
+	void dummy()
+	{
+		m_referenceCount = 0;
+	}
 
 private:
 	int m_referenceCount;

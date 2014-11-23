@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _CONTROLLER_H
-#define _CONTROLLER_H
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
 #include "engine.h"
 #include "Mixer.h"
@@ -65,9 +65,7 @@ public:
 
 	inline bool isSampleExact() const
 	{
-		return m_sampleExact ||
-			engine::mixer()->currentQualitySettings().
-							sampleExactControllers;
+		return m_sampleExact;
 	}
 
 	void setSampleExact( bool _exact )

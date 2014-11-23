@@ -1,9 +1,9 @@
 /*
  * AudioPort.h - base-class for objects providing sound at a port
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,7 +33,7 @@
 
 class EffectChain;
 
-class AudioPort
+class AudioPort : public ThreadableJob
 {
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true );
@@ -108,6 +108,13 @@ public:
 
 
 	bool processEffects();
+
+	// ThreadableJob stuff
+	virtual void doProcessing( sampleFrame * );
+	virtual bool requiresProcessing() const
+	{
+		return true;
+	}
 
 
 	enum bufferUsages

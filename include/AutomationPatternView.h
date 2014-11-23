@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,10 +33,14 @@ class AutomationPattern;
 class AutomationPatternView : public trackContentObjectView
 {
 	Q_OBJECT
+
+// theming qproperties
+	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+
 public:
 	AutomationPatternView( AutomationPattern * _pat, trackView * _parent );
 	virtual ~AutomationPatternView();
-
 
 public slots:
 	virtual void update();
@@ -46,7 +50,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void disconnectObject( QAction * _a );
-
+	void toggleRecording();
 
 protected:
 	virtual void constructContextMenu( QMenu * );
@@ -65,9 +69,10 @@ private:
 	AutomationPattern * m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
+	
+	static QPixmap * s_pat_rec;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );
-
 } ;
 
 

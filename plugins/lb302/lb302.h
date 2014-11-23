@@ -3,12 +3,12 @@
  *           emulate the Roland TB303 bass synth
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * lb302FilterIIR2 is based on the gsyn filter code by Andy Sloane.
- * 
- * lb302Filter3Pole is based on the TB303 instrument written by 
+ *
+ * lb302Filter3Pole is based on the TB303 instrument written by
  *   Josep M Comajuncosas for the CSounds library
  *
  * This program is free software; you can redistribute it and/or
@@ -29,8 +29,8 @@
  */
 
 
-#ifndef _LB302_H_
-#define _LB302_H_
+#ifndef LB302_H_
+#define LB302_H_
 
 #include "DspEffectLibrary.h"
 #include "Instrument.h"
@@ -38,6 +38,8 @@
 #include "led_checkbox.h"
 #include "knob.h"
 #include "Mixer.h"
+#include "NotePlayHandle.h"
+#include <QMutex>
 
 static const int NUM_FILTERS = 2;
 
@@ -67,12 +69,12 @@ class lb302Filter
 	virtual void playNote();
 
 	protected:
-	lb302FilterKnobState *fs;  
+	lb302FilterKnobState *fs;
 
 	// Filter Decay
 	float vcf_c0;           // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
 	float vcf_e0,           // e0 and e1 for interpolation
-	      vcf_e1;           
+	      vcf_e1;
 	float vcf_rescoeff;     // Resonance coefficient [0.30,9.54]
 };
 
@@ -87,13 +89,13 @@ class lb302FilterIIR2 : public lb302Filter
 	virtual float process(const float& samp);
 
 	protected:
-	float vcf_d1,           //   d1 and d2 are added back into the sample with 
+	float vcf_d1,           //   d1 and d2 are added back into the sample with
 	      vcf_d2;           //   vcf_a and b as coefficients. IIR2 resonance
 	                        //   loop.
 
 	                        // IIR2 Coefficients for mixing dry and delay.
-	float vcf_a,            //   Mixing coefficients for the final sound.  
-	      vcf_b,            //  
+	float vcf_a,            //   Mixing coefficients for the final sound.
+	      vcf_b,            //
 	      vcf_c;
 
 	DspEffectLibrary::Distortion * m_dist;
@@ -111,15 +113,15 @@ class lb302Filter3Pole : public lb302Filter
 	virtual float process(const float& samp);
 
 	protected:
-	float kfcn, 
-	      kp, 
-	      kp1, 
-	      kp1h, 
+	float kfcn,
+	      kp,
+	      kp1,
+	      kp1h,
 	      kres;
-	float ay1, 
-	      ay2, 
-	      aout, 
-	      lastin, 
+	float ay1,
+	      ay2,
+	      aout,
+	      lastin,
 	      value;
 };
 
@@ -164,9 +166,10 @@ public:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 private:
+	void processNote( NotePlayHandle * n );
 
 	void initNote(lb302Note *note);
-
+	void initSlide();
 
 private:
 	FloatModel vcf_cut_knob;
@@ -179,7 +182,7 @@ private:
 	FloatModel dist_knob;
 	IntModel wave_shape;
 	FloatModel slide_dec_knob;
-    
+
 	BoolModel slideToggle;
 	BoolModel accentToggle;
 	BoolModel deadToggle;
@@ -200,9 +203,8 @@ private:
 	      vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
 	      vco_slidebase;    //* The base vco_inc while sliding.
 
-	float vco_detune;
-
-	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE };
+	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE,
+							BL_SAWTOOTH, BL_SQUARE, BL_TRIANGLE, BL_MOOG };
 	vco_shape_t vco_shape;
 
 	// Filters (just keep both loaded and switch)
@@ -217,9 +219,9 @@ private:
 	// More States
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
 
-	float vca_attack,       // Amp attack 
+	float vca_attack,       // Amp attack
 	      vca_decay,        // Amp decay
-	      vca_a0,           // Initial amplifier coefficient 
+	      vca_a0,           // Initial amplifier coefficient
 	      vca_a;            // Amplifier coefficient.
 
 	// Envelope State
@@ -233,9 +235,7 @@ private:
 	int catch_frame;
 	int catch_decay;
 
-	float new_freq;
-	float current_freq;
-	float delete_freq;
+	bool new_freq;
 	float true_freq;
 
 	void recalcFilter();
@@ -244,6 +244,9 @@ private:
 
 	friend class lb302SynthView;
 
+	NotePlayHandle * m_playingNote;
+	NotePlayHandleList m_notes;
+	QMutex m_notesMutex;
 } ;
 
 
@@ -256,20 +259,18 @@ public:
 
 private:
 	virtual void modelChanged();
-	
+
 	knob * m_vcfCutKnob;
 	knob * m_vcfResKnob;
 	knob * m_vcfDecKnob;
 	knob * m_vcfModKnob;
 
-	knob * m_vcoFineDetuneKnob;
-
 	knob * m_distKnob;
 	knob * m_slideDecKnob;
 	automatableButtonGroup * m_waveBtnGrp;
-    
+
 	ledCheckBox * m_slideToggle;
-	ledCheckBox * m_accentToggle;
+	/*ledCheckBox * m_accentToggle;*/ // removed pending accent implementation
 	ledCheckBox * m_deadToggle;
 	ledCheckBox * m_db24Toggle;
 

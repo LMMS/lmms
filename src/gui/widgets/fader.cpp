@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -60,7 +60,9 @@
 
 
 textFloat * fader::s_textFloat = NULL;
-
+QPixmap * fader::s_back = NULL;
+QPixmap * fader::s_leds = NULL;
+QPixmap * fader::s_knob = NULL;
 
 fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -72,18 +74,30 @@ fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_back( embed::getIconPixmap( "fader_background" ) ),
-	m_leds( embed::getIconPixmap( "fader_leds" ) ),
-	m_knob( embed::getIconPixmap( "fader_knob" ) ),
 	m_moveStartPoint( -1 ),
-	m_startValue( 0 )
+	m_startValue( 0 ),
+	m_peakGreen( 0, 0, 0 ),
+	m_peakRed( 0, 0, 0 )
 {
 	if( s_textFloat == NULL )
 	{
 		s_textFloat = new textFloat;
 	}
+	if( ! s_back )
+	{
+		s_back = new QPixmap( embed::getIconPixmap( "fader_background" ) );
+	}
+	if( ! s_leds )
+	{
+		s_leds = new QPixmap( embed::getIconPixmap( "fader_leds" ) );
+	}
+	if( ! s_knob )
+	{
+		s_knob = new QPixmap( embed::getIconPixmap( "fader_knob" ) );
+	}
+	
 	setWindowTitle( _name );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
+	setAttribute( Qt::WA_OpaquePaintEvent, false );
 	setMinimumSize( 23, 116 );
 	setMaximumSize( 23, 116);
 	resize( 23, 116 );
@@ -116,7 +130,7 @@ void fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 	{
 		int dy = m_moveStartPoint - mouseEvent->globalY();
 
-		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - m_knob.height() );
+		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - ( *s_knob ).height() );
 
 		model()->setValue( m_startValue + delta );
 
@@ -132,7 +146,7 @@ void fader::mousePressEvent( QMouseEvent* mouseEvent )
 	if( mouseEvent->button() == Qt::LeftButton &&
 			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
-		if( mouseEvent->y() >= knobPosY() - m_knob.height() && mouseEvent->y() < knobPosY() )
+		if( mouseEvent->y() >= knobPosY() - ( *s_knob ).height() && mouseEvent->y() < knobPosY() )
 		{
 			updateTextFloat();
 			s_textFloat->show();
@@ -260,7 +274,7 @@ void fader::updateTextFloat()
 	{
 		s_textFloat->setText( QString("Volume: %1 %").arg( m_model->value() * 100 ) );
 	}
-	s_textFloat->moveGlobal( this, QPoint( width() - m_knob.width() - 5, knobPosY() - 46 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() - ( *s_knob ).width() - 5, knobPosY() - 46 ) );
 }
 
 
@@ -277,8 +291,7 @@ void fader::paintEvent( QPaintEvent * ev)
 	QPainter painter(this);
 
 	// background
-//	painter.drawPixmap( rect(), m_back, QRect( 0, 0, 23, 116 ) );
-	painter.drawPixmap( ev->rect(), m_back, ev->rect() );
+	painter.drawPixmap( ev->rect(), *s_back, ev->rect() );
 
 
 	// peak leds
@@ -286,28 +299,50 @@ void fader::paintEvent( QPaintEvent * ev)
 
 	int peak_L = calculateDisplayPeak( m_fPeakValue_L - m_fMinPeak );
 	int persistentPeak_L = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_L - m_fMinPeak ) );
-	painter.drawPixmap( QRect( 0, peak_L, 11, 116 - peak_L ), m_leds, QRect( 0, peak_L, 11, 116 - peak_L ) );
+	painter.drawPixmap( QRect( 0, peak_L, 11, 116 - peak_L ), *s_leds, QRect( 0, peak_L, 11, 116 - peak_L ) );
 
 	if( m_persistentPeak_L > 0.05 )
 	{
-		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), (m_persistentPeak_L < 1.0 )? QColor( 74, 253, 133) : QColor( 255, 100, 100));
+		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), ( m_persistentPeak_L < 1.0 )
+			? peakGreen() 
+			: peakRed() );
 	}
 
 	int peak_R = calculateDisplayPeak( m_fPeakValue_R - m_fMinPeak );
 	int persistentPeak_R = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_R - m_fMinPeak ) );
-	painter.drawPixmap( QRect( 11, peak_R, 11, 116 - peak_R ), m_leds, QRect( 11, peak_R, 11, 116 - peak_R ) );
+	painter.drawPixmap( QRect( 11, peak_R, 11, 116 - peak_R ), *s_leds, QRect( 11, peak_R, 11, 116 - peak_R ) );
 
 	if( m_persistentPeak_R > 0.05 )
 	{
-		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), (m_persistentPeak_R < 1.0 )? QColor( 74, 253, 133) : QColor( 255, 100, 100));
+		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), ( m_persistentPeak_R < 1.0 )
+			? peakGreen() 
+			: peakRed() );
 	}
 
 	// knob
-	painter.drawPixmap( 0, knobPosY() - m_knob.height(), m_knob );
+	painter.drawPixmap( 0, knobPosY() - ( *s_knob ).height(), *s_knob );
 }
 
 
+QColor fader::peakGreen() const
+{
+	return m_peakGreen;
+}
 
+QColor fader::peakRed() const
+{
+	return m_peakRed;
+}
+	
+void fader::setPeakGreen( const QColor & c )
+{
+	m_peakGreen = c;
+}
+	
+void fader::setPeakRed( const QColor & c )
+{
+	m_peakRed = c;
+}
 
 #include "moc_fader.cxx"
 

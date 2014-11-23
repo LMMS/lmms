@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,12 @@
 #include "ProjectJournal.h"
 #include "bb_track_container.h"
 #include "song.h"
+#include "text_float.h"
+#include "embed.h"
 
+
+const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
+const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
 
 AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
@@ -44,7 +49,9 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_objects(),
 	m_tension( 1.0 ),
 	m_progressionType( DiscreteProgression ),
-	m_dragging( false )
+	m_dragging( false ),
+	m_isRecording( false ),
+	m_lastRecordedValue( 0 )
 {
 	changeLength( MidiTime( 1, 0 ) );
 }
@@ -91,8 +98,8 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 		{
 			if( *it == _obj )
 			{
-				// Already exists
-				// TODO: Maybe let the user know in some non-annoying way
+				textFloat::displayMessage( _obj->displayName(), tr( "Model is already connected "
+												"to this pattern." ), embed::getIconPixmap( "automation" ), 2000 );
 				return;
 			}
 		}
@@ -102,7 +109,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->value<float>(), false );
+		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
 	m_objects += _obj;
@@ -466,24 +473,41 @@ const QString AutomationPattern::name() const
 
 
 
-void AutomationPattern::processMidiTime( const MidiTime & _time )
+void AutomationPattern::processMidiTime( const MidiTime & time )
 {
-	if( _time >= 0 && hasAutomation() )
+	if( ! isRecording() )
 	{
-		const float val = valueAt( _time );
-		for( objectVector::iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+		if( time >= 0 && hasAutomation() )
 		{
-			if( *it )
+			const float val = valueAt( time );
+			for( objectVector::iterator it = m_objects.begin();
+							it != m_objects.end(); ++it )
 			{
-				( *it )->setAutomatedValue( val );
-			}
+				if( *it )
+				{
+					( *it )->setAutomatedValue( val );
+				}
 
+			}	
+		}
+	}
+	else
+	{
+		if( time >= 0 && ! m_objects.isEmpty() )
+		{
+			const float value = static_cast<float>( firstObject()->value<float>() );
+			if( value != m_lastRecordedValue ) 
+			{
+				putValue( time, value, true );
+				m_lastRecordedValue = value;
+			}
+			else if( valueAt( time ) != value )
+			{
+				removeValue( time, false );
+			}
 		}
 	}
 }
-
-
 
 
 
@@ -529,6 +553,51 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 }
 
 
+/*! \brief returns a list of all the automation patterns everywhere that are connected to a specific model
+ *  \param _m the model we want to look for
+ */
+QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
+{
+	QVector<AutomationPattern *> patterns;
+	TrackContainer::TrackList l;
+	l += engine::getSong()->tracks();
+	l += engine::getBBTrackContainer()->tracks();
+	l += engine::getSong()->globalAutomationTrack();
+	
+	// go through all tracks...
+	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	{
+		// we want only automation tracks...
+		if( ( *it )->type() == track::AutomationTrack ||
+			( *it )->type() == track::HiddenAutomationTrack )
+		{
+			// get patterns in those tracks....
+			const track::tcoVector & v = ( *it )->getTCOs();
+			// go through all the patterns...
+			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			{
+				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
+				// check that the pattern has automation
+				if( a && a->hasAutomation() )
+				{
+					// now check is the pattern is connected to the model we want by going through all the connections
+					// of the pattern
+					bool has_object = false;
+					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					{
+						if( *k == _m )
+						{
+							has_object = true;
+						}
+					}
+					// if the patterns is connected to the model, add it to the list
+					if( has_object ) { patterns += a; }
+				}
+			}
+		}
+	}
+	return patterns;
+}
 
 
 

@@ -1,26 +1,5 @@
 INCLUDE(BuildPlugin)
 
-SET(ZYN_SRC_GUI
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/MasterUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/VirKeyboard.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/ConfigUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/OscilGenUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/WidgetPDial.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/ResonanceUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/MicrotonalUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/ADnoteUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/PresetsUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/EffUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/FilterUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/PartUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/EnvelopeUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/LFOUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/SeqUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/PADnoteUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/SUBnoteUI.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/UI/BankUI.cc"
-)
-
 
 # definitions for ZynAddSubFX
 IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -48,42 +27,85 @@ ENDIF(LMMS_BUILD_WIN32)
 SET(FLTK_SKIP_OPENGL TRUE)
 SET(FLTK_SKIP_FORMS TRUE)
 SET(FLTK_SKIP_IMAGES TRUE)
-SET(FLTK_SKIP_FLUID TRUE)
+SET(FLTK_SKIP_MATH TRUE)
+IF(MINGW_PREFIX)
+	SET(FLTK_SKIP_FLUID TRUE)
+ENDIF()
 
 FIND_PACKAGE(FLTK REQUIRED)
+
+IF(MINGW_PREFIX)
+	SET(FLTK_FLUID_EXECUTABLE "${MINGW_PREFIX}/bin/fluid")
+ENDIF()
+
+IF(NOT EXISTS ${FLTK_FLUID_EXECUTABLE})
+	MESSAGE(FATAL_ERROR "Please install the fluid binary which is part of FLTK.")
+ENDIF()
 
 INCLUDE_DIRECTORIES("${FLTK_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_SOURCE_DIR}"
                     ${FFTW3F_INCLUDE_DIRS}
                     "${CMAKE_CURRENT_BINARY_DIR}"
                     "${CMAKE_BINARY_DIR}")
-set(ZASF_CORE_LIBS
-    zynaddsubfx_input
-    zynaddsubfx_output
-    zynaddsubfx_misc
-    zynaddsubfx_synth
-    zynaddsubfx_seq
-    zynaddsubfx_effect
-    zynaddsubfx_params
-    zynaddsubfx_dsp
-    zynaddsubfx_samples
+
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/zynaddsubfx/src/UI)
+
+ADD_DEFINITIONS(-DPLUGINVERSION)	# removes exit confirmation dialogs etc. in MasterUI.fl
+add_subdirectory(zynaddsubfx/src/Nio)
+add_subdirectory(zynaddsubfx/src/UI)
+
+SET(zynaddsubfx_core_SRCS
+    zynaddsubfx/src/DSP/AnalogFilter.cpp
+    zynaddsubfx/src/DSP/FFTwrapper.cpp
+    zynaddsubfx/src/DSP/Filter.cpp
+    zynaddsubfx/src/DSP/FormantFilter.cpp
+    zynaddsubfx/src/DSP/SVFilter.cpp
+    zynaddsubfx/src/DSP/Unison.cpp
+    zynaddsubfx/src/Effects/Alienwah.cpp
+	zynaddsubfx/src/Effects/Chorus.cpp
+	zynaddsubfx/src/Effects/Distorsion.cpp
+	zynaddsubfx/src/Effects/DynamicFilter.cpp
+	zynaddsubfx/src/Effects/Echo.cpp
+	zynaddsubfx/src/Effects/Effect.cpp
+	zynaddsubfx/src/Effects/EffectLFO.cpp
+	zynaddsubfx/src/Effects/EffectMgr.cpp
+	zynaddsubfx/src/Effects/EQ.cpp
+	zynaddsubfx/src/Effects/Phaser.cpp
+	zynaddsubfx/src/Effects/Reverb.cpp
+	zynaddsubfx/src/Misc/Bank.cpp
+	zynaddsubfx/src/Misc/Config.cpp
+	zynaddsubfx/src/Misc/Dump.cpp
+	zynaddsubfx/src/Misc/Master.cpp
+	zynaddsubfx/src/Misc/Microtonal.cpp
+	zynaddsubfx/src/Misc/Part.cpp
+	zynaddsubfx/src/Misc/Util.cpp
+	zynaddsubfx/src/Misc/QtXmlWrapper.cpp
+	zynaddsubfx/src/Misc/Recorder.cpp
+	zynaddsubfx/src/Misc/WavFile.cpp
+	zynaddsubfx/src/Misc/WaveShapeSmps.cpp
+	zynaddsubfx/src/Params/ADnoteParameters.cpp
+	zynaddsubfx/src/Params/Controller.cpp
+	zynaddsubfx/src/Params/EnvelopeParams.cpp
+	zynaddsubfx/src/Params/FilterParams.cpp
+	zynaddsubfx/src/Params/LFOParams.cpp
+	zynaddsubfx/src/Params/PADnoteParameters.cpp
+	zynaddsubfx/src/Params/Presets.cpp
+	zynaddsubfx/src/Params/PresetsArray.cpp
+	zynaddsubfx/src/Params/PresetsStore.cpp
+	zynaddsubfx/src/Params/SUBnoteParameters.cpp
+	zynaddsubfx/src/Synth/SynthNote.cpp
+	zynaddsubfx/src/Synth/ADnote.cpp
+	zynaddsubfx/src/Synth/Envelope.cpp
+	zynaddsubfx/src/Synth/LFO.cpp
+	zynaddsubfx/src/Synth/OscilGen.cpp
+	zynaddsubfx/src/Synth/PADnote.cpp
+	zynaddsubfx/src/Synth/Resonance.cpp
+	zynaddsubfx/src/Synth/SUBnote.cpp
     )
 
-macro(unit_test NAME CXX_FILE FILES)
-endmacro(unit_test)
 
-add_subdirectory(src/Misc)
-add_subdirectory(src/Input)
-add_subdirectory(src/Synth)
-add_subdirectory(src/Output)
-add_subdirectory(src/Seq)
-add_subdirectory(src/Effects)
-add_subdirectory(src/Params)
-add_subdirectory(src/DSP)
-add_subdirectory(src/Samples)
-
-ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp)
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore ${ZASF_CORE_LIBS} ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
+ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
+TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lws2_32)
 	INSTALL(TARGETS ZynAddSubFxCore RUNTIME DESTINATION "${PLUGIN_DIR}")
@@ -106,12 +128,11 @@ ENDIF(WIN32)
 
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp ${ZYN_SRC_GUI} "${WINRC}")
+ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx ${FLTK_LIBRARIES} -lpthread "-L\"${CMAKE_CURRENT_BINARY_DIR}\"" -lZynAddSubFxCore )
-ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ZynAddSubFxCore ${FLTK_LIBRARIES} -lpthread )
 
-# link system libraries when on win32
+# link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx ${QT_LIBRARIES})
 ENDIF(LMMS_BUILD_WIN32)

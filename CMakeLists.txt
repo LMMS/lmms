@@ -13,9 +13,9 @@ INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
 
-SET(VERSION_MAJOR "0")
-SET(VERSION_MINOR "9")
-SET(VERSION_PATCH "92")
+SET(VERSION_MAJOR "1")
+SET(VERSION_MINOR "0")
+SET(VERSION_PATCH "98")
 #SET(VERSION_SUFFIX "")
 SET(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 IF(VERSION_SUFFIX)
@@ -29,6 +29,7 @@ INCLUDE(DetectMachine)
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
+OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
@@ -42,6 +43,19 @@ OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
+
+
+IF(LMMS_BUILD_APPLE)
+	SET(WANT_SF2 OFF)
+	SET(WANT_ALSA OFF)
+	SET(WANT_PULSEAUDIO OFF)
+	SET(WANT_VST OFF)
+	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	# MacPorts: /opt/local/lib
+	LINK_DIRECTORIES(${LINK_DIRECTORIES} /opt/local/lib)
+ENDIF(LMMS_BUILD_APPLE)
+
 
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
@@ -142,6 +156,18 @@ SET(STATUS_TAP "OK")
 ELSE(WANT_TAP)
 SET(STATUS_TAP "not built as requested")
 ENDIF(WANT_TAP)
+
+
+# check for CARLA
+IF(WANT_CARLA)
+	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	IF(CARLA_FOUND)
+		SET(LMMS_HAVE_CARLA TRUE)
+		SET(STATUS_CARLA "OK")
+	ELSE(CARLA_FOUND)
+		SET(STATUS_CARLA "not found, please install the latest carla")
+	ENDIF(CARLA_FOUND)
+ENDIF(WANT_CARLA)
 
 
 # check for SDL
@@ -307,7 +333,16 @@ CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmms.rc.in" "${CMAKE_BINARY_DIR}/lmms.rc")
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in" "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
 
 # set compiler flags
-SET(WERROR_FLAGS "-Wall -Werror -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
+SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
+IF(NOT LMMS_BUILD_APPLE)
+   SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
+ENDIF()
+
+# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
+IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0")))
+   SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds")
+ENDIF()
+
 SET(CMAKE_C_FLAGS "-O2 -g ${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
@@ -371,6 +406,18 @@ ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 ENDIF(WIN32)
 
+# set up apple vars before traversing into data/scripts
+SET(MACOSX_BUNDLE_ICON_FILE "lmms.icns")
+SET(MACOSX_BUNDLE_GUI_IDENTIFIER "LMMS")
+SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
+SET(MACOSX_BUNDLE_BUNDLE_NAME "LMMS")
+SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
+SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
+SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
+SET(MACOSX_BUNDLE_MIMETYPE "application/x-lmms-project")
+SET(MACOSX_BUNDLE_MIMETYPE_ICON "project.icns")
+SET(MACOSX_BUNDLE_MIMETYPE_ID "net.sourceforge.lmms")
+SET(MACOSX_BUNDLE_PROJECT_URL "http://lmms.io")
 
 
 # make sub-directories
@@ -428,22 +475,26 @@ IF(LMMS_BUILD_WIN32)
 	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/QtCore4.dll"
 					"${MINGW_PREFIX}/bin/QtGui4.dll"
+					"${MINGW_PREFIX}/bin/QtSvg4.dll"
 					"${MINGW_PREFIX}/bin/QtXml4.dll"
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
 					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
+					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
+					"${MINGW_PREFIX}/lib/libfltk.dll"
 					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
 					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
-					"${MINGW_PREFIX}/bin/libpng15-15.dll"
+					"${MINGW_PREFIX}/bin/libpng16-16.dll"
 					"${MINGW_PREFIX}/bin/SDL.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/zlib1.dll"
+					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
 				DESTINATION .)
 
 ELSE(LMMS_BUILD_WIN32)
@@ -568,6 +619,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
@@ -613,8 +665,8 @@ SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/nsis_branding.bmp")
 SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/lmms.ico")
 SET(CPACK_NSIS_INSTALLED_ICON_NAME "lmms.exe")
 SET(CPACK_NSIS_DISPLAY_NAME "LMMS ${VERSION}")
-SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lmms.sourceforge.net")
-SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lmms.sourceforge.net")
+SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lmms.io")
+SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lmms.io")
 SET(CPACK_NSIS_CONTACT "lmms-devel@lists.sourceforge.net")
 SET(CPACK_PACKAGE_EXECUTABLES "lmms.exe;LMMS")
 SET(CPACK_NSIS_MENU_LINKS "lmms.exe;LMMS")
@@ -627,6 +679,8 @@ SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
   \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+  DeleteRegKey HKCR \\\"LMMS Project\\\"
+  DeleteRegKey HKCR \\\"LMMS Project (compressed)\\\"
   ")
 ELSE(WIN32)
 SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")
@@ -638,14 +692,6 @@ IF(WIN64)
 	SET(CPACK_NSIS_DEFINES "${CPACK_NSIS_DEFINES}
 		InstallDir \\\"\\\$PROGRAMFILES64\\\\${CPACK_PACKAGE_INSTALL_DIRECTORY}\\\"")
 ENDIF(WIN64)
-
-SET(MACOSX_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/data/themes/default/icon.png")
-SET(MACOSX_BUNDLE_GUI_IDENTIFIER "LMMS")
-SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
-SET(MACOSX_BUNDLE_BUNDLE_NAME "LMMS")
-SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
-SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
-SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
 
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "lmms-${VERSION}")

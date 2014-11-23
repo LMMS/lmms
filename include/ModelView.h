@@ -1,9 +1,9 @@
 /*
  * ModelView.h - declaration of ModelView base class
  *
- * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MODEL_VIEW_H
-#define _MODEL_VIEW_H
+#ifndef MODEL_VIEW_H
+#define MODEL_VIEW_H
 
 #include "Model.h"
 
@@ -31,31 +31,31 @@
 class EXPORT ModelView
 {
 public:
-	ModelView( Model * _model, QWidget * _this );
+	ModelView( Model* model, QWidget* widget );
 	virtual ~ModelView();
 
-	virtual void setModel( Model * _model, bool _old_model_valid = true );
+	virtual void setModel( Model* model, bool isOldModelValid = true );
 
-	inline Model * model()
+	Model* model()
 	{
 		return m_model;
 	}
 
-	inline const Model * model() const
+	const Model* model() const
 	{
 		return m_model;
 	}
 
 	template<class T>
-	T * castModel()
+	T* castModel()
 	{
-		return dynamic_cast<T *>( model() );
+		return dynamic_cast<T*>( model() );
 	}
 
 	template<class T>
-	const T * castModel() const
+	const T* castModel() const
 	{
-		return dynamic_cast<const T *>( model() );
+		return dynamic_cast<const T*>( model() );
 	}
 
 
@@ -65,7 +65,7 @@ protected:
 	{
 	}
 
-	QWidget * widget()
+	QWidget* widget()
 	{
 		return m_widget;
 	}
@@ -74,7 +74,7 @@ protected:
 
 
 private:
-	QWidget * m_widget;
+	QWidget* m_widget;
 	QPointer<Model> m_model;
 
 } ;

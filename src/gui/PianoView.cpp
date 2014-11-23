@@ -3,8 +3,8 @@
  *             for testing + according model class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,7 +31,7 @@
  * \mainpage Instrument plugin keyboard display classes
  *
  * \section introduction Introduction
- * 
+ *
  * \todo fill this out
  * \todo write isWhite inline function and replace throughout
  */
@@ -160,7 +160,7 @@ PianoView::~PianoView()
 
 
 
-/*! \brief Map a keyboard key being pressed to a note in our keyboard view 
+/*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
  *  \param _k The keyboard scan code of the key being pressed.
  *  \todo check the scan codes for ',' = c, 'L' = c#, '.' = d, ':' = d#,
@@ -255,7 +255,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 19: return 27; // 0 = d'#
 		case 33: return 28; // P = e'
 		case 34: return 29; // [
-		case 21: return 30; // = 
+		case 21: return 30; // =
 		case 35: return 31; // ]
 	}
 #endif
@@ -459,7 +459,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				( ( KEY_ORDER[key_num % KeysPerOctave] ==
 							Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float) MidiDefaultVelocity );
+						(float) m_piano->instrumentTrack()->midiPort()->baseVelocity() );
 			if( y_diff < 0 )
 			{
 				velocity = 0;
@@ -469,10 +469,10 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 							Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 			{
-				velocity = MidiDefaultVelocity;
+				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
 			// set note on
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 			m_piano->setKeyState( key_num, true );
 			m_lastKey = key_num;
 
@@ -517,7 +517,7 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 	{
 		if( m_piano != NULL )
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, m_lastKey, 0 ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
 		}
 
@@ -557,7 +557,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	int velocity = (int)( (float) y_diff /
 		( ( KEY_ORDER[key_num % KeysPerOctave] == Piano::WhiteKey ) ?
 			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float) MidiDefaultVelocity );
+						(float) m_piano->instrumentTrack()->midiPort()->baseVelocity() );
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
 	// correct volume if necessary
@@ -569,7 +569,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		( ( KEY_ORDER[key_num % KeysPerOctave] == Piano::WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 	{
-		velocity = MidiDefaultVelocity;
+		velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 	}
 
 	// is the calculated key different from current key? (could be the
@@ -578,7 +578,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	{
 		if( m_lastKey != -1 )
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, m_lastKey, 0 ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
 			m_lastKey = -1;
 		}
@@ -586,7 +586,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		{
 			if( _me->pos().y() > PIANO_BASE )
 			{
-				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
+				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 				m_piano->setKeyState( key_num, true );
 				m_lastKey = key_num;
 			}
@@ -600,7 +600,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_piano->isKeyPressed( key_num ) )
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, 0, key_num, velocity ) );
+		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, -1, key_num, velocity ) );
 	}
 
 }
@@ -697,7 +697,7 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// hang otherwise
 	for( int i = 0; i < NumKeys; ++i )
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, i, 0 ) );
+		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		m_piano->setKeyState( i, false );
 	}
 	update();

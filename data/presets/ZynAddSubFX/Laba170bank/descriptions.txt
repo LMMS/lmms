@@ -1,0 +1,8 @@
+Author of presets: Laba170
+
+Made in Zynaddsubfx vsti ver 2.4.1.420
+
+
+* Some of these presets needs unison to sound like they were intended.
+
+* Relative bandwith (relBW) can on many patches be tweaked to fatten up the sound or make it sharper.

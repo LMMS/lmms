@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _BB_EDITOR_H
-#define _BB_EDITOR_H
+#ifndef BB_EDITOR_H
+#define BB_EDITOR_H
 
 #include "TrackContainerView.h"
 
@@ -45,6 +45,8 @@ public:
 	{
 		return( true );
 	}
+	
+	virtual void dropEvent( QDropEvent * _de );
 
 	void removeBBView( int _bb );
 

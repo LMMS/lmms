@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -104,7 +104,13 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
-		model()->prepareJournalEntryFromOldVal();
+
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
 	}
 	else
 	{
@@ -139,7 +145,7 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 {
 	if( m_mouseMoving )
 	{
-		model()->addJournalEntryFromOldToCurVal();
+		model()->restoreJournallingState();
 
 		QCursor::setPos( m_origMousePos );
 		QApplication::restoreOverrideCursor();

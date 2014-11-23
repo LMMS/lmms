@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,9 +35,11 @@
 #include "song.h"
 #include "tool_button.h"
 #include "config_mgr.h"
+#include "DataFile.h"
+#include "string_pair_drag.h"
 
 #include "TrackContainer.h"
-#include "pattern.h"
+#include "Pattern.h"
 
 
 
@@ -157,14 +159,33 @@ bbEditor::~bbEditor()
 }
 
 
+void bbEditor::dropEvent( QDropEvent * de )
+{
+	QString type = stringPairDrag::decodeKey( de );
+	QString value = stringPairDrag::decodeValue( de );
+	
+	if( type.left( 6 ) == "track_" )
+	{
+		DataFile dataFile( value.toUtf8() );
+		track * t = track::create( dataFile.content().firstChild().toElement(), model() );
+		
+		t->deleteTCOs();
+		m_bbtc->updateAfterTrackAdd();
+		
+		de->accept();
+	}
+	else
+	{
+		TrackContainerView::dropEvent( de );
+	}
+}
 
 
 void bbEditor::removeBBView( int _bb )
 {
-	QList<trackView *> tl = trackViews();
-	for( int i = 0; i < tl.size(); ++i )
+	foreach( trackView* view, trackViews() )
 	{
-		tl[i]->getTrackContentWidget()->removeTCOView( _bb );
+		view->getTrackContentWidget()->removeTCOView( _bb );
 	}
 }
 
@@ -235,8 +256,7 @@ void bbEditor::addSteps()
 	{
 		if( ( *it )->type() == track::InstrumentTrack )
 		{
-			pattern * p = static_cast<pattern *>(
-				( *it )->getTCO( m_bbtc->currentBB() ) );
+			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			p->addSteps();
 		}
 	}
@@ -254,8 +274,7 @@ void bbEditor::removeSteps()
 	{
 		if( ( *it )->type() == track::InstrumentTrack )
 		{
-			pattern * p = static_cast<pattern *>(
-				( *it )->getTCO( m_bbtc->currentBB() ) );
+			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			p->removeSteps();
 		}
 	}

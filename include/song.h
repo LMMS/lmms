@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,7 @@
 #include "VstSyncController.h"
 
 class AutomationTrack;
-class pattern;
+class Pattern;
 class timeLine;
 
 
@@ -210,26 +210,29 @@ public:
 	void loadProject( const QString & _filename );
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & _filename );
-    bool saveProjectFile( const QString & _filename );
-	inline const QString & projectFileName() const
+	bool saveProjectFile( const QString & _filename );
+
+	const QString & projectFileName() const
 	{
 		return m_fileName;
 	}
-	inline bool isLoadingProject() const
+
+	bool isLoadingProject() const
 	{
 		return m_loadingProject;
 	}
-	inline bool isModified() const
+
+	bool isModified() const
 	{
 		return m_modified;
 	}
 
-	inline virtual QString nodeName() const
+	virtual QString nodeName() const
 	{
 		return "song";
 	}
 
-	virtual inline bool fixedTCOs() const
+	virtual bool fixedTCOs() const
 	{
 		return false;
 	}
@@ -256,7 +259,7 @@ public slots:
 	void playAndRecord();
 	void playTrack( track * _trackToPlay );
 	void playBB();
-	void playPattern( pattern * _patternToPlay, bool _loop = true );
+	void playPattern( Pattern* patternToPlay, bool _loop = true );
 	void togglePause();
 	void stop();
 
@@ -273,8 +276,6 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
-
-	bool isLoadingProject();
 
 
 private slots:
@@ -343,7 +344,7 @@ private:
 	tact_t m_length;
 
 	track * m_trackToPlay;
-	pattern * m_patternToPlay;
+	Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
 	double m_elapsedMilliSeconds;

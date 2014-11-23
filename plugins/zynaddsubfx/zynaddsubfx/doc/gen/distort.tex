@@ -1,0 +1,44 @@
+\documentclass[11pt]{report}
+\pagestyle{empty}
+\usepackage{pst-sigsys}
+\usepackage{auto-pst-pdf}
+\begin{document}
+\begin{pspicture}[showgrid=false](0,-2)(10,2)
+    %Style
+    \psset{framesize=1 .65}
+    \psset{style=Arrow}
+
+    %In/Out
+    \rput(0,0){\rnode{in}{$x[n]$}}
+    \rput(9.5,0){\rnode{out}{$y[n]$}}
+
+    %Panning
+    \rput(1,0.5){Panning}
+    \pscircleop[operation=times] (1,0){pan}
+    \ncline{in}{pan}
+
+    %Preamp
+    \rput(2,-0.5){Preamp}
+    \pscircleop[operation=times] (2,0){preamp}
+    \ncline{pan}{preamp}
+    
+    %Filtering
+    \psfblock(3,0){fil1}{Filter}
+    \ncline{preamp}{fil1}
+
+    %Distortion
+    \psfblock(4.5,0){shape}{$H(n)$}
+    \ncline{fil1}{shape}
+    
+    %Filtering
+    \psfblock(6,0){fil2}{Filter}
+    \ncline{shape}{fil2}
+
+    %Crossover
+    \psfblock[framesize=1.8 .65](8,0){cross}{Crossover}
+    \ncline{fil2}{cross}
+    \ncline{cross}{out}
+
+
+\end{pspicture}
+\end{document}

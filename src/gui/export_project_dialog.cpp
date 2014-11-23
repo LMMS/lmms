@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -251,9 +251,7 @@ ProjectRenderer* exportProjectDialog::prepRender()
 	Mixer::qualitySettings qs =
 			Mixer::qualitySettings(
 					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()),
-					sampleExactControllersCB->isChecked(),
-					aliasFreeOscillatorsCB->isChecked() );
+					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
 	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
 			samplerateCB->currentText().section(" ", 0, 0).toUInt(),

@@ -2,8 +2,8 @@
  * organic.h - additive synthesizer for organ-like sounds
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,10 @@
  */
 
 
-#ifndef _ORGANIC_H
-#define _ORGANIC_H
+#ifndef ORGANIC_H
+#define ORGANIC_H
+
+#include <QString>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -37,6 +39,38 @@ class knob;
 class NotePlayHandle;
 class pixmapButton;
 
+const int NUM_HARMONICS = 18;
+const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
+	"Octave below",
+	"Fifth below",
+	"Fundamental",
+	"2nd harmonic",
+	"3rd harmonic",
+	"4th harmonic",
+	"5th harmonic",
+	"6th harmonic",
+	"7th harmonic",
+	"8th harmonic",
+	"9th harmonic",
+	"10th harmonic",
+	"11th harmonic",
+	"12th harmonic",
+	"13th harmonic",
+	"14th harmonic",
+	"15th harmonic",
+	"16th harmonic"
+	};
+	
+const QString WAVEFORM_NAMES[6] = {
+	"Sine wave",
+	"Triangle wave",
+	"Saw wave",
+	"Square wave",
+	"Moog saw wave",
+	"Exponential wave"
+	};
+	
+const float CENT = 1.0f / 1200.0f;
 
 class OscillatorObject : public Model
 {
@@ -45,11 +79,11 @@ private:
 	int m_numOscillators;
 	IntModel m_waveShape;
 	FloatModel m_oscModel;
+	FloatModel m_harmModel;
 	FloatModel m_volModel;
 	FloatModel m_panModel;
 	FloatModel m_detuneModel;
 
-	float m_harmonic;
 	float m_volumeLeft;
 	float m_volumeRight;
 	// normalized detuning -> x/sampleRate
@@ -90,9 +124,10 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName() const;
-	
+
 	int intRand( int min, int max );
 
+	static float * s_harmonics;
 
 public slots:
 	void randomiseSettings();
@@ -101,17 +136,17 @@ public slots:
 private:
 	float inline waveshape(float in, float amount);
 
-	
+
 	// fast atan, fast rather than accurate
 	inline float fastatan( float x )
 	{
     	return (x / (1.0 + 0.28 * (x * x)));
 	}
-	
+
 	int m_numOscillators;
-	
+
 	OscillatorObject ** m_osc;
-	
+
 	struct oscPtr
 	{
 		Oscillator * oscLeft;
@@ -124,6 +159,7 @@ private:
 	FloatModel  m_volModel;
 
 	virtual PluginView * instantiateView( QWidget * _parent );
+
 
 private slots:
 	void updateAllDetuning();
@@ -144,10 +180,13 @@ private:
 
 	struct OscillatorKnobs
 	{
-		OscillatorKnobs( knob * v,
+		OscillatorKnobs( 
+					knob * h,
+					knob * v,
 					knob * o,
 					knob * p,
 					knob * dt ) :
+			m_harmKnob( h ),
 			m_volKnob( v ),
 			m_oscKnob( o ),
 			m_panKnob( p ),
@@ -157,7 +196,8 @@ private:
 		OscillatorKnobs()
 		{
 		}
-		
+
+		knob * m_harmKnob;
 		knob * m_volKnob;
 		knob * m_oscKnob;
 		knob * m_panKnob;
@@ -171,8 +211,11 @@ private:
 	pixmapButton * m_randBtn;
 
 	int m_numOscillators;
-	
+
 	static QPixmap * s_artwork;
+	
+protected slots:
+	void updateKnobHint();
 };
 
 

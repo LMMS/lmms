@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,14 @@
 
 #ifndef _MIXER_H
 #define _MIXER_H
+
+// denormals stripping
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
 
 #include "lmmsconfig.h"
 
@@ -47,6 +55,7 @@
 #include "lmms_basics.h"
 #include "note.h"
 #include "fifo_buffer.h"
+#include "MixerProfiler.h"
 
 
 class AudioDevice;
@@ -106,8 +115,6 @@ public:
 
 		Interpolation interpolation;
 		Oversampling oversampling;
-		bool sampleExactControllers;
-		bool aliasFreeOscillators;
 
 		qualitySettings( Mode _m )
 		{
@@ -116,31 +123,22 @@ public:
 				case Mode_Draft:
 					interpolation = Interpolation_Linear;
 					oversampling = Oversampling_None;
-					sampleExactControllers = false;
-					aliasFreeOscillators = false;
 					break;
 				case Mode_HighQuality:
 					interpolation =
 						Interpolation_SincFastest;
 					oversampling = Oversampling_2x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = false;
 					break;
 				case Mode_FinalMix:
 					interpolation = Interpolation_SincBest;
 					oversampling = Oversampling_8x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = true;
 					break;
 			}
 		}
 
-		qualitySettings( Interpolation _i, Oversampling _o, bool _sec,
-								bool _afo ) :
+		qualitySettings( Interpolation _i, Oversampling _o ) :
 			interpolation( _i ),
-			oversampling( _o ),
-			sampleExactControllers( _sec ),
-			aliasFreeOscillators( _afo )
+			oversampling( _o )
 		{
 		}
 
@@ -240,7 +238,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( track * _track );
+	void removePlayHandles( track * _track, bool removeIPHs = true );
 
 	bool hasNotePlayHandles();
 
@@ -257,9 +255,14 @@ public:
 	}
 
 
-	inline int cpuLoad() const
+	MixerProfiler& profiler()
 	{
-		return m_cpuLoad;
+		return m_profiler;
+	}
+
+	int cpuLoad() const
+	{
+		return m_profiler.cpuLoad();
 	}
 
 	const qualitySettings & currentQualitySettings() const
@@ -435,7 +438,6 @@ private:
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
-	int m_cpuLoad;
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
 	QWaitCondition m_queueReadyWaitCond;
@@ -464,6 +466,7 @@ private:
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
+	MixerProfiler m_profiler;
 
 	friend class engine;
 	friend class MixerWorkerThread;

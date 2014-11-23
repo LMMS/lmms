@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -68,6 +68,7 @@ void EnvelopeAndLfoParameters::LfoInstances::reset()
 
 
 
+
 void EnvelopeAndLfoParameters::LfoInstances::add( EnvelopeAndLfoParameters * lfo )
 {
 	QMutexLocker m( &m_lfoListMutex );
@@ -82,7 +83,6 @@ void EnvelopeAndLfoParameters::LfoInstances::remove( EnvelopeAndLfoParameters * 
 	QMutexLocker m( &m_lfoListMutex );
 	m_lfos.removeAll( lfo );
 }
-
 
 
 
@@ -217,6 +217,13 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 			break;
 		case UserDefinedWave:
 			shape_sample = m_userWave.userWaveSample( phase );
+			break;
+		case RandomWave:
+			if( frame == 0 )
+			{
+				m_random = Oscillator::noiseSample( 0.0f );
+			}
+			shape_sample = m_random;
 			break;
 		case SineWave:
 		default:

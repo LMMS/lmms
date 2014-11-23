@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,47 +40,40 @@
 
 
 
+
+//! @todo: in C++11, we can use delegating ctors
+#define DEFAULT_LCDWIDGET_INITIALIZER_LIST \
+	QWidget( parent ), \
+	m_label()
+
+LcdWidget::LcdWidget( QWidget* parent, const QString& name ) :
+	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
+	m_numDigits( 1 )
+{
+	initUi( name );
+}
+
+
+
+
 LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name ) :
-	QWidget( parent ),
-	m_label(),
+	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
 	m_numDigits( numDigits )
 {
-	setEnabled( true );
-
-	setWindowTitle( name );
-
-	m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) );
-
-	m_cellWidth = m_lcdPixmap->size().width() / LcdWidget::charsPerPixmap;
-	m_cellHeight = m_lcdPixmap->size().height() / 2;
-
-	m_marginWidth =  m_cellWidth / 2;
-
-	updateSize();
+	initUi( name );
 }
 
 
 
 
 LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
-	QWidget( parent ),
-	m_label(),
+	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
 	m_numDigits( numDigits )
 {
-	setEnabled( true );
-
-	setWindowTitle( name );
-
-	// We should make a factory for these or something.
-	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
-
-	m_cellWidth = m_lcdPixmap->size().width() / LcdWidget::charsPerPixmap;
-	m_cellHeight = m_lcdPixmap->size().height() / 2;
-
-	m_marginWidth =  m_cellWidth / 2;
-
-	updateSize();
+	initUi( name, style );
 }
+
+#undef DEFAULT_LCDWIDGET_INITIALIZER_LIST
 
 
 
@@ -238,6 +231,28 @@ void LcdWidget::updateSize()
 	}
 
 	update();
+}
+
+
+
+
+void LcdWidget::initUi(const QString& name , const QString& style)
+{
+	setEnabled( true );
+
+	setWindowTitle( name );
+
+	// We should make a factory for these or something.
+	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
+	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) ); // TODO!!
+	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
+
+	m_cellWidth = m_lcdPixmap->size().width() / LcdWidget::charsPerPixmap;
+	m_cellHeight = m_lcdPixmap->size().height() / 2;
+
+	m_marginWidth =  m_cellWidth / 2;
+
+	updateSize();
 }
 
 

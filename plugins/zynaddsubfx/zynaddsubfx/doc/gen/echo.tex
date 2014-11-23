@@ -1,0 +1,43 @@
+\documentclass[11pt]{report}
+\pagestyle{empty}
+\usepackage{pst-sigsys}
+\usepackage{auto-pst-pdf}
+\begin{document}
+\begin{pspicture}[showgrid=false](0,0)(8,2)
+    %Style
+    \psset{framesize=1 .65}
+    \psset{style=Arrow}
+
+    %In/Out
+    \rput(0,0){\rnode{in}{$x[n]$}}
+    \rput(8,0){\rnode{out}{$y[n]$}}
+
+    %Panning
+    \rput(1,0.5){Panning}
+    \pscircleop[operation=times] (1,0){pan}
+    \ncline{in}{pan}
+
+    %Crossover
+    \psfblock[framesize=1.8 .65](6,0){cross}{Crossover}
+
+    %Feedback
+    \rput(4,1.5){Feedback}
+    \pscircleop[operation=times](4,1){fb}
+    \ncangle[angleA=90,angleB=0]{cross}{fb}
+    \pscircleop(2,0){combine}
+    \ncline{pan}{combine}
+    \ncangle[angleA=180,angleB=90]{fb}{combine}
+
+    %Dampining
+    \psfblock(3,0){hidamp}{LPF}
+    \ncline{combine}{hidamp}
+    
+    %Delay
+    \psfblock(4.3,0){delay}{$z^{-n}$}
+    \ncline{hidamp}{delay}
+    \ncline{delay}{cross}
+    \ncline{cross}{out}
+
+
+\end{pspicture}
+\end{document}

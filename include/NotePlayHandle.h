@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -51,6 +51,8 @@ public:
 	{
 		OriginPattern,		/*! playback of a note from a pattern */
 		OriginMidiInput,	/*! playback of a MIDI note input event */
+		OriginNoteStacking,	/*! created by note stacking instrument function */
+		OriginArpeggio,		/*! created by arpeggio instrument function */
 		OriginCount
 	};
 	typedef Origins Origin;
@@ -60,7 +62,6 @@ public:
 					const f_cnt_t frames,
 					const note& noteToPlay,
 					NotePlayHandle* parent = NULL,
-					const bool isPartOfArp = false,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
 	virtual ~NotePlayHandle();
@@ -93,7 +94,7 @@ public:
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
 	virtual bool isFinished() const
 	{
-		return m_released && framesLeft() <= 0;
+		return m_released && framesLeft() <= 0 && m_scheduledNoteOff < 0;
 	}
 
 	/*! Returns number of frames left for playback */
@@ -160,26 +161,23 @@ public:
 		return m_instrumentTrack;
 	}
 
-	/*! Returns whether note is a top note, e.g. is not part of an arpeggio or a chord */
-	bool isTopNote() const
+	/*! Returns whether note has a parent, e.g. is not part of an arpeggio or a chord */
+	bool hasParent() const
 	{
-		return m_topNote;
+		return m_hasParent;
 	}
 
-	/*! Returns whether note is part of an arpeggio playback */
-	bool isPartOfArpeggio() const
+	/*! Returns origin of note */
+	Origin origin() const
 	{
-		return m_partOfArpeggio;
+		return m_origin;
 	}
 
-	/*! Sets whether note is part of an arpeggio playback */
-	void setPartOfArpeggio( const bool _on )
+	/*! Returns whether note has children */
+	bool isMasterNote() const
 	{
-		m_partOfArpeggio = _on;
+		return m_subNotes.size() > 0 || m_hadChildren;
 	}
-
-	/*! Returns whether note is base note for arpeggio */
-	bool isArpeggioBaseNote() const;
 
 	/*! Returns whether note is muted */
 	bool isMuted() const
@@ -266,13 +264,11 @@ private:
 											// played after release
 	f_cnt_t m_releaseFramesDone;			// number of frames done after
 											// release of note
+	f_cnt_t m_scheduledNoteOff;			// variable for scheduling noteoff at next period
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
-	bool m_topNote;							// indicates whether note is a
-											// base-note (i.e. no sub-note)
-	bool m_partOfArpeggio;					// indicates whether note is part of
-											// an arpeggio (either base-note or
-											// sub-note)
+	bool m_hasParent;
+	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
 	track* m_bbTrack;						// related BB track
 

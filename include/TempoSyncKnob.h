@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2008 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,7 @@ class EXPORT TempoSyncKnob : public knob
 {
 	Q_OBJECT
 public:
-	TempoSyncKnob( int knobNum, QWidget* parent = NULL, const QString& name = QString() );
+	TempoSyncKnob( knobTypes knobNum, QWidget* parent = NULL, const QString& name = QString() );
 	virtual ~TempoSyncKnob();
 
 	const QString & syncDescription();

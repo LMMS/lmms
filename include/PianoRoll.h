@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,13 +28,14 @@
 #define PIANO_ROLL_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QInputDialog>
 
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "note.h"
 #include "lmms_basics.h"
 #include "song.h"
-
+#include "tooltip.h"
 
 class QPainter;
 class QPixmap;
@@ -45,15 +46,22 @@ class QSignalMapper;
 
 class comboBox;
 class NotePlayHandle;
-class pattern;
+class Pattern;
 class timeLine;
 class toolButton;
 
 class PianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
+	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
+	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
+	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 public:
-	void setCurrentPattern( pattern * _new_pattern );
+	/*! \brief Resets settings to default when e.g. creating a new project */
+	void reset();
+
+	void setCurrentPattern( Pattern* newPattern );
 
 	inline void stopRecording()
 	{
@@ -65,12 +73,12 @@ public:
 		return m_recording;
 	}
 
-	inline const pattern * currentPattern() const
+	const Pattern* currentPattern() const
 	{
 		return m_pattern;
 	}
 
-	inline bool validPattern() const
+	bool hasValidPattern() const
 	{
 		return m_pattern != NULL;
 	}
@@ -89,7 +97,16 @@ public:
 	}
 
 	void setPauseIcon( bool pause );
-
+	
+	// qproperty acces functions
+	QColor gridColor() const;
+	void setGridColor( const QColor & _c );
+	QColor noteModeColor() const;
+	void setNoteModeColor( const QColor & _c );
+	QColor noteColor() const;
+	void setNoteColor( const QColor & _c );
+	QColor barColor() const;
+	void setBarColor( const QColor & _c );
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -106,11 +123,13 @@ protected:
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width, note * _n );
+					int  _width, note * _n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
 	void getSelectedNotes( NoteVector & _selected_notes );
 
+	// for entering values with dblclick in the vol/pan bars
+	void enterValue( NoteVector* nv );
 
 protected slots:
 	void play();
@@ -144,6 +163,8 @@ protected slots:
 
 	void changeNoteEditMode( int i );
 	void markSemiTone( int i );
+
+	void hidePattern( Pattern* pattern );
 
 
 signals:
@@ -241,6 +262,7 @@ private:
 
 	static PianoRollKeyTypes prKeyOrder[];
 
+	static textFloat * s_textFloat;
 
 	QWidget * m_toolBar;
 
@@ -272,7 +294,7 @@ private:
 
 
 
-	pattern * m_pattern;
+	Pattern* m_pattern;
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
@@ -341,8 +363,16 @@ private:
 	void computeSelectedNotes( bool shift );
 	void clearSelectedNotes();
 
+	// did we start a mouseclick with shift pressed
+	bool m_startedWithShift;
+
 	friend class engine;
 
+	// qproperty fields
+	QColor m_gridColor;
+	QColor m_noteModeColor;
+	QColor m_noteColor;
+	QColor m_barColor;
 
 signals:
 	void positionChanged( const MidiTime & );

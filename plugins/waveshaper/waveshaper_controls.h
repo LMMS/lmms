@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _WAVESHAPER_CONTROLS_H
-#define _WAVESHAPER_CONTROLS_H
+#ifndef WAVESHAPER_CONTROLS_H
+#define WAVESHAPER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "waveshaper_control_dialog.h"
@@ -64,10 +64,7 @@ public:
 
 
 private slots:
-	void changeInput();
-	void changeOutput();
 	void samplesChanged( int, int );
-	void changeClip();
 
 	void resetClicked();
 	void smoothClicked();

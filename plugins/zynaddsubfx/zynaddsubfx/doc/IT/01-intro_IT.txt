@@ -1,0 +1,55 @@
+Come iniziare
+---------------
+ZynAddSubFX è un sintetizzatore software piuttosto complesso, con un gran numero
+di controlli. Perciò l'uso di ZynAddSubFX non è sempre ovvio.
+
+Molte applicazioni sotto Linux trasportano il MIDI con AlSA e trasmettono l'audio
+con JACK. ZynAddSubFX può essere lanciato con questa configurazione eseguendo:
+
+------------------------------
+zynaddsubfx -I alsa -O jack -a
+------------------------------
+
+Questo imposta ALSA come driver input e JACK come driver audio, che dovrebbe
+tentare di connettersi automaticamente alla tua scheda audio, per via del flag -a.
+Se questa è la prima volta che lanci ZynAddSubFX, vedrai una schermata che ti lascia
+scegliere tra l'interfaccia per principianti e quella avanzata. Attualmente
+l'interfaccia 'beginner' è deprecata, quindi è raccomandato usare l'interfaccia
+'advanced'.
+
+Ora dovresti essere in grado di vedere la finestra principale di ZynAddSubFX, dalla
+quale puoi impostare patch, effetti e altre configurazioni generali, ma la cosa più
+importante è che fornisce i collegamenti tra le patch. ZynAddSubFX è uno strumento
+potente con una serie di patch di base, ma la vera forza sta dietro all'abilità di
+creare delle patch personali.
+
+.Main Window
+image::./images/uimain.png[]
+
+Per un utilizzo base, potrai usare il pulsante alla destra dell'etichetta 'enabled'.
+Questo pulsante consentirà di selezionare lo strumento desiderato dai banchi
+disponibili in ZynAddSubFX. Per suonare note in ZynAddSubFX puoi usare la tastiera
+virtuale integrata (accessibile dal pulsante 'vK') oppure puoi connettere la tua
+tastiera al sistema e usare *aconnect* per connetterla in ZynAddSubFX (supponendo
+che si stia usando ALSA).
+
+Questa finestra principale consente l'accesso a molte features più avanzate.
+Di cui alcune sono:
+
+* System Effects
+* Insertion Effects
+* Recording
+* Part Settings (strumento impostazioni del livello)
+* Master Settings
+* Microtonal Settings
+
+Ad esempio, per utilizzare la funzione di registrazione deve essere selezionato un
+file wave dal menù di registrazione, poi può essere avviata con il pulsante 'record'
+e stoppata con il pulsante 'stop'. Questo è un modo semplice e veloce di registrare
+alcuni samples da ZynAddSubFX, anche se ci sono strumenti con caratteristiche più
+complete disponibili tramite gli strumenti di registrazione di JACK.
+
+NOTE: Dopo aver premuto 'record', il file wave non partirà la registrazione fino a
+quando un nuovo tasto non sarà premuto da una sorgente MIDI esterna o dalla virtual
+keyboard. Le proprietà dei 'System Effects' e degli 'Insertion Effects' sono
+accessibili e disponibili così come le proprietà di ogni strumento.

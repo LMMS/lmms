@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -55,6 +55,10 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 {
 	m_filter1 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
 	m_filter2 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
+
+	// ensure filters get updated
+	m_filter1changed = true;
+	m_filter2changed = true;
 }
 
 
@@ -80,11 +84,40 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
-	m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+	if( m_dfControls.m_filter1Model.isValueChanged() )
+	{
+		m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
+		m_filter1changed = true;
+	}
+	if( m_dfControls.m_filter2Model.isValueChanged() )
+	{
+		m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+		m_filter2changed = true;
+	}
 
-	if( m_dfControls.m_enabled1Model.value() ) m_filter1->calcFilterCoeffs( m_dfControls.m_cut1Model.value(), m_dfControls.m_res1Model.value() );
-	if( m_dfControls.m_enabled2Model.value() ) m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
+	const bool enabled1 = m_dfControls.m_enabled1Model.value();
+	const bool enabled2 = m_dfControls.m_enabled2Model.value();
+
+	// recalculate only when necessary: either cut/res is changed, or the changed-flag is set (filter type or samplerate changed)
+	if( ( enabled1 && ( m_dfControls.m_cut1Model.isValueChanged() ||
+		m_dfControls.m_res1Model.isValueChanged() ) ) || m_filter1changed )
+	{
+		m_filter1->calcFilterCoeffs( m_dfControls.m_cut1Model.value(), m_dfControls.m_res1Model.value() );
+		m_filter1changed = false;
+	}
+	if( ( enabled2 && ( m_dfControls.m_cut2Model.isValueChanged() ||
+		m_dfControls.m_res2Model.isValueChanged() ) ) || m_filter2changed )
+	{
+		m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
+		m_filter2changed = false;
+	}
+	
+	// get mix amounts for wet signals of both filters
+	const float mix2 = ( ( m_dfControls.m_mixModel.value() + 1.0f ) * 0.5f );
+	const float mix1 = 1.0f - mix2;
+	
+	const float gain1 = m_dfControls.m_gain1Model.value() * 0.01f;
+	const float gain2 = m_dfControls.m_gain2Model.value() * 0.01f;
 
 	// buffer processing loop
 	for( fpp_t f = 0; f < frames; ++f )
@@ -93,19 +126,15 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		sample_t s1[2] = { buf[f][0], buf[f][1] };	// filter 1
 		sample_t s2[2] = { buf[f][0], buf[f][1] };	// filter 2
 
-		// get mix amounts for wet signals of both filters
-		const float mix1 = 1.0f - ( ( m_dfControls.m_mixModel.value( f ) + 1.0f ) / 2.0f );
-		const float mix2 = ( ( m_dfControls.m_mixModel.value( f ) + 1.0f ) / 2.0f );
-
 		// update filter 1
-		if( m_dfControls.m_enabled1Model.value() )
+		if( enabled1 )
 		{
 			s1[0] = m_filter1->update( s1[0], 0 );
 			s1[1] = m_filter1->update( s1[1], 1 );
 
 			// apply gain
-			s1[0] *= ( m_dfControls.m_gain1Model.value( f ) / 100.0f );
-			s1[1] *= ( m_dfControls.m_gain1Model.value( f ) / 100.0f );
+			s1[0] *= gain1;
+			s1[1] *= gain1;
 
 			// apply mix
 			s[0] += ( s1[0] * mix1 );
@@ -113,14 +142,14 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		}
 
 		// update filter 2
-		if( m_dfControls.m_enabled2Model.value() )
+		if( enabled2 )
 		{
 			s2[0] = m_filter2->update( s2[0], 0 );
 			s2[1] = m_filter2->update( s2[1], 1 );
 
 			//apply gain
-			s2[0] *= ( m_dfControls.m_gain2Model.value( f ) / 100.0f );
-			s2[1] *= ( m_dfControls.m_gain2Model.value( f ) / 100.0f );
+			s2[0] *= gain2;
+			s2[1] *= gain2;
 
 			// apply mix
 			s[0] += ( s2[0] * mix2 );
@@ -137,6 +166,8 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
 	return isRunning();
 }
+
+
 
 
 

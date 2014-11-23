@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -70,7 +70,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -224,7 +224,6 @@ static void runGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	int count = plugin_data->count;
 	LADSPA_Data * dry = plugin_data->dry;
 	gsm_signal * dst = plugin_data->dst;
-	float fs = plugin_data->fs;
 	gsm handle = plugin_data->handle;
 	int resamp = plugin_data->resamp;
 	float rsf = plugin_data->rsf;
@@ -237,8 +236,6 @@ static void runGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	float part;
 	int error_rate = f_round(error);
 	int num_passes = f_round(passes);
-
-	fs = fs; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 
@@ -322,7 +319,6 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	int count = plugin_data->count;
 	LADSPA_Data * dry = plugin_data->dry;
 	gsm_signal * dst = plugin_data->dst;
-	float fs = plugin_data->fs;
 	gsm handle = plugin_data->handle;
 	int resamp = plugin_data->resamp;
 	float rsf = plugin_data->rsf;
@@ -335,8 +331,6 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	float part;
 	int error_rate = f_round(error);
 	int num_passes = f_round(passes);
-
-	fs = fs; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 
@@ -387,7 +381,7 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	*(plugin_data->latency) = 160 * resamp;
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -493,7 +487,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (gsmDescriptor) {
 		free((LADSPA_PortDescriptor *)gsmDescriptor->PortDescriptors);
 		free((char **)gsmDescriptor->PortNames);

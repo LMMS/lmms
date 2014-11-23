@@ -5,7 +5,7 @@
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -46,10 +46,11 @@ ladspaManager::ladspaManager()
 	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );
 #ifndef LMMS_BUILD_WIN32
 	ladspaDirectories.push_back( qApp->applicationDirPath() + '/' + LIB_DIR + "ladspa" );
-	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
-	ladspaDirectories.push_back( "/usr/local/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );
+	ladspaDirectories.push_back( "/usr/lib64/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/ladspa" );
+	ladspaDirectories.push_back( "/usr/local/lib64/ladspa" );
+	ladspaDirectories.push_back( "/Library/Audio/Plug-Ins/LADSPA" );
 #endif
 
 	for( QStringList::iterator it = ladspaDirectories.begin(); 

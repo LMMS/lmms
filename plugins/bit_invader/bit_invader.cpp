@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,6 +26,7 @@
 #include <QtXml/QDomElement>
 
 #include "bit_invader.h"
+#include "base64.h"
 #include "engine.h"
 #include "graph.h"
 #include "InstrumentTrack.h"
@@ -37,6 +38,7 @@
 #include "templates.h"
 #include "tooltip.h"
 #include "song.h"
+#include "interpolation.h"
 
 #include "embed.cpp"
 
@@ -108,9 +110,9 @@ sample_t bSynth::nextStringSample()
 		}
 		
 		// Nachkommaanteil
-		float frac = sample_realindex - static_cast<int>(sample_realindex);
+		const float frac = fraction( sample_realindex );
 		
-		sample = sample_shape[a]*(1-frac) + sample_shape[b]*(frac);
+		sample = linearInterpolate( sample_shape[a], sample_shape[b], frac );
 
 	} else {
 		// No interpolation

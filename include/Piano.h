@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PIANO_H
-#define _PIANO_H
+#ifndef PIANO_H
+#define PIANO_H
 
 #include "note.h"
 #include "Model.h"
@@ -50,7 +50,7 @@ public:
 		return m_pressedKeys[key];
 	}
 
-	void handleKeyPress( int key, int midiVelocity = MidiDefaultVelocity );
+	void handleKeyPress( int key, int midiVelocity = -1 );
 	void handleKeyRelease( int key );
 
 	InstrumentTrack* instrumentTrack() const

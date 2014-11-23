@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -113,15 +113,23 @@ const int effGetVstVersion = 58; // currently unused
 const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
 const int kVstLangEnglish = 1;
 const int kVstMidiType = 1;
-const int kVstParameterUsesFloatStep = 1 << 2;
-const int kVstPpqPosValid = 1 << 9;
-const int kVstTempoValid = 1 << 10;
-const int kVstBarsValid = 1 << 11;
-const int kVstCyclePosValid = 1 << 12;
-const int kVstTimeSigValid = 1 << 13;
+
 const int kVstTransportPlaying = 1 << 1;
 const int kVstTransportCycleActive = 1 << 2;
 const int kVstTransportChanged = 1;
+
+/* validity flags for a VstTimeInfo structure, this info comes from the web */
+
+const int kVstNanosValid (1 << 8);
+const int kVstPpqPosValid (1 << 9);
+const int kVstTempoValid (1 << 10);
+const int kVstBarsValid (1 << 11);
+const int kVstCyclePosValid (1 << 12);
+const int kVstTimeSigValid (1 << 13);
+const int kVstSmpteValid (1 << 14);
+const int kVstClockValid (1 << 15);
+
+
 
 
 class RemoteVstPlugin;
@@ -180,43 +188,50 @@ public:
 } ;
 
 
-
-
-// Not finished, neither really used
-class VstParameterProperties
+/* constants from http://www.rawmaterialsoftware.com/juceforum/viewtopic.php?t=3740&sid=183f74631fee71a493316735e2b9f28b */
+enum Vestige2StringConstants
 {
-public:
-/*	float stepFloat;
-	char label[64];
-	int flags;
-	int minInteger;
-	int maxInteger;
-	int stepInteger;
-	char shortLabel[8];
-	int category;
-	char categoryLabel[24];
-	char empty[128];*/
-
-	float stepFloat;
-	float smallStepFloat;
-	float largeStepFloat;
-	char label[64];
-	unsigned int flags;
-	unsigned int minInteger;
-	unsigned int maxInteger;
-	unsigned int stepInteger;
-	unsigned int largeStepInteger;
-	char shortLabel[8];
-	unsigned short displayIndex;
-  	unsigned short category;
-  	unsigned short numParametersInCategory;
-	unsigned short reserved;
-	char categoryLabel[24];
-	char future[16];
-
-} ;
+        VestigeMaxNameLen       = 64,
+        VestigeMaxLabelLen      = 64,
+        VestigeMaxShortLabelLen = 8,
+        VestigeMaxCategLabelLen = 24,
+        VestigeMaxFileNameLen   = 100
+};
 
 
+/* this struct taken from http://asseca.com/vst-24-specs/efGetParameterProperties.html */
+struct VstParameterProperties
+{
+    float stepFloat;              /* float step */
+    float smallStepFloat;         /* small float step */
+    float largeStepFloat;         /* large float step */
+    char label[VestigeMaxLabelLen];  /* parameter label */
+    int32_t flags;               /* @see VstParameterFlags */
+    int32_t minInteger;          /* integer minimum */
+    int32_t maxInteger;          /* integer maximum */
+    int32_t stepInteger;         /* integer step */
+    int32_t largeStepInteger;    /* large integer step */
+    char shortLabel[VestigeMaxShortLabelLen]; /* short label, recommended: 6 + delimiter */
+    int16_t displayIndex;        /* index where this parameter should be displayed (starting with 0) */
+    int16_t category;            /* 0: no category, else group index + 1 */
+    int16_t numParametersInCategory; /* number of parameters in category */
+    int16_t reserved;            /* zero */
+    char categoryLabel[VestigeMaxCategLabelLen]; /* category label, e.g. "Osc 1"  */
+    char future[16];              /* reserved for future use */
+};
+
+
+/* this enum taken from http://asseca.com/vst-24-specs/efGetParameterProperties.html */
+enum VstParameterFlags
+{
+        kVstParameterIsSwitch                = 1 << 0,  /* parameter is a switch (on/off) */
+        kVstParameterUsesIntegerMinMax       = 1 << 1,  /* minInteger, maxInteger valid */
+        kVstParameterUsesFloatStep           = 1 << 2,  /* stepFloat, smallStepFloat, largeStepFloat valid */
+        kVstParameterUsesIntStep             = 1 << 3,  /* stepInteger, largeStepInteger valid */
+        kVstParameterSupportsDisplayIndex    = 1 << 4,  /* displayIndex valid */
+        kVstParameterSupportsDisplayCategory = 1 << 5,  /* category, etc. valid */
+        kVstParameterCanRamp                 = 1 << 6   /* set if parameter value can ramp up/down */
+};
 
 
 class AEffect
@@ -274,7 +289,7 @@ public:
 	// 08
 	double sampleRate;
 	// unconfirmed 10
-	char empty1[8];
+	double nanoSeconds;
 	// 18
 	double ppqPos;
 	// 20?
@@ -286,13 +301,15 @@ public:
 	// 38?
 	double cycleEndPos;
 	// 40?
-	int timeSigNumerator;
+	int32_t timeSigNumerator;
 	// 44?
-	int timeSigDenominator;
-	// unconfirmed 48 4c 50
-	char empty3[4 + 4 + 4];
+	int32_t timeSigDenominator;
+
+    int32_t   smpteOffset;
+    int32_t   smpteFrameRate;
+    int32_t   samplesToNextClock;
 	// 54
-	int flags;
+	int32_t flags;
 
 } ;
 

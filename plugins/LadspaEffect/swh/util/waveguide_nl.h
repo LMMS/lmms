@@ -115,7 +115,8 @@ inline void waveguide_nl_process(waveguide_nl *wg, float in0, float in1, float *
 	b = (*out0 + 1.0) * 6.0f;
 	if (b > 1.0f) {
 		b = 1.0f;
-	} else if (b < 0.0f) {
+	}
+	if (b < 0.0f) {
 		b = 0.0f;
 	}
 	a1 = b * wg->a1a + (1.0f - b) * wg->a1b;
@@ -129,7 +130,8 @@ inline void waveguide_nl_process(waveguide_nl *wg, float in0, float in1, float *
 	b = (*out1 + 1.0) * 6.0f;
 	if (b > 1.0f) {
 		b = 1.0f;
-	} else if (b < 0.0f) {
+	}
+	if (b < 0.0f) {
 		b = 0.0f;
 	}
 	a1 = b * wg->a1a + (1.0f - b) * wg->a1b;

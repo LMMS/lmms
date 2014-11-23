@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,6 +26,14 @@
 #include "lmmsconfig.h"
 #include "lmmsversion.h"
 #include "versioninfo.h"
+
+// denormals stripping
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -65,6 +73,7 @@
 #include "ProjectRenderer.h"
 #include "DataFile.h"
 #include "song.h"
+#include "LmmsPalette.h"
 
 static inline QString baseName( const QString & _file )
 {
@@ -91,10 +100,20 @@ int main( int argc, char * * argv )
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
+	// set denormal protection for this thread
+	#ifdef __SSE3__
+	/* DAZ flag */
+	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
+	#endif
+	#ifdef __SSE__
+	/* FTZ flag */
+	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
+	#endif
+
 	bool core_only = false;
 	bool fullscreen = true;
 	bool exit_after_import = false;
-	QString file_to_load, file_to_save, file_to_import, render_out;
+	QString file_to_load, file_to_save, file_to_import, render_out, profilerOutputFile;
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -119,7 +138,6 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new QApplication( argc, argv ) ;
 
-
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
 	ProjectRenderer::OutputSettings os( 44100, false, 160,
 						ProjectRenderer::Depth_16Bit );
@@ -131,13 +149,13 @@ int main( int argc, char * * argv )
 		if( QString( argv[i] ) == "--version" ||
 						QString( argv[i] ) == "-v" )
 		{
-			printf( "\nLinux MultiMedia Studio %s\n(%s %s, Qt %s, %s)\n\n"
+			printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
 	"Copyright (c) 2004-2014 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
 	"version 2 of the License, or (at your option) any later version.\n\n"
-	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION, 
+	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
 				PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
 				argv[0] );
 
@@ -146,7 +164,7 @@ int main( int argc, char * * argv )
 		else if( argc > i && ( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) )
 		{
-			printf( "\nLinux MultiMedia Studio %s\n"
+			printf( "LMMS %s\n"
 	"Copyright (c) 2004-2014 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
 	"            [ -u <in> <out> ]\n"
@@ -181,10 +199,12 @@ int main( int argc, char * * argv )
 		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
 						QString( argv[i] ) == "-u" ) )
 		{
-			DataFile dataFile( QString( argv[i + 1] ) );
+			QString inFile( argv[i + 1] );
+			DataFile dataFile( inFile );
 			if (argc > i+2)
 			{
-				dataFile.writeFile( argv[i + 2] );
+				const QString outFile = argv[i + 2];
+				dataFile.writeFile( outFile );
 			}
 			else
 			{
@@ -339,6 +359,11 @@ int main( int argc, char * * argv )
 				exit_after_import = true;
 			}
 		}
+		else if( argc > i && ( QString( argv[i] ) == "--profile" || QString( argv[i] ) == "-p" ) )
+		{
+			profilerOutputFile = argv[i+1];
+			++i;
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -388,7 +413,15 @@ int main( int argc, char * * argv )
 	if( render_out.isEmpty() )
 	{
 		// init style and palette
-		QApplication::setStyle( new LmmsStyle() );
+		LmmsStyle * lmmsstyle = new LmmsStyle();
+		QApplication::setStyle( lmmsstyle );
+
+		LmmsPalette * lmmspal = new LmmsPalette( NULL, lmmsstyle );
+		QPalette lpal = lmmspal->palette();
+
+		QApplication::setPalette( lpal );
+		LmmsStyle::s_palette = &lpal;
+
 
 		// show splash screen
 		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
@@ -407,7 +440,7 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.dataFile");
+		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.mmp");
 		if( QFileInfo(recoveryFile).exists() &&
 			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "
@@ -483,6 +516,11 @@ int main( int argc, char * * argv )
 		r->connect( t, SIGNAL( timeout() ),
 				SLOT( updateConsoleProgress() ) );
 		t->start( 200 );
+
+		if( profilerOutputFile.isEmpty() == false )
+		{
+			engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+		}
 
 		// start now!
 		r->startProcessing();

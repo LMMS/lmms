@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,7 @@
  *
  */
 
-#include <math.h>
-
+#include "lmms_math.h"
 #include "MixHelpers.h"
 
 
@@ -102,6 +101,26 @@ struct AddMultipliedOp
 void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
 {
 	run<>( dst, src, frames, AddMultipliedOp(coeffSrc) );
+}
+
+
+
+struct AddSanitizedMultipliedOp
+{
+	AddSanitizedMultipliedOp( float coeff ) : m_coeff( coeff ) { }
+	
+	void operator()( sampleFrame& dst, const sampleFrame& src ) const
+	{
+		dst[0] += ( isinff( src[0] ) || isnanf( src[0] ) ) ? 0.0f : src[0] * m_coeff;
+		dst[1] += ( isinff( src[1] ) || isnanf( src[1] ) ) ? 0.0f : src[1] * m_coeff;
+	}
+
+	const float m_coeff;
+};
+
+void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
+{
+	run<>( dst, src, frames, AddSanitizedMultipliedOp(coeffSrc) );
 }
 
 

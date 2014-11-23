@@ -1,9 +1,9 @@
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -159,6 +159,7 @@ void configManager::addRecentlyOpenedProject( const QString & _file )
 		m_recentlyOpenedProjects.removeLast();
 	}
 	m_recentlyOpenedProjects.push_front( _file );
+	configManager::inst()->saveConfigFile();
 }
 
 
@@ -313,7 +314,7 @@ void configManager::loadConfigFile()
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
-		else
+		else if( QApplication::type() == QApplication::GuiClient )
 		{
 			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
 									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
@@ -344,8 +345,10 @@ void configManager::loadConfigFile()
 	if( m_ladDir.isEmpty() || m_ladDir == QDir::separator() ||
 			( !m_ladDir.contains( ':' ) && !QDir( m_ladDir ).exists() ) )
 	{
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32)
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
+#elif defined(LMMS_BUILD_APPLE)
+		m_ladDir = qApp->applicationDirPath() + "/../lib/lmms/ladspa/";
 #else
 		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/ladspa/";
 #endif
@@ -355,8 +358,10 @@ void configManager::loadConfigFile()
 	if( m_stkDir.isEmpty() || m_stkDir == QDir::separator() ||
 			!QDir( m_stkDir ).exists() )
 	{
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32)
 		m_stkDir = m_dataDir + "stk/rawwaves/";
+#elif defined(LMMS_BUILD_APPLE)
+		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
 		m_stkDir = "/usr/share/stk/rawwaves/";
 #endif
@@ -367,19 +372,18 @@ void configManager::loadConfigFile()
 	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
 						<< defaultArtworkDir() );
 
-	if( !QDir( m_workingDir ).exists() )
-	{
-		if( QMessageBox::question( 0,
+	if( !QDir( m_workingDir ).exists() &&
+		QApplication::type() == QApplication::GuiClient &&
+		QMessageBox::question( 0,
 			MainWindow::tr( "Working directory" ),
 			MainWindow::tr( "The LMMS working directory %1 does not "
 				"exist. Create it now? You can change the directory "
 				"later via Edit -> Settings." ).arg( m_workingDir ),
-					QMessageBox::Yes, QMessageBox::No ) ==
-								QMessageBox::Yes )
-		{
-			QDir().mkpath( m_workingDir );
-		}
+					QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+	{
+		QDir().mkpath( m_workingDir );
 	}
+
 	if( QDir( m_workingDir ).exists() )
 	{
 		QDir().mkpath( userProjectsDir() );

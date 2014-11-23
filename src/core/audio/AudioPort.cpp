@@ -1,9 +1,9 @@
 /*
  * AudioPort.cpp - base-class for objects providing sound at a port
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,6 +25,7 @@
 #include "AudioPort.h"
 #include "AudioDevice.h"
 #include "EffectChain.h"
+#include "FxMixer.h"
 #include "engine.h"
 
 
@@ -117,4 +118,14 @@ bool AudioPort::processEffects()
 	return false;
 }
 
+
+void AudioPort::doProcessing( sampleFrame * )
+{
+	const bool me = processEffects();
+	if( me || m_bufferUsage != NoUsage )
+	{
+		engine::fxMixer()->mixToChannel( firstBuffer(), nextFxChannel() );
+		nextPeriod();
+	}
+}
 

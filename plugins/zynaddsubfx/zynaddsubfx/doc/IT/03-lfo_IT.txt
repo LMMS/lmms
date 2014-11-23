@@ -1,0 +1,64 @@
+LFO
+---
+:author: Paul Nasca
+
+Introduzione
+~~~~~~~~~~~~
+
+"LFO" significa Low Frequency Oscillator. Questi oscillatori non sono usati per
+fare suoni da soli, ma per cambiare alcuni parametri (come le frequenze, le
+ampiezze o i filtri).
+
+L'LFO ha alcuni parametri di base:
+
+* *Delay*: Questo parametro imposta il tempo tra l'inizio della nota e l'inizio
+           dell'LFO
+* *Start Phase*: La posizione che avrà l'LFO alla partenza
+* *Frequency*: La velocità dell'LFO (quanto velocemente il parametro è controllato
+               dai cambiamenti dell'LFO)
+* *Depth*: L'ampiezza dell'LFO (quanto il parametro è controllato dai cambiamenti
+           dell'LFO)
+
+image:images/lfo0.png[]
+
+Un altro importante parametro dell'LFO è la forma '(shape)'. Ci sono molti
+tipi di LFO in base alla forma. ZynAddSubFX supporta le seguenti forme:
+
+image:images/lfo1.png[]
+
+Un altro parametro è 'LFO Randomness' (casualità dell'LFO). 
+Esso modifica casualmente l'ampiezza o la frequenza dell'LFO ed in ZynAddSubFX puoi scegliere quanto, con questo parametro. 
+Nelle seguenti immagini sono mostrati alcuni esempi di casualità e come cambia la
+forma d'onda triangolare dell'LFO.
+
+image:images/lfo2.png[]
+
+Altri parametri sono:
+
+* *Continous mode*: Se si utilizza questa modalità, l'LFO non partirà da "zero"
+ad ogni nuova nota, ma sarà continuo. E' molto utile applicato sui filtri, per
+fare interessanti 'sweeps'.
+* *Stretch*: Controlla quanto la frequenza dell'LFO cambia in base alla frequenza
+della nota.
+Si può passare da 'stretch' negativo (la frequenza dell'LFO diminuisce sulle
+note più alte) a zero (rimane la stessa in tutte le note) a 'stretch' positivo
+(aumenta sulle note più alte).
+
+User Interface
+~~~~~~~~~~~~~~
+
+In ZynAddSubFX i parametri dell'LFO sono mostrati così:
+
+image:images/uilfo.jpg[]
+
+Questi parametri sono:
+
+* *Freq*: LFO Frequency
+* *Depth*: LFO Depth
+* *Start*: LFO Start Phase - 
+Se questo knob è al valore più basso, LFO Start Phase sarà random
+* *Delay*: LFO Delay
+* *A.R.*: LFO Amplitude Randomnes
+* *F.R.*: LFO Frequency Randomness
+* *C.*: LFO Continous Mode
+* *Str.*: LFO Stretch - Nell'immagine sopra LFO Stretch è impostato a zero

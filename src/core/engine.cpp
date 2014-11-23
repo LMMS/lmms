@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,7 @@
 #include "ladspa_2_lmms.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "PianoRoll.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
@@ -43,6 +43,7 @@
 #include "Plugin.h"
 #include "SongEditor.h"
 #include "song.h"
+#include "BandLimitedWave.h"
 
 
 bool engine::s_hasGUI = true;
@@ -71,6 +72,9 @@ QMap<QString, QString> engine::s_pluginFileHandling;
 void engine::init( const bool _has_gui )
 {
 	s_hasGUI = _has_gui;
+
+	// generate (load from file) bandlimited wavetables
+	BandLimitedWave::generateWaves();
 
 	initPluginFileHandling();
 

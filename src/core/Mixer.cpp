@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 #include "Mixer.h"
 #include "FxMixer.h"
 #include "MixHelpers.h"
+#include "MixerWorkerThread.h"
 #include "song.h"
 #include "templates.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -37,7 +38,6 @@
 #include "config_mgr.h"
 #include "SamplePlayHandle.h"
 #include "PianoRoll.h"
-#include "MicroTimer.h"
 #include "atomic_int.h"
 
 // platform-specific audio-interface-classes
@@ -56,237 +56,7 @@
 #include "MidiWinMM.h"
 #include "MidiDummy.h"
 
-
-static QVector<fx_ch_t> __fx_channel_jobs( NumFxChannels );
-
-
-
-static void aligned_free( void * _buf )
-{
-	if( _buf != NULL )
-	{
-		int *ptr2=(int *)_buf - 1;
-		_buf = (char *)_buf- *ptr2;
-		free(_buf);
-	}
-}
-
-static void * aligned_malloc( int _bytes )
-{
-	char *ptr,*ptr2,*aligned_ptr;
-	int align_mask = ALIGN_SIZE- 1;
-	ptr=(char *)malloc(_bytes +ALIGN_SIZE+ sizeof(int));
-	if(ptr==NULL) return(NULL);
-
-	ptr2 = ptr + sizeof(int);
-	aligned_ptr = ptr2 + (ALIGN_SIZE- ((size_t)ptr2 & align_mask));
-
-
-	ptr2 = aligned_ptr - sizeof(int);
-	*((int *)ptr2)=(int)(aligned_ptr - ptr);
-
-	return(aligned_ptr);
-}
-
-
-
-class MixerWorkerThread : public QThread
-{
-public:
-	enum JobTypes
-	{
-		InvalidJob,
-		PlayHandle,
-		AudioPortEffects,
-		EffectChannel,
-		NumJobTypes
-	} ;
-
-	struct JobQueueItem
-	{
-		JobQueueItem() :
-			type( InvalidJob ),
-			job( NULL ),
-			param( 0 ),
-			done( false )
-		{
-		}
-		JobQueueItem( JobTypes _type, void * _job, int _param = 0 ) :
-			type( _type ),
-			job( _job ),
-			param( _param ),
-			done( false )
-		{
-		}
-
-		JobTypes type;
-		void * job;
-		int param;
-
-		AtomicInt done;
-	} ;
-
-
-	struct JobQueue
-	{
-#define JOB_QUEUE_SIZE 1024
-		JobQueue() :
-			queueSize( 0 )
-		{
-		}
-
-		JobQueueItem items[JOB_QUEUE_SIZE];
-		int queueSize;
-		AtomicInt itemsDone;
-	} ;
-
-	static JobQueue s_jobQueue;
-
-	MixerWorkerThread( int _worker_num, Mixer* mixer ) :
-		QThread( mixer ),
-		m_workingBuf( (sampleFrame *) aligned_malloc( mixer->framesPerPeriod() * sizeof( sampleFrame ) ) ),
-		m_workerNum( _worker_num ),
-		m_quit( false ),
-		m_mixer( mixer ),
-		m_queueReadyWaitCond( &m_mixer->m_queueReadyWaitCond )
-	{
-	}
-
-	virtual ~MixerWorkerThread()
-	{
-		aligned_free( m_workingBuf );
-	}
-
-	virtual void quit()
-	{
-		m_quit = true;
-	}
-
-	void processJobQueue();
-
-
-private:
-	virtual void run()
-	{
-#if 0
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
-		cpu_set_t mask;
-		CPU_ZERO( &mask );
-		CPU_SET( m_workerNum, &mask );
-		sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-		QMutex m;
-		while( m_quit == false )
-		{
-			m.lock();
-			m_queueReadyWaitCond->wait( &m );
-			processJobQueue();
-			m.unlock();
-		}
-	}
-
-	sampleFrame * m_workingBuf;
-	int m_workerNum;
-	volatile bool m_quit;
-	Mixer* m_mixer;
-	QWaitCondition * m_queueReadyWaitCond;
-
-} ;
-
-
-MixerWorkerThread::JobQueue MixerWorkerThread::s_jobQueue;
-
-
-
-void MixerWorkerThread::processJobQueue()
-{
-	for( int i = 0; i < s_jobQueue.queueSize; ++i )
-	{
-		JobQueueItem * it = &s_jobQueue.items[i];
-		if( it->done.fetchAndStoreOrdered( 1 ) == 0 )
-		{
-			switch( it->type )
-			{
-				case PlayHandle:
-					( (::PlayHandle *) it->job )->play( m_workingBuf );
-					break;
-				case AudioPortEffects:
-					{
-	AudioPort * a = (AudioPort *) it->job;
-	const bool me = a->processEffects();
-	if( me || a->m_bufferUsage != AudioPort::NoUsage )
-	{
-		engine::fxMixer()->mixToChannel( a->firstBuffer(), a->nextFxChannel() );
-		a->nextPeriod();
-	}
-					}
-					break;
-				case EffectChannel:
-	engine::fxMixer()->processChannel( (fx_ch_t) it->param );
-					break;
-				default:
-					break;
-			}
-			s_jobQueue.itemsDone.fetchAndAddOrdered( 1 );
-		}
-	}
-}
-
-#define FILL_JOB_QUEUE_BEGIN(_vec_type,_vec,_condition)			\
-	MixerWorkerThread::s_jobQueue.queueSize = 0;			\
-	MixerWorkerThread::s_jobQueue.itemsDone = 0;			\
-	for( _vec_type::Iterator it = _vec.begin();			\
-					it != _vec.end(); ++it )	\
-	{								\
-		if( _condition )					\
-		{
-
-#define FILL_JOB_QUEUE_END()						\
-			++MixerWorkerThread::s_jobQueue.queueSize;	\
-		}							\
-	}
-
-#define FILL_JOB_QUEUE(_vec_type,_vec,_job_type,_condition)		\
-	FILL_JOB_QUEUE_BEGIN(_vec_type,_vec,_condition)			\
-	MixerWorkerThread::s_jobQueue.items				\
-		[MixerWorkerThread::s_jobQueue.queueSize] =		\
-			MixerWorkerThread::JobQueueItem( _job_type,	\
-							(void *) *it );	\
-	FILL_JOB_QUEUE_END()
-
-#define FILL_JOB_QUEUE_PARAM(_vec_type,_vec,_job_type,_condition)	\
-	FILL_JOB_QUEUE_BEGIN(_vec_type,_vec,_condition)			\
-	MixerWorkerThread::s_jobQueue.items				\
-		[MixerWorkerThread::s_jobQueue.queueSize] =		\
-			MixerWorkerThread::JobQueueItem( _job_type,	\
-							NULL, *it );	\
-	FILL_JOB_QUEUE_END()
-
-#define START_JOBS()							\
-	m_queueReadyWaitCond.wakeAll();
-
-// define a pause instruction for spinlock-loop - merely useful on
-// HyperThreading systems with just one physical core (e.g. Intel Atom)
-#ifdef LMMS_HOST_X86
-#define SPINLOCK_PAUSE()        asm( "pause" )
-#else
-#ifdef LMMS_HOST_X86_64
-#define SPINLOCK_PAUSE()        asm( "pause" )
-#else
-#define SPINLOCK_PAUSE()
-#endif
-#endif
-
-#define WAIT_FOR_JOBS()							\
-	m_workers[m_numWorkers]->processJobQueue();			\
-	while( MixerWorkerThread::s_jobQueue.itemsDone <		\
-			MixerWorkerThread::s_jobQueue.queueSize )	\
-	{								\
-		SPINLOCK_PAUSE();					\
-	}								\
+#include "MemoryHelper.h"
 
 
 
@@ -298,7 +68,6 @@ Mixer::Mixer() :
 	m_inputBufferWrite( 1 ),
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
-	m_cpuLoad( 0 ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_queueReadyWaitCond(),
@@ -306,7 +75,8 @@ Mixer::Mixer() :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
-	m_globalMutex( QMutex::Recursive )
+	m_globalMutex( QMutex::Recursive ),
+	m_profiler()
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -314,11 +84,6 @@ Mixer::Mixer() :
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
-	}
-
-	for( int i = 1; i < NumFxChannels+1; ++i )
-	{
-		__fx_channel_jobs[i-1] = (fx_ch_t) i;
 	}
 
 	// just rendering?
@@ -353,12 +118,12 @@ Mixer::Mixer() :
 		m_fifo = new fifo( 1 );
 	}
 
-	m_workingBuf = (sampleFrame*) aligned_malloc( m_framesPerPeriod *
+	m_workingBuf = (sampleFrame*) MemoryHelper::alignedMalloc( m_framesPerPeriod *
 							sizeof( sampleFrame ) );
 	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = (surroundSampleFrame*)
-			aligned_malloc( m_framesPerPeriod *
+			MemoryHelper::alignedMalloc( m_framesPerPeriod *
 						sizeof( surroundSampleFrame ) );
 
 		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
@@ -367,7 +132,7 @@ Mixer::Mixer() :
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
-		MixerWorkerThread * wt = new MixerWorkerThread( i, this );
+		MixerWorkerThread * wt = new MixerWorkerThread( this );
 		if( i < m_numWorkers )
 		{
 			wt->start( QThread::TimeCriticalPriority );
@@ -385,14 +150,13 @@ Mixer::Mixer() :
 
 Mixer::~Mixer()
 {
-	// distribute an empty job-queue so that worker-threads
-	// get out of their processing-loop
-	MixerWorkerThread::s_jobQueue.queueSize = 0;
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
 	}
-	START_JOBS();
+
+	MixerWorkerThread::startAndWaitForJobs();
+
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->wait( 500 );
@@ -409,10 +173,10 @@ Mixer::~Mixer()
 
 	for( int i = 0; i < 3; i++ )
 	{
-		aligned_free( m_bufferPool[i] );
+		MemoryHelper::alignedFree( m_bufferPool[i] );
 	}
 
-	aligned_free( m_workingBuf );
+	MemoryHelper::alignedFree( m_workingBuf );
 
 	for( int i = 0; i < 2; ++i )
 	{
@@ -512,7 +276,7 @@ sample_rate_t Mixer::processingSampleRate() const
 
 bool Mixer::criticalXRuns() const
 {
-	return m_cpuLoad >= 99 && engine::getSong()->isExporting() == false;
+	return cpuLoad() >= 99 && engine::getSong()->isExporting() == false;
 }
 
 
@@ -550,7 +314,8 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 const surroundSampleFrame * Mixer::renderNextBuffer()
 {
-	MicroTimer timer;
+	m_profiler.startPeriod();
+
 	static song::playPos last_metro_pos = -1;
 
 	song::playPos p = engine::getSong()->getPlayPos(
@@ -612,9 +377,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 1: run and render all play handles
-	FILL_JOB_QUEUE(PlayHandleList,m_playHandles,MixerWorkerThread::PlayHandle, !( *it )->isFinished());
-	START_JOBS();
-	WAIT_FOR_JOBS();
+	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
+	MixerWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
 	for( PlayHandleList::Iterator it = m_playHandles.begin();
@@ -639,20 +403,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	FILL_JOB_QUEUE(QVector<AudioPort*>,m_audioPorts,
-					MixerWorkerThread::AudioPortEffects,1);
-	START_JOBS();
-	WAIT_FOR_JOBS();
+	MixerWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
+	MixerWorkerThread::startAndWaitForJobs();
 
 
-	// STAGE 3: process effects in FX mixer
-	FILL_JOB_QUEUE_PARAM(QVector<fx_ch_t>,__fx_channel_jobs,
-					MixerWorkerThread::EffectChannel,1);
-	START_JOBS();
-	WAIT_FOR_JOBS();
-
-
-	// STAGE 4: do master mix in FX mixer
+	// STAGE 3: do master mix in FX mixer
 	engine::fxMixer()->masterMix( m_writeBuf );
 
 	unlock();
@@ -664,10 +419,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 
-	const float new_cpu_load = timer.elapsed() / 10000.0f *
-				processingSampleRate() / m_framesPerPeriod;
-	m_cpuLoad = tLimit( (int) ( new_cpu_load * 0.1f + m_cpuLoad * 0.9f ), 0,
-									100 );
+	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
 
 	return m_readBuf;
 }
@@ -763,14 +515,7 @@ float Mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
-		if( _ab[f][0] > p )
-		{
-			p = _ab[f][0];
-		}
-		else if( -_ab[f][0] > p )
-		{
-			p = -_ab[f][0];
-		}
+		p = qMax( p, qAbs( _ab[f][0] ) );
 	}
 	return p;
 }
@@ -783,14 +528,7 @@ float Mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
-		if( _ab[f][1] > p )
-		{
-			p = _ab[f][1];
-		}
-		else if( -_ab[f][1] > p )
-		{
-			p = -_ab[f][1];
-		}
+		p = qMax( p, qAbs( _ab[f][1] ) );
 	}
 	return p;
 }
@@ -931,13 +669,13 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 
 
-void Mixer::removePlayHandles( track * _track )
+void Mixer::removePlayHandles( track * _track, bool removeIPHs )
 {
 	lock();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( _track ) )
+		if( ( *it )->isFromTrack( _track ) && ( removeIPHs || ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle ) )
 		{
 			delete *it;
 			it = m_playHandles.erase( it );
@@ -1179,6 +917,16 @@ void Mixer::fifoWriter::finish()
 
 void Mixer::fifoWriter::run()
 {
+// set denormal protection for this thread
+#ifdef __SSE3__
+/* DAZ flag */
+	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
+#endif
+#ifdef __SSE__
+/* FTZ flag */
+	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
+#endif	
+	
 #if 0
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H

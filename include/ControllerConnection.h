@@ -7,7 +7,7 @@
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -100,7 +100,7 @@ protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
 	Controller * m_controller;
 	QString m_targetName;
-	int m_controllerId;	
+	int m_controllerId;
 	
 	bool m_ownsController;
 

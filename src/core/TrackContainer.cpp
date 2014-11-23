@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -73,10 +73,16 @@ void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void TrackContainer::loadSettings( const QDomElement & _this )
 {
+	bool journalRestore = _this.parentNode().nodeName() == "journaldata";
+	if( journalRestore )
+	{
+		clearAllTracks();
+	}
+
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( engine::hasGUI() )
+	if( !journalRestore && engine::hasGUI() )
 	{
 		if( pd == NULL )
 		{

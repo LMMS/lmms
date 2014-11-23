@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,7 @@
 
 #include "fft_helpers.h"
 
-#include <math.h>
+#include "lmms_math.h"
 
 
 /* returns biggest value from abs_spectrum[spec_size] array
@@ -73,7 +73,7 @@ int hanming(float *timebuffer, int length, WINDOWS type)
 	
 	for ( i=0; i<length; i++ )
 	{
-		timebuffer[i]=timebuffer[i]*(alpha+(1-alpha)*cos(2*M_PI*i/((float)length-1.0)));
+		timebuffer[i]=timebuffer[i]*(alpha+(1-alpha)*cos(2*F_PI*i/((float)length-1.0)));
 	}	
 
 	return 0;

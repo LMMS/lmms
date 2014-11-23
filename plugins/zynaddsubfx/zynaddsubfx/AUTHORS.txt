@@ -1,0 +1,32 @@
+Main author:
+        Nasca Octavian Paul
+
+Developers:
+        Mark McCurry
+        Harald Hvaal
+
+Contributors:
+        Gerald Folcher (legato, mono notes memory)
+        Lars Luthman (zombie fix,jack midi, LASH support)
+        Daniel Clemente (with a workaround of X11 repeated key bug)
+        Emmanuel Saracco (fix for JACK output)
+        Achim Settelmeier (QUERTZ keyboard layout for virtual keyboard)
+        Jérémie Andréi (AZERTY keyboard layout, Array index fix, OSS failsafe)
+        Alexis Ballier (const char* <-> string mismatch, NULLMidi prototype fix)
+        Tobias Doerffel (static-instance variables fix, missing include fix)
+        James Morris (Memory leaks in FLTK GUI)
+        Alan Calvert (Portions of New IO)
+        Stephen Parry (DSSI rebuild)
+        Ryan Billing (APhaser)
+        Hans Petter Selasky (OSS Midi, FreeBSD support, Bank UI bug fix)
+        Damien Goutte-Gattat (Bank select midi support)
+        Lieven Moors (Spike/Circle waveform)
+        Olaf Schulz (MIDI Aftertouch support)
+        Jonathan Liles (NSM & NTK support)
+        Johannes Lorenz (Effect Documentation)
+        Ilario Glasgo (Italian Doc Translation)
+        Christopher Oliver (Unison + presets fix, mousewheel support,
+                            SUBnote overtones, unison enhancements, ...)
+        Filipe Coelho (Globals Cleanup)
+        Andre Sklenar (UI Pixmaps)
+

@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,6 +40,7 @@
 #include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
+#include "base64.h"
 
 // bbTCO::defaultColor()
 #include "bb_track.h"
@@ -58,6 +59,38 @@ DataFile::typeDescStruct
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" }
 } ;
+
+
+
+DataFile::LocaleHelper::LocaleHelper( Mode mode )
+{
+	switch( mode )
+	{
+		case ModeLoad:
+			// set a locale for which QString::fromFloat() returns valid values if
+			// floating point separator is a comma - otherwise we would fail to load
+			// older projects made by people from various countries due to their
+			// locale settings
+		    QLocale::setDefault( QLocale::German );
+			break;
+
+		case ModeSave:
+			// set default locale to C so that floating point decimals are rendered to
+			// strings with periods as decimal point instead of commas in some countries
+			QLocale::setDefault( QLocale::C );
+
+		default: break;
+	}
+}
+
+
+
+DataFile::LocaleHelper::~LocaleHelper()
+{
+	// revert to original locale
+	QLocale::setDefault( QLocale::system() );
+}
+
 
 
 
@@ -683,28 +716,25 @@ void DataFile::upgrade()
 
 	}
 
-	// new default colour for B&B tracks
-	QDomNodeList list = elementsByTagName( "bbtco" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
+	// update document meta data
+	documentElement().setAttribute( "version", LDF_VERSION_STRING );
+	documentElement().setAttribute( "type", typeName( type() ) );
+	documentElement().setAttribute( "creator", "LMMS" );
+	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
+
+	if( type() == SongProject || type() == SongProjectTemplate )
 	{
-		QDomElement el = list.item( i ).toElement();
-		unsigned int rgb = el.attribute( "color" ).toUInt();
-		if( rgb == qRgb( 64, 128, 255 ) )
+		// Time-signature
+		if ( !m_head.hasAttribute( "timesig_numerator" ) )
 		{
-			el.setAttribute( "color", bbTCO::defaultColor() );
+			m_head.setAttribute( "timesig_numerator", 4 );
+			m_head.setAttribute( "timesig_denominator", 4 );
 		}
-	}
 
-	// Time-signature
-	if ( !m_head.hasAttribute( "timesig_numerator" ) )
-	{
-		m_head.setAttribute( "timesig_numerator", 4 );
-		m_head.setAttribute( "timesig_denominator", 4 );
-	}
-
-	if( !m_head.hasAttribute( "mastervol" ) )
-	{
-		m_head.setAttribute( "mastervol", 100 );
+		if( !m_head.hasAttribute( "mastervol" ) )
+		{
+			m_head.setAttribute( "mastervol", 100 );
+		}
 	}
 //printf("%s\n", toString( 2 ).toUtf8().constData());
 }

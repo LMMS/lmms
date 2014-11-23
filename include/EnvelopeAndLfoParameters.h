@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -157,6 +157,7 @@ private:
 	float m_lfoAmount;
 	bool m_lfoAmountIsZero;
 	sample_t * m_lfoShapeData;
+	sample_t m_random;
 	bool m_bad_lfoShapeData;
 	SampleBuffer m_userWave;
 
@@ -167,12 +168,12 @@ private:
 		SawWave,
 		SquareWave,
 		UserDefinedWave,
+		RandomWave,
 		NumLfoShapes
 	} ;
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLfoShapeData();
-
 
 
 	friend class EnvelopeAndLfoView;

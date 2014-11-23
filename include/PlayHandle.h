@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,12 +28,13 @@
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 
+#include "ThreadableJob.h"
 #include "lmms_basics.h"
 
 class track;
 
 
-class PlayHandle
+class PlayHandle : public ThreadableJob
 {
 public:
 	enum Types
@@ -71,6 +72,18 @@ public:
 	{
 		return m_type;
 	}
+
+	// required for ThreadableJob
+	virtual void doProcessing( sampleFrame* buffer )
+	{
+		play( buffer );
+	}
+
+	virtual bool requiresProcessing() const
+	{
+		return !isFinished();
+	}
+
 
 	virtual void play( sampleFrame* buffer ) = 0;
 	virtual bool isFinished( void ) const = 0;

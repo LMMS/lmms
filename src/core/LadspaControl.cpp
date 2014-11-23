@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -54,6 +54,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			{
 				m_toggledModel.setValue( true );
 			}
+			// TODO: careful: we must prevent saved scales
+			m_toggledModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		case INTEGER:
@@ -65,6 +67,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 					static_cast<int>( m_port->def ) );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
+			// TODO: careful: we must prevent saved scales
+			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		case FLOATING:
@@ -72,19 +76,23 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
 					&& m_port->max == 10.0f ? 4000.0f :
-								400.0f ) );
+								( m_port->suggests_logscale ? 8000.0f : 800.0f ) ) );
 			m_knobModel.setInitValue( m_port->def );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
+			// TODO: careful: we must prevent saved scales
+			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		case TIME:
 			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max,
 					  ( m_port->max -
-						m_port->min ) / 400.0f );
+						m_port->min ) / 800.0f );
 			m_tempoSyncKnobModel.setInitValue( m_port->def );
 			connect( &m_tempoSyncKnobModel, SIGNAL( dataChanged() ),
 					 this, SLOT( tempoKnobChanged() ) );
+			// TODO: careful: we must prevent saved scales
+			m_tempoSyncKnobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
 		default:

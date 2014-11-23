@@ -1,0 +1,531 @@
+Effects
+-------
+
+Effects are, generally, blackboxes that transform audio signals in a
+specified way. More exactly, the only input data for an effect in ZynAddSubFX
+is:
+
+* an array of samples, which is read *on line*
+* the current system time (used for LFOs)
+
+The output is the transformed array of samples.
+
+NOTE: As described, effects have no information about anything else. For
+example, key presses are not recognized. Therefore, pressing a key does not
+initiate the LFO. Phase knobs will always be relative to a *global* LFO, which is
+only dependent on the system time.
+
+ZynAddSubFX has 3 types of effects:
+
+* System Effects
+* Insertion Effects
+* Instrument Effects
+
+TODO: Describe these 3 types (their differences).
+
+[[effects::general_topics, General Topics]]
+General topics
+~~~~~~~~~~~~~~
+
+* *Wetness* determines the mix of the results of the effect and its input. This
+mix is made the effects output. If an effect is wet, it means that nothing of
+the input signal is bypassing the effect. If it is dry, then the effect has no
+effect. TODO: Difference between Volume and D/W?
+* *Pan* lets you apply panning, which means that the sound source can move to 
+the right or left. Set it to 0.0 to only hear output on the right side, or to 
+the maximum value to only hear output on the left side.
+* *LRc.* or *L/R* let you apply crossover.
+* *Filter stages* are the number of times that this filter is applied in series.
+So, if this number is 1, you simply have this one filter. If it is two, the
+sound first passes the filter, and the results then pass the same filter again.
+In ZynAddSubFX, the wetness is applied after all stages were passed.
+* *LFOs* are, as the name says, oscillators with, compared to the frequency of 
+the sound, low frequency. They often appear in order to control the effect. 
+They can have some of the following controls:
+** *LFO Type* determines the shape of the LFO. If not present, the LFO is a 
+sine wave.
+** *Freq* determines the LFO's frequency.
+** *Dpth* is a multiplier to the LFO. Thus, it determines the LFOs amplitude 
+and its influence.
+** *Rnd* is the LFO amplitude's randomness
+** *St.df* lets you determine how much left and right LFO are phase shifted.
+64.0 means stereo, higher values increase the right LFO relatively to the left
+one.
+********************************************************************
+Hint: Keep in mind that Effects that can be controlled by LFO can also be 
+controlled arbitrary: Set the LFO depth to zero and manipulate the phase knob
+(e.g. with NRPNs or maybe via OSC in the future).
+********************************************************************
+
+Equalizer
+~~~~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+An http://en.wikipedia.org/wiki/Filter_%28signal_processing%29[equalizer] is a
+filter effect that applies different volume to different frequencies of the
+input signal. This can, for example, be used to "filter out" unwanted 
+frequencies.
+ZynAddSubFX's implementations follow the
+http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt["Cookbook formulae for
+audio EQ"] by Robert Bristow-Johnson.
+
+Filter Types
+^^^^^^^^^^^^
+
+This topic is completely discussed in <<filters, the Filters section>>.
+
+Usage
+^^^^^
+
+We describe all parts of the GUI here. The term passband (or often just "band")
+refers to the amount of frequencies which are not significantly attenuated by
+the filter.
+
+* *Gain* (on the left) defines an offset which is added to the complete filter.
+* *B.* lets you choose the passband number. Multiple passbands define one
+filter. This is important if you want multiple filters to be called after each
+other. Note that filters are commutative.
+* *T.* lets you choose the current filter's type, as described above.
+* *Freq* describes the frequencies where the filter has its poles. For some
+filters, this is called the "cutoff" frequency. Note, however, that a bandpass
+filter has two cutoff frequencies.
+* *Gain* is only active for some filters and sets the amount of a special peak
+these filters have. Note that for those filters, using the predefined gain makes
+them effectless.
+* *Resonance* lets you describe a peak at the given frequency for filters with
+2 poles. This can be compared to real physical objects that have more gain at
+their resonance frequency.
+* *St.* lets you define multiple filter stages. This is equivalent to having
+multiple copies of the same filter in sequence.
+
+Chorus
+~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+In a chorus, many people sing together. Even if each of them sings at exactly
+the same frequency, all their voices usually sound different. We say they have a
+different timbre. Timbre is the way we perceive sound and makes us differ
+between different music instruments. This is, physically, achieved by varying
+both the amplitude envelope and the frequency spectrum. Multiple sounds with
+slightly different timbres make a sound more shimmering, or powerful. This is
+called the chorus effect.
+
+Function
+^^^^^^^^
+
+The chorus effect can be achieved by multiple people singing together. In
+a concert, there are many instruments, resulting in the same effect. When making
+electronic music, we only have an input wave and need to generate these
+different timbres by ourselves. ZynAddSubFX therefore simply plays the sound,
+pitch modulated by an LFO, and adds this to the original sound. This explains
+the diagram below: The multiple pitches are generated by a delayed version of
+the input. This version is being pitched by an LFO. More detailled, this pitch
+is generated by varying the reading speed of the delayed sound; the variation
+amount is controlled by an LFO.
+
+image:./gen/chorus.png[width=700,
+	title="The chorus effect. z^(-n.m) describes the delay."]
+
+TODO: Add LFO pointing to delay?
+
+Related effects to Chorus are Flangers. Flangers can be described as Chorus
+with very short LFO delay and little LFO depth. You can imagine a flanger as two
+copies of a sound playing at almost the same time. This leeds to interference,
+which can be clearly heared. It is popular to apply flangers to guitars, giving
+them more "character".
+
+Usage
+^^^^^
+
+* First, crossover is applied.
+* The following 5 knobs (*Freq*, *Rnd*, *LFO Type*, *St.df*, *Depth*) control 
+the LFO for the pitch. If the depth is set to zero, the pitch will not be 
+changed at all.
+* *Delay* is the time that the delayed sound is delayed "on average". Note that
+the delay also depends on the current pitch.
+* After the correct element of the sound buffer is found using the LFO, the
+*Fb* knob lets you set how loud it shall be played. This is mostly redundant to
+the *D/W* knob, but we have not applied panning and substraction yet. 
+* Next, the singal can be negated. If the *Substract* Checkbox is activated,
+the amplitude is multiplied by -1.
+* Finally, *Pan* lets you apply panning.
+
+Distortion
+~~~~~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+Distortion means, in general, altering a signal. Natural instruments
+usually produce sine like waves. A wave is transformed in an unnatural way when
+distortion is used. The most distorted waves are usually pulse waves. It is 
+typical for distortion to add overtones to a sound. Distortion often increases 
+the power and the http://en.wikipedia.org/wiki/Loudness[loudness] of a signal, 
+while the db level is not increased. This is an important topic in the
+http://en.wikipedia.org/wiki/Loudness_war[Loudness War].
+
+NOTE: As distortion increases loudness, distorted music can cause ear damage
+at lower volume levels. Thus, you might want to use it a bit careful.
+
+Distortion can happen in many situations when working with audio. Often, this is
+not wanted. In classical music, for example, distortion does not occur
+naturally. However, distortion can also be a wanted effect. It is typical for
+Rock guitars, but also present in electronic music, mostly in Dubstep and
+DrumNBass.
+
+The basic components of distortion are mainly
+
+* a preamplifier
+* the waveshaping function
+* filters
+
+Preamplification changes the volume before the wave is shaped, and is indeed the
+amount of distortion. For example, if you clip a signal, the louder the input
+gets, the more distortion you will get. This can have different meanings for
+different types of distortions, as described below.
+
+********************************************************************
+The filters are practical. A reason for using them afterwards is that distortion
+can lead to waves with undesired high frequency parts. Those can be filtered out
+using the LPF. A reason for using filters before applying is to achieve
+multiband distortion. ZynAddSubFX has no "real" multiband distortion by now,
+however.
+********************************************************************
+
+Types of Distortion
+^^^^^^^^^^^^^^^^^^^
+
+This topic is completely discussed in
+<<adsynth::oscilllator::types_of_waveshaping, the Oscillator Section>>. Note
+that you can use the 
+Oscillator editor in order to find out what your distortion effect does. Also 
+note that while the Oscillator editor's distortion is limited to some 
+oscillators you can produce in the Oscillator editor, the distortion effect can 
+be used on every wave that you can generate with ZynAddSubFX.
+
+Function
+^^^^^^^^
+
+We explain the functionality in a diagram and list the components below.
+
+image:./gen/distort.png[width=700,
+	title="The components of a distortion function."]
+	
+* Negation is the first thing to happen. If the *Neg* Checkbox is activated, the
+amplitude is multiplied by -1.
+* Panning is applied. Note, however, that you have to activate the
+Stereo Checkbox, labeled *St*, before.
+* Pre amplification is done next. The amount can be changed using the
+*Drive* nob. Indeed, this is the amount of distortion. For example, if you clip
+a signal, the louder the input gets, the more distortion you will get. This can
+have different meanings for different types of distortion, as described above.
+* *HPF* and *LPF* are filters with 2 poles. Whether they are used before or
+after the waveshape, depends on the checkbox labeled *PF*.
+* The next step is the wave shape. This defines how the wave is
+actually modified. The *Type* ComboBox lets you define how. We will discuss some
+types below.
+* After the wave shape, we scale the level again. This is called
+output amplification. You can change the value using the *Level* knob.
+* Crossover is the last step. This is controlled by the knob *LR Mix* and
+means that afterwards, a percentage of the left side is applied to the right
+side, and, synchronously, the other way round. It is a kind of interpolation
+between left and right. If you set the LR Mix to 0.0, you will always have a
+stereo output.
+
+Dynamic Filter
+~~~~~~~~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+A dynamic filter is, as the name says, a filter which changes its parameters
+dynamically, dependent on the input and current time. In ZynAddSubFX,
+frequency is the only variable parameter. It can be used as an "envelope
+following filter" (sometimes referenced "Auto Wah" or simply "envelope filter").
+
+Function
+^^^^^^^^
+
+Though this filter might look a bit complicated, it is actually easy. We divide
+the parameters into two classes:
+
+* *Filter Parameters* are the ones you get when you click on *Filter*. They
+give the filter its basic settings.
+* *Effect Parameters* are the other ones that control how the filter changes.
+
+The filter basically works like this: The input signal is passed through a
+filter which dynamically changes its frequency. The frequency is an additive of:
+
+* the filter's base frequency
+* an LFO from the effect parameters
+* the "amplitude" of the input wave
+
+image:./gen/dynamic.png[width=700,
+	title="The components of a dynamical filter"]
+
+The amplitude of the input wave is not the current amplitude, but the so called
+https://en.wikipedia.org/wiki/Root_mean_square["Root Mean Square (RMS)"] value.
+This means that we build a mean on the current amplitude and the past values.
+How much the new amplitude takes influence is determined by the *Amplitude
+Smoothness* (see below).
+
+********************************************************************
+RMS value plays an important role in the term loudness. A fully distorted
+signal can sound 20 db louder due to its higher RMS value. This filter takes
+this into account, depending on the smoothness.
+********************************************************************
+
+Usage
+^^^^^
+
+* The 4 knobs in the middle (*Freq*, *Rnd*, *LFO Type*, *St.df*) control the
+LFO.
+* Two knobs let you control the way how the RMS value of the amplitudes is
+measured:
+** *A.M* sets the Amplitude Smoothness (this is described above). The higher
+you set this value, the more slow will the filter react.
+** *A.Inv.*, if being set, negates the (absolute) RMS value. This will lower
+the filter frequency instead of increasing it. Note that this will not have
+much effect if the effects input is not very loud.
+* The following controls define the mix of the LFO and the amplitude.
+** *A.S* sets the Amplitude Sensing (i.e. how much influence the amplitude
+shall have).
+** *LfoD* sets the LFO depth.
+* The filter button lets you choose the filter type.
+* After the input signal has passed through the filter, *Pan* can apply
+panning.
+
+Echo
+~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+The echo effect, also known as
+http://en.wikipedia.org/wiki/Delay_%28audio_effect%29[delay effect], simulates
+the natural reflection of a sound. The listener can hear the sound multiple
+times, usually decreasing in volume. Echos can be useful to fill empty parts of
+your songs with.
+
+Function
+^^^^^^^^
+
+In ZynAddSubFX, the echo is basically implemented as the addition of the
+current sound and a delayed version of it. The delay is implemented as in the
+picture below. First, we add the delayed signal to the effect input. Then,
+they pass an LP1. This shall simulate the effect of dampening, which means that
+low and especially high frequencies get lost earlier over distance than middle
+frequencies do. Next, the sound is delayed, and then it will be output and added
+to the input.
+
+image:./gen/echo.png[width="700",
+	title="The echo includes a fb line, labeled as z^-n, and a delay."]
+
+********************************************************************
+The exact formula in the source code for the dampening effect is as follows:
+
+latexmath:[$Y(t) := (1-d) \cdot X(t) + d \cdot Y(t-1)$],
+
+where latexmath:[t] be the time index for the input
+buffer, latexmath:[d] be the dampening amount and latexmath:[X,Y] be the input,
+respective the output of the dampening. This solves to
+
+latexmath:[$Y(z) = Z(Y(t)) = (1-d) \cdot X(z) + d \cdot Y(z) \cdot z^{-1}$]
+
+latexmath:[$\Leftrightarrow H(z) := \frac{Y(z)}{X(z)} = \frac{1-d}{1 -
+d \cdot z^{-1}}$]
+
+which is used in latexmath:[$Y(z) = H(z) \cdot X(z)$]. So latexmath:[$H(z)$] is
+indeed a filter, and by looking at it, we see that it is an LP1. Note that
+infinite looping for d=1 is impossible.
+********************************************************************
+
+Description
+^^^^^^^^^^^
+
+* *Pan* lets you apply panning of the input.
+* *Delay* sets the time for one delay.
+* *LRdl.* means Left-Right-Delay. If it is set to the middle, then both sides
+are delayed equally. If not, then the left echo comes earlier and the right
+echo comes (the same amount) later than the average echo; or the other way
+round. Set the knob to 0 to hear on the right first.
+* *LRc.* applies crossover.
+* Feedback describes how much of the delay is added back to the input. Set
+*Fb.* to the maximum to hear an infinite echo, or to the minimum to just
+hear a single repeat.
+* The *Damp* value lets the LP1 reject higher frequencies earlier if
+increased.
+
+Reverb
+~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+A http://en.wikipedia.org/wiki/Reverberation[Reverberation] actually expresses
+the effect of many echoes being played at the same time. This can happen in an
+enclosed room, where the sound can be reflected in different angles. Also, in
+nature, thunders approximate reverbs, because the sound is reflected in many
+different ways, arriving at the listener at different times.
+
+In music, reverbs are popular in many ways. Reverbs with large room size can be
+used to emulate sounds like in live concerts. This is useful for voices, pads,
+and hand claps. A small room size can simulate the sound board of string
+instruments, like guitars or pianos.
+
+Function
+^^^^^^^^
+
+As mentioned, a reverb consists of permanent echo. The reverb in ZynAddSubFX is
+more complex than the echo. After the delaying, comb filters and then allpass
+filters are being applied. These make the resulting sound more realistic. The
+parameters for these filters depend on the roomsize. For details, consider the
+information about https://ccrma.stanford.edu/~jos/pasp/Freeverb.html[Freeverb].
+
+image:./gen/reverb.png[width=700,
+	"The reverb, being similar to the echo."]
+
+Description
+^^^^^^^^^^^
+
+* The *Type* ComboBox lets you select a reverb type:
+** *Freeverb* is a preset. It was proposed by Jezar at Dreampoint.
+** *Bandwidth* has the same parameters for the comb and allpass filters, but it
+applies a unison before the LP/HP. The unison's bandwidth can be set using *bw*.
+** Random chooses a random layout for comb and allpass each time the type or
+the roomsize is being changed.
+* The roomsize (*R.S.*) defines parameters only for the comb and allpass
+filters.
+* *Time* controls how long the whole reverb shall take, including how slow the
+volume is decreased.
+* The initial delay (*I.del*) is the time which the sounds need at least to
+return to the user. The initial delay feedback (*I.delfb*) says how much of the
+delayed sound is added to the input.
+* Low pass filter (*LPF*) and high pass filter (*HPF*) can be applied before
+the comb filters.
+* The dampening control (*Damp*) currently only allows to damp low frequencies.
+Its parameters are being used by the comb and allpass filters.
+* *Pan* lets you apply panning. This is the last thing to happen.
+
+
+Phaser
+~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+The http://en.wikipedia.org/wiki/Phaser_%28effect%29[Phaser] is a special
+dynamic filter. The result is a sweeping
+sound, which is
+often used on instruments with a large frequency band, like guitars or strings.
+This makes it typical for genres like rock or funk, where it is often modulated
+with a pedal, but also for giving strings a warm, relaxing character.
+
+Function
+^^^^^^^^
+
+The audio signal is split into two paths. One path remains unchanged. The other
+one is sent to a delay line. The delay time (the so called *phase*) is made
+dependent on the frequency. Therefore, an all-pass filter is applied to the
+signal, which *preserves* the amplitude, but determines the delay time. In the
+end, both paths are added.
+
+The following picture describes how this works on white noise. Light blue
+signalises that the frequency is not present at the current time, and dark blue
+signalises the opposite. The dark blue peaks appear if the delay time is very
+short, because then, the second path almost equals the first one, which results
+in duplication of the signal. If the delay line is very long, then it is --- in
+the case of white noise --- totally at random whether the delayed signal
+currently duplicates the unchanged path, or whether it cancels it out to zero.
+This random effect results in white noise between the clear blue structures.
+
+image:./images/phaser-spectrogram.jpg[width="700",
+	title="Spectrogram of an 8-stage phaser
+	modulated by a sine LFO applied to white noise."]
+
+Phaser Types
+^^^^^^^^^^^^
+
+ZynAddSubFX offers different types of phasers:
+
+* Analog and "normal" phasers. Analog phasers are more complicated. They sound
+punchier, while normal phasers sound more fluently. However, analog filters
+usually need more filter stages to reach a characteristic sound.
+* Sine and triangle filters. Note that an analog triangle filter with many poles
+is a barber pole filter and can be used to generate
+http://en.wikipedia.org/wiki/Shepard_tone[Shepard Tones],
+i.e. tones that seem to increase or decrease with time, but do not really.
+* The LFO function can be squared. This converts the triangle wave into a hyper 
+sine wave. The sine squared is simply a faster sine wave.
+* TODO: Barber is deactivated, since PLFOtype is only 0 or 1?
+
+Description
+^^^^^^^^^^^
+
+For the normal phaser, first, the LFO is generated:
+
+* There are 4 controls (*Freq*,*Rnd*,*LFO tpye*,*St.df*) that define the 
+LFO.
+* *Phase* and *Depth* are applied afterwards in the usual way (TODO: I don't 
+understand the code here for the normal phase...). For the analog phaser, 
+*Phase* is not implemented, yet.
+** If *hyp* is being set, then the LFO function is being squared.
+
+Next, the input is being used.
+
+* *Analog* decides whether the phaser is analog or "normal".
+* First, *Pan* applies panning to the original input in every loop.
+* Next, barber pole phasing is being applied (Analog only).
+* *Fb* applies feedback. The last sound buffer element is (after 
+phasing) multiplied by this value and then added to the current one. For normal 
+filter, the value is added before, for analog after the first phasing stage.
+* Now, *Stages* phasing stages are being applied. *dist* sets the distortion 
+for when applying the phasing stages. This has only effect for analog phasers.
+* The feedback is taken now.
+* In the end, *Substract* inverts the signal, multiplying it by -1.
+
+Alienwah
+~~~~~~~~
+
+Introduction
+^^^^^^^^^^^^
+
+The AlienWah effect is a special, dynamic
+http://en.wikipedia.org/wiki/Formant[formant] filter (TODO: is this true?).
+Paul Nasca named it AlienWah because it sounded "a bit like wahwah, but more
+strange". The result of the filter is a sound varying between the 
+vocals "Ahhhhh" (or "Uhhhhh") and "Eeeeee".
+
+Function
+^^^^^^^^
+
+The way that the filter moves between the two vocals is mainly 
+described by an LFO. A bit easified, Paul Nasca has stated the formula (for
+latexmath:[$i^2=-1; R<1$]) as
+
+latexmath:[$fb=R*(\cos(\alpha)+i*\sin(\alpha))$]
+
+latexmath:[$y_n=y_{n-delay}*R*(\cos(\alpha)+i*\sin(\alpha))+x_n*(1-R)$].
+
+The input latexmath:[$x_n$] has the real part of the samples from the wavefile
+and the imaginary part is zero. The output of this effect is the real part of
+latexmath:[$y_n$]. latexmath:[$\alpha$] is the phase.
+
+Description
+^^^^^^^^^^^
+
+* *Pan*
+* The following 5 controls (*Freq*,*Rnd*,*LFO tpye*,*St.df*, *Dpth*) define the 
+LFO.
+** *Fb*
+
+** *Delay* If this value is low, the sound is turned more into a
+"wah-wah"-effect.
+** *Phase* See latexmath:[$\alpha$] in the above formula. This lets you set
+where the vocal is between "Ahhhhh" and "Eeeeee".
+** *L/R* applies crossover in the end of every stage. This is currently not 
+implemented for the Analog Phaser.

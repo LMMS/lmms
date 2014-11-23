@@ -2,9 +2,9 @@
  * DummyInstrument.h - instrument used as fallback if an instrument couldn't
  *                     be loaded
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	virtual void playNote( NotePlayHandle *, bool, sampleFrame * )
+	virtual void playNote( NotePlayHandle *, sampleFrame * )
 	{
 	}
 

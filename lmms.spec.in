@@ -13,7 +13,7 @@
 %define with_sf         1%{nil}
 
 # Build by setting these defines on the command line, for example:
-# rpmbuild --define 'disttag .EL' --define 'repotag .fc6' 
+# rpmbuild --define 'disttag .EL' --define 'repotag .fc6'
 %{!?desktop_vendor:     %{expand: %%define desktop_vendor rpmfarm}}
 # This can be changed at build time:
 # rpmbuild --define 'desktop_vendor RPMfarm'
@@ -26,11 +26,11 @@ Release:	%{release}
 Summary:	powerful sequencer-, synthesizer- and sample-studio for Linux
 Summary(de):	Leistungsfaehiges Sequenzer-, Synthesizer- und Sample-Studio fuer Linux
 License:	GPL
-URL:		http://lmms.sourceforge.net/
+URL:		http://lmms.io/
 Group:		Applications/Multimedia
 Provides:	lmms = %{version}-%{release}
 BuildRequires:	gcc gcc-c++ libstdc++-devel autoconf automake libtool make
-BuildRequires:	alsa-lib-devel 
+BuildRequires:	alsa-lib-devel
 BuildRequires:	qt-devel > 3.0
 # ------------- BuildRequires:
 %if %{with_vorbis}
@@ -40,7 +40,7 @@ BuildRequires:  libvorbis libvorbis-devel
 BuildRequires:	SDL SDL-devel SDL_sound
 %endif
 %if %{with_sr}
-BuildRequires:	libsamplerate libsamplerate-devel 
+BuildRequires:	libsamplerate libsamplerate-devel
 %endif
 %if %{with_sf}
 BuildRequires:  libsndfile libsndfile-devel
@@ -57,7 +57,7 @@ Requires:	qt >= 3.0 alsa-lib
 Requires:	libsamplerate
 %endif
 %if %{with_sf}
-Requires:	libsndfile 
+Requires:	libsndfile
 %endif
 %if %{with_jack}
 Requires:	jack-audio-connection-kit
@@ -116,13 +116,13 @@ Group:		Applications/Multimedia
 Provides:	lmms-data = %{version}-%{release}
 
 %description data
-This package contains platform-independent data and resources for Linux
-MultiMedia Studio (LMMS), e.g. samples, presets and demo-projects.
+This package contains platform-independent data and resources for LMMS, e.g.
+samples, presets and demo-projects.
 
 
 %description data -l de
-Dieses Paket beinhaltet plattform-unabhaengige Daten und Resourcen fuer Linux
-MultiMedia Studio (LMMS), wie z.B. Samples, Presets und Demo-Projekte.
+Dieses Paket beinhaltet plattform-unabhaengige Daten und Resourcen fuer LMMS,
+wie z.B. Samples, Presets und Demo-Projekte.
 
 
 %prep
@@ -156,7 +156,7 @@ MultiMedia Studio (LMMS), wie z.B. Samples, Presets und Demo-Projekte.
 # Create a desktop menu entry
 %{__cat} > %{name}.desktop << EOF
 [Desktop Entry]
-Name=Linux MultiMedia Studio
+Name=LMMS
 Comment=Powerful sequencer-, synthesizer- and sample-studio for Linux
 Exec=lmms
 Icon=%{_datadir}/%{name}/themes/default/icon.png

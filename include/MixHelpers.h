@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,6 +39,8 @@ void add( sampleFrame* dst, const sampleFrame* src, int frames );
 /*! \brief Add samples from src multiplied by coeffSrc to dst */
 void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
 
+/*! \brief Same as addMultiplied, but sanitize output (strip out infs/nans) */
+void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
 void addMultipliedStereo( sampleFrame* dst, const sampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );

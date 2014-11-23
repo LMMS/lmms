@@ -1,9 +1,9 @@
 /*
  * ProjectJournal.cpp - implementation of ProjectJournal
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,11 +29,12 @@
 #include "JournallingObject.h"
 #include "song.h"
 
+const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
 ProjectJournal::ProjectJournal() :
 	m_joIDs(),
-	m_journalEntries(),
-	m_currentJournalEntry( m_journalEntries.end() ),
+	m_undoCheckPoints(),
+	m_redoCheckPoints(),
 	m_journalling( false )
 {
 }
@@ -50,51 +51,70 @@ ProjectJournal::~ProjectJournal()
 
 void ProjectJournal::undo()
 {
-	if( m_journalEntries.empty() == true )
+	while( !m_undoCheckPoints.isEmpty() )
 	{
-		return;
-	}
+		CheckPoint c = m_undoCheckPoints.pop();
+		JournallingObject *jo = m_joIDs[c.joID];
 
-	JournallingObject * jo;
+		if( jo )
+		{
+			DataFile curState( DataFile::JournalData );
+			jo->saveState( curState, curState.content() );
+			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
-	if( m_currentJournalEntry - 1 >= m_journalEntries.begin() &&
-		( jo = m_joIDs[*--m_currentJournalEntry] ) != NULL )
-	{
-		jo->undo();
-		engine::getSong()->setModified();
+			bool prev = isJournalling();
+			setJournalling( false );
+			jo->restoreState( c.data.content().firstChildElement() );
+			setJournalling( prev );
+			engine::getSong()->setModified();
+			break;
+		}
 	}
 }
-
 
 
 
 void ProjectJournal::redo()
 {
-	if( m_journalEntries.empty() == true )
+	while( !m_redoCheckPoints.isEmpty() )
 	{
-		return;
-	}
+		CheckPoint c = m_redoCheckPoints.pop();
+		JournallingObject *jo = m_joIDs[c.joID];
 
-	JournallingObject * jo;
+		if( jo )
+		{
+			DataFile curState( DataFile::JournalData );
+			jo->saveState( curState, curState.content() );
+			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
-	//printf("%d\n", m_joIDs[*(m_currentJournalEntry+1)] );
-	if( m_currentJournalEntry < m_journalEntries.end() &&
-		( jo = m_joIDs[*m_currentJournalEntry++] ) != NULL )
-	{
-		jo->redo();
-		engine::getSong()->setModified();
+			bool prev = isJournalling();
+			setJournalling( false );
+			jo->restoreState( c.data.content().firstChildElement() );
+			setJournalling( prev );
+			engine::getSong()->setModified();
+			break;
+		}
 	}
 }
 
 
 
 
-void ProjectJournal::journalEntryAdded( const jo_id_t _id )
+void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 {
-	m_journalEntries.erase( m_currentJournalEntry, m_journalEntries.end() );
-	m_journalEntries.push_back( _id );
-	m_currentJournalEntry = m_journalEntries.end();
-	engine::getSong()->setModified();
+	if( isJournalling() )
+	{
+		m_redoCheckPoints.clear();
+
+		DataFile dataFile( DataFile::JournalData );
+		jo->saveState( dataFile, dataFile.content() );
+
+		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
+		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
+		{
+			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
+		}
+	}
 }
 
 
@@ -105,7 +125,7 @@ jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 	const jo_id_t EO_ID_MAX = (1 << 23)-1;
 	jo_id_t id;
 	while( m_joIDs.contains( id =
-			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() % 
+			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() %
 								 EO_ID_MAX ) ) )
 	{
 	}
@@ -130,29 +150,11 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 
 
 
-void ProjectJournal::forgetAboutID( const jo_id_t _id )
-{
-	//printf("forget about %d\n", _id );
-	JournalEntryVector::Iterator it;
-	while( ( it = qFind( m_journalEntries.begin(), m_journalEntries.end(),
-					_id ) ) != m_journalEntries.end() )
-	{
-		if( m_currentJournalEntry >= it )
-		{
-			--m_currentJournalEntry;
-		}
-		m_journalEntries.erase( it );
-	}
-	m_joIDs.remove( _id );
-}
-
-
-
-
 void ProjectJournal::clearJournal()
 {
-	m_journalEntries.clear();
-	m_currentJournalEntry = m_journalEntries.end();
+	m_undoCheckPoints.clear();
+	m_redoCheckPoints.clear();
+
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
 		if( it.value() == NULL )

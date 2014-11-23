@@ -1,9 +1,9 @@
 /*
  * InstrumentSoundShapingView.cpp - view for InstrumentSoundShaping class
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -21,6 +21,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
+#include <QtGui/QLabel>
 
 #include "InstrumentSoundShapingView.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -115,6 +117,16 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 		tr( "Use this knob for setting Q/Resonance for the selected "
 			"filter. Q/Resonance tells the filter how much it "
 			"should amplify frequencies near Cutoff-frequency." ) );
+
+
+	m_singleStreamInfoLabel = new QLabel( tr( "Envelopes, LFOs and filters are not supported by the current instrument." ), this );
+	m_singleStreamInfoLabel->setWordWrap( true );
+	m_singleStreamInfoLabel->setFont( pointSize<8>( m_singleStreamInfoLabel->font() ) );
+
+	m_singleStreamInfoLabel->setGeometry( TARGETS_TABWIDGET_X,
+						TARGETS_TABWIDGET_Y,
+						TARGETS_TABWIDGET_WIDTH,
+						TARGETS_TABWIDGET_HEIGTH );
 }
 
 
@@ -131,6 +143,7 @@ void InstrumentSoundShapingView::setFunctionsHidden( bool hidden )
 {
 	m_targetsTabWidget->setHidden( hidden );
 	m_filterGroupBox->setHidden( hidden );
+	m_singleStreamInfoLabel->setHidden( !hidden );
 }
 
 

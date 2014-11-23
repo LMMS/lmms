@@ -43,7 +43,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -333,10 +333,9 @@ LADSPA_Descriptor * g_psDescriptor = NULL;
 
 /*****************************************************************************/
 
-/* _init() is called automatically when the plugin library is first
+/* __attribute__((constructor)) swh_init() is called automatically when the plugin library is first
    loaded. */
-void 
-_init() {
+void __attribute__((constructor)) swh_init() {
   char ** pcPortNames;
   LADSPA_PortDescriptor * piPortDescriptors;
   LADSPA_PortRangeHint * psPortRangeHints;
@@ -421,9 +420,9 @@ _init() {
 
 /*****************************************************************************/
 
-/* _fini() is called automatically when the library is unloaded. */
+/*  __attribute__((destructor)) swh_fini() is called automatically when the library is unloaded. */
 void 
-_fini() {
+ __attribute__((destructor)) swh_fini() {
   long lIndex;
   if (g_psDescriptor) {
     free((char *)g_psDescriptor->Label);
@@ -448,7 +447,7 @@ const LADSPA_Descriptor *
 ladspa_descriptor(unsigned long Index) {
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif

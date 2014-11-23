@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -149,7 +149,8 @@ protected:
 private:
 	static QPixmap * s_timeLinePixmap;
 	static QPixmap * s_posMarkerPixmap;
-	static QPixmap * s_loopPointPixmap;
+	static QPixmap * s_loopPointBeginPixmap;
+	static QPixmap * s_loopPointEndPixmap;
 	static QPixmap * s_loopPointDisabledPixmap;
 
 	AutoScrollStates m_autoScroll;

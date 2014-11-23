@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -53,7 +53,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -191,7 +191,7 @@ static void runAddingLowpass_iir(LADSPA_Handle instance, unsigned long sample_co
 	iir_process_buffer_ns_5(iirf, gt, input, output, sample_count,RUN_ADDING);
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -280,7 +280,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (lowpass_iirDescriptor) {
 		free((LADSPA_PortDescriptor *)lowpass_iirDescriptor->PortDescriptors);
 		free((char **)lowpass_iirDescriptor->PortNames);

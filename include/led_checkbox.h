@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -47,6 +47,10 @@ public:
 	ledCheckBox( const QString & _txt, QWidget * _parent,
 				const QString & _name = QString::null,
 						LedColors _color = Yellow );
+	ledCheckBox( QWidget * _parent,
+				const QString & _name = QString::null,
+						LedColors _color = Yellow );
+
 	virtual ~ledCheckBox();
 
 
@@ -55,6 +59,9 @@ public:
 		return( m_text );
 	}
 
+	void setText( const QString& s );
+
+	Q_PROPERTY( QString text READ text WRITE setText )
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -65,6 +72,9 @@ private:
 	QPixmap * m_ledOffPixmap;
 	
 	QString m_text;
+
+	void initUi( LedColors _color ); //!< to be called by ctors
+	void onTextUpdated(); //!< to be called when you updated @a m_text
 
 } ;
 

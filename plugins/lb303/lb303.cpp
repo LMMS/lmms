@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * lb303FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  * 

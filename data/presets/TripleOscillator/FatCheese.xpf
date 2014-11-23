@@ -1,16 +1,21 @@
 <?xml version="1.0"?>
-<!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.0" type="channelsettings" version="1.0" >
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
-  <channelsettings>
-    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="100" name="FatCheese" basetone="9" tab="2" >
-      <tripleoscillator userwavefile1="" wavetype1="5" coarse1="0" userwavefile2="" wavetype2="4" coarse2="0" vol0="100" vol1="100" finel0="0" vol2="100" finel1="0" finel2="-25" modalgo1="2" stphdetun0="102" pan0="0" modalgo2="3" stphdetun1="0" pan1="0" stphdetun2="0" pan2="0" phoffset0="295" phoffset1="267" phoffset2="169" finer0="0" finer1="0" finer2="30" userwavefile0="" wavetype0="2" coarse0="-12" />
-      <eldata fres="0.57" ftype="6" fcut="3354" fwet="1" >
-        <elvol lpdel="0" amt="1" rel="0.18" ctlenvamt="0" latt="0" sus="0" lspd="0.1553" att="0.038" pdel="0" lamt="0" dec="0.375" x100="0" lshp="0" hold="0" />
-        <elcut lpdel="0" amt="0.58" rel="0" ctlenvamt="1" latt="0" sus="0.999" lspd="0.53" att="0" pdel="0" lamt="0.515" dec="0.158" x100="0" lshp="0" hold="0" />
-        <elres lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.4849" att="0" pdel="0" lamt="0.23" dec="0.5" x100="0" lshp="1" hold="0.5" />
+  <instrumenttracksettings muted="0" type="0" name="FatCheese" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="55">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="169" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="30" coarse0="-12" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="3" finel2="-25" pan0="0" modalgo3="2" pan1="0" stphdetun0="102" pan2="0" stphdetun1="0" wavetype0="2" stphdetun2="0" wavetype1="5" wavetype2="4" vol0="100" vol1="100" phoffset0="295" phoffset1="267" vol2="100"/>
+      </instrument>
+      <eldata fres="0.57" ftype="6" fcut="3354" fwet="1">
+        <elvol lspd_denominator="4" sustain="1" pdel="0" userwavefile="" dec="0.375" lamt="0" syncmode="0" latt="0" rel="0.18" amt="1" x100="0" att="0.038" lpdel="0" hold="0" lshp="0" lspd="0.1553" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.001" pdel="0" userwavefile="" dec="0.158" lamt="0.515" syncmode="0" latt="0" rel="0" amt="0.58" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.53" ctlenvamt="1" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0.23" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="1" lspd="0.4849" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>
-      <arpandchords chordrange="1" arprange="3" arpdisabled="0" chord="0" chorddisabled="1" arpgate="73" arp="0" arptime="89" arpdir="3" />
-    </channeltrack>
-  </channelsettings>
-</multimediaproject>
+      <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="90" arprange="3" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="4" arpdir="1" arpgate="60"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+      <fxchain numofeffects="0" enabled="0"/>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

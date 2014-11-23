@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -755,9 +755,8 @@ void vibedView::normalizeClicked()
 void vibedView::contextMenuEvent( QContextMenuEvent * )
 {
 
-	captionMenu contextMenu( model()->displayName() );
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-					this, SLOT( displayHelp() ) );
+	captionMenu contextMenu( model()->displayName(), this );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 
 }

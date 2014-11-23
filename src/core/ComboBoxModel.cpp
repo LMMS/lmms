@@ -1,9 +1,9 @@
 /*
  * ComboBoxModel.cpp - implementation of ComboBoxModel
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,9 +27,9 @@
 
 
 
-void ComboBoxModel::addItem( const QString & _item, PixmapLoader * _pl )
+void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
 {
-	m_items.push_back( qMakePair( _item, _pl ) );
+	m_items.push_back( qMakePair( item, loader ) );
 	setRange( 0, m_items.size() - 1 );
 }
 
@@ -39,23 +39,24 @@ void ComboBoxModel::addItem( const QString & _item, PixmapLoader * _pl )
 void ComboBoxModel::clear()
 {
 	setRange( 0, 0 );
-	foreach( const Item & _i, m_items )
+	foreach( const Item& i, m_items )
 	{
-		delete _i.second;
+		delete i.second;
 	}
+
 	m_items.clear();
+
 	emit propertiesChanged();
 }
 
 
 
 
-int ComboBoxModel::findText( const QString & _txt ) const
+int ComboBoxModel::findText( const QString& txt ) const
 {
-	for( QVector<Item>::ConstIterator it = m_items.begin();
-						it != m_items.end(); ++it )
+	for( QVector<Item>::ConstIterator it = m_items.begin(); it != m_items.end(); ++it )
 	{
-		if( ( *it ).first == _txt )
+		if( ( *it ).first == txt )
 		{
 			return it - m_items.begin();
 		}

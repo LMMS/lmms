@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -149,7 +149,6 @@ void trackContentObject::movePosition( const MidiTime & _pos )
 {
 	if( m_startPosition != _pos )
 	{
-		addJournalEntry( JournalEntry( Move, m_startPosition - _pos ) );
 		m_startPosition = _pos;
 		engine::getSong()->updateLength();
 	}
@@ -170,52 +169,10 @@ void trackContentObject::changeLength( const MidiTime & _length )
 {
 	if( m_length != _length )
 	{
-		addJournalEntry( JournalEntry( Resize, m_length - _length ) );
 		m_length = _length;
 		engine::getSong()->updateLength();
 	}
 	emit lengthChanged();
-}
-
-
-
-
-/*! \brief Undo one journal entry of this trackContentObject
- *
- *  Restore the previous state of this track content object.  This will
- *  restore the position or the length of the track content object
- *  depending on what was changed.
- *
- * \param _je The journal entry to undo
- */
-void trackContentObject::undoStep( JournalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case Move:
-			movePosition( startPosition() + _je.data().toInt() );
-			break;
-		case Resize:
-			changeLength( length() + _je.data().toInt() );
-			break;
-	}
-	restoreJournallingState();
-}
-
-
-
-
-/*! \brief Redo one journal entry of this trackContentObject
- *
- *  Undoes one 'undo' of this track content object.
- *
- * \param _je The journal entry to redo
- */
-void trackContentObject::redoStep( JournalEntry & _je )
-{
-	JournalEntry je( _je.actionID(), -_je.data().toInt() );
-	undoStep( je );
 }
 
 
@@ -292,7 +249,9 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	m_action( NoAction ),
 	m_autoResize( false ),
 	m_initialMouseX( 0 ),
-	m_hint( NULL )
+	m_hint( NULL ),
+	m_fgColor( 0, 0, 0 ),
+	m_textColor( 0, 0, 0 )
 {
 	if( s_textFloat == NULL )
 	{
@@ -303,7 +262,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	move( 0, 1 );
 	show();
 
@@ -357,6 +316,23 @@ bool trackContentObjectView::fixedTCOs()
 
 
 
+// qproperty access functions, to be inherited & used by TCOviews
+//! \brief CSS theming qproperty access method
+QColor trackContentObjectView::fgColor() const
+{ return m_fgColor; }
+
+//! \brief CSS theming qproperty access method
+QColor trackContentObjectView::textColor() const
+{ return m_textColor; }
+
+//! \brief CSS theming qproperty access method
+void trackContentObjectView::setFgColor( const QColor & _c )
+{ m_fgColor = QColor( _c ); }
+
+//! \brief CSS theming qproperty access method
+void trackContentObjectView::setTextColor( const QColor & _c )
+{ m_textColor = QColor( _c ); }
+
 
 /*! \brief Close a trackContentObjectView
  *
@@ -383,6 +359,8 @@ bool trackContentObjectView::close()
  */
 void trackContentObjectView::remove()
 {
+	m_trackView->getTrack()->addJournalCheckPoint();
+
 	// delete ourself
 	close();
 	m_tco->deleteLater();
@@ -554,11 +532,6 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		}
 		return;
 	}
-	else if( _me->modifiers() & Qt::ShiftModifier )
-	{
-		// add/remove object to/from selection
-		selectableObject::mousePressEvent( _me );
-	}
 	else if( _me->button() == Qt::LeftButton &&
 			_me->modifiers() & Qt::ControlModifier )
 	{
@@ -577,6 +550,8 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		/*	engine::mainWindow()->isShiftPressed() == false &&*/
 							fixedTCOs() == false )
 	{
+		m_tco->addJournalCheckPoint();
+
 		// move or resize
 		m_tco->setJournalling( false );
 
@@ -612,6 +587,17 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		// setup text-float as if TCO was already moved/resized
 		mouseMoveEvent( _me );
 		s_textFloat->show();
+	}
+	else if( _me->button() == Qt::RightButton )
+	{
+		if( _me->modifiers() & Qt::ControlModifier )
+		{
+			m_tco->toggleMute();
+		}
+		else if( _me->modifiers() & Qt::ShiftModifier && fixedTCOs() == false )
+		{
+			remove();
+		}
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
@@ -770,9 +756,6 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 	if( m_action == Move || m_action == Resize )
 	{
 		m_tco->setJournalling( true );
-		m_tco->addJournalEntry( JournalEntry( m_action, m_oldTime -
-			( ( m_action == Move ) ?
-				m_tco->startPosition() : m_tco->length() ) ) );
 	}
 	m_action = NoAction;
 	delete m_hint;
@@ -794,6 +777,11 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
  */
 void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	if( _cme->modifiers() )
+	{
+		return;
+	}
+
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
 	{
@@ -867,6 +855,8 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 			SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( changePosition( const MidiTime & ) ) );
 
+	setStyle( QApplication::style() );
+
 	updateBackground();
 }
 
@@ -897,22 +887,13 @@ void trackContentWidget::updateBackground()
 	m_background = QPixmap( w * 2, height() );
 	QPainter pmp( &m_background );
 
-	QLinearGradient grad( 0,0, 0, h );
-	grad.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad.setColorAt( 0.33, QColor( 20, 20, 20 ) );
-	grad.setColorAt( 1.0, QColor( 15, 15, 15 ) );
-	pmp.fillRect( 0, 0, w, h, grad );
-
-	QLinearGradient grad2( 0,0, 0, h );
-	grad2.setColorAt( 0.0, QColor( 50, 50, 50 ) );
-	grad2.setColorAt( 0.33, QColor( 40, 40, 40 ) );
-	grad2.setColorAt( 1.0, QColor( 30, 30, 30 ) );
-	pmp.fillRect( w, 0, w , h, grad2 );
+	pmp.fillRect( 0, 0, w, h, darkerColor() );
+	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
 	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
 	// horizontal line
-	pmp.drawLine( 0, 0, w*2, 0 );
+	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	// vertical lines
 	for( float x = 0; x < w * 2; x += ppt )
@@ -945,9 +926,6 @@ void trackContentWidget::updateBackground()
 void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 {
 	trackContentObject * tco = _tcov->getTrackContentObject();
-/*	QMap<QString, QVariant> map;
-	map["id"] = tco->id();
-	addJournalEntry( JournalEntry( AddTrackContentObject, map ) );*/
 
 	m_tcoViews.push_back( _tcov );
 
@@ -972,14 +950,6 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 						_tcov );
 	if( it != m_tcoViews.end() )
 	{
-/*		QMap<QString, QVariant> map;
-		DataFile dataFile( DataFile::JournalData );
-		_tcov->getTrackContentObject()->saveState( dataFile, dataFile.content() );
-		map["id"] = _tcov->getTrackContentObject()->id();
-		map["state"] = dataFile.toString();
-		addJournalEntry( JournalEntry( RemoveTrackContentObject,
-								map ) );*/
-
 		m_tcoViews.erase( it );
 		engine::getSong()->setModified();
 	}
@@ -1120,7 +1090,8 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		m_trackView->trackContainerView()->fixedTCOs() == false )
 	{
 		const MidiTime pos = getPosition( _de->pos().x()
-							).toNearestTact();
+                            ).getTact() * MidiTime::ticksPerTact();
+		getTrack()->addJournalCheckPoint();
 		trackContentObject * tco = getTrack()->createTCO( pos );
 
 		// value contains our XML-data so simply create a
@@ -1209,71 +1180,6 @@ void trackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 
 
 
-/*! \brief Undo an action on the trackContentWidget
- *
- * \param _je the details of the edit journal
- */
-void trackContentWidget::undoStep( JournalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case AddTrackContentObject:
-		{
-			QMap<QString, QVariant> map = _je.data().toMap();
-			trackContentObject * tco =
-				dynamic_cast<trackContentObject *>(
-			engine::projectJournal()->journallingObject( map["id"].toInt() ) );
-			DataFile dataFile( DataFile::JournalData );
-			tco->saveState( dataFile, dataFile.content() );
-			map["state"] = dataFile.toString();
-			_je.data() = map;
-			tco->deleteLater();
-			break;
-		}
-
-		case RemoveTrackContentObject:
-		{
-			trackContentObject * tco = getTrack()->createTCO( MidiTime( 0 ) );
-			DataFile dataFile(
-				_je.data().toMap()["state"].
-					toString().toUtf8() );
-			tco->restoreState( dataFile.content().firstChild().toElement() );
-			break;
-		}
-	}
-	restoreJournallingState();
-}
-
-
-
-
-/*! \brief Redo an action of the trackContentWidget
- *
- * \param _je the entry in the edit journal to redo.
- */
-void trackContentWidget::redoStep( JournalEntry & _je )
-{
-	switch( _je.actionID() )
-	{
-		case AddTrackContentObject:
-		case RemoveTrackContentObject:
-			_je.actionID() = ( _je.actionID() ==
-						AddTrackContentObject ) ?
-				RemoveTrackContentObject :
-						AddTrackContentObject;
-			undoStep( _je );
-			_je.actionID() = ( _je.actionID() ==
-						AddTrackContentObject ) ?
-				RemoveTrackContentObject :
-						AddTrackContentObject;
-			break;
-	}
-}
-
-
-
-
 /*! \brief Return the track shown by the trackContentWidget
  *
  */
@@ -1312,7 +1218,22 @@ MidiTime trackContentWidget::endPosition( const MidiTime & _pos_start )
 }
 
 
+// qproperty access methods
+//! \brief CSS theming qproperty access method
+QBrush trackContentWidget::darkerColor() const
+{ return m_darkerColor; }
 
+//! \brief CSS theming qproperty access method
+QBrush trackContentWidget::lighterColor() const
+{ return m_lighterColor; }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setDarkerColor( const QBrush & c )
+{ m_darkerColor = c; }
+
+//! \brief CSS theming qproperty access method
+void trackContentWidget::setLighterColor( const QBrush & c )
+{ m_lighterColor = c; }
 
 
 
@@ -1484,6 +1405,14 @@ void trackOperationsWidget::cloneTrack()
 }
 
 
+/*! \brief Clear this track - clears all TCOs from the track */
+void trackOperationsWidget::clearTrack()
+{
+	engine::mixer()->lock();
+	m_trackView->getTrack()->deleteTCOs();
+	engine::mixer()->unlock();
+}
+
 
 
 /*! \brief Remove this track from the track list
@@ -1501,6 +1430,9 @@ void trackOperationsWidget::removeTrack()
  *
  *  For all track types, we have the Clone and Remove options.
  *  For instrument-tracks we also offer the MIDI-control-menu
+ *  For automation tracks, extra options: turn on/off recording
+ *  on all TCOs (same should be added for sample tracks when
+ *  sampletrack recording is implemented)
  */
 void trackOperationsWidget::updateMenu()
 {
@@ -1512,6 +1444,11 @@ void trackOperationsWidget::updateMenu()
 	to_menu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
+						
+	if( ! m_trackView->trackContainerView()->fixedTCOs() )
+	{
+		to_menu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
+	}
 
 	if( dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
@@ -1519,10 +1456,44 @@ void trackOperationsWidget::updateMenu()
 		to_menu->addMenu( dynamic_cast<InstrumentTrackView *>(
 						m_trackView )->midiMenu() );
 	}
+	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
+	{
+		to_menu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
+		to_menu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+	}
 }
 
 
+void trackOperationsWidget::recordingOn()
+{
+	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	if( atv )
+	{
+		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		{
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+			if( ap ) { ap->setRecording( true ); }
+		}
+		atv->update();
+	}
+}
 
+
+void trackOperationsWidget::recordingOff()
+{
+	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	if( atv )
+	{
+		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		{
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+			if( ap ) { ap->setRecording( false ); }
+		}
+		atv->update();
+	}	
+}
 
 
 // ===========================================================================
@@ -1815,6 +1786,14 @@ void track::removeTCO( trackContentObject * _tco )
 }
 
 
+/*! \brief Remove all TCOs from this track */
+void track::deleteTCOs()
+{
+	while( ! m_trackContentObjects.isEmpty() )
+	{
+		delete m_trackContentObjects.first();
+	}
+}
 
 
 /*! \brief Return the number of trackContentObjects we contain
@@ -2227,55 +2206,6 @@ void trackView::modelChanged()
 
 
 
-/*! \brief Undo a change to this track View.
- *
- *  \param _je the Journal Entry to undo.
- */
-void trackView::undoStep( JournalEntry & _je )
-{
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case MoveTrack:
-			if( _je.data().toInt() > 0 )
-			{
-				m_trackContainerView->moveTrackViewUp( this );
-			}
-			else
-			{
-				m_trackContainerView->moveTrackViewDown( this );
-			}
-			break;
-		case ResizeTrack:
-			setFixedHeight( qMax<int>( height() +
-						_je.data().toInt(),
-						MINIMAL_TRACK_HEIGHT ) );
-			m_trackContainerView->realignTracks();
-			break;
-			/*case RestoreTrack:
-			setFixedHeight( DEFAULT_TRACK_HEIGHT );
-			m_trackContainerView->realignTracks();
-			break; */
-	}
-	restoreJournallingState();
-}
-
-
-
-
-/*! \brief Redo a change to this track View.
- *
- *  \param _je the Journal Event to redo.
- */
-void trackView::redoStep( JournalEntry & _je )
-{
-	JournalEntry je( _je.actionID(), -_je.data().toInt() );
-	undoStep( je );
-}
-
-
-
-
 /*! \brief Start a drag event on this track View.
  *
  *  \param _dee the DragEnterEvent to start.
@@ -2408,7 +2338,7 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 
 // debug code
 //			qDebug( "y position %d", y_pos );
-			
+
 		// a track-widget not equal to ourself?
 		if( track_at_y != NULL && track_at_y != this )
 		{
@@ -2421,7 +2351,6 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_trackContainerView->moveTrackViewDown( this );
 			}
-			addJournalEntry( JournalEntry( MoveTrack, _me->y() ) );
 		}
 	}
 	else if( m_action == ResizeTrack )

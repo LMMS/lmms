@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -48,7 +48,7 @@
 #include "PianoView.h"
 #include "about_dialog.h"
 #include "ControllerRackView.h"
-#include "file_browser.h"
+#include "FileBrowser.h"
 #include "plugin_browser.h"
 #include "SideBar.h"
 #include "config_mgr.h"
@@ -95,42 +95,50 @@ MainWindow::MainWindow() :
 
 	QString wdir = configManager::inst()->workingDir();
 	sideBar->appendTab( new pluginBrowser( splitter ) );
-	sideBar->appendTab( new fileBrowser(
+	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userProjectsDir() + "*" +
 				configManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	sideBar->appendTab( new fileBrowser(
+	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userSamplesDir() + "*" +
 				configManager::inst()->factorySamplesDir(),
 					"*", tr( "My samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	sideBar->appendTab( new fileBrowser(
+	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userPresetsDir() + "*" +
 				configManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	sideBar->appendTab( new fileBrowser( QDir::homePath(), "*",
+	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
-	QFileInfoList drives = QDir::drives();
+
 	QStringList root_paths;
+#ifdef LMMS_BUILD_APPLE
+	root_paths += "/Volumes";
+#else
+	QFileInfoList drives = QDir::drives();
 	foreach( const QFileInfo & drive, drives )
 	{
 		root_paths += drive.absolutePath();
 	}
-	sideBar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
+#endif
+	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
 							tr( "My computer" ),
+#elif defined(LMMS_BUILD_APPLE)
+							tr( "Volumes" ),
 #else
 							tr( "Root directory" ),
 #endif
+
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter,
 #ifdef LMMS_BUILD_WIN32
@@ -279,15 +287,15 @@ void MainWindow::finalize()
 
 	QMenu * edit_menu = new QMenu( this );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-/*	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
 					this, SLOT( undo() ),
 					Qt::CTRL + Qt::Key_Z );
 	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
 					tr( "Redo" ),
 					this, SLOT( redo() ),
-					Qt::CTRL + Qt::Key_R );
-	edit_menu->addSeparator();*/
+					Qt::CTRL + Qt::Key_Y );
+	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
@@ -388,6 +396,12 @@ void MainWindow::finalize()
 							SLOT( exportProject() ),
 								m_toolBar );
 
+	toolButton * whatsthis = new toolButton(
+				embed::getIconPixmap( "whatsthis" ),
+					tr( "What's this?" ),
+					this, SLOT( enterWhatsThisMode() ),
+								m_toolBar );
+
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -396,7 +410,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
 	m_toolBarLayout->addWidget( project_save, 0, 5 );
 	m_toolBarLayout->addWidget( project_export, 0, 6 );
-
+	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
 
 
 	// window-toolbar
@@ -740,11 +754,14 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
-	const QString & f = _action->text();
-	setCursor( Qt::WaitCursor );
-	engine::getSong()->loadProject( f );
-	configManager::inst()->addRecentlyOpenedProject( f );
-	setCursor( Qt::ArrowCursor );
+	if ( mayChangeProject() )
+	{
+		const QString & f = _action->text();
+		setCursor( Qt::WaitCursor );
+		engine::getSong()->loadProject( f );
+		configManager::inst()->addRecentlyOpenedProject( f );
+		setCursor( Qt::ArrowCursor );
+	}
 }
 
 

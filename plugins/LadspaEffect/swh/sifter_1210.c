@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -33,7 +33,11 @@ void _init(); // forward declaration
 
 inline int partition(LADSPA_Data array[], int left, int right);
 
+#ifdef __clang__
+void q_sort(LADSPA_Data array[], int left, int right) {
+#else
 inline void q_sort(LADSPA_Data array[], int left, int right) {
+#endif
         float pivot = partition(array, left, right);
 
         if (left < pivot) {
@@ -92,7 +96,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -355,7 +359,7 @@ static void runAddingSifter(LADSPA_Handle instance, unsigned long sample_count) 
 	plugin_data->b2ptr = b2ptr;
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -434,7 +438,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (sifterDescriptor) {
 		free((LADSPA_PortDescriptor *)sifterDescriptor->PortDescriptors);
 		free((char **)sifterDescriptor->PortNames);

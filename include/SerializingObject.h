@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -52,7 +52,7 @@ public:
 
 	void setHook( SerializingObjectHook * _hook );
 
-	SerializingObjectHook * getHook()
+	SerializingObjectHook* hook()
 	{
 		return m_hook;
 	}
@@ -60,8 +60,8 @@ public:
 
 protected:
 	// to be implemented by sub-objects
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element ) = 0;
+	virtual void loadSettings( const QDomElement& element ) = 0;
 
 
 private:

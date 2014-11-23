@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Raine M. Ekman <raine/at/iki/fi>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,7 +22,7 @@
  *
  */
 
-// TODO: 
+// TODO:
 // - Better voice allocation: long releases get cut short :(
 // - .sbi (or similar) file loading into models
 // - RT safety = get rid of mutex = make emulator code thread-safe
@@ -36,9 +36,9 @@
 //   - SBI file import?
 
 // - Envelope times in ms for UI: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
-//   - attack 0.0, 0.23194, 0.46388, 0.92776, 1.85552, 3.71104, 7.42208, 14.84416, 
+//   - attack 0.0, 0.23194, 0.46388, 0.92776, 1.85552, 3.71104, 7.42208, 14.84416,
 //           29.68832, 59.37664, 118.75328, 237.50656, 475.01312, 950.02624, 1900.05248, 3800.10496
-//   -decay/release 0.0, 1.2622, 2.5244, 5.0488, 10.0976, 20.1952, 40.3904, 80.7808, 161.5616, 
+//   -decay/release 0.0, 1.2622, 2.5244, 5.0488, 10.0976, 20.1952, 40.3904, 80.7808, 161.5616,
 //                323.1232, 646.2464, 1292.4928, 2584.9856, 5169.9712, 10339.9424, 20679.8848
 
 #include "opl2instrument.h"
@@ -250,14 +250,14 @@ void opl2instrument::setVoiceVelocity(int voice, int vel) {
 	} else {
 		vel_adjusted = 63 - op1_lvl_mdl.value();
 	}
-	theEmulator->write(0x40+adlib_opadd[voice], 
+	theEmulator->write(0x40+adlib_opadd[voice],
 			   ( (int)op1_scale_mdl.value() & 0x03 << 6) +
 			   ( vel_adjusted & 0x3f ) );
-	
+
 
 	vel_adjusted = 63 - ( op2_lvl_mdl.value() * vel/127.0 );
 	// vel_adjusted = 63 - op2_lvl_mdl.value();
-	theEmulator->write(0x43+adlib_opadd[voice], 
+	theEmulator->write(0x43+adlib_opadd[voice],
 			   ( (int)op2_scale_mdl.value() & 0x03 << 6) +
 			   ( vel_adjusted & 0x3f ) );
 }
@@ -283,7 +283,7 @@ int opl2instrument::pushVoice(int v) {
 	return i;
 }
 
-bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
+bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
@@ -293,10 +293,10 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 		// to get us in line with MIDI(?)
 		key = event.key() +12;
 		vel = event.velocity();
-		
+
 		voice = popVoice();
 		if( voice != OPL2_NO_VOICE ) {
-			// Turn voice on, NB! the frequencies are straight by voice number, 
+			// Turn voice on, NB! the frequencies are straight by voice number,
 			// not by the adlib_opadd table!
 			theEmulator->write(0xA0+voice, fnums[key] & 0xff);
 			theEmulator->write(0xB0+voice, 32 + ((fnums[key] & 0x1f00) >> 8) );
@@ -306,7 +306,7 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 		}
                 break;
         case MidiNoteOff:
-                key = event.key() +12; 
+                key = event.key() +12;
                 for(voice=0; voice<9; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
@@ -331,12 +331,12 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
                 break;
         case MidiPitchBend:
 		// Update fnumber table
-		// Pitchbend should be in the range 0...16383 but the new range knob gets it wrong. 
+		// Pitchbend should be in the range 0...16383 but the new range knob gets it wrong.
 		// tmp_pb = (2*BEND_CENTS)*((float)event.m_data.m_param[0]/16383)-BEND_CENTS;
 
 		// Something like 100 cents = 8192, but offset by 8192 so the +/-100 cents range goes from 0...16383?
 		tmp_pb = ( event.pitchBend()-8192 ) * pitchBendRange / 8192;
-		
+
 		if( tmp_pb != pitchbend ) {
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
@@ -349,7 +349,7 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			}
                 }
                 break;
-	case MidiControlChange:		
+	case MidiControlChange:
 		switch (event.controllerNumber()) {
 		case MidiControllerRegisteredParameterNumberLSB:
 			RPNfine = event.controllerValue();
@@ -385,14 +385,14 @@ PluginView * opl2instrument::instantiateView( QWidget * _parent )
 }
 
 
-void opl2instrument::play( sampleFrame * _working_buffer ) 	
+void opl2instrument::play( sampleFrame * _working_buffer )
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
 
 	for( fpp_t frame = 0; frame < frameCount; ++frame )
         {
-                sample_t s = float(renderbuffer[frame])/32768.0;
+                sample_t s = float(renderbuffer[frame]) / 8192.0;
                 for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
                 {
                         _working_buffer[frame][ch] = s;
@@ -406,7 +406,7 @@ void opl2instrument::play( sampleFrame * _working_buffer )
 }
 
 
-void opl2instrument::saveSettings( QDomDocument & _doc, QDomElement & _this ) 
+void opl2instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	op1_a_mdl.saveSettings( _doc, _this, "op1_a" );
 	op1_d_mdl.saveSettings( _doc, _this, "op1_d" );
@@ -577,11 +577,11 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
         InstrumentView( _instrument, _parent )
 {
-	/* Unnecessary? 
+	/* Unnecessary?
 	   m_patch = new LcdSpinBox( 3, this , "PRESET");
 	   m_patch->setLabel( "PRESET" );
 	   m_patch->move( 100, 1 );
-	   m_patch->setEnabled( true );	
+	   m_patch->setEnabled( true );
 	*/
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
@@ -608,7 +608,7 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
         toolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
-	
+
 
 	// OP1 knobs & buttons...
 	KNOB_GEN(op1_a_kn, "Attack", "", 6, 48);

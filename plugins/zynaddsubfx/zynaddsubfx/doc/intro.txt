@@ -1,0 +1,59 @@
+Getting Started
+---------------
+
+ZynAddSubFX is a fairly complex software synthesizer with a very large number of
+controls.
+As such, it is not alway obvious how to use ZynAddSubFX.
+
+Many applications under Linux transport MIDI over ALSA and transmit audio over
+JACK.
+ZynAddSubFX can be run in this configuration by running:
+
+------------------------------
+zynaddsubfx -I alsa -O jack -a
+------------------------------
+
+This sets the input driver to be alsa and the output driver to be jack, which
+should attempt to autoconnect to your soundcard as per the '-a' flag.
+If this is your first time running ZynAddSubFX, you will see a screen that lets
+you choose between the advanced and beginner interface.
+Currently the beginner interface is deprecated, so the advanced one is
+recommended.
+
+Now you should be able to see ZynAddSubFX's main window, from which you can
+setup patches, effects, and general configurations, but more importatnly it
+provides links into the parameters of the patches.
+ZynAddSubFX is a powerful tool with a number of base patches, but its true power
+lies in the ability to make your own patches.
+
+.Main Window
+image::./images/uimain.png[]
+
+For basic usage, you will want to use the button to the right of the enabled
+label.
+This button will allow for one to select the desired instrument from the banks
+that ZynAddSubFX has available.
+To play notes in ZynAddSubFX, either utilize the builtin virtual keyboard
+(accessible via the vK button) or connect your keyboard to the system and use
+*aconnect* to connect it to ZynAddSubFX (assuming that ALSA was used).
+
+This main window provides access to a number of more advanced features.
+Some of these features are:
+
+* System Effects
+* Insertion Effects
+* Recording
+* Part Settings (instrument level settings)
+* Master Settings
+* Microtonal Settings
+
+For instance to use the recording feature, a wave file must be selected from the
+recording menu and then the recording can be started with the record button and
+stopped with the stop button.
+This is a simple and quick way of recording some samples from ZynAddSubFX,
+though there are more full featured options available via JACK recording tools.
+
+NOTE: After hitting record, the wave file will not start recording until a new
+key has been pressed via either an external midi source or the virtual keyboard
+Both system and insertion effects can be accessed, the properties are available as well as properties of each
+instrument.

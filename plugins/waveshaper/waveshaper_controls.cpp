@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,6 +28,7 @@
 
 #include "waveshaper_controls.h"
 #include "waveshaper.h"
+#include "base64.h"
 #include "graph.h"
 #include "engine.h"
 #include "song.h"
@@ -43,39 +44,14 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_clipModel( false, this )
 {
-	connect( &m_inputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeInput() ) );
-
-	connect( &m_outputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeOutput() ) );
-	
-	connect( &m_clipModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeClip() ) );
-
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
 
-
 	setDefaultShape();
-
 }
 
 
 
-void waveShaperControls::changeInput()
-{
-	engine::getSong()->setModified();
-}
-
-void waveShaperControls::changeOutput()
-{
-	engine::getSong()->setModified();
-}
-
-void waveShaperControls::changeClip()
-{
-	engine::getSong()->setModified();
-}
 
 void waveShaperControls::samplesChanged( int _begin, int _end)
 {

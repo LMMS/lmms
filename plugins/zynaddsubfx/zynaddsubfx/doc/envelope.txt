@@ -1,0 +1,131 @@
+Envelopes
+---------
+
+Introduction
+~~~~~~~~~~~~
+Envelopes control how the amplitude, the frequency, or the
+filter changes over time.
+
+Amplitude Envelopes
+~~~~~~~~~~~~~~~~~~~
+
+These envelopes controls the amplitude of the sound.
+In ZynAddSubFX, amplitude envelopes can be linear or logarithmic. 
+In the next image, it is shown the differences between these envelopes. 
+
+image::images/envelope1.png[Alt text]
+
+The amplitude envelope is divided into:
+
+* *Attack*: Begins at the Note On. The volume starts from 0 to the maximum.
+In ZynAddSubFX, the attack is always linear.
+* *Decay*: The volume drops from the maximum value to a level called "Sustain level"
+* *Sustain*: The volume remains constant until the key is depressed (Note Off).
+After this, the last stage take place.
+* *Release*: The volume drops to zero
+
+
+Frequency Envelopes
+~~~~~~~~~~~~~~~~~~~
+
+These envelopes controls the frequency (more exactly, the pitch) of
+the oscillators.
+The following picture draws the stages of these envelopes.
+
+image::images/envelope2.png[Alt text]
+
+The dotted line represents the real pitch of the sound without the
+envelope.
+
+The frequency envelopes are divided into 3 stages:
+
+* *Attack*: Begins at the Note On. The frequency starts from a certain value and
+glides to the real frequency of the note.
+* *Sustain*: The frequency is the same on over the sustain period 
+* *Release*: This stage begins on Note Off and glides the frequency of the note
+to a certain
+value
+
+Filter Envelopes
+~~~~~~~~~~~~~~~~
+These envelopes controls the cutoff frequency of the filters and are divided
+into
+
+image:images/envelope3.png[Alt Text]
+
+* *Attack*: Begins at the Note On. The cutoff frequency starts from a certain value and glides to another value
+* *Decay*: The cutoff frequency continues to glide to the real cutoff frequency value of the filter (dotted line)
+* *Sustain*: the cutoff frequency is the same on over the sustain period (dotted line)
+* *Release*: this stage begins on Note Off and glides the filter cutoff frequency of the note to a certain value 
+
+Freemode Envelopes
+~~~~~~~~~~~~~~~~~~
+
+For all envelope there is a mode that allows the user to set an arbitrary number of stages and control points. This mode is called Freemode.
+
+image:images/envelope4.png[Alt Text]
+
+Only stage that always remains defined is the Sustain, where the envelopes freezes until a Note Off event.
+
+User Interface
+~~~~~~~~~~~~~~
+All the envelope types has some common controls:
+
+* *E*: Shows a window that you can view the real envelope shape or convert to free mode to edit it
+* *Stretch*: How the envelope is stretched according the note.
+On the higher notes the envelopes are shorter than lower notes.
+In the leftmost value, the stretch is zero.
+The rightmost use a stretch of 200%; this means that the envelope is stretched about 4 times/octave.
+* *frcR*: Forced release.
+This means that if this option is turned on, the release will go to the final value, even if the sustain stage is not reached. Usually, this must be set.
+
+
+The parameters for Amplitude Envelopes for ZynAddSubFX are:
+
+image:images/uienvelope3.jpg[Alt Text]
+
+* *A.dt*: Attack duration
+* *D.dt*: Decay duration
+* *S.Val*: Sustain value
+* *R.dt*: Release time
+* *L*: If this option is set, the envelope is linear, otherwise, it will be
+logarithmic
+
+
+For Frequency Envelopes the interface has the following parameters:
+
+image:images/uienvelope2.jpg[Alt Text]
+
+* *A.val*: Attack value
+* *A.dt*: Attack duration
+* *R.dt*: Release time
+* *R.val*: Release value
+
+
+Filter Envelopes has the parameters:
+
+image:images/uienvelope1.jpg[Alt Text]
+
+* *A.val*: Attack value
+* *A.dt*: Attack duration
+* *D.val*: Decay value
+* *D.dt*: Decay time
+* *R.dt*: Release time
+* *R.val*: Release value
+
+The Freemode envelopes has a separate window to set the parameters and controls:
+
+image:images/uienvelope0.jpg[]
+
+*  *Control points*: You can move the points using the mouse.
+In the right on the windows, it is shown the total duration of the envelope.
+If the mouse button will be pressed on a control point, it will be shown the
+duration of the stage where the point is.
+* *FreeMode*: this button activates or deactivates the freemode mode.
+* *Add Point*: Adds the point next to the current selected point.
+You can select a point by clicking on it.
+* *Delete point*: Removes the point from the envelope.
+* *Sust.*: Set the sustain point. It is shown using the yellow line.
+* *Str.*: Envelope stretch
+
+

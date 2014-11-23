@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,8 +25,9 @@
 
 
 #include "waveshaper.h"
-#include <math.h>
+#include "lmms_math.h"
 #include "embed.cpp"
+#include "interpolation.h"
 
 
 extern "C"
@@ -77,23 +78,25 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 // variables for effect
 	int i = 0;
-	float lookup;
-	float frac;
-	float posneg;
 
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
+	const float input = m_wsControls.m_inputModel.value();
+	const float output = m_wsControls.m_outputModel.value();
+	const float * samples = m_wsControls.m_wavegraphModel.samples();
+	const bool clip = m_wsControls.m_clipModel.value();
+
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		sample_t s[2] = { _buf[f][0], _buf[f][1] };
+		float s[2] = { _buf[f][0], _buf[f][1] };
 
 // apply input gain
-		s[0] *= m_wsControls.m_inputModel.value();
-		s[1] *= m_wsControls.m_inputModel.value();
+		s[0] *= input;
+		s[1] *= input;
 
 // clip if clip enabled
-		if( m_wsControls.m_clipModel.value() )
+		if( clip )
 		{
 			s[0] = qBound( -1.0f, s[0], 1.0f );
 			s[1] = qBound( -1.0f, s[1], 1.0f );
@@ -101,34 +104,31 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 // start effect
 
-		for ( i=0; i <= 1; ++i )
+		for( i=0; i <= 1; ++i )
 		{
-			lookup = fabsf( s[i] ) * 200.0f;
-			posneg = s[i] < 0 ? -1.0f : 1.0f;
+			const int lookup = static_cast<int>( qAbs( s[i] ) * 200.0f );
+			const float frac = fraction( qAbs( s[i] ) * 200.0f ); 
+			const float posneg = s[i] < 0 ? -1.0f : 1.0f;
 
-			if ( lookup < 1 )
+			if( lookup < 1 )
 			{
-				frac = lookup - truncf(lookup);
-				s[i] = frac * m_wsControls.m_wavegraphModel.samples()[0] * posneg;
+				s[i] = frac * samples[0] * posneg;
 			}
-			else
-			if ( lookup < 200 )
-			{
-				frac = lookup - truncf(lookup);
-				s[i] =
-						(( (1.0f-frac) * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) - 1 ] ) +
-						( frac * m_wsControls.m_wavegraphModel.samples()[ (int)truncf(lookup) ] ))
+			else if( lookup < 200 )
+			{	
+				s[i] = linearInterpolate( samples[ lookup - 1 ], 
+						samples[ lookup ], frac )
 						* posneg;
 			}
 			else
 			{
-				s[i] *= m_wsControls.m_wavegraphModel.samples()[199];
+				s[i] *= samples[199];
 			}
 		}
 
 // apply output gain
-		s[0] *= m_wsControls.m_outputModel.value();
-		s[1] *= m_wsControls.m_outputModel.value();
+		s[0] *= output;
+		s[1] *= output;
 
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];

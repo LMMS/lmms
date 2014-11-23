@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -49,9 +49,13 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 
 BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &bassbooster_plugin_descriptor, parent, key ),
+	m_frequencyChangeNeeded( false ),
 	m_bbFX( DspEffectLibrary::FastBassBoost( 70.0f, 1.0f, 2.8f ) ),
 	m_bbControls( this )
 {
+	changeFrequency();
+	changeGain();
+	changeRatio();
 }
 
 
@@ -70,6 +74,14 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	{
 		return( false );
 	}
+	// check out changed controls
+	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
+	{
+		changeFrequency();
+		m_frequencyChangeNeeded = false;
+	}
+	if( m_bbControls.m_gainModel.isValueChanged() ) { changeGain(); }
+	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
 
 	double outSum = 0.0;
 	const float d = dryLevel();
@@ -90,6 +102,32 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	return isRunning();
 }
 
+
+inline void BassBoosterEffect::changeFrequency()
+{
+	const sample_t fac = engine::mixer()->processingSampleRate() / 44100.0f;
+
+	m_bbFX.leftFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
+	m_bbFX.rightFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
+}
+
+
+
+
+inline void BassBoosterEffect::changeGain()
+{
+	m_bbFX.leftFX().setGain( m_bbControls.m_gainModel.value() );
+	m_bbFX.rightFX().setGain( m_bbControls.m_gainModel.value() );
+}
+
+
+
+
+inline void BassBoosterEffect::changeRatio()
+{
+	m_bbFX.leftFX().setRatio( m_bbControls.m_ratioModel.value() );
+	m_bbFX.rightFX().setRatio( m_bbControls.m_ratioModel.value() );
+}
 
 
 

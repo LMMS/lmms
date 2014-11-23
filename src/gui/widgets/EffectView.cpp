@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 #include <QtGui/QWhatsThis>
 
 #include "EffectView.h"
+#include "DummyEffect.h"
 #include "caption_menu.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
@@ -51,16 +52,21 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
-
-	m_bypass = new ledCheckBox( "", this );
+	
+	// Disable effects that are of type "DummyEffect"
+	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
+	m_bypass = new ledCheckBox( this, "", isEnabled ? ledCheckBox::Green : ledCheckBox::Red );
 	m_bypass->move( 3, 3 );
+	m_bypass->setEnabled( isEnabled );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
+	
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 
 
 	m_wetDry = new knob( knobBright_26, this );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->move( 27, 5 );
+	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
 	m_wetDry->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
 					"the input signal and the effect signal that "
@@ -70,6 +76,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
+	m_autoQuit->setEnabled( isEnabled );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
 	m_autoQuit->setWhatsThis( tr(
 "The Decay knob controls how many buffers of silence must pass before the "
@@ -80,6 +87,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_gate = new knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
+	m_gate->setEnabled( isEnabled );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
 	m_gate->setWhatsThis( tr(
 "The Gate knob controls the signal level that is considered to be 'silence' "
@@ -237,7 +245,7 @@ void EffectView::closeEffects()
 
 void EffectView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName() );
+	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
@@ -249,9 +257,7 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 						tr( "&Remove this plugin" ),
 						this, SLOT( deletePlugin() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _INSTRUMENT_TRACK_H
-#define _INSTRUMENT_TRACK_H
+#ifndef INSTRUMENT_TRACK_H
+#define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
@@ -71,10 +71,10 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
 	// silence all running notes played by this track
-	void silenceAllNotes();
+	void silenceAllNotes( bool removeIPH = false );
 
 	bool isSustainPedalPressed() const
 	{
@@ -160,6 +160,8 @@ public:
 	{
 		return &m_baseNoteModel;
 	}
+	
+	int baseNote() const;
 
 	Piano *pianoModel()
 	{

@@ -2,9 +2,9 @@
  * note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -213,21 +213,8 @@ protected:
 							QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-/*	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );*/
-
 
 private:
-/*	enum Actions
-	{
-		ChangeKey,
-		ChangeVolume,
-		ChangePanning,
-		ChangeLength,
-		ChangePosition
-	} ;*/
-
-	
 	// for piano roll editing
 	bool m_selected; 
 	int m_oldKey;

@@ -1,0 +1,78 @@
+AdSynth
+-------
+
+AdSynth, principalmente un motore di sintesi additiva, è uno dei tre principali
+motori di sintesi disponibili in ZynAddSubFX.
+Il concetto base di questo motore è la somma di un insieme di voci, ciascuno dei
+quali consiste in oscillatori.
+
+High Level (Global)
+~~~~~~~~~~~~~~~~~~~
+
+Il livello globale di AdSynth consiste negli elementi mostrati nella figura sotto:
+
+.AdSynth Global Elements
+image::gen/ad-note.png[scalewidth="50%",width="700"]
+
+Il livello globale di AdSynth è quasi interamente composto dagli elementi
+precedentemente discussi.
+Comunque appaiono qui alcune nuove features, come: il rilevamento di velocità
+'(velocity sensing)', 'punch', opzioni di detune e relativa bandwidth, resonance.
+
+.AdSynth Global Window
+image::images/ad-global.png[]
+
+Il rilevamento di velocità è semplicemente una trasformazione esponenziale dalla
+velocità della nota ad alcuni cambiamenti di parametro (!?).
+Il diagramma sotto mostra come il 'velocity sensing' controlla questa traslazione
+in tutto il range di velocity delle note possibili.
+
+.Velocity Sensing Chart
+image::gen/velf.png[scalewidth="50%",width="600"]
+
+Il 'punch' di una nota in AdSynth è un'amplificazione costante dell'output
+alla partenza della nota, con una lunghezza determinata dal 'punch time' e 'stretch'
+e l'ampiezza determinata da 'punch strength' e 'velocity sensing'.
+Il controllo relBw nel riquadro di frequenza è di fatto un moltiplicatore per
+"scordare" '(detuning)' tutte le voci di una nota.
+
+NOTE: TODO Talk about resonance
+
+
+La somma delle voci passa attraverso filtri e amplificazione per produrre il
+suono finale.
+Questro potrebbe far pensare che ad-note è solo un mucchio di post-elaborazione
+minore e che a questo livello molto della generazione del suono è nascosta.
+
+Voices
+~~~~~~
+
+La voce da accesso ad un configurazione simile dei parametri globali più altre
+cose come il modulatore, l'oscillatore e features di unison.
+
+.AdSynth Voice Window
+image::images/ad-voice.png[]
+
+Modulation
+^^^^^^^^^^
+
+Tra le opzioni di modulazione si può selezionare:
+
+* Morph
+* Ring Modulation
+* Phase Modulation
+* Frequency Modulation
+* Disabled
+
+Unison
+^^^^^^
+
+Unison è utile nel creare il suono tipo chorus di più oscillatori simultanei.
+
+Oscillator
+~~~~~~~~~~
+
+NOTE: TODO show waveforms, talk about distortions somewhere, etc
+
+.Oscillator Window
+image::images/uioscil.png[]
