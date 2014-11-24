@@ -27,7 +27,7 @@
 #define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
@@ -168,7 +168,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 900;
+	static const int INITIAL_WIDTH = 860;
 	static const int INITIAL_HEIGHT = 480;
 
 	static const int SCROLLBAR_SIZE = 16;
@@ -190,8 +190,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
-	static QPixmap * s_toolXFlip;
-
+	static QPixmap * s_toolXFlip
 
 	QWidget * m_toolBar;
 
