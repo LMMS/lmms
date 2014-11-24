@@ -94,7 +94,7 @@ MainWindow::MainWindow() :
 	splitter->setChildrenCollapsible( FALSE );
 
 	QString wdir = configManager::inst()->workingDir();
-	sideBar->appendTab( new pluginBrowser( splitter ) );
+	sideBar->appendTab( new PluginBrowser( splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				configManager::inst()->userProjectsDir() + "*" +
 				configManager::inst()->factoryProjectsDir(),

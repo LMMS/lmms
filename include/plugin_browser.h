@@ -35,30 +35,40 @@
 class trackContainer;
 
 
-class pluginBrowser : public SideBarWidget
+class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
-	pluginBrowser( QWidget * _parent );
-	virtual ~pluginBrowser();
+	PluginBrowser( QWidget * _parent );
+	virtual ~PluginBrowser();
 
 
 private:
-	Plugin::DescriptorList m_pluginDescriptors;
-
 	QWidget * m_view;
-
-} ;
-
+};
 
 
 
-class pluginDescWidget : public QWidget
+
+class PluginDescList : public QWidget
 {
 	Q_OBJECT
 public:
-	pluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
-	virtual ~pluginDescWidget();
+	PluginDescList(QWidget* parent);
+
+private:
+	Plugin::DescriptorList m_pluginDescriptors;
+};
+
+
+
+
+class PluginDescWidget : public QWidget
+{
+	Q_OBJECT
+public:
+	PluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
+	virtual ~PluginDescWidget();
 
 
 protected:
@@ -81,7 +91,7 @@ private:
 	bool m_mouseOver;
 	int m_targetHeight;
 
-} ;
+};
 
 
 #endif
