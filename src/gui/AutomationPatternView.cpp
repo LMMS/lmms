@@ -22,9 +22,9 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QMenu>
 
 #include "AutomationPatternView.h"
 #include "AutomationEditor.h"
@@ -62,6 +62,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 	
 	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
 							"pat_rec" ) ); }
+	
 }
 
 
@@ -91,6 +92,24 @@ void AutomationPatternView::update()
 void AutomationPatternView::resetName()
 {
 	m_pat->setName( QString::null );
+}
+
+
+
+
+void AutomationPatternView::flipY()
+{
+	m_pat->flipY(m_pat->getMin(), m_pat->getMax());
+	update();
+}
+
+
+
+
+void AutomationPatternView::flipX()
+{
+	m_pat->flipX();
+	update();
 }
 
 
@@ -143,26 +162,6 @@ void AutomationPatternView::toggleRecording()
 	m_pat->setRecording( ! m_pat->isRecording() );
 	update();
 }
-
-
-
-
-void AutomationPatternView::flipY()
-{
-	m_pat->flipY(m_pat->getMin(), m_pat->getMax());
-	update();
-}
-
-
-
-
-void AutomationPatternView::flipX()
-{
-	m_pat->flipX();
-	update();
-}
-
-
 
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
@@ -456,8 +455,3 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 
 	m_pat->generateTangents();
 }
-
-
-
-#include "moc_AutomationPatternView.cxx"
-
