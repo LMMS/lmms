@@ -190,7 +190,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
-	static QPixmap * s_toolXFlip
+	static QPixmap * s_toolXFlip;
 
 	QWidget * m_toolBar;
 
