@@ -24,9 +24,9 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
+#include <QDomElement>
+#include <QMouseEvent>
+#include <QPainter>
 
 #include "AutomationPattern.h"
 #include "AutomationPatternView.h"
@@ -109,7 +109,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->value<float>(), false );
+		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
 	m_objects += _obj;
@@ -861,8 +861,3 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 		it++;
 	}
 }
-
-
-
-
-#include "moc_AutomationPattern.cxx"
