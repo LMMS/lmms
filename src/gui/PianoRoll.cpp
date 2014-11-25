@@ -47,7 +47,7 @@
 
 #include "ConfigManager.h"
 #include "PianoRoll.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "Clipboard.h"
 #include "combobox.h"
 #include "debug.h"

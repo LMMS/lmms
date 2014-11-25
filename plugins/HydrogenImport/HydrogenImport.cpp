@@ -16,7 +16,7 @@
 #include "Pattern.h"
 #include "Track.h"
 #include "bb_track.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "Instrument.h"
 
 #define MAX_LAYERS 4

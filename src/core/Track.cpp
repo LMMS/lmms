@@ -51,7 +51,7 @@
 #include "AutomationTrack.h"
 #include "bb_editor.h"
 #include "bb_track.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Clipboard.h"
 #include "embed.h"

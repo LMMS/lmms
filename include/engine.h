@@ -35,7 +35,7 @@
 
 class AutomationEditor;
 class bbEditor;
-class bbTrackContainer;
+class BBTrackContainer;
 class DummyTrackContainer;
 class FxMixer;
 class FxMixerView;
@@ -87,7 +87,7 @@ public:
 		return s_song;
 	}
 
-	static bbTrackContainer * getBBTrackContainer()
+	static BBTrackContainer * getBBTrackContainer()
 	{
 		return s_bbTrackContainer;
 	}
@@ -179,7 +179,7 @@ private:
 	static Mixer *s_mixer;
 	static FxMixer * s_fxMixer;
 	static Song * s_song;
-	static bbTrackContainer * s_bbTrackContainer;
+	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
 	static ControllerRackView * s_controllerRackView;

@@ -29,7 +29,7 @@
 #include "TrackContainerView.h"
 
 
-class bbTrackContainer;
+class BBTrackContainer;
 class comboBox;
 class toolButton;
 
@@ -38,7 +38,7 @@ class bbEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	bbEditor( bbTrackContainer * _tc );
+	bbEditor( BBTrackContainer * _tc );
 	virtual ~bbEditor();
 
 	virtual inline bool fixedTCOs() const
@@ -64,7 +64,7 @@ public slots:
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 
-	bbTrackContainer * m_bbtc;
+	BBTrackContainer * m_bbtc;
 	QWidget * m_toolBar;
 
 	toolButton * m_playButton;

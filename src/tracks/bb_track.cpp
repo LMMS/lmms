@@ -29,7 +29,7 @@
 
 #include "bb_editor.h"
 #include "bb_track.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"

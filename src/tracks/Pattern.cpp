@@ -46,7 +46,7 @@
 #include "AudioSampleRecorder.h"
 #include "Song.h"
 #include "tooltip.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "string_pair_drag.h"
 #include "MainWindow.h"
 

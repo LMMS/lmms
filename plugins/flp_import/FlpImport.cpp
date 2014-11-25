@@ -34,7 +34,7 @@
 #include "AutomationPattern.h"
 #include "basic_filters.h"
 #include "bb_track.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "combobox.h"
 #include "ConfigManager.h"
 #include "debug.h"

@@ -29,7 +29,7 @@
 #include <QMdiArea>
 
 #include "bb_editor.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
@@ -43,7 +43,7 @@
 
 
 
-bbEditor::bbEditor( bbTrackContainer* tc ) :
+bbEditor::bbEditor( BBTrackContainer* tc ) :
 	TrackContainerView( tc ),
 	m_bbtc( tc )
 {

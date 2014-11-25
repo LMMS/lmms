@@ -33,7 +33,7 @@
 #include "AutomationEditor.h"
 #include "AutomationTrack.h"
 #include "ProjectJournal.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "Song.h"
 #include "text_float.h"
 #include "embed.h"

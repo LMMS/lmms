@@ -1,5 +1,5 @@
 /*
- * bb_track_container.h - model-component of BB-Editor
+ * BBTrackContainer.h - model-component of BB-Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -30,13 +30,13 @@
 #include "combobox.h"
 
 
-class EXPORT bbTrackContainer : public TrackContainer
+class EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
 public:
-	bbTrackContainer();
-	virtual ~bbTrackContainer();
+	BBTrackContainer();
+	virtual ~BBTrackContainer();
 
 	virtual bool play( MidiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );

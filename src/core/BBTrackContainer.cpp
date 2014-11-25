@@ -1,5 +1,5 @@
 /*
- * bb_track_container.cpp - model-component of BB-Editor
+ * BBTrackContainer.cpp - model-component of BB-Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,7 +23,7 @@
  */
 
 
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "bb_track.h"
 #include "combobox.h"
 #include "embed.h"
@@ -32,7 +32,7 @@
 
 
 
-bbTrackContainer::bbTrackContainer() :
+BBTrackContainer::BBTrackContainer() :
 	TrackContainer(),
 	m_bbComboBoxModel( this )
 {
@@ -47,14 +47,14 @@ bbTrackContainer::bbTrackContainer() :
 
 
 
-bbTrackContainer::~bbTrackContainer()
+BBTrackContainer::~BBTrackContainer()
 {
 }
 
 
 
 
-bool bbTrackContainer::play( MidiTime _start, fpp_t _frames,
+bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
 								f_cnt_t _offset, int _tco_num )
 {
 	bool played_a_note = false;
@@ -80,7 +80,7 @@ bool bbTrackContainer::play( MidiTime _start, fpp_t _frames,
 
 
 
-void bbTrackContainer::updateAfterTrackAdd()
+void BBTrackContainer::updateAfterTrackAdd()
 {
 	if( numOfBBs() == 0 && !engine::getSong()->isLoadingProject() )
 	{
@@ -97,7 +97,7 @@ void bbTrackContainer::updateAfterTrackAdd()
 
 
 
-tact_t bbTrackContainer::lengthOfBB( int _bb )
+tact_t BBTrackContainer::lengthOfBB( int _bb )
 {
 	MidiTime max_length = MidiTime::ticksPerTact();
 
@@ -114,7 +114,7 @@ tact_t bbTrackContainer::lengthOfBB( int _bb )
 
 
 
-int bbTrackContainer::numOfBBs() const
+int BBTrackContainer::numOfBBs() const
 {
 	return engine::getSong()->countTracks( Track::BBTrack );
 }
@@ -122,7 +122,7 @@ int bbTrackContainer::numOfBBs() const
 
 
 
-void bbTrackContainer::removeBB( int _bb )
+void BBTrackContainer::removeBB( int _bb )
 {
 	TrackList tl = tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -139,7 +139,7 @@ void bbTrackContainer::removeBB( int _bb )
 
 
 
-void bbTrackContainer::swapBB( int _bb1, int _bb2 )
+void BBTrackContainer::swapBB( int _bb1, int _bb2 )
 {
 	TrackList tl = tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -152,7 +152,7 @@ void bbTrackContainer::swapBB( int _bb1, int _bb2 )
 
 
 
-void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
+void BBTrackContainer::updateBBTrack( trackContentObject * _tco )
 {
 	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() /
 							DefaultTicksPerTact );
@@ -165,7 +165,7 @@ void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 
 
 
-void bbTrackContainer::fixIncorrectPositions()
+void BBTrackContainer::fixIncorrectPositions()
 {
 	TrackList tl = tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -180,7 +180,7 @@ void bbTrackContainer::fixIncorrectPositions()
 
 
 
-void bbTrackContainer::play()
+void BBTrackContainer::play()
 {
 	if( engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
@@ -195,7 +195,7 @@ void bbTrackContainer::play()
 
 
 
-void bbTrackContainer::stop()
+void BBTrackContainer::stop()
 {
 	engine::getSong()->stop();
 }
@@ -203,7 +203,7 @@ void bbTrackContainer::stop()
 
 
 
-void bbTrackContainer::updateComboBox()
+void BBTrackContainer::updateComboBox()
 {
 	const int cur_bb = currentBB();
 
@@ -220,7 +220,7 @@ void bbTrackContainer::updateComboBox()
 
 
 
-void bbTrackContainer::currentBBChanged()
+void BBTrackContainer::currentBBChanged()
 {
 	// first make sure, all channels have a TCO at current BB
 	createTCOsForBB( currentBB() );
@@ -240,7 +240,7 @@ void bbTrackContainer::currentBBChanged()
 
 
 
-void bbTrackContainer::createTCOsForBB( int _bb )
+void BBTrackContainer::createTCOsForBB( int _bb )
 {
 	if( numOfBBs() == 0 || engine::getSong()->isLoadingProject() )
 	{

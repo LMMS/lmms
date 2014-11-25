@@ -45,7 +45,7 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 
 FxMixerView::FxMixerView() :
 	QWidget(),

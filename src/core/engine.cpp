@@ -26,7 +26,7 @@
 #include "engine.h"
 #include "AutomationEditor.h"
 #include "bb_editor.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixer.h"
@@ -53,7 +53,7 @@ Mixer* engine::s_mixer = NULL;
 FxMixer * engine::s_fxMixer = NULL;
 FxMixerView * engine::s_fxMixerView = NULL;
 MainWindow * engine::s_mainWindow = NULL;
-bbTrackContainer * engine::s_bbTrackContainer = NULL;
+BBTrackContainer * engine::s_bbTrackContainer = NULL;
 Song * engine::s_song = NULL;
 SongEditor* engine::s_songEditor = NULL;
 AutomationEditor * engine::s_automationEditor = NULL;
@@ -82,7 +82,7 @@ void engine::init( const bool _has_gui )
 	s_mixer = new Mixer;
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
-	s_bbTrackContainer = new bbTrackContainer;
+	s_bbTrackContainer = new BBTrackContainer;
 
 	s_ladspaManager = new ladspa2LMMS;
 

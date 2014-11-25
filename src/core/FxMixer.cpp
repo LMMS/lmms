@@ -31,7 +31,7 @@
 #include "Song.h"
 
 #include "InstrumentTrack.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "ValueBuffer.h"
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :

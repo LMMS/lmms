@@ -59,7 +59,7 @@
 #include "tool_button.h"
 #include "text_float.h"
 #include "combobox.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "PianoRoll.h"
 #include "debug.h"
 #include "MeterModel.h"
