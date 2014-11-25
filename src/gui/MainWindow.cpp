@@ -49,7 +49,7 @@
 #include "about_dialog.h"
 #include "ControllerRackView.h"
 #include "FileBrowser.h"
-#include "plugin_browser.h"
+#include "PluginBrowser.h"
 #include "SideBar.h"
 #include "ConfigManager.h"
 #include "Mixer.h"

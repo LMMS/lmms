@@ -28,7 +28,7 @@
 #include <QMouseEvent>
 #include <QScrollArea>
 
-#include "plugin_browser.h"
+#include "PluginBrowser.h"
 #include "embed.h"
 #include "debug.h"
 #include "templates.h"

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PLUGIN_BROWSER_H
-#define _PLUGIN_BROWSER_H
+#ifndef PLUGIN_BROWSER_H
+#define PLUGIN_BROWSER_H
 
 #include <QtCore/QTimer>
 #include <QPixmap>
