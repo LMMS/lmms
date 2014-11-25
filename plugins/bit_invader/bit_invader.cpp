@@ -37,7 +37,7 @@
 #include "pixmap_button.h"
 #include "templates.h"
 #include "tooltip.h"
-#include "song.h"
+#include "Song.h"
 #include "interpolation.h"
 
 #include "embed.cpp"

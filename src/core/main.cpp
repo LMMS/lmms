@@ -74,7 +74,7 @@
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "DataFile.h"
-#include "song.h"
+#include "Song.h"
 #include "LmmsPalette.h"
 
 static inline QString baseName( const QString & _file )

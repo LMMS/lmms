@@ -28,7 +28,7 @@
 #include "MainWindow.h"
 #include "engine.h"
 #include "tooltip.h"
-#include "song.h"
+#include "Song.h"
 
 
 
@@ -95,7 +95,7 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 void TimeDisplayWidget::updateTime()
 {
-	song* s = engine::getSong();
+	Song* s = engine::getSong();
 
 	switch( m_displayMode )
 	{

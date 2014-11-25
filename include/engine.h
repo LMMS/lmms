@@ -44,7 +44,7 @@ class MainWindow;
 class Mixer;
 class PianoRoll;
 class projectNotes;
-class song;
+class Song;
 class SongEditor;
 class ladspa2LMMS;
 class ControllerRackView;
@@ -82,7 +82,7 @@ public:
 		return s_fxMixer;
 	}
 
-	static song * getSong()
+	static Song * getSong()
 	{
 		return s_song;
 	}
@@ -178,7 +178,7 @@ private:
 	// core
 	static Mixer *s_mixer;
 	static FxMixer * s_fxMixer;
-	static song * s_song;
+	static Song * s_song;
 	static bbTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;

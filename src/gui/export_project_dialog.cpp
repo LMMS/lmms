@@ -27,7 +27,7 @@
 #include <QMessageBox>
 
 #include "export_project_dialog.h"
-#include "song.h"
+#include "Song.h"
 #include "engine.h"
 #include "MainWindow.h"
 #include "bb_track_container.h"

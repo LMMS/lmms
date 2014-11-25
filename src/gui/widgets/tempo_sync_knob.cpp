@@ -32,7 +32,7 @@
 #include "embed.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
-#include "song.h"
+#include "Song.h"
 
 
 

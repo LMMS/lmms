@@ -34,7 +34,7 @@
 #include "SerializingObject.h"
 #include "note.h"
 #include "lmms_basics.h"
-#include "song.h"
+#include "Song.h"
 #include "tooltip.h"
 
 class QPainter;
@@ -83,7 +83,7 @@ public:
 		return m_pattern != NULL;
 	}
 
-	song::PlayModes desiredPlayModeForAccompany() const;
+	Song::PlayModes desiredPlayModeForAccompany() const;
 
 	int quantization() const;
 

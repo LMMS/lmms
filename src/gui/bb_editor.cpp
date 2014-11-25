@@ -32,7 +32,7 @@
 #include "bb_track_container.h"
 #include "embed.h"
 #include "MainWindow.h"
-#include "song.h"
+#include "Song.h"
 #include "tool_button.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -209,7 +209,7 @@ void bbEditor::setPauseIcon( bool pause )
 
 void bbEditor::play()
 {
-	if( engine::getSong()->playMode() != song::Mode_PlayBB )
+	if( engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
 		engine::getSong()->playBB();
 	}

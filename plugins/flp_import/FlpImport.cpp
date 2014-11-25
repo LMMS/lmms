@@ -52,7 +52,7 @@
 #include "Piano.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
-#include "song.h"
+#include "Song.h"
 #include "TrackContainer.h"
 #include "embed.h"
 #include "lmmsconfig.h"

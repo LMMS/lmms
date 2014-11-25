@@ -29,7 +29,7 @@
 #include "DualFilterControls.h"
 #include "DualFilter.h"
 #include "engine.h"
-#include "song.h"
+#include "Song.h"
 #include "basic_filters.h"
 #include "embed.h"
 

@@ -39,7 +39,7 @@
 #include "combobox.h"
 #include "tab_widget.h"
 #include "group_box.h"
-#include "song.h"
+#include "Song.h"
 #include "tool_button.h"
 
 #include "gui_templates.h"

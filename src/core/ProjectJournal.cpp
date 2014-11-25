@@ -27,7 +27,7 @@
 #include "ProjectJournal.h"
 #include "engine.h"
 #include "JournallingObject.h"
-#include "song.h"
+#include "Song.h"
 
 const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 

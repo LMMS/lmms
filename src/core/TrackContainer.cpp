@@ -32,7 +32,7 @@
 #include "InstrumentTrack.h"
 #include "engine.h"
 #include "MainWindow.h"
-#include "song.h"
+#include "Song.h"
 
 
 TrackContainer::TrackContainer() :

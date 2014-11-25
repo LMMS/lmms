@@ -33,7 +33,7 @@
 
 #include "audio_file_processor.h"
 #include "engine.h"
-#include "song.h"
+#include "Song.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "interpolation.h"

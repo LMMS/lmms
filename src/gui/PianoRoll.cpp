@@ -61,7 +61,7 @@
 #include "Pattern.h"
 #include "Piano.h"
 #include "pixmap_button.h"
-#include "song.h"
+#include "Song.h"
 #include "SongEditor.h"
 #include "templates.h"
 #include "text_float.h"
@@ -293,7 +293,7 @@ PianoRoll::PianoRoll() :
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
 					engine::getSong()->getPlayPos(
-						song::Mode_PlayPattern ),
+						Song::Mode_PlayPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
@@ -301,12 +301,12 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePosition( const MidiTime & ) ) );
 
 	// update timeline when in record-accompany mode
-	connect( engine::getSong()->getPlayPos( song::Mode_PlaySong ).m_timeLine,
+	connect( engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine,
 				SIGNAL( positionChanged( const MidiTime & ) ),
 			this,
 			SLOT( updatePositionAccompany( const MidiTime & ) ) );
 	// TODO
-/*	connect( engine::getSong()->getPlayPos( song::Mode_PlayBB ).m_timeLine,
+/*	connect( engine::getSong()->getPlayPos( Song::Mode_PlayBB ).m_timeLine,
 				SIGNAL( positionChanged( const MidiTime & ) ),
 			this,
 			SLOT( updatePositionAccompany( const MidiTime & ) ) );*/
@@ -796,7 +796,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	// force the song-editor to stop playing if it played pattern before
 	if( engine::getSong()->isPlaying() &&
-		engine::getSong()->playMode() == song::Mode_PlayPattern )
+		engine::getSong()->playMode() == Song::Mode_PlayPattern )
 	{
 		engine::getSong()->playPattern( NULL );
 	}
@@ -3482,7 +3482,7 @@ void PianoRoll::resizeEvent( QResizeEvent * )
 	}
 	m_topBottomScroll->setValue( m_totalKeysToScroll - m_startKey );
 
-	engine::getSong()->getPlayPos( song::Mode_PlayPattern
+	engine::getSong()->getPlayPos( Song::Mode_PlayPattern
 					).m_timeLine->setFixedWidth( width() );
 	m_toolBar->setFixedWidth( width() );
 	update();
@@ -3649,14 +3649,14 @@ int PianoRoll::getKey( int _y ) const
 
 
 
-song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
+Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 {
 	if( m_pattern->getTrack()->trackContainer() ==
 					engine::getBBTrackContainer() )
 	{
-		return song::Mode_PlayBB;
+		return Song::Mode_PlayBB;
 	}
-	return song::Mode_PlaySong;
+	return Song::Mode_PlaySong;
 }
 
 
@@ -3669,7 +3669,7 @@ void PianoRoll::play()
 		return;
 	}
 
-	if( engine::getSong()->playMode() != song::Mode_PlayPattern )
+	if( engine::getSong()->playMode() != Song::Mode_PlayPattern )
 	{
 		engine::getSong()->playPattern( m_pattern );
 	}
@@ -3745,10 +3745,10 @@ void PianoRoll::startRecordNote( const note & _n )
 			( engine::getSong()->playMode() ==
 					desiredPlayModeForAccompany() ||
 				engine::getSong()->playMode() ==
-					song::Mode_PlayPattern ) )
+					Song::Mode_PlayPattern ) )
 	{
 		MidiTime sub;
-		if( engine::getSong()->playMode() == song::Mode_PlaySong )
+		if( engine::getSong()->playMode() == Song::Mode_PlaySong )
 		{
 			sub = m_pattern->startPosition();
 		}
@@ -3772,7 +3772,7 @@ void PianoRoll::finishRecordNote( const note & _n )
 			( engine::getSong()->playMode() ==
 					desiredPlayModeForAccompany() ||
 				engine::getSong()->playMode() ==
-					song::Mode_PlayPattern ) )
+					Song::Mode_PlayPattern ) )
 	{
 		for( QList<note>::Iterator it = m_recordingNotes.begin();
 					it != m_recordingNotes.end(); ++it )
@@ -4165,7 +4165,7 @@ void PianoRoll::updatePosition( const MidiTime & _t )
 {
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
-					song::Mode_PlayPattern &&
+					Song::Mode_PlayPattern &&
 		m_timeLine->autoScroll() == timeLine::AutoScrollEnabled ) ||
 							m_scrollBack == true )
 	{
@@ -4178,19 +4178,19 @@ void PianoRoll::updatePosition( const MidiTime & _t )
 
 void PianoRoll::updatePositionAccompany( const MidiTime & _t )
 {
-	song * s = engine::getSong();
+	Song * s = engine::getSong();
 
 	if( m_recording && hasValidPattern() &&
-					s->playMode() != song::Mode_PlayPattern )
+					s->playMode() != Song::Mode_PlayPattern )
 	{
 		MidiTime pos = _t;
-		if( s->playMode() != song::Mode_PlayBB )
+		if( s->playMode() != Song::Mode_PlayBB )
 		{
 			pos -= m_pattern->startPosition();
 		}
 		if( (int) pos > 0 )
 		{
-			s->getPlayPos( song::Mode_PlayPattern ).setTicks( pos );
+			s->getPlayPos( Song::Mode_PlayPattern ).setTicks( pos );
 			autoScroll( pos );
 		}
 	}

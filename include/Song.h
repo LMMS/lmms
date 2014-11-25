@@ -1,5 +1,5 @@
 /*
- * song.h - class song - the root of the model-tree
+ * Song.h - class song - the root of the model-tree
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -45,7 +45,7 @@ const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
-class EXPORT song : public TrackContainer
+class EXPORT Song : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getTempo,setTempo,m_tempoModel);
@@ -300,9 +300,9 @@ private slots:
 
 
 private:
-	song();
-	song( const song & );
-	virtual ~song();
+	Song();
+	Song( const Song & );
+	virtual ~Song();
 
 
 	inline tact_t currentTact() const

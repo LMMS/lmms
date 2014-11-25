@@ -32,7 +32,7 @@
 #include <QMdiArea>
 #include <QMessageBox>
 
-#include "song.h"
+#include "Song.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "group_box.h"
@@ -148,7 +148,7 @@ void ControllerRackView::deleteController( ControllerView * _view )
 void ControllerRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
-	song * s = engine::getSong();
+	Song * s = engine::getSong();
 
 	setUpdatesEnabled( false );
 

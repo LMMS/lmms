@@ -32,7 +32,7 @@
 #include "Instrument.h"
 #include "MidiEvent.h"
 #include "MidiPort.h"
-#include "song.h"
+#include "Song.h"
 
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :

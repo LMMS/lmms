@@ -134,7 +134,7 @@ AutomationEditor::AutomationEditor() :
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
 				engine::getSong()->getPlayPos(
-					song::Mode_PlayAutomationPattern ),
+					Song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
@@ -1819,7 +1819,7 @@ void AutomationEditor::resizeEvent( QResizeEvent * )
 
 	if( engine::getSong() )
 	{
-		engine::getSong()->getPlayPos( song::Mode_PlayAutomationPattern
+		engine::getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
 					).m_timeLine->setFixedWidth( width() );
 	}
 	m_toolBar->setFixedWidth( width() );
@@ -1931,7 +1931,7 @@ void AutomationEditor::play()
 
 	if( !m_pattern->getTrack() )
 	{
-		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
+		if( engine::getSong()->playMode() != Song::Mode_PlayPattern )
 		{
 			engine::getSong()->stop();
 			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
@@ -2309,7 +2309,7 @@ void AutomationEditor::updatePosition( const MidiTime & _t )
 {
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
-					song::Mode_PlayAutomationPattern ) ||
+					Song::Mode_PlayAutomationPattern ) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;

@@ -36,7 +36,7 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "rename_dialog.h"
-#include "song.h"
+#include "Song.h"
 #include "SongEditor.h"
 #include "templates.h"
 #include "track_label_button.h"

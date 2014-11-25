@@ -36,7 +36,7 @@ class automatableSlider;
 class comboBox;
 class LcdSpinBox;
 class MeterDialog;
-class song;
+class Song;
 class textFloat;
 class timeLine;
 class toolButton;
@@ -56,7 +56,7 @@ class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	SongEditor( song * _song );
+	SongEditor( Song * _song );
 	virtual ~SongEditor();
 
 	void setPauseIcon( bool pause );
@@ -98,7 +98,7 @@ private:
 	virtual bool allowRubberband() const;
 
 
-	song * m_s;
+	Song * m_song;
 
 	QScrollBar * m_leftRightScroll;
 

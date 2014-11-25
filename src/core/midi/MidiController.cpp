@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QVector>
 
-#include "song.h"
+#include "Song.h"
 #include "engine.h"
 #include "Mixer.h"
 #include "MidiClient.h"

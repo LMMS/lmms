@@ -30,7 +30,7 @@
 
 #include <math.h>
 
-#include "song.h"
+#include "Song.h"
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "bb_editor.h"
@@ -68,7 +68,7 @@ tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
 
-song::song() :
+Song::Song() :
 	TrackContainer(),
 	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
 				Track::create( Track::HiddenAutomationTrack,
@@ -118,7 +118,7 @@ song::song() :
 
 
 
-song::~song()
+Song::~Song()
 {
 	m_playing = false;
 	delete m_globalAutomationTrack;
@@ -127,7 +127,7 @@ song::~song()
 
 
 
-void song::masterVolumeChanged()
+void Song::masterVolumeChanged()
 {
 	engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
 								100.0f );
@@ -136,7 +136,7 @@ void song::masterVolumeChanged()
 
 
 
-void song::setTempo()
+void Song::setTempo()
 {
 	engine::mixer()->lockPlayHandleRemoval();
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
@@ -164,7 +164,7 @@ void song::setTempo()
 
 
 
-void song::setTimeSignature()
+void Song::setTimeSignature()
 {
 	MidiTime::setTicksPerTact( ticksPerTact() );
 	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
@@ -177,7 +177,7 @@ void song::setTimeSignature()
 
 
 
-void song::savePos()
+void Song::savePos()
 {
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 
@@ -190,7 +190,7 @@ void song::savePos()
 
 
 
-void song::processNextBuffer()
+void Song::processNextBuffer()
 {
 	if( m_playing == false )
 	{
@@ -389,7 +389,7 @@ void song::processNextBuffer()
 
 
 
-void song::playSong()
+void Song::playSong()
 {
 	m_recording = false;
 
@@ -412,7 +412,7 @@ void song::playSong()
 
 
 
-void song::record()
+void Song::record()
 {
 	m_recording = true;
 	// TODO: Implement
@@ -421,7 +421,7 @@ void song::record()
 
 
 
-void song::playAndRecord()
+void Song::playAndRecord()
 {
 	playSong();
 	m_recording = true;
@@ -430,7 +430,7 @@ void song::playAndRecord()
 
 
 
-void song::playTrack( Track * _trackToPlay )
+void Song::playTrack( Track * _trackToPlay )
 {
 	if( isStopped() == false )
 	{
@@ -452,7 +452,7 @@ void song::playTrack( Track * _trackToPlay )
 
 
 
-void song::playBB()
+void Song::playBB()
 {
 	if( isStopped() == false )
 	{
@@ -473,7 +473,7 @@ void song::playBB()
 
 
 
-void song::playPattern( Pattern* patternToPlay, bool _loop )
+void Song::playPattern( Pattern* patternToPlay, bool _loop )
 {
 	if( isStopped() == false )
 	{
@@ -498,7 +498,7 @@ void song::playPattern( Pattern* patternToPlay, bool _loop )
 
 
 
-void song::updateLength()
+void Song::updateLength()
 {
 	m_length = 0;
 	m_tracksMutex.lockForRead();
@@ -519,7 +519,7 @@ void song::updateLength()
 
 
 
-void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
+void Song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 {
 	m_elapsedTicks += m_playPos[_play_mode].getTicks() - _ticks;
 	m_elapsedMilliSeconds += (((( _ticks - m_playPos[_play_mode].getTicks()))*60*1000/48)/getTempo());
@@ -536,7 +536,7 @@ void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 
 
 
-void song::togglePause()
+void Song::togglePause()
 {
 	if( m_paused == true )
 	{
@@ -557,7 +557,7 @@ void song::togglePause()
 
 
 
-void song::stop()
+void Song::stop()
 {
 	// do not stop/reset things again if we're stopped already
 	if( m_playMode == Mode_None )
@@ -616,7 +616,7 @@ void song::stop()
 
 
 
-void song::startExport()
+void Song::startExport()
 {
 	stop();
 
@@ -630,7 +630,7 @@ void song::startExport()
 
 
 
-void song::stopExport()
+void Song::stopExport()
 {
 	stop();
 	m_exporting = false;
@@ -642,7 +642,7 @@ void song::stopExport()
 
 
 
-void song::insertBar()
+void Song::insertBar()
 {
 	m_tracksMutex.lockForRead();
 	for( TrackList::const_iterator it = tracks().begin();
@@ -656,7 +656,7 @@ void song::insertBar()
 
 
 
-void song::removeBar()
+void Song::removeBar()
 {
 	m_tracksMutex.lockForRead();
 	for( TrackList::const_iterator it = tracks().begin();
@@ -670,7 +670,7 @@ void song::removeBar()
 
 
 
-void song::addBBTrack()
+void Song::addBBTrack()
 {
 	Track * t = Track::create( Track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
@@ -679,7 +679,7 @@ void song::addBBTrack()
 
 
 
-void song::addSampleTrack()
+void Song::addSampleTrack()
 {
 	(void) Track::create( Track::SampleTrack, this );
 }
@@ -687,7 +687,7 @@ void song::addSampleTrack()
 
 
 
-void song::addAutomationTrack()
+void Song::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, this );
 }
@@ -695,7 +695,7 @@ void song::addAutomationTrack()
 
 
 
-bpm_t song::getTempo()
+bpm_t Song::getTempo()
 {
 	return (bpm_t) m_tempoModel.value();
 }
@@ -703,7 +703,7 @@ bpm_t song::getTempo()
 
 
 
-AutomationPattern * song::tempoAutomationPattern()
+AutomationPattern * Song::tempoAutomationPattern()
 {
 	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
 }
@@ -711,7 +711,7 @@ AutomationPattern * song::tempoAutomationPattern()
 
 
 
-void song::clearProject()
+void Song::clearProject()
 {
 	engine::projectJournal()->setJournalling( false );
 
@@ -793,7 +793,7 @@ void song::clearProject()
 
 
 // create new file
-void song::createNewProject()
+void Song::createNewProject()
 {
 	QString default_template = ConfigManager::inst()->userProjectsDir()
 						+ "templates/default.mpt";
@@ -858,7 +858,7 @@ void song::createNewProject()
 
 
 
-void song::createNewProjectFromTemplate( const QString & _template )
+void Song::createNewProjectFromTemplate( const QString & _template )
 {
 	loadProject( _template );
 	// clear file-name so that user doesn't overwrite template when
@@ -876,7 +876,7 @@ void song::createNewProjectFromTemplate( const QString & _template )
 
 
 // load given song
-void song::loadProject( const QString & _file_name )
+void Song::loadProject( const QString & _file_name )
 {
 	QDomNode node;
 
@@ -1005,7 +1005,7 @@ void song::loadProject( const QString & _file_name )
 
 
 // only save current song as _filename and do nothing else
-bool song::saveProjectFile( const QString & _filename )
+bool Song::saveProjectFile( const QString & _filename )
 {
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeSave );
 
@@ -1037,7 +1037,7 @@ bool song::saveProjectFile( const QString & _filename )
 
 
 // save current song and update the gui
-bool song::guiSaveProject()
+bool Song::guiSaveProject()
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_fileName = dataFile.nameWithExtension( m_fileName );
@@ -1068,7 +1068,7 @@ bool song::guiSaveProject()
 
 
 // save current song in given filename
-bool song::guiSaveProjectAs( const QString & _file_name )
+bool Song::guiSaveProjectAs( const QString & _file_name )
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
@@ -1086,7 +1086,7 @@ bool song::guiSaveProjectAs( const QString & _file_name )
 
 
 
-void song::importProject()
+void Song::importProject()
 {
 	FileDialog ofd( NULL, tr( "Import file" ),
 			ConfigManager::inst()->userProjectsDir(),
@@ -1109,7 +1109,7 @@ void song::importProject()
 
 
 
-void song::saveControllerStates( QDomDocument & _doc, QDomElement & _this )
+void Song::saveControllerStates( QDomDocument & _doc, QDomElement & _this )
 {
 	// save settings of controllers
 	QDomElement controllersNode =_doc.createElement( "controllers" );
@@ -1123,7 +1123,7 @@ void song::saveControllerStates( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void song::restoreControllerStates( const QDomElement & _this )
+void Song::restoreControllerStates( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
@@ -1144,12 +1144,12 @@ void song::restoreControllerStates( const QDomElement & _this )
 }
 
 
-void song::exportProjectTracks()
+void Song::exportProjectTracks()
 {
 	exportProject(true);
 }
 
-void song::exportProject(bool multiExport)
+void Song::exportProject(bool multiExport)
 {
 	if( isEmpty() )
 	{
@@ -1229,7 +1229,7 @@ void song::exportProject(bool multiExport)
 
 
 
-void song::updateFramesPerTick()
+void Song::updateFramesPerTick()
 {
 	engine::updateFramesPerTick();
 }
@@ -1237,7 +1237,7 @@ void song::updateFramesPerTick()
 
 
 
-void song::setModified()
+void Song::setModified()
 {
 	if( !m_loadingProject )
 	{
@@ -1253,7 +1253,7 @@ void song::setModified()
 
 
 
-void song::addController( Controller * _c )
+void Song::addController( Controller * _c )
 {
 	if( _c != NULL && !m_controllers.contains( _c ) ) 
 	{
@@ -1265,7 +1265,7 @@ void song::addController( Controller * _c )
 
 
 
-void song::removeController( Controller * _controller )
+void Song::removeController( Controller * _controller )
 {
 	int index = m_controllers.indexOf( _controller );
 	if( index != -1 )

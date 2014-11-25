@@ -28,7 +28,7 @@
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
 #include "Effect.h"
-#include "song.h"
+#include "Song.h"
 
 #include "InstrumentTrack.h"
 #include "bb_track_container.h"

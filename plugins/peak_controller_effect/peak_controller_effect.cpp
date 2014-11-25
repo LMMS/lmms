@@ -25,7 +25,7 @@
 
 
 #include "Controller.h"
-#include "song.h"
+#include "Song.h"
 #include "PeakController.h"
 #include "peak_controller_effect.h"
 #include "lmms_math.h"

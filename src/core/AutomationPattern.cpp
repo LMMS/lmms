@@ -34,7 +34,7 @@
 #include "AutomationTrack.h"
 #include "ProjectJournal.h"
 #include "bb_track_container.h"
-#include "song.h"
+#include "Song.h"
 #include "text_float.h"
 #include "embed.h"
 

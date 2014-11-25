@@ -51,7 +51,7 @@ QPixmap * timeLine::s_loopPointBeginPixmap = NULL;
 QPixmap * timeLine::s_loopPointEndPixmap = NULL;
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
-			song::playPos & _pos, const MidiTime & _begin,
+			Song::playPos & _pos, const MidiTime & _begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_autoScroll( AutoScrollEnabled ),

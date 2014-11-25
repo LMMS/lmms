@@ -32,7 +32,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "tooltip.h"
-#include "song.h"
+#include "Song.h"
 
 #include "ConfigManager.h"
 

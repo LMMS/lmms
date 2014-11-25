@@ -44,7 +44,7 @@
 #include "rename_dialog.h"
 #include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
-#include "song.h"
+#include "Song.h"
 #include "tooltip.h"
 #include "bb_track_container.h"
 #include "string_pair_drag.h"

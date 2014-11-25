@@ -29,7 +29,7 @@
 #include "ConfigManager.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "song.h"
+#include "Song.h"
 #include "MidiPort.h"
 #include "MidiTime.h"
 #include "note.h"

@@ -63,7 +63,7 @@
 #include "pixmap_button.h"
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
-#include "song.h"
+#include "Song.h"
 #include "string_pair_drag.h"
 #include "templates.h"
 #include "text_float.h"

@@ -71,7 +71,7 @@
 #include "Pattern.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
-#include "song.h"
+#include "Song.h"
 #include "string_pair_drag.h"
 #include "tab_widget.h"
 #include "tooltip.h"

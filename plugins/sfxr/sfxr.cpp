@@ -46,7 +46,7 @@ float frnd(float range)
 #include "pixmap_button.h"
 #include "templates.h"
 #include "tooltip.h"
-#include "song.h"
+#include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
 

@@ -35,7 +35,7 @@
 #include "InstrumentPlayHandle.h"
 #include "NotePlayHandle.h"
 #include "knob.h"
-#include "song.h"
+#include "Song.h"
 
 #include "patches_dialog.h"
 #include "tooltip.h"

@@ -31,7 +31,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "tooltip.h"
-#include "song.h"
+#include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 

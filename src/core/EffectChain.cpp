@@ -32,7 +32,7 @@
 #include "debug.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
-#include "song.h"
+#include "Song.h"
 
 
 EffectChain::EffectChain( Model * _parent ) :

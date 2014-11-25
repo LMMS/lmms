@@ -25,7 +25,7 @@
 #include <QMessageBox>
 
 #include "VstEffect.h"
-#include "song.h"
+#include "Song.h"
 #include "text_float.h"
 #include "VstSubPluginFeatures.h"
 

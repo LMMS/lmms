@@ -26,7 +26,7 @@
 #include <QFile>
 
 #include "ProjectRenderer.h"
-#include "song.h"
+#include "Song.h"
 #include "engine.h"
 
 #include "AudioFileWave.h"
@@ -161,8 +161,8 @@ void ProjectRenderer::run()
 
 	engine::getSong()->startExport();
 
-	song::playPos & pp = engine::getSong()->getPlayPos(
-							song::Mode_PlaySong );
+	Song::playPos & pp = engine::getSong()->getPlayPos(
+							Song::Mode_PlaySong );
 	m_progress = 0;
 	const int sl = ( engine::getSong()->length() + 1 ) * 192;
 

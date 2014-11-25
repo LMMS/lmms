@@ -41,7 +41,7 @@
 #include "MidiTime.h"
 #include "debug.h"
 #include "embed.h"
-#include "song.h"
+#include "Song.h"
 
 #include "portsmf/allegro.h"
 

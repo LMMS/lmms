@@ -39,7 +39,7 @@
 #include "MainWindow.h"
 #include "bb_editor.h"
 #include "SongEditor.h"
-#include "song.h"
+#include "Song.h"
 #include "PianoRoll.h"
 #include "embed.h"
 #include "engine.h"
@@ -957,19 +957,19 @@ void MainWindow::updatePlayPauseIcons()
 	{
 		switch( engine::getSong()->playMode() )
 		{
-			case song::Mode_PlaySong:
+			case Song::Mode_PlaySong:
 				engine::songEditor()->setPauseIcon( true );
 				break;
 
-			case song::Mode_PlayAutomationPattern:
+			case Song::Mode_PlayAutomationPattern:
 				engine::automationEditor()->setPauseIcon( true );
 				break;
 
-			case song::Mode_PlayBB:
+			case Song::Mode_PlayBB:
 				engine::getBBEditor()->setPauseIcon( true );
 				break;
 
-			case song::Mode_PlayPattern:
+			case Song::Mode_PlayPattern:
 				engine::pianoRoll()->setPauseIcon( true );
 				break;
 

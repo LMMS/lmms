@@ -30,7 +30,7 @@
 #include <QMessageBox>
 
 
-#include "song.h"
+#include "Song.h"
 #include "engine.h"
 #include "Mixer.h"
 #include "PeakController.h"

@@ -45,7 +45,7 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "song.h"
+#include "Song.h"
 #include "string_pair_drag.h"
 #include "templates.h"
 #include "text_float.h"

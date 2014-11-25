@@ -28,7 +28,7 @@
 #include "FxMixer.h"
 #include "MixHelpers.h"
 #include "MixerWorkerThread.h"
-#include "song.h"
+#include "Song.h"
 #include "templates.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
@@ -318,11 +318,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	m_profiler.startPeriod();
 
-	static song::playPos last_metro_pos = -1;
+	static Song::playPos last_metro_pos = -1;
 
-	song::playPos p = engine::getSong()->getPlayPos(
-						song::Mode_PlayPattern );
-	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
+	Song::playPos p = engine::getSong()->getPlayPos(
+						Song::Mode_PlayPattern );
+	if( engine::getSong()->playMode() == Song::Mode_PlayPattern &&
 		engine::pianoRoll()->isRecording() == true &&
 		p != last_metro_pos )
 	{

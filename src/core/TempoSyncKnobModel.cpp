@@ -28,7 +28,7 @@
 
 #include "TempoSyncKnobModel.h"
 #include "engine.h"
-#include "song.h"
+#include "Song.h"
 
 
 TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,

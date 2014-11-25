@@ -42,7 +42,7 @@
 #include "InstrumentTrack.h"
 #include "DataFile.h"
 #include "rubberband.h"
-#include "song.h"
+#include "Song.h"
 #include "string_pair_drag.h"
 #include "Track.h"
 

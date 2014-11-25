@@ -34,7 +34,7 @@
 
 #include "gui_templates.h"
 #include "SampleTrack.h"
-#include "song.h"
+#include "Song.h"
 #include "embed.h"
 #include "engine.h"
 #include "tooltip.h"

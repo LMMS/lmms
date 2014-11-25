@@ -8,7 +8,7 @@
 
 #include "LocalFileMng.h"
 #include "HydrogenImport.h"
-#include "song.h"
+#include "Song.h"
 #include "engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
@@ -143,7 +143,7 @@ bool HydrogenImport::readSong()
 	QHash<QString, int> pattern_length;
 	QHash<QString, int> pattern_id;
 
-	song *s = engine::getSong();
+	Song *s = engine::getSong();
 	int song_num_tracks = s->tracks().size();
 	if ( QFile( filename ).exists() == false ) 
 	{

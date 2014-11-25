@@ -30,7 +30,7 @@
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
-#include "song.h"
+#include "Song.h"
 
 
 PeakControllerEffectControls::

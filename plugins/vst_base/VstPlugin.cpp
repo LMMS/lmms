@@ -48,7 +48,7 @@
 #include "ConfigManager.h"
 #include "engine.h"
 #include "MainWindow.h"
-#include "song.h"
+#include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
 #include <QLayout>

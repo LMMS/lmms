@@ -28,7 +28,7 @@
 #include "combobox.h"
 #include "embed.h"
 #include "engine.h"
-#include "song.h"
+#include "Song.h"
 
 
 
@@ -182,7 +182,7 @@ void bbTrackContainer::fixIncorrectPositions()
 
 void bbTrackContainer::play()
 {
-	if( engine::getSong()->playMode() != song::Mode_PlayBB )
+	if( engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
 		engine::getSong()->playBB();
 	}

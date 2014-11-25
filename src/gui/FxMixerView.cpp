@@ -44,7 +44,7 @@
 #include "MainWindow.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "song.h"
+#include "Song.h"
 #include "bb_track_container.h"
 
 FxMixerView::FxMixerView() :

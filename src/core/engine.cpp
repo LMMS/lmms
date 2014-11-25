@@ -42,7 +42,7 @@
 #include "project_notes.h"
 #include "Plugin.h"
 #include "SongEditor.h"
-#include "song.h"
+#include "Song.h"
 #include "BandLimitedWave.h"
 
 
@@ -54,7 +54,7 @@ FxMixer * engine::s_fxMixer = NULL;
 FxMixerView * engine::s_fxMixerView = NULL;
 MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
-song * engine::s_song = NULL;
+Song * engine::s_song = NULL;
 SongEditor* engine::s_songEditor = NULL;
 AutomationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
@@ -80,7 +80,7 @@ void engine::init( const bool _has_gui )
 
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer;
-	s_song = new song;
+	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
 

@@ -28,7 +28,7 @@
 
 #include <QWidget>
 
-#include "song.h"
+#include "Song.h"
 
 
 class QPixmap;
@@ -60,11 +60,11 @@ public:
 	} ;
 
 
-	timeLine( int _xoff, int _yoff, float _ppt, song::playPos & _pos,
+	timeLine( int _xoff, int _yoff, float _ppt, Song::playPos & _pos,
 				const MidiTime & _begin, QWidget * _parent );
 	virtual ~timeLine();
 
-	inline song::playPos & pos()
+	inline Song::playPos & pos()
 	{
 		return( m_pos );
 	}
@@ -162,7 +162,7 @@ private:
 	int m_xOffset;
 	int m_posMarkerX;
 	float m_ppt;
-	song::playPos & m_pos;
+	Song::playPos & m_pos;
 	const MidiTime & m_begin;
 	MidiTime m_loopPos[2];
 

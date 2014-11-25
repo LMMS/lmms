@@ -29,7 +29,7 @@
 #include "AmplifierControls.h"
 #include "Amplifier.h"
 #include "engine.h"
-#include "song.h"
+#include "Song.h"
 
 
 AmplifierControls::AmplifierControls( AmplifierEffect* effect ) :

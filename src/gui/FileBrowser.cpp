@@ -46,7 +46,7 @@
 #include "DataFile.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
-#include "song.h"
+#include "Song.h"
 #include "string_pair_drag.h"
 #include "text_float.h"
 

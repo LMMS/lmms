@@ -35,7 +35,7 @@
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "pixmap_button.h"
-#include "song.h"
+#include "Song.h"
 #include "string_pair_drag.h"
 #include "tooltip.h"
 #include "FileDialog.h"
