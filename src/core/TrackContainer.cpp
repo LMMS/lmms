@@ -177,6 +177,10 @@ void TrackContainer::removeTrack( track * _track )
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
+		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
+		if (_track->isSolo()) {
+			_track->setSolo(false);
+		}
 		m_tracksMutex.lockForWrite();
 		m_tracks.remove( index );
 		m_tracksMutex.unlock();
