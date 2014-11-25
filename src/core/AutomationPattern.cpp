@@ -384,6 +384,88 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 
 
 
+void AutomationPattern::flipY( int min, int max )
+{
+	timeMap tempMap = m_timeMap;
+	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	float tempValue = 0;
+
+	int numPoints = 0;
+
+	//(iterate+1).key() - iterate.key(); gets the number of values until the next point
+
+	for( int i = 0; (iterate + i + 1) != m_timeMap.end() && (iterate + i ) != m_timeMap.end() ; i++)
+	{
+		numPoints++;
+	}
+	
+	for( int i = 0; i <= numPoints; i++ )
+	{
+
+		if (min < 0)
+		{
+			tempValue = valueAt((iterate + i).key()) * -1;
+			//removeValue((iterate + i).key(), false);
+			putValue( MidiTime((iterate + i).key()) , tempValue, false);
+		}
+		else
+		{
+			tempValue = max - valueAt((iterate + i).key());
+			//removeValue((iterate).key(), false);
+			putValue( MidiTime((iterate + i).key()) , tempValue, false);
+		}
+	}
+
+	generateTangents();
+	engine::automationEditor()->update();
+	emit dataChanged();
+
+//MidiTime AutomationPattern::putValue( const MidiTime & _time, const float _value, const bool _quant_pos )
+}
+
+
+
+
+void AutomationPattern::flipX()
+{
+	timeMap tempMap;
+
+	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	float tempValue = 0;
+	int numPoints = 0;
+
+	//(iterate+1).key() - iterate.key(); gets the number of values until the next point
+
+	for( int i = 0; (iterate + i + 1) != m_timeMap.end() && (iterate + i ) != m_timeMap.end() ; i++)
+	{
+		numPoints++;
+	}
+
+	float realLength = (iterate + numPoints).key();
+	
+	for( int i = 0; i <= numPoints; i++ )
+	{
+		tempValue = valueAt((iterate + i).key());
+
+		cleanObjects();
+
+		MidiTime newTime = MidiTime( realLength - (iterate + i).key() );
+
+		tempMap[newTime] = tempValue;
+	}
+	
+	m_timeMap.clear();
+
+	m_timeMap = tempMap;
+
+	generateTangents();
+	engine::automationEditor()->update();
+	emit dataChanged();
+}
+
+
+
+
 void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
@@ -779,8 +861,3 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 		it++;
 	}
 }
-
-
-
-
-
