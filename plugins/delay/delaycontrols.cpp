@@ -68,5 +68,3 @@ void DelayControls::changeSampleRate()
 {
     m_effect->changeSampleRate();
 }
-
-#include "moc_delaycontrols.cxx"

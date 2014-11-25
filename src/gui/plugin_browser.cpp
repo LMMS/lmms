@@ -26,6 +26,7 @@
 #include <QPainter>
 #include <QCursor>
 #include <QMouseEvent>
+#include <QScrollArea>
 
 #include "plugin_browser.h"
 #include "embed.h"
