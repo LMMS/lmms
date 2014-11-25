@@ -31,7 +31,7 @@
 #include <QWidget>
 
 
-#include "track.h"
+#include "Track.h"
 #include "JournallingObject.h"
 
 

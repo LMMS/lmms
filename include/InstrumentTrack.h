@@ -35,7 +35,7 @@
 #include "Piano.h"
 #include "PianoView.h"
 #include "Pitch.h"
-#include "track.h"
+#include "Track.h"
 
 
 class QLineEdit;

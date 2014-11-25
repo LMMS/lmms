@@ -44,7 +44,7 @@
 #include "rubberband.h"
 #include "song.h"
 #include "string_pair_drag.h"
-#include "track.h"
+#include "Track.h"
 
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :

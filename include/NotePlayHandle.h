@@ -29,7 +29,7 @@
 #include "lmmsconfig.h"
 #include "note.h"
 #include "PlayHandle.h"
-#include "track.h"
+#include "Track.h"
 #include "MemoryManager.h"
 #include <QtCore/QAtomicInt>
 #include <QtCore/QReadWriteLock>

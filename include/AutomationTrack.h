@@ -27,7 +27,7 @@
 #ifndef AUTOMATION_TRACK_H
 #define AUTOMATION_TRACK_H
 
-#include "track.h"
+#include "Track.h"
 
 
 class AutomationTrack : public Track

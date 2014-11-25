@@ -34,7 +34,7 @@
 
 
 #include "note.h"
-#include "track.h"
+#include "Track.h"
 
 
 class QAction;

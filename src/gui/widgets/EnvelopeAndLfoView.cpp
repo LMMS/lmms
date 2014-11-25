@@ -41,7 +41,7 @@
 #include "TempoSyncKnob.h"
 #include "text_float.h"
 #include "tooltip.h"
-#include "track.h"
+#include "Track.h"
 
 
 extern const float SECS_PER_ENV_SEGMENT;

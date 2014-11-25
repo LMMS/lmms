@@ -1,5 +1,5 @@
 /*
- * track.cpp - implementation of classes concerning tracks -> necessary for
+ * Track.cpp - implementation of classes concerning tracks -> necessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,7 +23,7 @@
  *
  */
 
-/** \file track.cpp
+/** \file Track.cpp
  *  \brief All classes concerning tracks and track-like objects
  */
 
@@ -35,7 +35,7 @@
  * \todo fill this out
  */
 
-#include "track.h"
+#include "Track.h"
 
 #include <assert.h>
 #include <cstdio>

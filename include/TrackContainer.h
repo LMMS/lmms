@@ -28,7 +28,7 @@
 
 #include <QtCore/QReadWriteLock>
 
-#include "track.h"
+#include "Track.h"
 #include "JournallingObject.h"
 
 

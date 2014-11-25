@@ -14,7 +14,7 @@
 #include "InstrumentTrack.h"
 #include "note.h"
 #include "Pattern.h"
-#include "track.h"
+#include "Track.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "Instrument.h"

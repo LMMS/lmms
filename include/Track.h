@@ -1,5 +1,5 @@
 /*
- * track.h - declaration of classes concerning tracks -> necessary for all
+ * Track.h - declaration of classes concerning tracks -> necessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>

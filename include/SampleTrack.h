@@ -28,7 +28,7 @@
 #include <QDialog>
 
 #include "AudioPort.h"
-#include "track.h"
+#include "Track.h"
 
 class EffectRackView;
 class knob;

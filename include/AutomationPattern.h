@@ -30,7 +30,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
-#include "track.h"
+#include "Track.h"
 
 
 class AutomationTrack;

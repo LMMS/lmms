@@ -30,7 +30,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QMap>
 
-#include "track.h"
+#include "Track.h"
 
 class trackLabelButton;
 class TrackContainer;
