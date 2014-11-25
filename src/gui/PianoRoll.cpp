@@ -1385,7 +1385,6 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 			if( event->modifiers() & Qt::ControlModifier )
 			{
 				event->accept();
-				m_selectButton->setChecked( true );
 				selectAll();
 				update();
 			}
