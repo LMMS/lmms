@@ -781,4 +781,3 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 	}
 }
 
-#include "moc_FxMixer.cxx"

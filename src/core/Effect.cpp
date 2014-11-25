@@ -217,4 +217,3 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	}
 }
 
-#include "moc_Effect.cxx"

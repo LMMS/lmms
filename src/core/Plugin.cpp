@@ -221,4 +221,3 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 	return e;
 }
 
-#include "moc_Plugin.cxx"

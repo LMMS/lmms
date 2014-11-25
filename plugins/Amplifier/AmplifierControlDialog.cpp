@@ -68,4 +68,3 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	rightKnob->setHintText( tr( "Right gain:" ) + " ", "%" );
 }
 
-#include "moc_AmplifierControlDialog.cxx"

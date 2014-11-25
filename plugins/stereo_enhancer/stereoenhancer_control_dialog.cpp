@@ -47,4 +47,3 @@ stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 	this->setLayout(l);
 }
 
-#include "moc_stereoenhancer_control_dialog.cxx"

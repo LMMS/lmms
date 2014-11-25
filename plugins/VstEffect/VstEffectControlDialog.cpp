@@ -264,4 +264,3 @@ VstEffectControlDialog::~VstEffectControlDialog()
 	//delete m_pluginWidget;
 }
 
-#include "moc_VstEffectControlDialog.cxx"

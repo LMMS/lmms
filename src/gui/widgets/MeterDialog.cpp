@@ -113,4 +113,3 @@ void MeterDialog::modelChanged()
 	m_denominator->setModel( &mm->denominatorModel() );
 }
 
-#include "moc_MeterDialog.cxx"

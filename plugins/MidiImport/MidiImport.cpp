@@ -569,4 +569,3 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 }
 
-#include "moc_MidiImport.cxx"

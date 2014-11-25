@@ -153,4 +153,3 @@ dynProcControlDialog::dynProcControlDialog(
 			_controls, SLOT( subOneClicked() ) );
 }
 
-#include "moc_dynamics_processor_control_dialog.cxx"
