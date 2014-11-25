@@ -54,7 +54,7 @@ class trackContentWidget;
 class trackView;
 
 typedef QWidget trackSettingsWidget;
-typedef QVector<track *> TrackList;
+typedef QVector<Track *> TrackList;
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
 const int TRACK_OP_WIDTH = 78;

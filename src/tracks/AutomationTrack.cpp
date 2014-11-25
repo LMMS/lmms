@@ -220,8 +220,8 @@ bool AutomationTrack::isAutomated( const AutomatableModel * m )
 
 	for( TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
-		if( ( *it )->type() == track::AutomationTrack ||
-			( *it )->type() == track::HiddenAutomationTrack )
+		if( ( *it )->type() == Track::AutomationTrack ||
+			( *it )->type() == Track::HiddenAutomationTrack )
 		{
 			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
 			if( at )
@@ -247,8 +247,8 @@ void AutomationTrack::resolveAllIDs()
 	for( TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
-		if( ( *it )->type() == track::AutomationTrack ||
-			 ( *it )->type() == track::HiddenAutomationTrack )
+		if( ( *it )->type() == Track::AutomationTrack ||
+			 ( *it )->type() == Track::HiddenAutomationTrack )
 		{
 			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
 			if( at )
