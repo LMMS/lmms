@@ -30,7 +30,7 @@
 #include "DataFile.h"
 #include "AudioDevice.h"
 #include "ConfigManager.h"
-#include "ladspa_2_lmms.h"
+#include "Ladspa2LMMS.h"
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"
 #include "Mixer.h"
@@ -71,7 +71,7 @@ LadspaEffect::LadspaEffect( Model * _parent,
 	m_maxSampleRate( 0 ),
 	m_key( LadspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
-	ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
 	{
 		if( !Engine::suppressMessages() )
@@ -291,7 +291,7 @@ void LadspaEffect::pluginInstantiation()
 {
 	m_maxSampleRate = maxSamplerate( displayName() );
 
-	ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
 	const ch_cnt_t lmms_chnls = Engine::mixer()->audioDev()->channels();
@@ -548,7 +548,7 @@ void LadspaEffect::pluginDestruction()
 
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
-		ladspa2LMMS * manager = Engine::getLADSPAManager();
+		Ladspa2LMMS * manager = Engine::getLADSPAManager();
 		manager->deactivate( m_key, m_handles[proc] );
 		manager->cleanup( m_key, m_handles[proc] );
 		for( int port = 0; port < m_portCount; port++ )

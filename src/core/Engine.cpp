@@ -32,7 +32,7 @@
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "InstrumentTrack.h"
-#include "ladspa_2_lmms.h"
+#include "Ladspa2LMMS.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Pattern.h"
@@ -61,7 +61,7 @@ bbEditor * Engine::s_bbEditor = NULL;
 PianoRoll* Engine::s_pianoRoll = NULL;
 projectNotes * Engine::s_projectNotes = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
-ladspa2LMMS * Engine::s_ladspaManager = NULL;
+Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
 ControllerRackView * Engine::s_controllerRackView = NULL;
 QMap<QString, QString> Engine::s_pluginFileHandling;
@@ -84,7 +84,7 @@ void Engine::init( const bool _has_gui )
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
-	s_ladspaManager = new ladspa2LMMS;
+	s_ladspaManager = new Ladspa2LMMS;
 
 	s_projectJournal->setJournalling( true );
 

@@ -1,5 +1,5 @@
 /*
- * ladspa_2_lmms.h - class that identifies and instantiates LADSPA effects
+ * Ladspa2LMMS.h - class that identifies and instantiates LADSPA effects
  *                   for use with LMMS
  *
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
@@ -23,14 +23,14 @@
  *
  */
 
-#ifndef _LADSPA_2_LMMS_H
-#define _LADSPA_2_LMMS_H
+#ifndef LADSPA_2_LMMS_H
+#define LADSPA_2_LMMS_H
 
 
 #include "ladspa_manager.h"
 
 
-class EXPORT ladspa2LMMS : public ladspaManager
+class EXPORT Ladspa2LMMS : public ladspaManager
 {
 public:
 	
@@ -62,8 +62,8 @@ public:
 	QString getShortName( const ladspa_key_t & _key );
 
 private:
-	ladspa2LMMS();
-	virtual ~ladspa2LMMS();
+	Ladspa2LMMS();
+	virtual ~Ladspa2LMMS();
 
 	l_sortable_plugin_t m_instruments;
 	l_sortable_plugin_t m_validEffects;

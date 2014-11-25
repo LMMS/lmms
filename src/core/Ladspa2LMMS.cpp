@@ -1,5 +1,5 @@
 /*
- * ladspa_2_lmms.cpp - class that identifies and instantiates LADSPA effects
+ * Ladspa2LMMS.cpp - class that identifies and instantiates LADSPA effects
  *                     for use with LMMS
  *
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
@@ -24,10 +24,10 @@
  */
 
 
-#include "ladspa_2_lmms.h"
+#include "Ladspa2LMMS.h"
 
 
-ladspa2LMMS::ladspa2LMMS()
+Ladspa2LMMS::Ladspa2LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
 	
@@ -78,13 +78,13 @@ ladspa2LMMS::ladspa2LMMS()
  
  
  
-ladspa2LMMS::~ladspa2LMMS()
+Ladspa2LMMS::~Ladspa2LMMS()
 {
 }
 
 
 
-QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
+QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 {
 	QString name = getName( _key );
 	

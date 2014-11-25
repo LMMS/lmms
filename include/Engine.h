@@ -46,7 +46,7 @@ class PianoRoll;
 class projectNotes;
 class Song;
 class SongEditor;
-class ladspa2LMMS;
+class Ladspa2LMMS;
 class ControllerRackView;
 
 
@@ -133,7 +133,7 @@ public:
 		return s_automationEditor;
 	}
 
-	static ladspa2LMMS * getLADSPAManager()
+	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
 	}
@@ -192,7 +192,7 @@ private:
 	static bbEditor * s_bbEditor;
 	static PianoRoll* s_pianoRoll;
 	static projectNotes * s_projectNotes;
-	static ladspa2LMMS * s_ladspaManager;
+	static Ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_pluginFileHandling;
 

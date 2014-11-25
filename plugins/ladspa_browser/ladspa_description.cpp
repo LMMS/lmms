@@ -32,7 +32,7 @@
 
 #include "AudioDevice.h"
 #include "Engine.h"
-#include "ladspa_2_lmms.h"
+#include "Ladspa2LMMS.h"
 #include "Mixer.h"
 
 
@@ -41,7 +41,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 						ladspaPluginType _type ) :
 	QWidget( _parent )
 {
-	ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	l_sortable_plugin_t plugins;
 	switch( _type )
@@ -128,7 +128,7 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 	QVBoxLayout * layout = new QVBoxLayout( description );
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 
-	ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	QLabel * name = new QLabel( description );
 	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );

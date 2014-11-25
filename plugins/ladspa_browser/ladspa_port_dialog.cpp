@@ -30,13 +30,13 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "ladspa_2_lmms.h"
+#include "Ladspa2LMMS.h"
 #include "Mixer.h"
 
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 {
-	ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	setWindowIcon( embed::getIconPixmap( "ports" ) );
 	setWindowTitle( tr( "Ports" ) );
