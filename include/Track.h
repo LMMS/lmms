@@ -1,5 +1,5 @@
 /*
- * track.h - declaration of classes concerning tracks -> necessary for all
+ * Track.h - declaration of classes concerning tracks -> necessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -46,7 +46,7 @@ class QPushButton;
 
 class pixmapButton;
 class textFloat;
-class track;
+class Track;
 class trackContentObjectView;
 class TrackContainer;
 class TrackContainerView;
@@ -81,10 +81,10 @@ class trackContentObject : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	trackContentObject( track * _track );
+	trackContentObject( Track * _track );
 	virtual ~trackContentObject();
 
-	inline track * getTrack() const
+	inline Track * getTrack() const
 	{
 		return m_track;
 	}
@@ -158,7 +158,7 @@ private:
 		Resize
 	} ;
 
-	track * m_track;
+	Track * m_track;
 	QString m_name;
 
 	MidiTime m_startPosition;
@@ -343,7 +343,7 @@ protected:
 
 
 private:
-	track * getTrack();
+	Track * getTrack();
 	MidiTime getPosition( int _mouse_x );
 
 	trackView * m_trackView;
@@ -405,7 +405,7 @@ signals:
 typedef QVector<trackContentObject *> tcoVector;
 
 // base-class for all tracks
-class EXPORT track : public Model, public JournallingObject
+class EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -425,11 +425,11 @@ public:
 		NumTrackTypes
 	} ;
 
-	track( TrackTypes _type, TrackContainer * _tc );
-	virtual ~track();
+	Track( TrackTypes _type, TrackContainer * _tc );
+	virtual ~Track();
 
-	static track * create( TrackTypes _tt, TrackContainer * _tc );
-	static track * create( const QDomElement & _this,
+	static Track * create( TrackTypes _tt, TrackContainer * _tc );
+	static Track * create( const QDomElement & _this,
 							TrackContainer * _tc );
 	void clone();
 
@@ -568,15 +568,15 @@ class trackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
-	trackView( track * _track, TrackContainerView* tcv );
+	trackView( Track * _track, TrackContainerView* tcv );
 	virtual ~trackView();
 
-	inline const track * getTrack() const
+	inline const Track * getTrack() const
 	{
 		return( m_track );
 	}
 
-	inline track * getTrack()
+	inline Track * getTrack()
 	{
 		return( m_track );
 	}
@@ -650,7 +650,7 @@ private:
 		ResizeTrack
 	} ;
 
-	track * m_track;
+	Track * m_track;
 	TrackContainerView * m_trackContainerView;
 
 	trackOperationsWidget m_trackOperationsWidget;

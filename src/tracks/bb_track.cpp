@@ -46,7 +46,7 @@
 bbTrack::infoMap bbTrack::s_infoMap;
 
 
-bbTCO::bbTCO( track * _track ) :
+bbTCO::bbTCO( Track * _track ) :
 	trackContentObject( _track ),
 	m_color( 128, 128, 128 ),
 	m_useStyleColor( true )
@@ -362,7 +362,7 @@ void bbTCOView::setColor( QColor new_color )
 QColor * bbTrack::s_lastTCOColor = NULL;
 
 bbTrack::bbTrack( TrackContainer* tc ) :
-	track( BBTrack, tc )
+	Track( BBTrack, tc )
 {
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
@@ -560,7 +560,7 @@ bbTrack * bbTrack::findBBTrack( int _bb_num )
 
 
 
-void bbTrack::swapBBTracks( track * _track1, track * _track2 )
+void bbTrack::swapBBTracks( Track * _track1, Track * _track2 )
 {
 	bbTrack * t1 = dynamic_cast<bbTrack *>( _track1 );
 	bbTrack * t2 = dynamic_cast<bbTrack *>( _track2 );

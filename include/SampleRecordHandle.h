@@ -34,7 +34,7 @@
 
 class bbTrack;
 class SampleTCO;
-class track;
+class Track;
 
 
 class SampleRecordHandle : public PlayHandle
@@ -46,7 +46,7 @@ public:
 	virtual void play( sampleFrame * _working_buffer );
 	virtual bool isFinished() const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	f_cnt_t framesRecorded() const;
 	void createSampleBuffer( SampleBuffer * * _sample_buf );
@@ -61,7 +61,7 @@ private:
 	f_cnt_t m_framesRecorded;
 	MidiTime m_minLength;
 
-	track * m_track;
+	Track * m_track;
 	bbTrack * m_bbTrack;
 	SampleTCO * m_tco;
 

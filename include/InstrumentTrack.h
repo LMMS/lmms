@@ -35,7 +35,7 @@
 #include "Piano.h"
 #include "PianoView.h"
 #include "Pitch.h"
-#include "track.h"
+#include "Track.h"
 
 
 class QLineEdit;
@@ -57,7 +57,7 @@ class tabWidget;
 class trackLabelButton;
 class InstrumentProcessHandle;
 
-class EXPORT InstrumentTrack : public track, public MidiEventProcessor
+class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -138,7 +138,7 @@ public:
 	
 	virtual ProcessHandle * getProcessHandle();
 
-	using track::setJournalling;
+	using Track::setJournalling;
 
 
 	// load instrument whose name matches given one

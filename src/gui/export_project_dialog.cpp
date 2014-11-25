@@ -127,7 +127,7 @@ void exportProjectDialog::accept()
 		// If done, then reset mute states
 		while( m_unmuted.isEmpty() == false )
 		{
-			track* restoreTrack = m_unmuted.back();
+			Track* restoreTrack = m_unmuted.back();
 			m_unmuted.pop_back();
 			restoreTrack->setMuted( false );
 		}
@@ -163,7 +163,7 @@ void exportProjectDialog::popRender()
 {
 	if( m_multiExport && m_tracksToRender.isEmpty() == false )
 	{
-		track* renderTrack = m_tracksToRender.back();
+		Track* renderTrack = m_tracksToRender.back();
 		m_tracksToRender.pop_back();
 
 		// Set must states for song tracks
@@ -202,11 +202,11 @@ void exportProjectDialog::multiRender()
 	for( TrackList::ConstIterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
-		track* tk = (*it);
-		track::TrackTypes type = tk->type();
+		Track* tk = (*it);
+		Track::TrackTypes type = tk->type();
 		// Don't mute automation tracks
 		if ( tk->isMuted() == false &&
-				( type == track::InstrumentTrack || type == track::SampleTrack ) )
+				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
 		{
 			m_unmuted.push_back(tk);
 			QString nextName = tk->name();
@@ -215,7 +215,7 @@ void exportProjectDialog::multiRender()
 			m_fileName = QDir(m_dirName).filePath(name);
 			prepRender();
 		}
-		else if (! tk->isMuted() && type == track::BBTrack )
+		else if (! tk->isMuted() && type == Track::BBTrack )
 		{
 			m_unmutedBB.push_back(tk);
 		}
@@ -226,7 +226,7 @@ void exportProjectDialog::multiRender()
 	const TrackList t2 = engine::getBBTrackContainer()->tracks();
 	for( TrackList::ConstIterator it = t2.begin(); it != t2.end(); ++it )
 	{
-		track* tk = (*it);
+		Track* tk = (*it);
 		if ( tk->isMuted() == false )
 		{
 			m_unmuted.push_back(tk);

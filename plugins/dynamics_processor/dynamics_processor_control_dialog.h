@@ -34,6 +34,7 @@ class dynProcControls;
 
 class dynProcControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	dynProcControlDialog( dynProcControls * _controls );
 	virtual ~dynProcControlDialog()

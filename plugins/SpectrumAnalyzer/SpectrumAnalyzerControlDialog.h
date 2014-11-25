@@ -33,6 +33,7 @@ class SpectrumAnalyzerControls;
 
 class SpectrumAnalyzerControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls );
 	virtual ~SpectrumAnalyzerControlDialog()

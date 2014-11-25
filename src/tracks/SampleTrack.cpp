@@ -49,7 +49,7 @@
 #include "ConfigManager.h"
 
 
-SampleTCO::SampleTCO( track * _track ) :
+SampleTCO::SampleTCO( Track * _track ) :
 	trackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer )
 {
@@ -402,7 +402,7 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 
 
 SampleTrack::SampleTrack( TrackContainer* tc ) :
-	track( track::SampleTrack, tc ),
+	Track( Track::SampleTrack, tc ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
 							tr( "Volume" ) ),
 	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, NULL )

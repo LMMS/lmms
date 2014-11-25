@@ -38,7 +38,7 @@
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, tc ),
+	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc ),
 	m_processHandle( new AutomationProcessHandle( this ) ),
 	m_objects()
 {
@@ -435,6 +435,5 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 
 	update();
 }
-
 
 

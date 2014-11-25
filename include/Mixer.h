@@ -225,7 +225,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( track * _track, bool removeIPHs = true );
+	void removePlayHandles( Track * _track, bool removeIPHs = true );
 
 	bool hasNotePlayHandles();
 

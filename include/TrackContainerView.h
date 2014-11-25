@@ -31,7 +31,7 @@
 #include <QWidget>
 
 
-#include "track.h"
+#include "Track.h"
 #include "JournallingObject.h"
 
 
@@ -120,7 +120,7 @@ public:
 
 public slots:
 	void realignTracks();
-	void createTrackView( track * _t );
+	void createTrackView( Track * _t );
 	void deleteTrackView( trackView * _tv );
 
 

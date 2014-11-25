@@ -143,7 +143,7 @@ bool SamplePlayHandle::isFinished() const
 
 
 
-bool SamplePlayHandle::isFromTrack( const track * _track ) const
+bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 {
 	return m_track == _track || m_bbTrack == _track;
 }

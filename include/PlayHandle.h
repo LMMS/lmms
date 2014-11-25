@@ -32,7 +32,7 @@
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
 
-class track;
+class Track;
 class AudioPort;
 
 class PlayHandle : public ThreadableJob
@@ -111,7 +111,7 @@ public:
 	}
 
 
-	virtual bool isFromTrack( const track * _track ) const = 0;
+	virtual bool isFromTrack( const Track * _track ) const = 0;
 
 	bool usesBuffer() const
 	{

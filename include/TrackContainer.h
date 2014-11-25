@@ -28,7 +28,7 @@
 
 #include <QtCore/QReadWriteLock>
 
-#include "track.h"
+#include "Track.h"
 #include "JournallingObject.h"
 
 
@@ -53,11 +53,11 @@ public:
 		return NULL;
 	}
 
-	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
+	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
 
 
-	void addTrack( track * _track );
-	void removeTrack( track * _track );
+	void addTrack( Track * _track );
+	void removeTrack( Track * _track );
 
 	virtual void updateAfterTrackAdd();
 
@@ -77,7 +77,7 @@ public:
 
 
 signals:
-	void trackAdded( track * _track );
+	void trackAdded( Track * _track );
 
 protected:
 	mutable QReadWriteLock m_tracksMutex;
@@ -87,7 +87,7 @@ private:
 
 
 	friend class TrackContainerView;
-	friend class track;
+	friend class Track;
 
 } ;
 

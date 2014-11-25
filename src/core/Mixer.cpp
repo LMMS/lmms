@@ -697,7 +697,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 
 
-void Mixer::removePlayHandles( track * _track, bool removeIPHs )
+void Mixer::removePlayHandles( Track * _track, bool removeIPHs )
 {
 	lockPlayHandleRemoval();
 	PlayHandleList::Iterator it = m_playHandles.begin();

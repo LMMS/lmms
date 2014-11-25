@@ -84,3 +84,4 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
+

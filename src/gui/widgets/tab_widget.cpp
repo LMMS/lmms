@@ -37,7 +37,8 @@
 tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
 	m_activeTab( 0 ),
-	m_caption( _caption )
+	m_caption( _caption ),
+	m_tabheight( _caption.isEmpty() ? 11: 10 )
 {
 	setFont( pointSize<8>( font() ) );
 
@@ -149,14 +150,13 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
-	QLinearGradient g( 0, 0, 0, 10 );
+	QLinearGradient g( 0, 0, 0, m_tabheight );
 	g.setColorAt( 0, bg_color.darker( 250 ) );
 	g.setColorAt( 0.1, bg_color.lighter( 120 ) );
 	g.setColorAt( 1, bg_color.darker( 250 ) );
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
 
 	bool big_tab_captions = ( m_caption == "" );
-	int add = big_tab_captions ? 1 : 0;
 
 	p.setPen( bg_color.darker( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
@@ -168,17 +168,17 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
-	p.fillRect( 2, 2, width() - 4, 10 + add, g );
-	p.drawLine( 2, 12 + add, width() - 3, 12 + add );
+	p.fillRect( 2, 2, width() - 4, m_tabheight, g );
+	p.drawLine( 2, m_tabheight + 2, width() - 3, m_tabheight + 2);
 
-	if( !big_tab_captions )
+	if( ! m_caption.isEmpty() )
 	{
 		p.setPen( QColor( 255, 255, 255 ) );
 		p.drawText( 5, 11, m_caption );
 	}
 
-	int cx = ( big_tab_captions ? 4 : 14 ) +
-					fontMetrics().width( m_caption );
+	// Calculate the tabs' x (tabs are painted next to the caption)
+	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
 
 	QColor cap_col( 160, 160, 160 );
 	if( big_tab_captions )
@@ -199,11 +199,11 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 		if( it.key() == m_activeTab )
 		{
 			p.setPen( QColor( 32, 48, 64 ) );
-			p.fillRect( cx, 2, ( *it ).nwidth - 6, 10, cap_col );
+			p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, 10, cap_col );
 		}
-		p.drawText( cx + 3, 10 + add, ( *it ).name );
+		p.drawText( tab_x_offset + 3, m_tabheight, ( *it ).name );
 		p.setPen( cap_col );
-		cx += ( *it ).nwidth;
+		tab_x_offset += ( *it ).nwidth;
 	}
 }
 
@@ -212,6 +212,9 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 
 void tabWidget::wheelEvent( QWheelEvent * _we )
 {
+	if (_we->y() > m_tabheight)
+		return;
+
 	_we->accept();
 	int dir = ( _we->delta() < 0 ) ? 1 : -1;
 	int tab = m_activeTab;

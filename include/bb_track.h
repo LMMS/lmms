@@ -30,7 +30,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QMap>
 
-#include "track.h"
+#include "Track.h"
 
 class trackLabelButton;
 class TrackContainer;
@@ -39,7 +39,7 @@ class TrackContainer;
 class bbTCO : public trackContentObject
 {
 public:
-	bbTCO( track * _track );
+	bbTCO( Track * _track );
 	virtual ~bbTCO();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -120,7 +120,7 @@ private:
 
 
 
-class EXPORT bbTrack : public track
+class EXPORT bbTrack : public Track
 {
 	Q_OBJECT
 public:
@@ -139,22 +139,22 @@ public:
 	virtual ProcessHandle * getProcessHandle();
 
 	static bbTrack * findBBTrack( int _bb_num );
-	static void swapBBTracks( track * _track1, track * _track2 );
+	static void swapBBTracks( Track * _track1, Track * _track2 );
 
 	int index()
 	{
 		return s_infoMap[this];
 	}
 
-	bool automationDisabled( track * _track )
+	bool automationDisabled( Track * _track )
 	{
 		return( m_disabledTracks.contains( _track ) );
 	}
-	void disableAutomation( track * _track )
+	void disableAutomation( Track * _track )
 	{
 		m_disabledTracks.append( _track );
 	}
-	void enableAutomation( track * _track )
+	void enableAutomation( Track * _track )
 	{
 		m_disabledTracks.removeAll( _track );
 	}
@@ -188,7 +188,7 @@ protected:
 
 
 private:
-	QList<track *> m_disabledTracks;
+	QList<Track *> m_disabledTracks;
 
 	typedef QMap<bbTrack *, int> infoMap;
 	static infoMap s_infoMap;

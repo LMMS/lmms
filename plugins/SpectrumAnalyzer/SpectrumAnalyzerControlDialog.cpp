@@ -190,5 +190,3 @@ void SpectrumAnalyzerControlDialog::paintEvent( QPaintEvent * )
 
 }
 
-
-

@@ -117,4 +117,3 @@ void MeterDialog::modelChanged()
 	}
 }
 
-

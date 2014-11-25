@@ -44,7 +44,7 @@
 #include "rubberband.h"
 #include "song.h"
 #include "string_pair_drag.h"
-#include "track.h"
+#include "Track.h"
 
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
@@ -83,8 +83,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
-	connect( m_tc, SIGNAL( trackAdded( track * ) ),
-			this, SLOT( createTrackView( track * ) ),
+	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
+			this, SLOT( createTrackView( Track * ) ),
 			Qt::QueuedConnection );
 }
 
@@ -218,7 +218,7 @@ void TrackContainerView::realignTracks()
 
 
 
-void TrackContainerView::createTrackView( track * _t )
+void TrackContainerView::createTrackView( Track * _t )
 {
 	//m_tc->addJournalCheckPoint();
 
@@ -232,7 +232,7 @@ void TrackContainerView::deleteTrackView( trackView * _tv )
 {
 	//m_tc->addJournalCheckPoint();
 
-	track * t = _tv->getTrack();
+	Track * t = _tv->getTrack();
 	removeTrackView( _tv );
 	delete _tv;
 
@@ -294,7 +294,7 @@ void TrackContainerView::clearAllTracks()
 	while( !m_trackViews.empty() )
 	{
 		trackView * tv = m_trackViews.takeLast();
-		track * t = tv->getTrack();
+		Track * t = tv->getTrack();
 		delete tv;
 		delete t;
 	}
@@ -309,8 +309,8 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,vstpluginfile,"
 				"track_%1,track_%2" ).
-						arg( track::InstrumentTrack ).
-						arg( track::SampleTrack ) );
+						arg( Track::InstrumentTrack ).
+						arg( Track::SampleTrack ) );
 }
 
 
@@ -323,7 +323,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	if( type == "instrument" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack,
+				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		it->loadInstrument( value );
 		//it->toggledInstrumentTrackButton( true );
@@ -333,7 +333,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		|| type == "soundfontfile" || type == "vstpluginfile")
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack,
+				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
 			engine::pluginFileHandling()[FileItem::extension(
@@ -346,7 +346,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	{
 		DataFile dataFile( value );
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack,
+				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		it->setSimpleSerializing();
 		it->loadSettings( dataFile.content().toElement() );
@@ -361,7 +361,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		track::create( dataFile.content().firstChild().toElement(), m_tc );
+		Track::create( dataFile.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
 }

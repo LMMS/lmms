@@ -201,4 +201,3 @@ void InstrumentMidiIOView::modelChanged()
 	}
 }
 
-

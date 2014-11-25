@@ -423,7 +423,7 @@ void song::playAndRecord()
 
 
 
-void song::playTrack( track * _trackToPlay )
+void song::playTrack( Track * _trackToPlay )
 {
 	if( isStopped() == false )
 	{
@@ -665,7 +665,7 @@ void song::removeBar()
 
 void song::addBBTrack()
 {
-	track * t = track::create( track::BBTrack, this );
+	Track * t = Track::create( Track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
 }
 
@@ -674,7 +674,7 @@ void song::addBBTrack()
 
 void song::addSampleTrack()
 {
-	(void) track::create( track::SampleTrack, this );
+	(void) Track::create( Track::SampleTrack, this );
 }
 
 
@@ -682,7 +682,7 @@ void song::addSampleTrack()
 
 void song::addAutomationTrack()
 {
-	(void) track::create( track::AutomationTrack, this );
+	(void) Track::create( Track::AutomationTrack, this );
 }
 
 
@@ -807,17 +807,17 @@ void song::createNewProject()
 
 	m_fileName = m_oldFileName = "";
 
-	track * t;
-	t = track::create( track::InstrumentTrack, this );
+	Track * t;
+	t = Track::create( Track::InstrumentTrack, this );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
-	t = track::create( track::InstrumentTrack,
+	t = Track::create( Track::InstrumentTrack,
 						engine::getBBTrackContainer() );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
-	track::create( track::SampleTrack, this );
-	track::create( track::BBTrack, this );
-	track::create( track::AutomationTrack, this );
+	Track::create( Track::SampleTrack, this );
+	Track::create( Track::BBTrack, this );
+	Track::create( Track::AutomationTrack, this );
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();
@@ -870,6 +870,7 @@ void song::loadProject( const QString & _file_name )
 	m_loadingProject = true;
 
 	engine::projectJournal()->setJournalling( false );
+	engine::mainWindow()->clearErrors();
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -971,6 +972,8 @@ void song::loadProject( const QString & _file_name )
 	engine::projectJournal()->setJournalling( true );
 
 	emit projectLoaded();
+
+	engine::mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
 
 	m_loadingProject = false;
 	m_modified = false;

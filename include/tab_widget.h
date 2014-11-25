@@ -66,7 +66,7 @@ private:
 	widgetStack m_widgets;
 	int m_activeTab;
 	QString m_caption;
-
+	quint8 m_tabheight;
 } ;
 
 #endif

@@ -28,7 +28,7 @@
 #include <QDialog>
 
 #include "AudioPort.h"
-#include "track.h"
+#include "Track.h"
 
 class EffectRackView;
 class knob;
@@ -40,7 +40,7 @@ class SampleTCO : public trackContentObject
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleTCO( track * _track );
+	SampleTCO( Track * _track );
 	virtual ~SampleTCO();
 
 	virtual void changeLength( const MidiTime & _length );
@@ -118,7 +118,7 @@ private:
 
 
 
-class SampleTrack : public track
+class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
@@ -162,7 +162,7 @@ class SampleTrackView : public trackView
 {
 	Q_OBJECT
 public:
-	SampleTrackView( SampleTrack* track, TrackContainerView* tcv );
+	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
 	virtual ~SampleTrackView();
 
 

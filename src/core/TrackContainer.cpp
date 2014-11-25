@@ -119,7 +119,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			track::create( node.toElement(), this );
+			Track::create( node.toElement(), this );
 		}
 		node = node.nextSibling();
 	}
@@ -138,13 +138,13 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 
 
-int TrackContainer::countTracks( track::TrackTypes _tt ) const
+int TrackContainer::countTracks( Track::TrackTypes _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
 	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		if( m_tracks[i]->type() == _tt || _tt == track::NumTrackTypes )
+		if( m_tracks[i]->type() == _tt || _tt == Track::NumTrackTypes )
 		{
 			++cnt;
 		}
@@ -156,9 +156,9 @@ int TrackContainer::countTracks( track::TrackTypes _tt ) const
 
 
 
-void TrackContainer::addTrack( track * _track )
+void TrackContainer::addTrack( Track * _track )
 {
-	if( _track->type() != track::HiddenAutomationTrack )
+	if( _track->type() != Track::HiddenAutomationTrack )
 	{
 		_track->lock();
 		m_tracksMutex.lockForWrite();
@@ -172,11 +172,15 @@ void TrackContainer::addTrack( track * _track )
 
 
 
-void TrackContainer::removeTrack( track * _track )
+void TrackContainer::removeTrack( Track * _track )
 {
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
+		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
+		if (_track->isSolo()) {
+			_track->setSolo(false);
+		}
 		m_tracksMutex.lockForWrite();
 		m_tracks.remove( index );
 		m_tracksMutex.unlock();
@@ -235,7 +239,7 @@ DummyTrackContainer::DummyTrackContainer() :
 {
 	setJournalling( false );
 	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack,
+				Track::create( Track::InstrumentTrack,
 							this ) );
 	m_dummyInstrumentTrack->setJournalling( false );
 }

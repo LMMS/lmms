@@ -353,7 +353,7 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 
 
 
-bool NotePlayHandle::isFromTrack( const track * _track ) const
+bool NotePlayHandle::isFromTrack( const Track * _track ) const
 {
 	return m_instrumentTrack == _track || m_bbTrack == _track;
 }

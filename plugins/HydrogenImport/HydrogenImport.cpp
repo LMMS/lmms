@@ -14,7 +14,7 @@
 #include "InstrumentTrack.h"
 #include "note.h"
 #include "Pattern.h"
-#include "track.h"
+#include "Track.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "Instrument.h"
@@ -213,7 +213,7 @@ bool HydrogenImport::readSong()
 
 					if ( nLayer == 0 ) 
 					{
-						drum_track[sId] = ( InstrumentTrack * ) track::create( track::InstrumentTrack,engine::getBBTrackContainer() );
+						drum_track[sId] = ( InstrumentTrack * ) Track::create( Track::InstrumentTrack,engine::getBBTrackContainer() );
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
 						ins = drum_track[sId]->loadInstrument( "audiofileprocessor" );
@@ -305,7 +305,7 @@ bool HydrogenImport::readSong()
 			patternId = ( QDomNode ) patternId.nextSiblingElement( "patternID" );
 
 			int i = pattern_id[patId]+song_num_tracks;
-			track *t = ( bbTrack * ) s->tracks().at( i );
+			Track *t = ( bbTrack * ) s->tracks().at( i );
  			trackContentObject *tco = t->createTCO( pos );      
 			tco->movePosition( pos );
 

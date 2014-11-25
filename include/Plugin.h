@@ -41,9 +41,10 @@ class PluginView;
 class AutomatableModel;
 
 
-class EXPORT Plugin : public JournallingObject, public Model
+class EXPORT Plugin : public Model, public JournallingObject
 {
 	MM_OPERATORS
+	Q_OBJECT
 public:
 	enum PluginTypes
 	{
@@ -184,6 +185,7 @@ public:
 protected:
 	// create a view for the model 
 	virtual PluginView* instantiateView( QWidget* ) = 0;
+	void collectErrorForUI( QString err_msg );
 
 
 private:

@@ -184,7 +184,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 
 	// we need to maximize our length in case we're part of a hidden
 	// automation track as the user can't resize this pattern
-	if( getTrack() && getTrack()->type() == track::HiddenAutomationTrack )
+	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
 	{
 		changeLength( length() );
 	}
@@ -215,7 +215,7 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	generateTangents(it, 3);
 
 	if( getTrack() &&
-		getTrack()->type() == track::HiddenAutomationTrack )
+		getTrack()->type() == Track::HiddenAutomationTrack )
 	{
 		changeLength( length() );
 	}
@@ -505,8 +505,8 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 	for( TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		// we want only automation tracks...
-		if( ( *it )->type() == track::AutomationTrack ||
-			( *it )->type() == track::HiddenAutomationTrack )
+		if( ( *it )->type() == Track::AutomationTrack ||
+			( *it )->type() == Track::HiddenAutomationTrack )
 		{
 			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
 			if( at )

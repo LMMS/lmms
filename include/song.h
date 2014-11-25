@@ -287,7 +287,7 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( track * _trackToPlay );
+	void playTrack( Track * _trackToPlay );
 	void playBB();
 	void playPattern( Pattern* patternToPlay, bool _loop = true );
 	void togglePause();
@@ -383,7 +383,7 @@ private:
 	volatile int m_playingTcoNum;	// tco num parameter for tracks when playing a single tco
 	TrackList m_trackList;
 
-	track * m_trackToPlay;
+	Track * m_trackToPlay;
 	Pattern* m_patternToPlay;
 	bool m_loopPattern;
 

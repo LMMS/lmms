@@ -228,16 +228,16 @@ void FxMixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void FxMixerView::updateMaxChannelSelector()
 {
-	QVector<track *> songTrackList = engine::getSong()->tracks();
-	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+	QVector<Track *> songTrackList = engine::getSong()->tracks();
+	QVector<Track *> bbTrackList = engine::getBBTrackContainer()->tracks();
 
-	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
+	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<track *> trackList = trackLists[tl];
+		QVector<Track *> trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
-			if( trackList[i]->type() == track::InstrumentTrack )
+			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->effectChannelModel()->setRange(0,

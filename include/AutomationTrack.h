@@ -27,12 +27,12 @@
 #ifndef AUTOMATION_TRACK_H
 #define AUTOMATION_TRACK_H
 
-#include "track.h"
+#include "Track.h"
 
 class AutomationProcessHandle;
 typedef QVector<QPointer<AutomatableModel> > objectVector;
 
-class AutomationTrack : public track
+class AutomationTrack : public Track
 {
 	Q_OBJECT
 	MM_OPERATORS
