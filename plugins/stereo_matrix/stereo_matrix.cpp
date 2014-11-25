@@ -79,6 +79,11 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 
 	double out_sum = 0.0;
 
+	const float ll = m_smControls.m_llModel.value();
+	const float lr = m_smControls.m_lrModel.value();
+	const float rl = m_smControls.m_rlModel.value();
+	const float rr = m_smControls.m_rrModel.value();
+
 	for( fpp_t f = 0; f < _frames; ++f )
 	{	
 		const float d = dryLevel();
@@ -92,11 +97,9 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 		_buf[f][1] = r * d;
 
 		// Add it wet
-		_buf[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
-					m_smControls.m_rlModel.value( f ) * r ) * w;
+		_buf[f][0] += ( ll * l  + rl * r ) * w;
 
-		_buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
-					m_smControls.m_rrModel.value( f ) * r ) * w;
+		_buf[f][1] += ( lr * l  + rr * r ) * w;
 		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 
 	}

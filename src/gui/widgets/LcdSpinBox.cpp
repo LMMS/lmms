@@ -38,6 +38,7 @@
 #include "gui_templates.h"
 #include "templates.h"
 #include "MainWindow.h"
+#include "AutomatableModel.h"
 
 
 

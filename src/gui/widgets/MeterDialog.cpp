@@ -33,6 +33,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
+#include "AutomatableModel.h"
 
 
 MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
@@ -109,8 +110,11 @@ MeterDialog::~MeterDialog()
 void MeterDialog::modelChanged()
 {
 	MeterModel * mm = castModel<MeterModel>();
-	m_numerator->setModel( &mm->numeratorModel() );
-	m_denominator->setModel( &mm->denominatorModel() );
+	if( mm )
+	{
+		m_numerator->setModel( &( mm->numeratorModel() ) );
+		m_denominator->setModel( &( mm->denominatorModel() ) );
+	}
 }
 
 

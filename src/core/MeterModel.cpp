@@ -24,7 +24,6 @@
 
 
 #include "MeterModel.h"
-#include "AutomationPattern.h"
 
 
 MeterModel::MeterModel( ::Model * _parent ) :

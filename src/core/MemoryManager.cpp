@@ -49,6 +49,7 @@ bool MemoryManager::init()
 
 void * MemoryManager::alloc( size_t size )
 {
+	if( size == 0 ) { qFatal( "MemoryManager.cpp: size 0 allocation attempted" ); }
 	int requiredChunks = size / MM_CHUNK_SIZE + ( size % MM_CHUNK_SIZE > 0 ? 1 : 0 );
 
 	MemoryPool * mp = NULL;

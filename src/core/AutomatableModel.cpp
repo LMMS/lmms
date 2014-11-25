@@ -52,7 +52,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_hasStrictStepSize( false ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
-	m_valueBuffer( 0 ),
+	m_valueBuffer(),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData( false ),
 	m_stepType( NormalStep ),
@@ -95,7 +95,7 @@ void AutomatableModel::setSampleExact( bool s )
 
 bool AutomatableModel::isAutomated() const
 {
-	return AutomationPattern::isAutomated( this );
+	return m_automationTrack != NULL;
 }
 
 

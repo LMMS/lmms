@@ -299,7 +299,7 @@ void FxMixer::deleteChannel( int index )
 		if( t->type() == track::InstrumentTrack )
 		{
 			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
-			int val = inst->effectChannelModel()->value(0);
+			int val = inst->effectChannelModel()->value();
 			if( val == index )
 			{
 				// we are deleting this track's fx send
@@ -359,7 +359,7 @@ void FxMixer::moveChannelLeft( int index )
 			if( trackList[i]->type() == track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
-				int val = inst->effectChannelModel()->value(0);
+				int val = inst->effectChannelModel()->value();
 				if( val == a )
 				{
 					inst->effectChannelModel()->setValue(b);

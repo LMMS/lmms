@@ -50,6 +50,10 @@ ModelView::~ModelView()
 
 void ModelView::setModel( Model* model, bool isOldModelValid )
 {
+	if( model == m_model )
+	{
+		return;
+	}
 	if( isOldModelValid && m_model != NULL )
 	{
 		if( m_model->isDefaultConstructed() )

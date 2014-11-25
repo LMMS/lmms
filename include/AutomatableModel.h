@@ -60,7 +60,6 @@
 			}
 
 class AutomationTrack;
-class AutomationConnection;
 class ControllerConnection;
 
 class EXPORT AutomatableModel : public Model, public JournallingObject
@@ -425,7 +424,7 @@ signals:
 
 
 #define defaultTypedMethods(type)								\
-	type value( int frameOffset = 0 ) const						\
+	type value() const						\
 	{															\
 		return AutomatableModel::value<type>();	\
 	}															\
