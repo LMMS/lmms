@@ -83,7 +83,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
-		m_instrumentTrack->m_processHandles.push_back( this );
+		m_instrumentTrack->m_noteHandles.push_back( this );
 	}
 	else
 	{
@@ -137,7 +137,7 @@ void NotePlayHandle::done()
 	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
-		m_instrumentTrack->m_processHandles.removeAll( this );
+		m_instrumentTrack->m_noteHandles.removeAll( this );
 	}
 	else
 	{

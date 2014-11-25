@@ -212,6 +212,33 @@ void AutomationTrack::objectDestroyed( jo_id_t id )
 }
 
 
+bool AutomationTrack::isAutomated( const AutomatableModel * m )
+{
+	TrackList l;
+	l += engine::getSong()->tracks();
+	l += engine::getBBTrackContainer()->tracks();
+
+	for( TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	{
+		if( ( *it )->type() == track::AutomationTrack ||
+			( *it )->type() == track::HiddenAutomationTrack )
+		{
+			AutomationTrack * at = dynamic_cast<AutomationTrack *>( *it );
+			if( at )
+			{
+				for( objectVector::const_iterator k = at->objects()->begin(); k != at->objects()->end(); ++k )
+				{
+					if( *k == m )
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
 
 void AutomationTrack::resolveAllIDs()
 {

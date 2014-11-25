@@ -41,11 +41,11 @@ class ProcessHandle : public ThreadableJob
 public:
 	enum Type
 	{
-		ControllerProcessHandle,
-		AutomationProcessHandle,
-		InstrumentProcessHandle,
-		BbTrackProcessHandle,
-		SampleTrackProcessHandle,
+		ControllerProcessHandleType,
+		AutomationProcessHandleType,
+		InstrumentProcessHandleType,
+		BbTrackProcessHandleType,
+		SampleTrackProcessHandleType,
 		NumProcessHandleTypes
 	};
 	

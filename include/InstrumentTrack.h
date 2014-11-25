@@ -55,7 +55,7 @@ class DataFile;
 class PluginView;
 class tabWidget;
 class trackLabelButton;
-
+class InstrumentProcessHandle;
 
 class EXPORT InstrumentTrack : public track, public MidiEventProcessor
 {
@@ -241,7 +241,7 @@ private:
 
 	IntModel m_baseNoteModel;
 
-	NotePlayHandleList m_processHandles;
+	NotePlayHandleList m_noteHandles;
 
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
@@ -259,13 +259,14 @@ private:
 	InstrumentFunctionNoteStacking m_noteStacking;
 
 	Piano m_piano;
-
+	
+	InstrumentProcessHandle * m_processHandle;
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class FlpImport;
-
+	friend class InstrumentProcessHandle;
 } ;
 
 
@@ -431,6 +432,22 @@ private:
 
 } ;
 
+
+class InstrumentProcessHandle : public ProcessHandle
+{
+	MM_OPERATORS
+public:
+	InstrumentProcessHandle( InstrumentTrack * it ) :
+	ProcessHandle( ProcessHandle::InstrumentProcessHandleType ),
+	m_track( it )
+	{ }
+	virtual ~InstrumentProcessHandle() {}
+	
+	virtual void doProcessing();
+	
+private:
+	InstrumentTrack * m_track;
+};
 
 
 #endif

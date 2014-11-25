@@ -22,8 +22,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 /*
+
 #ifndef TEMPO_TRACK_H
 #define TEMPO_TRACK_H
 
@@ -78,6 +78,7 @@ public:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 };
+
 
 
 class TempoPattern : public AutomationPattern

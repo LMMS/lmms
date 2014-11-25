@@ -112,7 +112,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano( this )
+	m_piano( this ),
+	m_processHandle( new InstrumentProcessHandle( this ) )
 {
 	m_volumeModel.setSampleExact( true );
 	m_panningModel.setSampleExact( true );
@@ -141,7 +142,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 ProcessHandle * InstrumentTrack::getProcessHandle()
 {
-	return NULL;
+	return static_cast<ProcessHandle *>( m_processHandle );
 }
 
 
@@ -429,7 +430,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 
 	lock();
 	// invalidate all NotePlayHandles linked to this track
-	m_processHandles.clear();
+	m_noteHandles.clear();
 	engine::mixer()->removePlayHandles( this, removeIPH );
 	unlock();
 }
@@ -520,8 +521,8 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
-	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
-					it != m_processHandles.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_noteHandles.begin();
+					it != m_noteHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
@@ -571,106 +572,107 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 }
 
 
-
-
-bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
-							const f_cnt_t _offset, int _tco_num )
+void InstrumentProcessHandle::doProcessing()
 {
-	if( ! tryLock() || ! m_instrument )
+	if( ! m_track->tryLock() || ! m_track->instrument() )
 	{
-		return false;
+		return;
 	}
-	const float frames_per_tick = engine::framesPerTick();
-
+	const int tcoNum = engine::getSong()->playingTcoNum();
+	const tick_t start = engine::getSong()->periodStartTick();
+	const tick_t end = engine::getSong()->getTicks();
+	TickOffsetHash * toh = engine::getSong()->ticksThisPeriod();
+	
 	tcoVector tcos;
-	bbTrack * bb_track = NULL;
-	if( _tco_num >= 0 )
+	bbTrack * bbtrack = NULL;
+	if( tcoNum >= 0 )
 	{
-		trackContentObject * tco = getTCO( _tco_num );
+		trackContentObject * tco = m_track->getTCO( tcoNum );
 		tcos.push_back( tco );
-		bb_track = bbTrack::findBBTrack( _tco_num );
+		bbtrack = bbTrack::findBBTrack( tcoNum );
 	}
 	else
 	{
-		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / frames_per_tick ) );
+		m_track->getTCOsInRange( tcos, start, end );
 	}
-
+	
 	// Handle automation: detuning
-	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
-					it != m_processHandles.end(); ++it )
+	for( NotePlayHandleList::Iterator it = m_track->m_noteHandles.begin();
+					it != m_track->m_noteHandles.end(); ++it )
 	{
-		( *it )->processMidiTime( _start );
+		( *it )->processMidiTime( start );
 	}
-
-	if ( tcos.size() == 0 )
+	
+	if ( tcos.size() == 0 || toh->size() == 0 )
 	{
-		unlock();
-		return false;
+		m_track->unlock();
+		return;
 	}
-
-	bool played_a_note = false;	// will be return variable
-
+	
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
-		Pattern* p = dynamic_cast<Pattern*>( *it );
+		Pattern * p = dynamic_cast<Pattern*>( *it );
 		// everything which is not a pattern or muted won't be played
 		if( p == NULL || ( *it )->isMuted() )
 		{
 			continue;
 		}
-		MidiTime cur_start = _start;
-		if( _tco_num < 0 )
+		for( TickOffsetHash::iterator tit = toh->begin(); tit != toh->end(); ++tit )
 		{
-			cur_start -= p->startPosition();
-		}
-
-		// get all notes from the given pattern...
-		const NoteVector & notes = p->notes();
-		// ...and set our index to zero
-		NoteVector::ConstIterator nit = notes.begin();
-
-		// very effective algorithm for playing notes that are
-		// posated within the current sample-frame
-
-
-		if( cur_start > 0 )
-		{
-			// skip notes which are posated before start-tact
-			while( nit != notes.end() && ( *nit )->pos() < cur_start )
+			MidiTime cur_start = tit.key();
+			if( tcoNum < 0 )
 			{
+				cur_start -= p->startPosition();
+			}
+
+			// get all notes from the given pattern...
+			const NoteVector & notes = p->notes();
+			// ...and set our index to zero
+			NoteVector::ConstIterator nit = notes.begin();
+
+			// very effective algorithm for playing notes that are
+			// posated within the current sample-frame
+			if( cur_start > 0 )
+			{
+				// skip notes which are posated before start
+				while( nit != notes.end() && ( *nit )->pos() < cur_start )
+				{
+					++nit;
+				}
+			}
+
+			note * cur_note;
+			while( nit != notes.end() &&
+						( cur_note = *nit )->pos() == cur_start )
+			{
+				if( cur_note->length() != 0 )
+				{
+					const f_cnt_t note_frames =
+						cur_note->length().frames( engine::framesPerTick() ); // TODO 2.0 replace fpt with fpt lookup once implemented
+
+					NotePlayHandle * nph = NotePlayHandleManager::acquire( m_track, tit.value(), note_frames, *cur_note );
+					nph->setBBTrack( bbtrack );
+					// are we playing global song?
+					if( tcoNum < 0 )
+					{
+						// then set song-global offset of pattern in order to
+						// properly perform the note detuning
+						nph->setSongGlobalParentOffset( p->startPosition() );
+					}
+					engine::mixer()->addPlayHandle( nph );
+				}
 				++nit;
 			}
 		}
-
-		note * cur_note;
-		while( nit != notes.end() &&
-					( cur_note = *nit )->pos() == cur_start )
-		{
-			if( cur_note->length() != 0 )
-			{
-				const f_cnt_t note_frames =
-					cur_note->length().frames(
-							frames_per_tick );
-
-				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-				notePlayHandle->setBBTrack( bb_track );
-				// are we playing global song?
-				if( _tco_num < 0 )
-				{
-					// then set song-global offset of pattern in order to
-					// properly perform the note detuning
-					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
-				}
-
-				engine::mixer()->addPlayHandle( notePlayHandle );
-				played_a_note = true;
-			}
-			++nit;
-		}
 	}
-	unlock();
-	return played_a_note;
+	m_track->unlock();
+}
+
+
+bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
+							const f_cnt_t _offset, int _tco_num )
+{
+	return false;
 }
 
 

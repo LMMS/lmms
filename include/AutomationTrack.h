@@ -66,6 +66,7 @@ public:
 	void removeObject( AutomatableModel * obj );
 	const AutomatableModel * firstObject() const;
 	static void resolveAllIDs();
+	static bool isAutomated( const AutomatableModel * _m );
 	
 	objectVector * objects()
 	{
@@ -113,7 +114,7 @@ class AutomationProcessHandle : public ProcessHandle
 	MM_OPERATORS
 public:
 	AutomationProcessHandle( AutomationTrack * at ) :
-	ProcessHandle( ProcessHandle::AutomationProcessHandle ),
+	ProcessHandle( ProcessHandle::AutomationProcessHandleType ),
 	m_track( at )
 	{ }
 	virtual ~AutomationProcessHandle() {}

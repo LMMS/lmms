@@ -149,8 +149,6 @@ public:
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
-
-	static bool isAutomated( const AutomatableModel * _m );
 	static QVector<AutomationPattern *> patternsForModel( const AutomatableModel * _m );
 
 	bool isRecording() const
