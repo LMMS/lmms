@@ -54,7 +54,7 @@
 #include "base64.h"
 #include "ConfigManager.h"
 #include "debug.h"
-#include "drumsynth.h"
+#include "DrumSynth.h"
 #include "endian_handling.h"
 #include "engine.h"
 #include "interpolation.h"

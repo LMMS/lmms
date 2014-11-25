@@ -24,7 +24,7 @@
  */
 
 
-#include "drumsynth.h"
+#include "DrumSynth.h"
 #include "lmmsconfig.h"
 
 #include <fstream>

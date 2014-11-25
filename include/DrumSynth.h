@@ -1,5 +1,5 @@
 /*
- * drumsynth.h - DrumSynth DS file renderer
+ * DrumSynth.h - DrumSynth DS file renderer
  *
  * Copyright (c) 1998-2000 Paul Kellett (mda-vst.com)
  * Copyright (c) 2007 Paul Giblock <drfaygo/at/gmail.com>
