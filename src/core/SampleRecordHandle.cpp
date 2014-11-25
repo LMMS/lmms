@@ -92,7 +92,7 @@ bool SampleRecordHandle::isFinished() const
 
 
 
-bool SampleRecordHandle::isFromTrack( const track * _track ) const
+bool SampleRecordHandle::isFromTrack( const Track * _track ) const
 {
 	return( m_track == _track || m_bbTrack == _track );
 }

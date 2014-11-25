@@ -57,7 +57,7 @@ class tabWidget;
 class trackLabelButton;
 
 
-class EXPORT InstrumentTrack : public track, public MidiEventProcessor
+class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -136,7 +136,7 @@ public:
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
-	using track::setJournalling;
+	using Track::setJournalling;
 
 
 	// load instrument whose name matches given one

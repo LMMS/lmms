@@ -1441,7 +1441,7 @@ else
 	{
 		const int cur_pat = bb_tracks.size();
 		bbTrack * bbt = dynamic_cast<bbTrack *>(
-			track::create( track::BBTrack, engine::getSong() ) );
+			Track::create( Track::BBTrack, engine::getSong() ) );
 		if( p.patternNames.contains( cur_pat ) )
 		{
 			bbt->setName( p.patternNames[cur_pat] );
@@ -1456,7 +1456,7 @@ else
 						it != p.channels.end(); ++it )
 	{
 		InstrumentTrack * t = dynamic_cast<InstrumentTrack *>(
-			track::create( track::InstrumentTrack,
+			Track::create( Track::InstrumentTrack,
 					engine::getBBTrackContainer() ) );
 		engine::getBBTrackContainer()->updateAfterTrackAdd();
 		i_tracks.push_back( t );

@@ -201,7 +201,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 
 	// we need to maximize our length in case we're part of a hidden
 	// automation track as the user can't resize this pattern
-	if( getTrack() && getTrack()->type() == track::HiddenAutomationTrack )
+	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
 	{
 		changeLength( length() );
 	}
@@ -234,7 +234,7 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	generateTangents(it, 3);
 
 	if( getTrack() &&
-		getTrack()->type() == track::HiddenAutomationTrack )
+		getTrack()->type() == Track::HiddenAutomationTrack )
 	{
 		changeLength( length() );
 	}
@@ -529,11 +529,11 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
-		if( ( *it )->type() == track::AutomationTrack ||
-			( *it )->type() == track::HiddenAutomationTrack )
+		if( ( *it )->type() == Track::AutomationTrack ||
+			( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			const track::tcoVector & v = ( *it )->getTCOs();
-			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			const Track::tcoVector & v = ( *it )->getTCOs();
+			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
 				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>( *j );
 				if( a && a->hasAutomation() )
@@ -568,13 +568,13 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		// we want only automation tracks...
-		if( ( *it )->type() == track::AutomationTrack ||
-			( *it )->type() == track::HiddenAutomationTrack )
+		if( ( *it )->type() == Track::AutomationTrack ||
+			( *it )->type() == Track::HiddenAutomationTrack )
 		{
 			// get patterns in those tracks....
-			const track::tcoVector & v = ( *it )->getTCOs();
+			const Track::tcoVector & v = ( *it )->getTCOs();
 			// go through all the patterns...
-			for( track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
 				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 				// check that the pattern has automation
@@ -605,8 +605,8 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 							AutomatableModel * _m )
 {
 	AutomationTrack * t = engine::getSong()->globalAutomationTrack();
-	track::tcoVector v = t->getTCOs();
-	for( track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
+	Track::tcoVector v = t->getTCOs();
+	for( Track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
 	{
 		AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 		if( a )
@@ -638,11 +638,11 @@ void AutomationPattern::resolveAllIDs()
 	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
-		if( ( *it )->type() == track::AutomationTrack ||
-			 ( *it )->type() == track::HiddenAutomationTrack )
+		if( ( *it )->type() == Track::AutomationTrack ||
+			 ( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			track::tcoVector v = ( *it )->getTCOs();
-			for( track::tcoVector::iterator j = v.begin();
+			Track::tcoVector v = ( *it )->getTCOs();
+			for( Track::tcoVector::iterator j = v.begin();
 							j != v.end(); ++j )
 			{
 				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );

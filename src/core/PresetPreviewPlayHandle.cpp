@@ -48,7 +48,7 @@ public:
 		m_dataMutex()
 	{
 		setJournalling( false );
-		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( track::create( track::InstrumentTrack, this ) );
+		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, this ) );
 		m_previewInstrumentTrack->setJournalling( false );
 	}
 
@@ -208,7 +208,7 @@ bool PresetPreviewPlayHandle::isFinished() const
 
 
 
-bool PresetPreviewPlayHandle::isFromTrack( const track * _track ) const
+bool PresetPreviewPlayHandle::isFromTrack( const Track * _track ) const
 {
 	return s_previewTC->previewInstrumentTrack() == _track;
 }

@@ -261,7 +261,7 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( track * _trackToPlay );
+	void playTrack( Track * _trackToPlay );
 	void playBB();
 	void playPattern( Pattern* patternToPlay, bool _loop = true );
 	void togglePause();
@@ -353,7 +353,7 @@ private:
 	playPos m_playPos[Mode_Count];
 	tact_t m_length;
 
-	track * m_trackToPlay;
+	Track * m_trackToPlay;
 	Pattern* m_patternToPlay;
 	bool m_loopPattern;
 

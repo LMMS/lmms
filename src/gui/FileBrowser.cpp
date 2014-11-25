@@ -617,7 +617,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	{
 //		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack,
+				Track::create( Track::InstrumentTrack,
 					engine::getBBTrackContainer() ) );
 		handleFile( f, it );
 //		engine::mixer()->unlock();
@@ -634,7 +634,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 	{
 //		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack, tc ) );
+				Track::create( Track::InstrumentTrack, tc ) );
 		handleFile( m_contextMenuItem, it );
 //		engine::mixer()->unlock();
 	}

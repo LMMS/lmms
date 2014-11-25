@@ -120,7 +120,7 @@ public:
 
 public slots:
 	void realignTracks();
-	void createTrackView( track * _t );
+	void createTrackView( Track * _t );
 	void deleteTrackView( trackView * _tv );
 
 

@@ -292,9 +292,9 @@ void FxMixer::deleteChannel( int index )
 	tracks += engine::getSong()->tracks();
 	tracks += engine::getBBTrackContainer()->tracks();
 
-	foreach( track* t, tracks )
+	foreach( Track* t, tracks )
 	{
-		if( t->type() == track::InstrumentTrack )
+		if( t->type() == Track::InstrumentTrack )
 		{
 			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
 			int val = inst->effectChannelModel()->value(0);
@@ -345,16 +345,16 @@ void FxMixer::moveChannelLeft( int index )
 	int a = index - 1, b = index;
 
 	// go through every instrument and adjust for the channel index change
-	QVector<track *> songTrackList = engine::getSong()->tracks();
-	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+	QVector<Track *> songTrackList = engine::getSong()->tracks();
+	QVector<Track *> bbTrackList = engine::getBBTrackContainer()->tracks();
 
-	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
+	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<track *> trackList = trackLists[tl];
+		QVector<Track *> trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
-			if( trackList[i]->type() == track::InstrumentTrack )
+			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				int val = inst->effectChannelModel()->value(0);

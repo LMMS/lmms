@@ -167,7 +167,7 @@ void bbEditor::dropEvent( QDropEvent * de )
 	if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		track * t = track::create( dataFile.content().firstChild().toElement(), model() );
+		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
 		
 		t->deleteTCOs();
 		m_bbtc->updateAfterTrackAdd();
@@ -241,7 +241,7 @@ void bbEditor::updatePosition()
 
 void bbEditor::addAutomationTrack()
 {
-	(void) track::create( track::AutomationTrack, model() );
+	(void) Track::create( Track::AutomationTrack, model() );
 }
 
 
@@ -254,7 +254,7 @@ void bbEditor::addSteps()
 	for( TrackContainer::TrackList::iterator it = tl.begin();
 		it != tl.end(); ++it )
 	{
-		if( ( *it )->type() == track::InstrumentTrack )
+		if( ( *it )->type() == Track::InstrumentTrack )
 		{
 			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			p->addSteps();
@@ -272,7 +272,7 @@ void bbEditor::removeSteps()
 	for( TrackContainer::TrackList::iterator it = tl.begin();
 		it != tl.end(); ++it )
 	{
-		if( ( *it )->type() == track::InstrumentTrack )
+		if( ( *it )->type() == Track::InstrumentTrack )
 		{
 			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			p->removeSteps();

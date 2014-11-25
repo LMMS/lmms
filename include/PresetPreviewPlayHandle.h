@@ -41,7 +41,7 @@ public:
 	virtual void play( sampleFrame* buffer );
 	virtual bool isFinished() const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	static void init();
 	static void cleanup();

@@ -131,7 +131,7 @@ void trackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void trackLabelButton::paintEvent( QPaintEvent * _pe )
 {
-	if( m_trackView->getTrack()->type() == track::InstrumentTrack )
+	if( m_trackView->getTrack()->type() == Track::InstrumentTrack )
 	{
 		InstrumentTrack * it =
 			dynamic_cast<InstrumentTrack *>(

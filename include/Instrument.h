@@ -38,7 +38,7 @@ class InstrumentView;
 class MidiEvent;
 class MidiTime;
 class NotePlayHandle;
-class track;
+class Track;
 
 
 class EXPORT Instrument : public Plugin
@@ -118,7 +118,7 @@ public:
 	static Instrument * instantiate( const QString & _plugin_name,
 									InstrumentTrack * _instrument_track );
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	inline InstrumentTrack * instrumentTrack() const
 	{

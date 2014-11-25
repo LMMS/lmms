@@ -93,7 +93,7 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 // #### IT:
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
-	track( track::InstrumentTrack, tc ),
+	Track( Track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
 								this, this ),
@@ -497,7 +497,7 @@ void InstrumentTrack::setName( const QString & _new_name )
 		}
 	}
 
-	track::setName( _new_name );
+	Track::setName( _new_name );
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );
 

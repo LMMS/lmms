@@ -35,7 +35,7 @@
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, tc )
+	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
 {
 	setName( tr( "Automation track" ) );
 }

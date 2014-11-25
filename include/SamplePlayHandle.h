@@ -31,7 +31,7 @@
 
 class bbTrack;
 class SampleTCO;
-class track;
+class Track;
 class AudioPort;
 
 
@@ -52,7 +52,7 @@ public:
 	virtual void play( sampleFrame * buffer );
 	virtual bool isFinished() const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	f_cnt_t totalFrames() const;
 	inline f_cnt_t framesDone() const
@@ -86,7 +86,7 @@ private:
 
 	FloatModel m_defaultVolumeModel;
 	FloatModel * m_volumeModel;
-	track * m_track;
+	Track * m_track;
 
 	bbTrack * m_bbTrack;
 

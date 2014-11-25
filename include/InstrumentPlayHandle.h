@@ -76,7 +76,7 @@ public:
 		return false;
 	}
 
-	virtual bool isFromTrack( const track* _track ) const
+	virtual bool isFromTrack( const Track* _track ) const
 	{
 		return m_instrument->isFromTrack( _track );
 	}

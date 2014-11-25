@@ -121,7 +121,7 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const track* _track ) const;
+	virtual bool isFromTrack( const Track* _track ) const;
 
 	/*! Releases the note (and plays release frames */
 	void noteOff( const f_cnt_t offset = 0 );
@@ -211,7 +211,7 @@ public:
 
 	/*! returns list of note-play-handles belonging to given instrument track,
 	    if allPlayHandles = true, also released note-play-handles are returned */
-	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* track, bool allPlayHandles = false );
+	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* Track, bool allPlayHandles = false );
 
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
@@ -223,7 +223,7 @@ public:
 	}
 
 	/*! Sets attached BB track */
-	void setBBTrack( track* t )
+	void setBBTrack( Track* t )
 	{
 		m_bbTrack = t;
 	}
@@ -294,7 +294,7 @@ private:
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	track* m_bbTrack;						// related BB track
+	Track* m_bbTrack;						// related BB track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo

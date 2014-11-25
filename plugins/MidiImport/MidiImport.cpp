@@ -159,7 +159,7 @@ public:
 	{
 		if( !at )
 		{
-			at = dynamic_cast<AutomationTrack *>( track::create( track::AutomationTrack, tc ) );
+			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
 		}
 		return *this;
 	}
@@ -218,7 +218,7 @@ public:
 	smfMidiChannel * create( TrackContainer* tc )
 	{
 		if( !it ) {
-			it = dynamic_cast<InstrumentTrack *>( track::create( track::InstrumentTrack, tc ) );
+			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument( "sf2player" );

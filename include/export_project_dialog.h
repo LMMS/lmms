@@ -64,7 +64,7 @@ private:
 	RenderVector m_renderers;
 	bool m_multiExport;
 
-	typedef QVector<track*> TrackVector;
+	typedef QVector<Track*> TrackVector;
 	TrackVector m_unmuted;
 	TrackVector m_unmutedBB;
 	ProjectRenderer::ExportFileFormats m_ft;

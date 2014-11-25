@@ -99,7 +99,7 @@ textFloat * trackContentObjectView::s_textFloat = NULL;
  *
  * \param _track The track that will contain the new object
  */
-trackContentObject::trackContentObject( track * _track ) :
+trackContentObject::trackContentObject( Track * _track ) :
 	Model( _track ),
 	m_track( _track ),
 	m_name( QString::null ),
@@ -535,7 +535,7 @@ void trackContentObjectView::leaveEvent( QEvent * _e )
 DataFile trackContentObjectView::createTCODataFiles(
     				const QVector<trackContentObjectView *> & tcoViews) const
 {
-	track * t = m_trackView->getTrack();
+	Track * t = m_trackView->getTrack();
 	TrackContainer * tc = t->trackContainer();
 	DataFile dataFile( DataFile::DragNDropData );
 	QDomElement tcoParent = dataFile.createElement( "tcos" );
@@ -1260,7 +1260,7 @@ void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
  */
 bool trackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData )
 {
-	track * t = getTrack();
+	Track * t = getTrack();
 	QString type = stringPairDrag::decodeMimeKey( mimeData );
 	QString value = stringPairDrag::decodeMimeValue( mimeData );
 
@@ -1312,8 +1312,8 @@ bool trackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
 		}
 
 		// Track must be of the same type
-		track * startTrack = tracks.at( trackIndex );
-		track * endTrack = tracks.at( finalTrackIndex );
+		Track * startTrack = tracks.at( trackIndex );
+		Track * endTrack = tracks.at( finalTrackIndex );
 		if( startTrack->type() != endTrack->type() )
 		{
 			return false;
@@ -1383,7 +1383,7 @@ bool trackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
 
 		int trackIndex = outerTCOElement.attributeNode( "trackIndex" ).value().toInt();
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
-		track * t = tracks.at( finalTrackIndex );
+		Track * t = tracks.at( finalTrackIndex );
 
 		// Compute the final position by moving the tco's pos by
 		// the number of tacts between the first TCO and the mouse drop TCO
@@ -1494,7 +1494,7 @@ void trackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 /*! \brief Return the track shown by the trackContentWidget
  *
  */
-track * trackContentWidget::getTrack()
+Track * trackContentWidget::getTrack()
 {
 	return m_trackView->getTrack();
 }
@@ -1638,7 +1638,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 		_me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != track::BBTrack )
+			m_trackView->getTrack()->type() != Track::BBTrack )
 	{
 		DataFile dataFile( DataFile::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
@@ -1704,7 +1704,7 @@ void trackOperationsWidget::cloneTrack()
 /*! \brief Clear this track - clears all TCOs from the track */
 void trackOperationsWidget::clearTrack()
 {
-	track * t = m_trackView->getTrack();
+	Track * t = m_trackView->getTrack();
 	t->lock();
 	t->deleteTCOs();
 	t->unlock();
@@ -1766,8 +1766,8 @@ void trackOperationsWidget::recordingOn()
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( true ); }
@@ -1782,8 +1782,8 @@ void trackOperationsWidget::recordingOff()
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( false ); }
@@ -1807,7 +1807,7 @@ void trackOperationsWidget::recordingOff()
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-track::track( TrackTypes _type, TrackContainer * _tc ) :
+Track::Track( TrackTypes _type, TrackContainer * _tc ) :
 	Model( _tc ),                   /*!< The track Model */
 	m_trackContainer( _tc ),        /*!< The track container object */
 	m_type( _type ),                /*!< The track type */
@@ -1836,7 +1836,7 @@ track::track( TrackTypes _type, TrackContainer * _tc ) :
  *
  *  Finally step through this track's automation and forget all of them.
  */
-track::~track()
+Track::~Track()
 {
 	lock();
 	emit destroyedTrack();
@@ -1858,9 +1858,9 @@ track::~track()
  *  \param _tt The type of track to create
  *  \param _tc The track container to attach to
  */
-track * track::create( TrackTypes _tt, TrackContainer * _tc )
+Track * Track::create( TrackTypes _tt, TrackContainer * _tc )
 {
-	track * t = NULL;
+	Track * t = NULL;
 
 	switch( _tt )
 	{
@@ -1888,9 +1888,9 @@ track * track::create( TrackTypes _tt, TrackContainer * _tc )
  *  \param _this The QDomElement containing the type of track to create
  *  \param _tc The track container to attach to
  */
-track * track::create( const QDomElement & _this, TrackContainer * _tc )
+Track * Track::create( const QDomElement & _this, TrackContainer * _tc )
 {
-	track * t = create(
+	Track * t = create(
 		static_cast<TrackTypes>( _this.attribute( "type" ).toInt() ),
 									_tc );
 	if( t != NULL )
@@ -1906,7 +1906,7 @@ track * track::create( const QDomElement & _this, TrackContainer * _tc )
 /*! \brief Clone a track from this track
  *
  */
-void track::clone()
+void Track::clone()
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
@@ -1930,7 +1930,7 @@ void track::clone()
  *  \todo Does this accurately describe the parameters?  I think not!?
  *  \todo Save the track height
  */
-void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( !m_simpleSerializingMode )
 	{
@@ -1980,7 +1980,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
  *  \param _this the QDomElement to load track settings from
  *  \todo Load the track height.
  */
-void track::loadSettings( const QDomElement & _this )
+void Track::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "type" ).toInt() != type() )
 	{
@@ -2052,7 +2052,7 @@ void track::loadSettings( const QDomElement & _this )
  *
  *  \param _tco The trackContentObject to attach to this track.
  */
-trackContentObject * track::addTCO( trackContentObject * _tco )
+trackContentObject * Track::addTCO( trackContentObject * _tco )
 {
 	m_trackContentObjects.push_back( _tco );
 
@@ -2068,7 +2068,7 @@ trackContentObject * track::addTCO( trackContentObject * _tco )
  *
  *  \param _tco The trackContentObject to remove from this track.
  */
-void track::removeTCO( trackContentObject * _tco )
+void Track::removeTCO( trackContentObject * _tco )
 {
 	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
 					m_trackContentObjects.end(),
@@ -2086,7 +2086,7 @@ void track::removeTCO( trackContentObject * _tco )
 
 
 /*! \brief Remove all TCOs from this track */
-void track::deleteTCOs()
+void Track::deleteTCOs()
 {
 	while( ! m_trackContentObjects.isEmpty() )
 	{
@@ -2099,7 +2099,7 @@ void track::deleteTCOs()
  *
  *  \return the number of trackContentObjects we currently contain.
  */
-int track::numOfTCOs()
+int Track::numOfTCOs()
 {
 	return m_trackContentObjects.size();
 }
@@ -2119,13 +2119,13 @@ int track::numOfTCOs()
  *  \todo if we create a TCO here, should we somehow attach it to the
  *     track?
  */
-trackContentObject * track::getTCO( int _tco_num )
+trackContentObject * Track::getTCO( int _tco_num )
 {
 	if( _tco_num < m_trackContentObjects.size() )
 	{
 		return m_trackContentObjects[_tco_num];
 	}
-	printf( "called track::getTCO( %d ), "
+	printf( "called Track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
 	return createTCO( _tco_num * MidiTime::ticksPerTact() );
 
@@ -2139,7 +2139,7 @@ trackContentObject * track::getTCO( int _tco_num )
  *  \param _tco The trackContentObject to search for.
  *  \return its number in our array.
  */
-int track::getTCONum( trackContentObject * _tco )
+int Track::getTCONum( trackContentObject * _tco )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
 	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
@@ -2153,7 +2153,7 @@ int track::getTCONum( trackContentObject * _tco )
 		}*/
 		return it - m_trackContentObjects.begin();
 	}
-	qWarning( "track::getTCONum(...) -> _tco not found!\n" );
+	qWarning( "Track::getTCONum(...) -> _tco not found!\n" );
 	return 0;
 }
 
@@ -2173,7 +2173,7 @@ int track::getTCONum( trackContentObject * _tco )
  *  \param _start The MIDI start time of the range.
  *  \param _end   The MIDI endi time of the range.
  */
-void track::getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
+void Track::getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
 							const MidiTime & _end )
 {
 	for( tcoVector::iterator it_o = m_trackContentObjects.begin();
@@ -2218,7 +2218,7 @@ void track::getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
  *  \param _tco_num1 The first trackContentObject to swap.
  *  \param _tco_num2 The second trackContentObject to swap.
  */
-void track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
+void Track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
 {
 	qSwap( m_trackContentObjects[_tco_num1],
 					m_trackContentObjects[_tco_num2] );
@@ -2240,7 +2240,7 @@ void track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
  *    in ascending order by TCO time, once we hit a TCO that was earlier
  *    than the insert time, we could fall out of the loop early.
  */
-void track::insertTact( const MidiTime & _pos )
+void Track::insertTact( const MidiTime & _pos )
 {
 	// we'll increase the position of every TCO, positioned behind _pos, by
 	// one tact
@@ -2262,7 +2262,7 @@ void track::insertTact( const MidiTime & _pos )
  *
  *  \param _pos The time at which we want to remove the bar.
  */
-void track::removeTact( const MidiTime & _pos )
+void Track::removeTact( const MidiTime & _pos )
 {
 	// we'll decrease the position of every TCO, positioned behind _pos, by
 	// one tact
@@ -2286,7 +2286,7 @@ void track::removeTact( const MidiTime & _pos )
  *  keeping track of the latest time found in ticks.  Then we return
  *  that in bars by dividing by the number of ticks per bar.
  */
-tact_t track::length() const
+tact_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
@@ -2311,7 +2311,7 @@ tact_t track::length() const
  *  is already soloed.  Then we have to save the mute state of all tracks,
  *  and set our mute state to on and all the others to off.
  */
-void track::toggleSolo()
+void Track::toggleSolo()
 {
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
@@ -2371,7 +2371,7 @@ void track::toggleSolo()
  *  \param _tcv The track Container View for us to be displayed in.
  *  \todo Is my description of these properties correct?
  */
-trackView::trackView( track * _track, TrackContainerView * _tcv ) :
+trackView::trackView( Track * _track, TrackContainerView * _tcv ) :
 	QWidget( _tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
 	ModelView( NULL, this ),            /*!< The model view of this track */
 	m_track( _track ),                  /*!< The track we're displaying */
@@ -2414,7 +2414,7 @@ trackView::trackView( track * _track, TrackContainerView * _tcv ) :
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ) );
 	// create views for already existing TCOs
-	for( track::tcoVector::iterator it =
+	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
 			it != m_track->m_trackContentObjects.end(); ++it )
 	{
@@ -2493,7 +2493,7 @@ bool trackView::close()
  */
 void trackView::modelChanged()
 {
-	m_track = castModel<track>();
+	m_track = castModel<Track>();
 	assert( m_track != NULL );
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );

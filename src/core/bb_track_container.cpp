@@ -116,7 +116,7 @@ tact_t bbTrackContainer::lengthOfBB( int _bb )
 
 int bbTrackContainer::numOfBBs() const
 {
-	return engine::getSong()->countTracks( track::BBTrack );
+	return engine::getSong()->countTracks( Track::BBTrack );
 }
 
 
@@ -230,7 +230,7 @@ void bbTrackContainer::currentBBChanged()
 	TrackList tl = engine::getSong()->tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		if( ( *it )->type() == track::BBTrack )
+		if( ( *it )->type() == Track::BBTrack )
 		{
 			( *it )->dataChanged();
 		}

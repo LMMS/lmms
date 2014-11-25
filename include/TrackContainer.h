@@ -41,7 +41,7 @@ class EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<track *> TrackList;
+	typedef QVector<Track *> TrackList;
 
 	TrackContainer();
 	virtual ~TrackContainer();
@@ -56,11 +56,11 @@ public:
 		return NULL;
 	}
 
-	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
+	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
 
 
-	void addTrack( track * _track );
-	void removeTrack( track * _track );
+	void addTrack( Track * _track );
+	void removeTrack( Track * _track );
 
 	virtual void updateAfterTrackAdd();
 
@@ -80,7 +80,7 @@ public:
 
 
 signals:
-	void trackAdded( track * _track );
+	void trackAdded( Track * _track );
 
 protected:
 	mutable QReadWriteLock m_tracksMutex;
@@ -90,7 +90,7 @@ private:
 
 
 	friend class TrackContainerView;
-	friend class track;
+	friend class Track;
 
 } ;
 

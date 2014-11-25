@@ -30,7 +30,7 @@
 #include "track.h"
 
 
-class AutomationTrack : public track
+class AutomationTrack : public Track
 {
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
