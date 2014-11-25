@@ -1590,8 +1590,8 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	if( configManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
-		m_muteBtn->move( 46, 0 );
-		m_soloBtn->move( 46, 16 );
+		m_muteBtn->move( 44, 0 );
+		m_soloBtn->move( 44, 16 );
 	}
 	else
 	{
