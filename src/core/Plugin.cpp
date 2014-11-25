@@ -34,6 +34,7 @@
 #include "ConfigManager.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
+#include "MainWindow.h"
 
 
 static PixmapLoader __dummy_loader;
@@ -124,6 +125,10 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 	return inst;
 }
 
+void Plugin::collectErrorForUI( QString err_msg )
+{
+    engine::mainWindow()->collectError( err_msg );
+}
 
 
 

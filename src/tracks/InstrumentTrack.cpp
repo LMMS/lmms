@@ -122,7 +122,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 
-    m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
+	m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -312,11 +312,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				}
 			}
 			if( event.controllerNumber() == MidiControllerAllSoundOff ||
-			    event.controllerNumber() == MidiControllerAllNotesOff ||
-			    event.controllerNumber() == MidiControllerOmniOn ||
-			    event.controllerNumber() == MidiControllerOmniOff ||
-			    event.controllerNumber() == MidiControllerMonoOn ||
-			    event.controllerNumber() == MidiControllerPolyOn )
+				event.controllerNumber() == MidiControllerAllNotesOff ||
+				event.controllerNumber() == MidiControllerOmniOn ||
+				event.controllerNumber() == MidiControllerOmniOff ||
+				event.controllerNumber() == MidiControllerMonoOn ||
+				event.controllerNumber() == MidiControllerPolyOn )
 			{
 				silenceAllNotes();
 			}
@@ -795,8 +795,8 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 	delete m_instrument;
 	m_instrument = Instrument::instantiate( _plugin_name, this );
 	unlock();
-
 	setName( m_instrument->displayName() );
+
 	emit instrumentChanged();
 
 	return m_instrument;
