@@ -1,8 +1,8 @@
 /*
- * tool_button.h - declaration of class toolButton 
+ * tool_button.h - declaration of class toolButton
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TOOL_BUTTON_H
-#define _TOOL_BUTTON_H 
+#ifndef TOOL_BUTTON_H
+#define TOOL_BUTTON_H
 
 #include <QToolButton>
 #include <QColor>

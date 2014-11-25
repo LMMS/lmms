@@ -2,7 +2,7 @@
  * bb_track_container.h - model-component of BB-Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _BB_TRACK_CONTAINER_H
-#define _BB_TRACK_CONTAINER_H
+#ifndef BB_TRACK_CONTAINER_H
+#define BB_TRACK_CONTAINER_H
 
 #include "TrackContainer.h"
 #include "combobox.h"

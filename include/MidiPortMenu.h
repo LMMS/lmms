@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _MIDI_PORT_MENU_H
-#define _MIDI_PORT_MENU_H
+#ifndef MIDI_PORT_MENU_H
+#define MIDI_PORT_MENU_H
 
 #include <QMenu>
 

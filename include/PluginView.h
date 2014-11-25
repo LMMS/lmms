@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PLUGIN_VIEW_H
-#define _PLUGIN_VIEW_H
+#ifndef PLUGIN_VIEW_H
+#define PLUGIN_VIEW_H
 
 #include <QWidget>
 

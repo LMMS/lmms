@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _CAPTION_MENU_H
-#define _CAPTION_MENU_H
+#ifndef CAPTION_MENU_H
+#define CAPTION_MENU_H
 
 #include <QMenu>
 

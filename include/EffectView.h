@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _EFFECT_VIEW_H
-#define _EFFECT_VIEW_H
+#ifndef EFFECT_VIEW_H
+#define EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
 #include "PluginView.h"
@@ -47,7 +47,7 @@ class EffectView : public PluginView
 public:
 	EffectView( Effect * _model, QWidget * _parent );
 	virtual ~EffectView();
-	
+
 	inline Effect * effect()
 	{
 		return castModel<Effect>();
@@ -66,7 +66,7 @@ public slots:
 	void displayHelp();
 	void closeEffects();
 
-	
+
 signals:
 	void moveUp( EffectView * _plugin );
 	void moveDown( EffectView * _plugin );

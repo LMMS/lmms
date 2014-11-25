@@ -2,7 +2,7 @@
  * pixmap_button.h - declaration of class pixmapButton
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _PIXMAP_BUTTON_H
-#define _PIXMAP_BUTTON_H
+#ifndef PIXMAP_BUTTON_H
+#define PIXMAP_BUTTON_H
 
 #include <QPixmap>
 

@@ -2,7 +2,7 @@
  * track_label_button.h - class trackLabelButton
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TRACK_LABEL_BUTTON_H
-#define _TRACK_LABEL_BUTTON_H
+#ifndef TRACK_LABEL_BUTTON_H
+#define TRACK_LABEL_BUTTON_H
 
 #include <QToolButton>
 

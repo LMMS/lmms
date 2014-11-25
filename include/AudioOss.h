@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_OSS_H
-#define _AUDIO_OSS_H
+#ifndef AUDIO_OSS_H
+#define AUDIO_OSS_H
 
 #include "lmmsconfig.h"
 

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TEMPO_SYNC_KNOB_MODEL_H
-#define _TEMPO_SYNC_KNOB_MODEL_H
+#ifndef TEMPO_SYNC_KNOB_MODEL_H
+#define TEMPO_SYNC_KNOB_MODEL_H
 
 #include "MeterModel.h"
 

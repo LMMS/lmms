@@ -2,7 +2,7 @@
  * custom_events.h - custom event types list
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _CUSTOM_EVENTS_H
-#define _CUSTOM_EVENTS_H
+#ifndef CUSTOM_EVENTS_H
+#define CUSTOM_EVENTS_H
 
 
 #include <QtCore/QEvent>

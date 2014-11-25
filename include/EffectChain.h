@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _EFFECT_CHAIN_H
-#define _EFFECT_CHAIN_H
+#ifndef EFFECT_CHAIN_H
+#define EFFECT_CHAIN_H
 
 #include "Model.h"
 #include "SerializingObject.h"

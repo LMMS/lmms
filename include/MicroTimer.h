@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MICRO_TIMER
-#define _MICRO_TIMER
+#ifndef MICRO_TIMER
+#define MICRO_TIMER
 
 #include "lmmsconfig.h"
 

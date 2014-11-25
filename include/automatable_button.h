@@ -2,7 +2,7 @@
  * automatable_button.h - class automatableButton, the base for all buttons
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _AUTOMATABLE_BUTTON_H
-#define _AUTOMATABLE_BUTTON_H
+#ifndef AUTOMATABLE_BUTTON_H
+#define AUTOMATABLE_BUTTON_H
 
 #include <QPushButton>
 
@@ -38,7 +38,7 @@ class EXPORT automatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
-	automatableButton( QWidget * _parent, const QString & _name 
+	automatableButton( QWidget * _parent, const QString & _name
 			= QString::null );
 	virtual ~automatableButton();
 

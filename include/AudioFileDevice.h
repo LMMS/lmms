@@ -1,5 +1,5 @@
 /*
- * AudioFileDevice.h - base-class for audio-device-classes which write 
+ * AudioFileDevice.h - base-class for audio-device-classes which write
  *                     their output into a file
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_FILE_DEVICE_H
-#define _AUDIO_FILE_DEVICE_H
+#ifndef AUDIO_FILE_DEVICE_H
+#define AUDIO_FILE_DEVICE_H
 
 #include <QtCore/QFile>
 

@@ -3,7 +3,7 @@
  *                    Hydrogen's CPU-load-widget)
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _CPULOAD_WIDGET_H
-#define _CPULOAD_WIDGET_H
+#ifndef CPULOAD_WIDGET_H
+#define CPULOAD_WIDGET_H
 
 #include <QtCore/QTimer>
 #include <QPixmap>

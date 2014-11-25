@@ -3,7 +3,7 @@
  *                 setup your songs
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _SONG_EDITOR_H
-#define _SONG_EDITOR_H
+#ifndef SONG_EDITOR_H
+#define SONG_EDITOR_H
 
 #include "TrackContainerView.h"
 

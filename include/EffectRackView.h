@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _EFFECT_RACK_VIEW_H
-#define _EFFECT_RACK_VIEW_H
+#ifndef EFFECT_RACK_VIEW_H
+#define EFFECT_RACK_VIEW_H
 
 #include <QWidget>
 

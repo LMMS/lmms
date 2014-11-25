@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _METER_MODEL_H
-#define _METER_MODEL_H
+#ifndef METER_MODEL_H
+#define METER_MODEL_H
 
 #include "AutomatableModel.h"
 

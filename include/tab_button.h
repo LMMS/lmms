@@ -2,7 +2,7 @@
  * tab_button.h - declaration of class tabButton
  *
  * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TAB_BUTTON_H
-#define _TAB_BUTTON_H
+#ifndef TAB_BUTTON_H
+#define TAB_BUTTON_H
 
 #include <QPushButton>
 

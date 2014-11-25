@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_H
-#define _MIDI_H
+#ifndef MIDI_H
+#define MIDI_H
 
 #include "lmms_basics.h"
 

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _LADSPA_BASE_H
-#define _LADSPA_BASE_H
+#ifndef LADSPA_BASE_H
+#define LADSPA_BASE_H
 
 #include "ladspa_manager.h"
 #include "Plugin.h"

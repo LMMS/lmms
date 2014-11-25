@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _JOURNALLING_OBJECT_H
-#define _JOURNALLING_OBJECT_H
+#ifndef JOURNALLING_OBJECT_H
+#define JOURNALLING_OBJECT_H
 
 #include <QtCore/QStack>
 
@@ -50,7 +50,7 @@ public:
 
 	void restoreJournallingState()
 	{
-		if( !isJournallingStateStackEmpty()) 
+		if( !isJournallingStateStackEmpty())
 		{
 			m_journalling = m_journallingStateStack.pop();
 		}

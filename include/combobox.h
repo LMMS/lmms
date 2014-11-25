@@ -2,7 +2,7 @@
  * combobox.h - class ComboBox, a combo box view for models
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _COMBOBOX_H
-#define _COMBOBOX_H
+#ifndef COMBOBOX_H
+#define COMBOBOX_H
 
 #include <QMenu>
 #include <QWidget>

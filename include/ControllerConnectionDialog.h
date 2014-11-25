@@ -3,7 +3,7 @@
  *	modify links between controllers and models
  *
  * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _CONTROLLER_CONNECTION_DIALOG_H
-#define _CONTROLLER_CONNECTION_DIALOG_H
+#ifndef CONTROLLER_CONNECTION_DIALOG_H
+#define CONTROLLER_CONNECTION_DIALOG_H
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
@@ -94,7 +94,7 @@ private:
 	Controller * m_controller;
 	const AutomatableModel * m_targetModel;
 
-	// Temporary midiController 
+	// Temporary midiController
 	AutoDetectMidiController * m_midiController;
 } ;
 

@@ -2,7 +2,7 @@
  * fifo_buffer.h - FIFO fixed-size buffer
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _FIFO_BUFFER_H
-#define _FIFO_BUFFER_H
+#ifndef FIFO_BUFFER_H
+#define FIFO_BUFFER_H
 
 #include <QtCore/QSemaphore>
 

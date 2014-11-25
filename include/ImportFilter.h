@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _IMPORT_FILTER_H
-#define _IMPORT_FILTER_H
+#ifndef IMPORT_FILTER_H
+#define IMPORT_FILTER_H
 
 #include <QtCore/QFile>
 

@@ -2,7 +2,7 @@
  * group_box.h - LMMS-groupbox
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _GROUP_BOX_H
-#define _GROUP_BOX_H
+#ifndef GROUP_BOX_H
+#define GROUP_BOX_H
 
 #include <QWidget>
 

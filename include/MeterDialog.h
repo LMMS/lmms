@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _METER_DIALOG_H
-#define _METER_DIALOG_H
+#ifndef METER_DIALOG_H
+#define METER_DIALOG_H
 
 #include <QWidget>
 

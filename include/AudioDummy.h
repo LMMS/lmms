@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_DUMMY_H
-#define _AUDIO_DUMMY_H
+#ifndef AUDIO_DUMMY_H
+#define AUDIO_DUMMY_H
 
 #include "AudioDevice.h"
 #include "MicroTimer.h"

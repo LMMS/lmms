@@ -2,7 +2,7 @@
  * nstate_button.h - declaration of class nStateButton
  *
  * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _NSTATE_BUTTON_H
-#define _NSTATE_BUTTON_H
+#ifndef NSTATE_BUTTON_H
+#define NSTATE_BUTTON_H
 
 #include <QPixmap>
 #include <QtCore/QVector>

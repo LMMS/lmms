@@ -2,7 +2,7 @@
  * tooltip.h - namespace toolTip, a tooltip-wrapper for LMMS
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TOOLTIP_H
-#define _TOOLTIP_H
+#ifndef TOOLTIP_H
+#define TOOLTIP_H
 
 #include <qstring.h>
 

@@ -2,7 +2,7 @@
  * tab_bar.h - class tabBar
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TAB_BAR_H
-#define _TAB_BAR_H
+#ifndef TAB_BAR_H
+#define TAB_BAR_H
 
 #include <QtCore/QMap>
 #include <QLayout>

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _NOTE_H
-#define _NOTE_H
+#ifndef NOTE_H
+#define NOTE_H
 
 #include <QtCore/QVector>
 
@@ -49,7 +49,7 @@ enum Keys
 	Key_GIS = 8, Key_AS = 8,
 	Key_A = 9,
 	Key_AIS = 10, Key_B = 10,
-	Key_H = 11 
+	Key_H = 11
 } ;
 
 
@@ -89,7 +89,7 @@ public:
 		DetuningHelper * _detuning = NULL );
 	note( const note & _note );
 	virtual ~note();
-	
+
 	// used by GUI
 	inline void setSelected( const bool _selected ){ m_selected = _selected; }
 	inline void setOldKey( const int _oldKey ){ m_oldKey = _oldKey; }
@@ -102,8 +102,8 @@ public:
 	{
 		m_isPlaying = _isPlaying;
 	}
-	
-	
+
+
 	void setLength( const MidiTime & _length );
 	void setPos( const MidiTime & _pos );
 	void setKey( const int _key );
@@ -216,12 +216,12 @@ protected:
 
 private:
 	// for piano roll editing
-	bool m_selected; 
+	bool m_selected;
 	int m_oldKey;
 	MidiTime m_oldPos;
 	MidiTime m_oldLength;
 	bool m_isPlaying;
-	
+
 	int m_key;
 	volume_t m_volume;
 	panning_t m_panning;

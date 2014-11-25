@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _TOOL_PLUGIN_H
-#define _TOOL_PLUGIN_H
+#ifndef TOOL_PLUGIN_H
+#define TOOL_PLUGIN_H
 
 #include "Plugin.h"
 

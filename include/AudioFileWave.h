@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_FILE_WAVE_H
-#define _AUDIO_FILE_WAVE_H
+#ifndef AUDIO_FILE_WAVE_H
+#define AUDIO_FILE_WAVE_H
 
 #include "lmmsconfig.h"
 #include "AudioFileDevice.h"

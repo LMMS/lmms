@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUTOMATABLE_MODEL_VIEW_H
-#define _AUTOMATABLE_MODEL_VIEW_H
+#ifndef AUTOMATABLE_MODEL_VIEW_H
+#define AUTOMATABLE_MODEL_VIEW_H
 
 #include "ModelView.h"
 #include "AutomatableModel.h"

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PITCH_H
-#define _PITCH_H
+#ifndef PITCH_H
+#define PITCH_H
 
 #include "lmms_basics.h"
 #include "Midi.h"

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_OSS_H
-#define _MIDI_OSS_H
+#ifndef MIDI_OSS_H
+#define MIDI_OSS_H
 
 #include "lmmsconfig.h"
 

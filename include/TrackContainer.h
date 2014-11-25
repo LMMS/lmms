@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TRACK_CONTAINER_H
-#define _TRACK_CONTAINER_H
+#ifndef TRACK_CONTAINER_H
+#define TRACK_CONTAINER_H
 
 #include <QtCore/QReadWriteLock>
 
