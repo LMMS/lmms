@@ -35,6 +35,7 @@
 
 class MidiImport : public ImportFilter
 {
+	Q_OBJECT
 public:
 	MidiImport( const QString & _file );
 	virtual ~MidiImport();

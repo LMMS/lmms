@@ -51,6 +51,14 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
+    <message>
+        <source>Involved</source>
+        <translation>Beteiligt</translation>
+    </message>
+    <message>
+        <source>Contributors ordered by number of commits:</source>
+        <translation>Mitwirkende sortiert nach der Anzahl an Einreichungen:</translation>
+    </message>
 </context>
 <context>
     <name>AmplifierControlDialog</name>
@@ -221,9 +229,6 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation>Der JACK-Server scheint heruntergefahren worden zu sein und es war nicht möglich, eine neue Instanz zu starten. LMMS ist daher nicht in der Lage, fortzufahren. Sie sollten Ihr Projekt speichern und JACK und LMMS neustarten.</translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation>CLIENT-NAME</translation>
@@ -1389,9 +1394,6 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <source>FX-Mixer</source>
         <translation>FX-Mixer</translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation>FX Schieber %1</translation>
@@ -2110,7 +2112,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation>Diese Tabs enthalten Hüllkurven. Diese sind sehr wichtig, um einen Klang zu verändern, insbesondere bei der substraktiven Synthese. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Klang welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann man ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahn-Welle wirklich coole Klänge machen...!</translation>
+        <translation>Diese Tabs enthalten Hüllkurven. Diese sind sehr wichtig, um einen Klang zu verändern, insbesondere bei der substraktiven Synthese. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Klang welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann man ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahnwelle wirklich coole Klänge machen...!</translation>
     </message>
     <message>
         <source>FILTER</source>
@@ -2487,12 +2489,8 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <translation>Klick für eine Rechteckwelle.</translation>
     </message>
     <message>
-        <source>Click here for a a moog saw-wave.</source>
-        <translation>Klick für eine Moog-ähnliche Welle.</translation>
-    </message>
-    <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klick für eine Exponential-Welle.</translation>
+        <translation>Klick für eine exponentielle Welle.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -2503,6 +2501,10 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
 Double click to pick a file.</source>
         <translation>Klicken Sie hier für eine benutzerdefinierte From.
 Doppelklicken Sie, um eine Datei auszuwählen.</translation>
+    </message>
+    <message>
+        <source>Click here for a moog saw-wave.</source>
+        <translation>Klick für eine Moog-Sägezahnwelle.</translation>
     </message>
 </context>
 <context>
@@ -2810,7 +2812,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
 </context>
 <context>
-    <name>MidiAlsaSeq::setupWidget</name>
+    <name>MidiAlsaSeq</name>
     <message>
         <source>DEVICE</source>
         <translation>GERÄT</translation>
@@ -3277,6 +3279,98 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <message>
         <source>Sub3-LFO2</source>
         <translation>Sub3-LFO2</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinuswelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Triangle wave</source>
+        <translation>Bandlimittierte Dreieckwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Saw wave</source>
+        <translation>Bandbegrenzte Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Square wave</source>
+        <translation>Bandbegrenzte Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Moog saw wave</source>
+        <translation>Bandbegrenzte Moog-Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Soft square wave</source>
+        <translation>Weiche Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Absolute sine wave</source>
+        <translation>Absolute Sinuswelle</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>Exponentielle Welle</translation>
+    </message>
+    <message>
+        <source>White noise</source>
+        <translation>Weißes Rauschen</translation>
+    </message>
+    <message>
+        <source>Digital Triangle wave</source>
+        <translation>Digitale Dreieckwelle</translation>
+    </message>
+    <message>
+        <source>Digital Saw wave</source>
+        <translation>Digitale Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Digital Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Square wave</source>
+        <translation>Digitale Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Digital Moog saw wave</source>
+        <translation>Digitale Moog-Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Dreieckwelle</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation>Moog-Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Abs. sine wave</source>
+        <translation>Abs. Sinuswelle</translation>
+    </message>
+    <message>
+        <source>Random</source>
+        <translation>Zufällig</translation>
+    </message>
+    <message>
+        <source>Random smooth</source>
+        <translation>Zufällig gleitend</translation>
     </message>
 </context>
 <context>
@@ -4648,7 +4742,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Use an exponential wave for current oscillator.</source>
-        <translation>Exponentialwelle für aktuellen Oszillator nutzen.</translation>
+        <translation>Exponentielle Welle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
@@ -4657,17 +4751,6 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
         <translation>Benutzerdefinierte Wellenform für aktuellen Oszillator nutzen.</translation>
-    </message>
-</context>
-<context>
-    <name>Ui</name>
-    <message>
-        <source>Contributors ordered by number of commits:</source>
-        <translation>Mitwirkende sortiert nach der Anzahl an Einreichungen:</translation>
-    </message>
-    <message>
-        <source>Involved</source>
-        <translation>Beteiligt</translation>
     </message>
 </context>
 <context>
@@ -5109,11 +5192,11 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Click for sine wave</source>
-        <translation>Klicken für Sinus-Welle</translation>
+        <translation>Klicken für Sinuswelle</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -5377,7 +5460,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -5385,7 +5468,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -5716,6 +5799,14 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
         <translation>Bitte geben Sie einen Wert zwischen -96.0 dBV und 6.0 dBV ein:</translation>
     </message>
+    <message>
+        <source>Set linear</source>
+        <translation>Linear einstellen</translation>
+    </message>
+    <message>
+        <source>Set logarithmic</source>
+        <translation>Logarithmisch einstellen</translation>
+    </message>
 </context>
 <context>
     <name>ladspaBrowserView</name>
@@ -5929,7 +6020,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
@@ -5969,7 +6060,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Click for a sine-wave.</source>
@@ -5981,7 +6072,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klick für eine Exponential-Welle.</translation>
+        <translation>Klick für eine exponentielle-Welle.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -7621,7 +7712,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>SawTooth</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -8162,7 +8253,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -8170,7 +8261,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Square wave</source>

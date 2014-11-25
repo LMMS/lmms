@@ -201,4 +201,4 @@ void InstrumentMidiIOView::modelChanged()
 	}
 }
 
-
+#include "moc_InstrumentMidiIOView.cxx"
