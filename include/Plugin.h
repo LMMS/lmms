@@ -40,8 +40,9 @@ class PluginView;
 class AutomatableModel;
 
 
-class EXPORT Plugin : public JournallingObject, public Model
+class EXPORT Plugin : public Model, public JournallingObject
 {
+	Q_OBJECT
 public:
 	enum PluginTypes
 	{

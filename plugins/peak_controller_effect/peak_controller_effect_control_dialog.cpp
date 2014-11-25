@@ -99,3 +99,4 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setLayout( tl );
 }
 
+#include "moc_peak_controller_effect_control_dialog.cxx"

@@ -116,3 +116,5 @@ waveShaperControlDialog::waveShaperControlDialog(
 	connect( subOneButton, SIGNAL( clicked() ),
 			_controls, SLOT( subOneClicked() ) );
 }
+
+#include "moc_waveshaper_control_dialog.cxx"

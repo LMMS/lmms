@@ -172,8 +172,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 
 FxMixer::FxMixer() :
-	JournallingObject(),
 	Model( NULL ),
+	JournallingObject(),
 	m_fxChannels()
 {
 	// create master channel
@@ -691,3 +691,5 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 		r->updateName();
 	}
 }
+
+#include "moc_FxMixer.cxx"

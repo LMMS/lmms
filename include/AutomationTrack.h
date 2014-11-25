@@ -32,6 +32,7 @@
 
 class AutomationTrack : public track
 {
+	Q_OBJECT
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
 	virtual ~AutomationTrack();

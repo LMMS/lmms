@@ -133,6 +133,7 @@ protected:
 
 class malletsInstrument : public Instrument
 {
+	Q_OBJECT
 public:
 	malletsInstrument( InstrumentTrack * _instrument_track );
 	virtual ~malletsInstrument();
