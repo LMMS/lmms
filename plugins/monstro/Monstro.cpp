@@ -26,7 +26,7 @@
 #include <QDomElement>
 
 #include "Monstro.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "templates.h"
 #include "gui_templates.h"
@@ -1012,9 +1012,9 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateSampleRate
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
 
-	m_fpp = engine::mixer()->framesPerPeriod();
+	m_fpp = Engine::mixer()->framesPerPeriod();
 
 	updateSamplerate();
 	updateVolume1();
@@ -1425,7 +1425,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = engine::mixer()->processingSampleRate();
+	m_samplerate = Engine::mixer()->processingSampleRate();
 	
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;

@@ -70,7 +70,7 @@ public:
 		{
 			m_detectedMidiChannel = event.channel() + 1;
 			m_detectedMidiController = event.controllerNumber() + 1;
-			m_detectedMidiPort = engine::mixer()->midiClient()->sourcePortName( event );
+			m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();
 		}
@@ -165,7 +165,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( !engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::mixer()->midiClient()->isRaw() )
 	{
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
@@ -189,9 +189,9 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	m_userController = new comboBox( m_userGroupBox, "Controller" );
 	m_userController->setGeometry( 10, 24, 200, 22 );
 
-	for( int i = 0; i < engine::getSong()->controllers().size(); ++i )
+	for( int i = 0; i < Engine::getSong()->controllers().size(); ++i )
 	{
-		Controller * c = engine::getSong()->controllers().at( i );
+		Controller * c = Engine::getSong()->controllers().at( i );
 		m_userController->model()->addItem( c->name() );
 	}
 	
@@ -242,7 +242,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	{
 		cc = m_targetModel->controllerConnection();
 
-		if( cc && cc->getController()->type() != Controller::DummyController && engine::getSong() )
+		if( cc && cc->getController()->type() != Controller::DummyController && Engine::getSong() )
 		{
 			if ( cc->getController()->type() == Controller::MidiController )
 			{
@@ -258,7 +258,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			}
 			else
 			{
-				int idx = engine::getSong()->controllers().indexOf( cc->getController() );
+				int idx = Engine::getSong()->controllers().indexOf( cc->getController() );
 
 				if( idx >= 0 )
 				{
@@ -298,7 +298,7 @@ void ControllerConnectionDialog::selectController()
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
 			MidiController * mc;
-			mc = m_midiController->copyToMidiController( engine::getSong() );
+			mc = m_midiController->copyToMidiController( Engine::getSong() );
 	
 			/*
 			if( m_targetModel->getTrack() && 
@@ -321,9 +321,9 @@ void ControllerConnectionDialog::selectController()
 	else 
 	{
 		if( m_userGroupBox->model()->value() > 0 && 
-				engine::getSong()->controllers().size() )
+				Engine::getSong()->controllers().size() )
 		{
-			m_controller = engine::getSong()->controllers().at( 
+			m_controller = Engine::getSong()->controllers().at( 
 					m_userController->model()->value() );
 		}
 
@@ -353,7 +353,7 @@ void ControllerConnectionDialog::midiToggled()
 
 		if( !m_midiController )
 		{
-			m_midiController = new AutoDetectMidiController( engine::getSong() );
+			m_midiController = new AutoDetectMidiController( Engine::getSong() );
 
 			MidiPort::Map map = m_midiController->m_midiPort.readablePorts();
 			for( MidiPort::Map::Iterator it = map.begin(); it != map.end(); ++it )

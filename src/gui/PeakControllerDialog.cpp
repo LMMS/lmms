@@ -33,7 +33,7 @@
 #include "caption_menu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "tooltip.h"
 

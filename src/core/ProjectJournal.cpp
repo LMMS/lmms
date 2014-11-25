@@ -25,7 +25,7 @@
 #include <cstdlib>
 
 #include "ProjectJournal.h"
-#include "engine.h"
+#include "Engine.h"
 #include "JournallingObject.h"
 #include "Song.h"
 
@@ -66,7 +66,7 @@ void ProjectJournal::undo()
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 			break;
 		}
 	}
@@ -91,7 +91,7 @@ void ProjectJournal::redo()
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 			break;
 		}
 	}

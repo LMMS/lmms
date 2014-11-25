@@ -110,9 +110,9 @@ SongEditor::SongEditor( Song * _song ) :
 
 
 	// add some essential widgets to global tool-bar
-	QWidget * tb = engine::mainWindow()->toolBar();
+	QWidget * tb = Engine::mainWindow()->toolBar();
 
-	engine::mainWindow()->addSpacingToToolBar( 10 );
+	Engine::mainWindow()->addSpacingToToolBar( 10 );
 
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
@@ -127,7 +127,7 @@ SongEditor::SongEditor( Song * _song ) :
 			"should be played within a minute (or how many measures "
 			"should be played within four minutes)." ) );
 
-	int tempoSpinBoxCol = engine::mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
+	int tempoSpinBoxCol = Engine::mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
@@ -140,15 +140,15 @@ SongEditor::SongEditor( Song * _song ) :
 	engine::mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
 
-	engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
+	Engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
-	engine::mainWindow()->addSpacingToToolBar( 10 );
+	Engine::mainWindow()->addSpacingToToolBar( 10 );
 
 	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
-	engine::mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
+	Engine::mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
-	engine::mainWindow()->addSpacingToToolBar( 10 );
+	Engine::mainWindow()->addSpacingToToolBar( 10 );
 
 
 	QLabel * master_vol_lbl = new QLabel( tb );
@@ -177,11 +177,11 @@ SongEditor::SongEditor( Song * _song ) :
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	engine::mainWindow()->addWidgetToToolBar( master_vol_lbl );
-	engine::mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
+	Engine::mainWindow()->addWidgetToToolBar( master_vol_lbl );
+	Engine::mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
 
 
-	engine::mainWindow()->addSpacingToToolBar( 10 );
+	Engine::mainWindow()->addSpacingToToolBar( 10 );
 
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
@@ -209,10 +209,10 @@ SongEditor::SongEditor( Song * _song ) :
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
-	engine::mainWindow()->addWidgetToToolBar( master_pitch_lbl );
-	engine::mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
+	Engine::mainWindow()->addWidgetToToolBar( master_pitch_lbl );
+	Engine::mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
 
-	engine::mainWindow()->addSpacingToToolBar( 10 );
+	Engine::mainWindow()->addSpacingToToolBar( 10 );
 
 	// create widget for visualization- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
@@ -227,7 +227,7 @@ SongEditor::SongEditor( Song * _song ) :
 	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
 	vcw_layout->addStretch();
 
-	engine::mainWindow()->addWidgetToToolBar( vc_w );
+	Engine::mainWindow()->addWidgetToToolBar( vc_w );
 
 
 	// create own toolbar
@@ -269,7 +269,7 @@ SongEditor::SongEditor( Song * _song ) :
 	m_recordButton->setDisabled( true );
 
 	// disable record buttons if capturing is not supported
-	if( !engine::mixer()->audioDev()->supportsCapture() )
+	if( !Engine::mixer()->audioDev()->supportsCapture() )
 	{
 		m_recordButton->setDisabled( true );
 		m_recordAccompanyButton->setDisabled( true );
@@ -390,7 +390,7 @@ SongEditor::SongEditor( Song * _song ) :
 			this, SLOT( updateScrollBar( int ) ) );
 
 
-	engine::mainWindow()->workspace()->addSubWindow( this );
+	Engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
@@ -409,7 +409,7 @@ SongEditor::~SongEditor()
 
 void SongEditor::setHighQuality( bool _hq )
 {
-	engine::mixer()->changeQuality( Mixer::qualitySettings(
+	Engine::mixer()->changeQuality( Mixer::qualitySettings(
 			_hq ? Mixer::qualitySettings::Mode_HighQuality :
 				Mixer::qualitySettings::Mode_Draft ) );
 }
@@ -443,13 +443,13 @@ void SongEditor::setPauseIcon( bool pause )
 
 void SongEditor::play()
 {
-	if( engine::getSong()->playMode() != Song::Mode_PlaySong )
+	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
 	{
-		engine::getSong()->playSong();
+		Engine::getSong()->playSong();
 	}
 	else
 	{
-		engine::getSong()->togglePause();
+		Engine::getSong()->togglePause();
 	}
 }
 
@@ -475,7 +475,7 @@ void SongEditor::recordAccompany()
 void SongEditor::stop()
 {
 	m_song->stop();
-	engine::pianoRoll()->stopRecording();
+	Engine::pianoRoll()->stopRecording();
 }
 
 
@@ -484,13 +484,13 @@ void SongEditor::stop()
 void SongEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		engine::mainWindow()->isShiftPressed() == true &&
+		Engine::mainWindow()->isShiftPressed() == true &&
 						_ke->key() == Qt::Key_Insert )
 	{
 		m_song->insertBar();
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			engine::mainWindow()->isShiftPressed() == true &&
+			Engine::mainWindow()->isShiftPressed() == true &&
 						_ke->key() == Qt::Key_Delete )
 	{
 		m_song->removeBar();
@@ -537,7 +537,7 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 
 void SongEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( engine::mainWindow()->isCtrlPressed() == true )
+	if( Engine::mainWindow()->isCtrlPressed() == true )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -561,7 +561,7 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( engine::mainWindow()->isShiftPressed() == true )
+	else if( Engine::mainWindow()->isShiftPressed() == true )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -587,7 +587,7 @@ void SongEditor::masterVolumeChanged( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	engine::mixer()->setMasterGain( _new_val / 100.0f );
+	Engine::mixer()->setMasterGain( _new_val / 100.0f );
 }
 
 
@@ -777,7 +777,7 @@ void SongEditor::adjustUiAfterProjectLoad()
 		// make sure to bring us to front as the song editor is the central
 		// widget in a song and when just opening a song in order to listen to
 		// it, it's very annyoing to manually bring up the song editor each time
-		engine::mainWindow()->workspace()->setActiveSubWindow(
+		Engine::mainWindow()->workspace()->setActiveSubWindow(
 				qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	}
 	scrolled( 0 );

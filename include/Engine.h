@@ -1,5 +1,5 @@
 /*
- * engine.h - engine-system of LMMS
+ * Engine.h - engine-system of LMMS
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -50,7 +50,7 @@ class ladspa2LMMS;
 class ControllerRackView;
 
 
-class EXPORT engine
+class EXPORT Engine
 {
 public:
 	static void init( const bool _has_gui = true );

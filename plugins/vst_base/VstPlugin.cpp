@@ -46,7 +46,7 @@
 #endif
 
 #include "ConfigManager.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "Song.h"
 #include "templates.h"
@@ -108,11 +108,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	}
 #endif
 
-	setTempo( engine::getSong()->getTempo() );
+	setTempo( Engine::getSong()->getTempo() );
 
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ) );
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -237,7 +237,7 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 	if( _parent == NULL )
 	{
 		vstSubWin * sw = new vstSubWin(
-					engine::mainWindow()->workspace() );
+					Engine::mainWindow()->workspace() );
 		if( isEffect )
 		{
 			sw->setAttribute( Qt::WA_TranslucentBackground );
@@ -377,7 +377,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( engine::mixer()->processingSampleRate() ) );
+			addInt( Engine::mixer()->processingSampleRate() ) );
 	unlock();
 }
 

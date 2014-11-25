@@ -26,7 +26,7 @@
 
 #include "InstrumentFunctions.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "PresetPreviewPlayHandle.h"
@@ -260,7 +260,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				engine::mixer()->addPlayHandle( 
+				Engine::mixer()->addPlayHandle( 
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking )
 						);
@@ -369,7 +369,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
-	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * engine::mixer()->processingSampleRate() );
+	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate() );
 	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames / 100.0f );
 
 	// used for calculating remaining frames for arp-note, we have to add
@@ -381,11 +381,11 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	// used for loop
 	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
-	while( frames_processed < engine::mixer()->framesPerPeriod() )
+	while( frames_processed < Engine::mixer()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer?
-		if( remaining_frames_for_cur_arp > engine::mixer()->framesPerPeriod() )
+		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() )
 		{
 			// then we don't have to do something!
 			break;
@@ -458,7 +458,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// range-checking
 		if( sub_note_key >= NumKeys ||
 			sub_note_key < 0 ||
-			engine::mixer()->criticalXRuns() )
+			Engine::mixer()->criticalXRuns() )
 		{
 			continue;
 		}
@@ -473,7 +473,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		engine::mixer()->addPlayHandle(
+		Engine::mixer()->addPlayHandle(
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,

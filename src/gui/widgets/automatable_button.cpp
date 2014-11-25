@@ -29,7 +29,7 @@
 #include <QMouseEvent>
 
 #include "caption_menu.h"
-#include "engine.h"
+#include "Engine.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "string_pair_drag.h"

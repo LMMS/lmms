@@ -36,7 +36,7 @@
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "knob.h"
 #include "led_checkbox.h"
@@ -109,7 +109,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			m_subWindow = engine::mainWindow()->workspace()->addSubWindow(
+			m_subWindow = Engine::mainWindow()->workspace()->addSubWindow(
 								m_controlView,
 				Qt::SubWindow | Qt::CustomizeWindowHint  |
 					Qt::WindowTitleHint | Qt::WindowSystemMenuHint );

@@ -39,7 +39,7 @@ float frnd(float range)
 #include <QDomElement>
 
 #include "sfxr.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "NotePlayHandle.h"
@@ -451,7 +451,7 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	float currentSampleRate = engine::mixer()->processingSampleRate();
+	float currentSampleRate = Engine::mixer()->processingSampleRate();
 
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
     const f_cnt_t offset = _n->noteOffset();

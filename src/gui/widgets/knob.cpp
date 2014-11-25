@@ -41,7 +41,7 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
@@ -462,7 +462,7 @@ float knob::getValue( const QPoint & _p )
 	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2.5f ), 6.0f ) ) ) / 12.0f;
 	
 	// if shift pressed we want slower movement
-	if( engine::mainWindow()->isShiftPressed() )	
+	if( Engine::mainWindow()->isShiftPressed() )	
 	{
 		value /= 4.0f;
 		value = qBound( -4.0f, value, 4.0f );
@@ -520,7 +520,7 @@ void knob::dropEvent( QDropEvent * _de )
 	else if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				engine::projectJournal()->
+				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
@@ -561,7 +561,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			engine::mainWindow()->isShiftPressed() == true )
+			Engine::mainWindow()->isShiftPressed() == true )
 	{
 		new stringPairDrag( "float_value",
 					QString::number( model()->value() ),

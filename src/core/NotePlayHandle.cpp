@@ -69,7 +69,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_hadChildren( false ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
-	m_origTempo( engine::getSong()->getTempo() ),
+	m_origTempo( Engine::getSong()->getTempo() ),
 	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
@@ -114,7 +114,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
 			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), engine::framesPerTick() ), 
+			MidiTime::fromFrames( offset(), Engine::framesPerTick() ), 
 			offset() );
 	}
 
@@ -207,9 +207,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// if the note offset falls over to next period, then don't start playback yet
-	if( offset() >= engine::mixer()->framesPerPeriod() )
+	if( offset() >= Engine::mixer()->framesPerPeriod() )
 	{
-		setOffset( offset() - engine::mixer()->framesPerPeriod() );
+		setOffset( offset() - Engine::mixer()->framesPerPeriod() );
 		return;
 	}
 	
@@ -221,8 +221,8 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	// number of frames that can be played this period
 	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0 
-		? engine::mixer()->framesPerPeriod() - offset()
-		: engine::mixer()->framesPerPeriod();
+		? Engine::mixer()->framesPerPeriod() - offset()
+		: Engine::mixer()->framesPerPeriod();
 
 	// check if we start release during this period
 	if( m_released == false &&
@@ -261,7 +261,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		// are inserted by arpAndChordsTabWidget::processNote()
 		if( ! m_subNotes.isEmpty() )
 		{
-			m_releaseFramesToDo = m_releaseFramesDone + 2 * engine::mixer()->framesPerPeriod();
+			m_releaseFramesToDo = m_releaseFramesDone + 2 * Engine::mixer()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -325,7 +325,7 @@ f_cnt_t NotePlayHandle::framesLeft() const
 {
 	if( instrumentTrack()->isSustainPedalPressed() )
 	{
-		return 4*engine::mixer()->framesPerPeriod();
+		return 4*Engine::mixer()->framesPerPeriod();
 	}
 	else if( m_released && actualReleaseFramesToDo() == 0 )
 	{
@@ -345,9 +345,9 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return (fpp_t) qMin<f_cnt_t>( framesLeft(), engine::mixer()->framesPerPeriod() - offset() );
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() - offset() );
 	}
-	return (fpp_t) qMin<f_cnt_t>( framesLeft(), engine::mixer()->framesPerPeriod() );
+	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() );
 }
 
 
@@ -386,14 +386,14 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-				MidiTime::fromFrames( _s, engine::framesPerTick() ), 
+				MidiTime::fromFrames( _s, Engine::framesPerTick() ), 
 				_s );
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
 	if( m_origin == OriginMidiInput )
 	{
-		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
+		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
 		m_instrumentTrack->midiNoteOff( *this );
 	}
 }
@@ -445,7 +445,7 @@ void NotePlayHandle::mute()
 
 int NotePlayHandle::index() const
 {
-	const PlayHandleList & playHandles = engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	int idx = 0;
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
@@ -468,7 +468,7 @@ int NotePlayHandle::index() const
 
 ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentTrack * _it, bool _all_ph )
 {
-	const PlayHandleList & playHandles = engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
@@ -512,7 +512,7 @@ void NotePlayHandle::updateFrequency()
 	const float pitch =
 		( key() -
 				m_instrumentTrack->baseNoteModel()->value() +
-				engine::getSong()->masterPitch() +
+				Engine::getSong()->masterPitch() +
 				m_baseDetuning->value() )
 												 / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );

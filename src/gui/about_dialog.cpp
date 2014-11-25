@@ -26,14 +26,14 @@
 #include "lmmsversion.h"
 #include "about_dialog.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "versioninfo.h"
 
 
 
 aboutDialog::aboutDialog() :
-	QDialog( engine::mainWindow() ),
+	QDialog( Engine::mainWindow() ),
 	Ui::AboutDialog()
 {
 	setupUi( this );

@@ -50,7 +50,7 @@
 #include "SongEditor.h"
 #include "MainWindow.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "pixmap_button.h"
 #include "templates.h"
 #include "gui_templates.h"
@@ -105,7 +105,7 @@ AutomationEditor::AutomationEditor() :
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
 				Qt::QueuedConnection );
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
 	// init pixmaps
 	if( s_toolDraw == NULL )
@@ -133,7 +133,7 @@ AutomationEditor::AutomationEditor() :
 
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
-				engine::getSong()->getPlayPos(
+				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -435,9 +435,9 @@ AutomationEditor::AutomationEditor() :
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
 	// add us to workspace
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
-		engine::mainWindow()->workspace()->addSubWindow( this );
+		Engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
 		parentWidget()->move( 5, 5 );
 		parentWidget()->hide();
@@ -587,7 +587,7 @@ void AutomationEditor::update()
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
-		engine::pianoRoll()->update();
+		Engine::pianoRoll()->update();
 	}
 }
 
@@ -725,7 +725,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSong()->isPlaying() )
+			if( Engine::getSong()->isPlaying() )
 			{
 				stop();
 			}
@@ -911,7 +911,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				QCursor c( Qt::SizeAllCursor );
 				QApplication::setOverrideCursor( c );
 
-				engine::getSong()->setModified();
+				Engine::getSong()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -921,7 +921,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				if( it != time_map.end() )
 				{
 					m_pattern->removeValue( it.key() );
-					engine::getSong()->setModified();
+					Engine::getSong()->setModified();
 				}
 				m_action = NONE;
 			}
@@ -954,7 +954,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 
 				m_action = MOVE_SELECTION;
 
-				engine::getSong()->setModified();
+				Engine::getSong()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -1039,7 +1039,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 								level );
 			}
 
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 
 		}
 		else if( ( _me->buttons() & Qt::RightButton &&
@@ -1492,7 +1492,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		}
 		// Then beat grid
 		int ticksPerBeat = DefaultTicksPerTact /
-			engine::getSong()->getTimeSigModel().getDenominator();
+			Engine::getSong()->getTimeSigModel().getDenominator();
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
 				 x = xCoordOfTick( tick );
 			 x<=width();
@@ -1817,9 +1817,9 @@ void AutomationEditor::resizeEvent( QResizeEvent * )
 
 	m_topBottomScroll->setValue( (int) m_scrollLevel );
 
-	if( engine::getSong() )
+	if( Engine::getSong() )
 	{
-		engine::getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
+		Engine::getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
 					).m_timeLine->setFixedWidth( width() );
 	}
 	m_toolBar->setFixedWidth( width() );
@@ -1914,7 +1914,7 @@ inline bool AutomationEditor::inBBEditor()
 {
 	QMutexLocker m( &m_patternMutex );
 	return( validPattern() &&
-				m_pattern->getTrack()->trackContainer() == engine::getBBTrackContainer() );
+				m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
 }
 
 
@@ -1931,37 +1931,37 @@ void AutomationEditor::play()
 
 	if( !m_pattern->getTrack() )
 	{
-		if( engine::getSong()->playMode() != Song::Mode_PlayPattern )
+		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 		{
-			engine::getSong()->stop();
-			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
+			Engine::getSong()->stop();
+			Engine::getSong()->playPattern( (Pattern *) Engine::pianoRoll()->currentPattern() );
 		}
-		else if( engine::getSong()->isStopped() == false )
+		else if( Engine::getSong()->isStopped() == false )
 		{
-			engine::getSong()->togglePause();
+			Engine::getSong()->togglePause();
 		}
 		else
 		{
-			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( (Pattern *) Engine::pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
 	{
-		engine::getBBTrackContainer()->play();
+		Engine::getBBTrackContainer()->play();
 	}
 	else
 	{
-		if( engine::getSong()->isStopped() == true )
+		if( Engine::getSong()->isStopped() == true )
 		{
-			engine::getSong()->playSong();
+			Engine::getSong()->playSong();
 		}
 		else
 		{
-			engine::getSong()->togglePause();
+			Engine::getSong()->togglePause();
 		}
 	}
 
-	setPauseIcon( engine::getSong()->isPlaying() );
+	setPauseIcon( Engine::getSong()->isPlaying() );
 }
 
 
@@ -1977,11 +1977,11 @@ void AutomationEditor::stop()
 	}
 	if( m_pattern->getTrack() && inBBEditor() )
 	{
-		engine::getBBTrackContainer()->stop();
+		Engine::getBBTrackContainer()->stop();
 	}
 	else
 	{
-		engine::getSong()->stop();
+		Engine::getSong()->stop();
 	}
 	m_scrollBack = true;
 }
@@ -2058,7 +2058,7 @@ void AutomationEditor::discreteButtonToggled()
 		disableTensionKnob();
 		m_pattern->setProgressionType(
 				AutomationPattern::DiscreteProgression );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -2074,7 +2074,7 @@ void AutomationEditor::linearButtonToggled()
 		disableTensionKnob();
 		m_pattern->setProgressionType(
 					AutomationPattern::LinearProgression );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -2096,7 +2096,7 @@ void AutomationEditor::cubicHermiteButtonToggled()
 				"level off at each control point." ) );
 		m_pattern->setProgressionType(
 				AutomationPattern::CubicHermiteProgression );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -2235,7 +2235,7 @@ void AutomationEditor::cutSelectedValues()
 
 	if( !selected_values.isEmpty() )
 	{
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
@@ -2246,7 +2246,7 @@ void AutomationEditor::cutSelectedValues()
 	}
 
 	update();
-	engine::songEditor()->update();
+	Engine::songEditor()->update();
 }
 
 
@@ -2266,9 +2266,9 @@ void AutomationEditor::pasteValues()
 
 		// we only have to do the following lines if we pasted at
 		// least one value...
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
-		engine::songEditor()->update();
+		Engine::songEditor()->update();
 	}
 }
 
@@ -2296,9 +2296,9 @@ void AutomationEditor::deleteSelectedValues()
 
 	if( update_after_delete == true )
 	{
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
-		engine::songEditor()->update();
+		Engine::songEditor()->update();
 	}
 }
 
@@ -2307,8 +2307,8 @@ void AutomationEditor::deleteSelectedValues()
 
 void AutomationEditor::updatePosition( const MidiTime & _t )
 {
-	if( ( engine::getSong()->isPlaying() &&
-			engine::getSong()->playMode() ==
+	if( ( Engine::getSong()->isPlaying() &&
+			Engine::getSong()->playMode() ==
 					Song::Mode_PlayAutomationPattern ) ||
 							m_scrollBack == true )
 	{

@@ -48,7 +48,7 @@
 #include "EffectChain.h"
 #include "EffectRackView.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -95,7 +95,7 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	Track( Track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
+	m_midiPort( tr( "unnamed_track" ), Engine::mixer()->midiClient(),
 								this, this ),
 	m_notes(),
 	m_sustainPedalPressed( false ),
@@ -122,7 +122,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 
-    m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
+    m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -138,7 +138,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 int InstrumentTrack::baseNote() const
 {
-	return m_baseNoteModel.value() - engine::getSong()->masterPitch();
+	return m_baseNoteModel.value() - Engine::getSong()->masterPitch();
 }
 
 
@@ -260,7 +260,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
-					if( ! engine::mixer()->addPlayHandle( nph ) )
+					if( ! Engine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = NULL;
 					}
@@ -421,7 +421,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	engine::mixer()->removePlayHandles( this, removeIPH );
+	Engine::mixer()->removePlayHandles( this, removeIPH );
 	unlock();
 }
 
@@ -571,7 +571,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		return false;
 	}
-	const float frames_per_tick = engine::framesPerTick();
+	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
 	bbTrack * bb_track = NULL;
@@ -654,7 +654,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 				}
 
-				engine::mixer()->addPlayHandle( notePlayHandle );
+				Engine::mixer()->addPlayHandle( notePlayHandle );
 				played_a_note = true;
 			}
 			++nit;
@@ -720,7 +720,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1 );
+	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
 	m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 
@@ -866,7 +866,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::mixer()->midiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
 							MidiPort::Input );
@@ -935,7 +935,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = NULL;
 	foreach( QMdiSubWindow * sw,
-				engine::mainWindow()->workspace()->subWindowList(
+				Engine::mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
 		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
@@ -1129,10 +1129,10 @@ class fxLineLcdSpinBox : public LcdSpinBox
 	protected:
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
-			engine::fxMixerView()->setCurrentFxLine( model()->value() );
+			Engine::fxMixerView()->setCurrentFxLine( model()->value() );
 
-			engine::fxMixerView()->show();// show fxMixer window
-			engine::fxMixerView()->setFocus();// set focus to fxMixer window
+			Engine::fxMixerView()->show();// show fxMixer window
+			Engine::fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
 		}
 };
@@ -1274,7 +1274,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = engine::mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = Engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1300,7 +1300,7 @@ InstrumentTrackWindow::~InstrumentTrackWindow()
 
 	delete m_instrumentView;
 
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -1439,7 +1439,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 void InstrumentTrackWindow::textChanged( const QString& newName )
 {
 	m_track->setName( newName );
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -1466,7 +1466,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
 	event->ignore();
 
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 	}
@@ -1515,7 +1515,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	{
 		m_track->loadInstrument( value );
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		event->accept();
 	}
@@ -1526,7 +1526,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		m_track->setSimpleSerializing();
 		m_track->loadSettings( dataFile.content().toElement() );
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		event->accept();
 	}
@@ -1537,7 +1537,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
-			i = m_track->loadInstrument( engine::pluginFileHandling()[ext] );
+			i = m_track->loadInstrument( Engine::pluginFileHandling()[ext] );
 		}
 
 		i->loadFile( value );

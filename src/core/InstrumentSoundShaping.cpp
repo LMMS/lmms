@@ -27,7 +27,7 @@
 #include "InstrumentSoundShaping.h"
 #include "basic_filters.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
@@ -119,7 +119,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 
 	if( n->isReleased() == false )
 	{
-		envReleaseBegin += engine::mixer()->framesPerPeriod();
+		envReleaseBegin += Engine::mixer()->framesPerPeriod();
 	}
 
 	float level;
@@ -161,7 +161,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 		if( n->m_filter == NULL )
 		{
-			n->m_filter = new basicFilters<>( engine::mixer()->processingSampleRate() );
+			n->m_filter = new basicFilters<>( Engine::mixer()->processingSampleRate() );
 		}
 		n->m_filter->setFilterType( m_filterModel.value() );
 

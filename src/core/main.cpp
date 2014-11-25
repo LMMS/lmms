@@ -68,7 +68,7 @@
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "LmmsStyle.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
@@ -437,7 +437,7 @@ int main( int argc, char * * argv )
 		qApp->processEvents();
 
 		// init central engine which handles all components of LMMS
-		engine::init();
+		Engine::init();
 		
 		splashScreen.hide();
 
@@ -449,7 +449,7 @@ int main( int argc, char * * argv )
 		QString recoveryFile = ConfigManager::inst()->recoveryFile();
 
 		if( QFileInfo(recoveryFile).exists() &&
-			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
+			QMessageBox::question( Engine::mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "
 										"Do you want to recover the project of this session?" ),
 						QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
@@ -460,54 +460,54 @@ int main( int argc, char * * argv )
 		// we try to load given file
 		if( !file_to_load.isEmpty() )
 		{
-			engine::mainWindow()->show();
+			Engine::mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::mainWindow()->showMaximized();
+				Engine::mainWindow()->showMaximized();
 			}
 			if( file_to_load == recoveryFile )
 			{
-				engine::getSong()->createNewProjectFromTemplate( file_to_load );
+				Engine::getSong()->createNewProjectFromTemplate( file_to_load );
 			}
 			else
 			{
-				engine::getSong()->loadProject( file_to_load );
+				Engine::getSong()->loadProject( file_to_load );
 			}
 		}
 		else if( !file_to_import.isEmpty() )
 		{
-			ImportFilter::import( file_to_import, engine::getSong() );
+			ImportFilter::import( file_to_import, Engine::getSong() );
 			if( exit_after_import )
 			{
 				return 0;
 			}
 
-			engine::mainWindow()->show();
+			Engine::mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::mainWindow()->showMaximized();
+				Engine::mainWindow()->showMaximized();
 			}
 		}
 		else
 		{
-			engine::getSong()->createNewProject();
+			Engine::getSong()->createNewProject();
 
 			// [Settel] workaround: showMaximized() doesn't work with
 			// FVWM2 unless the window is already visible -> show() first
-			engine::mainWindow()->show();
+			Engine::mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::mainWindow()->showMaximized();
+				Engine::mainWindow()->showMaximized();
 			}
 		}
 	}
 	else
 	{
 		// we're going to render our song
-		engine::init( false );
+		Engine::init( false );
 
 		printf( "loading project...\n" );
-		engine::getSong()->loadProject( file_to_load );
+		Engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );
 
 		// create renderer
@@ -527,7 +527,7 @@ int main( int argc, char * * argv )
 
 		if( profilerOutputFile.isEmpty() == false )
 		{
-			engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+			Engine::mixer()->profiler().setOutputFile( profilerOutputFile );
 		}
 
 		// start now!

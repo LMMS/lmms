@@ -30,7 +30,7 @@
 #include <QDomElement>
 
 #include "endian_handling.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
@@ -551,7 +551,7 @@ void PatmanView::openFile( void )
 		if( f != "" )
 		{
 			m_pi->setFile( f );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 }

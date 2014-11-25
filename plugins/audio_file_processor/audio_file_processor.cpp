@@ -32,7 +32,7 @@
 #include <samplerate.h>
 
 #include "audio_file_processor.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Song.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
@@ -293,7 +293,7 @@ QString audioFileProcessor::nodeName( void ) const
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
-			engine::mixer()->processingSampleRate() / engine::mixer()->baseSampleRate();
+			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
@@ -708,7 +708,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	if( af != "" )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 }
 

@@ -104,7 +104,7 @@ Song::Song() :
 					this, SLOT( setTimeSignature() ) );
 
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
@@ -129,7 +129,7 @@ Song::~Song()
 
 void Song::masterVolumeChanged()
 {
-	engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
+	Engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
 								100.0f );
 }
 
@@ -138,9 +138,9 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	engine::mixer()->lockPlayHandleRemoval();
+	Engine::mixer()->lockPlayHandleRemoval();
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
-	PlayHandleList & playHandles = engine::mixer()->playHandles();
+	PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
@@ -152,9 +152,9 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	engine::mixer()->unlockPlayHandleRemoval();
+	Engine::mixer()->unlockPlayHandleRemoval();
 
-	engine::updateFramesPerTick();
+	Engine::updateFramesPerTick();
 
 	m_vstSyncController.setTempo( tempo );
 
@@ -216,9 +216,9 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayBB:
-			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
+			if( Engine::getBBTrackContainer()->numOfBBs() > 0 )
 			{
-				tco_num = engine::getBBTrackContainer()->
+				tco_num = Engine::getBBTrackContainer()->
 								currentBB();
 				track_list.push_back( bbTrack::findBBTrack(
 								tco_num ) );
@@ -261,14 +261,14 @@ void Song::processNextBuffer()
 	}
 
 	f_cnt_t total_frames_played = 0;
-	const float frames_per_tick = engine::framesPerTick();
+	const float frames_per_tick = Engine::framesPerTick();
 
 	while( total_frames_played
-				< engine::mixer()->framesPerPeriod() )
+				< Engine::mixer()->framesPerPeriod() )
 	{
 		m_vstSyncController.update();
 
-		f_cnt_t played_frames = engine::mixer()->framesPerPeriod() - total_frames_played;
+		f_cnt_t played_frames = Engine::mixer()->framesPerPeriod() - total_frames_played;
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
 		// did we play a tick?
@@ -291,7 +291,7 @@ void Song::processNextBuffer()
 				// or to loop back to first tact
 				if( m_playMode == Mode_PlayBB )
 				{
-					max_tact = engine::getBBTrackContainer()
+					max_tact = Engine::getBBTrackContainer()
 							->lengthOfCurrentBB();
 				}
 				else if( m_playMode == Mode_PlayPattern &&
@@ -606,7 +606,7 @@ void Song::stop()
 	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
 
 	// remove all note-play-handles that are active
-	engine::mixer()->clear();
+	Engine::mixer()->clear();
 
 	m_playMode = Mode_None;
 
@@ -673,7 +673,7 @@ void Song::removeBar()
 void Song::addBBTrack()
 {
 	Track * t = Track::create( Track::BBTrack, this );
-	engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
+	Engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
 }
 
 
@@ -713,7 +713,7 @@ AutomationPattern * Song::tempoAutomationPattern()
 
 void Song::clearProject()
 {
-	engine::projectJournal()->setJournalling( false );
+	Engine::projectJournal()->setJournalling( false );
 
 	if( m_playing )
 	{
@@ -726,33 +726,33 @@ void Song::clearProject()
 	}
 
 
-	engine::mixer()->lock();
-	if( engine::getBBEditor() )
+	Engine::mixer()->lock();
+	if( Engine::getBBEditor() )
 	{
-		engine::getBBEditor()->clearAllTracks();
+		Engine::getBBEditor()->clearAllTracks();
 	}
-	if( engine::songEditor() )
+	if( Engine::songEditor() )
 	{
-		engine::songEditor()->clearAllTracks();
+		Engine::songEditor()->clearAllTracks();
 	}
-	if( engine::fxMixerView() )
+	if( Engine::fxMixerView() )
 	{
-		engine::fxMixerView()->clear();
+		Engine::fxMixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
-	engine::getBBTrackContainer()->clearAllTracks();
+	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	engine::fxMixer()->clear();
+	Engine::fxMixer()->clear();
 
-	if( engine::automationEditor() )
+	if( Engine::automationEditor() )
 	{
-		engine::automationEditor()->setCurrentPattern( NULL );
+		Engine::automationEditor()->setCurrentPattern( NULL );
 	}
 
-	if( engine::pianoRoll() )
+	if( Engine::pianoRoll() )
 	{
-		engine::pianoRoll()->reset();
+		Engine::pianoRoll()->reset();
 	}
 
 	m_tempoModel.reset();
@@ -766,11 +766,11 @@ void Song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 
-	if( engine::getProjectNotes() )
+	if( Engine::getProjectNotes() )
 	{
-		engine::getProjectNotes()->clear();
+		Engine::getProjectNotes()->clear();
 	}
 
 	// Move to function
@@ -781,9 +781,9 @@ void Song::clearProject()
 
 	emit dataChanged();
 
-	engine::projectJournal()->clearJournal();
+	Engine::projectJournal()->clearJournal();
 
-	engine::projectJournal()->setJournalling( true );
+	Engine::projectJournal()->setJournalling( true );
 
 	InstrumentTrackView::cleanupWindowCache();
 }
@@ -816,7 +816,7 @@ void Song::createNewProject()
 
 	clearProject();
 
-	engine::projectJournal()->setJournalling( false );
+	Engine::projectJournal()->setJournalling( false );
 
 	m_fileName = m_oldFileName = "";
 
@@ -825,7 +825,7 @@ void Song::createNewProject()
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	t = Track::create( Track::InstrumentTrack,
-						engine::getBBTrackContainer() );
+						Engine::getBBTrackContainer() );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
 	Track::create( Track::SampleTrack, this );
@@ -841,17 +841,17 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 
-	engine::getBBTrackContainer()->updateAfterTrackAdd();
+	Engine::getBBTrackContainer()->updateAfterTrackAdd();
 
-	engine::projectJournal()->setJournalling( true );
+	Engine::projectJournal()->setJournalling( true );
 
 	QCoreApplication::sendPostedEvents();
 
 	m_modified = false;
 
-	if( engine::mainWindow() )
+	if( Engine::mainWindow() )
 	{
-		engine::mainWindow()->resetWindowTitle();
+		Engine::mainWindow()->resetWindowTitle();
 	}
 }
 
@@ -865,9 +865,9 @@ void Song::createNewProjectFromTemplate( const QString & _template )
 	// saving...
 	m_fileName = m_oldFileName = "";
 	// update window title
-	if( engine::mainWindow() )
+	if( Engine::mainWindow() )
 	{
-		engine::mainWindow()->resetWindowTitle();
+		Engine::mainWindow()->resetWindowTitle();
 	}
 
 }
@@ -882,7 +882,7 @@ void Song::loadProject( const QString & _file_name )
 
 	m_loadingProject = true;
 
-	engine::projectJournal()->setJournalling( false );
+	Engine::projectJournal()->setJournalling( false );
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -899,7 +899,7 @@ void Song::loadProject( const QString & _file_name )
 
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
 
-	engine::mixer()->lock();
+	Engine::mixer()->lock();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -923,14 +923,14 @@ void Song::loadProject( const QString & _file_name )
 	PeakController::initGetControllerBySetting();
 
 	// Load mixer first to be able to set the correct range for FX channels
-	node = dataFile.content().firstChildElement( engine::fxMixer()->nodeName() );
+	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
 	if( !node.isNull() )
 	{
-		engine::fxMixer()->restoreState( node.toElement() );
-		if( engine::hasGUI() )
+		Engine::fxMixer()->restoreState( node.toElement() );
+		if( Engine::hasGUI() )
 		{
 			// refresh FxMixerView
-			engine::fxMixerView()->refreshDisplay();
+			Engine::fxMixerView()->refreshDisplay();
 		}
 	}
 
@@ -947,23 +947,23 @@ void Song::loadProject( const QString & _file_name )
 			{
 				restoreControllerStates( node.toElement() );
 			}
-			else if( engine::hasGUI() )
+			else if( Engine::hasGUI() )
 			{
-				if( node.nodeName() == engine::getControllerRackView()->nodeName() )
+				if( node.nodeName() == Engine::getControllerRackView()->nodeName() )
 				{
-					engine::getControllerRackView()->restoreState( node.toElement() );
+					Engine::getControllerRackView()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == engine::pianoRoll()->nodeName() )
+				else if( node.nodeName() == Engine::pianoRoll()->nodeName() )
 				{
-					engine::pianoRoll()->restoreState( node.toElement() );
+					Engine::pianoRoll()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == engine::automationEditor()->nodeName() )
+				else if( node.nodeName() == Engine::automationEditor()->nodeName() )
 				{
-					engine::automationEditor()->restoreState( node.toElement() );
+					Engine::automationEditor()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == engine::getProjectNotes()->nodeName() )
+				else if( node.nodeName() == Engine::getProjectNotes()->nodeName() )
 				{
-					 engine::getProjectNotes()->SerializingObject::restoreState( node.toElement() );
+					 Engine::getProjectNotes()->SerializingObject::restoreState( node.toElement() );
 				}
 				else if( node.nodeName() == m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
 				{
@@ -976,7 +976,7 @@ void Song::loadProject( const QString & _file_name )
 
 	// quirk for fixing projects with broken positions of TCOs inside
 	// BB-tracks
-	engine::getBBTrackContainer()->fixIncorrectPositions();
+	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
 	// Connect controller links to their controllers 
 	// now that everything is loaded
@@ -986,20 +986,20 @@ void Song::loadProject( const QString & _file_name )
 	AutomationPattern::resolveAllIDs();
 
 
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( _file_name );
 
-	engine::projectJournal()->setJournalling( true );
+	Engine::projectJournal()->setJournalling( true );
 
 	emit projectLoaded();
 
 	m_loadingProject = false;
 	m_modified = false;
 
-	if( engine::mainWindow() )
+	if( Engine::mainWindow() )
 	{
-		engine::mainWindow()->resetWindowTitle();
+		Engine::mainWindow()->resetWindowTitle();
 	}
 }
 
@@ -1019,13 +1019,13 @@ bool Song::saveProjectFile( const QString & _filename )
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
-	engine::fxMixer()->saveState( dataFile, dataFile.content() );
-	if( engine::hasGUI() )
+	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+	if( Engine::hasGUI() )
 	{
-		engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
-		engine::pianoRoll()->saveState( dataFile, dataFile.content() );
-		engine::automationEditor()->saveState( dataFile, dataFile.content() );
-		engine::getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+		Engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
+		Engine::pianoRoll()->saveState( dataFile, dataFile.content() );
+		Engine::automationEditor()->saveState( dataFile, dataFile.content() );
+		Engine::getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState( dataFile, dataFile.content() );
 	}
 
@@ -1041,7 +1041,7 @@ bool Song::guiSaveProject()
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_fileName = dataFile.nameWithExtension( m_fileName );
-	if( saveProjectFile( m_fileName ) && engine::hasGUI() )
+	if( saveProjectFile( m_fileName ) && Engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
@@ -1050,9 +1050,9 @@ bool Song::guiSaveProject()
 									2000 );
 		ConfigManager::inst()->addRecentlyOpenedProject( m_fileName );
 		m_modified = false;
-		engine::mainWindow()->resetWindowTitle();
+		Engine::mainWindow()->resetWindowTitle();
 	}
-	else if( engine::hasGUI() )
+	else if( Engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project NOT saved." ),
 				tr( "The project %1 was not saved!" ).arg(
@@ -1136,7 +1136,7 @@ void Song::restoreControllerStates( const QDomElement & _this )
 		 * This line removes the previously added controller for PeakController
 		 * without affecting the order of controllers in Controller Rack
 		 */
-		engine::getSong()->removeController( c );
+		Engine::getSong()->removeController( c );
 		addController( c );
 
 		node = node.nextSibling();
@@ -1153,7 +1153,7 @@ void Song::exportProject(bool multiExport)
 {
 	if( isEmpty() )
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 				tr( "Empty project" ),
 				tr( "This project is empty so exporting makes "
 					"no sense. Please put some items into "
@@ -1161,7 +1161,7 @@ void Song::exportProject(bool multiExport)
 		return;
 	}
 
-	FileDialog efd( engine::mainWindow() );
+	FileDialog efd( Engine::mainWindow() );
 	if (multiExport)
 	{
 		efd.setFileMode( FileDialog::Directory);
@@ -1221,7 +1221,7 @@ void Song::exportProject(bool multiExport)
 		}
 
 		const QString export_file_name = efd.selectedFiles()[0] + suffix;
-		exportProjectDialog epd( export_file_name, engine::mainWindow(), multiExport );
+		exportProjectDialog epd( export_file_name, Engine::mainWindow(), multiExport );
 		epd.exec();
 	}
 }
@@ -1231,7 +1231,7 @@ void Song::exportProject(bool multiExport)
 
 void Song::updateFramesPerTick()
 {
-	engine::updateFramesPerTick();
+	Engine::updateFramesPerTick();
 }
 
 
@@ -1242,10 +1242,10 @@ void Song::setModified()
 	if( !m_loadingProject )
 	{
 		m_modified = true;
-		if( engine::mainWindow() &&
-			QThread::currentThread() == engine::mainWindow()->thread() )
+		if( Engine::mainWindow() &&
+			QThread::currentThread() == Engine::mainWindow()->thread() )
 		{
-			engine::mainWindow()->resetWindowTitle();
+			Engine::mainWindow()->resetWindowTitle();
 		}
 	}
 }
@@ -1272,9 +1272,9 @@ void Song::removeController( Controller * _controller )
 	{
 		m_controllers.remove( index );
 
-		if( engine::getSong() )
+		if( Engine::getSong() )
 		{
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 		emit dataChanged();
 	}

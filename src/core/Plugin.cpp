@@ -29,7 +29,7 @@
 
 #include "Plugin.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "ConfigManager.h"
 #include "DummyPlugin.h"
@@ -96,7 +96,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 	QLibrary pluginLibrary( ConfigManager::inst()->pluginDir() + pluginName );
 	if( pluginLibrary.load() == false )
 	{
-		if( engine::hasGUI() )
+		if( Engine::hasGUI() )
 		{
 			QMessageBox::information( NULL,
 				tr( "Plugin not found" ),
@@ -110,7 +110,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 	InstantiationHook instantiationHook = ( InstantiationHook ) pluginLibrary.resolve( "lmms_plugin_main" );
 	if( instantiationHook == NULL )
 	{
-		if( engine::hasGUI() )
+		if( Engine::hasGUI() )
 		{
 			QMessageBox::information( NULL,
 				tr( "Error while loading plugin" ),

@@ -30,7 +30,7 @@
 
 #include "FileDialog.h"
 #include "sf2_player.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "NotePlayHandle.h"
@@ -119,7 +119,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_synth = new_fluid_synth( m_settings );
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	engine::mixer()->addPlayHandle( iph );
+	Engine::mixer()->addPlayHandle( iph );
 
 	loadFile( ConfigManager::inst()->defaultSoundfont() );
 
@@ -133,7 +133,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
 	// Gain
 	connect( &m_gain, SIGNAL( dataChanged() ), this, SLOT( updateGain() ) );
@@ -158,7 +158,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 sf2Instrument::~sf2Instrument()
 {
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
@@ -465,7 +465,7 @@ void sf2Instrument::updateSampleRate()
 	double tempRate;
 
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", engine::mixer()->processingSampleRate() );
+	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::mixer()->processingSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
@@ -495,7 +495,7 @@ void sf2Instrument::updateSampleRate()
 	}
 
 	m_synthMutex.lock();
-	if( engine::mixer()->currentQualitySettings().interpolation >=
+	if( Engine::mixer()->currentQualitySettings().interpolation >=
 			Mixer::qualitySettings::Interpolation_SincFastest )
 	{
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
@@ -505,7 +505,7 @@ void sf2Instrument::updateSampleRate()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < engine::mixer()->processingSampleRate() )
+	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
 		if( m_srcState != NULL )
@@ -513,7 +513,7 @@ void sf2Instrument::updateSampleRate()
 			src_delete( m_srcState );
 		}
 		int error;
-		m_srcState = src_new( engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
+		m_srcState = src_new( Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
 		if( m_srcState == NULL || error )
 		{
 			qCritical( "error while creating libsamplerate data structure in Sf2Instrument::updateSampleRate()" );
@@ -641,7 +641,7 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
@@ -722,10 +722,10 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
-	if( m_internalSampleRate < engine::mixer()->processingSampleRate() &&
+	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() &&
 							m_srcState != NULL )
 	{
-		const fpp_t f = frames * m_internalSampleRate / engine::mixer()->processingSampleRate();
+		const fpp_t f = frames * m_internalSampleRate / Engine::mixer()->processingSampleRate();
 #ifdef __GNUC__
 		sampleFrame tmp[f];
 #else
@@ -1084,7 +1084,7 @@ void sf2InstrumentView::showFileDialog()
 		if( f != "" )
 		{
 			k->openFile( f );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 

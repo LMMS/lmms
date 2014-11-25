@@ -31,7 +31,7 @@
 #include "string_pair_drag.h"
 #include "SampleBuffer.h"
 #include "Oscillator.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 graph::graph( QWidget * _parent, graphStyle _style, int _width,

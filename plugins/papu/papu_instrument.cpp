@@ -35,7 +35,7 @@
 #include "NotePlayHandle.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
-#include "engine.h"
+#include "Engine.h"
 #include "graph.h"
 
 #include "embed.cpp"
@@ -237,7 +237,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
-	const int samplerate = engine::mixer()->processingSampleRate();
+	const int samplerate = Engine::mixer()->processingSampleRate();
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 

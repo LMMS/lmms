@@ -30,7 +30,7 @@
 
 #include "caption_menu.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 
 

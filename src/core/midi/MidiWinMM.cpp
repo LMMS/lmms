@@ -27,7 +27,7 @@
 
 #include "MidiWinMM.h"
 #include "ConfigManager.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "MidiPort.h"
 #include "note.h"

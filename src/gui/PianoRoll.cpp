@@ -292,7 +292,7 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
-					engine::getSong()->getPlayPos(
+					Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -301,7 +301,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePosition( const MidiTime & ) ) );
 
 	// update timeline when in record-accompany mode
-	connect( engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine,
+	connect( Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine,
 				SIGNAL( positionChanged( const MidiTime & ) ),
 			this,
 			SLOT( updatePositionAccompany( const MidiTime & ) ) );
@@ -678,9 +678,9 @@ PianoRoll::PianoRoll() :
 	setMinimumSize( tb_layout->minimumSize().width(), 160 );
 
 	// add us to workspace
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
-		engine::mainWindow()->workspace()->addSubWindow( this );
+		Engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->setMinimumSize( tb_layout->minimumSize().width()+10, 200 );
 		parentWidget()->resize( tb_layout->minimumSize().width()+10,
 						INITIAL_PIANOROLL_HEIGHT );
@@ -694,7 +694,7 @@ PianoRoll::PianoRoll() :
 		hide();
 	}
 
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
 }
 
@@ -795,10 +795,10 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	}
 
 	// force the song-editor to stop playing if it played pattern before
-	if( engine::getSong()->isPlaying() &&
-		engine::getSong()->playMode() == Song::Mode_PlayPattern )
+	if( Engine::getSong()->isPlaying() &&
+		Engine::getSong()->playMode() == Song::Mode_PlayPattern )
 	{
-		engine::getSong()->playPattern( NULL );
+		Engine::getSong()->playPattern( NULL );
 	}
 
 	// set new data
@@ -1134,7 +1134,7 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 
 	// we modified the song
 	update();
-	engine::songEditor()->update();
+	Engine::songEditor()->update();
 
 }
 
@@ -1170,7 +1170,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 
 	// we modified the song
 	update();
-	engine::songEditor()->update();
+	Engine::songEditor()->update();
 }
 
 
@@ -1428,7 +1428,7 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSong()->isPlaying() )
+			if( Engine::getSong()->isPlaying() )
 			{
 				stop();
 			}
@@ -1879,9 +1879,9 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 							}
 
 							// added new notes, so must update engine, song, etc
-							engine::getSong()->setModified();
+							Engine::getSong()->setModified();
 							update();
-							engine::songEditor()->update();
+							Engine::songEditor()->update();
 						}
 					}
 
@@ -1889,7 +1889,7 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 					testPlayNote( m_currentNote );
 				}
 
-				engine::getSong()->setModified();
+				Engine::getSong()->setModified();
 			}
 			else if( ( _me->buttons() == Qt::RightButton &&
 							m_editMode == ModeDraw ) ||
@@ -1909,7 +1909,7 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 						( *it )->setLength( 0 );
 						m_pattern->dataChanged();
 					}
-					engine::getSong()->setModified();
+					Engine::getSong()->setModified();
 				}
 			}
 			else if( _me->button() == Qt::LeftButton &&
@@ -2658,7 +2658,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 							( *it )->setLength( 0 );
 							m_pattern->dataChanged();
 						}
-						engine::getSong()->setModified();
+						Engine::getSong()->setModified();
 					}
 				}
 				else
@@ -2883,7 +2883,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 	}
 
 	m_pattern->dataChanged();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 static QString calculateNoteLabel(QString note, int octave)
@@ -3482,7 +3482,7 @@ void PianoRoll::resizeEvent( QResizeEvent * )
 	}
 	m_topBottomScroll->setValue( m_totalKeysToScroll - m_startKey );
 
-	engine::getSong()->getPlayPos( Song::Mode_PlayPattern
+	Engine::getSong()->getPlayPos( Song::Mode_PlayPattern
 					).m_timeLine->setFixedWidth( width() );
 	m_toolBar->setFixedWidth( width() );
 	update();
@@ -3652,7 +3652,7 @@ int PianoRoll::getKey( int _y ) const
 Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 {
 	if( m_pattern->getTrack()->trackContainer() ==
-					engine::getBBTrackContainer() )
+					Engine::getBBTrackContainer() )
 	{
 		return Song::Mode_PlayBB;
 	}
@@ -3669,13 +3669,13 @@ void PianoRoll::play()
 		return;
 	}
 
-	if( engine::getSong()->playMode() != Song::Mode_PlayPattern )
+	if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 	{
-		engine::getSong()->playPattern( m_pattern );
+		Engine::getSong()->playPattern( m_pattern );
 	}
 	else
 	{
-		engine::getSong()->togglePause();
+		Engine::getSong()->togglePause();
 	}
 }
 
@@ -3684,7 +3684,7 @@ void PianoRoll::play()
 
 void PianoRoll::record()
 {
-	if( engine::getSong()->isPlaying() )
+	if( Engine::getSong()->isPlaying() )
 	{
 		stop();
 	}
@@ -3695,7 +3695,7 @@ void PianoRoll::record()
 
 	m_recording = true;
 
-	engine::getSong()->playPattern( m_pattern, false );
+	Engine::getSong()->playPattern( m_pattern, false );
 }
 
 
@@ -3703,7 +3703,7 @@ void PianoRoll::record()
 
 void PianoRoll::recordAccompany()
 {
-	if( engine::getSong()->isPlaying() )
+	if( Engine::getSong()->isPlaying() )
 	{
 		stop();
 	}
@@ -3714,13 +3714,13 @@ void PianoRoll::recordAccompany()
 
 	m_recording = true;
 
-	if( m_pattern->getTrack()->trackContainer() == engine::getSong() )
+	if( m_pattern->getTrack()->trackContainer() == Engine::getSong() )
 	{
-		engine::getSong()->playSong();
+		Engine::getSong()->playSong();
 	}
 	else
 	{
-		engine::getSong()->playBB();
+		Engine::getSong()->playBB();
 	}
 }
 
@@ -3730,7 +3730,7 @@ void PianoRoll::recordAccompany()
 
 void PianoRoll::stop()
 {
-	engine::getSong()->stop();
+	Engine::getSong()->stop();
 	m_recording = false;
 	m_scrollBack = true;
 }
@@ -3741,19 +3741,19 @@ void PianoRoll::stop()
 void PianoRoll::startRecordNote( const note & _n )
 {
 	if( m_recording == true && hasValidPattern() == true &&
-		engine::getSong()->isPlaying() &&
-			( engine::getSong()->playMode() ==
+		Engine::getSong()->isPlaying() &&
+			( Engine::getSong()->playMode() ==
 					desiredPlayModeForAccompany() ||
-				engine::getSong()->playMode() ==
+				Engine::getSong()->playMode() ==
 					Song::Mode_PlayPattern ) )
 	{
 		MidiTime sub;
-		if( engine::getSong()->playMode() == Song::Mode_PlaySong )
+		if( Engine::getSong()->playMode() == Song::Mode_PlaySong )
 		{
 			sub = m_pattern->startPosition();
 		}
-		note n( 1, engine::getSong()->getPlayPos(
-					engine::getSong()->playMode() ) - sub,
+		note n( 1, Engine::getSong()->getPlayPos(
+					Engine::getSong()->playMode() ) - sub,
 				_n.key(), _n.getVolume(), _n.getPanning() );
 		if( n.pos() >= 0 )
 		{
@@ -3768,10 +3768,10 @@ void PianoRoll::startRecordNote( const note & _n )
 void PianoRoll::finishRecordNote( const note & _n )
 {
 	if( m_recording == true && hasValidPattern() == true &&
-		engine::getSong()->isPlaying() &&
-			( engine::getSong()->playMode() ==
+		Engine::getSong()->isPlaying() &&
+			( Engine::getSong()->playMode() ==
 					desiredPlayModeForAccompany() ||
-				engine::getSong()->playMode() ==
+				Engine::getSong()->playMode() ==
 					Song::Mode_PlayPattern ) )
 	{
 		for( QList<note>::Iterator it = m_recordingNotes.begin();
@@ -4025,7 +4025,7 @@ void PianoRoll::cutSelectedNotes()
 	{
 		copy_to_clipboard( selected_notes );
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		for( NoteVector::Iterator it = selected_notes.begin();
 					it != selected_notes.end(); ++it )
@@ -4037,7 +4037,7 @@ void PianoRoll::cutSelectedNotes()
 	}
 
 	update();
-	engine::songEditor()->update();
+	Engine::songEditor()->update();
 }
 
 
@@ -4084,11 +4084,11 @@ void PianoRoll::pasteNotes()
 
 		// we only have to do the following lines if we pasted at
 		// least one note...
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		m_ctrlMode = ModeDraw;
 		m_drawButton->setChecked( true );
 		update();
-		engine::songEditor()->update();
+		Engine::songEditor()->update();
 	}
 }
 
@@ -4130,9 +4130,9 @@ void PianoRoll::deleteSelectedNotes()
 
 	if( update_after_delete == true )
 	{
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
-		engine::songEditor()->update();
+		Engine::songEditor()->update();
 	}
 
 }
@@ -4163,8 +4163,8 @@ void PianoRoll::autoScroll( const MidiTime & _t )
 
 void PianoRoll::updatePosition( const MidiTime & _t )
 {
-	if( ( engine::getSong()->isPlaying() &&
-			engine::getSong()->playMode() ==
+	if( ( Engine::getSong()->isPlaying() &&
+			Engine::getSong()->playMode() ==
 					Song::Mode_PlayPattern &&
 		m_timeLine->autoScroll() == timeLine::AutoScrollEnabled ) ||
 							m_scrollBack == true )
@@ -4178,7 +4178,7 @@ void PianoRoll::updatePosition( const MidiTime & _t )
 
 void PianoRoll::updatePositionAccompany( const MidiTime & _t )
 {
-	Song * s = engine::getSong();
+	Song * s = Engine::getSong();
 
 	if( m_recording && hasValidPattern() &&
 					s->playMode() != Song::Mode_PlayPattern )

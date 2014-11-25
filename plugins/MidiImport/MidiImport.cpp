@@ -96,10 +96,10 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if( engine::hasGUI() &&
+	if( Engine::hasGUI() &&
 		ConfigManager::inst()->defaultSoundfont().isEmpty() )
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You do not have set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
@@ -268,7 +268,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
-	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, engine::mainWindow() );
+	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, Engine::mainWindow() );
 	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration( 0 );
@@ -285,7 +285,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiCC ccs[129];
 	smfMidiChannel chs[256];
 
-	MeterModel & timeSigMM = engine::getSong()->getTimeSigModel();
+	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
 	AutomationPattern * timeSigNumeratorPat = 
 		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
 	AutomationPattern * timeSigDenominatorPat = 

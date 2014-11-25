@@ -41,7 +41,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include <QLabel>
 #include <QLineEdit>
 
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"

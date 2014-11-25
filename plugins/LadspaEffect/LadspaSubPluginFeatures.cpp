@@ -30,7 +30,7 @@
 
 #include "LadspaSubPluginFeatures.h"
 #include "AudioDevice.h"
-#include "engine.h"
+#include "Engine.h"
 #include "ladspa_2_lmms.h"
 #include "LadspaBase.h"
 #include "Mixer.h"
@@ -48,7 +48,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 													const Key * _key  ) const
 {
 	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
-	ladspa2LMMS * lm = engine::getLADSPAManager();
+	ladspa2LMMS * lm = Engine::getLADSPAManager();
 
 	QLabel * label = new QLabel( _parent );
 	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
@@ -119,7 +119,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void LadspaSubPluginFeatures::listSubPluginKeys(
 						const Plugin::Descriptor * _desc, KeyList & _kl ) const
 {
-	ladspa2LMMS * lm = engine::getLADSPAManager();
+	ladspa2LMMS * lm = Engine::getLADSPAManager();
 
 	l_sortable_plugin_t plugins;
 	switch( m_type )
@@ -145,7 +145,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 						it != plugins.end(); ++it )
 	{
 		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  engine::mixer()->audioDev()->channels() )
+				  Engine::mixer()->audioDev()->channels() )
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}

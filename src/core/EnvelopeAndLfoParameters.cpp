@@ -26,7 +26,7 @@
 
 #include "EnvelopeAndLfoParameters.h"
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "Oscillator.h"
 
@@ -47,7 +47,7 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 							it != m_lfos.end(); ++it )
 	{
 		( *it )->m_lfoFrame +=
-				engine::mixer()->framesPerPeriod();
+				Engine::mixer()->framesPerPeriod();
 		( *it )->m_bad_lfoShapeData = true;
 	}
 }
@@ -157,12 +157,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	connect( &m_x100Model, SIGNAL( dataChanged() ),
 				this, SLOT( updateSampleVars() ) );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleVars() ) );
 
 
 	m_lfoShapeData =
-		new sample_t[engine::mixer()->framesPerPeriod()];
+		new sample_t[Engine::mixer()->framesPerPeriod()];
 
 	updateSampleVars();
 }
@@ -242,7 +242,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 
 void EnvelopeAndLfoParameters::updateLfoShapeData()
 {
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	for( fpp_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
@@ -404,7 +404,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				engine::mixer()->processingSampleRate();
+				Engine::mixer()->processingSampleRate();
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
@@ -502,7 +502,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-				engine::mixer()->processingSampleRate();
+				Engine::mixer()->processingSampleRate();
 	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayModel.value() ) );
 	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *

@@ -79,10 +79,10 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 
 AutomationPattern::~AutomationPattern()
 {
-	if( engine::automationEditor() &&
-		engine::automationEditor()->currentPattern() == this )
+	if( Engine::automationEditor() &&
+		Engine::automationEditor()->currentPattern() == this )
 	{
-		engine::automationEditor()->setCurrentPattern( NULL );
+		Engine::automationEditor()->setCurrentPattern( NULL );
 	}
 }
 
@@ -186,9 +186,9 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos && engine::automationEditor() ?
+	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
 		note::quantized( _time,
-			engine::automationEditor()->quantization() ) :
+			Engine::automationEditor()->quantization() ) :
 		_time;
 
 	m_timeMap[newTime] = _value;
@@ -219,9 +219,9 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos && engine::automationEditor() ?
+	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
 		note::quantized( _time,
-			engine::automationEditor()->quantization() ) :
+			Engine::automationEditor()->quantization() ) :
 		_time;
 
 	m_timeMap.remove( newTime );
@@ -259,9 +259,9 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 {
 	if( m_dragging == false )
 	{
-		MidiTime newTime = _quant_pos && engine::automationEditor() ?
+		MidiTime newTime = _quant_pos && Engine::automationEditor() ?
 			note::quantized( _time,
-				engine::automationEditor()->quantization() ) :
+				Engine::automationEditor()->quantization() ) :
 			_time;
 		this->removeValue( newTime );
 		m_oldTimeMap = m_timeMap;
@@ -523,9 +523,9 @@ trackContentObjectView * AutomationPattern::createView( trackView * _tv )
 bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
-	l += engine::getSong()->tracks();
-	l += engine::getBBTrackContainer()->tracks();
-	l += engine::getSong()->globalAutomationTrack();
+	l += Engine::getSong()->tracks();
+	l += Engine::getBBTrackContainer()->tracks();
+	l += Engine::getSong()->globalAutomationTrack();
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
@@ -560,9 +560,9 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 {
 	QVector<AutomationPattern *> patterns;
 	TrackContainer::TrackList l;
-	l += engine::getSong()->tracks();
-	l += engine::getBBTrackContainer()->tracks();
-	l += engine::getSong()->globalAutomationTrack();
+	l += Engine::getSong()->tracks();
+	l += Engine::getBBTrackContainer()->tracks();
+	l += Engine::getSong()->globalAutomationTrack();
 	
 	// go through all tracks...
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
@@ -604,7 +604,7 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 AutomationPattern * AutomationPattern::globalAutomationPattern(
 							AutomatableModel * _m )
 {
-	AutomationTrack * t = engine::getSong()->globalAutomationTrack();
+	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
 	Track::tcoVector v = t->getTCOs();
 	for( Track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
 	{
@@ -632,9 +632,9 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 
 void AutomationPattern::resolveAllIDs()
 {
-	TrackContainer::TrackList l = engine::getSong()->tracks() +
-				engine::getBBTrackContainer()->tracks();
-	l += engine::getSong()->globalAutomationTrack();
+	TrackContainer::TrackList l = Engine::getSong()->tracks() +
+				Engine::getBBTrackContainer()->tracks();
+	l += Engine::getSong()->globalAutomationTrack();
 	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
@@ -651,7 +651,7 @@ void AutomationPattern::resolveAllIDs()
 					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
 									k != a->m_idsToResolve.end(); ++k )
 					{
-						JournallingObject * o = engine::projectJournal()->
+						JournallingObject * o = Engine::projectJournal()->
 														journallingObject( *k );
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
@@ -676,10 +676,10 @@ void AutomationPattern::clear()
 
 	emit dataChanged();
 
-	if( engine::automationEditor() &&
-		engine::automationEditor()->currentPattern() == this )
+	if( Engine::automationEditor() &&
+		Engine::automationEditor()->currentPattern() == this )
 	{
-		engine::automationEditor()->update();
+		Engine::automationEditor()->update();
 	}
 }
 
@@ -688,9 +688,9 @@ void AutomationPattern::clear()
 
 void AutomationPattern::openInAutomationEditor()
 {
-	engine::automationEditor()->setCurrentPattern( this );
-	engine::automationEditor()->parentWidget()->show();
-	engine::automationEditor()->setFocus();
+	Engine::automationEditor()->setCurrentPattern( this );
+	Engine::automationEditor()->parentWidget()->show();
+	Engine::automationEditor()->setFocus();
 }
 
 

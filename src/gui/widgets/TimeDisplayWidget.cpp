@@ -26,7 +26,7 @@
 
 #include "TimeDisplayWidget.h"
 #include "MainWindow.h"
-#include "engine.h"
+#include "Engine.h"
 #include "tooltip.h"
 #include "Song.h"
 
@@ -53,7 +53,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
 
@@ -95,7 +95,7 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 void TimeDisplayWidget::updateTime()
 {
-	Song* s = engine::getSong();
+	Song* s = Engine::getSong();
 
 	switch( m_displayMode )
 	{

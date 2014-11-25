@@ -29,7 +29,7 @@
 
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
-#include "engine.h"
+#include "Engine.h"
 #include "embed.h"
 #include "group_box.h"
 #include "gui_templates.h"
@@ -117,7 +117,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 		m_fixedOutputNoteSpinBox, SLOT( setEnabled( bool ) ) );
 
-	if( !engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::mixer()->midiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton;
 		m_rpBtn->setMinimumSize( 32, 32 );

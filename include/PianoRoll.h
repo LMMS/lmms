@@ -366,7 +366,7 @@ private:
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
 
-	friend class engine;
+	friend class Engine;
 
 	// qproperty fields
 	QColor m_gridColor;

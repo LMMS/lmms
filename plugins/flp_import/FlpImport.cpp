@@ -39,7 +39,7 @@
 #include "ConfigManager.h"
 #include "debug.h"
 #include "Effect.h"
-#include "engine.h"
+#include "Engine.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "group_box.h"
@@ -767,8 +767,8 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	
 	int cur_channel = -1;
 
-	const bool is_journ = engine::projectJournal()->isJournalling();
-	engine::projectJournal()->setJournalling( false );
+	const bool is_journ = Engine::projectJournal()->isJournalling();
+	Engine::projectJournal()->setJournalling( false );
 
 
 	while( file().atEnd() == false )
@@ -1411,22 +1411,22 @@ else
 
 
 	// now create a project from FL_Project data structure
-	engine::getSong()->clearProject();
+	Engine::getSong()->clearProject();
 
 	// configure the mixer
 	for( int i=0; i<NumFLFxChannels; ++i )
 	{
-		engine::fxMixer()->createChannel();
+		Engine::fxMixer()->createChannel();
 	}
-	engine::fxMixerView()->refreshDisplay();
+	Engine::fxMixerView()->refreshDisplay();
 
 	// set global parameters
-	engine::getSong()->setMasterVolume( p.mainVolume );
-	engine::getSong()->setMasterPitch( p.mainPitch );
-	engine::getSong()->setTempo( p.tempo );
+	Engine::getSong()->setMasterVolume( p.mainVolume );
+	Engine::getSong()->setMasterPitch( p.mainPitch );
+	Engine::getSong()->setTempo( p.tempo );
 
 	// set project notes
-	engine::getProjectNotes()->setText( p.projectNotes );
+	Engine::getProjectNotes()->setText( p.projectNotes );
 
 
 	progressDialog.setMaximum( p.maxPatterns + p.channels.size() +
@@ -1437,11 +1437,11 @@ else
 	QList<bbTrack *> bb_tracks;
 	QList<InstrumentTrack *> i_tracks;
 
-	while( engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
+	while( Engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
 	{
 		const int cur_pat = bb_tracks.size();
 		bbTrack * bbt = dynamic_cast<bbTrack *>(
-			Track::create( Track::BBTrack, engine::getSong() ) );
+			Track::create( Track::BBTrack, Engine::getSong() ) );
 		if( p.patternNames.contains( cur_pat ) )
 		{
 			bbt->setName( p.patternNames[cur_pat] );
@@ -1457,8 +1457,8 @@ else
 	{
 		InstrumentTrack * t = dynamic_cast<InstrumentTrack *>(
 			Track::create( Track::InstrumentTrack,
-					engine::getBBTrackContainer() ) );
-		engine::getBBTrackContainer()->updateAfterTrackAdd();
+					Engine::getBBTrackContainer() ) );
+		Engine::getBBTrackContainer()->updateAfterTrackAdd();
 		i_tracks.push_back( t );
 		switch( it->pluginType )
 		{
@@ -1657,7 +1657,7 @@ p->putValue( jt->pos, value, false );
 
 	for( int fx_ch = 0; fx_ch <= NumFLFxChannels ; ++fx_ch )
 	{
-		FxChannel * ch = engine::fxMixer()->effectChannel( fx_ch );
+		FxChannel * ch = Engine::fxMixer()->effectChannel( fx_ch );
 		if( !ch )
 		{
 			continue;
@@ -1719,7 +1719,7 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		EffectChain * ec = &engine::fxMixer()->
+		EffectChain * ec = &Engine::fxMixer()->
 					effectChannel( it->fxChannel )->m_fxChain;
 		qDebug( "adding %s to %d\n", effName.toUtf8().constData(),
 								it->fxChannel );
@@ -1763,14 +1763,14 @@ p->putValue( jt->pos, value, false );
 
 
 	// set current pattern
-	if( p.activeEditPattern < engine::getBBTrackContainer()->numOfBBs() )
+	if( p.activeEditPattern < Engine::getBBTrackContainer()->numOfBBs() )
 	{
-		engine::getBBTrackContainer()->setCurrentBB(
+		Engine::getBBTrackContainer()->setCurrentBB(
 							p.activeEditPattern );
 	}
 
 	// restore journalling settings
-	engine::projectJournal()->setJournalling( is_journ );
+	Engine::projectJournal()->setJournalling( is_journ );
 
 	return true;
 }

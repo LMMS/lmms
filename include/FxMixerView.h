@@ -33,7 +33,7 @@
 #include "FxLine.h"
 #include "FxMixer.h"
 #include "ModelView.h"
-#include "engine.h"
+#include "Engine.h"
 #include "fader.h"
 #include "pixmap_button.h"
 #include "tooltip.h"

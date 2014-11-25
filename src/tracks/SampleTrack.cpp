@@ -36,7 +36,7 @@
 #include "SampleTrack.h"
 #include "Song.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "tooltip.h"
 #include "AudioPort.h"
 #include "SamplePlayHandle.h"
@@ -59,7 +59,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
 }
 
@@ -130,7 +130,7 @@ void SampleTCO::updateLength( bpm_t )
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / engine::framesPerTick() );
+	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
 
 
@@ -291,7 +291,7 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 		m_tco->updateLength();
 		update();
 		_de->accept();
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 	else
 	{
@@ -325,7 +325,7 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
 	{
 		m_tco->setSampleFile( af );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 }
 
@@ -415,7 +415,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 
 SampleTrack::~SampleTrack()
 {
-	engine::mixer()->removePlayHandles( this );
+	Engine::mixer()->removePlayHandles( this );
 }
 
 
@@ -440,7 +440,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			PlayHandle* handle;
 			if( st->isRecord() )
 			{
-				if( !engine::getSong()->isRecording() )
+				if( !Engine::getSong()->isRecording() )
 				{
 					return played_a_note;
 				}
@@ -457,7 +457,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 //			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
-			engine::mixer()->addPlayHandle( handle );
+			Engine::mixer()->addPlayHandle( handle );
 			played_a_note = true;
 		}
 	}
@@ -553,7 +553,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
 
-	m_effWindow = engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
+	m_effWindow = Engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
  	m_effWindow->setWindowTitle( _t->name() );

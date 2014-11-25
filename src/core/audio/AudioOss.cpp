@@ -32,7 +32,7 @@
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "templates.h"
 
@@ -268,7 +268,7 @@ void AudioOss::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		unsigned int value = sampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )

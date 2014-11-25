@@ -59,7 +59,7 @@ public:
 		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
-		connect( engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
+		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
 		setAttribute( Qt::WA_OpaquePaintEvent, true );
 	}
 

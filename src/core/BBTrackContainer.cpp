@@ -27,7 +27,7 @@
 #include "bb_track.h"
 #include "combobox.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Song.h"
 
 
@@ -82,9 +82,9 @@ bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
 
 void BBTrackContainer::updateAfterTrackAdd()
 {
-	if( numOfBBs() == 0 && !engine::getSong()->isLoadingProject() )
+	if( numOfBBs() == 0 && !Engine::getSong()->isLoadingProject() )
 	{
-		engine::getSong()->addBBTrack();
+		Engine::getSong()->addBBTrack();
 	}
 
 	// make sure, new track(s) have TCOs for every beat/bassline
@@ -116,7 +116,7 @@ tact_t BBTrackContainer::lengthOfBB( int _bb )
 
 int BBTrackContainer::numOfBBs() const
 {
-	return engine::getSong()->countTracks( Track::BBTrack );
+	return Engine::getSong()->countTracks( Track::BBTrack );
 }
 
 
@@ -182,13 +182,13 @@ void BBTrackContainer::fixIncorrectPositions()
 
 void BBTrackContainer::play()
 {
-	if( engine::getSong()->playMode() != Song::Mode_PlayBB )
+	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
-		engine::getSong()->playBB();
+		Engine::getSong()->playBB();
 	}
 	else
 	{
-		engine::getSong()->togglePause();
+		Engine::getSong()->togglePause();
 	}
 }
 
@@ -197,7 +197,7 @@ void BBTrackContainer::play()
 
 void BBTrackContainer::stop()
 {
-	engine::getSong()->stop();
+	Engine::getSong()->stop();
 }
 
 
@@ -227,7 +227,7 @@ void BBTrackContainer::currentBBChanged()
 
 	// now update all track-labels (the current one has to become white,
 	// the others gray)
-	TrackList tl = engine::getSong()->tracks();
+	TrackList tl = Engine::getSong()->tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		if( ( *it )->type() == Track::BBTrack )
@@ -242,7 +242,7 @@ void BBTrackContainer::currentBBChanged()
 
 void BBTrackContainer::createTCOsForBB( int _bb )
 {
-	if( numOfBBs() == 0 || engine::getSong()->isLoadingProject() )
+	if( numOfBBs() == 0 || Engine::getSong()->isLoadingProject() )
 	{
 		return;
 	}

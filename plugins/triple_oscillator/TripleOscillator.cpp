@@ -30,7 +30,7 @@
 #include "TripleOscillator.h"
 #include "automatable_button.h"
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "NotePlayHandle.h"
@@ -175,7 +175,7 @@ void OscillatorObject::updateDetuningLeft()
 {
 	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-				/ engine::mixer()->processingSampleRate();
+				/ Engine::mixer()->processingSampleRate();
 }
 
 
@@ -185,7 +185,7 @@ void OscillatorObject::updateDetuningRight()
 {
 	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineRightModel.value() ) / 1200.0f )
-				/ engine::mixer()->processingSampleRate();
+				/ Engine::mixer()->processingSampleRate();
 }
 
 
@@ -217,7 +217,7 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 	}
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateAllDetuning() ) );
 }
 

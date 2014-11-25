@@ -40,7 +40,7 @@
 #include "ProjectJournal.h"
 #include "ConfigManager.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
 #include "tooltip.h"
 #include "led_checkbox.h"
@@ -129,7 +129,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
 
-	engine::projectJournal()->setJournalling( false );
+	Engine::projectJournal()->setJournalling( false );
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -631,8 +631,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-			tr( engine::mixer()->audioDevName().toLatin1() ) ) );
-	m_audioIfaceSetupWidgets[engine::mixer()->audioDevName()]->show();
+			tr( Engine::mixer()->audioDevName().toLatin1() ) ) );
+	m_audioIfaceSetupWidgets[Engine::mixer()->audioDevName()]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( audioInterfaceChanged( const QString & ) ) );
@@ -712,8 +712,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	}
 
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-		tr( engine::mixer()->midiClientName().toLatin1() ) ) );
-	m_midiIfaceSetupWidgets[engine::mixer()->midiClientName()]->show();
+		tr( Engine::mixer()->midiClientName().toLatin1() ) ) );
+	m_midiIfaceSetupWidgets[Engine::mixer()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( midiInterfaceChanged( const QString & ) ) );
@@ -784,7 +784,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 setupDialog::~setupDialog()
 {
-	engine::projectJournal()->setJournalling( true );
+	Engine::projectJournal()->setJournalling( true );
 }
 
 
@@ -896,7 +896,7 @@ void setupDialog::setBufferSize( int _value )
 	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
-				engine::mixer()->processingSampleRate(),
+				Engine::mixer()->processingSampleRate(),
 						0, 'f', 1 ) );
 }
 

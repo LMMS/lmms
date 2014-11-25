@@ -27,7 +27,7 @@
 #include <QMdiArea>
 
 #include "TempoSyncKnob.h"
-#include "engine.h"
+#include "Engine.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -87,7 +87,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	
-	float limit = 60000.0f / ( engine::getSong()->getTempo() *
+	float limit = 60000.0f / ( Engine::getSong()->getTempo() *
 							model()->m_scale );
 	
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
@@ -291,8 +291,8 @@ void TempoSyncKnob::showCustom()
 {
 	if( m_custom == NULL )
 	{
-	 	m_custom = new MeterDialog( engine::mainWindow()->workspace() );
-		engine::mainWindow()->workspace()->addSubWindow( m_custom );
+	 	m_custom = new MeterDialog( Engine::mainWindow()->workspace() );
+		Engine::mainWindow()->workspace()->addSubWindow( m_custom );
 		m_custom->setWindowTitle( "Meter" );
 		m_custom->setModel( &model()->m_custom );
 	}

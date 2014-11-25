@@ -32,7 +32,7 @@
 #include <QMenu>
 #include <QDomElement>
 
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
@@ -83,7 +83,7 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	engine::mixer()->addPlayHandle( iph );
+	Engine::mixer()->addPlayHandle( iph );
 }
 
 
@@ -101,7 +101,7 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 	closePlugin();
 }
 
@@ -302,7 +302,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 	m_plugin->process( NULL, _buf );
 
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
@@ -647,7 +647,7 @@ void VestigeInstrumentView::openPlugin()
 		{
 			return;
 		}
-		engine::mixer()->lock();
+		Engine::mixer()->lock();
 
 		if (m_vi->p_subWindow != NULL) {
 			delete m_vi->p_subWindow;
@@ -655,7 +655,7 @@ void VestigeInstrumentView::openPlugin()
 		}
 
 		m_vi->loadFile( ofd.selectedFiles()[0] );
-		engine::mixer()->unlock();
+		Engine::mixer()->unlock();
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
@@ -881,7 +881,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
+	m_vi->m_subWindow = Engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
 	m_vi->m_subWindow->setFixedWidth( 960 );

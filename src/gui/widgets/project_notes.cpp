@@ -38,14 +38,14 @@
 #include <QDomCDATASection>
 
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "Song.h"
 
 
 
 projectNotes::projectNotes() :
-	QMainWindow( engine::mainWindow()->workspace() )
+	QMainWindow( Engine::mainWindow()->workspace() )
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( true );
@@ -62,7 +62,7 @@ projectNotes::projectNotes() :
 //	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
 //			this, SLOT( alignmentChanged( int ) ) );
 	connect( m_edit, SIGNAL( textChanged() ),
-			engine::getSong(), SLOT( setModified() ) );
+			Engine::getSong(), SLOT( setModified() ) );
 
 	setupActions();
 
@@ -70,7 +70,7 @@ projectNotes::projectNotes() :
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	engine::mainWindow()->workspace()->addSubWindow( this );
+	Engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 700, 10 );
 	parentWidget()->resize( 400, 300 );
@@ -250,7 +250,7 @@ void projectNotes::textBold()
 {
 	m_edit->setFontWeight( m_actionTextBold->isChecked() ? QFont::Bold :
 								QFont::Normal );
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -259,7 +259,7 @@ void projectNotes::textBold()
 void projectNotes::textUnderline()
 {
 	m_edit->setFontUnderline( m_actionTextUnderline->isChecked() );
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -268,7 +268,7 @@ void projectNotes::textUnderline()
 void projectNotes::textItalic()
 {
 	m_edit->setFontItalic( m_actionTextItalic->isChecked() );
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -278,7 +278,7 @@ void projectNotes::textFamily( const QString & _f )
 {
 	m_edit->setFontFamily( _f );
 	m_edit->viewport()->setFocus();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -288,7 +288,7 @@ void projectNotes::textSize( const QString & _p )
 {
 	m_edit->setFontPointSize( _p.toInt() );
 	m_edit->viewport()->setFocus();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -346,7 +346,7 @@ void projectNotes::formatChanged( const QTextCharFormat & _f )
 	pix.fill( _f.foreground().color() );
 	m_actionTextColor->setIcon( pix );
 
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -370,7 +370,7 @@ void projectNotes::alignmentChanged( int _a )
 	{
 		m_actionAlignJustify->setChecked( true );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 

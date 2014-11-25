@@ -26,7 +26,7 @@
 
 #include "delaycontrols.h"
 #include "delayeffect.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Song.h"
 
 DelayControls::DelayControls( DelayEffect* effect ):
@@ -37,7 +37,7 @@ DelayControls::DelayControls( DelayEffect* effect ):
     m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
     m_lfoAmountModel(0.0f,0.0f,0.1f,0.0001f, this, tr ( "Lfo Amount" ) )
 {
-    connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
+    connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
 }
 
 

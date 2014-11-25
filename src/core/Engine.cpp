@@ -1,5 +1,5 @@
 /*
- * engine.cpp - implementation of LMMS' engine-system
+ * Engine.cpp - implementation of LMMS' engine-system
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,7 +23,7 @@
  */
 
 
-#include "engine.h"
+#include "Engine.h"
 #include "AutomationEditor.h"
 #include "bb_editor.h"
 #include "BBTrackContainer.h"
@@ -46,30 +46,30 @@
 #include "BandLimitedWave.h"
 
 
-bool engine::s_hasGUI = true;
-bool engine::s_suppressMessages = false;
-float engine::s_framesPerTick;
-Mixer* engine::s_mixer = NULL;
-FxMixer * engine::s_fxMixer = NULL;
-FxMixerView * engine::s_fxMixerView = NULL;
-MainWindow * engine::s_mainWindow = NULL;
-BBTrackContainer * engine::s_bbTrackContainer = NULL;
-Song * engine::s_song = NULL;
-SongEditor* engine::s_songEditor = NULL;
-AutomationEditor * engine::s_automationEditor = NULL;
-bbEditor * engine::s_bbEditor = NULL;
-PianoRoll* engine::s_pianoRoll = NULL;
-projectNotes * engine::s_projectNotes = NULL;
-ProjectJournal * engine::s_projectJournal = NULL;
-ladspa2LMMS * engine::s_ladspaManager = NULL;
-DummyTrackContainer * engine::s_dummyTC = NULL;
-ControllerRackView * engine::s_controllerRackView = NULL;
-QMap<QString, QString> engine::s_pluginFileHandling;
+bool Engine::s_hasGUI = true;
+bool Engine::s_suppressMessages = false;
+float Engine::s_framesPerTick;
+Mixer* Engine::s_mixer = NULL;
+FxMixer * Engine::s_fxMixer = NULL;
+FxMixerView * Engine::s_fxMixerView = NULL;
+MainWindow * Engine::s_mainWindow = NULL;
+BBTrackContainer * Engine::s_bbTrackContainer = NULL;
+Song * Engine::s_song = NULL;
+SongEditor* Engine::s_songEditor = NULL;
+AutomationEditor * Engine::s_automationEditor = NULL;
+bbEditor * Engine::s_bbEditor = NULL;
+PianoRoll* Engine::s_pianoRoll = NULL;
+projectNotes * Engine::s_projectNotes = NULL;
+ProjectJournal * Engine::s_projectJournal = NULL;
+ladspa2LMMS * Engine::s_ladspaManager = NULL;
+DummyTrackContainer * Engine::s_dummyTC = NULL;
+ControllerRackView * Engine::s_controllerRackView = NULL;
+QMap<QString, QString> Engine::s_pluginFileHandling;
 
 
 
 
-void engine::init( const bool _has_gui )
+void Engine::init( const bool _has_gui )
 {
 	s_hasGUI = _has_gui;
 
@@ -113,7 +113,7 @@ void engine::init( const bool _has_gui )
 
 
 
-void engine::destroy()
+void Engine::destroy()
 {
 	s_mixer->stopProcessing();
 
@@ -150,7 +150,7 @@ void engine::destroy()
 
 
 
-void engine::updateFramesPerTick()
+void Engine::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
@@ -159,7 +159,7 @@ void engine::updateFramesPerTick()
 
 
 
-void engine::initPluginFileHandling()
+void Engine::initPluginFileHandling()
 {
 	Plugin::DescriptorList pluginDescriptors;
 	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );

@@ -30,7 +30,7 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "tooltip.h"
 #include "Song.h"
 
@@ -42,17 +42,17 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
 	s_background( _bg ),
-	m_points( new QPointF[engine::mixer()->framesPerPeriod()] ),
+	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
 	m_active( false )
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	engine::mixer()->clearAudioBuffer( m_buffer, frames );
+	Engine::mixer()->clearAudioBuffer( m_buffer, frames );
 
 
 	toolTip::add( this, tr( "click to enable/disable visualization of "
@@ -73,11 +73,11 @@ visualizationWidget::~visualizationWidget()
 
 void visualizationWidget::updateAudioBuffer()
 {
-	if( !engine::getSong()->isExporting() )
+	if( !Engine::getSong()->isExporting() )
 	{
-		const surroundSampleFrame * c = engine::mixer()->
+		const surroundSampleFrame * c = Engine::mixer()->
 							currentReadBuffer();
-		const fpp_t fpp = engine::mixer()->framesPerPeriod();
+		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 		memcpy( m_buffer, c, sizeof( surroundSampleFrame ) * fpp );
 	}
 }
@@ -90,19 +90,19 @@ void visualizationWidget::setActive( bool _active )
 	m_active = _active;
 	if( m_active )
 	{
-		connect( engine::mainWindow(),
+		connect( Engine::mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		connect( engine::mixer(),
+		connect( Engine::mixer(),
 					SIGNAL( nextAudioBuffer() ),
 				this, SLOT( updateAudioBuffer() ) );
 	}
 	else
 	{
-		disconnect( engine::mainWindow(),
+		disconnect( Engine::mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		disconnect( engine::mixer(),
+		disconnect( Engine::mixer(),
 					SIGNAL( nextAudioBuffer() ),
 				this, SLOT( updateAudioBuffer() ) );
 		// we have to update (remove last waves),
@@ -120,9 +120,9 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, s_background );
 
-	if( m_active && !engine::getSong()->isExporting() )
+	if( m_active && !Engine::getSong()->isExporting() )
 	{
-		float master_output = engine::mixer()->masterGain();
+		float master_output = Engine::mixer()->masterGain();
 		int w = width()-4;
 		const float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		int x_base = 2;
@@ -132,7 +132,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 
 		const fpp_t frames =
-				engine::mixer()->framesPerPeriod();
+				Engine::mixer()->framesPerPeriod();
 		const float max_level = qMax<float>(
 				Mixer::peakValueLeft( m_buffer, frames ),
 				Mixer::peakValueRight( m_buffer, frames ) );

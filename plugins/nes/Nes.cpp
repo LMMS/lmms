@@ -26,7 +26,7 @@
 #include <QDomElement>
 
 #include "Nes.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "templates.h"
 #include "tooltip.h"
@@ -560,7 +560,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
 	{	
-		NesObject * nes = new NesObject( this, engine::mixer()->processingSampleRate(), n );
+		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	

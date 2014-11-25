@@ -38,7 +38,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "PianoRoll.h"
 #include "TrackContainer.h"
 #include "rename_dialog.h"
@@ -104,7 +104,7 @@ Pattern::~Pattern()
 
 void Pattern::init()
 {
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
 	saveJournallingState( false );
 
@@ -170,9 +170,9 @@ MidiTime Pattern::beatPatternLength() const
 note * Pattern::addNote( const note & _new_note, const bool _quant_pos )
 {
 	note * new_note = new note( _new_note );
-	if( _quant_pos && engine::pianoRoll() )
+	if( _quant_pos && Engine::pianoRoll() )
 	{
-		new_note->quantizePos( engine::pianoRoll()->quantization() );
+		new_note->quantizePos( Engine::pianoRoll()->quantization() );
 	}
 
 	instrumentTrack()->lock();
@@ -534,14 +534,14 @@ void Pattern::ensureBeatNotes()
 
 void Pattern::updateBBTrack()
 {
-	if( getTrack()->trackContainer() == engine::getBBTrackContainer() )
+	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
 	{
-		engine::getBBTrackContainer()->updateBBTrack( this );
+		Engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( engine::pianoRoll() && engine::pianoRoll()->currentPattern() == this )
+	if( Engine::pianoRoll() && Engine::pianoRoll()->currentPattern() == this )
 	{
-		engine::pianoRoll()->update();
+		Engine::pianoRoll()->update();
 	}
 }
 
@@ -607,7 +607,7 @@ PatternView::PatternView( Pattern* pattern, trackView* parent ) :
 	m_paintPixmap(),
 	m_needsUpdate( true )
 {
-	connect( engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
+	connect( Engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	if( s_stepBtnOn == NULL )
@@ -668,9 +668,9 @@ void PatternView::update()
 
 void PatternView::openInPianoRoll()
 {
-	engine::pianoRoll()->setCurrentPattern( m_pat );
-	engine::pianoRoll()->parentWidget()->show();
-	engine::pianoRoll()->setFocus();
+	Engine::pianoRoll()->setCurrentPattern( m_pat );
+	Engine::pianoRoll()->parentWidget()->show();
+	Engine::pianoRoll()->setFocus();
 }
 
 
@@ -798,12 +798,12 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 			}
 		}
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 
-		if( engine::pianoRoll()->currentPattern() == m_pat )
+		if( Engine::pianoRoll()->currentPattern() == m_pat )
 		{
-			engine::pianoRoll()->update();
+			Engine::pianoRoll()->update();
 		}
 	}
 	else
@@ -860,11 +860,11 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 				n->setVolume( qMax( 0, vol - 5 ) );
 			}
 
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 			update();
-			if( engine::pianoRoll()->currentPattern() == m_pat )
+			if( Engine::pianoRoll()->currentPattern() == m_pat )
 			{
-				engine::pianoRoll()->update();
+				Engine::pianoRoll()->update();
 			}
 		}
 		_we->accept();
@@ -924,7 +924,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setBrush( lingrad );
-	if( engine::pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != Pattern::BeatPattern )
+	if( Engine::pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != Pattern::BeatPattern )
 		p.setPen( c.lighter( 130 ) );
 	else
 		p.setPen( c.darker( 300 ) );
@@ -933,7 +933,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	p.setBrush( QBrush() );
 	if( m_pat->m_patternType != Pattern::BeatPattern )
 	{
-		if( engine::pianoRoll()->currentPattern() == m_pat )
+		if( Engine::pianoRoll()->currentPattern() == m_pat )
 			p.setPen( c.lighter( 160 ) );
 		else
 			p.setPen( c.lighter( 130 ) );

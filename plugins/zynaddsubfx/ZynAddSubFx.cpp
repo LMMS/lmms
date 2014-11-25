@@ -32,7 +32,7 @@
 #include <QPushButton>
 
 #include "ZynAddSubFx.h"
-#include "engine.h"
+#include "Engine.h"
 #include "knob.h"
 #include "led_checkbox.h"
 #include "DataFile.h"
@@ -130,9 +130,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
-	engine::mixer()->addPlayHandle( iph );
+	Engine::mixer()->addPlayHandle( iph );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( reloadPlugin() ) );
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
@@ -144,7 +144,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 {
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 
 	m_pluginMutex.lock();
 	delete m_plugin;
@@ -333,7 +333,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
-	instrumentTrack()->processAudioBuffer( _buf, engine::mixer()->framesPerPeriod(), NULL );
+	instrumentTrack()->processAudioBuffer( _buf, Engine::mixer()->framesPerPeriod(), NULL );
 }
 
 
@@ -443,11 +443,11 @@ void ZynAddSubFxInstrument::initPlugin()
 						QString( ConfigManager::inst()->factoryPresetsDir() +
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
 
-		m_remotePlugin->updateSampleRate( engine::mixer()->processingSampleRate() );
+		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
 
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
-		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( engine::mixer()->framesPerPeriod() ) );
+		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( Engine::mixer()->framesPerPeriod() ) );
 
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
@@ -455,8 +455,8 @@ void ZynAddSubFxInstrument::initPlugin()
 	else
 	{
 		m_plugin = new LocalZynAddSubFx;
-		m_plugin->setSampleRate( engine::mixer()->processingSampleRate() );
-		m_plugin->setBufferSize( engine::mixer()->framesPerPeriod() );
+		m_plugin->setSampleRate( Engine::mixer()->processingSampleRate() );
+		m_plugin->setBufferSize( Engine::mixer()->framesPerPeriod() );
 	}
 
 	m_pluginMutex.unlock();

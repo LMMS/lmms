@@ -33,7 +33,7 @@
 
 #include "timeline.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "templates.h"
 #include "nstate_button.h"
 #include "MainWindow.h"
@@ -111,7 +111,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 
 timeLine::~timeLine()
 {
-	if( engine::songEditor() )
+	if( Engine::songEditor() )
 	{
 		m_pos.m_timeLine = NULL;
 	}
@@ -339,7 +339,7 @@ void timeLine::mouseMoveEvent( QMouseEvent* event )
 	{
 		case MovePositionMarker:
 			m_pos.setTicks( t.getTicks() );
-			engine::getSong()->setMilliSeconds(((((t.getTicks()))*60*1000/48)/engine::getSong()->getTempo()));
+			Engine::getSong()->setMilliSeconds(((((t.getTicks()))*60*1000/48)/Engine::getSong()->getTempo()));
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			break;

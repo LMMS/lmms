@@ -28,7 +28,7 @@
 
 #include "DualFilterControls.h"
 #include "DualFilter.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Song.h"
 #include "basic_filters.h"
 #include "embed.h"
@@ -97,7 +97,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	m_filter2Model.addItem( tr( "Fast Formant" ), new PixmapLoader( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "Tripole" ), new PixmapLoader( "filter_lp" ) );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateFilters() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateFilters() ) );
 }
 
 
@@ -108,8 +108,8 @@ void DualFilterControls::updateFilters()
 	
 	delete m_effect->m_filter1;
 	delete m_effect->m_filter2;
-	m_effect->m_filter1 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
-	m_effect->m_filter2 = new basicFilters<2>( engine::mixer()->processingSampleRate() );
+	m_effect->m_filter1 = new basicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_effect->m_filter2 = new basicFilters<2>( Engine::mixer()->processingSampleRate() );
 	
 	// flag filters as needing recalculation
 	

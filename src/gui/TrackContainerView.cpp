@@ -81,7 +81,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	setAcceptDrops( true );
 
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
 	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
 			this, SLOT( createTrackView( Track * ) ),
@@ -145,9 +145,9 @@ void TrackContainerView::removeTrackView( trackView * _tv )
 		m_scrollLayout->removeWidget( _tv );
 
 		realignTracks();
-		if( engine::getSong() )
+		if( Engine::getSong() )
 		{
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 }
@@ -336,7 +336,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
-			engine::pluginFileHandling()[FileItem::extension(
+			Engine::pluginFileHandling()[FileItem::extension(
 								value )]);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );

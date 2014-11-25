@@ -66,7 +66,7 @@ ControllerRackView::ControllerRackView( ) :
 	connect( m_addButton, SIGNAL( clicked() ),
 			this, SLOT( addController() ) );
 
-	connect( engine::getSong(), SIGNAL( dataChanged() ),
+	connect( Engine::getSong(), SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
 
 	QVBoxLayout * layout = new QVBoxLayout();
@@ -75,7 +75,7 @@ ControllerRackView::ControllerRackView( ) :
 	this->setLayout( layout );
 
 	QMdiSubWindow * subWin =
-			engine::mainWindow()->workspace()->addSubWindow( this );
+			Engine::mainWindow()->workspace()->addSubWindow( this );
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -148,7 +148,7 @@ void ControllerRackView::deleteController( ControllerView * _view )
 void ControllerRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
-	Song * s = engine::getSong();
+	Song * s = Engine::getSong();
 
 	setUpdatesEnabled( false );
 
@@ -184,7 +184,7 @@ void ControllerRackView::addController()
 {
 	// TODO: Eventually let the user pick from available controller types
 
-	engine::getSong()->addController( new LfoController( engine::getSong() ) );
+	Engine::getSong()->addController( new LfoController( Engine::getSong() ) );
 	update();
 
 	// fix bug which always made ControllerRackView loose focus when adding

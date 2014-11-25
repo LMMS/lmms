@@ -177,7 +177,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( (QWidget*) engine::mainWindow(), m );
+	ControllerConnectionDialog d( (QWidget*) Engine::mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{

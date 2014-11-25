@@ -31,7 +31,7 @@
 #include "bb_track.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
@@ -51,7 +51,7 @@ bbTCO::bbTCO( Track * _track ) :
 	m_color( 128, 128, 128 ),
 	m_useStyleColor( true )
 {
-	tact_t t = engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
+	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
 	{
 		saveJournallingState( false );
@@ -234,7 +234,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 1, col.light( 70 ) );
 	p.fillRect( rect(), lingrad );
 
-	tact_t t = engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
+	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
 	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerTact() );
@@ -273,9 +273,9 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 void bbTCOView::openInBBEditor()
 {
-	engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
+	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
 
-	engine::mainWindow()->toggleBBEditorWin( true );
+	Engine::mainWindow()->toggleBBEditorWin( true );
 }
 
 
@@ -310,7 +310,7 @@ void bbTCOView::changeColor()
 	if( isSelected() )
 	{
 		QVector<selectableObject *> selected =
-				engine::songEditor()->selectedObjects();
+				Engine::songEditor()->selectedObjects();
 		for( QVector<selectableObject *>::iterator it =
 							selected.begin();
 						it != selected.end(); ++it )
@@ -335,7 +335,7 @@ void bbTCOView::resetColor()
 	if( ! m_bbTCO->m_useStyleColor )
 	{
 		m_bbTCO->m_useStyleColor = true;
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 	bbTrack::clearLastTCOColor();
@@ -349,7 +349,7 @@ void bbTCOView::setColor( QColor new_color )
 	{
 		m_bbTCO->setColor( new_color );
 		m_bbTCO->m_useStyleColor = false;
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 	bbTrack::setLastTCOColor( new_color );
@@ -368,11 +368,11 @@ bbTrack::bbTrack( TrackContainer* tc ) :
 	s_infoMap[this] = bbNum;
 
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
-	engine::getBBTrackContainer()->setCurrentBB( bbNum );
-	engine::getBBTrackContainer()->updateComboBox();
+	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
+	Engine::getBBTrackContainer()->updateComboBox();
 
 	connect( this, SIGNAL( nameChanged() ),
-		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
+		Engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 }
 
 
@@ -380,10 +380,10 @@ bbTrack::bbTrack( TrackContainer* tc ) :
 
 bbTrack::~bbTrack()
 {
-	engine::mixer()->removePlayHandles( this );
+	Engine::mixer()->removePlayHandles( this );
 
 	const int bb = s_infoMap[this];
-	engine::getBBTrackContainer()->removeBB( bb );
+	Engine::getBBTrackContainer()->removeBB( bb );
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
@@ -397,7 +397,7 @@ bbTrack::~bbTrack()
 	// remove us from TC so bbTrackContainer::numOfBBs() returns a smaller
 	// value and thus combobox-updating in bbTrackContainer works well
 	trackContainer()->removeTrack( this );
-	engine::getBBTrackContainer()->updateComboBox();
+	Engine::getBBTrackContainer()->updateComboBox();
 }
 
 
@@ -414,11 +414,11 @@ bool bbTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	if( _tco_num >= 0 )
 	{
-		return engine::getBBTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
+		return Engine::getBBTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
 	}
 
 	tcoVector tcos;
-	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames / engine::framesPerTick() ) );
+	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
 
 	if( tcos.size() == 0 )
 	{
@@ -439,7 +439,7 @@ bool bbTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	if( _start - lastPosition < lastLen )
 	{
-		return engine::getBBTrackContainer()->play( _start - lastPosition, _frames, _offset, s_infoMap[this] );
+		return Engine::getBBTrackContainer()->play( _start - lastPosition, _frames, _offset, s_infoMap[this] );
 	}
 	return false;
 }
@@ -479,7 +479,7 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
-		( (JournallingObject *)( engine::getBBTrackContainer() ) )->
+		( (JournallingObject *)( Engine::getBBTrackContainer() ) )->
 						saveState( _doc, _this );
 	}
 	if( _this.parentNode().parentNode().nodeName() == "clone" )
@@ -502,9 +502,9 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
-		engine::getBBTrackContainer()->createTCOsForBB( dst );
+		Engine::getBBTrackContainer()->createTCOsForBB( dst );
 		TrackContainer::TrackList tl =
-					engine::getBBTrackContainer()->tracks();
+					Engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination
 		// TCOs (which are created if they do not exist yet)
 		for( TrackContainer::TrackList::iterator it = tl.begin();
@@ -522,7 +522,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					TrackContainer::classNodeName() );
 		if( node.isElement() )
 		{
-			( (JournallingObject *)engine::getBBTrackContainer() )->
+			( (JournallingObject *)Engine::getBBTrackContainer() )->
 					restoreState( node.toElement() );
 		}
 	}
@@ -562,9 +562,9 @@ void bbTrack::swapBBTracks( Track * _track1, Track * _track2 )
 	if( t1 != NULL && t2 != NULL )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
-		engine::getBBTrackContainer()->swapBB( s_infoMap[t1],
+		Engine::getBBTrackContainer()->swapBB( s_infoMap[t1],
 								s_infoMap[t2] );
-		engine::getBBTrackContainer()->setCurrentBB( s_infoMap[t1] );
+		Engine::getBBTrackContainer()->setCurrentBB( s_infoMap[t1] );
 	}
 }
 
@@ -599,7 +599,7 @@ bbTrackView::bbTrackView( bbTrack * _bbt, TrackContainerView* tcv ) :
 
 bbTrackView::~bbTrackView()
 {
-	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
+	Engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
 }
 
 
@@ -607,7 +607,7 @@ bbTrackView::~bbTrackView()
 
 bool bbTrackView::close()
 {
-	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
+	Engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
 	return trackView::close();
 }
 
@@ -616,8 +616,8 @@ bool bbTrackView::close()
 
 void bbTrackView::clickedTrackLabel()
 {
-	engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	engine::getBBEditor()->show();
+	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
+	Engine::getBBEditor()->show();
 /*	foreach( bbTrackView * tv,
 			trackContainerView()->findChildren<bbTrackView *>() )
 	{

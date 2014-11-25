@@ -29,7 +29,7 @@
 #include "InstrumentFunctionViews.h"
 #include "combobox.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "group_box.h"
 #include "gui_templates.h"
 #include "knob.h"

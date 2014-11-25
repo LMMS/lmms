@@ -30,7 +30,7 @@
 #include <QPainter>
 
 
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "NotePlayHandle.h"
@@ -143,7 +143,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	}
 	
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( updateAllDetuning() ) );	
 }
 
@@ -628,10 +628,10 @@ void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				+ (float)m_detuneModel.value() * CENT ) /
-				engine::mixer()->processingSampleRate();
+				Engine::mixer()->processingSampleRate();
 	m_detuningRight = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				- (float)m_detuneModel.value() * CENT ) /
-				engine::mixer()->processingSampleRate();
+				Engine::mixer()->processingSampleRate();
 }
 
 

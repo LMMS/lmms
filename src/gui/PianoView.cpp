@@ -47,7 +47,7 @@
 #include "PianoView.h"
 #include "caption_menu.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "knob.h"

@@ -30,7 +30,7 @@
 #include "AutomationEditor.h"
 #include "AutomationPattern.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "ProjectJournal.h"
 #include "rename_dialog.h"
@@ -49,7 +49,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 {
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
-	connect( engine::automationEditor(), SIGNAL( currentPatternChanged() ),
+	connect( Engine::automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -110,7 +110,7 @@ void AutomationPatternView::changeName()
 
 void AutomationPatternView::disconnectObject( QAction * _a )
 {
-	JournallingObject * j = engine::projectJournal()->
+	JournallingObject * j = Engine::projectJournal()->
 				journallingObject( _a->data().toInt() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
@@ -123,9 +123,9 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		update();
 
 		//If automation editor is opened, update its display after disconnection
-		if( engine::automationEditor() )
+		if( Engine::automationEditor() )
 		{
-			engine::automationEditor()->updateAfterPatternChange();
+			Engine::automationEditor()->updateAfterPatternChange();
 		}
 
 		//if there is no more connection connected to the AutomationPattern
@@ -242,7 +242,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c );
 
 	p.setBrush( lingrad );
-	if( engine::automationEditor()->currentPattern() == m_pat )
+	if( Engine::automationEditor()->currentPattern() == m_pat )
 		p.setPen( c.lighter( 160 ) );
 	else
 		p.setPen( c.lighter( 130 ) );
@@ -325,7 +325,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	// outer edge
 	p.setBrush( QBrush() );
-	if( engine::automationEditor()->currentPattern() == m_pat )
+	if( Engine::automationEditor()->currentPattern() == m_pat )
 		p.setPen( c.lighter( 130 ) );
 	else
 		p.setPen( c.darker( 300 ) );
@@ -378,7 +378,7 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				engine::projectJournal()->
+				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
@@ -386,10 +386,10 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		}
 		update();
 
-		if( engine::automationEditor() &&
-			engine::automationEditor()->currentPattern() == m_pat )
+		if( Engine::automationEditor() &&
+			Engine::automationEditor()->currentPattern() == m_pat )
 		{
-			engine::automationEditor()->setCurrentPattern( m_pat );
+			Engine::automationEditor()->setCurrentPattern( m_pat );
 		}
 	}
 	else

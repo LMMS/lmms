@@ -142,8 +142,8 @@ void VstEffect::openPlugin( const QString & _plugin )
 		return;
 	}
 
-	VstPlugin::connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( engine::getSong()->getTempo() );
+	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
+	m_plugin->setTempo( Engine::getSong()->getTempo() );
 
 	m_pluginMutex.unlock();
 

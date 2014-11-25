@@ -52,7 +52,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_hasStrictStepSize( false ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
-	m_valueBuffer( static_cast<int>( engine::mixer()->framesPerPeriod() ) ),
+	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData( false )
 

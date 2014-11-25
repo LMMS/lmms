@@ -52,7 +52,7 @@
 
 #include "fader.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "caption_menu.h"
 #include "ConfigManager.h"
 #include "text_float.h"

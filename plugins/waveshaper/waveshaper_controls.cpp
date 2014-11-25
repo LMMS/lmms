@@ -30,7 +30,7 @@
 #include "waveshaper.h"
 #include "base64.h"
 #include "graph.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Song.h"
 
 
@@ -55,7 +55,7 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 
 void waveShaperControls::samplesChanged( int _begin, int _end)
 {
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -115,13 +115,13 @@ void waveShaperControls::setDefaultShape()
 void waveShaperControls::resetClicked()
 {
 	setDefaultShape();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void waveShaperControls::smoothClicked()
 {
 	m_wavegraphModel.smoothNonCyclic();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void waveShaperControls::addOneClicked()
@@ -130,7 +130,7 @@ void waveShaperControls::addOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void waveShaperControls::subOneClicked()
@@ -139,7 +139,7 @@ void waveShaperControls::subOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 

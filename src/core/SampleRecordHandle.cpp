@@ -25,7 +25,7 @@
 
 #include "SampleRecordHandle.h"
 #include "bb_track.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"
 #include "SampleBuffer.h"
@@ -68,12 +68,12 @@ SampleRecordHandle::~SampleRecordHandle()
 
 void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = engine::mixer()->inputBuffer();
-	const f_cnt_t frames = engine::mixer()->inputBufferFrames();
+	const sampleFrame * recbuf = Engine::mixer()->inputBuffer();
+	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
-	MidiTime len = (tick_t)( m_framesRecorded / engine::framesPerTick() );
+	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
 //		m_tco->changeLength( len );
@@ -129,7 +129,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	}
 	// create according sample-buffer out of big buffer
 	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf)->setSampleRate( engine::mixer()->inputSampleRate() );
+	( *sampleBuf)->setSampleRate( Engine::mixer()->inputSampleRate() );
 	delete[] data;
 }
 

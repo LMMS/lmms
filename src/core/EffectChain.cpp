@@ -28,7 +28,7 @@
 
 #include "EffectChain.h"
 #include "Effect.h"
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
@@ -121,9 +121,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	engine::mixer()->lock();
+	Engine::mixer()->lock();
 	m_effects.append( _effect );
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 
 	emit dataChanged();
 }
@@ -133,9 +133,9 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	engine::mixer()->lock();
+	Engine::mixer()->lock();
 	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 
 	emit dataChanged();
 }
@@ -195,7 +195,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	{
 		return false;
 	}
-	const bool exporting = engine::getSong()->isExporting();
+	const bool exporting = Engine::getSong()->isExporting();
 	if( exporting ) // strip infs/nans if exporting
 	{
 		MixHelpers::sanitize( _buf, _frames );

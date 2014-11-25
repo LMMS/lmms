@@ -34,7 +34,7 @@
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
@@ -179,7 +179,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( engine::mixer()->framesPerPeriod() ) /
+			double latency = (double)( Engine::mixer()->framesPerPeriod() ) /
 													(double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)

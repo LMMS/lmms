@@ -317,7 +317,7 @@ private:
 	
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * engine::framesPerTick() + m_playPos[m_playMode].currentFrame();
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + m_playPos[m_playMode].currentFrame();
 	}
 	
 	void setPlayPos( tick_t _ticks, PlayModes _play_mode );
@@ -364,7 +364,7 @@ private:
 	VstSyncController m_vstSyncController;
 
 
-	friend class engine;
+	friend class Engine;
 	friend class SongEditor;
 	friend class mainWindow;
 	friend class ControllerRackView;

@@ -28,7 +28,7 @@
 
 #include "export_project_dialog.h"
 #include "Song.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "BBTrackContainer.h"
 #include "bb_track.h"
@@ -196,7 +196,7 @@ void exportProjectDialog::multiRender()
 
 	int x = 1;
 
-	const TrackContainer::TrackList & tl = engine::getSong()->tracks();
+	const TrackContainer::TrackList & tl = Engine::getSong()->tracks();
 
 	// Check for all unmuted tracks. Remember list.
 	for( TrackContainer::TrackList::ConstIterator it = tl.begin();
@@ -223,7 +223,7 @@ void exportProjectDialog::multiRender()
 
 	}
 
-	const TrackContainer::TrackList t2 = engine::getBBTrackContainer()->tracks();
+	const TrackContainer::TrackList t2 = Engine::getBBTrackContainer()->tracks();
 	for( TrackContainer::TrackList::ConstIterator it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);
@@ -259,7 +259,7 @@ ProjectRenderer* exportProjectDialog::prepRender()
 			bitrateCB->currentText().section(" ", 0, 0).toUInt(),
 			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
 
-	engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
+	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 
 	ProjectRenderer* renderer = new ProjectRenderer( qs, os, m_ft, m_fileName );
 
@@ -278,7 +278,7 @@ void exportProjectDialog::render( ProjectRenderer* renderer )
 		connect( renderer, SIGNAL( progressChanged( int ) ), progressBar, SLOT( setValue( int ) ) );
 		connect( renderer, SIGNAL( progressChanged( int ) ), this, SLOT( updateTitleBar( int ) )) ;
 		connect( renderer, SIGNAL( finished() ), this, SLOT( accept() ) );
-		connect( renderer, SIGNAL( finished() ), engine::mainWindow(), SLOT( resetWindowTitle() ) );
+		connect( renderer, SIGNAL( finished() ), Engine::mainWindow(), SLOT( resetWindowTitle() ) );
 
 		renderer->startProcessing();
 	}
@@ -337,7 +337,7 @@ void exportProjectDialog::startBtnClicked()
 
 void exportProjectDialog::updateTitleBar( int _prog )
 {
-	engine::mainWindow()->setWindowTitle(
+	Engine::mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
 }
 

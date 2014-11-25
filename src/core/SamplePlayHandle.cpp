@@ -25,7 +25,7 @@
 #include "SamplePlayHandle.h"
 #include "AudioPort.h"
 #include "bb_track.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"
 #include "SampleBuffer.h"
@@ -105,7 +105,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	sampleFrame * workingBuffer = buffer;
-	const fpp_t fpp = engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period
@@ -153,7 +153,7 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( engine::mixer()->processingSampleRate() / engine::mixer()->baseSampleRate() );
+	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate() );
 }
 
 

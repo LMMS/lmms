@@ -28,7 +28,7 @@
 
 #include "AmplifierControls.h"
 #include "Amplifier.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Song.h"
 
 

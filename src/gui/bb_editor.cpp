@@ -93,7 +93,7 @@ bbEditor::bbEditor( BBTrackContainer* tc ) :
 	toolButton * add_bb_track = new toolButton(
 					embed::getIconPixmap( "add_bb_track" ),
 						tr( "Add beat/bassline" ),
-				engine::getSong(), SLOT( addBBTrack() ),
+				Engine::getSong(), SLOT( addBBTrack() ),
 								m_toolBar );
 
 	toolButton * add_automation_track = new toolButton(
@@ -138,7 +138,7 @@ bbEditor::bbEditor( BBTrackContainer* tc ) :
 	tb_layout->addWidget( add_bar );
 	tb_layout->addSpacing( 15 );
 
-	engine::mainWindow()->workspace()->addSubWindow( this );
+	Engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	parentWidget()->resize( minimumWidth(), 300 );
@@ -209,13 +209,13 @@ void bbEditor::setPauseIcon( bool pause )
 
 void bbEditor::play()
 {
-	if( engine::getSong()->playMode() != Song::Mode_PlayBB )
+	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
-		engine::getSong()->playBB();
+		Engine::getSong()->playBB();
 	}
 	else
 	{
-		engine::getSong()->togglePause();
+		Engine::getSong()->togglePause();
 	}
 }
 
@@ -224,7 +224,7 @@ void bbEditor::play()
 
 void bbEditor::stop()
 {
-	engine::getSong()->stop();
+	Engine::getSong()->stop();
 }
 
 
@@ -287,7 +287,7 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{
-		if( engine::getSong()->isPlaying() )
+		if( Engine::getSong()->isPlaying() )
 		{
 			stop();
 		}

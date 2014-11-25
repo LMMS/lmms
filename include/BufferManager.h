@@ -28,7 +28,7 @@
 
 #include "MemoryManager.h"
 #include "lmms_basics.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include <QtCore/QAtomicInt>
 #include <QtCore/QReadWriteLock>

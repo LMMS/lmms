@@ -55,7 +55,7 @@
 #include "ConfigManager.h"
 #include "Clipboard.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
@@ -151,7 +151,7 @@ void trackContentObject::movePosition( const MidiTime & _pos )
 	if( m_startPosition != _pos )
 	{
 		m_startPosition = _pos;
-		engine::getSong()->updateLength();
+		Engine::getSong()->updateLength();
 	}
 	emit positionChanged();
 }
@@ -171,7 +171,7 @@ void trackContentObject::changeLength( const MidiTime & _length )
 	if( m_length != _length )
 	{
 		m_length = _length;
-		engine::getSong()->updateLength();
+		Engine::getSong()->updateLength();
 	}
 	emit lengthChanged();
 }
@@ -1102,7 +1102,7 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 	if( it != m_tcoViews.end() )
 	{
 		m_tcoViews.erase( it );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 }
 
@@ -1134,9 +1134,9 @@ void trackContentWidget::update()
  */
 void trackContentWidget::changePosition( const MidiTime & _new_pos )
 {
-	if( m_trackView->trackContainerView() == engine::getBBEditor() )
+	if( m_trackView->trackContainerView() == Engine::getBBEditor() )
 	{
-		const int cur_bb = engine::getBBTrackContainer()->currentBB();
+		const int cur_bb = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
 
 		// first show TCO for current BB...
@@ -1466,7 +1466,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 	int ppt = static_cast<int>( tcv->pixelsPerTact() );
 	QPainter p( this );
 	// Don't draw background on BB-Editor
-	if( m_trackView->trackContainerView() != engine::getBBEditor() )
+	if( m_trackView->trackContainerView() != Engine::getBBEditor() )
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getTact() * ppt, 0 ) );
@@ -2076,10 +2076,10 @@ void Track::removeTCO( trackContentObject * _tco )
 	if( it != m_trackContentObjects.end() )
 	{
 		m_trackContentObjects.erase( it );
-		if( engine::getSong() )
+		if( Engine::getSong() )
 		{
-			engine::getSong()->updateLength();
-			engine::getSong()->setModified();
+			Engine::getSong()->updateLength();
+			Engine::getSong()->setModified();
 		}
 	}
 }

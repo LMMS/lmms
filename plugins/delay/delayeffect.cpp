@@ -23,7 +23,7 @@
  */
 
 #include "delayeffect.h"
-#include "engine.h"
+#include "Engine.h"
 #include "embed.cpp"
 
 
@@ -51,8 +51,8 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
     m_delayControls( this )
 {
     m_delay = 0;
-    m_delay = new StereoDelay( 20, engine::mixer()->processingSampleRate() );
-    m_lfo = new Lfo( engine::mixer()->processingSampleRate() );
+    m_delay = new StereoDelay( 20, Engine::mixer()->processingSampleRate() );
+    m_lfo = new Lfo( Engine::mixer()->processingSampleRate() );
 }
 
 
@@ -82,7 +82,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
     double outSum = 0.0;
     const float d = dryLevel();
     const float w = wetLevel();
-    const float length = m_delayControls.m_delayTimeModel.value() * engine::mixer()->processingSampleRate();
+    const float length = m_delayControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
     m_lfo->setAmplitude( m_delayControls.m_lfoAmountModel.value() );
     m_lfo->setFrequency( 1.0 / m_delayControls.m_lfoTimeModel.value() );
     m_delay->setFeedback( m_delayControls.m_feedbackModel.value() );
@@ -104,8 +104,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 void DelayEffect::changeSampleRate()
 {
-    m_lfo->setSampleRate( engine::mixer()->processingSampleRate() );
-    m_delay->setSampleRate( engine::mixer()->processingSampleRate() );
+    m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
+    m_delay->setSampleRate( Engine::mixer()->processingSampleRate() );
 }
 
 
