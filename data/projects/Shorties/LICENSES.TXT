@@ -1,15 +1,15 @@
 * Greshz-CoolSnip.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1170
+  - http://lmms.io/lsp/index.php?action=show&file=1170
 
 * Root84-TrancyLoop.mmpz
   - Yellow openmusic
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=246
+  - http://lmms.io/lsp/index.php?action=show&file=246
 
 * Skiessi-222.mmpz
   - CC (by-sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=543
+  - http://lmms.io/lsp/index.php?action=show&file=543
 
 * Surrender-Main.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=489
+  - http://lmms.io/lsp/index.php?action=show&file=489

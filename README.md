@@ -7,11 +7,10 @@ What is LMMS?
 
 LMMS is a free cross-platform alternative to commercial programs like FL Studio®, which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
 
-[Homepage](http://lmms.sf.net)<br>
+[Homepage](http://lmms.io)<br>
 [Downloads/Releases](https://github.com/LMMS/lmms/releases)<br>
 [Developer Wiki](https://github.com/LMMS/lmms/wiki)<br>
-[Artist & User Wiki/Documentation](http://lmms.sourceforge.net/wiki/index.php/Main_Page) This still has some useful pages.<br>
-[Screenshots](http://lmms.io/screenshots/)<br>
+[Artist & User Wiki/Documentation](http://lmms.io/documentation)<br>
 [Sound Demos](http://lmms.io/showcase/)<br>
 [LMMS Sharing Platform](http://lmms.io/lsp/) Share your songs!
 
