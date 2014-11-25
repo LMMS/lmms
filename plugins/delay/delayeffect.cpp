@@ -83,7 +83,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
     const float d = dryLevel();
     const float w = wetLevel();
     const float length = m_delayControls.m_delayTimeModel.value() * engine::mixer()->processingSampleRate();
-    m_lfo->setAmplitude( m_delayControls.m_lfoAmountModel.value() );
+    const float amplitude = m_delayControls.m_lfoAmountModel.value() * engine::mixer()->processingSampleRate();
     m_lfo->setFrequency( 1.0 / m_delayControls.m_lfoTimeModel.value() );
     m_delay->setFeedback( m_delayControls.m_feedbackModel.value() );
     sample_t dryS[2];
@@ -91,7 +91,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
     {
         dryS[0] = buf[f][0];
         dryS[1] = buf[f][1];
-        m_delay->setLength( ( float )length * ( float )m_lfo->tick() );
+        m_delay->setLength( ( float )length + ( amplitude * ( float )m_lfo->tick() ) );
         m_delay->tick( buf[f] );
 
         buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
