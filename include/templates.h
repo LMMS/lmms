@@ -2,7 +2,7 @@
  * templates.h - miscellanous templates and algorithms
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TEMPLATES_H
-#define _TEMPLATES_H
+#ifndef TEMPLATES_H
+#define TEMPLATES_H
 
 #include <QtCore/QtAlgorithms>
 

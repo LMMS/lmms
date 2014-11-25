@@ -1,24 +1,24 @@
 * CapDan-ReggaetonTry.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1370
+  - http://lmms.io/lsp/index.php?action=show&file=1370
 
 * CapDan-ReggaeTry.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1369
+  - http://lmms.io/lsp/index.php?action=show&file=1369
 
 * EsoXLB-CPU.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=723
+  - http://lmms.io/lsp/index.php?action=show&file=723
 
 * Oglsdl-PpTrip.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1156
+  - http://lmms.io/lsp/index.php?action=show&file=1156
 
 * Skiessi-C64.mmpz
   - CC (by sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=472
+  - http://lmms.io/lsp/index.php?action=show&file=472
 
 * Thomasso-AxeFromThe80s.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=474
+  - http://lmms.io/lsp/index.php?action=show&file=474
 

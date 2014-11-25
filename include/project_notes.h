@@ -2,7 +2,7 @@
  * project_notes.h - header for project-notes-editor
  *
  * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _PROJECT_NOTES_H
-#define _PROJECT_NOTES_H
+#ifndef PROJECT_NOTES_H
+#define PROJECT_NOTES_H
 
 #include <QMainWindow>
 

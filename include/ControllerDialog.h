@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _CONTROLLER_DIALOG_H
-#define _CONTROLLER_DIALOG_H
+#ifndef CONTROLLER_DIALOG_H
+#define CONTROLLER_DIALOG_H
 
 #include <QWidget>
 

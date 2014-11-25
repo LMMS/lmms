@@ -3,7 +3,7 @@
  *                           responsible for exporting project
  *
  * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _EXPORT_PROJECT_DIALOG_H
-#define _EXPORT_PROJECT_DIALOG_H
+#ifndef EXPORT_PROJECT_DIALOG_H
+#define EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
 #include <vector>

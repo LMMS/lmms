@@ -26,8 +26,9 @@
 #include <QPainter>
 #include <QCursor>
 #include <QMouseEvent>
+#include <QScrollArea>
 
-#include "plugin_browser.h"
+#include "PluginBrowser.h"
 #include "embed.h"
 #include "debug.h"
 #include "templates.h"
@@ -43,7 +44,7 @@ bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )
 
 
 
-pluginBrowser::pluginBrowser( QWidget * _parent ) :
+PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument plugins" ),
 				embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
 {
@@ -65,29 +66,20 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 								m_view );
 	hint->setFont( pointSize<8>( hint->font() ) );
 	hint->setWordWrap( true );
-	view_layout->addWidget( hint );
 
-	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
-	qSort( m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore );
+	QScrollArea* scrollarea = new QScrollArea( m_view );
+	PluginDescList* descList = new PluginDescList( m_view );
+	scrollarea->setWidget(descList);
+	scrollarea->setWidgetResizable(true);
 
-	for( Plugin::DescriptorList::ConstIterator it = m_pluginDescriptors.begin();
-										it != m_pluginDescriptors.end(); ++it )
-	{
-		if( it->type == Plugin::Instrument )
-		{
-			pluginDescWidget * p = new pluginDescWidget( *it, m_view );
-			p->show();
-			view_layout->addWidget( p );
-		}
-	}
-	view_layout->addStretch();
-	show();
+	view_layout->addWidget(hint);
+	view_layout->addWidget(scrollarea);
 }
 
 
 
 
-pluginBrowser::~pluginBrowser()
+PluginBrowser::~PluginBrowser()
 {
 }
 
@@ -96,8 +88,36 @@ pluginBrowser::~pluginBrowser()
 
 
 
+PluginDescList::PluginDescList(QWidget *parent) :
+	QWidget(parent)
+{
+	QVBoxLayout* layout = new QVBoxLayout(this);
 
-pluginDescWidget::pluginDescWidget( const Plugin::Descriptor & _pd,
+	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
+	std::sort(m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore);
+
+
+	for(Plugin::DescriptorList::const_iterator it = m_pluginDescriptors.constBegin();
+		it != m_pluginDescriptors.constEnd(); it++)
+	{
+		if( it->type == Plugin::Instrument )
+		{
+			PluginDescWidget* p = new PluginDescWidget( *it, this );
+			p->show();
+			layout->addWidget(p);
+		}
+	}
+
+	setLayout(layout);
+	layout->addStretch();
+}
+
+
+
+
+
+
+PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_updateTimer( this ),
@@ -115,14 +135,14 @@ pluginDescWidget::pluginDescWidget( const Plugin::Descriptor & _pd,
 
 
 
-pluginDescWidget::~pluginDescWidget()
+PluginDescWidget::~PluginDescWidget()
 {
 }
 
 
 
 
-void pluginDescWidget::paintEvent( QPaintEvent * )
+void PluginDescWidget::paintEvent( QPaintEvent * )
 {
 	const QColor fill_color = m_mouseOver ? QColor( 224, 224, 224 ) :
 						QColor( 192, 192, 192 );
@@ -152,7 +172,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
 							Qt::TextWordWrap,
-			pluginBrowser::tr( m_pluginDescriptor.description ),
+			PluginBrowser::tr( m_pluginDescriptor.description ),
 								&br );
 		if( m_mouseOver )
 		{
@@ -165,7 +185,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 
 
 
-void pluginDescWidget::enterEvent( QEvent * _e )
+void PluginDescWidget::enterEvent( QEvent * _e )
 {
 	m_mouseOver = true;
 	m_targetHeight = height() + 1;
@@ -176,7 +196,7 @@ void pluginDescWidget::enterEvent( QEvent * _e )
 
 
 
-void pluginDescWidget::leaveEvent( QEvent * _e )
+void PluginDescWidget::leaveEvent( QEvent * _e )
 {
 	m_mouseOver = false;
 	m_targetHeight = 24;
@@ -187,7 +207,7 @@ void pluginDescWidget::leaveEvent( QEvent * _e )
 
 
 
-void pluginDescWidget::mousePressEvent( QMouseEvent * _me )
+void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
@@ -200,7 +220,7 @@ void pluginDescWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-void pluginDescWidget::updateHeight()
+void PluginDescWidget::updateHeight()
 {
 	if( m_targetHeight > height() )
 	{

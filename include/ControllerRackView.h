@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _CONTROLLER_RACK_VIEW_H
-#define _CONTROLLER_RACK_VIEW_H
+#ifndef CONTROLLER_RACK_VIEW_H
+#define CONTROLLER_RACK_VIEW_H
 
 #include <QWidget>
 

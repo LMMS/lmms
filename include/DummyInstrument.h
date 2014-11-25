@@ -3,7 +3,7 @@
  *                     be loaded
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _DUMMY_INSTRUMENT_H
-#define _DUMMY_INSTRUMENT_H
+#ifndef DUMMY_INSTRUMENT_H
+#define DUMMY_INSTRUMENT_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"

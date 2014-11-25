@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _INSTRUMENT_FUNCTIONS_H
-#define _INSTRUMENT_FUNCTIONS_H
+#ifndef INSTRUMENT_FUNCTIONS_H
+#define INSTRUMENT_FUNCTIONS_H
 
 #include "JournallingObject.h"
 #include "lmms_basics.h"

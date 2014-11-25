@@ -49,7 +49,7 @@
 #include "AboutDialog.h"
 #include "ControllerRackView.h"
 #include "FileBrowser.h"
-#include "plugin_browser.h"
+#include "PluginBrowser.h"
 #include "SideBar.h"
 #include "ConfigManager.h"
 #include "Mixer.h"
@@ -94,7 +94,7 @@ MainWindow::MainWindow() :
 	splitter->setChildrenCollapsible( false );
 
 	QString wdir = ConfigManager::inst()->workingDir();
-	sideBar->appendTab( new pluginBrowser( splitter ) );
+	sideBar->appendTab( new PluginBrowser( splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userProjectsDir() + "*" +
 				ConfigManager::inst()->factoryProjectsDir(),

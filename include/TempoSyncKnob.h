@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TEMPO_SYNC_KNOB_H
-#define _TEMPO_SYNC_KNOB_H
+#ifndef TEMPO_SYNC_KNOB_H
+#define TEMPO_SYNC_KNOB_H
 
 #include <QPixmap>
 #include <QtCore/QPointer>

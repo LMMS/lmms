@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_ALSA_SEQ_H
-#define _MIDI_ALSA_SEQ_H
+#ifndef MIDI_ALSA_SEQ_H
+#define MIDI_ALSA_SEQ_H
 
 #include "lmmsconfig.h"
 
@@ -71,7 +71,7 @@ public:
 	virtual void removePort( MidiPort * _port );
 
 
-	// list seq-ports from ALSA 
+	// list seq-ports from ALSA
 	virtual QStringList readablePorts() const
 	{
 		return m_readablePorts;
@@ -85,7 +85,7 @@ public:
 	// return name of port which specified MIDI event came from
 	virtual QString sourcePortName( const MidiEvent & ) const;
 
-	// (un)subscribe given MidiPort to/from destination-port 
+	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe = true );

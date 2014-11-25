@@ -6,7 +6,7 @@
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of LMMS - http://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _LADSPA_MANAGER_H
-#define _LADSPA_MANAGER_H
+#ifndef LADSPA_MANAGER_H
+#define LADSPA_MANAGER_H
 
 #include <ladspa.h>
 
@@ -52,12 +52,12 @@ it loads all of the plug-ins found in the LADSPA_PATH environmental variable
 and stores their access descriptors according in a dictionary keyed on
 the filename the plug-in was loaded from and the label of the plug-in.
 
-The can be retrieved by using ladspa_key_t.  For example, to get the 
+The can be retrieved by using ladspa_key_t.  For example, to get the
 "Phase Modulated Voice" plug-in from the cmt library, you would perform the
 calls using:
 
 	ladspa_key_t key( "cmt.so", "phasemod" )
-	
+
 as the plug-in key. */
 
 enum ladspaPluginType
@@ -83,14 +83,14 @@ typedef struct ladspaManagerStorage
 class EXPORT ladspaManager
 {
 public:
-	
+
 	ladspaManager();
 	virtual ~ladspaManager();
 
 	l_sortable_plugin_t getSortedPlugins();
-	ladspaManagerDescription * getDescription( const ladspa_key_t & 
+	ladspaManagerDescription * getDescription( const ladspa_key_t &
 								_plugin );
-	
+
 	/* This identifier can be used as a unique, case-sensitive
 	identifier for the plugin type within the plugin file. Plugin
 	types should be identified by file and label rather than by index
@@ -103,7 +103,7 @@ public:
 	be cached or subject to significant latency. */
 	bool  hasRealTimeDependency( const ladspa_key_t & _plugin );
 
-	/* Indicates that the plugin may cease to work correctly if the 
+	/* Indicates that the plugin may cease to work correctly if the
 	host elects to use the same data location for both input and output
 	(see connectPort). */
 	bool  isInplaceBroken( const ladspa_key_t & _plugin );
@@ -138,13 +138,13 @@ public:
 	/* Indicates that the port is an control. */
 	bool  isPortControl( const ladspa_key_t & _plugin, uint32_t _port );
 
-	/* Indicates that any bounds specified should be interpreted as 
-	multiples of the sample rate. For instance, a frequency range from 
-	0Hz to the Nyquist frequency (half the sample rate) could be requested 
-	by this hint in conjunction with LowerBound = 0 and UpperBound = 0.5. 
+	/* Indicates that any bounds specified should be interpreted as
+	multiples of the sample rate. For instance, a frequency range from
+	0Hz to the Nyquist frequency (half the sample rate) could be requested
+	by this hint in conjunction with LowerBound = 0 and UpperBound = 0.5.
 	Hosts that support bounds at all must support this hint to retain
 	meaning. */
-	bool  areHintsSampleRateDependent( const ladspa_key_t & _plugin, 
+	bool  areHintsSampleRateDependent( const ladspa_key_t & _plugin,
 								uint32_t _port );
 
   	/* Returns the lower boundary value for the given port. If
@@ -172,17 +172,17 @@ public:
 	particularly useful for frequencies and gains. */
 	bool  isLogarithmic( const ladspa_key_t & _plugin, uint32_t _port );
 
-	/* Indicates that a user interface would probably wish to provide a 
-	stepped control taking only integer values. Any bounds set should be 
+	/* Indicates that a user interface would probably wish to provide a
+	stepped control taking only integer values. Any bounds set should be
 	slightly wider than the actual integer range required to avoid floating
-	point rounding errors. For instance, the integer set {0,1,2,3} might 
+	point rounding errors. For instance, the integer set {0,1,2,3} might
 	be described as [-0.1, 3.1]. */
 	bool  isInteger( const ladspa_key_t & _plugin, uint32_t _port );
-	
+
 	/* Returns the name of the port. */
 	QString  getPortName( const ladspa_key_t & _plugin, uint32_t _port );
-	
-	
+
+
 	/* This may be used by the plugin developer to pass any custom
 	implementation data into an instantiate call. It must not be used
 	or interpreted by the host. It is expected that most plugin
@@ -190,24 +190,24 @@ public:
 	used to hold instance data. */
 	const void *  getImplementationData(
 						const ladspa_key_t & _plugin );
-	
-	
+
+
 	/* Returns a pointer to the plug-in's descriptor from which control
 	of the plug-in is accessible */
 	const LADSPA_Descriptor *  getDescriptor(
 						const ladspa_key_t & _plugin );
-	
-	
+
+
 	/* The following methods are convenience functions for use during
 	development.  A real instrument should use the getDescriptor()
 	method and implement the plug-in manipulations internally to avoid
 	the overhead associated with QMap lookups. */
-	
-	
+
+
 	/* Returns a handle to an instantiation of the given plug-in. */
-	LADSPA_Handle  instantiate( const ladspa_key_t & _plugin, 
+	LADSPA_Handle  instantiate( const ladspa_key_t & _plugin,
 						uint32_t _sample_rate );
-	
+
   	/* This method calls a function pointer that connects a port on an
 	instantiated plugin to a memory location at which a block of data
 	for the port will be read/written. The data location is expected
@@ -225,11 +225,11 @@ public:
 
 	connectPort() must be called at least once for each port before
 	run() or runAdding() is called. */
-	bool  connectPort( const ladspa_key_t & _plugin, 
-					LADSPA_Handle _instance, 
+	bool  connectPort( const ladspa_key_t & _plugin,
+					LADSPA_Handle _instance,
 					uint32_t _port,
 					LADSPA_Data * _data_location );
-	
+
   	/* This method calls a function pointer that initialises a plugin
 	instance and activates it for use. This is separated from
 	instantiate() to aid real-time support and so that hosts can
@@ -262,7 +262,7 @@ public:
 	before run() or run_adding(). If deactivate() is called for a
 	plugin instance then the plugin instance may not be reused until
 	activate() has been called again. */
-	bool  run( const ladspa_key_t & _plugin, 
+	bool  run( const ladspa_key_t & _plugin,
 					LADSPA_Handle _instance,
 					uint32_t _sample_count );
 
@@ -315,7 +315,7 @@ public:
 	/* Once an instance of a plugin has been finished with it can be
 	deleted using the following function. The instance handle passed
 	ceases to be valid after this call.
-  
+
 	If activate() was called for a plugin instance then a
 	corresponding call to deactivate() must be made before cleanup()
 	is called. */
@@ -327,7 +327,7 @@ private:
 						const QString & _file );
 	uint16_t  getPluginInputs( const LADSPA_Descriptor * _descriptor );
 	uint16_t  getPluginOutputs( const LADSPA_Descriptor * _descriptor );
-	
+
 	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
 						ladspaManagerMapType;
 	ladspaManagerMapType m_ladspaManagerMap;

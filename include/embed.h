@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _EMBED_H
-#define _EMBED_H
+#ifndef EMBED_H
+#define EMBED_H
 
 #include <QPixmap>
 #include <QtCore/QString>

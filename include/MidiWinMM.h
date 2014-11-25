@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_WINMM_H
-#define _MIDI_WINMM_H
+#ifndef MIDI_WINMM_H
+#define MIDI_WINMM_H
 
 #include "lmmsconfig.h"
 
@@ -77,7 +77,7 @@ public:
 	// return name of port which specified MIDI event came from
 	virtual QString sourcePortName( const MidiEvent & ) const;
 
-	// (un)subscribe given MidiPort to/from destination-port 
+	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe = true );

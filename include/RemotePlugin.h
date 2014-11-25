@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _REMOTE_PLUGIN_H
-#define _REMOTE_PLUGIN_H
+#ifndef REMOTE_PLUGIN_H
+#define REMOTE_PLUGIN_H
 
 #include "export.h"
 #include "MidiEvent.h"

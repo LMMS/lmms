@@ -2,7 +2,7 @@
  * instrument_view.h - definition of instrumentView-class
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _INSTRUMENT_VIEW_H
-#define _INSTRUMENT_VIEW_H
+#ifndef INSTRUMENT_VIEW_H
+#define INSTRUMENT_VIEW_H
 
 #include "Instrument.h"
 #include "PluginView.h"

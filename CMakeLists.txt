@@ -36,6 +36,7 @@ OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
+OPTION(WANT_GIG		"Include GIG player plugin" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
@@ -314,6 +315,17 @@ IF(WANT_SF2)
 			"is highly recommended")
 	ENDIF(FLUIDSYNTH_FOUND)
 ENDIF(WANT_SF2)
+
+# check for libgig
+If(WANT_GIG)
+	PKG_CHECK_MODULES(GIG gig)
+	IF(GIG_FOUND)
+		SET(LMMS_HAVE_GIG TRUE)
+		SET(STATUS_GIG "OK")
+	ELSE(GIG_FOUND)
+		SET(STATUS_GIG "not found, libgig needed for decoding .gig files")
+	ENDIF(GIG_FOUND)
+ENDIF(WANT_GIG)
 
 # check for pthreads
 IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -652,6 +664,7 @@ MESSAGE(
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
+"* GIG player                  : ${STATUS_GIG}\n"
 )
 
 MESSAGE(

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PIANO_VIEW_H
-#define _PIANO_VIEW_H
+#ifndef PIANO_VIEW_H
+#define PIANO_VIEW_H
 
 #include <QPixmap>
 #include <QScrollBar>

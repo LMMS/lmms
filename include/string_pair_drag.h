@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _STRING_PAIR_DRAG_H
-#define _STRING_PAIR_DRAG_H
+#ifndef STRING_PAIR_DRAG_H
+#define STRING_PAIR_DRAG_H
 
 #include <QDrag>
 #include <QDragEnterEvent>

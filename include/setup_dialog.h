@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SETUP_DIALOG_H
-#define _SETUP_DIALOG_H
+#ifndef SETUP_DIALOG_H
+#define SETUP_DIALOG_H
 
 #include <QDialog>
 #include <QtCore/QMap>
@@ -77,7 +77,7 @@ private slots:
 	void setSTKDir( const QString & _sd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
-	
+
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
 	void displayAudioHelp();

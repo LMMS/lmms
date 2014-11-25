@@ -1,8 +1,8 @@
 /*
- * fade_button.h - declaration of class fadeButton 
+ * fade_button.h - declaration of class fadeButton
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _FADE_BUTTON_H
-#define _FADE_BUTTON_H 
+#ifndef FADE_BUTTON_H
+#define FADE_BUTTON_H
 
 #include <QtCore/QTime>
 #include <QAbstractButton>

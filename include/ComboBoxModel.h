@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _COMBOBOX_MODEL_H
-#define _COMBOBOX_MODEL_H
+#ifndef COMBOBOX_MODEL_H
+#define COMBOBOX_MODEL_H
 
 #include <QtCore/QVector>
 #include <QtCore/QPair>

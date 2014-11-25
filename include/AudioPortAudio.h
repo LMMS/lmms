@@ -36,7 +36,7 @@ class AudioPortAudioSetupUtil : public QObject
 public slots:
 	void updateDevices();
 	void updateChannels();
-		
+
 public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
@@ -119,7 +119,7 @@ private:
 
 	typedef double PaTime;
 	typedef PaDeviceID PaDeviceIndex;
-	
+
 	typedef struct PaStreamParameters
 	{
 		PaDeviceIndex device;
@@ -136,7 +136,7 @@ private:
 	PaStreamParameters m_inputParameters;
 
 	bool m_wasPAInitError;
- 
+
 	surroundSampleFrame * m_outBuf;
 	int m_outBufPos;
 	int m_outBufSize;

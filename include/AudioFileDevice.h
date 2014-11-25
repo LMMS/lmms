@@ -1,5 +1,5 @@
 /*
- * AudioFileDevice.h - base-class for audio-device-classes which write 
+ * AudioFileDevice.h - base-class for audio-device-classes which write
  *                     their output into a file
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>

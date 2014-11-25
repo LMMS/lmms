@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TOOL_PLUGIN_VIEW_H
-#define _TOOL_PLUGIN_VIEW_H
+#ifndef TOOL_PLUGIN_VIEW_H
+#define TOOL_PLUGIN_VIEW_H
 
 #include "PluginView.h"
 

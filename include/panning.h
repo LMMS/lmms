@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PANNING_H
-#define _PANNING_H
+#ifndef PANNING_H
+#define PANNING_H
 
 #include "lmms_basics.h"
 #include "volume.h"
@@ -45,7 +45,7 @@ inline stereoVolumeVector panningToVolumeVector( panning_t _p,
 inline int panningToMidi( panning_t _p )
 {
 	return MidiMinPanning + (int) (
-			  ( (float)( _p - PanningLeft ) ) / 
+			  ( (float)( _p - PanningLeft ) ) /
 			  ( (float)( PanningRight - PanningLeft ) ) *
 			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
 }

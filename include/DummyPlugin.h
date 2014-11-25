@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _DUMMY_PLUGIN_H
-#define _DUMMY_PLUGIN_H
+#ifndef DUMMY_PLUGIN_H
+#define DUMMY_PLUGIN_H
 
 #include "Plugin.h"
 #include "PluginView.h"

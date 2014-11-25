@@ -1272,7 +1272,14 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
+
+  // Hide the Size and Maximize options from the system menu
+  // since the dialog size is fixed.
+  QMenu * systemMenu = subWin->systemMenu();
+  systemMenu->actions().at( 2 )->setVisible( false ); // Size
+  systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
+
+  subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
 	subWin->setFixedSize( subWin->size() );
 	subWin->hide();
 }

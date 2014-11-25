@@ -2,7 +2,7 @@
  * types.h - typedefs for common types that are used in the whole app
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ inline float typeInfo<float>::minEps()
 {
 	return 1.0e-10;
 }
-	
+
 template<>
 inline bool typeInfo<float>::isEqual( float _x, float _y )
 {

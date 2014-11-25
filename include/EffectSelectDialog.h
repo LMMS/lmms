@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _EFFECT_SELECT_DIALOG_H
-#define _EFFECT_SELECT_DIALOG_H
+#ifndef EFFECT_SELECT_DIALOG_H
+#define EFFECT_SELECT_DIALOG_H
 
 #include <QDialog>
 #include <QSortFilterProxyModel>

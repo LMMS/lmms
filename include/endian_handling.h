@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _ENDIAN_HANDLING_H
-#define _ENDIAN_HANDLING_H
+#ifndef ENDIAN_HANDLING_H
+#define ENDIAN_HANDLING_H
 
 #include <QtCore/QSysInfo>
 

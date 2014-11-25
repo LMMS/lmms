@@ -2,7 +2,7 @@
  * export.h - macros for export-declarations
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _EXPORT_H
-#define _EXPORT_H
+#ifndef EXPORT_H
+#define EXPORT_H
 
 #include "lmmsconfig.h"
 

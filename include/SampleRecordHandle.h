@@ -2,7 +2,7 @@
  * SampleRecordHandle.h - play-handle for recording a sample
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _SAMPLE_RECORD_HANDLE_H
-#define _SAMPLE_RECORD_HANDLE_H
+#ifndef SAMPLE_RECORD_HANDLE_H
+#define SAMPLE_RECORD_HANDLE_H
 
 #include <QtCore/QList>
 #include <QtCore/QPair>

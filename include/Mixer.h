@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIXER_H
-#define _MIXER_H
+#ifndef MIXER_H
+#define MIXER_H
 
 // denormals stripping
 #ifdef __SSE__
@@ -103,7 +103,7 @@ public:
 			Interpolation_SincFastest,
 			Interpolation_SincMedium,
 			Interpolation_SincBest
-		} ; 
+		} ;
 
 		enum Oversampling
 		{
@@ -309,12 +309,12 @@ public:
 	{
 		m_inputFramesMutex.unlock();
 	}
-	
+
 	void lockPlayHandleRemoval()
 	{
 		m_playHandleRemovalMutex.lock();
 	}
-	
+
 	void unlockPlayHandleRemoval()
 	{
 		m_playHandleRemovalMutex.unlock();
@@ -342,7 +342,7 @@ public:
 	}
 
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
-	
+
 	inline const sampleFrame * inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
@@ -414,10 +414,10 @@ private:
 	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
-	
+
 	surroundSampleFrame * m_readBuf;
 	surroundSampleFrame * m_writeBuf;
-	
+
 	QVector<surroundSampleFrame *> m_bufferPool;
 	int m_readBuffer;
 	int m_writeBuffer;
@@ -428,7 +428,7 @@ private:
 	fpp_t m_halfStart[SURROUND_CHANNELS];
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
-	
+
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
 	QWaitCondition m_queueReadyWaitCond;
@@ -454,7 +454,7 @@ private:
 
 	QMutex m_globalMutex;
 	QMutex m_inputFramesMutex;
-	
+
 	QMutex m_playHandleRemovalMutex;
 
 	fifo * m_fifo;

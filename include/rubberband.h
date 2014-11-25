@@ -3,7 +3,7 @@
  *                             Qt4
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _RUBBERBAND_H
-#define _RUBBERBAND_H
+#ifndef RUBBERBAND_H
+#define RUBBERBAND_H
 
 #include <QRubberBand>
 #include <QtCore/QVector>

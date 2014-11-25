@@ -1,75 +1,75 @@
 * Alf42red-Mauiwowi.mmpz
   - CC (by-sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=819
+  - http://lmms.io/lsp/index.php?action=show&file=819
 
 * CapDan-TwilightArea-OriginalByAlf42red.mmpz
   - CC (by-sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1439
+  - http://lmms.io/lsp/index.php?action=show&file=1439
 
 * CapDan-ZeroSumGame-OriginalByZakarra.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1565
+  - http://lmms.io/lsp/index.php?action=show&file=1565
 
 * Farbro-Tectonic.mmpz
   - CC (by)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1327
+  - http://lmms.io/lsp/index.php?action=show&file=1327
   
 * Greippi-ardudar.mmpz
   - CC (by-sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=4916
+  - http://lmms.io/lsp/index.php?action=show&file=4916
 
 * Impulslogik-Zen.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=581
+  - http://lmms.io/lsp/index.php?action=show&file=581
 
 * Momo64-esp.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1534
+  - http://lmms.io/lsp/index.php?action=show&file=1534
 
 * Namitryus-K-Project.mmpz
   - CC (by-nc)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1138
+  - http://lmms.io/lsp/index.php?action=show&file=1138
 
 * Oglsdl-Dr8v2.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1124
+  - http://lmms.io/lsp/index.php?action=show&file=1124
 
 * Root84-Initialize.mmpz
   - Yellow openmusic
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=628
+  - http://lmms.io/lsp/index.php?action=show&file=628
 
 * Saber-FinalStep.mmpz
   - BSD
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=721
+  - http://lmms.io/lsp/index.php?action=show&file=721
 
 * Settel-InnerRecreation.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=515
+  - http://lmms.io/lsp/index.php?action=show&file=515
 
 * Skiessi-Onion.mmpz
   - CC (by-sa)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=405
+  - http://lmms.io/lsp/index.php?action=show&file=405
 
 * Socceroos-Progress.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1516
+  - http://lmms.io/lsp/index.php?action=show&file=1516
 
 * TameAnderson-MakeMe.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1060
+  - http://lmms.io/lsp/index.php?action=show&file=1060
   
 * unfa-Spoken.mmpz
   - CC (by-nc)
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=4929
+  - http://lmms.io/lsp/index.php?action=show&file=4929
 
 * Zakarra-MainstreamMemory.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1201
+  - http://lmms.io/lsp/index.php?action=show&file=1201
 
 * Zakarra-OneDay.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1501
+  - http://lmms.io/lsp/index.php?action=show&file=1501
 
 * Zakarra-59_Degrees.mmpz
   - Artistic 2.0
-  - http://lmms.sourceforge.net/lsp/index.php?action=show&file=1059
+  - http://lmms.io/lsp/index.php?action=show&file=1059

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_ALSA_RAW_H
-#define _MIDI_ALSA_RAW_H
+#ifndef MIDI_ALSA_RAW_H
+#define MIDI_ALSA_RAW_H
 
 #include "lmmsconfig.h"
 

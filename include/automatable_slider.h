@@ -2,7 +2,7 @@
  * automatable_slider.h - class automatableSlider, a QSlider with automation
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _AUTOMATABLE_SLIDER_H
-#define _AUTOMATABLE_SLIDER_H
+#ifndef AUTOMATABLE_SLIDER_H
+#define AUTOMATABLE_SLIDER_H
 
 #include <QSlider>
 

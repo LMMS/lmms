@@ -2,7 +2,7 @@
  * transformable_auto_model.h - template transformableAutoModel
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _TRANSFORMABLE_AUTO_MODEL_H
-#define _TRANSFORMABLE_AUTO_MODEL_H
+#ifndef TRANSFORMABLE_AUTO_MODEL_H
+#define TRANSFORMABLE_AUTO_MODEL_H
 
 #include "AutomatableModel.h"
 //#include "automatable_model_templates.h"

@@ -3,7 +3,7 @@
  *                   changing the content of a string
  *
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _RENAME_DIALOG_H
-#define _RENAME_DIALOG_H
+#ifndef RENAME_DIALOG_H
+#define RENAME_DIALOG_H
 
 #include <QDialog>
 

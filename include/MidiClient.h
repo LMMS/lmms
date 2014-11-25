@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_CLIENT_H
-#define _MIDI_CLIENT_H
+#ifndef MIDI_CLIENT_H
+#define MIDI_CLIENT_H
 
 #include <QtCore/QStringList>
 #include <QtCore/QVector>

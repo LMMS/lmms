@@ -2,7 +2,7 @@
  * led_checkbox.h - class ledCheckBox, an improved QCheckBox
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _LED_CHECKBOX_H
-#define _LED_CHECKBOX_H
+#ifndef LED_CHECKBOX_H
+#define LED_CHECKBOX_H
 
 #include "automatable_button.h"
 
@@ -70,7 +70,7 @@ protected:
 private:
 	QPixmap * m_ledOnPixmap;
 	QPixmap * m_ledOffPixmap;
-	
+
 	QString m_text;
 
 	void initUi( LedColors _color ); //!< to be called by ctors

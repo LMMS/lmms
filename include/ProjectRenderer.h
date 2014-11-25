@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PROJECT_RENDERER_H
-#define _PROJECT_RENDERER_H
+#ifndef PROJECT_RENDERER_H
+#define PROJECT_RENDERER_H
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
