@@ -293,20 +293,37 @@ void Song::processNextBuffer()
 	}
 
 	f_cnt_t total_frames_played = 0;
-	float frames_per_tick = Engine::framesPerTick( m_playPos[m_playMode] );
+	float framesPerTick;
 
 	while( total_frames_played
 				< Engine::mixer()->framesPerPeriod() )
 	{
+		// update tempo and fpt, either from tempomap or from tempo widget
+		if( useTempoMap )
+		{
+			tempo = Engine::tempoAt( m_playPos[m_playMode] );
+			framesPerTick = Engine::framesPerTick( m_playPos[m_playMode] );
+		}
+		else
+		{
+			tempo = m_tempoModel.value();
+			framesPerTick = Engine::framesPerTick();
+		}
+		// update vst sync if tempo has changed
+		if( tempo != m_lastTempo )
+		{
+			m_vstSyncController.setTempo( tempo );
+			m_lastTempo = tempo;
+		}
 		m_vstSyncController.update();
 
 		f_cnt_t played_frames = Engine::mixer()->framesPerPeriod() - total_frames_played;
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
 		// did we play a tick?
-		if( current_frame >= frames_per_tick )
+		if( current_frame >= framesPerTick )
 		{
-			int ticks = m_playPos[m_playMode].getTicks() + (int)( current_frame / frames_per_tick );
+			int ticks = m_playPos[m_playMode].getTicks() + (int)( current_frame / framesPerTick );
 
 			m_vstSyncController.setAbsolutePosition( ticks );
 
@@ -366,11 +383,11 @@ void Song::processNextBuffer()
 				m_vstSyncController.stopCycle();
 			}
 
-			current_frame = fmodf( current_frame, frames_per_tick );
+			current_frame = fmodf( current_frame, framesPerTick );
 			m_playPos[m_playMode].setCurrentFrame( current_frame );
 		}
 
-		f_cnt_t last_frames = (f_cnt_t)frames_per_tick -
+		f_cnt_t last_frames = (f_cnt_t)framesPerTick -
 						(f_cnt_t) current_frame;
 		// skip last frame fraction
 		if( last_frames == 0 )
@@ -397,9 +414,8 @@ void Song::processNextBuffer()
 
 		// update frame-counters
 		total_frames_played += played_frames;
-		m_playPos[m_playMode].setCurrentFrame( played_frames +
-								current_frame );
-		m_elapsedMilliSeconds += (((played_frames/frames_per_tick)*60*1000/48)/getTempo());
+		m_playPos[m_playMode].setCurrentFrame( played_frames + current_frame );
+		m_elapsedMilliSeconds += (((played_frames/framesPerTick)*60*1000/48)/getTempo());
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
