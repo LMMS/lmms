@@ -36,7 +36,6 @@
 class MidiTime;
 
 
-
 class EXPORT AutomationPattern : public TrackContentObject
 {
 	Q_OBJECT
@@ -47,8 +46,6 @@ public:
 		LinearProgression,
 		CubicHermiteProgression
 	} ;
-
-	typedef QMap<int, float> timeMap;
 
 	AutomationPattern( AutomationTrack * _auto_track );
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
@@ -91,22 +88,22 @@ public:
 		return m_dragging;
 	}
 
-	inline const timeMap & getTimeMap() const
+	inline const TimeMap & getTimeMap() const
 	{
 		return m_timeMap;
 	}
 
-	inline timeMap & getTimeMap()
+	inline TimeMap & getTimeMap()
 	{
 		return m_timeMap;
 	}
 
-	inline const timeMap & getTangents() const
+	inline const TimeMap & getTangents() const
 	{
 		return m_tangents;
 	}
 
-	inline timeMap & getTangents()
+	inline TimeMap & getTangents()
 	{
 		return m_tangents;
 	}
@@ -174,6 +171,9 @@ public:
 		return m_isTempoPattern;
 	}
 	
+	void updateTempoMaps();
+	void updateTempoMaps( tick_t start, tick_t end );
+	
 public slots:
 	void clear();
 	void openInAutomationEditor();
@@ -181,14 +181,14 @@ public slots:
 
 private:
 	void generateTangents();
-	void generateTangents( timeMap::const_iterator it, int numToGenerate );
-	float valueAt( timeMap::const_iterator v, int offset ) const;
+	void generateTangents( TimeMap::const_iterator it, int numToGenerate );
+	float valueAt( TimeMap::const_iterator v, int offset ) const;
 
 	AutomationTrack * m_autoTrack;
 
-	timeMap m_timeMap;	// actual values
-	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
-	timeMap m_tangents;	// slope at each point for calculating spline
+	TimeMap m_timeMap;	// actual values
+	TimeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
+	TimeMap m_tangents;	// slope at each point for calculating spline
 	float m_tension;
 	bool m_hasAutomation;
 	ProgressionTypes m_progressionType;

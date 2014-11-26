@@ -27,6 +27,7 @@
 #define ENGINE_H
 
 #include "lmmsconfig.h"
+#include "lmms_basics.h"
 #include "MemoryManager.h"
 
 #include <QtCore/QMap>
@@ -162,6 +163,9 @@ public:
 	{
 		return s_framesPerTick;
 	}
+	
+	static float framesPerTick( tick_t position );
+		
 	static void updateFramesPerTick();
 
 	static const QMap<QString, QString> & pluginFileHandling()
@@ -169,6 +173,8 @@ public:
 		return s_pluginFileHandling;
 	}
 	
+	static float tempoToFramesPerTick( float tempo );
+		
 	// returns the max polyphony for instruments
 	static inline int polyphony() 
 	{

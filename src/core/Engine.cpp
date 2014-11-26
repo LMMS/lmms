@@ -44,6 +44,7 @@
 #include "SongEditor.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include "TempoTrack.h"
 
 
 bool Engine::s_hasGUI = true;
@@ -152,11 +153,21 @@ void Engine::destroy()
 
 void Engine::updateFramesPerTick()
 {
-	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerTact / s_song->getTempo();
+	s_framesPerTick = tempoToFramesPerTick( s_song->getTempo() );
 }
 
 
+float Engine::tempoToFramesPerTick( float tempo )
+{
+	return s_mixer->processingSampleRate() * ( 60.0f * 4.0f ) /
+			DefaultTicksPerTact / tempo;
+}
+
+
+float Engine::framesPerTick( tick_t position )
+{
+	return TempoTrack::s_fptMap->value( position );
+}
 
 
 void Engine::initPluginFileHandling()

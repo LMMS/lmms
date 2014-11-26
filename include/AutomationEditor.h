@@ -95,8 +95,6 @@ public slots:
 
 
 protected:
-	typedef AutomationPattern::timeMap timeMap;
-
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
@@ -114,7 +112,7 @@ protected:
 					float _value, bool _is_selected );
 	void removeSelection();
 	void selectAll();
-	void getSelectedValues( timeMap & _selected_values );
+	void getSelectedValues( TimeMap & _selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 	void disableTensionKnob();
@@ -251,8 +249,8 @@ private:
 	int m_y_delta;
 	bool m_y_auto;
 
-	timeMap m_valuesToCopy;
-	timeMap m_selValuesForMove;
+	TimeMap m_valuesToCopy;
+	TimeMap m_selValuesForMove;
 
 
 	editModes m_editMode;
@@ -262,7 +260,7 @@ private:
 	bool m_scrollBack;
 
 	void drawCross( QPainter & _p );
-	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
+	void drawAutomationPoint( QPainter & p, TimeMap::iterator it );
 	bool inBBEditor();
 
 	QColor m_gridColor;

@@ -37,6 +37,7 @@
 #include "Song.h"
 #include "TextFloat.h"
 #include "embed.h"
+#include "TempoTrack.h"
 
 
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
@@ -75,7 +76,7 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	m_inlineObject( _pat_to_copy.m_inlineObject ),
 	m_isTempoPattern( _pat_to_copy.m_isTempoPattern )
 {
-	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
+	for( TimeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
 	{
 		m_timeMap[it.key()] = it.value();
@@ -100,6 +101,7 @@ AutomationPattern::~AutomationPattern()
 
 void AutomationPattern::addObject( AutomatableModel * obj, bool search_dup )
 {
+	if( m_isTempoPattern ) { return; } // no adding objects to tempo patterns
 	m_autoTrack->addObject( obj, search_dup );
 	
 	// if there is nothing in the pattern..
@@ -113,6 +115,7 @@ void AutomationPattern::addObject( AutomatableModel * obj, bool search_dup )
 
 void AutomationPattern::addInlineObject( InlineAutomation * i )
 {
+	if( m_isTempoPattern ) { return; } // no adding objects to tempo patterns
 	m_inlineObject = i;
 	if( hasAutomation() == false )
 	{
@@ -162,7 +165,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 MidiTime AutomationPattern::length() const
 {
 	if( m_timeMap.isEmpty() ) return 0;
-	timeMap::const_iterator it = m_timeMap.end();	
+	TimeMap::const_iterator it = m_timeMap.end();	
 	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
 }
 
@@ -179,11 +182,12 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 		_time;
 
 	m_timeMap[newTime] = _value;
-	timeMap::const_iterator it = m_timeMap.find( newTime );
+	TimeMap::const_iterator it = m_timeMap.find( newTime );
 	if( it != m_timeMap.begin() )
 	{
 		it--;
 	}
+	if( m_isTempoPattern ) { updateTempoMaps( it.key(), (it+1).key() ); }
 	generateTangents(it, 3);
 
 	// we need to maximize our length in case we're part of a hidden
@@ -211,11 +215,12 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 
 	m_timeMap.remove( newTime );
 	m_tangents.remove( newTime );
-	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
+	TimeMap::const_iterator it = m_timeMap.lowerBound( newTime );
 	if( it != m_timeMap.begin() )
 	{
 		it--;
 	}
+	if( m_isTempoPattern ) { updateTempoMaps( it.key(), (it+1).key() ); }
 	generateTangents(it, 3);
 
 	if( getTrack() &&
@@ -256,7 +261,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 	//Restore to the state before it the point were being dragged
 	m_timeMap = m_oldTimeMap;
 
-	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); it++ )
+	for( TimeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); it++ )
 	{
 		generateTangents(it, 3);
 	}
@@ -293,7 +298,7 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 
 	// lowerBound returns next value with greater key, therefore we take
 	// the previous element to get the current value
-	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
+	TimeMap::ConstIterator v = m_timeMap.lowerBound( _time );
 
 	if( v == m_timeMap.begin() )
 	{
@@ -310,7 +315,7 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 
 
 
-float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
+float AutomationPattern::valueAt( TimeMap::const_iterator v, int offset ) const
 {
 	if( m_progressionType == DiscreteProgression || v == m_timeMap.end() )
 	{
@@ -349,7 +354,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 {
-	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
+	TimeMap::ConstIterator v = m_timeMap.lowerBound( _time );
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
 	{
 		return NULL;
@@ -377,7 +382,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	
-	for( timeMap::const_iterator it = m_timeMap.begin();
+	for( TimeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
 	{
 		QDomElement element = _doc.createElement( "time" );
@@ -385,6 +390,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		element.setAttribute( "value", it.value() );
 		_this.appendChild( element );
 	}
+	
+	if( m_isTempoPattern ) { _this.setAttribute( "istempopattern", 1 ); }
 }
 
 
@@ -420,8 +427,16 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	{
 		len = length();
 	}
+	
+	if( _this.hasAttribute( "istempopattern" ) )
+	{
+		m_isTempoPattern = true;
+	}
+	
 	changeLength( len );
 	generateTangents();
+	
+	if( m_isTempoPattern ) { updateTempoMaps(); }
 }
 
 
@@ -438,6 +453,12 @@ const QString AutomationPattern::name() const
 	{
 		return m_autoTrack->name();
 	}
+	
+	if( m_isTempoPattern )
+	{
+		return tr( "Tempo automation" );
+	}
+
 	return tr( "Drag a control while pressing <Ctrl>" );
 }
 
@@ -555,6 +576,8 @@ void AutomationPattern::clear()
 	{
 		Engine::automationEditor()->update();
 	}
+	
+	if( m_isTempoPattern ) { updateTempoMaps(); }
 }
 
 
@@ -578,7 +601,7 @@ void AutomationPattern::generateTangents()
 
 
 
-void AutomationPattern::generateTangents( timeMap::const_iterator it,
+void AutomationPattern::generateTangents( TimeMap::const_iterator it,
 							int numToGenerate )
 {
 	if( m_timeMap.size() < 2 )
@@ -625,7 +648,7 @@ void AutomationPattern::scaleTimemapToFit( float oldMin, float oldMax )
 		return;
 	}
 
-	for( timeMap::iterator it = m_timeMap.begin();
+	for( TimeMap::iterator it = m_timeMap.begin();
 		it != m_timeMap.end(); ++it )
 	{
 		if( *it < oldMin )
@@ -642,3 +665,55 @@ void AutomationPattern::scaleTimemapToFit( float oldMin, float oldMax )
 	generateTangents();
 }
 
+
+/**
+ * @brief Updates the cached tempo & fpt values with the values in this pattern
+ */
+void AutomationPattern::updateTempoMaps()
+{
+	updateTempoMaps( startPosition(), endPosition() );
+}
+void AutomationPattern::updateTempoMaps( tick_t start, tick_t end )
+{
+	TimeMap * tm = TempoTrack::s_tempoMap;
+	TimeMap * fm = TempoTrack::s_fptMap;
+	
+	if( ! hasAutomation() ) // clear maps from the area of this pattern
+	{
+		for( int i = start; i <= end; ++i )
+		{
+			tm->remove( i );
+			fm->remove( i );
+		}
+		return;
+	}
+	
+	if( m_progressionType == DiscreteProgression ) // discrete, so we only need the values of the points
+	{
+		for( int i = start; i <= end; ++i )
+		{
+			const int j = i - startPosition();
+			if( m_timeMap.contains( j ) )
+			{
+				const float val = m_timeMap.value( j );
+				tm->insert( i, val );
+				fm->insert( i, Engine::tempoToFramesPerTick( val ) );
+			}
+			else
+			{
+				tm->remove( i );
+				fm->remove( i );
+			}
+		}
+		return;
+	}
+	
+	// linear or cubic progression, so we need all the in-between values too
+	for( int i = start; i <= end; ++i )
+	{
+		const int j = i - startPosition();
+		const float val = valueAt( j );
+		tm->insert( i, val );
+		fm->insert( i, Engine::tempoToFramesPerTick( val ) );
+	}
+}

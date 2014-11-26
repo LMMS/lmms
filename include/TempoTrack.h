@@ -48,6 +48,11 @@ public:
 		return "tempotrack";
 	}
 	
+	virtual QString defaultName() const
+	{
+		return tr( "Tempo track" ); 
+	}	
+
 	virtual inline float getMin() const
 	{
 		return MinTempo;
@@ -66,6 +71,9 @@ public:
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 	
 	virtual ProcessHandle * getProcessHandle();
+
+	static TimeMap * s_tempoMap;
+	static TimeMap * s_fptMap;
 	
 private:
 	friend class TempoTrackView;
@@ -111,6 +119,8 @@ public:
 	}
 	
 	virtual TrackContentObjectView * createView( TrackView * tv );
+	
+	virtual void changeLength( const MidiTime & _length );
 };
 
 #endif

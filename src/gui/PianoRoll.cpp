@@ -70,7 +70,7 @@
 #include "TextFloat.h"
 #include "AutomationPattern.h"
 
-typedef AutomationPattern::timeMap timeMap;
+
 
 
 extern Keys whiteKeys[];	// defined in piano_widget.cpp
@@ -1026,8 +1026,8 @@ inline void PianoRoll::drawDetuningInfo( QPainter & _p, Note * _n, int _x,
 	int old_x = 0;
 	int old_y = 0;
 
-	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
-	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
+	TimeMap & map = _n->detuning()->automationPattern()->getTimeMap();
+	for( TimeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
 		int pos_ticks = it.key();
 		if( pos_ticks > _n->length() )

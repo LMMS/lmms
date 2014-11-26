@@ -276,7 +276,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 0.5, fgColor() );
 	lin2grad.setColorAt( 0, fgColor().darker( 150 ) );
 
-	for( AutomationPattern::timeMap::const_iterator it =
+	for( TimeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
 	{

@@ -472,6 +472,7 @@ public:
 				bool defaultConstructed = false ) :
 		AutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
 	{
+		setStrictStepSize( true );
 	}
 
 	defaultTypedMethods(int);
@@ -488,6 +489,7 @@ public:
 				bool defaultConstructed = false ) :
 		AutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
 	{
+		setStrictStepSize( true );
 	}
 
 	defaultTypedMethods(bool);

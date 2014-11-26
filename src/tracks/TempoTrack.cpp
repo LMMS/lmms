@@ -30,10 +30,21 @@
 #include "Engine.h"
 #include "embed.h"
 
+TimeMap * TempoTrack::s_tempoMap = NULL;
+TimeMap * TempoTrack::s_fptMap = NULL;
+
 TempoTrack::TempoTrack(  TrackContainer* tc ) :
 	AutomationTrack( tc, false, true )
 {
-	setName( tr( "Tempo Track" ) );
+	setName( defaultName() );
+	if( ! s_tempoMap )
+	{
+		s_tempoMap = new TimeMap();
+	}
+	if( ! s_fptMap )
+	{
+		s_fptMap = new TimeMap();
+	}
 }
 
 
@@ -75,6 +86,7 @@ TempoPattern::TempoPattern( TempoTrack * tt ) :
 	AutomationPattern( tt )
 {
 	setTempoPattern( true );
+	updateTempoMaps();
 }
 
 
@@ -82,6 +94,7 @@ TempoPattern::TempoPattern( const TempoPattern & tpToCopy ) :
 	AutomationPattern( tpToCopy )
 {
 	setTempoPattern( true );
+	updateTempoMaps();
 }
 
 
@@ -93,6 +106,14 @@ TempoPattern::~TempoPattern()
 TrackContentObjectView * TempoPattern::createView( TrackView * tv )
 {
 	return new TempoPatternView( this, tv );
+}
+
+
+void TempoPattern::changeLength( const MidiTime & length )
+{
+	int oldEnd = endPosition();
+	TrackContentObject::changeLength( length );
+	updateTempoMaps( startPosition(), qMax<int>( endPosition(), oldEnd ) );
 }
 
 

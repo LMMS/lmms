@@ -562,8 +562,8 @@ void AutomationEditor::updateAfterPatternChange()
 		m_cubicHermiteButton->setChecked( true );
 	}
 
-	m_minLevel = m_pattern->firstObject()->minValue<float>();
-	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
+	m_minLevel = m_pattern->getMin();
+	m_maxLevel = m_pattern->getMax();
 	m_step = m_pattern->firstObject()->step<float>();
 	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
 
@@ -845,10 +845,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 							m_currentPosition;
 
 			// get time map of current pattern
-			timeMap & time_map = m_pattern->getTimeMap();
+			TimeMap & time_map = m_pattern->getTimeMap();
 
 			// will be our iterator in the following loop
-			timeMap::iterator it = time_map.begin();
+			TimeMap::iterator it = time_map.begin();
 
 			// loop through whole time-map...
 			while( it != time_map.end() )
@@ -1054,10 +1054,10 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			// set move- or resize-cursor
 
 			// get time map of current pattern
-			timeMap & time_map = m_pattern->getTimeMap();
+			TimeMap & time_map = m_pattern->getTimeMap();
 
 			// will be our iterator in the following loop
-			timeMap::iterator it = time_map.begin();
+			TimeMap::iterator it = time_map.begin();
 			// loop through whole time map...
 			for( ; it != time_map.end(); ++it )
 			{
@@ -1226,8 +1226,8 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			m_selectStartLevel += level_diff;
 
 
-			timeMap new_selValuesForMove;
-			for( timeMap::iterator it = m_selValuesForMove.begin();
+			TimeMap new_selValuesForMove;
+			for( TimeMap::iterator it = m_selValuesForMove.begin();
 					it != m_selValuesForMove.end(); ++it )
 			{
 				MidiTime new_value_pos;
@@ -1368,7 +1368,7 @@ inline void AutomationEditor::drawCross( QPainter & _p )
 
 
 
-inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterator it )
+inline void AutomationEditor::drawAutomationPoint( QPainter & p, TimeMap::iterator it )
 {
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
@@ -1576,12 +1576,12 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	if( validPattern() )
 	{
 		int len_ticks = 4;
-		timeMap & time_map = m_pattern->getTimeMap();
+		TimeMap & time_map = m_pattern->getTimeMap();
 
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin();			
+			TimeMap::iterator it = time_map.begin();			
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -2120,9 +2120,9 @@ void AutomationEditor::selectAll()
 		return;
 	}
 
-	timeMap & time_map = m_pattern->getTimeMap();
+	TimeMap & time_map = m_pattern->getTimeMap();
 
-	timeMap::iterator it = time_map.begin();
+	TimeMap::iterator it = time_map.begin();
 	m_selectStartTick = 0;
 	m_selectedTick = m_pattern->length();
 	m_selectStartLevel = it.value();
@@ -2151,7 +2151,7 @@ void AutomationEditor::selectAll()
 
 
 // returns vector with pointers to all selected values
-void AutomationEditor::getSelectedValues( timeMap & _selected_values )
+void AutomationEditor::getSelectedValues( TimeMap & _selected_values )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -2173,9 +2173,9 @@ void AutomationEditor::getSelectedValues( timeMap & _selected_values )
 		qSwap<float>( selLevel_start, selLevel_end );
 	}
 
-	timeMap & time_map = m_pattern->getTimeMap();
+	TimeMap & time_map = m_pattern->getTimeMap();
 
-	for( timeMap::iterator it = time_map.begin(); it != time_map.end();
+	for( TimeMap::iterator it = time_map.begin(); it != time_map.end();
 									++it )
 	{
 		//TODO: Add constant
@@ -2200,12 +2200,12 @@ void AutomationEditor::copySelectedValues()
 {
 	m_valuesToCopy.clear();
 
-	timeMap selected_values;
+	TimeMap selected_values;
 	getSelectedValues( selected_values );
 
 	if( !selected_values.isEmpty() )
 	{
-		for( timeMap::iterator it = selected_values.begin();
+		for( TimeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
 			m_valuesToCopy[it.key()] = it.value();
@@ -2230,14 +2230,14 @@ void AutomationEditor::cutSelectedValues()
 
 	m_valuesToCopy.clear();
 
-	timeMap selected_values;
+	TimeMap selected_values;
 	getSelectedValues( selected_values );
 
 	if( !selected_values.isEmpty() )
 	{
 		Engine::getSong()->setModified();
 
-		for( timeMap::iterator it = selected_values.begin();
+		for( TimeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
 			m_valuesToCopy[it.key()] = it.value();
@@ -2257,7 +2257,7 @@ void AutomationEditor::pasteValues()
 	QMutexLocker m( &m_patternMutex );
 	if( validPattern() && !m_valuesToCopy.isEmpty() )
 	{
-		for( timeMap::iterator it = m_valuesToCopy.begin();
+		for( TimeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
 		{
 			m_pattern->putValue( it.key() + m_currentPosition,
@@ -2283,12 +2283,12 @@ void AutomationEditor::deleteSelectedValues()
 		return;
 	}
 
-	timeMap selected_values;
+	TimeMap selected_values;
 	getSelectedValues( selected_values );
 
 	const bool update_after_delete = !selected_values.empty();
 
-	for( timeMap::iterator it = selected_values.begin();
+	for( TimeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 	{
 		m_pattern->removeValue( it.key() );

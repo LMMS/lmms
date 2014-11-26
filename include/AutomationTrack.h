@@ -31,6 +31,7 @@
 
 class AutomationProcessHandle;
 typedef QVector<QPointer<AutomatableModel> > objectVector;
+typedef QMap<int, float> TimeMap;
 
 class AutomationTrack : public Track
 {
@@ -48,7 +49,7 @@ public:
 		return "automationtrack";
 	}
 	
-	QString defaultName() const
+	virtual QString defaultName() const
 	{
 		return tr( "Automation track" ); 
 	}
