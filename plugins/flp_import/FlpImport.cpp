@@ -414,7 +414,7 @@ struct FL_Channel : public FL_Plugin
 	int fxChannel;
 	int layerParent;
 
-	typedef QList<QPair<int, note> > noteVector;
+	typedef QList<QPair<int, Note> > noteVector;
 	noteVector notes;
 
 	QList<int> dots;
@@ -1313,7 +1313,7 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 									8 ) );
 					pos /= (4*ppq) / DefaultTicksPerTact;
 					len /= (4*ppq) / DefaultTicksPerTact;
-					note n( len, pos, key, vol * 100 / 128,
+					Note n( len, pos, key, vol * 100 / 128,
 							pan*200 / 128 - 100 );
 					if( ch < p.numChannels )
 					{

@@ -256,7 +256,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				{
 					nph = NotePlayHandleManager::acquire( this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
-								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
@@ -634,7 +634,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 			}
 		}
 
-		note * cur_note;
+		Note * cur_note;
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{

@@ -48,12 +48,12 @@ NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								const f_cnt_t _offset,
 								const f_cnt_t _frames,
-								const note& n,
+								const Note& n,
 								NotePlayHandle *parent,
 								int midiEventChannel,
 								Origin origin ) :
 	PlayHandle( TypeNotePlayHandle, _offset ),
-	note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
+	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
@@ -168,7 +168,7 @@ void NotePlayHandle::done()
 
 void NotePlayHandle::setVolume( volume_t _volume )
 {
-	note::setVolume( _volume );
+	Note::setVolume( _volume );
 
 	const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
@@ -180,7 +180,7 @@ void NotePlayHandle::setVolume( volume_t _volume )
 
 void NotePlayHandle::setPanning( panning_t panning )
 {
-	note::setPanning( panning );
+	Note::setPanning( panning );
 
 	MidiEvent event( MidiMetaEvent, midiChannel(), midiKey(), panningToMidi( panning ) );
 	event.setMetaEvent( MidiNotePanning );
@@ -582,7 +582,7 @@ void NotePlayHandleManager::init()
 NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrack,
 				const f_cnt_t offset,
 				const f_cnt_t frames,
-				const note& noteToPlay,
+				const Note& noteToPlay,
 				NotePlayHandle* parent,
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )

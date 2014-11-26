@@ -34,7 +34,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "note.h"
+#include "Note.h"
 #include "knob.h"
 
 #include "AutomatableModel.h"

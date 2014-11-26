@@ -168,7 +168,7 @@ public:
 private:
 	void processNote( NotePlayHandle * n );
 
-	void initNote(lb302Note *note);
+	void initNote(lb302Note *Note);
 	void initSlide();
 
 private:

@@ -244,7 +244,7 @@ public:
 	}
 
 
-	void addNote( note & n )
+	void addNote( Note & n )
 	{
 		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
 		{
@@ -378,7 +378,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				smfMidiChannel * ch = chs[evt->chan].create( tc );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
 
-				note n( noteEvt->get_duration() * ticksPerBeat,
+				Note n( noteEvt->get_duration() * ticksPerBeat,
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
 						noteEvt->get_loud());

@@ -256,7 +256,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 					break;
 				}
 				// create copy of base-note
-				note note_copy( _n->length(), 0, sub_note_key, _n->getVolume(), _n->getPanning(), _n->detuning() );
+				Note note_copy( _n->length(), 0, sub_note_key, _n->getVolume(), _n->getPanning(), _n->detuning() );
 
 				// create sub-note-play-handle, only note is
 				// different
@@ -477,7 +477,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
-							note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),
+							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),
 									_n->getPanning(), _n->detuning() ),
 							_n, -1, NotePlayHandle::OriginArpeggio )
 				);

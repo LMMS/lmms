@@ -32,7 +32,7 @@
 
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
-#include "note.h"
+#include "Note.h"
 #include "lmms_basics.h"
 #include "Song.h"
 #include "tooltip.h"
@@ -123,7 +123,7 @@ protected:
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width, note * _n, const QColor & noteCol );
+					int  _width, Note * _n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
 	void getSelectedNotes( NoteVector & _selected_notes );
@@ -137,8 +137,8 @@ protected slots:
 	void recordAccompany();
 	void stop();
 
-	void startRecordNote( const note & _n );
-	void finishRecordNote( const note & _n );
+	void startRecordNote( const Note & _n );
+	void finishRecordNote( const Note & _n );
 
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
@@ -232,7 +232,7 @@ private:
 	void shiftSemiTone(int amount);
 	bool isSelection() const;
 	int selectionCount() const;
-	void testPlayNote( note * n );
+	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes( bool _pause = true );
 
@@ -300,9 +300,9 @@ private:
 
 	MidiTime m_currentPosition;
 	bool m_recording;
-	QList<note> m_recordingNotes;
+	QList<Note> m_recordingNotes;
 
-	note * m_currentNote;
+	Note * m_currentNote;
 	actions m_action;
 	noteEditMode m_noteEditMode;
 
@@ -355,9 +355,9 @@ private:
 
 	void copy_to_clipboard( const NoteVector & _notes ) const;
 
-	void drawDetuningInfo( QPainter & _p, note * _n, int _x, int _y );
+	void drawDetuningInfo( QPainter & _p, Note * _n, int _x, int _y );
 	bool mouseOverNote();
-	note * noteUnderMouse();
+	Note * noteUnderMouse();
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );

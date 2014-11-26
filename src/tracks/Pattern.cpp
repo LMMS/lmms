@@ -79,7 +79,7 @@ Pattern::Pattern( const Pattern& other ) :
 {
 	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
 	{
-		m_notes.push_back( new note( **it ) );
+		m_notes.push_back( new Note( **it ) );
 	}
 
 	init();
@@ -167,9 +167,9 @@ MidiTime Pattern::beatPatternLength() const
 	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
 }
 
-note * Pattern::addNote( const note & _new_note, const bool _quant_pos )
+Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	note * new_note = new note( _new_note );
+	Note * new_note = new Note( _new_note );
 	if( _quant_pos && Engine::pianoRoll() )
 	{
 		new_note->quantizePos( Engine::pianoRoll()->quantization() );
@@ -213,7 +213,7 @@ note * Pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 
 
-void Pattern::removeNote( const note * _note_to_del )
+void Pattern::removeNote( const Note * _note_to_del )
 {
 	instrumentTrack()->lock();
 	NoteVector::Iterator it = m_notes.begin();
@@ -240,7 +240,7 @@ void Pattern::removeNote( const note * _note_to_del )
 
 // returns a pointer to the note at specified step, or NULL if note doesn't exist
 
-note * Pattern::noteAtStep( int _step )
+Note * Pattern::noteAtStep( int _step )
 {
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
@@ -254,12 +254,12 @@ note * Pattern::noteAtStep( int _step )
 }
 
 
-note * Pattern::rearrangeNote( const note * _note_to_proc,
+Note * Pattern::rearrangeNote( const Note * _note_to_proc,
 							const bool _quant_pos )
 {
 	// just rearrange the position of the note by removing it and adding
 	// a copy of it -> addNote inserts it at the correct position
-	note copy_of_note( *_note_to_proc );
+	Note copy_of_note( *_note_to_proc );
 	removeNote( _note_to_proc );
 
 	return addNote( copy_of_note, _quant_pos );
@@ -270,7 +270,7 @@ note * Pattern::rearrangeNote( const note * _note_to_proc,
 void Pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
-	qSort(m_notes.begin(), m_notes.end(), note::lessThan );
+	qSort(m_notes.begin(), m_notes.end(), Note::lessThan );
 }
 
 
@@ -397,7 +397,7 @@ void Pattern::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			note * n = new note;
+			Note * n = new Note;
 			n->restoreState( node.toElement() );
 			m_notes.push_back( n );
 		}
@@ -499,7 +499,7 @@ void Pattern::ensureBeatNotes()
 		}
 		if( found == false )
 		{
-			addNote( note( MidiTime( 0 ), MidiTime( ( i *
+			addNote( Note( MidiTime( 0 ), MidiTime( ( i *
 				MidiTime::ticksPerTact() ) /
 					MidiTime::stepsPerTact() ) ), false );
 		}
@@ -773,7 +773,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 			return;
 		}
 
-		note * n = m_pat->noteAtStep( step );
+		Note * n = m_pat->noteAtStep( step );
 
 		// if note at step not found, ensureBeatNotes and try again
 		if( n == NULL )
@@ -840,7 +840,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		int vol = 0;
 		int len = 0;
 
-		note * n = m_pat->noteAtStep( step );
+		Note * n = m_pat->noteAtStep( step );
 		if( n != NULL )
 		{
 			vol = n->getVolume();
@@ -1083,7 +1083,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
-			note * n = m_pat->noteAtStep( it );
+			Note * n = m_pat->noteAtStep( it );
 
 			// figure out x and y coordinates for step graphic
 			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );

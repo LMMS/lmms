@@ -53,7 +53,7 @@
 
 
 #include "lmms_basics.h"
-#include "note.h"
+#include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
 

@@ -33,7 +33,7 @@
 #include <QPixmap>
 
 
-#include "note.h"
+#include "Note.h"
 #include "Track.h"
 
 
@@ -67,13 +67,13 @@ public:
 	MidiTime beatPatternLength() const;
 
 	// note management
-	note * addNote( const note & _new_note, const bool _quant_pos = true );
+	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( const note * _note_to_del );
+	void removeNote( const Note * _note_to_del );
 
-	note * noteAtStep( int _step );
+	Note * noteAtStep( int _step );
 
-	note * rearrangeNote( const note * _note_to_proc,
+	Note * rearrangeNote( const Note * _note_to_proc,
 						const bool _quant_pos = true );
 	void rearrangeAllNotes();
 	void clearNotes();

@@ -1,5 +1,5 @@
 /*
- * note.h - declaration of class note which contains all informations about a
+ * Note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -78,17 +78,17 @@ const float MaxDetuning = 4 * 12.0f;
 
 
 
-class EXPORT note : public SerializingObject
+class EXPORT Note : public SerializingObject
 {
 public:
-	note( const MidiTime & _length = MidiTime( 0 ),
+	Note( const MidiTime & _length = MidiTime( 0 ),
 		const MidiTime & _pos = MidiTime( 0 ),
 		int key = DefaultKey,
 		volume_t _volume = DefaultVolume,
 		panning_t _panning = DefaultPanning,
 		DetuningHelper * _detuning = NULL );
-	note( const note & _note );
-	virtual ~note();
+	Note( const Note & _note );
+	virtual ~Note();
 
 	// used by GUI
 	inline void setSelected( const bool _selected ){ m_selected = _selected; }
@@ -112,7 +112,7 @@ public:
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
 
-	static inline bool lessThan( note * &lhs, note * &rhs )
+	static inline bool lessThan( Note * &lhs, Note * &rhs )
 	{
 		// function to compare two notes - must be called explictly when
 		// using qSort
@@ -234,7 +234,7 @@ private:
 } ;
 
 
-typedef QVector<note *> NoteVector;
+typedef QVector<Note *> NoteVector;
 
 
 #endif

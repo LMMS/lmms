@@ -12,7 +12,7 @@
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "note.h"
+#include "Note.h"
 #include "Pattern.h"
 #include "Track.h"
 #include "bb_track.h"
@@ -271,7 +271,7 @@ bool HydrogenImport::readSong()
 				int i = pattern_count - 1 + nbb;
 				pattern_id[sName] = pattern_count - 1;
 				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getTCO( i ) );
-				note n; 
+				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
 				{

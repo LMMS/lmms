@@ -27,7 +27,7 @@
 
 #include <math.h>
 
-#include "note.h"
+#include "Note.h"
 #include "DetuningHelper.h"
 #include "templates.h"
 
@@ -35,7 +35,7 @@
 
 
 
-note::note( const MidiTime & _length, const MidiTime & _pos,
+Note::Note( const MidiTime & _length, const MidiTime & _pos,
 		int _key, volume_t _volume, panning_t _panning,
 						DetuningHelper * _detuning ) :
 	m_selected( false ),
@@ -63,7 +63,7 @@ note::note( const MidiTime & _length, const MidiTime & _pos,
 
 
 
-note::note( const note & _note ) :
+Note::Note( const Note & _note ) :
 	SerializingObject( _note ),
 	m_selected( _note.m_selected ),
 	m_oldKey( _note.m_oldKey ),
@@ -86,7 +86,7 @@ note::note( const note & _note ) :
 
 
 
-note::~note()
+Note::~Note()
 {
 	if( m_detuning )
 	{
@@ -97,7 +97,7 @@ note::~note()
 
 
 
-void note::setLength( const MidiTime & _length )
+void Note::setLength( const MidiTime & _length )
 {
 	m_length = _length;
 }
@@ -105,7 +105,7 @@ void note::setLength( const MidiTime & _length )
 
 
 
-void note::setPos( const MidiTime & _pos )
+void Note::setPos( const MidiTime & _pos )
 {
 	m_pos = _pos;
 }
@@ -113,7 +113,7 @@ void note::setPos( const MidiTime & _pos )
 
 
 
-void note::setKey( const int _key )
+void Note::setKey( const int _key )
 {
 	const int k = qBound( 0, _key, NumKeys );
 	m_key = k;
@@ -122,7 +122,7 @@ void note::setKey( const int _key )
 
 
 
-void note::setVolume( volume_t _volume )
+void Note::setVolume( volume_t _volume )
 {
 	const volume_t v = qBound( MinVolume, _volume, MaxVolume );
 	m_volume = v;
@@ -131,7 +131,7 @@ void note::setVolume( volume_t _volume )
 
 
 
-void note::setPanning( panning_t _panning )
+void Note::setPanning( panning_t _panning )
 {
 	const panning_t p = qBound( PanningLeft, _panning, PanningRight );
 	m_panning = p;
@@ -140,7 +140,7 @@ void note::setPanning( panning_t _panning )
 
 
 
-MidiTime note::quantized( const MidiTime & _m, const int _q_grid )
+MidiTime Note::quantized( const MidiTime & _m, const int _q_grid )
 {
 	float p = ( (float) _m / _q_grid );
 	if( p - floorf( p ) < 0.5f )
@@ -153,7 +153,7 @@ MidiTime note::quantized( const MidiTime & _m, const int _q_grid )
 
 
 
-void note::quantizeLength( const int _q_grid )
+void Note::quantizeLength( const int _q_grid )
 {
 	setLength( quantized( length(), _q_grid ) );
 	if( length() == 0 )
@@ -165,7 +165,7 @@ void note::quantizeLength( const int _q_grid )
 
 
 
-void note::quantizePos( const int _q_grid )
+void Note::quantizePos( const int _q_grid )
 {
 	setPos( quantized( pos(), _q_grid ) );
 }
@@ -173,7 +173,7 @@ void note::quantizePos( const int _q_grid )
 
 
 
-void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "key", m_key );
 	_this.setAttribute( "vol", m_volume );
@@ -190,7 +190,7 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void note::loadSettings( const QDomElement & _this )
+void Note::loadSettings( const QDomElement & _this )
 {
 	const int oldKey = _this.attribute( "tone" ).toInt() + _this.attribute( "oct" ).toInt() * KeysPerOctave;
 	m_key = qMax( oldKey, _this.attribute( "key" ).toInt() );
@@ -209,7 +209,7 @@ void note::loadSettings( const QDomElement & _this )
 
 
 
-void note::editDetuningPattern()
+void Note::editDetuningPattern()
 {
 	createDetuning();
 	m_detuning->automationPattern()->openInAutomationEditor();
@@ -218,7 +218,7 @@ void note::editDetuningPattern()
 
 
 
-void note::createDetuning()
+void Note::createDetuning()
 {
 	if( m_detuning == NULL )
 	{
@@ -232,7 +232,7 @@ void note::createDetuning()
 
 
 
-bool note::hasDetuningInfo() const
+bool Note::hasDetuningInfo() const
 {
 	return m_detuning && m_detuning->hasAutomation();
 }

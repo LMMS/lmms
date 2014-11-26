@@ -187,7 +187,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 	cleanObjects();
 
 	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-		note::quantized( _time,
+		Note::quantized( _time,
 			Engine::automationEditor()->quantization() ) :
 		_time;
 
@@ -220,7 +220,7 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	cleanObjects();
 
 	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-		note::quantized( _time,
+		Note::quantized( _time,
 			Engine::automationEditor()->quantization() ) :
 		_time;
 
@@ -260,7 +260,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 	if( m_dragging == false )
 	{
 		MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-			note::quantized( _time,
+			Note::quantized( _time,
 				Engine::automationEditor()->quantization() ) :
 			_time;
 		this->removeValue( newTime );

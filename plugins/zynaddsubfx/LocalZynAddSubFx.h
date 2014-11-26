@@ -26,7 +26,7 @@
 #define LOCAL_ZYNADDSUBFX_H
 
 #include "MidiEvent.h"
-#include "note.h"
+#include "Note.h"
 
 class Master;
 class NulEngine;

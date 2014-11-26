@@ -32,7 +32,7 @@
 #include "Song.h"
 #include "MidiPort.h"
 #include "MidiTime.h"
-#include "note.h"
+#include "Note.h"
 
 
 #ifdef LMMS_HAVE_ALSA
