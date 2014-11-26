@@ -1,5 +1,5 @@
 /*
- * transformable_auto_model.h - template transformableAutoModel
+ * TransformableAutoModel.h - template transformableAutoModel
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -41,10 +41,10 @@ struct AutoModelTransformer
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-class transformableAutoModel : public AutomatableModel<T, EDIT_STEP_TYPE>
+class TransformableAutoModel : public AutomatableModel<T, EDIT_STEP_TYPE>
 {
 public:
-	transformableAutoModel( const AutoModelTransformer<T> * _transformer,
+	TransformableAutoModel( const AutoModelTransformer<T> * _transformer,
 				const T _val = 0,
 				const T _min = 0,
 				const T _max = 0,
@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	inline virtual ~transformableAutoModel()
+	inline virtual ~TransformableAutoModel()
 	{
 	}
 
