@@ -34,14 +34,14 @@
 
 #include "ControllerView.h"
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
-#include "led_checkbox.h"
+#include "Engine.h"
+#include "LedCheckbox.h"
 #include "MainWindow.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
@@ -62,9 +62,9 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	connect( ctls_btn, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );
 
-	m_controllerDlg = getController()->createDialog( engine::mainWindow()->workspace() );
+	m_controllerDlg = getController()->createDialog( Engine::mainWindow()->workspace() );
 
-	m_subWindow = engine::mainWindow()->workspace()->addSubWindow( 
+	m_subWindow = Engine::mainWindow()->workspace()->addSubWindow( 
                 m_controllerDlg );
 	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
@@ -176,7 +176,7 @@ void ControllerView::modelChanged()
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName(), this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );

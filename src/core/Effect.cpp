@@ -26,7 +26,7 @@
 #include <QDomElement>
 
 #include "Effect.h"
-#include "engine.h"
+#include "Engine.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
@@ -182,7 +182,7 @@ void Effect::reinitSRC()
 		}
 		int error;
 		if( ( m_srcState[i] = src_new(
-			engine::mixer()->currentQualitySettings().
+			Engine::mixer()->currentQualitySettings().
 							libsrcInterpolation(),
 					DEFAULT_CHANNELS, &error ) ) == NULL )
 		{
@@ -204,7 +204,7 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 		return;
 	}
 	m_srcData[_i].input_frames = _frames;
-	m_srcData[_i].output_frames = engine::mixer()->framesPerPeriod();
+	m_srcData[_i].output_frames = Engine::mixer()->framesPerPeriod();
 	m_srcData[_i].data_in = (float *) _src_buf[0];
 	m_srcData[_i].data_out = _dst_buf[0];
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;

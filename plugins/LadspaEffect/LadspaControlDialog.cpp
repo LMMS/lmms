@@ -31,7 +31,7 @@
 #include "LadspaEffect.h"
 #include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 
 
 
@@ -52,7 +52,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 		mainLay->addSpacing( 3 );
 		QHBoxLayout * center = new QHBoxLayout();
 		mainLay->addLayout( center );
-		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this );
+		m_stereoLink = new LedCheckBox( tr( "Link Channels" ), this );
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 		center->addWidget( m_stereoLink );
 	}

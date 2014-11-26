@@ -37,17 +37,17 @@
 
 #include "FileDialog.h"
 #include "GigPlayer.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "NotePlayHandle.h"
-#include "knob.h"
-#include "song.h"
+#include "Knob.h"
+#include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
 
 #include "PatchesDialog.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.cpp"
@@ -87,13 +87,13 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_currentKeyDimension( 0 )
 {
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	engine::mixer()->addPlayHandle( iph );
+	Engine::mixer()->addPlayHandle( iph );
 
 	updateSampleRate();
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 }
 
 
@@ -101,7 +101,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 	freeInstance();
 }
 
@@ -316,8 +316,8 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 // the preferences)
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
-	const int rate = engine::mixer()->processingSampleRate();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const int rate = Engine::mixer()->processingSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -753,7 +753,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / engine::mixer()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / Engine::mixer()->processingSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
@@ -904,11 +904,11 @@ void GigInstrument::updateSampleRate()
 
 
 
-class gigKnob : public knob
+class gigKnob : public Knob
 {
 public:
 	gigKnob( QWidget * _parent ) :
-			knob( knobBright_26, _parent )
+			Knob( knobBright_26, _parent )
 	{
 		setFixedSize( 31, 38 );
 	}
@@ -926,7 +926,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	connect( &k->m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
 
 	// File Button
-	m_fileDialogButton = new pixmapButton( this );
+	m_fileDialogButton = new PixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
 	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
@@ -934,12 +934,12 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	toolTip::add( m_fileDialogButton, tr( "Open other GIG file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open other GIG file" ) );
 
 	m_fileDialogButton->setWhatsThis( tr( "Click here to open another GIG file" ) );
 
 	// Patch Button
-	m_patchDialogButton = new pixmapButton( this );
+	m_patchDialogButton = new PixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
@@ -948,7 +948,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
 
 	m_patchDialogButton->setWhatsThis( tr( "Click here to change which patch of the GIG file to use" ) );
 
@@ -1094,7 +1094,7 @@ void GigInstrumentView::showFileDialog()
 		if( f != "" )
 		{
 			k->openFile( f );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 

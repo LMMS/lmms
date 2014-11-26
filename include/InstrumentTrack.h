@@ -44,17 +44,17 @@ class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class EffectRackView;
 class InstrumentSoundShapingView;
-class fadeButton;
+class FadeButton;
 class Instrument;
 class InstrumentTrackWindow;
 class InstrumentMidiIOView;
-class knob;
+class Knob;
 class LcdSpinBox;
 class midiPortMenu;
 class DataFile;
 class PluginView;
-class tabWidget;
-class trackLabelButton;
+class TabWidget;
+class TrackLabelButton;
 class InstrumentProcessHandle;
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -125,10 +125,10 @@ public:
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 	// create new view for me
-	virtual trackView * createView( TrackContainerView* tcv );
+	virtual TrackView * createView( TrackContainerView* tcv );
 
 	// create new track-content-object = pattern
-	virtual trackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 
 	// called by track
@@ -208,8 +208,8 @@ public:
 signals:
 	void instrumentChanged();
 	void newNote();
-	void midiNoteOn( const note& );
-	void midiNoteOff( const note& );
+	void midiNoteOn( const Note& );
+	void midiNoteOff( const Note& );
 	void nameChanged();
 
 
@@ -272,7 +272,7 @@ private:
 
 
 
-class InstrumentTrackView : public trackView
+class InstrumentTrackView : public TrackView
 {
 	Q_OBJECT
 public:
@@ -324,10 +324,10 @@ private:
 	static QQueue<InstrumentTrackWindow *> s_windowCache;
 
 	// widgets in track-settings-widget
-	trackLabelButton * m_tlb;
-	knob * m_volumeKnob;
-	knob * m_panningKnob;
-	fadeButton * m_activityIndicator;
+	TrackLabelButton * m_tlb;
+	Knob * m_volumeKnob;
+	Knob * m_panningKnob;
+	FadeButton * m_activityIndicator;
 
 	QMenu * m_midiMenu;
 
@@ -353,7 +353,7 @@ public:
 	virtual ~InstrumentTrackWindow();
 
 	// parent for all internal tab-widgets
-	tabWidget * tabWidgetParent()
+	TabWidget * tabWidgetParent()
 	{
 		return m_tabWidget;
 	}
@@ -409,15 +409,15 @@ private:
 
 	// widgets on the top of an instrument-track-window
 	QLineEdit * m_nameLineEdit;
-	knob * m_volumeKnob;
-	knob * m_panningKnob;
-	knob * m_pitchKnob;
+	Knob * m_volumeKnob;
+	Knob * m_panningKnob;
+	Knob * m_pitchKnob;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	LcdSpinBox * m_effectChannelNumber;
 
 
 	// tab-widget with all children
-	tabWidget * m_tabWidget;
+	TabWidget * m_tabWidget;
 	PluginView * m_instrumentView;
 	InstrumentSoundShapingView * m_ssView;
 	InstrumentFunctionNoteStackingView* m_noteStackingView;

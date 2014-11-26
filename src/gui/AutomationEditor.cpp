@@ -50,16 +50,16 @@
 #include "SongEditor.h"
 #include "MainWindow.h"
 #include "embed.h"
-#include "engine.h"
-#include "pixmap_button.h"
+#include "Engine.h"
+#include "PixmapButton.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "timeline.h"
-#include "tooltip.h"
-#include "tool_button.h"
-#include "text_float.h"
-#include "combobox.h"
-#include "bb_track_container.h"
+#include "Timeline.h"
+#include "ToolTip.h"
+#include "ToolButton.h"
+#include "TextFloat.h"
+#include "ComboBox.h"
+#include "BBTrackContainer.h"
 #include "PianoRoll.h"
 #include "debug.h"
 #include "MeterModel.h"
@@ -105,7 +105,7 @@ AutomationEditor::AutomationEditor() :
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
 				Qt::QueuedConnection );
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
 	// init pixmaps
 	if( s_toolDraw == NULL )
@@ -132,9 +132,9 @@ AutomationEditor::AutomationEditor() :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
-				engine::getSong()->getPlayPos(
-					song::Mode_PlayAutomationPattern ),
+	m_timeLine = new Timeline( VALUES_WIDTH, 32, m_ppt,
+				Engine::getSong()->getPlayPos(
+					Song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
@@ -158,12 +158,12 @@ AutomationEditor::AutomationEditor() :
 
 	// init control-buttons at the top
 
-	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
 				tr( "Play/pause current pattern (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
@@ -193,14 +193,14 @@ AutomationEditor::AutomationEditor() :
 						SLOT( verScrolled( int ) ) );
 
 	// init edit-buttons at the top
-	m_drawButton = new toolButton( embed::getIconPixmap( "edit_draw" ),
+	m_drawButton = new ToolButton( embed::getIconPixmap( "edit_draw" ),
 					tr( "Draw mode (Shift+D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
 	m_drawButton->setCheckable( true );
 	m_drawButton->setChecked( true );
 
-	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
+	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
 					tr( "Erase mode (Shift+E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
@@ -249,7 +249,7 @@ AutomationEditor::AutomationEditor() :
 			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );*/
 
-	m_discreteButton = new toolButton( embed::getIconPixmap(
+	m_discreteButton = new ToolButton( embed::getIconPixmap(
 						"progression_discrete" ),
 					tr( "Discrete progression" ),
 					this, SLOT( discreteButtonToggled() ),
@@ -257,14 +257,14 @@ AutomationEditor::AutomationEditor() :
 	m_discreteButton->setCheckable( true );
 	m_discreteButton->setChecked( true );
 
-	m_linearButton = new toolButton( embed::getIconPixmap(
+	m_linearButton = new ToolButton( embed::getIconPixmap(
 							"progression_linear" ),
 					tr( "Linear progression" ),
 					this, SLOT( linearButtonToggled() ),
 					m_toolBar );
 	m_linearButton->setCheckable( true );
 
-	m_cubicHermiteButton = new toolButton( embed::getIconPixmap(
+	m_cubicHermiteButton = new ToolButton( embed::getIconPixmap(
 						"progression_cubic_hermite" ),
 					tr( "Cubic Hermite progression" ),
 					this, SLOT(
@@ -273,7 +273,7 @@ AutomationEditor::AutomationEditor() :
 	m_cubicHermiteButton->setCheckable( true );
 
 	// setup tension-stuff
-	m_tensionKnob = new knob( knobSmall_17, this, "Tension" );
+	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
 	connect( m_tensionModel, SIGNAL( dataChanged() ),
 				this, SLOT( tensionChanged() ) );
@@ -305,17 +305,17 @@ AutomationEditor::AutomationEditor() :
 			"object will change in a smooth curve and ease in to "
 			"the peaks and valleys." ) );
 
-	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
+	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected values (Ctrl+X)" ),
 					this, SLOT( cutSelectedValues() ),
 					m_toolBar );
 
-	m_copyButton = new toolButton( embed::getIconPixmap( "edit_copy" ),
+	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
 					tr( "Copy selected values (Ctrl+C)" ),
 					this, SLOT( copySelectedValues() ),
 					m_toolBar );
 
-	m_pasteButton = new toolButton( embed::getIconPixmap( "edit_paste" ),
+	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste values from clipboard "
 								"(Ctrl+V)" ),
 					this, SLOT( pasteValues() ),
@@ -338,7 +338,7 @@ AutomationEditor::AutomationEditor() :
 	QLabel * zoom_x_lbl = new QLabel( m_toolBar );
 	zoom_x_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new comboBox( m_toolBar );
+	m_zoomingXComboBox = new ComboBox( m_toolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 
 	for( int i = 0; i < 6; ++i )
@@ -356,7 +356,7 @@ AutomationEditor::AutomationEditor() :
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
 	zoom_y_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new comboBox( m_toolBar );
+	m_zoomingYComboBox = new ComboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 
 	m_zoomingYModel.addItem( "Auto" );
@@ -376,7 +376,7 @@ AutomationEditor::AutomationEditor() :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
 	for( int i = 0; i < 7; ++i )
@@ -435,9 +435,9 @@ AutomationEditor::AutomationEditor() :
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
 	// add us to workspace
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
-		engine::mainWindow()->workspace()->addSubWindow( this );
+		Engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
 		parentWidget()->move( 5, 5 );
 		parentWidget()->hide();
@@ -587,7 +587,7 @@ void AutomationEditor::update()
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
-		engine::pianoRoll()->update();
+		Engine::pianoRoll()->update();
 	}
 }
 
@@ -725,7 +725,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSong()->isPlaying() )
+			if( Engine::getSong()->isPlaying() )
 			{
 				stop();
 			}
@@ -911,7 +911,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				QCursor c( Qt::SizeAllCursor );
 				QApplication::setOverrideCursor( c );
 
-				engine::getSong()->setModified();
+				Engine::getSong()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -921,7 +921,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				if( it != time_map.end() )
 				{
 					m_pattern->removeValue( it.key() );
-					engine::getSong()->setModified();
+					Engine::getSong()->setModified();
 				}
 				m_action = NONE;
 			}
@@ -954,7 +954,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 
 				m_action = MOVE_SELECTION;
 
-				engine::getSong()->setModified();
+				Engine::getSong()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -1039,7 +1039,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 								level );
 			}
 
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 
 		}
 		else if( ( _me->buttons() & Qt::RightButton &&
@@ -1492,7 +1492,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		}
 		// Then beat grid
 		int ticksPerBeat = DefaultTicksPerTact /
-			engine::getSong()->getTimeSigModel().getDenominator();
+			Engine::getSong()->getTimeSigModel().getDenominator();
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
 				 x = xCoordOfTick( tick );
 			 x<=width();
@@ -1817,9 +1817,9 @@ void AutomationEditor::resizeEvent( QResizeEvent * )
 
 	m_topBottomScroll->setValue( (int) m_scrollLevel );
 
-	if( engine::getSong() )
+	if( Engine::getSong() )
 	{
-		engine::getSong()->getPlayPos( song::Mode_PlayAutomationPattern
+		Engine::getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
 					).m_timeLine->setFixedWidth( width() );
 	}
 	m_toolBar->setFixedWidth( width() );
@@ -1914,7 +1914,7 @@ inline bool AutomationEditor::inBBEditor()
 {
 	QMutexLocker m( &m_patternMutex );
 	return( validPattern() &&
-				m_pattern->getTrack()->trackContainer() == engine::getBBTrackContainer() );
+				m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
 }
 
 
@@ -1931,37 +1931,37 @@ void AutomationEditor::play()
 
 	if( !m_pattern->getTrack() )
 	{
-		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
+		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 		{
-			engine::getSong()->stop();
-			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
+			Engine::getSong()->stop();
+			Engine::getSong()->playPattern( (Pattern *) Engine::pianoRoll()->currentPattern() );
 		}
-		else if( engine::getSong()->isStopped() == false )
+		else if( Engine::getSong()->isStopped() == false )
 		{
-			engine::getSong()->togglePause();
+			Engine::getSong()->togglePause();
 		}
 		else
 		{
-			engine::getSong()->playPattern( (Pattern *) engine::pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( (Pattern *) Engine::pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
 	{
-		engine::getBBTrackContainer()->play();
+		Engine::getBBTrackContainer()->play();
 	}
 	else
 	{
-		if( engine::getSong()->isStopped() == true )
+		if( Engine::getSong()->isStopped() == true )
 		{
-			engine::getSong()->playSong();
+			Engine::getSong()->playSong();
 		}
 		else
 		{
-			engine::getSong()->togglePause();
+			Engine::getSong()->togglePause();
 		}
 	}
 
-	setPauseIcon( engine::getSong()->isPlaying() );
+	setPauseIcon( Engine::getSong()->isPlaying() );
 }
 
 
@@ -1977,11 +1977,11 @@ void AutomationEditor::stop()
 	}
 	if( m_pattern->getTrack() && inBBEditor() )
 	{
-		engine::getBBTrackContainer()->stop();
+		Engine::getBBTrackContainer()->stop();
 	}
 	else
 	{
-		engine::getSong()->stop();
+		Engine::getSong()->stop();
 	}
 	m_scrollBack = true;
 }
@@ -2058,7 +2058,7 @@ void AutomationEditor::discreteButtonToggled()
 		disableTensionKnob();
 		m_pattern->setProgressionType(
 				AutomationPattern::DiscreteProgression );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -2074,7 +2074,7 @@ void AutomationEditor::linearButtonToggled()
 		disableTensionKnob();
 		m_pattern->setProgressionType(
 					AutomationPattern::LinearProgression );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -2088,7 +2088,7 @@ void AutomationEditor::cubicHermiteButtonToggled()
 	{
 		m_tensionKnob->setModel( m_tensionModel );
 		m_tensionKnob->setEnabled( true );
-		toolTip::add( m_tensionKnob, tr( "Tension value for spline" ) );
+		ToolTip::add( m_tensionKnob, tr( "Tension value for spline" ) );
 		m_tensionKnob->setWhatsThis(
 			tr( "A higher tension value may make a smoother curve "
 				"but overshoot some values.  A low tension "
@@ -2096,7 +2096,7 @@ void AutomationEditor::cubicHermiteButtonToggled()
 				"level off at each control point." ) );
 		m_pattern->setProgressionType(
 				AutomationPattern::CubicHermiteProgression );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -2210,7 +2210,7 @@ void AutomationEditor::copySelectedValues()
 		{
 			m_valuesToCopy[it.key()] = it.value();
 		}
-		textFloat::displayMessage( tr( "Values copied" ),
+		TextFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
 								"clipboard." ),
 				embed::getIconPixmap( "edit_copy" ), 2000 );
@@ -2235,7 +2235,7 @@ void AutomationEditor::cutSelectedValues()
 
 	if( !selected_values.isEmpty() )
 	{
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
@@ -2246,7 +2246,7 @@ void AutomationEditor::cutSelectedValues()
 	}
 
 	update();
-	engine::songEditor()->update();
+	Engine::songEditor()->update();
 }
 
 
@@ -2266,9 +2266,9 @@ void AutomationEditor::pasteValues()
 
 		// we only have to do the following lines if we pasted at
 		// least one value...
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
-		engine::songEditor()->update();
+		Engine::songEditor()->update();
 	}
 }
 
@@ -2296,9 +2296,9 @@ void AutomationEditor::deleteSelectedValues()
 
 	if( update_after_delete == true )
 	{
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
-		engine::songEditor()->update();
+		Engine::songEditor()->update();
 	}
 }
 
@@ -2307,9 +2307,9 @@ void AutomationEditor::deleteSelectedValues()
 
 void AutomationEditor::updatePosition( const MidiTime & _t )
 {
-	if( ( engine::getSong()->isPlaying() &&
-			engine::getSong()->playMode() ==
-					song::Mode_PlayAutomationPattern ) ||
+	if( ( Engine::getSong()->isPlaying() &&
+			Engine::getSong()->playMode() ==
+					Song::Mode_PlayAutomationPattern ) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;

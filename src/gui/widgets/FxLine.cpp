@@ -34,10 +34,10 @@
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "SendButtonIndicator.h"
 #include "gui_templates.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
@@ -62,7 +62,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 
 	// mixer sends knob
-	m_sendKnob = new knob( knobBright_26, this, tr("Channel send amount") );
+	m_sendKnob = new Knob( knobBright_26, this, tr("Channel send amount") );
 	m_sendKnob->move( 3, 22 );
 	m_sendKnob->setVisible(false);
 
@@ -154,7 +154,7 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	FxMixer * mix = engine::fxMixer();
+	FxMixer * mix = Engine::fxMixer();
 	bool sendToThis = mix->channelSendModel(
 		m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
 	bool receiveFromThis = mix->channelSendModel(
@@ -182,8 +182,8 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
-	FxMixer * mix = engine::fxMixer();
-	QPointer<captionMenu> contextMenu = new captionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
+	FxMixer * mix = Engine::fxMixer();
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master 
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
@@ -208,7 +208,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 void FxLine::renameChannel()
 {
 	bool ok;
-	FxMixer * mix = engine::fxMixer();
+	FxMixer * mix = Engine::fxMixer();
 	QString new_name = QInputDialog::getText( this,
 			FxMixerView::tr( "Rename FX channel" ),
 			FxMixerView::tr( "Enter the new name for this "
@@ -224,21 +224,21 @@ void FxLine::renameChannel()
 
 void FxLine::removeChannel()
 {
-	FxMixerView * mix = engine::fxMixerView();
+	FxMixerView * mix = Engine::fxMixerView();
 	mix->deleteChannel( m_channelIndex );
 }
 
 
 void FxLine::moveChannelLeft()
 {
-	FxMixerView * mix = engine::fxMixerView();
+	FxMixerView * mix = Engine::fxMixerView();
 	mix->moveChannelLeft( m_channelIndex );
 }
 
 
 void FxLine::moveChannelRight()
 {
-	FxMixerView * mix = engine::fxMixerView();
+	FxMixerView * mix = Engine::fxMixerView();
 	mix->moveChannelRight( m_channelIndex );
 }
 

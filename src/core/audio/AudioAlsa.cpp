@@ -31,7 +31,7 @@
 
 #include "endian_handling.h"
 #include "ConfigManager.h"
-#include "engine.h"
+#include "Engine.h"
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 #include "templates.h"
@@ -202,7 +202,7 @@ void AudioAlsa::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		if( m_handle != NULL )
 		{

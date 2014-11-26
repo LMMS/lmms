@@ -30,13 +30,13 @@
 #include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "knob.h"
+#include "Knob.h"
 
 
 class sidInstrumentView;
 class NotePlayHandle;
 class automatableButtonGroup;
-class pixmapButton;
+class PixmapButton;
 
 class voiceObject : public Model
 {
@@ -147,17 +147,17 @@ private:
 
 	struct voiceKnobs
 	{
-		voiceKnobs( knob * a,
-					knob * d,
-					knob * s,
-					knob * r,
-					knob * pw,
-					knob * crs,
+		voiceKnobs( Knob * a,
+					Knob * d,
+					Knob * s,
+					Knob * r,
+					Knob * pw,
+					Knob * crs,
 					automatableButtonGroup * wfbg,
-					pixmapButton * syncb,
-					pixmapButton * ringb,
-					pixmapButton * filterb,
-					pixmapButton * testb ) :
+					PixmapButton * syncb,
+					PixmapButton * ringb,
+					PixmapButton * filterb,
+					PixmapButton * testb ) :
 			m_attKnob( a ),
 			m_decKnob( d ),
 			m_sustKnob( s ),
@@ -174,25 +174,25 @@ private:
 		voiceKnobs()
 		{
 		}
-		knob * m_attKnob;
-		knob * m_decKnob;
-		knob * m_sustKnob;
-		knob * m_relKnob;
-		knob * m_pwKnob;
-		knob * m_crsKnob;
+		Knob * m_attKnob;
+		Knob * m_decKnob;
+		Knob * m_sustKnob;
+		Knob * m_relKnob;
+		Knob * m_pwKnob;
+		Knob * m_crsKnob;
 		automatableButtonGroup * m_waveFormBtnGrp;
-		pixmapButton * m_syncButton;
-		pixmapButton * m_ringModButton;
-		pixmapButton * m_filterButton;
-		pixmapButton * m_testButton;
+		PixmapButton * m_syncButton;
+		PixmapButton * m_ringModButton;
+		PixmapButton * m_filterButton;
+		PixmapButton * m_testButton;
 	} ;
 
 	voiceKnobs m_voiceKnobs[3];
 
-	knob * m_volKnob;
-	knob * m_resKnob;
-	knob * m_cutKnob;
-	pixmapButton * m_offButton;
+	Knob * m_volKnob;
+	Knob * m_resKnob;
+	Knob * m_cutKnob;
+	PixmapButton * m_offButton;
 
 protected slots:
 	void updateKnobHint();

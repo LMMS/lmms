@@ -87,7 +87,7 @@ void AutomatableModel::setSampleExact( bool s )
 	m_isSampleExact = s;
 	if( s )
 	{
-		m_valueBuffer = ValueBuffer( engine::mixer()->framesPerPeriod() );
+		m_valueBuffer = ValueBuffer( Engine::mixer()->framesPerPeriod() );
 	}
 }
 

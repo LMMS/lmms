@@ -27,7 +27,7 @@
 #define NOTE_PLAY_HANDLE_H
 
 #include "lmmsconfig.h"
-#include "note.h"
+#include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
 #include "MemoryManager.h"
@@ -37,17 +37,17 @@
 class InstrumentTrack;
 class NotePlayHandle;
 
-template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
+template<ch_cnt_t=DEFAULT_CHANNELS> class BasicFilters;
 typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 
-class EXPORT NotePlayHandle : public PlayHandle, public note
+class EXPORT NotePlayHandle : public PlayHandle, public Note
 {
 	MM_OPERATORS
 public:
 	void * m_pluginData;
-	basicFilters<> * m_filter;
+	BasicFilters<> * m_filter;
 
 	// specifies origin of NotePlayHandle
 	enum Origins
@@ -63,7 +63,7 @@ public:
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
-					const note& noteToPlay,
+					const Note& noteToPlay,
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
@@ -326,7 +326,7 @@ public:
 	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
-					const note& noteToPlay,
+					const Note& noteToPlay,
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );

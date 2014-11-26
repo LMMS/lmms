@@ -34,7 +34,7 @@
 
 #include "lmms_basics.h"
 #include "MidiTime.h"
-#include "rubberband.h"
+#include "Rubberband.h"
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "ModelView.h"
@@ -44,14 +44,14 @@
 class QMenu;
 class QPushButton;
 
-class pixmapButton;
-class textFloat;
+class PixmapButton;
+class TextFloat;
 class Track;
-class trackContentObjectView;
+class TrackContentObjectView;
 class TrackContainer;
 class TrackContainerView;
-class trackContentWidget;
-class trackView;
+class TrackContentWidget;
+class TrackView;
 
 typedef QWidget trackSettingsWidget;
 typedef QVector<Track *> TrackList;
@@ -74,15 +74,15 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 const int TCO_BORDER_WIDTH = 2;
 
 
-class trackContentObject : public Model, public JournallingObject
+class TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	trackContentObject( Track * _track );
-	virtual ~trackContentObject();
+	TrackContentObject( Track * _track );
+	virtual ~TrackContentObject();
 
 	inline Track * getTrack() const
 	{
@@ -125,7 +125,7 @@ public:
 	virtual void movePosition( const MidiTime & _pos );
 	virtual void changeLength( const MidiTime & _length );
 
-	virtual trackContentObjectView * createView( trackView * _tv ) = 0;
+	virtual TrackContentObjectView * createView( TrackView * _tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -169,13 +169,13 @@ private:
 
 	bool m_selectViewOnCreate;
 
-	friend class trackContentObjectView;
+	friend class TrackContentObjectView;
 
 } ;
 
 
 
-class trackContentObjectView : public selectableObject, public ModelView
+class TrackContentObjectView : public selectableObject, public ModelView
 {
 	Q_OBJECT
 
@@ -184,12 +184,12 @@ class trackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	trackContentObjectView( trackContentObject * _tco, trackView * _tv );
-	virtual ~trackContentObjectView();
+	TrackContentObjectView( TrackContentObject * _tco, TrackView * _tv );
+	virtual ~TrackContentObjectView();
 
 	bool fixedTCOs();
 
-	inline trackContentObject * getTrackContentObject()
+	inline TrackContentObject * getTrackContentObject()
 	{
 		return m_tco;
 	}
@@ -220,12 +220,12 @@ protected:
 	void setAutoResizeEnabled( bool _e = false );
 	float pixelsPerTact();
 
-	inline trackView * getTrackView()
+	inline TrackView * getTrackView()
 	{
 		return m_trackView;
 	}
 
-	DataFile createTCODataFiles(const QVector<trackContentObjectView *> & tcos) const;
+	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
 
 protected slots:
@@ -244,16 +244,16 @@ private:
 		ToggleSelected
 	} ;
 
-	static textFloat * s_textFloat;
+	static TextFloat * s_textFloat;
 
-	trackContentObject * m_tco;
-	trackView * m_trackView;
+	TrackContentObject * m_tco;
+	TrackView * m_trackView;
 	Actions m_action;
 	bool m_autoResize;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 
-	textFloat * m_hint;
+	TextFloat * m_hint;
 
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
@@ -275,7 +275,7 @@ private:
 
 
 
-class trackContentWidget : public QWidget, public JournallingObject
+class TrackContentWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 
@@ -284,14 +284,14 @@ class trackContentWidget : public QWidget, public JournallingObject
 	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
 
 public:
-	trackContentWidget( trackView * _parent );
-	virtual ~trackContentWidget();
+	TrackContentWidget( TrackView * _parent );
+	virtual ~TrackContentWidget();
 
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
 
-	void addTCOView( trackContentObjectView * _tcov );
-	void removeTCOView( trackContentObjectView * _tcov );
+	void addTCOView( TrackContentObjectView * _tcov );
+	void removeTCOView( TrackContentObjectView * _tcov );
 	void removeTCOView( int _tco_num )
 	{
 		if( _tco_num >= 0 && _tco_num < m_tcoViews.size() )
@@ -346,9 +346,9 @@ private:
 	Track * getTrack();
 	MidiTime getPosition( int _mouse_x );
 
-	trackView * m_trackView;
+	TrackView * m_trackView;
 
-	typedef QVector<trackContentObjectView *> tcoViewVector;
+	typedef QVector<TrackContentObjectView *> tcoViewVector;
 	tcoViewVector m_tcoViews;
 
 	QPixmap m_background;
@@ -362,12 +362,12 @@ private:
 
 
 
-class trackOperationsWidget : public QWidget
+class TrackOperationsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	trackOperationsWidget( trackView * _parent );
-	~trackOperationsWidget();
+	TrackOperationsWidget( TrackView * _parent );
+	~TrackOperationsWidget();
 
 
 protected:
@@ -386,23 +386,23 @@ private slots:
 private:
 	static QPixmap * s_grip;
 
-	trackView * m_trackView;
+	TrackView * m_trackView;
 
 	QPushButton * m_trackOps;
-	pixmapButton * m_muteBtn;
-	pixmapButton * m_soloBtn;
+	PixmapButton * m_muteBtn;
+	PixmapButton * m_soloBtn;
 
 
-	friend class trackView;
+	friend class TrackView;
 
 signals:
-	void trackRemovalScheduled( trackView * _t );
+	void trackRemovalScheduled( TrackView * _t );
 
 } ;
 
 
 
-typedef QVector<trackContentObject *> tcoVector;
+typedef QVector<TrackContentObject *> tcoVector;
 
 // base-class for all tracks
 class EXPORT Track : public Model, public JournallingObject
@@ -412,6 +412,7 @@ class EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
+	typedef QVector<TrackContentObject *> tcoVector;
 
 	enum TrackTypes
 	{
@@ -446,8 +447,8 @@ public:
 						const f_cnt_t _frame_base, int _tco_num = -1 ) = 0;
 
 
-	virtual trackView * createView( TrackContainerView * _view ) = 0;
-	virtual trackContentObject * createTCO( const MidiTime & _pos ) = 0;
+	virtual TrackView * createView( TrackContainerView * _view ) = 0;
+	virtual TrackContentObject * createTCO( const MidiTime & _pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 						QDomElement & _parent ) = 0;
@@ -462,15 +463,15 @@ public:
 		m_simpleSerializingMode = true;
 	}
 
-	// -- for usage by trackContentObject only ---------------
-	trackContentObject * addTCO( trackContentObject * _tco );
-	void removeTCO( trackContentObject * _tco );
+	// -- for usage by TrackContentObject only ---------------
+	TrackContentObject * addTCO( TrackContentObject * _tco );
+	void removeTCO( TrackContentObject * _tco );
 	// -------------------------------------------------------
 	void deleteTCOs();
 
 	int numOfTCOs();
-	trackContentObject * getTCO( int _tco_num );
-	int getTCONum( trackContentObject * _tco );
+	TrackContentObject * getTCO( int _tco_num );
+	int getTCONum( TrackContentObject * _tco );
 
 	const tcoVector & getTCOs() const
 	{
@@ -551,25 +552,25 @@ private:
 
 	QMutex m_processingLock;
 
-	friend class trackView;
+	friend class TrackView;
 
 
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void trackContentObjectAdded( trackContentObject * );
+	void trackContentObjectAdded( TrackContentObject * );
 
 } ;
 
 
 
 
-class trackView : public QWidget, public ModelView, public JournallingObject
+class TrackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
-	trackView( Track * _track, TrackContainerView* tcv );
-	virtual ~trackView();
+	TrackView( Track * _track, TrackContainerView* tcv );
+	virtual ~TrackView();
 
 	inline const Track * getTrack() const
 	{
@@ -586,7 +587,7 @@ public:
 		return m_trackContainerView;
 	}
 
-	inline trackOperationsWidget * getTrackOperationsWidget()
+	inline TrackOperationsWidget * getTrackOperationsWidget()
 	{
 		return( &m_trackOperationsWidget );
 	}
@@ -596,7 +597,7 @@ public:
 		return( &m_trackSettingsWidget );
 	}
 
-	inline trackContentWidget * getTrackContentWidget()
+	inline TrackContentWidget * getTrackContentWidget()
 	{
 		return( &m_trackContentWidget );
 	}
@@ -653,18 +654,18 @@ private:
 	Track * m_track;
 	TrackContainerView * m_trackContainerView;
 
-	trackOperationsWidget m_trackOperationsWidget;
+	TrackOperationsWidget m_trackOperationsWidget;
 	trackSettingsWidget m_trackSettingsWidget;
-	trackContentWidget m_trackContentWidget;
+	TrackContentWidget m_trackContentWidget;
 
 	Actions m_action;
 
 
-	friend class trackLabelButton;
+	friend class TrackLabelButton;
 
 
 private slots:
-	void createTCOView( trackContentObject * _tco );
+	void createTCOView( TrackContentObject * _tco );
 
 } ;
 

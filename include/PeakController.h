@@ -33,7 +33,7 @@
 #include "ControllerDialog.h"
 
 class automatableButtonGroup;
-class knob;
+class Knob;
 class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;

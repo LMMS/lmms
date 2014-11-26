@@ -30,8 +30,8 @@
 #include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "knob.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
 #include "TempoSyncKnob.h"
 
 
@@ -104,19 +104,19 @@ public:
 private:
 	virtual void modelChanged();
 
-	knob * m_startFreqKnob;
-	knob * m_endFreqKnob;
-	knob * m_decayKnob;
-	knob * m_distKnob;
-	knob * m_distEndKnob;
-	knob * m_gainKnob;
-	knob * m_envKnob;
-	knob * m_noiseKnob;
-	knob * m_clickKnob;
-	knob * m_slopeKnob;
+	Knob * m_startFreqKnob;
+	Knob * m_endFreqKnob;
+	Knob * m_decayKnob;
+	Knob * m_distKnob;
+	Knob * m_distEndKnob;
+	Knob * m_gainKnob;
+	Knob * m_envKnob;
+	Knob * m_noiseKnob;
+	Knob * m_clickKnob;
+	Knob * m_slopeKnob;
 
-	ledCheckBox * m_startNoteToggle;
-	ledCheckBox * m_endNoteToggle;
+	LedCheckBox * m_startNoteToggle;
+	LedCheckBox * m_endNoteToggle;
 
 } ;
 

@@ -23,7 +23,7 @@
  */
 
 #include "MixerWorkerThread.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;

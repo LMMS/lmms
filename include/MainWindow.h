@@ -37,7 +37,7 @@ class QMdiArea;
 
 class ConfigManager;
 class PluginView;
-class toolButton;
+class ToolButton;
 
 
 class MainWindow : public QMainWindow
@@ -177,7 +177,7 @@ private:
 
 	QList<QString>* m_errors;
 
-	friend class engine;
+	friend class Engine;
 
 
 private slots:

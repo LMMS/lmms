@@ -35,8 +35,8 @@
 #include "gui_templates.h"
 #include "ladspa_description.h"
 #include "ladspa_port_dialog.h"
-#include "tab_bar.h"
-#include "tab_button.h"
+#include "TabBar.h"
+#include "TabButton.h"
 
 #include "embed.cpp"
 
@@ -103,7 +103,7 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 	hlayout->setSpacing( 0 );
 	hlayout->setMargin( 0 );
 
-	m_tabBar = new tabBar( this, QBoxLayout::TopToBottom );
+	m_tabBar = new TabBar( this, QBoxLayout::TopToBottom );
 	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 

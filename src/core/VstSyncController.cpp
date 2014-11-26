@@ -26,7 +26,7 @@
 #include <QDebug>
 
 #include "ConfigManager.h"
-#include "engine.h"
+#include "Engine.h"
 #include "lmmsconfig.h"
 #include "Mixer.h"
 #include "VstSyncController.h"
@@ -54,7 +54,7 @@ VstSyncController::VstSyncController() :
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
-		connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+		connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
 #ifdef USE_QT_SHMEM
 		if ( m_shm.create( sizeof( VstSyncData ) ) )
@@ -104,7 +104,7 @@ VstSyncController::VstSyncController() :
 	}
 
 	m_syncData->isPlaying = false;
-	m_syncData->m_bufferSize = engine::mixer()->framesPerPeriod();
+	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
 	m_syncData->timeSigNumer = 4;
 	m_syncData->timeSigDenom = 4;
 
@@ -176,7 +176,7 @@ void VstSyncController::startCycle( int startTick, int endTick )
 
 void VstSyncController::update()
 {
-	m_syncData->m_bufferSize = engine::mixer()->framesPerPeriod();
+	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
 
 #ifdef VST_SNC_LATENCY
 	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );
@@ -187,7 +187,7 @@ void VstSyncController::update()
 
 void VstSyncController::updateSampleRate()
 {
-	m_syncData->m_sampleRate = engine::mixer()->processingSampleRate();
+	m_syncData->m_sampleRate = Engine::mixer()->processingSampleRate();
 
 #ifdef VST_SNC_LATENCY
 	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );

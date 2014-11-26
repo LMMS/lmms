@@ -30,11 +30,11 @@
 #include <QMutex>
 
 #include "Instrument.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "InstrumentView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "fluidsynth.h"
 #include "SampleBuffer.h"
 #include "MemoryManager.h"
@@ -198,8 +198,8 @@ public:
 private:
 	virtual void modelChanged();
 
-	pixmapButton * m_fileDialogButton;
-	pixmapButton * m_patchDialogButton;
+	PixmapButton * m_fileDialogButton;
+	PixmapButton * m_patchDialogButton;
 
 	LcdSpinBox * m_bankNumLcd;
 	LcdSpinBox * m_patchNumLcd;
@@ -207,19 +207,19 @@ private:
 	QLabel * m_filenameLabel;
 	QLabel * m_patchLabel;
 
-	knob	* m_gainKnob;
+	Knob	* m_gainKnob;
 
-	pixmapButton * m_reverbButton;
-	knob	* m_reverbRoomSizeKnob;
-	knob	* m_reverbDampingKnob;
-	knob	* m_reverbWidthKnob;
-	knob	* m_reverbLevelKnob;
+	PixmapButton * m_reverbButton;
+	Knob	* m_reverbRoomSizeKnob;
+	Knob	* m_reverbDampingKnob;
+	Knob	* m_reverbWidthKnob;
+	Knob	* m_reverbLevelKnob;
 
-	pixmapButton * m_chorusButton;
-	knob * m_chorusNumKnob;
-	knob * m_chorusLevelKnob;
-	knob * m_chorusSpeedKnob;
-	knob * m_chorusDepthKnob;
+	PixmapButton * m_chorusButton;
+	Knob * m_chorusNumKnob;
+	Knob * m_chorusLevelKnob;
+	Knob * m_chorusSpeedKnob;
+	Knob * m_chorusDepthKnob;
 
 	static patchesDialog * s_patchDialog;
 

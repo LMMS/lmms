@@ -26,7 +26,7 @@
 
 #include "EnvelopeAndLfoParameters.h"
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "Oscillator.h"
 
@@ -46,7 +46,7 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 							it != m_lfos.end(); ++it )
 	{
 		( *it )->m_lfoFrame +=
-				engine::mixer()->framesPerPeriod();
+				Engine::mixer()->framesPerPeriod();
 		( *it )->m_bad_lfoShapeData = true;
 	}
 }
@@ -154,12 +154,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	connect( &m_x100Model, SIGNAL( dataChanged() ),
 				this, SLOT( updateSampleVars() ) );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleVars() ) );
 
 
 	m_lfoShapeData =
-		new sample_t[engine::mixer()->framesPerPeriod()];
+		new sample_t[Engine::mixer()->framesPerPeriod()];
 
 	updateSampleVars();
 }
@@ -239,7 +239,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 
 void EnvelopeAndLfoParameters::updateLfoShapeData()
 {
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	for( fpp_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
@@ -380,7 +380,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
-	const float framesPerEnv = (float) engine::mixer()->processingSampleRate();
+	const float framesPerEnv = (float) Engine::mixer()->processingSampleRate();
 
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>( framesPerEnv * m_predelayModel.value() );
 

@@ -29,18 +29,18 @@
 #include "EnvelopeAndLfoView.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
-#include "knob.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
 #include "Mixer.h"
 #include "DataFile.h"
 #include "Oscillator.h"
-#include "pixmap_button.h"
-#include "string_pair_drag.h"
+#include "PixmapButton.h"
+#include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
-#include "text_float.h"
-#include "tooltip.h"
+#include "TextFloat.h"
+#include "ToolTip.h"
 #include "Track.h"
 
 
@@ -94,7 +94,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
 	}
 
-	m_predelayKnob = new knob( knobBright_26, this );
+	m_predelayKnob = new Knob( knobBright_26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
 	m_predelayKnob->setHintText( tr( "Predelay:" ) + " ", "" );
@@ -104,7 +104,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"before start of actual envelope." ) );
 
 
-	m_attackKnob = new knob( knobBright_26, this );
+	m_attackKnob = new Knob( knobBright_26, this );
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
 	m_attackKnob->setHintText( tr( "Attack:" )+" ", "" );
@@ -115,7 +115,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"Choose a small value for instruments like pianos "
 			"and a big value for strings." ) );
 
-	m_holdKnob = new knob( knobBright_26, this );
+	m_holdKnob = new Knob( knobBright_26, this );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
 	m_holdKnob->setHintText( tr( "Hold:" ) + " ", "" );
@@ -125,7 +125,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"envelope holds attack-level before it begins to "
 			"decrease to sustain-level." ) );
 
-	m_decayKnob = new knob( knobBright_26, this );
+	m_decayKnob = new Knob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "" );
@@ -137,7 +137,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"like pianos." ) );
 
 
-	m_sustainKnob = new knob( knobBright_26, this );
+	m_sustainKnob = new Knob( knobBright_26, this );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
 	m_sustainKnob->setHintText( tr( "Sustain:" ) + " ", "" );
@@ -148,7 +148,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"zero." ) );
 
 
-	m_releaseKnob = new knob( knobBright_26, this );
+	m_releaseKnob = new Knob( knobBright_26, this );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
 	m_releaseKnob->setHintText( tr( "Release:" ) + " ", "" );
@@ -160,7 +160,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"strings." ) );
 
 
-	m_amountKnob = new knob( knobBright_26, this );
+	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
@@ -173,7 +173,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 
 
 
-	m_lfoPredelayKnob = new knob( knobBright_26, this );
+	m_lfoPredelayKnob = new Knob( knobBright_26, this );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
 	m_lfoPredelayKnob->setHintText( tr( "LFO predelay:" ) + " ", "" );
@@ -183,7 +183,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"LFO starts to oscillate." ) );
 
 
-	m_lfoAttackKnob = new knob( knobBright_26, this );
+	m_lfoAttackKnob = new Knob( knobBright_26, this );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
 	m_lfoAttackKnob->setHintText( tr( "LFO- attack:" ) + " ", "" );
@@ -203,7 +203,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"the faster will be your effect." ) );
 
 
-	m_lfoAmountKnob = new knob( knobBright_26, this );
+	m_lfoAmountKnob = new Knob( knobBright_26, this );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
@@ -214,7 +214,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"be influenced by this LFO." ) );
 
 
-	pixmapButton * sin_lfo_btn = new pixmapButton( this, NULL );
+	PixmapButton * sin_lfo_btn = new PixmapButton( this, NULL );
 	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
 	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
@@ -223,7 +223,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	sin_lfo_btn->setWhatsThis(
 		tr( "Click here for a sine-wave." ) );
 
-	pixmapButton * triangle_lfo_btn = new pixmapButton( this, NULL );
+	PixmapButton * triangle_lfo_btn = new PixmapButton( this, NULL );
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
 	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
@@ -232,7 +232,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	triangle_lfo_btn->setWhatsThis(
 		tr( "Click here for a triangle-wave." ) );
 
-	pixmapButton * saw_lfo_btn = new pixmapButton( this, NULL );
+	PixmapButton * saw_lfo_btn = new PixmapButton( this, NULL );
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
 	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
@@ -241,7 +241,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	saw_lfo_btn->setWhatsThis(
 		tr( "Click here for a saw-wave for current." ) );
 
-	pixmapButton * sqr_lfo_btn = new pixmapButton( this, NULL );
+	PixmapButton * sqr_lfo_btn = new PixmapButton( this, NULL );
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
 	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -250,7 +250,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	sqr_lfo_btn->setWhatsThis(
 		tr( "Click here for a square-wave." ) );
 
-	m_userLfoBtn = new pixmapButton( this, NULL );
+	m_userLfoBtn = new PixmapButton( this, NULL );
 	m_userLfoBtn->move( LFO_SHAPES_X+75, LFO_SHAPES_Y );
 	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -264,7 +264,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
 				this, SLOT( lfoUserWaveChanged() ) );
 
-	pixmapButton * random_lfo_btn = new pixmapButton( this, NULL );
+	PixmapButton * random_lfo_btn = new PixmapButton( this, NULL );
 	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
 	random_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"random_wave_active" ) );
@@ -281,23 +281,23 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
 	m_lfoWaveBtnGrp->addButton( random_lfo_btn );
 
-	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
+	m_x100Cb = new LedCheckBox( tr( "FREQ x 100" ), this );
 	m_x100Cb->setFont( pointSizeF( m_x100Cb->font(), 6.5 ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 	m_x100Cb->setWhatsThis(
 		tr( "Click here if the frequency of this LFO should be "
 						"multiplied by 100." ) );
-	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency by 100" ) );
+	ToolTip::add( m_x100Cb, tr( "multiply LFO-frequency by 100" ) );
 
 
-	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
+	m_controlEnvAmountCb = new LedCheckBox( tr( "MODULATE ENV-AMOUNT" ),
 			this );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSizeF( m_controlEnvAmountCb->font(), 6.5 ) );
 	m_controlEnvAmountCb ->setWhatsThis(
 		tr( "Click here to make the envelope-amount controlled by this "
 								"LFO." ) );
-	toolTip::add( m_controlEnvAmountCb,
+	ToolTip::add( m_controlEnvAmountCb,
 				tr( "control envelope-amount by this LFO" ) );
 
 
@@ -376,7 +376,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee,
+	StringPairDrag::processDragEnterEvent( _dee,
 					QString( "samplefile,tco_%1" ).arg(
 							Track::SampleTrack ) );
 }
@@ -386,12 +386,12 @@ void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
 		m_params->m_userWave.setAudioFile(
-					stringPairDrag::decodeValue( _de ) );
+					StringPairDrag::decodeValue( _de ) );
 		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
 	}
@@ -491,7 +491,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
-				engine::mixer()->baseSampleRate() / 10;
+				Engine::mixer()->baseSampleRate() / 10;
 
 	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
 	p.setPen( QPen( QColor( static_cast<int>( 96 * lfo_gray_amount ),
@@ -580,7 +580,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 	{
 		if( m_params->m_userWave.frames() <= 1 )
 		{
-			textFloat::displayMessage( tr( "Hint" ),
+			TextFloat::displayMessage( tr( "Hint" ),
 				tr( "Drag a sample from somewhere and drop "
 					"it in this window." ),
 					embed::getIconPixmap( "hint" ), 3000 );

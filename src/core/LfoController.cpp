@@ -29,8 +29,8 @@
 #include <QVector>
 
 
-#include "song.h"
-#include "engine.h"
+#include "Song.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "LfoController.h"
 #include "ControllerDialog.h"
@@ -60,12 +60,12 @@ LfoController::LfoController( Model * _parent ) :
 			this, SLOT( updateDuration() ) );
 	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateDuration() ) );
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), 
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), 
 			this, SLOT( updateDuration() ) );
 	
-	connect( engine::getSong(), SIGNAL( playbackStateChanged() ),
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 			this, SLOT( updatePhase() ) );
-	connect( engine::getSong(), SIGNAL( playbackPositionChanged() ),
+	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
 			this, SLOT( updatePhase() ) );
 			
 	updateDuration();
@@ -97,7 +97,7 @@ void LfoController::updateValueBuffer()
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
-		phase += static_cast<float>( engine::mixer()->framesPerPeriod() * diff ) / m_duration;
+		phase += static_cast<float>( Engine::mixer()->framesPerPeriod() * diff ) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
 
@@ -119,14 +119,14 @@ void LfoController::updateValueBuffer()
 
 void LfoController::updatePhase()
 {
-	m_currentPhase = ( engine::getSong()->getFrames() ) / m_duration;
+	m_currentPhase = ( Engine::getSong()->getFrames() ) / m_duration;
 	m_bufferLastUpdated = s_periods - 1;
 }
 
 
 void LfoController::updateDuration()
 {
-	float newDurationF = engine::mixer()->processingSampleRate() *	m_speedModel.value();
+	float newDurationF = Engine::mixer()->processingSampleRate() *	m_speedModel.value();
 
 	switch(m_multiplierModel.value() )
 	{

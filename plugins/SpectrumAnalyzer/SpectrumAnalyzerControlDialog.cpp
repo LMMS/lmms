@@ -27,7 +27,7 @@
 
 #include "SpectrumAnalyzer.h"
 #include "MainWindow.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "embed.h"
 
 
@@ -59,7 +59,7 @@ public:
 		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
-		connect( engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
+		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
 		setAttribute( Qt::WA_OpaquePaintEvent, true );
 	}
 
@@ -157,11 +157,11 @@ SpectrumAnalyzerControlDialog::SpectrumAnalyzerControlDialog( SpectrumAnalyzerCo
 	SpectrumView* v = new SpectrumView( controls->m_effect, this );
 	v->move( 27, 30 );
 
-	ledCheckBox * lin_spec = new ledCheckBox( tr( "Linear spectrum" ), this );
+	LedCheckBox * lin_spec = new LedCheckBox( tr( "Linear spectrum" ), this );
 	lin_spec->move( 24, 204 );
 	lin_spec->setModel( &controls->m_linearSpec );
 
-	ledCheckBox * lin_y = new ledCheckBox( tr( "Linear Y axis" ), this );
+	LedCheckBox * lin_y = new LedCheckBox( tr( "Linear Y axis" ), this );
 	lin_y->move( 24, 220 );
 	lin_y->setModel( &controls->m_linearYAxis );
 

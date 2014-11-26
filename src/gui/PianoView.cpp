@@ -45,13 +45,13 @@
 
 
 #include "PianoView.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
-#include "string_pair_drag.h"
+#include "Knob.h"
+#include "StringPairDrag.h"
 #include "MainWindow.h"
 #include "MidiEvent.h"
 #include "templates.h"
@@ -419,7 +419,7 @@ void PianoView::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	captionMenu contextMenu( tr( "Base note" ) );
+	CaptionMenu contextMenu( tr( "Base note" ) );
 	AutomatableModelView amv( m_piano->instrumentTrack()->baseNoteModel(), &contextMenu );
 	amv.addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
@@ -482,7 +482,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 		{
 			if( _me->modifiers() & Qt::ControlModifier )
 			{
-				new stringPairDrag( "automatable_model",
+				new StringPairDrag( "automatable_model",
 					QString::number( m_piano->instrumentTrack()->baseNoteModel()->id() ),
 					QPixmap(), this );
 				_me->accept();

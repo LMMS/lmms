@@ -41,12 +41,12 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include <QLabel>
 #include <QLineEdit>
 
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "LcdSpinBox.h"
 
 
@@ -232,7 +232,7 @@ void AudioPortAudio::applyQualitySettings()
 	if( hqAudio() )
 	{
 
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 		int samples = mixer()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(
@@ -391,14 +391,14 @@ void AudioPortAudioSetupUtil::updateChannels()
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioPortAudio::name(), _parent )
 {
-	m_backend = new comboBox( this, "BACKEND" );
+	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
 	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
-	m_device = new comboBox( this, "DEVICE" );
+	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );

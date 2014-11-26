@@ -27,8 +27,8 @@
 #define REAL_BUILD // FIXME this shouldn't be needed
 #include "CarlaHost.h"
 
-#include "engine.h"
-#include "song.h"
+#include "Engine.h"
+#include "Song.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
@@ -181,14 +181,14 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
     // we need a play-handle which cares for calling play()
     InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    engine::mixer()->addPlayHandle( iph );
+    Engine::mixer()->addPlayHandle( iph );
 
-    connect(engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+    connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
 CarlaInstrument::~CarlaInstrument()
 {
-    engine::mixer()->removePlayHandles( instrumentTrack() );
+    Engine::mixer()->removePlayHandles( instrumentTrack() );
 
     if (fHost.resourceDir != NULL)
     {
@@ -218,12 +218,12 @@ CarlaInstrument::~CarlaInstrument()
 
 uint32_t CarlaInstrument::handleGetBufferSize() const
 {
-    return engine::mixer()->framesPerPeriod();
+    return Engine::mixer()->framesPerPeriod();
 }
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return engine::mixer()->processingSampleRate();
+    return Engine::mixer()->processingSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -317,7 +317,7 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 
 void CarlaInstrument::play(sampleFrame* workingBuffer)
 {
-    const uint bufsize = engine::mixer()->framesPerPeriod();
+    const uint bufsize = Engine::mixer()->framesPerPeriod();
 
     std::memset(workingBuffer, 0, sizeof(sample_t)*bufsize*DEFAULT_CHANNELS);
 
@@ -328,9 +328,9 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     }
 
     // set time info
-    song* const s = engine::getSong();
+    song* const s = Engine::getSong();
     fTimeInfo.playing  = s->isPlaying();
-    fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(engine::framesPerTick());
+    fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(Engine::framesPerTick());
     fTimeInfo.usecs    = s->getMilliseconds()*1000;
     fTimeInfo.bbt.bar  = s->getTacts() + 1;
     fTimeInfo.bbt.beat = s->getBeat() + 1;

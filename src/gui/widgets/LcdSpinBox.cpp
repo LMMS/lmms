@@ -32,8 +32,8 @@
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
-#include "caption_menu.h"
-#include "engine.h"
+#include "CaptionMenu.h"
+#include "Engine.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"
@@ -88,7 +88,7 @@ void LcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName() );
+	CaptionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -127,7 +127,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 	if( m_mouseMoving )
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if( engine::mainWindow()->isShiftPressed() )
+		if( Engine::mainWindow()->isShiftPressed() )
 			dy = qBound( -4, dy/4, 4 );
 		if( dy > 1 || dy < -1 )
 		{

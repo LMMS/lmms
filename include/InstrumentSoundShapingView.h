@@ -33,10 +33,10 @@
 class QLabel;
 
 class EnvelopeAndLfoView;
-class comboBox;
-class groupBox;
-class knob;
-class tabWidget;
+class ComboBox;
+class GroupBox;
+class Knob;
+class TabWidget;
 
 
 class InstrumentSoundShapingView : public QWidget, public ModelView
@@ -54,14 +54,14 @@ private:
 
 
 	InstrumentSoundShaping * m_ss;
-	tabWidget * m_targetsTabWidget;
+	TabWidget * m_targetsTabWidget;
 	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
 
 	// filter-stuff
-	groupBox * m_filterGroupBox;
-	comboBox * m_filterComboBox;
-	knob * m_filterCutKnob;
-	knob * m_filterResKnob;
+	GroupBox * m_filterGroupBox;
+	ComboBox * m_filterComboBox;
+	Knob * m_filterCutKnob;
+	Knob * m_filterResKnob;
 
 	QLabel* m_singleStreamInfoLabel;
 

@@ -36,7 +36,7 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
-class ledCheckBox;
+class LedCheckBox;
 
 
 class ControllerView : public QWidget, public ModelView

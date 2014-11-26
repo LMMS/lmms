@@ -34,10 +34,10 @@
 
 
 class VstEffectControls;
-class pixmapButton;
+class PixmapButton;
 class QPixmap;
 class QPushButton;
-class pixmapButton;
+class PixmapButton;
 
 
 class VstEffectControlDialog : public EffectControlDialog
@@ -53,11 +53,11 @@ protected:
 private:
 	QWidget * m_pluginWidget;
 
-	pixmapButton * m_openPresetButton;
-	pixmapButton * m_rolLPresetButton;
-	pixmapButton * m_rolRPresetButton;
-	pixmapButton * m_managePluginButton;
-	pixmapButton * m_savePresetButton;
+	PixmapButton * m_openPresetButton;
+	PixmapButton * m_rolLPresetButton;
+	PixmapButton * m_rolRPresetButton;
+	PixmapButton * m_managePluginButton;
+	PixmapButton * m_savePresetButton;
 
 	VstPlugin * m_plugin;
 

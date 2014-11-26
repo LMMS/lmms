@@ -32,27 +32,27 @@
 #include "FlpImport.h"
 #include "NotePlayHandle.h"
 #include "AutomationPattern.h"
-#include "basic_filters.h"
-#include "bb_track.h"
-#include "bb_track_container.h"
-#include "combobox.h"
+#include "BasicFilters.h"
+#include "BBTrack.h"
+#include "BBTrackContainer.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "debug.h"
 #include "Effect.h"
-#include "engine.h"
+#include "Engine.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
-#include "group_box.h"
+#include "GroupBox.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "knob.h"
+#include "Knob.h"
 #include "Oscillator.h"
 #include "Pattern.h"
 #include "Piano.h"
 #include "ProjectJournal.h"
-#include "project_notes.h"
-#include "song.h"
+#include "ProjectNotes.h"
+#include "Song.h"
 #include "TrackContainer.h"
 #include "embed.h"
 #include "lmmsconfig.h"
@@ -414,7 +414,7 @@ struct FL_Channel : public FL_Plugin
 	int fxChannel;
 	int layerParent;
 
-	typedef QList<QPair<int, note> > noteVector;
+	typedef QList<QPair<int, Note> > noteVector;
 	noteVector notes;
 
 	QList<int> dots;
@@ -462,7 +462,7 @@ struct FL_Channel : public FL_Plugin
 		sampleUseLoopPoints( false ),
 		instrumentPlugin( NULL ),
 		envelopes(),
-		filterType( basicFilters<>::LowPass ),
+		filterType( BasicFilters<>::LowPass ),
 		filterCut( 10000 ),
 		filterRes( 0.1 ),
 		filterEnabled( false ),
@@ -595,14 +595,14 @@ bool FlpImport::tryImport( TrackContainer* tc )
 {
 	const int mappedFilter[] =
 	{
-		basicFilters<>::LowPass,// fast LP
-		basicFilters<>::LowPass,
-		basicFilters<>::BandPass_CSG,
-		basicFilters<>::HiPass,
-		basicFilters<>::Notch,
-		basicFilters<>::NumFilters+basicFilters<>::LowPass,
-		basicFilters<>::LowPass,
-		basicFilters<>::NumFilters+basicFilters<>::LowPass
+		BasicFilters<>::LowPass,// fast LP
+		BasicFilters<>::LowPass,
+		BasicFilters<>::BandPass_CSG,
+		BasicFilters<>::HiPass,
+		BasicFilters<>::Notch,
+		BasicFilters<>::NumFilters+BasicFilters<>::LowPass,
+		BasicFilters<>::LowPass,
+		BasicFilters<>::NumFilters+BasicFilters<>::LowPass
 	} ;
 
 	const InstrumentFunctionArpeggio::ArpDirections mappedArpDir[] =
@@ -767,8 +767,8 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	
 	int cur_channel = -1;
 
-	const bool is_journ = engine::projectJournal()->isJournalling();
-	engine::projectJournal()->setJournalling( false );
+	const bool is_journ = Engine::projectJournal()->isJournalling();
+	Engine::projectJournal()->setJournalling( false );
 
 
 	while( file().atEnd() == false )
@@ -1313,7 +1313,7 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 									8 ) );
 					pos /= (4*ppq) / DefaultTicksPerTact;
 					len /= (4*ppq) / DefaultTicksPerTact;
-					note n( len, pos, key, vol * 100 / 128,
+					Note n( len, pos, key, vol * 100 / 128,
 							pan*200 / 128 - 100 );
 					if( ch < p.numChannels )
 					{
@@ -1411,22 +1411,22 @@ else
 
 
 	// now create a project from FL_Project data structure
-	engine::getSong()->clearProject();
+	Engine::getSong()->clearProject();
 
 	// configure the mixer
 	for( int i=0; i<NumFLFxChannels; ++i )
 	{
-		engine::fxMixer()->createChannel();
+		Engine::fxMixer()->createChannel();
 	}
-	engine::fxMixerView()->refreshDisplay();
+	Engine::fxMixerView()->refreshDisplay();
 
 	// set global parameters
-	engine::getSong()->setMasterVolume( p.mainVolume );
-	engine::getSong()->setMasterPitch( p.mainPitch );
-	engine::getSong()->setTempo( p.tempo );
+	Engine::getSong()->setMasterVolume( p.mainVolume );
+	Engine::getSong()->setMasterPitch( p.mainPitch );
+	Engine::getSong()->setTempo( p.tempo );
 
 	// set project notes
-	engine::getProjectNotes()->setText( p.projectNotes );
+	Engine::getProjectNotes()->setText( p.projectNotes );
 
 
 	progressDialog.setMaximum( p.maxPatterns + p.channels.size() +
@@ -1434,14 +1434,14 @@ else
 	int cur_progress = 0;
 
 	// create BB tracks
-	QList<bbTrack *> bb_tracks;
+	QList<BBTrack *> bb_tracks;
 	QList<InstrumentTrack *> i_tracks;
 
-	while( engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
+	while( Engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
 	{
 		const int cur_pat = bb_tracks.size();
-		bbTrack * bbt = dynamic_cast<bbTrack *>(
-			Track::create( Track::BBTrack, engine::getSong() ) );
+		BBTrack * bbt = dynamic_cast<BBTrack *>(
+			Track::create( Track::BBTrack, Engine::getSong() ) );
 		if( p.patternNames.contains( cur_pat ) )
 		{
 			bbt->setName( p.patternNames[cur_pat] );
@@ -1457,8 +1457,8 @@ else
 	{
 		InstrumentTrack * t = dynamic_cast<InstrumentTrack *>(
 			Track::create( Track::InstrumentTrack,
-					engine::getBBTrackContainer() ) );
-		engine::getBBTrackContainer()->updateAfterTrackAdd();
+					Engine::getBBTrackContainer() ) );
+		Engine::getBBTrackContainer()->updateAfterTrackAdd();
 		i_tracks.push_back( t );
 		switch( it->pluginType )
 		{
@@ -1657,7 +1657,7 @@ p->putValue( jt->pos, value, false );
 
 	for( int fx_ch = 0; fx_ch <= NumFLFxChannels ; ++fx_ch )
 	{
-		FxChannel * ch = engine::fxMixer()->effectChannel( fx_ch );
+		FxChannel * ch = Engine::fxMixer()->effectChannel( fx_ch );
 		if( !ch )
 		{
 			continue;
@@ -1719,7 +1719,7 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		EffectChain * ec = &engine::fxMixer()->
+		EffectChain * ec = &Engine::fxMixer()->
 					effectChannel( it->fxChannel )->m_fxChain;
 		qDebug( "adding %s to %d\n", effName.toUtf8().constData(),
 								it->fxChannel );
@@ -1752,7 +1752,7 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		trackContentObject * tco = bb_tracks[it->pattern]->createTCO( MidiTime() );
+		TrackContentObject * tco = bb_tracks[it->pattern]->createTCO( MidiTime() );
 		tco->movePosition( it->position );
 		if( it->length != DefaultTicksPerTact )
 		{
@@ -1763,14 +1763,14 @@ p->putValue( jt->pos, value, false );
 
 
 	// set current pattern
-	if( p.activeEditPattern < engine::getBBTrackContainer()->numOfBBs() )
+	if( p.activeEditPattern < Engine::getBBTrackContainer()->numOfBBs() )
 	{
-		engine::getBBTrackContainer()->setCurrentBB(
+		Engine::getBBTrackContainer()->setCurrentBB(
 							p.activeEditPattern );
 	}
 
 	// restore journalling settings
-	engine::projectJournal()->setJournalling( is_journ );
+	Engine::projectJournal()->setJournalling( is_journ );
 
 	return true;
 }

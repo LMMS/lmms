@@ -26,7 +26,7 @@
 #define DELAYCONTROLS_H
 
 #include "EffectControls.h"
-#include "knob.h"
+#include "Knob.h"
 #include "delaycontrolsdialog.h"
 
 

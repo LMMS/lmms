@@ -30,9 +30,9 @@
 
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
-#include "song.h"
+#include "Song.h"
 
 
 TrackContainer::TrackContainer() :
@@ -82,14 +82,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( !journalRestore && engine::hasGUI() )
+	if( !journalRestore && Engine::hasGUI() )
 	{
 		if( pd == NULL )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count(),
-						engine::mainWindow() );
+						Engine::mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -185,9 +185,9 @@ void TrackContainer::removeTrack( Track * _track )
 		m_tracks.remove( index );
 		m_tracksMutex.unlock();
 
-		if( engine::getSong() )
+		if( Engine::getSong() )
 		{
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 }

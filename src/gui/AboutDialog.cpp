@@ -1,5 +1,5 @@
 /*
- * about_dialog.cpp - implementation of about-dialog
+ * AboutDialog.cpp - implementation of about-dialog
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -26,14 +26,14 @@
 #include "lmmsversion.h"
 #include "AboutDialog.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "versioninfo.h"
 
 
 
-aboutDialog::aboutDialog() :
-	QDialog( engine::mainWindow() ),
+AboutDialog::AboutDialog() :
+	QDialog( Engine::mainWindow() ),
 	Ui::AboutDialog()
 {
 	setupUi( this );

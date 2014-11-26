@@ -24,15 +24,15 @@
  */
 
 #include "RingBuffer.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include <string.h>
 #include "MixHelpers.h"
 
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
-	m_fpp( engine::mixer()->framesPerPeriod() ),
-	m_samplerate( engine::mixer()->processingSampleRate() ),
+	m_fpp( Engine::mixer()->framesPerPeriod() ),
+	m_samplerate( Engine::mixer()->processingSampleRate() ),
 	m_size( size + m_fpp )
 {
 	m_buffer = new sampleFrame[ m_size ];
@@ -41,8 +41,8 @@ RingBuffer::RingBuffer( f_cnt_t size ) :
 
 
 RingBuffer::RingBuffer( float size ) : 
-	m_fpp( engine::mixer()->framesPerPeriod() ),
-	m_samplerate( engine::mixer()->processingSampleRate() )
+	m_fpp( Engine::mixer()->framesPerPeriod() ),
+	m_samplerate( Engine::mixer()->processingSampleRate() )
 {
 	m_size = msToFrames( size ) + m_fpp;
 	m_buffer = new sampleFrame[ m_size ];
@@ -87,11 +87,11 @@ void RingBuffer::setSamplerateAware( bool b )
 {
 	if( b )
 	{
-		connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ), Qt::UniqueConnection );
+		connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ), Qt::UniqueConnection );
 	}
 	else
 	{
-		disconnect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+		disconnect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 	}
 }
 
@@ -274,9 +274,9 @@ void RingBuffer::writeAddingMultiplied( sampleFrame * src, float offset, f_cnt_t
 
 void RingBuffer::updateSamplerate()
 {
-	float newsize = static_cast<float>( ( m_size - m_fpp ) * engine::mixer()->processingSampleRate() ) / m_samplerate;
+	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::mixer()->processingSampleRate() ) / m_samplerate;
 	m_size = static_cast<f_cnt_t>( ceilf( newsize ) ) + m_fpp;
-	m_samplerate = engine::mixer()->processingSampleRate();
+	m_samplerate = Engine::mixer()->processingSampleRate();
 	delete m_buffer;
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );

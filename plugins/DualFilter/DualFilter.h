@@ -29,7 +29,7 @@
 
 #include "Effect.h"
 #include "DualFilterControls.h"
-#include "basic_filters.h"
+#include "BasicFilters.h"
 
 class DualFilterEffect : public Effect
 {
@@ -47,8 +47,8 @@ public:
 private:
 	DualFilterControls m_dfControls;
 
-	basicFilters<2> * m_filter1;
-	basicFilters<2> * m_filter2;
+	BasicFilters<2> * m_filter1;
+	BasicFilters<2> * m_filter2;
 	
 	bool m_filter1changed;
 	bool m_filter2changed;

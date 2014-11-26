@@ -25,7 +25,7 @@
 #ifndef PIANO_H
 #define PIANO_H
 
-#include "note.h"
+#include "Note.h"
 #include "Model.h"
 
 class InstrumentTrack;

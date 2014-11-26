@@ -32,14 +32,14 @@
 #include <samplerate.h>
 
 #include "audio_file_processor.h"
-#include "engine.h"
-#include "song.h"
+#include "Engine.h"
+#include "Song.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "interpolation.h"
 #include "gui_templates.h"
-#include "tooltip.h"
-#include "string_pair_drag.h"
+#include "ToolTip.h"
+#include "StringPairDrag.h"
 #include "DataFile.h"
 
 #include "embed.cpp"
@@ -285,7 +285,7 @@ QString audioFileProcessor::nodeName( void ) const
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
-			engine::mixer()->processingSampleRate() / engine::mixer()->baseSampleRate();
+			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
@@ -439,7 +439,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 								"artwork" ) );
 	}
 
-	m_openAudioFileButton = new pixmapButton( this );
+	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 227, 72 );
 	m_openAudioFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -448,7 +448,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openAudioFileButton, SIGNAL( clicked() ),
 					this, SLOT( openAudioFile() ) );
-	toolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
+	ToolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
 
 	m_openAudioFileButton->setWhatsThis(
 		tr( "Click here, if you want to open another audio-file. "
@@ -457,14 +457,14 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"amplify-value, and so on are not reset. So, it may not "
 			"sound like the original sample.") );
 
-	m_reverseButton = new pixmapButton( this );
+	m_reverseButton = new PixmapButton( this );
 	m_reverseButton->setCheckable( true );
 	m_reverseButton->move( 164, 105 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_on" ) );
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_off" ) );
-	toolTip::add( m_reverseButton, tr( "Reverse sample" ) );
+	ToolTip::add( m_reverseButton, tr( "Reverse sample" ) );
 	m_reverseButton->setWhatsThis(
 		tr( "If you enable this button, the whole sample is reversed. "
 			"This is useful for cool effects, e.g. a reversed "
@@ -472,39 +472,39 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 // loop button group
 
-	pixmapButton * m_loopOffButton = new pixmapButton( this );
+	PixmapButton * m_loopOffButton = new PixmapButton( this );
 	m_loopOffButton->setCheckable( true );
 	m_loopOffButton->move( 190, 105 );
 	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_off_on" ) );
 	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_off_off" ) );
-	toolTip::add( m_loopOffButton, tr( "Disable loop" ) );
+	ToolTip::add( m_loopOffButton, tr( "Disable loop" ) );
 	m_loopOffButton->setWhatsThis(
 		tr( "This button disables looping. "
 			"The sample plays only once from start to end. " ) );
 
 
-	pixmapButton * m_loopOnButton = new pixmapButton( this );
+	PixmapButton * m_loopOnButton = new PixmapButton( this );
 	m_loopOnButton->setCheckable( true );
 	m_loopOnButton->move( 190, 124 );
 	m_loopOnButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_on_on" ) );
 	m_loopOnButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_on_off" ) );
-	toolTip::add( m_loopOnButton, tr( "Enable loop" ) );
+	ToolTip::add( m_loopOnButton, tr( "Enable loop" ) );
 	m_loopOnButton->setWhatsThis(
 		tr( "This button enables forwards-looping. "
 			"The sample loops between the end point and the loop point." ) );
 
-	pixmapButton * m_loopPingPongButton = new pixmapButton( this );
+	PixmapButton * m_loopPingPongButton = new PixmapButton( this );
 	m_loopPingPongButton->setCheckable( true );
 	m_loopPingPongButton->move( 216, 124 );
 	m_loopPingPongButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_pingpong_on" ) );
 	m_loopPingPongButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_pingpong_off" ) );
-	toolTip::add( m_loopPingPongButton, tr( "Enable loop" ) );
+	ToolTip::add( m_loopPingPongButton, tr( "Enable loop" ) );
 	m_loopPingPongButton->setWhatsThis(
 		tr( "This button enables ping-pong-looping. "
 			"The sample loops backwards and forwards between the end point "
@@ -515,14 +515,14 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_loopGroup->addButton( m_loopOnButton );
 	m_loopGroup->addButton( m_loopPingPongButton );
 
-	m_stutterButton = new pixmapButton( this );
+	m_stutterButton = new PixmapButton( this );
 	m_stutterButton->setCheckable( true );
 	m_stutterButton->move( 164, 124 );
 	m_stutterButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"stutter_on" ) );
 	m_stutterButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"stutter_off" ) );
-	toolTip::add( m_stutterButton,
+	ToolTip::add( m_stutterButton,
 		tr( "Continue sample playback across notes" ) );
 	m_stutterButton->setWhatsThis(
 		tr( "Enabling this option makes the sample continue playing "
@@ -532,7 +532,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"playback to the start of the sample, insert a note at the bottom "
 			"of the keyboard (< 20 Hz)") );
 
-	m_ampKnob = new knob( knobBright_26, this );
+	m_ampKnob = new Knob( knobBright_26, this );
 	m_ampKnob->setVolumeKnob( true );
 	m_ampKnob->move( 5, 108 );
 	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
@@ -564,7 +564,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"the loop starts. " ) );
 
 // interpolation selector
-	m_interpBox = new comboBox( this );
+	m_interpBox = new ComboBox( this );
 	m_interpBox->setGeometry( 142, 62, 82, 22 );
 	m_interpBox->setFont( pointSize<8>( m_interpBox->font() ) );
 
@@ -597,10 +597,10 @@ AudioFileProcessorView::~AudioFileProcessorView()
 
 void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
 							Track::SampleTrack ) )
 		{
@@ -626,8 +626,8 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( value );
@@ -700,7 +700,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	if( af != "" )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 }
 
@@ -1239,7 +1239,7 @@ float AudioFileProcessorWaveView::knob::getValue( const QPoint & _p )
 	const double dec_fact = ! m_waveView ? 1 :
 		double( m_waveView->m_to - m_waveView->m_from )
 			/ m_waveView->m_sampleBuffer.frames();
-	const float inc = ::knob::getValue( _p ) * dec_fact;
+	const float inc = ::Knob::getValue( _p ) * dec_fact;
 
 	return inc;
 }

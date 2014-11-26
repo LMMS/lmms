@@ -34,23 +34,23 @@
 
 #include "gui_templates.h"
 #include "SampleTrack.h"
-#include "song.h"
+#include "Song.h"
 #include "embed.h"
-#include "engine.h"
-#include "tooltip.h"
+#include "Engine.h"
+#include "ToolTip.h"
 #include "AudioPort.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
-#include "string_pair_drag.h"
-#include "knob.h"
+#include "StringPairDrag.h"
+#include "Knob.h"
 #include "MainWindow.h"
 #include "EffectRackView.h"
-#include "track_label_button.h"
+#include "TrackLabelButton.h"
 #include "ConfigManager.h"
 
 
 SampleTCO::SampleTCO( Track * _track ) :
-	trackContentObject( _track ),
+	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer )
 {
 	saveJournallingState( false );
@@ -59,7 +59,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
 }
 
@@ -76,7 +76,7 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const MidiTime & _length )
 {
-	trackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
+	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
 }
 
 
@@ -130,7 +130,7 @@ void SampleTCO::updateLength( bpm_t )
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / engine::framesPerTick() );
+	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
 
 
@@ -178,7 +178,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 
 
 
-trackContentObjectView * SampleTCO::createView( trackView * _tv )
+TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
 {
 	return new SampleTCOView( this, _tv );
 }
@@ -192,8 +192,8 @@ trackContentObjectView * SampleTCO::createView( trackView * _tv )
 
 
 
-SampleTCOView::SampleTCOView( SampleTCO * _tco, trackView * _tv ) :
-	trackContentObjectView( _tco, _tv ),
+SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
+	TrackContentObjectView( _tco, _tv ),
 	m_tco( _tco )
 {
 	// update UI and tooltip
@@ -221,7 +221,7 @@ void SampleTCOView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
-	toolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
+	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
 					tr( "double-click to select sample" ) );
 }
@@ -267,10 +267,10 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 
 void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( stringPairDrag::processDragEnterEvent( _dee,
+	if( StringPairDrag::processDragEnterEvent( _dee,
 					"samplefile,sampledata" ) == false )
 	{
-		trackContentObjectView::dragEnterEvent( _dee );
+		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
 
@@ -279,23 +279,23 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleTCOView::dropEvent( QDropEvent * _de )
 {
-	if( stringPairDrag::decodeKey( _de ) == "samplefile" )
+	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
-		m_tco->setSampleFile( stringPairDrag::decodeValue( _de ) );
+		m_tco->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
 	}
-	else if( stringPairDrag::decodeKey( _de ) == "sampledata" )
+	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
 		m_tco->m_sampleBuffer->loadFromBase64(
-					stringPairDrag::decodeValue( _de ) );
+					StringPairDrag::decodeValue( _de ) );
 		m_tco->updateLength();
 		update();
 		_de->accept();
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 	else
 	{
-		trackContentObjectView::dropEvent( _de );
+		TrackContentObjectView::dropEvent( _de );
 	}
 }
 
@@ -312,7 +312,7 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		trackContentObjectView::mousePressEvent( _me );
+		TrackContentObjectView::mousePressEvent( _me );
 	}
 }
 
@@ -325,7 +325,7 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
 	{
 		m_tco->setSampleFile( af );
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 	}
 }
 
@@ -415,7 +415,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 
 SampleTrack::~SampleTrack()
 {
-	engine::mixer()->removePlayHandles( this );
+	Engine::mixer()->removePlayHandles( this );
 }
 
 
@@ -434,7 +434,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
-		trackContentObject * tco = getTCO( i );
+		TrackContentObject * tco = getTCO( i );
 		if( tco->startPosition() != _start )
 		{
 			continue;
@@ -445,7 +445,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			PlayHandle* handle;
 			if( st->isRecord() )
 			{
-				if( !engine::getSong()->isRecording() )
+				if( !Engine::getSong()->isRecording() )
 				{
 					return played_a_note;
 				}
@@ -462,7 +462,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 //			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
-			engine::mixer()->addPlayHandle( handle );
+			Engine::mixer()->addPlayHandle( handle );
 			played_a_note = true;
 		}
 	}
@@ -473,7 +473,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackView * SampleTrack::createView( TrackContainerView* tcv )
+TrackView * SampleTrack::createView( TrackContainerView* tcv )
 {
 	return new SampleTrackView( this, tcv );
 }
@@ -481,7 +481,7 @@ trackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * SampleTrack::createTCO( const MidiTime & )
+TrackContentObject * SampleTrack::createTCO( const MidiTime & )
 {
 	return new SampleTCO( this );
 }
@@ -526,11 +526,11 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
-	trackView( _t, tcv )
+	TrackView( _t, tcv )
 {
 	setFixedHeight( 32 );
 
-	trackLabelButton * tlb = new trackLabelButton( this,
+	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
 			this, SLOT( showEffects() ) );
@@ -538,7 +538,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	tlb->move( 3, 1 );
 	tlb->show();
 
-	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
@@ -558,7 +558,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
 
-	m_effWindow = engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
+	m_effWindow = Engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
  	m_effWindow->setWindowTitle( _t->name() );
@@ -599,7 +599,7 @@ void SampleTrackView::modelChanged()
 	SampleTrack * st = castModel<SampleTrack>();
 	m_volumeKnob->setModel( &st->m_volumeModel );
 
-	trackView::modelChanged();
+	TrackView::modelChanged();
 }
 
 

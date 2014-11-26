@@ -33,11 +33,11 @@
 #include <QMdiSubWindow>
 
 #include "FileBrowser.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "debug.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -46,9 +46,9 @@
 #include "DataFile.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
-#include "song.h"
-#include "string_pair_drag.h"
-#include "text_float.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "TextFloat.h"
 
 
 
@@ -415,7 +415,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		m_pphMutex.lock();
 		if( m_previewPlayHandle != NULL )
 		{
-			engine::mixer()->removePlayHandle(
+			Engine::mixer()->removePlayHandle(
 							m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
@@ -424,7 +424,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		// handling() rather than directly creating a SamplePlayHandle
 		if( f->type() == FileItem::SampleFile )
 		{
-			textFloat * tf = textFloat::displayMessage(
+			TextFloat * tf = TextFloat::displayMessage(
 					tr( "Loading sample" ),
 					tr( "Please wait, loading sample for "
 								"preview..." ),
@@ -446,7 +446,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		}
 		if( m_previewPlayHandle != NULL )
 		{
-			if( !engine::mixer()->addPlayHandle(
+			if( !Engine::mixer()->addPlayHandle(
 							m_previewPlayHandle ) )
 			{
 				m_previewPlayHandle = NULL;
@@ -474,29 +474,29 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 			switch( f->type() )
 			{
 				case FileItem::PresetFile:
-	new stringPairDrag( f->handling() == FileItem::LoadAsPreset ?
+	new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
 					"presetfile" : "pluginpresetfile",
 				f->fullName(),
 				embed::getIconPixmap( "preset_file" ), this );
 					break;
 
 				case FileItem::SampleFile:
-	new stringPairDrag( "samplefile", f->fullName(),
+	new StringPairDrag( "samplefile", f->fullName(),
 				embed::getIconPixmap( "sample_file" ), this );
 					break;
 				case FileItem::SoundFontFile:
- 	new stringPairDrag( "soundfontfile", f->fullName(),
+ 	new StringPairDrag( "soundfontfile", f->fullName(),
  				embed::getIconPixmap( "soundfont_file" ), this );
  					break;
 				case FileItem::VstPluginFile:
-	new stringPairDrag( "vstpluginfile", f->fullName(),
+	new StringPairDrag( "vstpluginfile", f->fullName(),
 				embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
 				case FileItem::MidiFile:
 // don't allow dragging FLP-files as FLP import filter clears project
 // without asking
 //				case fileItem::FlpFile:
-	new stringPairDrag( "importedproject", f->fullName(),
+	new StringPairDrag( "importedproject", f->fullName(),
 				embed::getIconPixmap( "midi_file" ), this );
 					break;
 
@@ -524,7 +524,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(
 							m_previewPlayHandle );
 			if( s && s->totalFrames() - s->framesDone() <=
-				static_cast<f_cnt_t>( engine::mixer()->
+				static_cast<f_cnt_t>( Engine::mixer()->
 						processingSampleRate() * 3 ) )
 			{
 				s->setDoneMayReturnTrue( true );
@@ -533,7 +533,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 				return;
 			}
 		}
-		engine::mixer()->removePlayHandle( m_previewPlayHandle );
+		Engine::mixer()->removePlayHandle( m_previewPlayHandle );
 		m_previewPlayHandle = NULL;
 	}
 	m_pphMutex.unlock();
@@ -545,13 +545,13 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 {
-	engine::mixer()->lock();
+	Engine::mixer()->lock();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( engine::mainWindow()->mayChangeProject() )
+			if( Engine::mainWindow()->mayChangeProject() )
 			{
-				engine::getSong()->loadProject( f->fullName() );
+				Engine::getSong()->loadProject( f->fullName() );
 			}
 			break;
 
@@ -563,7 +563,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				i = it->loadInstrument(
-					engine::pluginFileHandling()[e] );
+					Engine::pluginFileHandling()[e] );
 			}
 			i->loadFile( f->fullName() );
 			break;
@@ -580,12 +580,12 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 
 		case FileItem::ImportAsProject:
 			if( f->type() == FileItem::FlpFile &&
-				!engine::mainWindow()->mayChangeProject() )
+				!Engine::mainWindow()->mayChangeProject() )
 			{
 				break;
 			}
 			ImportFilter::import( f->fullName(),
-							engine::getSong() );
+							Engine::getSong() );
 			break;
 
 		case FileItem::NotSupported:
@@ -593,7 +593,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			break;
 
 	}
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 }
 
 
@@ -618,7 +618,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 //		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
-					engine::getBBTrackContainer() ) );
+					Engine::getBBTrackContainer() ) );
 		handleFile( f, it );
 //		engine::mixer()->unlock();
 	}
@@ -645,7 +645,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 
 void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 {
-	openInNewInstrumentTrack( engine::getBBTrackContainer() );
+	openInNewInstrumentTrack( Engine::getBBTrackContainer() );
 }
 
 
@@ -653,7 +653,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 
 void FileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 {
-	openInNewInstrumentTrack( engine::getSong() );
+	openInNewInstrumentTrack( Engine::getSong() );
 }
 
 
@@ -663,7 +663,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			engine::mainWindow()->workspace()->
+			Engine::mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -988,7 +988,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( ext == "xiz" && engine::pluginFileHandling().contains( ext ) )
+	else if( ext == "xiz" && Engine::pluginFileHandling().contains( ext ) )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
@@ -1022,7 +1022,7 @@ void FileItem::determineFileType( void )
 	}
 
 	if( m_handling == NotSupported &&
-		!ext.isEmpty() && engine::pluginFileHandling().contains( ext ) )
+		!ext.isEmpty() && Engine::pluginFileHandling().contains( ext ) )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can

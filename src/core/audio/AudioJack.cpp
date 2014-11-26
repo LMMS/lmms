@@ -33,7 +33,7 @@
 #include <stdlib.h>
 
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "ConfigManager.h"
@@ -106,7 +106,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -115,7 +115,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "
@@ -259,7 +259,7 @@ void AudioJack::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		if( jack_get_sample_rate( m_client ) != sampleRate() )
 		{

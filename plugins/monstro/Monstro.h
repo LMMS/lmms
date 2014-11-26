@@ -30,11 +30,11 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
-#include "combobox.h"
+#include "PixmapButton.h"
+#include "ComboBox.h"
 #include "Oscillator.h"
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
@@ -44,7 +44,7 @@
 //
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobStyled, view ); 				\
+	name = new Knob( knobStyled, view ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( tr( hint ) + " ", unit );		\
 	name ->setObjectName( oname );						\
@@ -58,12 +58,12 @@
 	name ->setFixedSize( 20, 20 );
 
 #define maketinyled( name, x, y, ttip ) \
-	name = new pixmapButton( view, NULL ); 	\
+	name = new PixmapButton( view, NULL ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
-	toolTip::add( name, tr( ttip ) );
+	ToolTip::add( name, tr( ttip ) );
 
 // UI constants
 const int O1ROW = 22;
@@ -592,61 +592,61 @@ private:
 //                                  //
 //////////////////////////////////////
 
-	knob *	m_osc1VolKnob;
-	knob *	m_osc1PanKnob;
-	knob *	m_osc1CrsKnob;
-	knob *	m_osc1FtlKnob;
-	knob *	m_osc1FtrKnob;
-	knob *	m_osc1SpoKnob;
-	knob *	m_osc1PwKnob;
-	pixmapButton * m_osc1SSRButton;
-	pixmapButton * m_osc1SSFButton;
+	Knob *	m_osc1VolKnob;
+	Knob *	m_osc1PanKnob;
+	Knob *	m_osc1CrsKnob;
+	Knob *	m_osc1FtlKnob;
+	Knob *	m_osc1FtrKnob;
+	Knob *	m_osc1SpoKnob;
+	Knob *	m_osc1PwKnob;
+	PixmapButton * m_osc1SSRButton;
+	PixmapButton * m_osc1SSFButton;
 
-	knob *	m_osc2VolKnob;
-	knob *	m_osc2PanKnob;
-	knob *	m_osc2CrsKnob;
-	knob *	m_osc2FtlKnob;
-	knob *	m_osc2FtrKnob;
-	knob *	m_osc2SpoKnob;
-	comboBox *	m_osc2WaveBox;
-	pixmapButton * m_osc2SyncHButton;
-	pixmapButton * m_osc2SyncRButton;
+	Knob *	m_osc2VolKnob;
+	Knob *	m_osc2PanKnob;
+	Knob *	m_osc2CrsKnob;
+	Knob *	m_osc2FtlKnob;
+	Knob *	m_osc2FtrKnob;
+	Knob *	m_osc2SpoKnob;
+	ComboBox *	m_osc2WaveBox;
+	PixmapButton * m_osc2SyncHButton;
+	PixmapButton * m_osc2SyncRButton;
 
-	knob *	m_osc3VolKnob;
-	knob *	m_osc3PanKnob;
-	knob *	m_osc3CrsKnob;
-	knob *	m_osc3SpoKnob;
-	knob *	m_osc3SubKnob;
-	comboBox *	m_osc3Wave1Box;
-	comboBox *	m_osc3Wave2Box;
-	pixmapButton * m_osc3SyncHButton;
-	pixmapButton * m_osc3SyncRButton;
+	Knob *	m_osc3VolKnob;
+	Knob *	m_osc3PanKnob;
+	Knob *	m_osc3CrsKnob;
+	Knob *	m_osc3SpoKnob;
+	Knob *	m_osc3SubKnob;
+	ComboBox *	m_osc3Wave1Box;
+	ComboBox *	m_osc3Wave2Box;
+	PixmapButton * m_osc3SyncHButton;
+	PixmapButton * m_osc3SyncRButton;
 
-	comboBox *	m_lfo1WaveBox;
+	ComboBox *	m_lfo1WaveBox;
 	TempoSyncKnob *	m_lfo1AttKnob;
 	TempoSyncKnob *	m_lfo1RateKnob;
-	knob *	m_lfo1PhsKnob;
+	Knob *	m_lfo1PhsKnob;
 
-	comboBox *	m_lfo2WaveBox;
+	ComboBox *	m_lfo2WaveBox;
 	TempoSyncKnob *	m_lfo2AttKnob;
 	TempoSyncKnob *	m_lfo2RateKnob;
-	knob *	m_lfo2PhsKnob;
+	Knob *	m_lfo2PhsKnob;
 
 	TempoSyncKnob *	m_env1PreKnob;
 	TempoSyncKnob *	m_env1AttKnob;
 	TempoSyncKnob *	m_env1HoldKnob;
 	TempoSyncKnob *	m_env1DecKnob;
-	knob *	m_env1SusKnob;
+	Knob *	m_env1SusKnob;
 	TempoSyncKnob *	m_env1RelKnob;
-	knob *	m_env1SlopeKnob;
+	Knob *	m_env1SlopeKnob;
 
 	TempoSyncKnob *	m_env2PreKnob;
 	TempoSyncKnob *	m_env2AttKnob;
 	TempoSyncKnob *	m_env2HoldKnob;
 	TempoSyncKnob *	m_env2DecKnob;
-	knob *	m_env2SusKnob;
+	Knob *	m_env2SusKnob;
 	TempoSyncKnob *	m_env2RelKnob;
-	knob *	m_env2SlopeKnob;
+	Knob *	m_env2SlopeKnob;
 
 	automatableButtonGroup * m_o23ModGroup;
 
@@ -661,60 +661,60 @@ private:
 //                             //
 /////////////////////////////////
 
-	knob * 	m_vol1env1Knob;
-	knob *	m_vol1env2Knob;
-	knob *	m_vol1lfo1Knob;
-	knob *	m_vol1lfo2Knob;
+	Knob * 	m_vol1env1Knob;
+	Knob *	m_vol1env2Knob;
+	Knob *	m_vol1lfo1Knob;
+	Knob *	m_vol1lfo2Knob;
 
-	knob * 	m_vol2env1Knob;
-	knob *	m_vol2env2Knob;
-	knob *	m_vol2lfo1Knob;
-	knob *	m_vol2lfo2Knob;
+	Knob * 	m_vol2env1Knob;
+	Knob *	m_vol2env2Knob;
+	Knob *	m_vol2lfo1Knob;
+	Knob *	m_vol2lfo2Knob;
 
-	knob * 	m_vol3env1Knob;
-	knob *	m_vol3env2Knob;
-	knob *	m_vol3lfo1Knob;
-	knob *	m_vol3lfo2Knob;
+	Knob * 	m_vol3env1Knob;
+	Knob *	m_vol3env2Knob;
+	Knob *	m_vol3lfo1Knob;
+	Knob *	m_vol3lfo2Knob;
 
-	knob * 	m_phs1env1Knob;
-	knob *	m_phs1env2Knob;
-	knob *	m_phs1lfo1Knob;
-	knob *	m_phs1lfo2Knob;
+	Knob * 	m_phs1env1Knob;
+	Knob *	m_phs1env2Knob;
+	Knob *	m_phs1lfo1Knob;
+	Knob *	m_phs1lfo2Knob;
 
-	knob * 	m_phs2env1Knob;
-	knob *	m_phs2env2Knob;
-	knob *	m_phs2lfo1Knob;
-	knob *	m_phs2lfo2Knob;
+	Knob * 	m_phs2env1Knob;
+	Knob *	m_phs2env2Knob;
+	Knob *	m_phs2lfo1Knob;
+	Knob *	m_phs2lfo2Knob;
 
-	knob * 	m_phs3env1Knob;
-	knob *	m_phs3env2Knob;
-	knob *	m_phs3lfo1Knob;
-	knob *	m_phs3lfo2Knob;
+	Knob * 	m_phs3env1Knob;
+	Knob *	m_phs3env2Knob;
+	Knob *	m_phs3lfo1Knob;
+	Knob *	m_phs3lfo2Knob;
 
-	knob * 	m_pit1env1Knob;
-	knob *	m_pit1env2Knob;
-	knob *	m_pit1lfo1Knob;
-	knob *	m_pit1lfo2Knob;
+	Knob * 	m_pit1env1Knob;
+	Knob *	m_pit1env2Knob;
+	Knob *	m_pit1lfo1Knob;
+	Knob *	m_pit1lfo2Knob;
 
-	knob * 	m_pit2env1Knob;
-	knob *	m_pit2env2Knob;
-	knob *	m_pit2lfo1Knob;
-	knob *	m_pit2lfo2Knob;
+	Knob * 	m_pit2env1Knob;
+	Knob *	m_pit2env2Knob;
+	Knob *	m_pit2lfo1Knob;
+	Knob *	m_pit2lfo2Knob;
 
-	knob * 	m_pit3env1Knob;
-	knob *	m_pit3env2Knob;
-	knob *	m_pit3lfo1Knob;
-	knob *	m_pit3lfo2Knob;
+	Knob * 	m_pit3env1Knob;
+	Knob *	m_pit3env2Knob;
+	Knob *	m_pit3lfo1Knob;
+	Knob *	m_pit3lfo2Knob;
 
-	knob * 	m_pw1env1Knob;
-	knob *	m_pw1env2Knob;
-	knob *	m_pw1lfo1Knob;
-	knob *	m_pw1lfo2Knob;
+	Knob * 	m_pw1env1Knob;
+	Knob *	m_pw1env2Knob;
+	Knob *	m_pw1lfo1Knob;
+	Knob *	m_pw1lfo2Knob;
 
-	knob * 	m_sub3env1Knob;
-	knob *	m_sub3env2Knob;
-	knob *	m_sub3lfo1Knob;
-	knob *	m_sub3lfo2Knob;
+	Knob * 	m_sub3env1Knob;
+	Knob *	m_sub3env2Knob;
+	Knob *	m_sub3lfo1Knob;
+	Knob *	m_sub3lfo2Knob;
 
 };
 
