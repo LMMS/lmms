@@ -1,5 +1,5 @@
 /*
- * automatable_button.h - class automatableButton, the base for all buttons
+ * AutomatableButton.h - class automatableButton, the base for all buttons
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -34,13 +34,13 @@
 class automatableButtonGroup;
 
 
-class EXPORT automatableButton : public QPushButton, public BoolModelView
+class EXPORT AutomatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
-	automatableButton( QWidget * _parent, const QString & _name
+	AutomatableButton( QWidget * _parent, const QString & _name
 			= QString::null );
-	virtual ~automatableButton();
+	virtual ~AutomatableButton();
 
 	inline void setCheckable( bool _on )
 	{
@@ -87,10 +87,10 @@ public:
 			= QString::null );
 	virtual ~automatableButtonGroup();
 
-	void addButton( automatableButton * _btn );
-	void removeButton( automatableButton * _btn );
+	void addButton( AutomatableButton * _btn );
+	void removeButton( AutomatableButton * _btn );
 
-	void activateButton( automatableButton * _btn );
+	void activateButton( AutomatableButton * _btn );
 
 	virtual void modelChanged();
 
@@ -100,7 +100,7 @@ private slots:
 
 
 private:
-	QList<automatableButton *> m_buttons;
+	QList<AutomatableButton *> m_buttons;
 
 } ;
 

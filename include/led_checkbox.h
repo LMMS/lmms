@@ -26,13 +26,13 @@
 #ifndef LED_CHECKBOX_H
 #define LED_CHECKBOX_H
 
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 
 
 class QPixmap;
 
 
-class EXPORT ledCheckBox : public automatableButton
+class EXPORT ledCheckBox : public AutomatableButton
 {
 	Q_OBJECT
 public:

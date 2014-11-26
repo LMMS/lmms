@@ -28,7 +28,7 @@
 #include <QPainter>
 
 #include "TripleOscillator.h"
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 #include "debug.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"

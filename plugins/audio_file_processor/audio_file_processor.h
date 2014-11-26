@@ -34,7 +34,7 @@
 #include "SampleBuffer.h"
 #include "knob.h"
 #include "pixmap_button.h"
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 #include "combobox.h"
 
 

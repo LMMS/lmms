@@ -29,7 +29,7 @@
  */
 
 #include "lb302.h"
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"

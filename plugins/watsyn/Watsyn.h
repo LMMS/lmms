@@ -30,7 +30,7 @@
 #include "InstrumentView.h"
 #include "graph.h"
 #include "AutomatableModel.h"
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
 #include "pixmap_button.h"

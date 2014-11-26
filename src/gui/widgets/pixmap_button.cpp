@@ -34,7 +34,7 @@
 
 
 pixmapButton::pixmapButton( QWidget * _parent, const QString & _name ) :
-	automatableButton( _parent, _name ),
+	AutomatableButton( _parent, _name ),
 	m_activePixmap(),
 	m_inactivePixmap(),
 	m_pressed( false )
@@ -83,7 +83,7 @@ void pixmapButton::mousePressEvent( QMouseEvent * _me )
 		update();
 	}
 
-	automatableButton::mousePressEvent( _me );
+	AutomatableButton::mousePressEvent( _me );
 }
 
 
@@ -91,7 +91,7 @@ void pixmapButton::mousePressEvent( QMouseEvent * _me )
 
 void pixmapButton::mouseReleaseEvent( QMouseEvent * _me )
 {
-	automatableButton::mouseReleaseEvent( _me );
+	AutomatableButton::mouseReleaseEvent( _me );
 
 	if( !isCheckable() )
 	{

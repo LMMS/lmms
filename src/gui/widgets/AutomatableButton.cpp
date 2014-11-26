@@ -1,5 +1,5 @@
 /*
- * automatable_button.cpp - implementation of class automatableButton and
+ * AutomatableButton.cpp - implementation of class automatableButton and
  *                          automatableButtonGroup
  *
  * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,7 +23,7 @@
  *
  */
 
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 
 #include <QCursor>
 #include <QMouseEvent>
@@ -36,7 +36,7 @@
 
 
 
-automatableButton::automatableButton( QWidget * _parent,
+AutomatableButton::AutomatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
 	BoolModelView( new BoolModel( false, NULL, _name, true ), this ),
@@ -50,7 +50,7 @@ automatableButton::automatableButton( QWidget * _parent,
 
 
 
-automatableButton::~automatableButton()
+AutomatableButton::~AutomatableButton()
 {
 	if( m_group != NULL )
 	{
@@ -61,7 +61,7 @@ automatableButton::~automatableButton()
 
 
 
-void automatableButton::modelChanged()
+void AutomatableButton::modelChanged()
 {
 	if( QPushButton::isChecked() != model()->value() )
 	{
@@ -72,7 +72,7 @@ void automatableButton::modelChanged()
 
 
 
-void automatableButton::update()
+void AutomatableButton::update()
 {
 	if( QPushButton::isChecked() != model()->value() )
 	{
@@ -84,7 +84,7 @@ void automatableButton::update()
 
 
 
-void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
+void AutomatableButton::contextMenuEvent( QContextMenuEvent * _me )
 {
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
@@ -110,7 +110,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 
 
 
-void automatableButton::mousePressEvent( QMouseEvent * _me )
+void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 			! ( _me->modifiers() & Qt::ControlModifier ) )
@@ -147,7 +147,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 
 
 
-void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
+void AutomatableButton::mouseReleaseEvent( QMouseEvent * _me )
 {
 	if( _me && _me->button() == Qt::LeftButton )
 	{
@@ -158,7 +158,7 @@ void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void automatableButton::toggle()
+void AutomatableButton::toggle()
 {
 	if( isCheckable() && m_group != NULL )
 	{
@@ -194,7 +194,7 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 
 automatableButtonGroup::~automatableButtonGroup()
 {
-	for( QList<automatableButton *>::iterator it = m_buttons.begin();
+	for( QList<AutomatableButton *>::iterator it = m_buttons.begin();
 					it != m_buttons.end(); ++it )
 	{
 		( *it )->m_group = NULL;
@@ -204,7 +204,7 @@ automatableButtonGroup::~automatableButtonGroup()
 
 
 
-void automatableButtonGroup::addButton( automatableButton * _btn )
+void automatableButtonGroup::addButton( AutomatableButton * _btn )
 {
 	_btn->m_group = this;
 	_btn->setCheckable( true );
@@ -221,7 +221,7 @@ void automatableButtonGroup::addButton( automatableButton * _btn )
 
 
 
-void automatableButtonGroup::removeButton( automatableButton * _btn )
+void automatableButtonGroup::removeButton( AutomatableButton * _btn )
 {
 	m_buttons.erase( qFind( m_buttons.begin(), m_buttons.end(), _btn ) );
 	_btn->m_group = NULL;
@@ -230,13 +230,13 @@ void automatableButtonGroup::removeButton( automatableButton * _btn )
 
 
 
-void automatableButtonGroup::activateButton( automatableButton * _btn )
+void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 {
 	if( _btn != m_buttons[model()->value()] &&
 					m_buttons.indexOf( _btn ) != -1 )
 	{
 		model()->setValue( m_buttons.indexOf( _btn ) );
-		foreach( automatableButton * btn, m_buttons )
+		foreach( AutomatableButton * btn, m_buttons )
 		{
 			btn->update();
 		}
@@ -261,7 +261,7 @@ void automatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
-	foreach( automatableButton * btn, m_buttons )
+	foreach( AutomatableButton * btn, m_buttons )
 	{
 		btn->model()->setValue( i == model()->value() );
 		++i;

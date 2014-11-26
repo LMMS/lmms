@@ -28,10 +28,10 @@
 
 #include <QPixmap>
 
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 
 
-class EXPORT pixmapButton : public automatableButton
+class EXPORT pixmapButton : public AutomatableButton
 {
 	Q_OBJECT
 public:
