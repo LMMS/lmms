@@ -30,15 +30,15 @@
 
 #include "FileDialog.h"
 #include "sf2_player.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "NotePlayHandle.h"
-#include "knob.h"
-#include "song.h"
+#include "Knob.h"
+#include "Song.h"
 
 #include "patches_dialog.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.cpp"
@@ -119,7 +119,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_synth = new_fluid_synth( m_settings );
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	engine::mixer()->addPlayHandle( iph );
+	Engine::mixer()->addPlayHandle( iph );
 
 	loadFile( ConfigManager::inst()->defaultSoundfont() );
 
@@ -133,7 +133,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
 	// Gain
 	connect( &m_gain, SIGNAL( dataChanged() ), this, SLOT( updateGain() ) );
@@ -158,7 +158,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 sf2Instrument::~sf2Instrument()
 {
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
@@ -466,7 +466,7 @@ void sf2Instrument::updateSampleRate()
 	double tempRate;
 
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", engine::mixer()->processingSampleRate() );
+	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::mixer()->processingSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
@@ -496,7 +496,7 @@ void sf2Instrument::updateSampleRate()
 	}
 
 	m_synthMutex.lock();
-	if( engine::mixer()->currentQualitySettings().interpolation >=
+	if( Engine::mixer()->currentQualitySettings().interpolation >=
 			Mixer::qualitySettings::Interpolation_SincFastest )
 	{
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
@@ -506,7 +506,7 @@ void sf2Instrument::updateSampleRate()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < engine::mixer()->processingSampleRate() )
+	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
 		if( m_srcState != NULL )
@@ -514,7 +514,7 @@ void sf2Instrument::updateSampleRate()
 			src_delete( m_srcState );
 		}
 		int error;
-		m_srcState = src_new( engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
+		m_srcState = src_new( Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
 		if( m_srcState == NULL || error )
 		{
 			qCritical( "error while creating libsamplerate data structure in Sf2Instrument::updateSampleRate()" );
@@ -642,7 +642,7 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
@@ -723,10 +723,10 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
-	if( m_internalSampleRate < engine::mixer()->processingSampleRate() &&
+	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() &&
 							m_srcState != NULL )
 	{
-		const fpp_t f = frames * m_internalSampleRate / engine::mixer()->processingSampleRate();
+		const fpp_t f = frames * m_internalSampleRate / Engine::mixer()->processingSampleRate();
 #ifdef __GNUC__
 		sampleFrame tmp[f];
 #else
@@ -789,11 +789,11 @@ PluginView * sf2Instrument::instantiateView( QWidget * _parent )
 
 
 
-class sf2Knob : public knob
+class sf2Knob : public Knob
 {
 public:
 	sf2Knob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 31, 38 );
 	}
@@ -813,7 +813,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	connect( &k->m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
 
 	// File Button
-	m_fileDialogButton = new pixmapButton( this );
+	m_fileDialogButton = new PixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
 	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
@@ -821,12 +821,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	toolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
 
 	m_fileDialogButton->setWhatsThis( tr( "Click here to open another SF2 file" ) );
 
 	// Patch Button
-	m_patchDialogButton = new pixmapButton( this );
+	m_patchDialogButton = new PixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
@@ -835,7 +835,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
 
 
 	// LCDs
@@ -878,12 +878,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 //	hl = new QHBoxLayout();
 
 
-	m_reverbButton = new pixmapButton( this );
+	m_reverbButton = new PixmapButton( this );
 	m_reverbButton->setCheckable( true );
 	m_reverbButton->move( 14, 180 );
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_on" ) );
 	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_off" ) );
-	toolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
+	ToolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
 	m_reverbButton->setWhatsThis(
 		tr( "This button enables the reverb effect. "
 			"This is useful for cool effects, but only works on "
@@ -918,12 +918,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	// Chorus
 //	hl = new QHBoxLayout();
 
-	m_chorusButton = new pixmapButton( this );
+	m_chorusButton = new PixmapButton( this );
 	m_chorusButton->setCheckable( true );
 	m_chorusButton->move( 14, 226 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
-	toolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
+	ToolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
 	m_chorusButton->setWhatsThis(
 		tr( "This button enables the chorus effect. "
 			"This is useful for cool echo effects, but only works on "
@@ -1085,7 +1085,7 @@ void sf2InstrumentView::showFileDialog()
 		if( f != "" )
 		{
 			k->openFile( f );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 

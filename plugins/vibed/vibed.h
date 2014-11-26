@@ -26,10 +26,10 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "graph.h"
-#include "knob.h"
-#include "pixmap_button.h"
-#include "led_checkbox.h"
+#include "Graph.h"
+#include "Knob.h"
+#include "PixmapButton.h"
+#include "LedCheckbox.h"
 #include "nine_button_selector.h"
 
 class vibedView;
@@ -110,31 +110,31 @@ private:
 
 
 	// String-related
-	knob * m_pickKnob;
-	knob * m_pickupKnob;
-	knob * m_stiffnessKnob;
-	knob * m_volumeKnob;
-	knob * m_panKnob;
-	knob * m_detuneKnob;
-	knob * m_randomKnob;
-	knob * m_lengthKnob;
-	graph * m_graph;
+	Knob * m_pickKnob;
+	Knob * m_pickupKnob;
+	Knob * m_stiffnessKnob;
+	Knob * m_volumeKnob;
+	Knob * m_panKnob;
+	Knob * m_detuneKnob;
+	Knob * m_randomKnob;
+	Knob * m_lengthKnob;
+	Graph * m_graph;
 	nineButtonSelector * m_harmonic;
-	ledCheckBox * m_impulse;
-	ledCheckBox * m_power;
+	LedCheckBox * m_impulse;
+	LedCheckBox * m_power;
 
 	// Not in model
 	nineButtonSelector * m_stringSelector;
-	pixmapButton * m_smoothBtn;
-	pixmapButton * m_normalizeBtn;
+	PixmapButton * m_smoothBtn;
+	PixmapButton * m_normalizeBtn;
 
 	// From impulse editor
-	pixmapButton * m_sinWaveBtn;
-	pixmapButton * m_triangleWaveBtn;
-	pixmapButton * m_sqrWaveBtn;
-	pixmapButton * m_sawWaveBtn;
-	pixmapButton * m_whiteNoiseWaveBtn;
-	pixmapButton * m_usrWaveBtn;
+	PixmapButton * m_sinWaveBtn;
+	PixmapButton * m_triangleWaveBtn;
+	PixmapButton * m_sqrWaveBtn;
+	PixmapButton * m_sawWaveBtn;
+	PixmapButton * m_whiteNoiseWaveBtn;
+	PixmapButton * m_usrWaveBtn;
 
 
 };

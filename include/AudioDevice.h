@@ -30,7 +30,7 @@
 #include <QtCore/QThread>
 
 #include "Mixer.h"
-#include "tab_widget.h"
+#include "TabWidget.h"
 
 
 class AudioPort;
@@ -90,12 +90,12 @@ public:
 
 
 
-	class setupWidget : public tabWidget
+	class setupWidget : public TabWidget
 	{
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
-			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-					tabWidget::tr( _caption.toLatin1() ) ).
+			TabWidget( TabWidget::tr( "Settings for %1" ).arg(
+					TabWidget::tr( _caption.toLatin1() ) ).
 							toUpper(), _parent )
 		{
 		}

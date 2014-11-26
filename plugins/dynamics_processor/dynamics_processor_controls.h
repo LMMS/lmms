@@ -28,8 +28,8 @@
 
 #include "EffectControls.h"
 #include "dynamics_processor_control_dialog.h"
-#include "knob.h"
-#include "graph.h"
+#include "Knob.h"
+#include "Graph.h"
 
 class dynProcEffect;
 

@@ -28,7 +28,7 @@
 #ifndef _LADSPA_SUBPLUGIN_FEATURES_H
 #define _LADSPA_SUBPLUGIN_FEATURES_H
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 #include "Plugin.h"
 
 

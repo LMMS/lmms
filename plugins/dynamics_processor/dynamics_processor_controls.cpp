@@ -29,9 +29,9 @@
 #include "dynamics_processor_controls.h"
 #include "dynamics_processor.h"
 #include "base64.h"
-#include "graph.h"
-#include "engine.h"
-#include "song.h"
+#include "Graph.h"
+#include "Engine.h"
+#include "Song.h"
 
 
 #define onedB 1.1220184543019633f
@@ -48,7 +48,7 @@ dynProcControls::dynProcControls( dynProcEffect * _eff ) :
 {
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 
 	setDefaultShape();
 
@@ -63,7 +63,7 @@ void dynProcControls::sampleRateChanged()
 
 void dynProcControls::samplesChanged( int _begin, int _end)
 {
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -126,13 +126,13 @@ void dynProcControls::setDefaultShape()
 void dynProcControls::resetClicked()
 {
 	setDefaultShape();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void dynProcControls::smoothClicked()
 {
 	m_wavegraphModel.smoothNonCyclic();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void dynProcControls::addOneClicked()
@@ -141,7 +141,7 @@ void dynProcControls::addOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void dynProcControls::subOneClicked()
@@ -150,7 +150,7 @@ void dynProcControls::subOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 

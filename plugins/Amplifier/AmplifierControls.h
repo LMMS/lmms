@@ -28,7 +28,7 @@
 
 #include "EffectControls.h"
 #include "AmplifierControlDialog.h"
-#include "knob.h"
+#include "Knob.h"
 
 
 class AmplifierEffect;

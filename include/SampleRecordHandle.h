@@ -32,7 +32,7 @@
 #include "Mixer.h"
 #include "SampleBuffer.h"
 
-class bbTrack;
+class BBTrack;
 class SampleTCO;
 class Track;
 
@@ -62,7 +62,7 @@ private:
 	MidiTime m_minLength;
 
 	Track * m_track;
-	bbTrack * m_bbTrack;
+	BBTrack * m_bbTrack;
 	SampleTCO * m_tco;
 
 } ;

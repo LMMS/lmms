@@ -27,8 +27,8 @@
 #include <QObject>
 #include <QVector>
 
-#include "song.h"
-#include "engine.h"
+#include "Song.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "MidiClient.h"
 #include "MidiController.h"
@@ -38,7 +38,7 @@ MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			engine::mixer()->midiClient(), this, this, MidiPort::Input ),
+			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f )
 {
 	setSampleExact( true );

@@ -32,7 +32,7 @@
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
 
-class pixmapButton;
+class PixmapButton;
 
 
 #define MODES_16BIT	( 1 << 0 )
@@ -141,9 +141,9 @@ private:
 	patmanInstrument * m_pi;
 	QString m_displayFilename;
 
-	pixmapButton * m_openFileButton;
-	pixmapButton * m_loopButton;
-	pixmapButton * m_tuneButton;
+	PixmapButton * m_openFileButton;
+	PixmapButton * m_loopButton;
+	PixmapButton * m_tuneButton;
 
 } ;
 

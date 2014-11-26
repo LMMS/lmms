@@ -26,15 +26,15 @@
 
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
-#include "engine.h"
+#include "Engine.h"
 #include "embed.h"
 #include "ProjectJournal.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "TrackContainerView.h"
-#include "track_label_button.h"
-#include "song.h"
-#include "text_float.h"
-#include "bb_track_container.h"
+#include "TrackLabelButton.h"
+#include "Song.h"
+#include "TextFloat.h"
+#include "BBTrackContainer.h"
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
@@ -59,10 +59,10 @@ ProcessHandle * AutomationTrack::getProcessHandle()
 
 void AutomationProcessHandle::doProcessing()
 {
-	int tcoNum = engine::getSong()->playingTcoNum();
-	const tick_t start = engine::getSong()->periodStartTick();
-	const tick_t end = engine::getSong()->getTicks();
-	// TickOffsetHash * ticks = engine::getSong()->ticksThisPeriod(); // not yet...
+	int tcoNum = Engine::getSong()->playingTcoNum();
+	const tick_t start = Engine::getSong()->periodStartTick();
+	const tick_t end = Engine::getSong()->getTicks();
+	// TickOffsetHash * ticks = Engine::getSong()->ticksThisPeriod(); // not yet...
 	
 	if( m_track->isMuted() )
 	{
@@ -72,7 +72,7 @@ void AutomationProcessHandle::doProcessing()
 	tcoVector tcos;
 	if( tcoNum >= 0 )
 	{
-		trackContentObject * tco = m_track->getTCO( tcoNum );
+		TrackContentObject * tco = m_track->getTCO( tcoNum );
 		tcos.push_back( tco );
 	}
 	else
@@ -110,7 +110,7 @@ void AutomationTrack::addObject( AutomatableModel * obj, bool search_dup )
 		{
 			if( *it == obj )
 			{
-				textFloat::displayMessage( obj->displayName(), tr( "Model is already connected "
+				TextFloat::displayMessage( obj->displayName(), tr( "Model is already connected "
 												"to this track." ), embed::getIconPixmap( "automation" ), 2000 );
 				return;
 			}
@@ -215,8 +215,8 @@ void AutomationTrack::objectDestroyed( jo_id_t id )
 bool AutomationTrack::isAutomated( const AutomatableModel * m )
 {
 	TrackList l;
-	l += engine::getSong()->tracks();
-	l += engine::getBBTrackContainer()->tracks();
+	l += Engine::getSong()->tracks();
+	l += Engine::getBBTrackContainer()->tracks();
 
 	for( TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
@@ -242,8 +242,8 @@ bool AutomationTrack::isAutomated( const AutomatableModel * m )
 
 void AutomationTrack::resolveAllIDs()
 {
-	TrackList l = engine::getSong()->tracks() +
-				engine::getBBTrackContainer()->tracks();
+	TrackList l = Engine::getSong()->tracks() +
+				Engine::getBBTrackContainer()->tracks();
 	for( TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
@@ -256,7 +256,7 @@ void AutomationTrack::resolveAllIDs()
 				for( QVector<jo_id_t>::Iterator k = at->m_idsToResolve.begin();
 								k != at->m_idsToResolve.end(); ++k )
 				{
-					JournallingObject * o = engine::projectJournal()->
+					JournallingObject * o = Engine::projectJournal()->
 													journallingObject( *k );
 					if( o && dynamic_cast<AutomatableModel *>( o ) )
 					{
@@ -283,13 +283,13 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 	tcoVector tcos;
 	if( _tco_num >= 0 )
 	{
-		trackContentObject * tco = getTCO( _tco_num );
+		TrackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
 	}
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / engine::framesPerTick()) );
+					_frames / Engine::framesPerTick()) );
 	}
 
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
@@ -312,7 +312,7 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackView * AutomationTrack::createView( TrackContainerView* tcv )
+TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 {
 	return new AutomationTrackView( this, tcv );
 }
@@ -320,7 +320,7 @@ trackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
 {
 	return new AutomationPattern( this );
 }
@@ -373,10 +373,10 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
-	trackView( _at, tcv )
+	TrackView( _at, tcv )
 {
         setFixedHeight( 32 );
-	trackLabelButton * tlb = new trackLabelButton( this,
+	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
 	tlb->move( 3, 1 );
@@ -396,7 +396,7 @@ AutomationTrackView::~AutomationTrackView()
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
 
@@ -404,12 +404,12 @@ void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString val = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				engine::projectJournal()->
+				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
@@ -426,7 +426,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			trackContentObject * tco = getTrack()->createTCO( pos );
+			TrackContentObject * tco = getTrack()->createTCO( pos );
 			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
 			pat->movePosition( pos );

@@ -39,11 +39,11 @@ class QLineEdit;
 class QListView;
 class QScrollArea;
 class AutoDetectMidiController;
-class comboBox;
-class groupBox;
-class tabWidget;
+class ComboBox;
+class GroupBox;
+class TabWidget;
 class LcdSpinBox;
-class ledCheckBox;
+class LedCheckBox;
 class MidiPortMenu;
 
 
@@ -76,19 +76,19 @@ protected slots:
 
 private:
 	// Midi
-	groupBox * m_midiGroupBox;
+	GroupBox * m_midiGroupBox;
 	LcdSpinBox * m_midiChannelSpinBox;
 	LcdSpinBox * m_midiControllerSpinBox;
-	ledCheckBox * m_midiAutoDetectCheckBox;
+	LedCheckBox * m_midiAutoDetectCheckBox;
 	MidiPortMenu * m_readablePorts;
 	BoolModel m_midiAutoDetect;
 
 	// User
-	groupBox * m_userGroupBox;
-	comboBox * m_userController;
+	GroupBox * m_userGroupBox;
+	ComboBox * m_userController;
 
 	// Mapping
-	tabWidget * m_mappingBox;
+	TabWidget * m_mappingBox;
 	QLineEdit * m_mappingFunction;
 
 	Controller * m_controller;

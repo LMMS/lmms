@@ -30,8 +30,8 @@
 
 #include "peak_controller_effect_control_dialog.h"
 #include "peak_controller_effect_controls.h"
-#include "knob.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
 #include "embed.h"
 
 
@@ -50,32 +50,32 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 	QHBoxLayout * l = new QHBoxLayout;
 	l->setSpacing( 4 );
-	m_baseKnob = new knob( knobBright_26, this );
+	m_baseKnob = new Knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->setModel( &_controls->m_baseModel );
 	m_baseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
 
-	m_amountKnob = new knob( knobBright_26, this );
+	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 
-	m_amountMultKnob = new knob( knobBright_26, this );
+	m_amountMultKnob = new Knob( knobBright_26, this );
 	m_amountMultKnob->setLabel( tr( "MULT" ) );
 	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
 	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) + " ", "" );
 
-	m_attackKnob = new knob( knobBright_26, this );
+	m_attackKnob = new Knob( knobBright_26, this );
 	m_attackKnob->setLabel( tr( "ATCK" ) );
 	m_attackKnob->setModel( &_controls->m_attackModel );
 	m_attackKnob->setHintText( tr( "Attack:" ) + " ", "" );
 
-	m_decayKnob = new knob( knobBright_26, this );
+	m_decayKnob = new Knob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DCAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release:" ) + " ", "" );
 	
-	m_tresholdKnob = new knob( knobBright_26, this );
+	m_tresholdKnob = new Knob( knobBright_26, this );
 	m_tresholdKnob->setLabel( tr( "TRES" ) );
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
 	m_tresholdKnob->setHintText( tr( "Treshold:" ) + " ", "" );
@@ -91,10 +91,10 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 	QVBoxLayout * l2 = new QVBoxLayout; // = 2nd vbox
 
-	m_muteLed = new ledCheckBox( "Mute Effect", this );
+	m_muteLed = new LedCheckBox( "Mute Effect", this );
 	m_muteLed->setModel( &_controls->m_muteModel );
 
-	m_absLed = new ledCheckBox( "Absolute Value", this );
+	m_absLed = new LedCheckBox( "Absolute Value", this );
 	m_absLed->setModel( &_controls->m_absModel );
 
 	l2->addWidget( m_muteLed );

@@ -36,7 +36,7 @@
 #include "export.h"
 #include "MemoryManager.h"
 
-class engine;
+class Engine;
 
 
 const QString PROJECTS_PATH = "projects/";
@@ -221,7 +221,7 @@ private:
 	settingsMap m_settings;
 
 
-	friend class engine;
+	friend class Engine;
 
 } ;
 

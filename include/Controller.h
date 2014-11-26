@@ -27,7 +27,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "Model.h"
 #include "JournallingObject.h"

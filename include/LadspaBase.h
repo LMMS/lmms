@@ -26,7 +26,7 @@
 #ifndef LADSPA_BASE_H
 #define LADSPA_BASE_H
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 #include "Plugin.h"
 
 class LadspaControl;

@@ -58,8 +58,8 @@ dynProcEffect::dynProcEffect( Model * _parent,
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper( 64 * engine::mixer()->processingSampleRate() / 44100 );
-	m_rms[1] = new RmsHelper( 64 * engine::mixer()->processingSampleRate() / 44100 );
+	m_rms[0] = new RmsHelper( 64 * Engine::mixer()->processingSampleRate() / 44100 );
+	m_rms[1] = new RmsHelper( 64 * Engine::mixer()->processingSampleRate() / 44100 );
 	calcAttack();
 	calcRelease();
 }
@@ -76,12 +76,12 @@ dynProcEffect::~dynProcEffect()
 
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
+	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::mixer()->processingSampleRate() );
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / engine::mixer()->processingSampleRate() );
+	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::mixer()->processingSampleRate() );
 }
 
 
@@ -117,8 +117,8 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_needsUpdate )
 	{
-		m_rms[0]->setSize( 64 * engine::mixer()->processingSampleRate() / 44100 );
-		m_rms[1]->setSize( 64 * engine::mixer()->processingSampleRate() / 44100 );
+		m_rms[0]->setSize( 64 * Engine::mixer()->processingSampleRate() / 44100 );
+		m_rms[1]->setSize( 64 * Engine::mixer()->processingSampleRate() / 44100 );
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;

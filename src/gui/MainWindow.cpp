@@ -37,12 +37,12 @@
 
 #include "lmmsversion.h"
 #include "MainWindow.h"
-#include "bb_editor.h"
+#include "BBEditor.h"
 #include "SongEditor.h"
-#include "song.h"
+#include "Song.h"
 #include "PianoRoll.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "FxMixerView.h"
 #include "InstrumentTrack.h"
 #include "PianoView.h"
@@ -54,11 +54,11 @@
 #include "ConfigManager.h"
 #include "Mixer.h"
 #include "PluginView.h"
-#include "project_notes.h"
-#include "setup_dialog.h"
+#include "ProjectNotes.h"
+#include "SetupDialog.h"
 #include "AudioDummy.h"
 #include "ToolPlugin.h"
-#include "tool_button.h"
+#include "ToolButton.h"
 #include "ProjectJournal.h"
 #include "AutomationEditor.h"
 #include "templates.h"
@@ -200,7 +200,7 @@ MainWindow::MainWindow() :
 		m_autoSaveTimer.start(1000 * 60); // 1 minute
 	}
 
-	connect( engine::getSong(), SIGNAL( playbackStateChanged() ),
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
 }
 
@@ -218,7 +218,7 @@ MainWindow::~MainWindow()
 	}
 	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
-	engine::destroy();
+	Engine::destroy();
 }
 
 
@@ -267,16 +267,16 @@ void MainWindow::finalize()
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
-					engine::getSong(),
+					Engine::getSong(),
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					engine::getSong(),
+					Engine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport tracks..." ),
-					engine::getSong(),
+					Engine::getSong(),
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
@@ -349,13 +349,13 @@ void MainWindow::finalize()
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
-	toolButton * project_new = new toolButton(
+	ToolButton * project_new = new ToolButton(
 					embed::getIconPixmap( "project_new" ),
 					tr( "Create new project" ),
 					this, SLOT( createNewProject() ),
 							m_toolBar );
 
-	toolButton * project_new_from_template = new toolButton(
+	ToolButton * project_new_from_template = new ToolButton(
 			embed::getIconPixmap( "project_new_from_template" ),
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
@@ -367,37 +367,37 @@ void MainWindow::finalize()
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
 	project_new_from_template->setMenu( m_templatesMenu );
-	project_new_from_template->setPopupMode( toolButton::InstantPopup );
+	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
-	toolButton * project_open = new toolButton(
+	ToolButton * project_open = new ToolButton(
 					embed::getIconPixmap( "project_open" ),
 					tr( "Open existing project" ),
 					this, SLOT( openProject() ),
 								m_toolBar );
 
 
-	toolButton * project_open_recent = new toolButton(
+	ToolButton * project_open_recent = new ToolButton(
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened project" ),
 					this, SLOT( emptySlot() ), m_toolBar );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
-	project_open_recent->setPopupMode( toolButton::InstantPopup );
+	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
-	toolButton * project_save = new toolButton(
+	ToolButton * project_save = new ToolButton(
 					embed::getIconPixmap( "project_save" ),
 					tr( "Save current project" ),
 					this, SLOT( saveProject() ),
 								m_toolBar );
 
 
-	toolButton * project_export = new toolButton(
+	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					engine::getSong(),
+					Engine::getSong(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
-	toolButton * whatsthis = new toolButton(
+	ToolButton * whatsthis = new ToolButton(
 				embed::getIconPixmap( "whatsthis" ),
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ),
@@ -415,7 +415,7 @@ void MainWindow::finalize()
 
 
 	// window-toolbar
-	toolButton * song_editor_window = new toolButton(
+	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
 					tr( "Show/hide Song-Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
@@ -430,7 +430,7 @@ void MainWindow::finalize()
 			"rap samples) directly into the playlist." ) );
 
 
-	toolButton * bb_editor_window = new toolButton(
+	ToolButton * bb_editor_window = new ToolButton(
 					embed::getIconPixmap( "bb_track_btn" ),
 					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
@@ -446,7 +446,7 @@ void MainWindow::finalize()
 			"that." ) );
 
 
-	toolButton * piano_roll_window = new toolButton(
+	ToolButton * piano_roll_window = new ToolButton(
 						embed::getIconPixmap( "piano" ),
 						tr( "Show/hide Piano-Roll" ) +
 									" (F7)",
@@ -459,7 +459,7 @@ void MainWindow::finalize()
 				"you can edit melodies in an easy way."
 				) );
 
-	toolButton * automation_editor_window = new toolButton(
+	ToolButton * automation_editor_window = new ToolButton(
 					embed::getIconPixmap( "automation" ),
 					tr( "Show/hide Automation Editor" ) +
 									" (F8)",
@@ -474,7 +474,7 @@ void MainWindow::finalize()
 				"in an easy way."
 				) );
 
-	toolButton * fx_mixer_window = new toolButton(
+	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
 					tr( "Show/hide FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
@@ -486,7 +486,7 @@ void MainWindow::finalize()
 			"for managing effects for your song. You can insert "
 			"effects into different effect-channels." ) );
 
-	toolButton * project_notes_window = new toolButton(
+	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
 					tr( "Show/hide project notes" ) +
 								" (F10)",
@@ -498,7 +498,7 @@ void MainWindow::finalize()
 			"project notes window. In this window you can put "
 			"down your project notes.") );
 
-	toolButton * controllers_window = new toolButton(
+	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
 					tr( "Show/hide controller rack" ) +
 								" (F11)",
@@ -520,14 +520,14 @@ void MainWindow::finalize()
 	{
 		ConfigManager::inst()->setValue( "app", "configured", "1" );
 		// no, so show it that user can setup everything
-		setupDialog sd;
+		SetupDialog sd;
 		sd.exec();
 	}
 	// look whether mixer could use a audio-interface beside AudioDummy
-	else if( engine::mixer()->audioDevName() == AudioDummy::name() )
+	else if( Engine::mixer()->audioDevName() == AudioDummy::name() )
 	{
 		// no, so we offer setup-dialog with audio-settings...
-		setupDialog sd( setupDialog::AudioSettings );
+		SetupDialog sd( SetupDialog::AudioSettings );
 		sd.exec();
 	}
 }
@@ -564,16 +564,16 @@ void MainWindow::addSpacingToToolBar( int _size )
 void MainWindow::resetWindowTitle()
 {
 	QString title = "";
-	if( engine::getSong()->projectFileName() != "" )
+	if( Engine::getSong()->projectFileName() != "" )
 	{
-		title = QFileInfo( engine::getSong()->projectFileName()
+		title = QFileInfo( Engine::getSong()->projectFileName()
 							).completeBaseName();
 	}
 	if( title == "" )
 	{
 		title = tr( "Untitled" );
 	}
-	if( engine::getSong()->isModified() )
+	if( Engine::getSong()->isModified() )
 	{
 		title += '*';
 	}
@@ -585,9 +585,9 @@ void MainWindow::resetWindowTitle()
 
 bool MainWindow::mayChangeProject()
 {
-	engine::getSong()->stop();
+	Engine::getSong()->stop();
 
-	if( !engine::getSong()->isModified() )
+	if( !Engine::getSong()->isModified() )
 	{
 		return( true );
 	}
@@ -694,7 +694,7 @@ void MainWindow::createNewProject()
 {
 	if( mayChangeProject() )
 	{
-		engine::getSong()->createNewProject();
+		Engine::getSong()->createNewProject();
 	}
 }
 
@@ -709,7 +709,7 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 						>= m_custom_templates_count ?
 				ConfigManager::inst()->factoryProjectsDir() :
 				ConfigManager::inst()->userProjectsDir();
-		engine::getSong()->createNewProjectFromTemplate(
+		Engine::getSong()->createNewProjectFromTemplate(
 			dir_base + "templates/" + _idx->text() + ".mpt" );
 	}
 }
@@ -729,7 +729,7 @@ void MainWindow::openProject()
 						!ofd.selectedFiles().isEmpty() )
 		{
 			setCursor( Qt::WaitCursor );
-			engine::getSong()->loadProject(
+			Engine::getSong()->loadProject(
 						ofd.selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
@@ -759,7 +759,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 	{
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
-		engine::getSong()->loadProject( f );
+		Engine::getSong()->loadProject( f );
 		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
@@ -770,13 +770,13 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool MainWindow::saveProject()
 {
-	if( engine::getSong()->projectFileName() == "" )
+	if( Engine::getSong()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
 	else
 	{
-		engine::getSong()->guiSaveProject();
+		Engine::getSong()->guiSaveProject();
 	}
 	return( true );
 }
@@ -789,7 +789,7 @@ bool MainWindow::saveProjectAs()
 	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
 			tr( "LMMS Project (*.mmpz *.mmp);;"
 				"LMMS Project Template (*.mpt)" ) );
-	QString f = engine::getSong()->projectFileName();
+	QString f = Engine::getSong()->projectFileName();
 	if( f != "" )
 	{
 		sfd.setDirectory( QFileInfo( f ).absolutePath() );
@@ -803,7 +803,7 @@ bool MainWindow::saveProjectAs()
 	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-		engine::getSong()->guiSaveProjectAs(
+		Engine::getSong()->guiSaveProjectAs(
 						sfd.selectedFiles()[0] );
 		return( true );
 	}
@@ -815,7 +815,7 @@ bool MainWindow::saveProjectAs()
 
 bool MainWindow::saveProjectAsNewVersion()
 {
-	QString fileName = engine::getSong()->projectFileName();
+	QString fileName = Engine::getSong()->projectFileName();
 	if( fileName == "" )
 	{
 		return saveProjectAs();
@@ -825,7 +825,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		engine::getSong()->guiSaveProjectAs( fileName );
+		Engine::getSong()->guiSaveProjectAs( fileName );
 		return true;
 	}
 }
@@ -835,7 +835,7 @@ bool MainWindow::saveProjectAsNewVersion()
 
 void MainWindow::showSettingsDialog()
 {
-	setupDialog sd;
+	SetupDialog sd;
 	sd.exec();
 }
 
@@ -844,7 +844,7 @@ void MainWindow::showSettingsDialog()
 
 void MainWindow::aboutLMMS()
 {
-	aboutDialog().exec();
+	AboutDialog().exec();
 }
 
 
@@ -893,7 +893,7 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 
 void MainWindow::toggleBBEditorWin( bool forceShow )
 {
-	toggleWindow( engine::getBBEditor(), forceShow );
+	toggleWindow( Engine::getBBEditor(), forceShow );
 }
 
 
@@ -901,7 +901,7 @@ void MainWindow::toggleBBEditorWin( bool forceShow )
 
 void MainWindow::toggleSongEditorWin()
 {
-	toggleWindow( engine::songEditor() );
+	toggleWindow( Engine::songEditor() );
 }
 
 
@@ -909,7 +909,7 @@ void MainWindow::toggleSongEditorWin()
 
 void MainWindow::toggleProjectNotesWin()
 {
-	toggleWindow( engine::getProjectNotes() );
+	toggleWindow( Engine::getProjectNotes() );
 }
 
 
@@ -917,7 +917,7 @@ void MainWindow::toggleProjectNotesWin()
 
 void MainWindow::togglePianoRollWin()
 {
-	toggleWindow( engine::pianoRoll() );
+	toggleWindow( Engine::pianoRoll() );
 }
 
 
@@ -925,7 +925,7 @@ void MainWindow::togglePianoRollWin()
 
 void MainWindow::toggleAutomationEditorWin()
 {
-	toggleWindow( engine::automationEditor() );
+	toggleWindow( Engine::automationEditor() );
 }
 
 
@@ -933,7 +933,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleFxMixerWin()
 {
-	toggleWindow( engine::fxMixerView() );
+	toggleWindow( Engine::fxMixerView() );
 }
 
 
@@ -941,7 +941,7 @@ void MainWindow::toggleFxMixerWin()
 
 void MainWindow::toggleControllerRack()
 {
-	toggleWindow( engine::getControllerRackView() );
+	toggleWindow( Engine::getControllerRackView() );
 }
 
 
@@ -949,29 +949,29 @@ void MainWindow::toggleControllerRack()
 
 void MainWindow::updatePlayPauseIcons()
 {
-	engine::songEditor()->setPauseIcon( false );
-	engine::automationEditor()->setPauseIcon( false );
-	engine::getBBEditor()->setPauseIcon( false );
-	engine::pianoRoll()->setPauseIcon( false );
+	Engine::songEditor()->setPauseIcon( false );
+	Engine::automationEditor()->setPauseIcon( false );
+	Engine::getBBEditor()->setPauseIcon( false );
+	Engine::pianoRoll()->setPauseIcon( false );
 
-	if( engine::getSong()->isPlaying() )
+	if( Engine::getSong()->isPlaying() )
 	{
-		switch( engine::getSong()->playMode() )
+		switch( Engine::getSong()->playMode() )
 		{
-			case song::Mode_PlaySong:
-				engine::songEditor()->setPauseIcon( true );
+			case Song::Mode_PlaySong:
+				Engine::songEditor()->setPauseIcon( true );
 				break;
 
-			case song::Mode_PlayAutomationPattern:
-				engine::automationEditor()->setPauseIcon( true );
+			case Song::Mode_PlayAutomationPattern:
+				Engine::automationEditor()->setPauseIcon( true );
 				break;
 
-			case song::Mode_PlayBB:
-				engine::getBBEditor()->setPauseIcon( true );
+			case Song::Mode_PlayBB:
+				Engine::getBBEditor()->setPauseIcon( true );
 				break;
 
-			case song::Mode_PlayPattern:
-				engine::pianoRoll()->setPauseIcon( true );
+			case Song::Mode_PlayPattern:
+				Engine::pianoRoll()->setPauseIcon( true );
 				break;
 
 			default:
@@ -985,7 +985,7 @@ void MainWindow::updatePlayPauseIcons()
 
 void MainWindow::undo()
 {
-	engine::projectJournal()->undo();
+	Engine::projectJournal()->undo();
 }
 
 
@@ -993,7 +993,7 @@ void MainWindow::undo()
 
 void MainWindow::redo()
 {
-	engine::projectJournal()->redo();
+	Engine::projectJournal()->redo();
 }
 
 
@@ -1146,10 +1146,10 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !( engine::getSong()->isPlaying() ||
-			engine::getSong()->isExporting() ) )
+	if( !( Engine::getSong()->isPlaying() ||
+			Engine::getSong()->isExporting() ) )
 	{
-		engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 	}
 	else
 	{

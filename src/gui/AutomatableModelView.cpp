@@ -31,7 +31,7 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "MainWindow.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 
 
 
@@ -134,7 +134,7 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
 	{
-		new stringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
+		new StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
 	}
 	else if( event->button() == Qt::MidButton )
@@ -165,7 +165,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( (QWidget*) engine::mainWindow(), m );
+	ControllerConnectionDialog d( (QWidget*) Engine::mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{

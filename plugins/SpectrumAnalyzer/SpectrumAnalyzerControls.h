@@ -27,7 +27,7 @@
 
 #include "EffectControls.h"
 #include "SpectrumAnalyzerControlDialog.h"
-#include "knob.h"
+#include "Knob.h"
 
 
 class SpectrumAnalyzer;

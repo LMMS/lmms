@@ -30,12 +30,13 @@
 #include "DataFile.h"
 #include "AudioDevice.h"
 #include "ConfigManager.h"
-#include "ladspa_2_lmms.h"
+#include "Ladspa2LMMS.h"
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"
 #include "Mixer.h"
 #include "EffectChain.h"
 #include "AutomationPattern.h"
+#include "AutomationTrack.h"
 #include "ControllerConnection.h"
 #include "MemoryManager.h"
 #include "ValueBuffer.h"
@@ -71,10 +72,10 @@ LadspaEffect::LadspaEffect( Model * _parent,
 	m_maxSampleRate( 0 ),
 	m_key( LadspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
 	{
-		if( !engine::suppressMessages() )
+		if( !Engine::suppressMessages() )
 		{
 			QMessageBox::warning( 0, tr( "Effect" ), 
 				tr( "Unknown LADSPA plugin %1 requested." ).
@@ -89,7 +90,7 @@ LadspaEffect::LadspaEffect( Model * _parent,
 
 	pluginInstantiation();
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( changeSampleRate() ) );
 }
 
@@ -147,13 +148,13 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	sampleFrame * o_buf = NULL;
 	sampleFrame sBuf [_frames];
 
-	if( m_maxSampleRate < engine::mixer()->processingSampleRate() )
+	if( m_maxSampleRate < Engine::mixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
 		_buf = &sBuf[0];
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
-				engine::mixer()->processingSampleRate();
+				Engine::mixer()->processingSampleRate();
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
@@ -291,10 +292,10 @@ void LadspaEffect::pluginInstantiation()
 {
 	m_maxSampleRate = maxSamplerate( displayName() );
 
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
-	const ch_cnt_t lmms_chnls = engine::mixer()->audioDev()->channels();
+	const ch_cnt_t lmms_chnls = Engine::mixer()->audioDev()->channels();
 	int effect_channels = manager->getDescription( m_key )->inputChannels;
 	setProcessorCount( lmms_chnls / effect_channels );
 
@@ -329,7 +330,7 @@ void LadspaEffect::pluginInstantiation()
 					manager->isPortInput( m_key, port ) )
 				{
 					p->rate = CHANNEL_IN;
-					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+					p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
 					inbuf[ inputch ] = p->buffer;
 					inputch++;
 				}
@@ -344,7 +345,7 @@ void LadspaEffect::pluginInstantiation()
 					}
 					else
 					{
-						p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+						p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
 						m_inPlaceBroken = true;
 					}
 				}
@@ -352,12 +353,12 @@ void LadspaEffect::pluginInstantiation()
 				{
 					p->rate = AUDIO_RATE_INPUT;
 					p->control->setSampleExact( true );
-					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+					p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
 				}
 				else
 				{
 					p->rate = AUDIO_RATE_OUTPUT;
-					p->buffer = MM_ALLOC( LADSPA_Data, engine::mixer()->framesPerPeriod() );
+					p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
 				}
 			}
 			else
@@ -549,7 +550,7 @@ void LadspaEffect::pluginDestruction()
 
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
-		ladspa2LMMS * manager = engine::getLADSPAManager();
+		Ladspa2LMMS * manager = Engine::getLADSPAManager();
 		manager->deactivate( m_key, m_handles[proc] );
 		manager->cleanup( m_key, m_handles[proc] );
 		for( int port = 0; port < m_portCount; port++ )
@@ -588,7 +589,7 @@ sample_rate_t LadspaEffect::maxSamplerate( const QString & _name )
 	{
 		return( __buggy_plugins[_name] );
 	}
-	return( engine::mixer()->processingSampleRate() );
+	return( Engine::mixer()->processingSampleRate() );
 }
 
 

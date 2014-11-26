@@ -54,9 +54,9 @@
 #include "base64.h"
 #include "ConfigManager.h"
 #include "debug.h"
-#include "drumsynth.h"
+#include "DrumSynth.h"
 #include "endian_handling.h"
-#include "engine.h"
+#include "Engine.h"
 #include "interpolation.h"
 #include "templates.h"
 
@@ -78,13 +78,13 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( engine::mixer()->baseSampleRate() )
+	m_sampleRate( Engine::mixer()->baseSampleRate() )
 {
 	if( _is_base64_data == true )
 	{
 		loadFromBase64( _audio_file );
 	}
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -104,7 +104,7 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( engine::mixer()->baseSampleRate() )
+	m_sampleRate( Engine::mixer()->baseSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -112,7 +112,7 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -132,7 +132,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( engine::mixer()->baseSampleRate() )
+	m_sampleRate( Engine::mixer()->baseSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -140,7 +140,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
 }
 
@@ -194,7 +194,7 @@ void SampleBuffer::update( bool _keep_settings )
 		int_sample_t * buf = NULL;
 		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = engine::mixer()->baseSampleRate();
+		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
@@ -359,10 +359,10 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != engine::mixer()->baseSampleRate() )
+	if( _src_sr != Engine::mixer()->baseSampleRate() )
 	{
 		SampleBuffer * resampled = resample( this, _src_sr,
-					engine::mixer()->baseSampleRate() );
+					Engine::mixer()->baseSampleRate() );
 		MM_FREE( m_data );
 		m_frames = resampled->frames();
 		m_data = MM_ALLOC( sampleFrame, m_frames );
@@ -621,7 +621,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	bool is_backwards = _state->isBackwards();
 
 	const double freq_factor = (double) _freq / (double) m_frequency *
-		m_sampleRate / engine::mixer()->processingSampleRate();
+		m_sampleRate / Engine::mixer()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
@@ -1111,7 +1111,7 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, true );
 	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, true );*/
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
-					engine::mixer()->sampleRate() );
+					Engine::mixer()->sampleRate() );
 	QBuffer ba_writer;
 	ba_writer.open( QBuffer::WriteOnly );
 

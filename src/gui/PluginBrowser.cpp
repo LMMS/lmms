@@ -33,7 +33,7 @@
 #include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 
 
 bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )
@@ -211,7 +211,7 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		new stringPairDrag( "instrument", m_pluginDescriptor.name,
+		new StringPairDrag( "instrument", m_pluginDescriptor.name,
 								m_logo, this );
 		leaveEvent( _me );
 	}

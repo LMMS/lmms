@@ -31,7 +31,7 @@
 
 #include "MidiEvent.h"
 #include "MidiEventProcessor.h"
-#include "tab_widget.h"
+#include "TabWidget.h"
 
 
 class MidiPort;
@@ -107,11 +107,11 @@ public:
 	static MidiClient * openMidiClient();
 
 
-	class setupWidget : public tabWidget
+	class setupWidget : public TabWidget
 	{
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
-			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
+			TabWidget( TabWidget::tr( "Settings for %1" ).arg(
 					tr( _caption.toLatin1() ) ).toUpper(),
 								_parent )
 		{

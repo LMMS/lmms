@@ -27,7 +27,7 @@
 
 #include "MidiPort.h"
 #include "MidiClient.h"
-#include "song.h"
+#include "Song.h"
 
 
 
@@ -332,7 +332,7 @@ void MidiPort::updateMidiPortMode()
 	emit writablePortsChanged();
 	emit modeChanged();
 
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 

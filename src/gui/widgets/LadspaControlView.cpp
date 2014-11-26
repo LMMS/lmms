@@ -28,9 +28,9 @@
 #include "LadspaControl.h"
 #include "LadspaControlView.h"
 #include "LadspaBase.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "TempoSyncKnob.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 LadspaControlView::LadspaControlView( QWidget * _parent,
@@ -43,24 +43,24 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
 
-	ledCheckBox * link = NULL;
+	LedCheckBox * link = NULL;
 
 	if( m_ctl->m_link )
 	{
-		link = new ledCheckBox( "", this );
+		link = new LedCheckBox( "", this );
 		link->setModel( &m_ctl->m_linkEnabledModel );
-		toolTip::add( link, tr( "Link channels" ) );
+		ToolTip::add( link, tr( "Link channels" ) );
 		layout->addWidget( link );
 	}
 
-	knob * knb = NULL;
+	Knob * knb = NULL;
 
 	switch( m_ctl->port()->data_type )
 	{
 		case TOGGLED:
 		{
-			ledCheckBox * toggle = new ledCheckBox(
-				m_ctl->port()->name, this, QString::null, ledCheckBox::Green );
+			LedCheckBox * toggle = new LedCheckBox(
+				m_ctl->port()->name, this, QString::null, LedCheckBox::Green );
 			toggle->setModel( m_ctl->toggledModel() );
 			layout->addWidget( toggle );
 			if( link != NULL )
@@ -78,7 +78,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 		case INTEGER:
 		case FLOATING:
-			knb = new knob( knobBright_26, this, m_ctl->port()->name );
+			knb = new Knob( knobBright_26, this, m_ctl->port()->name );
 			break;
 
 		case TIME:

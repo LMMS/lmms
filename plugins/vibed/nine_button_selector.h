@@ -25,7 +25,7 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 
 
 class nineButtonSelector: public QWidget , public IntModelView
@@ -83,9 +83,9 @@ private:
 	virtual void modelChanged();
 	void updateButton( int );
 
-	QList<pixmapButton *> m_buttons;
-	pixmapButton * m_button;
-	pixmapButton * m_lastBtn;
+	QList<PixmapButton *> m_buttons;
+	PixmapButton * m_button;
+	PixmapButton * m_lastBtn;
 
 } ;
 

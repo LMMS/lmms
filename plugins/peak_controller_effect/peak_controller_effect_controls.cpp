@@ -30,7 +30,7 @@
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
-#include "song.h"
+#include "Song.h"
 
 
 PeakControllerEffectControls::
@@ -72,7 +72,7 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	 * m_effectId is copied, then there would be two instruments
 	 * having the same id.
 	 */
-	if( engine::getSong()->isLoadingProject() == true )
+	if( Engine::getSong()->isLoadingProject() == true )
 	{
 		m_effect->m_effectId = _this.attribute( "effectId" ).toInt();
 	}

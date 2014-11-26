@@ -25,7 +25,7 @@
 
 
 #include "Controller.h"
-#include "song.h"
+#include "Song.h"
 #include "PeakController.h"
 #include "peak_controller_effect.h"
 #include "lmms_math.h"
@@ -66,8 +66,8 @@ PeakControllerEffect::PeakControllerEffect(
 	m_lastSample( 0 ),
 	m_autoController( NULL )
 {
-	m_autoController = new PeakController( engine::getSong(), this );
-	engine::getSong()->addController( m_autoController );
+	m_autoController = new PeakController( Engine::getSong(), this );
+	Engine::getSong()->addController( m_autoController );
 	PeakController::s_effects.append( this );
 }
 
@@ -80,7 +80,7 @@ PeakControllerEffect::~PeakControllerEffect()
 	if( idx >= 0 )
 	{
 		PeakController::s_effects.remove( idx );
-		engine::getSong()->removeController( m_autoController );
+		Engine::getSong()->removeController( m_autoController );
 	}
 }
 

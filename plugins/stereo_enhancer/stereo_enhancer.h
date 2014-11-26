@@ -28,7 +28,7 @@
 
 #include "Effect.h"
 #include "DspEffectLibrary.h"
-#include "engine.h"
+#include "Engine.h"
 #include "stereoenhancer_controls.h"
 
 class stereoEnhancerEffect : public Effect
