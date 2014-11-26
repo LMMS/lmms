@@ -1,5 +1,5 @@
 /*
- * basic_filters.h - simple but powerful filter-class with most used filters
+ * BasicFilters.h - simple but powerful filter-class with most used filters
  *
  * original file by ???
  * modified and enhanced by Tobias Doerffel
@@ -49,7 +49,7 @@
 //#include <cstdlib>
 
 template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
-class basicFilters
+class BasicFilters
 {
 	MM_OPERATORS
 public:
@@ -106,14 +106,14 @@ public:
 			: Moog;
 		if( m_subFilter == NULL )
 		{
-			m_subFilter = new basicFilters<CHANNELS>(
+			m_subFilter = new BasicFilters<CHANNELS>(
 						static_cast<sample_rate_t>(
 							m_sampleRate ) );
 		}
 		m_subFilter->m_type = m_type;
 	}
 
-	inline basicFilters( const sample_rate_t _sample_rate ) :
+	inline BasicFilters( const sample_rate_t _sample_rate ) :
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
 		m_sampleRatio( 1.0f / m_sampleRate ),
@@ -123,7 +123,7 @@ public:
 		clearHistory();
 	}
 
-	inline ~basicFilters()
+	inline ~BasicFilters()
 	{
 		delete m_subFilter;
 	}
@@ -756,7 +756,7 @@ private:
 
 	float m_sampleRate;
 	float m_sampleRatio;
-	basicFilters<CHANNELS> * m_subFilter;
+	BasicFilters<CHANNELS> * m_subFilter;
 
 } ;
 

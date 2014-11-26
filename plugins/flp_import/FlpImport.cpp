@@ -32,7 +32,7 @@
 #include "FlpImport.h"
 #include "NotePlayHandle.h"
 #include "AutomationPattern.h"
-#include "basic_filters.h"
+#include "BasicFilters.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "ComboBox.h"
@@ -462,7 +462,7 @@ struct FL_Channel : public FL_Plugin
 		sampleUseLoopPoints( false ),
 		instrumentPlugin( NULL ),
 		envelopes(),
-		filterType( basicFilters<>::LowPass ),
+		filterType( BasicFilters<>::LowPass ),
 		filterCut( 10000 ),
 		filterRes( 0.1 ),
 		filterEnabled( false ),
@@ -595,14 +595,14 @@ bool FlpImport::tryImport( TrackContainer* tc )
 {
 	const int mappedFilter[] =
 	{
-		basicFilters<>::LowPass,// fast LP
-		basicFilters<>::LowPass,
-		basicFilters<>::BandPass_CSG,
-		basicFilters<>::HiPass,
-		basicFilters<>::Notch,
-		basicFilters<>::NumFilters+basicFilters<>::LowPass,
-		basicFilters<>::LowPass,
-		basicFilters<>::NumFilters+basicFilters<>::LowPass
+		BasicFilters<>::LowPass,// fast LP
+		BasicFilters<>::LowPass,
+		BasicFilters<>::BandPass_CSG,
+		BasicFilters<>::HiPass,
+		BasicFilters<>::Notch,
+		BasicFilters<>::NumFilters+BasicFilters<>::LowPass,
+		BasicFilters<>::LowPass,
+		BasicFilters<>::NumFilters+BasicFilters<>::LowPass
 	} ;
 
 	const InstrumentFunctionArpeggio::ArpDirections mappedArpDir[] =

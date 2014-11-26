@@ -26,7 +26,7 @@
 #include "DualFilter.h"
 
 #include "embed.cpp"
-#include "basic_filters.h"
+#include "BasicFilters.h"
 
 
 extern "C"
@@ -53,8 +53,8 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
-	m_filter1 = new basicFilters<2>( Engine::mixer()->processingSampleRate() );
-	m_filter2 = new basicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_filter1 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_filter2 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
 
 	// ensure filters get updated
 	m_filter1changed = true;

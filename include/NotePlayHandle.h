@@ -37,7 +37,7 @@
 class InstrumentTrack;
 class NotePlayHandle;
 
-template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
+template<ch_cnt_t=DEFAULT_CHANNELS> class BasicFilters;
 typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
@@ -47,7 +47,7 @@ class EXPORT NotePlayHandle : public PlayHandle, public Note
 	MM_OPERATORS
 public:
 	void * m_pluginData;
-	basicFilters<> * m_filter;
+	BasicFilters<> * m_filter;
 
 	// specifies origin of NotePlayHandle
 	enum Origins
