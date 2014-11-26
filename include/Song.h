@@ -36,7 +36,7 @@
 
 class AutomationTrack;
 class Pattern;
-class timeLine;
+class Timeline;
 
 
 const bpm_t MinTempo = 10;
@@ -83,7 +83,7 @@ public:
 		{
 			return m_currentFrame;
 		}
-		timeLine * m_timeLine;
+		Timeline * m_timeLine;
 		bool m_timeLineUpdate;
 
 	private:

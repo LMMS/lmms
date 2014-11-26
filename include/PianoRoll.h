@@ -47,7 +47,7 @@ class QSignalMapper;
 class comboBox;
 class NotePlayHandle;
 class Pattern;
-class timeLine;
+class Timeline;
 class toolButton;
 
 class PianoRoll : public QWidget, public SerializingObject
@@ -350,7 +350,7 @@ private:
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
 
-	timeLine * m_timeLine;
+	Timeline * m_timeLine;
 	bool m_scrollBack;
 
 	void copy_to_clipboard( const NoteVector & _notes ) const;

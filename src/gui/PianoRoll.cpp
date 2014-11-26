@@ -65,7 +65,7 @@
 #include "SongEditor.h"
 #include "templates.h"
 #include "text_float.h"
-#include "timeline.h"
+#include "Timeline.h"
 #include "tool_button.h"
 #include "text_float.h"
 
@@ -291,7 +291,7 @@ PianoRoll::PianoRoll() :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
+	m_timeLine = new Timeline( WHITE_KEY_WIDTH, 32, m_ppt,
 					Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern ),
 						m_currentPosition, this );
@@ -4166,7 +4166,7 @@ void PianoRoll::updatePosition( const MidiTime & _t )
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
 					Song::Mode_PlayPattern &&
-		m_timeLine->autoScroll() == timeLine::AutoScrollEnabled ) ||
+		m_timeLine->autoScroll() == Timeline::AutoScrollEnabled ) ||
 							m_scrollBack == true )
 	{
 		autoScroll( _t );

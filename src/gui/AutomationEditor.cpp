@@ -54,7 +54,7 @@
 #include "pixmap_button.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "timeline.h"
+#include "Timeline.h"
 #include "tooltip.h"
 #include "tool_button.h"
 #include "text_float.h"
@@ -132,7 +132,7 @@ AutomationEditor::AutomationEditor() :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
+	m_timeLine = new Timeline( VALUES_WIDTH, 32, m_ppt,
 				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );

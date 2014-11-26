@@ -38,7 +38,7 @@ class LcdSpinBox;
 class MeterDialog;
 class Song;
 class textFloat;
-class timeLine;
+class Timeline;
 class toolButton;
 
 class positionLine : public QWidget
@@ -110,7 +110,7 @@ private:
 	toolButton * m_stopButton;
 	LcdSpinBox * m_tempoSpinBox;
 
-	timeLine * m_timeLine;
+	Timeline * m_timeLine;
 
 	MeterDialog * m_timeSigDisplay;
 	automatableSlider * m_masterVolumeSlider;

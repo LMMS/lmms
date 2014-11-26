@@ -1,5 +1,5 @@
 /*
- * timeline.cpp - class timeLine, representing a time-line with position marker
+ * Timeline.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -31,7 +31,7 @@
 #include <QPainter>
 
 
-#include "timeline.h"
+#include "Timeline.h"
 #include "embed.h"
 #include "Engine.h"
 #include "templates.h"
@@ -45,12 +45,12 @@
 #endif
 
 
-QPixmap * timeLine::s_timeLinePixmap = NULL;
-QPixmap * timeLine::s_posMarkerPixmap = NULL;
-QPixmap * timeLine::s_loopPointBeginPixmap = NULL;
-QPixmap * timeLine::s_loopPointEndPixmap = NULL;
+QPixmap * Timeline::s_timeLinePixmap = NULL;
+QPixmap * Timeline::s_posMarkerPixmap = NULL;
+QPixmap * Timeline::s_loopPointBeginPixmap = NULL;
+QPixmap * Timeline::s_loopPointEndPixmap = NULL;
 
-timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
+Timeline::Timeline( const int _xoff, const int _yoff, const float _ppt,
 			Song::playPos & _pos, const MidiTime & _begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
@@ -109,7 +109,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 
 
 
-timeLine::~timeLine()
+Timeline::~Timeline()
 {
 	if( Engine::songEditor() )
 	{
@@ -121,7 +121,7 @@ timeLine::~timeLine()
 
 
 
-void timeLine::addToolButtons( QWidget * _tool_bar )
+void Timeline::addToolButtons( QWidget * _tool_bar )
 {
 	nStateButton * autoScroll = new nStateButton( _tool_bar );
 	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
@@ -161,7 +161,7 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 
 
 
-void timeLine::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Timeline::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "lp0pos", (int) loopBegin() );
 	_this.setAttribute( "lp1pos", (int) loopEnd() );
@@ -171,7 +171,7 @@ void timeLine::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void timeLine::loadSettings( const QDomElement & _this )
+void Timeline::loadSettings( const QDomElement & _this )
 {
 	m_loopPos[0] = _this.attribute( "lp0pos" ).toInt();
 	m_loopPos[1] = _this.attribute( "lp1pos" ).toInt();
@@ -184,7 +184,7 @@ void timeLine::loadSettings( const QDomElement & _this )
 
 
 
-void timeLine::updatePosition( const MidiTime & )
+void Timeline::updatePosition( const MidiTime & )
 {
 	const int new_x = markerX( m_pos );
 
@@ -200,7 +200,7 @@ void timeLine::updatePosition( const MidiTime & )
 
 
 
-void timeLine::toggleAutoScroll( int _n )
+void Timeline::toggleAutoScroll( int _n )
 {
 	m_autoScroll = static_cast<AutoScrollStates>( _n );
 }
@@ -208,7 +208,7 @@ void timeLine::toggleAutoScroll( int _n )
 
 
 
-void timeLine::toggleLoopPoints( int _n )
+void Timeline::toggleLoopPoints( int _n )
 {
 	m_loopPoints = static_cast<LoopPointStates>( _n );
 	update();
@@ -217,7 +217,7 @@ void timeLine::toggleLoopPoints( int _n )
 
 
 
-void timeLine::toggleBehaviourAtStop( int _n )
+void Timeline::toggleBehaviourAtStop( int _n )
 {
 	m_behaviourAtStop = static_cast<BehaviourAtStopStates>( _n );
 }
@@ -225,7 +225,7 @@ void timeLine::toggleBehaviourAtStop( int _n )
 
 
 
-void timeLine::paintEvent( QPaintEvent * )
+void Timeline::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
@@ -274,7 +274,7 @@ void timeLine::paintEvent( QPaintEvent * )
 
 
 
-void timeLine::mousePressEvent( QMouseEvent* event )
+void Timeline::mousePressEvent( QMouseEvent* event )
 {
 	if( event->x() < m_xOffset )
 	{
@@ -331,7 +331,7 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 
 
 
-void timeLine::mouseMoveEvent( QMouseEvent* event )
+void Timeline::mouseMoveEvent( QMouseEvent* event )
 {
 	const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
 
@@ -381,7 +381,7 @@ void timeLine::mouseMoveEvent( QMouseEvent* event )
 
 
 
-void timeLine::mouseReleaseEvent( QMouseEvent* event )
+void Timeline::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = NULL;
