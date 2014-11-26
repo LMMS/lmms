@@ -1,5 +1,5 @@
 /*
- * ladspa_manager.h - declaration of class ladspaManager
+ * LadspaManager.h - declaration of class ladspaManager
  *                    a class to manage loading and instantiation
  *                    of ladspa plugins
  *
@@ -80,12 +80,12 @@ typedef struct ladspaManagerStorage
 } ladspaManagerDescription;
 
 
-class EXPORT ladspaManager
+class EXPORT LadspaManager
 {
 public:
 
-	ladspaManager();
-	virtual ~ladspaManager();
+	LadspaManager();
+	virtual ~LadspaManager();
 
 	l_sortable_plugin_t getSortedPlugins();
 	ladspaManagerDescription * getDescription( const ladspa_key_t &

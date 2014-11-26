@@ -27,7 +27,7 @@
 #ifndef _LADSPA_BROWSER_H
 #define _LADSPA_BROWSER_H
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 

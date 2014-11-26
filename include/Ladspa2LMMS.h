@@ -27,10 +27,10 @@
 #define LADSPA_2_LMMS_H
 
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 
 
-class EXPORT Ladspa2LMMS : public ladspaManager
+class EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
 	
