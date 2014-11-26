@@ -42,11 +42,5 @@ float Lfo::tick()
     float output = sinf( m_phase );
     m_phase += m_increment;
 
-    if( m_amplitude > 0.0001 )
-    {
-        return ( ( output * m_amplitude + 1.0 ) * 0.5 ) ;
-    } else
-    {
-        return 1;
-    }
+    return output;
 }
