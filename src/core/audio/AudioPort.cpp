@@ -26,7 +26,7 @@
 #include "AudioDevice.h"
 #include "EffectChain.h"
 #include "FxMixer.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
 #include "ValueBuffer.h"
@@ -44,7 +44,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 	m_volumeModel( volumeModel ),
 	m_panningModel( panningModel )
 {
-	engine::mixer()->addAudioPort( this );
+	Engine::mixer()->addAudioPort( this );
 	setExtOutputEnabled( true );
 }
 
@@ -54,7 +54,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
-	engine::mixer()->removeAudioPort( this );
+	Engine::mixer()->removeAudioPort( this );
 	delete m_effects;
 }
 
@@ -68,11 +68,11 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 		m_extOutputEnabled = _enabled;
 		if( m_extOutputEnabled )
 		{
-			engine::mixer()->audioDev()->registerPort( this );
+			Engine::mixer()->audioDev()->registerPort( this );
 		}
 		else
 		{
-			engine::mixer()->audioDev()->unregisterPort( this );
+			Engine::mixer()->audioDev()->unregisterPort( this );
 		}
 	}
 }
@@ -83,7 +83,7 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 void AudioPort::setName( const QString & _name )
 {
 	m_name = _name;
-	engine::mixer()->audioDev()->renamePort( this );
+	Engine::mixer()->audioDev()->renamePort( this );
 }
 
 
@@ -93,7 +93,7 @@ bool AudioPort::processEffects()
 {
 	if( m_effects )
 	{
-		bool more = m_effects->processAudioBuffer( m_portBuffer, engine::mixer()->framesPerPeriod(), m_bufferUsage );
+		bool more = m_effects->processAudioBuffer( m_portBuffer, Engine::mixer()->framesPerPeriod(), m_bufferUsage );
 		return more;
 	}
 	return false;
@@ -102,11 +102,11 @@ bool AudioPort::processEffects()
 
 void AudioPort::doProcessing()
 {
-	const fpp_t fpp = engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
 	m_portBuffer = BufferManager::acquire(); // get buffer for processing
 
-	engine::mixer()->clearAudioBuffer( m_portBuffer, fpp ); // clear the audioport buffer so we can use it
+	Engine::mixer()->clearAudioBuffer( m_portBuffer, fpp ); // clear the audioport buffer so we can use it
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	foreach( PlayHandle * ph, m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
@@ -215,7 +215,7 @@ void AudioPort::doProcessing()
 	const bool me = processEffects();
 	if( me || m_bufferUsage )
 	{
-		engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to fx mixer
+		Engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to fx mixer
 																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}

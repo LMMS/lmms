@@ -26,7 +26,7 @@
 #include <QMessageBox>
 
 #include "AudioFileDevice.h"
-#include "export_project_dialog.h"
+#include "ExportProjectDialog.h"
 
 
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
@@ -51,8 +51,8 @@ AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
 	{
 		QMessageBox::critical( NULL,
-			exportProjectDialog::tr( "Could not open file" ),
-			exportProjectDialog::tr( "Could not open file %1 "
+			ExportProjectDialog::tr( "Could not open file" ),
+			ExportProjectDialog::tr( "Could not open file %1 "
 						"for writing.\nPlease make "
 						"sure you have write-"
 						"permission to the file and "

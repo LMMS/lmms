@@ -26,9 +26,9 @@
 
 #include "TimeDisplayWidget.h"
 #include "MainWindow.h"
-#include "engine.h"
-#include "tooltip.h"
-#include "song.h"
+#include "Engine.h"
+#include "ToolTip.h"
+#include "Song.h"
 
 
 
@@ -48,12 +48,12 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	toolTip::add( this, tr( "click to change time units" ) );
+	ToolTip::add( this, tr( "click to change time units" ) );
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
 
@@ -95,7 +95,7 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 void TimeDisplayWidget::updateTime()
 {
-	song* s = engine::getSong();
+	Song* s = Engine::getSong();
 
 	switch( m_displayMode )
 	{

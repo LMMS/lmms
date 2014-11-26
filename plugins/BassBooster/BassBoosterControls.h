@@ -27,7 +27,7 @@
 
 #include "EffectControls.h"
 #include "BassBoosterControlDialog.h"
-#include "knob.h"
+#include "Knob.h"
 
 
 class BassBoosterEffect;

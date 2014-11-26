@@ -27,24 +27,24 @@
 
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "embed.h"
-#include "engine.h"
-#include "group_box.h"
+#include "Engine.h"
+#include "GroupBox.h"
 #include "gui_templates.h"
-#include "knob.h"
-#include "pixmap_button.h"
+#include "Knob.h"
+#include "PixmapButton.h"
 #include "TempoSyncKnob.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_cc( cc ),
-	m_chordsGroupBox( new groupBox( tr( "STACKING" ) ) ),
-	m_chordsComboBox( new comboBox() ),
-	m_chordRangeKnob( new knob( knobBright_26 ) )
+	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
+	m_chordsComboBox( new ComboBox() ),
+	m_chordRangeKnob( new Knob( knobBright_26 ) )
 {
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );
@@ -100,13 +100,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_a( arp ),
-	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ) ) ),
-	m_arpComboBox( new comboBox() ),
-	m_arpRangeKnob( new knob( knobBright_26 ) ),
+	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
+	m_arpComboBox( new ComboBox() ),
+	m_arpRangeKnob( new Knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
-	m_arpGateKnob( new knob( knobBright_26 ) ),
-	m_arpDirectionComboBox( new comboBox() ),
-	m_arpModeComboBox( new comboBox() )
+	m_arpGateKnob( new Knob( knobBright_26 ) ),
+	m_arpDirectionComboBox( new ComboBox() ),
+	m_arpModeComboBox( new ComboBox() )
 {
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );

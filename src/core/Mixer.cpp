@@ -28,13 +28,13 @@
 #include "FxMixer.h"
 #include "MixHelpers.h"
 #include "MixerWorkerThread.h"
-#include "song.h"
+#include "Song.h"
 #include "templates.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
 #include "InstrumentTrack.h"
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "PianoRoll.h"
@@ -86,7 +86,7 @@ Mixer::Mixer() :
 	}
 
 	// just rendering?
-	if( !engine::hasGUI() )
+	if( !Engine::hasGUI() )
 	{
 		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		m_fifo = new fifo( 1 );
@@ -278,7 +278,7 @@ sample_rate_t Mixer::processingSampleRate() const
 
 bool Mixer::criticalXRuns() const
 {
-	return cpuLoad() >= 99 && engine::getSong()->isExporting() == false;
+	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
 }
 
 
@@ -318,12 +318,12 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	m_profiler.startPeriod();
 
-	static song::playPos last_metro_pos = -1;
+	static Song::playPos last_metro_pos = -1;
 
-	song::playPos p = engine::getSong()->getPlayPos(
-						song::Mode_PlayPattern );
-	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
-		engine::pianoRoll()->isRecording() == true &&
+	Song::playPos p = Engine::getSong()->getPlayPos(
+						Song::Mode_PlayPattern );
+	if( Engine::getSong()->playMode() == Song::Mode_PlayPattern &&
+		Engine::pianoRoll()->isRecording() == true &&
 		p != last_metro_pos )
 	{
 		if ( p.getTicks() % (MidiTime::ticksPerTact() / 1 ) == 0 )
@@ -331,7 +331,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
 		else if ( p.getTicks() % (MidiTime::ticksPerTact() /
-			engine::getSong()->getTimeSigModel().getNumerator() ) == 0 )
+			Engine::getSong()->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
 		}
@@ -385,10 +385,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	engine::fxMixer()->prepareMasterMix();
+	Engine::fxMixer()->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.
-	engine::getSong()->processNextBuffer();
+	Engine::getSong()->processNextBuffer();
 
 	// add all play-handles that have to be added
 	m_playHandleMutex.lock();
@@ -434,7 +434,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 3: do master mix in FX mixer
-	engine::fxMixer()->masterMix( m_writeBuf );
+	Engine::fxMixer()->masterMix( m_writeBuf );
 
 	unlock();
 

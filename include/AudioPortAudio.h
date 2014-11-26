@@ -56,7 +56,7 @@ public:
 #endif
 
 
-class comboBox;
+class ComboBox;
 class LcdSpinBox;
 
 
@@ -86,8 +86,8 @@ public:
 		virtual void saveSettings();
 
 	private:
-		comboBox * m_backend;
-		comboBox * m_device;
+		ComboBox * m_backend;
+		ComboBox * m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;

@@ -33,7 +33,7 @@
 
 #include "TrackContainerView.h"
 #include "TrackContainer.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "MainWindow.h"
 #include "debug.h"
 #include "FileBrowser.h"
@@ -41,9 +41,9 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "DataFile.h"
-#include "rubberband.h"
-#include "song.h"
-#include "string_pair_drag.h"
+#include "Rubberband.h"
+#include "Song.h"
+#include "StringPairDrag.h"
 #include "Track.h"
 
 
@@ -57,7 +57,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
-	m_rubberBand( new rubberBand( m_scrollArea ) ),
+	m_rubberBand( new RubberBand( m_scrollArea ) ),
 	m_origin()
 {
 	m_tc->setHook( this );
@@ -81,7 +81,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	setAcceptDrops( true );
 
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
 	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
 			this, SLOT( createTrackView( Track * ) ),
@@ -120,7 +120,7 @@ void TrackContainerView::loadSettings( const QDomElement & _this )
 
 
 
-trackView * TrackContainerView::addTrackView( trackView * _tv )
+TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
@@ -134,7 +134,7 @@ trackView * TrackContainerView::addTrackView( trackView * _tv )
 
 
 
-void TrackContainerView::removeTrackView( trackView * _tv )
+void TrackContainerView::removeTrackView( TrackView * _tv )
 {
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
@@ -145,9 +145,9 @@ void TrackContainerView::removeTrackView( trackView * _tv )
 		m_scrollLayout->removeWidget( _tv );
 
 		realignTracks();
-		if( engine::getSong() )
+		if( Engine::getSong() )
 		{
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 }
@@ -155,14 +155,14 @@ void TrackContainerView::removeTrackView( trackView * _tv )
 
 
 
-void TrackContainerView::moveTrackViewUp( trackView * _tv )
+void TrackContainerView::moveTrackViewUp( TrackView * _tv )
 {
 	for( int i = 1; i < m_trackViews.size(); ++i )
 	{
-		trackView * t = m_trackViews[i];
+		TrackView * t = m_trackViews[i];
 		if( t == _tv )
 		{
-			bbTrack::swapBBTracks( t->getTrack(),
+			BBTrack::swapBBTracks( t->getTrack(),
 					m_trackViews[i - 1]->getTrack() );
 			m_scrollLayout->removeWidget( t );
 			m_scrollLayout->insertWidget( i - 1, t );
@@ -177,14 +177,14 @@ void TrackContainerView::moveTrackViewUp( trackView * _tv )
 
 
 
-void TrackContainerView::moveTrackViewDown( trackView * _tv )
+void TrackContainerView::moveTrackViewDown( TrackView * _tv )
 {
 	for( int i = 0; i < m_trackViews.size()-1; ++i )
 	{
-		trackView * t = m_trackViews[i];
+		TrackView * t = m_trackViews[i];
 		if( t == _tv )
 		{
-			bbTrack::swapBBTracks( t->getTrack(),
+			BBTrack::swapBBTracks( t->getTrack(),
 					m_trackViews[i + 1]->getTrack() );
 			m_scrollLayout->removeWidget( t );
 			m_scrollLayout->insertWidget( i + 1, t );
@@ -228,7 +228,7 @@ void TrackContainerView::createTrackView( Track * _t )
 
 
 
-void TrackContainerView::deleteTrackView( trackView * _tv )
+void TrackContainerView::deleteTrackView( TrackView * _tv )
 {
 	//m_tc->addJournalCheckPoint();
 
@@ -242,7 +242,7 @@ void TrackContainerView::deleteTrackView( trackView * _tv )
 
 
 
-const trackView * TrackContainerView::trackViewAt( const int _y ) const
+const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 {
 	const int abs_y = _y + m_scrollArea->verticalScrollBar()->value();
 	int y_cnt = 0;
@@ -293,7 +293,7 @@ void TrackContainerView::clearAllTracks()
 {
 	while( !m_trackViews.empty() )
 	{
-		trackView * tv = m_trackViews.takeLast();
+		TrackView * tv = m_trackViews.takeLast();
 		Track * t = tv->getTrack();
 		delete tv;
 		delete t;
@@ -305,7 +305,7 @@ void TrackContainerView::clearAllTracks()
 
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee,
+	StringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,vstpluginfile,"
 				"track_%1,track_%2" ).
@@ -318,8 +318,8 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void TrackContainerView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "instrument" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
@@ -336,7 +336,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
-			engine::pluginFileHandling()[FileItem::extension(
+			Engine::pluginFileHandling()[FileItem::extension(
 								value )]);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );

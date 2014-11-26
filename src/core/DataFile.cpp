@@ -36,14 +36,14 @@
 
 
 #include "ConfigManager.h"
-#include "project_version.h"
+#include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
 #include "base64.h"
 
 // bbTCO::defaultColor()
-#include "bb_track.h"
+#include "BBTrack.h"
 
 
 
@@ -327,7 +327,7 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 
 void DataFile::upgrade()
 {
-	projectVersion version =
+	ProjectVersion version =
 		documentElement().attribute( "creatorversion" ).
 							replace( "svn", "" );
 

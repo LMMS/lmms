@@ -32,16 +32,16 @@
 #include <QMenu>
 #include <QDomElement>
 
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "VstPlugin.h"
 #include "MainWindow.h"
-#include "pixmap_button.h"
-#include "string_pair_drag.h"
-#include "text_float.h"
-#include "tooltip.h"
+#include "PixmapButton.h"
+#include "StringPairDrag.h"
+#include "TextFloat.h"
+#include "ToolTip.h"
 #include "FileDialog.h"
 
 #include "embed.cpp"
@@ -83,7 +83,7 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	engine::mixer()->addPlayHandle( iph );
+	Engine::mixer()->addPlayHandle( iph );
 }
 
 
@@ -101,7 +101,7 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 	closePlugin();
 }
 
@@ -119,7 +119,7 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
 		char paramStr[35];
-		vstKnobs = new knob *[ paramCount ];
+		vstKnobs = new Knob *[ paramCount ];
 		knobFModel = new FloatModel *[ paramCount ];
 		QStringList s_dumpValues;
 		QWidget * widget = new QWidget();
@@ -128,7 +128,7 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 			sprintf( paramStr, "param%d", i );
 			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			vstKnobs[i] = new knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+			vstKnobs[i] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
 			vstKnobs[i]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
 			vstKnobs[i]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
@@ -250,7 +250,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginDLL = _file;
-	textFloat * tf = textFloat::displayMessage(
+	TextFloat * tf = TextFloat::displayMessage(
 			tr( "Loading plugin" ),
 			tr( "Please wait while loading VST-plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -294,7 +294,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 	m_plugin->process( NULL, _buf );
 
-	const fpp_t frames = engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
@@ -398,7 +398,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 								"artwork" ) );
 	}
 
-	m_openPluginButton = new pixmapButton( this, "" );
+	m_openPluginButton = new PixmapButton( this, "" );
 	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 216, 81 );
@@ -408,14 +408,14 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openPluginButton, SIGNAL( clicked() ), this,
 						SLOT( openPlugin() ) );
-	toolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
+	ToolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
 
 	m_openPluginButton->setWhatsThis(
 		tr( "Click here, if you want to open another VST-plugin. After "
 			"clicking on this button, a file-open-dialog appears "
 			"and you can select your file." ) );
 
-	m_managePluginButton = new pixmapButton( this, "" );
+	m_managePluginButton = new PixmapButton( this, "" );
 	m_managePluginButton->setCheckable( false );
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
@@ -425,13 +425,13 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"track_op_menu" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
-	toolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
+	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
 
 	m_managePluginButton->setWhatsThis(
 		tr( "Click here, if you want to control VST-plugin from host." ) );
 
 
-	m_openPresetButton = new pixmapButton( this, "" );
+	m_openPresetButton = new PixmapButton( this, "" );
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
 	m_openPresetButton->move( 200, 224 );
@@ -441,13 +441,13 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"project_open", 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
-	toolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
+	ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
 
 	m_openPresetButton->setWhatsThis(
 		tr( "Click here, if you want to open another *.fxp, *.fxb VST-plugin preset." ) );
 
 
-	m_rolLPresetButton = new pixmapButton( this, "" );
+	m_rolLPresetButton = new PixmapButton( this, "" );
 	m_rolLPresetButton->setCheckable( false );
 	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolLPresetButton->move( 190, 201 );
@@ -457,7 +457,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
-	toolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
+	ToolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
 
 	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
@@ -465,7 +465,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
 
 
-	m_savePresetButton = new pixmapButton( this, "" );
+	m_savePresetButton = new PixmapButton( this, "" );
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
 	m_savePresetButton->move( 224, 224 );
@@ -475,13 +475,13 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"project_save", 20, 20  ) );
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
-	toolTip::add( m_savePresetButton, tr( "Save preset" ) );
+	ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
 
 	m_savePresetButton->setWhatsThis(
 		tr( "Click here, if you want to save current VST-plugin preset program." ) );
 
 
-	m_rolRPresetButton = new pixmapButton( this, "" );
+	m_rolRPresetButton = new PixmapButton( this, "" );
 	m_rolRPresetButton->setCheckable( false );
 	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolRPresetButton->move( 209, 201 );
@@ -491,7 +491,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
-	toolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
+	ToolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
 
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
@@ -639,7 +639,7 @@ void VestigeInstrumentView::openPlugin()
 		{
 			return;
 		}
-		engine::mixer()->lock();
+		Engine::mixer()->lock();
 
 		if (m_vi->p_subWindow != NULL) {
 			delete m_vi->p_subWindow;
@@ -647,7 +647,7 @@ void VestigeInstrumentView::openPlugin()
 		}
 
 		m_vi->loadFile( ofd.selectedFiles()[0] );
-		engine::mixer()->unlock();
+		Engine::mixer()->unlock();
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
@@ -783,10 +783,10 @@ void VestigeInstrumentView::noteOffAll( void )
 
 void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -807,8 +807,8 @@ void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void VestigeInstrumentView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "vstplugin" )
 	{
 		m_vi->loadFile( value );
@@ -873,7 +873,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
+	m_vi->m_subWindow = Engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
 	m_vi->m_subWindow->setFixedWidth( 960 );
@@ -926,7 +926,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	bool isVstKnobs = true;
 
 	if (m_vi->vstKnobs == NULL) {
-		m_vi->vstKnobs = new knob *[ m_vi->paramCount ];
+		m_vi->vstKnobs = new Knob *[ m_vi->paramCount ];
 		isVstKnobs = false;
 	}
 	if (m_vi->knobFModel == NULL) {
@@ -942,7 +942,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 			sprintf( paramStr, "param%d", i);
     			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			m_vi->vstKnobs[ i ] = new knob( knobBright_26, this, s_dumpValues.at( 1 ) );
+			m_vi->vstKnobs[ i ] = new Knob( knobBright_26, this, s_dumpValues.at( 1 ) );
 			m_vi->vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
 			m_vi->vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
@@ -1097,10 +1097,10 @@ void manageVestigeInstrumentView::setParameter( void )
 
 void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -1121,8 +1121,8 @@ void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void manageVestigeInstrumentView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "vstplugin" )
 	{
 		m_vi->loadFile( value );

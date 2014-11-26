@@ -46,7 +46,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
     sampleDelayKnob->setLabel( tr( "Delay" ) );
     sampleDelayKnob->setHintText( tr( "Delay Time Seconds:" ) + " ", "" );
 
-    knob * feedbackKnob = new knob( knobBright_26, this );
+    Knob * feedbackKnob = new Knob( knobBright_26, this );
     feedbackKnob->move( 63,10 );
     feedbackKnob->setVolumeKnob( true) ;
     feedbackKnob->setModel( &controls->m_feedbackModel);
@@ -60,7 +60,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
     lfoFreqKnob->setLabel( tr( "Rate" ) );
     lfoFreqKnob->setHintText( tr ( "Lfo Seconds:" ) + " ", "" );
 
-    knob * lfoAmtKnob = new knob( knobBright_26, this );
+    Knob * lfoAmtKnob = new Knob( knobBright_26, this );
     lfoAmtKnob->move( 150,10 );
     lfoAmtKnob->setVolumeKnob( true );
     lfoAmtKnob->setModel( &controls->m_lfoAmountModel );

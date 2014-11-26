@@ -33,7 +33,7 @@
 #include <QPixmap>
 
 
-#include "note.h"
+#include "Note.h"
 #include "Track.h"
 
 
@@ -46,7 +46,7 @@ class SampleBuffer;
 
 
 
-class EXPORT Pattern : public trackContentObject
+class EXPORT Pattern : public TrackContentObject
 {
 	Q_OBJECT
 public:
@@ -67,13 +67,13 @@ public:
 	MidiTime beatPatternLength() const;
 
 	// note management
-	note * addNote( const note & _new_note, const bool _quant_pos = true );
+	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( const note * _note_to_del );
+	void removeNote( const Note * _note_to_del );
 
-	note * noteAtStep( int _step );
+	Note * noteAtStep( int _step );
 
-	note * rearrangeNote( const note * _note_to_proc,
+	Note * rearrangeNote( const Note * _note_to_proc,
 						const bool _quant_pos = true );
 	void rearrangeAllNotes();
 	void clearNotes();
@@ -110,7 +110,7 @@ public:
 	bool empty();
 
 
-	virtual trackContentObjectView * createView( trackView * _tv );
+	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 
 	using Model::dataChanged;
@@ -138,7 +138,7 @@ private:
 	int m_steps;
 
 	friend class PatternView;
-	friend class bbEditor;
+	friend class BBEditor;
 
 
 signals:
@@ -148,7 +148,7 @@ signals:
 
 
 
-class PatternView : public trackContentObjectView
+class PatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
@@ -156,7 +156,7 @@ class PatternView : public trackContentObjectView
 	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 public:
-	PatternView( Pattern* pattern, trackView* parent );
+	PatternView( Pattern* pattern, TrackView* parent );
 	virtual ~PatternView();
 
 
@@ -179,7 +179,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * _re )
 	{
 		m_needsUpdate = true;
-		trackContentObjectView::resizeEvent( _re );
+		TrackContentObjectView::resizeEvent( _re );
 	}
 	virtual void wheelEvent( QWheelEvent * _we );
 

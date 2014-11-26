@@ -32,11 +32,11 @@
 #include <QMutexLocker>
 
 #include "Instrument.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "InstrumentView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "SampleBuffer.h"
 #include "MemoryManager.h"
 #include "gig.h"
@@ -345,8 +345,8 @@ public:
 private:
 	virtual void modelChanged();
 
-	pixmapButton * m_fileDialogButton;
-	pixmapButton * m_patchDialogButton;
+	PixmapButton * m_fileDialogButton;
+	PixmapButton * m_patchDialogButton;
 
 	LcdSpinBox * m_bankNumLcd;
 	LcdSpinBox * m_patchNumLcd;
@@ -354,7 +354,7 @@ private:
 	QLabel * m_filenameLabel;
 	QLabel * m_patchLabel;
 
-	knob * m_gainKnob;
+	Knob * m_gainKnob;
 
 	static PatchesDialog * s_patchDialog;
 

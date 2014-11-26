@@ -27,7 +27,7 @@
 
 #include "PresetPreviewPlayHandle.h"
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MidiPort.h"
@@ -123,10 +123,10 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	}
 
 
-	const bool j = engine::projectJournal()->isJournalling();
-	engine::projectJournal()->setJournalling( false );
+	const bool j = Engine::projectJournal()->isJournalling();
+	Engine::projectJournal()->setJournalling( false );
 
-	engine::setSuppressMessages( true );
+	Engine::setSuppressMessages( true );
 
 	if( _load_by_plugin )
 	{
@@ -137,7 +137,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		{
 			i = s_previewTC->previewInstrumentTrack()->
 				loadInstrument(
-					engine::pluginFileHandling()[ext] );
+					Engine::pluginFileHandling()[ext] );
 		}
 		if( i != NULL )
 		{
@@ -152,7 +152,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 				dataFile.content().firstChild().toElement() );
 	}
 
-	engine::setSuppressMessages( false );
+	Engine::setSuppressMessages( false );
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
@@ -163,14 +163,14 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	m_previewNote = NotePlayHandleManager::acquire(
 			s_previewTC->previewInstrumentTrack(), 0,
 			typeInfo<f_cnt_t>::max() / 2,
-				note( 0, 0, DefaultKey, 100 ) );
+				Note( 0, 0, DefaultKey, 100 ) );
 
 	setAudioPort( s_previewTC->previewInstrumentTrack()->audioPort() );
 
 	s_previewTC->setPreviewNote( m_previewNote );
 
 	s_previewTC->unlockData();
-	engine::projectJournal()->setJournalling( j );
+	Engine::projectJournal()->setJournalling( j );
 }
 
 

@@ -41,7 +41,7 @@
 #include "MidiTime.h"
 #include "debug.h"
 #include "embed.h"
-#include "song.h"
+#include "Song.h"
 
 #include "portsmf/allegro.h"
 
@@ -96,10 +96,10 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if( engine::hasGUI() &&
+	if( Engine::hasGUI() &&
 		ConfigManager::inst()->defaultSoundfont().isEmpty() )
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You do not have set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
@@ -109,9 +109,9 @@ bool MidiImport::tryImport( TrackContainer* tc )
 				"settings dialog and try again." ) );
 	}
 #else
-	if( engine::hasGUI() )
+	if( Engine::hasGUI() )
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You did not compile LMMS with support for "
 				"SoundFont2 player, which is used to add default "
@@ -244,7 +244,7 @@ public:
 	}
 
 
-	void addNote( note & n )
+	void addNote( Note & n )
 	{
 		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
 		{
@@ -268,7 +268,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
-	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, engine::mainWindow() );
+	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, Engine::mainWindow() );
 	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration( 0 );
@@ -285,7 +285,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiCC ccs[129];
 	smfMidiChannel chs[256];
 
-	MeterModel & timeSigMM = engine::getSong()->getTimeSigModel();
+	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
 	AutomationPattern * timeSigNumeratorPat = 
 		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
 	AutomationPattern * timeSigDenominatorPat = 
@@ -378,7 +378,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				smfMidiChannel * ch = chs[evt->chan].create( tc );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
 
-				note n( noteEvt->get_duration() * ticksPerBeat,
+				Note n( noteEvt->get_duration() * ticksPerBeat,
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
 						noteEvt->get_loud());

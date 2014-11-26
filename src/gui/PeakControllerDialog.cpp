@@ -30,18 +30,18 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 #include "PeakController.h"
 #include "ControllerDialog.h"
-#include "knob.h"
+#include "Knob.h"
 #include "TempoSyncKnob.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
@@ -51,7 +51,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 256, 64 );
 	
-	toolTip::add( this, tr( "LFO Controller" ) );
+	ToolTip::add( this, tr( "LFO Controller" ) );
 
 	QLabel * l = new QLabel( this );
 	l->setText( "Use FX's controls" );

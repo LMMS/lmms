@@ -35,10 +35,10 @@
 #include "Oscillator.h"
 
 class automatableButtonGroup;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 class TempoSyncKnob;
-class pixmapButton;
+class PixmapButton;
 
 
 class LfoController : public Controller 
@@ -103,17 +103,17 @@ protected:
 
 	LfoController * m_lfo;
 
-	knob * m_baseKnob;
+	Knob * m_baseKnob;
 	TempoSyncKnob * m_speedKnob;
-	knob * m_amountKnob;
-	knob * m_phaseKnob;
-	pixmapButton * m_userLfoBtn;
+	Knob * m_amountKnob;
+	Knob * m_phaseKnob;
+	PixmapButton * m_userLfoBtn;
 	automatableButtonGroup * m_waveBtnGrp;
 	automatableButtonGroup * m_multiplierBtnGrp;
 
 
 private:
-	pixmapButton * m_userWaveBtn;
+	PixmapButton * m_userWaveBtn;
 
 private slots:
 	void askUserDefWave();

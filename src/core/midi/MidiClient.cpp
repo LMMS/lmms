@@ -25,7 +25,7 @@
 
 #include "MidiClient.h"
 #include "MidiPort.h"
-#include "note.h"
+#include "Note.h"
 
 
 MidiClient::MidiClient()

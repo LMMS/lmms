@@ -25,8 +25,8 @@
 #include <QMessageBox>
 
 #include "VstEffect.h"
-#include "song.h"
-#include "text_float.h"
+#include "Song.h"
+#include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
 
 #include "embed.cpp"
@@ -124,7 +124,7 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	textFloat * tf = textFloat::displayMessage(
+	TextFloat * tf = TextFloat::displayMessage(
 		VstPlugin::tr( "Loading plugin" ),
 		VstPlugin::tr( "Please wait while loading VST plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -139,8 +139,8 @@ void VstEffect::openPlugin( const QString & _plugin )
 		return;
 	}
 
-	VstPlugin::connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( engine::getSong()->getTempo() );
+	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
+	m_plugin->setTempo( Engine::getSong()->getTempo() );
 
 	m_pluginMutex.unlock();
 

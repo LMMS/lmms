@@ -29,12 +29,12 @@
 #include <QPixmap>
 #include <QtCore/QPointer>
 
-#include "knob.h"
+#include "Knob.h"
 #include "TempoSyncKnobModel.h"
 
 class MeterDialog;
 
-class EXPORT TempoSyncKnob : public knob
+class EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:

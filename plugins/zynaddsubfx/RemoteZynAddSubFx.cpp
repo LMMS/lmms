@@ -30,7 +30,7 @@
 #include <queue>
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
-#include "note.h"
+#include "Note.h"
 #include "RemotePlugin.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"

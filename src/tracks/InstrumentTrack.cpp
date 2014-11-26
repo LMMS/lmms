@@ -41,27 +41,27 @@
 #include "InstrumentTrack.h"
 #include "AudioPort.h"
 #include "AutomationPattern.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "debug.h"
 #include "EffectChain.h"
 #include "EffectRackView.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentSoundShapingView.h"
-#include "fade_button.h"
+#include "FadeButton.h"
 #include "gui_templates.h"
 #include "Instrument.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -71,11 +71,11 @@
 #include "Pattern.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
-#include "song.h"
-#include "string_pair_drag.h"
-#include "tab_widget.h"
-#include "tooltip.h"
-#include "track_label_button.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "TabWidget.h"
+#include "ToolTip.h"
+#include "TrackLabelButton.h"
 #include "ValueBuffer.h"
 #include "volume.h"
 
@@ -95,7 +95,7 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	Track( Track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
+	m_midiPort( tr( "unnamed_track" ), Engine::mixer()->midiClient(),
 								this, this ),
 	m_notes(),
 	m_sustainPedalPressed( false ),
@@ -122,7 +122,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 
-	m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
+	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -138,7 +138,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 int InstrumentTrack::baseNote() const
 {
-	return m_baseNoteModel.value() - engine::getSong()->masterPitch();
+	return m_baseNoteModel.value() - Engine::getSong()->masterPitch();
 }
 
 
@@ -256,11 +256,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				{
 					nph = NotePlayHandleManager::acquire( this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
-								note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
-					if( ! engine::mixer()->addPlayHandle( nph ) )
+					if( ! Engine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = NULL;
 					}
@@ -421,7 +421,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	engine::mixer()->removePlayHandles( this, removeIPH );
+	Engine::mixer()->removePlayHandles( this, removeIPH );
 	unlock();
 }
 
@@ -571,15 +571,15 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		return false;
 	}
-	const float frames_per_tick = engine::framesPerTick();
+	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
-	bbTrack * bb_track = NULL;
+	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
-		trackContentObject * tco = getTCO( _tco_num );
+		TrackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = bbTrack::findBBTrack( _tco_num );
+		bb_track = BBTrack::findBBTrack( _tco_num );
 	}
 	else
 	{
@@ -634,7 +634,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 			}
 		}
 
-		note * cur_note;
+		Note * cur_note;
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
@@ -654,7 +654,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 				}
 
-				engine::mixer()->addPlayHandle( notePlayHandle );
+				Engine::mixer()->addPlayHandle( notePlayHandle );
 				played_a_note = true;
 			}
 			++nit;
@@ -667,7 +667,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackContentObject * InstrumentTrack::createTCO( const MidiTime & )
+TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 {
 	return new Pattern( this );
 }
@@ -675,7 +675,7 @@ trackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 
 
 
-trackView * InstrumentTrack::createView( TrackContainerView* tcv )
+TrackView * InstrumentTrack::createView( TrackContainerView* tcv )
 {
 	return new InstrumentTrackView( this, tcv );
 }
@@ -720,7 +720,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1 );
+	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
 	m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 
@@ -814,14 +814,14 @@ QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
 
 
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
-	trackView( _it, tcv ),
+	TrackView( _it, tcv ),
 	m_window( NULL ),
 	m_lastPos( -1, -1 )
 {
 	setAcceptDrops( true );
 	setFixedHeight( 32 );
 
-	m_tlb = new trackLabelButton( this, getTrackSettingsWidget() );
+	m_tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_tlb->setCheckable( true );
 	m_tlb->setIcon( embed::getIconPixmap( "instrument_track" ) );
 	m_tlb->move( 3, 1 );
@@ -845,7 +845,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
 	}
 
-	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
@@ -855,7 +855,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->show();
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
-	m_panningKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
@@ -866,7 +866,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::mixer()->midiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
 							MidiPort::Input );
@@ -898,7 +898,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiInputAction->setText( tr( "Input" ) );
 	m_midiOutputAction->setText( tr( "Output" ) );
 
-	m_activityIndicator = new fadeButton( QApplication::palette().color( QPalette::Active,
+	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
@@ -935,7 +935,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = NULL;
 	foreach( QMdiSubWindow * sw,
-				engine::mainWindow()->workspace()->subWindowList(
+				Engine::mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
 		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
@@ -1040,7 +1040,7 @@ void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 	InstrumentTrackWindow::dragEnterEventGeneric( _dee );
 	if( !_dee->isAccepted() )
 	{
-		trackView::dragEnterEvent( _dee );
+		TrackView::dragEnterEvent( _dee );
 	}
 }
 
@@ -1050,7 +1050,7 @@ void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 void InstrumentTrackView::dropEvent( QDropEvent * _de )
 {
 	getInstrumentTrackWindow()->dropEvent( _de );
-	trackView::dropEvent( _de );
+	TrackView::dropEvent( _de );
 }
 
 
@@ -1129,10 +1129,10 @@ class fxLineLcdSpinBox : public LcdSpinBox
 	protected:
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
-			engine::fxMixerView()->setCurrentFxLine( model()->value() );
+			Engine::fxMixerView()->setCurrentFxLine( model()->value() );
 
-			engine::fxMixerView()->show();// show fxMixer window
-			engine::fxMixerView()->setFocus();// set focus to fxMixer window
+			Engine::fxMixerView()->show();// show fxMixer window
+			Engine::fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
 		}
 };
@@ -1155,7 +1155,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
-	tabWidget* generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ), this );
+	TabWidget* generalSettingsWidget = new TabWidget( tr( "GENERAL SETTINGS" ), this );
 
 	QVBoxLayout* generalSettingsLayout = new QVBoxLayout( generalSettingsWidget );
 
@@ -1174,7 +1174,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setSpacing( 3 );
 
 	// set up volume knob
-	m_volumeKnob = new knob( knobBright_26, NULL, tr( "Instrument volume" ) );
+	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
@@ -1184,7 +1184,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( m_volumeKnob );
 
 	// set up panning knob
-	m_panningKnob = new knob( knobBright_26, NULL, tr( "Panning" ) );
+	m_panningKnob = new Knob( knobBright_26, NULL, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 
@@ -1192,7 +1192,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addStretch();
 
 	// set up pitch knob
-	m_pitchKnob = new knob( knobBright_26, NULL, tr( "Pitch" ) );
+	m_pitchKnob = new Knob( knobBright_26, NULL, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
@@ -1219,7 +1219,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
-	toolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
+	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
 	saveSettingsBtn->setWhatsThis(
 		tr( "Click here, if you want to save current instrument track settings in a preset file. "
 			"Later you can load this preset by double-clicking it in the preset-browser." ) );
@@ -1229,7 +1229,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
-	m_tabWidget = new tabWidget( "", this );
+	m_tabWidget = new TabWidget( "", this );
 	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + 10 );
 
 
@@ -1274,7 +1274,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = engine::mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = Engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1300,7 +1300,7 @@ InstrumentTrackWindow::~InstrumentTrackWindow()
 
 	delete m_instrumentView;
 
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -1439,7 +1439,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 void InstrumentTrackWindow::textChanged( const QString& newName )
 {
 	m_track->setName( newName );
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -1466,7 +1466,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
 	event->ignore();
 
-	if( engine::mainWindow()->workspace() )
+	if( Engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 	}
@@ -1492,7 +1492,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	stringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
+	StringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
 }
 
 
@@ -1508,14 +1508,14 @@ void InstrumentTrackWindow::dragEnterEvent( QDragEnterEvent* event )
 
 void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 {
-	QString type = stringPairDrag::decodeKey( event );
-	QString value = stringPairDrag::decodeValue( event );
+	QString type = StringPairDrag::decodeKey( event );
+	QString value = StringPairDrag::decodeValue( event );
 
 	if( type == "instrument" )
 	{
 		m_track->loadInstrument( value );
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		event->accept();
 	}
@@ -1526,7 +1526,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		m_track->setSimpleSerializing();
 		m_track->loadSettings( dataFile.content().toElement() );
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 
 		event->accept();
 	}
@@ -1537,7 +1537,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
-			i = m_track->loadInstrument( engine::pluginFileHandling()[ext] );
+			i = m_track->loadInstrument( Engine::pluginFileHandling()[ext] );
 		}
 
 		i->loadFile( value );

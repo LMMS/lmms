@@ -34,7 +34,7 @@
 
 #include <QMdiSubWindow>
 #include <QScrollArea>
-#include "knob.h"
+#include "Knob.h"
 #include <QLayout>
 #include <QPainter>
 #include <QObject>
@@ -87,7 +87,7 @@ private:
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
-	knob ** vstKnobs;
+	Knob ** vstKnobs;
 	int paramCount;
 
 	QObject * ctrHandle;

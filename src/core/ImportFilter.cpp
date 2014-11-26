@@ -26,7 +26,7 @@
 #include <QMessageBox>
 
 #include "ImportFilter.h"
-#include "engine.h"
+#include "Engine.h"
 #include "TrackContainer.h"
 #include "ProjectJournal.h"
 
@@ -60,8 +60,8 @@ void ImportFilter::import( const QString & _file_to_import,
 	char * s = qstrdup( _file_to_import.toUtf8().constData() );
 
 	// do not record changes while importing files
-	const bool j = engine::projectJournal()->isJournalling();
-	engine::projectJournal()->setJournalling( false );
+	const bool j = Engine::projectJournal()->isJournalling();
+	Engine::projectJournal()->setJournalling( false );
 
 	for( Plugin::DescriptorList::ConstIterator it = d.begin();
 												it != d.end(); ++it )
@@ -80,7 +80,7 @@ void ImportFilter::import( const QString & _file_to_import,
 		}
 	}
 
-	engine::projectJournal()->setJournalling( j );
+	Engine::projectJournal()->setJournalling( j );
 
 	delete[] s;
 

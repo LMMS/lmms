@@ -40,27 +40,27 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	setPalette( pal );
 	setFixedSize( 100, 125 );
 
-	knob * volumeKnob = new knob( knobBright_26, this);
+	Knob * volumeKnob = new Knob( knobBright_26, this);
 	volumeKnob -> move( 20, 30 );
 	volumeKnob -> setVolumeKnob( true );
 	volumeKnob->setModel( &controls->m_volumeModel );
 	volumeKnob->setLabel( tr( "VOL" ) );
 	volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 
-	knob * panKnob = new knob( knobBright_26, this);
+	Knob * panKnob = new Knob( knobBright_26, this);
 	panKnob -> move( 60, 30 );
 	panKnob->setModel( &controls->m_panModel );
 	panKnob->setLabel( tr( "PAN" ) );
 	panKnob->setHintText( tr( "Panning:" ) + " ", "" );
 
-	knob * leftKnob = new knob( knobBright_26, this);
+	Knob * leftKnob = new Knob( knobBright_26, this);
 	leftKnob -> move( 20, 80 );
 	leftKnob -> setVolumeKnob( true );
 	leftKnob->setModel( &controls->m_leftModel );
 	leftKnob->setLabel( tr( "LEFT" ) );
 	leftKnob->setHintText( tr( "Left gain:" ) + " ", "%" );
 
-	knob * rightKnob = new knob( knobBright_26, this);
+	Knob * rightKnob = new Knob( knobBright_26, this);
 	rightKnob -> move( 60, 80 );
 	rightKnob -> setVolumeKnob( true );
 	rightKnob->setModel( &controls->m_rightModel );

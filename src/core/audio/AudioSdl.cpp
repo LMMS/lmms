@@ -29,7 +29,7 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
@@ -131,7 +131,7 @@ void AudioSdl::applyQualitySettings()
 	{
 		SDL_CloseAudio();
 
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		m_audioHandle.freq = sampleRate();
 

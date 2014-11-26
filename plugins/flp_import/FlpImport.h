@@ -30,7 +30,7 @@
 #include <QVector>
 
 #include "ImportFilter.h"
-#include "note.h"
+#include "Note.h"
 
 
 

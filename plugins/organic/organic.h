@@ -35,9 +35,9 @@
 
 class QPixmap;
 
-class knob;
+class Knob;
 class NotePlayHandle;
-class pixmapButton;
+class PixmapButton;
 
 const int NUM_HARMONICS = 18;
 const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
@@ -184,11 +184,11 @@ private:
 	{
 		MM_OPERATORS
 		OscillatorKnobs( 
-					knob * h,
-					knob * v,
-					knob * o,
-					knob * p,
-					knob * dt ) :
+					Knob * h,
+					Knob * v,
+					Knob * o,
+					Knob * p,
+					Knob * dt ) :
 			m_harmKnob( h ),
 			m_volKnob( v ),
 			m_oscKnob( o ),
@@ -200,18 +200,18 @@ private:
 		{
 		}
 
-		knob * m_harmKnob;
-		knob * m_volKnob;
-		knob * m_oscKnob;
-		knob * m_panKnob;
-		knob * m_detuneKnob;
+		Knob * m_harmKnob;
+		Knob * m_volKnob;
+		Knob * m_oscKnob;
+		Knob * m_panKnob;
+		Knob * m_detuneKnob;
 	} ;
 
 	OscillatorKnobs * m_oscKnobs;
 
-	knob * m_fx1Knob;
-	knob * m_volKnob;
-	pixmapButton * m_randBtn;
+	Knob * m_fx1Knob;
+	Knob * m_volKnob;
+	PixmapButton * m_randBtn;
 
 	int m_numOscillators;
 

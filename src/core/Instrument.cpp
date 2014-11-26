@@ -27,7 +27,7 @@
 #include "DummyInstrument.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 Instrument::Instrument( InstrumentTrack * _instrument_track,
@@ -100,7 +100,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const fpp_t fpp = engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
 	if( fl <= desiredReleaseFrames()+fpp )
 	{

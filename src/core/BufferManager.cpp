@@ -99,12 +99,12 @@ void BufferManager::extend( int c )
 	MM_FREE( s_available );
 	s_available = tmp;
 
-	int cc = c * engine::mixer()->framesPerPeriod();
+	int cc = c * Engine::mixer()->framesPerPeriod();
 	sampleFrame * b = MM_ALLOC( sampleFrame, cc );
 	
 	for( int i = 0; i < c; ++i )
 	{
 		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = b;
-		b += engine::mixer()->framesPerPeriod();
+		b += Engine::mixer()->framesPerPeriod();
 	}
 }*/

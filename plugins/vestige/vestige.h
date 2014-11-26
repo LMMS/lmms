@@ -34,8 +34,8 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "note.h"
-#include "knob.h"
+#include "Note.h"
+#include "Knob.h"
 
 #include "AutomatableModel.h"
 
@@ -43,7 +43,7 @@
 class QPixmap;
 class QPushButton;
 
-class pixmapButton;
+class PixmapButton;
 class VstPlugin;
 
 
@@ -85,7 +85,7 @@ private:
 	QString m_pluginDLL;
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	knob ** vstKnobs;
+	Knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
@@ -168,14 +168,14 @@ private:
 
 	int lastPosInMenu;
 
-	pixmapButton * m_openPluginButton;
-	pixmapButton * m_openPresetButton;
-	pixmapButton * m_rolLPresetButton;
-	pixmapButton * m_rolRPresetButton;
+	PixmapButton * m_openPluginButton;
+	PixmapButton * m_openPresetButton;
+	PixmapButton * m_rolLPresetButton;
+	PixmapButton * m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
-	pixmapButton * m_managePluginButton;
-	pixmapButton * m_savePresetButton;
+	PixmapButton * m_managePluginButton;
+	PixmapButton * m_savePresetButton;
 
 	Instrument * _instrument2;
 	QWidget * _parent2;

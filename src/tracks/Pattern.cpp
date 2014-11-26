@@ -38,16 +38,16 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "PianoRoll.h"
 #include "TrackContainer.h"
-#include "rename_dialog.h"
+#include "RenameDialog.h"
 #include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
-#include "song.h"
-#include "tooltip.h"
-#include "bb_track_container.h"
-#include "string_pair_drag.h"
+#include "Song.h"
+#include "ToolTip.h"
+#include "BBTrackContainer.h"
+#include "StringPairDrag.h"
 #include "MainWindow.h"
 
 
@@ -59,7 +59,7 @@ QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
 
 Pattern::Pattern( InstrumentTrack * _instrument_track ) :
-	trackContentObject( _instrument_track ),
+	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerTact() )
@@ -72,14 +72,14 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 
 
 Pattern::Pattern( const Pattern& other ) :
-	trackContentObject( other.m_instrumentTrack ),
+	TrackContentObject( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
 	m_steps( other.m_steps )
 {
 	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
 	{
-		m_notes.push_back( new note( **it ) );
+		m_notes.push_back( new Note( **it ) );
 	}
 
 	init();
@@ -104,7 +104,7 @@ Pattern::~Pattern()
 
 void Pattern::init()
 {
-	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
 	saveJournallingState( false );
 
@@ -167,12 +167,12 @@ MidiTime Pattern::beatPatternLength() const
 	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
 }
 
-note * Pattern::addNote( const note & _new_note, const bool _quant_pos )
+Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	note * new_note = new note( _new_note );
-	if( _quant_pos && engine::pianoRoll() )
+	Note * new_note = new Note( _new_note );
+	if( _quant_pos && Engine::pianoRoll() )
 	{
-		new_note->quantizePos( engine::pianoRoll()->quantization() );
+		new_note->quantizePos( Engine::pianoRoll()->quantization() );
 	}
 
 	instrumentTrack()->lock();
@@ -213,7 +213,7 @@ note * Pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 
 
-void Pattern::removeNote( const note * _note_to_del )
+void Pattern::removeNote( const Note * _note_to_del )
 {
 	instrumentTrack()->lock();
 	NoteVector::Iterator it = m_notes.begin();
@@ -240,7 +240,7 @@ void Pattern::removeNote( const note * _note_to_del )
 
 // returns a pointer to the note at specified step, or NULL if note doesn't exist
 
-note * Pattern::noteAtStep( int _step )
+Note * Pattern::noteAtStep( int _step )
 {
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
@@ -254,12 +254,12 @@ note * Pattern::noteAtStep( int _step )
 }
 
 
-note * Pattern::rearrangeNote( const note * _note_to_proc,
+Note * Pattern::rearrangeNote( const Note * _note_to_proc,
 							const bool _quant_pos )
 {
 	// just rearrange the position of the note by removing it and adding
 	// a copy of it -> addNote inserts it at the correct position
-	note copy_of_note( *_note_to_proc );
+	Note copy_of_note( *_note_to_proc );
 	removeNote( _note_to_proc );
 
 	return addNote( copy_of_note, _quant_pos );
@@ -270,7 +270,7 @@ note * Pattern::rearrangeNote( const note * _note_to_proc,
 void Pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
-	qSort(m_notes.begin(), m_notes.end(), note::lessThan );
+	qSort(m_notes.begin(), m_notes.end(), Note::lessThan );
 }
 
 
@@ -397,7 +397,7 @@ void Pattern::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			note * n = new note;
+			Note * n = new Note;
 			n->restoreState( node.toElement() );
 			m_notes.push_back( n );
 		}
@@ -471,7 +471,7 @@ void Pattern::removeSteps()
 
 
 
-trackContentObjectView * Pattern::createView( trackView * _tv )
+TrackContentObjectView * Pattern::createView( TrackView * _tv )
 {
 	return new PatternView( this, _tv );
 }
@@ -499,7 +499,7 @@ void Pattern::ensureBeatNotes()
 		}
 		if( found == false )
 		{
-			addNote( note( MidiTime( 0 ), MidiTime( ( i *
+			addNote( Note( MidiTime( 0 ), MidiTime( ( i *
 				MidiTime::ticksPerTact() ) /
 					MidiTime::stepsPerTact() ) ), false );
 		}
@@ -534,14 +534,14 @@ void Pattern::ensureBeatNotes()
 
 void Pattern::updateBBTrack()
 {
-	if( getTrack()->trackContainer() == engine::getBBTrackContainer() )
+	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
 	{
-		engine::getBBTrackContainer()->updateBBTrack( this );
+		Engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( engine::pianoRoll() && engine::pianoRoll()->currentPattern() == this )
+	if( Engine::pianoRoll() && Engine::pianoRoll()->currentPattern() == this )
 	{
-		engine::pianoRoll()->update();
+		Engine::pianoRoll()->update();
 	}
 }
 
@@ -601,13 +601,13 @@ void Pattern::changeTimeSignature()
 
 
 
-PatternView::PatternView( Pattern* pattern, trackView* parent ) :
-	trackContentObjectView( pattern, parent ),
+PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
+	TrackContentObjectView( pattern, parent ),
 	m_pat( pattern ),
 	m_paintPixmap(),
 	m_needsUpdate( true )
 {
-	connect( engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
+	connect( Engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	if( s_stepBtnOn == NULL )
@@ -637,7 +637,7 @@ PatternView::PatternView( Pattern* pattern, trackView* parent ) :
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAutoResizeEnabled( false );
 
-	toolTip::add( this,
+	ToolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
 			"use mouse wheel to set volume of a step" ) );
 	setStyle( QApplication::style() );
@@ -660,7 +660,7 @@ void PatternView::update()
 {
 	m_needsUpdate = true;
 	m_pat->changeLength( m_pat->length() );
-	trackContentObjectView::update();
+	TrackContentObjectView::update();
 }
 
 
@@ -668,9 +668,9 @@ void PatternView::update()
 
 void PatternView::openInPianoRoll()
 {
-	engine::pianoRoll()->setCurrentPattern( m_pat );
-	engine::pianoRoll()->parentWidget()->show();
-	engine::pianoRoll()->setFocus();
+	Engine::pianoRoll()->setCurrentPattern( m_pat );
+	Engine::pianoRoll()->parentWidget()->show();
+	Engine::pianoRoll()->setFocus();
 }
 
 
@@ -687,7 +687,7 @@ void PatternView::resetName()
 void PatternView::changeName()
 {
 	QString s = m_pat->name();
-	renameDialog rename_dlg( s );
+	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_pat->setName( s );
 }
@@ -773,7 +773,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 			return;
 		}
 
-		note * n = m_pat->noteAtStep( step );
+		Note * n = m_pat->noteAtStep( step );
 
 		// if note at step not found, ensureBeatNotes and try again
 		if( n == NULL )
@@ -798,12 +798,12 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 			}
 		}
 
-		engine::getSong()->setModified();
+		Engine::getSong()->setModified();
 		update();
 
-		if( engine::pianoRoll()->currentPattern() == m_pat )
+		if( Engine::pianoRoll()->currentPattern() == m_pat )
 		{
-			engine::pianoRoll()->update();
+			Engine::pianoRoll()->update();
 		}
 	}
 	else
@@ -811,7 +811,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	// if not in beat/bassline -mode, let parent class handle the event
 
 	{
-		trackContentObjectView::mousePressEvent( _me );
+		TrackContentObjectView::mousePressEvent( _me );
 	}
 }
 
@@ -840,7 +840,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		int vol = 0;
 		int len = 0;
 
-		note * n = m_pat->noteAtStep( step );
+		Note * n = m_pat->noteAtStep( step );
 		if( n != NULL )
 		{
 			vol = n->getVolume();
@@ -860,18 +860,18 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 				n->setVolume( qMax( 0, vol - 5 ) );
 			}
 
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 			update();
-			if( engine::pianoRoll()->currentPattern() == m_pat )
+			if( Engine::pianoRoll()->currentPattern() == m_pat )
 			{
-				engine::pianoRoll()->update();
+				Engine::pianoRoll()->update();
 			}
 		}
 		_we->accept();
 	}
 	else
 	{
-		trackContentObjectView::wheelEvent( _we );
+		TrackContentObjectView::wheelEvent( _we );
 	}
 }
 
@@ -924,7 +924,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setBrush( lingrad );
-	if( engine::pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != Pattern::BeatPattern )
+	if( Engine::pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != Pattern::BeatPattern )
 		p.setPen( c.lighter( 130 ) );
 	else
 		p.setPen( c.darker( 300 ) );
@@ -933,7 +933,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	p.setBrush( QBrush() );
 	if( m_pat->m_patternType != Pattern::BeatPattern )
 	{
-		if( engine::pianoRoll()->currentPattern() == m_pat )
+		if( Engine::pianoRoll()->currentPattern() == m_pat )
 			p.setPen( c.lighter( 160 ) );
 		else
 			p.setPen( c.lighter( 130 ) );
@@ -1083,7 +1083,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
-			note * n = m_pat->noteAtStep( it );
+			Note * n = m_pat->noteAtStep( it );
 
 			// figure out x and y coordinates for step graphic
 			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );

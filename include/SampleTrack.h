@@ -31,11 +31,11 @@
 #include "Track.h"
 
 class EffectRackView;
-class knob;
+class Knob;
 class SampleBuffer;
 
 
-class SampleTCO : public trackContentObject
+class SampleTCO : public TrackContentObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
@@ -60,7 +60,7 @@ public:
 
 	MidiTime sampleLength() const;
 
-	virtual trackContentObjectView * createView( trackView * _tv );
+	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 
 public slots:
@@ -85,7 +85,7 @@ signals:
 
 
 
-class SampleTCOView : public trackContentObjectView
+class SampleTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
 	
@@ -94,7 +94,7 @@ class SampleTCOView : public trackContentObjectView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	SampleTCOView( SampleTCO * _tco, trackView * _tv );
+	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
 	virtual ~SampleTCOView();
 
 
@@ -127,8 +127,8 @@ public:
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual trackView * createView( TrackContainerView* tcv );
-	virtual trackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackView * createView( TrackContainerView* tcv );
+	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -157,7 +157,7 @@ private:
 
 
 
-class SampleTrackView : public trackView
+class SampleTrackView : public TrackView
 {
 	Q_OBJECT
 public:
@@ -180,7 +180,7 @@ protected:
 private:
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
-	knob * m_volumeKnob;
+	Knob * m_volumeKnob;
 
 } ;
 
