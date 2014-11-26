@@ -166,8 +166,46 @@ float Engine::tempoToFramesPerTick( float tempo )
 
 float Engine::framesPerTick( tick_t position )
 {
-	return TempoTrack::s_fptMap->value( position );
+	if( TempoTrack::s_fptMap->empty() ) // if we have no tempo automation, simply fetch the current fpt value											
+	{
+		return s_framesPerTick;
+	}
+	if( TempoTrack::s_fptMap->contains( position ) ) // we have the exact position so get we'll that
+	{
+		return TempoTrack::s_fptMap->value( position );
+	}
+	
+	// fetch the nearest tempo from the cached map
+	TimeMap::iterator it = TempoTrack::s_fptMap->lowerBound( position );
+	if( it == TempoTrack::s_fptMap->begin() ) // we're before the first automation point, so ...
+	{
+		return s_framesPerTick;	// TODO 2.0: change to fetch the "value at playback start" value when impl.
+	}
+	return ( it - 1 ).value();
 }
+
+
+float Engine::tempoAt( tick_t position )
+{
+	if( TempoTrack::s_tempoMap->empty() ) // if we have no tempo automation, simply fetch the current tempo widget value
+											// TODO 2.0: change to fetch the "value at playback start" value when impl.
+	{
+		return s_song->getTempo();
+	}
+	if( TempoTrack::s_tempoMap->contains( position ) ) // we have the exact position so get we'll that
+	{
+		return TempoTrack::s_tempoMap->value( position );
+	}
+	
+	// fetch the nearest tempo from the cached map
+	TimeMap::iterator it = TempoTrack::s_tempoMap->lowerBound( position );
+	if( it == TempoTrack::s_tempoMap->begin() ) // we're before the first automation point, so ...
+	{
+		return s_song->getTempo();	// TODO 2.0: change to fetch the "value at playback start" value when impl.
+	}
+	return ( it - 1 ).value(); // lowerbound returns the next value after pos, so subtract the pos
+}
+
 
 
 void Engine::initPluginFileHandling()

@@ -700,7 +700,7 @@ void AutomationPattern::updateTempoMaps( tick_t start, tick_t end )
 	
 	if( ! hasAutomation() ) // clear maps from the area of this pattern
 	{
-		for( int i = start; i <= end; ++i )
+		for( int i = start; i < end; ++i )
 		{
 			tm->remove( i );
 			fm->remove( i );
@@ -710,12 +710,12 @@ void AutomationPattern::updateTempoMaps( tick_t start, tick_t end )
 	
 	if( m_progressionType == DiscreteProgression ) // discrete, so we only need the values of the points
 	{
-		for( int i = start; i <= end; ++i )
+		for( int i = start; i < end; ++i )
 		{
 			const int j = i - startPosition();
 			if( m_timeMap.contains( j ) )
 			{
-				const float val = m_timeMap.value( j );
+				const float val = roundf( m_timeMap.value( j ) );
 				tm->insert( i, val );
 				fm->insert( i, Engine::tempoToFramesPerTick( val ) );
 			}
@@ -729,10 +729,10 @@ void AutomationPattern::updateTempoMaps( tick_t start, tick_t end )
 	}
 	
 	// linear or cubic progression, so we need all the in-between values too
-	for( int i = start; i <= end; ++i )
+	for( int i = start; i < end; ++i )
 	{
 		const int j = i - startPosition();
-		const float val = valueAt( j );
+		const float val = roundf( valueAt( j ) );
 		tm->insert( i, val );
 		fm->insert( i, Engine::tempoToFramesPerTick( val ) );
 	}

@@ -100,6 +100,12 @@ TempoPattern::TempoPattern( const TempoPattern & tpToCopy ) :
 
 TempoPattern::~TempoPattern()
 {
+	// clear out the tempomaps in the area of the pattern when removing a tempo pattern
+	for( int i = startPosition(); i < endPosition(); ++i )
+	{
+		TempoTrack::s_tempoMap->remove( i );
+		TempoTrack::s_fptMap->remove( i );
+	}
 }
 
 
@@ -111,10 +117,35 @@ TrackContentObjectView * TempoPattern::createView( TrackView * tv )
 
 void TempoPattern::changeLength( const MidiTime & length )
 {
+	// we have to update the cached tempomaps when resizing a tempo pattern
 	int oldEnd = endPosition();
 	TrackContentObject::changeLength( length );
 	updateTempoMaps( startPosition(), qMax<int>( endPosition(), oldEnd ) );
 }
+
+
+void TempoPattern::movePosition( const MidiTime & pos )
+{
+	// we have to update the cached tempomaps when moving a tempo pattern
+	int oldStart = startPosition();
+	int oldEnd = endPosition();
+	
+	TrackContentObject::movePosition( pos );
+	
+	if( startPosition() != oldStart || endPosition() != oldEnd ) // either start or end changed so update the areas
+	{
+		// clear the old area
+		for( int i = oldStart; i < oldEnd; ++i )
+		{
+			TempoTrack::s_tempoMap->remove( i );
+			TempoTrack::s_fptMap->remove( i );
+		}
+		// update the new
+		updateTempoMaps();
+	}
+}
+
+
 
 
 TempoPatternView::TempoPatternView( TempoPattern * pat, TrackView * parent ) :

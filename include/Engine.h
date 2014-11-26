@@ -165,6 +165,8 @@ public:
 	}
 	
 	static float framesPerTick( tick_t position );
+	
+	static float tempoAt( tick_t position );
 		
 	static void updateFramesPerTick();
 

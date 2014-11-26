@@ -115,6 +115,12 @@ Song::Song() :
 			this, SLOT( masterPitchChanged() ) );*/
 
 	qRegisterMetaType<Note>( "note" );
+	
+	updateFramesPerTick();
+	m_playbackStartFpt = Engine::framesPerTick();
+	m_playbackStartTempo = m_tempoModel.value();
+	m_lastTempo = m_tempoModel.value();
+	m_vstSyncController.setTempo( m_lastTempo );
 }
 
 
@@ -137,8 +143,15 @@ void Song::masterVolumeChanged()
 
 
 
-void Song::setTempo()
+void Song::setTempo() // called when the tempo widget is changed manually
 {
+	if( ! ( m_playing && m_playMode == Mode_PlaySong ) ) // if we're already playing the song, don't change the playback-start values
+	{
+		m_playbackStartTempo = m_tempoModel.value();
+		Engine::updateFramesPerTick();
+		m_playbackStartFpt = Engine::framesPerTick();
+	}
+	/*
 	Engine::mixer()->lockPlayHandleRemoval();
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::mixer()->playHandles();
@@ -160,6 +173,7 @@ void Song::setTempo()
 	m_vstSyncController.setTempo( tempo );
 
 	emit tempoChanged( tempo );
+	*/
 }
 
 
@@ -203,19 +217,31 @@ void Song::processNextBuffer()
 	
 	m_ticksThisPeriod.clear();
 
+	float tempo = m_lastTempo;
+	bool useTempoMap = false;
+
 	switch( m_playMode )
 	{
 		case Mode_PlaySong:
+			//qDebug( "tick %d, tempo %f, fpt %f", m_playPos[m_playMode].getTicks(), 
+			//	Engine::tempoAt( m_playPos[m_playMode] ), Engine::framesPerTick( m_playPos[m_playMode] ) );
 			m_trackList = tracks();
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
 			{
 				EnvelopeAndLfoParameters::instances()->reset();
 			}
+			useTempoMap = true;
 			break;
 
 		case Mode_PlayTrack:
 			m_trackList.push_back( m_trackToPlay );
+			// at song-start we have to reset the LFOs
+			if( m_playPos[Mode_PlayTrack] == 0 )
+			{
+				EnvelopeAndLfoParameters::instances()->reset();
+			}
+			useTempoMap = true;
 			break;
 
 		case Mode_PlayBB:
@@ -267,7 +293,7 @@ void Song::processNextBuffer()
 	}
 
 	f_cnt_t total_frames_played = 0;
-	const float frames_per_tick = Engine::framesPerTick(); // TODO 2.0: when we have tempo track, look this up from it
+	float frames_per_tick = Engine::framesPerTick( m_playPos[m_playMode] );
 
 	while( total_frames_played
 				< Engine::mixer()->framesPerPeriod() )
@@ -688,9 +714,9 @@ void Song::addAutomationTrack()
 
 
 
-bpm_t Song::getTempo()
+float Song::getTempo()
 {
-	return (bpm_t) m_tempoModel.value();
+	return m_tempoModel.value();
 }
 
 

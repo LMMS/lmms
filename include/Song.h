@@ -201,7 +201,7 @@ public:
 	}
 
 
-	bpm_t getTempo();
+	float getTempo();
 	virtual AutomationPattern * tempoAutomationPattern();
 
 	// file management
@@ -282,6 +282,15 @@ public:
 		return &m_trackList;
 	}
 
+	inline float playbackStartTempo() const
+	{
+		return m_playbackStartTempo;
+	}
+	
+	inline float playbackStartFpt() const
+	{
+		return m_playbackStartFpt;
+	}
 
 public slots:
 	void playSong();
@@ -392,7 +401,10 @@ private:
 	tact_t m_elapsedTacts;
 
 	VstSyncController m_vstSyncController;
-
+	
+	float m_playbackStartTempo;
+	float m_playbackStartFpt;
+	float m_lastTempo;
 
 	friend class Engine;
 	friend class SongEditor;

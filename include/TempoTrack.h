@@ -121,6 +121,7 @@ public:
 	virtual TrackContentObjectView * createView( TrackView * tv );
 	
 	virtual void changeLength( const MidiTime & _length );
+	virtual void movePosition( const MidiTime & _pos );
 };
 
 #endif
