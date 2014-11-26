@@ -34,7 +34,7 @@
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
@@ -220,7 +220,7 @@ void Song::processNextBuffer()
 			{
 				tco_num = Engine::getBBTrackContainer()->
 								currentBB();
-				track_list.push_back( bbTrack::findBBTrack(
+				track_list.push_back( BBTrack::findBBTrack(
 								tco_num ) );
 			}
 			break;
@@ -673,7 +673,7 @@ void Song::removeBar()
 void Song::addBBTrack()
 {
 	Track * t = Track::create( Track::BBTrack, this );
-	Engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<bbTrack *>( t )->index() );
+	Engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<BBTrack *>( t )->index() );
 }
 
 

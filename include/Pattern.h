@@ -46,7 +46,7 @@ class SampleBuffer;
 
 
 
-class EXPORT Pattern : public trackContentObject
+class EXPORT Pattern : public TrackContentObject
 {
 	Q_OBJECT
 public:
@@ -110,7 +110,7 @@ public:
 	bool empty();
 
 
-	virtual trackContentObjectView * createView( trackView * _tv );
+	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 
 	using Model::dataChanged;
@@ -148,7 +148,7 @@ signals:
 
 
 
-class PatternView : public trackContentObjectView
+class PatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
@@ -156,7 +156,7 @@ class PatternView : public trackContentObjectView
 	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 public:
-	PatternView( Pattern* pattern, trackView* parent );
+	PatternView( Pattern* pattern, TrackView* parent );
 	virtual ~PatternView();
 
 
@@ -179,7 +179,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * _re )
 	{
 		m_needsUpdate = true;
-		trackContentObjectView::resizeEvent( _re );
+		TrackContentObjectView::resizeEvent( _re );
 	}
 	virtual void wheelEvent( QWheelEvent * _we );
 

@@ -15,7 +15,7 @@
 #include "Note.h"
 #include "Pattern.h"
 #include "Track.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "Instrument.h"
 
@@ -305,8 +305,8 @@ bool HydrogenImport::readSong()
 			patternId = ( QDomNode ) patternId.nextSiblingElement( "patternID" );
 
 			int i = pattern_id[patId]+song_num_tracks;
-			Track *t = ( bbTrack * ) s->tracks().at( i );
- 			trackContentObject *tco = t->createTCO( pos );      
+			Track *t = ( BBTrack * ) s->tracks().at( i );
+ 			TrackContentObject *tco = t->createTCO( pos );      
 			tco->movePosition( pos );
 
 			

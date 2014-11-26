@@ -41,8 +41,8 @@
 QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
-						trackView * _parent ) :
-	trackContentObjectView( _pattern, _parent ),
+						TrackView * _parent ) :
+	TrackContentObjectView( _pattern, _parent ),
 	m_pat( _pattern ),
 	m_paintPixmap(),
 	m_needsUpdate( true )
@@ -82,7 +82,7 @@ void AutomationPatternView::update()
 	{
 		m_pat->changeLength( m_pat->length() );
 	}
-	trackContentObjectView::update();
+	TrackContentObjectView::update();
 }
 
 
@@ -364,7 +364,7 @@ void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 	if( !_dee->isAccepted() )
 	{
-		trackContentObjectView::dragEnterEvent( _dee );
+		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
 
@@ -394,7 +394,7 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 	}
 	else
 	{
-		trackContentObjectView::dropEvent( _de );
+		TrackContentObjectView::dropEvent( _de );
 	}
 }
 

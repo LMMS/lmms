@@ -29,7 +29,7 @@
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
-class bbTrack;
+class BBTrack;
 class SampleTCO;
 class Track;
 class AudioPort;
@@ -64,7 +64,7 @@ public:
 		m_doneMayReturnTrue = _enable;
 	}
 
-	void setBBTrack( bbTrack * _bb_track )
+	void setBBTrack( BBTrack * _bb_track )
 	{
 		m_bbTrack = _bb_track;
 	}
@@ -88,7 +88,7 @@ private:
 	FloatModel * m_volumeModel;
 	Track * m_track;
 
-	bbTrack * m_bbTrack;
+	BBTrack * m_bbTrack;
 
 } ;
 

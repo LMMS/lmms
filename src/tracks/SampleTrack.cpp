@@ -50,7 +50,7 @@
 
 
 SampleTCO::SampleTCO( Track * _track ) :
-	trackContentObject( _track ),
+	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer )
 {
 	saveJournallingState( false );
@@ -76,7 +76,7 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const MidiTime & _length )
 {
-	trackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
+	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
 }
 
 
@@ -178,7 +178,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 
 
 
-trackContentObjectView * SampleTCO::createView( trackView * _tv )
+TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
 {
 	return new SampleTCOView( this, _tv );
 }
@@ -192,8 +192,8 @@ trackContentObjectView * SampleTCO::createView( trackView * _tv )
 
 
 
-SampleTCOView::SampleTCOView( SampleTCO * _tco, trackView * _tv ) :
-	trackContentObjectView( _tco, _tv ),
+SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
+	TrackContentObjectView( _tco, _tv ),
 	m_tco( _tco )
 {
 	// update UI and tooltip
@@ -270,7 +270,7 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 	if( StringPairDrag::processDragEnterEvent( _dee,
 					"samplefile,sampledata" ) == false )
 	{
-		trackContentObjectView::dragEnterEvent( _dee );
+		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
 
@@ -295,7 +295,7 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 	}
 	else
 	{
-		trackContentObjectView::dropEvent( _de );
+		TrackContentObjectView::dropEvent( _de );
 	}
 }
 
@@ -312,7 +312,7 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		trackContentObjectView::mousePressEvent( _me );
+		TrackContentObjectView::mousePressEvent( _me );
 	}
 }
 
@@ -429,7 +429,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
-		trackContentObject * tco = getTCO( i );
+		TrackContentObject * tco = getTCO( i );
 		if( tco->startPosition() != _start )
 		{
 			continue;
@@ -468,7 +468,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackView * SampleTrack::createView( TrackContainerView* tcv )
+TrackView * SampleTrack::createView( TrackContainerView* tcv )
 {
 	return new SampleTrackView( this, tcv );
 }
@@ -476,7 +476,7 @@ trackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * SampleTrack::createTCO( const MidiTime & )
+TrackContentObject * SampleTrack::createTCO( const MidiTime & )
 {
 	return new SampleTCO( this );
 }
@@ -521,7 +521,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
-	trackView( _t, tcv )
+	TrackView( _t, tcv )
 {
 	setFixedHeight( 32 );
 
@@ -594,7 +594,7 @@ void SampleTrackView::modelChanged()
 	SampleTrack * st = castModel<SampleTrack>();
 	m_volumeKnob->setModel( &st->m_volumeModel );
 
-	trackView::modelChanged();
+	TrackView::modelChanged();
 }
 
 

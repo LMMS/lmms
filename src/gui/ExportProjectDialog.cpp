@@ -31,7 +31,7 @@
 #include "Engine.h"
 #include "MainWindow.h"
 #include "BBTrackContainer.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 
 
 ExportProjectDialog::ExportProjectDialog( const QString & _file_name,

@@ -38,7 +38,7 @@
 
 
 
-TrackLabelButton::TrackLabelButton( trackView * _tv, QWidget * _parent ) :
+TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
 	m_trackView( _tv ),
 	m_iconName()

@@ -58,7 +58,7 @@ public:
 
 	void swapBB( int _bb1, int _bb2 );
 
-	void updateBBTrack( trackContentObject * _tco );
+	void updateBBTrack( TrackContentObject * _tco );
 	void fixIncorrectPositions();
 	void createTCOsForBB( int _bb );
 

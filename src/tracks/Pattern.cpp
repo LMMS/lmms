@@ -59,7 +59,7 @@ QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
 
 Pattern::Pattern( InstrumentTrack * _instrument_track ) :
-	trackContentObject( _instrument_track ),
+	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerTact() )
@@ -72,7 +72,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 
 
 Pattern::Pattern( const Pattern& other ) :
-	trackContentObject( other.m_instrumentTrack ),
+	TrackContentObject( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
 	m_steps( other.m_steps )
@@ -471,7 +471,7 @@ void Pattern::removeSteps()
 
 
 
-trackContentObjectView * Pattern::createView( trackView * _tv )
+TrackContentObjectView * Pattern::createView( TrackView * _tv )
 {
 	return new PatternView( this, _tv );
 }
@@ -601,8 +601,8 @@ void Pattern::changeTimeSignature()
 
 
 
-PatternView::PatternView( Pattern* pattern, trackView* parent ) :
-	trackContentObjectView( pattern, parent ),
+PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
+	TrackContentObjectView( pattern, parent ),
 	m_pat( pattern ),
 	m_paintPixmap(),
 	m_needsUpdate( true )
@@ -660,7 +660,7 @@ void PatternView::update()
 {
 	m_needsUpdate = true;
 	m_pat->changeLength( m_pat->length() );
-	trackContentObjectView::update();
+	TrackContentObjectView::update();
 }
 
 
@@ -811,7 +811,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	// if not in beat/bassline -mode, let parent class handle the event
 
 	{
-		trackContentObjectView::mousePressEvent( _me );
+		TrackContentObjectView::mousePressEvent( _me );
 	}
 }
 
@@ -871,7 +871,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 	}
 	else
 	{
-		trackContentObjectView::wheelEvent( _we );
+		TrackContentObjectView::wheelEvent( _we );
 	}
 }
 

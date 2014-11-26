@@ -44,7 +44,7 @@ const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
 
 AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
-	trackContentObject( _auto_track ),
+	TrackContentObject( _auto_track ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
@@ -60,7 +60,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 
 
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
-	trackContentObject( _pat_to_copy.m_autoTrack ),
+	TrackContentObject( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_objects( _pat_to_copy.m_objects ),
 	m_tension( _pat_to_copy.m_tension ),
@@ -387,7 +387,7 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
-	_this.setAttribute( "len", trackContentObject::length() );
+	_this.setAttribute( "len", TrackContentObject::length() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
@@ -459,9 +459,9 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 const QString AutomationPattern::name() const
 {
-	if( !trackContentObject::name().isEmpty() )
+	if( !TrackContentObject::name().isEmpty() )
 	{
-		return trackContentObject::name();
+		return TrackContentObject::name();
 	}
 	if( !m_objects.isEmpty() && m_objects.first() != NULL )
 	{
@@ -511,7 +511,7 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 
 
 
-trackContentObjectView * AutomationPattern::createView( trackView * _tv )
+TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
 {
 	return new AutomationPatternView( this, _tv );
 }

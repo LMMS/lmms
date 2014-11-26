@@ -24,7 +24,7 @@
 
 
 #include "BBTrackContainer.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "ComboBox.h"
 #include "embed.h"
 #include "Engine.h"
@@ -152,9 +152,9 @@ void BBTrackContainer::swapBB( int _bb1, int _bb2 )
 
 
 
-void BBTrackContainer::updateBBTrack( trackContentObject * _tco )
+void BBTrackContainer::updateBBTrack( TrackContentObject * _tco )
 {
-	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() /
+	BBTrack * t = BBTrack::findBBTrack( _tco->startPosition() /
 							DefaultTicksPerTact );
 	if( t != NULL )
 	{
@@ -211,7 +211,7 @@ void BBTrackContainer::updateComboBox()
 
 	for( int i = 0; i < numOfBBs(); ++i )
 	{
-		bbTrack * bbt = bbTrack::findBBTrack( i );
+		BBTrack * bbt = BBTrack::findBBTrack( i );
 		m_bbComboBoxModel.addItem( bbt->name() );
 	}
 	setCurrentBB( cur_bb );
@@ -253,7 +253,7 @@ void BBTrackContainer::createTCOsForBB( int _bb )
 		while( tl[i]->numOfTCOs() < _bb + 1 )
 		{
 			MidiTime position = MidiTime( tl[i]->numOfTCOs(), 0 );
-			trackContentObject * tco = tl[i]->createTCO( position );
+			TrackContentObject * tco = tl[i]->createTCO( position );
 			tco->movePosition( position );
 			tco->changeLength( MidiTime( 1, 0 ) );
 		}

@@ -38,7 +38,7 @@ class MidiTime;
 
 
 
-class EXPORT AutomationPattern : public trackContentObject
+class EXPORT AutomationPattern : public TrackContentObject
 {
 	Q_OBJECT
 public:
@@ -148,7 +148,7 @@ public:
 
 	void processMidiTime( const MidiTime & _time );
 
-	virtual trackContentObjectView * createView( trackView * _tv );
+	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 
 	static bool isAutomated( const AutomatableModel * _m );

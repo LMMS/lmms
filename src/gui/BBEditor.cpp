@@ -183,7 +183,7 @@ void BBEditor::dropEvent( QDropEvent * de )
 
 void BBEditor::removeBBView( int _bb )
 {
-	foreach( trackView* view, trackViews() )
+	foreach( TrackView* view, trackViews() )
 	{
 		view->getTrackContentWidget()->removeTCOView( _bb );
 	}

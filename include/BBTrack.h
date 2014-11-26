@@ -1,5 +1,5 @@
 /*
- * bb_track.h - class bbTrack, a wrapper for using bbEditor
+ * BBTrack.h - class BBTrack, a wrapper for using bbEditor
  *              (which is a singleton-class) as track
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -36,11 +36,11 @@ class TrackLabelButton;
 class TrackContainer;
 
 
-class bbTCO : public trackContentObject
+class BBTCO : public TrackContentObject
 {
 public:
-	bbTCO( Track * _track );
-	virtual ~bbTCO();
+	BBTCO( Track * _track );
+	virtual ~BBTCO();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -71,25 +71,25 @@ public:
 
 	int bbTrackIndex();
 
-	virtual trackContentObjectView * createView( trackView * _tv );
+	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 private:
 	QColor m_color;
 	bool m_useStyleColor;
 
 
-	friend class bbTCOView;
+	friend class BBTCOView;
 
 } ;
 
 
 
-class bbTCOView : public trackContentObjectView
+class BBTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
 public:
-	bbTCOView( trackContentObject * _tco, trackView * _tv );
-	virtual ~bbTCOView();
+	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
+	virtual ~BBTCOView();
 
 	QColor color() const
 	{
@@ -113,30 +113,30 @@ protected:
 
 
 private:
-	bbTCO * m_bbTCO;
+	BBTCO * m_bbTCO;
 
 } ;
 
 
 
 
-class EXPORT bbTrack : public Track
+class EXPORT BBTrack : public Track
 {
 	Q_OBJECT
 public:
-	bbTrack( TrackContainer* tc );
-	virtual ~bbTrack();
+	BBTrack( TrackContainer* tc );
+	virtual ~BBTrack();
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual trackView * createView( TrackContainerView* tcv );
-	virtual trackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackView * createView( TrackContainerView* tcv );
+	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
-	static bbTrack * findBBTrack( int _bb_num );
+	static BBTrack * findBBTrack( int _bb_num );
 	static void swapBBTracks( Track * _track1, Track * _track2 );
 
 	int index()
@@ -188,27 +188,27 @@ protected:
 private:
 	QList<Track *> m_disabledTracks;
 
-	typedef QMap<bbTrack *, int> infoMap;
+	typedef QMap<BBTrack *, int> infoMap;
 	static infoMap s_infoMap;
 
 	static QColor * s_lastTCOColor;
 
-	friend class bbTrackView;
+	friend class BBTrackView;
 
 } ;
 
 
 
-class bbTrackView : public trackView
+class BBTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	bbTrackView( bbTrack* bbt, TrackContainerView* tcv );
-	virtual ~bbTrackView();
+	BBTrackView( BBTrack* bbt, TrackContainerView* tcv );
+	virtual ~BBTrackView();
 
 	virtual bool close();
 
-	const bbTrack * getBBTrack() const
+	const BBTrack * getBBTrack() const
 	{
 		return( m_bbTrack );
 	}
@@ -219,7 +219,7 @@ public slots:
 
 
 private:
-	bbTrack * m_bbTrack;
+	BBTrack * m_bbTrack;
 	TrackLabelButton * m_trackLabel;
 
 } ;

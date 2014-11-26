@@ -1,5 +1,5 @@
 /*
- * bb_track.cpp - implementation of class bbTrack and bbTCO
+ * BBTrack.cpp - implementation of class BBTrack and bbTCO
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -28,7 +28,7 @@
 #include <QPainter>
 
 #include "BBEditor.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "Engine.h"
@@ -43,11 +43,11 @@
 
 
 
-bbTrack::infoMap bbTrack::s_infoMap;
+BBTrack::infoMap BBTrack::s_infoMap;
 
 
-bbTCO::bbTCO( Track * _track ) :
-	trackContentObject( _track ),
+BBTCO::BBTCO( Track * _track ) :
+	TrackContentObject( _track ),
 	m_color( 128, 128, 128 ),
 	m_useStyleColor( true )
 {
@@ -63,14 +63,14 @@ bbTCO::bbTCO( Track * _track ) :
 
 
 
-bbTCO::~bbTCO()
+BBTCO::~BBTCO()
 {
 }
 
 
 
 
-void bbTCO::saveSettings( QDomDocument & doc, QDomElement & element )
+void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 {
 	element.setAttribute( "name", name() );
 	if( element.parentNode().nodeName() == "clipboard" )
@@ -98,7 +98,7 @@ void bbTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 
 
 
-void bbTCO::loadSettings( const QDomElement & element )
+void BBTCO::loadSettings( const QDomElement & element )
 {
 	setName( element.attribute( "name" ) );
 	if( element.attribute( "pos" ).toInt() >= 0 )
@@ -142,44 +142,44 @@ void bbTCO::loadSettings( const QDomElement & element )
 
 
 
-int bbTCO::bbTrackIndex()
+int BBTCO::bbTrackIndex()
 {
-	return dynamic_cast<bbTrack *>( getTrack() )->index();
+	return dynamic_cast<BBTrack *>( getTrack() )->index();
 }
 
 
 
-trackContentObjectView * bbTCO::createView( trackView * _tv )
+TrackContentObjectView * BBTCO::createView( TrackView * _tv )
 {
-	return new bbTCOView( this, _tv );
-}
-
-
-
-
-
-
-
-
-
-
-bbTCOView::bbTCOView( trackContentObject * _tco, trackView * _tv ) :
-	trackContentObjectView( _tco, _tv ),
-	m_bbTCO( dynamic_cast<bbTCO *>( _tco ) )
-{
+	return new BBTCOView( this, _tv );
 }
 
 
 
 
-bbTCOView::~bbTCOView()
+
+
+
+
+
+
+BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
+	TrackContentObjectView( _tco, _tv ),
+	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) )
 {
 }
 
 
 
 
-void bbTCOView::constructContextMenu( QMenu * _cm )
+BBTCOView::~BBTCOView()
+{
+}
+
+
+
+
+void BBTCOView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
 					tr( "Open in Beat+Bassline-Editor" ),
@@ -203,7 +203,7 @@ void bbTCOView::constructContextMenu( QMenu * _cm )
 
 
 
-void bbTCOView::mouseDoubleClickEvent( QMouseEvent * )
+void BBTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	openInBBEditor();
 }
@@ -211,7 +211,7 @@ void bbTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void bbTCOView::paintEvent( QPaintEvent * )
+void BBTCOView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
@@ -271,7 +271,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 
 
-void bbTCOView::openInBBEditor()
+void BBTCOView::openInBBEditor()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
 
@@ -281,7 +281,7 @@ void bbTCOView::openInBBEditor()
 
 
 
-void bbTCOView::resetName()
+void BBTCOView::resetName()
 {
 	m_bbTCO->setName( m_bbTCO->getTrack()->name() );
 }
@@ -289,7 +289,7 @@ void bbTCOView::resetName()
 
 
 
-void bbTCOView::changeName()
+void BBTCOView::changeName()
 {
 	QString s = m_bbTCO->name();
 	RenameDialog rename_dlg( s );
@@ -300,7 +300,7 @@ void bbTCOView::changeName()
 
 
 
-void bbTCOView::changeColor()
+void BBTCOView::changeColor()
 {
 	QColor new_color = QColorDialog::getColor( m_bbTCO->m_color );
 	if( ! new_color.isValid() )
@@ -315,7 +315,7 @@ void bbTCOView::changeColor()
 							selected.begin();
 						it != selected.end(); ++it )
 		{
-			bbTCOView * bb_tcov = dynamic_cast<bbTCOView *>( *it );
+			BBTCOView * bb_tcov = dynamic_cast<BBTCOView *>( *it );
 			if( bb_tcov )
 			{
 				bb_tcov->setColor( new_color );
@@ -330,7 +330,7 @@ void bbTCOView::changeColor()
 
 
 /** \brief Makes the BB pattern use the colour defined in the stylesheet */
-void bbTCOView::resetColor() 
+void BBTCOView::resetColor()
 {
 	if( ! m_bbTCO->m_useStyleColor )
 	{
@@ -338,12 +338,12 @@ void bbTCOView::resetColor()
 		Engine::getSong()->setModified();
 		update();
 	}
-	bbTrack::clearLastTCOColor();
+	BBTrack::clearLastTCOColor();
 }
 
 
 
-void bbTCOView::setColor( QColor new_color )
+void BBTCOView::setColor( QColor new_color )
 {
 	if( new_color.rgb() != m_bbTCO->color() )
 	{
@@ -352,17 +352,17 @@ void bbTCOView::setColor( QColor new_color )
 		Engine::getSong()->setModified();
 		update();
 	}
-	bbTrack::setLastTCOColor( new_color );
+	BBTrack::setLastTCOColor( new_color );
 }
 
 
 
 
 
-QColor * bbTrack::s_lastTCOColor = NULL;
+QColor * BBTrack::s_lastTCOColor = NULL;
 
-bbTrack::bbTrack( TrackContainer* tc ) :
-	Track( BBTrack, tc )
+BBTrack::BBTrack( TrackContainer* tc ) :
+	Track( Track::BBTrack, tc )
 {
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
@@ -378,7 +378,7 @@ bbTrack::bbTrack( TrackContainer* tc ) :
 
 
 
-bbTrack::~bbTrack()
+BBTrack::~BBTrack()
 {
 	Engine::mixer()->removePlayHandles( this );
 
@@ -404,7 +404,7 @@ bbTrack::~bbTrack()
 
 
 // play _frames frames of given TCO within starting with _start
-bool bbTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	if( isMuted() )
@@ -447,17 +447,17 @@ bool bbTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackView * bbTrack::createView( TrackContainerView* tcv )
+TrackView * BBTrack::createView( TrackContainerView* tcv )
 {
-	return new bbTrackView( this, tcv );
+	return new BBTrackView( this, tcv );
 }
 
 
 
 
-trackContentObject * bbTrack::createTCO( const MidiTime & _pos )
+TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
 {
-	bbTCO * bbtco = new bbTCO( this );
+	BBTCO * bbtco = new BBTCO( this );
 	if( s_lastTCOColor )
 	{
 		bbtco->setColor( *s_lastTCOColor );
@@ -469,7 +469,7 @@ trackContentObject * bbTrack::createTCO( const MidiTime & _pos )
 
 
 
-void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
+void BBTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
@@ -491,7 +491,7 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 
 
-void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 /*	if( _this.attribute( "icon" ) != "" )
 	{
@@ -526,7 +526,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					restoreState( node.toElement() );
 		}
 	}
-/*	doesn't work yet because bbTrack-ctor also sets current bb so if
+/*	doesn't work yet because BBTrack-ctor also sets current bb so if
 	bb-tracks are created after this function is called, this doesn't
 	help at all....
 	if( _this.attribute( "current" ).toInt() )
@@ -538,8 +538,8 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-// return pointer to bbTrack specified by _bb_num
-bbTrack * bbTrack::findBBTrack( int _bb_num )
+// return pointer to BBTrack specified by _bb_num
+BBTrack * BBTrack::findBBTrack( int _bb_num )
 {
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
@@ -555,10 +555,10 @@ bbTrack * bbTrack::findBBTrack( int _bb_num )
 
 
 
-void bbTrack::swapBBTracks( Track * _track1, Track * _track2 )
+void BBTrack::swapBBTracks( Track * _track1, Track * _track2 )
 {
-	bbTrack * t1 = dynamic_cast<bbTrack *>( _track1 );
-	bbTrack * t2 = dynamic_cast<bbTrack *>( _track2 );
+	BBTrack * t1 = dynamic_cast<BBTrack *>( _track1 );
+	BBTrack * t2 = dynamic_cast<BBTrack *>( _track2 );
 	if( t1 != NULL && t2 != NULL )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
@@ -576,8 +576,8 @@ void bbTrack::swapBBTracks( Track * _track1, Track * _track2 )
 
 
 
-bbTrackView::bbTrackView( bbTrack * _bbt, TrackContainerView* tcv ) :
-	trackView( _bbt, tcv ),
+BBTrackView::BBTrackView( BBTrack * _bbt, TrackContainerView* tcv ) :
+	TrackView( _bbt, tcv ),
 	m_bbTrack( _bbt )
 {
 	setFixedHeight( 32 );
@@ -597,24 +597,24 @@ bbTrackView::bbTrackView( bbTrack * _bbt, TrackContainerView* tcv ) :
 
 
 
-bbTrackView::~bbTrackView()
+BBTrackView::~BBTrackView()
 {
-	Engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
+	Engine::getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 }
 
 
 
 
-bool bbTrackView::close()
+bool BBTrackView::close()
 {
-	Engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
-	return trackView::close();
+	Engine::getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	return TrackView::close();
 }
 
 
 
 
-void bbTrackView::clickedTrackLabel()
+void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
 	Engine::getBBEditor()->show();

@@ -24,7 +24,7 @@
 
 
 #include "SampleRecordHandle.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"

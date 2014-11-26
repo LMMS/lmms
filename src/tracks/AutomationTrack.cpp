@@ -61,7 +61,7 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 	tcoVector tcos;
 	if( _tco_num >= 0 )
 	{
-		trackContentObject * tco = getTCO( _tco_num );
+		TrackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
 	}
 	else
@@ -90,7 +90,7 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackView * AutomationTrack::createView( TrackContainerView* tcv )
+TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 {
 	return new AutomationTrackView( this, tcv );
 }
@@ -98,7 +98,7 @@ trackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-trackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
 {
 	return new AutomationPattern( this );
 }
@@ -128,7 +128,7 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
-	trackView( _at, tcv )
+	TrackView( _at, tcv )
 {
         setFixedHeight( 32 );
 	TrackLabelButton * tlb = new TrackLabelButton( this,
@@ -181,7 +181,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			trackContentObject * tco = getTrack()->createTCO( pos );
+			TrackContentObject * tco = getTrack()->createTCO( pos );
 			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
 			pat->movePosition( pos );

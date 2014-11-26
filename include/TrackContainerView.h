@@ -73,7 +73,7 @@ public:
 
 	void setPixelsPerTact( int _ppt );
 
-	const trackView * trackViewAt( const int _y ) const;
+	const TrackView * trackViewAt( const int _y ) const;
 
 	virtual bool allowRubberband() const;
 
@@ -102,12 +102,12 @@ public:
 		return m_tc;
 	}
 
-	void moveTrackViewUp( trackView * _tv );
-	void moveTrackViewDown( trackView * _tv );
+	void moveTrackViewUp( TrackView * _tv );
+	void moveTrackViewDown( TrackView * _tv );
 
 	// -- for usage by trackView only ---------------
-	trackView * addTrackView( trackView * _tv );
-	void removeTrackView( trackView * _tv );
+	TrackView * addTrackView( TrackView * _tv );
+	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
 	void clearAllTracks();
@@ -121,13 +121,13 @@ public:
 public slots:
 	void realignTracks();
 	void createTrackView( Track * _t );
-	void deleteTrackView( trackView * _tv );
+	void deleteTrackView( TrackView * _tv );
 
 
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	const QList<trackView *> & trackViews() const
+	const QList<TrackView *> & trackViews() const
 	{
 		return( m_trackViews );
 	}
@@ -164,7 +164,7 @@ private:
 	} ;
 
 	TrackContainer* m_tc;
-	typedef QList<trackView *> trackViewList;
+	typedef QList<TrackView *> trackViewList;
 	trackViewList m_trackViews;
 
 	scrollArea * m_scrollArea;

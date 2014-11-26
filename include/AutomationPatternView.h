@@ -30,7 +30,7 @@
 class AutomationPattern;
 
 
-class AutomationPatternView : public trackContentObjectView
+class AutomationPatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
@@ -39,7 +39,7 @@ class AutomationPatternView : public trackContentObjectView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	AutomationPatternView( AutomationPattern * _pat, trackView * _parent );
+	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
 	virtual ~AutomationPatternView();
 
 public slots:
@@ -59,7 +59,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * _re )
 	{
 		m_needsUpdate = true;
-		trackContentObjectView::resizeEvent( _re );
+		TrackContentObjectView::resizeEvent( _re );
 	}
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );

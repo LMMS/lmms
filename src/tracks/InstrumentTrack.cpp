@@ -41,7 +41,7 @@
 #include "InstrumentTrack.h"
 #include "AudioPort.h"
 #include "AutomationPattern.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "debug.h"
@@ -574,12 +574,12 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
-	bbTrack * bb_track = NULL;
+	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
-		trackContentObject * tco = getTCO( _tco_num );
+		TrackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = bbTrack::findBBTrack( _tco_num );
+		bb_track = BBTrack::findBBTrack( _tco_num );
 	}
 	else
 	{
@@ -667,7 +667,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-trackContentObject * InstrumentTrack::createTCO( const MidiTime & )
+TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 {
 	return new Pattern( this );
 }
@@ -675,7 +675,7 @@ trackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 
 
 
-trackView * InstrumentTrack::createView( TrackContainerView* tcv )
+TrackView * InstrumentTrack::createView( TrackContainerView* tcv )
 {
 	return new InstrumentTrackView( this, tcv );
 }
@@ -814,7 +814,7 @@ QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
 
 
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
-	trackView( _it, tcv ),
+	TrackView( _it, tcv ),
 	m_window( NULL ),
 	m_lastPos( -1, -1 )
 {
@@ -1040,7 +1040,7 @@ void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 	InstrumentTrackWindow::dragEnterEventGeneric( _dee );
 	if( !_dee->isAccepted() )
 	{
-		trackView::dragEnterEvent( _dee );
+		TrackView::dragEnterEvent( _dee );
 	}
 }
 
@@ -1050,7 +1050,7 @@ void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 void InstrumentTrackView::dropEvent( QDropEvent * _de )
 {
 	getInstrumentTrackWindow()->dropEvent( _de );
-	trackView::dropEvent( _de );
+	TrackView::dropEvent( _de );
 }
 
 

@@ -29,14 +29,14 @@
 #include <QToolButton>
 
 
-class trackView;
+class TrackView;
 
 
 class TrackLabelButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	TrackLabelButton( trackView * _tv, QWidget * _parent );
+	TrackLabelButton( TrackView * _tv, QWidget * _parent );
 	virtual ~TrackLabelButton();
 
 
@@ -53,7 +53,7 @@ protected:
 
 
 private:
-	trackView * m_trackView;
+	TrackView * m_trackView;
 	QString m_iconName;
 
 } ;

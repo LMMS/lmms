@@ -33,7 +33,7 @@
 #include "NotePlayHandle.h"
 #include "AutomationPattern.h"
 #include "basic_filters.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
@@ -1434,13 +1434,13 @@ else
 	int cur_progress = 0;
 
 	// create BB tracks
-	QList<bbTrack *> bb_tracks;
+	QList<BBTrack *> bb_tracks;
 	QList<InstrumentTrack *> i_tracks;
 
 	while( Engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
 	{
 		const int cur_pat = bb_tracks.size();
-		bbTrack * bbt = dynamic_cast<bbTrack *>(
+		BBTrack * bbt = dynamic_cast<BBTrack *>(
 			Track::create( Track::BBTrack, Engine::getSong() ) );
 		if( p.patternNames.contains( cur_pat ) )
 		{
@@ -1752,7 +1752,7 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		trackContentObject * tco = bb_tracks[it->pattern]->createTCO( MidiTime() );
+		TrackContentObject * tco = bb_tracks[it->pattern]->createTCO( MidiTime() );
 		tco->movePosition( it->position );
 		if( it->length != DefaultTicksPerTact )
 		{

@@ -33,7 +33,7 @@
 
 #include "TrackContainerView.h"
 #include "TrackContainer.h"
-#include "bb_track.h"
+#include "BBTrack.h"
 #include "MainWindow.h"
 #include "debug.h"
 #include "FileBrowser.h"
@@ -120,7 +120,7 @@ void TrackContainerView::loadSettings( const QDomElement & _this )
 
 
 
-trackView * TrackContainerView::addTrackView( trackView * _tv )
+TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
@@ -134,7 +134,7 @@ trackView * TrackContainerView::addTrackView( trackView * _tv )
 
 
 
-void TrackContainerView::removeTrackView( trackView * _tv )
+void TrackContainerView::removeTrackView( TrackView * _tv )
 {
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
@@ -155,14 +155,14 @@ void TrackContainerView::removeTrackView( trackView * _tv )
 
 
 
-void TrackContainerView::moveTrackViewUp( trackView * _tv )
+void TrackContainerView::moveTrackViewUp( TrackView * _tv )
 {
 	for( int i = 1; i < m_trackViews.size(); ++i )
 	{
-		trackView * t = m_trackViews[i];
+		TrackView * t = m_trackViews[i];
 		if( t == _tv )
 		{
-			bbTrack::swapBBTracks( t->getTrack(),
+			BBTrack::swapBBTracks( t->getTrack(),
 					m_trackViews[i - 1]->getTrack() );
 			m_scrollLayout->removeWidget( t );
 			m_scrollLayout->insertWidget( i - 1, t );
@@ -177,14 +177,14 @@ void TrackContainerView::moveTrackViewUp( trackView * _tv )
 
 
 
-void TrackContainerView::moveTrackViewDown( trackView * _tv )
+void TrackContainerView::moveTrackViewDown( TrackView * _tv )
 {
 	for( int i = 0; i < m_trackViews.size()-1; ++i )
 	{
-		trackView * t = m_trackViews[i];
+		TrackView * t = m_trackViews[i];
 		if( t == _tv )
 		{
-			bbTrack::swapBBTracks( t->getTrack(),
+			BBTrack::swapBBTracks( t->getTrack(),
 					m_trackViews[i + 1]->getTrack() );
 			m_scrollLayout->removeWidget( t );
 			m_scrollLayout->insertWidget( i + 1, t );
@@ -228,7 +228,7 @@ void TrackContainerView::createTrackView( Track * _t )
 
 
 
-void TrackContainerView::deleteTrackView( trackView * _tv )
+void TrackContainerView::deleteTrackView( TrackView * _tv )
 {
 	//m_tc->addJournalCheckPoint();
 
@@ -242,7 +242,7 @@ void TrackContainerView::deleteTrackView( trackView * _tv )
 
 
 
-const trackView * TrackContainerView::trackViewAt( const int _y ) const
+const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 {
 	const int abs_y = _y + m_scrollArea->verticalScrollBar()->value();
 	int y_cnt = 0;
@@ -293,7 +293,7 @@ void TrackContainerView::clearAllTracks()
 {
 	while( !m_trackViews.empty() )
 	{
-		trackView * tv = m_trackViews.takeLast();
+		TrackView * tv = m_trackViews.takeLast();
 		Track * t = tv->getTrack();
 		delete tv;
 		delete t;
