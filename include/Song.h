@@ -98,12 +98,9 @@ public:
 
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds;
+		return (int) elapsedMilliSeconds();
 	}
-	inline void setMilliSeconds( float _ellapsedMilliSeconds )
-	{
-		m_elapsedMilliSeconds = (_ellapsedMilliSeconds);
-	}
+
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -291,6 +288,14 @@ public:
 	{
 		return m_playbackStartFpt;
 	}
+	
+	// for use in other parts of the software that need to know the tempo...
+	// return the actual currently used tempo
+	float actualTempo() const;
+	// return the actual currently used fpt-value
+	float actualFpt() const;
+
+	float elapsedMilliSeconds() const;
 
 public slots:
 	void playSong();
@@ -396,7 +401,7 @@ private:
 	Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
-	double m_elapsedMilliSeconds;
+	unsigned long m_elapsedFrames;
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 

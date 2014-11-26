@@ -159,15 +159,17 @@ public:
 		s_tempoTrack = tt;
 	}
 
+	// returns value based on the tempo widget only, disregarding any automation
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
 	}
 	
+	// returns value from the tempo map, at given position
 	static float framesPerTick( tick_t position );
-	
 	static float tempoAt( tick_t position );
-		
+	
+	// used to update the tempo-widget-based fpt value
 	static void updateFramesPerTick();
 
 	static const QMap<QString, QString> & pluginFileHandling()

@@ -89,7 +89,7 @@ Song::Song() :
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
-	m_elapsedMilliSeconds( 0 ),
+	m_elapsedFrames( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
@@ -116,10 +116,9 @@ Song::Song() :
 
 	qRegisterMetaType<Note>( "note" );
 	
-	updateFramesPerTick();
-	m_playbackStartFpt = Engine::framesPerTick();
-	m_playbackStartTempo = m_tempoModel.value();
 	m_lastTempo = m_tempoModel.value();
+	m_playbackStartFpt = Engine::tempoToFramesPerTick( m_lastTempo );
+	m_playbackStartTempo = m_lastTempo;
 	m_vstSyncController.setTempo( m_lastTempo );
 }
 
@@ -145,11 +144,13 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo() // called when the tempo widget is changed manually
 {
-	if( ! ( m_playing && m_playMode == Mode_PlaySong ) ) // if we're already playing the song, don't change the playback-start values
+	// if we're already playing the song, don't change the playback-start values
+	if( ! ( m_playing && ( m_playMode == Mode_PlaySong || m_playMode == Mode_PlayTrack ) ) )
 	{
 		m_playbackStartTempo = m_tempoModel.value();
 		Engine::updateFramesPerTick();
 		m_playbackStartFpt = Engine::framesPerTick();
+		m_vstSyncController.setTempo( m_tempoModel.value() ); // if we're not playing, we also need to update vst-sync here
 	}
 	/*
 	Engine::mixer()->lockPlayHandleRemoval();
@@ -174,6 +175,30 @@ void Song::setTempo() // called when the tempo widget is changed manually
 
 	emit tempoChanged( tempo );
 	*/
+}
+
+
+float Song::actualTempo() const
+{
+	// if we're not playing the song or a track, return the tempo widget tempo
+	if( ! ( m_playing && ( m_playMode == Mode_PlaySong || m_playMode == Mode_PlayTrack ) ) )
+	{
+		return m_tempoModel.value();
+	}
+	// we are playing, so return tempo from tempomap
+	return Engine::tempoAt( m_playPos[m_playMode] );
+}
+
+
+float Song::actualFpt() const
+{
+	// if we're not playing the song or a track, return value based on the tempo widget tempo
+	if( ! ( m_playing && ( m_playMode == Mode_PlaySong || m_playMode == Mode_PlayTrack ) ) )
+	{
+		return Engine::framesPerTick();
+	}
+	// we are playing, so return tempo from tempomap
+	return Engine::framesPerTick( m_playPos[m_playMode] );
 }
 
 
@@ -203,6 +228,11 @@ void Song::savePos()
 }
 
 
+float Song::elapsedMilliSeconds() const
+{
+	return m_elapsedFrames * 1000.0f / Engine::mixer()->processingSampleRate();
+}
+
 
 
 void Song::processNextBuffer()
@@ -223,8 +253,8 @@ void Song::processNextBuffer()
 	switch( m_playMode )
 	{
 		case Mode_PlaySong:
-			//qDebug( "tick %d, tempo %f, fpt %f", m_playPos[m_playMode].getTicks(), 
-			//	Engine::tempoAt( m_playPos[m_playMode] ), Engine::framesPerTick( m_playPos[m_playMode] ) );
+			qDebug( "tick %d, tempo %f, fpt %f", m_playPos[m_playMode].getTicks(), 
+				Engine::tempoAt( m_playPos[m_playMode] ), Engine::framesPerTick( m_playPos[m_playMode] ) );
 			m_trackList = tracks();
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
@@ -277,6 +307,20 @@ void Song::processNextBuffer()
 		return;
 	}
 
+	float framesPerTick;
+
+	// update tempo and fpt, either from tempomap or from tempo widget
+	if( useTempoMap )
+	{
+		tempo = Engine::tempoAt( m_playPos[m_playMode] );
+		framesPerTick = Engine::framesPerTick( m_playPos[m_playMode] );
+	}
+	else
+	{
+		tempo = m_tempoModel.value();
+		framesPerTick = Engine::framesPerTick();
+	}
+
 	// check for looping-mode and act if necessary
 	Timeline * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
@@ -286,29 +330,15 @@ void Song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			m_elapsedMilliSeconds = (tl->loopBegin().getTicks()*60*1000/48)/getTempo();
-			m_playPos[m_playMode].setTicks(
-						tl->loopBegin().getTicks() );
+			m_elapsedFrames = tl->loopBegin().getTicks() * framesPerTick;
+			m_playPos[m_playMode].setTicks(	tl->loopBegin().getTicks() );
 		}
 	}
 
 	f_cnt_t total_frames_played = 0;
-	float framesPerTick;
 
-	while( total_frames_played
-				< Engine::mixer()->framesPerPeriod() )
+	while( total_frames_played < Engine::mixer()->framesPerPeriod() )
 	{
-		// update tempo and fpt, either from tempomap or from tempo widget
-		if( useTempoMap )
-		{
-			tempo = Engine::tempoAt( m_playPos[m_playMode] );
-			framesPerTick = Engine::framesPerTick( m_playPos[m_playMode] );
-		}
-		else
-		{
-			tempo = m_tempoModel.value();
-			framesPerTick = Engine::framesPerTick();
-		}
 		// update vst sync if tempo has changed
 		if( tempo != m_lastTempo )
 		{
@@ -333,40 +363,42 @@ void Song::processNextBuffer()
 				// per default we just continue playing even if
 				// there's no more stuff to play
 				// (song-play-mode)
-				int max_tact = m_playPos[m_playMode].getTact()
-									+ 2;
+				int max_tact = m_playPos[m_playMode].getTact() + 2;
 
 				// then decide whether to go over to next tact
 				// or to loop back to first tact
 				if( m_playMode == Mode_PlayBB )
 				{
-					max_tact = Engine::getBBTrackContainer()
-							->lengthOfCurrentBB();
+					max_tact = Engine::getBBTrackContainer()->lengthOfCurrentBB();
 				}
 				else if( m_playMode == Mode_PlayPattern &&
 					m_loopPattern == true &&
 					tl != NULL &&
 					tl->loopPointsEnabled() == false )
 				{
-					max_tact = m_patternToPlay->length()
-								.getTact();
+					max_tact = m_patternToPlay->length().getTact();
 				}
 
 				// end of played object reached?
-				if( m_playPos[m_playMode].getTact() + 1
-								>= max_tact )
+				if( m_playPos[m_playMode].getTact() + 1 >= max_tact )
 				{
 					// then start from beginning and keep
 					// offset
 					ticks = ticks % ( max_tact * MidiTime::ticksPerTact() );
 
 					// wrap milli second counter
-					m_elapsedMilliSeconds = ( ticks * 60 * 1000 / 48 ) / getTempo();
+					m_elapsedFrames = ( ticks * framesPerTick );
 
 					m_vstSyncController.setAbsolutePosition( ticks );
 				}
 			}
 			m_playPos[m_playMode].setTicks( ticks );
+			// if tempomap is used, update tempo and fpt
+			if( useTempoMap )
+			{
+				tempo = Engine::tempoAt( m_playPos[m_playMode] );
+				framesPerTick = Engine::framesPerTick( m_playPos[m_playMode] );
+			}
 
 			if( check_loop )
 			{
@@ -375,7 +407,7 @@ void Song::processNextBuffer()
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
-					m_elapsedMilliSeconds = ((tl->loopBegin().getTicks())*60*1000/48)/getTempo();
+					m_elapsedFrames = tl->loopBegin().getTicks() * framesPerTick;
 				}
 			}
 			else
@@ -387,14 +419,12 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( current_frame );
 		}
 
-		f_cnt_t last_frames = (f_cnt_t)framesPerTick -
-						(f_cnt_t) current_frame;
+		f_cnt_t last_frames = (f_cnt_t)framesPerTick - (f_cnt_t) current_frame;
 		// skip last frame fraction
 		if( last_frames == 0 )
 		{
 			++total_frames_played;
-			m_playPos[m_playMode].setCurrentFrame( current_frame
-								+ 1.0f );
+			m_playPos[m_playMode].setCurrentFrame( current_frame + 1.0f );
 			continue;
 		}
 		// do we have some samples left in this tick but these are
@@ -415,7 +445,7 @@ void Song::processNextBuffer()
 		// update frame-counters
 		total_frames_played += played_frames;
 		m_playPos[m_playMode].setCurrentFrame( played_frames + current_frame );
-		m_elapsedMilliSeconds += (((played_frames/framesPerTick)*60*1000/48)/getTempo());
+		m_elapsedFrames += played_frames;
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
@@ -557,7 +587,7 @@ void Song::updateLength()
 void Song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 {
 	m_elapsedTicks += m_playPos[_play_mode].getTicks() - _ticks;
-	m_elapsedMilliSeconds += (((( _ticks - m_playPos[_play_mode].getTicks()))*60*1000/48)/getTempo());
+	m_elapsedFrames = _ticks * Engine::framesPerTick(); // TODO 2.0 : fix this counter to use fpt map when appropriate
 	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
 
@@ -612,14 +642,14 @@ void Song::stop()
 		{
 			case Timeline::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
-				m_elapsedMilliSeconds = 0;
+				m_elapsedFrames = 0;
 				break;
 
 			case Timeline::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
-					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
+					m_elapsedFrames = tl->savedPos().getTicks() * Engine::framesPerTick();
 					tl->savePos( -1 );
 				}
 				break;
@@ -632,7 +662,7 @@ void Song::stop()
 	else
 	{
 		m_playPos[m_playMode].setTicks( 0 );
-		m_elapsedMilliSeconds = 0;
+		m_elapsedFrames = 0;
 	}
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );
