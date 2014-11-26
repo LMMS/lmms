@@ -1,5 +1,5 @@
 /*
- * project_version.cpp - compare versions in import upgrades
+ * ProjectVersion.cpp - compare versions in import upgrades
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -26,13 +26,13 @@
 
 
 
-#include "project_version.h"
+#include "ProjectVersion.h"
 
 
 
 
-int projectVersion::compare( const projectVersion & _v1,
-						const projectVersion & _v2 )
+int ProjectVersion::compare( const ProjectVersion & _v1,
+						const ProjectVersion & _v2 )
 {
 	int n1, n2;
 

@@ -1,5 +1,5 @@
 /*
- * project_version.h - version compared in import upgrades
+ * ProjectVersion.h - version compared in import upgrades
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
@@ -29,25 +29,25 @@
 #include <QtCore/QString>
 
 
-class projectVersion : public QString
+class ProjectVersion : public QString
 {
 public:
-	projectVersion( const QString & _s ) :
+	ProjectVersion( const QString & _s ) :
 		QString( _s )
 	{
 	}
 
-	static int compare( const projectVersion & _v1,
-						const projectVersion & _v2 );
+	static int compare( const ProjectVersion & _v1,
+						const ProjectVersion & _v2 );
 
 } ;
 
 
 
 
-inline bool operator<( const projectVersion & _v1, const char * _str )
+inline bool operator<( const ProjectVersion & _v1, const char * _str )
 {
-	return projectVersion::compare( _v1, projectVersion( _str ) ) < 0;
+	return ProjectVersion::compare( _v1, ProjectVersion( _str ) ) < 0;
 }
 
 
