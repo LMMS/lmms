@@ -116,3 +116,4 @@ waveShaperControlDialog::waveShaperControlDialog(
 	connect( subOneButton, SIGNAL( clicked() ),
 			_controls, SLOT( subOneClicked() ) );
 }
+

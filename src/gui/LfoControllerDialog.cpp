@@ -158,7 +158,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	moog_saw_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
 	ToolTip::add( moog_saw_wave_btn,
-			tr( "Click here for a a moog saw-wave." ) );
+			tr( "Click here for a moog saw-wave." ) );
 
 	PixmapButton * exp_wave_btn = new PixmapButton( this, NULL );
 	exp_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y + 15 );

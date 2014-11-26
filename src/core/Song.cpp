@@ -883,6 +883,7 @@ void Song::loadProject( const QString & _file_name )
 	m_loadingProject = true;
 
 	Engine::projectJournal()->setJournalling( false );
+	Engine::mainWindow()->clearErrors();
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -993,6 +994,8 @@ void Song::loadProject( const QString & _file_name )
 	Engine::projectJournal()->setJournalling( true );
 
 	emit projectLoaded();
+
+	Engine::mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
 
 	m_loadingProject = false;
 	m_modified = false;

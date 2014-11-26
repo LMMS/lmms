@@ -44,6 +44,7 @@ class NotePlayHandle;
 
 class kickerInstrument : public Instrument
 {
+	Q_OBJECT
 public:
 	kickerInstrument( InstrumentTrack * _instrument_track );
 	virtual ~kickerInstrument();

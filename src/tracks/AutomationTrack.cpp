@@ -192,4 +192,3 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 }
 
 
-

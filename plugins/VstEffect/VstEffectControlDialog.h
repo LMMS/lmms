@@ -42,6 +42,7 @@ class PixmapButton;
 
 class VstEffectControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	VstEffectControlDialog( VstEffectControls * _controls );
 	virtual ~VstEffectControlDialog();

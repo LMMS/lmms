@@ -67,4 +67,3 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	setLayout( tl );
 }
 
-

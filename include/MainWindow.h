@@ -95,6 +95,11 @@ public:
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
+	void collectErrors( const QList<QString>* errors );
+	void collectError( const QString error );
+	void clearErrors();
+	void showErrors( const QString reason );
+
 
 public slots:
 	void resetWindowTitle();
@@ -170,6 +175,7 @@ private:
 	QBasicTimer m_updateTimer;
 	QTimer m_autoSaveTimer;
 
+	QList<QString>* m_errors;
 
 	friend class Engine;
 

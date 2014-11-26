@@ -152,3 +152,4 @@ dynProcControlDialog::dynProcControlDialog(
 	connect( subOneButton, SIGNAL( clicked() ),
 			_controls, SLOT( subOneClicked() ) );
 }
+
