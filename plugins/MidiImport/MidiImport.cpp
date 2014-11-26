@@ -109,9 +109,9 @@ bool MidiImport::tryImport( TrackContainer* tc )
 				"settings dialog and try again." ) );
 	}
 #else
-	if( engine::hasGUI() )
+	if( Engine::hasGUI() )
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( Engine::mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You did not compile LMMS with support for "
 				"SoundFont2 player, which is used to add default "

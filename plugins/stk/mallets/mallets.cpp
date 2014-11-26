@@ -32,7 +32,7 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 
@@ -82,7 +82,7 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 						+ "sinewave.raw" ).exists() )
 {
 	// try to inform user about missing Stk-installation
-	if( m_filesMissing && engine::hasGUI() )
+	if( m_filesMissing && Engine::hasGUI() )
 	{
 		QMessageBox::information( 0, tr( "Missing files" ),
 				tr( "Your Stk-installation seems to be "
@@ -233,7 +233,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_vibratoFreqModel.value(),
 						p,
 						(uint8_t) m_spreadModel.value(),
-				engine::mixer()->processingSampleRate() );
+				Engine::mixer()->processingSampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -246,7 +246,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				engine::mixer()->processingSampleRate() );
+				Engine::mixer()->processingSampleRate() );
 		}
 		else
 		{
@@ -259,7 +259,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_strikeModel.value() * 128.0,
 						m_velocityModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				engine::mixer()->processingSampleRate() );
+				Engine::mixer()->processingSampleRate() );
 		}
 		m.unlock();
 	}

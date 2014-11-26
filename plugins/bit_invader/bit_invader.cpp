@@ -521,7 +521,7 @@ void bitInvaderView::usrWaveClicked()
 	Engine::getSong()->setModified();
 	/*
 	m_graph->model()->setWaveToNoise();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 	// zero sample_shape
 	for (int i = 0; i < sample_length; i++)
 	{

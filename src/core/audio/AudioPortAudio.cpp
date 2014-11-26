@@ -232,7 +232,7 @@ void AudioPortAudio::applyQualitySettings()
 	if( hqAudio() )
 	{
 
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 		int samples = mixer()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(

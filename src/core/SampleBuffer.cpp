@@ -1111,7 +1111,7 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, true );
 	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, true );*/
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
-					engine::mixer()->sampleRate() );
+					Engine::mixer()->sampleRate() );
 	QBuffer ba_writer;
 	ba_writer.open( QBuffer::WriteOnly );
 

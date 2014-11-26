@@ -188,7 +188,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 	{
 		target->setFixedSize( m_pluginGeometry );
 		vstSubWin * sw = new vstSubWin(
-					engine::mainWindow()->workspace() );
+					Engine::mainWindow()->workspace() );
 		sw->setWidget( helper );
 		helper->setWindowTitle( name() );
 		m_pluginWidget = helper;

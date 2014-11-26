@@ -137,7 +137,7 @@ SongEditor::SongEditor( Song * _song ) :
 	connect( hq_btn, SIGNAL( toggled( bool ) ),
 			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
-	engine::mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
+	Engine::mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
 
 	Engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );

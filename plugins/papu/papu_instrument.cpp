@@ -215,7 +215,7 @@ QString papuInstrument::nodeName() const
 
 /*f_cnt_t papuInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = engine::mixer()->processingSampleRate();
+	const float samplerate = Engine::mixer()->processingSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
