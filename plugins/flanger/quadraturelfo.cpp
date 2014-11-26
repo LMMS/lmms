@@ -35,15 +35,16 @@ void QuadratureLfo::tick( float *s, float *c )
     *c = cosf( m_phase );
     m_phase += m_increment;
 
-    if( m_amplitude < 0.0001 )
-    {
-        *s = 1;
-        *c = 1;
-    } else
-    {
-        *s = ( ( *s * m_amplitude + 1.0 ) * 0.5 );
-        *c = ( ( *c * m_amplitude + 1.0 ) * 0.5 );
-    }
+// removed to return -1 +1
+//    if( m_amplitude < 0.0001 )
+//    {
+//        *s = 1;
+//        *c = 1;
+//    } else
+//    {
+//        *s = ( ( *s * m_amplitude + 1.0 ) * 0.5 );
+//        *c = ( ( *c * m_amplitude + 1.0 ) * 0.5 );
+//    }
 
 
 }

@@ -35,8 +35,8 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
     EffectControls ( effect ),
     m_effect ( effect ),
     m_delayTimeModel(0.001, 0.0001, 0.050, 0.0001,  this, tr( "Delay Samples" ) ) ,
-    m_lfoFrequencyModel( 0.25, 0.01, 5, 0.0001, this, tr( "Lfo Frequency" ) ),
-    m_lfoAmountModel( 0.1, 0.0, 1.0 , 0.001 , this , tr( "Amount" ) ),
+    m_lfoFrequencyModel( 0.25, 0.01, 5, 0.0001, 20000.0 ,this, tr( "Lfo Frequency" ) ),
+    m_lfoAmountModel( 0.0, 0.0, 0.0025 , 0.0001 , this , tr( "Seconds" ) ),
     m_feedbackModel( 0.0 , 0.0 , 1.0 , 0.0001, this, tr( "Regen" ) ),
     m_whiteNoiseAmountModel( 0.0 , 0.0 , 0.05 , 0.0001, this, tr( "Noise" ) ),
     m_invertFeedbackModel ( false , this, tr( "Invert" ) )

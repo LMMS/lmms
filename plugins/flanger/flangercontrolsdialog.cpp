@@ -26,6 +26,7 @@
 #include "flangercontrols.h"
 #include "embed.h"
 #include "LedCheckbox.h"
+#include "TempoSyncKnob.h"
 
 
 
@@ -46,7 +47,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
     delayKnob->setLabel( tr( "Delay" ) );
     delayKnob->setHintText( tr( "Delay Time :" ) + " ", "" );
 
-    Knob * lfoFreqKnob = new Knob( knobBright_26, this );
+    TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
     lfoFreqKnob->move( 53,10 );
     lfoFreqKnob->setVolumeKnob( false );
     lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );

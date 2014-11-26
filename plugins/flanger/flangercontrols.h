@@ -61,7 +61,7 @@ private slots:
 private:
     FlangerEffect* m_effect;
     FloatModel m_delayTimeModel;
-    FloatModel m_lfoFrequencyModel;
+    TempoSyncKnobModel m_lfoFrequencyModel;
     FloatModel m_lfoAmountModel;
     FloatModel m_feedbackModel;
     FloatModel m_whiteNoiseAmountModel;

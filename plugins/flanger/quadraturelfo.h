@@ -50,14 +50,8 @@ public:
         }
     }
 
-    inline void setAmplitude( float amplitude )
-    {
-        if( amplitude < 0.0 || amplitude > 1.0 )
-        {
-            return;
-        }
-        m_amplitude = amplitude;
-    }
+
+
 
     inline void setSampleRate ( int samplerate )
     {
@@ -72,7 +66,6 @@ private:
     double m_frequency;
     double m_phase;
     double m_increment;
-    double m_amplitude;
     double m_twoPiOverSr;
     int m_samplerate;
 

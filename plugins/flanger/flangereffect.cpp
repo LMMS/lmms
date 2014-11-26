@@ -92,7 +92,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
     const float w = wetLevel();
     const float length = m_flangerControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
     const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
-    m_lfo->setAmplitude( m_flangerControls.m_lfoAmountModel.value() );
+    float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
     m_lfo->setFrequency(  m_flangerControls.m_lfoFrequencyModel.value() );
     m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
     m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
@@ -106,8 +106,8 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
         dryS[0] = buf[f][0];
         dryS[1] = buf[f][1];
         m_lfo->tick(&leftLfo, &rightLfo);
-        m_lDelay->setLength( ( float )length * leftLfo );
-        m_rDelay->setLength( ( float )length * rightLfo );
+        m_lDelay->setLength( ( float )length + ( amplitude * leftLfo ) );
+        m_rDelay->setLength( ( float )length+ ( amplitude * rightLfo ) );
         if(m_flangerControls.m_invertFeedbackModel.value())
         {
             m_lDelay->tick( &buf[f][1] );
