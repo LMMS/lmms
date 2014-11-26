@@ -31,7 +31,7 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
-class tabBar;
+class TabBar;
 
 
 class ladspaBrowserView : public ToolPluginView
@@ -47,7 +47,7 @@ public slots:
 
 
 private:
-	tabBar * m_tabBar;
+	TabBar * m_tabBar;
 
 	QWidget * createTab( QWidget * _parent, const QString & _txt,
 						ladspaPluginType _type );

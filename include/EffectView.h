@@ -36,8 +36,8 @@ class QPushButton;
 class QMdiSubWindow;
 
 class EffectControlDialog;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 class TempoSyncKnob;
 
 
@@ -81,10 +81,10 @@ protected:
 
 private:
 	QPixmap m_bg;
-	ledCheckBox * m_bypass;
-	knob * m_wetDry;
+	LedCheckBox * m_bypass;
+	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	knob * m_gate;
+	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 

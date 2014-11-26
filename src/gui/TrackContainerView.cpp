@@ -41,7 +41,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "DataFile.h"
-#include "rubberband.h"
+#include "Rubberband.h"
 #include "Song.h"
 #include "string_pair_drag.h"
 #include "Track.h"
@@ -57,7 +57,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
-	m_rubberBand( new rubberBand( m_scrollArea ) ),
+	m_rubberBand( new RubberBand( m_scrollArea ) ),
 	m_origin()
 {
 	m_tc->setHook( this );

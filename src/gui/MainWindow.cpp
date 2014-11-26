@@ -54,11 +54,11 @@
 #include "ConfigManager.h"
 #include "Mixer.h"
 #include "PluginView.h"
-#include "project_notes.h"
+#include "ProjectNotes.h"
 #include "setup_dialog.h"
 #include "AudioDummy.h"
 #include "ToolPlugin.h"
-#include "tool_button.h"
+#include "ToolButton.h"
 #include "ProjectJournal.h"
 #include "AutomationEditor.h"
 #include "templates.h"
@@ -348,13 +348,13 @@ void MainWindow::finalize()
 			      this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
-	toolButton * project_new = new toolButton(
+	ToolButton * project_new = new ToolButton(
 					embed::getIconPixmap( "project_new" ),
 					tr( "Create new project" ),
 					this, SLOT( createNewProject() ),
 							m_toolBar );
 
-	toolButton * project_new_from_template = new toolButton(
+	ToolButton * project_new_from_template = new ToolButton(
 			embed::getIconPixmap( "project_new_from_template" ),
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
@@ -366,37 +366,37 @@ void MainWindow::finalize()
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
 	project_new_from_template->setMenu( m_templatesMenu );
-	project_new_from_template->setPopupMode( toolButton::InstantPopup );
+	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
-	toolButton * project_open = new toolButton(
+	ToolButton * project_open = new ToolButton(
 					embed::getIconPixmap( "project_open" ),
 					tr( "Open existing project" ),
 					this, SLOT( openProject() ),
 								m_toolBar );
 
 
-	toolButton * project_open_recent = new toolButton(
+	ToolButton * project_open_recent = new ToolButton(
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened project" ),
 					this, SLOT( emptySlot() ), m_toolBar );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
-	project_open_recent->setPopupMode( toolButton::InstantPopup );
+	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
-	toolButton * project_save = new toolButton(
+	ToolButton * project_save = new ToolButton(
 					embed::getIconPixmap( "project_save" ),
 					tr( "Save current project" ),
 					this, SLOT( saveProject() ),
 								m_toolBar );
 
 
-	toolButton * project_export = new toolButton(
+	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
 					Engine::getSong(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
-	toolButton * whatsthis = new toolButton(
+	ToolButton * whatsthis = new ToolButton(
 				embed::getIconPixmap( "whatsthis" ),
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ),
@@ -414,7 +414,7 @@ void MainWindow::finalize()
 
 
 	// window-toolbar
-	toolButton * song_editor_window = new toolButton(
+	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
 					tr( "Show/hide Song-Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
@@ -429,7 +429,7 @@ void MainWindow::finalize()
 			"rap samples) directly into the playlist." ) );
 
 
-	toolButton * bb_editor_window = new toolButton(
+	ToolButton * bb_editor_window = new ToolButton(
 					embed::getIconPixmap( "bb_track_btn" ),
 					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
@@ -445,7 +445,7 @@ void MainWindow::finalize()
 			"that." ) );
 
 
-	toolButton * piano_roll_window = new toolButton(
+	ToolButton * piano_roll_window = new ToolButton(
 						embed::getIconPixmap( "piano" ),
 						tr( "Show/hide Piano-Roll" ) +
 									" (F7)",
@@ -458,7 +458,7 @@ void MainWindow::finalize()
 				"you can edit melodies in an easy way."
 				) );
 
-	toolButton * automation_editor_window = new toolButton(
+	ToolButton * automation_editor_window = new ToolButton(
 					embed::getIconPixmap( "automation" ),
 					tr( "Show/hide Automation Editor" ) +
 									" (F8)",
@@ -473,7 +473,7 @@ void MainWindow::finalize()
 				"in an easy way."
 				) );
 
-	toolButton * fx_mixer_window = new toolButton(
+	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
 					tr( "Show/hide FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
@@ -485,7 +485,7 @@ void MainWindow::finalize()
 			"for managing effects for your song. You can insert "
 			"effects into different effect-channels." ) );
 
-	toolButton * project_notes_window = new toolButton(
+	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
 					tr( "Show/hide project notes" ) +
 								" (F10)",
@@ -497,7 +497,7 @@ void MainWindow::finalize()
 			"project notes window. In this window you can put "
 			"down your project notes.") );
 
-	toolButton * controllers_window = new toolButton(
+	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
 					tr( "Show/hide controller rack" ) +
 								" (F11)",

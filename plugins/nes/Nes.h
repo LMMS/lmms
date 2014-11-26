@@ -31,31 +31,31 @@
 #include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobStyled, this ); 				\
+	name = new Knob( knobStyled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( tr( hint ) + " ", unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 29, 29 );
 
 #define makenesled( name, x, y, ttip ) \
-	name = new pixmapButton( this, NULL ); 	\
+	name = new PixmapButton( this, NULL ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_off" ) ); \
-	toolTip::add( name, tr( ttip ) );
+	ToolTip::add( name, tr( ttip ) );
 
 #define makedcled( name, x, y, ttip, active ) \
-	pixmapButton * name = new pixmapButton( this, NULL ); 	\
+	PixmapButton * name = new PixmapButton( this, NULL ); 	\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( active ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesdc_off" ) ); \
-	toolTip::add( name, tr( ttip ) );
+	ToolTip::add( name, tr( ttip ) );
 
 const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
 const float NFB = 895000.0f;
@@ -304,58 +304,58 @@ private:
 	virtual void modelChanged();
 	
 	// channel 1
-	pixmapButton * 	m_ch1EnabledBtn;
-	knob *			m_ch1CrsKnob;
-	knob *			m_ch1VolumeKnob;
+	PixmapButton * 	m_ch1EnabledBtn;
+	Knob *			m_ch1CrsKnob;
+	Knob *			m_ch1VolumeKnob;
 	
-	pixmapButton *	m_ch1EnvEnabledBtn;
-	pixmapButton *	m_ch1EnvLoopedBtn;
-	knob *			m_ch1EnvLenKnob;
+	PixmapButton *	m_ch1EnvEnabledBtn;
+	PixmapButton *	m_ch1EnvLoopedBtn;
+	Knob *			m_ch1EnvLenKnob;
 	
 	automatableButtonGroup *	m_ch1DutyCycleGrp;
 	
-	pixmapButton *	m_ch1SweepEnabledBtn;
-	knob *			m_ch1SweepAmtKnob;
-	knob *			m_ch1SweepRateKnob;
+	PixmapButton *	m_ch1SweepEnabledBtn;
+	Knob *			m_ch1SweepAmtKnob;
+	Knob *			m_ch1SweepRateKnob;
 	
 	// channel 2
-	pixmapButton * 	m_ch2EnabledBtn;
-	knob *			m_ch2CrsKnob;
-	knob *			m_ch2VolumeKnob;
+	PixmapButton * 	m_ch2EnabledBtn;
+	Knob *			m_ch2CrsKnob;
+	Knob *			m_ch2VolumeKnob;
 	
-	pixmapButton *	m_ch2EnvEnabledBtn;
-	pixmapButton *	m_ch2EnvLoopedBtn;
-	knob *			m_ch2EnvLenKnob;
+	PixmapButton *	m_ch2EnvEnabledBtn;
+	PixmapButton *	m_ch2EnvLoopedBtn;
+	Knob *			m_ch2EnvLenKnob;
 	
 	automatableButtonGroup *	m_ch2DutyCycleGrp;
 	
-	pixmapButton *	m_ch2SweepEnabledBtn;
-	knob *			m_ch2SweepAmtKnob;
-	knob *			m_ch2SweepRateKnob;
+	PixmapButton *	m_ch2SweepEnabledBtn;
+	Knob *			m_ch2SweepAmtKnob;
+	Knob *			m_ch2SweepRateKnob;
 	
 	//channel 3
-	pixmapButton * 	m_ch3EnabledBtn;
-	knob *			m_ch3CrsKnob;
-	knob *			m_ch3VolumeKnob;
+	PixmapButton * 	m_ch3EnabledBtn;
+	Knob *			m_ch3CrsKnob;
+	Knob *			m_ch3VolumeKnob;
 
 	//channel 4
-	pixmapButton * 	m_ch4EnabledBtn;
-	knob *			m_ch4VolumeKnob;
+	PixmapButton * 	m_ch4EnabledBtn;
+	Knob *			m_ch4VolumeKnob;
 	
-	pixmapButton * 	m_ch4EnvEnabledBtn;
-	pixmapButton * 	m_ch4EnvLoopedBtn;
-	knob *			m_ch4EnvLenKnob;
+	PixmapButton * 	m_ch4EnvEnabledBtn;
+	PixmapButton * 	m_ch4EnvLoopedBtn;
+	Knob *			m_ch4EnvLenKnob;
 	
-	pixmapButton * 	m_ch4NoiseModeBtn;
-	pixmapButton * 	m_ch4NoiseFreqModeBtn;
-	knob *			m_ch4NoiseFreqKnob;
+	PixmapButton * 	m_ch4NoiseModeBtn;
+	PixmapButton * 	m_ch4NoiseFreqModeBtn;
+	Knob *			m_ch4NoiseFreqKnob;
 	
-	knob *			m_ch4SweepKnob;
-	pixmapButton *	m_ch4NoiseQuantizeBtn;
+	Knob *			m_ch4SweepKnob;
+	PixmapButton *	m_ch4NoiseQuantizeBtn;
 	
 	//master
-	knob *			m_masterVolKnob;
-	knob *			m_vibratoKnob;	
+	Knob *			m_masterVolKnob;
+	Knob *			m_vibratoKnob;	
 	
 	static QPixmap *	s_artwork;
 };

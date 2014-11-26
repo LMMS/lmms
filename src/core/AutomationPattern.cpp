@@ -35,7 +35,7 @@
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
-#include "text_float.h"
+#include "TextFloat.h"
 #include "embed.h"
 
 
@@ -98,7 +98,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 		{
 			if( *it == _obj )
 			{
-				textFloat::displayMessage( _obj->displayName(), tr( "Model is already connected "
+				TextFloat::displayMessage( _obj->displayName(), tr( "Model is already connected "
 												"to this pattern." ), embed::getIconPixmap( "automation" ), 2000 );
 				return;
 			}

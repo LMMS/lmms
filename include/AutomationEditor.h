@@ -34,17 +34,17 @@
 #include "MidiTime.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
-#include "knob.h"
+#include "Knob.h"
 
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class comboBox;
+class ComboBox;
 class NotePlayHandle;
 class Timeline;
-class toolButton;
+class ToolButton;
 
 
 class AutomationEditor : public QWidget, public JournallingObject
@@ -191,27 +191,27 @@ private:
 
 	QWidget * m_toolBar;
 
-	toolButton * m_playButton;
-	toolButton * m_stopButton;
+	ToolButton * m_playButton;
+	ToolButton * m_stopButton;
 
-	toolButton * m_drawButton;
-	toolButton * m_eraseButton;
-	toolButton * m_selectButton;
-	toolButton * m_moveButton;
+	ToolButton * m_drawButton;
+	ToolButton * m_eraseButton;
+	ToolButton * m_selectButton;
+	ToolButton * m_moveButton;
 
-	toolButton * m_discreteButton;
-	toolButton * m_linearButton;
-	toolButton * m_cubicHermiteButton;
-	knob * m_tensionKnob;
+	ToolButton * m_discreteButton;
+	ToolButton * m_linearButton;
+	ToolButton * m_cubicHermiteButton;
+	Knob * m_tensionKnob;
 	FloatModel * m_tensionModel;
 
-	toolButton * m_cutButton;
-	toolButton * m_copyButton;
-	toolButton * m_pasteButton;
+	ToolButton * m_cutButton;
+	ToolButton * m_copyButton;
+	ToolButton * m_pasteButton;
 
-	comboBox * m_zoomingXComboBox;
-	comboBox * m_zoomingYComboBox;
-	comboBox * m_quantizeComboBox;
+	ComboBox * m_zoomingXComboBox;
+	ComboBox * m_zoomingYComboBox;
+	ComboBox * m_quantizeComboBox;
 
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;

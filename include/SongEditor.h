@@ -33,13 +33,13 @@ class QLabel;
 class QScrollBar;
 
 class AutomatableSlider;
-class comboBox;
+class ComboBox;
 class LcdSpinBox;
 class MeterDialog;
 class Song;
-class textFloat;
+class TextFloat;
 class Timeline;
-class toolButton;
+class ToolButton;
 
 class positionLine : public QWidget
 {
@@ -104,10 +104,10 @@ private:
 
 	QWidget * m_toolBar;
 
-	toolButton * m_playButton;
-	toolButton * m_recordButton;
-	toolButton * m_recordAccompanyButton;
-	toolButton * m_stopButton;
+	ToolButton * m_playButton;
+	ToolButton * m_recordButton;
+	ToolButton * m_recordAccompanyButton;
+	ToolButton * m_stopButton;
 	LcdSpinBox * m_tempoSpinBox;
 
 	Timeline * m_timeLine;
@@ -116,17 +116,17 @@ private:
 	AutomatableSlider * m_masterVolumeSlider;
 	AutomatableSlider * m_masterPitchSlider;
 
-	textFloat * m_mvsStatus;
-	textFloat * m_mpsStatus;
+	TextFloat * m_mvsStatus;
+	TextFloat * m_mpsStatus;
 
-	toolButton * m_addBBTrackButton;
-	toolButton * m_addSampleTrackButton;
-	toolButton * m_addAutomationTrackButton;
+	ToolButton * m_addBBTrackButton;
+	ToolButton * m_addSampleTrackButton;
+	ToolButton * m_addAutomationTrackButton;
 
-	toolButton * m_drawModeButton;
-	toolButton * m_editModeButton;
+	ToolButton * m_drawModeButton;
+	ToolButton * m_editModeButton;
 
-	comboBox * m_zoomingComboBox;
+	ComboBox * m_zoomingComboBox;
 
 	positionLine * m_positionLine;
 

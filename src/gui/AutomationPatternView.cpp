@@ -33,9 +33,9 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "ProjectJournal.h"
-#include "rename_dialog.h"
+#include "RenameDialog.h"
 #include "string_pair_drag.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 QPixmap * AutomationPatternView::s_pat_rec = NULL;
@@ -56,7 +56,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAutoResizeEnabled( false );
 
-	toolTip::add( this, tr( "double-click to open this pattern in "
+	ToolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
 	setStyle( QApplication::style() );
 	
@@ -99,7 +99,7 @@ void AutomationPatternView::resetName()
 void AutomationPatternView::changeName()
 {
 	QString s = m_pat->name();
-	renameDialog rename_dlg( s );
+	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_pat->setName( s );
 	update();

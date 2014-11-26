@@ -43,7 +43,7 @@ class ProjectJournal;
 class MainWindow;
 class Mixer;
 class PianoRoll;
-class projectNotes;
+class ProjectNotes;
 class Song;
 class SongEditor;
 class Ladspa2LMMS;
@@ -123,7 +123,7 @@ public:
 		return s_pianoRoll;
 	}
 
-	static projectNotes * getProjectNotes()
+	static ProjectNotes * getProjectNotes()
 	{
 		return s_projectNotes;
 	}
@@ -191,7 +191,7 @@ private:
 	static AutomationEditor * s_automationEditor;
 	static bbEditor * s_bbEditor;
 	static PianoRoll* s_pianoRoll;
-	static projectNotes * s_projectNotes;
+	static ProjectNotes * s_projectNotes;
 	static Ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_pluginFileHandling;

@@ -29,10 +29,10 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "graph.h"
-#include "knob.h"
-#include "pixmap_button.h"
-#include "led_checkbox.h"
+#include "Graph.h"
+#include "Knob.h"
+#include "PixmapButton.h"
+#include "LedCheckbox.h"
 #include "MemoryManager.h"
 
 class oscillator;
@@ -135,20 +135,20 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	knob * m_sampleLengthKnob;
-	pixmapButton * m_sinWaveBtn;
-	pixmapButton * m_triangleWaveBtn;
-	pixmapButton * m_sqrWaveBtn;
-	pixmapButton * m_sawWaveBtn;
-	pixmapButton * m_whiteNoiseWaveBtn;
-	pixmapButton * m_smoothBtn;
-	pixmapButton * m_usrWaveBtn;
+	Knob * m_sampleLengthKnob;
+	PixmapButton * m_sinWaveBtn;
+	PixmapButton * m_triangleWaveBtn;
+	PixmapButton * m_sqrWaveBtn;
+	PixmapButton * m_sawWaveBtn;
+	PixmapButton * m_whiteNoiseWaveBtn;
+	PixmapButton * m_smoothBtn;
+	PixmapButton * m_usrWaveBtn;
 
 	static QPixmap * s_artwork;
 
-	graph * m_graph;
-	ledCheckBox * m_interpolationToggle;
-	ledCheckBox * m_normalizeToggle;
+	Graph * m_graph;
+	LedCheckBox * m_interpolationToggle;
+	LedCheckBox * m_normalizeToggle;
 
 } ;
 

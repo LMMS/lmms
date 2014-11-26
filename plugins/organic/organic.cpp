@@ -32,12 +32,12 @@
 
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "templates.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 #include "embed.cpp"
 
@@ -403,11 +403,11 @@ PluginView * organicInstrument::instantiateView( QWidget * _parent )
 
 
 
-class organicKnob : public knob
+class organicKnob : public Knob
 {
 public:
 	organicKnob( QWidget * _parent ) :
-		knob( knobStyled, _parent )
+		Knob( knobStyled, _parent )
 	{
 		setFixedSize( 21, 21 );
 	}
@@ -448,7 +448,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 									"It is cumulative with the instrument window's volume control. " ) );
 
 	// randomise
-	m_randBtn = new pixmapButton( this, tr( "Randomise" ) );
+	m_randBtn = new PixmapButton( this, tr( "Randomise" ) );
 	m_randBtn->move( 148, 224 );
 	m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"randomise_pressed" ) );
@@ -501,14 +501,14 @@ void organicInstrumentView::modelChanged()
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		// setup harmonic knob
-		knob * harmKnob = new organicKnob( this );
+		Knob * harmKnob = new organicKnob( this );
 		harmKnob->move( x + i * colWidth, y - rowHeight );
 		harmKnob->setObjectName( "harmKnob" );
 		connect( &oi->m_osc[i]->m_harmModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
 			
 		// setup waveform-knob
-		knob * oscKnob = new organicKnob( this );
+		Knob * oscKnob = new organicKnob( this );
 		oscKnob->move( x + i * colWidth, y );
 		connect( &oi->m_osc[i]->m_oscModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
@@ -516,7 +516,7 @@ void organicInstrumentView::modelChanged()
 		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ) + " ", QString() );
 										
 		// setup volume-knob
-		knob * volKnob = new knob( knobStyled, this );
+		Knob * volKnob = new Knob( knobStyled, this );
 		volKnob->setVolumeKnob( true );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
@@ -524,13 +524,13 @@ void organicInstrumentView::modelChanged()
 							i + 1 ) + " ", "%" );
 							
 		// setup panning-knob
-		knob * panKnob = new organicKnob( this );
+		Knob * panKnob = new organicKnob( this );
 		panKnob->move( x + i  * colWidth, y + rowHeight*2 );
 		panKnob->setHintText( tr("Osc %1 panning:").arg(
 							i + 1 ) + " ", "" );
 							
 		// setup knob for fine-detuning
-		knob * detuneKnob = new organicKnob( this );
+		Knob * detuneKnob = new organicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
 		detuneKnob->setHintText( tr( "Osc %1 stereo detuning" ).arg( i + 1 )
 							+ " ", " " +

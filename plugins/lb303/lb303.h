@@ -35,8 +35,8 @@
 #include "effect_lib.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "led_checkbox.h"
-#include "knob.h"
+#include "LedCheckbox.h"
+#include "Knob.h"
 #include "Mixer.h"
 
 class lb303SynthView;
@@ -249,21 +249,21 @@ public:
 private:
 	virtual void modelChanged();
 	
-	knob * m_vcfCutKnob;
-	knob * m_vcfResKnob;
-	knob * m_vcfDecKnob;
-	knob * m_vcfModKnob;
+	Knob * m_vcfCutKnob;
+	Knob * m_vcfResKnob;
+	Knob * m_vcfDecKnob;
+	Knob * m_vcfModKnob;
 
-	knob * m_vcoFineDetuneKnob;
+	Knob * m_vcoFineDetuneKnob;
 
-	knob * m_distKnob;
-	knob * m_waveKnob;
-	knob * m_slideDecKnob;
+	Knob * m_distKnob;
+	Knob * m_waveKnob;
+	Knob * m_slideDecKnob;
     
-	ledCheckBox * m_slideToggle;
-	ledCheckBox * m_accentToggle;
-	ledCheckBox * m_deadToggle;
-	ledCheckBox * m_db24Toggle;
+	LedCheckBox * m_slideToggle;
+	LedCheckBox * m_accentToggle;
+	LedCheckBox * m_deadToggle;
+	LedCheckBox * m_db24Toggle;
 
 } ;
 

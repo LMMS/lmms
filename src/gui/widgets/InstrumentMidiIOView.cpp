@@ -31,12 +31,12 @@
 #include "MidiPortMenu.h"
 #include "Engine.h"
 #include "embed.h"
-#include "group_box.h"
+#include "GroupBox.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 #include "Mixer.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 
@@ -48,7 +48,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 {
 	QVBoxLayout* layout = new QVBoxLayout( this );
 	layout->setMargin( 5 );
-	m_midiInputGroupBox = new groupBox( tr( "ENABLE MIDI INPUT" ) );
+	m_midiInputGroupBox = new GroupBox( tr( "ENABLE MIDI INPUT" ) );
 	layout->addWidget( m_midiInputGroupBox );
 
 	QHBoxLayout* midiInputLayout = new QHBoxLayout( m_midiInputGroupBox );
@@ -76,7 +76,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 
 
-	m_midiOutputGroupBox = new groupBox( tr( "ENABLE MIDI OUTPUT" ) );
+	m_midiOutputGroupBox = new GroupBox( tr( "ENABLE MIDI OUTPUT" ) );
 	layout->addWidget( m_midiOutputGroupBox );
 
 	QHBoxLayout* midiOutputLayout = new QHBoxLayout( m_midiOutputGroupBox );
@@ -138,7 +138,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 #define PROVIDE_CUSTOM_BASE_VELOCITY_UI
 #ifdef PROVIDE_CUSTOM_BASE_VELOCITY_UI
-	groupBox* baseVelocityGroupBox = new groupBox( tr( "CUSTOM BASE VELOCITY" ) );
+	GroupBox* baseVelocityGroupBox = new GroupBox( tr( "CUSTOM BASE VELOCITY" ) );
 	layout->addWidget( baseVelocityGroupBox );
 
 	QVBoxLayout* baseVelocityLayout = new QVBoxLayout( baseVelocityGroupBox );

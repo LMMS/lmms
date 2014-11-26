@@ -39,7 +39,7 @@
 #include "PianoRoll.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
-#include "project_notes.h"
+#include "ProjectNotes.h"
 #include "Plugin.h"
 #include "SongEditor.h"
 #include "Song.h"
@@ -59,7 +59,7 @@ SongEditor* Engine::s_songEditor = NULL;
 AutomationEditor * Engine::s_automationEditor = NULL;
 bbEditor * Engine::s_bbEditor = NULL;
 PianoRoll* Engine::s_pianoRoll = NULL;
-projectNotes * Engine::s_projectNotes = NULL;
+ProjectNotes * Engine::s_projectNotes = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
@@ -96,7 +96,7 @@ void Engine::init( const bool _has_gui )
 		s_songEditor = new SongEditor( s_song );
 		s_fxMixerView = new FxMixerView;
 		s_controllerRackView = new ControllerRackView;
-		s_projectNotes = new projectNotes;
+		s_projectNotes = new ProjectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new PianoRoll;
 		s_automationEditor = new AutomationEditor;

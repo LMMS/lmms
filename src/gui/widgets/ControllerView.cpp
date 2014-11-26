@@ -39,9 +39,9 @@
 #include "gui_templates.h"
 #include "embed.h"
 #include "Engine.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "MainWindow.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :

@@ -30,7 +30,7 @@
 #include "kicker.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 
@@ -226,11 +226,11 @@ PluginView * kickerInstrument::instantiateView( QWidget * _parent )
 
 
 
-class kickerKnob : public knob
+class kickerKnob : public Knob
 {
 public:
 	kickerKnob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -250,11 +250,11 @@ public:
 };
 
 
-class kickerLargeKnob : public knob
+class kickerLargeKnob : public Knob
 {
 public:
 	kickerLargeKnob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 34, 34 );
 		setObjectName( "largeKnob" );
@@ -319,10 +319,10 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_distEndKnob->setHintText( tr( "Distortion End:" ) + " ", "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
-	m_startNoteToggle = new ledCheckBox( "", this, "", ledCheckBox::Green );
+	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
 	m_startNoteToggle->move( COL1 + 8, LED_ROW );
 
-	m_endNoteToggle = new ledCheckBox( "", this, "", ledCheckBox::Green );
+	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
 	m_endNoteToggle->move( END_COL + 8, LED_ROW );
 
 	setAutoFillBackground( true );

@@ -172,7 +172,7 @@ private:
 
 	float m_ppt;
 
-	rubberBand * m_rubberBand;
+	RubberBand * m_rubberBand;
 	QPoint m_origin;
 
 

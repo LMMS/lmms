@@ -31,12 +31,12 @@
 #include "papu_instrument.h"
 #include "base64.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
+#include "PixmapButton.h"
+#include "ToolTip.h"
 #include "Engine.h"
-#include "graph.h"
+#include "Graph.h"
 
 #include "embed.cpp"
 
@@ -426,11 +426,11 @@ PluginView * papuInstrument::instantiateView( QWidget * _parent )
 }
 
 
-class papuKnob : public knob
+class papuKnob : public Knob
 {
 public:
 	papuKnob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 30, 30 );
 		setCenterPointX( 15.0 );
@@ -458,7 +458,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1SweepTimeKnob = new papuKnob( this );
 	m_ch1SweepTimeKnob->setHintText( tr( "Sweep Time:" ) + " ", "" );
 	m_ch1SweepTimeKnob->move( 5 + 4*32, 106 );
-	toolTip::add( m_ch1SweepTimeKnob, tr( "Sweep Time" ) );
+	ToolTip::add( m_ch1SweepTimeKnob, tr( "Sweep Time" ) );
 	m_ch1SweepTimeKnob->setWhatsThis( tr( "The amount of increase or"
 									" decrease in frequency" ) );
 
@@ -466,7 +466,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1SweepRtShiftKnob->setHintText( tr( "Sweep RtShift amount:" )
 											+ " ", "" );
 	m_ch1SweepRtShiftKnob->move( 5 + 3*32, 106 );
-	toolTip::add( m_ch1SweepRtShiftKnob, tr( "Sweep RtShift amount" ) );
+	ToolTip::add( m_ch1SweepRtShiftKnob, tr( "Sweep RtShift amount" ) );
 	m_ch1SweepRtShiftKnob->setWhatsThis( tr( "The rate at which increase or"
 									" decrease in frequency occurs" ) );
 
@@ -474,7 +474,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
 											+ " ", "" );
 	m_ch1WavePatternDutyKnob->move( 5 + 2*32, 106 );
-	toolTip::add( m_ch1WavePatternDutyKnob, tr( "Wave Pattern Duty" ) );
+	ToolTip::add( m_ch1WavePatternDutyKnob, tr( "Wave Pattern Duty" ) );
 	m_ch1WavePatternDutyKnob->setWhatsThis( tr( "The duty cycle is the ratio of"
 									" the duration (time) that a signal is ON"
 									" versus the total period of the signal." ) );
@@ -483,14 +483,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1VolumeKnob->setHintText( tr( "Square Channel 1 Volume:" )
 											+ " ", "" );
 	m_ch1VolumeKnob->move( 5, 106 );
-	toolTip::add( m_ch1VolumeKnob, tr( "Square Channel 1 Volume:" ) );
+	ToolTip::add( m_ch1VolumeKnob, tr( "Square Channel 1 Volume:" ) );
 	m_ch1VolumeKnob->setWhatsThis( tr( "Square Channel 1 Volume" ) );
 
 	m_ch1SweepStepLengthKnob = new papuKnob( this );
 	m_ch1SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 											+ " ", "" );
 	m_ch1SweepStepLengthKnob->move( 5 + 32, 106 );
-	toolTip::add( m_ch1SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
+	ToolTip::add( m_ch1SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
 	m_ch1SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
 
 
@@ -499,7 +499,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch2WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
 											+ " ", "" );
 	m_ch2WavePatternDutyKnob->move( 5 + 2*32, 155 );
-	toolTip::add( m_ch2WavePatternDutyKnob, tr( "Wave pattern duty" ) );
+	ToolTip::add( m_ch2WavePatternDutyKnob, tr( "Wave pattern duty" ) );
 	m_ch2WavePatternDutyKnob->setWhatsThis( tr( "The duty cycle is the ratio of"
 									" the duration (time) that a signal is ON"
 									" versus the total period of the signal." ) );
@@ -508,14 +508,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch2VolumeKnob->setHintText( tr( "Square Channel 2 Volume:" )
 											+ " ", "" );
 	m_ch2VolumeKnob->move( 5, 155 );
-	toolTip::add( m_ch2VolumeKnob, tr( "Square Channel 2 Volume" ) );
+	ToolTip::add( m_ch2VolumeKnob, tr( "Square Channel 2 Volume" ) );
 	m_ch2VolumeKnob->setWhatsThis( tr( "Square Channel 2 Volume" ) );
 
 	m_ch2SweepStepLengthKnob = new papuKnob( this );
 	m_ch2SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 											+ " ", "" );
 	m_ch2SweepStepLengthKnob->move( 5 + 32, 155 );
-	toolTip::add( m_ch2SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
+	ToolTip::add( m_ch2SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
 	m_ch2SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
 
 
@@ -523,7 +523,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch3VolumeKnob = new papuKnob( this );
 	m_ch3VolumeKnob->setHintText( tr( "Wave Channel Volume:" ) + " ", "" );
 	m_ch3VolumeKnob->move( 5, 204 );
-	toolTip::add( m_ch3VolumeKnob, tr( "Wave Channel Volume" ) );
+	ToolTip::add( m_ch3VolumeKnob, tr( "Wave Channel Volume" ) );
 	m_ch3VolumeKnob->setWhatsThis( tr( "Wave Channel Volume" ) );
 
 
@@ -531,14 +531,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch4VolumeKnob = new papuKnob( this );
 	m_ch4VolumeKnob->setHintText( tr( "Noise Channel Volume:" ) + " ", "" );
 	m_ch4VolumeKnob->move( 144, 155 );
-	toolTip::add( m_ch4VolumeKnob, tr( "Noise Channel Volume" ) );
+	ToolTip::add( m_ch4VolumeKnob, tr( "Noise Channel Volume" ) );
 	m_ch4VolumeKnob->setWhatsThis( tr( "Noise Channel Volume" ) );
 
 	m_ch4SweepStepLengthKnob = new papuKnob( this );
 	m_ch4SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 											+ " ", "" );
 	m_ch4SweepStepLengthKnob->move( 144 + 32, 155 );
-	toolTip::add( m_ch4SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
+	ToolTip::add( m_ch4SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
 	m_ch4SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
 
 
@@ -546,44 +546,44 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_so1VolumeKnob = new papuKnob( this );
 	m_so1VolumeKnob->setHintText( tr( "SO1 Volume (Right):" ) + " ", "" );
 	m_so1VolumeKnob->move( 5, 58 );
-	toolTip::add( m_so1VolumeKnob, tr( "SO1 Volume (Right)" ) );
+	ToolTip::add( m_so1VolumeKnob, tr( "SO1 Volume (Right)" ) );
 
 	m_so2VolumeKnob = new papuKnob( this );
 	m_so2VolumeKnob->setHintText( tr( "SO2 Volume (Left):" ) + " ", "" );
 	m_so2VolumeKnob->move( 5 + 32, 58 );
-	toolTip::add( m_so2VolumeKnob, tr( "SO2 Volume (Left)" ) );
+	ToolTip::add( m_so2VolumeKnob, tr( "SO2 Volume (Left)" ) );
 
 	m_trebleKnob = new papuKnob( this );
 	m_trebleKnob->setHintText( tr( "Treble:" ) + " ", "" );
 	m_trebleKnob->move( 5 + 2*32, 58 );
-	toolTip::add( m_trebleKnob, tr( "Treble" ) );
+	ToolTip::add( m_trebleKnob, tr( "Treble" ) );
 
 	m_bassKnob = new papuKnob( this );
 	m_bassKnob->setHintText( tr( "Bass:" ) + " ", "" );
 	m_bassKnob->move( 5 + 3*32, 58 );
-	toolTip::add( m_bassKnob, tr( "Bass" ) );
+	ToolTip::add( m_bassKnob, tr( "Bass" ) );
 
-	m_ch1SweepDirButton = new pixmapButton( this, NULL );
+	m_ch1SweepDirButton = new PixmapButton( this, NULL );
 	m_ch1SweepDirButton->setCheckable( true );
 	m_ch1SweepDirButton->move( 167, 108 );
 	m_ch1SweepDirButton->setActiveGraphic(
 							PLUGIN_NAME::getIconPixmap( "btn_down" ) );
 	m_ch1SweepDirButton->setInactiveGraphic(
 							PLUGIN_NAME::getIconPixmap( "btn_up" ) );
-	toolTip::add( m_ch1SweepDirButton, tr( "Sweep Direction" ) );
+	ToolTip::add( m_ch1SweepDirButton, tr( "Sweep Direction" ) );
 
-	m_ch1VolSweepDirButton = new pixmapButton( this, NULL );
+	m_ch1VolSweepDirButton = new PixmapButton( this, NULL );
 	m_ch1VolSweepDirButton->setCheckable( true );
 	m_ch1VolSweepDirButton->move( 207, 108 );
 	m_ch1VolSweepDirButton->setActiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch1VolSweepDirButton->setInactiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
-	toolTip::add( m_ch1VolSweepDirButton, tr( "Volume Sweep Direction" ) );
+	ToolTip::add( m_ch1VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
 
 
-	m_ch2VolSweepDirButton = new pixmapButton( this,
+	m_ch2VolSweepDirButton = new PixmapButton( this,
 										tr( "Volume Sweep Direction" ) );
 	m_ch2VolSweepDirButton->setCheckable( true );
 	m_ch2VolSweepDirButton->move( 102, 156 );
@@ -591,12 +591,12 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch2VolSweepDirButton->setInactiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
-	toolTip::add( m_ch2VolSweepDirButton, tr( "Volume Sweep Direction" ) );
+	ToolTip::add( m_ch2VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
-	//m_ch3OnButton = new pixmapButton( this, NULL );
+	//m_ch3OnButton = new PixmapButton( this, NULL );
 	//m_ch3OnButton->move( 176, 53 );
 
-	m_ch4VolSweepDirButton = new pixmapButton( this,
+	m_ch4VolSweepDirButton = new PixmapButton( this,
 										tr( "Volume Sweep Direction" ) );
 	m_ch4VolSweepDirButton->setCheckable( true );
 	m_ch4VolSweepDirButton->move( 207, 157 );
@@ -604,85 +604,85 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch4VolSweepDirButton->setInactiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
-	toolTip::add( m_ch4VolSweepDirButton, tr( "Volume Sweep Direction" ) );
+	ToolTip::add( m_ch4VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
-	m_ch4ShiftRegWidthButton = new pixmapButton( this, NULL );
+	m_ch4ShiftRegWidthButton = new PixmapButton( this, NULL );
 	m_ch4ShiftRegWidthButton->setCheckable( true );
 	m_ch4ShiftRegWidthButton->move( 207, 171 );
 	m_ch4ShiftRegWidthButton->setActiveGraphic(
 									PLUGIN_NAME::getIconPixmap( "btn_7" ) );
 	m_ch4ShiftRegWidthButton->setInactiveGraphic(
 									PLUGIN_NAME::getIconPixmap( "btn_15" ) );
-	toolTip::add( m_ch4ShiftRegWidthButton, tr( "Shift Register Width" ) );
+	ToolTip::add( m_ch4ShiftRegWidthButton, tr( "Shift Register Width" ) );
 
 
 
 
-	m_ch1So1Button = new pixmapButton( this, NULL );
+	m_ch1So1Button = new PixmapButton( this, NULL );
 	m_ch1So1Button->setCheckable( true );
 	m_ch1So1Button->move( 208, 51 );
 	m_ch1So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch1So1Button, tr( "Channel1 to SO1 (Right)" ) );
+	ToolTip::add( m_ch1So1Button, tr( "Channel1 to SO1 (Right)" ) );
 
-	m_ch2So1Button = new pixmapButton( this, NULL );
+	m_ch2So1Button = new PixmapButton( this, NULL );
 	m_ch2So1Button->setCheckable( true );
 	m_ch2So1Button->move( 208, 51 + 12 );
 	m_ch2So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch2So1Button, tr( "Channel2 to SO1 (Right)" ) );
+	ToolTip::add( m_ch2So1Button, tr( "Channel2 to SO1 (Right)" ) );
 
-	m_ch3So1Button = new pixmapButton( this, NULL );
+	m_ch3So1Button = new PixmapButton( this, NULL );
 	m_ch3So1Button->setCheckable( true );
 	m_ch3So1Button->move( 208, 51 + 2*12 );
 	m_ch3So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch3So1Button, tr( "Channel3 to SO1 (Right)" ) );
+	ToolTip::add( m_ch3So1Button, tr( "Channel3 to SO1 (Right)" ) );
 
-	m_ch4So1Button = new pixmapButton( this, NULL );
+	m_ch4So1Button = new PixmapButton( this, NULL );
 	m_ch4So1Button->setCheckable( true );
 	m_ch4So1Button->setChecked( false );
 	m_ch4So1Button->move( 208, 51 + 3*12 );
 	m_ch4So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch4So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch4So1Button, tr( "Channel4 to SO1 (Right)" ) );
+	ToolTip::add( m_ch4So1Button, tr( "Channel4 to SO1 (Right)" ) );
 
-	m_ch1So2Button = new pixmapButton( this, NULL );
+	m_ch1So2Button = new PixmapButton( this, NULL );
 	m_ch1So2Button->setCheckable( true );
 	m_ch1So2Button->move( 148, 51 );
 	m_ch1So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch1So2Button, tr( "Channel1 to SO2 (Left)" ) );
+	ToolTip::add( m_ch1So2Button, tr( "Channel1 to SO2 (Left)" ) );
 
-	m_ch2So2Button = new pixmapButton( this, NULL );
+	m_ch2So2Button = new PixmapButton( this, NULL );
 	m_ch2So2Button->setCheckable( true );
 	m_ch2So2Button->move( 148, 51 + 12 );
 	m_ch2So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch2So2Button, tr( "Channel2 to SO2 (Left)" ) );
+	ToolTip::add( m_ch2So2Button, tr( "Channel2 to SO2 (Left)" ) );
 
-	m_ch3So2Button = new pixmapButton( this, NULL );
+	m_ch3So2Button = new PixmapButton( this, NULL );
 	m_ch3So2Button->setCheckable( true );
 	m_ch3So2Button->move( 148, 51 + 2*12 );
 	m_ch3So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch3So2Button, tr( "Channel3 to SO2 (Left)" ) );
+	ToolTip::add( m_ch3So2Button, tr( "Channel3 to SO2 (Left)" ) );
 
-	m_ch4So2Button = new pixmapButton( this, NULL );
+	m_ch4So2Button = new PixmapButton( this, NULL );
 	m_ch4So2Button->setCheckable( true );
 	m_ch4So2Button->setChecked( false );
 	m_ch4So2Button->move( 148, 51 + 3*12 );
 	m_ch4So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch4So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	toolTip::add( m_ch4So2Button, tr( "Channel4 to SO2 (Left)" ) );
+	ToolTip::add( m_ch4So2Button, tr( "Channel4 to SO2 (Left)" ) );
 
 
-	m_graph = new graph( this );
-	m_graph->setGraphStyle( graph::NearestStyle );
+	m_graph = new Graph( this );
+	m_graph->setGraphStyle( Graph::NearestStyle );
 	m_graph->setGraphColor( QColor(0x4E, 0x83, 0x2B) );
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);
-	toolTip::add( m_graph, tr( "Wave Pattern" ) );
+	ToolTip::add( m_graph, tr( "Wave Pattern" ) );
 	m_graph->setWhatsThis( tr( "Draw the wave here" ) );
 }
 

@@ -26,7 +26,7 @@
 
 #include "VstEffect.h"
 #include "Song.h"
-#include "text_float.h"
+#include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
 
 #include "embed.cpp"
@@ -124,7 +124,7 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	textFloat * tf = textFloat::displayMessage(
+	TextFloat * tf = TextFloat::displayMessage(
 		VstPlugin::tr( "Loading plugin" ),
 		VstPlugin::tr( "Please wait while loading VST plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );

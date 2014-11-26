@@ -28,18 +28,18 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "graph.h"
+#include "Graph.h"
 #include "AutomatableModel.h"
 #include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include <samplerate.h>
 #include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobStyled, this ); 				\
+	name = new Knob( knobStyled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( tr( hint ) + " ", unit );		\
 	name ->setObjectName( oname );						\
@@ -320,60 +320,60 @@ private:
 	virtual void modelChanged();
 
 // knobs
-	knob * a1_volKnob;
-	knob * a2_volKnob;
-	knob * b1_volKnob;
-	knob * b2_volKnob;
+	Knob * a1_volKnob;
+	Knob * a2_volKnob;
+	Knob * b1_volKnob;
+	Knob * b2_volKnob;
 
-	knob * a1_panKnob;
-	knob * a2_panKnob;
-	knob * b1_panKnob;
-	knob * b2_panKnob;
+	Knob * a1_panKnob;
+	Knob * a2_panKnob;
+	Knob * b1_panKnob;
+	Knob * b2_panKnob;
 
-	knob * a1_multKnob;
-	knob * a2_multKnob;
-	knob * b1_multKnob;
-	knob * b2_multKnob;
+	Knob * a1_multKnob;
+	Knob * a2_multKnob;
+	Knob * b1_multKnob;
+	Knob * b2_multKnob;
 
-	knob * a1_ltuneKnob;
-	knob * a2_ltuneKnob;
-	knob * b1_ltuneKnob;
-	knob * b2_ltuneKnob;
+	Knob * a1_ltuneKnob;
+	Knob * a2_ltuneKnob;
+	Knob * b1_ltuneKnob;
+	Knob * b2_ltuneKnob;
 
-	knob * a1_rtuneKnob;
-	knob * a2_rtuneKnob;
-	knob * b1_rtuneKnob;
-	knob * b2_rtuneKnob;
+	Knob * a1_rtuneKnob;
+	Knob * a2_rtuneKnob;
+	Knob * b1_rtuneKnob;
+	Knob * b2_rtuneKnob;
 
-	knob * m_abmixKnob;
+	Knob * m_abmixKnob;
 
-	knob * m_envAmtKnob;
+	Knob * m_envAmtKnob;
 
 	TempoSyncKnob * m_envAttKnob;
 	TempoSyncKnob * m_envHoldKnob;
 	TempoSyncKnob * m_envDecKnob;
 
-	knob * m_xtalkKnob;
+	Knob * m_xtalkKnob;
 
 	automatableButtonGroup * m_selectedGraphGroup;
 	automatableButtonGroup * m_aModGroup;
 	automatableButtonGroup * m_bModGroup;
 
-	graph * a1_graph;
-	graph * a2_graph;
-	graph * b1_graph;
-	graph * b2_graph;
+	Graph * a1_graph;
+	Graph * a2_graph;
+	Graph * b1_graph;
+	Graph * b2_graph;
 
-	pixmapButton * m_sinWaveButton;
-	pixmapButton * m_triWaveButton;
-	pixmapButton * m_sawWaveButton;
-	pixmapButton * m_sqrWaveButton;
-	pixmapButton * m_normalizeButton;
-	pixmapButton * m_invertButton;
-	pixmapButton * m_smoothButton;
-	pixmapButton * m_phaseLeftButton;
-	pixmapButton * m_phaseRightButton;
-	pixmapButton * m_loadButton;
+	PixmapButton * m_sinWaveButton;
+	PixmapButton * m_triWaveButton;
+	PixmapButton * m_sawWaveButton;
+	PixmapButton * m_sqrWaveButton;
+	PixmapButton * m_normalizeButton;
+	PixmapButton * m_invertButton;
+	PixmapButton * m_smoothButton;
+	PixmapButton * m_phaseLeftButton;
+	PixmapButton * m_phaseRightButton;
+	PixmapButton * m_loadButton;
 
 };
 

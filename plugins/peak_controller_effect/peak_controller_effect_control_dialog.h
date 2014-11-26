@@ -29,8 +29,8 @@
 #include "EffectControlDialog.h"
 
 class PeakControllerEffectControls;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 
 
 class PeakControllerEffectControlDialog : public EffectControlDialog
@@ -44,15 +44,15 @@ public:
 
 
 protected:
-	knob * m_baseKnob;
-	knob * m_amountKnob;
-	knob * m_attackKnob;
-	knob * m_decayKnob;
-	knob * m_tresholdKnob;
-	ledCheckBox * m_muteLed;
+	Knob * m_baseKnob;
+	Knob * m_amountKnob;
+	Knob * m_attackKnob;
+	Knob * m_decayKnob;
+	Knob * m_tresholdKnob;
+	LedCheckBox * m_muteLed;
 
-	ledCheckBox * m_absLed;
-	knob * m_amountMultKnob;
+	LedCheckBox * m_absLed;
+	Knob * m_amountMultKnob;
 
 } ;
 

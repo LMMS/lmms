@@ -37,7 +37,7 @@ class QMdiArea;
 
 class ConfigManager;
 class PluginView;
-class toolButton;
+class ToolButton;
 
 
 class MainWindow : public QMainWindow

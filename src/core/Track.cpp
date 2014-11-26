@@ -60,14 +60,14 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "DataFile.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "string_pair_drag.h"
 #include "templates.h"
-#include "text_float.h"
-#include "tooltip.h"
+#include "TextFloat.h"
+#include "ToolTip.h"
 #include "TrackContainer.h"
 
 
@@ -87,7 +87,7 @@ const int TRACK_OP_BTN_HEIGHT = 14;
  * beside the cursor as you move or resize elements of a track about.
  * This pointer keeps track of it, as you only ever need one at a time.
  */
-textFloat * trackContentObjectView::s_textFloat = NULL;
+TextFloat * trackContentObjectView::s_textFloat = NULL;
 
 
 // ===========================================================================
@@ -257,7 +257,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 {
 	if( s_textFloat == NULL )
 	{
-		s_textFloat = new textFloat;
+		s_textFloat = new TextFloat;
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
@@ -651,7 +651,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current position" ) );
 			delete m_hint;
-			m_hint = textFloat::displayMessage( tr( "Hint" ),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> and drag to make "
 							"a copy." ),
 					embed::getIconPixmap( "hint" ), 0 );
@@ -664,7 +664,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current length" ) );
 			delete m_hint;
-			m_hint = textFloat::displayMessage( tr( "Hint" ),
+			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> for free "
 							"resizing." ),
 					embed::getIconPixmap( "hint" ), 0 );
@@ -1559,7 +1559,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 							"track_op_grip" ) );
 	}
 
-	toolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
+	ToolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
 				"to begin a new drag'n'drop-action." ) );
 
 	QMenu * to_menu = new QMenu( this );
@@ -1574,15 +1574,15 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_trackOps->move( 12, 1 );
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( to_menu );
-	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
+	ToolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
 
-	m_muteBtn = new pixmapButton( this, tr( "Mute" ) );
+	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( true );
 
-	m_soloBtn = new pixmapButton( this, tr( "Solo" ) );
+	m_soloBtn = new PixmapButton( this, tr( "Solo" ) );
 	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
@@ -1600,10 +1600,10 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	}
 
 	m_muteBtn->show();
-	toolTip::add( m_muteBtn, tr( "Mute this track" ) );
+	ToolTip::add( m_muteBtn, tr( "Mute this track" ) );
 
 	m_soloBtn->show();
-	toolTip::add( m_soloBtn, tr( "Solo" ) );
+	ToolTip::add( m_soloBtn, tr( "Solo" ) );
 
 	connect( this, SIGNAL( trackRemovalScheduled( trackView * ) ),
 			m_trackView->trackContainerView(),
@@ -2661,7 +2661,7 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
 	{
-		toolTip::add( this, m_track->m_name );
+		ToolTip::add( this, m_track->m_name );
 	}
 }
 

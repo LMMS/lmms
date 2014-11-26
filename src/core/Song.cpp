@@ -54,12 +54,12 @@
 #include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "project_notes.h"
+#include "ProjectNotes.h"
 #include "ProjectRenderer.h"
-#include "rename_dialog.h"
+#include "RenameDialog.h"
 #include "SongEditor.h"
 #include "templates.h"
-#include "text_float.h"
+#include "TextFloat.h"
 #include "Timeline.h"
 #include "PeakController.h"
 
@@ -1043,7 +1043,7 @@ bool Song::guiSaveProject()
 	m_fileName = dataFile.nameWithExtension( m_fileName );
 	if( saveProjectFile( m_fileName ) && Engine::hasGUI() )
 	{
-		textFloat::displayMessage( tr( "Project saved" ),
+		TextFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
 							).arg( m_fileName ),
 				embed::getIconPixmap( "project_save", 24, 24 ),
@@ -1054,7 +1054,7 @@ bool Song::guiSaveProject()
 	}
 	else if( Engine::hasGUI() )
 	{
-		textFloat::displayMessage( tr( "Project NOT saved." ),
+		TextFloat::displayMessage( tr( "Project NOT saved." ),
 				tr( "The project %1 was not saved!" ).arg(
 							m_fileName ),
 				embed::getIconPixmap( "error" ), 4000 );

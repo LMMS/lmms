@@ -33,9 +33,9 @@
 
 
 class automatableButtonGroup;
-class knob;
+class Knob;
 class NotePlayHandle;
-class pixmapButton;
+class PixmapButton;
 class SampleBuffer;
 
 const int NUM_OF_OSCILLATORS = 3;
@@ -153,14 +153,14 @@ private:
 	struct OscillatorKnobs
 	{
 		MM_OPERATORS
-		OscillatorKnobs( knob * v,
-					knob * p,
-					knob * c,
-					knob * fl,
-					knob * fr,
-					knob * po,
-					knob * spd,
-					pixmapButton * uwb,
+		OscillatorKnobs( Knob * v,
+					Knob * p,
+					Knob * c,
+					Knob * fl,
+					Knob * fr,
+					Knob * po,
+					Knob * spd,
+					PixmapButton * uwb,
 					automatableButtonGroup * wsbg ) :
 			m_volKnob( v ),
 			m_panKnob( p ),
@@ -176,14 +176,14 @@ private:
 		OscillatorKnobs()
 		{
 		}
-		knob * m_volKnob;
-		knob * m_panKnob;
-		knob * m_coarseKnob;
-		knob * m_fineLeftKnob;
-		knob * m_fineRightKnob;
-		knob * m_phaseOffsetKnob;
-		knob * m_stereoPhaseDetuningKnob;
-		pixmapButton * m_userWaveButton;
+		Knob * m_volKnob;
+		Knob * m_panKnob;
+		Knob * m_coarseKnob;
+		Knob * m_fineLeftKnob;
+		Knob * m_fineRightKnob;
+		Knob * m_phaseOffsetKnob;
+		Knob * m_stereoPhaseDetuningKnob;
+		PixmapButton * m_userWaveButton;
 		automatableButtonGroup * m_waveShapeBtnGrp;
 
 	} ;

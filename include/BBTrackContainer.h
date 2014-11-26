@@ -27,7 +27,7 @@
 #define BB_TRACK_CONTAINER_H
 
 #include "TrackContainer.h"
-#include "combobox.h"
+#include "ComboBox.h"
 
 
 class EXPORT BBTrackContainer : public TrackContainer

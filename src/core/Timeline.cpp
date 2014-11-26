@@ -35,9 +35,9 @@
 #include "embed.h"
 #include "Engine.h"
 #include "templates.h"
-#include "nstate_button.h"
+#include "NStateButton.h"
 #include "MainWindow.h"
-#include "text_float.h"
+#include "TextFloat.h"
 
 
 #if QT_VERSION < 0x040800
@@ -123,14 +123,14 @@ Timeline::~Timeline()
 
 void Timeline::addToolButtons( QWidget * _tool_bar )
 {
-	nStateButton * autoScroll = new nStateButton( _tool_bar );
+	NStateButton * autoScroll = new NStateButton( _tool_bar );
 	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleAutoScroll( int ) ) );
 
-	nStateButton * loopPoints = new nStateButton( _tool_bar );
+	NStateButton * loopPoints = new NStateButton( _tool_bar );
 	loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
@@ -139,7 +139,7 @@ void Timeline::addToolButtons( QWidget * _tool_bar )
 	connect( this, SIGNAL( loopPointStateLoaded( int ) ), loopPoints,
 					SLOT( changeState( int ) ) );
 
-	nStateButton * behaviourAtStop = new nStateButton( _tool_bar );
+	NStateButton * behaviourAtStop = new NStateButton( _tool_bar );
 	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
 					tr( "After stopping go back to begin" )
 									);
@@ -313,14 +313,14 @@ void Timeline::mousePressEvent( QMouseEvent* event )
 	if( m_action == MoveLoopBegin )
 	{
 		delete m_hint;
-		m_hint = textFloat::displayMessage( tr( "Hint" ),
+		m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> to disable magnetic loop points." ),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 	else if( m_action == MoveLoopEnd )
 	{
 		delete m_hint;
-		m_hint = textFloat::displayMessage( tr( "Hint" ),
+		m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
 					embed::getIconPixmap( "hint" ), 0 );
 	}

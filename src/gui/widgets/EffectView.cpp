@@ -38,11 +38,11 @@
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "knob.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "TempoSyncKnob.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
@@ -55,15 +55,15 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
-	m_bypass = new ledCheckBox( this, "", isEnabled ? ledCheckBox::Green : ledCheckBox::Red );
+	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
 	
-	toolTip::add( m_bypass, tr( "On/Off" ) );
+	ToolTip::add( m_bypass, tr( "On/Off" ) );
 
 
-	m_wetDry = new knob( knobBright_26, this );
+	m_wetDry = new Knob( knobBright_26, this );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->move( 27, 5 );
 	m_wetDry->setEnabled( isEnabled );
@@ -84,7 +84,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 "run the risk of clipping the tail on delay and reverb effects." ) );
 
 
-	m_gate = new knob( knobBright_26, this );
+	m_gate = new Knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
 	m_gate->setEnabled( isEnabled );

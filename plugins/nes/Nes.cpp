@@ -29,7 +29,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "templates.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"

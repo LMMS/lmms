@@ -34,9 +34,9 @@
 #include "FxMixer.h"
 #include "ModelView.h"
 #include "Engine.h"
-#include "fader.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
+#include "Fader.h"
+#include "PixmapButton.h"
+#include "ToolTip.h"
 #include "embed.h"
 #include "EffectRackView.h"
 
@@ -54,9 +54,9 @@ public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
 		FxLine * m_fxLine;
-		pixmapButton * m_muteBtn;
-		pixmapButton * m_soloBtn;
-		fader * m_fader;
+		PixmapButton * m_muteBtn;
+		PixmapButton * m_soloBtn;
+		Fader * m_fader;
 		EffectRackView * m_rackView;
 	};
 

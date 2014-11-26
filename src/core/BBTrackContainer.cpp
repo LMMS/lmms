@@ -25,7 +25,7 @@
 
 #include "BBTrackContainer.h"
 #include "bb_track.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "embed.h"
 #include "Engine.h"
 #include "Song.h"

@@ -57,10 +57,10 @@
 #include "embed.cpp"
 #include "math.h"
 
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
+#include "PixmapButton.h"
+#include "ToolTip.h"
 
 extern "C"
 {
@@ -585,7 +585,7 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 	*/
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
-	knobname = new knob( knobStyled, this );\
+	knobname = new Knob( knobStyled, this );\
 	knobname->setHintText( tr(hinttext) + "", hintunit );\
 	knobname->setFixedSize(22,22);\
 	knobname->setCenterPointX(11.0);\
@@ -594,18 +594,18 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 	knobname->move(xpos,ypos);
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new pixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, NULL );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_off" ) );\
 	buttname->setCheckable( true );\
-        toolTip::add( buttname, tr( tooltip ) );\
+        ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new pixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, NULL );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        toolTip::add( buttname, tr( tooltip ) );\
+        ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 

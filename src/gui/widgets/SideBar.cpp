@@ -28,7 +28,7 @@
 
 #include "SideBar.h"
 #include "SideBarWidget.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 // internal helper class allowing to create QToolButtons with
@@ -120,7 +120,7 @@ void SideBar::appendTab( SideBarWidget * _sbw )
 	_sbw->hide();
 	_sbw->setMinimumWidth( 200 );
 
-	toolTip::add( btn, _sbw->title() );
+	ToolTip::add( btn, _sbw->title() );
 }
 
 

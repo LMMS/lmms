@@ -32,9 +32,9 @@
 #include <QWhatsThis>
 
 #include "setup_dialog.h"
-#include "tab_bar.h"
+#include "TabBar.h"
 #include "tab_button.h"
-#include "tab_widget.h"
+#include "TabWidget.h"
 #include "gui_templates.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
@@ -42,8 +42,8 @@
 #include "embed.h"
 #include "Engine.h"
 #include "debug.h"
-#include "tooltip.h"
-#include "led_checkbox.h"
+#include "ToolTip.h"
+#include "LedCheckbox.h"
 #include "LcdSpinBox.h"
 #include "FileDialog.h"
 
@@ -139,7 +139,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	hlayout->setSpacing( 0 );
 	hlayout->setMargin( 0 );
 
-	m_tabBar = new tabBar( settings, QBoxLayout::TopToBottom );
+	m_tabBar = new TabBar( settings, QBoxLayout::TopToBottom );
 	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
@@ -159,7 +159,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	gen_layout->setMargin( 0 );
 	labelWidget( general, tr( "General settings" ) );
 
-	tabWidget * bufsize_tw = new tabWidget( tr( "BUFFER SIZE" ), general );
+	TabWidget * bufsize_tw = new TabWidget( tr( "BUFFER SIZE" ), general );
 	bufsize_tw->setFixedHeight( 80 );
 
 	m_bufSizeSlider = new QSlider( Qt::Horizontal, bufsize_tw );
@@ -182,7 +182,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	bufsize_reset_btn->setGeometry( 290, 40, 28, 28 );
 	connect( bufsize_reset_btn, SIGNAL( clicked() ), this,
 						SLOT( resetBufSize() ) );
-	toolTip::add( bufsize_reset_btn, tr( "Reset to default-value" ) );
+	ToolTip::add( bufsize_reset_btn, tr( "Reset to default-value" ) );
 
 	QPushButton * bufsize_help_btn = new QPushButton(
 			embed::getIconPixmap( "help" ), "", bufsize_tw );
@@ -191,14 +191,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 						SLOT( displayBufSizeHelp() ) );
 
 
-	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
+	TabWidget * misc_tw = new TabWidget( tr( "MISC" ), general );
 	const int XDelta = 10;
 	const int YDelta = 18;
 	const int HeaderSize = 30;
 	int labelNumber = 0;
 
 
-	ledCheckBox * enable_tooltips = new ledCheckBox(
+	LedCheckBox * enable_tooltips = new LedCheckBox(
 							tr( "Enable tooltips" ),
 								misc_tw );
 	labelNumber++;
@@ -208,7 +208,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 					this, SLOT( toggleToolTips( bool ) ) );
 
 
-	ledCheckBox * restart_msg = new ledCheckBox(
+	LedCheckBox * restart_msg = new LedCheckBox(
 			tr( "Show restart warning after changing settings" ),
 								misc_tw );
 	labelNumber++;
@@ -218,7 +218,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleWarnAfterSetup( bool ) ) );
 
 
-	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dBV " ),
+	LedCheckBox * dbv = new LedCheckBox( tr( "Display volume as dBV " ),
 								misc_tw );
 	labelNumber++;
 	dbv->move( XDelta, YDelta*labelNumber );
@@ -227,7 +227,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleDisplaydBV( bool ) ) );
 
 
-	ledCheckBox * mmpz = new ledCheckBox(
+	LedCheckBox * mmpz = new LedCheckBox(
 				tr( "Compress project files per default" ),
 								misc_tw );
 	labelNumber++;
@@ -236,7 +236,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( mmpz, SIGNAL( toggled( bool ) ),
 					this, SLOT( toggleMMPZ( bool ) ) );
 
-	ledCheckBox * oneitw = new ledCheckBox(
+	LedCheckBox * oneitw = new LedCheckBox(
 				tr( "One instrument track window mode" ),
 								misc_tw );
 	labelNumber++;
@@ -245,7 +245,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( oneitw, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleOneInstrumentTrackWindow( bool ) ) );
 
-	ledCheckBox * hqaudio = new ledCheckBox(
+	LedCheckBox * hqaudio = new LedCheckBox(
 				tr( "HQ-mode for output audio-device" ),
 								misc_tw );
 	labelNumber++;
@@ -254,7 +254,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( hqaudio, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleHQAudioDev( bool ) ) );
 
-	ledCheckBox * compacttracks = new ledCheckBox(
+	LedCheckBox * compacttracks = new LedCheckBox(
 				tr( "Compact track buttons" ),
 								misc_tw );
 	labelNumber++;
@@ -264,7 +264,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleCompactTrackButtons( bool ) ) );
 
 
-	ledCheckBox * syncVST = new ledCheckBox(
+	LedCheckBox * syncVST = new LedCheckBox(
 				tr( "Sync VST plugins to host playback" ),
 								misc_tw );
 	labelNumber++;
@@ -273,7 +273,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( syncVST, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSyncVSTPlugins( bool ) ) );
 
-	ledCheckBox * noteLabels = new ledCheckBox(
+	LedCheckBox * noteLabels = new LedCheckBox(
 				tr( "Enable note labels in piano roll" ),
 								misc_tw );
 	labelNumber++;
@@ -282,7 +282,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( noteLabels, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleNoteLabels( bool ) ) );
 
-	ledCheckBox * displayWaveform = new ledCheckBox(
+	LedCheckBox * displayWaveform = new LedCheckBox(
 				tr( "Enable waveform display by default" ),
 								misc_tw );
 	labelNumber++;
@@ -291,7 +291,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( displayWaveform, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisplayWaveform( bool ) ) );
 
-	ledCheckBox * disableAutoquit = new ledCheckBox(
+	LedCheckBox * disableAutoquit = new LedCheckBox(
 				tr( "Keep effects running even without input" ),
 								misc_tw );
 	labelNumber++;
@@ -325,7 +325,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	labelWidget( paths, tr( "Paths" ) );
 
 	// working-dir
-	tabWidget * lmms_wd_tw = new tabWidget( tr(
+	TabWidget * lmms_wd_tw = new TabWidget( tr(
 					"LMMS working directory" ).toUpper(),
 								paths );
 	lmms_wd_tw->setFixedHeight( 48 );
@@ -344,7 +344,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 						SLOT( openWorkingDir() ) );
 
 	// vst-dir
-	tabWidget * vst_tw = new tabWidget( tr(
+	TabWidget * vst_tw = new TabWidget( tr(
 					"VST-plugin directory" ).toUpper(),
 								paths );
 	vst_tw->setFixedHeight( 48 );
@@ -363,7 +363,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 						SLOT( openVSTDir() ) );
 
 	// artwork-dir
-	tabWidget * artwork_tw = new tabWidget( tr(
+	TabWidget * artwork_tw = new TabWidget( tr(
 					"Artwork directory" ).toUpper(),
 								paths );
 	artwork_tw->setFixedHeight( 48 );
@@ -384,7 +384,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	// background artwork file
-	tabWidget * backgroundArtwork_tw = new tabWidget( tr(
+	TabWidget * backgroundArtwork_tw = new TabWidget( tr(
 			"Background artwork" ).toUpper(), paths );
 	backgroundArtwork_tw->setFixedHeight( 48 );
 
@@ -407,7 +407,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	// FL Studio-dir
-	tabWidget * fl_tw = new tabWidget( tr(
+	TabWidget * fl_tw = new TabWidget( tr(
 				"FL Studio installation directory" ).toUpper(),
 								paths );
 	fl_tw->setFixedHeight( 48 );
@@ -425,7 +425,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( fldir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openFLDir() ) );
 	// LADSPA-dir
-	tabWidget * lad_tw = new tabWidget( tr(
+	TabWidget * lad_tw = new TabWidget( tr(
 			"LADSPA plugin paths" ).toUpper(),
 							paths );
 	lad_tw->setFixedHeight( 48 );
@@ -445,7 +445,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_STK
 	// STK-dir
-	tabWidget * stk_tw = new tabWidget( tr(
+	TabWidget * stk_tw = new TabWidget( tr(
 			"STK rawwave directory" ).toUpper(),
 							paths );
 	stk_tw->setFixedHeight( 48 );
@@ -466,7 +466,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	// Soundfont
-	tabWidget * sf_tw = new tabWidget( tr(
+	TabWidget * sf_tw = new TabWidget( tr(
 			"Default Soundfont File" ).toUpper(), paths );
 	sf_tw->setFixedHeight( 48 );
 
@@ -517,12 +517,12 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	perf_layout->setMargin( 0 );
 	labelWidget( performance, tr( "Performance settings" ) );
 
-	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
+	TabWidget * ui_fx_tw = new TabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
 	ui_fx_tw->setFixedHeight( 80 );
 
-	ledCheckBox * smoothScroll = new ledCheckBox(
+	LedCheckBox * smoothScroll = new LedCheckBox(
 			tr( "Smooth scroll in Song Editor" ), ui_fx_tw );
 	smoothScroll->move( 10, 20 );
 	smoothScroll->setChecked( m_smoothScroll );
@@ -530,7 +530,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleSmoothScroll( bool ) ) );
 
 
-	ledCheckBox * autoSave = new ledCheckBox(
+	LedCheckBox * autoSave = new LedCheckBox(
 			tr( "Enable auto save feature" ), ui_fx_tw );
 	autoSave->move( 10, 40 );
 	autoSave->setChecked( m_enableAutoSave );
@@ -538,7 +538,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleAutoSave( bool ) ) );
 
 
-	ledCheckBox * animAFP = new ledCheckBox(
+	LedCheckBox * animAFP = new LedCheckBox(
 				tr( "Show playback cursor in AudioFileProcessor" ),
 								ui_fx_tw );
 	animAFP->move( 10, 60 );
@@ -560,7 +560,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	audio_layout->setMargin( 0 );
 	labelWidget( audio, tr( "Audio settings" ) );
 
-	tabWidget * audioiface_tw = new tabWidget( tr( "AUDIO INTERFACE" ),
+	TabWidget * audioiface_tw = new TabWidget( tr( "AUDIO INTERFACE" ),
 									audio );
 	audioiface_tw->setFixedHeight( 60 );
 
@@ -652,7 +652,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	midi_layout->setMargin( 0 );
 	labelWidget( midi, tr( "MIDI settings" ) );
 
-	tabWidget * midiiface_tw = new tabWidget( tr( "MIDI INTERFACE" ),
+	TabWidget * midiiface_tw = new TabWidget( tr( "MIDI INTERFACE" ),
 									midi );
 	midiiface_tw->setFixedHeight( 60 );
 

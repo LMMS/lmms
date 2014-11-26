@@ -54,14 +54,14 @@
 #include "FxMixerView.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentSoundShapingView.h"
-#include "fade_button.h"
+#include "FadeButton.h"
 #include "gui_templates.h"
 #include "Instrument.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -73,9 +73,9 @@
 #include "SamplePlayHandle.h"
 #include "Song.h"
 #include "string_pair_drag.h"
-#include "tab_widget.h"
-#include "tooltip.h"
-#include "track_label_button.h"
+#include "TabWidget.h"
+#include "ToolTip.h"
+#include "TrackLabelButton.h"
 #include "ValueBuffer.h"
 #include "volume.h"
 
@@ -821,7 +821,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	setAcceptDrops( true );
 	setFixedHeight( 32 );
 
-	m_tlb = new trackLabelButton( this, getTrackSettingsWidget() );
+	m_tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_tlb->setCheckable( true );
 	m_tlb->setIcon( embed::getIconPixmap( "instrument_track" ) );
 	m_tlb->move( 3, 1 );
@@ -845,7 +845,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
 	}
 
-	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
@@ -855,7 +855,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->show();
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
-	m_panningKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
@@ -898,7 +898,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiInputAction->setText( tr( "Input" ) );
 	m_midiOutputAction->setText( tr( "Output" ) );
 
-	m_activityIndicator = new fadeButton( QApplication::palette().color( QPalette::Active,
+	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
@@ -1155,7 +1155,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
-	tabWidget* generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ), this );
+	TabWidget* generalSettingsWidget = new TabWidget( tr( "GENERAL SETTINGS" ), this );
 
 	QVBoxLayout* generalSettingsLayout = new QVBoxLayout( generalSettingsWidget );
 
@@ -1174,7 +1174,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setSpacing( 3 );
 
 	// set up volume knob
-	m_volumeKnob = new knob( knobBright_26, NULL, tr( "Instrument volume" ) );
+	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
@@ -1184,7 +1184,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( m_volumeKnob );
 
 	// set up panning knob
-	m_panningKnob = new knob( knobBright_26, NULL, tr( "Panning" ) );
+	m_panningKnob = new Knob( knobBright_26, NULL, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 
@@ -1192,7 +1192,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addStretch();
 
 	// set up pitch knob
-	m_pitchKnob = new knob( knobBright_26, NULL, tr( "Pitch" ) );
+	m_pitchKnob = new Knob( knobBright_26, NULL, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
@@ -1219,7 +1219,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
-	toolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
+	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
 	saveSettingsBtn->setWhatsThis(
 		tr( "Click here, if you want to save current instrument track settings in a preset file. "
 			"Later you can load this preset by double-clicking it in the preset-browser." ) );
@@ -1229,7 +1229,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
-	m_tabWidget = new tabWidget( "", this );
+	m_tabWidget = new TabWidget( "", this );
 	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + 10 );
 
 

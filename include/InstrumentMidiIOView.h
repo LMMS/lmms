@@ -31,7 +31,7 @@
 #include "ModelView.h"
 
 
-class groupBox;
+class GroupBox;
 class LcdSpinBox;
 class QToolButton;
 
@@ -46,12 +46,12 @@ public:
 private:
 	virtual void modelChanged();
 
-	groupBox * m_midiInputGroupBox;
+	GroupBox * m_midiInputGroupBox;
 	LcdSpinBox * m_inputChannelSpinBox;
 	LcdSpinBox * m_fixedInputVelocitySpinBox;
 	QToolButton * m_rpBtn;
 
-	groupBox * m_midiOutputGroupBox;
+	GroupBox * m_midiOutputGroupBox;
 	LcdSpinBox * m_outputChannelSpinBox;
 	LcdSpinBox * m_fixedOutputVelocitySpinBox;
 	LcdSpinBox * m_outputProgramSpinBox;

@@ -50,7 +50,7 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "string_pair_drag.h"
 #include "MainWindow.h"
 #include "MidiEvent.h"

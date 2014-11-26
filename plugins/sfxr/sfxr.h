@@ -30,10 +30,10 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "knob.h"
-#include "graph.h"
-#include "pixmap_button.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "Graph.h"
+#include "PixmapButton.h"
+#include "LedCheckbox.h"
 #include "MemoryManager.h"
 
 
@@ -248,53 +248,53 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	knob * m_attKnob; //Attack Time
-	knob * m_holdKnob; //Sustain Time
-	knob * m_susKnob; //Sustain Punch
-	knob * m_decKnob; //Decay Time
+	Knob * m_attKnob; //Attack Time
+	Knob * m_holdKnob; //Sustain Time
+	Knob * m_susKnob; //Sustain Punch
+	Knob * m_decKnob; //Decay Time
 
-	knob * m_startFreqKnob; //Start Frequency
-	knob * m_minFreqKnob; //Min Frequency
-	knob * m_slideKnob; //Slide
-	knob * m_dSlideKnob; //Delta Slide
-	knob * m_vibDepthKnob; //Vibrato Depth
-	knob * m_vibSpeedKnob; //Vibrato Speed
+	Knob * m_startFreqKnob; //Start Frequency
+	Knob * m_minFreqKnob; //Min Frequency
+	Knob * m_slideKnob; //Slide
+	Knob * m_dSlideKnob; //Delta Slide
+	Knob * m_vibDepthKnob; //Vibrato Depth
+	Knob * m_vibSpeedKnob; //Vibrato Speed
 
-	knob * m_changeAmtKnob; //Change Amount
-	knob * m_changeSpeedKnob; //Change Speed
+	Knob * m_changeAmtKnob; //Change Amount
+	Knob * m_changeSpeedKnob; //Change Speed
 
-	knob * m_sqrDutyKnob; //Squre Duty
-    knob * m_sqrSweepKnob; //Squre Sweep
+	Knob * m_sqrDutyKnob; //Squre Duty
+    Knob * m_sqrSweepKnob; //Squre Sweep
 
-	knob * m_repeatSpeedKnob; //Repeat Speed
+	Knob * m_repeatSpeedKnob; //Repeat Speed
 
-	knob * m_phaserOffsetKnob; //Phaser Offset
-	knob * m_phaserSweepKnob; //Phaser Sweep
+	Knob * m_phaserOffsetKnob; //Phaser Offset
+	Knob * m_phaserSweepKnob; //Phaser Sweep
 
-	knob * m_lpFilCutKnob; //LP Filter Cutoff
-	knob * m_lpFilCutSweepKnob; //LP Filter Cutoff Sweep
-	knob * m_lpFilResoKnob; //LP Filter Resonance
-	knob * m_hpFilCutKnob; //HP Filter Cutoff
-	knob * m_hpFilCutSweepKnob; //HP Filter Cutoff Sweep
+	Knob * m_lpFilCutKnob; //LP Filter Cutoff
+	Knob * m_lpFilCutSweepKnob; //LP Filter Cutoff Sweep
+	Knob * m_lpFilResoKnob; //LP Filter Resonance
+	Knob * m_hpFilCutKnob; //HP Filter Cutoff
+	Knob * m_hpFilCutSweepKnob; //HP Filter Cutoff Sweep
 
 	automatableButtonGroup * m_waveBtnGroup;
-	pixmapButton * m_sqrWaveBtn; //NOTE: This button has Squre Duty
+	PixmapButton * m_sqrWaveBtn; //NOTE: This button has Squre Duty
 								//and Squre Speed configurable
-	pixmapButton * m_sawWaveBtn;
-	pixmapButton * m_sinWaveBtn;
-	pixmapButton * m_noiseWaveBtn;
+	PixmapButton * m_sawWaveBtn;
+	PixmapButton * m_sinWaveBtn;
+	PixmapButton * m_noiseWaveBtn;
 
 
-	pixmapButton * m_pickupBtn;
-	pixmapButton * m_laserBtn;
-	pixmapButton * m_explosionBtn;
-	pixmapButton * m_powerupBtn;
-	pixmapButton * m_hitBtn;
-	pixmapButton * m_jumpBtn;
-	pixmapButton * m_blipBtn;
+	PixmapButton * m_pickupBtn;
+	PixmapButton * m_laserBtn;
+	PixmapButton * m_explosionBtn;
+	PixmapButton * m_powerupBtn;
+	PixmapButton * m_hitBtn;
+	PixmapButton * m_jumpBtn;
+	PixmapButton * m_blipBtn;
 
-	pixmapButton * m_randomizeBtn;
-	pixmapButton * m_mutateBtn;
+	PixmapButton * m_randomizeBtn;
+	PixmapButton * m_mutateBtn;
 
 	static QPixmap * s_artwork;
 };

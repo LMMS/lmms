@@ -48,7 +48,7 @@
 #include "SamplePlayHandle.h"
 #include "Song.h"
 #include "string_pair_drag.h"
-#include "text_float.h"
+#include "TextFloat.h"
 
 
 
@@ -424,7 +424,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		// handling() rather than directly creating a SamplePlayHandle
 		if( f->type() == FileItem::SampleFile )
 		{
-			textFloat * tf = textFloat::displayMessage(
+			TextFloat * tf = TextFloat::displayMessage(
 					tr( "Loading sample" ),
 					tr( "Please wait, loading sample for "
 								"preview..." ),

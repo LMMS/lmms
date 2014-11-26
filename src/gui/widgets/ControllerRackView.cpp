@@ -35,7 +35,7 @@
 #include "Song.h"
 #include "embed.h"
 #include "MainWindow.h"
-#include "group_box.h"
+#include "GroupBox.h"
 #include "ControllerRackView.h"
 #include "ControllerView.h"
 #include "LfoController.h"

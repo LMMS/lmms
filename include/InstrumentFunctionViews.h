@@ -30,9 +30,9 @@
 #include <QWidget>
 
 class QLabel;
-class comboBox;
-class groupBox;
-class knob;
+class ComboBox;
+class GroupBox;
+class Knob;
 class TempoSyncKnob;
 
 class InstrumentFunctionArpeggio;
@@ -53,9 +53,9 @@ private:
 
 	InstrumentFunctionNoteStacking * m_cc;
 
-	groupBox * m_chordsGroupBox;
-	comboBox * m_chordsComboBox;
-	knob * m_chordRangeKnob;
+	GroupBox * m_chordsGroupBox;
+	ComboBox * m_chordsComboBox;
+	Knob * m_chordRangeKnob;
 
 } ;
 
@@ -75,14 +75,14 @@ private:
 	virtual void modelChanged();
 
 	InstrumentFunctionArpeggio * m_a;
-	groupBox * m_arpGroupBox;
-	comboBox * m_arpComboBox;
-	knob * m_arpRangeKnob;
+	GroupBox * m_arpGroupBox;
+	ComboBox * m_arpComboBox;
+	Knob * m_arpRangeKnob;
 	TempoSyncKnob * m_arpTimeKnob;
-	knob * m_arpGateKnob;
+	Knob * m_arpGateKnob;
 
-	comboBox * m_arpDirectionComboBox;
-	comboBox * m_arpModeComboBox;
+	ComboBox * m_arpDirectionComboBox;
+	ComboBox * m_arpModeComboBox;
 
 } ;
 

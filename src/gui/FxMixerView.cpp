@@ -38,7 +38,7 @@
 #include <QKeyEvent>
 
 #include "FxMixerView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "Engine.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -268,13 +268,13 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_fxLine = new FxLine(_parent, _mv, _chIndex);
 
 	FxMixer * m = Engine::fxMixer();
-	m_fader = new fader( &m->effectChannel(_chIndex)->m_volumeModel,
+	m_fader = new Fader( &m->effectChannel(_chIndex)->m_volumeModel,
 					tr( "FX Fader %1" ).arg( _chIndex ), m_fxLine );
 	m_fader->move( 16-m_fader->width()/2,
 					m_fxLine->height()-
 					m_fader->height()-5 );
 
-	m_muteBtn = new pixmapButton( m_fxLine, tr( "Mute" ) );
+	m_muteBtn = new PixmapButton( m_fxLine, tr( "Mute" ) );
 	m_muteBtn->setModel( &m->effectChannel(_chIndex)->m_muteModel );
 	m_muteBtn->setActiveGraphic(
 				embed::getIconPixmap( "led_off" ) );
@@ -282,9 +282,9 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 				embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( true );
 	m_muteBtn->move( 9,  m_fader->y()-11);
-	toolTip::add( m_muteBtn, tr( "Mute this FX channel" ) );
+	ToolTip::add( m_muteBtn, tr( "Mute this FX channel" ) );
 
-	m_soloBtn = new pixmapButton( m_fxLine, tr( "Solo" ) );
+	m_soloBtn = new PixmapButton( m_fxLine, tr( "Solo" ) );
 	m_soloBtn->setModel( &m->effectChannel(_chIndex)->m_soloModel );
 	m_soloBtn->setActiveGraphic(
 				embed::getIconPixmap( "led_red" ) );
@@ -294,7 +294,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&m->effectChannel(_chIndex)->m_soloModel, SIGNAL( dataChanged() ),
 			_mv, SLOT ( toggledSolo() ) );
-	toolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
+	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
 	
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &m->effectChannel(_chIndex)->m_fxChain, _mv->m_racksWidget );

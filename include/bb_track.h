@@ -32,7 +32,7 @@
 
 #include "Track.h"
 
-class trackLabelButton;
+class TrackLabelButton;
 class TrackContainer;
 
 
@@ -220,7 +220,7 @@ public slots:
 
 private:
 	bbTrack * m_bbTrack;
-	trackLabelButton * m_trackLabel;
+	TrackLabelButton * m_trackLabel;
 
 } ;
 

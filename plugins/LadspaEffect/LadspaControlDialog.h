@@ -32,7 +32,7 @@
 
 class QHBoxLayout;
 class LadspaControls;
-class ledCheckBox;
+class LedCheckBox;
 
 
 class LadspaControlDialog : public EffectControlDialog
@@ -49,7 +49,7 @@ private slots:
 
 private:
 	QHBoxLayout * m_effectLayout;
-	ledCheckBox * m_stereoLink;
+	LedCheckBox * m_stereoLink;
 
 } ;
 

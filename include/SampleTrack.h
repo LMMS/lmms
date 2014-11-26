@@ -31,7 +31,7 @@
 #include "Track.h"
 
 class EffectRackView;
-class knob;
+class Knob;
 class SampleBuffer;
 
 
@@ -180,7 +180,7 @@ protected:
 private:
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
-	knob * m_volumeKnob;
+	Knob * m_volumeKnob;
 
 } ;
 

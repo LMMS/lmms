@@ -37,15 +37,15 @@
 #include "Song.h"
 #include "embed.h"
 #include "Engine.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "AudioPort.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
 #include "string_pair_drag.h"
-#include "knob.h"
+#include "Knob.h"
 #include "MainWindow.h"
 #include "EffectRackView.h"
-#include "track_label_button.h"
+#include "TrackLabelButton.h"
 #include "ConfigManager.h"
 
 
@@ -221,7 +221,7 @@ void SampleTCOView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
-	toolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
+	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
 					tr( "double-click to select sample" ) );
 }
@@ -525,7 +525,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 {
 	setFixedHeight( 32 );
 
-	trackLabelButton * tlb = new trackLabelButton( this,
+	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
 			this, SLOT( showEffects() ) );
@@ -533,7 +533,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	tlb->move( 3, 1 );
 	tlb->show();
 
-	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );

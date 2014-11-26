@@ -35,11 +35,11 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "rename_dialog.h"
+#include "RenameDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "templates.h"
-#include "track_label_button.h"
+#include "TrackLabelButton.h"
 
 
 
@@ -292,7 +292,7 @@ void bbTCOView::resetName()
 void bbTCOView::changeName()
 {
 	QString s = m_bbTCO->name();
-	renameDialog rename_dlg( s );
+	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_bbTCO->setName( s );
 }
@@ -585,7 +585,7 @@ bbTrackView::bbTrackView( bbTrack * _bbt, TrackContainerView* tcv ) :
 	// too), so disable it
 	setAcceptDrops( false );
 
-	m_trackLabel = new trackLabelButton( this, getTrackSettingsWidget() );
+	m_trackLabel = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_trackLabel->setIcon( embed::getIconPixmap( "bb_track" ) );
 	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();

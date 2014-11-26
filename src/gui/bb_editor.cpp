@@ -33,7 +33,7 @@
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "tool_button.h"
+#include "ToolButton.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "string_pair_drag.h"
@@ -79,34 +79,34 @@ bbEditor::bbEditor( BBTrackContainer* tc ) :
 	}
 
 
-	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
 			tr( "Play/pause current beat/bassline (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
 			tr( "Stop playback of current beat/bassline (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
 	m_playButton->setObjectName( "playButton" );
 	m_stopButton->setObjectName( "stopButton" );
 
-	toolButton * add_bb_track = new toolButton(
+	ToolButton * add_bb_track = new ToolButton(
 					embed::getIconPixmap( "add_bb_track" ),
 						tr( "Add beat/bassline" ),
 				Engine::getSong(), SLOT( addBBTrack() ),
 								m_toolBar );
 
-	toolButton * add_automation_track = new toolButton(
+	ToolButton * add_automation_track = new ToolButton(
 				embed::getIconPixmap( "add_automation" ),
 						tr( "Add automation-track" ),
 				this, SLOT( addAutomationTrack() ), m_toolBar );
 
-	toolButton * remove_bar = new toolButton(
+	ToolButton * remove_bar = new ToolButton(
 				embed::getIconPixmap( "step_btn_remove" ),
 						tr( "Remove steps" ),
 				this, SLOT( removeSteps() ), m_toolBar );
 
-	toolButton * add_bar = new toolButton(
+	ToolButton * add_bar = new ToolButton(
 				embed::getIconPixmap( "step_btn_add" ),
 						tr( "Add steps" ),
 				this, SLOT( addSteps() ), m_toolBar );
@@ -121,7 +121,7 @@ bbEditor::bbEditor( BBTrackContainer* tc ) :
 		tr( "Click here to stop playing of current "
 							"beat/bassline." ) );
 
-	m_bbComboBox = new comboBox( m_toolBar );
+	m_bbComboBox = new ComboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 

@@ -34,10 +34,10 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "Song.h"
 #include "string_pair_drag.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "FileDialog.h"
 
 #include "embed.cpp"
@@ -448,7 +448,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	setPalette( pal );
 
 
-	m_openFileButton = new pixmapButton( this, NULL );
+	m_openFileButton = new PixmapButton( this, NULL );
 	m_openFileButton->setObjectName( "openFileButton" );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 227, 86 );
@@ -458,13 +458,13 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 							"select_file" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
-	toolTip::add( m_openFileButton, tr( "Open other patch" ) );
+	ToolTip::add( m_openFileButton, tr( "Open other patch" ) );
 
 	m_openFileButton->setWhatsThis(
 		tr( "Click here to open another patch-file. Loop and Tune "
 			"settings are not reset." ) );
 
-	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
+	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");
 	m_loopButton->setCheckable( true );
 	m_loopButton->move( 195, 138 );
@@ -472,13 +472,13 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
-	toolTip::add( m_loopButton, tr( "Loop mode" ) );
+	ToolTip::add( m_loopButton, tr( "Loop mode" ) );
 	m_loopButton->setWhatsThis(
 		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
 			"will use the loop information available in the "
 			"file." ) );
 
-	m_tuneButton = new pixmapButton( this, tr( "Tune" ) );
+	m_tuneButton = new PixmapButton( this, tr( "Tune" ) );
 	m_tuneButton->setObjectName("tuneButton");
 	m_tuneButton->setCheckable( true );
 	m_tuneButton->move( 223, 138 );
@@ -486,7 +486,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"tune_on" ) );
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_off" ) );
-	toolTip::add( m_tuneButton, tr( "Tune mode" ) );
+	ToolTip::add( m_tuneButton, tr( "Tune mode" ) );
 	m_tuneButton->setWhatsThis(
 		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
 			"will tune the sample to match the note's "

@@ -35,7 +35,7 @@
 #include "Note.h"
 #include "lmms_basics.h"
 #include "Song.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 class QPainter;
 class QPixmap;
@@ -44,11 +44,11 @@ class QString;
 class QMenu;
 class QSignalMapper;
 
-class comboBox;
+class ComboBox;
 class NotePlayHandle;
 class Pattern;
 class Timeline;
-class toolButton;
+class ToolButton;
 
 class PianoRoll : public QWidget, public SerializingObject
 {
@@ -262,29 +262,29 @@ private:
 
 	static PianoRollKeyTypes prKeyOrder[];
 
-	static textFloat * s_textFloat;
+	static TextFloat * s_textFloat;
 
 	QWidget * m_toolBar;
 
-	toolButton * m_playButton;
-	toolButton * m_recordButton;
-	toolButton * m_recordAccompanyButton;
-	toolButton * m_stopButton;
+	ToolButton * m_playButton;
+	ToolButton * m_recordButton;
+	ToolButton * m_recordAccompanyButton;
+	ToolButton * m_stopButton;
 
-	toolButton * m_drawButton;
-	toolButton * m_eraseButton;
-	toolButton * m_selectButton;
-	toolButton * m_detuneButton;
+	ToolButton * m_drawButton;
+	ToolButton * m_eraseButton;
+	ToolButton * m_selectButton;
+	ToolButton * m_detuneButton;
 
-	toolButton * m_cutButton;
-	toolButton * m_copyButton;
-	toolButton * m_pasteButton;
+	ToolButton * m_cutButton;
+	ToolButton * m_copyButton;
+	ToolButton * m_pasteButton;
 
-	comboBox * m_zoomingComboBox;
-	comboBox * m_quantizeComboBox;
-	comboBox * m_noteLenComboBox;
-	comboBox * m_scaleComboBox;
-	comboBox * m_chordComboBox;
+	ComboBox * m_zoomingComboBox;
+	ComboBox * m_quantizeComboBox;
+	ComboBox * m_noteLenComboBox;
+	ComboBox * m_scaleComboBox;
+	ComboBox * m_chordComboBox;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;

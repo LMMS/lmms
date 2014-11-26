@@ -71,7 +71,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
 		char paramStr[35];
-		vstKnobs = new knob *[ paramCount ];
+		vstKnobs = new Knob *[ paramCount ];
 		knobFModel = new FloatModel *[ paramCount ];
 		QStringList s_dumpValues;
 		QWidget * widget = new QWidget();
@@ -80,7 +80,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 			sprintf( paramStr, "param%d", i );
 			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			vstKnobs[i] = new knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+			vstKnobs[i] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
 			vstKnobs[i]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
 			vstKnobs[i]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
@@ -361,7 +361,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 
 	if (m_vi->vstKnobs == NULL) {
-		m_vi->vstKnobs = new knob *[ m_vi->paramCount ];
+		m_vi->vstKnobs = new Knob *[ m_vi->paramCount ];
 		isVstKnobs = false;
 	}
 	if (m_vi->knobFModel == NULL) {
@@ -377,7 +377,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 			sprintf( paramStr, "param%d", i);
     			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			m_vi->vstKnobs[ i ] = new knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+			m_vi->vstKnobs[ i ] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
 			m_vi->vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
 			m_vi->vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 

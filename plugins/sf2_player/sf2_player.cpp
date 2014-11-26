@@ -34,11 +34,11 @@
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "NotePlayHandle.h"
-#include "knob.h"
+#include "Knob.h"
 #include "Song.h"
 
 #include "patches_dialog.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.cpp"
@@ -788,11 +788,11 @@ PluginView * sf2Instrument::instantiateView( QWidget * _parent )
 
 
 
-class sf2Knob : public knob
+class sf2Knob : public Knob
 {
 public:
 	sf2Knob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 31, 38 );
 	}
@@ -812,7 +812,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	connect( &k->m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
 
 	// File Button
-	m_fileDialogButton = new pixmapButton( this );
+	m_fileDialogButton = new PixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
 	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
@@ -820,12 +820,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	toolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
 
 	m_fileDialogButton->setWhatsThis( tr( "Click here to open another SF2 file" ) );
 
 	// Patch Button
-	m_patchDialogButton = new pixmapButton( this );
+	m_patchDialogButton = new PixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
@@ -834,7 +834,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
 
 
 	// LCDs
@@ -877,12 +877,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 //	hl = new QHBoxLayout();
 
 
-	m_reverbButton = new pixmapButton( this );
+	m_reverbButton = new PixmapButton( this );
 	m_reverbButton->setCheckable( true );
 	m_reverbButton->move( 14, 180 );
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_on" ) );
 	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_off" ) );
-	toolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
+	ToolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
 	m_reverbButton->setWhatsThis(
 		tr( "This button enables the reverb effect. "
 			"This is useful for cool effects, but only works on "
@@ -917,12 +917,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	// Chorus
 //	hl = new QHBoxLayout();
 
-	m_chorusButton = new pixmapButton( this );
+	m_chorusButton = new PixmapButton( this );
 	m_chorusButton->setCheckable( true );
 	m_chorusButton->move( 14, 226 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
-	toolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
+	ToolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
 	m_chorusButton->setWhatsThis(
 		tr( "This button enables the chorus effect. "
 			"This is useful for cool echo effects, but only works on "

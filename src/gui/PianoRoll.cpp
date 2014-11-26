@@ -49,7 +49,7 @@
 #include "PianoRoll.h"
 #include "BBTrackContainer.h"
 #include "Clipboard.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "debug.h"
 #include "DetuningHelper.h"
 #include "embed.h"
@@ -60,14 +60,14 @@
 #include "DataFile.h"
 #include "Pattern.h"
 #include "Piano.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "templates.h"
-#include "text_float.h"
+#include "TextFloat.h"
 #include "Timeline.h"
-#include "tool_button.h"
-#include "text_float.h"
+#include "ToolButton.h"
+#include "TextFloat.h"
 
 
 typedef AutomationPattern::timeMap timeMap;
@@ -126,7 +126,7 @@ QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
 
-textFloat * PianoRoll::s_textFloat = NULL;
+TextFloat * PianoRoll::s_textFloat = NULL;
 
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
@@ -285,7 +285,7 @@ PianoRoll::PianoRoll() :
 	// init text-float
 	if( s_textFloat == NULL )
 	{
-		s_textFloat = new textFloat;
+		s_textFloat = new TextFloat;
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -328,19 +328,19 @@ PianoRoll::PianoRoll() :
 
 	// init control-buttons at the top
 
-	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
 				tr( "Play/pause current pattern (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
-	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
+	m_recordButton = new ToolButton( embed::getIconPixmap( "record" ),
 			tr( "Record notes from MIDI-device/channel-piano" ),
 					this, SLOT( record() ), m_toolBar );
-	m_recordAccompanyButton = new toolButton(
+	m_recordAccompanyButton = new ToolButton(
 			embed::getIconPixmap( "record_accompany" ),
 			tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ),
 					this, SLOT( recordAccompany() ), m_toolBar );
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
@@ -384,27 +384,27 @@ PianoRoll::PianoRoll() :
 						SLOT( verScrolled( int ) ) );
 
 	// init edit-buttons at the top
-	m_drawButton = new toolButton( embed::getIconPixmap( "edit_draw" ),
+	m_drawButton = new ToolButton( embed::getIconPixmap( "edit_draw" ),
 					tr( "Draw mode (Shift+D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
 	m_drawButton->setCheckable( true );
 	m_drawButton->setChecked( true );
 
-	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
+	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
 					tr( "Erase mode (Shift+E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
 	m_eraseButton->setCheckable( true );
 
-	m_selectButton = new toolButton( embed::getIconPixmap(
+	m_selectButton = new ToolButton( embed::getIconPixmap(
 							"edit_select" ),
 					tr( "Select mode (Shift+S)" ),
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
 	m_selectButton->setCheckable( true );
 
-	m_detuneButton = new toolButton( embed::getIconPixmap( "automation"),
+	m_detuneButton = new ToolButton( embed::getIconPixmap( "automation"),
 					tr( "Detune mode (Shift+T)" ),
 					this, SLOT( detuneButtonToggled() ),
 					m_toolBar );
@@ -440,17 +440,17 @@ PianoRoll::PianoRoll() :
 		    "notes from one to another. You can also press "
 		    "'Shift+T' on your keyboard to activate this mode." ) );
 
-	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
+	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected notes (Ctrl+X)" ),
 					this, SLOT( cutSelectedNotes() ),
 					m_toolBar );
 
-	m_copyButton = new toolButton( embed::getIconPixmap( "edit_copy" ),
+	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
 					tr( "Copy selected notes (Ctrl+C)" ),
 					this, SLOT( copySelectedNotes() ),
 					m_toolBar );
 
-	m_pasteButton = new toolButton( embed::getIconPixmap( "edit_paste" ),
+	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste notes from clipboard "
 								"(Ctrl+V)" ),
 					this, SLOT( pasteNotes() ),
@@ -479,7 +479,7 @@ PianoRoll::PianoRoll() :
 	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
 	connect( &m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
-	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setModel( &m_zoomingModel );
 	m_zoomingComboBox->setFixedSize( 64, 22 );
 
@@ -498,7 +498,7 @@ PianoRoll::PianoRoll() :
 	}
 	m_quantizeModel.addItem( "1/192" );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
-	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 64, 22 );
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
@@ -527,7 +527,7 @@ PianoRoll::PianoRoll() :
 				new PixmapLoader( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] ) );
 	}
 	m_noteLenModel.setValue( 0 );
-	m_noteLenComboBox = new comboBox( m_toolBar );
+	m_noteLenComboBox = new ComboBox( m_toolBar );
 	m_noteLenComboBox->setModel( &m_noteLenModel );
 	m_noteLenComboBox->setFixedSize( 105, 22 );
 	// Note length change can cause a redraw if Q is set to lock
@@ -551,7 +551,7 @@ PianoRoll::PianoRoll() :
 	}
 
 	m_scaleModel.setValue( 0 );
-	m_scaleComboBox = new comboBox( m_toolBar );
+	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_scaleModel );
 	m_scaleComboBox->setFixedSize( 105, 22 );
 	// change can update m_semiToneMarkerMenu
@@ -573,7 +573,7 @@ PianoRoll::PianoRoll() :
 	}
 
 	m_chordModel.setValue( 0 );
-	m_chordComboBox = new comboBox( m_toolBar );
+	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_chordModel );
 	m_chordComboBox->setFixedSize( 105, 22 );
 	// change can update m_semiToneMarkerMenu

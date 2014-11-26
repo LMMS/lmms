@@ -29,7 +29,7 @@
 #include <QWidget>
 #include <QLabel>
 
-#include "knob.h"
+#include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
 
@@ -52,7 +52,7 @@ public:
 	inline int channelIndex() { return m_channelIndex; }
 	void setChannelIndex(int index);
 
-	knob * m_sendKnob;
+	Knob * m_sendKnob;
 	SendButtonIndicator * m_sendBtn;
 
 	QBrush backgroundActive() const;

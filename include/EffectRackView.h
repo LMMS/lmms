@@ -36,7 +36,7 @@ class QScrollArea;
 class QVBoxLayout;
 
 class EffectView;
-class groupBox;
+class GroupBox;
 
 
 class EffectRackView : public QWidget, public ModelView
@@ -75,7 +75,7 @@ private:
 
 	QVector<EffectView *> m_effectViews;
 
-	groupBox* m_effectsGroupBox;
+	GroupBox* m_effectsGroupBox;
 	QScrollArea* m_scrollArea;
 
 	int m_lastY;

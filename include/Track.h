@@ -34,7 +34,7 @@
 
 #include "lmms_basics.h"
 #include "MidiTime.h"
-#include "rubberband.h"
+#include "Rubberband.h"
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "ModelView.h"
@@ -44,8 +44,8 @@
 class QMenu;
 class QPushButton;
 
-class pixmapButton;
-class textFloat;
+class PixmapButton;
+class TextFloat;
 class Track;
 class trackContentObjectView;
 class TrackContainer;
@@ -243,7 +243,7 @@ private:
 		ToggleSelected
 	} ;
 
-	static textFloat * s_textFloat;
+	static TextFloat * s_textFloat;
 
 	trackContentObject * m_tco;
 	trackView * m_trackView;
@@ -252,7 +252,7 @@ private:
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 
-	textFloat * m_hint;
+	TextFloat * m_hint;
 
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
@@ -388,8 +388,8 @@ private:
 	trackView * m_trackView;
 
 	QPushButton * m_trackOps;
-	pixmapButton * m_muteBtn;
-	pixmapButton * m_soloBtn;
+	PixmapButton * m_muteBtn;
+	PixmapButton * m_soloBtn;
 
 
 	friend class trackView;
@@ -658,7 +658,7 @@ private:
 	Actions m_action;
 
 
-	friend class trackLabelButton;
+	friend class TrackLabelButton;
 
 
 private slots:

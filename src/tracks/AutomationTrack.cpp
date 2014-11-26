@@ -31,7 +31,7 @@
 #include "ProjectJournal.h"
 #include "string_pair_drag.h"
 #include "TrackContainerView.h"
-#include "track_label_button.h"
+#include "TrackLabelButton.h"
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
@@ -131,7 +131,7 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 	trackView( _at, tcv )
 {
         setFixedHeight( 32 );
-	trackLabelButton * tlb = new trackLabelButton( this,
+	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
 	tlb->move( 3, 1 );

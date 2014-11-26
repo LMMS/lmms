@@ -37,18 +37,18 @@
 
 #include "SongEditor.h"
 #include "AutomatableSlider.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
-#include "cpuload_widget.h"
+#include "CPULoadWidget.h"
 #include "embed.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
-#include "text_float.h"
+#include "TextFloat.h"
 #include "Timeline.h"
-#include "tool_button.h"
-#include "tooltip.h"
-#include "visualization_widget.h"
+#include "ToolButton.h"
+#include "ToolTip.h"
+#include "VisualizationWidget.h"
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
@@ -117,7 +117,7 @@ SongEditor::SongEditor( Song * _song ) :
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO/BPM" ) );
-	toolTip::add( m_tempoSpinBox, tr( "tempo of song" ) );
+	ToolTip::add( m_tempoSpinBox, tr( "tempo of song" ) );
 
 	m_tempoSpinBox->setWhatsThis(
 		tr( "The tempo of a song is specified in beats per minute "
@@ -162,7 +162,7 @@ SongEditor::SongEditor( Song * _song ) :
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
-	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
+	ToolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( masterVolumeChanged( int ) ) );
@@ -173,7 +173,7 @@ SongEditor::SongEditor( Song * _song ) :
 	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterVolumeReleased() ) );
 
-	m_mvsStatus = new textFloat;
+	m_mvsStatus = new TextFloat;
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
@@ -195,7 +195,7 @@ SongEditor::SongEditor( Song * _song ) :
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
+	ToolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( masterPitchChanged( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
@@ -205,7 +205,7 @@ SongEditor::SongEditor( Song * _song ) :
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterPitchReleased() ) );
 
-	m_mpsStatus = new textFloat;
+	m_mpsStatus = new TextFloat;
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
@@ -221,10 +221,10 @@ SongEditor::SongEditor( Song * _song ) :
 	vcw_layout->setSpacing( 0 );
 
 	//vcw_layout->addStretch();
-	vcw_layout->addWidget( new visualizationWidget(
+	vcw_layout->addWidget( new VisualizationWidget(
 			embed::getIconPixmap( "output_graph" ), vc_w ) );
 
-	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
+	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
 
 	Engine::mainWindow()->addWidgetToToolBar( vc_w );
@@ -248,17 +248,17 @@ SongEditor::SongEditor( Song * _song ) :
 
 
 	// fill own tool-bar
-	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
 					tr( "Play song (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 	m_playButton->setObjectName( "playButton" );
 
-	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
+	m_recordButton = new ToolButton( embed::getIconPixmap( "record" ),
 			tr( "Record samples from Audio-device" ),
 					this, SLOT( record() ), m_toolBar );
 	m_recordButton->setObjectName( "recordButton" );
 
-	m_recordAccompanyButton = new toolButton(
+	m_recordAccompanyButton = new ToolButton(
 			embed::getIconPixmap( "record_accompany" ),
 			tr( "Record samples from Audio-device while playing "
 							"song or BB track" ),
@@ -275,37 +275,37 @@ SongEditor::SongEditor( Song * _song ) :
 		m_recordAccompanyButton->setDisabled( true );
 	}
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
 					tr( "Stop song (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 	m_stopButton->setObjectName( "stopButton" );
 
-	m_addBBTrackButton = new toolButton( embed::getIconPixmap(
+	m_addBBTrackButton = new ToolButton( embed::getIconPixmap(
 						"add_bb_track" ),
 						tr( "Add beat/bassline" ),
 						m_song, SLOT( addBBTrack() ),
 						m_toolBar );
 
-	m_addSampleTrackButton = new toolButton( embed::getIconPixmap(
+	m_addSampleTrackButton = new ToolButton( embed::getIconPixmap(
 					"add_sample_track" ),
 					tr( "Add sample-track" ),
 					m_song, SLOT( addSampleTrack() ),
 					m_toolBar );
 
-	m_addAutomationTrackButton = new toolButton( embed::getIconPixmap(
+	m_addAutomationTrackButton = new ToolButton( embed::getIconPixmap(
 					"add_automation" ),
 					tr( "Add automation-track" ),
 					m_song, SLOT( addAutomationTrack() ),
 					m_toolBar );
 
-	m_drawModeButton = new toolButton( embed::getIconPixmap(
+	m_drawModeButton = new ToolButton( embed::getIconPixmap(
 								"edit_draw" ),
 							tr( "Draw mode" ),
 							NULL, NULL, m_toolBar );
 	m_drawModeButton->setCheckable( true );
 	m_drawModeButton->setChecked( true );
 
-	m_editModeButton = new toolButton( embed::getIconPixmap(
+	m_editModeButton = new ToolButton( embed::getIconPixmap(
 								"edit_select" ),
 					tr( "Edit mode (select and move)" ),
 							NULL, NULL, m_toolBar );
@@ -343,7 +343,7 @@ SongEditor::SongEditor( Song * _song ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )

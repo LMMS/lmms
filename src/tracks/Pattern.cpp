@@ -41,11 +41,11 @@
 #include "Engine.h"
 #include "PianoRoll.h"
 #include "TrackContainer.h"
-#include "rename_dialog.h"
+#include "RenameDialog.h"
 #include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
 #include "Song.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "BBTrackContainer.h"
 #include "string_pair_drag.h"
 #include "MainWindow.h"
@@ -637,7 +637,7 @@ PatternView::PatternView( Pattern* pattern, trackView* parent ) :
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAutoResizeEnabled( false );
 
-	toolTip::add( this,
+	ToolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
 			"use mouse wheel to set volume of a step" ) );
 	setStyle( QApplication::style() );
@@ -687,7 +687,7 @@ void PatternView::resetName()
 void PatternView::changeName()
 {
 	QString s = m_pat->name();
-	renameDialog rename_dlg( s );
+	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_pat->setName( s );
 }

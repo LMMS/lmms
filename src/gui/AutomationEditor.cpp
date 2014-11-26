@@ -51,14 +51,14 @@
 #include "MainWindow.h"
 #include "embed.h"
 #include "Engine.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "Timeline.h"
-#include "tooltip.h"
-#include "tool_button.h"
-#include "text_float.h"
-#include "combobox.h"
+#include "ToolTip.h"
+#include "ToolButton.h"
+#include "TextFloat.h"
+#include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "PianoRoll.h"
 #include "debug.h"
@@ -158,12 +158,12 @@ AutomationEditor::AutomationEditor() :
 
 	// init control-buttons at the top
 
-	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
 				tr( "Play/pause current pattern (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
@@ -193,14 +193,14 @@ AutomationEditor::AutomationEditor() :
 						SLOT( verScrolled( int ) ) );
 
 	// init edit-buttons at the top
-	m_drawButton = new toolButton( embed::getIconPixmap( "edit_draw" ),
+	m_drawButton = new ToolButton( embed::getIconPixmap( "edit_draw" ),
 					tr( "Draw mode (Shift+D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
 	m_drawButton->setCheckable( true );
 	m_drawButton->setChecked( true );
 
-	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
+	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
 					tr( "Erase mode (Shift+E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
@@ -249,7 +249,7 @@ AutomationEditor::AutomationEditor() :
 			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );*/
 
-	m_discreteButton = new toolButton( embed::getIconPixmap(
+	m_discreteButton = new ToolButton( embed::getIconPixmap(
 						"progression_discrete" ),
 					tr( "Discrete progression" ),
 					this, SLOT( discreteButtonToggled() ),
@@ -257,14 +257,14 @@ AutomationEditor::AutomationEditor() :
 	m_discreteButton->setCheckable( true );
 	m_discreteButton->setChecked( true );
 
-	m_linearButton = new toolButton( embed::getIconPixmap(
+	m_linearButton = new ToolButton( embed::getIconPixmap(
 							"progression_linear" ),
 					tr( "Linear progression" ),
 					this, SLOT( linearButtonToggled() ),
 					m_toolBar );
 	m_linearButton->setCheckable( true );
 
-	m_cubicHermiteButton = new toolButton( embed::getIconPixmap(
+	m_cubicHermiteButton = new ToolButton( embed::getIconPixmap(
 						"progression_cubic_hermite" ),
 					tr( "Cubic Hermite progression" ),
 					this, SLOT(
@@ -273,7 +273,7 @@ AutomationEditor::AutomationEditor() :
 	m_cubicHermiteButton->setCheckable( true );
 
 	// setup tension-stuff
-	m_tensionKnob = new knob( knobSmall_17, this, "Tension" );
+	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
 	connect( m_tensionModel, SIGNAL( dataChanged() ),
 				this, SLOT( tensionChanged() ) );
@@ -305,17 +305,17 @@ AutomationEditor::AutomationEditor() :
 			"object will change in a smooth curve and ease in to "
 			"the peaks and valleys." ) );
 
-	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
+	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected values (Ctrl+X)" ),
 					this, SLOT( cutSelectedValues() ),
 					m_toolBar );
 
-	m_copyButton = new toolButton( embed::getIconPixmap( "edit_copy" ),
+	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
 					tr( "Copy selected values (Ctrl+C)" ),
 					this, SLOT( copySelectedValues() ),
 					m_toolBar );
 
-	m_pasteButton = new toolButton( embed::getIconPixmap( "edit_paste" ),
+	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste values from clipboard "
 								"(Ctrl+V)" ),
 					this, SLOT( pasteValues() ),
@@ -338,7 +338,7 @@ AutomationEditor::AutomationEditor() :
 	QLabel * zoom_x_lbl = new QLabel( m_toolBar );
 	zoom_x_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new comboBox( m_toolBar );
+	m_zoomingXComboBox = new ComboBox( m_toolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 
 	for( int i = 0; i < 6; ++i )
@@ -356,7 +356,7 @@ AutomationEditor::AutomationEditor() :
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
 	zoom_y_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new comboBox( m_toolBar );
+	m_zoomingYComboBox = new ComboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 
 	m_zoomingYModel.addItem( "Auto" );
@@ -376,7 +376,7 @@ AutomationEditor::AutomationEditor() :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
 	for( int i = 0; i < 7; ++i )
@@ -2088,7 +2088,7 @@ void AutomationEditor::cubicHermiteButtonToggled()
 	{
 		m_tensionKnob->setModel( m_tensionModel );
 		m_tensionKnob->setEnabled( true );
-		toolTip::add( m_tensionKnob, tr( "Tension value for spline" ) );
+		ToolTip::add( m_tensionKnob, tr( "Tension value for spline" ) );
 		m_tensionKnob->setWhatsThis(
 			tr( "A higher tension value may make a smoother curve "
 				"but overshoot some values.  A low tension "
@@ -2210,7 +2210,7 @@ void AutomationEditor::copySelectedValues()
 		{
 			m_valuesToCopy[it.key()] = it.value();
 		}
-		textFloat::displayMessage( tr( "Values copied" ),
+		TextFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
 								"clipboard." ),
 				embed::getIconPixmap( "edit_copy" ), 2000 );

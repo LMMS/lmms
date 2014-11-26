@@ -41,11 +41,11 @@ float frnd(float range)
 #include "sfxr.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "templates.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
@@ -547,11 +547,11 @@ void sfxrInstrument::resetModels()
 
 
 
-class sfxrKnob : public knob
+class sfxrKnob : public Knob
 {
 public:
 	sfxrKnob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 20, 20 );
 		setCenterPointX( 10.0 );
@@ -568,27 +568,27 @@ public:
 	_knob = new sfxrKnob( this ); \
 	_knob->setHintText( tr( _name ":" ), "" ); \
 	_knob->move( _x, _y ); \
-	toolTip::add( _knob, tr( _name ) );
+	ToolTip::add( _knob, tr( _name ) );
 
 
 
 
 #define createButton( _button, _x, _y, _name, _resName )\
-	_button = new pixmapButton( this, tr( _name ) );\
+	_button = new PixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( embed::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( embed::getIconPixmap( _resName "_inactive" ) );\
-	toolTip::add( _button, tr( _name ) );
+	ToolTip::add( _button, tr( _name ) );
 
 
 
 
 #define createButtonLocalGraphic( _button, _x, _y, _name, _resName )\
-	_button = new pixmapButton( this, tr( _name ) );\
+	_button = new PixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_inactive" ) );\
-	toolTip::add( _button, tr( _name ) );
+	ToolTip::add( _button, tr( _name ) );
 
 
 

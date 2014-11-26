@@ -62,7 +62,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 
 	// mixer sends knob
-	m_sendKnob = new knob( knobBright_26, this, tr("Channel send amount") );
+	m_sendKnob = new Knob( knobBright_26, this, tr("Channel send amount") );
 	m_sendKnob->move( 3, 22 );
 	m_sendKnob->setVisible(false);
 

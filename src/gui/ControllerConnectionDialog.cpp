@@ -35,12 +35,12 @@
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
 #include "LcdSpinBox.h"
-#include "led_checkbox.h"
-#include "combobox.h"
-#include "tab_widget.h"
-#include "group_box.h"
+#include "LedCheckbox.h"
+#include "ComboBox.h"
+#include "TabWidget.h"
+#include "GroupBox.h"
 #include "Song.h"
-#include "tool_button.h"
+#include "ToolButton.h"
 
 #include "gui_templates.h"
 #include "embed.h"
@@ -137,7 +137,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	setModal( true );
 
 	// Midi stuff
-	m_midiGroupBox = new groupBox( tr( "MIDI CONTROLLER" ), this );
+	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
 	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
 	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
@@ -156,7 +156,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	
 
 	m_midiAutoDetectCheckBox =
-			new ledCheckBox( tr("Auto Detect"),
+			new LedCheckBox( tr("Auto Detect"),
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
 	m_midiAutoDetectCheckBox->move( 8, 60 );
@@ -170,7 +170,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
 				this, SLOT( enableAutoDetect( QAction * ) ) );
-		toolButton * rp_btn = new toolButton( m_midiGroupBox );
+		ToolButton * rp_btn = new ToolButton( m_midiGroupBox );
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
@@ -181,12 +181,12 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 
 	// User stuff
-	m_userGroupBox = new groupBox( tr( "USER CONTROLLER" ), this );
+	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
 	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
 	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( userToggled() ) );
 
-	m_userController = new comboBox( m_userGroupBox, "Controller" );
+	m_userController = new ComboBox( m_userGroupBox, "Controller" );
 	m_userController->setGeometry( 10, 24, 200, 22 );
 
 	for( int i = 0; i < Engine::getSong()->controllers().size(); ++i )
@@ -197,7 +197,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	
 
 	// Mapping functions
-	m_mappingBox = new tabWidget( tr( "MAPPING FUNCTION" ), this );
+	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
 	m_mappingBox->setGeometry( 8, 170, 240, 64 );
 	m_mappingFunction = new QLineEdit( m_mappingBox );
 	m_mappingFunction->setGeometry( 10, 20, 170, 16 );

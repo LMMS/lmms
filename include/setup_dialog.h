@@ -38,7 +38,7 @@ class QLabel;
 class QLineEdit;
 class QSlider;
 
-class tabBar;
+class TabBar;
 
 
 class setupDialog : public QDialog
@@ -114,7 +114,7 @@ private slots:
 
 
 private:
-	tabBar * m_tabBar;
+	TabBar * m_tabBar;
 
 	QSlider * m_bufSizeSlider;
 	QLabel * m_bufSizeLbl;

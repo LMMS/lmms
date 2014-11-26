@@ -30,7 +30,7 @@
 #include "InstrumentTrack.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
@@ -1467,22 +1467,22 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 // "tab buttons"
 
-	pixmapButton * m_opViewButton = new pixmapButton( this, NULL );
+	PixmapButton * m_opViewButton = new PixmapButton( this, NULL );
 	m_opViewButton -> move( 0,0 );
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
-	toolTip::add( m_opViewButton, tr( "Operators view" ) );
+	ToolTip::add( m_opViewButton, tr( "Operators view" ) );
 	m_opViewButton -> setWhatsThis( tr( "The Operators view contains all the operators. These include both audible "
 										"operators (oscillators) and inaudible operators, or modulators: "
 										"Low-frequency oscillators and Envelopes. \n\n"
 										"Knobs and other widgets in the Operators view have their own what's this -texts, "
 										"so you can get more specific help for them that way. " ) );
 
-	pixmapButton * m_matViewButton = new pixmapButton( this, NULL );
+	PixmapButton * m_matViewButton = new PixmapButton( this, NULL );
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
-	toolTip::add( m_matViewButton, tr( "Matrix view" ) );
+	ToolTip::add( m_matViewButton, tr( "Matrix view" ) );
 	m_matViewButton -> setWhatsThis( tr( "The Matrix view contains the modulation matrix. Here you can define "
 										"the modulation relationships between the various operators: Each "
 										"audible operator (oscillators 1-3) has 3-4 properties that can be "
@@ -1686,7 +1686,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc2VolKnob -> setVolumeKnob( true );
 
-	m_osc2WaveBox = new comboBox( view );
+	m_osc2WaveBox = new ComboBox( view );
 	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, 22 );
 	m_osc2WaveBox->setFont( pointSize<8>( m_osc2WaveBox->font() ) );
 
@@ -1699,18 +1699,18 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc3SpoKnob, KNOBCOL4, O3ROW, "Stereo phase offset", " deg", "osc3Knob" )
 	makeknob( m_osc3SubKnob, KNOBCOL5, O3ROW, "Sub-osc mix", "", "osc3Knob" )
 
-	m_osc3Wave1Box = new comboBox( view );
+	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, 22 );
 	m_osc3Wave1Box->setFont( pointSize<8>( m_osc3Wave1Box->font() ) );
 
-	m_osc3Wave2Box = new comboBox( view );
+	m_osc3Wave2Box = new ComboBox( view );
 	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, 22 );
 	m_osc3Wave2Box->setFont( pointSize<8>( m_osc3Wave2Box->font() ) );
 
 	maketinyled( m_osc3SyncHButton, 212, O3ROW - 3, "Hard sync oscillator 3" )
 	maketinyled( m_osc3SyncRButton, 191, O3ROW - 3, "Reverse sync oscillator 3" )
 
-	m_lfo1WaveBox = new comboBox( view );
+	m_lfo1WaveBox = new ComboBox( view );
 	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, 22 );
 	m_lfo1WaveBox->setFont( pointSize<8>( m_lfo1WaveBox->font() ) );
 
@@ -1718,7 +1718,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, "Rate", " ms", "lfoKnob" )
 	makeknob( m_lfo1PhsKnob, LFOCOL3, LFOROW, "Phase", " deg", "lfoKnob" )
 
-	m_lfo2WaveBox = new comboBox( view );
+	m_lfo2WaveBox = new ComboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, 22 );
 	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
@@ -1743,29 +1743,29 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_env2SlopeKnob, KNOBCOL7, E2ROW, "Slope", "", "envKnob" )
 
 	// mod selector
-	pixmapButton * m_mixButton = new pixmapButton( view, NULL );
+	PixmapButton * m_mixButton = new PixmapButton( view, NULL );
 	m_mixButton -> move( 225, 185 );
 	m_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
 	m_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
-	toolTip::add( m_mixButton, tr( "Mix Osc2 with Osc3" ) );
+	ToolTip::add( m_mixButton, tr( "Mix Osc2 with Osc3" ) );
 
-	pixmapButton * m_amButton = new pixmapButton( view, NULL );
+	PixmapButton * m_amButton = new PixmapButton( view, NULL );
 	m_amButton -> move( 225, 185 + 15 );
 	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
 	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
-	toolTip::add( m_amButton, tr( "Modulate amplitude of Osc3 with Osc2" ) );
+	ToolTip::add( m_amButton, tr( "Modulate amplitude of Osc3 with Osc2" ) );
 
-	pixmapButton * m_fmButton = new pixmapButton( view, NULL );
+	PixmapButton * m_fmButton = new PixmapButton( view, NULL );
 	m_fmButton -> move( 225, 185 + 15*2 );
 	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
 	m_fmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_inactive" ) );
-	toolTip::add( m_fmButton, tr( "Modulate frequency of Osc3 with Osc2" ) );
+	ToolTip::add( m_fmButton, tr( "Modulate frequency of Osc3 with Osc2" ) );
 
-	pixmapButton * m_pmButton = new pixmapButton( view, NULL );
+	PixmapButton * m_pmButton = new PixmapButton( view, NULL );
 	m_pmButton -> move( 225, 185 + 15*3 );
 	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
-	toolTip::add( m_pmButton, tr( "Modulate phase of Osc3 with Osc2" ) );
+	ToolTip::add( m_pmButton, tr( "Modulate phase of Osc3 with Osc2" ) );
 
 	m_o23ModGroup = new automatableButtonGroup( view );
 	m_o23ModGroup-> addButton( m_mixButton );

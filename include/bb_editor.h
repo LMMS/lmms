@@ -30,8 +30,8 @@
 
 
 class BBTrackContainer;
-class comboBox;
-class toolButton;
+class ComboBox;
+class ToolButton;
 
 
 class bbEditor : public TrackContainerView
@@ -67,10 +67,10 @@ private:
 	BBTrackContainer * m_bbtc;
 	QWidget * m_toolBar;
 
-	toolButton * m_playButton;
-	toolButton * m_stopButton;
+	ToolButton * m_playButton;
+	ToolButton * m_stopButton;
 
-	comboBox * m_bbComboBox;
+	ComboBox * m_bbComboBox;
 
 } ;
 

@@ -27,11 +27,11 @@
 #include "InstrumentSoundShapingView.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
-#include "combobox.h"
-#include "group_box.h"
+#include "ComboBox.h"
+#include "GroupBox.h"
 #include "gui_templates.h"
-#include "knob.h"
-#include "tab_widget.h"
+#include "Knob.h"
+#include "TabWidget.h"
 
 
 
@@ -52,7 +52,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	ModelView( NULL, this ),
 	m_ss( NULL )
 {
-	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );
+	m_targetsTabWidget = new TabWidget( tr( "TARGET" ), this );
 	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
 						TARGETS_TABWIDGET_Y,
 						TARGETS_TABWIDGET_WIDTH,
@@ -80,13 +80,13 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	}
 
 
-	m_filterGroupBox = new groupBox( tr( "FILTER" ), this );
+	m_filterGroupBox = new GroupBox( tr( "FILTER" ), this );
 	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );
 
 
-	m_filterComboBox = new comboBox( m_filterGroupBox );
+	m_filterComboBox = new ComboBox( m_filterGroupBox );
 	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
@@ -96,7 +96,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 			"for changing the characteristics of a sound." ) );
 
 
-	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox );
+	m_filterCutKnob = new Knob( knobBright_26, m_filterGroupBox );
 	m_filterCutKnob->setLabel( tr( "FREQ" ) );
 	m_filterCutKnob->move( 140, 18 );
 	m_filterCutKnob->setHintText( tr( "cutoff frequency:" ) + " ", " " + tr( "Hz" ) );
@@ -109,7 +109,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 			"frequencies below cutoff frequency, and so on..." ) );
 
 
-	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox );
+	m_filterResKnob = new Knob( knobBright_26, m_filterGroupBox );
 	m_filterResKnob->setLabel( tr( "RESO" ) );
 	m_filterResKnob->move( 196, 18 );
 	m_filterResKnob->setHintText( tr( "Resonance:" ) + " ", "" );

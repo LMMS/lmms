@@ -32,8 +32,8 @@
 
 
 class QPixmap;
-class nStateButton;
-class textFloat;
+class NStateButton;
+class TextFloat;
 
 
 class Timeline : public QWidget, public JournallingObject
@@ -169,7 +169,7 @@ private:
 	MidiTime m_savedPos;
 
 
-	textFloat * m_hint;
+	TextFloat * m_hint;
 
 
 	enum actions
