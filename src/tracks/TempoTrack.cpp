@@ -86,6 +86,7 @@ TempoPattern::TempoPattern( TempoTrack * tt ) :
 	AutomationPattern( tt )
 {
 	setTempoPattern( true );
+	putValue( MidiTime(0), Engine::getSong()->getTempo() ); // initialize with value from tempo widget
 	updateTempoMaps();
 }
 
@@ -94,6 +95,7 @@ TempoPattern::TempoPattern( const TempoPattern & tpToCopy ) :
 	AutomationPattern( tpToCopy )
 {
 	setTempoPattern( true );
+	putValue( MidiTime(0), Engine::getSong()->getTempo() ); // initialize with value from tempo widget
 	updateTempoMaps();
 }
 

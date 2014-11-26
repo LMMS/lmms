@@ -56,7 +56,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
 	m_isTempoPattern( false )
 {
 	changeLength( MidiTime( 1, 0 ) );
-	
+
 	if( m_autoTrack && ! m_autoTrack->objects()->isEmpty() )
 	{
 		const AutomatableModel * obj = firstObject();
