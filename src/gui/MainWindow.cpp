@@ -519,14 +519,14 @@ void MainWindow::finalize()
 	{
 		ConfigManager::inst()->setValue( "app", "configured", "1" );
 		// no, so show it that user can setup everything
-		setupDialog sd;
+		SetupDialog sd;
 		sd.exec();
 	}
 	// look whether mixer could use a audio-interface beside AudioDummy
 	else if( Engine::mixer()->audioDevName() == AudioDummy::name() )
 	{
 		// no, so we offer setup-dialog with audio-settings...
-		setupDialog sd( setupDialog::AudioSettings );
+		SetupDialog sd( SetupDialog::AudioSettings );
 		sd.exec();
 	}
 }
@@ -834,7 +834,7 @@ bool MainWindow::saveProjectAsNewVersion()
 
 void MainWindow::showSettingsDialog()
 {
-	setupDialog sd;
+	SetupDialog sd;
 	sd.exec();
 }
 
@@ -843,7 +843,7 @@ void MainWindow::showSettingsDialog()
 
 void MainWindow::aboutLMMS()
 {
-	aboutDialog().exec();
+	AboutDialog().exec();
 }
 
 

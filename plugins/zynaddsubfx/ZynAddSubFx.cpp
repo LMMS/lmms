@@ -571,10 +571,10 @@ ZynAddSubFxView::~ZynAddSubFxView()
 
 void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
 		{
 			_dee->acceptProposedAction();
@@ -595,8 +595,8 @@ void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 {
-	const QString type = stringPairDrag::decodeKey( _de );
-	const QString value = stringPairDrag::decodeValue( _de );
+	const QString type = StringPairDrag::decodeKey( _de );
+	const QString value = StringPairDrag::decodeValue( _de );
 	if( type == "pluginpresetfile" )
 	{
 		castModel<ZynAddSubFxInstrument>()->loadFile( value );

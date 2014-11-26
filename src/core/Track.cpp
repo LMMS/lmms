@@ -446,7 +446,7 @@ void trackContentObjectView::dragEnterEvent( QDragEnterEvent * _dee )
 	}
 	else
 	{
-		stringPairDrag::processDragEnterEvent( _dee, "tco_" +
+		StringPairDrag::processDragEnterEvent( _dee, "tco_" +
 					QString::number( m_tco->getTrack()->type() ) );
 	}
 }
@@ -465,8 +465,8 @@ void trackContentObjectView::dragEnterEvent( QDragEnterEvent * _dee )
  */
 void trackContentObjectView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 
 	// Track must be the same type to paste into
 	if( type != ( "tco_" + QString::number( m_tco->getTrack()->type() ) ) )
@@ -628,7 +628,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 						128, 128,
 						Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
-		new stringPairDrag( QString( "tco_%1" ).arg(
+		new StringPairDrag( QString( "tco_%1" ).arg(
 						m_tco->getTrack()->type() ),
 					dataFile.toString(), thumbnail, this );
 	}
@@ -750,7 +750,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-			new stringPairDrag( QString( "tco_%1" ).arg(
+			new StringPairDrag( QString( "tco_%1" ).arg(
 								m_tco->getTrack()->type() ),
 								dataFile.toString(), thumbnail, this );
 		}
@@ -881,7 +881,7 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	// If the CopySelection was chosen as the action due to mouse movement,
 	// it will have been cleared.  At this point Toggle is the desired action.
-	// An active stringPairDrag will prevent this method from being called,
+	// An active StringPairDrag will prevent this method from being called,
 	// so a real CopySelection would not have occurred.
 	if( m_action == CopySelection ||
 	    ( m_action == ToggleSelected && mouseMovedDistance( _me, 2 ) == false ) )
@@ -1245,7 +1245,7 @@ void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
 	}
 	else
 	{
-		stringPairDrag::processDragEnterEvent( _dee, "tco_" +
+		StringPairDrag::processDragEnterEvent( _dee, "tco_" +
 						QString::number( getTrack()->type() ) );
 	}
 }
@@ -1261,8 +1261,8 @@ void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
 bool trackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData )
 {
 	Track * t = getTrack();
-	QString type = stringPairDrag::decodeMimeKey( mimeData );
-	QString value = stringPairDrag::decodeMimeValue( mimeData );
+	QString type = StringPairDrag::decodeMimeKey( mimeData );
+	QString value = StringPairDrag::decodeMimeValue( mimeData );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1335,8 +1335,8 @@ bool trackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
 		return false;
 	}
 
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 
 	getTrack()->addJournalCheckPoint();
 
@@ -1642,7 +1642,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		DataFile dataFile( DataFile::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
-		new stringPairDrag( QString( "track_%1" ).arg(
+		new StringPairDrag( QString( "track_%1" ).arg(
 					m_trackView->getTrack()->type() ),
 			dataFile.toString(), QPixmap::grabWidget(
 				m_trackView->getTrackSettingsWidget() ),
@@ -2511,7 +2511,7 @@ void trackView::modelChanged()
  */
 void trackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "track_" +
+	StringPairDrag::processDragEnterEvent( _dee, "track_" +
 					QString::number( m_track->type() ) );
 }
 
@@ -2528,8 +2528,8 @@ void trackView::dragEnterEvent( QDragEnterEvent * _dee )
  */
 void trackView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == ( "track_" + QString::number( m_track->type() ) ) )
 	{
 		// value contains our XML-data so simply create a

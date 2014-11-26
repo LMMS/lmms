@@ -393,8 +393,8 @@ void Graph::paintEvent( QPaintEvent * )
 
 void Graph::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 
 	if( type == "samplefile" )
 	{
@@ -406,7 +406,7 @@ void Graph::dropEvent( QDropEvent * _de )
 
 void Graph::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( stringPairDrag::processDragEnterEvent( _dee,
+	if( StringPairDrag::processDragEnterEvent( _dee,
 		QString( "samplefile" ) ) == false )
 	{
 		_dee->ignore();

@@ -791,10 +791,10 @@ void VestigeInstrumentView::noteOffAll( void )
 
 void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -815,8 +815,8 @@ void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void VestigeInstrumentView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "vstplugin" )
 	{
 		m_vi->loadFile( value );
@@ -1105,10 +1105,10 @@ void manageVestigeInstrumentView::setParameter( void )
 
 void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -1129,8 +1129,8 @@ void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void manageVestigeInstrumentView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "vstplugin" )
 	{
 		m_vi->loadFile( value );

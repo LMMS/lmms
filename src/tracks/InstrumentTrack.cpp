@@ -1492,7 +1492,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	stringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
+	StringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
 }
 
 
@@ -1508,8 +1508,8 @@ void InstrumentTrackWindow::dragEnterEvent( QDragEnterEvent* event )
 
 void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 {
-	QString type = stringPairDrag::decodeKey( event );
-	QString value = stringPairDrag::decodeValue( event );
+	QString type = StringPairDrag::decodeKey( event );
+	QString value = StringPairDrag::decodeValue( event );
 
 	if( type == "instrument" )
 	{

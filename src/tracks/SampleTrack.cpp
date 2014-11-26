@@ -267,7 +267,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 
 void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( stringPairDrag::processDragEnterEvent( _dee,
+	if( StringPairDrag::processDragEnterEvent( _dee,
 					"samplefile,sampledata" ) == false )
 	{
 		trackContentObjectView::dragEnterEvent( _dee );
@@ -279,15 +279,15 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleTCOView::dropEvent( QDropEvent * _de )
 {
-	if( stringPairDrag::decodeKey( _de ) == "samplefile" )
+	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
-		m_tco->setSampleFile( stringPairDrag::decodeValue( _de ) );
+		m_tco->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
 	}
-	else if( stringPairDrag::decodeKey( _de ) == "sampledata" )
+	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
 		m_tco->m_sampleBuffer->loadFromBase64(
-					stringPairDrag::decodeValue( _de ) );
+					StringPairDrag::decodeValue( _de ) );
 		m_tco->updateLength();
 		update();
 		_de->accept();

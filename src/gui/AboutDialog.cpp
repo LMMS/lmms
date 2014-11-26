@@ -32,7 +32,7 @@
 
 
 
-aboutDialog::aboutDialog() :
+AboutDialog::AboutDialog() :
 	QDialog( Engine::mainWindow() ),
 	Ui::AboutDialog()
 {

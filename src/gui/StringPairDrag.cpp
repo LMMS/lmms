@@ -1,5 +1,5 @@
 /*
- * StringPairDrag.cpp - class stringPairDrag which provides general support
+ * StringPairDrag.cpp - class StringPairDrag which provides general support
  *                        for drag'n'drop of string-pairs and which is the base
  *                        for all drag'n'drop-actions within LMMS
  *
@@ -35,7 +35,7 @@
 #include "MainWindow.h"
 
 
-stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
+StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
 {
@@ -60,7 +60,7 @@ stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 
 
 
-stringPairDrag::~stringPairDrag()
+StringPairDrag::~StringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
@@ -73,7 +73,7 @@ stringPairDrag::~stringPairDrag()
 
 
 
-bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
+bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
 	if( !_dee->mimeData()->hasFormat( mimeType() ) )
@@ -93,7 +93,7 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 
 
-QString stringPairDrag::decodeMimeKey( const QMimeData * mimeData )
+QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 {
 	return( QString( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
 }
@@ -101,7 +101,7 @@ QString stringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 
 
 
-QString stringPairDrag::decodeMimeValue( const QMimeData * mimeData )
+QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
 {
 	return( QString( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
 }
@@ -109,7 +109,7 @@ QString stringPairDrag::decodeMimeValue( const QMimeData * mimeData )
 
 
 
-QString stringPairDrag::decodeKey( QDropEvent * _de )
+QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
 	return decodeMimeKey( _de->mimeData() );
 }
@@ -117,7 +117,7 @@ QString stringPairDrag::decodeKey( QDropEvent * _de )
 
 
 
-QString stringPairDrag::decodeValue( QDropEvent * _de )
+QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
 	return decodeMimeValue( _de->mimeData() );
 }

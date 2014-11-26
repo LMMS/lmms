@@ -1,5 +1,5 @@
 /*
- * ExportProjectDialog.h - declaration of class exportProjectDialog which is
+ * ExportProjectDialog.h - declaration of class ExportProjectDialog which is
  *                           responsible for exporting project
  *
  * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -34,12 +34,12 @@
 #include "ProjectRenderer.h"
 
 
-class exportProjectDialog : public QDialog, public Ui::ExportProjectDialog
+class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
-	exportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
-	virtual ~exportProjectDialog();
+	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
+	virtual ~ExportProjectDialog();
 
 
 protected:

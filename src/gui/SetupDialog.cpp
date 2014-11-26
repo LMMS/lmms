@@ -84,7 +84,7 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 
 
 
-setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
+SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_bufferSize( ConfigManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt() ),
 	m_toolTips( !ConfigManager::inst()->value( "tooltips",
@@ -782,7 +782,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 
-setupDialog::~setupDialog()
+SetupDialog::~SetupDialog()
 {
 	Engine::projectJournal()->setJournalling( true );
 }
@@ -790,7 +790,7 @@ setupDialog::~setupDialog()
 
 
 
-void setupDialog::accept()
+void SetupDialog::accept()
 {
 	ConfigManager::inst()->setValue( "mixer", "framesperaudiobuffer",
 					QString::number( m_bufferSize ) );
@@ -870,7 +870,7 @@ void setupDialog::accept()
 
 
 
-void setupDialog::setBufferSize( int _value )
+void SetupDialog::setBufferSize( int _value )
 {
 	const int step = DEFAULT_BUFFER_SIZE / 64;
 	if( _value > step && _value % step )
@@ -903,7 +903,7 @@ void setupDialog::setBufferSize( int _value )
 
 
 
-void setupDialog::resetBufSize()
+void SetupDialog::resetBufSize()
 {
 	setBufferSize( DEFAULT_BUFFER_SIZE / 64 );
 }
@@ -911,7 +911,7 @@ void setupDialog::resetBufSize()
 
 
 
-void setupDialog::displayBufSizeHelp()
+void SetupDialog::displayBufSizeHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 			tr( "Here you can setup the internal buffer-size "
@@ -926,7 +926,7 @@ void setupDialog::displayBufSizeHelp()
 
 
 
-void setupDialog::toggleToolTips( bool _enabled )
+void SetupDialog::toggleToolTips( bool _enabled )
 {
 	m_toolTips = _enabled;
 }
@@ -934,7 +934,7 @@ void setupDialog::toggleToolTips( bool _enabled )
 
 
 
-void setupDialog::toggleWarnAfterSetup( bool _enabled )
+void SetupDialog::toggleWarnAfterSetup( bool _enabled )
 {
 	m_warnAfterSetup = _enabled;
 }
@@ -942,7 +942,7 @@ void setupDialog::toggleWarnAfterSetup( bool _enabled )
 
 
 
-void setupDialog::toggleDisplaydBV( bool _enabled )
+void SetupDialog::toggleDisplaydBV( bool _enabled )
 {
 	m_displaydBV = _enabled;
 }
@@ -950,7 +950,7 @@ void setupDialog::toggleDisplaydBV( bool _enabled )
 
 
 
-void setupDialog::toggleMMPZ( bool _enabled )
+void SetupDialog::toggleMMPZ( bool _enabled )
 {
 	m_MMPZ = _enabled;
 }
@@ -958,7 +958,7 @@ void setupDialog::toggleMMPZ( bool _enabled )
 
 
 
-void setupDialog::toggleHQAudioDev( bool _enabled )
+void SetupDialog::toggleHQAudioDev( bool _enabled )
 {
 	m_hqAudioDev = _enabled;
 }
@@ -966,14 +966,14 @@ void setupDialog::toggleHQAudioDev( bool _enabled )
 
 
 
-void setupDialog::toggleSmoothScroll( bool _enabled )
+void SetupDialog::toggleSmoothScroll( bool _enabled )
 {
 	m_smoothScroll = _enabled;
 }
 
 
 
-void setupDialog::toggleAutoSave( bool _enabled )
+void SetupDialog::toggleAutoSave( bool _enabled )
 {
 	m_enableAutoSave = _enabled;
 }
@@ -983,7 +983,7 @@ void setupDialog::toggleAutoSave( bool _enabled )
 
 
 
-void setupDialog::toggleCompactTrackButtons( bool _enabled )
+void SetupDialog::toggleCompactTrackButtons( bool _enabled )
 {
 	m_compactTrackButtons = _enabled;
 }
@@ -992,36 +992,36 @@ void setupDialog::toggleCompactTrackButtons( bool _enabled )
 
 
 
-void setupDialog::toggleSyncVSTPlugins( bool _enabled )
+void SetupDialog::toggleSyncVSTPlugins( bool _enabled )
 {
 	m_syncVSTPlugins = _enabled;
 }
 
-void setupDialog::toggleAnimateAFP( bool _enabled )
+void SetupDialog::toggleAnimateAFP( bool _enabled )
 {
 	m_animateAFP = _enabled;
 }
 
 
-void setupDialog::toggleNoteLabels( bool en )
+void SetupDialog::toggleNoteLabels( bool en )
 {
 	m_printNoteLabels = en;
 }
 
 
-void setupDialog::toggleDisplayWaveform( bool en )
+void SetupDialog::toggleDisplayWaveform( bool en )
 {
 	m_displayWaveform = en;
 }
 
 
-void setupDialog::toggleDisableAutoquit( bool en )
+void SetupDialog::toggleDisableAutoquit( bool en )
 {
 	m_disableAutoQuit = en;
 }
 
 
-void setupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
+void SetupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 {
 	m_oneInstrumentTrackWindow = _enabled;
 }
@@ -1030,7 +1030,7 @@ void setupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 
 
 
-void setupDialog::openWorkingDir()
+void SetupDialog::openWorkingDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
 					tr( "Choose LMMS working directory" ), m_workingDir );
@@ -1043,7 +1043,7 @@ void setupDialog::openWorkingDir()
 
 
 
-void setupDialog::setWorkingDir( const QString & _wd )
+void SetupDialog::setWorkingDir( const QString & _wd )
 {
 	m_workingDir = _wd;
 }
@@ -1051,7 +1051,7 @@ void setupDialog::setWorkingDir( const QString & _wd )
 
 
 
-void setupDialog::openVSTDir()
+void SetupDialog::openVSTDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose your VST-plugin directory" ),
@@ -1065,7 +1065,7 @@ void setupDialog::openVSTDir()
 
 
 
-void setupDialog::setVSTDir( const QString & _vd )
+void SetupDialog::setVSTDir( const QString & _vd )
 {
 	m_vstDir = _vd;
 }
@@ -1073,7 +1073,7 @@ void setupDialog::setVSTDir( const QString & _vd )
 
 
 
-void setupDialog::openArtworkDir()
+void SetupDialog::openArtworkDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose artwork-theme directory" ),
@@ -1087,7 +1087,7 @@ void setupDialog::openArtworkDir()
 
 
 
-void setupDialog::setArtworkDir( const QString & _ad )
+void SetupDialog::setArtworkDir( const QString & _ad )
 {
 	m_artworkDir = _ad;
 }
@@ -1095,7 +1095,7 @@ void setupDialog::setArtworkDir( const QString & _ad )
 
 
 
-void setupDialog::openFLDir()
+void SetupDialog::openFLDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose FL Studio installation directory" ),
@@ -1109,7 +1109,7 @@ void setupDialog::openFLDir()
 
 
 
-void setupDialog::openLADSPADir()
+void SetupDialog::openLADSPADir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
 				tr( "Choose LADSPA plugin directory" ),
@@ -1131,7 +1131,7 @@ void setupDialog::openLADSPADir()
 
 
 
-void setupDialog::openSTKDir()
+void SetupDialog::openSTKDir()
 {
 #ifdef LMMS_HAVE_STK
 	QString new_dir = FileDialog::getExistingDirectory( this,
@@ -1147,7 +1147,7 @@ void setupDialog::openSTKDir()
 
 
 
-void setupDialog::openDefaultSoundfont()
+void SetupDialog::openDefaultSoundfont()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName( this,
@@ -1164,7 +1164,7 @@ void setupDialog::openDefaultSoundfont()
 
 
 
-void setupDialog::openBackgroundArtwork()
+void SetupDialog::openBackgroundArtwork()
 {
 	QList<QByteArray> fileTypesList = QImageReader::supportedImageFormats();
 	QString fileTypes;
@@ -1196,7 +1196,7 @@ void setupDialog::openBackgroundArtwork()
 
 
 
-void setupDialog::setFLDir( const QString & _fd )
+void SetupDialog::setFLDir( const QString & _fd )
 {
 	m_flDir = _fd;
 }
@@ -1204,7 +1204,7 @@ void setupDialog::setFLDir( const QString & _fd )
 
 
 
-void setupDialog::setLADSPADir( const QString & _fd )
+void SetupDialog::setLADSPADir( const QString & _fd )
 {
 	m_ladDir = _fd;
 }
@@ -1212,7 +1212,7 @@ void setupDialog::setLADSPADir( const QString & _fd )
 
 
 
-void setupDialog::setSTKDir( const QString & _fd )
+void SetupDialog::setSTKDir( const QString & _fd )
 {
 #ifdef LMMS_HAVE_STK
 	m_stkDir = _fd;
@@ -1222,7 +1222,7 @@ void setupDialog::setSTKDir( const QString & _fd )
 
 
 
-void setupDialog::setDefaultSoundfont( const QString & _sf )
+void SetupDialog::setDefaultSoundfont( const QString & _sf )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont = _sf;
@@ -1232,7 +1232,7 @@ void setupDialog::setDefaultSoundfont( const QString & _sf )
 
 
 
-void setupDialog::setBackgroundArtwork( const QString & _ba )
+void SetupDialog::setBackgroundArtwork( const QString & _ba )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
@@ -1242,7 +1242,7 @@ void setupDialog::setBackgroundArtwork( const QString & _ba )
 
 
 
-void setupDialog::audioInterfaceChanged( const QString & _iface )
+void SetupDialog::audioInterfaceChanged( const QString & _iface )
 {
 	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
@@ -1256,7 +1256,7 @@ void setupDialog::audioInterfaceChanged( const QString & _iface )
 
 
 
-void setupDialog::displayAudioHelp()
+void SetupDialog::displayAudioHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 				tr( "Here you can select your preferred "
@@ -1272,7 +1272,7 @@ void setupDialog::displayAudioHelp()
 
 
 
-void setupDialog::midiInterfaceChanged( const QString & _iface )
+void SetupDialog::midiInterfaceChanged( const QString & _iface )
 {
 	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
@@ -1286,7 +1286,7 @@ void setupDialog::midiInterfaceChanged( const QString & _iface )
 
 
 
-void setupDialog::displayMIDIHelp()
+void SetupDialog::displayMIDIHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 				tr( "Here you can select your preferred "

@@ -1,5 +1,5 @@
 /*
- * StringPairDrag.h - class stringPairDrag which provides general support
+ * StringPairDrag.h - class StringPairDrag which provides general support
  *                      for drag'n'drop of string-pairs
  *
  * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -36,12 +36,12 @@
 class QPixmap;
 
 
-class EXPORT stringPairDrag : public QDrag
+class EXPORT StringPairDrag : public QDrag
 {
 public:
-	stringPairDrag( const QString & _key, const QString & _value,
+	StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w );
-	~stringPairDrag();
+	~StringPairDrag();
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );

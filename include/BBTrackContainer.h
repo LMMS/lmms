@@ -74,7 +74,7 @@ private:
 	ComboBoxModel m_bbComboBoxModel;
 
 
-	friend class bbEditor;
+	friend class BBEditor;
 
 } ;
 

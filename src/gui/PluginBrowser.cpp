@@ -211,7 +211,7 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		new stringPairDrag( "instrument", m_pluginDescriptor.name,
+		new StringPairDrag( "instrument", m_pluginDescriptor.name,
 								m_logo, this );
 		leaveEvent( _me );
 	}

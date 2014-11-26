@@ -376,7 +376,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee,
+	StringPairDrag::processDragEnterEvent( _dee,
 					QString( "samplefile,tco_%1" ).arg(
 							Track::SampleTrack ) );
 }
@@ -386,12 +386,12 @@ void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
 		m_params->m_userWave.setAudioFile(
-					stringPairDrag::decodeValue( _de ) );
+					StringPairDrag::decodeValue( _de ) );
 		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
 	}

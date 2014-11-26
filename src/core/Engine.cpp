@@ -57,7 +57,7 @@ BBTrackContainer * Engine::s_bbTrackContainer = NULL;
 Song * Engine::s_song = NULL;
 SongEditor* Engine::s_songEditor = NULL;
 AutomationEditor * Engine::s_automationEditor = NULL;
-bbEditor * Engine::s_bbEditor = NULL;
+BBEditor * Engine::s_bbEditor = NULL;
 PianoRoll* Engine::s_pianoRoll = NULL;
 ProjectNotes * Engine::s_projectNotes = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
@@ -97,7 +97,7 @@ void Engine::init( const bool _has_gui )
 		s_fxMixerView = new FxMixerView;
 		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new ProjectNotes;
-		s_bbEditor = new bbEditor( s_bbTrackContainer );
+		s_bbEditor = new BBEditor( s_bbTrackContainer );
 		s_pianoRoll = new PianoRoll;
 		s_automationEditor = new AutomationEditor;
 

@@ -34,12 +34,12 @@ class ComboBox;
 class ToolButton;
 
 
-class bbEditor : public TrackContainerView
+class BBEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	bbEditor( BBTrackContainer * _tc );
-	virtual ~bbEditor();
+	BBEditor( BBTrackContainer * _tc );
+	virtual ~BBEditor();
 
 	virtual inline bool fixedTCOs() const
 	{

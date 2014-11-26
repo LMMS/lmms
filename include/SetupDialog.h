@@ -41,7 +41,7 @@ class QSlider;
 class TabBar;
 
 
-class setupDialog : public QDialog
+class SetupDialog : public QDialog
 {
 	Q_OBJECT
 public:
@@ -54,8 +54,8 @@ public:
 		MidiSettings
 	} ;
 
-	setupDialog( ConfigTabs _tab_to_open = GeneralSettings );
-	virtual ~setupDialog();
+	SetupDialog( ConfigTabs _tab_to_open = GeneralSettings );
+	virtual ~SetupDialog();
 
 
 protected slots:

@@ -361,7 +361,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 	if( !_dee->isAccepted() )
 	{
 		trackContentObjectView::dragEnterEvent( _dee );
@@ -373,8 +373,8 @@ void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationPatternView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString val = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(

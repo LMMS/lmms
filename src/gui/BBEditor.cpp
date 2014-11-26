@@ -43,7 +43,7 @@
 
 
 
-bbEditor::bbEditor( BBTrackContainer* tc ) :
+BBEditor::BBEditor( BBTrackContainer* tc ) :
 	TrackContainerView( tc ),
 	m_bbtc( tc )
 {
@@ -154,15 +154,15 @@ bbEditor::bbEditor( BBTrackContainer* tc ) :
 
 
 
-bbEditor::~bbEditor()
+BBEditor::~BBEditor()
 {
 }
 
 
-void bbEditor::dropEvent( QDropEvent * de )
+void BBEditor::dropEvent( QDropEvent * de )
 {
-	QString type = stringPairDrag::decodeKey( de );
-	QString value = stringPairDrag::decodeValue( de );
+	QString type = StringPairDrag::decodeKey( de );
+	QString value = StringPairDrag::decodeValue( de );
 	
 	if( type.left( 6 ) == "track_" )
 	{
@@ -181,7 +181,7 @@ void bbEditor::dropEvent( QDropEvent * de )
 }
 
 
-void bbEditor::removeBBView( int _bb )
+void BBEditor::removeBBView( int _bb )
 {
 	foreach( trackView* view, trackViews() )
 	{
@@ -192,7 +192,7 @@ void bbEditor::removeBBView( int _bb )
 
 
 
-void bbEditor::setPauseIcon( bool pause )
+void BBEditor::setPauseIcon( bool pause )
 {
 	if( pause == true )
 	{
@@ -207,7 +207,7 @@ void bbEditor::setPauseIcon( bool pause )
 
 
 
-void bbEditor::play()
+void BBEditor::play()
 {
 	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
@@ -222,7 +222,7 @@ void bbEditor::play()
 
 
 
-void bbEditor::stop()
+void BBEditor::stop()
 {
 	Engine::getSong()->stop();
 }
@@ -230,7 +230,7 @@ void bbEditor::stop()
 
 
 
-void bbEditor::updatePosition()
+void BBEditor::updatePosition()
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
@@ -239,7 +239,7 @@ void bbEditor::updatePosition()
 
 
 
-void bbEditor::addAutomationTrack()
+void BBEditor::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, model() );
 }
@@ -247,7 +247,7 @@ void bbEditor::addAutomationTrack()
 
 
 
-void bbEditor::addSteps()
+void BBEditor::addSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -265,7 +265,7 @@ void bbEditor::addSteps()
 
 
 
-void bbEditor::removeSteps()
+void BBEditor::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -283,7 +283,7 @@ void bbEditor::removeSteps()
 
 
 
-void bbEditor::keyPressEvent( QKeyEvent * _ke )
+void BBEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{

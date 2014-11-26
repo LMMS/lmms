@@ -482,7 +482,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 		{
 			if( _me->modifiers() & Qt::ControlModifier )
 			{
-				new stringPairDrag( "automatable_model",
+				new StringPairDrag( "automatable_model",
 					QString::number( m_piano->instrumentTrack()->baseNoteModel()->id() ),
 					QPixmap(), this );
 				_me->accept();

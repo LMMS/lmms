@@ -605,10 +605,10 @@ AudioFileProcessorView::~AudioFileProcessorView()
 
 void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
 							Track::SampleTrack ) )
 		{
@@ -634,8 +634,8 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( value );

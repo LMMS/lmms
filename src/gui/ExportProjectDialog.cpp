@@ -34,7 +34,7 @@
 #include "bb_track.h"
 
 
-exportProjectDialog::exportProjectDialog( const QString & _file_name,
+ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 							QWidget * _parent, bool multi_export=false ) :
 	QDialog( _parent ),
 	Ui::ExportProjectDialog(),
@@ -86,7 +86,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 
 
 
-exportProjectDialog::~exportProjectDialog()
+ExportProjectDialog::~ExportProjectDialog()
 {
 
 	for( RenderVector::ConstIterator it = m_renderers.begin();
@@ -99,7 +99,7 @@ exportProjectDialog::~exportProjectDialog()
 
 
 
-void exportProjectDialog::reject()
+void ExportProjectDialog::reject()
 {
 	for( RenderVector::ConstIterator it = m_renderers.begin(); it != m_renderers.end(); ++it )
 	{
@@ -115,7 +115,7 @@ void exportProjectDialog::reject()
 
 
 
-void exportProjectDialog::accept()
+void ExportProjectDialog::accept()
 {
 	// If more to render, kick off next render job
 	if( m_renderers.isEmpty() == false )
@@ -140,7 +140,7 @@ void exportProjectDialog::accept()
 
 
 
-void exportProjectDialog::closeEvent( QCloseEvent * _ce )
+void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
 	for( RenderVector::ConstIterator it = m_renderers.begin(); it != m_renderers.end(); ++it )
 	{
@@ -159,7 +159,7 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-void exportProjectDialog::popRender()
+void ExportProjectDialog::popRender()
 {
 	if( m_multiExport && m_tracksToRender.isEmpty() == false )
 	{
@@ -189,7 +189,7 @@ void exportProjectDialog::popRender()
 
 
 
-void exportProjectDialog::multiRender()
+void ExportProjectDialog::multiRender()
 {
 	m_dirName = m_fileName;
 	QString path = QDir(m_fileName).filePath("text.txt");
@@ -246,7 +246,7 @@ void exportProjectDialog::multiRender()
 
 
 
-ProjectRenderer* exportProjectDialog::prepRender()
+ProjectRenderer* ExportProjectDialog::prepRender()
 {
 	Mixer::qualitySettings qs =
 			Mixer::qualitySettings(
@@ -270,7 +270,7 @@ ProjectRenderer* exportProjectDialog::prepRender()
 
 
 
-void exportProjectDialog::render( ProjectRenderer* renderer )
+void ExportProjectDialog::render( ProjectRenderer* renderer )
 {
 
 	if( renderer->isReady() )
@@ -290,7 +290,7 @@ void exportProjectDialog::render( ProjectRenderer* renderer )
 
 
 
-void exportProjectDialog::startBtnClicked()
+void ExportProjectDialog::startBtnClicked()
 {
 	m_ft = ProjectRenderer::NumFileFormats;
 
@@ -335,7 +335,7 @@ void exportProjectDialog::startBtnClicked()
 
 
 
-void exportProjectDialog::updateTitleBar( int _prog )
+void ExportProjectDialog::updateTitleBar( int _prog )
 {
 	Engine::mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );

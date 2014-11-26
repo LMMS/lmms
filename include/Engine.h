@@ -34,7 +34,7 @@
 #include "export.h"
 
 class AutomationEditor;
-class bbEditor;
+class BBEditor;
 class BBTrackContainer;
 class DummyTrackContainer;
 class FxMixer;
@@ -113,7 +113,7 @@ public:
 		return s_songEditor;
 	}
 
-	static bbEditor * getBBEditor()
+	static BBEditor * getBBEditor()
 	{
 		return s_bbEditor;
 	}
@@ -189,7 +189,7 @@ private:
 	static FxMixerView * s_fxMixerView;
 	static SongEditor* s_songEditor;
 	static AutomationEditor * s_automationEditor;
-	static bbEditor * s_bbEditor;
+	static BBEditor * s_bbEditor;
 	static PianoRoll* s_pianoRoll;
 	static ProjectNotes * s_projectNotes;
 	static Ladspa2LMMS * s_ladspaManager;

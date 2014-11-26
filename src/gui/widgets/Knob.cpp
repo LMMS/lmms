@@ -501,7 +501,7 @@ void Knob::toggleScale()
 
 void Knob::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "float_value,"
+	StringPairDrag::processDragEnterEvent( _dee, "float_value,"
 							"automatable_model" );
 }
 
@@ -510,8 +510,8 @@ void Knob::dragEnterEvent( QDragEnterEvent * _dee )
 
 void Knob::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString val = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
 		model()->setValue( val.toFloat() );
@@ -563,7 +563,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			Engine::mainWindow()->isShiftPressed() == true )
 	{
-		new stringPairDrag( "float_value",
+		new StringPairDrag( "float_value",
 					QString::number( model()->value() ),
 							QPixmap(), this );
 	}

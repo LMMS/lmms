@@ -588,10 +588,10 @@ void PatmanView::updateFilename( void )
 
 void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "samplefile" )
 		{
 			_dee->acceptProposedAction();
@@ -612,8 +612,8 @@ void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void PatmanView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
 		m_pi->setFile( value );

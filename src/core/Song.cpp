@@ -1221,7 +1221,7 @@ void Song::exportProject(bool multiExport)
 		}
 
 		const QString export_file_name = efd.selectedFiles()[0] + suffix;
-		exportProjectDialog epd( export_file_name, Engine::mainWindow(), multiExport );
+		ExportProjectDialog epd( export_file_name, Engine::mainWindow(), multiExport );
 		epd.exec();
 	}
 }
