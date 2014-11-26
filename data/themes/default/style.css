@@ -1,7 +1,7 @@
 /********************
  * LMMS style sheet *
  ********************/
- 
+
 /* most foreground text items */
 QLabel, QTreeWidget, QListWidget, QGroupBox {
 	color: #e0e0e0;
@@ -16,7 +16,7 @@ AutomationEditor {
 	color: #e0e0e0;
 	qproperty-vertexColor: #ff77af;
 	qproperty-gridColor: #808080;
-	
+
 	qproperty-graphColor: qlineargradient(spread:reflect,
                      x1:0, y1:0, x2:0, y2:1,
                      stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
@@ -51,7 +51,7 @@ QToolTip {
 	color: #4afd85;
 }
 
-textFloat {
+TextFloat {
 	border-radius: 4px;
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
@@ -119,14 +119,14 @@ PianoRoll {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-visualizationWidget  {
+VisualizationWidget  {
 	background: none;
 	border: none;
 }
 
 /* main toolbar cpu load widget - this can have transparent bg now */
 
-cpuloadWidget {
+CPULoadWidget {
 	border: none;
 	background: url(resources:cpuload_bg.png);
 }
@@ -261,7 +261,7 @@ TrackContainerView QFrame{
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-nStateButton {
+NStateButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -269,17 +269,17 @@ nStateButton {
 }
 
 /* track background colors */
-trackContentWidget {
-	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+TrackContentWidget {
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
 							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
-	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
 							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
 }
 
 
 /* gear button in tracks */
 
-trackOperationsWidget > QPushButton {
+TrackOperationsWidget > QPushButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -288,7 +288,7 @@ trackOperationsWidget > QPushButton {
 	border:none;
 }
 
-trackOperationsWidget > QPushButton::menu-indicator {
+TrackOperationsWidget > QPushButton::menu-indicator {
 	image: url(resources:trackop.png);
 	subcontrol-origin: padding;
 	subcontrol-position: center;
@@ -296,13 +296,13 @@ trackOperationsWidget > QPushButton::menu-indicator {
 	top: 2px;
 }
 
-trackOperationsWidget > QPushButton::menu-indicator:hover {
+TrackOperationsWidget > QPushButton::menu-indicator:hover {
 	image: url(resources:trackop_h.png);
 }
 
 
-trackOperationsWidget > QPushButton::menu-indicator:pressed,
-trackOperationsWidget > QPushButton::menu-indicator:checked
+TrackOperationsWidget > QPushButton::menu-indicator:pressed,
+TrackOperationsWidget > QPushButton::menu-indicator:checked
  {
 	image: url(resources:trackop_c.png);
 	position: relative;
@@ -323,7 +323,7 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 
 /* main toolbar sliders (master vol, master pitch) */
 
-automatableSlider::groove:vertical {
+AutomatableSlider::groove:vertical {
 	background: rgba(0,0,0, 128);
 	border: 1px inset rgba(100,100,100, 64);
 	border-radius: 2px;
@@ -331,7 +331,7 @@ automatableSlider::groove:vertical {
 	margin: 2px 2px;
 }
 
-automatableSlider::handle:vertical {
+AutomatableSlider::handle:vertical {
 	background: none;
 	border-image: url(resources:main_slider.png);
 	width: 26px;
@@ -380,7 +380,7 @@ QToolBar {
 	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
 }
 
-QToolButton, toolButton {
+QToolButton, ToolButton {
 	padding: 1px 1px 1px 1px;
 	border-radius: 2px;
 	border: 1px solid rgba(0,0,0,32);
@@ -391,12 +391,12 @@ QToolButton, toolButton {
 
 /* separate corner rounding for play and stop buttons! */
 
-toolButton#playButton {
+ToolButton#playButton {
 	border-top-left-radius: 5px 15px;
 	border-bottom-left-radius: 5px 15px;
 }
 
-toolButton#stopButton {
+ToolButton#stopButton {
 	border-top-right-radius: 5px 15px;
 	border-bottom-right-radius: 5px 15px;
 }
@@ -405,20 +405,20 @@ toolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton:hover, toolButton:hover {
+QToolButton:hover, ToolButton:hover {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
 }
 
-QToolButton:pressed, toolButton:pressed {
+QToolButton:pressed, ToolButton:pressed {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
 	padding: 2px 1px 0px 1px;
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
 }
 
-QToolButton:checked, toolButton:checked  {
+QToolButton:checked, ToolButton:checked  {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
 	border-radius: 3px;
 	padding: 2px 1px 0px 1px;
@@ -428,7 +428,7 @@ QToolButton:checked, toolButton:checked  {
 
 /* track label buttons - the part that contains the icon and track title */
 
-trackLabelButton {
+TrackLabelButton {
 	background-color: #5b6571;
 	color: #c9c9c9;
 	font-size: 11px;
@@ -438,7 +438,7 @@ trackLabelButton {
 	padding: 2px 1px;
 }
 
-trackLabelButton:hover {
+TrackLabelButton:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
@@ -446,7 +446,7 @@ trackLabelButton:hover {
 	margin: 0px;
 }
 
-trackLabelButton:pressed {
+TrackLabelButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
@@ -454,7 +454,7 @@ trackLabelButton:pressed {
 	font-weight: bold;
 }
 
-trackLabelButton:checked {
+TrackLabelButton:checked {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,128);
@@ -462,11 +462,11 @@ trackLabelButton:checked {
 	font-weight: bold;
 }
 
-trackLabelButton:checked:hover {
+TrackLabelButton:checked:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 }
 
-trackLabelButton:checked:pressed {
+TrackLabelButton:checked:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 }
 
@@ -489,17 +489,17 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 FxLine {
 	background: #5b6571;
 	color: #e0e0e0;
-	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0, 
+	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
 }
 
 /* persistent peak markers for fx peak meters */
-fader {
+Fader {
 	qproperty-peakGreen: rgb( 74, 253, 133);
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
-timeLine {
+TimeLine {
 	font-size: 8px;
 }
 
@@ -525,7 +525,7 @@ PatternView {
 SampleTCOView {
 	color: rgb( 74, 253, 133 );
 	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 60, 60 );	
+	qproperty-textColor: rgb( 255, 60, 60 );
 }
 
 /* automation pattern */
@@ -536,7 +536,7 @@ AutomationPatternView {
 }
 
 /* bb-pattern */
-bbTCOView {
+BBTCOView {
 	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
 	qproperty-textColor: rgb( 255, 255, 255 );
 }
