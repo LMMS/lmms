@@ -60,9 +60,9 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
     lfoFreqKnob->setLabel( tr( "Rate" ) );
     lfoFreqKnob->setHintText( tr ( "Lfo Seconds:" ) + " ", "" );
 
-    knob * lfoAmtKnob = new knob( knobBright_26, this );
+    TempoSyncKnob * lfoAmtKnob = new TempoSyncKnob( knobBright_26, this );
     lfoAmtKnob->move( 150,10 );
-    lfoAmtKnob->setVolumeKnob( true );
+    lfoAmtKnob->setVolumeKnob( false );
     lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
     lfoAmtKnob->setLabel( tr( "Lfo" ) );
     lfoAmtKnob->setHintText( tr ( "Lfo Amt:" ) + " ", "" );

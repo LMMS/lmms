@@ -63,7 +63,7 @@ private:
     TempoSyncKnobModel m_delayTimeModel;
     FloatModel m_feedbackModel;
     TempoSyncKnobModel m_lfoTimeModel;
-    FloatModel m_lfoAmountModel;
+    TempoSyncKnobModel m_lfoAmountModel;
 
     friend class DelayControlsDialog;
     friend class DelayEffect;
