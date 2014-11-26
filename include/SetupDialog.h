@@ -1,5 +1,5 @@
 /*
- * setup_dialog.h - dialog for setting up LMMS
+ * SetupDialog.h - dialog for setting up LMMS
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

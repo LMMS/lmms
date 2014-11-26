@@ -1,5 +1,5 @@
 /*
- * setup_dialog.cpp - dialog for setting up LMMS
+ * SetupDialog.cpp - dialog for setting up LMMS
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -31,7 +31,7 @@
 #include <QSlider>
 #include <QWhatsThis>
 
-#include "setup_dialog.h"
+#include "SetupDialog.h"
 #include "TabBar.h"
 #include "tab_button.h"
 #include "TabWidget.h"

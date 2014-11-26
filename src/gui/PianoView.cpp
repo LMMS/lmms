@@ -51,7 +51,7 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "MainWindow.h"
 #include "MidiEvent.h"
 #include "templates.h"

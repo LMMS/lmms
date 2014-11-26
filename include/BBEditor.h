@@ -1,5 +1,5 @@
 /*
- * bb_editor.h - view-component of BB-Editor
+ * BBEditor.h - view-component of BB-Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

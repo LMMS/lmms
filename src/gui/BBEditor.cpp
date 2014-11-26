@@ -1,5 +1,5 @@
 /*
- * bb_editor.cpp - basic main-window for editing of beats and basslines
+ * BBEditor.cpp - basic main-window for editing of beats and basslines
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -28,7 +28,7 @@
 #include <QLayout>
 #include <QMdiArea>
 
-#include "bb_editor.h"
+#include "BBEditor.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -36,7 +36,7 @@
 #include "ToolButton.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 
 #include "TrackContainer.h"
 #include "Pattern.h"

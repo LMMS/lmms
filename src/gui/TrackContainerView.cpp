@@ -43,7 +43,7 @@
 #include "DataFile.h"
 #include "Rubberband.h"
 #include "Song.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "Track.h"
 
 

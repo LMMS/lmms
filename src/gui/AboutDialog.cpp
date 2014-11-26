@@ -1,5 +1,5 @@
 /*
- * about_dialog.cpp - implementation of about-dialog
+ * AboutDialog.cpp - implementation of about-dialog
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -24,7 +24,7 @@
 
 
 #include "lmmsversion.h"
-#include "about_dialog.h"
+#include "AboutDialog.h"
 #include "embed.h"
 #include "Engine.h"
 #include "MainWindow.h"

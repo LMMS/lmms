@@ -39,7 +39,7 @@
 #include "VstPlugin.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
 #include "FileDialog.h"

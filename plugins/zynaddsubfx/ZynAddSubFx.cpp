@@ -39,7 +39,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 #include "ControllerConnection.h"

@@ -1,5 +1,5 @@
 /*
- * string_pair_drag.cpp - class stringPairDrag which provides general support
+ * StringPairDrag.cpp - class stringPairDrag which provides general support
  *                        for drag'n'drop of string-pairs and which is the base
  *                        for all drag'n'drop-actions within LMMS
  *
@@ -30,7 +30,7 @@
 #include <QDropEvent>
 
 
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "Engine.h"
 #include "MainWindow.h"
 

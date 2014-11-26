@@ -28,7 +28,7 @@
 #include <QPainter>
 
 #include "Graph.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "SampleBuffer.h"
 #include "Oscillator.h"
 #include "Engine.h"

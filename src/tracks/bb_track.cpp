@@ -27,7 +27,7 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "bb_editor.h"
+#include "BBEditor.h"
 #include "bb_track.h"
 #include "BBTrackContainer.h"
 #include "embed.h"

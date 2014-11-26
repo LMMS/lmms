@@ -34,7 +34,7 @@
 #include "gui_templates.h"
 #include "ProjectJournal.h"
 #include "RenameDialog.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "ToolTip.h"
 
 

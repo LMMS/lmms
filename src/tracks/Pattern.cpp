@@ -47,7 +47,7 @@
 #include "Song.h"
 #include "ToolTip.h"
 #include "BBTrackContainer.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "MainWindow.h"
 
 

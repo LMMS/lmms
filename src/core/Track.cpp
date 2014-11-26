@@ -49,7 +49,7 @@
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
-#include "bb_editor.h"
+#include "BBEditor.h"
 #include "bb_track.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
@@ -64,7 +64,7 @@
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "templates.h"
 #include "TextFloat.h"
 #include "ToolTip.h"

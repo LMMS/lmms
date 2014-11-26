@@ -33,7 +33,7 @@
 #include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 
 
 bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )

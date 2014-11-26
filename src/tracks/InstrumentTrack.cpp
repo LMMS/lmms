@@ -72,7 +72,7 @@
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "TabWidget.h"
 #include "ToolTip.h"
 #include "TrackLabelButton.h"

@@ -39,7 +39,7 @@
 #include "interpolation.h"
 #include "gui_templates.h"
 #include "ToolTip.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "DataFile.h"
 
 #include "embed.cpp"

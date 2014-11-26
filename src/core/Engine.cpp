@@ -25,7 +25,7 @@
 
 #include "Engine.h"
 #include "AutomationEditor.h"
-#include "bb_editor.h"
+#include "BBEditor.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"

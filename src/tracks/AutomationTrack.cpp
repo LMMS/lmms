@@ -29,7 +29,7 @@
 #include "Engine.h"
 #include "embed.h"
 #include "ProjectJournal.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 

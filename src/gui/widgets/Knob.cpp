@@ -46,7 +46,7 @@
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "templates.h"
 #include "TextFloat.h"
 

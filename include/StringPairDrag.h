@@ -1,5 +1,5 @@
 /*
- * string_pair_drag.h - class stringPairDrag which provides general support
+ * StringPairDrag.h - class stringPairDrag which provides general support
  *                      for drag'n'drop of string-pairs
  *
  * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>

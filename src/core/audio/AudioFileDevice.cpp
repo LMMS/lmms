@@ -26,7 +26,7 @@
 #include <QMessageBox>
 
 #include "AudioFileDevice.h"
-#include "export_project_dialog.h"
+#include "ExportProjectDialog.h"
 
 
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,

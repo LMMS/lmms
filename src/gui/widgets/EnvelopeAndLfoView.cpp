@@ -37,7 +37,7 @@
 #include "DataFile.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
 #include "TextFloat.h"
 #include "ToolTip.h"

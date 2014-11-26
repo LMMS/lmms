@@ -47,7 +47,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "TextFloat.h"
 
 

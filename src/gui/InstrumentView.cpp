@@ -28,7 +28,7 @@
 #include "embed.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 
 
 InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :

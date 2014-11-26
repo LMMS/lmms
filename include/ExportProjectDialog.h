@@ -1,5 +1,5 @@
 /*
- * export_project_dialog.h - declaration of class exportProjectDialog which is
+ * ExportProjectDialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
  * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>

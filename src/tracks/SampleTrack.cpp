@@ -41,7 +41,7 @@
 #include "AudioPort.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "EffectRackView.h"

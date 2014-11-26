@@ -1,5 +1,5 @@
 /*
- * export_project_dialog.cpp - implementation of dialog for exporting project
+ * ExportProjectDialog.cpp - implementation of dialog for exporting project
  *
  * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -26,7 +26,7 @@
 #include <QDir>
 #include <QMessageBox>
 
-#include "export_project_dialog.h"
+#include "ExportProjectDialog.h"
 #include "Song.h"
 #include "Engine.h"
 #include "MainWindow.h"

@@ -36,7 +36,7 @@
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
 #include "ToolTip.h"
 #include "FileDialog.h"
 
