@@ -32,7 +32,7 @@
 class QLabel;
 class QScrollBar;
 
-class automatableSlider;
+class AutomatableSlider;
 class comboBox;
 class LcdSpinBox;
 class MeterDialog;
@@ -113,8 +113,8 @@ private:
 	Timeline * m_timeLine;
 
 	MeterDialog * m_timeSigDisplay;
-	automatableSlider * m_masterVolumeSlider;
-	automatableSlider * m_masterPitchSlider;
+	AutomatableSlider * m_masterVolumeSlider;
+	AutomatableSlider * m_masterPitchSlider;
 
 	textFloat * m_mvsStatus;
 	textFloat * m_mpsStatus;

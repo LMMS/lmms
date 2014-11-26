@@ -1,5 +1,5 @@
 /*
- * automatable_slider.h - class automatableSlider, a QSlider with automation
+ * AutomatableSlider.h - class automatableSlider, a QSlider with automation
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
@@ -32,12 +32,12 @@
 
 
 
-class automatableSlider : public QSlider, public IntModelView
+class AutomatableSlider : public QSlider, public IntModelView
 {
 	Q_OBJECT
 public:
-	automatableSlider( QWidget * _parent, const QString & _name = QString::null );
-	virtual ~automatableSlider();
+	AutomatableSlider( QWidget * _parent, const QString & _name = QString::null );
+	virtual ~AutomatableSlider();
 
 	bool showStatus()
 	{

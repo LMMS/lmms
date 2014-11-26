@@ -36,7 +36,7 @@
 #include <math.h>
 
 #include "SongEditor.h"
-#include "automatable_slider.h"
+#include "AutomatableSlider.h"
 #include "combobox.h"
 #include "ConfigManager.h"
 #include "cpuload_widget.h"
@@ -154,7 +154,7 @@ SongEditor::SongEditor( Song * _song ) :
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	m_masterVolumeSlider = new automatableSlider( tb,
+	m_masterVolumeSlider = new AutomatableSlider( tb,
 							tr( "Master volume" ) );
 	m_masterVolumeSlider->setModel( &m_song->m_masterVolumeModel );
 	m_masterVolumeSlider->setOrientation( Qt::Vertical );
@@ -188,7 +188,7 @@ SongEditor::SongEditor( Song * _song ) :
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
-	m_masterPitchSlider = new automatableSlider( tb, tr( "Master pitch" ) );
+	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Master pitch" ) );
 	m_masterPitchSlider->setModel( &m_song->m_masterPitchModel );
 	m_masterPitchSlider->setOrientation( Qt::Vertical );
 	m_masterPitchSlider->setPageStep( 1 );

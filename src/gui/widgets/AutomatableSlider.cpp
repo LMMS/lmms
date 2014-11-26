@@ -1,5 +1,5 @@
 /*
- * automatable_slider.cpp - implementation of class automatableSlider
+ * AutomatableSlider.cpp - implementation of class automatableSlider
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,7 +23,7 @@
  *
  */
 
-#include "automatable_slider.h"
+#include "AutomatableSlider.h"
 
 #include <QCursor>
 #include <QMouseEvent>
@@ -36,7 +36,7 @@
 
 
 
-automatableSlider::automatableSlider( QWidget * _parent,
+AutomatableSlider::AutomatableSlider( QWidget * _parent,
 						const QString & _name ) :
 	QSlider( _parent ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
@@ -53,14 +53,14 @@ automatableSlider::automatableSlider( QWidget * _parent,
 
 
 
-automatableSlider::~automatableSlider()
+AutomatableSlider::~AutomatableSlider()
 {
 }
 
 
 
 
-void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
+void AutomatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 {
 	captionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
@@ -70,7 +70,7 @@ void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 
 
 
-void automatableSlider::mousePressEvent( QMouseEvent * _me )
+void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 	   ! ( _me->modifiers() & Qt::ControlModifier ) )
@@ -87,7 +87,7 @@ void automatableSlider::mousePressEvent( QMouseEvent * _me )
 
 
 
-void automatableSlider::mouseReleaseEvent( QMouseEvent * _me )
+void AutomatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_showStatus = false;
 	QSlider::mouseReleaseEvent( _me );
@@ -96,7 +96,7 @@ void automatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void automatableSlider::wheelEvent( QWheelEvent * _me )
+void AutomatableSlider::wheelEvent( QWheelEvent * _me )
 {
 	bool old_status = m_showStatus;
 	m_showStatus = true;
@@ -107,7 +107,7 @@ void automatableSlider::wheelEvent( QWheelEvent * _me )
 
 
 
-void automatableSlider::modelChanged()
+void AutomatableSlider::modelChanged()
 {
 	QSlider::setRange( model()->minValue(), model()->maxValue() );
 	updateSlider();
@@ -118,7 +118,7 @@ void automatableSlider::modelChanged()
 
 
 
-void automatableSlider::changeValue( int _value )
+void AutomatableSlider::changeValue( int _value )
 {
 	model()->setValue( _value );
 	emit logicValueChanged( model()->value() );
@@ -127,7 +127,7 @@ void automatableSlider::changeValue( int _value )
 
 
 
-void automatableSlider::moveSlider( int _value )
+void AutomatableSlider::moveSlider( int _value )
 {
 	model()->setValue( _value );
 	emit logicSliderMoved( model()->value() );
@@ -136,7 +136,7 @@ void automatableSlider::moveSlider( int _value )
 
 
 
-void automatableSlider::updateSlider()
+void AutomatableSlider::updateSlider()
 {
 	QSlider::setValue( model()->value() );
 }
