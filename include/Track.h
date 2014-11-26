@@ -114,7 +114,7 @@ public:
 	inline MidiTime endPosition() const
 	{
 		const int sp = m_startPosition;
-		return sp + m_length;
+		return sp + m_length - 1;
 	}
 
 	inline const MidiTime & length() const
@@ -481,7 +481,7 @@ public:
 	}
 	void getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
 							const MidiTime & _end );
-	bool hasTCOsInRange( const MidiTime & start, const MidiTime & end );
+	bool hasTCOsInRange( const MidiTime & start, const MidiTime & end, TrackContentObject * otherThan = NULL );
 	void swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
 
 

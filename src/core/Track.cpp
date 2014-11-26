@@ -147,11 +147,15 @@ TrackContentObject::~TrackContentObject()
  *
  * \param _pos The new position of the track content object.
  */
-void TrackContentObject::movePosition( const MidiTime & _pos )
+void TrackContentObject::movePosition( const MidiTime & pos )
 {
-	if( m_startPosition != _pos )
+	if( m_startPosition != pos )
 	{
-		m_startPosition = _pos;
+		if( m_track && m_track->hasTCOsInRange( pos + 1, pos + m_length - 1, this ) ) // check against overlap
+		{
+				return;
+		}
+		m_startPosition = pos;
 		Engine::getSong()->updateLength();
 	}
 	emit positionChanged();
@@ -167,11 +171,20 @@ void TrackContentObject::movePosition( const MidiTime & _pos )
  *
  * \param _length The new length of the track content object.
  */
-void TrackContentObject::changeLength( const MidiTime & _length )
+void TrackContentObject::changeLength( const MidiTime & length )
 {
-	if( m_length != _length )
+	if( m_length != length )
 	{
-		m_length = _length;
+		if( m_track && length > m_length ) // if we're increasing the length, we have to check against overlap
+											// but only if we actually have a track - inline automation patterns and other
+											// trackless TCO's get a pass
+		{
+			if( m_track->hasTCOsInRange( m_startPosition + 1, m_startPosition + length - 1, this ) )
+			{
+				return; // bail to prevent overlap
+			}
+		}
+		m_length = length;
 		Engine::getSong()->updateLength();
 	}
 	emit lengthChanged();
@@ -2243,16 +2256,18 @@ void Track::getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
  * @brief Test whether the track has TCOs in given range
  * @param start Start of range
  * @param end End of range
+ * @param otherThan Exclude this TCO from the test
  */
-bool Track::hasTCOsInRange( const MidiTime & start, const MidiTime & end )
+bool Track::hasTCOsInRange( const MidiTime & start, const MidiTime & end, TrackContentObject * otherThan )
 {
 	for( tcoVector::iterator it_o = m_trackContentObjects.begin();
 				it_o != m_trackContentObjects.end(); ++it_o )
 	{
 		TrackContentObject * tco = ( *it_o );
+		if( tco == otherThan ) { continue; } // excluded TCO, skip to next
 		int s = tco->startPosition();
 		int e = tco->endPosition();
-		if( ( s <= _end ) && ( e >= _start ) )
+		if( ( s <= end ) && ( e >= start ) )
 		{
 			return true;
 		}
