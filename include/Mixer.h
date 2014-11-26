@@ -462,7 +462,7 @@ private:
 
 	MixerProfiler m_profiler;
 
-	friend class engine;
+	friend class Engine;
 	friend class MixerWorkerThread;
 
 } ;

@@ -171,7 +171,7 @@ private:
 	QTimer m_autoSaveTimer;
 
 
-	friend class engine;
+	friend class Engine;
 
 
 private slots:

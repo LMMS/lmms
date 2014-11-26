@@ -270,7 +270,7 @@ private:
 	QColor m_vertexColor;
 	QBrush m_scaleColor;
 
-	friend class engine;
+	friend class Engine;
 
 
 signals:

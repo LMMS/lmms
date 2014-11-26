@@ -71,7 +71,7 @@ private:
 	l_sortable_plugin_t m_analysisTools;
 	l_sortable_plugin_t m_otherPlugins;
 	
-	friend class engine;
+	friend class Engine;
 
 } ;
 
