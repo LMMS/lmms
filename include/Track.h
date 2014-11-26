@@ -481,6 +481,7 @@ public:
 	}
 	void getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
 							const MidiTime & _end );
+	bool hasTCOsInRange( const MidiTime & start, const MidiTime & end );
 	void swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
 
 

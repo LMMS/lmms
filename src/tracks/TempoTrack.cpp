@@ -120,6 +120,7 @@ void TempoPattern::changeLength( const MidiTime & length )
 TempoPatternView::TempoPatternView( TempoPattern * pat, TrackView * parent ) :
 	AutomationPatternView( pat, parent )
 {
+	update();
 }
 
 

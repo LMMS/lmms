@@ -2239,6 +2239,27 @@ void Track::getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
 }
 
 
+/**
+ * @brief Test whether the track has TCOs in given range
+ * @param start Start of range
+ * @param end End of range
+ */
+bool Track::hasTCOsInRange( const MidiTime & start, const MidiTime & end )
+{
+	for( tcoVector::iterator it_o = m_trackContentObjects.begin();
+				it_o != m_trackContentObjects.end(); ++it_o )
+	{
+		TrackContentObject * tco = ( *it_o );
+		int s = tco->startPosition();
+		int e = tco->endPosition();
+		if( ( s <= _end ) && ( e >= _start ) )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 
 
 /*! \brief Swap the position of two trackContentObjects.

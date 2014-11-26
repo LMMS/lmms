@@ -187,7 +187,17 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 	{
 		it--;
 	}
-	if( m_isTempoPattern ) { updateTempoMaps( it.key(), (it+1).key() ); }
+	if( m_isTempoPattern ) // if we're a tempo pattern, update the cached tempo maps
+	{
+		if( (it+2) != m_timeMap.end() )
+		{
+			updateTempoMaps( it.key(), qMin<int>( (it+2).key(), endPosition() ) );
+		}
+		else
+		{
+			updateTempoMaps( it.key(), endPosition() );
+		}
+	}
 	generateTangents(it, 3);
 
 	// we need to maximize our length in case we're part of a hidden
@@ -220,7 +230,17 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	{
 		it--;
 	}
-	if( m_isTempoPattern ) { updateTempoMaps( it.key(), (it+1).key() ); }
+	if( m_isTempoPattern ) // if we're a tempo pattern, update the cached tempo maps
+	{
+		if( (it+2) != m_timeMap.end() )
+		{
+			updateTempoMaps( it.key(), qMin<int>( (it+2).key(), endPosition() ) );
+		}
+		else
+		{
+			updateTempoMaps( it.key(), endPosition() );
+		}
+	}
 	generateTangents(it, 3);
 
 	if( getTrack() &&

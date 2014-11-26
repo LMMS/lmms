@@ -261,8 +261,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		}
 	}
 
-	const float min = m_pat->firstObject()->minValue<float>();
-	const float max = m_pat->firstObject()->maxValue<float>();
+	const float min = m_pat->getMin();
+	const float max = m_pat->getMax();
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2*TCO_BORDER_WIDTH ) / y_scale;
