@@ -36,6 +36,7 @@
 #include "Mixer.h"
 #include "EffectChain.h"
 #include "AutomationPattern.h"
+#include "AutomationTrack.h"
 #include "ControllerConnection.h"
 #include "MemoryManager.h"
 #include "ValueBuffer.h"
