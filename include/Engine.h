@@ -48,7 +48,7 @@ class Song;
 class SongEditor;
 class Ladspa2LMMS;
 class ControllerRackView;
-
+class TempoTrack;
 
 class EXPORT Engine
 {
@@ -148,6 +148,16 @@ public:
 		return s_controllerRackView;
 	}
 
+	static TempoTrack * tempoTrack()
+	{
+		return s_tempoTrack;
+	}
+	
+	static void setTempoTrack( TempoTrack * tt )
+	{
+		s_tempoTrack = tt;
+	}
+
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
@@ -189,6 +199,7 @@ private:
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
 	static ControllerRackView * s_controllerRackView;
+	static TempoTrack * s_tempoTrack;
 
 	// GUI
 	static MainWindow * s_mainWindow;

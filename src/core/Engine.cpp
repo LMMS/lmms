@@ -65,7 +65,7 @@ Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
 ControllerRackView * Engine::s_controllerRackView = NULL;
 QMap<QString, QString> Engine::s_pluginFileHandling;
-
+TempoTrack * Engine::s_tempoTrack = NULL;
 
 
 

@@ -69,6 +69,7 @@
 #include "TextFloat.h"
 #include "ToolTip.h"
 #include "TrackContainer.h"
+#include "TempoTrack.h"
 
 
 /*! The width of the resize grip in pixels
@@ -1735,13 +1736,15 @@ void TrackOperationsWidget::updateMenu()
 {
 	QMenu * to_menu = m_trackOps->menu();
 	to_menu->clear();
-	to_menu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
-						tr( "Clone this track" ),
-						this, SLOT( cloneTrack() ) );
-	to_menu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
-						tr( "Remove this track" ),
-						this, SLOT( removeTrack() ) );
-						
+	if( ! dynamic_cast<TempoTrackView *>( m_trackView ) )
+	{
+		to_menu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
+							tr( "Clone this track" ),
+							this, SLOT( cloneTrack() ) );
+		to_menu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
+							tr( "Remove this track" ),
+							this, SLOT( removeTrack() ) );
+	}
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		to_menu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -1750,8 +1753,7 @@ void TrackOperationsWidget::updateMenu()
 	if( dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
 		to_menu->addSeparator();
-		to_menu->addMenu( dynamic_cast<InstrumentTrackView *>(
-						m_trackView )->midiMenu() );
+		to_menu->addMenu( dynamic_cast<InstrumentTrackView *>( m_trackView )->midiMenu() );
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
@@ -1864,15 +1866,44 @@ Track * Track::create( TrackTypes _tt, TrackContainer * _tc )
 
 	switch( _tt )
 	{
-		case InstrumentTrack: t = new ::InstrumentTrack( _tc ); break;
-		case BBTrack: t = new ::BBTrack( _tc ); break;
-		case SampleTrack: t = new ::SampleTrack( _tc ); break;
+		case InstrumentTrack:
+		{
+			t = new ::InstrumentTrack( _tc );
+			break;
+		}
+		case BBTrack:
+		{
+			t = new ::BBTrack( _tc );
+			break;
+		}
+		case SampleTrack:
+		{
+			t = new ::SampleTrack( _tc );
+			break;
+		}
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
-		case AutomationTrack: t = new ::AutomationTrack( _tc ); break;
+		case AutomationTrack:
+		{
+			t = new ::AutomationTrack( _tc );
+			break;
+		}
 		case HiddenAutomationTrack:
-						t = new ::AutomationTrack( _tc, true ); break;
-		default: break;
+		{
+			t = new ::AutomationTrack( _tc, true );
+			break;
+		}
+		case TempoTrack:
+		{
+			::TempoTrack * tt = new ::TempoTrack( _tc );
+			Engine::setTempoTrack( tt );
+			t = tt;
+			break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 	_tc->updateAfterTrackAdd();

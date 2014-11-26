@@ -51,7 +51,8 @@ AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
 	m_dragging( false ),
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 ),
-	m_inlineObject( NULL )
+	m_inlineObject( NULL ),
+	m_isTempoPattern( false )
 {
 	changeLength( MidiTime( 1, 0 ) );
 	
@@ -63,13 +64,16 @@ AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
 }
 
 
-
-
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	TrackContentObject( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_tension( _pat_to_copy.m_tension ),
-	m_progressionType( _pat_to_copy.m_progressionType )
+	m_progressionType( _pat_to_copy.m_progressionType ),
+	m_dragging( false ),
+	m_isRecording( _pat_to_copy.m_isRecording ),
+	m_lastRecordedValue( _pat_to_copy.m_lastRecordedValue ),
+	m_inlineObject( _pat_to_copy.m_inlineObject ),
+	m_isTempoPattern( _pat_to_copy.m_isTempoPattern )
 {
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )

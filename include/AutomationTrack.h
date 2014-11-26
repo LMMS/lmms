@@ -37,7 +37,7 @@ class AutomationTrack : public Track
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	AutomationTrack( TrackContainer* tc, bool _hidden = false );
+	AutomationTrack( TrackContainer* tc, bool _hidden = false, bool tempo = false );
 	virtual ~AutomationTrack();
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,

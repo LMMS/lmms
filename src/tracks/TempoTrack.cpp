@@ -25,4 +25,106 @@
 
 
 #include "TempoTrack.h"
+#include "Track.h"
+#include "TrackLabelButton.h"
+#include "Engine.h"
+#include "embed.h"
 
+TempoTrack::TempoTrack(  TrackContainer* tc ) :
+	AutomationTrack( tc, false, true )
+{
+	setName( tr( "Tempo Track" ) );
+}
+
+
+TempoTrack::~TempoTrack()
+{
+}
+
+
+ProcessHandle * TempoTrack::getProcessHandle()
+{
+	return NULL;
+}
+
+
+TrackView * TempoTrack::createView( TrackContainerView * tcv )
+{
+	return new TempoTrackView( this, tcv );
+}
+
+
+TrackContentObject * TempoTrack::createTCO( const MidiTime & _pos )
+{
+	return new TempoPattern( this );
+}
+
+
+void TempoTrack::saveTrackSpecificSettings( QDomDocument & _doc, QDomElement & _parent )
+{
+}
+
+
+void TempoTrack::loadTrackSpecificSettings( const QDomElement & _this )
+{
+}
+
+
+
+TempoPattern::TempoPattern( TempoTrack * tt ) :
+	AutomationPattern( tt )
+{
+	setTempoPattern( true );
+}
+
+
+TempoPattern::TempoPattern( const TempoPattern & tpToCopy ) :
+	AutomationPattern( tpToCopy )
+{
+	setTempoPattern( true );
+}
+
+
+TempoPattern::~TempoPattern()
+{
+}
+
+
+TrackContentObjectView * TempoPattern::createView( TrackView * tv )
+{
+	return new TempoPatternView( this, tv );
+}
+
+
+TempoPatternView::TempoPatternView( TempoPattern * pat, TrackView * parent ) :
+	AutomationPatternView( pat, parent )
+{
+}
+
+
+TempoPatternView::~TempoPatternView()
+{
+}
+
+
+TempoTrackView::TempoTrackView( TempoTrack * tt, TrackContainerView * tcv ) :
+	TrackView( tt, tcv )
+{
+	setFixedHeight( 32 );
+	TrackLabelButton * tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
+	tlb->setIcon( embed::getIconPixmap( "tempo_sync" ) );
+	tlb->move( 3, 1 );
+	tlb->show();
+	setModel( tt );
+}
+
+
+TempoTrackView::~TempoTrackView()
+{
+}
+
+
+void TempoTrackView::dragEnterEvent( QDragEnterEvent * _dee )
+{}
+void TempoTrackView::dropEvent( QDropEvent * _de )
+{}

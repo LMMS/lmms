@@ -22,23 +22,25 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-/*
+
 
 #ifndef TEMPO_TRACK_H
 #define TEMPO_TRACK_H
 
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
-#include "song.h"
+#include "AutomationPatternView.h"
+#include "Song.h"
 
 class TempoTrackView;
 class TempoPatternView;
+class TempoPattern;
 class TempoTrack : public AutomationTrack
 {
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	TempoTrack();
+	TempoTrack( TrackContainer* tc );
 	virtual ~TempoTrack();
 	
 	virtual QString nodeName() const
@@ -56,8 +58,8 @@ public:
 		return MaxTempo;
 	}	
 	
-	virtual trackView * createView( TrackContainerView* );
-	virtual trackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackView * createView( TrackContainerView * tcv );
+	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
@@ -69,7 +71,7 @@ private:
 	friend class TempoTrackView;
 };
 
-class TempoTrackView : public trackView
+class TempoTrackView : public TrackView
 {
 public:
 	TempoTrackView( TempoTrack * tt, TrackContainerView * tcv );
@@ -81,41 +83,8 @@ public:
 
 
 
-class TempoPattern : public AutomationPattern
-{
-	MM_OPERATORS
-	Q_OBJECT
-public:
-	TempoPattern( TempoTrack * tt );
-	TempoPattern( const TempoPattern & tpCopy );
-	virtual ~TempoPattern();
-	
-	virtual MidiTime length() const;
-	
-	
-	// settings-management
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	
-	virtual static inline const QString classNodeName()
-	{
-		return "tempopattern";
-	}
-	
-	inline virtual QString nodeName() const
-	{
-		return classNodeName();
-	}
-	
-	virtual trackContentObjectView * createView( trackView * _tv );
-	
-private:
-	friend class TempoTrack;
-	friend class TempoPatternView;
-	
-};
 
-class TempoPatternView : public trackContentObjectView
+class TempoPatternView : public AutomationPatternView
 {
 	Q_OBJECT
 
@@ -124,16 +93,24 @@ class TempoPatternView : public trackContentObjectView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	TempoPatternView( TempoPattern * pat, trackView * parent );
+	TempoPatternView( TempoPattern * pat, TrackView * parent );
 	virtual ~TempoPatternView();
+};
 
-public slots:
-	virtual void update();
-
-protected slots:
-	void resetName();
-	void changeName();
+class TempoPattern : public AutomationPattern
+{
+	Q_OBJECT
+public:
+	TempoPattern( TempoTrack * tt );
+	TempoPattern( const TempoPattern & tpToCopy );
+	virtual ~TempoPattern();
+	
+	inline virtual QString nodeName() const
+	{
+		return "tempopattern";
+	}
+	
+	virtual TrackContentObjectView * createView( TrackView * tv );
 };
 
 #endif
-*/

@@ -37,8 +37,8 @@
 #include "BBTrackContainer.h"
 
 
-AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc ),
+AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden, bool tempo ) :
+	Track( _hidden ? HiddenAutomationTrack : ( tempo ? Track::TempoTrack : Track::AutomationTrack ), tc ),
 	m_processHandle( new AutomationProcessHandle( this ) ),
 	m_objects()
 {
@@ -375,9 +375,8 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
 	TrackView( _at, tcv )
 {
-        setFixedHeight( 32 );
-	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
+	setFixedHeight( 32 );
+	TrackLabelButton * tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
 	tlb->move( 3, 1 );
 	tlb->show();

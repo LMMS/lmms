@@ -766,6 +766,9 @@ void Song::clearProject()
 		delete m_controllers.last();
 	}
 
+	// new tempo track
+	Track::create( Track::TempoTrack, this );
+
 	emit dataChanged();
 
 	Engine::projectJournal()->clearJournal();

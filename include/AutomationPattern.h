@@ -163,7 +163,17 @@ public:
 
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
-
+	
+	void setTempoPattern( bool b )
+	{
+		m_isTempoPattern = b;
+	}
+	
+	bool isTempoPattern() const
+	{
+		return m_isTempoPattern;
+	}
+	
 public slots:
 	void clear();
 	void openInAutomationEditor();
@@ -189,6 +199,8 @@ private:
 	float m_lastRecordedValue;
 
 	InlineAutomation * m_inlineObject;
+	
+	bool m_isTempoPattern;
 
 	friend class AutomationPatternView;
 

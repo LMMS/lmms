@@ -423,6 +423,8 @@ public:
 		VideoTrack,
 		AutomationTrack,
 		HiddenAutomationTrack,
+		TempoTrack,
+		CommentTrack,
 		NumTrackTypes
 	} ;
 
