@@ -33,7 +33,7 @@
 #include "export.h"
 
 
-class tabButton;
+class TabButton;
 
 
 class EXPORT TabBar : public QWidget
@@ -44,7 +44,7 @@ public:
 			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
 	virtual ~TabBar();
 
-	tabButton * addTab( QWidget * _w, const QString & _text,
+	TabButton * addTab( QWidget * _w, const QString & _text,
 					int _id, bool _add_stretch = false,
 					bool _text_is_tooltip = false );
 	void removeTab( int _id );
@@ -73,7 +73,7 @@ protected slots:
 
 
 private:
-	QMap<int, QPair<tabButton *, QWidget *> > m_tabs;
+	QMap<int, QPair<TabButton *, QWidget *> > m_tabs;
 	QBoxLayout * m_layout;
 	bool m_exclusive;
 

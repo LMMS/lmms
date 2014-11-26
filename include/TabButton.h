@@ -1,5 +1,5 @@
 /*
- * tab_button.h - declaration of class tabButton
+ * TabButton.h - declaration of class TabButton
  *
  * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -29,11 +29,11 @@
 #include <QPushButton>
 
 
-class tabButton : public QPushButton
+class TabButton : public QPushButton
 {
 	Q_OBJECT
 public:
-	tabButton( const QString & _text, int _id, QWidget * _parent ) :
+	TabButton( const QString & _text, int _id, QWidget * _parent ) :
 		QPushButton( _text, _parent ),
 		m_id( _id )
 	{
@@ -42,7 +42,7 @@ public:
 						SLOT( slotClicked() ) );
 	}
 
-	~tabButton()
+	~TabButton()
 	{
 	}
 

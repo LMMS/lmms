@@ -36,7 +36,7 @@
 #include "ladspa_description.h"
 #include "ladspa_port_dialog.h"
 #include "TabBar.h"
-#include "tab_button.h"
+#include "TabButton.h"
 
 #include "embed.cpp"
 

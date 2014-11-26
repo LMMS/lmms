@@ -33,7 +33,7 @@
 
 #include "SetupDialog.h"
 #include "TabBar.h"
-#include "tab_button.h"
+#include "TabButton.h"
 #include "TabWidget.h"
 #include "gui_templates.h"
 #include "Mixer.h"

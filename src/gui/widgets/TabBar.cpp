@@ -24,7 +24,7 @@
 
 
 #include "TabBar.h"
-#include "tab_button.h"
+#include "TabButton.h"
 #include "gui_templates.h"
 #include "ToolTip.h"
 
@@ -51,7 +51,7 @@ TabBar::~TabBar()
 
 
 
-tabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
+TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 				bool _add_stretch, bool _text_is_tooltip )
 {
 	// already tab with id?
@@ -62,7 +62,7 @@ tabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	}
 	QString caption = ( _text_is_tooltip ) ? QString( "" ) : _text;
 	// create tab-button
-	tabButton * b = new tabButton( caption, _id, this );
+	TabButton * b = new TabButton( caption, _id, this );
 	connect( b, SIGNAL( clicked( int ) ), this, SLOT( tabClicked( int ) ) );
 	b->setIconSize( QSize( 48, 48 ) );
 	b->setFixedSize( 64, 64 );
@@ -75,7 +75,7 @@ tabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	// small workaround, because QBoxLayout::addWidget(...) doesn't
 	// work properly, so we first have to remove all tabs from the
 	// layout and them add them in the correct order
-	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
+	QMap<int, QPair<TabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
 		m_layout->removeWidget( it.value().first );
@@ -136,7 +136,7 @@ void TabBar::setActiveTab( int _id )
 
 int TabBar::activeTab()
 {
-	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
+	QMap<int, QPair<TabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
 		if( tabState( it.key() ) == true )
@@ -175,7 +175,7 @@ void TabBar::setTabState( int _id, bool _checked )
 
 void TabBar::hideAll( int _exception )
 {
-	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
+	QMap<int, QPair<TabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
 		if( it.key() != _exception )
@@ -228,7 +228,7 @@ void TabBar::tabClicked( int _id )
 
 bool TabBar::allHidden()
 {
-	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
+	QMap<int, QPair<TabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
 		if( !it.value().second->isHidden() )
