@@ -1,5 +1,5 @@
 /*
- * caption_menu.h - context menu with a caption
+ * CaptionMenu.h - context menu with a caption
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
@@ -33,12 +33,12 @@
 ///
 /// \brief A context menu with a caption
 ///
-class EXPORT captionMenu : public QMenu
+class EXPORT CaptionMenu : public QMenu
 {
 	Q_OBJECT
 public:
-	captionMenu( const QString & _title, QWidget * _parent = 0 );
-	virtual ~captionMenu();
+	CaptionMenu( const QString & _title, QWidget * _parent = 0 );
+	virtual ~CaptionMenu();
 
 	///
 	/// \brief Adds a "Help" action displaying the Menu's parent's WhatsThis

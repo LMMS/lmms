@@ -1,5 +1,5 @@
 /*
- * caption_menu.cpp - context menu with a caption
+ * CaptionMenu.cpp - context menu with a caption
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
@@ -23,13 +23,13 @@
  */
 
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 
 
 
 
-captionMenu::captionMenu( const QString & _title, QWidget * _parent ) :
+CaptionMenu::CaptionMenu( const QString & _title, QWidget * _parent ) :
 	QMenu( _title, _parent )
 {
 	QAction * caption = addAction( _title );
@@ -39,14 +39,14 @@ captionMenu::captionMenu( const QString & _title, QWidget * _parent ) :
 
 
 
-captionMenu::~captionMenu()
+CaptionMenu::~CaptionMenu()
 {
 }
 
 
 
 
-void captionMenu::addHelpAction()
+void CaptionMenu::addHelpAction()
 {
 	QWidget* parent = (QWidget*) this->parent();
 

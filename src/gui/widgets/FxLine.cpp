@@ -37,7 +37,7 @@
 #include "Engine.h"
 #include "SendButtonIndicator.h"
 #include "gui_templates.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
@@ -183,7 +183,7 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	FxMixer * mix = Engine::fxMixer();
-	QPointer<captionMenu> contextMenu = new captionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master 
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );

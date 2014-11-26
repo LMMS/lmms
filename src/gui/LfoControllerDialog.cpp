@@ -29,7 +29,7 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
 #include "Engine.h"

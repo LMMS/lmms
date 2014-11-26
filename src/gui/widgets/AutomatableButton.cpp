@@ -28,7 +28,7 @@
 #include <QCursor>
 #include <QMouseEvent>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "Engine.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -94,13 +94,13 @@ void AutomatableButton::contextMenuEvent( QContextMenuEvent * _me )
 
 	if ( m_group != NULL )
 	{
-		captionMenu contextMenu( m_group->model()->displayName() );
+		CaptionMenu contextMenu( m_group->model()->displayName() );
 		m_group->addDefaultActions( &contextMenu );
 		contextMenu.exec( QCursor::pos() );
 	}
 	else
 	{
-		captionMenu contextMenu( model()->displayName() );
+		CaptionMenu contextMenu( model()->displayName() );
 		addDefaultActions( &contextMenu );
 		contextMenu.exec( QCursor::pos() );
 	}

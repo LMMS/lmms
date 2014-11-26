@@ -34,7 +34,7 @@
 #include <QPixmap>
 #include <QStyleOptionFrame>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "Engine.h"
 #include "embed.h"
 #include "gui_templates.h"
@@ -113,7 +113,7 @@ void comboBox::contextMenuEvent( QContextMenuEvent * event )
 		return;
 	}
 
-	captionMenu contextMenu( model()->displayName() );
+	CaptionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }

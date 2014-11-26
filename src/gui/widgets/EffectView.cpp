@@ -32,7 +32,7 @@
 
 #include "EffectView.h"
 #include "DummyEffect.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
 #include "embed.h"
@@ -245,7 +245,7 @@ void EffectView::closeEffects()
 
 void EffectView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName(), this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );

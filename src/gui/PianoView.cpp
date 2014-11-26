@@ -45,7 +45,7 @@
 
 
 #include "PianoView.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -419,7 +419,7 @@ void PianoView::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	captionMenu contextMenu( tr( "Base note" ) );
+	CaptionMenu contextMenu( tr( "Base note" ) );
 	AutomatableModelView amv( m_piano->instrumentTrack()->baseNoteModel(), &contextMenu );
 	amv.addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );

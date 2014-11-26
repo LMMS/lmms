@@ -28,7 +28,7 @@
 
 #include <QWhatsThis>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 
 
@@ -251,7 +251,7 @@ void nineButtonSelector::updateButton( int _new_button )
 
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
-	captionMenu contextMenu( windowTitle(), this );
+	CaptionMenu contextMenu( windowTitle(), this );
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }

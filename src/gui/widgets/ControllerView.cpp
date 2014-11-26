@@ -34,7 +34,7 @@
 
 #include "ControllerView.h"
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
@@ -176,7 +176,7 @@ void ControllerView::modelChanged()
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName(), this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );

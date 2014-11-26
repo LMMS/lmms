@@ -53,7 +53,7 @@
 #include "fader.h"
 #include "embed.h"
 #include "Engine.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "text_float.h"
 #include "MainWindow.h"
@@ -115,7 +115,7 @@ fader::~fader()
 
 void fader::contextMenuEvent( QContextMenuEvent * _ev )
 {
-	captionMenu contextMenu( windowTitle() );
+	CaptionMenu contextMenu( windowTitle() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 	_ev->accept();

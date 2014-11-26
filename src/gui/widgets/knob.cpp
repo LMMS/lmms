@@ -37,7 +37,7 @@
 
 #include "lmms_math.h"
 #include "knob.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -481,7 +481,7 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName(), this );
+	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addAction( QPixmap(), 
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),

@@ -28,7 +28,7 @@
 
 #include "TempoSyncKnob.h"
 #include "Engine.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
@@ -83,7 +83,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName(), this );
+	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	

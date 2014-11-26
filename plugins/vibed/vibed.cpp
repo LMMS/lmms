@@ -32,7 +32,7 @@
 #include "NotePlayHandle.h"
 #include "tooltip.h"
 #include "base64.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "Oscillator.h"
 #include "string_container.h"
 #include "templates.h"
@@ -756,7 +756,7 @@ void vibedView::normalizeClicked()
 void vibedView::contextMenuEvent( QContextMenuEvent * )
 {
 
-	captionMenu contextMenu( model()->displayName(), this );
+	CaptionMenu contextMenu( model()->displayName(), this );
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 

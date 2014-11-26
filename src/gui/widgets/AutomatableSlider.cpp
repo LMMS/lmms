@@ -28,7 +28,7 @@
 #include <QCursor>
 #include <QMouseEvent>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
 #include "MainWindow.h"
@@ -62,7 +62,7 @@ AutomatableSlider::~AutomatableSlider()
 
 void AutomatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 {
-	captionMenu contextMenu( model()->displayName() );
+	CaptionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
