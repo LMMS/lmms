@@ -328,7 +328,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     }
 
     // set time info
-    song* const s = Engine::getSong();
+    Song * const s = Engine::getSong();
     fTimeInfo.playing  = s->isPlaying();
     fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(Engine::framesPerTick());
     fTimeInfo.usecs    = s->getMilliseconds()*1000;
