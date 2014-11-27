@@ -272,6 +272,33 @@ void RingBuffer::writeAddingMultiplied( sampleFrame * src, float offset, f_cnt_t
 }
 
 
+void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt_t length, float level )
+{
+	const f_cnt_t pos = ( m_position + offset ) % m_size;
+	if( length == 0 ) { length = m_fpp; }
+	
+	if( pos + length <= m_size ) // we won't go over the edge so we can just memcpy here
+	{
+		MixHelpers::addSwappedMultiplied( m_buffer + ( pos * sizeof( sampleFrame ) ), src, level, length );
+	}
+	else
+	{
+		f_cnt_t first = m_size - pos;
+		f_cnt_t second = length - first;
+
+		MixHelpers::addSwappedMultiplied( m_buffer + ( pos * sizeof( sampleFrame ) ), src, level, first );
+		
+		MixHelpers::addSwappedMultiplied( m_buffer, src + ( first * sizeof( sampleFrame ) ), level, second );
+	}
+}
+
+
+void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level )
+{
+	writeSwappedAddingMultiplied( src, msToFrames( offset ), length, level );
+}
+
+
 void RingBuffer::updateSamplerate()
 {
 	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::mixer()->processingSampleRate() ) / m_samplerate;

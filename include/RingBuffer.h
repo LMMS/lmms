@@ -179,6 +179,24 @@ public:
  */
 	void writeAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level );
 
+/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
+ * 	a specified multiplier applied to the frames, with swapped channels
+ * 	\param	src Pointer to the source buffer
+ * 	\param offset Offset in frames against current position, may *NOT* be negative
+ * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
+ * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
+ */
+	void writeSwappedAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt_t length, float level );
+
+/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
+ * 	a specified multiplier applied to the frames, with swapped channels
+ * 	\param	src Pointer to the source buffer
+ * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
+ * 	\param length Length of the source buffer, if zero, period size is used
+ * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
+ */
+	void writeSwappedAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level );
+
 
 protected slots:
 	void updateSamplerate();

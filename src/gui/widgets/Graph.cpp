@@ -444,6 +444,7 @@ graphModel::graphModel( float _min, float _max, int _length,
 			::Model * _parent, bool _default_constructed,  float _step ) :
 	Model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
+	m_length( _length ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
 	m_step( _step )
@@ -482,9 +483,13 @@ void graphModel::setRange( float _min, float _max )
 
 void graphModel::setLength( int _length )
 {
-	if( _length != length() )
+	if( _length != m_length )
 	{
-		m_samples.resize( _length );
+		m_length = _length;
+		if( m_samples.size() < m_length )
+		{
+			m_samples.resize( m_length );
+		}
 		emit lengthChanged();
 	}
 }
