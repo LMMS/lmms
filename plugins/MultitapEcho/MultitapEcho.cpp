@@ -49,16 +49,19 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &multitapecho_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_buffer( 20000.0f ),
+	m_buffer( 20100.0f ),
 	m_sampleRate( Engine::mixer()->processingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
+	m_work = new sampleFrame[ Engine::mixer()->framesPerPeriod() ];
+	m_buffer.reset();
 	updateFilters( 0, 19 );
 }
 
 
 MultitapEchoEffect::~MultitapEchoEffect()
 {
+	delete m_work;
 }
 
 
@@ -99,9 +102,6 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	const float dryGain = dbvToAmp( m_controls.m_dryGain.value() );
 	const bool swapInputs = m_controls.m_swapInputs.value();
 	
-	// temp processing stackbuffer for lp-filtering
-	sampleFrame work [frames];
-	
 	// add dry buffer - never swap inputs for dry
 	m_buffer.writeAddingMultiplied( buf, 0, frames, dryGain );
 	
@@ -111,8 +111,8 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 		float offset = stepLength;
 		for( int i = 0; i < steps; ++i ) // add all steps swapped
 		{
-			runFilter( &work[0], buf, m_filter[i], frames );
-			m_buffer.writeSwappedAddingMultiplied( &work[0], offset, frames, m_amp[i] );
+			runFilter( m_work, buf, m_filter[i], frames );
+			m_buffer.writeSwappedAddingMultiplied( m_work, offset, frames, m_amp[i] );
 			offset += stepLength;
 		}
 	}
@@ -121,19 +121,19 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 		float offset = stepLength;
 		for( int i = 0; i < steps; ++i ) // add all steps swapped
 		{
-			runFilter( &work[0], buf, m_filter[i], frames );
-			m_buffer.writeAddingMultiplied( &work[0], offset, frames, m_amp[i] );
+			runFilter( m_work, buf, m_filter[i], frames );
+			m_buffer.writeAddingMultiplied( m_work, offset, frames, m_amp[i] );
 			offset += stepLength;
 		}
 	}
 	
 	// pop the buffer and mix it into output
-	m_buffer.pop( &work[0] );
+	m_buffer.pop( m_work );
 
 	for( int f = 0; f < frames; ++f )
 	{
-		buf[f][0] = d * buf[f][0] + w * work[f][0];
-		buf[f][1] = d * buf[f][1] + w * work[f][1];
+		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
+		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 	

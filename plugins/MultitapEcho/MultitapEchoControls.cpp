@@ -38,7 +38,7 @@ MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 	m_stepLength( 100.0f, 1.0f, 1000.0f, 0.1f, 1000.0f, this, "Step length" ),
 	m_dryGain( 0.0f, -80.0f, 20.0f, 0.1f, this, "Dry gain" ),
 	m_swapInputs( false, this, "Swap inputs" ),
-	m_ampGraph( -100.0f, 0.0f, 16, this ),
+	m_ampGraph( -60.0f, 0.0f, 16, this ),
 	m_lpGraph( 0.0f, 3.0f, 16, this )
 {
 	connect( &m_ampGraph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( ampSamplesChanged( int, int ) ) );
@@ -140,6 +140,7 @@ void MultitapEchoControls::ampResetClicked()
 
 void MultitapEchoControls::lpSamplesChanged( int begin, int end )
 {
+	//qDebug( "b/e %d - %d", begin, end );
 	const float * samples = m_lpGraph.samples();
 	for( int i = begin; i <= end; ++i )
 	{
@@ -157,12 +158,18 @@ void MultitapEchoControls::lpResetClicked()
 
 void MultitapEchoControls::lengthChanged()
 {
-	m_ampGraph.setLength( m_steps.value() );
-	m_lpGraph.setLength( m_steps.value() );
+	const int len = m_steps.value();
+	m_ampGraph.setLength( len );
+	ampSamplesChanged( 0, len - 1 );
+	m_lpGraph.setLength( len );
+	lpSamplesChanged( 0, len - 1 );
+	m_effect->updateFilters( 0, len - 1 );
 }
 
 
 void MultitapEchoControls::sampleRateChanged()
 {
+	m_effect->m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_effect->m_sampleRatio = 1.0f / m_effect->m_sampleRate;
 	m_effect->updateFilters( 0, 19 );
 }

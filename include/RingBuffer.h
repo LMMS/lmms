@@ -1,5 +1,5 @@
 /*
- * RingBuffer.h - an effective, thread-safe and flexible implementation of a ringbuffer for LMMS
+ * RingBuffer.h - an effective and flexible implementation of a ringbuffer for LMMS
  *
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -32,7 +32,7 @@
 #include "lmms_math.h"
 #include "MemoryManager.h"
 
-class RingBuffer : public QObject
+class EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -204,14 +204,14 @@ protected slots:
 private:
 	inline f_cnt_t msToFrames( float ms )
 	{
-		return static_cast<f_cnt_t>( ceilf( ms * m_samplerate / 1000 ) );
+		return static_cast<f_cnt_t>( ceilf( ms * (float)m_samplerate * 0.001f ) );
 	}
 
 	const fpp_t m_fpp;
 	sample_rate_t m_samplerate;
-	f_cnt_t m_size;
+	size_t m_size;
 	sampleFrame * m_buffer;
-	f_cnt_t m_position;
+	volatile unsigned int m_position;
 
 };
 #endif

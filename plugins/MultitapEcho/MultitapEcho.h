@@ -86,6 +86,8 @@ private:
 	
 	float m_sampleRate;
 	float m_sampleRatio;
+	
+	sampleFrame * m_work;
 
 	friend class MultitapEchoControls;
 
