@@ -137,7 +137,7 @@ public:
 
 	inline int length() const
 	{
-		return( m_samples.count() );
+		return m_length;
 	}
 
 	inline const float * samples() const
@@ -175,6 +175,7 @@ private:
 	void drawSampleAt( int x, float val );
 
 	QVector<float> m_samples;
+	int m_length;
 	float m_minValue;
 	float m_maxValue;
 	float m_step;

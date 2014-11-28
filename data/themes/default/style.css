@@ -543,7 +543,7 @@ BBTCOView {
 
 /* Plugins */
 
-TripleOscillatorView knob {
+TripleOscillatorView Knob {
 	color: rgb(1, 32, 64);
 	qproperty-outerColor: rgb(0, 0, 0);
 	qproperty-innerRadius: 2;
@@ -554,7 +554,7 @@ TripleOscillatorView knob {
 }
 
 
-kickerInstrumentView knob#smallKnob {
+kickerInstrumentView Knob#smallKnob {
 	color: #595959;
 	qproperty-outerColor: black;
 	qproperty-innerRadius: 3;
@@ -565,7 +565,7 @@ kickerInstrumentView knob#smallKnob {
 }
 
 
-kickerInstrumentView knob#largeKnob {
+kickerInstrumentView Knob#largeKnob {
 	color: #0c3b89;
 	qproperty-outerColor: #519fff;
 	qproperty-innerRadius: 12.0;
@@ -576,7 +576,7 @@ kickerInstrumentView knob#largeKnob {
 }
 
 
-AudioFileProcessorView knob {
+AudioFileProcessorView Knob {
 	color: rgb(240, 147, 14);
 	qproperty-outerColor: rgb(30, 35, 37);
 	qproperty-innerRadius: 4;
@@ -586,7 +586,7 @@ AudioFileProcessorView knob {
 	qproperty-lineWidth: 3;
 }
 
-organicInstrumentView knob {
+organicInstrumentView Knob {
 	color: rgb(124, 207, 98);
 	qproperty-outerColor: rgb(13, 42, 4);
 	qproperty-innerRadius: 2;
@@ -596,13 +596,13 @@ organicInstrumentView knob {
 	qproperty-lineWidth: 1.5;
 }
 
-organicInstrumentView knob#harmKnob {
+organicInstrumentView Knob#harmKnob {
 	color: rgb(205, 98, 216);
 	qproperty-outerColor: rgb(18, 4, 18);
 }
 
-organicInstrumentView knob#fx1Knob,
-organicInstrumentView knob#volKnob {
+organicInstrumentView Knob#fx1Knob,
+organicInstrumentView Knob#volKnob {
 	color: rgb(157, 157, 157);
 	qproperty-outerColor: rgb(37, 37, 37);
 	qproperty-innerRadius: 4;
@@ -612,7 +612,7 @@ organicInstrumentView knob#volKnob {
 	qproperty-lineWidth: 2;
 }
 
-sf2InstrumentView knob {
+sf2InstrumentView Knob {
 	color: #ff00ea;
 	qproperty-outerColor: rgb(20, 5, 18);
 	qproperty-innerRadius: 2;
@@ -622,7 +622,7 @@ sf2InstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-sfxrInstrumentView knob {
+sfxrInstrumentView Knob {
 	color: #000;
 	qproperty-outerColor: rgb(194, 177, 145);
 	qproperty-innerRadius: 2;
@@ -630,42 +630,42 @@ sfxrInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-sfxrInstrumentView knob#envKnob {
+sfxrInstrumentView Knob#envKnob {
 	color:	#263352;
 	qproperty-outerColor: #4b66a4;
 }
 
-sfxrInstrumentView knob#freqKnob {
+sfxrInstrumentView Knob#freqKnob {
 	color:	#1e4a22;
 	qproperty-outerColor: #3c9544;
 }
 
-sfxrInstrumentView knob#changeKnob {
+sfxrInstrumentView Knob#changeKnob {
 	color:	#591c1c;
 	qproperty-outerColor: #b23737;
 }
 
-sfxrInstrumentView knob#sqrKnob {
+sfxrInstrumentView Knob#sqrKnob {
 	color:	#3b2714;
 	qproperty-outerColor: #724c27;
 }
 
-sfxrInstrumentView knob#repeatKnob {
+sfxrInstrumentView Knob#repeatKnob {
 	color:	#292929;
 	qproperty-outerColor: #515151;
 }
 
-sfxrInstrumentView knob#phaserKnob {
+sfxrInstrumentView Knob#phaserKnob {
 	color:	#144c4d;
 	qproperty-outerColor: #299899;
 }
 
-sfxrInstrumentView knob#filterKnob {
+sfxrInstrumentView Knob#filterKnob {
 	color:	#47224c;
 	qproperty-outerColor: #8e4397;
 }
 
-opl2instrumentView knob {
+opl2instrumentView Knob {
 	color: rgb(128,128,128);
 	qproperty-outerColor: rgb(255,255,255);
 	qproperty-innerRadius: 2;
@@ -673,7 +673,7 @@ opl2instrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-sidInstrumentView knob {
+sidInstrumentView Knob {
 	color: rgb(113,95,80);
 	qproperty-outerColor: rgb( 255,255,255 );
 	qproperty-innerRadius: 2;
@@ -681,7 +681,7 @@ sidInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-WatsynView knob {
+WatsynView Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 9.5;
@@ -689,17 +689,17 @@ WatsynView knob {
 	qproperty-lineWidth: 2;
 }
 
-WatsynView knob#aKnob {
+WatsynView Knob#aKnob {
 	color: #43b2ff;
 	qproperty-outerColor: #43b2ff;
 }
 
-WatsynView knob#bKnob {
+WatsynView Knob#bKnob {
 	color: #fc5431;
 	qproperty-outerColor: #fc5431;
 }
 
-WatsynView knob#mixKnob {
+WatsynView Knob#mixKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 	qproperty-outerRadius: 13;
@@ -707,17 +707,17 @@ WatsynView knob#mixKnob {
 	qproperty-centerPointY: 15.5;
 }
 
-WatsynView knob#mixenvKnob {
+WatsynView Knob#mixenvKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 }
 
-WatsynView knob#xtalkKnob {
+WatsynView Knob#xtalkKnob {
 	color: #fb50fb;
 	qproperty-outerColor: #fb50fb;
 }
 
-MonstroView knob {
+MonstroView Knob {
 	color: #ffffff;
 	qproperty-outerColor: #aaaaaa;
 	qproperty-outerRadius: 9;
@@ -727,7 +727,7 @@ MonstroView knob {
 	qproperty-lineWidth: 2.5;
 }
 
-NesInstrumentView knob {
+NesInstrumentView Knob {
 	color: #e7231b;
 	qproperty-outerColor: #fff;
 	qproperty-outerRadius: 11.0;

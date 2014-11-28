@@ -1,5 +1,5 @@
 /*
- * RingBuffer.h - an effective, thread-safe and flexible implementation of a ringbuffer for LMMS
+ * RingBuffer.h - an effective and flexible implementation of a ringbuffer for LMMS
  *
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -32,7 +32,7 @@
 #include "lmms_math.h"
 #include "MemoryManager.h"
 
-class RingBuffer : public QObject
+class EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -179,6 +179,24 @@ public:
  */
 	void writeAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level );
 
+/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
+ * 	a specified multiplier applied to the frames, with swapped channels
+ * 	\param	src Pointer to the source buffer
+ * 	\param offset Offset in frames against current position, may *NOT* be negative
+ * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
+ * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
+ */
+	void writeSwappedAddingMultiplied( sampleFrame * src, f_cnt_t offset, f_cnt_t length, float level );
+
+/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
+ * 	a specified multiplier applied to the frames, with swapped channels
+ * 	\param	src Pointer to the source buffer
+ * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
+ * 	\param length Length of the source buffer, if zero, period size is used
+ * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
+ */
+	void writeSwappedAddingMultiplied( sampleFrame * src, float offset, f_cnt_t length, float level );
+
 
 protected slots:
 	void updateSamplerate();
@@ -186,14 +204,14 @@ protected slots:
 private:
 	inline f_cnt_t msToFrames( float ms )
 	{
-		return static_cast<f_cnt_t>( ceilf( ms * m_samplerate / 1000 ) );
+		return static_cast<f_cnt_t>( ceilf( ms * (float)m_samplerate * 0.001f ) );
 	}
 
 	const fpp_t m_fpp;
 	sample_rate_t m_samplerate;
-	f_cnt_t m_size;
+	size_t m_size;
 	sampleFrame * m_buffer;
-	f_cnt_t m_position;
+	volatile unsigned int m_position;
 
 };
 #endif
