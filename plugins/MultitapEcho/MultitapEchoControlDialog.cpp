@@ -67,7 +67,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	
 	lpGraph->setAutoFillBackground( true );
 	lpGraph->setPalette( pal );
-	lpGraph->setGraphColor( QColor( 48, 255, 117 ) );
+	lpGraph->setGraphColor( QColor( 255, 48, 117 ) );
 	lpGraph -> setMaximumSize( 204, 105 );
 	
 	// steps spinbox
@@ -79,13 +79,13 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	// knobs
 
 	TempoSyncKnob * stepLength = new TempoSyncKnob( knobBright_26, this );
-	stepLength->move( 80, 240 );
+	stepLength->move( 130, 240 );
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setLabel( tr( "Length" ) );
 	stepLength->setHintText( tr( "Step length:" ) + " ", "ms" );
 	
 	Knob * dryGain = new Knob( knobBright_26, this );
-	dryGain->move( 130, 240 );
+	dryGain->move( 180, 240 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setLabel( tr( "Dry" ) );
 	dryGain->setHintText( tr( "Dry Gain:" ) + " ", "dBV" );
@@ -93,7 +93,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	// switch led
 	
 	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
-	swapInputs->move( 20, 280 );
+	swapInputs->move( 20, 270 );
 	swapInputs->setModel( & controls->m_swapInputs );
 	ToolTip::add( swapInputs, tr( "Swap left and right input channel for reflections" ) );
 }
