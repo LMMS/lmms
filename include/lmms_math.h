@@ -228,4 +228,13 @@ static inline float sqrt_neg( float val )
 }
 
 
+// fast approximation of square root
+float fastSqrt( float n )
+{
+    int i = *(int*) &n;
+    i = ( ( i - ( 1 << 23 ) ) >> 1 ) + ( 1 << 29 ); 
+    return *(float*) &i;
+}
+
+
 #endif
