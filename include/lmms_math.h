@@ -232,7 +232,7 @@ static inline float sqrt_neg( float val )
 float fastSqrt( float n )
 {
     int i = *(int*) &n;
-    i = ( ( i - ( 1 << 23 ) ) >> 1 ) + ( 1 << 29 ); 
+    i = ( i + ( 127 << 23 ) ) >> 1;
     return *(float*) &i;
 }
 
