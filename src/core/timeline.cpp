@@ -294,6 +294,7 @@ void timeLine::mousePressEvent( QMouseEvent* event )
 	}
 	else if( event->button() == Qt::RightButton || event->button() == Qt::MiddleButton )
 	{
+        m_moveXOff = s_posMarkerPixmap->width() / 2;
 		const MidiTime t = m_begin + static_cast<int>( event->x() * MidiTime::ticksPerTact() / m_ppt );
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
