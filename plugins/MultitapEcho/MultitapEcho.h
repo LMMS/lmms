@@ -31,34 +31,7 @@
 #include "ValueBuffer.h"
 #include "RingBuffer.h"
 #include "lmms_math.h"
-
-class OnePole
-{
-public:
-	OnePole()
-	{
-		m_a0 = 1.0; 
-		m_b1 = 0.0; 
-		m_z1 = 0.0;
-	}
-	virtual ~OnePole() {}
-	
-	inline void setFc( float fc )
-	{
-		m_b1 = expf( -2.0f * F_PI * fc );
-		m_a0 = 1.0f - m_b1;
-	}
-	
-	inline float update( float s )
-	{
-		return m_z1 = s * m_a0 + m_z1 * m_b1;
-	}
-	
-private:
-	float m_a0, m_b1, m_z1;
-};
-
-typedef OnePole StereoOnePole [2];
+#include "BasicFilters.h"
 
 class MultitapEchoEffect : public Effect
 {
@@ -75,6 +48,12 @@ public:
 private:
 	void updateFilters( int begin, int end );
 	void runFilter( sampleFrame * dst, sampleFrame * src, StereoOnePole & filter, const fpp_t frames );
+
+	inline void setFilterFreq( float fc, StereoOnePole & f )
+	{
+		const float b1 = expf( -2.0f * F_PI * fc );
+		f.setCoeffs( 1.0f - b1, b1 );
+	}
 
 	MultitapEchoControls m_controls;
 	
