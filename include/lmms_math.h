@@ -229,11 +229,11 @@ static inline float sqrt_neg( float val )
 
 
 // fast approximation of square root
-float fastSqrt( float n )
+static inline float fastSqrt( float n )
 {
 	union 
 	{
-		int i;
+		int32_t i;
 		float f;
 	} u;
 	u.f = n;
