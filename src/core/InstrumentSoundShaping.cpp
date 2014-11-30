@@ -79,28 +79,11 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 			tr( __targetNames[i][2].toUtf8().constData() ) );
 	}
 
-	m_filterModel.addItem( tr( "LowPass" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "HiPass" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "BandPass csg" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "BandPass czpg" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "Notch" ), new PixmapLoader( "filter_notch" ) );
-	m_filterModel.addItem( tr( "Allpass" ), new PixmapLoader( "filter_ap" ) );
-	m_filterModel.addItem( tr( "Moog" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "2x LowPass" ), new PixmapLoader( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "RC LowPass 12dB" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC BandPass 12dB" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC HighPass 12dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "RC LowPass 24dB" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );	
-	m_filterModel.addItem( tr( "2x Moog" ), new PixmapLoader( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "SV LowPass" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "SV BandPass" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "SV HighPass" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "SV Notch" ), new PixmapLoader( "filter_notch" ) );
-	m_filterModel.addItem( tr( "Fast Formant" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Tripole" ), new PixmapLoader( "filter_lp" ) );
+	for( int i = 0; i < BasicFilters<0>::NumFilters; ++i )
+	{
+		m_filterModel.addItem( BasicFilterNames::nameTr( (BasicFilters<0>::FilterTypes) i ), 
+			new PixmapLoader( BasicFilterNames::pixmap( (BasicFilters<0>::FilterTypes) i ) ) );
+	}
 }
 
 
@@ -322,7 +305,7 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 
 void InstrumentSoundShaping::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	m_filterModel.saveSettings( _doc, _this, "ftype" );
+	_this.setAttribute( "ftype", BasicFilterNames::name( (BasicFilters<0>::FilterTypes) m_filterModel.value() ) );
 	m_filterCutModel.saveSettings( _doc, _this, "fcut" );
 	m_filterResModel.saveSettings( _doc, _this, "fres" );
 	m_filterEnabledModel.saveSettings( _doc, _this, "fwet" );
@@ -340,7 +323,15 @@ void InstrumentSoundShaping::saveSettings( QDomDocument & _doc, QDomElement & _t
 
 void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 {
-	m_filterModel.loadSettings( _this, "ftype" );
+	QString ftype = _this.attribute( "ftype" );
+	for( int i = 0; i < BasicFilters<0>::NumFilters; ++i )
+	{
+		if( ftype == BasicFilterNames::name( (BasicFilters<0>::FilterTypes) i ) )
+		{
+			m_filterModel.setValue( i );
+			break;
+		}
+	}
 	m_filterCutModel.loadSettings( _this, "fcut" );
 	m_filterResModel.loadSettings( _this, "fres" );
 	m_filterEnabledModel.loadSettings( _this, "fwet" );
