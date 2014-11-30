@@ -53,7 +53,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_sampleRate( Engine::mixer()->processingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = new sampleFrame[ Engine::mixer()->framesPerPeriod() ];
+	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
 	m_buffer.reset();
 	updateFilters( 0, 19 );
 }
@@ -61,16 +61,15 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 
 MultitapEchoEffect::~MultitapEchoEffect()
 {
-	delete m_work;
+	MM_FREE( m_work );
 }
 
 
 void MultitapEchoEffect::updateFilters( int begin, int end )
 {
 	for( int i = begin; i <= end; ++i )
-	{ 
-		m_filter[i][0].setFc( m_lpFreq[i] * m_sampleRatio );
-		m_filter[i][1].setFc( m_lpFreq[i] * m_sampleRatio );
+	{
+		setFilterFreq( m_lpFreq[i] * m_sampleRatio, m_filter[i] );
 	}
 }
 
@@ -79,8 +78,8 @@ void MultitapEchoEffect::runFilter( sampleFrame * dst, sampleFrame * src, Stereo
 {
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] = filter[0].update( src[f][0] );
-		dst[f][1] = filter[1].update( src[f][1] );
+		dst[f][0] = filter.update( src[f][0], 0 );
+		dst[f][1] = filter.update( src[f][1], 1 );
 	}
 }
 
@@ -119,7 +118,7 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	else
 	{
 		float offset = stepLength;
-		for( int i = 0; i < steps; ++i ) // add all steps swapped
+		for( int i = 0; i < steps; ++i ) // add all steps
 		{
 			runFilter( m_work, buf, m_filter[i], frames );
 			m_buffer.writeAddingMultiplied( m_work, offset, frames, m_amp[i] );

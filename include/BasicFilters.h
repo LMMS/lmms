@@ -47,8 +47,85 @@
 
 //#include <iostream>
 //#include <cstdlib>
+template<ch_cnt_t CHANNELS> class BasicFilters;
+template<ch_cnt_t CHANNELS>
+class BiQuad
+{
+	MM_OPERATORS
+public:
+	BiQuad() 
+	{
+		clearHistory();
+	}
+	virtual ~BiQuad() {}
+	
+	inline void setCoeffs( float a1, float a2, float b0, float b1, float b2 )
+	{
+		m_a1 = a1;
+		m_a2 = a2;
+		m_b0 = b0;
+		m_b1 = b1;
+		m_b2 = b2;
+	}
+	inline void clearHistory()
+	{
+		for( int i = 0; i < CHANNELS; ++i )
+		{
+			m_z1[i] = 0.0f;
+			m_z2[i] = 0.0f;
+		}
+	}
+	inline float update( float in, ch_cnt_t ch )
+	{
+		// biquad filter in transposed form
+		const float out = m_z1[ch] + m_b0 * in;
+		m_z1[ch] = m_b1 * in + m_z2[ch] - m_a1 * out;
+		m_z2[ch] = m_b2 * in - m_a2 * out;
+		return out;
+	}
+private:
+	float m_a1, m_a2, m_b0, m_b1, m_b2;
+	float m_z1 [CHANNELS], m_z2 [CHANNELS];
+	
+	friend class BasicFilters<CHANNELS>;
+};
+typedef BiQuad<2> StereoBiQuad;
 
-template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
+template<ch_cnt_t CHANNELS>
+class OnePole
+{
+	MM_OPERATORS
+public:
+	OnePole()
+	{
+		m_a0 = 1.0; 
+		m_b1 = 0.0;
+		for( int i = 0; i < CHANNELS; ++i )
+		{
+			m_z1[i] = 0.0;
+		}
+	}
+	virtual ~OnePole() {}
+	
+	inline void setCoeffs( float a0, float b1 )
+	{
+		m_a0 = a0;
+		m_b1 = b1;
+	}
+	
+	inline float update( float s, ch_cnt_t ch )
+	{
+		if( s < 1.0e-10f && m_z1[ch] < 1.0e-10f ) return 0.0f;
+		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
+	}
+	
+private:
+	float m_a0, m_b1; 
+	float m_z1 [CHANNELS];
+};
+typedef OnePole<2> StereoOnePole;
+
+template<ch_cnt_t CHANNELS>
 class BasicFilters
 {
 	MM_OPERATORS
@@ -130,12 +207,12 @@ public:
 
 	inline void clearHistory()
 	{
+		// reset in/out history for biquads
+		m_biQuad.clearHistory();
+
 		// reset in/out history
 		for( ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl )
 		{
-			// reset in/out history for simple filters
-			m_z1[_chnl] = m_z2[_chnl] = 0.0f;
-
 			// reset in/out history for moog-filter
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
 					m_oldx[_chnl] = m_oldy1[_chnl] =
@@ -534,10 +611,7 @@ public:
 			}
 
 			default:
-				// biquad filter in transposed form
-				out = m_z1[_chnl] + m_b0a0 * _in0;
-				m_z1[_chnl] = m_b1a0 * _in0 + m_z2[_chnl] - m_a1a0 * out;
-				m_z2[_chnl] = m_b2a0 * _in0 - m_a2a0 * out;
+				out = m_biQuad.update( _in0, _chnl );
 				break;
 		}
 
@@ -665,59 +739,61 @@ public:
 
 		const float a0 = 1.0f / ( 1.0f + alpha );
 
-		m_a1a0 = -2.0f * tcos * a0;
-		m_a2a0 = ( 1.0f - alpha ) * a0;
+		const float a1 = -2.0f * tcos * a0;
+		const float a2 = ( 1.0f - alpha ) * a0;
 
 		switch( m_type )
 		{
 			case LowPass:
-				m_b1a0 = ( 1.0f - tcos ) * a0;
-				m_b0a0 = m_b1a0 * 0.5f;
-				m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
+			{
+				const float b1 = ( 1.0f - tcos ) * a0;
+				const float b0 = b1 * 0.5f;
+				m_biQuad.setCoeffs( a1, a2, b0, b1, b0 );
 				break;
+			}
 			case HiPass:
-				m_b1a0 = ( -1.0f - tcos ) * a0;
-				m_b0a0 = m_b1a0 * -0.5f;
-				m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
+			{
+				const float b1 = ( -1.0f - tcos ) * a0;
+				const float b0 = b1 * -0.5f;
+				m_biQuad.setCoeffs( a1, a2, b0, b1, b0 );
 				break;
+			}
 			case BandPass_CSG:
-				m_b1a0 = 0.0f;
-				m_b0a0 = tsin * a0;
-				m_b2a0 = -m_b0a0;
+			{
+				const float b0 = tsin * a0;
+				m_biQuad.setCoeffs( a1, a2, b0, 0.0f, -b0 );
 				break;
+			}
 			case BandPass_CZPG:
-				m_b1a0 = 0.0f;
-				m_b0a0 = alpha * a0;
-				m_b2a0 = -m_b0a0;
+			{
+				const float b0 = alpha * a0;
+				m_biQuad.setCoeffs( a1, a2, b0, 0.0f, -b0 );
 				break;
+			}
 			case Notch:
-				m_b1a0 = m_a1a0;
-				m_b0a0 = a0;
-				m_b2a0 = a0;
+			{
+				m_biQuad.setCoeffs( a1, a2, a0, a1, a0 );
 				break;
+			}
 			case AllPass:
-				m_b1a0 = m_a1a0;
-				m_b0a0 = m_a2a0;
-				m_b2a0 = 1.0f;//(1.0f+alpha)*a0;
+			{
+				m_biQuad.setCoeffs( a1, a2, a2, a1, 1.0f );
 				break;
+			}
 			default:
 				break;
 		}
 
 		if( m_doubleFilter )
 		{
-			m_subFilter->m_b0a0 = m_b0a0;
-			m_subFilter->m_b1a0 = m_b1a0;
-			m_subFilter->m_b2a0 = m_b2a0;
-			m_subFilter->m_a1a0 = m_a1a0;
-			m_subFilter->m_a2a0 = m_a2a0;
+			m_subFilter->m_biQuad.setCoeffs( m_biQuad.m_a1, m_biQuad.m_a2, m_biQuad.m_b0, m_biQuad.m_b1, m_biQuad.m_b2 );
 		}
 	}
 
 
 private:
-	// filter coeffs
-	float m_b0a0, m_b1a0, m_b2a0, m_a1a0, m_a2a0;
+	// biquad filter
+	BiQuad<CHANNELS> m_biQuad;
 
 	// coeffs for moog-filter
 	float m_r, m_p, m_k;
@@ -732,9 +808,6 @@ private:
 	float m_svf1, m_svf2, m_svq, m_svsr;
 
 	typedef sample_t frame[CHANNELS];
-
-	// in/out history
-	frame m_z1, m_z2;
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
