@@ -87,7 +87,7 @@ private:
 	float m_a1, m_a2, m_b0, m_b1, m_b2;
 	float m_z1 [CHANNELS], m_z2 [CHANNELS];
 	
-	friend class BasicFilters<CHANNELS>;
+	friend class BasicFilters<CHANNELS>; // needed for subfilter stuff in BasicFilters
 };
 typedef BiQuad<2> StereoBiQuad;
 
@@ -115,7 +115,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if( s < 1.0e-10f && m_z1[ch] < 1.0e-10f ) return 0.0f;
+		if( qAbs( s ) < 1.0e-10f && qAbs( m_z1[ch] ) < 1.0e-10f ) return 0.0f;
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -516,6 +516,7 @@ public:
 			case Formantfilter:
 			case FastFormant:
 			{
+				if( qAbs( _in0 ) < 1.0e-10f && qAbs( m_vflast[0][_chnl] ) < 1.0e-10f ) { return 0.0f; } // performance hack - skip processing when the numbers get too small
 				sample_t hp, bp, in;
 
 				out = 0;

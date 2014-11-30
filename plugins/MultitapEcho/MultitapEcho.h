@@ -55,13 +55,15 @@ private:
 		f.setCoeffs( 1.0f - b1, b1 );
 	}
 
+	int m_stages;
+
 	MultitapEchoControls m_controls;
 	
-	float m_amp [20];
-	float m_lpFreq [20];
+	float m_amp [32];
+	float m_lpFreq [32];
 
 	RingBuffer m_buffer;
-	StereoOnePole m_filter [20];
+	StereoOnePole m_filter [32][4];
 	
 	float m_sampleRate;
 	float m_sampleRatio;

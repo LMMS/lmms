@@ -53,7 +53,7 @@ public:
 
 	virtual int controlCount()
 	{
-		return( 4 );
+		return( 5 );
 	}
 
 	virtual EffectControlDialog * createView()
@@ -78,6 +78,7 @@ private:
 	
 	FloatModel m_dryGain;
 	BoolModel m_swapInputs;
+	FloatModel m_stages;
 	
 	graphModel m_ampGraph;
 	graphModel m_lpGraph;
