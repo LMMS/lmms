@@ -48,6 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 
 MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &multitapecho_plugin_descriptor, parent, key ),
+	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 20100.0f ),
 	m_sampleRate( Engine::mixer()->processingSampleRate() ),
@@ -55,6 +56,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 {
 	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
 	m_buffer.reset();
+	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
 }
 
@@ -69,7 +71,10 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 {
 	for( int i = begin; i <= end; ++i )
 	{
-		setFilterFreq( m_lpFreq[i] * m_sampleRatio, m_filter[i] );
+		for( int s = 0; s < m_stages; ++s )
+		{
+			setFilterFreq( m_lpFreq[i] * m_sampleRatio, m_filter[i][s] );
+		}
 	}
 }
 
@@ -101,6 +106,13 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	const float dryGain = dbvToAmp( m_controls.m_dryGain.value() );
 	const bool swapInputs = m_controls.m_swapInputs.value();
 	
+	// check if number of stages has changed
+	if( m_controls.m_stages.isValueChanged() )
+	{
+		m_stages = static_cast<int>( m_controls.m_stages.value() );
+		updateFilters( 0, steps - 1 );
+	}
+	
 	// add dry buffer - never swap inputs for dry
 	m_buffer.writeAddingMultiplied( buf, 0, frames, dryGain );
 	
@@ -110,7 +122,10 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 		float offset = stepLength;
 		for( int i = 0; i < steps; ++i ) // add all steps swapped
 		{
-			runFilter( m_work, buf, m_filter[i], frames );
+			for( int s = 0; s < m_stages; ++s )
+			{
+				runFilter( m_work, buf, m_filter[i][s], frames );
+			}
 			m_buffer.writeSwappedAddingMultiplied( m_work, offset, frames, m_amp[i] );
 			offset += stepLength;
 		}
@@ -120,7 +135,10 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 		float offset = stepLength;
 		for( int i = 0; i < steps; ++i ) // add all steps
 		{
-			runFilter( m_work, buf, m_filter[i], frames );
+			for( int s = 0; s < m_stages; ++s )
+			{
+				runFilter( m_work, buf, m_filter[i][s], frames );
+			}
 			m_buffer.writeAddingMultiplied( m_work, offset, frames, m_amp[i] );
 			offset += stepLength;
 		}

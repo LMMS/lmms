@@ -73,27 +73,32 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	// steps spinbox
 	
 	LcdSpinBox * steps = new LcdSpinBox( 2, this, "Steps" );
-	steps->move( 20, 240 );
+	steps->move( 20, 245 );
 	steps->setModel( & controls->m_steps );
 	
 	// knobs
 
 	TempoSyncKnob * stepLength = new TempoSyncKnob( knobBright_26, this );
-	stepLength->move( 130, 240 );
+	stepLength->move( 100, 245 );
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setLabel( tr( "Length" ) );
-	stepLength->setHintText( tr( "Step length:" ) + " ", "ms" );
+	stepLength->setHintText( tr( "Step length:" ) + " ", " ms" );
 	
 	Knob * dryGain = new Knob( knobBright_26, this );
-	dryGain->move( 180, 240 );
+	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setLabel( tr( "Dry" ) );
-	dryGain->setHintText( tr( "Dry Gain:" ) + " ", "dBV" );
-	
+	dryGain->setHintText( tr( "Dry Gain:" ) + " ", " dBV" );
+
+	Knob * stages = new Knob( knobBright_26, this );
+	stages->move( 200, 245 );
+	stages->setModel( & controls->m_stages );
+	stages->setLabel( tr( "Stages" ) );
+	stages->setHintText( tr( "Lowpass stages:" ) + " ", "x" );	
 	// switch led
 	
 	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
-	swapInputs->move( 20, 270 );
+	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
 	ToolTip::add( swapInputs, tr( "Swap left and right input channel for reflections" ) );
 }

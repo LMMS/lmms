@@ -34,13 +34,15 @@
 MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 	EffectControls( eff ),
 	m_effect( eff ),
-	m_steps( 16, 4, 20, this, "Steps" ),
+	m_steps( 16, 4, 32, this, "Steps" ),
 	m_stepLength( 100.0f, 1.0f, 1000.0f, 0.1f, 1000.0f, this, "Step length" ),
 	m_dryGain( 0.0f, -80.0f, 20.0f, 0.1f, this, "Dry gain" ),
 	m_swapInputs( false, this, "Swap inputs" ),
+	m_stages( 1.0f, 1.0f, 4.0f, 1.0f, this, "Lowpass stages" ),
 	m_ampGraph( -60.0f, 0.0f, 16, this ),
 	m_lpGraph( 0.0f, 3.0f, 16, this )
 {
+	m_stages.setStrictStepSize( true );
 	connect( &m_ampGraph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( ampSamplesChanged( int, int ) ) );
 	connect( &m_lpGraph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( lpSamplesChanged( int, int ) ) );
 
@@ -63,6 +65,7 @@ void MultitapEchoControls::saveSettings( QDomDocument & doc, QDomElement & paren
 	m_stepLength.saveSettings( doc, parent, "steplength" );
 	m_dryGain.saveSettings( doc, parent, "drygain" );
 	m_swapInputs.saveSettings( doc, parent, "swapinputs" );
+	m_stages.saveSettings( doc, parent, "stages" );
 	
 	QString ampString;
 	base64::encode( (const char *) m_ampGraph.samples(), m_ampGraph.length() * sizeof(float), ampString );
@@ -80,6 +83,7 @@ void MultitapEchoControls::loadSettings( const QDomElement & elem )
 	m_stepLength.loadSettings( elem, "steplength" );
 	m_dryGain.loadSettings( elem, "drygain" );
 	m_swapInputs.loadSettings( elem, "swapinputs" );
+	m_stages.loadSettings( elem, "stages" );
 	
 	int size = 0;
 	char * dst = 0;
