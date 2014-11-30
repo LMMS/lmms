@@ -84,12 +84,12 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	if( m_dfControls.m_filter1Model.isValueChanged() )
+    if( m_dfControls.m_filter1Model.isValueChanged() || m_filter1changed )
 	{
 		m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
 		m_filter1changed = true;
 	}
-	if( m_dfControls.m_filter2Model.isValueChanged() )
+    if( m_dfControls.m_filter2Model.isValueChanged() || m_filter2changed )
 	{
 		m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
 		m_filter2changed = true;
