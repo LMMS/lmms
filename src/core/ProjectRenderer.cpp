@@ -160,6 +160,8 @@ void ProjectRenderer::run()
 
 
 	Engine::getSong()->startExport();
+    //skip first empty buffer
+    Engine::mixer()->nextBuffer();
 
 	Song::playPos & pp = Engine::getSong()->getPlayPos(
 							Song::Mode_PlaySong );

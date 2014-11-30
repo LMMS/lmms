@@ -124,6 +124,25 @@ void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, in
 }
 
 
+struct AddSwappedMultipliedOp
+{
+	AddSwappedMultipliedOp( float coeff ) : m_coeff( coeff ) { }
+
+	void operator()( sampleFrame& dst, const sampleFrame& src ) const
+	{
+		dst[0] += src[1] * m_coeff;
+		dst[1] += src[0] * m_coeff;
+	}
+
+	const float m_coeff;
+};
+
+void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
+{
+	run<>( dst, src, frames, AddSwappedMultipliedOp(coeffSrc) );
+}
+
+
 void addMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
 {
 	for( int f = 0; f < frames; ++f )

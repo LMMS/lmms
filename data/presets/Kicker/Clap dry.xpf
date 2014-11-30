@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.98" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Dry Clap" solo="0">
+    <instrumenttrack pan="0" fxch="0" scale_type="linear" pitchrange="1" pitch="0" basenote="57" vol="100">
+      <instrument name="kicker">
+        <kicker decay_numerator="4" decay_denominator="4" distend="0" click="0.4" endnote="0" version="1" decay="223" syncmode="0" noise="1" slope="0.06" dist="0" env="0.568" scale_type="linear" startnote="0" startfreq="150" endfreq="40" gain="1"/>
+      </instrument>
+      <eldata scale_type="linear" fres="1.64" ftype="0" fcut="3114" fwet="0">
+        <elvol lspd_denominator="4" sustain="0" pdel="0" userwavefile="" dec="0.357" lamt="-1" syncmode="0" latt="0" rel="0" amt="1" x100="1" att="0" lpdel="0" hold="0" lshp="2" lspd="0.0997" ctlenvamt="0" lspd_numerator="4" scale_type="linear"/>
+        <elcut lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="1" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="2" lspd="0.001" ctlenvamt="1" lspd_numerator="4" scale_type="linear"/>
+        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" scale_type="linear"/>
+      </eldata>
+      <chordcreator chord="0" scale_type="linear" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" scale_type="linear" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" scale_type="linear" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+      <fxchain numofeffects="2" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" scale_type="linear" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="10">
+            <port02 scale_type="linear" data="-47.97"/>
+            <port03 scale_type="linear" data="0"/>
+            <port04 scale_type="linear" data="0"/>
+            <port05 scale_type="linear" data="0"/>
+            <port06 scale_type="linear" data="0"/>
+            <port07 scale_type="linear" data="0"/>
+            <port08 scale_type="linear" data="0"/>
+            <port09 scale_type="linear" data="2.07"/>
+            <port010 scale_type="linear" data="5.67"/>
+            <port011 scale_type="linear" data="2.7"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps" name="file"/>
+            <attribute value="Eq2x2" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" scale_type="linear" autoquit="1" gate="0" name="dualfilter" wet="1" on="1">
+          <DualFilterControls gain2="100" cut1="1721" cut2="6461" mix="-0.4" res1="1.64" res2="0.5" scale_type="linear" filter1="0" filter2="1" enabled1="1" enabled2="1" gain1="100"/>
+          <key/>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

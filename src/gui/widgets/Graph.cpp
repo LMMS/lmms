@@ -217,14 +217,17 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 	int xstep = _x > _lastx ? -1 : 1;
 	float ystep = ( lastval - val ) / linelen;
 
+	int start = INT_MAX;
+	int end = 0;
 	// draw a line
 	for ( int i = 0; i < linelen; i++ )
 	{
-		int x = (_x + (i * xstep));		// get x value
-		model()->drawSampleAt( (int)( x * xscale ), val + (i * ystep));
+		int x = (_x + (i * xstep)) * xscale;		// get x value
+		model()->drawSampleAt( x, val + (i * ystep));
+		start = qMin( start, x );
+		end = qMax( end, x );
 	}
-	int start = qMin( _x, _x + ( ( linelen - 1 ) * xstep ) );
-	int end = qMax( _x, _x + ( ( linelen - 1 ) * xstep ) );
+	
 	model()->samplesChanged( start, end );
 }
 
@@ -362,7 +365,7 @@ void Graph::paintEvent( QPaintEvent * )
 							qMax( static_cast<int>( ( minVal - maxVal ) * yscale ) - static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ), 1 ),
 							gcol );
 
-				p.setPen( QPen( m_graphColor, 1 ) );
+				p.setPen( QPen( m_graphColor, 1.0 ) );
 
 				p.drawLine( 2+static_cast<int>(i*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
@@ -444,6 +447,7 @@ graphModel::graphModel( float _min, float _max, int _length,
 			::Model * _parent, bool _default_constructed,  float _step ) :
 	Model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
+	m_length( _length ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
 	m_step( _step )
@@ -482,9 +486,13 @@ void graphModel::setRange( float _min, float _max )
 
 void graphModel::setLength( int _length )
 {
-	if( _length != length() )
+	if( _length != m_length )
 	{
-		m_samples.resize( _length );
+		m_length = _length;
+		if( m_samples.size() < m_length )
+		{
+			m_samples.resize( m_length );
+		}
 		emit lengthChanged();
 	}
 }
