@@ -50,7 +50,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	Effect( &multitapecho_plugin_descriptor, parent, key ),
 	m_stages( 1 ),
 	m_controls( this ),
-	m_buffer( 20100.0f ),
+	m_buffer( 16100.0f ),
 	m_sampleRate( Engine::mixer()->processingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
