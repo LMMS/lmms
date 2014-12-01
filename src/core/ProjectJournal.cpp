@@ -168,5 +168,17 @@ void ProjectJournal::clearJournal()
 	}
 }
 
+void ProjectJournal::stopAllJournalling()
+{
+	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
+	{
+		if( it.value() != NULL ) 
+		{
+			it.value()->setJournalling(false);
+		}
+	}
+	setJournalling(false);
+}
+
 
 
