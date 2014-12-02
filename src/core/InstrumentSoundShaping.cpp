@@ -81,7 +81,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 
 	for( int i = 0; i < BasicFilters<0>::NumFilters; ++i )
 	{
-		m_filterModel.addItem( BasicFilterNames::nameTr( (BasicFilters<0>::FilterTypes) i ), 
+		m_filterModel.addItem( BasicFilterNames::name( (BasicFilters<0>::FilterTypes) i, true ), 
 			new PixmapLoader( BasicFilterNames::pixmap( (BasicFilters<0>::FilterTypes) i ) ) );
 	}
 }

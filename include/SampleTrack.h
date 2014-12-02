@@ -40,7 +40,7 @@ class SampleTCO : public TrackContentObject
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleTCO( Track * _track );
+	SampleTCO( Track * _track, const MidiTime & pos );
 	virtual ~SampleTCO();
 
 	virtual void changeLength( const MidiTime & _length );

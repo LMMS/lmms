@@ -320,9 +320,9 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject * AutomationTrack::createTCO( const MidiTime & pos )
 {
-	return new AutomationPattern( this );
+	return new AutomationPattern( this, pos );
 }
 
 

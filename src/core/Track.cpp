@@ -100,12 +100,12 @@ TextFloat * TrackContentObjectView::s_textFloat = NULL;
  *
  * \param _track The track that will contain the new object
  */
-TrackContentObject::TrackContentObject( Track * _track ) :
+TrackContentObject::TrackContentObject( Track * _track, const MidiTime & position ) :
 	Model( _track ),
 	m_track( _track ),
 	m_name( QString::null ),
-	m_startPosition(),
-	m_length(),
+	m_startPosition( position ),
+	m_length( 0 ),
 	m_mutedModel( false, this, tr( "Muted" ) ),
 	m_selectViewOnCreate( false )
 {
@@ -113,9 +113,6 @@ TrackContentObject::TrackContentObject( Track * _track ) :
 	{
 		getTrack()->addTCO( this );
 	}
-	setJournalling( false );
-	movePosition( 0 );
-	changeLength( 0 );
 	setJournalling( true );
 }
 
@@ -151,7 +148,7 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 {
 	if( m_startPosition != pos )
 	{
-		if( m_track && m_track->hasTCOsInRange( pos + 1, pos + m_length - 1, this ) ) // check against overlap
+		if( m_track && ! m_track->allowsOverlap() && m_track->hasTCOsInRange( pos, pos + m_length - 1, this ) ) // check against overlap
 		{
 				return;
 		}
@@ -166,7 +163,7 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 
 /*! \brief Change the length of this TrackContentObject
  *
- *  If the track content object's length has chaanged, update it.  We
+ *  If the track content object's length has changed, update it.  We
  *  also add a journal entry for undo and update the display.
  *
  * \param _length The new length of the track content object.
@@ -175,11 +172,11 @@ void TrackContentObject::changeLength( const MidiTime & length )
 {
 	if( m_length != length )
 	{
-		if( m_track && length > m_length ) // if we're increasing the length, we have to check against overlap
+		if( m_track && ! m_track->allowsOverlap() && length > m_length ) // if we're increasing the length, we have to check against overlap
 											// but only if we actually have a track - inline automation patterns and other
 											// trackless TCO's get a pass
 		{
-			if( m_track->hasTCOsInRange( m_startPosition + 1, m_startPosition + length - 1, this ) )
+			if( m_track->hasTCOsInRange( m_startPosition, m_startPosition + length - 1, this ) )
 			{
 				return; // bail to prevent overlap
 			}
@@ -1457,12 +1454,12 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		const MidiTime pos = getPosition( _me->x() ).getTact() *
 						MidiTime::ticksPerTact();
-		TrackContentObject * tco = getTrack()->createTCO( pos );
-
-		tco->saveJournallingState( false );
-		tco->movePosition( pos );
-		tco->restoreJournallingState();
-
+		if( getTrack()->allowsOverlap() || ! getTrack()->hasTCOsInRange( pos, pos, NULL ) )
+		{
+			TrackContentObject * tco = getTrack()->createTCO( pos );
+			tco->saveJournallingState( false );
+			tco->restoreJournallingState();
+		}
 	}
 }
 
@@ -1828,11 +1825,12 @@ Track::Track( TrackTypes _type, TrackContainer * _tc ) :
 	m_type( _type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
 	m_mutedModel( false, this, tr( "Muted" ) ),
-					 /*!< For controlling track muting */
+									/*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ),
-					/*!< For controlling track soloing */
+									/*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects()         /*!< The track content objects (segments) */
+	m_trackContentObjects(),		/*!< The track content objects (segments) */
+	m_allowsOverlap( true ) 		/*!< Can TCOs overlap */
 {
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -1899,11 +1897,13 @@ Track * Track::create( TrackTypes _tt, TrackContainer * _tc )
 		case AutomationTrack:
 		{
 			t = new ::AutomationTrack( _tc );
+			t->setAllowsOverlap( false );
 			break;
 		}
 		case HiddenAutomationTrack:
 		{
 			t = new ::AutomationTrack( _tc, true );
+			t->setAllowsOverlap( false );
 			break;
 		}
 		case TempoTrack:
@@ -1911,6 +1911,7 @@ Track * Track::create( TrackTypes _tt, TrackContainer * _tc )
 			::TempoTrack * tt = new ::TempoTrack( _tc );
 			Engine::setTempoTrack( tt );
 			t = tt;
+			t->setAllowsOverlap( false );
 			break;
 		}
 		default:
@@ -2264,7 +2265,7 @@ bool Track::hasTCOsInRange( const MidiTime & start, const MidiTime & end, TrackC
 				it_o != m_trackContentObjects.end(); ++it_o )
 	{
 		TrackContentObject * tco = ( *it_o );
-		if( tco == otherThan ) { continue; } // excluded TCO, skip to next
+		if( tco == otherThan || tco->length() <= 0 ) { continue; } // excluded TCO or no-length, skip to next
 		int s = tco->startPosition();
 		int e = tco->endPosition();
 		if( ( s <= end ) && ( e >= start ) )

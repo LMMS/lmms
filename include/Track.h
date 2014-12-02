@@ -81,7 +81,7 @@ class TrackContentObject : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	TrackContentObject( Track * _track );
+	TrackContentObject( Track * _track, const MidiTime & position );
 	virtual ~TrackContentObject();
 
 	inline Track * getTrack() const
@@ -528,6 +528,16 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
+	
+	bool allowsOverlap() const
+	{
+		return m_allowsOverlap;
+	}
+	
+	void setAllowsOverlap( bool b )
+	{
+		m_allowsOverlap = b;
+	}
 
 public slots:
 	virtual void setName( const QString & _new_name )
@@ -554,6 +564,8 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
+
+	bool m_allowsOverlap;
 
 	friend class TrackView;
 

@@ -109,7 +109,7 @@ class TempoPattern : public AutomationPattern
 {
 	Q_OBJECT
 public:
-	TempoPattern( TempoTrack * tt );
+	TempoPattern( TempoTrack * tt, const MidiTime & pos );
 	TempoPattern( const TempoPattern & tpToCopy );
 	virtual ~TempoPattern();
 	

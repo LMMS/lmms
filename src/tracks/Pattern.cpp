@@ -58,8 +58,8 @@ QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
 
 
-Pattern::Pattern( InstrumentTrack * _instrument_track ) :
-	TrackContentObject( _instrument_track ),
+Pattern::Pattern( InstrumentTrack * _instrument_track, const MidiTime & position ) :
+	TrackContentObject( _instrument_track, position ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerTact() )
@@ -72,7 +72,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 
 
 Pattern::Pattern( const Pattern& other ) :
-	TrackContentObject( other.m_instrumentTrack ),
+	TrackContentObject( other.m_instrumentTrack, MidiTime( 0 ) ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
 	m_steps( other.m_steps )

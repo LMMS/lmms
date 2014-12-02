@@ -46,8 +46,8 @@
 BBTrack::infoMap BBTrack::s_infoMap;
 
 
-BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track ),
+BBTCO::BBTCO( Track * _track, const MidiTime & pos ) :
+	TrackContentObject( _track, pos ),
 	m_color( 128, 128, 128 ),
 	m_useStyleColor( true )
 {
@@ -462,7 +462,7 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
 {
-	BBTCO * bbtco = new BBTCO( this );
+	BBTCO * bbtco = new BBTCO( this, _pos );
 	if( s_lastTCOColor )
 	{
 		bbtco->setColor( *s_lastTCOColor );

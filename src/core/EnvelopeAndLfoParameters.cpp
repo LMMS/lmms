@@ -457,7 +457,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	const float rfI = ( 1.0f / m_rFrames ) * m_amount;
 	for( f_cnt_t i = 0; i < m_rFrames; ++i )
 	{
-		m_rEnv[i] = (float)( m_rFrames - i ) * rfI + amsum;
+		m_rEnv[i] = (float)( m_rFrames - i ) * rfI + aa;
 	}
 
 	// save this calculation in real-time-part

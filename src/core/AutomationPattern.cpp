@@ -44,8 +44,8 @@ const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
 const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
 
-AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
-	TrackContentObject( auto_track ),
+AutomationPattern::AutomationPattern( AutomationTrack * auto_track, const MidiTime & pos ) :
+	TrackContentObject( auto_track, pos ),
 	m_autoTrack( auto_track ),
 	m_tension( 1.0 ),
 	m_progressionType( DiscreteProgression ),
@@ -66,7 +66,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * auto_track ) :
 
 
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
-	TrackContentObject( _pat_to_copy.m_autoTrack ),
+	TrackContentObject( _pat_to_copy.m_autoTrack, MidiTime( 0 ) ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_tension( _pat_to_copy.m_tension ),
 	m_progressionType( _pat_to_copy.m_progressionType ),

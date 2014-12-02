@@ -56,7 +56,7 @@ public:
 		MelodyPattern
 	} ;
 
-	Pattern( InstrumentTrack* instrumentTrack );
+	Pattern( InstrumentTrack* instrumentTrack, const MidiTime & position );
 	Pattern( const Pattern& other );
 	virtual ~Pattern();
 

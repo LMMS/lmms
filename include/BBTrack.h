@@ -39,7 +39,7 @@ class TrackContainer;
 class BBTCO : public TrackContentObject
 {
 public:
-	BBTCO( Track * _track );
+	BBTCO( Track * _track, const MidiTime & pos );
 	virtual ~BBTCO();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

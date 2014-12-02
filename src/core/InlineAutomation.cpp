@@ -26,6 +26,7 @@
 
 #include "InlineAutomation.h"
 #include "AutomationPattern.h"
+#include "MidiTime.h"
 
 InlineAutomation::InlineAutomation() :
 		FloatModel(),
@@ -69,7 +70,7 @@ AutomationPattern * InlineAutomation::automationPattern()
 {
 	if( m_autoPattern == NULL )
 	{
-		m_autoPattern = new AutomationPattern( NULL );
+		m_autoPattern = new AutomationPattern( NULL, MidiTime( 0 ) );
 		m_autoPattern->addInlineObject( this );
 	}
 	return m_autoPattern;

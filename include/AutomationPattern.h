@@ -47,7 +47,7 @@ public:
 		CubicHermiteProgression
 	} ;
 
-	AutomationPattern( AutomationTrack * _auto_track );
+	AutomationPattern( AutomationTrack * _auto_track, const MidiTime & pos );
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
 	virtual ~AutomationPattern();
 

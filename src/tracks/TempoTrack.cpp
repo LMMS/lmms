@@ -67,7 +67,7 @@ TrackView * TempoTrack::createView( TrackContainerView * tcv )
 
 TrackContentObject * TempoTrack::createTCO( const MidiTime & _pos )
 {
-	return new TempoPattern( this );
+	return new TempoPattern( this, _pos );
 }
 
 
@@ -82,8 +82,8 @@ void TempoTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-TempoPattern::TempoPattern( TempoTrack * tt ) :
-	AutomationPattern( tt )
+TempoPattern::TempoPattern( TempoTrack * tt, const MidiTime & pos ) :
+	AutomationPattern( tt, pos )
 {
 	setTempoPattern( true );
 	putValue( MidiTime(0), Engine::getSong()->getTempo() ); // initialize with value from tempo widget
