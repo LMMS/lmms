@@ -133,6 +133,10 @@ void AutomationPattern::setProgressionType(
 	{
 		m_progressionType = _new_progression_type;
 		emit dataChanged();
+		if( m_isTempoPattern )
+		{
+			updateTempoMaps();
+		}
 	}
 }
 

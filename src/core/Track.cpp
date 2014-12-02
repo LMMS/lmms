@@ -2225,6 +2225,11 @@ void Track::getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
 				it_o != m_trackContentObjects.end(); ++it_o )
 	{
 		TrackContentObject * tco = ( *it_o );
+		if( tco->length() <= 0 ) // get rid of 0-length patterns
+		{
+			tco->deleteLater();
+			continue;
+		}
 		int s = tco->startPosition();
 		int e = tco->endPosition();
 		if( ( s <= _end ) && ( e >= _start ) )
