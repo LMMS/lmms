@@ -149,7 +149,9 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 
 SampleBuffer::~SampleBuffer()
 {
-	MM_FREE( m_origData );
+	if( m_origData != NULL )
+		MM_FREE( m_origData );
+
 	MM_FREE( m_data );
 }
 
