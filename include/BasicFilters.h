@@ -45,9 +45,109 @@
 #include "interpolation.h"
 #include "MemoryManager.h"
 
-//#include <iostream>
-//#include <cstdlib>
 template<ch_cnt_t CHANNELS> class BasicFilters;
+
+template<ch_cnt_t CHANNELS>
+class LinkwitzRiley
+{
+	MM_OPERATORS
+public:
+	LinkwitzRiley( float sampleRate )
+	{
+		m_sampleRate = sampleRate;
+		clearHistory();
+	}
+	virtual ~LinkwitzRiley() {}
+
+	inline void clearHistory()
+	{
+		for( int i = 0; i < CHANNELS; ++i )
+		{
+			m_x1[i] = m_x2[i] = m_x3[i] = m_x4[i] = 0.0f;
+			m_y1[i] = m_y2[i] = m_y3[i] = m_y4[i] = 0.0f;
+		}
+	}
+
+	inline void setSampleRate( float sampleRate )
+	{
+		m_sampleRate = sampleRate;
+	}
+
+	inline void setCoeffs( float freq )
+	{
+		// wc
+		const float wc = F_2PI * freq;
+		const float wc2 = wc * wc;
+		const float wc3 = wc2 * wc;
+		m_wc4 = wc2 * wc2;
+
+		// k
+		const float k = wc / tanf( F_PI * freq / m_sampleRate );
+		const float k2 = k * k;
+		const float k3 = k2 * k;
+		m_k4 = k2 * k2;
+
+		// a
+		static const float sqrt2 = sqrtf( 2.0f );
+		const float sq_tmp1 = sqrt2 * wc3 * k;
+		const float sq_tmp2 = sqrt2 * wc * k3;
+		m_a = 4.0f * wc2 * k2 + 2.0f * sq_tmp1 + m_k4 + 2.0f * sq_tmp2 + m_wc4;
+
+		// b
+		m_b1 = ( 4.0f * ( m_wc4 + sq_tmp1 - m_k4 - sq_tmp2 ) ) / m_a;
+		m_b2 = ( 6.0f * m_wc4 - 8.0f * wc2 * k2 + 6.0f * m_k4 ) / m_a;
+		m_b3 = ( 4.0f * ( m_wc4 - sq_tmp1 + sq_tmp2 - m_k4 ) ) / m_a;
+		m_b4 = ( m_k4 - 2.0f * sq_tmp1 + m_wc4 - 2.0f * sq_tmp2 + 4.0f * wc2 * k2 ) / m_a;
+	}
+
+	inline void setLowpass( float freq )
+	{
+		setCoeffs( freq );
+		m_a0 = m_wc4 / m_a;
+		m_a1 = 4.0f * m_a0;
+		m_a2 = 6.0f * m_a0;
+	}
+	
+	inline void setHighpass( float freq )
+	{
+		setCoeffs( freq );
+		m_a0 = m_k4 / m_a;
+		m_a1 = 4.0f * m_a0;
+		m_a2 = 6.0f * m_a0;
+	}
+	
+	inline float update( float in, ch_cnt_t ch )
+	{
+		const float tmpy = m_a0 * in + m_a1 * m_x1[ch] + m_a2 * m_x2[ch] +
+							m_a1 * m_x3[ch] + m_a0 * m_x4[ch] - m_b1 * m_y1[ch] -
+							m_b2 * m_y2[ch] - m_b3 * m_y3[ch] - m_b4 * m_y4[ch];
+		
+		m_x4[ch] = m_x3[ch];
+		m_x3[ch] = m_x2[ch];
+		m_x2[ch] = m_x1[ch];
+		m_x1[ch] = in;
+		
+		m_y4[ch] = m_y3[ch];
+		m_y3[ch] = m_y2[ch];
+		m_y2[ch] = m_y1[ch];
+		m_y1[ch] = tmpy;
+		
+		return tmpy;
+	}
+
+private:
+	float m_sampleRate;
+	float m_wc4;
+	float m_k4;
+	float m_a, m_a0, m_a1, m_a2;
+	float m_b1, m_b2, m_b3, m_b4;
+	
+	typedef float frame[CHANNELS];
+	frame m_x1, m_x2, m_x3, m_x4;
+	frame m_y1, m_y2, m_y3, m_y4;
+};
+typedef LinkwitzRiley<2> StereoLinkwitzRiley;
+
 template<ch_cnt_t CHANNELS>
 class BiQuad
 {
