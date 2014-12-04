@@ -63,8 +63,7 @@ public:
 	{
 		for( int i = 0; i < CHANNELS; ++i )
 		{
-			m_x1[i] = m_x2[i] = m_x3[i] = m_x4[i] = 0.0f;
-			m_y1[i] = m_y2[i] = m_y3[i] = m_y4[i] = 0.0f;
+			m_z1[i] = m_z2[i] = m_z3[i] = m_z4[i] = 0.0f;
 		}
 	}
 
@@ -115,24 +114,19 @@ public:
 		m_a1 = 4.0f * m_a0;
 		m_a2 = 6.0f * m_a0;
 	}
-	
+
 	inline float update( float in, ch_cnt_t ch )
 	{
-		const float tmpy = m_a0 * in + m_a1 * m_x1[ch] + m_a2 * m_x2[ch] +
-							m_a1 * m_x3[ch] + m_a0 * m_x4[ch] - m_b1 * m_y1[ch] -
-							m_b2 * m_y2[ch] - m_b3 * m_y3[ch] - m_b4 * m_y4[ch];
+		const float a0in = m_a0 * in;
+		const float a1in = m_a1 * in;
+		const float out = m_z1[ch] + a0in;
 		
-		m_x4[ch] = m_x3[ch];
-		m_x3[ch] = m_x2[ch];
-		m_x2[ch] = m_x1[ch];
-		m_x1[ch] = in;
+		m_z1[ch] = a1in + m_z2[ch] - ( m_b1 * out );
+		m_z2[ch] = ( m_a2 * in ) + m_z3[ch] - ( m_b2 * out );
+		m_z3[ch] = a1in + m_z4[ch] - ( m_b3 * out );
+		m_z4[ch] = a0in - ( m_b4 * out );
 		
-		m_y4[ch] = m_y3[ch];
-		m_y3[ch] = m_y2[ch];
-		m_y2[ch] = m_y1[ch];
-		m_y1[ch] = tmpy;
-		
-		return tmpy;
+		return out;
 	}
 
 private:
@@ -143,8 +137,7 @@ private:
 	float m_b1, m_b2, m_b3, m_b4;
 	
 	typedef float frame[CHANNELS];
-	frame m_x1, m_x2, m_x3, m_x4;
-	frame m_y1, m_y2, m_y3, m_y4;
+	frame m_z1, m_z2, m_z3, m_z4;
 };
 typedef LinkwitzRiley<2> StereoLinkwitzRiley;
 
