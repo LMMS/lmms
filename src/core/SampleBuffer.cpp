@@ -1479,11 +1479,3 @@ SampleBuffer::handleState::~handleState()
 {
 	src_delete( m_resamplingData );
 }
-
-
-
-
-
-
-
-/* vim: set tw=0 noexpandtab: */
