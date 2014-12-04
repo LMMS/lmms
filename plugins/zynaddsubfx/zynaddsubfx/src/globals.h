@@ -80,7 +80,7 @@
 /*
  * Number of part's insertion effects
  */
-#define NUM_PART_EFX 8
+#define NUM_PART_EFX 3
 
 /*
  * Maximum number of the instrument on a part
