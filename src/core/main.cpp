@@ -542,6 +542,3 @@ int main( int argc, char * * argv )
 	
 	return( ret );
 }
-
-
-/* vim: set tw=0 noexpandtab: */
