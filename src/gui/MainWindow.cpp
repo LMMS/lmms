@@ -879,6 +879,7 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	else
 	{
 		parent->hide();
+		this->setFocus();
 	}
 
 	// Workaround for Qt Bug #260116
