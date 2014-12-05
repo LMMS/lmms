@@ -779,11 +779,3 @@ bool SongEditor::allowRubberband() const
 {
 	return( m_editModeButton->isChecked() );
 }
-
-
-
-
-
-
-
-/* vim: set tw=0 noexpandtab: */
