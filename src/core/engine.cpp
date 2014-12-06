@@ -115,6 +115,7 @@ void engine::init( const bool _has_gui )
 
 void engine::destroy()
 {
+	s_projectJournal->stopAllJournalling();
 	s_mixer->stopProcessing();
 
 	deleteHelper( &s_projectNotes );

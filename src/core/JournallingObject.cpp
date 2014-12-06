@@ -70,14 +70,19 @@ void JournallingObject::addJournalCheckPoint()
 QDomElement JournallingObject::saveState( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	QDomElement _this = SerializingObject::saveState( _doc, _parent );
+	if( isJournalling() ) 
+	{
+		QDomElement _this = SerializingObject::saveState( _doc, _parent );
 
-	QDomElement journalNode = _doc.createElement( "journallingObject" );
-	journalNode.setAttribute( "id", id() );
-	journalNode.setAttribute( "metadata", true );
-	_this.appendChild( journalNode );
+		QDomElement journalNode = _doc.createElement( "journallingObject" );
+		journalNode.setAttribute( "id", id() );
+		journalNode.setAttribute( "metadata", true );
+		_this.appendChild( journalNode );
 
-	return _this;
+		return _this;
+	} else {
+		return QDomElement();
+	}
 }
 
 
