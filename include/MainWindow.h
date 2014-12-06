@@ -147,6 +147,7 @@ private:
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
+	void refocus();
 
 
 	QMdiArea * m_workspace;
