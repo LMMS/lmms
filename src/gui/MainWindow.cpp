@@ -245,7 +245,7 @@ void MainWindow::finalize()
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
 				embed::getIconPixmap( "project_open_recent" ),
-					tr( "&Recently opened projects" ) );
+					tr( "&Recently Opened Projects" ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
 			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
@@ -257,7 +257,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::Key_S );
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "Save as new &version" ),
+					tr( "Save as New &Version" ),
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
@@ -275,7 +275,7 @@ void MainWindow::finalize()
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
-					tr( "E&xport tracks..." ),
+					tr( "E&xport Tracks..." ),
 					Engine::getSong(),
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
@@ -331,7 +331,7 @@ void MainWindow::finalize()
 	if( true )
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
-						tr( "Online help" ),
+						tr( "Online Help" ),
 						this, SLOT( browseHelp() ) );
 	}
 	else
@@ -341,7 +341,7 @@ void MainWindow::finalize()
 							this, SLOT( help() ) );
 	}
 	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
-					tr( "What's this?" ),
+					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
 	help_menu->addSeparator();
