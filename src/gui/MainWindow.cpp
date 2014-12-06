@@ -99,24 +99,24 @@ MainWindow::MainWindow() :
 				ConfigManager::inst()->userProjectsDir() + "*" +
 				ConfigManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
-							tr( "My projects" ),
+							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userSamplesDir() + "*" +
 				ConfigManager::inst()->factorySamplesDir(),
-					"*", tr( "My samples" ),
+					"*", tr( "My Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userPresetsDir() + "*" +
 				ConfigManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
-					tr( "My presets" ),
+					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My home" ),
+							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 
@@ -132,11 +132,11 @@ MainWindow::MainWindow() :
 #endif
 	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
-							tr( "My computer" ),
+							tr( "My Computer" ),
 #elif defined(LMMS_BUILD_APPLE)
 							tr( "Volumes" ),
 #else
-							tr( "Root directory" ),
+							tr( "Root Directory" ),
 #endif
 
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
@@ -721,7 +721,7 @@ void MainWindow::openProject()
 {
 	if( mayChangeProject() )
 	{
-		FileDialog ofd( this, tr( "Open project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
+		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
 
 		ofd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 		ofd.setFileMode( FileDialog::ExistingFiles );
@@ -786,7 +786,7 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
+	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project (*.mmpz *.mmp);;"
 				"LMMS Project Template (*.mpt)" ) );
 	QString f = Engine::getSong()->projectFileName();
