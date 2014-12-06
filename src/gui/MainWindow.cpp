@@ -879,7 +879,7 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	else
 	{
 		parent->hide();
-		this->setFocus();
+		refocus();
 	}
 
 	// Workaround for Qt Bug #260116
@@ -887,6 +887,38 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+}
+
+
+
+
+/*
+ * When an editor window with focus is toggled off, attempt to set focus
+ * to the next visible editor window, or if none are visible, set focus
+ * to the parent window.
+ */
+void MainWindow::refocus()
+{
+	QList<QWidget*> editors;
+	editors
+		<< Engine::songEditor()->parentWidget()
+		<< Engine::getBBEditor()->parentWidget()
+		<< Engine::pianoRoll()->parentWidget()
+		<< Engine::automationEditor()->parentWidget();
+
+	bool found = false;
+	QList<QWidget*>::Iterator editor;
+	for( editor = editors.begin(); editor != editors.end(); ++editor )
+	{
+		if( ! (*editor)->isHidden() ) {
+			(*editor)->setFocus();
+			found = true;
+			break;
+		}
+	}
+
+	if( ! found )
+		this->setFocus();
 }
 
 
