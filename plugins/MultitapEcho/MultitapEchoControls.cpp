@@ -35,7 +35,7 @@ MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 	EffectControls( eff ),
 	m_effect( eff ),
 	m_steps( 16, 4, 32, this, "Steps" ),
-	m_stepLength( 100.0f, 1.0f, 1000.0f, 0.1f, 1000.0f, this, "Step length" ),
+	m_stepLength( 100.0f, 1.0f, 500.0f, 0.1f, 500.0f, this, "Step length" ),
 	m_dryGain( 0.0f, -80.0f, 20.0f, 0.1f, this, "Dry gain" ),
 	m_swapInputs( false, this, "Swap inputs" ),
 	m_stages( 1.0f, 1.0f, 4.0f, 1.0f, this, "Lowpass stages" ),

@@ -340,10 +340,3 @@ void ExportProjectDialog::updateTitleBar( int _prog )
 	Engine::mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
 }
-
-
-
-
-
-
-/* vim: set tw=0 noexpandtab: */

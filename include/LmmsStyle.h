@@ -69,8 +69,6 @@ public:
 
 	virtual QPalette standardPalette( void ) const;
 
-//	virtual void drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const;
-
 	virtual void drawComplexControl(
 				ComplexControl control,
 				const QStyleOptionComplex * option,
@@ -84,9 +82,6 @@ public:
 	virtual int pixelMetric( PixelMetric metric,
 					const QStyleOption * option = 0,
 					const QWidget * widget = 0 ) const;
-
-//	QSize sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const;
-//	QRect subControlRect( ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget ) const;
 
 	static QPalette * s_palette;
 

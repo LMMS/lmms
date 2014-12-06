@@ -99,24 +99,24 @@ MainWindow::MainWindow() :
 				ConfigManager::inst()->userProjectsDir() + "*" +
 				ConfigManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
-							tr( "My projects" ),
+							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userSamplesDir() + "*" +
 				ConfigManager::inst()->factorySamplesDir(),
-					"*", tr( "My samples" ),
+					"*", tr( "My Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userPresetsDir() + "*" +
 				ConfigManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
-					tr( "My presets" ),
+					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My home" ),
+							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter ) );
 
@@ -132,11 +132,11 @@ MainWindow::MainWindow() :
 #endif
 	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
-							tr( "My computer" ),
+							tr( "My Computer" ),
 #elif defined(LMMS_BUILD_APPLE)
 							tr( "Volumes" ),
 #else
-							tr( "Root directory" ),
+							tr( "Root Directory" ),
 #endif
 
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
@@ -245,7 +245,7 @@ void MainWindow::finalize()
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
 				embed::getIconPixmap( "project_open_recent" ),
-					tr( "&Recently opened projects" ) );
+					tr( "&Recently Opened Projects" ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
 			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
@@ -257,7 +257,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::Key_S );
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "Save as new &version" ),
+					tr( "Save as New &Version" ),
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
@@ -275,7 +275,7 @@ void MainWindow::finalize()
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
-					tr( "E&xport tracks..." ),
+					tr( "E&xport Tracks..." ),
 					Engine::getSong(),
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
@@ -331,7 +331,7 @@ void MainWindow::finalize()
 	if( true )
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
-						tr( "Online help" ),
+						tr( "Online Help" ),
 						this, SLOT( browseHelp() ) );
 	}
 	else
@@ -341,7 +341,7 @@ void MainWindow::finalize()
 							this, SLOT( help() ) );
 	}
 	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
-					tr( "What's this?" ),
+					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
 	help_menu->addSeparator();
@@ -721,7 +721,7 @@ void MainWindow::openProject()
 {
 	if( mayChangeProject() )
 	{
-		FileDialog ofd( this, tr( "Open project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
+		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
 
 		ofd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 		ofd.setFileMode( FileDialog::ExistingFiles );
@@ -786,7 +786,7 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	VersionedSaveDialog sfd( this, tr( "Save project" ), "",
+	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project (*.mmpz *.mmp);;"
 				"LMMS Project Template (*.mpt)" ) );
 	QString f = Engine::getSong()->projectFileName();
@@ -879,6 +879,7 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	else
 	{
 		parent->hide();
+		refocus();
 	}
 
 	// Workaround for Qt Bug #260116
@@ -886,6 +887,38 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+}
+
+
+
+
+/*
+ * When an editor window with focus is toggled off, attempt to set focus
+ * to the next visible editor window, or if none are visible, set focus
+ * to the parent window.
+ */
+void MainWindow::refocus()
+{
+	QList<QWidget*> editors;
+	editors
+		<< Engine::songEditor()->parentWidget()
+		<< Engine::getBBEditor()->parentWidget()
+		<< Engine::pianoRoll()->parentWidget()
+		<< Engine::automationEditor()->parentWidget();
+
+	bool found = false;
+	QList<QWidget*>::Iterator editor;
+	for( editor = editors.begin(); editor != editors.end(); ++editor )
+	{
+		if( ! (*editor)->isHidden() ) {
+			(*editor)->setFocus();
+			found = true;
+			break;
+		}
+	}
+
+	if( ! found )
+		this->setFocus();
 }
 
 
