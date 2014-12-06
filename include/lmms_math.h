@@ -132,7 +132,7 @@ static inline int fast_rand()
 
 static inline double fastRand( double range )
 {
-	static const double fast_rand_ratio = 1.0f / FAST_RAND_MAX;
+	static const double fast_rand_ratio = 1.0 / FAST_RAND_MAX;
 	return fast_rand() * range * fast_rand_ratio;
 }
 
