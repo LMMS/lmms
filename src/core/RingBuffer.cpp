@@ -56,7 +56,7 @@ RingBuffer::RingBuffer( float size ) :
 
 RingBuffer::~RingBuffer()
 {
-	delete m_buffer;
+	delete[] m_buffer;
 }
 
 
@@ -308,7 +308,7 @@ void RingBuffer::updateSamplerate()
 	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::mixer()->processingSampleRate() ) / m_samplerate;
 	m_size = static_cast<f_cnt_t>( ceilf( newsize ) ) + m_fpp;
 	m_samplerate = Engine::mixer()->processingSampleRate();
-	delete m_buffer;
+	delete[] m_buffer;
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
 	m_position = 0;
