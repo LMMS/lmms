@@ -103,7 +103,6 @@ void FxChannel::incrementDeps()
 	{
 		m_queued = true;
 		MixerWorkerThread::addJob( this );
-		m_dependenciesMet = 0;
 	}
 }
 
@@ -164,8 +163,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 	{
 		m_peakLeft = m_peakRight = 0.0f;
 	}
-	
-	// increment dependency counter of all receivers 
+
+	// increment dependency counter of all receivers
 	processed();
 }
 
@@ -358,7 +357,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	// add us to fxmixer's list
 	engine::fxMixer()->m_fxRoutes.append( route );
 	m_sendsMutex.unlock();
-	
+
 	return route;
 }
 
@@ -527,6 +526,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		m_fxChannels[i]->m_queued = false;
 		// also reset hasInput
 		m_fxChannels[i]->m_hasInput = false;
+		m_fxChannels[i]->m_dependenciesMet = 0;
 	}
 }
 
@@ -600,7 +600,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
 		}
 	}
-} 
+}
 
 // make sure we have at least num channels
 void FxMixer::allocateChannelsTo(int num)
