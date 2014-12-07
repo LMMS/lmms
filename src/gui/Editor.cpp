@@ -30,13 +30,13 @@
 #include <QToolBar>
 
 
-void Editor::setPlaying(bool playing)
+void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
-	if (playing)
-		m_playButton->setIcon(embed::getIconPixmap("play"));
-	else
+	if (displayPauseIcon)
 		m_playButton->setIcon(embed::getIconPixmap("pause"));
+	else
+		m_playButton->setIcon(embed::getIconPixmap("play"));
 }
 
 Editor::Editor(bool record) :

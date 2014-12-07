@@ -125,7 +125,7 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		//If automation editor is opened, update its display after disconnection
 		if( Engine::automationEditor() )
 		{
-			Engine::automationEditor()->updateAfterPatternChange();
+			Engine::automationEditor()->m_editor->updateAfterPatternChange();
 		}
 
 		//if there is no more connection connected to the AutomationPattern

@@ -958,9 +958,9 @@ void Song::loadProject( const QString & _file_name )
 				{
 					Engine::pianoRoll()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == Engine::automationEditor()->nodeName() )
+				else if( node.nodeName() == Engine::automationEditor()->m_editor->nodeName() )
 				{
-					Engine::automationEditor()->restoreState( node.toElement() );
+					Engine::automationEditor()->m_editor->restoreState( node.toElement() );
 				}
 				else if( node.nodeName() == Engine::getProjectNotes()->nodeName() )
 				{
@@ -1027,7 +1027,7 @@ bool Song::saveProjectFile( const QString & _filename )
 	{
 		Engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
 		Engine::pianoRoll()->saveState( dataFile, dataFile.content() );
-		Engine::automationEditor()->saveState( dataFile, dataFile.content() );
+		Engine::automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
 		Engine::getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState( dataFile, dataFile.content() );
 	}

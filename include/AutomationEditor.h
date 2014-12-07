@@ -29,13 +29,14 @@
 #include <QtCore/QMutex>
 #include <QWidget>
 
+#include "Editor.h"
+
 #include "lmms_basics.h"
 #include "JournallingObject.h"
 #include "MidiTime.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
 #include "Knob.h"
-
 
 class QPainter;
 class QPixmap;
@@ -45,6 +46,7 @@ class ComboBox;
 class NotePlayHandle;
 class Timeline;
 class ToolButton;
+
 
 
 class AutomationEditor : public QWidget, public JournallingObject
@@ -69,15 +71,12 @@ public:
 
 	int quantization() const;
 
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	QString nodeName() const
 	{
-		return( "automationeditor" );
+		return "automationeditor";
 	}
-
-	void setPauseIcon( bool pause );
 
 	// qproperty access methods
 	QColor gridColor() const;
@@ -89,6 +88,14 @@ public:
 	void setVertexColor( const QColor & c );
 	void setScaleColor( const QBrush & c );
 
+	enum editModes
+	{
+		DRAW,
+		ERASE,
+		SELECT,
+		MOVE
+	};
+
 public slots:
 	void update();
 	void updateAfterPatternChange();
@@ -97,7 +104,6 @@ public slots:
 protected:
 	typedef AutomationPattern::timeMap timeMap;
 
-	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -117,7 +123,6 @@ protected:
 	void getSelectedValues( timeMap & _selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	void disableTensionKnob();
 
 protected slots:
 	void play();
@@ -126,15 +131,14 @@ protected slots:
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
 
-	void drawButtonToggled();
-	void eraseButtonToggled();
-	void selectButtonToggled();
-	void moveButtonToggled();
+	void setEditMode(AutomationEditor::editModes mode);
+	void setEditMode(int mode);
 
-	void discreteButtonToggled();
-	void linearButtonToggled();
-	void cubicHermiteButtonToggled();
-	void tensionChanged();
+	void setProgressionType(AutomationPattern::ProgressionTypes type);
+	void setProgressionDiscrete();
+	void setProgressionLinear();
+	void setProgressionHermite();
+	void setTension();
 
 	void copySelectedValues();
 	void cutSelectedValues();
@@ -149,14 +153,6 @@ protected slots:
 
 private:
 
-	enum editModes
-	{
-		DRAW,
-		ERASE,
-		SELECT,
-		MOVE
-	} ;
-
 	enum actions
 	{
 		NONE,
@@ -166,11 +162,8 @@ private:
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 860;
-	static const int INITIAL_HEIGHT = 480;
-
 	static const int SCROLLBAR_SIZE = 16;
-	static const int TOP_MARGIN = 48;
+	static const int TOP_MARGIN = 16;
 
 	static const int DEFAULT_Y_DELTA = 6;
 	static const int DEFAULT_STEPS_PER_TACT = 16;
@@ -182,40 +175,16 @@ private:
 	AutomationEditor( const AutomationEditor & );
 	virtual ~AutomationEditor();
 
-
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 
-
-	QWidget * m_toolBar;
-
-	ToolButton * m_playButton;
-	ToolButton * m_stopButton;
-
-	ToolButton * m_drawButton;
-	ToolButton * m_eraseButton;
-	ToolButton * m_selectButton;
-	ToolButton * m_moveButton;
-
-	ToolButton * m_discreteButton;
-	ToolButton * m_linearButton;
-	ToolButton * m_cubicHermiteButton;
-	Knob * m_tensionKnob;
-	FloatModel * m_tensionModel;
-
-	ToolButton * m_cutButton;
-	ToolButton * m_copyButton;
-	ToolButton * m_pasteButton;
-
-	ComboBox * m_zoomingXComboBox;
-	ComboBox * m_zoomingYComboBox;
-	ComboBox * m_quantizeComboBox;
-
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
+
+	FloatModel * m_tensionModel;
 
 	QMutex m_patternMutex;
 	AutomationPattern * m_pattern;
@@ -270,14 +239,64 @@ private:
 	QColor m_vertexColor;
 	QBrush m_scaleColor;
 
-	friend class Engine;
+	//friend class Engine;
+	friend class AutomationEditorWindow;
 
 
 signals:
 	void currentPatternChanged();
 	void positionChanged( const MidiTime & );
-
 } ;
+
+
+
+class AutomationEditorWindow : public Editor
+{
+	Q_OBJECT
+
+	static const int INITIAL_WIDTH = 860;
+	static const int INITIAL_HEIGHT = 480;
+public:
+	AutomationEditorWindow();
+	~AutomationEditorWindow();
+
+	void setCurrentPattern(AutomationPattern* pattern);
+	const AutomationPattern* currentPattern();
+
+	int quantization() const;
+
+	AutomationEditor* m_editor;
+
+	virtual void closeEvent( QCloseEvent * _ce );
+
+signals:
+	void currentPatternChanged();
+
+protected slots:
+	void play();
+	void stop();
+
+private:
+	QAbstractButton * m_drawButton;
+	QAbstractButton * m_eraseButton;
+	QAbstractButton * m_selectButton;
+	QAbstractButton * m_moveButton;
+
+	ToolButton * m_discreteButton;
+	ToolButton * m_linearButton;
+	ToolButton * m_cubicHermiteButton;
+	Knob * m_tensionKnob;
+
+	ToolButton * m_cutButton;
+	ToolButton * m_copyButton;
+	ToolButton * m_pasteButton;
+
+	ComboBox * m_zoomingXComboBox;
+	ComboBox * m_zoomingYComboBox;
+	ComboBox * m_quantizeComboBox;
+
+	friend class Engine;
+};
 
 
 #endif

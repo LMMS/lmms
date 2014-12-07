@@ -56,7 +56,7 @@ MainWindow * Engine::s_mainWindow = NULL;
 BBTrackContainer * Engine::s_bbTrackContainer = NULL;
 Song * Engine::s_song = NULL;
 SongEditor* Engine::s_songEditor = NULL;
-AutomationEditor * Engine::s_automationEditor = NULL;
+AutomationEditorWindow * Engine::s_automationEditor = NULL;
 BBEditor * Engine::s_bbEditor = NULL;
 PianoRoll* Engine::s_pianoRoll = NULL;
 ProjectNotes * Engine::s_projectNotes = NULL;
@@ -99,7 +99,7 @@ void Engine::init( const bool _has_gui )
 		s_projectNotes = new ProjectNotes;
 		s_bbEditor = new BBEditor( s_bbTrackContainer );
 		s_pianoRoll = new PianoRoll;
-		s_automationEditor = new AutomationEditor;
+		s_automationEditor = new AutomationEditorWindow;
 
 		s_mainWindow->finalize();
 	}

@@ -33,7 +33,7 @@
 
 #include "export.h"
 
-class AutomationEditor;
+class AutomationEditorWindow;
 class BBEditor;
 class BBTrackContainer;
 class DummyTrackContainer;
@@ -128,7 +128,7 @@ public:
 		return s_projectNotes;
 	}
 
-	static AutomationEditor * automationEditor()
+	static AutomationEditorWindow * automationEditor()
 	{
 		return s_automationEditor;
 	}
@@ -188,7 +188,7 @@ private:
 	static MainWindow * s_mainWindow;
 	static FxMixerView * s_fxMixerView;
 	static SongEditor* s_songEditor;
-	static AutomationEditor * s_automationEditor;
+	static AutomationEditorWindow * s_automationEditor;
 	static BBEditor * s_bbEditor;
 	static PianoRoll* s_pianoRoll;
 	static ProjectNotes * s_projectNotes;

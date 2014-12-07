@@ -39,7 +39,7 @@ class Editor : public QMainWindow
 {
 	Q_OBJECT
 public:
-	void setPlaying(bool playing=true);
+	void setPauseIcon(bool displayPauseIcon=true);
 
 signals:
 
