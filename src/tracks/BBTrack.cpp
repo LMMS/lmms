@@ -310,7 +310,7 @@ void BBTCOView::changeColor()
 	if( isSelected() )
 	{
 		QVector<selectableObject *> selected =
-				Engine::songEditor()->selectedObjects();
+				Engine::songEditor()->m_editor->selectedObjects();
 		for( QVector<selectableObject *>::iterator it =
 							selected.begin();
 						it != selected.end(); ++it )

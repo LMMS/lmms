@@ -27,6 +27,7 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
+#include "Editor.h"
 #include "TrackContainerView.h"
 
 class QLabel;
@@ -34,6 +35,7 @@ class QScrollBar;
 
 class AutomatableSlider;
 class ComboBox;
+class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
 class Song;
@@ -56,6 +58,12 @@ class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
+	enum Mode
+	{
+		DrawMode,
+		EditMode
+	};
+
 	SongEditor( Song * _song );
 	virtual ~SongEditor();
 
@@ -64,6 +72,10 @@ public:
 
 public slots:
 	void scrolled( int _new_pos );
+
+	void setMode(Mode mode);
+	void setModeDraw();
+	void setModeEdit();
 
 
 private slots:
@@ -119,6 +131,28 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
+	positionLine * m_positionLine;
+
+	ComboBoxModel* m_zoomingModel;
+
+	bool m_scrollBack;
+	bool m_smoothScroll;
+
+	Mode m_mode;
+
+	friend class SongEditorWindow;
+
+} ;
+
+class SongEditorWindow : public Editor
+{
+	Q_OBJECT
+public:
+	SongEditorWindow(Song* song);
+
+	SongEditor* m_editor;
+
+private:
 	ToolButton * m_addBBTrackButton;
 	ToolButton * m_addSampleTrackButton;
 	ToolButton * m_addAutomationTrackButton;
@@ -127,14 +161,6 @@ private:
 	ToolButton * m_editModeButton;
 
 	ComboBox * m_zoomingComboBox;
-
-	positionLine * m_positionLine;
-
-	bool m_scrollBack;
-	bool m_smoothScroll;
-
-} ;
-
-
+};
 
 #endif

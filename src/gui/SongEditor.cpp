@@ -77,15 +77,11 @@ void positionLine::paintEvent( QPaintEvent * _pe )
 SongEditor::SongEditor( Song * _song ) :
 	TrackContainerView( _song ),
 	m_song( _song ),
+	m_zoomingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
-	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() )
+	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
+	m_mode(DrawMode)
 {
-	setWindowTitle( tr( "Song-Editor" ) );
-	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
-
-	setFocusPolicy( Qt::StrongFocus );
-	setFocus();
-
 	// create time-line
 	int widgetTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
@@ -102,6 +98,8 @@ SongEditor::SongEditor( Song * _song ) :
 			this, SLOT( updatePosition( const MidiTime & ) ) );
 
 	m_positionLine = new positionLine( this );
+
+	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 
 	// let's get notified when loading a project
@@ -229,154 +227,7 @@ SongEditor::SongEditor( Song * _song ) :
 
 	Engine::mainWindow()->addWidgetToToolBar( vc_w );
 
-
-	// create own toolbar
-	m_toolBar = new QWidget( this );
-	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(),
-				embed::getIconPixmap( "toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
-
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
-
-	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
-	tb_layout->setMargin( 0 );
-	tb_layout->setSpacing( 0 );
-
-
-	// fill own tool-bar
-	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
-					tr( "Play song (Space)" ),
-					this, SLOT( play() ), m_toolBar );
-	m_playButton->setObjectName( "playButton" );
-
-	m_recordButton = new ToolButton( embed::getIconPixmap( "record" ),
-			tr( "Record samples from Audio-device" ),
-					this, SLOT( record() ), m_toolBar );
-	m_recordButton->setObjectName( "recordButton" );
-
-	m_recordAccompanyButton = new ToolButton(
-			embed::getIconPixmap( "record_accompany" ),
-			tr( "Record samples from Audio-device while playing "
-							"song or BB track" ),
-				this, SLOT( recordAccompany() ), m_toolBar );
-	m_recordAccompanyButton->setObjectName( "recordAccompanyButton" );
-
-	// FIXME: disable record button while it is not implemented
-	m_recordButton->setDisabled( true );
-
-	// disable record buttons if capturing is not supported
-	if( !Engine::mixer()->audioDev()->supportsCapture() )
-	{
-		m_recordButton->setDisabled( true );
-		m_recordAccompanyButton->setDisabled( true );
-	}
-
-	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
-					tr( "Stop song (Space)" ),
-					this, SLOT( stop() ), m_toolBar );
-	m_stopButton->setObjectName( "stopButton" );
-
-	m_addBBTrackButton = new ToolButton( embed::getIconPixmap(
-						"add_bb_track" ),
-						tr( "Add beat/bassline" ),
-						m_song, SLOT( addBBTrack() ),
-						m_toolBar );
-
-	m_addSampleTrackButton = new ToolButton( embed::getIconPixmap(
-					"add_sample_track" ),
-					tr( "Add sample-track" ),
-					m_song, SLOT( addSampleTrack() ),
-					m_toolBar );
-
-	m_addAutomationTrackButton = new ToolButton( embed::getIconPixmap(
-					"add_automation" ),
-					tr( "Add automation-track" ),
-					m_song, SLOT( addAutomationTrack() ),
-					m_toolBar );
-
-	m_drawModeButton = new ToolButton( embed::getIconPixmap(
-								"edit_draw" ),
-							tr( "Draw mode" ),
-							NULL, NULL, m_toolBar );
-	m_drawModeButton->setCheckable( true );
-	m_drawModeButton->setChecked( true );
-
-	m_editModeButton = new ToolButton( embed::getIconPixmap(
-								"edit_select" ),
-					tr( "Edit mode (select and move)" ),
-							NULL, NULL, m_toolBar );
-	m_editModeButton->setCheckable( true );
-
-	QButtonGroup * tool_button_group = new QButtonGroup( this );
-	tool_button_group->addButton( m_drawModeButton );
-	tool_button_group->addButton( m_editModeButton );
-	tool_button_group->setExclusive( true );
-
-#if 0
-#warning TODO
-	QWhatsThis::add( m_playButton, tr( "Click here, if you want to play "
-						"your whole song. Playing will "
-						"be started at the "
-						"song-position-marker (green). "
-						"You can also move it while "
-						"playing." ) );
-	QWhatsThis::add( m_stopButton, tr ( "Click here, if you want to stop "
-						"playing of your song. The "
-						"song-position-marker will be "
-						"set to the start of your song."
-			) );
-/*	QWhatsThis::add( m_insertBarButton, tr( "If you click here, a "
-							"bar will "
-							"be inserted at the "
-							"current bar." ) );
-	QWhatsThis::add( m_removeBarButton, tr( "If you click here, the "
-							"current bar will be "
-							"removed." ) );*/
-#endif
-
-
-	QLabel * zoom_lbl = new QLabel( m_toolBar );
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
-
-	// setup zooming-stuff
-	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
-	m_zoomingComboBox->move( 580, 4 );
-	for( int i = 0; i < 7; ++i )
-	{
-		m_zoomingComboBox->model()->addItem(
-					QString::number( 25 << i ) + "%" );
-	}
-	m_zoomingComboBox->model()->setInitValue(
-			m_zoomingComboBox->model()->findText( "100%" ) );
-	connect( m_zoomingComboBox->model(), SIGNAL( dataChanged() ),
-					this, SLOT( zoomingChanged() ) );
-
-
-	tb_layout->addSpacing( 5 );
-	tb_layout->addWidget( m_playButton );
-	tb_layout->addWidget( m_recordButton );
-	tb_layout->addWidget( m_recordAccompanyButton );
-	tb_layout->addWidget( m_stopButton );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( m_addBBTrackButton );
-	tb_layout->addWidget( m_addSampleTrackButton );
-	tb_layout->addWidget( m_addAutomationTrackButton );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( m_drawModeButton );
-	tb_layout->addWidget( m_editModeButton );
-	tb_layout->addSpacing( 10 );
-	m_timeLine->addToolButtons( m_toolBar );
-	tb_layout->addSpacing( 15 );
-	tb_layout->addWidget( zoom_lbl );
-	tb_layout->addSpacing( 5 );
-	tb_layout->addWidget( m_zoomingComboBox );
-	tb_layout->addStretch();
-
+	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setMinimum( 0 );
@@ -389,12 +240,16 @@ SongEditor::SongEditor( Song * _song ) :
 	connect( m_song, SIGNAL( lengthChanged( int ) ),
 			this, SLOT( updateScrollBar( int ) ) );
 
-
-	Engine::mainWindow()->workspace()->addSubWindow( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->resize( 600, 300 );
-	parentWidget()->move( 5, 5 );
-	parentWidget()->show();
+	// Set up zooming model
+	for( int i = 0; i < 7; ++i )
+	{
+		m_zoomingModel->addItem(
+					QString::number( 25 << i ) + "%" );
+	}
+	m_zoomingModel->setInitValue(
+			m_zoomingModel->findText( "100%" ) );
+	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+					this, SLOT( zoomingChanged() ) );
 }
 
 
@@ -421,6 +276,24 @@ void SongEditor::scrolled( int _new_pos )
 {
 	update();
 	emit positionChanged( m_currentPosition = MidiTime( _new_pos, 0 ) );
+}
+
+
+
+
+void SongEditor::setMode(Mode mode)
+{
+	m_mode = mode;
+}
+
+void SongEditor::setModeDraw()
+{
+	setMode(DrawMode);
+}
+
+void SongEditor::setModeEdit()
+{
+	setMode(EditMode);
 }
 
 
@@ -549,8 +422,8 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 			setPixelsPerTact( (int) pixelsPerTact() / 2 );
 		}
 		// update combobox with zooming-factor
-		m_zoomingComboBox->model()->setValue(
-			m_zoomingComboBox->model()->findText(
+		m_zoomingModel->setValue(
+			m_zoomingModel->findText(
 				QString::number(
 					static_cast<int>( pixelsPerTact() *
 					100 / DEFAULT_PIXELS_PER_TACT ) ) +
@@ -759,7 +632,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 
 void SongEditor::zoomingChanged()
 {
-	const QString & zfac = m_zoomingComboBox->model()->currentText();
+	const QString & zfac = m_zoomingModel->currentText();
 	setPixelsPerTact( zfac.left( zfac.length() - 1 ).toInt() *
 					DEFAULT_PIXELS_PER_TACT / 100 );
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
@@ -788,5 +661,109 @@ void SongEditor::adjustUiAfterProjectLoad()
 
 bool SongEditor::allowRubberband() const
 {
-	return( m_editModeButton->isChecked() );
+	return m_mode == EditMode;
+}
+
+
+SongEditorWindow::SongEditorWindow(Song* song) :
+	Editor(Engine::mixer()->audioDev()->supportsCapture()),
+	m_editor(new SongEditor(song))
+{
+	setWindowTitle( tr( "Song-Editor" ) );
+	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
+
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
+
+	setCentralWidget(m_editor);
+
+	// Set up buttons
+	m_playButton->setToolTip(tr("Play song (Space)"));
+	connect(m_playButton, SIGNAL(clicked()), m_editor, SLOT(play()));
+
+	if (m_recordButton && m_recordAccompanyButton)
+	{
+		m_recordButton->setToolTip(tr("Record samples from Audio-device"));
+		connect(m_recordButton, SIGNAL(clicked()), m_editor, SLOT(record()));
+
+		m_recordAccompanyButton->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
+		connect(m_recordAccompanyButton, SIGNAL(clicked()), m_editor, SLOT(recordAccompany()));
+	}
+
+	m_stopButton->setToolTip(tr( "Stop song (Space)" ));
+	connect(m_stopButton, SIGNAL(clicked()), m_editor, SLOT(stop()));
+
+	m_addBBTrackButton = new ToolButton(
+				embed::getIconPixmap("add_bb_track"),
+				tr("Add beat/bassline"),
+				m_editor->m_song, SLOT(addBBTrack()));
+
+	m_addSampleTrackButton = new ToolButton(
+				embed::getIconPixmap("add_sample_track" ),
+				tr( "Add sample-track"),
+				m_editor->m_song, SLOT(addSampleTrack()));
+
+	m_addAutomationTrackButton = new ToolButton(
+				embed::getIconPixmap("add_automation" ),
+				tr( "Add automation-track"),
+				m_editor->m_song, SLOT(addAutomationTrack()));
+
+	m_drawModeButton = new ToolButton(embed::getIconPixmap("edit_draw"),
+									  tr("Draw mode"), m_editor, SLOT(setModeDraw()));
+	m_drawModeButton->setCheckable(true);
+	m_drawModeButton->setChecked(true);
+
+	m_editModeButton = new ToolButton(embed::getIconPixmap("edit_select"),
+									  tr("Edit mode (select and move)"),
+									  m_editor, SLOT(setModeEdit()));
+	m_editModeButton->setCheckable(true);
+
+	QButtonGroup * tool_button_group = new QButtonGroup(this);
+	tool_button_group->addButton(m_drawModeButton);
+	tool_button_group->addButton(m_editModeButton);
+	tool_button_group->setExclusive(true);
+
+	m_playButton->setWhatsThis(
+				tr("Click here, if you want to play your whole song. "
+				   "Playing will be started at the song-position-marker (green). "
+				   "You can also move it while playing."));
+	m_stopButton->setWhatsThis(
+				tr("Click here, if you want to stop playing of your song. "
+				   "The song-position-marker will be set to the start of your song."));
+
+
+	QLabel * zoom_lbl = new QLabel( m_toolBar );
+	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+
+	// setup zooming-stuff
+	m_zoomingComboBox = new ComboBox( m_toolBar );
+	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->move( 580, 4 );
+	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
+
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( m_addBBTrackButton );
+	m_toolBar->addWidget( m_addSampleTrackButton );
+	m_toolBar->addWidget( m_addAutomationTrackButton );
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( m_drawModeButton );
+	m_toolBar->addWidget( m_editModeButton );
+
+	QWidget* timeLineButtons = new QWidget();
+	timeLineButtons->setFixedHeight(m_toolBar->height());
+	timeLineButtons->move(0,0);
+	QLayout* l = new QHBoxLayout( timeLineButtons );
+	l->setSpacing(0); l->setMargin(0);
+	m_editor->m_timeLine->addToolButtons(timeLineButtons);
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( zoom_lbl );
+	m_toolBar->addWidget( m_zoomingComboBox );
+
+	Engine::mainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
+	parentWidget()->resize( 600, 300 );
+	parentWidget()->move( 5, 5 );
+	parentWidget()->show();
 }

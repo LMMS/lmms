@@ -733,7 +733,7 @@ void Song::clearProject()
 	}
 	if( Engine::songEditor() )
 	{
-		Engine::songEditor()->clearAllTracks();
+		Engine::songEditor()->m_editor->clearAllTracks();
 	}
 	if( Engine::fxMixerView() )
 	{
