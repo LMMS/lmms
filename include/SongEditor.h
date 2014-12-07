@@ -65,10 +65,7 @@ public:
 	};
 
 	SongEditor( Song * _song );
-	virtual ~SongEditor();
-
-	void setPauseIcon( bool pause );
-
+	~SongEditor();
 
 public slots:
 	void scrolled( int _new_pos );
@@ -80,11 +77,6 @@ public slots:
 
 private slots:
 	void setHighQuality( bool );
-
-	void play();
-	void record();
-	void recordAccompany();
-	void stop();
 
 	void masterVolumeChanged( int _new_val );
 	void masterVolumePressed();
@@ -114,12 +106,6 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
-	QWidget * m_toolBar;
-
-	ToolButton * m_playButton;
-	ToolButton * m_recordButton;
-	ToolButton * m_recordAccompanyButton;
-	ToolButton * m_stopButton;
 	LcdSpinBox * m_tempoSpinBox;
 
 	Timeline * m_timeLine;
@@ -151,6 +137,12 @@ public:
 	SongEditorWindow(Song* song);
 
 	SongEditor* m_editor;
+
+protected slots:
+	void play();
+	void record();
+	void recordAccompany();
+	void stop();
 
 private:
 	ToolButton * m_addBBTrackButton;

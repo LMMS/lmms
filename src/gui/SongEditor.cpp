@@ -299,61 +299,6 @@ void SongEditor::setModeEdit()
 
 
 
-void SongEditor::setPauseIcon( bool pause )
-{
-	if( pause == true )
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-	}
-	else
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	}
-}
-
-
-
-
-void SongEditor::play()
-{
-	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
-	{
-		Engine::getSong()->playSong();
-	}
-	else
-	{
-		Engine::getSong()->togglePause();
-	}
-}
-
-
-
-
-void SongEditor::record()
-{
-	m_song->record();
-}
-
-
-
-
-void SongEditor::recordAccompany()
-{
-	m_song->playAndRecord();
-}
-
-
-
-
-void SongEditor::stop()
-{
-	m_song->stop();
-	Engine::pianoRoll()->stopRecording();
-}
-
-
-
-
 void SongEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
@@ -382,17 +327,6 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
-		}
-	}
-	else if( _ke->key() == Qt::Key_Space )
-	{
-		if( m_song->isPlaying() )
-		{
-			stop();
-		}
-		else
-		{
-			play();
 		}
 	}
 	else if( _ke->key() == Qt::Key_Home )
@@ -679,19 +613,12 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// Set up buttons
 	m_playButton->setToolTip(tr("Play song (Space)"));
-	connect(m_playButton, SIGNAL(clicked()), m_editor, SLOT(play()));
-
 	if (m_recordButton && m_recordAccompanyButton)
 	{
 		m_recordButton->setToolTip(tr("Record samples from Audio-device"));
-		connect(m_recordButton, SIGNAL(clicked()), m_editor, SLOT(record()));
-
 		m_recordAccompanyButton->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
-		connect(m_recordAccompanyButton, SIGNAL(clicked()), m_editor, SLOT(recordAccompany()));
 	}
-
 	m_stopButton->setToolTip(tr( "Stop song (Space)" ));
-	connect(m_stopButton, SIGNAL(clicked()), m_editor, SLOT(stop()));
 
 	m_addBBTrackButton = new ToolButton(
 				embed::getIconPixmap("add_bb_track"),
@@ -766,4 +693,36 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
 	parentWidget()->show();
+}
+
+
+void SongEditorWindow::play()
+{
+	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
+	{
+		Engine::getSong()->playSong();
+	}
+	else
+	{
+		Engine::getSong()->togglePause();
+	}
+}
+
+
+void SongEditorWindow::record()
+{
+	m_editor->m_song->record();
+}
+
+
+void SongEditorWindow::recordAccompany()
+{
+	m_editor->m_song->playAndRecord();
+}
+
+
+void SongEditorWindow::stop()
+{
+	m_editor->m_song->stop();
+	Engine::pianoRoll()->stopRecording();
 }

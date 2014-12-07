@@ -39,6 +39,22 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playButton->setIcon(embed::getIconPixmap("play"));
 }
 
+void Editor::play()
+{
+}
+
+void Editor::record()
+{
+}
+
+void Editor::recordAccompany()
+{
+}
+
+void Editor::stop()
+{
+}
+
 Editor::Editor(bool record) :
 	m_toolBar(new QToolBar(this)),
 	m_playButton(nullptr),
@@ -46,6 +62,8 @@ Editor::Editor(bool record) :
 	m_recordAccompanyButton(nullptr),
 	m_stopButton(nullptr)
 {
+	m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+
 	auto addButton = [this](const char* pixmap_name, QString text, QString objectName) {
 		ToolButton* button = new ToolButton(embed::getIconPixmap(pixmap_name), text);
 		button->setObjectName(objectName);
@@ -55,11 +73,12 @@ Editor::Editor(bool record) :
 
 	// Set up play button
 	m_playButton = addButton("play", tr("Play (Space)"), "playButton");
+	m_playButton->setShortcut(Qt::Key_Space);
 
 	// Set up record buttons if wanted
 	if (record)
 	{
-		m_recordButton= addButton("record", tr("Record"), "recordButton");
+		m_recordButton = addButton("record", tr("Record"), "recordButton");
 		m_recordAccompanyButton = addButton("record_accompany", tr("Record while playing"), "recordAccompanyButton");
 	}
 
@@ -68,6 +87,15 @@ Editor::Editor(bool record) :
 
 	// Add toolbar to window
 	addToolBar(Qt::TopToolBarArea, m_toolBar);
+
+	// Set up connections
+	connect(m_playButton, SIGNAL(clicked()), this, SLOT(play()));
+	if (record)
+	{
+		connect(m_recordButton, SIGNAL(clicked()), this, SLOT(record()));
+		connect(m_recordAccompanyButton, SIGNAL(clicked()), this, SLOT(recordAccompany()));
+	}
+	connect(m_stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 }
 
 Editor::~Editor()

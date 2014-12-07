@@ -2040,11 +2040,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 		tr( "Click here if you want to stop playing of the "
 			"current pattern." ) );
 
-	// Set up signals)
-	connect(m_playButton, SIGNAL(clicked()), this, SLOT(play()));
-	connect(m_stopButton, SIGNAL(clicked()), this, SLOT(stop()));
-
-
 	// Edit mode buttons
 
 	m_drawButton = new ToolButton(embed::getIconPixmap( "edit_draw" ),

@@ -41,6 +41,12 @@ class Editor : public QMainWindow
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
 
+protected slots:
+	virtual void play();
+	virtual void record();
+	virtual void recordAccompany();
+	virtual void stop();
+
 signals:
 
 protected:
