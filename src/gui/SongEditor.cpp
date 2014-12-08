@@ -676,14 +676,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( m_drawModeButton );
 	m_toolBar->addWidget( m_editModeButton );
-
-	QWidget* timeLineButtons = new QWidget();
-	timeLineButtons->setFixedHeight(m_toolBar->height());
-	timeLineButtons->move(0,0);
-	QLayout* l = new QHBoxLayout( timeLineButtons );
-	l->setSpacing(0); l->setMargin(0);
-	m_editor->m_timeLine->addToolButtons(timeLineButtons);
-
+	m_toolBar->addSeparator();
+	m_editor->m_timeLine->addToolButtons(m_toolBar);
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( zoom_lbl );
 	m_toolBar->addWidget( m_zoomingComboBox );

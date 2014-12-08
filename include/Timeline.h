@@ -32,6 +32,7 @@
 
 
 class QPixmap;
+class QToolBar;
 class NStateButton;
 class TextFloat;
 
@@ -111,7 +112,7 @@ public:
 		update();
 	}
 
-	void addToolButtons( QWidget * _tool_bar );
+	void addToolButtons(QToolBar* _tool_bar );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );

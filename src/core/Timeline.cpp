@@ -29,6 +29,7 @@
 #include <QLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QToolBar>
 
 
 #include "Timeline.h"
@@ -121,7 +122,7 @@ Timeline::~Timeline()
 
 
 
-void Timeline::addToolButtons( QWidget * _tool_bar )
+void Timeline::addToolButtons( QToolBar * _tool_bar )
 {
 	NStateButton * autoScroll = new NStateButton( _tool_bar );
 	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
@@ -152,10 +153,9 @@ void Timeline::addToolButtons( QWidget * _tool_bar )
 	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleBehaviourAtStop( int ) ) );
 
-	QBoxLayout * layout = dynamic_cast<QBoxLayout *>( _tool_bar->layout() );
-	layout->addWidget( autoScroll );
-	layout->addWidget( loopPoints );
-	layout->addWidget( behaviourAtStop );
+	_tool_bar->addWidget( autoScroll );
+	_tool_bar->addWidget( loopPoints );
+	_tool_bar->addWidget( behaviourAtStop );
 }
 
 

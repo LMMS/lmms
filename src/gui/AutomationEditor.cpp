@@ -2265,13 +2265,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addWidget( m_copyButton );
 	m_toolBar->addWidget( m_pasteButton );
 	m_toolBar->addSeparator();
-	QWidget* timeLineButtons = new QWidget();
-	timeLineButtons->setFixedHeight(m_cutButton->height());
-	timeLineButtons->move(0,0);
-	QLayout* l = new QHBoxLayout( timeLineButtons );
-	l->setSpacing(0); l->setMargin(0);
-	m_editor->m_timeLine->addToolButtons(timeLineButtons);
-	m_toolBar->addWidget(timeLineButtons);
+	m_editor->m_timeLine->addToolButtons(m_toolBar);
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( zoom_x_label );
 	m_toolBar->addWidget( m_zoomingXComboBox );
