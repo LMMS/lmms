@@ -51,27 +51,27 @@ class Timeline;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
-	Q_PROPERTY( QColor vertexColor READ vertexColor WRITE setVertexColor )
-	Q_PROPERTY( QBrush scaleColor READ scaleColor WRITE setScaleColor )
-	Q_PROPERTY( QBrush graphColor READ graphColor WRITE setGraphColor )	
+	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
+	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
+	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
+	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 public:
-	void setCurrentPattern( AutomationPattern * _new_pattern );
+	void setCurrentPattern(AutomationPattern * new_pattern);
 
 	inline const AutomationPattern * currentPattern() const
 	{
-		return( m_pattern );
+		return m_pattern;
 	}
 
 	inline bool validPattern() const
 	{
-		return( m_pattern != NULL );
+		return m_pattern != nullptr;
 	}
 
 	int quantization() const;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
+	virtual void loadSettings(const QDomElement & parent);
 	QString nodeName() const
 	{
 		return "automationeditor";
@@ -82,12 +82,12 @@ public:
 	QBrush graphColor() const;
 	QColor vertexColor() const;
 	QBrush scaleColor() const;
-	void setGridColor( const QColor & c );
-	void setGraphColor( const QBrush & c );
-	void setVertexColor( const QColor & c );
-	void setScaleColor( const QBrush & c );
+	void setGridColor(const QColor& c);
+	void setGraphColor(const QBrush& c);
+	void setVertexColor(const QColor& c);
+	void setScaleColor(const QBrush& c);
 
-	enum editModes
+	enum EditModes
 	{
 		DRAW,
 		ERASE,
@@ -103,23 +103,23 @@ public slots:
 protected:
 	typedef AutomationPattern::timeMap timeMap;
 
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void keyPressEvent(QKeyEvent * ke);
+	virtual void leaveEvent(QEvent * e);
+	virtual void mousePressEvent(QMouseEvent * mouseEvent);
+	virtual void mouseReleaseEvent(QMouseEvent * mouseEvent);
+	virtual void mouseMoveEvent(QMouseEvent * mouseEvent);
+	virtual void paintEvent(QPaintEvent * pe);
+	virtual void resizeEvent(QResizeEvent * re);
+	virtual void wheelEvent(QWheelEvent * we);
 
-	float getLevel( int _y );
-	int xCoordOfTick( int _tick );
-	int yCoordOfLevel( float _level );
-	inline void drawLevelTick( QPainter & _p, int _tick,
-					float _value, bool _is_selected );
+	float getLevel( int y );
+	int xCoordOfTick( int tick );
+	int yCoordOfLevel( float level );
+	inline void drawLevelTick( QPainter & p, int tick,
+					float value, bool is_selected );
 	void removeSelection();
 	void selectAll();
-	void getSelectedValues( timeMap & _selected_values );
+	void getSelectedValues(timeMap & selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 
@@ -127,10 +127,10 @@ protected slots:
 	void play();
 	void stop();
 
-	void horScrolled( int _new_pos );
-	void verScrolled( int _new_pos );
+	void horScrolled( int new_pos );
+	void verScrolled( int new_pos );
 
-	void setEditMode(AutomationEditor::editModes mode);
+	void setEditMode(AutomationEditor::EditModes mode);
 	void setEditMode(int mode);
 
 	void setProgressionType(AutomationPattern::ProgressionTypes type);
@@ -144,7 +144,7 @@ protected slots:
 	void pasteValues();
 	void deleteSelectedValues();
 
-	void updatePosition( const MidiTime & _t );
+	void updatePosition( const MidiTime & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -152,7 +152,7 @@ protected slots:
 
 private:
 
-	enum actions
+	enum Actions
 	{
 		NONE,
 		MOVE_VALUE,
@@ -201,7 +201,7 @@ private:
 
 	MidiTime m_currentPosition;
 
-	actions m_action;
+	Actions m_action;
 
 	tick_t m_selectStartTick;
 	tick_t m_selectedTick;
@@ -223,13 +223,13 @@ private:
 	timeMap m_selValuesForMove;
 
 
-	editModes m_editMode;
+	EditModes m_editMode;
 
 
 	Timeline * m_timeLine;
 	bool m_scrollBack;
 
-	void drawCross( QPainter & _p );
+	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 

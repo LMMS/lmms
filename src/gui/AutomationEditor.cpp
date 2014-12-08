@@ -187,10 +187,10 @@ AutomationEditor::~AutomationEditor()
 
 
 
-void AutomationEditor::setCurrentPattern( AutomationPattern * _new_pattern )
+void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 {
 	m_patternMutex.lock();
-	m_pattern = _new_pattern;
+	m_pattern = new_pattern;
 	m_patternMutex.unlock();
 
 	emit currentPatternChanged();
@@ -199,17 +199,17 @@ void AutomationEditor::setCurrentPattern( AutomationPattern * _new_pattern )
 
 
 
-void AutomationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & parent )
 {
-	MainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, parent );
 }
 
 
 
 
-void AutomationEditor::loadSettings( const QDomElement & _this )
+void AutomationEditor::loadSettings( const QDomElement & parent )
 {
-	MainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, parent );
 }
 
 
@@ -293,20 +293,20 @@ void AutomationEditor::removeSelection()
 
 
 
-void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
+void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 {
-	switch( _ke->key() )
+	switch( ke->key() )
 	{
 		case Qt::Key_Up:
 			m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
-			_ke->accept();
+			ke->accept();
 			break;
 
 		case Qt::Key_Down:
 			m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
-			_ke->accept();
+			ke->accept();
 			break;
 
 		case Qt::Key_Left:
@@ -315,35 +315,35 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 				m_timeLine->pos().setTicks( 0 );
 			}
 			m_timeLine->updatePosition();
-			_ke->accept();
+			ke->accept();
 			break;
 
 		case Qt::Key_Right:
 			m_timeLine->pos() += 16;
 			m_timeLine->updatePosition();
-			_ke->accept();
+			ke->accept();
 			break;
 
 		//TODO: m_selectButton and m_moveButton are broken.
 		/*case Qt::Key_A:
-			if( _ke->modifiers() & Qt::ControlModifier )
+			if( ke->modifiers() & Qt::ControlModifier )
 			{
 				m_selectButton->setChecked( true );
 				selectAll();
 				update();
-				_ke->accept();
+				ke->accept();
 			}
 			break;
 
 		case Qt::Key_Delete:
 			deleteSelectedValues();
-			_ke->accept();
+			ke->accept();
 			break;*/
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
-			_ke->accept();
+			ke->accept();
 			break;
 
 		default:
@@ -354,23 +354,23 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void AutomationEditor::leaveEvent( QEvent * _e )
+void AutomationEditor::leaveEvent(QEvent * e )
 {
 	while( QApplication::overrideCursor() != NULL )
 	{
 		QApplication::restoreOverrideCursor();
 	}
 
-	QWidget::leaveEvent( _e );
+	QWidget::leaveEvent( e );
 }
 
 
-void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
+void AutomationEditor::drawLine( int x0, float y0, int x1, float y1 )
 {
-	int deltax = qRound( qAbs<float>( _x1 - _x0 ) );
-	float deltay = qAbs<float>( _y1 - _y0 );
-	int x = _x0;
-	float y = _y0;
+	int deltax = qRound( qAbs<float>( x1 - x0 ) );
+	float deltay = qAbs<float>( y1 - y0 );
+	int x = x0;
+	float y = y0;
 	int xstep;
 	int ystep;
 
@@ -383,7 +383,7 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( _x0 < _x1)
+	if( x0 < x1)
 	{
 		xstep = quantization();
 	}
@@ -392,7 +392,7 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 		xstep = -( quantization() );
 	}
 
-	if( _y0 < _y1 )
+	if( y0 < y1 )
 	{
 		ystep = 1;
 	}
@@ -404,7 +404,7 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 	int i = 0;
 	while( i < deltax )
 	{
-		y = _y0 + ( ystep * yscale * i );
+		y = y0 + ( ystep * yscale * i );
 
 		x += xstep;
 		i += 1;
@@ -416,7 +416,7 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 
 
-void AutomationEditor::mousePressEvent( QMouseEvent * _me )
+void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -424,11 +424,11 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if( _me->y() > TOP_MARGIN )
+	if( mouseEvent->y() > TOP_MARGIN )
 	{
-		float level = getLevel( _me->y() );
+		float level = getLevel( mouseEvent->y() );
 
-		int x = _me->x();
+		int x = mouseEvent->x();
 
 		if( x > VALUES_WIDTH )
 		{
@@ -466,11 +466,11 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 			}
 
 			// left button??
-			if( _me->button() == Qt::LeftButton &&
+			if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == DRAW )
 			{
 				// Connect the dots
-				if( _me->modifiers() & Qt::ShiftModifier )
+				if( mouseEvent->modifiers() & Qt::ShiftModifier )
 				{
 					drawLine( m_drawLastTick,
 							m_drawLastLevel,
@@ -509,7 +509,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 
 				Engine::getSong()->setModified();
 			}
-			else if( ( _me->button() == Qt::RightButton &&
+			else if( ( mouseEvent->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
 					m_editMode == ERASE )
 			{
@@ -521,7 +521,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				}
 				m_action = NONE;
 			}
-			else if( _me->button() == Qt::LeftButton &&
+			else if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == SELECT )
 			{
 				// select an area of values
@@ -532,14 +532,14 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 				m_selectedLevels = 1;
 				m_action = SELECT_VALUES;
 			}
-			else if( _me->button() == Qt::RightButton &&
+			else if( mouseEvent->button() == Qt::RightButton &&
 							m_editMode == SELECT )
 			{
 				// when clicking right in select-move, we
 				// switch to move-mode
 				//m_moveButton->setChecked( true );
 			}
-			else if( _me->button() == Qt::LeftButton &&
+			else if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == MOVE )
 			{
 				// move selection (including selected values)
@@ -552,7 +552,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 
 				Engine::getSong()->setModified();
 			}
-			else if( _me->button() == Qt::RightButton &&
+			else if( mouseEvent->button() == Qt::RightButton &&
 							m_editMode == MOVE )
 			{
 				// when clicking right in select-move, we
@@ -568,7 +568,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 
 
 
-void AutomationEditor::mouseReleaseEvent( QMouseEvent * _me )
+void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 {
 	if( m_editMode == DRAW )
 	{
@@ -585,7 +585,7 @@ void AutomationEditor::mouseReleaseEvent( QMouseEvent * _me )
 
 
 #include <stdio.h>
-void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
+void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -594,12 +594,12 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if( _me->y() > TOP_MARGIN )
+	if( mouseEvent->y() > TOP_MARGIN )
 	{
-		float level = getLevel( _me->y() );
-		int x = _me->x();
+		float level = getLevel( mouseEvent->y() );
+		int x = mouseEvent->x();
 
-		if( _me->x() <= VALUES_WIDTH )
+		if( mouseEvent->x() <= VALUES_WIDTH )
 		{
 			update();
 			return;
@@ -612,7 +612,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 		int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
-		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
+		if( mouseEvent->buttons() & Qt::LeftButton && m_editMode == DRAW )
 		{
 			if( m_action == MOVE_VALUE )
 			{
@@ -638,14 +638,14 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			Engine::getSong()->setModified();
 
 		}
-		else if( ( _me->buttons() & Qt::RightButton &&
+		else if( ( mouseEvent->buttons() & Qt::RightButton &&
 						m_editMode == DRAW ) ||
-				( _me->buttons() & Qt::LeftButton &&
+				( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == ERASE ) )
 		{
 			m_pattern->removeValue( MidiTime( pos_ticks ) );
 		}
-		else if( _me->buttons() & Qt::NoButton && m_editMode == DRAW )
+		else if( mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
 			// set move- or resize-cursor
 
@@ -702,7 +702,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				}
 			}
 		}
-		else if( _me->buttons() & Qt::LeftButton &&
+		else if( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == SELECT &&
 						m_action == SELECT_VALUES )
 		{
@@ -713,7 +713,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				x = 0;
 				QCursor::setPos( mapToGlobal( QPoint(
-						VALUES_WIDTH, _me->y() ) ) );
+						VALUES_WIDTH, mouseEvent->y() ) ) );
 				if( m_currentPosition >= 4 )
 				{
 					m_leftRightScroll->setValue(
@@ -728,7 +728,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				x = width() - VALUES_WIDTH;
 				QCursor::setPos( mapToGlobal( QPoint( width(),
-								_me->y() ) ) );
+								mouseEvent->y() ) ) );
 				m_leftRightScroll->setValue( m_currentPosition +
 									4 );
 			}
@@ -748,7 +748,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				--m_selectedLevels;
 			}
 		}
-		else if( _me->buttons() & Qt::LeftButton &&
+		else if( mouseEvent->buttons() & Qt::LeftButton &&
 					m_editMode == MOVE &&
 					m_action == MOVE_SELECTION )
 		{
@@ -863,17 +863,17 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if( _me->buttons() & Qt::LeftButton &&
+		if( mouseEvent->buttons() & Qt::LeftButton &&
 					m_editMode == SELECT &&
 					m_action == SELECT_VALUES )
 		{
 
-			int x = _me->x() - VALUES_WIDTH;
+			int x = mouseEvent->x() - VALUES_WIDTH;
 			if( x < 0 && m_currentPosition > 0 )
 			{
 				x = 0;
 				QCursor::setPos( mapToGlobal( QPoint( VALUES_WIDTH,
-								_me->y() ) ) );
+								mouseEvent->y() ) ) );
 				if( m_currentPosition >= 4 )
 				{
 					m_leftRightScroll->setValue(
@@ -888,7 +888,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				x = width() - VALUES_WIDTH;
 				QCursor::setPos( mapToGlobal( QPoint( width(),
-							_me->y() ) ) );
+							mouseEvent->y() ) ) );
 				m_leftRightScroll->setValue( m_currentPosition +
 									4 );
 			}
@@ -905,11 +905,11 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 				m_selectedTick = -m_selectStartTick;
 			}
 
-			float level = getLevel( _me->y() );
+			float level = getLevel( mouseEvent->y() );
 
 			if( level <= m_bottomLevel )
 			{
-				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
+				QCursor::setPos( mapToGlobal( QPoint( mouseEvent->x(),
 							height() -
 							SCROLLBAR_SIZE ) ) );
 				m_topBottomScroll->setValue(
@@ -918,7 +918,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 			else if( level >= m_topLevel )
 			{
-				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
+				QCursor::setPos( mapToGlobal( QPoint( mouseEvent->x(),
 							TOP_MARGIN ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
@@ -939,7 +939,7 @@ void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-inline void AutomationEditor::drawCross( QPainter & _p )
+inline void AutomationEditor::drawCross( QPainter & p )
 {
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
 	float level = getLevel( mouse_pos.y() );
@@ -950,9 +950,9 @@ inline void AutomationEditor::drawCross( QPainter & _p )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
-	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
-	_p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
-	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
+	p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
+	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
+	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
 						height() - SCROLLBAR_SIZE );
 	QPoint tt_pos =  QCursor::pos();
 	tt_pos.ry() -= 64;
@@ -977,7 +977,7 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 
 
 
-void AutomationEditor::paintEvent( QPaintEvent * _pe )
+void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
 	QMutexLocker m( &m_patternMutex );
 
@@ -1310,27 +1310,27 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 
 
 
-int AutomationEditor::xCoordOfTick( int _tick )
+int AutomationEditor::xCoordOfTick(int tick )
 {
-	return VALUES_WIDTH + ( ( _tick - m_currentPosition )
+	return VALUES_WIDTH + ( ( tick - m_currentPosition )
 						* m_ppt / MidiTime::ticksPerTact() );
 }
 
 
 
 
-int AutomationEditor::yCoordOfLevel( float _level )
+int AutomationEditor::yCoordOfLevel(float level )
 {
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	if( m_y_auto )
 	{
 		return (int)( grid_bottom - ( grid_bottom - TOP_MARGIN )
-						* ( _level - m_minLevel )
+						* ( level - m_minLevel )
 						/ ( m_maxLevel - m_minLevel ) );
 	}
 	else
 	{
-		return (int)( grid_bottom - ( _level - m_bottomLevel )
+		return (int)( grid_bottom - ( level - m_bottomLevel )
 								* m_y_delta );
 	}
 }
@@ -1338,19 +1338,19 @@ int AutomationEditor::yCoordOfLevel( float _level )
 
 
 
-void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
-							bool _is_selected )
+void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value,
+							bool is_selected )
 {
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
-	const int x = xCoordOfTick( _tick );
-	int rect_width = xCoordOfTick( _tick+1 ) - x;
+	const int x = xCoordOfTick( tick );
+	int rect_width = xCoordOfTick( tick+1 ) - x;
 
 	// is the level in visible area?
-	if( ( _level >= m_bottomLevel && _level <= m_topLevel )
-			|| ( _level > m_topLevel && m_topLevel >= 0 )
-			|| ( _level < m_bottomLevel && m_bottomLevel <= 0 ) )
+	if( ( value >= m_bottomLevel && value <= m_topLevel )
+			|| ( value > m_topLevel && m_topLevel >= 0 )
+			|| ( value < m_bottomLevel && m_bottomLevel <= 0 ) )
 	{
-		int y_start = yCoordOfLevel( _level );
+		int y_start = yCoordOfLevel( value );
 		int rect_height;
 
 		if( m_y_auto )
@@ -1364,14 +1364,14 @@ void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
 		}
 		else
 		{
-			rect_height = (int)( _level * m_y_delta );
+			rect_height = (int)( value * m_y_delta );
 		}
 
-		QBrush currentColor = _is_selected
+		QBrush currentColor = is_selected
 			? QBrush( QColor( 0x00, 0x40, 0xC0 ) )
 			: graphColor();
 
-		_p.fillRect( x, y_start, rect_width, rect_height, currentColor );
+		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
 	
 	else
@@ -1385,7 +1385,7 @@ void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
 
 
 // responsible for moving/resizing scrollbars after window-resizing
-void AutomationEditor::resizeEvent( QResizeEvent * )
+void AutomationEditor::resizeEvent(QResizeEvent * re)
 {
 	m_leftRightScroll->setGeometry( VALUES_WIDTH, height() - SCROLLBAR_SIZE,
 							width() - VALUES_WIDTH,
@@ -1426,31 +1426,31 @@ void AutomationEditor::resizeEvent( QResizeEvent * )
 
 
 
-void AutomationEditor::wheelEvent( QWheelEvent * _we )
+void AutomationEditor::wheelEvent(QWheelEvent * we )
 {
-	_we->accept();
-	if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::ShiftModifier )
+	we->accept();
+	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
 		int y = m_zoomingYModel.value();
-		if( _we->delta() > 0 )
+		if( we->delta() > 0 )
 		{
 			y++;
 		}
-		if( _we->delta() < 0 )
+		if( we->delta() < 0 )
 		{
 			y--;
 		}
 		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
 		m_zoomingYModel.setValue( y );	
 	}
-	else if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::AltModifier )
+	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
 		int q = m_quantizeModel.value();
-		if( _we->delta() > 0 )
+		if( we->delta() > 0 )
 		{
 			q--;
 		}
-		if( _we->delta() < 0 )
+		if( we->delta() < 0 )
 		{
 			q++;
 		}
@@ -1458,44 +1458,44 @@ void AutomationEditor::wheelEvent( QWheelEvent * _we )
 		m_quantizeModel.setValue( q );
 		update();
 	}
-	else if( _we->modifiers() & Qt::ControlModifier )
+	else if( we->modifiers() & Qt::ControlModifier )
 	{
 		int x = m_zoomingXModel.value();
-		if( _we->delta() > 0 )
+		if( we->delta() > 0 )
 		{
 			x++;
 		}
-		if( _we->delta() < 0 )
+		if( we->delta() < 0 )
 		{
 			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 		m_zoomingXModel.setValue( x );
 	}
-	else if( _we->modifiers() & Qt::ShiftModifier
-			|| _we->orientation() == Qt::Horizontal )
+	else if( we->modifiers() & Qt::ShiftModifier
+			|| we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							_we->delta() * 2 / 15 );
+							we->delta() * 2 / 15 );
 	}
 	else
 	{
 		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							_we->delta() / 30 );
+							we->delta() / 30 );
 	}
 }
 
 
 
 
-float AutomationEditor::getLevel( int _y )
+float AutomationEditor::getLevel(int y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
 	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
-			( m_maxLevel - m_minLevel ) * ( level_line_y - _y )
+			( m_maxLevel - m_minLevel ) * ( level_line_y - y )
 					/ (float)( level_line_y - ( TOP_MARGIN + 2 ) ) :
-			( level_line_y - _y ) / (float)m_y_delta ) ) / m_step ) * m_step;
+			( level_line_y - y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
 	level = qBound( m_bottomLevel, level, m_topLevel );
 
@@ -1582,9 +1582,9 @@ void AutomationEditor::stop()
 
 
 
-void AutomationEditor::horScrolled( int _new_pos )
+void AutomationEditor::horScrolled(int new_pos )
 {
-	m_currentPosition = _new_pos;
+	m_currentPosition = new_pos;
 	emit positionChanged( m_currentPosition );
 	update();
 }
@@ -1592,9 +1592,9 @@ void AutomationEditor::horScrolled( int _new_pos )
 
 
 
-void AutomationEditor::verScrolled( int _new_pos )
+void AutomationEditor::verScrolled(int new_pos )
 {
-	m_scrollLevel = _new_pos;
+	m_scrollLevel = new_pos;
 	updateTopBottomLevels();
 	update();
 }
@@ -1602,7 +1602,7 @@ void AutomationEditor::verScrolled( int _new_pos )
 
 
 
-void AutomationEditor::setEditMode(AutomationEditor::editModes mode)
+void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 {
 	if (m_editMode == mode)
 		return;
@@ -1626,7 +1626,7 @@ void AutomationEditor::setEditMode(AutomationEditor::editModes mode)
 
 void AutomationEditor::setEditMode(int mode)
 {
-	setEditMode((AutomationEditor::editModes) mode);
+	setEditMode((AutomationEditor::EditModes) mode);
 }
 
 
@@ -1711,7 +1711,7 @@ void AutomationEditor::selectAll()
 
 
 // returns vector with pointers to all selected values
-void AutomationEditor::getSelectedValues( timeMap & _selected_values )
+void AutomationEditor::getSelectedValues( timeMap & selected_values )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -1748,7 +1748,7 @@ void AutomationEditor::getSelectedValues( timeMap & _selected_values )
 				pos_ticks >= sel_pos_start &&
 				pos_ticks + len_ticks <= sel_pos_end )
 		{
-			_selected_values[it.key()] = level;
+			selected_values[it.key()] = level;
 		}
 	}
 }
@@ -1865,7 +1865,7 @@ void AutomationEditor::deleteSelectedValues()
 
 
 
-void AutomationEditor::updatePosition( const MidiTime & _t )
+void AutomationEditor::updatePosition(const MidiTime & t )
 {
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
@@ -1873,16 +1873,16 @@ void AutomationEditor::updatePosition( const MidiTime & _t )
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;
-		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() / m_ppt )
+		if( t > m_currentPosition + w * MidiTime::ticksPerTact() / m_ppt )
 		{
-			m_leftRightScroll->setValue( _t.getTact() *
+			m_leftRightScroll->setValue( t.getTact() *
 							MidiTime::ticksPerTact() );
 		}
-		else if( _t < m_currentPosition )
+		else if( t < m_currentPosition )
 		{
-			MidiTime t = qMax( _t - w * MidiTime::ticksPerTact() *
+			MidiTime t_ = qMax( t - w * MidiTime::ticksPerTact() *
 					MidiTime::ticksPerTact() / m_ppt, 0 );
-			m_leftRightScroll->setValue( t.getTact() *
+			m_leftRightScroll->setValue( t_.getTact() *
 							MidiTime::ticksPerTact() );
 		}
 		m_scrollBack = false;
