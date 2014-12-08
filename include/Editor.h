@@ -33,8 +33,8 @@
 
 /// \brief Superclass for editors with a toolbar.
 ///
-/// Those editors include the Song Editor, the Automation Editor,
-/// B&B Editor, Piano Roll.
+/// Those editors include the Song Editor, the Automation Editor, B&B Editor,
+/// and the Piano Roll.
 class Editor : public QMainWindow
 {
 	Q_OBJECT
