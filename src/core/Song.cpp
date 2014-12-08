@@ -729,7 +729,7 @@ void Song::clearProject()
 	Engine::mixer()->lock();
 	if( Engine::getBBEditor() )
 	{
-		Engine::getBBEditor()->clearAllTracks();
+		Engine::getBBEditor()->trackContainerView()->clearAllTracks();
 	}
 	if( Engine::songEditor() )
 	{

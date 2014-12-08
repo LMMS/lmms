@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
@@ -44,27 +44,13 @@
 
 
 BBEditor::BBEditor( BBTrackContainer* tc ) :
-	TrackContainerView( tc ),
-	m_bbtc( tc )
+	Editor(false),
+	m_trackContainerView( new BBTrackContainerView(tc) )
 {
-	// create toolbar
-	m_toolBar = new QWidget;
-	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->move( 0, 0 );
-	m_toolBar->setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(),
-					embed::getIconPixmap( "toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
-
-	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
-	tb_layout->setSpacing( 0 );
-	tb_layout->setMargin( 0 );
-
-
 	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setCentralWidget(m_trackContainerView);
+
 	// TODO: Use style sheet
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
@@ -79,16 +65,8 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	}
 
 
-	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
-			tr( "Play/pause current beat/bassline (Space)" ),
-					this, SLOT( play() ), m_toolBar );
-
-	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
-			tr( "Stop playback of current beat/bassline (Space)" ),
-					this, SLOT( stop() ), m_toolBar );
-
-	m_playButton->setObjectName( "playButton" );
-	m_stopButton->setObjectName( "stopButton" );
+	m_playButton->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
+	m_stopButton->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
 
 	ToolButton * add_bb_track = new ToolButton(
 					embed::getIconPixmap( "add_bb_track" ),
@@ -99,18 +77,17 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	ToolButton * add_automation_track = new ToolButton(
 				embed::getIconPixmap( "add_automation" ),
 						tr( "Add automation-track" ),
-				this, SLOT( addAutomationTrack() ), m_toolBar );
+				m_trackContainerView, SLOT( addAutomationTrack() ), m_toolBar );
 
 	ToolButton * remove_bar = new ToolButton(
 				embed::getIconPixmap( "step_btn_remove" ),
 						tr( "Remove steps" ),
-				this, SLOT( removeSteps() ), m_toolBar );
+				m_trackContainerView, SLOT( removeSteps() ), m_toolBar );
 
 	ToolButton * add_bar = new ToolButton(
 				embed::getIconPixmap( "step_btn_add" ),
 						tr( "Add steps" ),
-				this, SLOT( addSteps() ), m_toolBar );
-
+				m_trackContainerView, SLOT( addSteps() ), m_toolBar );
 
 
 	m_playButton->setWhatsThis(
@@ -125,30 +102,35 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_bbComboBox->setFixedSize( 200, 22 );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
-	tb_layout->addSpacing( 5 );
-	tb_layout->addWidget( m_playButton );
-	tb_layout->addWidget( m_stopButton );
-	tb_layout->addSpacing( 20 );
-	tb_layout->addWidget( m_bbComboBox );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( add_bb_track );
-	tb_layout->addWidget( add_automation_track );
-	tb_layout->addStretch();
-	tb_layout->addWidget( remove_bar );
-	tb_layout->addWidget( add_bar );
-	tb_layout->addSpacing( 15 );
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( m_bbComboBox );
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( add_bb_track );
+	m_toolBar->addWidget( add_automation_track );
+	QWidget* stretch = new QWidget(m_toolBar);
+	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_toolBar->addWidget(stretch);
+	m_toolBar->addWidget( remove_bar );
+	m_toolBar->addWidget( add_bar );
+	m_toolBar->addSeparator();
 
-	Engine::mainWindow()->workspace()->addSubWindow( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	parentWidget()->resize( minimumWidth(), 300 );
 	parentWidget()->move( 610, 5 );
 	parentWidget()->show();
 
-
-	setModel( tc );
 	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePosition() ) );
+			m_trackContainerView, SLOT( updatePosition() ) );
+
+	QAction* viewNext = new QAction(this);
+	connect(viewNext, SIGNAL(triggered()), m_bbComboBox, SLOT(selectNext()));
+	viewNext->setShortcut(Qt::Key_Plus);
+	addAction(viewNext);
+
+	QAction* viewPrevious = new QAction(this);
+	connect(viewPrevious, SIGNAL(triggered()), m_bbComboBox, SLOT(selectPrevious()));
+	viewPrevious->setShortcut(Qt::Key_Minus);
+	addAction(viewPrevious);
 }
 
 
@@ -159,49 +141,11 @@ BBEditor::~BBEditor()
 }
 
 
-void BBEditor::dropEvent( QDropEvent * de )
+
+
+void BBEditor::removeBBView( int bb )
 {
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
-	
-	if( type.left( 6 ) == "track_" )
-	{
-		DataFile dataFile( value.toUtf8() );
-		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
-		
-		t->deleteTCOs();
-		m_bbtc->updateAfterTrackAdd();
-		
-		de->accept();
-	}
-	else
-	{
-		TrackContainerView::dropEvent( de );
-	}
-}
-
-
-void BBEditor::removeBBView( int _bb )
-{
-	foreach( TrackView* view, trackViews() )
-	{
-		view->getTrackContentWidget()->removeTCOView( _bb );
-	}
-}
-
-
-
-
-void BBEditor::setPauseIcon( bool pause )
-{
-	if( pause == true )
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-	}
-	else
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	}
+	m_trackContainerView->removeBBView(bb);
 }
 
 
@@ -230,24 +174,21 @@ void BBEditor::stop()
 
 
 
-void BBEditor::updatePosition()
+
+
+BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
+	TrackContainerView(tc),
+	m_bbtc(tc)
 {
-	//realignTracks();
-	emit positionChanged( m_currentPosition );
+	setModel( tc );
 }
 
 
 
 
-void BBEditor::addAutomationTrack()
-{
-	(void) Track::create( Track::AutomationTrack, model() );
-}
 
 
-
-
-void BBEditor::addSteps()
+void BBTrackContainerView::addSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -265,7 +206,7 @@ void BBEditor::addSteps()
 
 
 
-void BBEditor::removeSteps()
+void BBTrackContainerView::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -283,43 +224,51 @@ void BBEditor::removeSteps()
 
 
 
-void BBEditor::keyPressEvent( QKeyEvent * _ke )
+void BBTrackContainerView::addAutomationTrack()
 {
-	if ( _ke->key() == Qt::Key_Space )
-	{
-		if( Engine::getSong()->isPlaying() )
-		{
-			stop();
-		}
-		else
-		{
-			play();
-		}
-	}
-	else if ( _ke->key() == Qt::Key_Plus )
-	{
-		if( m_bbtc->currentBB()+ 1 < m_bbtc->numOfBBs() )
-		{
-			m_bbtc->setCurrentBB( m_bbtc->currentBB() + 1 );
-		}
-	}
-	else if ( _ke->key() == Qt::Key_Minus )
-	{
-		if( m_bbtc->currentBB() > 0 )
-		{
-			m_bbtc->setCurrentBB( m_bbtc->currentBB() - 1 );
-		}
-	}
-	else
-	{
-		// ignore event and pass to parent-widget
-		_ke->ignore();
-	}
-
+	(void) Track::create( Track::AutomationTrack, model() );
 }
 
 
 
 
+void BBTrackContainerView::removeBBView(int bb)
+{
+	foreach( TrackView* view, trackViews() )
+	{
+		view->getTrackContentWidget()->removeTCOView( bb );
+	}
+}
 
 
+
+
+void BBTrackContainerView::dropEvent(QDropEvent* de)
+{
+	QString type = StringPairDrag::decodeKey( de );
+	QString value = StringPairDrag::decodeValue( de );
+
+	if( type.left( 6 ) == "track_" )
+	{
+		DataFile dataFile( value.toUtf8() );
+		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
+
+		t->deleteTCOs();
+		m_bbtc->updateAfterTrackAdd();
+
+		de->accept();
+	}
+	else
+	{
+		TrackContainerView::dropEvent( de );
+	}
+}
+
+
+
+
+void BBTrackContainerView::updatePosition()
+{
+	//realignTracks();
+	emit positionChanged( m_currentPosition );
+}

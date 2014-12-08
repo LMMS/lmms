@@ -26,6 +26,7 @@
 #ifndef BB_EDITOR_H
 #define BB_EDITOR_H
 
+#include "Editor.h"
 #include "TrackContainerView.h"
 
 
@@ -33,46 +34,60 @@ class BBTrackContainer;
 class ComboBox;
 class ToolButton;
 
+class BBTrackContainerView;
 
-class BBEditor : public TrackContainerView
+class BBEditor : public Editor
 {
 	Q_OBJECT
 public:
 	BBEditor( BBTrackContainer * _tc );
-	virtual ~BBEditor();
+	~BBEditor();
 
-	virtual inline bool fixedTCOs() const
-	{
-		return( true );
+	const BBTrackContainerView* trackContainerView() const {
+		return m_trackContainerView;
 	}
-	
-	virtual void dropEvent( QDropEvent * _de );
+	BBTrackContainerView* trackContainerView() {
+		return m_trackContainerView;
+	}
 
-	void removeBBView( int _bb );
-
-	void setPauseIcon( bool pause );
-
+	void removeBBView( int bb );
 
 public slots:
 	void play();
 	void stop();
-	void updatePosition();
-	void addAutomationTrack();
-	void addSteps();
-	void removeSteps();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * _ke );
-
-	BBTrackContainer * m_bbtc;
-	QWidget * m_toolBar;
-
-	ToolButton * m_playButton;
-	ToolButton * m_stopButton;
-
+	BBTrackContainerView* m_trackContainerView;
 	ComboBox * m_bbComboBox;
-
 } ;
+
+
+
+class BBTrackContainerView : public TrackContainerView
+{
+	Q_OBJECT
+public:
+	BBTrackContainerView(BBTrackContainer* tc);
+
+	bool fixedTCOs() const
+	{
+		return true;
+	}
+
+	void removeBBView(int bb);
+
+public slots:
+	void addSteps();
+	void removeSteps();
+	void addAutomationTrack();
+
+protected slots:
+	virtual void dropEvent(QDropEvent * de );
+	void updatePosition();
+
+private:
+	BBTrackContainer * m_bbtc;
+};
 
 
 #endif
