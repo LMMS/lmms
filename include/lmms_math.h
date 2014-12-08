@@ -136,7 +136,7 @@ static inline long fastFmal( long a, long b, long c) {
 	#ifdef __clang__
 		return fma(a, b, c);
 	#else
-		return fmal(a, b, c);
+		return fmal( a, b, c );
 	#endif
 #else
 	return a * ( b - c ) + c;
@@ -147,9 +147,9 @@ static inline long fastFmal( long a, long b, long c) {
 static inline float fastFmaf( float a, float b, float c) {
 #ifdef FP_FAST_FMAF
 	#ifdef __clang__
-		return fma(a, b, c);
+		return fma( a, b, c );
 	#else
-		return fmaf(a, b, c);
+		return fmaf( a, b, c );
 	#endif
 #else
 	return a * ( b - c ) + c;
@@ -159,7 +159,7 @@ static inline float fastFmaf( float a, float b, float c) {
 //! @brief Takes advantage of fma() function if present in hardware
 static inline int fastFma( int a, int b, int c) {
 #ifdef FP_FAST_FMAF
-	return fma(a, b, c);
+	return fma( a, b, c );
 #else
 	return a * ( b - c ) + c;
 #endif
