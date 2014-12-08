@@ -555,7 +555,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(
-                            i+1 ), "%" );
+							 i+1 ), "%" );
 		vk->setWhatsThis(
 			tr( "With this knob you can set the volume of "
 				"oscillator %1. When setting a value of 0 the "
@@ -566,7 +566,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		// setup panning-knob
 		Knob * pk = new TripleOscKnob( this );
 		pk->move( 35, knob_y );
-        pk->setHintText( tr("Osc %1 panning:").arg( i + 1 ), "" );
+		pk->setHintText( tr("Osc %1 panning:").arg( i + 1 ), "" );
 		pk->setWhatsThis(
 			tr( "With this knob you can set the panning of the "
 				"oscillator %1. A value of -100 means 100% "
@@ -576,8 +576,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		// setup coarse-knob
 		Knob * ck = new TripleOscKnob( this );
 		ck->move( 82, knob_y );
-        ck->setHintText( tr( "Osc %1 coarse detuning:" ).arg( i + 1 )
-                        , " " + tr( "semitones" ) );
+		ck->setHintText( tr( "Osc %1 coarse detuning:" ).arg( i + 1 )
+						 , " " + tr( "semitones" ) );
 		ck->setWhatsThis(
 			tr( "With this knob you can set the coarse detuning of "
 				"oscillator %1. You can detune the oscillator "
@@ -590,7 +590,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		Knob * flk = new TripleOscKnob( this );
 		flk->move( 111, knob_y );
 		flk->setHintText( tr( "Osc %1 fine detuning left:" ).
-                        arg( i + 1 ),
+						  arg( i + 1 ),
 							" " + tr( "cents" ) );
 		flk->setWhatsThis(
 			tr( "With this knob you can set the fine detuning of "
@@ -603,7 +603,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		Knob * frk = new TripleOscKnob( this );
 		frk->move( 140, knob_y );
 		frk->setHintText( tr( "Osc %1 fine detuning right:" ).
-                        arg( i + 1 ),
+						  arg( i + 1 ),
 							" " + tr( "cents" ) );
 		frk->setWhatsThis(
 			tr( "With this knob you can set the fine detuning of "
@@ -617,7 +617,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		Knob * pok = new TripleOscKnob( this );
 		pok->move( 188, knob_y );
 		pok->setHintText( tr( "Osc %1 phase-offset:" ).
-                        arg( i + 1 ),
+						  arg( i + 1 ),
 							" " + tr( "degrees" ) );
 		pok->setWhatsThis(
 			tr( "With this knob you can set the phase-offset of "
@@ -633,7 +633,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		Knob * spdk = new TripleOscKnob( this );
 		spdk->move( 217, knob_y );
 		spdk->setHintText( tr("Osc %1 stereo phase-detuning:" ).
-                    arg( i + 1 ),
+						arg( i + 1 ),
 							" " + tr( "degrees" ) );
 		spdk->setWhatsThis(
 			tr( "With this knob you can set the stereo phase-"

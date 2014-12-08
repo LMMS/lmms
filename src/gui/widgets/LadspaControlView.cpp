@@ -100,7 +100,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 			knb->setModel( m_ctl->tempoSyncKnobModel() );
 		}
 		knb->setLabel( m_ctl->port()->name );
-        knb->setHintText( tr( "Value:" ), "" );
+		knb->setHintText( tr( "Value:" ), "" );
 		knb->setWhatsThis( tr( "Sorry, no help available." ) );
 		layout->addWidget( knb );
 		if( link != NULL )

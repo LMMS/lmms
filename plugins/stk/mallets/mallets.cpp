@@ -334,7 +334,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	m_spreadKnob = new Knob( knobVintage_32, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 190, 140 );
-	m_spreadKnob->setHintText( tr( "Spread:" ) + " ", "" );
+	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 }
 
 
@@ -366,27 +366,27 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	m_hardnessKnob = new Knob( knobVintage_32, widget );
 	m_hardnessKnob->setLabel( tr( "Hardness" ) );
 	m_hardnessKnob->move( 30, 90 );
-	m_hardnessKnob->setHintText( tr( "Hardness:" ) + " ", "" );
+	m_hardnessKnob->setHintText( tr( "Hardness:" ), "" );
 
 	m_positionKnob = new Knob( knobVintage_32, widget );
 	m_positionKnob->setLabel( tr( "Position" ) );
 	m_positionKnob->move( 110, 90 );
-	m_positionKnob->setHintText( tr( "Position:" ) + " ", "" );
+	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
 	m_vibratoGainKnob = new Knob( knobVintage_32, widget );
 	m_vibratoGainKnob->setLabel( tr( "Vib Gain" ) );
 	m_vibratoGainKnob->move( 30, 140 );
-	m_vibratoGainKnob->setHintText( tr( "Vib Gain:" ) + " ", "" );
+	m_vibratoGainKnob->setHintText( tr( "Vib Gain:" ), "" );
 
 	m_vibratoFreqKnob = new Knob( knobVintage_32, widget );
 	m_vibratoFreqKnob->setLabel( tr( "Vib Freq" ) );
 	m_vibratoFreqKnob->move( 110, 140 );
-	m_vibratoFreqKnob->setHintText( tr( "Vib Freq:" ) + " ", "" );
+	m_vibratoFreqKnob->setHintText( tr( "Vib Freq:" ), "" );
 
 	m_stickKnob = new Knob( knobVintage_32, widget );
 	m_stickKnob->setLabel( tr( "Stick Mix" ) );
 	m_stickKnob->move( 190, 90 );
-	m_stickKnob->setHintText( tr( "Stick Mix:" ) + " ", "" );
+	m_stickKnob->setHintText( tr( "Stick Mix:" ), "" );
 	
 	return( widget );
 }
@@ -402,27 +402,27 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	m_modulatorKnob = new Knob( knobVintage_32, widget );
 	m_modulatorKnob->setLabel( tr( "Modulator" ) );
 	m_modulatorKnob->move( 30, 90 );
-	m_modulatorKnob->setHintText( tr( "Modulator:" ) + " ", "" );
+	m_modulatorKnob->setHintText( tr( "Modulator:" ), "" );
 
 	m_crossfadeKnob = new Knob( knobVintage_32, widget );
 	m_crossfadeKnob->setLabel( tr( "Crossfade" ) );
 	m_crossfadeKnob->move( 110, 90 );
-	m_crossfadeKnob->setHintText( tr( "Crossfade:" ) + " ", "" );
+	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
 	
 	m_lfoSpeedKnob = new Knob( knobVintage_32, widget );
 	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
 	m_lfoSpeedKnob->move( 30, 140 );
-	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ) + " ", "" );
+	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ), "" );
 	
 	m_lfoDepthKnob = new Knob( knobVintage_32, widget );
 	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
 	m_lfoDepthKnob->move( 110, 140 );
-	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ) + " ", "" );
+	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ), "" );
 	
 	m_adsrKnob = new Knob( knobVintage_32, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
 	m_adsrKnob->move( 190, 90 );
-	m_adsrKnob->setHintText( tr( "ADSR:" ) + " ", "" );
+	m_adsrKnob->setHintText( tr( "ADSR:" ), "" );
 
 	return( widget );
 }
@@ -442,22 +442,22 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 	m_pressureKnob = new Knob( knobVintage_32, widget );
 	m_pressureKnob->setLabel( tr( "Pressure" ) );
 	m_pressureKnob->move( 30, 90 );
-	m_pressureKnob->setHintText( tr( "Pressure:" ) + " ", "" );
+	m_pressureKnob->setHintText( tr( "Pressure:" ), "" );
 
 	m_motionKnob = new Knob( knobVintage_32, widget );
 	m_motionKnob->setLabel( tr( "Motion" ) );
 	m_motionKnob->move( 110, 90 );
-	m_motionKnob->setHintText( tr( "Motion:" ) + " ", "" );
+	m_motionKnob->setHintText( tr( "Motion:" ), "" );
 	
 	m_velocityKnob = new Knob( knobVintage_32, widget );
 	m_velocityKnob->setLabel( tr( "Speed" ) );
 	m_velocityKnob->move( 30, 140 );
-	m_velocityKnob->setHintText( tr( "Speed:" ) + " ", "" );
+	m_velocityKnob->setHintText( tr( "Speed:" ), "" );
 	
 	m_vibratoKnob = new Knob( knobVintage_32, widget, tr( "Vibrato" ) );
 	m_vibratoKnob->setLabel( tr( "Vibrato" ) );
 	m_vibratoKnob->move( 110, 140 );
-	m_vibratoKnob->setHintText( tr( "Vibrato:" ) + " ", "" );
+	m_vibratoKnob->setHintText( tr( "Vibrato:" ), "" );
 	
 	return( widget );
 }

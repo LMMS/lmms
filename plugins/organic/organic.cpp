@@ -433,7 +433,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob = new organicKnob( this );
 	m_fx1Knob->move( 15, 201 );
 	m_fx1Knob->setFixedSize( 37, 47 );
-    m_fx1Knob->setHintText( tr( "Distortion:" ), QString() );
+	m_fx1Knob->setHintText( tr( "Distortion:" ), QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
 	m_fx1Knob->setWhatsThis( tr( "The distortion knob adds distortion to the output of the instrument. " ) );
 
@@ -442,7 +442,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_volKnob->setVolumeKnob( true );
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
-    m_volKnob->setHintText( tr( "Volume:" ), "%" );
+	m_volKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volKnob->setObjectName( "volKnob" );
 	m_volKnob->setWhatsThis( tr( "The volume knob controls the volume of the output of the instrument. "
 									"It is cumulative with the instrument window's volume control. " ) );
@@ -513,7 +513,7 @@ void organicInstrumentView::modelChanged()
 		connect( &oi->m_osc[i]->m_oscModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
 
-        oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), QString() );
+		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), QString() );
 										
 		// setup volume-knob
 		Knob * volKnob = new Knob( knobStyled, this );
@@ -521,19 +521,19 @@ void organicInstrumentView::modelChanged()
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
-                            i + 1 ), "%" );
+								i + 1 ), "%" );
 							
 		// setup panning-knob
 		Knob * panKnob = new organicKnob( this );
 		panKnob->move( x + i  * colWidth, y + rowHeight*2 );
 		panKnob->setHintText( tr("Osc %1 panning:").arg(
-                            i + 1 ), "" );
+								i + 1 ), "" );
 							
 		// setup knob for fine-detuning
 		Knob * detuneKnob = new organicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
 		detuneKnob->setHintText( tr( "Osc %1 stereo detuning" ).arg( i + 1 )
-                            , " " +
+							, " " +
 							tr( "cents" ) );
 
 		m_oscKnobs[i] = OscillatorKnobs( harmKnob, volKnob, oscKnob, panKnob, detuneKnob );
@@ -557,9 +557,9 @@ void organicInstrumentView::updateKnobHint()
 		const float harm = oi->m_osc[i]->m_harmModel.value();
 		const float wave = oi->m_osc[i]->m_oscModel.value();
 		
-        m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ), " (" +
+		m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ), " (" +
 			HARMONIC_NAMES[ static_cast<int>( harm ) ] + ")" );
-        m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ), " (" +
+		m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ), " (" +
 			WAVEFORM_NAMES[ static_cast<int>( wave ) ] + ")" );
 	}
 }

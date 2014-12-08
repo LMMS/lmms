@@ -335,7 +335,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	
 	m_sampleLengthKnob = new Knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 6, 201 );
-    m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
+	m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
 
 	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border

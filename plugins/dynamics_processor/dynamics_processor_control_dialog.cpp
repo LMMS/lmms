@@ -63,7 +63,7 @@ dynProcControlDialog::dynProcControlDialog(
 	inputKnob -> move( 14, 251 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setLabel( tr( "INPUT" ) );
-    inputKnob->setHintText( tr( "Input gain:" ) , "" );
+	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
 	Knob * outputKnob = new Knob( knobBright_26, this );
 	outputKnob -> setVolumeKnob( true );
@@ -71,19 +71,19 @@ dynProcControlDialog::dynProcControlDialog(
 	outputKnob -> move( 54, 251 );
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setLabel( tr( "OUTPUT" ) );
-    outputKnob->setHintText( tr( "Output gain:" ) , "" );
+	outputKnob->setHintText( tr( "Output gain:" ) , "" );
 	
 	Knob * attackKnob = new Knob( knobBright_26, this);
 	attackKnob -> move( 11, 291 );
 	attackKnob->setModel( &_controls->m_attackModel );
 	attackKnob->setLabel( tr( "ATTACK" ) );
-    attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
+	attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
 
 	Knob * releaseKnob = new Knob( knobBright_26, this );
 	releaseKnob -> move( 52, 291 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
 	releaseKnob->setLabel( tr( "RELEASE" ) );
-    releaseKnob->setHintText( tr( "Peak release time:" ) , "ms" );
+	releaseKnob->setHintText( tr( "Peak release time:" ) , "ms" );
 
 //waveform control buttons
 

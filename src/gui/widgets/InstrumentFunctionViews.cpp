@@ -60,7 +60,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
-    m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
+	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
 	m_chordRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the chord range in octaves. "
 			"The selected chord will be played within specified "
@@ -130,7 +130,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
-    m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
+	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
 	m_arpRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
@@ -138,7 +138,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
-    m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
+	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
 	m_arpTimeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio time in "
 			"milliseconds. The arpeggio time specifies how long "
@@ -146,7 +146,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
-    m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
+	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 	m_arpGateKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio gate. The "
 			"arpeggio gate specifies the percent of a whole "

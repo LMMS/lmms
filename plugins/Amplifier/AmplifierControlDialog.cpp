@@ -45,26 +45,26 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	volumeKnob -> setVolumeKnob( true );
 	volumeKnob->setModel( &controls->m_volumeModel );
 	volumeKnob->setLabel( tr( "VOL" ) );
-    volumeKnob->setHintText( tr( "Volume:" ) , "%" );
+	volumeKnob->setHintText( tr( "Volume:" ) , "%" );
 
 	Knob * panKnob = new Knob( knobBright_26, this);
 	panKnob -> move( 60, 30 );
 	panKnob->setModel( &controls->m_panModel );
 	panKnob->setLabel( tr( "PAN" ) );
-    panKnob->setHintText( tr( "Panning:" ) , "" );
+	panKnob->setHintText( tr( "Panning:" ) , "" );
 
 	Knob * leftKnob = new Knob( knobBright_26, this);
 	leftKnob -> move( 20, 80 );
 	leftKnob -> setVolumeKnob( true );
 	leftKnob->setModel( &controls->m_leftModel );
 	leftKnob->setLabel( tr( "LEFT" ) );
-    leftKnob->setHintText( tr( "Left gain:" ) , "%" );
+	leftKnob->setHintText( tr( "Left gain:" ) , "%" );
 
 	Knob * rightKnob = new Knob( knobBright_26, this);
 	rightKnob -> move( 60, 80 );
 	rightKnob -> setVolumeKnob( true );
 	rightKnob->setModel( &controls->m_rightModel );
 	rightKnob->setLabel( tr( "RIGHT" ) );
-    rightKnob->setHintText( tr( "Right gain:" ) , "%" );
+	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
 }
 
