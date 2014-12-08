@@ -3459,37 +3459,11 @@ void PianoRoll::verScrolled( int _new_pos )
 
 
 
-void PianoRoll::drawButtonToggled()
+void PianoRoll::setEditMode(PianoRoll::editModes mode)
 {
-	m_editMode = ModeDraw;
-	update();
+	m_editMode = mode;
 }
 
-
-
-
-void PianoRoll::eraseButtonToggled()
-{
-	m_editMode = ModeErase;
-	update();
-}
-
-
-
-
-void PianoRoll::selectButtonToggled()
-{
-	m_editMode = ModeSelect;
-	update();
-}
-
-
-
-void PianoRoll::detuneButtonToggled()
-{
-	m_editMode = ModeEditDetuning;
-	update();
-}
 
 
 
@@ -4047,10 +4021,10 @@ PianoRollWindow::PianoRollWindow() :
 			"notes from one to another. You can also press "
 			"'Shift+T' on your keyboard to activate this mode." ) );
 
-	connect(m_drawAction, SIGNAL(triggered()), m_editor, SLOT(drawButtonToggled()));
-	connect(m_eraseAction, SIGNAL(triggered()), m_editor, SLOT(eraseButtonToggled()));
-	connect(m_selectAction, SIGNAL(triggered()), m_editor, SLOT(selectButtonToggled()));
-	connect(m_detuneAction, SIGNAL(triggered()), m_editor, SLOT(detuneButtonToggled()));
+	connect(m_drawAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
+	connect(m_eraseAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeErase()));
+	connect(m_selectAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
+	connect(m_detuneAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDetune()));
 
 	// Copy + paste actions
 	m_cutAction = new QAction(embed::getIconPixmap("edit_cut"),

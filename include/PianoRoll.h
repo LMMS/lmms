@@ -58,6 +58,14 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 public:
+	enum editModes
+	{
+		ModeDraw,
+		ModeErase,
+		ModeSelect,
+		ModeEditDetuning,
+	};
+
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
 
@@ -97,6 +105,7 @@ public:
 	QColor barColor() const;
 	void setBarColor( const QColor & _c );
 
+
 protected:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void keyReleaseEvent( QKeyEvent * _ke );
@@ -131,10 +140,11 @@ protected slots:
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
 
-	void drawButtonToggled();
-	void eraseButtonToggled();
-	void selectButtonToggled();
-	void detuneButtonToggled();
+	void setEditMode(editModes mode);
+	void setEditModeDraw() {setEditMode(ModeDraw); }
+	void setEditModeErase() {setEditMode(ModeErase); }
+	void setEditModeSelect() {setEditMode(ModeSelect); }
+	void setEditModeDetune() {setEditMode(ModeEditDetuning); }
 
 	void copySelectedNotes();
 	void cutSelectedNotes();
@@ -162,14 +172,6 @@ signals:
 
 
 private:
-	enum editModes
-	{
-		ModeDraw,
-		ModeErase,
-		ModeSelect,
-		ModeEditDetuning,
-	};
-
 	enum actions
 	{
 		ActionNone,
