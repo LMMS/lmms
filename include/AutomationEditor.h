@@ -44,7 +44,7 @@ class QScrollBar;
 
 class ComboBox;
 class NotePlayHandle;
-class Timeline;
+class TimeLineWidget;
 
 
 
@@ -226,7 +226,7 @@ private:
 	EditModes m_editMode;
 
 
-	Timeline * m_timeLine;
+	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
 	void drawCross(QPainter & p );

@@ -45,7 +45,7 @@
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "TextFloat.h"
-#include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "ToolTip.h"
 #include "VisualizationWidget.h"
 #include "TimeDisplayWidget.h"
@@ -86,7 +86,7 @@ SongEditor::SongEditor( Song * _song ) :
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	m_timeLine = new Timeline( widgetTotal, 32,
+	m_timeLine = new TimeLineWidget( widgetTotal, 32,
 					pixelsPerTact(),
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition, this );
@@ -525,7 +525,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 	}
 
 	if( ( m_song->isPlaying() && m_song->m_playMode == Song::Mode_PlaySong
-		  && m_timeLine->autoScroll() == Timeline::AutoScrollEnabled) ||
+		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - widgetWidth

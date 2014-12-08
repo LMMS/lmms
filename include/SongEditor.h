@@ -40,7 +40,7 @@ class LcdSpinBox;
 class MeterDialog;
 class Song;
 class TextFloat;
-class Timeline;
+class TimeLineWidget;
 
 class positionLine : public QWidget
 {
@@ -108,7 +108,7 @@ private:
 
 	LcdSpinBox * m_tempoSpinBox;
 
-	Timeline * m_timeLine;
+	TimeLineWidget * m_timeLine;
 
 	MeterDialog * m_timeSigDisplay;
 	AutomatableSlider * m_masterVolumeSlider;

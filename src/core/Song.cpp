@@ -60,7 +60,7 @@
 #include "SongEditor.h"
 #include "templates.h"
 #include "TextFloat.h"
-#include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "PeakController.h"
 
 
@@ -179,7 +179,7 @@ void Song::setTimeSignature()
 
 void Song::savePos()
 {
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
+	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 
 	if( tl != NULL )
 	{
@@ -246,7 +246,7 @@ void Song::processNextBuffer()
 	}
 
 	// check for looping-mode and act if necessary
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
+	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
 				tl->loopPointsEnabled();
 	if( check_loop )
@@ -565,7 +565,7 @@ void Song::stop()
 		return;
 	}
 
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
+	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_playing = false;
 	m_paused = false;
 	m_recording = true;
@@ -575,12 +575,12 @@ void Song::stop()
 
 		switch( tl->behaviourAtStop() )
 		{
-			case Timeline::BackToZero:
+			case TimeLineWidget::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
 				m_elapsedMilliSeconds = 0;
 				break;
 
-			case Timeline::BackToStart:
+			case TimeLineWidget::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
@@ -589,7 +589,7 @@ void Song::stop()
 				}
 				break;
 
-			case Timeline::KeepStopPosition:
+			case TimeLineWidget::KeepStopPosition:
 			default:
 				break;
 		}

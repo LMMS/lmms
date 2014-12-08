@@ -1,5 +1,5 @@
 /*
- * Timeline.h - class timeLine, representing a time-line with position marker
+ * TimeLineWidget.h - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -37,7 +37,7 @@ class NStateButton;
 class TextFloat;
 
 
-class Timeline : public QWidget, public JournallingObject
+class TimeLineWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -61,9 +61,9 @@ public:
 	} ;
 
 
-	Timeline( int _xoff, int _yoff, float _ppt, Song::playPos & _pos,
+	TimeLineWidget( int _xoff, int _yoff, float _ppt, Song::playPos & _pos,
 				const MidiTime & _begin, QWidget * _parent );
-	virtual ~Timeline();
+	virtual ~TimeLineWidget();
 
 	inline Song::playPos & pos()
 	{

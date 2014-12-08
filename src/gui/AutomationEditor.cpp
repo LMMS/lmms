@@ -55,7 +55,7 @@
 #include "PixmapButton.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "ToolTip.h"
 #include "TextFloat.h"
 #include "ComboBox.h"
@@ -121,7 +121,7 @@ AutomationEditor::AutomationEditor() :
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
 	// add time-line
-	m_timeLine = new Timeline( VALUES_WIDTH, 0, m_ppt,
+	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
 				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );

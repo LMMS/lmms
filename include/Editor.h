@@ -28,7 +28,7 @@
 #include <QMainWindow>
 #include <QToolBar>
 
-#include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "ToolButton.h"
 
 /// \brief Superclass for editors with a toolbar.
