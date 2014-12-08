@@ -58,7 +58,7 @@ Song * Engine::s_song = NULL;
 SongEditorWindow* Engine::s_songEditor = NULL;
 AutomationEditorWindow * Engine::s_automationEditor = NULL;
 BBEditor * Engine::s_bbEditor = NULL;
-PianoRoll* Engine::s_pianoRoll = NULL;
+PianoRollWindow* Engine::s_pianoRoll = NULL;
 ProjectNotes * Engine::s_projectNotes = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
@@ -98,7 +98,7 @@ void Engine::init( const bool _has_gui )
 		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new ProjectNotes;
 		s_bbEditor = new BBEditor( s_bbTrackContainer );
-		s_pianoRoll = new PianoRoll;
+		s_pianoRoll = new PianoRollWindow();
 		s_automationEditor = new AutomationEditorWindow;
 
 		s_mainWindow->finalize();

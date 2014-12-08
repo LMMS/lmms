@@ -30,6 +30,7 @@
 #include <QWidget>
 #include <QInputDialog>
 
+#include "Editor.h"
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
@@ -50,7 +51,7 @@ class Pattern;
 class Timeline;
 class ToolButton;
 
-class PianoRoll : public QWidget, public SerializingObject
+class PianoRoll : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
@@ -86,17 +87,6 @@ public:
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
 	int quantization() const;
-
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-
-	inline virtual QString nodeName() const
-	{
-		return "pianoroll";
-	}
-
-	void setPauseIcon( bool pause );
 	
 	// qproperty acces functions
 	QColor gridColor() const;
@@ -109,7 +99,6 @@ public:
 	void setBarColor( const QColor & _c );
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void keyReleaseEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
@@ -264,34 +253,11 @@ private:
 
 	static TextFloat * s_textFloat;
 
-	QWidget * m_toolBar;
-
-	ToolButton * m_playButton;
-	ToolButton * m_recordButton;
-	ToolButton * m_recordAccompanyButton;
-	ToolButton * m_stopButton;
-
-	ToolButton * m_drawButton;
-	ToolButton * m_eraseButton;
-	ToolButton * m_selectButton;
-	ToolButton * m_detuneButton;
-
-	ToolButton * m_cutButton;
-	ToolButton * m_copyButton;
-	ToolButton * m_pasteButton;
-
-	ComboBox * m_zoomingComboBox;
-	ComboBox * m_quantizeComboBox;
-	ComboBox * m_noteLenComboBox;
-	ComboBox * m_scaleComboBox;
-	ComboBox * m_chordComboBox;
-
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
-
 
 
 	Pattern* m_pattern;
@@ -367,6 +333,7 @@ private:
 	bool m_startedWithShift;
 
 	friend class Engine;
+	friend class PianoRollWindow;
 
 	// qproperty fields
 	QColor m_gridColor;
@@ -378,6 +345,62 @@ signals:
 	void positionChanged( const MidiTime & );
 
 } ;
+
+
+class PianoRollWindow : public Editor, SerializingObject
+{
+	Q_OBJECT
+public:
+	PianoRollWindow();
+
+	const Pattern* currentPattern() const;
+	void setCurrentPattern(Pattern* pattern);
+
+	int quantization() const;
+
+	void play();
+	void stop();
+	void record();
+	void recordAccompany();
+	void stopRecording();
+
+	bool isRecording() const;
+
+	/*! \brief Resets settings to default when e.g. creating a new project */
+	void reset();
+
+	using SerializingObject::saveState;
+	using SerializingObject::restoreState;
+	virtual void saveSettings(QDomDocument & doc, QDomElement & de );
+	virtual void loadSettings( const QDomElement & de );
+
+	inline virtual QString nodeName() const
+	{
+		return "pianoroll";
+	}
+
+signals:
+	void currentPatternChanged();
+
+private:
+	PianoRoll* m_editor;
+
+	ToolButton * m_drawButton;
+	ToolButton * m_eraseButton;
+	ToolButton * m_selectButton;
+	ToolButton * m_detuneButton;
+
+	ToolButton * m_cutButton;
+	ToolButton * m_copyButton;
+	ToolButton * m_pasteButton;
+
+	ComboBox * m_zoomingComboBox;
+	ComboBox * m_quantizeComboBox;
+	ComboBox * m_noteLenComboBox;
+	ComboBox * m_scaleComboBox;
+	ComboBox * m_chordComboBox;
+
+};
 
 
 #endif

@@ -250,6 +250,9 @@ SongEditor::SongEditor( Song * _song ) :
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
 }
 
 
@@ -605,9 +608,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
-
-	setFocusPolicy( Qt::StrongFocus );
-	setFocus();
 
 	setCentralWidget(m_editor);
 

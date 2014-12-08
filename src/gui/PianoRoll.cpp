@@ -95,7 +95,7 @@ const int NOTE_EDIT_RESIZE_BAR = 6;
 const int NOTE_EDIT_MIN_HEIGHT = 50;
 const int KEY_AREA_MIN_HEIGHT = 100;
 const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
-const int PR_TOP_MARGIN = 48;
+const int PR_TOP_MARGIN = 16;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
@@ -291,7 +291,7 @@ PianoRoll::PianoRoll() :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new Timeline( WHITE_KEY_WIDTH, 32, m_ppt,
+	m_timeLine = new Timeline( WHITE_KEY_WIDTH, 0, m_ppt,
 					Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern ),
 						m_currentPosition, this );
@@ -311,64 +311,6 @@ PianoRoll::PianoRoll() :
 			this,
 			SLOT( updatePositionAccompany( const MidiTime & ) ) );*/
 
-
-	m_toolBar = new QWidget( this );
-	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->move( 0, 0 );
-	m_toolBar->setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(),
-					embed::getIconPixmap( "toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
-
-	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
-	tb_layout->setMargin( 0 );
-	tb_layout->setSpacing( 0 );
-
-
-	// init control-buttons at the top
-
-	m_playButton = new ToolButton( embed::getIconPixmap( "play" ),
-				tr( "Play/pause current pattern (Space)" ),
-					this, SLOT( play() ), m_toolBar );
-
-	m_recordButton = new ToolButton( embed::getIconPixmap( "record" ),
-			tr( "Record notes from MIDI-device/channel-piano" ),
-					this, SLOT( record() ), m_toolBar );
-	m_recordAccompanyButton = new ToolButton(
-			embed::getIconPixmap( "record_accompany" ),
-			tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ),
-					this, SLOT( recordAccompany() ), m_toolBar );
-
-	m_stopButton = new ToolButton( embed::getIconPixmap( "stop" ),
-				tr( "Stop playing of current pattern (Space)" ),
-					this, SLOT( stop() ), m_toolBar );
-
-	m_playButton->setObjectName( "playButton" );
-	m_stopButton->setObjectName( "stopButton" );
-	m_recordButton->setObjectName( "recordButton" );
-	m_recordAccompanyButton->setObjectName( "recordAccompanyButton" );
-
-	m_playButton->setWhatsThis(
-		tr( "Click here to play the current pattern. "
-			"This is useful while editing it. The pattern is "
-			"automatically looped when its end is reached." ) );
-	m_recordButton->setWhatsThis(
-		tr( "Click here to record notes from a MIDI-"
-			"device or the virtual test-piano of the according "
-			"channel-window to the current pattern. When recording "
-			"all notes you play will be written to this pattern "
-			"and you can play and edit them afterwards." ) );
-	m_recordAccompanyButton->setWhatsThis(
-		tr( "Click here to record notes from a MIDI-"
-			"device or the virtual test-piano of the according "
-			"channel-window to the current pattern. When recording "
-			"all notes you play will be written to this pattern "
-			"and you will hear the song or BB track in the background." ) );
-	m_stopButton->setWhatsThis(
-		tr( "Click here to stop playback of current pattern." ) );
-
-
 	removeSelection();
 
 	// init scrollbars
@@ -383,94 +325,6 @@ PianoRoll::PianoRoll() :
 	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( verScrolled( int ) ) );
 
-	// init edit-buttons at the top
-	m_drawButton = new ToolButton( embed::getIconPixmap( "edit_draw" ),
-					tr( "Draw mode (Shift+D)" ),
-					this, SLOT( drawButtonToggled() ),
-					m_toolBar );
-	m_drawButton->setCheckable( true );
-	m_drawButton->setChecked( true );
-
-	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
-					tr( "Erase mode (Shift+E)" ),
-					this, SLOT( eraseButtonToggled() ),
-					m_toolBar );
-	m_eraseButton->setCheckable( true );
-
-	m_selectButton = new ToolButton( embed::getIconPixmap(
-							"edit_select" ),
-					tr( "Select mode (Shift+S)" ),
-					this, SLOT( selectButtonToggled() ),
-					m_toolBar );
-	m_selectButton->setCheckable( true );
-
-	m_detuneButton = new ToolButton( embed::getIconPixmap( "automation"),
-					tr( "Detune mode (Shift+T)" ),
-					this, SLOT( detuneButtonToggled() ),
-					m_toolBar );
-	m_detuneButton->setCheckable( true );
-
-	QButtonGroup * tool_button_group = new QButtonGroup( this );
-	tool_button_group->addButton( m_drawButton );
-	tool_button_group->addButton( m_eraseButton );
-	tool_button_group->addButton( m_selectButton );
-	tool_button_group->addButton( m_detuneButton );
-	tool_button_group->setExclusive( true );
-
-	m_drawButton->setWhatsThis(
-		tr( "Click here and draw mode will be activated. In this "
-			"mode you can add, resize and move notes. This "
-			"is the default mode which is used most of the time. "
-			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode. In this mode, hold Ctrl to "
-		    "temporarily go into select mode." ) );
-	m_eraseButton->setWhatsThis(
-		tr( "Click here and erase mode will be activated. In this "
-			"mode you can erase notes. You can also press "
-			"'Shift+E' on your keyboard to activate this mode." ) );
-	m_selectButton->setWhatsThis(
-		tr( "Click here and select mode will be activated. "
-			"In this mode you can select notes. Alternatively, "
-		    "you can hold Ctrl in draw mode to temporarily use "
-		    "select mode." ) );
-	m_detuneButton->setWhatsThis(
-		tr( "Click here and detune mode will be activated. "
-			"In this mode you can click a note to open its "
-		    "automation detuning. You can utilize this to slide "
-		    "notes from one to another. You can also press "
-		    "'Shift+T' on your keyboard to activate this mode." ) );
-
-	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut selected notes (Ctrl+X)" ),
-					this, SLOT( cutSelectedNotes() ),
-					m_toolBar );
-
-	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy selected notes (Ctrl+C)" ),
-					this, SLOT( copySelectedNotes() ),
-					m_toolBar );
-
-	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste notes from clipboard "
-								"(Ctrl+V)" ),
-					this, SLOT( pasteNotes() ),
-					m_toolBar );
-
-	m_cutButton->setWhatsThis(
-		tr( "Click here and the selected notes will be cut into the "
-			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste button." ) );
-	m_copyButton->setWhatsThis(
-		tr( "Click here and the selected notes will be copied into the "
-			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste button." ) );
-	m_pasteButton->setWhatsThis(
-		tr( "Click here and the notes from the clipboard will be "
-			"pasted at the first visible measure." ) );
-
-	QLabel * zoom_lbl = new QLabel( m_toolBar );
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
-
 	// setup zooming-stuff
 	for( int i = 0; i < 6; ++i )
 	{
@@ -479,14 +333,8 @@ PianoRoll::PianoRoll() :
 	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
 	connect( &m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
-	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setModel( &m_zoomingModel );
-	m_zoomingComboBox->setFixedSize( 64, 22 );
 
-	// setup quantize-stuff
-	QLabel * quantize_lbl = new QLabel( m_toolBar );
-	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
-
+	// Set up quantization model
 	m_quantizeModel.addItem( tr( "Note lock" ) );
 	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
 	{
@@ -498,17 +346,11 @@ PianoRoll::PianoRoll() :
 	}
 	m_quantizeModel.addItem( "1/192" );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
-	m_quantizeComboBox = new ComboBox( m_toolBar );
-	m_quantizeComboBox->setModel( &m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 64, 22 );
+
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
 					this, SLOT( quantizeChanged() ) );
 
-
-	// setup note-len-stuff
-	QLabel * note_len_lbl = new QLabel( m_toolBar );
-	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
-
+	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					new PixmapLoader( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
@@ -527,19 +369,14 @@ PianoRoll::PianoRoll() :
 				new PixmapLoader( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] ) );
 	}
 	m_noteLenModel.setValue( 0 );
-	m_noteLenComboBox = new ComboBox( m_toolBar );
-	m_noteLenComboBox->setModel( &m_noteLenModel );
-	m_noteLenComboBox->setFixedSize( 105, 22 );
+
 	// Note length change can cause a redraw if Q is set to lock
 	connect( &m_noteLenModel, SIGNAL( dataChanged() ),
 					this, SLOT( quantizeChanged() ) );
 
+	// Set up scale model
 
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-
-	// setup scale-stuff
-	QLabel * scale_lbl = new QLabel( m_toolBar );
-	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
 
 	m_scaleModel.addItem( tr("No scale") );
 	for( int i = 0; i < chord_table.size(); ++i )
@@ -551,18 +388,11 @@ PianoRoll::PianoRoll() :
 	}
 
 	m_scaleModel.setValue( 0 );
-	m_scaleComboBox = new ComboBox( m_toolBar );
-	m_scaleComboBox->setModel( &m_scaleModel );
-	m_scaleComboBox->setFixedSize( 105, 22 );
 	// change can update m_semiToneMarkerMenu
 	connect( &m_scaleModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateSemiToneMarkerMenu() ) );
+						this, SLOT( updateSemiToneMarkerMenu() ) );
 
-
-	// setup chord-stuff
-	QLabel * chord_lbl = new QLabel( m_toolBar );
-	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
-
+	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
 	for( int i = 0; i < chord_table.size(); ++i )
 	{
@@ -573,126 +403,17 @@ PianoRoll::PianoRoll() :
 	}
 
 	m_chordModel.setValue( 0 );
-	m_chordComboBox = new ComboBox( m_toolBar );
-	m_chordComboBox->setModel( &m_chordModel );
-	m_chordComboBox->setFixedSize( 105, 22 );
+
 	// change can update m_semiToneMarkerMenu
 	connect( &m_chordModel, SIGNAL( dataChanged() ),
 					this, SLOT( updateSemiToneMarkerMenu() ) );
 
-
-	tb_layout->addSpacing( 4 );
-	tb_layout->addWidget( m_playButton );
-	tb_layout->addWidget( m_recordButton );
-	tb_layout->addWidget( m_recordAccompanyButton );
-	tb_layout->addWidget( m_stopButton );
-	tb_layout->addSpacing( 7 );
-	tb_layout->addWidget( m_drawButton );
-	tb_layout->addWidget( m_eraseButton );
-	tb_layout->addWidget( m_selectButton );
-	tb_layout->addWidget( m_detuneButton );
-	tb_layout->addSpacing( 7 );
-	tb_layout->addWidget( m_cutButton );
-	tb_layout->addWidget( m_copyButton );
-	tb_layout->addWidget( m_pasteButton );
-	tb_layout->addSpacing( 7 );
-	m_timeLine->addToolButtons( m_toolBar );
-	tb_layout->addSpacing( 7 );
-	tb_layout->addWidget( zoom_lbl );
-	tb_layout->addSpacing( 4 );
-	tb_layout->addWidget( m_zoomingComboBox );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( quantize_lbl );
-	tb_layout->addSpacing( 4 );
-	tb_layout->addWidget( m_quantizeComboBox );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( note_len_lbl );
-	tb_layout->addSpacing( 4 );
-	tb_layout->addWidget( m_noteLenComboBox );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( scale_lbl );
-	tb_layout->addSpacing( 4 );
-	tb_layout->addWidget( m_scaleComboBox );
-	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( chord_lbl );
-	tb_layout->addSpacing( 4 );
-	tb_layout->addWidget( m_chordComboBox );
-	tb_layout->addStretch();
-	
-        m_zoomingComboBox->setWhatsThis(
-		tr( 
-			"This controls the magnification of an axis. " 
-			"It can be helpful to choose magnification for a specific "
-			"task. For ordinary editing, the magnification should be " 
-			"fitted to your smallest notes. "
-		) );
-		
-		m_quantizeComboBox->setWhatsThis(
-		tr(
-			"The 'Q' stands for quantization, and controls the grid size " 
-			"notes and control points snap to. " 
-			"With smaller quantization values, you can draw shorter notes " 
-			"in Piano Roll, and more exact control points in the " 
-			"Automation Editor." 
-
-		) );	
-		
-		m_noteLenComboBox->setWhatsThis(
-		tr(
-			"This lets you select the length of new notes. " 
-			"'Last Note' means that LMMS will use the note length of " 
-                        "the note you last edited" 
-		) );			
-		
-		m_scaleComboBox->setWhatsThis(
-		tr(
-			"The feature is directly connected to the context-menu " 
-			"on the virtual keyboard, to the left in Piano Roll. " 
-			"After you have chosen the scale you want " 
-			"in this drop-down menu, " 
-			"you can right click on a desired key in the virtual keyboard, " 
-			"and then choose 'Mark current Scale'. " 
-			"LMMS will highlight all notes that belongs to the chosen scale, " 
-			"and in the key you have selected!" 
-					) );
-		
-
-		m_chordComboBox->setWhatsThis(
-		tr(
-			"Let you select a chord which LMMS then can draw or highlight." 
-			"You can find the most common chords in this drop-down menu. " 
-			"After you have selected a chord, click anywhere to place the chord, and right " 
-			"click on the virtual keyboard to open context menu and highlight the chord. " 
-			"To return to single note placement, you need to choose 'No chord' " 
-			"in this drop-down menu." 
-		) );	  
-
-	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
-	setWindowIcon( embed::getIconPixmap( "piano" ) );
-	setCurrentPattern( NULL );
-
 	setMouseTracking( true );
 
-	setMinimumSize( tb_layout->minimumSize().width(), 160 );
-
-	// add us to workspace
-	if( Engine::mainWindow()->workspace() )
-	{
-		Engine::mainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->setMinimumSize( tb_layout->minimumSize().width()+10, 200 );
-		parentWidget()->resize( tb_layout->minimumSize().width()+10,
-						INITIAL_PIANOROLL_HEIGHT );
-		parentWidget()->move( 5, 5 );
-
-		parentWidget()->hide();
-	}
-	else
-	{
-		resize( tb_layout->minimumSize().width(), INITIAL_PIANOROLL_HEIGHT );
-		hide();
-	}
+	connect( &m_scaleModel, SIGNAL( dataChanged() ),
+					this, SLOT( updateSemiToneMarkerMenu() ) );
 
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
@@ -872,34 +593,6 @@ void PianoRoll::hidePattern( Pattern* pattern )
 }
 
 
-
-void PianoRoll::saveSettings( QDomDocument & _doc, QDomElement & _this )
-{
-	MainWindow::saveWidgetState( this, _this );
-}
-
-
-
-
-void PianoRoll::loadSettings( const QDomElement & _this )
-{
-	MainWindow::restoreWidgetState( this, _this );
-}
-
-
-
-
-void PianoRoll::setPauseIcon( bool pause )
-{
-	if( pause == true )
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-	}
-	else
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	}
-}
 
 
 /** \brief qproperty access implementation */
@@ -1095,23 +788,6 @@ void PianoRoll::clearSelectedNotes()
 			++it;
 		}
 	}
-}
-
-
-
-
-void PianoRoll::closeEvent( QCloseEvent * _ce )
-{
-	QApplication::restoreOverrideCursor();
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
 }
 
 
@@ -1387,38 +1063,6 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 				event->accept();
 				selectAll();
 				update();
-			}
-			break;
-
-		case Qt::Key_D:
-			if( event->modifiers() & Qt::ShiftModifier )
-			{
-				event->accept();
-				m_drawButton->setChecked( true );
-			}
-			break;
-
-		case Qt::Key_E:
-			if( event->modifiers() & Qt::ShiftModifier )
-			{
-				event->accept();
-				m_eraseButton->setChecked( true );
-			}
-			break;
-
-		case Qt::Key_S:
-			if( event->modifiers() & Qt::ShiftModifier )
-			{
-				event->accept();
-				m_selectButton->setChecked( true );
-			}
-			break;
-
-		case Qt::Key_T:
-			if( event->modifiers() & Qt::ShiftModifier )
-			{
-				event->accept();
-				m_detuneButton->setChecked( true );
 			}
 			break;
 
@@ -3484,7 +3128,7 @@ void PianoRoll::resizeEvent( QResizeEvent * )
 
 	Engine::getSong()->getPlayPos( Song::Mode_PlayPattern
 					).m_timeLine->setFixedWidth( width() );
-	m_toolBar->setFixedWidth( width() );
+
 	update();
 }
 
@@ -4085,8 +3729,6 @@ void PianoRoll::pasteNotes()
 		// we only have to do the following lines if we pasted at
 		// least one note...
 		Engine::getSong()->setModified();
-		m_ctrlMode = ModeDraw;
-		m_drawButton->setChecked( true );
 		update();
 		Engine::songEditor()->update();
 	}
@@ -4328,3 +3970,338 @@ Note * PianoRoll::noteUnderMouse()
 
 
 
+
+
+PianoRollWindow::PianoRollWindow() :
+	Editor(true),
+	m_editor(new PianoRoll())
+{
+	setCentralWidget(m_editor);
+
+	m_playButton->setToolTip(tr("Play/pause current pattern (Space)"));
+	m_recordButton->setToolTip(tr("Record notes from MIDI-device/channel-piano"));
+	m_recordAccompanyButton->setToolTip(tr("Record notes from MIDI-device/channel-piano while playing song or BB track"));
+	m_stopButton->setToolTip(tr("Stop playing of current pattern (Space)"));
+
+	m_playButton->setWhatsThis(
+		tr( "Click here to play the current pattern. "
+			"This is useful while editing it. The pattern is "
+			"automatically looped when its end is reached." ) );
+	m_recordButton->setWhatsThis(
+		tr( "Click here to record notes from a MIDI-"
+			"device or the virtual test-piano of the according "
+			"channel-window to the current pattern. When recording "
+			"all notes you play will be written to this pattern "
+			"and you can play and edit them afterwards." ) );
+	m_recordAccompanyButton->setWhatsThis(
+		tr( "Click here to record notes from a MIDI-"
+			"device or the virtual test-piano of the according "
+			"channel-window to the current pattern. When recording "
+			"all notes you play will be written to this pattern "
+			"and you will hear the song or BB track in the background." ) );
+	m_stopButton->setWhatsThis(
+		tr( "Click here to stop playback of current pattern." ) );
+
+	// init edit-buttons at the top
+	m_drawButton = new ToolButton( embed::getIconPixmap( "edit_draw" ),
+					tr( "Draw mode (Shift+D)" ),
+					m_editor, SLOT( drawButtonToggled() ),
+					m_toolBar );
+	m_drawButton->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawButton->setCheckable( true );
+	m_drawButton->setChecked( true );
+
+	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
+					tr( "Erase mode (Shift+E)" ),
+					m_editor, SLOT( eraseButtonToggled() ),
+					m_toolBar );
+	m_eraseButton->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseButton->setCheckable( true );
+
+	m_selectButton = new ToolButton( embed::getIconPixmap(
+							"edit_select" ),
+					tr( "Select mode (Shift+S)" ),
+					m_editor, SLOT( selectButtonToggled() ),
+					m_toolBar );
+	m_selectButton->setShortcut(Qt::SHIFT | Qt::Key_S);
+	m_selectButton->setCheckable( true );
+
+	m_detuneButton = new ToolButton( embed::getIconPixmap( "automation"),
+					tr( "Detune mode (Shift+T)" ),
+					m_editor, SLOT( detuneButtonToggled() ),
+					m_toolBar );
+	m_detuneButton->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_detuneButton->setCheckable( true );
+
+	QButtonGroup * tool_button_group = new QButtonGroup( this );
+	tool_button_group->addButton( m_drawButton );
+	tool_button_group->addButton( m_eraseButton );
+	tool_button_group->addButton( m_selectButton );
+	tool_button_group->addButton( m_detuneButton );
+	tool_button_group->setExclusive( true );
+
+	m_drawButton->setWhatsThis(
+		tr( "Click here and draw mode will be activated. In this "
+			"mode you can add, resize and move notes. This "
+			"is the default mode which is used most of the time. "
+			"You can also press 'Shift+D' on your keyboard to "
+			"activate this mode. In this mode, hold Ctrl to "
+			"temporarily go into select mode." ) );
+	m_eraseButton->setWhatsThis(
+		tr( "Click here and erase mode will be activated. In this "
+			"mode you can erase notes. You can also press "
+			"'Shift+E' on your keyboard to activate this mode." ) );
+	m_selectButton->setWhatsThis(
+		tr( "Click here and select mode will be activated. "
+			"In this mode you can select notes. Alternatively, "
+			"you can hold Ctrl in draw mode to temporarily use "
+			"select mode." ) );
+	m_detuneButton->setWhatsThis(
+		tr( "Click here and detune mode will be activated. "
+			"In this mode you can click a note to open its "
+			"automation detuning. You can utilize this to slide "
+			"notes from one to another. You can also press "
+			"'Shift+T' on your keyboard to activate this mode." ) );
+
+	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
+					tr( "Cut selected notes (Ctrl+X)" ),
+					m_editor, SLOT( cutSelectedNotes() ),
+					m_toolBar );
+
+	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
+					tr( "Copy selected notes (Ctrl+C)" ),
+					m_editor, SLOT( copySelectedNotes() ),
+					m_toolBar );
+
+	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
+					tr( "Paste notes from clipboard "
+								"(Ctrl+V)" ),
+					m_editor, SLOT( pasteNotes() ),
+					m_toolBar );
+
+	m_cutButton->setWhatsThis(
+		tr( "Click here and the selected notes will be cut into the "
+			"clipboard. You can paste them anywhere in any pattern "
+			"by clicking on the paste button." ) );
+	m_copyButton->setWhatsThis(
+		tr( "Click here and the selected notes will be copied into the "
+			"clipboard. You can paste them anywhere in any pattern "
+			"by clicking on the paste button." ) );
+	m_pasteButton->setWhatsThis(
+		tr( "Click here and the notes from the clipboard will be "
+			"pasted at the first visible measure." ) );
+
+	QLabel * zoom_lbl = new QLabel( m_toolBar );
+	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+
+	m_zoomingComboBox = new ComboBox( m_toolBar );
+	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
+	m_zoomingComboBox->setFixedSize( 64, 22 );
+
+	// setup quantize-stuff
+	QLabel * quantize_lbl = new QLabel( m_toolBar );
+	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+
+	m_quantizeComboBox = new ComboBox( m_toolBar );
+	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
+	m_quantizeComboBox->setFixedSize( 64, 22 );
+
+
+	// setup note-len-stuff
+	QLabel * note_len_lbl = new QLabel( m_toolBar );
+	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
+
+
+	m_noteLenComboBox = new ComboBox( m_toolBar );
+	m_noteLenComboBox->setModel( &m_editor->m_noteLenModel );
+	m_noteLenComboBox->setFixedSize( 105, 22 );
+
+	// setup scale-stuff
+	QLabel * scale_lbl = new QLabel( m_toolBar );
+	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
+
+	m_scaleComboBox = new ComboBox( m_toolBar );
+	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
+	m_scaleComboBox->setFixedSize( 105, 22 );
+
+	// setup chord-stuff
+	QLabel * chord_lbl = new QLabel( m_toolBar );
+	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
+
+	m_chordComboBox = new ComboBox( m_toolBar );
+	m_chordComboBox->setModel( &m_editor->m_chordModel );
+	m_chordComboBox->setFixedSize( 105, 22 );
+
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( m_drawButton );
+	m_toolBar->addWidget( m_eraseButton );
+	m_toolBar->addWidget( m_selectButton );
+	m_toolBar->addWidget( m_detuneButton );
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( m_cutButton );
+	m_toolBar->addWidget( m_copyButton );
+	m_toolBar->addWidget( m_pasteButton );
+
+	m_toolBar->addSeparator();
+	QWidget* timeLineButtons = new QWidget();
+	timeLineButtons->setFixedHeight(m_toolBar->height());
+	timeLineButtons->move(0,0);
+	QLayout* l = new QHBoxLayout( timeLineButtons );
+	l->setSpacing(0); l->setMargin(0);
+	m_editor->m_timeLine->addToolButtons(timeLineButtons);
+	m_toolBar->addWidget(timeLineButtons);
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( zoom_lbl );
+	m_toolBar->addWidget( m_zoomingComboBox );
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( quantize_lbl );
+	m_toolBar->addWidget( m_quantizeComboBox );
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( note_len_lbl );
+	m_toolBar->addWidget( m_noteLenComboBox );
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( scale_lbl );
+	m_toolBar->addWidget( m_scaleComboBox );
+
+	m_toolBar->addSeparator();
+	m_toolBar->addWidget( chord_lbl );
+	m_toolBar->addWidget( m_chordComboBox );
+
+	m_zoomingComboBox->setWhatsThis(
+				tr(
+					"This controls the magnification of an axis. "
+					"It can be helpful to choose magnification for a specific "
+					"task. For ordinary editing, the magnification should be "
+					"fitted to your smallest notes. "
+					) );
+
+	m_quantizeComboBox->setWhatsThis(
+				tr(
+					"The 'Q' stands for quantization, and controls the grid size "
+					"notes and control points snap to. "
+					"With smaller quantization values, you can draw shorter notes "
+					"in Piano Roll, and more exact control points in the "
+					"Automation Editor."
+
+					) );
+
+	m_noteLenComboBox->setWhatsThis(
+				tr(
+					"This lets you select the length of new notes. "
+					"'Last Note' means that LMMS will use the note length of "
+					"the note you last edited"
+					) );
+
+	m_scaleComboBox->setWhatsThis(
+				tr(
+					"The feature is directly connected to the context-menu "
+					"on the virtual keyboard, to the left in Piano Roll. "
+					"After you have chosen the scale you want "
+					"in this drop-down menu, "
+					"you can right click on a desired key in the virtual keyboard, "
+					"and then choose 'Mark current Scale'. "
+					"LMMS will highlight all notes that belongs to the chosen scale, "
+					"and in the key you have selected!"
+					) );
+
+
+	m_chordComboBox->setWhatsThis(
+				tr(
+					"Let you select a chord which LMMS then can draw or highlight."
+					"You can find the most common chords in this drop-down menu. "
+					"After you have selected a chord, click anywhere to place the chord, and right "
+					"click on the virtual keyboard to open context menu and highlight the chord. "
+					"To return to single note placement, you need to choose 'No chord' "
+					"in this drop-down menu."
+					) );
+
+
+	// setup our actual window
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
+	setWindowIcon( embed::getIconPixmap( "piano" ) );
+	setCurrentPattern( NULL );
+
+	if( Engine::mainWindow()->workspace() )
+	{
+		parentWidget()->resize(m_toolBar->sizeHint().width()+10, INITIAL_PIANOROLL_HEIGHT);
+		parentWidget()->move( 5, 5 );
+		parentWidget()->hide();
+	}
+	else
+	{
+		resize( m_toolBar->sizeHint().width()+10, INITIAL_PIANOROLL_HEIGHT );
+		hide();
+	}
+
+	// Connections
+	connect(m_editor, SIGNAL(currentPatternChanged()), this, SIGNAL(currentPatternChanged()));
+}
+
+const Pattern*PianoRollWindow::currentPattern() const
+{
+	return m_editor->currentPattern();
+}
+
+void PianoRollWindow::setCurrentPattern(Pattern* pattern)
+{
+	m_editor->setCurrentPattern(pattern);
+}
+
+bool PianoRollWindow::isRecording() const
+{
+	return m_editor->isRecording();
+}
+
+int PianoRollWindow::quantization() const
+{
+	return m_editor->quantization();
+}
+
+void PianoRollWindow::play()
+{
+	m_editor->play();
+}
+
+void PianoRollWindow::stop()
+{
+	m_editor->stop();
+}
+
+void PianoRollWindow::record()
+{
+	m_editor->record();
+}
+
+void PianoRollWindow::recordAccompany()
+{
+	m_editor->recordAccompany();
+}
+
+void PianoRollWindow::stopRecording()
+{
+	m_editor->stopRecording();
+}
+
+void PianoRollWindow::reset()
+{
+	m_editor->reset();
+}
+
+
+void PianoRollWindow::saveSettings(QDomDocument & doc, QDomElement & de)
+{
+	MainWindow::saveWidgetState(this, de);
+}
+
+
+void PianoRollWindow::loadSettings(const QDomElement & de)
+{
+	MainWindow::restoreWidgetState(this, de);
+}

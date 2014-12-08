@@ -670,6 +670,7 @@ void PatternView::openInPianoRoll()
 {
 	Engine::pianoRoll()->setCurrentPattern( m_pat );
 	Engine::pianoRoll()->parentWidget()->show();
+	Engine::pianoRoll()->show();
 	Engine::pianoRoll()->setFocus();
 }
 
