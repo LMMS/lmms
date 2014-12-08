@@ -60,10 +60,10 @@ protected:
 
 	QToolBar* m_toolBar;
 
-	QAbstractButton* m_playButton;
-	QAbstractButton* m_recordButton;
-	QAbstractButton* m_recordAccompanyButton;
-	QAbstractButton* m_stopButton;
+	QAction* m_playAction;
+	QAction* m_recordAction;
+	QAction* m_recordAccompanyAction;
+	QAction* m_stopAction;
 private:
 };
 

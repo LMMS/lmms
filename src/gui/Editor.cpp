@@ -36,9 +36,9 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
 	if (displayPauseIcon)
-		m_playButton->setIcon(embed::getIconPixmap("pause"));
+		m_playAction->setIcon(embed::getIconPixmap("pause"));
 	else
-		m_playButton->setIcon(embed::getIconPixmap("play"));
+		m_playAction->setIcon(embed::getIconPixmap("play"));
 }
 
 void Editor::play()
@@ -59,45 +59,45 @@ void Editor::stop()
 
 Editor::Editor(bool record) :
 	m_toolBar(new QToolBar(this)),
-	m_playButton(nullptr),
-	m_recordButton(nullptr),
-	m_recordAccompanyButton(nullptr),
-	m_stopButton(nullptr)
+	m_playAction(nullptr),
+	m_recordAction(nullptr),
+	m_recordAccompanyAction(nullptr),
+	m_stopAction(nullptr)
 {
 	m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+	m_toolBar->setMovable(false);
 
 	auto addButton = [this](const char* pixmap_name, QString text, QString objectName) {
-		ToolButton* button = new ToolButton(embed::getIconPixmap(pixmap_name), text);
-		button->setObjectName(objectName);
-		m_toolBar->addWidget(button);
-		return button;
+		QAction* action = m_toolBar->addAction(embed::getIconPixmap(pixmap_name), text);
+		m_toolBar->widgetForAction(action)->setObjectName(objectName);
+		return action;
 	};
 
 	// Set up play button
-	m_playButton = addButton("play", tr("Play (Space)"), "playButton");
-	m_playButton->setShortcut(Qt::Key_Space);
+	m_playAction = addButton("play", tr("Play (Space)"), "playButton");
+	m_playAction->setShortcut(Qt::Key_Space);
 
 	// Set up record buttons if wanted
 	if (record)
 	{
-		m_recordButton = addButton("record", tr("Record"), "recordButton");
-		m_recordAccompanyButton = addButton("record_accompany", tr("Record while playing"), "recordAccompanyButton");
+		m_recordAction = addButton("record", tr("Record"), "recordButton");
+		m_recordAccompanyAction = addButton("record_accompany", tr("Record while playing"), "recordAccompanyButton");
 	}
 
 	// Set up stop button
-	m_stopButton = addButton("stop", tr("Stop (Space)"), "stopButton");
+	m_stopAction = addButton("stop", tr("Stop (Space)"), "stopButton");
 
 	// Add toolbar to window
 	addToolBar(Qt::TopToolBarArea, m_toolBar);
 
 	// Set up connections
-	connect(m_playButton, SIGNAL(clicked()), this, SLOT(play()));
+	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
 	if (record)
 	{
-		connect(m_recordButton, SIGNAL(clicked()), this, SLOT(record()));
-		connect(m_recordAccompanyButton, SIGNAL(clicked()), this, SLOT(recordAccompany()));
+		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
+		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	}
-	connect(m_stopButton, SIGNAL(clicked()), this, SLOT(stop()));
+	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 }
 
 Editor::~Editor()

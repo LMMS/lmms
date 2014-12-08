@@ -65,8 +65,8 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	}
 
 
-	m_playButton->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
-	m_stopButton->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
+	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
+	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
 
 	ToolButton * add_bb_track = new ToolButton(
 					embed::getIconPixmap( "add_bb_track" ),
@@ -90,11 +90,11 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 				m_trackContainerView, SLOT( addSteps() ), m_toolBar );
 
 
-	m_playButton->setWhatsThis(
+	m_playAction->setWhatsThis(
 		tr( "Click here to play the current "
 			"beat/bassline.  The beat/bassline is automatically "
 			"looped when its end is reached." ) );
-	m_stopButton->setWhatsThis(
+	m_stopAction->setWhatsThis(
 		tr( "Click here to stop playing of current "
 							"beat/bassline." ) );
 
@@ -136,7 +136,7 @@ BBEditor::~BBEditor()
 
 QSize BBEditor::sizeHint() const
 {
-	return {minimumWidth(), 300};
+	return {minimumWidth()+10, 300};
 }
 
 

@@ -2029,14 +2029,14 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 	// Play/stop buttons
-	m_playButton->setToolTip(tr( "Play/pause current pattern (Space)" ));
-	m_playButton->setWhatsThis(
+	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ));
+	m_playAction->setWhatsThis(
 		tr( "Click here if you want to play the current pattern. "
 			"This is useful while editing it.  The pattern is "
 			"automatically looped when the end is reached." ) );
 
-	m_stopButton->setToolTip(tr("Stop playing of current pattern (Space)"));
-	m_stopButton->setWhatsThis(
+	m_stopAction->setToolTip(tr("Stop playing of current pattern (Space)"));
+	m_stopAction->setWhatsThis(
 		tr( "Click here if you want to stop playing of the "
 			"current pattern." ) );
 

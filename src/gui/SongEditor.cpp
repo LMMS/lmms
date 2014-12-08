@@ -611,13 +611,13 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	setCentralWidget(m_editor);
 
 	// Set up buttons
-	m_playButton->setToolTip(tr("Play song (Space)"));
-	if (m_recordButton && m_recordAccompanyButton)
+	m_playAction->setToolTip(tr("Play song (Space)"));
+	if (m_recordAction && m_recordAccompanyAction)
 	{
-		m_recordButton->setToolTip(tr("Record samples from Audio-device"));
-		m_recordAccompanyButton->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
+		m_recordAction->setToolTip(tr("Record samples from Audio-device"));
+		m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	}
-	m_stopButton->setToolTip(tr( "Stop song (Space)" ));
+	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
 	m_addBBTrackButton = new ToolButton(
 				embed::getIconPixmap("add_bb_track"),
@@ -649,11 +649,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	tool_button_group->addButton(m_editModeButton);
 	tool_button_group->setExclusive(true);
 
-	m_playButton->setWhatsThis(
+	m_playAction->setWhatsThis(
 				tr("Click here, if you want to play your whole song. "
 				   "Playing will be started at the song-position-marker (green). "
 				   "You can also move it while playing."));
-	m_stopButton->setWhatsThis(
+	m_stopAction->setWhatsThis(
 				tr("Click here, if you want to stop playing of your song. "
 				   "The song-position-marker will be set to the start of your song."));
 

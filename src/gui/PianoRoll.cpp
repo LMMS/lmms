@@ -3978,28 +3978,28 @@ PianoRollWindow::PianoRollWindow() :
 {
 	setCentralWidget(m_editor);
 
-	m_playButton->setToolTip(tr("Play/pause current pattern (Space)"));
-	m_recordButton->setToolTip(tr("Record notes from MIDI-device/channel-piano"));
-	m_recordAccompanyButton->setToolTip(tr("Record notes from MIDI-device/channel-piano while playing song or BB track"));
-	m_stopButton->setToolTip(tr("Stop playing of current pattern (Space)"));
+	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
+	m_recordAction->setToolTip(tr("Record notes from MIDI-device/channel-piano"));
+	m_recordAccompanyAction->setToolTip(tr("Record notes from MIDI-device/channel-piano while playing song or BB track"));
+	m_stopAction->setToolTip(tr("Stop playing of current pattern (Space)"));
 
-	m_playButton->setWhatsThis(
+	m_playAction->setWhatsThis(
 		tr( "Click here to play the current pattern. "
 			"This is useful while editing it. The pattern is "
 			"automatically looped when its end is reached." ) );
-	m_recordButton->setWhatsThis(
+	m_recordAction->setWhatsThis(
 		tr( "Click here to record notes from a MIDI-"
 			"device or the virtual test-piano of the according "
 			"channel-window to the current pattern. When recording "
 			"all notes you play will be written to this pattern "
 			"and you can play and edit them afterwards." ) );
-	m_recordAccompanyButton->setWhatsThis(
+	m_recordAccompanyAction->setWhatsThis(
 		tr( "Click here to record notes from a MIDI-"
 			"device or the virtual test-piano of the according "
 			"channel-window to the current pattern. When recording "
 			"all notes you play will be written to this pattern "
 			"and you will hear the song or BB track in the background." ) );
-	m_stopButton->setWhatsThis(
+	m_stopAction->setWhatsThis(
 		tr( "Click here to stop playback of current pattern." ) );
 
 	// init edit-buttons at the top
