@@ -58,10 +58,10 @@ class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	enum Mode
+	enum EditMode
 	{
 		DrawMode,
-		EditMode
+		SelectMode
 	};
 
 	SongEditor( Song * _song );
@@ -70,22 +70,23 @@ public:
 public slots:
 	void scrolled( int _new_pos );
 
-	void setMode(Mode mode);
-	void setModeDraw();
-	void setModeEdit();
+	void setEditMode(EditMode mode);
+	void setEditModeDraw();
+	void setEditModeSelect();
 
 
 private slots:
 	void setHighQuality( bool );
 
-	void masterVolumeChanged( int _new_val );
-	void masterVolumePressed();
-	void masterVolumeMoved( int _new_val );
-	void masterVolumeReleased();
-	void masterPitchChanged( int _new_val );
-	void masterPitchPressed();
-	void masterPitchMoved( int _new_val );
-	void masterPitchReleased();
+	void setMasterVolume( int _new_val );
+	void showMasterVolumeFloat();
+	void updateMasterVolumeFloat( int _new_val );
+	void hideMasterVolumeFloat();
+
+	void setMasterPitch( int _new_val );
+	void showMasterPitchFloat();
+	void updateMasterPitchFloat( int _new_val );
+	void hideMasterPitchFloat();
 
 	void updateScrollBar( int );
 	void updatePosition( const MidiTime & _t );
@@ -124,7 +125,7 @@ private:
 	bool m_scrollBack;
 	bool m_smoothScroll;
 
-	Mode m_mode;
+	EditMode m_mode;
 
 	friend class SongEditorWindow;
 

@@ -163,13 +163,13 @@ SongEditor::SongEditor( Song * _song ) :
 	ToolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( masterVolumeChanged( int ) ) );
+			SLOT( setMasterVolume( int ) ) );
 	connect( m_masterVolumeSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( masterVolumePressed() ) );
+			SLOT( showMasterVolumeFloat()) );
 	connect( m_masterVolumeSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( masterVolumeMoved( int ) ) );
+			SLOT( updateMasterVolumeFloat( int ) ) );
 	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( masterVolumeReleased() ) );
+			SLOT( hideMasterVolumeFloat() ) );
 
 	m_mvsStatus = new TextFloat;
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
@@ -195,13 +195,13 @@ SongEditor::SongEditor( Song * _song ) :
 	m_masterPitchSlider->setTickInterval( 12 );
 	ToolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( masterPitchChanged( int ) ) );
+			SLOT( setMasterPitch( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( masterPitchPressed() ) );
+			SLOT( showMasterPitchFloat() ) );
 	connect( m_masterPitchSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( masterPitchMoved( int ) ) );
+			SLOT( updateMasterPitchFloat( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( masterPitchReleased() ) );
+			SLOT( hideMasterPitchFloat() ) );
 
 	m_mpsStatus = new TextFloat;
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
@@ -284,19 +284,19 @@ void SongEditor::scrolled( int _new_pos )
 
 
 
-void SongEditor::setMode(Mode mode)
+void SongEditor::setEditMode(EditMode mode)
 {
 	m_mode = mode;
 }
 
-void SongEditor::setModeDraw()
+void SongEditor::setEditModeDraw()
 {
-	setMode(DrawMode);
+	setEditMode(DrawMode);
 }
 
-void SongEditor::setModeEdit()
+void SongEditor::setEditModeSelect()
 {
-	setMode(EditMode);
+	setEditMode(SelectMode);
 }
 
 
@@ -387,9 +387,8 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 
 
 
-void SongEditor::masterVolumeChanged( int _new_val )
+void SongEditor::setMasterVolume( int _new_val )
 {
-	masterVolumeMoved( _new_val );
 	if( m_mvsStatus->isVisible() == false && m_song->m_loadingProject == false
 					&& m_masterVolumeSlider->showStatus() )
 	{
@@ -403,18 +402,18 @@ void SongEditor::masterVolumeChanged( int _new_val )
 
 
 
-void SongEditor::masterVolumePressed( void )
+void SongEditor::showMasterVolumeFloat( void )
 {
 	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 	m_mvsStatus->show();
-	masterVolumeMoved( m_song->m_masterVolumeModel.value() );
+	updateMasterVolumeFloat( m_song->m_masterVolumeModel.value() );
 }
 
 
 
 
-void SongEditor::masterVolumeMoved( int _new_val )
+void SongEditor::updateMasterVolumeFloat( int _new_val )
 {
 	m_mvsStatus->setText( tr( "Value: %1%" ).arg( _new_val ) );
 }
@@ -422,7 +421,7 @@ void SongEditor::masterVolumeMoved( int _new_val )
 
 
 
-void SongEditor::masterVolumeReleased( void )
+void SongEditor::hideMasterVolumeFloat( void )
 {
 	m_mvsStatus->hide();
 }
@@ -430,9 +429,9 @@ void SongEditor::masterVolumeReleased( void )
 
 
 
-void SongEditor::masterPitchChanged( int _new_val )
+void SongEditor::setMasterPitch( int _new_val )
 {
-	masterPitchMoved( _new_val );
+	updateMasterPitchFloat( _new_val );
 	if( m_mpsStatus->isVisible() == false && m_song->m_loadingProject == false
 					&& m_masterPitchSlider->showStatus() )
 	{
@@ -445,18 +444,18 @@ void SongEditor::masterPitchChanged( int _new_val )
 
 
 
-void SongEditor::masterPitchPressed( void )
+void SongEditor::showMasterPitchFloat( void )
 {
 	m_mpsStatus->moveGlobal( m_masterPitchSlider,
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 	m_mpsStatus->show();
-	masterPitchMoved( m_song->m_masterPitchModel.value() );
+	updateMasterPitchFloat( m_song->m_masterPitchModel.value() );
 }
 
 
 
 
-void SongEditor::masterPitchMoved( int _new_val )
+void SongEditor::updateMasterPitchFloat( int _new_val )
 {
 	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( _new_val ) );
 
@@ -465,7 +464,7 @@ void SongEditor::masterPitchMoved( int _new_val )
 
 
 
-void SongEditor::masterPitchReleased( void )
+void SongEditor::hideMasterPitchFloat( void )
 {
 	m_mpsStatus->hide();
 }
@@ -598,7 +597,7 @@ void SongEditor::adjustUiAfterProjectLoad()
 
 bool SongEditor::allowRubberband() const
 {
-	return m_mode == EditMode;
+	return m_mode == SelectMode;
 }
 
 
@@ -636,13 +635,13 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 				m_editor->m_song, SLOT(addAutomationTrack()));
 
 	m_drawModeButton = new ToolButton(embed::getIconPixmap("edit_draw"),
-									  tr("Draw mode"), m_editor, SLOT(setModeDraw()));
+									  tr("Draw mode"), m_editor, SLOT(setEditModeDraw()));
 	m_drawModeButton->setCheckable(true);
 	m_drawModeButton->setChecked(true);
 
 	m_editModeButton = new ToolButton(embed::getIconPixmap("edit_select"),
 									  tr("Edit mode (select and move)"),
-									  m_editor, SLOT(setModeEdit()));
+									  m_editor, SLOT(setEditModeSelect()));
 	m_editModeButton->setCheckable(true);
 
 	QButtonGroup * tool_button_group = new QButtonGroup(this);
