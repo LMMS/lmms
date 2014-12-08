@@ -134,7 +134,7 @@ static inline int fast_rand()
 static inline long fastFmal( long a, long b, long c ) {
 #ifdef FP_FAST_FMAF
 	#ifdef __clang__
-		return fma(a, b, c);
+		return fma( a, b, c );
 	#else
 		return fmal( a, b, c );
 	#endif
