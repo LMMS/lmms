@@ -98,11 +98,6 @@ Editor::Editor(bool record) :
 		connect(m_recordAccompanyButton, SIGNAL(clicked()), this, SLOT(recordAccompany()));
 	}
 	connect(m_stopButton, SIGNAL(clicked()), this, SLOT(stop()));
-
-
-	// Add editor to main window
-	Engine::mainWindow()->workspace()->addSubWindow(this);
-	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
 }
 
 Editor::~Editor()

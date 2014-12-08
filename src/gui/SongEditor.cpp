@@ -680,10 +680,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( zoom_lbl );
 	m_toolBar->addWidget( m_zoomingComboBox );
+}
 
-	parentWidget()->resize( 600, 300 );
-	parentWidget()->move( 5, 5 );
-	parentWidget()->show();
+QSize SongEditorWindow::sizeHint() const
+{
+	return {600, 300};
 }
 
 

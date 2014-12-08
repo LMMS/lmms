@@ -379,6 +379,8 @@ public:
 		return "pianoroll";
 	}
 
+	QSize sizeHint() const;
+
 signals:
 	void currentPatternChanged();
 

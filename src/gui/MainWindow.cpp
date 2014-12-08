@@ -530,6 +530,28 @@ void MainWindow::finalize()
 		SetupDialog sd( SetupDialog::AudioSettings );
 		sd.exec();
 	}
+
+	// Add editor subwindows
+	for (QWidget* widget : QList<QWidget*>{
+			Engine::automationEditor(),
+			Engine::getBBEditor(),
+			Engine::pianoRoll(),
+			Engine::songEditor()
+	})
+	{
+		QMdiSubWindow* window = workspace()->addSubWindow(widget);
+		window->setWindowIcon(widget->windowIcon());
+		window->setAttribute(Qt::WA_DeleteOnClose, false);
+		window->resize(widget->sizeHint());
+	}
+
+	Engine::automationEditor()->parentWidget()->hide();
+	Engine::getBBEditor()->parentWidget()->move( 610, 5 );
+	Engine::getBBEditor()->parentWidget()->show();
+	Engine::pianoRoll()->parentWidget()->move(5, 5);
+	Engine::pianoRoll()->parentWidget()->hide();
+	Engine::songEditor()->parentWidget()->move(5, 5);
+	Engine::songEditor()->parentWidget()->show();
 }
 
 

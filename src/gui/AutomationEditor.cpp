@@ -2280,18 +2280,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
-
-	// Add us to workspace
-	if( Engine::mainWindow()->workspace() )
-	{
-		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
-		parentWidget()->hide();
-	}
-	else
-	{
-		resize( INITIAL_WIDTH, INITIAL_HEIGHT );
-		hide();
-	}
 }
 
 
@@ -2333,6 +2321,11 @@ const AutomationPattern* AutomationEditorWindow::currentPattern()
 int AutomationEditorWindow::quantization() const
 {
 	return m_editor->quantization();
+}
+
+QSize AutomationEditorWindow::sizeHint() const
+{
+	return {INITIAL_WIDTH, INITIAL_HEIGHT};
 }
 
 void AutomationEditorWindow::play()

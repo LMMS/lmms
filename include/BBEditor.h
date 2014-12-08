@@ -43,6 +43,8 @@ public:
 	BBEditor( BBTrackContainer * _tc );
 	~BBEditor();
 
+	QSize sizeHint() const;
+
 	const BBTrackContainerView* trackContainerView() const {
 		return m_trackContainerView;
 	}

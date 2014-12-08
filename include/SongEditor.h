@@ -137,6 +137,8 @@ class SongEditorWindow : public Editor
 public:
 	SongEditorWindow(Song* song);
 
+	QSize sizeHint() const;
+
 	SongEditor* m_editor;
 
 protected slots:

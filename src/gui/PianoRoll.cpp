@@ -4222,18 +4222,6 @@ PianoRollWindow::PianoRollWindow() :
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
 	setCurrentPattern( NULL );
 
-	if( Engine::mainWindow()->workspace() )
-	{
-		parentWidget()->resize(m_toolBar->sizeHint().width()+10, INITIAL_PIANOROLL_HEIGHT);
-		parentWidget()->move( 5, 5 );
-		parentWidget()->hide();
-	}
-	else
-	{
-		resize( m_toolBar->sizeHint().width()+10, INITIAL_PIANOROLL_HEIGHT );
-		hide();
-	}
-
 	// Connections
 	connect(m_editor, SIGNAL(currentPatternChanged()), this, SIGNAL(currentPatternChanged()));
 }
@@ -4294,8 +4282,12 @@ void PianoRollWindow::saveSettings(QDomDocument & doc, QDomElement & de)
 	MainWindow::saveWidgetState(this, de);
 }
 
-
 void PianoRollWindow::loadSettings(const QDomElement & de)
 {
 	MainWindow::restoreWidgetState(this, de);
+}
+
+QSize PianoRollWindow::sizeHint() const
+{
+	return {m_toolBar->sizeHint().width()+10, INITIAL_PIANOROLL_HEIGHT};
 }

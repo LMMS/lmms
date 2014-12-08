@@ -114,11 +114,6 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_toolBar->addWidget( add_bar );
 	m_toolBar->addSeparator();
 
-	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
-	parentWidget()->resize( minimumWidth(), 300 );
-	parentWidget()->move( 610, 5 );
-	parentWidget()->show();
-
 	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
 			m_trackContainerView, SLOT( updatePosition() ) );
 
@@ -134,21 +129,21 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 }
 
 
-
-
 BBEditor::~BBEditor()
 {
 }
 
 
+QSize BBEditor::sizeHint() const
+{
+	return {minimumWidth(), 300};
+}
 
 
 void BBEditor::removeBBView( int bb )
 {
 	m_trackContainerView->removeBBView(bb);
 }
-
-
 
 
 void BBEditor::play()
@@ -162,8 +157,6 @@ void BBEditor::play()
 		Engine::getSong()->togglePause();
 	}
 }
-
-
 
 
 void BBEditor::stop()

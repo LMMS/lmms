@@ -267,6 +267,8 @@ public:
 
 	AutomationEditor* m_editor;
 
+	QSize sizeHint() const;
+
 signals:
 	void currentPatternChanged();
 
