@@ -131,7 +131,7 @@ static inline int fast_rand()
 }
 
 //! @brief Takes advantage of fmal() function if present in hardware
-static inline long fastFmal( long a, long b, long c) {
+static inline long fastFmal( long a, long b, long c ) {
 #ifdef FP_FAST_FMAF
 	#ifdef __clang__
 		return fma(a, b, c);
@@ -139,12 +139,12 @@ static inline long fastFmal( long a, long b, long c) {
 		return fmal( a, b, c );
 	#endif
 #else
-	return a * ( b - c ) + c;
+	return a * b + c;
 #endif
 }
 
 //! @brief Takes advantage of fmaf() function if present in hardware
-static inline float fastFmaf( float a, float b, float c) {
+static inline float fastFmaf( float a, float b, float c ) {
 #ifdef FP_FAST_FMAF
 	#ifdef __clang__
 		return fma( a, b, c );
@@ -152,16 +152,16 @@ static inline float fastFmaf( float a, float b, float c) {
 		return fmaf( a, b, c );
 	#endif
 #else
-	return a * ( b - c ) + c;
+	return a * b + c;
 #endif
 }
 
 //! @brief Takes advantage of fma() function if present in hardware
-static inline int fastFma( int a, int b, int c) {
+static inline int fastFma( int a, int b, int c ) {
 #ifdef FP_FAST_FMAF
 	return fma( a, b, c );
 #else
-	return a * ( b - c ) + c;
+	return a * b + c;
 #endif
 }
 
