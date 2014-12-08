@@ -361,14 +361,14 @@ vibedView::vibedView( Instrument * _instrument,
 	m_volumeKnob = new Knob( knobBright_26, this );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->move( 103, 142 );
-	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
+    m_volumeKnob->setHintText( tr( "Volume:" ), "" );
 	m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
 					"of the selected string." ) );
 
 	m_stiffnessKnob = new Knob( knobBright_26, this );
 	m_stiffnessKnob->move( 129, 142 );
-	m_stiffnessKnob->setHintText( tr( "String stiffness:" ) +
-					" ", "" );
+    m_stiffnessKnob->setHintText( tr( "String stiffness:" )
+                    , "" );
 	m_stiffnessKnob->setWhatsThis( tr(
 "The 'S' knob sets the stiffness of the selected string.  The stiffness "
 "of the string affects how long the string will ring out.  The lower "
@@ -377,15 +377,15 @@ vibedView::vibedView( Instrument * _instrument,
 	
 	m_pickKnob = new Knob( knobBright_26, this );
 	m_pickKnob->move( 153, 142 );
-	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
+    m_pickKnob->setHintText( tr( "Pick position:" ), "" );
 	m_pickKnob->setWhatsThis( tr(
 "The 'P' knob sets the position where the selected string will be 'picked'.  "
 "The lower the setting the closer the pick is to the bridge." ) );
 
 	m_pickupKnob = new Knob( knobBright_26, this );
 	m_pickupKnob->move( 177, 142 );
-	m_pickupKnob->setHintText( tr( "Pickup position:" ) +
-				" ", "" );
+    m_pickupKnob->setHintText( tr( "Pickup position:" )
+                , "" );
 	m_pickupKnob->setWhatsThis( tr(
 "The 'PU' knob sets the position where the vibrations will be monitored "
 "for the selected string.  The lower the setting, the closer the "
@@ -393,14 +393,14 @@ vibedView::vibedView( Instrument * _instrument,
 
 	m_panKnob = new Knob( knobBright_26, this );
 	m_panKnob->move( 105, 187 );
-	m_panKnob->setHintText( tr( "Pan:" ) + " ", "" );
+    m_panKnob->setHintText( tr( "Pan:" ), "" );
 	m_panKnob->setWhatsThis( tr(
 "The Pan knob determines the location of the selected string in the stereo "
 "field." ) );
 	
 	m_detuneKnob = new Knob( knobBright_26, this );
 	m_detuneKnob->move( 150, 187 );
-	m_detuneKnob->setHintText( tr( "Detune:" ) + " ", "" );
+    m_detuneKnob->setHintText( tr( "Detune:" ), "" );
 	m_detuneKnob->setWhatsThis( tr(
 "The Detune knob modifies the pitch of the selected string.  Settings less "
 "than zero will cause the string to sound flat.  Settings greater than zero "
@@ -408,8 +408,8 @@ vibedView::vibedView( Instrument * _instrument,
 
 	m_randomKnob = new Knob( knobBright_26, this );
 	m_randomKnob->move( 194, 187 );
-	m_randomKnob->setHintText( tr( "Fuzziness:" ) +
-				" ", "" );
+    m_randomKnob->setHintText( tr( "Fuzziness:" )
+                , "" );
 	m_randomKnob->setWhatsThis( tr(
 "The Slap knob adds a bit of fuzz to the selected string which is most "
 "apparent during the attack, though it can also be used to make the string "
@@ -417,8 +417,8 @@ vibedView::vibedView( Instrument * _instrument,
 
 	m_lengthKnob = new Knob( knobBright_26, this );
 	m_lengthKnob->move( 23, 193 );
-	m_lengthKnob->setHintText( tr( "Length:" ) +
-				" ", "" );
+    m_lengthKnob->setHintText( tr( "Length:" )
+                , "" );
 	m_lengthKnob->setWhatsThis( tr(
 "The Length knob sets the length of the selected string.  Longer strings "
 "will both ring longer and sound brighter, however, they will also eat up "

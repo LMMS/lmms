@@ -38,7 +38,7 @@
 	name -> move( x, y );									\
 	name ->setModel( &controls-> model );					\
 	name ->setLabel( tr( label ) );							\
-	name ->setHintText( tr( hint ) + " ", unit );
+    name ->setHintText( tr( hint ) , unit );
 
 
 

@@ -97,7 +97,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_predelayKnob = new Knob( knobBright_26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
-	m_predelayKnob->setHintText( tr( "Predelay:" ) + " ", "" );
+    m_predelayKnob->setHintText( tr( "Predelay:" ), "" );
 	m_predelayKnob->setWhatsThis(
 		tr( "Use this knob for setting predelay of the current "
 			"envelope. The bigger this value the longer the time "
@@ -107,7 +107,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_attackKnob = new Knob( knobBright_26, this );
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
-	m_attackKnob->setHintText( tr( "Attack:" )+" ", "" );
+    m_attackKnob->setHintText( tr( "Attack:" ), "" );
 	m_attackKnob->setWhatsThis(
 		tr( "Use this knob for setting attack-time of the current "
 			"envelope. The bigger this value the longer the "
@@ -118,7 +118,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_holdKnob = new Knob( knobBright_26, this );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
-	m_holdKnob->setHintText( tr( "Hold:" ) + " ", "" );
+    m_holdKnob->setHintText( tr( "Hold:" ), "" );
 	m_holdKnob->setWhatsThis(
 		tr( "Use this knob for setting hold-time of the current "
 			"envelope. The bigger this value the longer the "
@@ -128,7 +128,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_decayKnob = new Knob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
-	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "" );
+    m_decayKnob->setHintText( tr( "Decay:" ), "" );
 	m_decayKnob->setWhatsThis(
 		tr( "Use this knob for setting decay-time of the current "
 			"envelope. The bigger this value the longer the "
@@ -140,7 +140,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_sustainKnob = new Knob( knobBright_26, this );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
-	m_sustainKnob->setHintText( tr( "Sustain:" ) + " ", "" );
+    m_sustainKnob->setHintText( tr( "Sustain:" ), "" );
 	m_sustainKnob->setWhatsThis(
 		tr( "Use this knob for setting sustain-level of the current "
 			"envelope. The bigger this value the higher the level "
@@ -151,7 +151,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_releaseKnob = new Knob( knobBright_26, this );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
-	m_releaseKnob->setHintText( tr( "Release:" ) + " ", "" );
+    m_releaseKnob->setHintText( tr( "Release:" ), "" );
 	m_releaseKnob->setWhatsThis(
 		tr( "Use this knob for setting release-time of the current "
 			"envelope. The bigger this value the longer the "
@@ -163,7 +163,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
-	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
+    m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 	m_amountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
 			"current envelope. The bigger this value the more the "
@@ -176,7 +176,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoPredelayKnob = new Knob( knobBright_26, this );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
-	m_lfoPredelayKnob->setHintText( tr( "LFO predelay:" ) + " ", "" );
+    m_lfoPredelayKnob->setHintText( tr( "LFO predelay:" ), "" );
 	m_lfoPredelayKnob->setWhatsThis(
 		tr( "Use this knob for setting predelay-time of the current "
 			"LFO. The bigger this value the the time until the "
@@ -186,7 +186,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoAttackKnob = new Knob( knobBright_26, this );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
-	m_lfoAttackKnob->setHintText( tr( "LFO- attack:" ) + " ", "" );
+    m_lfoAttackKnob->setHintText( tr( "LFO- attack:" ), "" );
 	m_lfoAttackKnob->setWhatsThis(
 		tr( "Use this knob for setting attack-time of the current LFO. "
 			"The bigger this value the longer the LFO needs to "
@@ -196,7 +196,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoSpeedKnob = new TempoSyncKnob( knobBright_26, this );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
-	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ) + " ", "" );
+    m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
 	m_lfoSpeedKnob->setWhatsThis(
 		tr( "Use this knob for setting speed of the current LFO. The "
 			"bigger this value the faster the LFO oscillates and "
@@ -206,7 +206,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoAmountKnob = new Knob( knobBright_26, this );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
-	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
+    m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ), "" );
 	m_lfoAmountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
 			"current LFO. The bigger this value the more the "

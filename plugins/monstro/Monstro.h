@@ -46,14 +46,14 @@
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, view ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ) + " ", unit );		\
+    name ->setHintText( tr( hint ), unit );             \
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
 	name = new TempoSyncKnob( knobStyled, view ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ) + " ", unit );		\
+    name ->setHintText( tr( hint ), unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 

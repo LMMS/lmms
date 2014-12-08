@@ -456,7 +456,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	setPalette( pal );
 
 	m_ch1SweepTimeKnob = new papuKnob( this );
-	m_ch1SweepTimeKnob->setHintText( tr( "Sweep Time:" ) + " ", "" );
+    m_ch1SweepTimeKnob->setHintText( tr( "Sweep Time:" ), "" );
 	m_ch1SweepTimeKnob->move( 5 + 4*32, 106 );
 	ToolTip::add( m_ch1SweepTimeKnob, tr( "Sweep Time" ) );
 	m_ch1SweepTimeKnob->setWhatsThis( tr( "The amount of increase or"
@@ -464,7 +464,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 	m_ch1SweepRtShiftKnob = new papuKnob( this );
 	m_ch1SweepRtShiftKnob->setHintText( tr( "Sweep RtShift amount:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch1SweepRtShiftKnob->move( 5 + 3*32, 106 );
 	ToolTip::add( m_ch1SweepRtShiftKnob, tr( "Sweep RtShift amount" ) );
 	m_ch1SweepRtShiftKnob->setWhatsThis( tr( "The rate at which increase or"
@@ -472,7 +472,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 	m_ch1WavePatternDutyKnob = new papuKnob( this );
 	m_ch1WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch1WavePatternDutyKnob->move( 5 + 2*32, 106 );
 	ToolTip::add( m_ch1WavePatternDutyKnob, tr( "Wave Pattern Duty" ) );
 	m_ch1WavePatternDutyKnob->setWhatsThis( tr( "The duty cycle is the ratio of"
@@ -481,14 +481,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 	m_ch1VolumeKnob = new papuKnob( this );
 	m_ch1VolumeKnob->setHintText( tr( "Square Channel 1 Volume:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch1VolumeKnob->move( 5, 106 );
 	ToolTip::add( m_ch1VolumeKnob, tr( "Square Channel 1 Volume:" ) );
 	m_ch1VolumeKnob->setWhatsThis( tr( "Square Channel 1 Volume" ) );
 
 	m_ch1SweepStepLengthKnob = new papuKnob( this );
 	m_ch1SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch1SweepStepLengthKnob->move( 5 + 32, 106 );
 	ToolTip::add( m_ch1SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
 	m_ch1SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
@@ -497,7 +497,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 	m_ch2WavePatternDutyKnob = new papuKnob( this );
 	m_ch2WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch2WavePatternDutyKnob->move( 5 + 2*32, 155 );
 	ToolTip::add( m_ch2WavePatternDutyKnob, tr( "Wave pattern duty" ) );
 	m_ch2WavePatternDutyKnob->setWhatsThis( tr( "The duty cycle is the ratio of"
@@ -506,14 +506,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 	m_ch2VolumeKnob = new papuKnob( this );
 	m_ch2VolumeKnob->setHintText( tr( "Square Channel 2 Volume:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch2VolumeKnob->move( 5, 155 );
 	ToolTip::add( m_ch2VolumeKnob, tr( "Square Channel 2 Volume" ) );
 	m_ch2VolumeKnob->setWhatsThis( tr( "Square Channel 2 Volume" ) );
 
 	m_ch2SweepStepLengthKnob = new papuKnob( this );
 	m_ch2SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch2SweepStepLengthKnob->move( 5 + 32, 155 );
 	ToolTip::add( m_ch2SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
 	m_ch2SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
@@ -521,7 +521,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 	m_ch3VolumeKnob = new papuKnob( this );
-	m_ch3VolumeKnob->setHintText( tr( "Wave Channel Volume:" ) + " ", "" );
+    m_ch3VolumeKnob->setHintText( tr( "Wave Channel Volume:" ), "" );
 	m_ch3VolumeKnob->move( 5, 204 );
 	ToolTip::add( m_ch3VolumeKnob, tr( "Wave Channel Volume" ) );
 	m_ch3VolumeKnob->setWhatsThis( tr( "Wave Channel Volume" ) );
@@ -529,14 +529,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 	m_ch4VolumeKnob = new papuKnob( this );
-	m_ch4VolumeKnob->setHintText( tr( "Noise Channel Volume:" ) + " ", "" );
+    m_ch4VolumeKnob->setHintText( tr( "Noise Channel Volume:" ), "" );
 	m_ch4VolumeKnob->move( 144, 155 );
 	ToolTip::add( m_ch4VolumeKnob, tr( "Noise Channel Volume" ) );
 	m_ch4VolumeKnob->setWhatsThis( tr( "Noise Channel Volume" ) );
 
 	m_ch4SweepStepLengthKnob = new papuKnob( this );
 	m_ch4SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
-											+ " ", "" );
+                                            , "" );
 	m_ch4SweepStepLengthKnob->move( 144 + 32, 155 );
 	ToolTip::add( m_ch4SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
 	m_ch4SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
@@ -544,22 +544,22 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 	m_so1VolumeKnob = new papuKnob( this );
-	m_so1VolumeKnob->setHintText( tr( "SO1 Volume (Right):" ) + " ", "" );
+    m_so1VolumeKnob->setHintText( tr( "SO1 Volume (Right):" ), "" );
 	m_so1VolumeKnob->move( 5, 58 );
 	ToolTip::add( m_so1VolumeKnob, tr( "SO1 Volume (Right)" ) );
 
 	m_so2VolumeKnob = new papuKnob( this );
-	m_so2VolumeKnob->setHintText( tr( "SO2 Volume (Left):" ) + " ", "" );
+    m_so2VolumeKnob->setHintText( tr( "SO2 Volume (Left):" ), "" );
 	m_so2VolumeKnob->move( 5 + 32, 58 );
 	ToolTip::add( m_so2VolumeKnob, tr( "SO2 Volume (Left)" ) );
 
 	m_trebleKnob = new papuKnob( this );
-	m_trebleKnob->setHintText( tr( "Treble:" ) + " ", "" );
+    m_trebleKnob->setHintText( tr( "Treble:" ), "" );
 	m_trebleKnob->move( 5 + 2*32, 58 );
 	ToolTip::add( m_trebleKnob, tr( "Treble" ) );
 
 	m_bassKnob = new papuKnob( this );
-	m_bassKnob->setHintText( tr( "Bass:" ) + " ", "" );
+    m_bassKnob->setHintText( tr( "Bass:" ), "" );
 	m_bassKnob->move( 5 + 3*32, 58 );
 	ToolTip::add( m_bassKnob, tr( "Bass" ) );
 

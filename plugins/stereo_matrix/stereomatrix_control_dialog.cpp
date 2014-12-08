@@ -49,22 +49,22 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 
 	Knob * llKnob = new Knob( knobSmall_17, this );
 	llKnob->setModel( &_controls->m_llModel );
-	llKnob->setHintText( tr( "Left to Left Vol:" ) + " ", "" );
+    llKnob->setHintText( tr( "Left to Left Vol:" ) , "" );
 	llKnob->move( 40, 60 );
 
 	Knob * lrKnob = new Knob( knobSmall_17, this );
 	lrKnob->setModel( &_controls->m_lrModel );
-	lrKnob->setHintText( tr( "Left to Right Vol:" ) + " ", "" );
+    lrKnob->setHintText( tr( "Left to Right Vol:" ) , "" );
 	lrKnob->move( 40+28, 60);
 
 	Knob * rlKnob = new Knob( knobSmall_17, this );
 	rlKnob->setModel( &_controls->m_rlModel );
-	rlKnob->setHintText( tr( "Right to Left Vol:" ) + " ", "" );
+    rlKnob->setHintText( tr( "Right to Left Vol:" ) , "" );
 	rlKnob->move( 40, 60+28 );
 
 	Knob * rrKnob = new Knob( knobSmall_17, this );
 	rrKnob->setModel( &_controls->m_rrModel );
-	rrKnob->setHintText( tr( "Right to Right Vol:" ) + " ", "" );
+    rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
 	rrKnob->move( 40+28, 60+28 );
 }
 

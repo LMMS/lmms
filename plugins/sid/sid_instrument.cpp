@@ -487,15 +487,15 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	setPalette( pal );
 
 	m_volKnob = new sidKnob( this );
-	m_volKnob->setHintText( tr( "Volume:" ) + " ", "" );
+    m_volKnob->setHintText( tr( "Volume:" ), "" );
 	m_volKnob->move( 7, 64 );
 
 	m_resKnob = new sidKnob( this );
-	m_resKnob->setHintText( tr( "Resonance:" ) + " ", "" );
+    m_resKnob->setHintText( tr( "Resonance:" ), "" );
 	m_resKnob->move( 7 + 28, 64 );
 
 	m_cutKnob = new sidKnob( this );
-	m_cutKnob->setHintText( tr( "Cutoff frequency:" ) + " ", "Hz" );
+    m_cutKnob->setHintText( tr( "Cutoff frequency:" ), "Hz" );
 	m_cutKnob->move( 7 + 2*28, 64 );
 
 	PixmapButton * hp_btn = new PixmapButton( this, NULL );
@@ -547,32 +547,32 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	for( int i = 0; i < 3; i++ ) 
 	{
 		Knob *ak = new sidKnob( this );
-		ak->setHintText( tr("Attack:") + " ", "" );
+        ak->setHintText( tr("Attack:"), "" );
 		ak->move( 7, 114 + i*50 );
 		ak->setWhatsThis( tr ( "Attack rate determines how rapidly the output "
 				"of Voice %1 rises from zero to peak amplitude." ).arg( i+1 ) );
 
 		Knob *dk = new sidKnob( this );
-		dk->setHintText( tr("Decay:") + " ", "" );
+        dk->setHintText( tr("Decay:") , "" );
 		dk->move( 7 + 28, 114 + i*50 );
 		dk->setWhatsThis( tr ( "Decay rate determines how rapidly the output "
 				"falls from the peak amplitude to the selected Sustain level." ) );
 
 		Knob *sk = new sidKnob( this );
-		sk->setHintText( tr("Sustain:") + " ", "" );
+        sk->setHintText( tr("Sustain:"), "" );
 		sk->move( 7 + 2*28, 114 + i*50 );
 		sk->setWhatsThis( tr ( "Output of Voice %1 will remain at the selected "
 				"Sustain amplitude as long as the note is held." ).arg( i+1 ) );
 
 		Knob *rk = new sidKnob( this );
-		rk->setHintText( tr("Release:") + " ", "" );
+        rk->setHintText( tr("Release:"), "" );
 		rk->move( 7 + 3*28, 114 + i*50 );
 		rk->setWhatsThis( tr ( "The output of of Voice %1 will fall from "
 				"Sustain amplitude to zero amplitude at the selected Release "
 				"rate." ).arg( i+1 ) );
 
 		Knob *pwk = new sidKnob( this );
-		pwk->setHintText( tr("Pulse Width:") + " ", "" );
+        pwk->setHintText( tr("Pulse Width:"), "" );
 		pwk->move( 7 + 4*28, 114 + i*50 );
 		pwk->setWhatsThis( tr ( "The Pulse Width resolution allows the width "
 				"to be smoothly swept with no discernable stepping. The Pulse "
@@ -580,7 +580,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 				" effect." ).arg( i+1 ) );
 
 		Knob *crsk = new sidKnob( this );
-		crsk->setHintText( tr("Coarse:") + " ", " semitones" );
+        crsk->setHintText( tr("Coarse:"), " semitones" );
 		crsk->move( 147, 114 + i*50 );
 		crsk->setWhatsThis( tr ( "The Coarse detuning allows to detune Voice "
 				"%1 one octave up or down." ).arg( i+1 ) );

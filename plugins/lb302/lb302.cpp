@@ -824,22 +824,22 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	// GUI
 	m_vcfCutKnob = new Knob( knobBright_26, this );
 	m_vcfCutKnob->move( 75, 130 );
-	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ) + " ", "" );
+    m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ), "" );
 	m_vcfCutKnob->setLabel( "" );
 
 	m_vcfResKnob = new Knob( knobBright_26, this );
 	m_vcfResKnob->move( 120, 130 );
-	m_vcfResKnob->setHintText( tr( "Resonance:" ) + " ", "" );
+    m_vcfResKnob->setHintText( tr( "Resonance:" ), "" );
 	m_vcfResKnob->setLabel( "" );
 
 	m_vcfModKnob = new Knob( knobBright_26, this );
 	m_vcfModKnob->move( 165, 130 );
-	m_vcfModKnob->setHintText( tr( "Env Mod:" ) + " ", "" );
+    m_vcfModKnob->setHintText( tr( "Env Mod:" ), "" );
 	m_vcfModKnob->setLabel( "" );
 
 	m_vcfDecKnob = new Knob( knobBright_26, this );
 	m_vcfDecKnob->move( 210, 130 );
-	m_vcfDecKnob->setHintText( tr( "Decay:" ) + " ", "" );
+    m_vcfDecKnob->setHintText( tr( "Decay:" ), "" );
 	m_vcfDecKnob->setLabel( "" );
 
 	m_slideToggle = new LedCheckBox( "", this );
@@ -860,12 +860,12 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_slideDecKnob = new Knob( knobBright_26, this );
 	m_slideDecKnob->move( 210, 75 );
-	m_slideDecKnob->setHintText( tr( "Slide Decay:" ) + " ", "" );
+    m_slideDecKnob->setHintText( tr( "Slide Decay:" ), "" );
 	m_slideDecKnob->setLabel( "");
 
 	m_distKnob = new Knob( knobBright_26, this );
 	m_distKnob->move( 210, 190 );
-	m_distKnob->setHintText( tr( "DIST:" ) + " ", "" );
+    m_distKnob->setHintText( tr( "DIST:" ), "" );
 	m_distKnob->setLabel( tr( ""));
 
 

@@ -40,7 +40,7 @@ stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 	Knob * widthKnob = new Knob( knobBright_26, this );
 	widthKnob->setModel( &_controls->m_widthModel );
 	widthKnob->setLabel( tr( "WIDE" ) );
-	widthKnob->setHintText( tr( "Width:" ) + " ", "samples" );
+    widthKnob->setHintText( tr( "Width:" ) , "samples" );
 
 	l->addWidget( widthKnob );
 
