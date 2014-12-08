@@ -32,6 +32,7 @@
 
 #include <math.h>
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 inline float hermiteInterpolate( float x0, float x1, float x2, float x3,
 								float frac_pos )
@@ -80,32 +81,13 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
 	const float f = ( 1.0f - cosf( x * F_PI ) ) * 0.5f;
-#ifdef FP_FAST_FMAF
-	#ifndef __clang__
-		return fmaf( f, v1-v0, v0 );
-	#else
-		return fma( f, v1-v0, v0 );
-	#endif
-#else
-	return f * (v1-v0) + v0;
-#endif	
-//	return( v0*f + v1*( 1.0f-f ) );
+	return fastFmaf( f, v1-v0, v0 );
 }
 
 
 inline float linearInterpolate( float v0, float v1, float x )
 {
-// take advantage of fma function if present in hardware
-
-#ifdef FP_FAST_FMAF
-	#ifndef __clang__
-		return fmaf( x, v1-v0, v0 );
-	#else
-		return fma( x, v1-v0, v0 );
-	#endif
-#else
-	return x * (v1-v0) + v0;
-#endif	
+	return fastFmaf( x, v1-v0, v0 );
 }
 
 
