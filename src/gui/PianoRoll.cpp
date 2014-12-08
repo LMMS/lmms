@@ -1032,30 +1032,6 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 			event->accept();
 			break;
 
-		case Qt::Key_C:
-			if( event->modifiers() & Qt::ControlModifier )
-			{
-				event->accept();
-				copySelectedNotes();
-			}
-			break;
-
-		case Qt::Key_X:
-			if( event->modifiers() & Qt::ControlModifier )
-			{
-				event->accept();
-				cutSelectedNotes();
-			}
-			break;
-
-		case Qt::Key_V:
-			if( event->modifiers() & Qt::ControlModifier )
-			{
-				event->accept();
-				pasteNotes();
-			}
-			break;
-
 		case Qt::Key_A:
 			if( event->modifiers() & Qt::ControlModifier )
 			{
@@ -1067,18 +1043,6 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
-			event->accept();
-			break;
-
-		case Qt::Key_Space:
-			if( Engine::getSong()->isPlaying() )
-			{
-				stop();
-			}
-			else
-			{
-				play();
-			}
 			event->accept();
 			break;
 
@@ -4047,6 +4011,10 @@ PianoRollWindow::PianoRollWindow() :
 	m_pasteAction->setWhatsThis(
 		tr( "Click here and the notes from the clipboard will be "
 			"pasted at the first visible measure." ) );
+
+	m_cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
+	m_copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
+	m_pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
 
 	connect(m_cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
 	connect(m_copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));

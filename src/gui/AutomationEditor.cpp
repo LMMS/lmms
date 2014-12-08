@@ -324,29 +324,6 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			_ke->accept();
 			break;
 
-		case Qt::Key_C:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				copySelectedValues();
-				_ke->accept();
-			}
-			break;
-
-		case Qt::Key_X:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				cutSelectedValues();
-				_ke->accept();
-			}
-			break;
-
-		case Qt::Key_V:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				pasteValues();
-				_ke->accept();
-			}
-			break;
 		//TODO: m_selectButton and m_moveButton are broken.
 		/*case Qt::Key_A:
 			if( _ke->modifiers() & Qt::ControlModifier )
@@ -362,18 +339,6 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			deleteSelectedValues();
 			_ke->accept();
 			break;*/
-
-		case Qt::Key_Space:
-			if( Engine::getSong()->isPlaying() )
-			{
-				stop();
-			}
-			else
-			{
-				play();
-			}
-			_ke->accept();
-			break;
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );
@@ -2171,6 +2136,10 @@ AutomationEditorWindow::AutomationEditorWindow() :
 		tr( "Click here and the values from the clipboard will be "
 			"pasted at the first visible measure." ) );
 
+	m_cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
+	m_copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
+	m_pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
+
 	connect(m_cutAction,   SIGNAL(triggered()), m_editor, SLOT(cutSelectedValues()));
 	connect(m_copyAction,  SIGNAL(triggered()), m_editor, SLOT(copySelectedValues()));
 	connect(m_pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteValues()));
@@ -2229,8 +2198,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addSeparator();;
 	m_toolBar->addAction(m_drawAction);
 	m_toolBar->addAction(m_eraseAction);
-	//m_toolBar->addAction(m_selectButton);
-	//m_toolBar->addAction(m_moveButton);
+//	m_toolBar->addAction(m_selectButton);
+//	m_toolBar->addAction(m_moveButton);
 	m_toolBar->addSeparator();
 	m_toolBar->addAction(m_discreteAction);
 	m_toolBar->addAction(m_linearAction);
@@ -2239,9 +2208,10 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addWidget( new QLabel( tr("Tension: "), m_toolBar ));
 	m_toolBar->addWidget( m_tensionKnob );
 	m_toolBar->addSeparator();
-	m_toolBar->addAction( m_cutAction );
-	m_toolBar->addAction( m_copyAction );
-	m_toolBar->addAction( m_pasteAction );
+//	Select is broken
+//	m_toolBar->addAction( m_cutAction );
+//	m_toolBar->addAction( m_copyAction );
+//	m_toolBar->addAction( m_pasteAction );
 	m_toolBar->addSeparator();
 	m_editor->m_timeLine->addToolButtons(m_toolBar);
 	m_toolBar->addSeparator();
