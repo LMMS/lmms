@@ -2290,9 +2290,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Add us to workspace
 	if( Engine::mainWindow()->workspace() )
 	{
-		Engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
-		parentWidget()->move( 5, 5 );
 		parentWidget()->hide();
 	}
 	else
@@ -2341,20 +2339,6 @@ const AutomationPattern* AutomationEditorWindow::currentPattern()
 int AutomationEditorWindow::quantization() const
 {
 	return m_editor->quantization();
-}
-
-void AutomationEditorWindow::closeEvent(QCloseEvent* _ce)
-{
-	QApplication::restoreOverrideCursor();
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
 }
 
 void AutomationEditorWindow::play()

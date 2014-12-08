@@ -690,6 +690,7 @@ void AutomationPattern::openInAutomationEditor()
 {
 	Engine::automationEditor()->setCurrentPattern( this );
 	Engine::automationEditor()->parentWidget()->show();
+	Engine::automationEditor()->show();
 	Engine::automationEditor()->setFocus();
 }
 

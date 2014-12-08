@@ -688,8 +688,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_toolBar->addWidget( zoom_lbl );
 	m_toolBar->addWidget( m_zoomingComboBox );
 
-	Engine::mainWindow()->workspace()->addSubWindow( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
 	parentWidget()->show();

@@ -267,8 +267,6 @@ public:
 
 	AutomationEditor* m_editor;
 
-	virtual void closeEvent( QCloseEvent * _ce );
-
 signals:
 	void currentPatternChanged();
 
