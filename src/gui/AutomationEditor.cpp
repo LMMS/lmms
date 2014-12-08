@@ -57,7 +57,6 @@
 #include "gui_templates.h"
 #include "Timeline.h"
 #include "ToolTip.h"
-#include "ToolButton.h"
 #include "TextFloat.h"
 #include "ComboBox.h"
 #include "BBTrackContainer.h"
@@ -2041,17 +2040,19 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"current pattern." ) );
 
 	// Edit mode buttons
+	QActionGroup * tool_action_group = new QActionGroup(this);
 
-	m_drawButton = new ToolButton(embed::getIconPixmap( "edit_draw" ),
-								  tr( "Draw mode (Shift+D)" ));
-	m_drawButton->setCheckable( true );
-	m_drawButton->setChecked( true );
-	m_drawButton->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawAction = new QAction(embed::getIconPixmap("edit_draw"),
+								  tr("Draw mode (Shift+D)"), tool_action_group);
+	m_drawAction->setCheckable(true);
+	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 
-	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
-									tr( "Erase mode (Shift+E)" ));
-	m_eraseButton->setCheckable( true );
-	m_eraseButton->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction = new QAction(embed::getIconPixmap("edit_erase"),
+									tr("Erase mode (Shift+E)"), tool_action_group);
+	m_eraseAction->setCheckable(true);
+	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+
+	m_drawAction->setChecked(true);
 
 	//TODO: m_selectButton and m_moveButton are broken.
 	/*m_selectButton = new ToolButton( embed::getIconPixmap(
@@ -2068,32 +2069,30 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_moveButton->setCheckable( true );*/
 
 	QSignalMapper* signalmapper = new QSignalMapper(this);
-	signalmapper->setMapping(m_drawButton, AutomationEditor::DRAW);
-	signalmapper->setMapping(m_eraseButton, AutomationEditor::ERASE);
+	signalmapper->setMapping(m_drawAction, AutomationEditor::DRAW);
+	signalmapper->setMapping(m_eraseAction, AutomationEditor::ERASE);
 //	signalmapper->setMapping(m_selectButton, AutomationEditor::SELECT);
 //	signalmapper->setMapping(m_moveButton, AutomationEditor::MOVE);
 
-	connect(m_drawButton, SIGNAL(clicked()), signalmapper, SLOT(map()));
-	connect(m_eraseButton, SIGNAL(clicked()), signalmapper, SLOT(map()));
+	connect(m_drawAction, SIGNAL(triggered()), signalmapper, SLOT(map()));
+	connect(m_eraseAction, SIGNAL(triggered()), signalmapper, SLOT(map()));
 //	connect(m_selectButton, SIGNAL(triggered()), signalmapper, SLOT(map()));
 //	connect(m_moveButton, SIGNAL(triggered()), signalmapper, SLOT(map()));
 
 	connect(signalmapper, SIGNAL(mapped(int)), m_editor, SLOT(setEditMode(int)));
 
-	QButtonGroup * tool_button_group = new QButtonGroup();
-	tool_button_group->addButton( m_drawButton );
-	tool_button_group->addButton( m_eraseButton );
+//	tool_action_group->addAction( m_drawButton );
+//	tool_action_group->addAction( m_eraseButton );
 	//tool_button_group->addButton( m_selectButton );
 	//tool_button_group->addButton( m_moveButton );
-	tool_button_group->setExclusive( true );
 
-	m_drawButton->setWhatsThis(
+	m_drawAction->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
 			"mode you can add and move single values.  This "
 			"is the default mode which is used most of the time.  "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode." ) );
-	m_eraseButton->setWhatsThis(
+	m_eraseAction->setWhatsThis(
 		tr( "Click here and erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
@@ -2112,90 +2111,69 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 	// Progression type buttons
+	QActionGroup* progression_type_group = new QActionGroup(this);
 
-	m_discreteButton = new ToolButton( embed::getIconPixmap(
-						"progression_discrete" ),
-					tr( "Discrete progression" ),
-					m_editor, SLOT( setProgressionDiscrete() ),
-					m_toolBar );
-	m_discreteButton->setCheckable( true );
-	m_discreteButton->setChecked( true );
+	m_discreteAction = new QAction(embed::getIconPixmap("progression_discrete"),
+								   tr("Discrete progression"), progression_type_group);
+	m_linearAction = new QAction(embed::getIconPixmap("progression_linear"),
+								 tr("Linear progression"), progression_type_group);
+	m_cubicHermiteAction = new QAction(embed::getIconPixmap("progression_cubic_hermite"),
+									   tr( "Cubic Hermite progression"), progression_type_group);
 
-	m_linearButton = new ToolButton( embed::getIconPixmap(
-							"progression_linear" ),
-					tr( "Linear progression" ),
-					m_editor, SLOT( setProgressionLinear() ),
-					m_toolBar );
-	m_linearButton->setCheckable( true );
+	m_linearAction->setCheckable( true );
+	m_cubicHermiteAction->setCheckable( true );
+	m_discreteAction->setCheckable( true );
+	m_discreteAction->setChecked( true );
 
-	m_cubicHermiteButton = new ToolButton( embed::getIconPixmap(
-						"progression_cubic_hermite" ),
-					tr( "Cubic Hermite progression" ),
-					m_editor, SLOT(
-						setProgressionHermite() ),
-					m_toolBar );
-	m_cubicHermiteButton->setCheckable( true );
+	connect(m_discreteAction, SIGNAL(triggered()), m_editor, SLOT(setProgressionDiscrete()));
+	connect(m_linearAction, SIGNAL(triggered()), m_editor, SLOT(setProgressionLinear()));
+	connect(m_cubicHermiteAction, SIGNAL(triggered()), m_editor, SLOT(setProgressionHermite()));
 
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 
-	tool_button_group = new QButtonGroup( this );
-	tool_button_group->addButton( m_discreteButton );
-	tool_button_group->addButton( m_linearButton );
-	tool_button_group->addButton( m_cubicHermiteButton );
-	tool_button_group->setExclusive( true );
-
-	m_discreteButton->setWhatsThis(
+	m_discreteAction->setWhatsThis(
 		tr( "Click here to choose discrete progressions for this "
 			"automation pattern.  The value of the connected "
 			"object will remain constant between control points "
 			"and be set immediately to the new value when each "
 			"control point is reached." ) );
-	m_linearButton->setWhatsThis(
+	m_linearAction->setWhatsThis(
 		tr( "Click here to choose linear progressions for this "
 			"automation pattern.  The value of the connected "
 			"object will change at a steady rate over time "
 			"between control points to reach the correct value at "
 			"each control point without a sudden change." ) );
-	m_cubicHermiteButton->setWhatsThis(
+	m_cubicHermiteAction->setWhatsThis(
 		tr( "Click here to choose cubic hermite progressions for this "
 			"automation pattern.  The value of the connected "
 			"object will change in a smooth curve and ease in to "
 			"the peaks and valleys." ) );
 
-
-
 	// Copy paste buttons
 
-	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut selected values (Ctrl+X)" ),
-					m_editor, SLOT( cutSelectedValues() ),
-					m_toolBar );
+	m_cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+					tr("Cut selected values (Ctrl+X)"), this);
+	m_copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+					tr("Copy selected values (Ctrl+C)"), this);
+	m_pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+					tr("Paste values from clipboard Ctrl+V)"), this);
 
-	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy selected values (Ctrl+C)" ),
-					m_editor, SLOT( copySelectedValues() ),
-					m_toolBar );
-
-	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste values from clipboard "
-								"(Ctrl+V)" ),
-					m_editor, SLOT( pasteValues() ),
-					m_toolBar );
-
-	m_cutButton->setWhatsThis(
+	m_cutAction->setWhatsThis(
 		tr( "Click here and selected values will be cut into the "
 			"clipboard.  You can paste them anywhere in any pattern "
 			"by clicking on the paste button." ) );
-	m_copyButton->setWhatsThis(
+	m_copyAction->setWhatsThis(
 		tr( "Click here and selected values will be copied into "
 			"the clipboard.  You can paste them anywhere in any "
 			"pattern by clicking on the paste button." ) );
-	m_pasteButton->setWhatsThis(
+	m_pasteAction->setWhatsThis(
 		tr( "Click here and the values from the clipboard will be "
 			"pasted at the first visible measure." ) );
 
-
+	connect(m_cutAction,   SIGNAL(triggered()), m_editor, SLOT(cutSelectedValues()));
+	connect(m_copyAction,  SIGNAL(triggered()), m_editor, SLOT(copySelectedValues()));
+	connect(m_pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteValues()));
 
 	// Zoom controls
 
@@ -2249,21 +2227,21 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 	m_toolBar->addSeparator();;
-	m_toolBar->addWidget( m_drawButton );
-	m_toolBar->addWidget( m_eraseButton );
-	//m_toolBar->addWidget( m_selectButton );
-	//m_toolBar->addWidget( m_moveButton );
+	m_toolBar->addAction(m_drawAction);
+	m_toolBar->addAction(m_eraseAction);
+	//m_toolBar->addAction(m_selectButton);
+	//m_toolBar->addAction(m_moveButton);
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_discreteButton );
-	m_toolBar->addWidget( m_linearButton );
-	m_toolBar->addWidget( m_cubicHermiteButton );
+	m_toolBar->addAction(m_discreteAction);
+	m_toolBar->addAction(m_linearAction);
+	m_toolBar->addAction(m_cubicHermiteAction);
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( new QLabel( tr("Tension: "), m_toolBar ));
 	m_toolBar->addWidget( m_tensionKnob );
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_cutButton );
-	m_toolBar->addWidget( m_copyButton );
-	m_toolBar->addWidget( m_pasteButton );
+	m_toolBar->addAction( m_cutAction );
+	m_toolBar->addAction( m_copyAction );
+	m_toolBar->addAction( m_pasteAction );
 	m_toolBar->addSeparator();
 	m_editor->m_timeLine->addToolButtons(m_toolBar);
 	m_toolBar->addSeparator();
@@ -2298,13 +2276,13 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	switch(m_editor->m_pattern->progressionType())
 	{
 	case AutomationPattern::DiscreteProgression:
-		m_discreteButton->setChecked(true);
+		m_discreteAction->setChecked(true);
 		break;
 	case AutomationPattern::LinearProgression:
-		m_linearButton->setChecked(true);
+		m_linearAction->setChecked(true);
 		break;
 	case AutomationPattern::CubicHermiteProgression:
-		m_cubicHermiteButton->setChecked(true);
+		m_cubicHermiteAction->setChecked(true);
 		break;
 	}
 

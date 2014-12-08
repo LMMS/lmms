@@ -66,7 +66,6 @@
 #include "templates.h"
 #include "TextFloat.h"
 #include "Timeline.h"
-#include "ToolButton.h"
 #include "TextFloat.h"
 
 
@@ -4003,93 +4002,81 @@ PianoRollWindow::PianoRollWindow() :
 		tr( "Click here to stop playback of current pattern." ) );
 
 	// init edit-buttons at the top
-	m_drawButton = new ToolButton( embed::getIconPixmap( "edit_draw" ),
-					tr( "Draw mode (Shift+D)" ),
-					m_editor, SLOT( drawButtonToggled() ),
-					m_toolBar );
-	m_drawButton->setShortcut(Qt::SHIFT | Qt::Key_D);
-	m_drawButton->setCheckable( true );
-	m_drawButton->setChecked( true );
+	QActionGroup* tool_button_group = new QActionGroup(this);
+	m_drawAction = new QAction(embed::getIconPixmap("edit_draw"),
+							   tr( "Draw mode (Shift+D)" ), tool_button_group);
+	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawAction->setCheckable( true );
+	m_drawAction->setChecked( true );
 
-	m_eraseButton = new ToolButton( embed::getIconPixmap( "edit_erase" ),
-					tr( "Erase mode (Shift+E)" ),
-					m_editor, SLOT( eraseButtonToggled() ),
-					m_toolBar );
-	m_eraseButton->setShortcut(Qt::SHIFT | Qt::Key_E);
-	m_eraseButton->setCheckable( true );
+	m_eraseAction = new QAction(embed::getIconPixmap("edit_erase"),
+					tr("Erase mode (Shift+E)"), tool_button_group);
+	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction->setCheckable( true );
 
-	m_selectButton = new ToolButton( embed::getIconPixmap(
-							"edit_select" ),
-					tr( "Select mode (Shift+S)" ),
-					m_editor, SLOT( selectButtonToggled() ),
-					m_toolBar );
-	m_selectButton->setShortcut(Qt::SHIFT | Qt::Key_S);
-	m_selectButton->setCheckable( true );
+	m_selectAction = new QAction( embed::getIconPixmap("edit_select"),
+									 tr("Select mode (Shift+S)"), tool_button_group);
+	m_selectAction->setShortcut(Qt::SHIFT | Qt::Key_S);
+	m_selectAction->setCheckable( true );
 
-	m_detuneButton = new ToolButton( embed::getIconPixmap( "automation"),
-					tr( "Detune mode (Shift+T)" ),
-					m_editor, SLOT( detuneButtonToggled() ),
-					m_toolBar );
-	m_detuneButton->setShortcut(Qt::SHIFT | Qt::Key_T);
-	m_detuneButton->setCheckable( true );
+	m_detuneAction = new QAction(embed::getIconPixmap("automation"),
+								 tr("Detune mode (Shift+T)"), tool_button_group);
+	m_detuneAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_detuneAction->setCheckable( true );
 
-	QButtonGroup * tool_button_group = new QButtonGroup( this );
-	tool_button_group->addButton( m_drawButton );
-	tool_button_group->addButton( m_eraseButton );
-	tool_button_group->addButton( m_selectButton );
-	tool_button_group->addButton( m_detuneButton );
-	tool_button_group->setExclusive( true );
-
-	m_drawButton->setWhatsThis(
+	m_drawAction->setWhatsThis(
 		tr( "Click here and draw mode will be activated. In this "
 			"mode you can add, resize and move notes. This "
 			"is the default mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode. In this mode, hold Ctrl to "
 			"temporarily go into select mode." ) );
-	m_eraseButton->setWhatsThis(
+	m_eraseAction->setWhatsThis(
 		tr( "Click here and erase mode will be activated. In this "
 			"mode you can erase notes. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
-	m_selectButton->setWhatsThis(
+	m_selectAction->setWhatsThis(
 		tr( "Click here and select mode will be activated. "
 			"In this mode you can select notes. Alternatively, "
 			"you can hold Ctrl in draw mode to temporarily use "
 			"select mode." ) );
-	m_detuneButton->setWhatsThis(
+	m_detuneAction->setWhatsThis(
 		tr( "Click here and detune mode will be activated. "
 			"In this mode you can click a note to open its "
 			"automation detuning. You can utilize this to slide "
 			"notes from one to another. You can also press "
 			"'Shift+T' on your keyboard to activate this mode." ) );
 
-	m_cutButton = new ToolButton( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut selected notes (Ctrl+X)" ),
-					m_editor, SLOT( cutSelectedNotes() ),
-					m_toolBar );
+	connect(m_drawAction, SIGNAL(triggered()), m_editor, SLOT(drawButtonToggled()));
+	connect(m_eraseAction, SIGNAL(triggered()), m_editor, SLOT(eraseButtonToggled()));
+	connect(m_selectAction, SIGNAL(triggered()), m_editor, SLOT(selectButtonToggled()));
+	connect(m_detuneAction, SIGNAL(triggered()), m_editor, SLOT(detuneButtonToggled()));
 
-	m_copyButton = new ToolButton( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy selected notes (Ctrl+C)" ),
-					m_editor, SLOT( copySelectedNotes() ),
-					m_toolBar );
+	// Copy + paste actions
+	m_cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+							  tr("Cut selected notes (Ctrl+X)"), this);
 
-	m_pasteButton = new ToolButton( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste notes from clipboard "
-								"(Ctrl+V)" ),
-					m_editor, SLOT( pasteNotes() ),
-					m_toolBar );
+	m_copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+							   tr("Copy selected notes (Ctrl+C)"), this);
 
-	m_cutButton->setWhatsThis(
+	m_pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+					tr("Paste notes from clipboard (Ctrl+V)"), this);
+
+	m_cutAction->setWhatsThis(
 		tr( "Click here and the selected notes will be cut into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste button." ) );
-	m_copyButton->setWhatsThis(
+	m_copyAction->setWhatsThis(
 		tr( "Click here and the selected notes will be copied into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste button." ) );
-	m_pasteButton->setWhatsThis(
+	m_pasteAction->setWhatsThis(
 		tr( "Click here and the notes from the clipboard will be "
 			"pasted at the first visible measure." ) );
+
+	connect(m_cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
+	connect(m_copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
+	connect(m_pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -4134,15 +4121,15 @@ PianoRollWindow::PianoRollWindow() :
 
 
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_drawButton );
-	m_toolBar->addWidget( m_eraseButton );
-	m_toolBar->addWidget( m_selectButton );
-	m_toolBar->addWidget( m_detuneButton );
+	m_toolBar->addAction( m_drawAction );
+	m_toolBar->addAction( m_eraseAction );
+	m_toolBar->addAction( m_selectAction );
+	m_toolBar->addAction( m_detuneAction );
 
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_cutButton );
-	m_toolBar->addWidget( m_copyButton );
-	m_toolBar->addWidget( m_pasteButton );
+	m_toolBar->addAction( m_cutAction );
+	m_toolBar->addAction( m_copyAction );
+	m_toolBar->addAction( m_pasteAction );
 
 	m_toolBar->addSeparator();
 	m_editor->m_timeLine->addToolButtons(m_toolBar);

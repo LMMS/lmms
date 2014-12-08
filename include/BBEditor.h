@@ -32,7 +32,6 @@
 
 class BBTrackContainer;
 class ComboBox;
-class ToolButton;
 
 class BBTrackContainerView;
 

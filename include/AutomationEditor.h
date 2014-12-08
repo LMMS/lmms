@@ -45,7 +45,6 @@ class QScrollBar;
 class ComboBox;
 class NotePlayHandle;
 class Timeline;
-class ToolButton;
 
 
 
@@ -277,19 +276,19 @@ protected slots:
 	void stop();
 
 private:
-	QAbstractButton * m_drawButton;
-	QAbstractButton * m_eraseButton;
-	QAbstractButton * m_selectButton;
-	QAbstractButton * m_moveButton;
+	QAction* m_drawAction;
+	QAction* m_eraseAction;
+	QAction* m_selectAction;
+	QAction* m_moveAction;
 
-	ToolButton * m_discreteButton;
-	ToolButton * m_linearButton;
-	ToolButton * m_cubicHermiteButton;
+	QAction* m_discreteAction;
+	QAction* m_linearAction;
+	QAction* m_cubicHermiteAction;
 	Knob * m_tensionKnob;
 
-	ToolButton * m_cutButton;
-	ToolButton * m_copyButton;
-	ToolButton * m_pasteButton;
+	QAction * m_cutAction;
+	QAction * m_copyAction;
+	QAction * m_pasteAction;
 
 	ComboBox * m_zoomingXComboBox;
 	ComboBox * m_zoomingYComboBox;

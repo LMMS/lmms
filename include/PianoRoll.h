@@ -49,7 +49,6 @@ class ComboBox;
 class NotePlayHandle;
 class Pattern;
 class Timeline;
-class ToolButton;
 
 class PianoRoll : public QWidget
 {
@@ -387,14 +386,14 @@ signals:
 private:
 	PianoRoll* m_editor;
 
-	ToolButton * m_drawButton;
-	ToolButton * m_eraseButton;
-	ToolButton * m_selectButton;
-	ToolButton * m_detuneButton;
+	QAction* m_drawAction;
+	QAction* m_eraseAction;
+	QAction* m_selectAction;
+	QAction* m_detuneAction;
 
-	ToolButton * m_cutButton;
-	ToolButton * m_copyButton;
-	ToolButton * m_pasteButton;
+	QAction* m_cutAction;
+	QAction* m_copyAction;
+	QAction* m_pasteAction;
 
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_quantizeComboBox;

@@ -33,7 +33,6 @@
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "ToolButton.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "StringPairDrag.h"
@@ -68,28 +67,6 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
 	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
 
-	ToolButton * add_bb_track = new ToolButton(
-					embed::getIconPixmap( "add_bb_track" ),
-						tr( "Add beat/bassline" ),
-				Engine::getSong(), SLOT( addBBTrack() ),
-								m_toolBar );
-
-	ToolButton * add_automation_track = new ToolButton(
-				embed::getIconPixmap( "add_automation" ),
-						tr( "Add automation-track" ),
-				m_trackContainerView, SLOT( addAutomationTrack() ), m_toolBar );
-
-	ToolButton * remove_bar = new ToolButton(
-				embed::getIconPixmap( "step_btn_remove" ),
-						tr( "Remove steps" ),
-				m_trackContainerView, SLOT( removeSteps() ), m_toolBar );
-
-	ToolButton * add_bar = new ToolButton(
-				embed::getIconPixmap( "step_btn_add" ),
-						tr( "Add steps" ),
-				m_trackContainerView, SLOT( addSteps() ), m_toolBar );
-
-
 	m_playAction->setWhatsThis(
 		tr( "Click here to play the current "
 			"beat/bassline.  The beat/bassline is automatically "
@@ -104,14 +81,21 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( m_bbComboBox );
+
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( add_bb_track );
-	m_toolBar->addWidget( add_automation_track );
+	m_toolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
+						 Engine::getSong(), SLOT(addBBTrack()));
+	m_toolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
+						 m_trackContainerView, SLOT(addAutomationTrack()));
+
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_toolBar->addWidget(stretch);
-	m_toolBar->addWidget( remove_bar );
-	m_toolBar->addWidget( add_bar );
+
+	m_toolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
+						 m_trackContainerView, SLOT(removeSteps()));
+	m_toolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
+						 m_trackContainerView, SLOT(addSteps()));
 	m_toolBar->addSeparator();
 
 	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),

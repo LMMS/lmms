@@ -41,7 +41,6 @@ class MeterDialog;
 class Song;
 class TextFloat;
 class Timeline;
-class ToolButton;
 
 class positionLine : public QWidget
 {
@@ -148,12 +147,12 @@ protected slots:
 	void stop();
 
 private:
-	ToolButton * m_addBBTrackButton;
-	ToolButton * m_addSampleTrackButton;
-	ToolButton * m_addAutomationTrackButton;
+	QAction* m_addBBTrackAction;
+	QAction* m_addSampleTrackAction;
+	QAction* m_addAutomationTrackAction;
 
-	ToolButton * m_drawModeButton;
-	ToolButton * m_editModeButton;
+	QAction* m_drawModeAction;
+	QAction* m_selectModeAction;
 
 	ComboBox * m_zoomingComboBox;
 };

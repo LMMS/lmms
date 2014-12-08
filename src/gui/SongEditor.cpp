@@ -46,7 +46,6 @@
 #include "MeterDialog.h"
 #include "TextFloat.h"
 #include "Timeline.h"
-#include "ToolButton.h"
 #include "ToolTip.h"
 #include "VisualizationWidget.h"
 #include "TimeDisplayWidget.h"
@@ -619,35 +618,32 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	}
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
-	m_addBBTrackButton = new ToolButton(
-				embed::getIconPixmap("add_bb_track"),
-				tr("Add beat/bassline"),
-				m_editor->m_song, SLOT(addBBTrack()));
+	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
+									 tr("Add beat/bassline"), this);
 
-	m_addSampleTrackButton = new ToolButton(
-				embed::getIconPixmap("add_sample_track" ),
-				tr( "Add sample-track"),
-				m_editor->m_song, SLOT(addSampleTrack()));
+	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
+										 tr("Add sample-track"), this);
 
-	m_addAutomationTrackButton = new ToolButton(
-				embed::getIconPixmap("add_automation" ),
-				tr( "Add automation-track"),
-				m_editor->m_song, SLOT(addAutomationTrack()));
+	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
+											 tr("Add automation-track"), this);
 
-	m_drawModeButton = new ToolButton(embed::getIconPixmap("edit_draw"),
-									  tr("Draw mode"), m_editor, SLOT(setEditModeDraw()));
-	m_drawModeButton->setCheckable(true);
-	m_drawModeButton->setChecked(true);
+	connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
+	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
+	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	m_editModeButton = new ToolButton(embed::getIconPixmap("edit_select"),
-									  tr("Edit mode (select and move)"),
-									  m_editor, SLOT(setEditModeSelect()));
-	m_editModeButton->setCheckable(true);
+	QActionGroup* tool_action_group = new QActionGroup(this);
+	m_drawModeAction = new QAction(embed::getIconPixmap("edit_draw"),
+								   tr("Draw mode"), tool_action_group);
+	m_drawModeAction->setCheckable(true);
+	m_drawModeAction->setChecked(true);
 
-	QButtonGroup * tool_button_group = new QButtonGroup(this);
-	tool_button_group->addButton(m_drawModeButton);
-	tool_button_group->addButton(m_editModeButton);
-	tool_button_group->setExclusive(true);
+	m_selectModeAction = new QAction(embed::getIconPixmap("edit_select"),
+								   tr("Edit mode (select and move)"), tool_action_group);
+	m_selectModeAction->setCheckable(true);
+
+	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
+	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
+
 
 	m_playAction->setWhatsThis(
 				tr("Click here, if you want to play your whole song. "
@@ -669,12 +665,12 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_addBBTrackButton );
-	m_toolBar->addWidget( m_addSampleTrackButton );
-	m_toolBar->addWidget( m_addAutomationTrackButton );
+	m_toolBar->addAction( m_addBBTrackAction );
+	m_toolBar->addAction( m_addSampleTrackAction );
+	m_toolBar->addAction( m_addAutomationTrackAction );
 	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_drawModeButton );
-	m_toolBar->addWidget( m_editModeButton );
+	m_toolBar->addAction( m_drawModeAction );
+	m_toolBar->addAction( m_selectModeAction );
 	m_toolBar->addSeparator();
 	m_editor->m_timeLine->addToolButtons(m_toolBar);
 	m_toolBar->addSeparator();
