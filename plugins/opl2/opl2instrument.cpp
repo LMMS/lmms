@@ -586,7 +586,7 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
 	knobname = new Knob( knobStyled, this );\
-	knobname->setHintText( tr(hinttext) + "", hintunit );\
+	knobname->setHintText( tr(hinttext), hintunit );\
 	knobname->setFixedSize(22,22);\
 	knobname->setCenterPointX(11.0);\
 	knobname->setCenterPointY(11.0);\
