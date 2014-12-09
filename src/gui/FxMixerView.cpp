@@ -480,6 +480,11 @@ void FxMixerView::clear()
 void FxMixerView::updateFaders()
 {
 	FxMixer * m = engine::fxMixer();
+
+	// apply master gain
+	m->m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
+	m->m_fxChannels[0]->m_peakRight *= engine::mixer()->masterGain();
+
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();

@@ -514,9 +514,6 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
-	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
-	m_fxChannels[0]->m_peakRight *= engine::mixer()->masterGain();
-
 	// clear all channel buffers and
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
