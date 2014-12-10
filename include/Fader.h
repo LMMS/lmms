@@ -64,6 +64,7 @@ public:
 	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
 	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
+	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
 	virtual ~Fader();
 
 	void setPeak_L( float fPeak );
@@ -76,6 +77,11 @@ public:
 	QColor peakRed() const;
 	void setPeakGreen( const QColor & c );
 	void setPeakRed( const QColor & c );
+	
+	void setDisplayConversion( bool b )
+	{
+		m_displayConversion = b;
+	}
 
 private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
@@ -112,6 +118,12 @@ private:
 	static QPixmap * s_back;
 	static QPixmap * s_leds;
 	static QPixmap * s_knob;
+	
+	QPixmap * m_back;
+	QPixmap * m_leds;
+	QPixmap * m_knob;
+	
+	bool m_displayConversion;
 
 	int m_moveStartPoint;
 	float m_startValue;

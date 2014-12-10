@@ -140,6 +140,7 @@ static inline float fastRandf( float range )
 {
 	static const float fast_rand_ratio = 1.0f / FAST_RAND_MAX;
 	return fast_rand() * range * fast_rand_ratio;
+}
 
 //! @brief Takes advantage of fmal() function if present in hardware
 static inline long double fastFmal( long double a, long double b, long double c ) 

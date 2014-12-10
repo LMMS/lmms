@@ -46,7 +46,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
     sampleDelayKnob->setLabel( tr( "Delay" ) );
     sampleDelayKnob->setHintText( tr( "Delay Time" ) + " ", " s" );
 
-    knob * feedbackKnob = new knob( knobBright_26, this );
+    Knob * feedbackKnob = new Knob( knobBright_26, this );
     feedbackKnob->move( 63,10 );
     feedbackKnob->setVolumeKnob( true) ;
     feedbackKnob->setModel( &controls->m_feedbackModel);
