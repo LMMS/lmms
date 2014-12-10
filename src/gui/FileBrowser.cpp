@@ -549,7 +549,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( Engine::mainWindow()->mayChangeProject() )
+			if( Engine::mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -580,7 +580,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 
 		case FileItem::ImportAsProject:
 			if( f->type() == FileItem::FlpFile &&
-				!Engine::mainWindow()->mayChangeProject() )
+				!Engine::mainWindow()->mayChangeProject(true) )
 			{
 				break;
 			}

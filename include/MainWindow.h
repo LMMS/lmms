@@ -69,10 +69,12 @@ public:
 	/// opens another file...) must call this before and may only proceed if
 	/// this function returns true.
 	///
+	/// \param	stopPlayback whether playback should be stopped upon prompting.  If set to false, the caller should ensure that Engine::getSong()->stop() is called before unloading/loading a song.
+	///
 	/// \return	true if the user allows the software to proceed, false if they
 	///         cancel the action.
 	///
-	bool mayChangeProject();
+	bool mayChangeProject(bool stopPlayback);
 
 
 	void clearKeyModifiers();
