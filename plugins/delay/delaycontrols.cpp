@@ -32,7 +32,7 @@
 DelayControls::DelayControls( DelayEffect* effect ):
     EffectControls( effect ),
     m_effect ( effect ),
-    m_delayTimeModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
+    m_delayTimeModel( 0.5, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
     m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
     m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
     m_lfoAmountModel(0.0, 0.0, 2.0, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) )

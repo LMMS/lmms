@@ -130,7 +130,54 @@ static inline int fast_rand()
 	return( (unsigned)( next / 65536 ) % 32768 );
 }
 
+static inline double fastRand( double range )
+{
+	static const double fast_rand_ratio = 1.0 / FAST_RAND_MAX;
+	return fast_rand() * range * fast_rand_ratio;
+}
 
+static inline float fastRandf( float range )
+{
+	static const float fast_rand_ratio = 1.0f / FAST_RAND_MAX;
+	return fast_rand() * range * fast_rand_ratio;
+
+//! @brief Takes advantage of fmal() function if present in hardware
+static inline long double fastFmal( long double a, long double b, long double c ) 
+{
+#ifdef FP_FAST_FMAL
+	#ifdef __clang__
+		return fma( a, b, c );
+	#else
+		return fmal( a, b, c );
+	#endif
+#else
+	return a * b + c;
+#endif
+}
+
+//! @brief Takes advantage of fmaf() function if present in hardware
+static inline float fastFmaf( float a, float b, float c ) 
+{
+#ifdef FP_FAST_FMAF
+	#ifdef __clang__
+		return fma( a, b, c );
+	#else
+		return fmaf( a, b, c );
+	#endif
+#else
+	return a * b + c;
+#endif
+}
+
+//! @brief Takes advantage of fma() function if present in hardware
+static inline double fastFma( double a, double b, double c ) 
+{
+#ifdef FP_FAST_FMA
+	return fma( a, b, c );
+#else
+	return a * b + c;
+#endif
+}
 
 // source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
 static inline double fastPow( double a, double b )
@@ -240,6 +287,5 @@ static inline float fastSqrt( float n )
 	u.i = ( u.i + ( 127 << 23 ) ) >> 1;
 	return u.f;
 }
-
 
 #endif

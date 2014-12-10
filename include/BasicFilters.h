@@ -289,7 +289,6 @@ public:
 		m_sampleRatio( 1.0f / m_sampleRate ),
 		m_subFilter( NULL )
 	{
-		m_svsr = 1.0f - expf( -4646.39874051f / m_sampleRate );
 		clearHistory();
 	}
 
@@ -326,7 +325,6 @@ public:
 			m_delay2[_chnl] = 0.0f;
 			m_delay3[_chnl] = 0.0f;
 			m_delay4[_chnl] = 0.0f;
-			m_sva[_chnl] = 0.0f;
 		}
 	}
 
@@ -409,7 +407,6 @@ public:
 			case Lowpass_SV:
 			case Bandpass_SV:
 			{
-				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				float highpass;
 				
 				for( int i = 0; i < 2; ++i ) // 2x oversample
@@ -425,14 +422,13 @@ public:
 
 				/* mix filter output into output buffer */
 				return m_type == Lowpass_SV 
-					? atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] )
-					: atanf( 3.0f * m_delay3[_chnl] * m_sva[_chnl] );
+					? m_delay4[_chnl]
+					: m_delay3[_chnl];
 				break;
 			}
 			
 			case Highpass_SV:
 			{
-				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				float hp;
 
 				for( int i = 0; i < 2; ++i ) // 2x oversample
@@ -442,13 +438,12 @@ public:
 					m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
 				}
 				
-				return atanf( 3.0f * hp * m_sva[_chnl] );
+				return hp;
 				break;
 			}
 			
 			case Notch_SV:
 			{
-				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				float hp1, hp2;
 				
 				for( int i = 0; i < 2; ++i ) // 2x oversample
@@ -463,7 +458,7 @@ public:
 				}
 
 				/* mix filter output into output buffer */
-				return atanf( 1.5f * ( m_delay4[_chnl] + hp1 ) * m_sva[_chnl] );
+				return m_delay4[_chnl] + hp1;
 				break;
 			}
 
@@ -899,7 +894,7 @@ private:
 	float m_vfa[4], m_vfb[4], m_vfc[4], m_vfq;
 
 	// coeffs for Lowpass_SV (state-variant lowpass)
-	float m_svf1, m_svf2, m_svq, m_svsr;
+	float m_svf1, m_svf2, m_svq;
 
 	typedef sample_t frame[CHANNELS];
 
@@ -916,7 +911,7 @@ private:
 	frame m_vfbp[6], m_vfhp[6], m_vflast[6];
 
 	// in/out history for Lowpass_SV (state-variant lowpass)
-	frame m_delay1, m_delay2, m_delay3, m_delay4, m_sva;
+	frame m_delay1, m_delay2, m_delay3, m_delay4;
 
 	FilterTypes m_type;
 	bool m_doubleFilter;

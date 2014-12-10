@@ -1,8 +1,9 @@
 /*
- * stereoenhancer_control_dialog.cpp - control-dialog for stereoenhancer-effect
+ * BitcrushControlDialog.h - A native bitcrusher
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -23,27 +24,21 @@
  */
 
 
+#ifndef BITCRUSH_CONTROL_DIALOG_H
+#define BITCRUSH_CONTROL_DIALOG_H
 
-#include <QLayout>
+#include "EffectControlDialog.h"
 
-#include "stereoenhancer_control_dialog.h"
-#include "stereoenhancer_controls.h"
+class BitcrushControls;
 
-
-
-stereoEnhancerControlDialog::stereoEnhancerControlDialog(
-	stereoEnhancerControls * _controls ) :
-	EffectControlDialog( _controls )
+class BitcrushControlDialog : public EffectControlDialog
 {
-	QHBoxLayout * l = new QHBoxLayout( this );
+	Q_OBJECT
+public:
+	BitcrushControlDialog( BitcrushControls * controls );
+	virtual ~BitcrushControlDialog()
+	{
+	}
+};
 
-	Knob * widthKnob = new Knob( knobBright_26, this );
-	widthKnob->setModel( &_controls->m_widthModel );
-	widthKnob->setLabel( tr( "WIDE" ) );
-	widthKnob->setHintText( tr( "Width:" ) , "samples" );
-
-	l->addWidget( widthKnob );
-
-	this->setLayout(l);
-}
-
+#endif
