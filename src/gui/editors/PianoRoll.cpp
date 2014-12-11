@@ -3347,24 +3347,22 @@ void PianoRoll::stop()
 
 void PianoRoll::startRecordNote(const Note & n )
 {
-	if( m_recording == true && hasValidPattern() == true &&
-		Engine::getSong()->isPlaying() &&
-			( Engine::getSong()->playMode() ==
-					desiredPlayModeForAccompany() ||
-				Engine::getSong()->playMode() ==
-					Song::Mode_PlayPattern ) )
+	if(m_recording && hasValidPattern() &&
+			Engine::getSong()->isPlaying() &&
+			(Engine::getSong()->playMode() == desiredPlayModeForAccompany() ||
+			 Engine::getSong()->playMode() == Song::Mode_PlayPattern ))
 	{
 		MidiTime sub;
 		if( Engine::getSong()->playMode() == Song::Mode_PlaySong )
 		{
 			sub = m_pattern->startPosition();
 		}
-		Note n( 1, Engine::getSong()->getPlayPos(
+		Note n1( 1, Engine::getSong()->getPlayPos(
 					Engine::getSong()->playMode() ) - sub,
 				n.key(), n.getVolume(), n.getPanning() );
-		if( n.pos() >= 0 )
+		if( n1.pos() >= 0 )
 		{
-			m_recordingNotes << n;
+			m_recordingNotes << n1;
 		}
 	}
 }
