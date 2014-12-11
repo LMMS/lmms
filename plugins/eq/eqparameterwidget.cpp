@@ -44,6 +44,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
     m_pixelsPerUnitHeight = (height() - 4) / ( totalHeight );
     m_scale = 1.5;
     m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
+
 }
 
 
@@ -59,9 +60,27 @@ EqParameterWidget::~EqParameterWidget()
 
 void EqParameterWidget::paintEvent( QPaintEvent *event )
 {
-    QPainter painter( this );
+	QPainter painter( this );
+	//Draw Frequecy maker lines
+	painter.setPen( QPen( QColor( 100, 100, 100, 200 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+	for( int x = 20 ; x < 100; x += 10)
+	{
+		painter.drawLine( freqToXPixel( x )  , 0, freqToXPixel( x ) , height() );
+	}
+	for( int x = 100 ; x < 1000; x += 100)
+	{
+		painter.drawLine( freqToXPixel( x )  , 0, freqToXPixel( x ) , height() );
+	}
+	for( int x = 1000 ; x < 11000; x += 1000)
+	{
+		painter.drawLine( freqToXPixel( x )  , 0, freqToXPixel( x ) , height() );
+	}
+	//draw 0dB line
+	painter.drawLine(0, gainToYPixel( 0 ) , width(), gainToYPixel( 0 ) );
+
     for( int i = 0 ; i < bandCount() ; i++ )
     {
+
         m_bands[i].color.setAlpha(m_bands[i].active->value() ? activeAplha() : inactiveAlpha());
 		painter.setPen( QPen( m_bands[i].color, 10, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
         float  x = freqToXPixel( m_bands[i].freq->value() );
@@ -71,11 +90,11 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
         {
             gain = m_bands[i].gain->value();
         }
-        y = gainToYPixel( gain ) + 3;
+		y = gainToYPixel( gain );
         float bw = m_bands[i].freq->value() / m_bands[i].res->value();
         m_bands[i].x = x; m_bands[i].y = y;
         painter.drawPoint( x, y );
-		painter.setPen( QPen( m_bands[i].color, 3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+		painter.setPen( QPen( m_bands[i].color, 3, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
         if(i == 0 || i == bandCount() - 1 ){
             painter.drawLine(x, y, x, y - (m_bands[i].res->value() * 4  ) );
         }

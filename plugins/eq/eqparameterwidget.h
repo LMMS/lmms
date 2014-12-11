@@ -122,6 +122,8 @@ private:
 
     enum MouseAction { none, drag, res } m_mouseAction;
     int m_oldX, m_oldY;
+	int *m_xGridBands;
+
 
     inline int freqToXPixel( float freq )
     {

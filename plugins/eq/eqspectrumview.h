@@ -63,9 +63,15 @@ public:
 	int m_lastY;
 	virtual void paintEvent( QPaintEvent* event )
 	{
+		const int fh = height();
+		const int LOWER_Y = -96;	// dB
 		int m_lastY = height();
 		QPainter p( this );
 		p.setPen( QPen( color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+		//draw grid lines
+		int y33 = (int)( fh * 2.0 / 3.0 * (20*(log10( 0.33 ) ) - LOWER_Y ) / (-LOWER_Y ) );
+		p.drawLine(0, y33, width(), y33);
+
 		const float e =  m_sa->m_energy;
 		if( e <= 0 )
 		{
@@ -73,9 +79,7 @@ public:
 			return;
 		}
 		float * b = m_sa->m_bands;
-		const int LOWER_Y = -60;	// dB
 		int h;
-		const int fh = height();
 		bool linX = true;
 		if( linX )
 		{
