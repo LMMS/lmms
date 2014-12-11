@@ -82,6 +82,12 @@ public:
 	{
 		m_displayConversion = b;
 	}
+	inline void setHintText( const QString & _txt_before,
+						const QString & _txt_after )
+	{
+		setDescription( _txt_before );
+		setUnit( _txt_after );
+	}
 
 private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
