@@ -34,7 +34,7 @@
 //re write to store data from each filter(models,name, storeage name ) in a class, stored in array
 //then just loop ever array for each section
 
-const int MAX_BANDS = 249;
+
 
 extern "C"
 {
@@ -58,16 +58,13 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect( &eq_plugin_descriptor, parent, key ),
 	m_eqControls( this )
-
-
-
 {
-	m_dFilterCount = 4;
+	m_dFilterCount = 10;
 	m_downsampleFilters = new EqLp12Filter[m_dFilterCount];
 	for( int i = 0; i < m_dFilterCount; i++)
 	{
-		m_downsampleFilters[i].setFrequency(20000);
-		m_downsampleFilters[i].setQ(0.66);
+		m_downsampleFilters[i].setFrequency(22000);
+		m_downsampleFilters[i].setQ(0.85);
 		m_downsampleFilters[i].setGain(0);
 		m_downsampleFilters[i].setSampleRate(Engine::mixer()->processingSampleRate() * 2 );
 	}
@@ -99,6 +96,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	sample_t dryS[2];
 	sampleFrame m_inPeak;
 
+	analyze( buf, frames, &m_eqControls.m_inFftBands) ;
 	//TODO UPSAMPLE
 	upsample( buf, frames );
 
@@ -236,6 +234,8 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 	checkGate( outSum / frames );
+	analyze( buf, frames, &m_eqControls.m_outFftBands) ;
+	setBandPeaks( &m_eqControls.m_outFftBands , (int)(sampleRate * 0.5));
 
 	return isRunning();
 }
@@ -296,6 +296,94 @@ void EqEffect::downSample(sampleFrame *buf, const fpp_t frames)
 		buf[f][0] = m_upBuf[f2][0];
 		buf[f][1] = m_upBuf[f2][1];
 	}
+}
+
+void EqEffect::analyze(sampleFrame *buf, const fpp_t frames, FftBands* fft)
+{
+	const int FFT_BUFFER_SIZE = 2048;
+	fpp_t f = 0;
+	if( frames > FFT_BUFFER_SIZE )
+	{
+		fft->m_framesFilledUp = 0;
+		f = frames - FFT_BUFFER_SIZE;
+	}
+	// meger channels
+	for( ; f < frames; ++f )
+	{
+		fft->m_buffer[fft->m_framesFilledUp] =
+			( buf[f][0] + buf[f][1] ) * 0.5;
+		++fft->m_framesFilledUp;
+	}
+
+	if( fft->m_framesFilledUp < FFT_BUFFER_SIZE )
+	{
+		return;
+	}
+
+	fft->m_sr = Engine::mixer()->processingSampleRate();
+	const int LOWEST_FREQ = 0;
+	const int HIGHEST_FREQ = fft->m_sr / 2;
+
+	fftwf_execute( fft->m_fftPlan );
+	absspec( fft->m_specBuf, fft->m_absSpecBuf, FFT_BUFFER_SIZE+1 );
+
+	compressbands( fft->m_absSpecBuf, fft->m_bands, FFT_BUFFER_SIZE+1,
+				   MAX_BANDS,
+				   (int)(LOWEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(fft->m_sr /2)),
+				   (int)(HIGHEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(fft->m_sr /2)));
+			   fft->m_energy = maximum( fft->m_bands, MAX_BANDS ) / maximum( fft->m_buffer, FFT_BUFFER_SIZE );
+			   fft->m_framesFilledUp = 0;
+}
+
+float EqEffect::peakBand(float minF, float maxF, FftBands *fft, int sr)
+{
+	float peak = -60;
+	float * b = fft->m_bands;
+	float h = 0;
+	for(int x = 0; x < MAX_BANDS; x++, b++)
+	{
+		if( bandToFreq( x ,sr)  >= minF && bandToFreq( x,sr ) <= maxF )
+		{
+			h = 20*( log10( *b / fft->m_energy ) );
+			peak = h > peak ? h : peak;
+		}
+	}
+	return (peak+100)/100;
+}
+
+void EqEffect::setBandPeaks(FftBands *fft, int samplerate )
+{
+	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL =
+			peakBand( 0,
+					  m_eqControls.m_lowShelfFreqModel.value(), fft , samplerate );
+
+	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
+			peakBand( m_eqControls.m_para1FreqModel.value()
+					  - (m_eqControls.m_para1FreqModel.value() / m_eqControls.m_para1ResModel.value() * 0.5),
+					  m_eqControls.m_para1FreqModel.value()
+					  + (m_eqControls.m_para1FreqModel.value() / m_eqControls.m_para1ResModel.value() * 0.5), fft , samplerate );
+
+	m_eqControls.m_para2PeakL = m_eqControls.m_para2PeakR =
+			peakBand( m_eqControls.m_para2FreqModel.value()
+					  - (m_eqControls.m_para2FreqModel.value() / m_eqControls.m_para2ResModel.value() * 0.5),
+					  m_eqControls.m_para2FreqModel.value()
+					  + (m_eqControls.m_para2FreqModel.value() / m_eqControls.m_para2ResModel.value() * 0.5), fft , samplerate );
+
+	m_eqControls.m_para3PeakL = m_eqControls.m_para3PeakR =
+			peakBand( m_eqControls.m_para3FreqModel.value()
+					  - (m_eqControls.m_para3FreqModel.value() / m_eqControls.m_para3ResModel.value() * 0.5),
+					  m_eqControls.m_para3FreqModel.value()
+					  + (m_eqControls.m_para3FreqModel.value() / m_eqControls.m_para3ResModel.value() * 0.5), fft , samplerate );
+
+	m_eqControls.m_para4PeakL = m_eqControls.m_para4PeakR =
+			peakBand( m_eqControls.m_para4FreqModel.value()
+					  - (m_eqControls.m_para4FreqModel.value() / m_eqControls.m_para4ResModel.value() * 0.5),
+					  m_eqControls.m_para4FreqModel.value()
+					  + (m_eqControls.m_para4FreqModel.value() / m_eqControls.m_para4ResModel.value() * 0.5), fft , samplerate );
+
+	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =
+			peakBand( m_eqControls.m_highShelfFreqModel.value(),
+					  samplerate * 0.5 , fft, samplerate );
 }
 
 

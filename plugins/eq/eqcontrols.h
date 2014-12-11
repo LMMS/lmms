@@ -33,9 +33,9 @@ class EqEffect;
 
 class EqControls : public EffectControls
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    EqControls( EqEffect* effect );
+	explicit EqControls( EqEffect* effect );
     virtual ~EqControls()
     {
     }
@@ -51,7 +51,6 @@ public:
     }
     virtual EffectControlDialog* createView()
     {
-        printf("create dialog\n");
         return new EqControlsDialog( this );
     }
 
@@ -65,6 +64,9 @@ public:
 	float m_para3PeakL, m_para3PeakR;
 	float m_para4PeakL, m_para4PeakR;
 	float m_highShelfPeakL, m_highShelfPeakR;
+
+	FftBands m_inFftBands;
+	FftBands m_outFftBands;
 
 
 

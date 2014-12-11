@@ -31,49 +31,60 @@
 #include "BasicFilters.h"
 #include "eqfilter.h"
 
+
+
 class EqEffect : public Effect
 {
 public:
-    EqEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-    virtual ~EqEffect();
-    virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-    virtual EffectControls* controls()
-    {
-        return &m_eqControls;
-    }
-    void  gain( sampleFrame *buf, const fpp_t frames, float scale, sampleFrame* peak );
+	EqEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~EqEffect();
+	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
+	virtual EffectControls* controls()
+	{
+		return &m_eqControls;
+	}
+	void  gain( sampleFrame *buf, const fpp_t frames, float scale, sampleFrame* peak );
 
 private:
-    EqControls m_eqControls;
+	EqControls m_eqControls;
 
-    EqHp12Filter m_hp12;
-    EqHp12Filter m_hp24;
-    EqHp12Filter m_hp480;
-    EqHp12Filter m_hp481;
+	EqHp12Filter m_hp12;
+	EqHp12Filter m_hp24;
+	EqHp12Filter m_hp480;
+	EqHp12Filter m_hp481;
 
-    EqLowShelfFilter m_lowShelf;
+	EqLowShelfFilter m_lowShelf;
 
-    EqPeakFilter m_para1;
-    EqPeakFilter m_para2;
-    EqPeakFilter m_para3;
-    EqPeakFilter m_para4;
+	EqPeakFilter m_para1;
+	EqPeakFilter m_para2;
+	EqPeakFilter m_para3;
+	EqPeakFilter m_para4;
 
-    EqHighShelfFilter m_highShelf;
+	EqHighShelfFilter m_highShelf;
 
-    EqLp12Filter m_lp12;
-    EqLp12Filter m_lp24;
-    EqLp12Filter m_lp480;
-    EqLp12Filter m_lp481;
+	EqLp12Filter m_lp12;
+	EqLp12Filter m_lp24;
+	EqLp12Filter m_lp480;
+	EqLp12Filter m_lp481;
 	EqLp12Filter* m_downsampleFilters;
 	int m_dFilterCount;
 	sampleFrame* m_upBuf;
 	fpp_t m_upBufFrames;
 
-//	const static int MAX_BANDS = 249;
+	//	const static int MAX_BANDS = 249;
 	void upsample( sampleFrame *buf, const fpp_t frames );
 	void downSample( sampleFrame *buf, const fpp_t frames );
-//	float m_bands[MAX_BANDS];
-//	float m_energy;
+	void analyze( sampleFrame *buf, const fpp_t frames, FftBands* fft );
+	float peakBand(float minF, float maxF,FftBands*, int);
+
+	inline float bandToFreq ( int index , int sampleRate )
+	{
+		return index * sampleRate / (MAX_BANDS * 2);
+	}
+
+	void setBandPeaks( FftBands *fft , int);
+	//	float m_bands[MAX_BANDS];
+	//	float m_energy;
 
 };
 

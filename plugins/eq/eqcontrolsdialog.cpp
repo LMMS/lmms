@@ -33,6 +33,7 @@
 #include "QWidget"
 #include "MainWindow.h"
 #include "LedCheckbox.h"
+//#include "eqspectrumview.h"
 
 
 
@@ -48,9 +49,14 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 	setPalette( pal );
 	setFixedSize( 350, 275 );
 
+	m_inSpec = new EqSpectrumView( &controls->m_inFftBands, this);
+	m_inSpec->move( 50, 5 );
+	m_inSpec->color = QColor( 200, 200, 100, 100 );
+	m_outSpec = new EqSpectrumView( &controls->m_outFftBands, this);
+	m_outSpec->move( 50, 5 );
+	m_outSpec->color = QColor(100, 200, 200, 100);
 	m_parameterWidget = new EqParameterWidget( this );
 	m_parameterWidget->move( 50, 5 );
-//	m_inSpec = new EqSpectrumView( controls->m_effect, this);
 
 	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(173, 115, 57), tr( "HP" ) ,0,0);
 	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255, 0, 0), tr( "Low Shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR );
@@ -66,6 +72,7 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 	m_inGainFader = new EqFader( &controls->m_inGainModel, tr( "In Gain" ), this,  &controls->m_inPeakL, &controls->m_inPeakR);
 	m_inGainFader->move( 10, 5 );
 
+
 	m_outGainFader = new EqFader( &controls->m_outGainModel, tr( "Out Gain" ), this, &controls->m_outPeakL, &controls->m_outPeakR );
 	m_outGainFader->move( 315, 5 );
 	//gain faders
@@ -78,6 +85,8 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 		m_gainFader->move( cw * i + fo , 123 );
 		m_gainFader->setMinimumHeight(80);
 		m_gainFader->resize(m_gainFader->width() , 80);
+		m_gainFader->setDisplayConversion( false );
+		m_gainFader->setHintText( tr( "Gain") , "dB");
 	}
 
 	for( int i = 0; i < m_parameterWidget->bandCount() ; i++)
@@ -86,11 +95,13 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 		m_resKnob->move(cw * i + ko , 205 );
 		m_resKnob->setVolumeKnob(false);
 		m_resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
+		m_resKnob->setHintText( tr( "Resonance:") , "");
 
 		m_freqKnob = new Knob( knobBright_26, this );
 		m_freqKnob->move(cw * i + ko, 235 );
 		m_freqKnob->setVolumeKnob( false );
 		m_freqKnob->setModel( m_parameterWidget->getBandModels( i )->freq );
+		m_freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
 
 		m_activeBox = new LedCheckBox( m_parameterWidget->getBandModels( i )->name , this );
 		m_activeBox->move( cw * i + fo + 3, 260 );

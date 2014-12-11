@@ -32,7 +32,7 @@
 #include "eqparameterwidget.h"
 #include "MainWindow.h"
 #include "qpushbutton.h"
-//#include "eqspectrumview.h"
+#include "eqspectrumview.h"
 
 class EqControls;
 
@@ -69,7 +69,8 @@ private:
     LedCheckBox* m_analyzeBox;
 
     EqParameterWidget* m_parameterWidget;
-//	EqSpectrumView* m_inSpec;
+	EqSpectrumView* m_inSpec;
+	EqSpectrumView* m_outSpec;
 
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
