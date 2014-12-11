@@ -58,7 +58,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 public:
-	enum editModes
+	enum EditModes
 	{
 		ModeDraw,
 		ModeErase,
@@ -97,33 +97,33 @@ public:
 	
 	// qproperty acces functions
 	QColor gridColor() const;
-	void setGridColor( const QColor & _c );
+	void setGridColor( const QColor & c );
 	QColor noteModeColor() const;
-	void setNoteModeColor( const QColor & _c );
+	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
-	void setNoteColor( const QColor & _c );
+	void setNoteColor( const QColor & c );
 	QColor barColor() const;
-	void setBarColor( const QColor & _c );
+	void setBarColor( const QColor & c );
 
 
 protected:
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void keyReleaseEvent( QKeyEvent * _ke );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+	virtual void leaveEvent( QEvent * e );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * me );
+	virtual void mouseReleaseEvent( QMouseEvent * me );
+	virtual void mouseMoveEvent( QMouseEvent * me );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void resizeEvent( QResizeEvent * re );
+	virtual void wheelEvent( QWheelEvent * we );
 
-	int getKey( int _y ) const;
-	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width, Note * _n, const QColor & noteCol );
+	int getKey( int y ) const;
+	static inline void drawNoteRect( QPainter & p, int x, int y,
+					int  width, Note * n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
-	void getSelectedNotes( NoteVector & _selected_notes );
+	void getSelectedNotes( NoteVector & selected_notes );
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -134,13 +134,13 @@ protected slots:
 	void recordAccompany();
 	void stop();
 
-	void startRecordNote( const Note & _n );
-	void finishRecordNote( const Note & _n );
+	void startRecordNote( const Note & n );
+	void finishRecordNote( const Note & n );
 
-	void horScrolled( int _new_pos );
-	void verScrolled( int _new_pos );
+	void horScrolled( int new_pos );
+	void verScrolled( int new_pos );
 
-	void setEditMode(editModes mode);
+	void setEditMode(EditModes mode);
 	void setEditModeDraw() {setEditMode(ModeDraw); }
 	void setEditModeErase() {setEditMode(ModeErase); }
 	void setEditModeSelect() {setEditMode(ModeSelect); }
@@ -151,8 +151,8 @@ protected slots:
 	void pasteNotes();
 	void deleteSelectedNotes();
 
-	void updatePosition( const MidiTime & _t );
-	void updatePositionAccompany( const MidiTime & _t );
+	void updatePosition(const MidiTime & t );
+	void updatePositionAccompany(const MidiTime & t );
 
 	void zoomingChanged();
 	void quantizeChanged();
@@ -172,7 +172,7 @@ signals:
 
 
 private:
-	enum actions
+	enum Actions
 	{
 		ActionNone,
 		ActionMoveNote,
@@ -182,14 +182,14 @@ private:
 		ActionResizeNoteEditArea
 	};
 
-	enum noteEditMode
+	enum NoteEditMode
 	{
 		NoteEditVolume,
 		NoteEditPanning,
 		NoteEditCount // make sure this one is always last
 	};
 
-	enum semiToneMarkerAction
+	enum SemiToneMarkerAction
 	{
 		stmaUnmarkAll,
 		stmaMarkCurrentSemiTone,
@@ -214,7 +214,7 @@ private:
 	PianoRoll( const PianoRoll & );
 	virtual ~PianoRoll();
 
-	void autoScroll( const MidiTime & _t );
+	void autoScroll(const MidiTime & t );
 
 	MidiTime newNoteLen() const;
 
@@ -224,7 +224,7 @@ private:
 	int selectionCount() const;
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
-	void pauseTestNotes( bool _pause = true );
+	void pauseTestNotes(bool pause = true );
 
 	inline int noteEditTop() const;
 	inline int keyAreaBottom() const;
@@ -270,8 +270,8 @@ private:
 	QList<Note> m_recordingNotes;
 
 	Note * m_currentNote;
-	actions m_action;
-	noteEditMode m_noteEditMode;
+	Actions m_action;
+	NoteEditMode m_noteEditMode;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -311,8 +311,8 @@ private:
 	int m_startKey;			// first key when drawing
 	int m_lastKey;
 
-	editModes m_editMode;
-	editModes m_ctrlMode; // mode they were in before they hit ctrl
+	EditModes m_editMode;
+	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
@@ -320,7 +320,7 @@ private:
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void copy_to_clipboard( const NoteVector & _notes ) const;
+	void copy_to_clipboard(const NoteVector & notes ) const;
 
 	void drawDetuningInfo( QPainter & _p, Note * _n, int _x, int _y );
 	bool mouseOverNote();
