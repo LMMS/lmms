@@ -2005,51 +2005,17 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"current pattern." ) );
 
 	// Edit mode buttons
-	QActionGroup * tool_action_group = new QActionGroup(this);
-
-	m_drawAction = new QAction(embed::getIconPixmap("edit_draw"),
-								  tr("Draw mode (Shift+D)"), tool_action_group);
-	m_drawAction->setCheckable(true);
+	m_drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 
-	m_eraseAction = new QAction(embed::getIconPixmap("edit_erase"),
-									tr("Erase mode (Shift+E)"), tool_action_group);
-	m_eraseAction->setCheckable(true);
+	m_eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
 	m_drawAction->setChecked(true);
 
-	//TODO: m_selectButton and m_moveButton are broken.
-	/*m_selectButton = new ToolButton( embed::getIconPixmap(
-							"edit_select" ),
-					tr( "Select mode (Shift+S)" ),
-					this, SLOT( selectButtonToggled() ),
-					m_toolBar );
-	m_selectButton->setCheckable( true );
-
-	m_moveButton = new ToolButton( embed::getIconPixmap( "edit_move" ),
-					tr( "Move selection mode (Shift+M)" ),
-					this, SLOT( moveButtonToggled() ),
-					m_toolBar );
-	m_moveButton->setCheckable( true );*/
-
-	QSignalMapper* signalmapper = new QSignalMapper(this);
-	signalmapper->setMapping(m_drawAction, AutomationEditor::DRAW);
-	signalmapper->setMapping(m_eraseAction, AutomationEditor::ERASE);
-//	signalmapper->setMapping(m_selectButton, AutomationEditor::SELECT);
-//	signalmapper->setMapping(m_moveButton, AutomationEditor::MOVE);
-
-	connect(m_drawAction, SIGNAL(triggered()), signalmapper, SLOT(map()));
-	connect(m_eraseAction, SIGNAL(triggered()), signalmapper, SLOT(map()));
-//	connect(m_selectButton, SIGNAL(triggered()), signalmapper, SLOT(map()));
-//	connect(m_moveButton, SIGNAL(triggered()), signalmapper, SLOT(map()));
-
-	connect(signalmapper, SIGNAL(mapped(int)), m_editor, SLOT(setEditMode(int)));
-
-//	tool_action_group->addAction( m_drawButton );
-//	tool_action_group->addAction( m_eraseButton );
-	//tool_button_group->addButton( m_selectButton );
-	//tool_button_group->addButton( m_moveButton );
+//	TODO: m_selectButton and m_moveButton are broken.
+//	m_selectButton = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
+//	m_moveButton = addEditMode(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"));
 
 	m_drawAction->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
@@ -2073,7 +2039,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );*/
 
-
+	connect(this, SIGNAL(editModeChanged(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Progression type buttons
 	QActionGroup* progression_type_group = new QActionGroup(this);

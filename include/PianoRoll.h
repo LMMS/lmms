@@ -140,11 +140,7 @@ protected slots:
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
 
-	void setEditMode(EditModes mode);
-	void setEditModeDraw() {setEditMode(ModeDraw); }
-	void setEditModeErase() {setEditMode(ModeErase); }
-	void setEditModeSelect() {setEditMode(ModeSelect); }
-	void setEditModeDetune() {setEditMode(ModeEditDetuning); }
+	void setEditMode(int mode);
 
 	void copySelectedNotes();
 	void cutSelectedNotes();

@@ -25,11 +25,15 @@
 #ifndef EDITOR_COMMON_H
 #define EDITOR_COMMON_H
 
+#include <QAction>
 #include <QMainWindow>
 #include <QToolBar>
 
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
+
+// Forward declarations
+class QActionGroup;
 
 /// \brief Superclass for editors with a toolbar.
 ///
@@ -41,11 +45,23 @@ class Editor : public QMainWindow
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
 
+	int editMode() const;
+	void setEditMode(int mode);
+
+signals:
+	void editModeChanged(int);
+
+protected:
+	QAction* addEditMode(const QIcon &icon, const QString &text, const QString& whatsThis=QString());
+
 protected slots:
 	virtual void play();
 	virtual void record();
 	virtual void recordAccompany();
 	virtual void stop();
+
+private slots:
+	void setEditModeByAction(QAction* action);
 
 signals:
 
@@ -65,6 +81,8 @@ protected:
 	QAction* m_recordAccompanyAction;
 	QAction* m_stopAction;
 private:
+	quint8 m_editMode;
+	QActionGroup* m_editModeGroup;
 };
 
 

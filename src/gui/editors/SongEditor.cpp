@@ -631,15 +631,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	QActionGroup* tool_action_group = new QActionGroup(this);
-	m_drawModeAction = new QAction(embed::getIconPixmap("edit_draw"),
-								   tr("Draw mode"), tool_action_group);
-	m_drawModeAction->setCheckable(true);
+	m_drawModeAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
 	m_drawModeAction->setChecked(true);
 
-	m_selectModeAction = new QAction(embed::getIconPixmap("edit_select"),
-								   tr("Edit mode (select and move)"), tool_action_group);
-	m_selectModeAction->setCheckable(true);
+	m_selectModeAction = addEditMode(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
 	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));

@@ -27,9 +27,9 @@
 #include "MainWindow.h"
 #include "embed.h"
 
-#include <QMdiArea>
 #include <QAction>
-#include <QToolBar>
+#include <QActionGroup>
+#include <QMdiArea>
 
 
 void Editor::setPauseIcon(bool displayPauseIcon)
@@ -39,6 +39,28 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("pause"));
 	else
 		m_playAction->setIcon(embed::getIconPixmap("play"));
+}
+
+int Editor::editMode() const
+{
+	return m_editMode;
+}
+
+void Editor::setEditMode(int mode)
+{
+	if (mode <= m_editModeGroup->actions().size())
+	{
+		m_editMode = mode;
+	}
+	emit(editModeChanged(mode));
+}
+
+QAction* Editor::addEditMode(const QIcon& icon, const QString& text, const QString& whatsThis)
+{
+	QAction* editModeAction = new QAction(icon, text, m_editModeGroup);
+	editModeAction->setWhatsThis(whatsThis);
+	editModeAction->setCheckable(true);
+	return editModeAction;
 }
 
 void Editor::play()
@@ -57,12 +79,21 @@ void Editor::stop()
 {
 }
 
+void Editor::setEditModeByAction(QAction* action)
+{
+	int index = m_editModeGroup->actions().indexOf(action);
+	if (index != -1)
+		setEditMode(index);
+}
+
 Editor::Editor(bool record) :
 	m_toolBar(new QToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
 	m_recordAccompanyAction(nullptr),
-	m_stopAction(nullptr)
+	m_stopAction(nullptr),
+	m_editMode(0),
+	m_editModeGroup(new QActionGroup(this))
 {
 	m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 	m_toolBar->setMovable(false);
@@ -98,6 +129,9 @@ Editor::Editor(bool record) :
 		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	}
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
+
+	// Connect edit mode
+	connect(m_editModeGroup, SIGNAL(triggered(QAction*)), this, SLOT(setEditModeByAction(QAction*)));
 }
 
 Editor::~Editor()

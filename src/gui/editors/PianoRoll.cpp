@@ -3423,9 +3423,9 @@ void PianoRoll::verScrolled( int new_pos )
 
 
 
-void PianoRoll::setEditMode(PianoRoll::EditModes mode)
+void PianoRoll::setEditMode(int mode)
 {
-	m_editMode = mode;
+	m_editMode = (EditModes) mode;
 }
 
 
@@ -3940,27 +3940,18 @@ PianoRollWindow::PianoRollWindow() :
 		tr( "Click here to stop playback of current pattern." ) );
 
 	// init edit-buttons at the top
-	QActionGroup* tool_button_group = new QActionGroup(this);
-	m_drawAction = new QAction(embed::getIconPixmap("edit_draw"),
-							   tr( "Draw mode (Shift+D)" ), tool_button_group);
+	m_drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
-	m_drawAction->setCheckable( true );
 	m_drawAction->setChecked( true );
 
-	m_eraseAction = new QAction(embed::getIconPixmap("edit_erase"),
-					tr("Erase mode (Shift+E)"), tool_button_group);
+	m_eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
-	m_eraseAction->setCheckable( true );
 
-	m_selectAction = new QAction( embed::getIconPixmap("edit_select"),
-									 tr("Select mode (Shift+S)"), tool_button_group);
+	m_selectAction = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
 	m_selectAction->setShortcut(Qt::SHIFT | Qt::Key_S);
-	m_selectAction->setCheckable( true );
 
-	m_detuneAction = new QAction(embed::getIconPixmap("automation"),
-								 tr("Detune mode (Shift+T)"), tool_button_group);
+	m_detuneAction = addEditMode(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
 	m_detuneAction->setShortcut(Qt::SHIFT | Qt::Key_T);
-	m_detuneAction->setCheckable( true );
 
 	m_drawAction->setWhatsThis(
 		tr( "Click here and draw mode will be activated. In this "
@@ -3985,10 +3976,7 @@ PianoRollWindow::PianoRollWindow() :
 			"notes from one to another. You can also press "
 			"'Shift+T' on your keyboard to activate this mode." ) );
 
-	connect(m_drawAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
-	connect(m_eraseAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeErase()));
-	connect(m_selectAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
-	connect(m_detuneAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDetune()));
+	connect(this, SIGNAL(editModeChanged(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Copy + paste actions
 	m_cutAction = new QAction(embed::getIconPixmap("edit_cut"),
