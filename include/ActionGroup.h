@@ -22,50 +22,36 @@
  *
  */
 
-#ifndef EDITOR_COMMON_H
-#define EDITOR_COMMON_H
 
-#include <QAction>
-#include <QMainWindow>
-#include <QToolBar>
+#ifndef ACTION_GROUP_H
+#define ACTION_GROUP_H
 
-#include "TimeLineWidget.h"
-#include "ToolButton.h"
+#include <QActionGroup>
 
-/// \brief Superclass for editors with a toolbar.
+/// \brief Convenience subclass of QActionGroup
 ///
-/// Those editors include the Song Editor, the Automation Editor, B&B Editor,
-/// and the Piano Roll.
-class Editor : public QMainWindow
+/// This class provides the same functionality as QActionGroup, but in addition
+/// has the actionTriggered(int) signal.
+/// It also sets every added action's checkable property to true.
+class ActionGroup : public QActionGroup
 {
 	Q_OBJECT
 public:
-	void setPauseIcon(bool displayPauseIcon=true);
+	ActionGroup(QObject* parent);
 
-protected slots:
-	virtual void play() {}
-	virtual void record() {}
-	virtual void recordAccompany() {}
-	virtual void stop() {}
+	QAction* addAction(QAction *a);
+	QAction* addAction(const QString &text);
+	QAction* addAction(const QIcon &icon, const QString &text);
 
 signals:
+	/// This signal is emitted when the action at the given index is triggered.
+	void triggered(int index);
 
-protected:
-	/// \brief	Constructor.
-	///
-	/// \param	record	If set true, the editor's toolbar will contain record
-	///					buttons in addition to the play and stop buttons.
-	Editor(bool record = false);
-	virtual ~Editor();
+private slots:
+	void actionTriggered_(QAction* action);
 
-
-	QToolBar* m_toolBar;
-
-	QAction* m_playAction;
-	QAction* m_recordAction;
-	QAction* m_recordAccompanyAction;
-	QAction* m_stopAction;
+private:
+	QList<QAction*> m_actions;
 };
-
 
 #endif

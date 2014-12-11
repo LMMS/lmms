@@ -47,7 +47,7 @@
 
 #include <math.h>
 
-
+#include "ActionGroup.h"
 #include "SongEditor.h"
 #include "MainWindow.h"
 #include "embed.h"
@@ -1643,22 +1643,9 @@ void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes ty
 	}
 }
 
-
-void AutomationEditor::setProgressionDiscrete()
+void AutomationEditor::setProgressionType(int type)
 {
-	setProgressionType(AutomationPattern::DiscreteProgression);
-}
-
-
-void AutomationEditor::setProgressionLinear()
-{
-	setProgressionType(AutomationPattern::LinearProgression);
-}
-
-
-void AutomationEditor::setProgressionHermite()
-{
-	setProgressionType(AutomationPattern::CubicHermiteProgression);
+	setProgressionType((AutomationPattern::ProgressionTypes) type);
 }
 
 
@@ -2005,17 +1992,18 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"current pattern." ) );
 
 	// Edit mode buttons
-	QAction* drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	ActionGroup* editModeGroup = new ActionGroup(this);
+	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 
-	QAction* eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
 	drawAction->setChecked(true);
 
 //	TODO: m_selectButton and m_moveButton are broken.
-//	m_selectButton = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
-//	m_moveButton = addEditMode(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"));
+//	m_selectButton = new QAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"), editModeGroup);
+//	m_moveButton = new QAction(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"), editModeGroup);
 
 	drawAction->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
@@ -2039,26 +2027,21 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );*/
 
-	connect(this, SIGNAL(editModeChanged(int)), m_editor, SLOT(setEditMode(int)));
+	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Progression type buttons
-	QActionGroup* progression_type_group = new QActionGroup(this);
+	ActionGroup* progression_type_group = new ActionGroup(this);
 
-	m_discreteAction = new QAction(embed::getIconPixmap("progression_discrete"),
-								   tr("Discrete progression"), progression_type_group);
-	m_linearAction = new QAction(embed::getIconPixmap("progression_linear"),
-								 tr("Linear progression"), progression_type_group);
-	m_cubicHermiteAction = new QAction(embed::getIconPixmap("progression_cubic_hermite"),
-									   tr( "Cubic Hermite progression"), progression_type_group);
+	m_discreteAction = progression_type_group->addAction(
+				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
+	m_linearAction = progression_type_group->addAction(
+				embed::getIconPixmap("progression_linear"), tr("Linear progression"));
+	m_cubicHermiteAction = progression_type_group->addAction(
+				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
 
-	m_linearAction->setCheckable( true );
-	m_cubicHermiteAction->setCheckable( true );
-	m_discreteAction->setCheckable( true );
 	m_discreteAction->setChecked( true );
 
-	connect(m_discreteAction, SIGNAL(triggered()), m_editor, SLOT(setProgressionDiscrete()));
-	connect(m_linearAction, SIGNAL(triggered()), m_editor, SLOT(setProgressionLinear()));
-	connect(m_cubicHermiteAction, SIGNAL(triggered()), m_editor, SLOT(setProgressionHermite()));
+	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
 
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );

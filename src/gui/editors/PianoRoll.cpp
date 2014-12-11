@@ -45,6 +45,7 @@
 #include <math.h>
 #include <algorithm>
 
+#include "ActionGroup.h"
 #include "ConfigManager.h"
 #include "PianoRoll.h"
 #include "BBTrackContainer.h"
@@ -3939,17 +3940,17 @@ PianoRollWindow::PianoRollWindow() :
 		tr( "Click here to stop playback of current pattern." ) );
 
 	// init edit-buttons at the top
-	QAction* drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	ActionGroup* editModeGroup = new ActionGroup(this);
+	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	QAction* selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
+	QAction* detuneAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
+
 	drawAction->setChecked( true );
 
-	QAction* eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
-
-	QAction* selectAction = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
 	selectAction->setShortcut(Qt::SHIFT | Qt::Key_S);
-
-	QAction* detuneAction = addEditMode(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
 	detuneAction->setShortcut(Qt::SHIFT | Qt::Key_T);
 
 	drawAction->setWhatsThis(
@@ -3975,7 +3976,7 @@ PianoRollWindow::PianoRollWindow() :
 			"notes from one to another. You can also press "
 			"'Shift+T' on your keyboard to activate this mode." ) );
 
-	connect(this, SIGNAL(editModeChanged(int)), m_editor, SLOT(setEditMode(int)));
+	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Copy + paste actions
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),

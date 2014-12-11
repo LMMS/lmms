@@ -35,6 +35,7 @@
 
 #include <math.h>
 
+#include "ActionGroup.h"
 #include "SongEditor.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
@@ -628,10 +629,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	m_drawModeAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_drawModeAction->setChecked(true);
+	ActionGroup* editModeGroup = new ActionGroup(this);
+	m_drawModeAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
+	m_selectModeAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 
-	m_selectModeAction = addEditMode(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
+	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
 	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));

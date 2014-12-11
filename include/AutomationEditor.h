@@ -134,9 +134,7 @@ protected slots:
 	void setEditMode(int mode);
 
 	void setProgressionType(AutomationPattern::ProgressionTypes type);
-	void setProgressionDiscrete();
-	void setProgressionLinear();
-	void setProgressionHermite();
+	void setProgressionType(int type);
 	void setTension();
 
 	void copySelectedValues();
