@@ -2005,25 +2005,25 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"current pattern." ) );
 
 	// Edit mode buttons
-	m_drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	QAction* drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 
-	m_eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	QAction* eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	m_drawAction->setChecked(true);
+	drawAction->setChecked(true);
 
 //	TODO: m_selectButton and m_moveButton are broken.
 //	m_selectButton = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
 //	m_moveButton = addEditMode(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"));
 
-	m_drawAction->setWhatsThis(
+	drawAction->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
 			"mode you can add and move single values.  This "
 			"is the default mode which is used most of the time.  "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode." ) );
-	m_eraseAction->setWhatsThis(
+	eraseAction->setWhatsThis(
 		tr( "Click here and erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
@@ -2083,32 +2083,32 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	// Copy paste buttons
 
-	m_cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
 					tr("Cut selected values (Ctrl+X)"), this);
-	m_copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
 					tr("Copy selected values (Ctrl+C)"), this);
-	m_pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
 					tr("Paste values from clipboard Ctrl+V)"), this);
 
-	m_cutAction->setWhatsThis(
+	cutAction->setWhatsThis(
 		tr( "Click here and selected values will be cut into the "
 			"clipboard.  You can paste them anywhere in any pattern "
 			"by clicking on the paste button." ) );
-	m_copyAction->setWhatsThis(
+	copyAction->setWhatsThis(
 		tr( "Click here and selected values will be copied into "
 			"the clipboard.  You can paste them anywhere in any "
 			"pattern by clicking on the paste button." ) );
-	m_pasteAction->setWhatsThis(
+	pasteAction->setWhatsThis(
 		tr( "Click here and the values from the clipboard will be "
 			"pasted at the first visible measure." ) );
 
-	m_cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
-	m_copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
-	m_pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
+	cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
+	copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
+	pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
 
-	connect(m_cutAction,   SIGNAL(triggered()), m_editor, SLOT(cutSelectedValues()));
-	connect(m_copyAction,  SIGNAL(triggered()), m_editor, SLOT(copySelectedValues()));
-	connect(m_pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteValues()));
+	connect(cutAction,   SIGNAL(triggered()), m_editor, SLOT(cutSelectedValues()));
+	connect(copyAction,  SIGNAL(triggered()), m_editor, SLOT(copySelectedValues()));
+	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteValues()));
 
 	// Zoom controls
 
@@ -2162,8 +2162,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 	m_toolBar->addSeparator();;
-	m_toolBar->addAction(m_drawAction);
-	m_toolBar->addAction(m_eraseAction);
+	m_toolBar->addAction(drawAction);
+	m_toolBar->addAction(eraseAction);
 //	m_toolBar->addAction(m_selectButton);
 //	m_toolBar->addAction(m_moveButton);
 	m_toolBar->addSeparator();
@@ -2175,9 +2175,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addWidget( m_tensionKnob );
 	m_toolBar->addSeparator();
 //	Select is broken
-//	m_toolBar->addAction( m_cutAction );
-//	m_toolBar->addAction( m_copyAction );
-//	m_toolBar->addAction( m_pasteAction );
+//	m_toolBar->addAction( cutAction );
+//	m_toolBar->addAction( copyAction );
+//	m_toolBar->addAction( pasteAction );
 	m_toolBar->addSeparator();
 	m_editor->m_timeLine->addToolButtons(m_toolBar);
 	m_toolBar->addSeparator();

@@ -611,11 +611,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));
-	if (m_recordAction && m_recordAccompanyAction)
-	{
-		m_recordAction->setToolTip(tr("Record samples from Audio-device"));
-		m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
-	}
+	m_recordAction->setToolTip(tr("Record samples from Audio-device"));
+	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
 	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),

@@ -98,40 +98,40 @@ Editor::Editor(bool record) :
 	m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 	m_toolBar->setMovable(false);
 
-	auto addButton = [this](const char* pixmap_name, QString text, QString objectName) {
-		QAction* action = m_toolBar->addAction(embed::getIconPixmap(pixmap_name), text);
+	auto addButton = [this](QAction* action, QString objectName) {
+		m_toolBar->addAction(action);
 		m_toolBar->widgetForAction(action)->setObjectName(objectName);
-		return action;
 	};
 
-	// Set up play button
-	m_playAction = addButton("play", tr("Play (Space)"), "playButton");
+	// Set up play and record actions
+	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
+	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
+
+	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
+	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
+
 	m_playAction->setShortcut(Qt::Key_Space);
-
-	// Set up record buttons if wanted
-	if (record)
-	{
-		m_recordAction = addButton("record", tr("Record"), "recordButton");
-		m_recordAccompanyAction = addButton("record_accompany", tr("Record while playing"), "recordAccompanyButton");
-	}
-
-	// Set up stop button
-	m_stopAction = addButton("stop", tr("Stop (Space)"), "stopButton");
-
-	// Add toolbar to window
-	addToolBar(Qt::TopToolBarArea, m_toolBar);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	if (record)
-	{
-		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
-		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
-	}
+	connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
+	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 
 	// Connect edit mode
 	connect(m_editModeGroup, SIGNAL(triggered(QAction*)), this, SLOT(setEditModeByAction(QAction*)));
+
+	// Add toolbar to window
+	addToolBar(Qt::TopToolBarArea, m_toolBar);
+
+	// Add actions to toolbar
+	addButton(m_playAction, "playButton");
+	if (record)
+	{
+		addButton(m_recordAction, "recordButton");
+		addButton(m_recordAccompanyAction, "recordAccompanyButton");
+	}
+	addButton(m_stopAction, "stopButton");
 }
 
 Editor::~Editor()

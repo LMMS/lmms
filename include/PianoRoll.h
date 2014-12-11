@@ -384,15 +384,6 @@ signals:
 private:
 	PianoRoll* m_editor;
 
-	QAction* m_drawAction;
-	QAction* m_eraseAction;
-	QAction* m_selectAction;
-	QAction* m_detuneAction;
-
-	QAction* m_cutAction;
-	QAction* m_copyAction;
-	QAction* m_pasteAction;
-
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_quantizeComboBox;
 	ComboBox * m_noteLenComboBox;

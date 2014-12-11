@@ -197,32 +197,33 @@ PianoRoll::PianoRoll() :
 	signalMapper = new QSignalMapper( this );
 	m_semiToneMarkerMenu = new QMenu( this );
 
-	QAction * act = new QAction( tr("Mark/unmark current semitone"), this );
-	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	signalMapper->setMapping( act, static_cast<int>( stmaMarkCurrentSemiTone ) );
-	m_semiToneMarkerMenu->addAction( act );
+	QAction * markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
+	QAction* markScaleAction = new QAction( tr("Mark current scale"), this );
+	QAction* markChordAction = new QAction( tr("Mark current chord"), this );
+	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
 
-	act = new QAction( tr("Mark current scale"), this );
-	act->setEnabled( false );
-	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( this, SIGNAL(semiToneMarkerMenuScaleSetEnabled(bool)), act, SLOT(setEnabled(bool)) );
-	signalMapper->setMapping( act, static_cast<int>( stmaMarkCurrentScale ) );
-	m_semiToneMarkerMenu->addAction( act );
+	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( markScaleAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( markChordAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 
-	act = new QAction( tr("Mark current chord"), this );
-	act->setEnabled( false );
-	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( this, SIGNAL(semiToneMarkerMenuChordSetEnabled(bool)), act, SLOT(setEnabled(bool)) );
-	signalMapper->setMapping( act, static_cast<int>( stmaMarkCurrentChord ) );
-	m_semiToneMarkerMenu->addAction( act );
+	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
+	signalMapper->setMapping( markScaleAction, static_cast<int>( stmaMarkCurrentScale ) );
+	signalMapper->setMapping( markChordAction, static_cast<int>( stmaMarkCurrentChord ) );
+	signalMapper->setMapping( unmarkAllAction, static_cast<int>( stmaUnmarkAll ) );
 
-	act = new QAction( tr("Unmark all"), this );
-	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	signalMapper->setMapping( act, static_cast<int>( stmaUnmarkAll ) );
-	m_semiToneMarkerMenu->addAction( act );
+	markScaleAction->setEnabled( false );
+	markChordAction->setEnabled( false );
 
-	connect( signalMapper, SIGNAL(mapped(int)),
-			this, SLOT(markSemiTone(int)) );
+	connect( this, SIGNAL(semiToneMarkerMenuScaleSetEnabled(bool)), markScaleAction, SLOT(setEnabled(bool)) );
+	connect( this, SIGNAL(semiToneMarkerMenuChordSetEnabled(bool)), markChordAction, SLOT(setEnabled(bool)) );
+
+	connect( signalMapper, SIGNAL(mapped(int)), this, SLOT(markSemiTone(int)) );
+
+	m_semiToneMarkerMenu->addAction( markSemitoneAction );
+	m_semiToneMarkerMenu->addAction( markScaleAction );
+	m_semiToneMarkerMenu->addAction( markChordAction );
+	m_semiToneMarkerMenu->addAction( unmarkAllAction );
 
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
@@ -3938,36 +3939,36 @@ PianoRollWindow::PianoRollWindow() :
 		tr( "Click here to stop playback of current pattern." ) );
 
 	// init edit-buttons at the top
-	m_drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
-	m_drawAction->setChecked( true );
+	QAction* drawAction = addEditMode(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	drawAction->setChecked( true );
 
-	m_eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	QAction* eraseAction = addEditMode(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	m_selectAction = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
-	m_selectAction->setShortcut(Qt::SHIFT | Qt::Key_S);
+	QAction* selectAction = addEditMode(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
+	selectAction->setShortcut(Qt::SHIFT | Qt::Key_S);
 
-	m_detuneAction = addEditMode(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
-	m_detuneAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	QAction* detuneAction = addEditMode(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
+	detuneAction->setShortcut(Qt::SHIFT | Qt::Key_T);
 
-	m_drawAction->setWhatsThis(
+	drawAction->setWhatsThis(
 		tr( "Click here and draw mode will be activated. In this "
 			"mode you can add, resize and move notes. This "
 			"is the default mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode. In this mode, hold Ctrl to "
 			"temporarily go into select mode." ) );
-	m_eraseAction->setWhatsThis(
+	eraseAction->setWhatsThis(
 		tr( "Click here and erase mode will be activated. In this "
 			"mode you can erase notes. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
-	m_selectAction->setWhatsThis(
+	selectAction->setWhatsThis(
 		tr( "Click here and select mode will be activated. "
 			"In this mode you can select notes. Alternatively, "
 			"you can hold Ctrl in draw mode to temporarily use "
 			"select mode." ) );
-	m_detuneAction->setWhatsThis(
+	detuneAction->setWhatsThis(
 		tr( "Click here and detune mode will be activated. "
 			"In this mode you can click a note to open its "
 			"automation detuning. You can utilize this to slide "
@@ -3977,34 +3978,34 @@ PianoRollWindow::PianoRollWindow() :
 	connect(this, SIGNAL(editModeChanged(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Copy + paste actions
-	m_cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
 							  tr("Cut selected notes (Ctrl+X)"), this);
 
-	m_copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
 							   tr("Copy selected notes (Ctrl+C)"), this);
 
-	m_pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
 					tr("Paste notes from clipboard (Ctrl+V)"), this);
 
-	m_cutAction->setWhatsThis(
+	cutAction->setWhatsThis(
 		tr( "Click here and the selected notes will be cut into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste button." ) );
-	m_copyAction->setWhatsThis(
+	copyAction->setWhatsThis(
 		tr( "Click here and the selected notes will be copied into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste button." ) );
-	m_pasteAction->setWhatsThis(
+	pasteAction->setWhatsThis(
 		tr( "Click here and the notes from the clipboard will be "
 			"pasted at the first visible measure." ) );
 
-	m_cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
-	m_copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
-	m_pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
+	cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
+	copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
+	pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
 
-	connect(m_cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
-	connect(m_copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
-	connect(m_pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
+	connect(cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
+	connect(copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
+	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -4049,15 +4050,15 @@ PianoRollWindow::PianoRollWindow() :
 
 
 	m_toolBar->addSeparator();
-	m_toolBar->addAction( m_drawAction );
-	m_toolBar->addAction( m_eraseAction );
-	m_toolBar->addAction( m_selectAction );
-	m_toolBar->addAction( m_detuneAction );
+	m_toolBar->addAction( drawAction );
+	m_toolBar->addAction( eraseAction );
+	m_toolBar->addAction( selectAction );
+	m_toolBar->addAction( detuneAction );
 
 	m_toolBar->addSeparator();
-	m_toolBar->addAction( m_cutAction );
-	m_toolBar->addAction( m_copyAction );
-	m_toolBar->addAction( m_pasteAction );
+	m_toolBar->addAction( cutAction );
+	m_toolBar->addAction( copyAction );
+	m_toolBar->addAction( pasteAction );
 
 	m_toolBar->addSeparator();
 	m_editor->m_timeLine->addToolButtons(m_toolBar);

@@ -276,19 +276,11 @@ protected slots:
 	void stop();
 
 private:
-	QAction* m_drawAction;
-	QAction* m_eraseAction;
-	QAction* m_selectAction;
-	QAction* m_moveAction;
-
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;
-	Knob * m_tensionKnob;
 
-	QAction * m_cutAction;
-	QAction * m_copyAction;
-	QAction * m_pasteAction;
+	Knob * m_tensionKnob;
 
 	ComboBox * m_zoomingXComboBox;
 	ComboBox * m_zoomingYComboBox;
