@@ -79,11 +79,6 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 
 AutomationPattern::~AutomationPattern()
 {
-	if( Engine::automationEditor() &&
-		Engine::automationEditor()->currentPattern() == this )
-	{
-		Engine::automationEditor()->setCurrentPattern( NULL );
-	}
 }
 
 

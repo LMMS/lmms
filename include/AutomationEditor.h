@@ -266,6 +266,9 @@ public:
 
 	QSize sizeHint() const;
 
+public slots:
+	void clearCurrentPattern();
+
 signals:
 	void currentPatternChanged();
 

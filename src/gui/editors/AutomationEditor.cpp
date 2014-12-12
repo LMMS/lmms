@@ -584,7 +584,6 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
-#include <stdio.h>
 void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
 	QMutexLocker m( &m_patternMutex );
@@ -1999,8 +1998,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	drawAction->setChecked(true);
-
 //	TODO: m_selectButton and m_moveButton are broken.
 //	m_selectButton = new QAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"), editModeGroup);
 //	m_moveButton = new QAction(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"), editModeGroup);
@@ -2039,12 +2036,19 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_cubicHermiteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
 
-	m_discreteAction->setChecked( true );
-
 	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
 
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
+	m_tensionKnob->setModel(m_editor->m_tensionModel);
+	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
+	m_tensionKnob->setWhatsThis(
+				tr("A higher tension value may make a smoother curve "
+				   "but overshoot some values. A low tension "
+				   "value will cause the slope of the curve to "
+				   "level off at each control point."));
+
+	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
 
 	m_discreteAction->setWhatsThis(
 		tr( "Click here to choose discrete progressions for this "
@@ -2173,6 +2177,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addWidget( quantize_lbl );
 	m_toolBar->addWidget( m_quantizeComboBox );
 
+	drawAction->setChecked(true);
+	m_discreteAction->setChecked(true);
+
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -2205,6 +2212,8 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 		break;
 	}
 
+	connect(pattern, SIGNAL(destroyed()), this, SLOT(clearCurrentPattern()));
+
 	emit currentPatternChanged();
 }
 
@@ -2223,6 +2232,11 @@ int AutomationEditorWindow::quantization() const
 QSize AutomationEditorWindow::sizeHint() const
 {
 	return {INITIAL_WIDTH, INITIAL_HEIGHT};
+}
+
+void AutomationEditorWindow::clearCurrentPattern()
+{
+	setCurrentPattern(nullptr);
 }
 
 void AutomationEditorWindow::play()
