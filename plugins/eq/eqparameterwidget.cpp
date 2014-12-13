@@ -40,7 +40,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 	//    connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(200);
+	timer->start(100);
 	float totalLength = log10( 21000 );
 	m_pixelsPerUnitWidth = width( ) /  totalLength ;
 	float totalHeight = 80;

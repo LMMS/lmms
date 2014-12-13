@@ -51,7 +51,7 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 
 	m_inSpec = new EqSpectrumView( &controls->m_inFftBands, this);
 	m_inSpec->move( 50, 5 );
-	m_inSpec->color = QColor( 255, 0, 255, 80 );
+	m_inSpec->color = QColor( 255, 0, 255, 150 );
 	m_outSpec = new EqSpectrumView( &controls->m_outFftBands, this);
 	m_outSpec->move( 50, 5 );
 	m_outSpec->color = QColor(00, 255, 255, 80);
@@ -92,45 +92,57 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 	for( int i = 0; i < m_parameterWidget->bandCount() ; i++)
 	{
 		m_resKnob = new Knob( knobBright_26, this );
-		m_resKnob->move(cw * i + ko , 205 );
+		if(i ==0 || i == 7)
+		{
+			m_resKnob->move(cw * i + ko , 190 );
+		} else
+		{
+			m_resKnob->move(cw * i + ko , 205 );
+		}
 		m_resKnob->setVolumeKnob(false);
 		m_resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
 		m_resKnob->setHintText( tr( "Resonance:") , "");
 
 		m_freqKnob = new Knob( knobBright_26, this );
-		m_freqKnob->move(cw * i + ko, 235 );
+		if( i == 0 || i == 7 )
+		{
+			m_freqKnob->move( cw * i + ko, 222 );
+		} else
+		{
+			m_freqKnob->move(cw * i + ko, 235 );
+		}
 		m_freqKnob->setVolumeKnob( false );
 		m_freqKnob->setModel( m_parameterWidget->getBandModels( i )->freq );
 		m_freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
 
-		m_activeBox = new LedCheckBox( m_parameterWidget->getBandModels( i )->name , this );
+		m_activeBox = new LedCheckBox( m_parameterWidget->getBandModels( i )->name , this , "" , LedCheckBox::Green );
 		m_activeBox->move( cw * i + fo + 3, 260 );
 		m_activeBox->setModel( m_parameterWidget->getBandModels( i )->active );
 	}
 
 	//hp filter type
 
-	m_hp12Box = new LedCheckBox( tr( "12dB" ), this );
-	m_hp12Box->move( cw*0 + ko, 175 );
+	m_hp12Box = new LedCheckBox( tr( "12dB" ), this , "" , LedCheckBox::Green );
+	m_hp12Box->move( cw*0 + ko, 170 );
 	m_hp12Box->setModel( &controls->m_hp12Model );
-	m_hp24Box = new LedCheckBox( tr( "24dB" ), this );
-	m_hp24Box->move( cw*0 + ko, 155 );
+	m_hp24Box = new LedCheckBox( tr( "24dB" ), this , "" , LedCheckBox::Green );
+	m_hp24Box->move( cw*0 + ko, 150 );
 	m_hp24Box->setModel( &controls->m_hp24Model );
 
-	m_hp48Box = new LedCheckBox( tr( "48dB" ), this );
-	m_hp48Box->move( cw*0 + ko, 135 );
+	m_hp48Box = new LedCheckBox( tr( "48dB" ), this , "" , LedCheckBox::Green );
+	m_hp48Box->move( cw*0 + ko, 130 );
 	m_hp48Box->setModel( &controls->m_hp48Model );
 
 	//LP filter type
 
-	m_lp12Box = new LedCheckBox( tr( "12dB"), this );
-	m_lp12Box->move( cw*7 + ko -5 , 175 );
+	m_lp12Box = new LedCheckBox( tr( "12dB"), this , "" , LedCheckBox::Green );
+	m_lp12Box->move( cw*7 + ko -5 , 170 );
 	m_lp12Box->setModel( &controls->m_lp12Model );
-	m_lp24Box = new LedCheckBox( tr( "24dB"), this );
-	m_lp24Box->move( cw*7 + ko - 5, 155 );
+	m_lp24Box = new LedCheckBox( tr( "24dB"), this , "" , LedCheckBox::Green );
+	m_lp24Box->move( cw*7 + ko - 5, 150 );
 	m_lp24Box->setModel( &controls->m_lp24Model );
-	m_lp48Box = new LedCheckBox( tr( "48dB"), this );
-	m_lp48Box->move( cw*7 + ko - 5, 135 );
+	m_lp48Box = new LedCheckBox( tr( "48dB"), this , "" , LedCheckBox::Green );
+	m_lp48Box->move( cw*7 + ko - 5, 130 );
 	m_lp48Box->setModel( &controls->m_lp48Model );
 
 	automatableButtonGroup *lpBtnGrp = new automatableButtonGroup(this,tr ( "lp grp" ) );
@@ -146,8 +158,8 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 	hpBtnGrp->setModel( &m_controls->m_hpTypeModel,false);
 
 	//Analize Box
-	m_analyzeBox = new LedCheckBox( tr( "Analyze" ), this );
-	m_analyzeBox->move( cw*1 + ko + 5, 10 );
+	m_analyzeBox = new LedCheckBox( tr( "Analyze" ), this , "" , LedCheckBox::Green );
+	m_analyzeBox->move( cw*1 + ko + 5, 15 );
 	m_analyzeBox->setModel( &controls->m_analyzeModel );
 
 }

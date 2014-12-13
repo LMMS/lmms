@@ -59,11 +59,11 @@ EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 	Effect( &eq_plugin_descriptor, parent, key ),
 	m_eqControls( this )
 {
-	m_dFilterCount = 20;
+	m_dFilterCount = 6;
 	m_downsampleFilters = new EqLinkwitzRiley[m_dFilterCount];
 	for( int i = 0; i < m_dFilterCount; i++)
 	{
-		m_downsampleFilters[i].setFrequency(21500);
+		m_downsampleFilters[i].setFrequency(20000);
 		m_downsampleFilters[i].setSR(Engine::mixer()->processingSampleRate() * 2 );
 	}
 	m_upBuf = 0;
