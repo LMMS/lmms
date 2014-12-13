@@ -289,4 +289,18 @@ static inline float fastSqrt( float n )
 	return u.f;
 }
 
+//! returns value furthest from zero
+template<class T>
+static inline T absMax( T a, T b )
+{
+	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
+}
+
+//! returns value nearest to zero
+template<class T>
+static inline T absMin( T a, T b )
+{
+	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+}
+
 #endif
