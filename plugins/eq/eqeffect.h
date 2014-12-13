@@ -66,7 +66,7 @@ private:
 	EqLp12Filter m_lp24;
 	EqLp12Filter m_lp480;
 	EqLp12Filter m_lp481;
-	EqLp12Filter* m_downsampleFilters;
+	EqLinkwitzRiley* m_downsampleFilters;
 	int m_dFilterCount;
 	sampleFrame* m_upBuf;
 	fpp_t m_upBufFrames;
@@ -74,15 +74,15 @@ private:
 	//	const static int MAX_BANDS = 249;
 	void upsample( sampleFrame *buf, const fpp_t frames );
 	void downSample( sampleFrame *buf, const fpp_t frames );
-	void analyze( sampleFrame *buf, const fpp_t frames, FftBands* fft );
-	float peakBand(float minF, float maxF,FftBands*, int);
+	void analyze( sampleFrame *buf, const fpp_t frames, EqAnalyser* fft );
+	float peakBand(float minF, float maxF,EqAnalyser*, int);
 
 	inline float bandToFreq ( int index , int sampleRate )
 	{
 		return index * sampleRate / (MAX_BANDS * 2);
 	}
 
-	void setBandPeaks( FftBands *fft , int);
+	void setBandPeaks( EqAnalyser *fft , int);
 	//	float m_bands[MAX_BANDS];
 	//	float m_energy;
 

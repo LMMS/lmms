@@ -65,14 +65,15 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_para4ActiveModel( false, this , tr( "Peak 4 active" ) ),
 	m_highShelfActiveModel( false, this , tr( "High shelf active" ) ),
 	m_lpActiveModel( false, this , tr( "LP active" ) ),
-	m_lp12Model( true, this , tr( "LP 12" ) ),
+	m_lp12Model( false, this , tr( "LP 12" ) ),
 	m_lp24Model( false, this , tr( "LP 24" ) ),
 	m_lp48Model( false, this , tr( "LP 48" ) ),
-	m_hp12Model( true, this , tr( "HP 12" ) ),
+	m_hp12Model( false, this , tr( "HP 12" ) ),
 	m_hp24Model( false, this , tr( "HP 24" ) ),
 	m_hp48Model( false, this , tr( "HP 48" ) ),
-	m_analyzeModel( true, this , tr( "Analyze enable" ) )
-
+	m_analyzeModel( true, this , tr( "Analyze enable" ) ),
+	m_lpTypeModel(0,0,2,this, tr( "low pass type") ) ,
+	m_hpTypeModel(0,0,2,this, tr( "high pass type") )
 {
 	m_hpFeqModel.setScaleLogarithmic( true );
 	m_lowShelfFreqModel.setScaleLogarithmic( true );
@@ -92,6 +93,7 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_para3PeakL = 0; m_para3PeakR = 0;
 	m_para4PeakL = 0; m_para4PeakR = 0;
 	m_highShelfPeakL = 0; m_highShelfPeakR = 0;
+	m_inProgress = false;
 
 }
 
@@ -144,6 +146,9 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_hp24Model.loadSettings( _this , "HP24" );
 	m_hp48Model.loadSettings( _this , "HP48" );
 	m_analyzeModel.loadSettings( _this, "Analyzeenable");
+
+	m_lpTypeModel.loadSettings( _this, "LP" );
+	m_hpTypeModel.loadSettings( _this, "HP" );
 }
 
 
@@ -197,5 +202,7 @@ void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_hp48Model.saveSettings( doc, parent, "HP48" );
 	m_analyzeModel.saveSettings( doc, parent, "Analyzeenable");
 
+	m_lpTypeModel.saveSettings( doc, parent, "LP" );
+	m_hpTypeModel.saveSettings( doc, parent, "HP" );
 }
 

@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "qpushbutton.h"
 #include "eqspectrumview.h"
+#include "qlist.h"
 
 class EqControls;
 
@@ -40,56 +41,56 @@ class EqControlsDialog : public EffectControlDialog
 {
 
 public:
-    EqControlsDialog( EqControls* controls );
-    virtual ~EqControlsDialog()
-    {
-    }
+	EqControlsDialog( EqControls* controls );
+	virtual ~EqControlsDialog()
+	{
+	}
 
-    EqBand * setBand(EqControls *controls);
+	EqBand * setBand(EqControls *controls);
 
 private slots:
-    void updateVuMeters();
+	void updateVuMeters();
 
 private:
-    EqControls * m_controls;
+	EqControls * m_controls;
 
-    Fader* m_inGainFader;
-    Fader* m_outGainFader;
-    Fader* m_gainFader;
-    Knob* m_resKnob;
-    Knob* m_freqKnob;
-    LedCheckBox* m_activeBox;
-    LedCheckBox* m_lp12Box;
-    LedCheckBox* m_lp24Box;
-    LedCheckBox* m_lp48Box;
-    LedCheckBox* m_hp12Box;
-    LedCheckBox* m_hp24Box;
-    LedCheckBox* m_hp48Box;
+	Fader* m_inGainFader;
+	Fader* m_outGainFader;
+	Fader* m_gainFader;
+	Knob* m_resKnob;
+	Knob* m_freqKnob;
+	LedCheckBox* m_activeBox;
+	LedCheckBox* m_lp12Box;
+	LedCheckBox* m_lp24Box;
+	LedCheckBox* m_lp48Box;
+	LedCheckBox* m_hp12Box;
+	LedCheckBox* m_hp24Box;
+	LedCheckBox* m_hp48Box;
 
-    LedCheckBox* m_analyzeBox;
+	LedCheckBox* m_analyzeBox;
 
-    EqParameterWidget* m_parameterWidget;
+	EqParameterWidget* m_parameterWidget;
 	EqSpectrumView* m_inSpec;
 	EqSpectrumView* m_outSpec;
 
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
 	EqBand* setBand( int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color, QString name, float* peakL, float* peakR)
-    {
-        EqBand* filterModels = m_parameterWidget->getBandModels( index );
-        filterModels->active = active;
-        filterModels->freq = freq;
-        filterModels->res = res;
-        filterModels->color = color;
-        filterModels->gain = gain;
+	{
+		EqBand* filterModels = m_parameterWidget->getBandModels( index );
+		filterModels->active = active;
+		filterModels->freq = freq;
+		filterModels->res = res;
+		filterModels->color = color;
+		filterModels->gain = gain;
 		filterModels->peakL = peakL;
 		filterModels->peakR = peakR;
-        return filterModels;
-    }
+		return filterModels;
+	}
 
-    int m_originalHeight;
-
-
+	int m_originalHeight;
 };
+
+
 
 #endif // EQCONTROLSDIALOG_H

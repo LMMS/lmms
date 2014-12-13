@@ -47,14 +47,6 @@ public:
 		m_lPeak = lPeak;
 		m_rPeak = rPeak;
 		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
-		m_text = 0;
-		QList<TextFloat*> tfs = Engine::mainWindow()->findChildren<TextFloat*>();
-		m_text = tfs.last();
-		if(m_text)
-		{
-			printf("found text float\n");
-		}
-		connect(model , SIGNAL (dataChanged()) , this, SLOT (updateText () ));
 		m_model = model;
 	}
 
@@ -95,16 +87,12 @@ private slots:
 		update();
 	}
 
-	void updateText()
-	{
-		m_text->setText(QString()+m_model->value());
-	}
+
 
 
 private:
 	float* m_lPeak;
 	float* m_rPeak;
-	TextFloat* m_text;
 	FloatModel* m_model;
 
 };

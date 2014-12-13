@@ -59,14 +59,12 @@ EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 	Effect( &eq_plugin_descriptor, parent, key ),
 	m_eqControls( this )
 {
-	m_dFilterCount = 10;
-	m_downsampleFilters = new EqLp12Filter[m_dFilterCount];
+	m_dFilterCount = 20;
+	m_downsampleFilters = new EqLinkwitzRiley[m_dFilterCount];
 	for( int i = 0; i < m_dFilterCount; i++)
 	{
-		m_downsampleFilters[i].setFrequency(22000);
-		m_downsampleFilters[i].setQ(0.85);
-		m_downsampleFilters[i].setGain(0);
-		m_downsampleFilters[i].setSampleRate(Engine::mixer()->processingSampleRate() * 2 );
+		m_downsampleFilters[i].setFrequency(21500);
+		m_downsampleFilters[i].setSR(Engine::mixer()->processingSampleRate() * 2 );
 	}
 	m_upBuf = 0;
 }
@@ -88,15 +86,21 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		return( false );
 	}
+	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
 	const float outGain = m_eqControls.m_outGainModel.value();
 	const int sampleRate = Engine::mixer()->processingSampleRate() * 2;
-	sample_t dryS[2];
-	sampleFrame m_inPeak;
+	sampleFrame m_inPeak = { 0, 0 };
 
-	analyze( buf, frames, &m_eqControls.m_inFftBands) ;
+	if(m_eqControls.m_analyzeModel.value() )
+	{
+		m_eqControls.m_inFftBands.analyze( buf, frames );
+	}
+	else
+	{
+		m_eqControls.m_inFftBands.clear();
+	}
+
 	//TODO UPSAMPLE
 	upsample( buf, frames );
 
@@ -214,7 +218,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		}
 	}
 
-	sampleFrame outPeak;
+	sampleFrame outPeak = { 0, 0 };
 	gain( m_upBuf , m_upBufFrames, outGain, &outPeak );
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[0] : m_eqControls.m_outPeakR;
@@ -229,14 +233,20 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
-		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 	checkGate( outSum / frames );
-	analyze( buf, frames, &m_eqControls.m_outFftBands) ;
-	setBandPeaks( &m_eqControls.m_outFftBands , (int)(sampleRate * 0.5));
 
+	if(m_eqControls.m_analyzeModel.value() )
+	{
+		m_eqControls.m_outFftBands.analyze( buf, frames );
+	}
+	else
+	{
+		m_eqControls.m_outFftBands.clear();
+	}
+	setBandPeaks( &m_eqControls.m_outFftBands , (int)(sampleRate * 0.5));
+	m_eqControls.m_inProgress = false;
 	return isRunning();
 }
 
@@ -259,8 +269,8 @@ void EqEffect::gain(sampleFrame *buf, const fpp_t frames, float scale, sampleFra
 		{
 			peak[0][1] = fabs( buf[f][0] );
 		}
-	}
 
+	}
 }
 
 sampleFrame m_lastUpFrame;
@@ -288,54 +298,60 @@ void EqEffect::upsample(sampleFrame *buf, const fpp_t frames)
 		m_lastUpFrame[1] = buf[f][1];
 	}
 }
+}
 
 void EqEffect::downSample(sampleFrame *buf, const fpp_t frames)
 {
 	for( int f = 0, f2 = 0; f < frames; ++f, f2 += 2 )
 	{
-		buf[f][0] = m_upBuf[f2][0];
-		buf[f][1] = m_upBuf[f2][1];
+		buf[f][0] = m_upBuf[f2+1][0];
+		buf[f][1] = m_upBuf[f2+1][1];
 	}
 }
 
-void EqEffect::analyze(sampleFrame *buf, const fpp_t frames, FftBands* fft)
+void EqEffect::analyze(sampleFrame *buf, const fpp_t frames, EqAnalyser* fft)
 {
-	const int FFT_BUFFER_SIZE = 2048;
-	fpp_t f = 0;
-	if( frames > FFT_BUFFER_SIZE )
+	if(m_eqControls.m_analyzeModel.value() )
 	{
+		const int FFT_BUFFER_SIZE = 2048;
+		fpp_t f = 0;
+		if( frames > FFT_BUFFER_SIZE )
+		{
+			fft->m_framesFilledUp = 0;
+			f = frames - FFT_BUFFER_SIZE;
+		}
+		// meger channels
+		for( ; f < frames; ++f )
+		{
+			fft->m_buffer[fft->m_framesFilledUp] =
+					( buf[f][0] + buf[f][1] ) * 0.5;
+			++fft->m_framesFilledUp;
+		}
+
+		if( fft->m_framesFilledUp < FFT_BUFFER_SIZE )
+		{
+			return;
+		}
+
+		fft->m_sr = Engine::mixer()->processingSampleRate();
+		const int LOWEST_FREQ = 0;
+		const int HIGHEST_FREQ = fft->m_sr / 2;
+
+		fftwf_execute( fft->m_fftPlan );
+		absspec( fft->m_specBuf, fft->m_absSpecBuf, FFT_BUFFER_SIZE+1 );
+
+		compressbands( fft->m_absSpecBuf, fft->m_bands, FFT_BUFFER_SIZE+1,
+					   MAX_BANDS,
+					   (int)(LOWEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(fft->m_sr /2)),
+					   (int)(HIGHEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(fft->m_sr /2)));
+		fft->m_energy = maximum( fft->m_bands, MAX_BANDS ) / maximum( fft->m_buffer, FFT_BUFFER_SIZE );
 		fft->m_framesFilledUp = 0;
-		f = frames - FFT_BUFFER_SIZE;
+
 	}
-	// meger channels
-	for( ; f < frames; ++f )
-	{
-		fft->m_buffer[fft->m_framesFilledUp] =
-			( buf[f][0] + buf[f][1] ) * 0.5;
-		++fft->m_framesFilledUp;
-	}
-
-	if( fft->m_framesFilledUp < FFT_BUFFER_SIZE )
-	{
-		return;
-	}
-
-	fft->m_sr = Engine::mixer()->processingSampleRate();
-	const int LOWEST_FREQ = 0;
-	const int HIGHEST_FREQ = fft->m_sr / 2;
-
-	fftwf_execute( fft->m_fftPlan );
-	absspec( fft->m_specBuf, fft->m_absSpecBuf, FFT_BUFFER_SIZE+1 );
-
-	compressbands( fft->m_absSpecBuf, fft->m_bands, FFT_BUFFER_SIZE+1,
-				   MAX_BANDS,
-				   (int)(LOWEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(fft->m_sr /2)),
-				   (int)(HIGHEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(fft->m_sr /2)));
-			   fft->m_energy = maximum( fft->m_bands, MAX_BANDS ) / maximum( fft->m_buffer, FFT_BUFFER_SIZE );
-			   fft->m_framesFilledUp = 0;
 }
 
-float EqEffect::peakBand(float minF, float maxF, FftBands *fft, int sr)
+
+float EqEffect::peakBand(float minF, float maxF, EqAnalyser *fft, int sr)
 {
 	float peak = -60;
 	float * b = fft->m_bands;
@@ -351,7 +367,7 @@ float EqEffect::peakBand(float minF, float maxF, FftBands *fft, int sr)
 	return (peak+100)/100;
 }
 
-void EqEffect::setBandPeaks(FftBands *fft, int samplerate )
+void EqEffect::setBandPeaks(EqAnalyser *fft, int samplerate )
 {
 	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL =
 			peakBand( 0,
@@ -399,4 +415,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
 	return new EqEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
-}}
+}

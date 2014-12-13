@@ -51,10 +51,10 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 
 	m_inSpec = new EqSpectrumView( &controls->m_inFftBands, this);
 	m_inSpec->move( 50, 5 );
-	m_inSpec->color = QColor( 200, 200, 100, 100 );
+	m_inSpec->color = QColor( 255, 0, 255, 80 );
 	m_outSpec = new EqSpectrumView( &controls->m_outFftBands, this);
 	m_outSpec->move( 50, 5 );
-	m_outSpec->color = QColor(100, 200, 200, 100);
+	m_outSpec->color = QColor(00, 255, 255, 80);
 	m_parameterWidget = new EqParameterWidget( this );
 	m_parameterWidget->move( 50, 5 );
 
@@ -134,31 +134,16 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 	m_lp48Box->setModel( &controls->m_lp48Model );
 
 	automatableButtonGroup *lpBtnGrp = new automatableButtonGroup(this,tr ( "lp grp" ) );
-	lpBtnGrp->addButton(m_lp12Box);
-	lpBtnGrp->addButton(m_lp24Box );
-	lpBtnGrp->addButton(m_lp48Box );
-	connect( m_lp12Box, SIGNAL( clicked() ), lpBtnGrp , SLOT( updateButtons() ) );
-	connect( m_lp24Box, SIGNAL( clicked() ), lpBtnGrp , SLOT( updateButtons() ) );
-	connect( m_lp48Box, SIGNAL( clicked() ), lpBtnGrp , SLOT( updateButtons() ) );
-	connect( &controls->m_lp12Model, SIGNAL( dataChanged() ), lpBtnGrp, SLOT( updateButtons() ) );
-	connect( &controls->m_lp24Model, SIGNAL( dataChanged() ), lpBtnGrp, SLOT( updateButtons() ) );
-	connect( &controls->m_lp48Model, SIGNAL( dataChanged() ), lpBtnGrp, SLOT( updateButtons() ) );
-
-
+	lpBtnGrp->addButton( m_lp12Box);
+	lpBtnGrp->addButton( m_lp24Box );
+	lpBtnGrp->addButton( m_lp48Box );
+	lpBtnGrp->setModel( &m_controls->m_lpTypeModel, false);
 
 	automatableButtonGroup *hpBtnGrp = new automatableButtonGroup( this, tr( "hp grp" ) );
-	hpBtnGrp->addButton(m_hp12Box );
-	hpBtnGrp->addButton(m_hp24Box );
-	hpBtnGrp->addButton(m_hp48Box );
-	connect( m_hp12Box, SIGNAL ( clicked() ), hpBtnGrp, SLOT( updateButtons() ) );
-	connect( m_hp24Box, SIGNAL ( clicked() ), hpBtnGrp, SLOT( updateButtons() ) );
-	connect( m_hp48Box, SIGNAL ( clicked() ), hpBtnGrp, SLOT( updateButtons() ) );
-	connect( &controls->m_hp12Model, SIGNAL( dataChanged() ), hpBtnGrp, SLOT( updateButtons() ) );
-	connect( &controls->m_hp24Model, SIGNAL( dataChanged() ), hpBtnGrp, SLOT( updateButtons() ) );
-	connect( &controls->m_hp48Model, SIGNAL( dataChanged() ), hpBtnGrp, SLOT( updateButtons() ) );
-
-
-
+	hpBtnGrp->addButton( m_hp12Box );
+	hpBtnGrp->addButton( m_hp24Box );
+	hpBtnGrp->addButton( m_hp48Box );
+	hpBtnGrp->setModel( &m_controls->m_hpTypeModel,false);
 
 	//Analize Box
 	m_analyzeBox = new LedCheckBox( tr( "Analyze" ), this );
