@@ -43,6 +43,9 @@ public:
 
 	}
 
+
+
+
 	virtual inline void setSampleRate( int sampleRate )
 	{
 		if( sampleRate != m_sampleRate )
@@ -52,6 +55,9 @@ public:
 		}
 	}
 
+
+
+
 	virtual inline void setFrequency( float freq ){
 		if ( freq != m_freq )
 		{
@@ -59,6 +65,9 @@ public:
 			calcCoefficents();
 		}
 	}
+
+
+
 
 	virtual void setQ( float res )
 	{
@@ -69,6 +78,9 @@ public:
 		}
 	}
 
+
+
+
 	virtual void setGain( float gain )
 	{
 		if ( gain != m_gain )
@@ -77,6 +89,9 @@ public:
 			calcCoefficents();
 		}
 	}
+
+
+
 
 	///
 	/// \brief processBuffer
@@ -151,6 +166,8 @@ public :
 
 	}
 };
+
+
 
 
 ///
@@ -236,6 +253,9 @@ public:
 	}
 };
 
+
+
+
 class EqLowShelfFilter : public EqFilter
 {
 public :
@@ -308,6 +328,9 @@ public :
 		setCoeffs( a1, a2, b0, b1, b2 );
 	}
 };
+
+
+
 
 class EqLinkwitzRiley : public StereoLinkwitzRiley
 {

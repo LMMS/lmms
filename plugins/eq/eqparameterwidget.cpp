@@ -26,7 +26,6 @@
 #include "QPainter"
 #include "qwidget.h"
 #include "lmms_math.h"
-
 #include "MainWindow.h"
 #include "QMouseEvent"
 
@@ -47,7 +46,6 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 	m_pixelsPerUnitHeight = (height() - 4) / ( totalHeight );
 	m_scale = 1.5;
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
-
 }
 
 
@@ -55,7 +53,6 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 
 EqParameterWidget::~EqParameterWidget()
 {
-
 }
 
 
@@ -83,8 +80,7 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 
 	for( int i = 0 ; i < bandCount() ; i++ )
 	{
-
-		m_bands[i].color.setAlpha(m_bands[i].active->value() ? activeAplha() : inactiveAlpha());
+		m_bands[i].color.setAlpha( m_bands[i].active->value() ? activeAplha() : inactiveAlpha() );
 		painter.setPen( QPen( m_bands[i].color, 10, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
 		float  x = freqToXPixel( m_bands[i].freq->value() );
 		float y = height() * 0.5;
@@ -98,7 +94,8 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 		m_bands[i].x = x; m_bands[i].y = y;
 		painter.drawPoint( x, y );
 		painter.setPen( QPen( m_bands[i].color, 3, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
-		if(i == 0 || i == bandCount() - 1 ){
+		if( i == 0 || i == bandCount() - 1 )
+		{
 			painter.drawLine(x, y, x, y - (m_bands[i].res->value() * 4  ) );
 		}
 		else
@@ -112,7 +109,7 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 	{
 		m_bands[i].color.setAlpha( 255 );
 		painter.setPen( QPen( m_bands[i].color, 3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
-		painter.drawLine(sectionLength * i , 1, sectionLength * (i+1) , 1);
+		painter.drawLine( sectionLength * i , 1, sectionLength * (i+1) , 1 );
 	}
 }
 
@@ -184,15 +181,15 @@ EqBand*  EqParameterWidget::selectNearestHandle( const int x, const  int y )
 	EqBand* selectedModel = 0;
 	float* distanceToHandles = new float[bandCount()];
 	//calc distance to each handle
-	for( int i = 0 ; i < bandCount() ; i++)
+	for( int i = 0 ; i < bandCount() ; i++ )
 	{
 		int xOffset = m_bands[i].x - x;
 		int yOffset = m_bands[i].y - y;
-		distanceToHandles[i] = fabs(sqrt((xOffset * xOffset ) + ( yOffset * yOffset ) ) );
+		distanceToHandles[i] = fabs( sqrt( ( xOffset * xOffset ) + ( yOffset * yOffset ) ) );
 	}
 	//select band
 	int shortestBand = 0;
-	for (int i = 1 ; i < bandCount() ; i++ )
+	for ( int i = 1 ; i < bandCount() ; i++ )
 	{
 		if ( distanceToHandles [i] < distanceToHandles[shortestBand] ){
 			shortestBand = i;

@@ -71,7 +71,6 @@ private:
 	sampleFrame* m_upBuf;
 	fpp_t m_upBufFrames;
 
-	//	const static int MAX_BANDS = 249;
 	void upsample( sampleFrame *buf, const fpp_t frames );
 	void downSample( sampleFrame *buf, const fpp_t frames );
 	void analyze( sampleFrame *buf, const fpp_t frames, EqAnalyser* fft );
@@ -83,8 +82,7 @@ private:
 	}
 
 	void setBandPeaks( EqAnalyser *fft , int);
-	//	float m_bands[MAX_BANDS];
-	//	float m_energy;
+
 
 };
 

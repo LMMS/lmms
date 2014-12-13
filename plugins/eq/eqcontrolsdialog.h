@@ -33,7 +33,7 @@
 #include "MainWindow.h"
 #include "qpushbutton.h"
 #include "eqspectrumview.h"
-#include "qlist.h"
+
 
 class EqControls;
 
@@ -66,9 +66,7 @@ private:
 	LedCheckBox* m_hp12Box;
 	LedCheckBox* m_hp24Box;
 	LedCheckBox* m_hp48Box;
-
 	LedCheckBox* m_analyzeBox;
-
 	EqParameterWidget* m_parameterWidget;
 	EqSpectrumView* m_inSpec;
 	EqSpectrumView* m_outSpec;

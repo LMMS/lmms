@@ -1,4 +1,3 @@
-
 /* eqspectrumview.h - defination of EqSpectrumView class.
 *
 * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
@@ -38,12 +37,10 @@ class EqAnalyser
 public:
 
 	fftwf_plan m_fftPlan;
-
 	fftwf_complex * m_specBuf;
 	float m_absSpecBuf[FFT_BUFFER_SIZE+1];
 	float m_buffer[FFT_BUFFER_SIZE*2];
 	int m_framesFilledUp;
-
 	float m_bands[MAX_BANDS];
 	float m_energy;
 	int m_sr;
@@ -77,7 +74,7 @@ public:
 
 
 
-	void analyze(sampleFrame *buf, const fpp_t frames )
+	void analyze( sampleFrame *buf, const fpp_t frames )
 	{
 		m_inProgress=true;
 		const int FFT_BUFFER_SIZE = 2048;
@@ -110,8 +107,8 @@ public:
 
 		compressbands( m_absSpecBuf, m_bands, FFT_BUFFER_SIZE+1,
 					   MAX_BANDS,
-					   (int)(LOWEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(m_sr /2)),
-					   (int)(HIGHEST_FREQ*(FFT_BUFFER_SIZE+1)/(float)(m_sr /2)));
+					   ( int )( LOWEST_FREQ * ( FFT_BUFFER_SIZE + 1 ) / ( float )( m_sr / 2 ) ),
+					   ( int )( HIGHEST_FREQ * ( FFT_BUFFER_SIZE +  1) / ( float )( m_sr / 2 ) ) );
 		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
 		m_framesFilledUp = 0;
 		m_inProgress = false;
@@ -125,12 +122,11 @@ class EqSpectrumView : public QWidget
 {
 
 public:
-	explicit EqSpectrumView( EqAnalyser * b, QWidget * _parent = 0) :
+	explicit EqSpectrumView( EqAnalyser * b, QWidget * _parent = 0 ):
 		QWidget( _parent ),
 		m_sa( b )
 	{
 		setFixedSize( 250, 116 );
-		//		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
 		QTimer *timer = new QTimer(this);
 		connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 		timer->start(2000);
@@ -140,12 +136,18 @@ public:
 		m_pixelsPerUnitWidth = width( ) /  totalLength ;
 		m_scale = 1.5;
 		color = QColor( 255, 255, 255, 255 );
-
 	}
+
+
+
 
 	virtual ~EqSpectrumView()
 	{
 	}
+
+
+
+
 	QColor color;
 	EqAnalyser *m_sa;
 	QPainterPath pp;
@@ -171,13 +173,13 @@ public:
 		pp.moveTo( 0,height() );
 		for( int x = 0; x < MAX_BANDS; ++x, ++b )
 		{
-			h = (int)( fh * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+			h = (int)( fh * 2.0 / 3.0 * ( 20 * ( log10 ( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
 			if( h < 0 ) h = 0; else if( h >= fh ) continue;
-			pp.lineTo( freqToXPixel(bandToFreq(x  ) ), fh-h );
+			pp.lineTo( freqToXPixel(bandToFreq( x ) ), fh-h );
 		}
-		pp.lineTo(width(), height() );
+		pp.lineTo( width(), height() );
 		pp.closeSubpath();
-		p.fillPath( pp ,QBrush( color ) );
+		p.fillPath( pp, QBrush( color ) );
 	}
 
 
@@ -190,7 +192,7 @@ public:
 
 	inline float bandToFreq ( int index )
 	{
-		return index * m_sa->m_sr / (MAX_BANDS * 2);
+		return index * m_sa->m_sr / (MAX_BANDS * 2 );
 	}
 
 
@@ -202,10 +204,6 @@ private:
 	float m_pixelsPerUnitWidth;
 	float m_scale;
 	int m_skipBands;
-
-
-
-
 } ;
 
 

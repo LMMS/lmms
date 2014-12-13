@@ -38,7 +38,7 @@
 
 
 
-EqControlsDialog::EqControlsDialog(EqControls *controls) :
+EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	EffectControlDialog( controls )
 
 {
@@ -94,10 +94,10 @@ EqControlsDialog::EqControlsDialog(EqControls *controls) :
 		m_resKnob = new Knob( knobBright_26, this );
 		if(i ==0 || i == 7)
 		{
-			m_resKnob->move(cw * i + ko , 190 );
+			m_resKnob->move( cw * i + ko , 190 );
 		} else
 		{
-			m_resKnob->move(cw * i + ko , 205 );
+			m_resKnob->move( cw * i + ko , 205 );
 		}
 		m_resKnob->setVolumeKnob(false);
 		m_resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
