@@ -30,6 +30,8 @@ const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
 const float CUTOFF_RATIO = 0.353553391f;
 const int SILENCEFRAMES = 10;
+const float OS_RESAMPLE [5] = { 0.0001490062883964112, 0.1645978376763992, 0.6705063120704088,
+		0.1645978376763992, 0.0001490062883964112 };
 
 extern "C"
 {
@@ -219,8 +221,8 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		float rsum = 0.0f;
 		for( int o = 0; o < OS_RATE; ++o )
 		{
-			lsum += m_buffer[f * OS_RATE + o][0] * OS_RATIO;
-			rsum += m_buffer[f * OS_RATE + o][1] * OS_RATIO;
+			lsum += m_buffer[f * OS_RATE + o][0] * OS_RESAMPLE[o];
+			rsum += m_buffer[f * OS_RATE + o][1] * OS_RESAMPLE[o];
 		}
 		buf[f][0] = d * buf[f][0] + w * qBound( -m_outClip, lsum, m_outClip ) * m_outGain;
 		buf[f][1] = d * buf[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
