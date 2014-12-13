@@ -100,7 +100,7 @@ inline void FxChannel::processed()
 void FxChannel::incrementDeps()
 {
 	m_dependenciesMet.ref();
-	if( m_dependenciesMet >= m_receives.size() )
+	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
 		MixerWorkerThread::addJob( this );

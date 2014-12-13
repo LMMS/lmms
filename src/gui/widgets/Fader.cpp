@@ -107,6 +107,7 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	setMaximumSize( 23, 116);
 	resize( 23, 116 );
 	setModel( _model );
+	setHintText( "Volume:","%");
 }
 
 
@@ -141,6 +142,7 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	setMaximumSize( m_back->width(), m_back->height() );
 	resize( m_back->width(), m_back->height() );
 	setModel( model );
+	setHintText( "Volume:","%");
 }
 
 
@@ -324,7 +326,7 @@ void Fader::updateTextFloat()
 	}
 	else
 	{
-		s_textFloat->setText( QString("Volume: %1 %").arg( m_displayConversion ? m_model->value() * 100 : m_model->value() ) );
+		s_textFloat->setText( m_description + " " + QString("%1 ").arg( m_displayConversion ? m_model->value() * 100 : m_model->value() ) + " " + m_unit );
 	}
 	s_textFloat->moveGlobal( this, QPoint( width() - ( *m_knob ).width() - 5, knobPosY() - 46 ) );
 }
