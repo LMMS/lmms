@@ -80,7 +80,7 @@ void BitcrushEffect::sampleRateChanged()
 {
 	m_sampleRate = Engine::mixer()->processingSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
-	m_filter.setLowpass( m_sampleRate * CUTOFF_RATIO );
+	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 }
 
@@ -97,6 +97,11 @@ inline float BitcrushEffect::noise( float amt )
 
 bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 {
+	if( !isEnabled() || !isRunning () )
+	{
+		return( false );
+	}
+
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
 	{
