@@ -93,7 +93,7 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 		float bw = m_bands[i].freq->value() / m_bands[i].res->value();
 		m_bands[i].x = x; m_bands[i].y = y;
 		painter.drawPoint( x, y );
-		painter.setPen( QPen( m_bands[i].color, 3, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
+		painter.setPen( QPen( m_bands[i].color, 1, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
 		if( i == 0 || i == bandCount() - 1 )
 		{
 			painter.drawLine(x, y, x, y - (m_bands[i].res->value() * 4  ) );
