@@ -39,7 +39,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 
 	m_enabled1Model( true, this, tr( "Filter 1 enabled" ) ),
 	m_filter1Model( this, tr( "Filter 1 type" ) ),
-	m_cut1Model( 7000.0f, 1.0f, 14000.0f, 1.0f, this, tr( "Cutoff 1 frequency" ) ),
+	m_cut1Model( 7000.0f, 1.0f, 20000.0f, 1.0f, this, tr( "Cutoff 1 frequency" ) ),
 	m_res1Model( 0.5, basicFilters<0>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance 1" ) ),
 	m_gain1Model( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Gain 1" ) ),
 
@@ -47,7 +47,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 
 	m_enabled2Model( true, this, tr( "Filter 2 enabled" ) ),
 	m_filter2Model( this, tr( "Filter 2 type" ) ),
-	m_cut2Model( 7000.0f, 1.0f, 14000.0f, 1.0f, this, tr( "Cutoff 2 frequency" ) ),
+	m_cut2Model( 7000.0f, 1.0f, 20000.0f, 1.0f, this, tr( "Cutoff 2 frequency" ) ),
 	m_res2Model( 0.5, basicFilters<0>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance 2" ) ),
 	m_gain2Model( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Gain 2" ) )
 {
