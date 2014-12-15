@@ -87,7 +87,7 @@ public:
 
     const int inactiveAlpha()
     {
-		return 50;
+		return 100;
     }
 
 

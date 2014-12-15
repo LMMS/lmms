@@ -81,7 +81,7 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 	for( int i = 0 ; i < bandCount() ; i++ )
 	{
 		m_bands[i].color.setAlpha( m_bands[i].active->value() ? activeAplha() : inactiveAlpha() );
-		painter.setPen( QPen( m_bands[i].color, 10, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+		painter.setPen( QPen( m_bands[i].color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
 		float  x = freqToXPixel( m_bands[i].freq->value() );
 		float y = height() * 0.5;
 		float gain = 1;
@@ -92,24 +92,19 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 		y = gainToYPixel( gain );
 		float bw = m_bands[i].freq->value() / m_bands[i].res->value();
 		m_bands[i].x = x; m_bands[i].y = y;
-		painter.drawPoint( x, y );
+		const int radius = 7;
+		painter.drawEllipse( x - radius , y - radius, radius * 2 ,radius * 2 );
+		QString msg = QString ("%1").arg (QString::number (i + 1));
+		painter.drawText(x - (radius * 0.5), y + (radius * 0.85 ), msg );
 		painter.setPen( QPen( m_bands[i].color, 1, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
 		if( i == 0 || i == bandCount() - 1 )
 		{
-			painter.drawLine(x, y, x, y - (m_bands[i].res->value() * 4  ) );
+			painter.drawLine(x , y, x, y - (m_bands[i].res->value() * 4  ) );
 		}
 		else
 		{
 			painter.drawLine(freqToXPixel(m_bands[i].freq->value()-(bw * 0.5)),y,freqToXPixel(m_bands[i].freq->value()+(bw * 0.5)),y);
 		}
-	}
-	//Draw color band
-	int sectionLength = width() / bandCount();
-	for( int i = 0; i < bandCount(); i++)
-	{
-		m_bands[i].color.setAlpha( 255 );
-		painter.setPen( QPen( m_bands[i].color, 3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
-		painter.drawLine( sectionLength * i , 1, sectionLength * (i+1) , 1 );
 	}
 }
 

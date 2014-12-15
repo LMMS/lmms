@@ -180,6 +180,7 @@ public:
 		pp.lineTo( width(), height() );
 		pp.closeSubpath();
 		p.fillPath( pp, QBrush( color ) );
+		p.drawPath( pp );
 	}
 
 

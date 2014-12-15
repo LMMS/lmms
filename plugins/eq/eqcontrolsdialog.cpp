@@ -48,24 +48,23 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 	setFixedSize( 350, 275 );
-
 	m_inSpec = new EqSpectrumView( &controls->m_inFftBands, this);
-	m_inSpec->move( 50, 5 );
-	m_inSpec->color = QColor( 255, 0, 0, 150 );
+	m_inSpec->move( 51, 2 );
+	m_inSpec->color = QColor( 238, 154, 120, 80 );
 	m_outSpec = new EqSpectrumView( &controls->m_outFftBands, this);
-	m_outSpec->move( 50, 5 );
-	m_outSpec->color = QColor(0, 255, 0, 80);
+	m_outSpec->move( 51, 2 );
+	m_outSpec->color = QColor(145, 205, 22, 80);
 	m_parameterWidget = new EqParameterWidget( this );
-	m_parameterWidget->move( 50, 5 );
+	m_parameterWidget->move( 51, 2 );
 
-	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(173, 115, 57), tr( "HP" ) ,0,0);
-	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255, 0, 0), tr( "Low Shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR );
-	setBand( 2, &controls->m_para1ActiveModel, &controls->m_para1FreqModel, &controls->m_para1ResModel, &controls->m_para1GainModel, QColor(255, 173, 115), tr( "Peak 1" ), &controls->m_para1PeakL, &controls->m_para1PeakR );
-	setBand( 3, &controls->m_para2ActiveModel, &controls->m_para2FreqModel, &controls->m_para2ResModel, &controls->m_para2GainModel, QColor(255, 255, 0), tr( "Peak 2" ), &controls->m_para2PeakL, &controls->m_para2PeakR );
-	setBand( 4, &controls->m_para3ActiveModel, &controls->m_para3FreqModel, &controls->m_para3ResModel, &controls->m_para3GainModel, QColor(0, 255, 0), tr( "Peak 3" ), &controls->m_para3PeakL, &controls->m_para3PeakR );
-	setBand( 5, &controls->m_para4ActiveModel, &controls->m_para4FreqModel, &controls->m_para4ResModel, &controls->m_para4GainModel, QColor(0, 186, 255), tr( "Peak 4" ), &controls->m_para4PeakL, &controls->m_para4PeakR );
-	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(222, 0, 222 ), tr( "High Shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR );
-	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(156, 156, 156 ), tr( "LP" ) ,0,0);
+	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255 ,255, 255), tr( "HP" ) ,0,0);
+	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255 ,255, 255), tr( "Low Shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR );
+	setBand( 2, &controls->m_para1ActiveModel, &controls->m_para1FreqModel, &controls->m_para1ResModel, &controls->m_para1GainModel, QColor(255 ,255, 255), tr( "Peak 1" ), &controls->m_para1PeakL, &controls->m_para1PeakR );
+	setBand( 3, &controls->m_para2ActiveModel, &controls->m_para2FreqModel, &controls->m_para2ResModel, &controls->m_para2GainModel, QColor(255 ,255, 255), tr( "Peak 2" ), &controls->m_para2PeakL, &controls->m_para2PeakR );
+	setBand( 4, &controls->m_para3ActiveModel, &controls->m_para3FreqModel, &controls->m_para3ResModel, &controls->m_para3GainModel, QColor(255 ,255, 255), tr( "Peak 3" ), &controls->m_para3PeakL, &controls->m_para3PeakR );
+	setBand( 5, &controls->m_para4ActiveModel, &controls->m_para4FreqModel, &controls->m_para4ResModel, &controls->m_para4GainModel, QColor(255 ,255, 255), tr( "Peak 4" ), &controls->m_para4PeakL, &controls->m_para4PeakR );
+	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High Shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR );
+	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255 ,255, 255), tr( "LP" ) ,0,0);
 	int cw = width()/8; //the chanel width in pixels
 	int ko = ( cw * 0.5 ) - ((new Knob( knobBright_26, 0 ))->width() * 0.5 );
 
