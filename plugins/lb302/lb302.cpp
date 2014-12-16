@@ -788,10 +788,12 @@ void lb302Synth::processNote( NotePlayHandle * _n )
 
 void lb302Synth::play( sampleFrame * _working_buffer )
 {
+	m_notesMutex.lock();
 	while( ! m_notes.isEmpty() )
 	{
 		processNote( m_notes.takeFirst() );
 	};
+	m_notesMutex.unlock();
 	
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
