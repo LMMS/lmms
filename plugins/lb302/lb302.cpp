@@ -799,7 +799,7 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 
 	process( _working_buffer, frames );
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
-	release_frame = 0;
+//	release_frame = 0; //removed for issue # 1432
 }
 
 

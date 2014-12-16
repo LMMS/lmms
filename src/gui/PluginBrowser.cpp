@@ -29,6 +29,8 @@
 #include <QScrollArea>
 
 #include "PluginBrowser.h"
+#include <algorithm> // for std::sort
+
 #include "embed.h"
 #include "debug.h"
 #include "templates.h"
