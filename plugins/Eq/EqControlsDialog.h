@@ -29,10 +29,10 @@
 #include "Fader.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "eqparameterwidget.h"
+#include "EqParameterWidget.h"
 #include "MainWindow.h"
 #include "qpushbutton.h"
-#include "eqspectrumview.h"
+#include "EqSpectrumView.h"
 
 
 class EqControls;

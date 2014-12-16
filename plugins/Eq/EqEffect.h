@@ -26,10 +26,10 @@
 #define EQEFFECT_H
 
 #include "Effect.h"
-#include "eqcontrols.h"
+#include "EqControls.h"
 #include "lmms_math.h"
 #include "BasicFilters.h"
-#include "eqfilter.h"
+#include "EqFilter.h"
 
 
 

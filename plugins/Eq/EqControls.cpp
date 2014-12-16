@@ -23,8 +23,8 @@
  */
 
 #include <QtXml/QDomElement>
-#include "eqcontrols.h"
-#include "eqeffect.h"
+#include "EqControls.h"
+#include "EqEffect.h"
 
 
 

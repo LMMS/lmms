@@ -22,7 +22,7 @@
  *
  */
 
-#include "eqparameterwidget.h"
+#include "EqParameterWidget.h"
 #include "QPainter"
 #include "qwidget.h"
 #include "lmms_math.h"
@@ -94,8 +94,8 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 		m_bands[i].x = x; m_bands[i].y = y;
 		const int radius = 7;
 		painter.drawEllipse( x - radius , y - radius, radius * 2 ,radius * 2 );
-		QString msg = QString ("%1").arg (QString::number (i + 1));
-		painter.drawText(x - (radius * 0.5), y + (radius * 0.85 ), msg );
+		QString msg = QString ( "%1" ).arg ( QString::number (i + 1) );
+		painter.drawText(x - ( radius * 0.5 ), y + ( radius * 0.85 ), msg );
 		painter.setPen( QPen( m_bands[i].color, 1, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
 		if( i == 0 || i == bandCount() - 1 )
 		{

@@ -26,7 +26,7 @@
 #define EQCONTROLS_H
 
 #include "EffectControls.h"
-#include "eqcontrolsdialog.h"
+#include "EqControlsDialog.h"
 #include "Knob.h"
 
 class EqEffect;

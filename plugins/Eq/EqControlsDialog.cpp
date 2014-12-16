@@ -23,17 +23,17 @@
  */
 
 
-#include "eqcontrolsdialog.h"
-#include "eqcontrols.h"
+#include "EqControlsDialog.h"
+#include "EqControls.h"
 #include "embed.h"
 #include "Fader.h"
-#include "eqfader.h"
+#include "EqFader.h"
 #include "Engine.h"
 #include "AutomatableButton.h"
 #include "QWidget"
 #include "MainWindow.h"
 #include "LedCheckbox.h"
-//#include "eqspectrumview.h"
+
 
 
 
