@@ -64,7 +64,6 @@ public:
 		for( int i = 0; i < CHANNELS; ++i )
 		{
 			m_z1[i] = m_z2[i] = m_z3[i] = m_z4[i] = 0.0f;
-			m_y1[i] = m_y2[i] = m_y3[i] = m_y4[i] = 0.0f;
 		}
 	}
 
@@ -119,34 +118,16 @@ public:
 
 	inline float update( float in, ch_cnt_t ch )
 	{
-		const double y = m_a0 * in + ( m_z1[ch] * m_a1 ) + ( m_z2[ch] * m_a2 ) +
-			( m_z3[ch] * m_a1 ) + ( m_z4[ch] * m_a0 ) - 
-			( m_y1[ch] * m_b1 ) - ( m_y2[ch] * m_b2 ) - 
-			( m_y3[ch] * m_b3 ) - ( m_y4[ch] * m_b4 );
-
-		m_z4[ch] = m_z3[ch];
-		m_z3[ch] = m_z2[ch];
-		m_z2[ch] = m_z1[ch];
-		m_z1[ch] = in;
-		
-		m_y4[ch] = m_y3[ch];
-		m_y3[ch] = m_y2[ch];
-		m_y2[ch] = m_y1[ch];
-		m_y1[ch] = y;
-		
-		return y;
-		
-// for some reason converting to direct form 2 doesn't seem to work for this filter
-/*		const double x = in - ( m_z1[ch] * m_b1 ) - ( m_z2[ch] * m_b2 ) -
+		const double x = in - ( m_z1[ch] * m_b1 ) - ( m_z2[ch] * m_b2 ) -
 			( m_z3[ch] * m_b3 ) - ( m_z4[ch] * m_b4 );
-			
+		const double y = ( m_a0 * x ) + ( m_z1[ch] * m_a1 ) + ( m_z2[ch] * m_a2 ) +
+			( m_z3[ch] * m_a1 ) + ( m_z4[ch] * m_a0 );
 		m_z4[ch] = m_z3[ch];
 		m_z3[ch] = m_z2[ch];
 		m_z2[ch] = m_z1[ch];
 		m_z1[ch] = x;
 		
-		return ( m_a0 * x ) + ( m_z1[ch] * m_a1 ) + ( m_z2[ch] * m_a2 ) +
-			( m_z3[ch] * m_a1 ) + ( m_z4[ch] * m_a0 );*/
+		return y;
 	}
 
 private:
@@ -158,7 +139,6 @@ private:
 	
 	typedef double frame[CHANNELS];
 	frame m_z1, m_z2, m_z3, m_z4;
-	frame m_y1, m_y2, m_y3, m_y4;
 };
 typedef LinkwitzRiley<2> StereoLinkwitzRiley;
 
