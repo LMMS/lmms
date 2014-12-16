@@ -28,6 +28,8 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QScrollArea>
 
+#include <algorithm> // for std::sort
+
 #include "plugin_browser.h"
 #include "embed.h"
 #include "debug.h"
