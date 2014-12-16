@@ -68,6 +68,10 @@ EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 
 EqEffect::~EqEffect()
 {
+	if(m_upBuf)
+	{
+		delete m_upBuf;
+	}
 }
 
 

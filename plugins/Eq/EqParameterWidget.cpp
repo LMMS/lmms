@@ -53,6 +53,10 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 
 EqParameterWidget::~EqParameterWidget()
 {
+	if(m_bands)
+	{
+		delete m_bands;
+	}
 }
 
 
