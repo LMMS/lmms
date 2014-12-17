@@ -30,6 +30,7 @@
 #include "Plugin.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "ConfigManager.h"
 #include "DummyPlugin.h"
@@ -127,7 +128,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 
 void Plugin::collectErrorForUI( QString err_msg )
 {
-	Engine::mainWindow()->collectError( err_msg );
+	gui->mainWindow()->collectError( err_msg );
 }
 
 

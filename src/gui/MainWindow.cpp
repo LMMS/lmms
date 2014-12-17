@@ -22,6 +22,7 @@
  *
  */
 
+#include "MainWindow.h"
 
 #include <QDomElement>
 #include <QUrl>
@@ -36,7 +37,7 @@
 #include <QWhatsThis>
 
 #include "lmmsversion.h"
-#include "MainWindow.h"
+#include "GuiApplication.h"
 #include "BBEditor.h"
 #include "SongEditor.h"
 #include "Song.h"
@@ -533,10 +534,10 @@ void MainWindow::finalize()
 
 	// Add editor subwindows
 	for (QWidget* widget : QList<QWidget*>{
-			Engine::automationEditor(),
-			Engine::getBBEditor(),
-			Engine::pianoRoll(),
-			Engine::songEditor()
+			gui->automationEditor(),
+			gui->getBBEditor(),
+			gui->pianoRoll(),
+			gui->songEditor()
 	})
 	{
 		QMdiSubWindow* window = workspace()->addSubWindow(widget);
@@ -545,13 +546,13 @@ void MainWindow::finalize()
 		window->resize(widget->sizeHint());
 	}
 
-	Engine::automationEditor()->parentWidget()->hide();
-	Engine::getBBEditor()->parentWidget()->move( 610, 5 );
-	Engine::getBBEditor()->parentWidget()->show();
-	Engine::pianoRoll()->parentWidget()->move(5, 5);
-	Engine::pianoRoll()->parentWidget()->hide();
-	Engine::songEditor()->parentWidget()->move(5, 5);
-	Engine::songEditor()->parentWidget()->show();
+	gui->automationEditor()->parentWidget()->hide();
+	gui->getBBEditor()->parentWidget()->move( 610, 5 );
+	gui->getBBEditor()->parentWidget()->show();
+	gui->pianoRoll()->parentWidget()->move(5, 5);
+	gui->pianoRoll()->parentWidget()->hide();
+	gui->songEditor()->parentWidget()->move(5, 5);
+	gui->songEditor()->parentWidget()->show();
 }
 
 
@@ -866,7 +867,7 @@ void MainWindow::showSettingsDialog()
 
 void MainWindow::aboutLMMS()
 {
-	AboutDialog().exec();
+	AboutDialog(this).exec();
 }
 
 
@@ -923,10 +924,10 @@ void MainWindow::refocus()
 {
 	QList<QWidget*> editors;
 	editors
-		<< Engine::songEditor()->parentWidget()
-		<< Engine::getBBEditor()->parentWidget()
-		<< Engine::pianoRoll()->parentWidget()
-		<< Engine::automationEditor()->parentWidget();
+		<< gui->songEditor()->parentWidget()
+		<< gui->getBBEditor()->parentWidget()
+		<< gui->pianoRoll()->parentWidget()
+		<< gui->automationEditor()->parentWidget();
 
 	bool found = false;
 	QList<QWidget*>::Iterator editor;
@@ -948,7 +949,7 @@ void MainWindow::refocus()
 
 void MainWindow::toggleBBEditorWin( bool forceShow )
 {
-	toggleWindow( Engine::getBBEditor(), forceShow );
+	toggleWindow( gui->getBBEditor(), forceShow );
 }
 
 
@@ -956,7 +957,7 @@ void MainWindow::toggleBBEditorWin( bool forceShow )
 
 void MainWindow::toggleSongEditorWin()
 {
-	toggleWindow( Engine::songEditor() );
+	toggleWindow( gui->songEditor() );
 }
 
 
@@ -964,7 +965,7 @@ void MainWindow::toggleSongEditorWin()
 
 void MainWindow::toggleProjectNotesWin()
 {
-	toggleWindow( Engine::getProjectNotes() );
+	toggleWindow( gui->getProjectNotes() );
 }
 
 
@@ -972,7 +973,7 @@ void MainWindow::toggleProjectNotesWin()
 
 void MainWindow::togglePianoRollWin()
 {
-	toggleWindow( Engine::pianoRoll() );
+	toggleWindow( gui->pianoRoll() );
 }
 
 
@@ -980,7 +981,7 @@ void MainWindow::togglePianoRollWin()
 
 void MainWindow::toggleAutomationEditorWin()
 {
-	toggleWindow( Engine::automationEditor() );
+	toggleWindow( gui->automationEditor() );
 }
 
 
@@ -988,7 +989,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleFxMixerWin()
 {
-	toggleWindow( Engine::fxMixerView() );
+	toggleWindow( gui->fxMixerView() );
 }
 
 
@@ -996,7 +997,7 @@ void MainWindow::toggleFxMixerWin()
 
 void MainWindow::toggleControllerRack()
 {
-	toggleWindow( Engine::getControllerRackView() );
+	toggleWindow( gui->getControllerRackView() );
 }
 
 
@@ -1004,29 +1005,29 @@ void MainWindow::toggleControllerRack()
 
 void MainWindow::updatePlayPauseIcons()
 {
-	Engine::songEditor()->setPauseIcon( false );
-	Engine::automationEditor()->setPauseIcon( false );
-	Engine::getBBEditor()->setPauseIcon( false );
-	Engine::pianoRoll()->setPauseIcon( false );
+	gui->songEditor()->setPauseIcon( false );
+	gui->automationEditor()->setPauseIcon( false );
+	gui->getBBEditor()->setPauseIcon( false );
+	gui->pianoRoll()->setPauseIcon( false );
 
 	if( Engine::getSong()->isPlaying() )
 	{
 		switch( Engine::getSong()->playMode() )
 		{
 			case Song::Mode_PlaySong:
-				Engine::songEditor()->setPauseIcon( true );
+				gui->songEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayAutomationPattern:
-				Engine::automationEditor()->setPauseIcon( true );
+				gui->automationEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayBB:
-				Engine::getBBEditor()->setPauseIcon( true );
+				gui->getBBEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayPattern:
-				Engine::pianoRoll()->setPauseIcon( true );
+				gui->pianoRoll()->setPauseIcon( true );
 				break;
 
 			default:

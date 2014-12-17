@@ -178,7 +178,7 @@ private:
 
 	QList<QString>* m_errors;
 
-	friend class Engine;
+	friend class GuiApplication;
 
 
 private slots:

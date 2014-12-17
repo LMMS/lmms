@@ -34,6 +34,7 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "RenameDialog.h"
 #include "Song.h"
@@ -275,7 +276,7 @@ void BBTCOView::openInBBEditor()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
 
-	Engine::mainWindow()->toggleBBEditorWin( true );
+	gui->mainWindow()->toggleBBEditorWin( true );
 }
 
 
@@ -310,7 +311,7 @@ void BBTCOView::changeColor()
 	if( isSelected() )
 	{
 		QVector<selectableObject *> selected =
-				Engine::songEditor()->m_editor->selectedObjects();
+				gui->songEditor()->m_editor->selectedObjects();
 		for( QVector<selectableObject *>::iterator it =
 							selected.begin();
 						it != selected.end(); ++it )
@@ -599,7 +600,7 @@ BBTrackView::BBTrackView( BBTrack * _bbt, TrackContainerView* tcv ) :
 
 BBTrackView::~BBTrackView()
 {
-	Engine::getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	gui->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 }
 
 
@@ -607,7 +608,7 @@ BBTrackView::~BBTrackView()
 
 bool BBTrackView::close()
 {
-	Engine::getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	gui->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 	return TrackView::close();
 }
 
@@ -617,7 +618,7 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	Engine::getBBEditor()->show();
+	gui->getBBEditor()->show();
 /*	foreach( bbTrackView * tv,
 			trackContainerView()->findChildren<bbTrackView *>() )
 	{

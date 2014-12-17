@@ -46,7 +46,7 @@
 #endif
 
 #include "ConfigManager.h"
-#include "Engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
 #include "templates.h"
@@ -188,7 +188,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 	{
 		target->setFixedSize( m_pluginGeometry );
 		vstSubWin * sw = new vstSubWin(
-					Engine::mainWindow()->workspace() );
+					gui->mainWindow()->workspace() );
 		sw->setWidget( helper );
 		helper->setWindowTitle( name() );
 		m_pluginWidget = helper;
@@ -237,7 +237,7 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 	if( _parent == NULL )
 	{
 		vstSubWin * sw = new vstSubWin(
-					Engine::mainWindow()->workspace() );
+					gui->mainWindow()->workspace() );
 		if( isEffect )
 		{
 			sw->setAttribute( Qt::WA_TranslucentBackground );

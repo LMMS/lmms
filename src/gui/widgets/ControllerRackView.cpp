@@ -34,6 +34,7 @@
 
 #include "Song.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "GroupBox.h"
 #include "ControllerRackView.h"
@@ -75,7 +76,7 @@ ControllerRackView::ControllerRackView( ) :
 	this->setLayout( layout );
 
 	QMdiSubWindow * subWin =
-			Engine::mainWindow()->workspace()->addSubWindow( this );
+			gui->mainWindow()->workspace()->addSubWindow( this );
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();

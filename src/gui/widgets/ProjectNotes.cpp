@@ -39,13 +39,14 @@
 
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
 
 
 
 ProjectNotes::ProjectNotes() :
-	QMainWindow( Engine::mainWindow()->workspace() )
+	QMainWindow( gui->mainWindow()->workspace() )
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( true );
@@ -70,7 +71,7 @@ ProjectNotes::ProjectNotes() :
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	Engine::mainWindow()->workspace()->addSubWindow( this );
+	gui->mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 700, 10 );
 	parentWidget()->resize( 400, 300 );

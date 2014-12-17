@@ -56,6 +56,7 @@
 #include "Clipboard.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
@@ -1134,7 +1135,7 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const MidiTime & _new_pos )
 {
-	if( m_trackView->trackContainerView() == Engine::getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
 	{
 		const int cur_bb = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
@@ -1466,7 +1467,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * _pe )
 	int ppt = static_cast<int>( tcv->pixelsPerTact() );
 	QPainter p( this );
 	// Don't draw background on BB-Editor
-	if( m_trackView->trackContainerView() != Engine::getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView() )
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getTact() * ppt, 0 ) );

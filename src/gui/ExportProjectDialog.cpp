@@ -28,7 +28,7 @@
 
 #include "ExportProjectDialog.h"
 #include "Song.h"
-#include "Engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
@@ -278,7 +278,7 @@ void ExportProjectDialog::render( ProjectRenderer* renderer )
 		connect( renderer, SIGNAL( progressChanged( int ) ), progressBar, SLOT( setValue( int ) ) );
 		connect( renderer, SIGNAL( progressChanged( int ) ), this, SLOT( updateTitleBar( int ) )) ;
 		connect( renderer, SIGNAL( finished() ), this, SLOT( accept() ) );
-		connect( renderer, SIGNAL( finished() ), Engine::mainWindow(), SLOT( resetWindowTitle() ) );
+		connect( renderer, SIGNAL( finished() ), gui->mainWindow(), SLOT( resetWindowTitle() ) );
 
 		renderer->startProcessing();
 	}
@@ -337,6 +337,6 @@ void ExportProjectDialog::startBtnClicked()
 
 void ExportProjectDialog::updateTitleBar( int _prog )
 {
-	Engine::mainWindow()->setWindowTitle(
+	gui->mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
 }

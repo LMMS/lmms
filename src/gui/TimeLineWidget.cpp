@@ -37,7 +37,7 @@
 #include "Engine.h"
 #include "templates.h"
 #include "NStateButton.h"
-#include "MainWindow.h"
+#include "GuiApplication.h"
 #include "TextFloat.h"
 
 
@@ -112,7 +112,7 @@ TimeLineWidget::TimeLineWidget( const int _xoff, const int _yoff, const float _p
 
 TimeLineWidget::~TimeLineWidget()
 {
-	if( Engine::songEditor() )
+	if( gui->songEditor() )
 	{
 		m_pos.m_timeLine = NULL;
 	}

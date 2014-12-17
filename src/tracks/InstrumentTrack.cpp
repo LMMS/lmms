@@ -52,6 +52,7 @@
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
+#include "GuiApplication.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentSoundShapingView.h"
 #include "FadeButton.h"
@@ -935,7 +936,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = NULL;
 	foreach( QMdiSubWindow * sw,
-				Engine::mainWindow()->workspace()->subWindowList(
+				gui->mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
 		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
@@ -1129,10 +1130,10 @@ class fxLineLcdSpinBox : public LcdSpinBox
 	protected:
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
-			Engine::fxMixerView()->setCurrentFxLine( model()->value() );
+			gui->fxMixerView()->setCurrentFxLine( model()->value() );
 
-			Engine::fxMixerView()->show();// show fxMixer window
-			Engine::fxMixerView()->setFocus();// set focus to fxMixer window
+			gui->fxMixerView()->show();// show fxMixer window
+			gui->fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
 		}
 };
@@ -1274,7 +1275,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = Engine::mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = gui->mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1300,7 +1301,7 @@ InstrumentTrackWindow::~InstrumentTrackWindow()
 
 	delete m_instrumentView;
 
-	if( Engine::mainWindow()->workspace() )
+	if( gui->mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -1466,7 +1467,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
 	event->ignore();
 
-	if( Engine::mainWindow()->workspace() )
+	if( gui->mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 	}

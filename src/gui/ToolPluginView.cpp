@@ -31,13 +31,14 @@
 
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 
 
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 	PluginView( _toolPlugin, NULL )
 {
-	Engine::mainWindow()->workspace()->addSubWindow( this );
+	gui->mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 
 	setWindowTitle( _toolPlugin->displayName() );
