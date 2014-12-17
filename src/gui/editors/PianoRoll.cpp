@@ -45,6 +45,7 @@
 #include <math.h>
 #include <algorithm>
 
+#include "AutomationEditor.h"
 #include "ActionGroup.h"
 #include "ConfigManager.h"
 #include "PianoRoll.h"
@@ -1210,7 +1211,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
-		noteUnderMouse()->editDetuningPattern();
+		Note* n = noteUnderMouse();
+		if (n->detuning() == NULL) n->createDetuning();
+		Engine::automationEditor()->open( noteUnderMouse()->detuning()->automationPattern() );
 		return;
 	}
 

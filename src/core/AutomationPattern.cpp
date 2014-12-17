@@ -25,12 +25,9 @@
  */
 
 #include <QDomElement>
-#include <QMouseEvent>
-#include <QPainter>
 
 #include "AutomationPattern.h"
 #include "AutomationPatternView.h"
-#include "AutomationEditor.h"
 #include "AutomationTrack.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
@@ -38,7 +35,7 @@
 #include "TextFloat.h"
 #include "embed.h"
 
-
+int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
 const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
@@ -181,10 +178,9 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-		Note::quantized( _time,
-			Engine::automationEditor()->quantization() ) :
-		_time;
+	MidiTime newTime = _quant_pos ?
+				Note::quantized( _time, quantization() ) :
+				_time;
 
 	m_timeMap[newTime] = _value;
 	timeMap::const_iterator it = m_timeMap.find( newTime );
@@ -214,10 +210,9 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-		Note::quantized( _time,
-			Engine::automationEditor()->quantization() ) :
-		_time;
+	MidiTime newTime = _quant_pos ?
+				Note::quantized( _time, quantization() ) :
+				_time;
 
 	m_timeMap.remove( newTime );
 	m_tangents.remove( newTime );
@@ -254,10 +249,9 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 {
 	if( m_dragging == false )
 	{
-		MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-			Note::quantized( _time,
-				Engine::automationEditor()->quantization() ) :
-			_time;
+		MidiTime newTime = _quant_pos  ?
+					Note::quantized( _time, quantization() ) :
+					_time;
 		this->removeValue( newTime );
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
@@ -670,23 +664,6 @@ void AutomationPattern::clear()
 	m_tangents.clear();
 
 	emit dataChanged();
-
-	if( Engine::automationEditor() &&
-		Engine::automationEditor()->currentPattern() == this )
-	{
-		Engine::automationEditor()->update();
-	}
-}
-
-
-
-
-void AutomationPattern::openInAutomationEditor()
-{
-	Engine::automationEditor()->setCurrentPattern( this );
-	Engine::automationEditor()->parentWidget()->show();
-	Engine::automationEditor()->show();
-	Engine::automationEditor()->setFocus();
 }
 
 

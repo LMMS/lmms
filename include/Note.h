@@ -202,10 +202,9 @@ public:
 	{
 		return m_detuning;
 	}
-
-	void editDetuningPattern();
-
 	bool hasDetuningInfo() const;
+
+	void createDetuning();
 
 
 protected:
@@ -228,10 +227,7 @@ private:
 	MidiTime m_length;
 	MidiTime m_pos;
 	DetuningHelper * m_detuning;
-
-	void createDetuning();
-
-} ;
+};
 
 
 typedef QVector<Note *> NoteVector;

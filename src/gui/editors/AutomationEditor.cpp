@@ -118,6 +118,8 @@ AutomationEditor::AutomationEditor() :
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
+
+	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
 	// add time-line
@@ -243,7 +245,6 @@ void AutomationEditor::updateAfterPatternChange()
 
 	if( !validPattern() )
 	{
-		setWindowTitle( tr( "Automation Editor - no pattern" ) );
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
 		m_step = 1;
 		resizeEvent( NULL );
@@ -258,8 +259,6 @@ void AutomationEditor::updateAfterPatternChange()
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of levels and so on...)
 	resizeEvent( NULL );
-
-	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_pattern->name() ) );
 
 	update();
 }
@@ -374,22 +373,22 @@ void AutomationEditor::drawLine( int x0, float y0, int x1, float y1 )
 	int xstep;
 	int ystep;
 
-	if( deltax < quantization() )
+	if( deltax < AutomationPattern::quantization() )
 	{
 		return;
 	}
 
-	deltax /= quantization();
+	deltax /= AutomationPattern::quantization();
 
 	float yscale = deltay / ( deltax );
 
 	if( x0 < x1)
 	{
-		xstep = quantization();
+		xstep = AutomationPattern::quantization();
 	}
 	else
 	{
-		xstep = -( quantization() );
+		xstep = -( AutomationPattern::quantization() );
 	}
 
 	if( y0 < y1 )
@@ -967,7 +966,7 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 {
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
-	const int outerRadius = qBound( 2, ( m_ppt * quantization() ) / 576, 5 ); // man, getting this calculation right took forever
+	const int outerRadius = qBound( 2, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
 	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
 	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
@@ -1076,10 +1075,10 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = m_currentPosition - m_currentPosition % quantization(),
+		for( tick = m_currentPosition - m_currentPosition % AutomationPattern::quantization(),
 				 x = xCoordOfTick( tick );
 			 x<=width();
-			 tick += quantization(), x = xCoordOfTick( tick ) )
+			 tick += AutomationPattern::quantization(), x = xCoordOfTick( tick ) )
 		{
 			lineColor.setAlpha( 80 );
 			p.setPen( lineColor );
@@ -1910,9 +1909,10 @@ void AutomationEditor::zoomingYChanged()
 
 
 
-int AutomationEditor::quantization() const
+void AutomationEditor::setQuantization()
 {
-	return DefaultTicksPerTact / (1 << m_quantizeModel.value());
+	int quantization = DefaultTicksPerTact / (1 << m_quantizeModel.value());;
+	AutomationPattern::setQuantization(quantization);
 }
 
 
@@ -2194,10 +2194,20 @@ AutomationEditorWindow::~AutomationEditorWindow()
 
 void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 {
+	if (currentPattern() != nullptr)
+	{
+		m_editor->m_pattern->disconnect(this);
+	}
+
 	m_editor->setCurrentPattern(pattern);
 
 	if (pattern == nullptr)
+	{
+		setWindowTitle( tr( "Automation Editor - no pattern" ) );
 		return;
+	}
+
+	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
 
 	switch(m_editor->m_pattern->progressionType())
 	{
@@ -2212,6 +2222,7 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 		break;
 	}
 
+	connect(pattern, SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(pattern, SIGNAL(destroyed()), this, SLOT(clearCurrentPattern()));
 
 	emit currentPatternChanged();
@@ -2223,10 +2234,12 @@ const AutomationPattern* AutomationEditorWindow::currentPattern()
 	return m_editor->currentPattern();
 }
 
-
-int AutomationEditorWindow::quantization() const
+void AutomationEditorWindow::open(AutomationPattern* pattern)
 {
-	return m_editor->quantization();
+	setCurrentPattern(pattern);
+	parentWidget()->show();
+	show();
+	setFocus();
 }
 
 QSize AutomationEditorWindow::sizeHint() const
@@ -2236,6 +2249,7 @@ QSize AutomationEditorWindow::sizeHint() const
 
 void AutomationEditorWindow::clearCurrentPattern()
 {
+	m_editor->m_pattern = nullptr;
 	setCurrentPattern(nullptr);
 }
 

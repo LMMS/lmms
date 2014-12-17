@@ -68,8 +68,6 @@ public:
 		return m_pattern != nullptr;
 	}
 
-	int quantization() const;
-
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & parent);
 	QString nodeName() const
@@ -147,6 +145,8 @@ protected slots:
 	void zoomingXChanged();
 	void zoomingYChanged();
 
+	/// Updates the pattern's quantization using the current user selected value.
+	void setQuantization();
 
 private:
 
@@ -260,7 +260,7 @@ public:
 	void setCurrentPattern(AutomationPattern* pattern);
 	const AutomationPattern* currentPattern();
 
-	int quantization() const;
+	void open(AutomationPattern* pattern);
 
 	AutomationEditor* m_editor;
 

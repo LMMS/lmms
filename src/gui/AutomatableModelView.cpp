@@ -33,6 +33,8 @@
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 
+#include "AutomationEditor.h"
+
 
 
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
@@ -224,7 +226,9 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
-	AutomationPattern::globalAutomationPattern( m_amv->modelUntyped() )->openInAutomationEditor();
+	Engine::automationEditor()->open(
+				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
+	);
 }
 
 

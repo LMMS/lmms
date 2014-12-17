@@ -203,7 +203,7 @@ void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
 		_me->ignore();
 		return;
 	}
-	m_pat->openInAutomationEditor();
+	Engine::automationEditor()->open(m_pat);
 }
 
 

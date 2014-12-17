@@ -136,15 +136,8 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	static inline const QString classNodeName()
-	{
-		return "automationpattern";
-	}
-
-	inline virtual QString nodeName() const
-	{
-		return classNodeName();
-	}
+	static const QString classNodeName() { return "automationpattern"; }
+	QString nodeName() const { return classNodeName(); }
 
 	void processMidiTime( const MidiTime & _time );
 
@@ -156,19 +149,14 @@ public:
 	static AutomationPattern * globalAutomationPattern( AutomatableModel * _m );
 	static void resolveAllIDs();
 
-	bool isRecording() const
-	{
-		return m_isRecording;
-	}
-	
-	void setRecording( const bool b )
-	{
-		m_isRecording = b;
-	}
+	bool isRecording() const { return m_isRecording; }
+	void setRecording( const bool b ) { m_isRecording = b; }
+
+	static int quantization() { return s_quantization; }
+	static void setQuantization(int q) { s_quantization = q; }
 
 public slots:
 	void clear();
-	void openInAutomationEditor();
 	void objectDestroyed( jo_id_t );
 
 private:
@@ -191,6 +179,8 @@ private:
 	
 	bool m_isRecording;
 	float m_lastRecordedValue;
+
+	static int s_quantization;
 
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
