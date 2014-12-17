@@ -56,7 +56,7 @@ EqParameterWidget::~EqParameterWidget()
 {
 	if(m_bands)
 	{
-		delete m_bands;
+		delete[] m_bands;
 		m_bands = 0;
 	}
 }

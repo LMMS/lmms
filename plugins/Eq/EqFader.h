@@ -32,7 +32,7 @@
 
 
 
-class EXPORT EqFader : public Fader
+class EqFader : public Fader
 {
 
 public:
