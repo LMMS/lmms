@@ -71,6 +71,11 @@
 #include "TextFloat.h"
 
 
+#if QT_VERSION < 0x040800
+#define MiddleButton MidButton
+#endif
+
+
 typedef AutomationPattern::timeMap timeMap;
 
 

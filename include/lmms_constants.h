@@ -25,15 +25,28 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-const double D_PI = 3.14159265358979323846;
-const double D_2PI = D_PI * 2.0;
-const double D_PI_2 = D_PI * 0.5;
-const double D_E = 2.71828182845904523536; 
+const long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
+const long double LD_2PI = LD_PI * 2.0;
+const long double LD_PI_2 = LD_PI * 0.5;
+const long double LD_PI_R = 1.0 / LD_PI;
+const long double LD_PI_SQR = LD_PI * LD_PI;
+const long double LD_E = 2.71828182845904523536028747135266249775724709369995;
+const long double LD_E_R = 1.0 / LD_E;
 
-const float F_PI = (float) D_PI;
-const float F_2PI = (float) D_2PI;
-const float F_PI_2 = (float) D_PI_2;
-const float F_E = (float) D_E;
+const double D_PI = (double) LD_PI;
+const double D_2PI = (double) LD_2PI;
+const double D_PI_2 = (double) LD_PI_2;
+const double D_PI_R = (double) LD_PI_R;
+const double D_PI_SQR = (double) LD_PI_SQR;
+const double D_E = (double) LD_E;
+const double D_E_R = (double) LD_E_R;
 
+const float F_PI = (float) LD_PI;
+const float F_2PI = (float) LD_2PI;
+const float F_PI_2 = (float) LD_PI_2;
+const float F_PI_R = (float) LD_PI_R;
+const float F_PI_SQR = (float) LD_PI_SQR;
+const float F_E = (float) LD_E;
+const float F_E_R = (float) LD_E_R;
 
 #endif

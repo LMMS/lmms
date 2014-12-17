@@ -1,8 +1,10 @@
 /*
- * stereoenhancer_control_dialog.cpp - control-dialog for stereoenhancer-effect
+ * CrossoverEQControlDialog.h - A native 4-band Crossover Equalizer 
+ * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,28 +24,27 @@
  *
  */
 
+#ifndef CROSSOVEREQ_CONTROL_DIALOG_H
+#define CROSSOVEREQ_CONTROL_DIALOG_H
 
+#include <QPixmap>
+#include "EffectControlDialog.h"
 
-#include <QLayout>
+class CrossoverEQControls;
 
-#include "stereoenhancer_control_dialog.h"
-#include "stereoenhancer_controls.h"
-
-
-
-stereoEnhancerControlDialog::stereoEnhancerControlDialog(
-	stereoEnhancerControls * _controls ) :
-	EffectControlDialog( _controls )
+class CrossoverEQControlDialog : public EffectControlDialog
 {
-	QHBoxLayout * l = new QHBoxLayout( this );
+	Q_OBJECT
+public:
+	CrossoverEQControlDialog( CrossoverEQControls * controls );
+	virtual ~CrossoverEQControlDialog()
+	{
+	}
+	
+private:
+	QPixmap m_fader_bg;
+	QPixmap m_fader_empty;
+	QPixmap m_fader_knob;
+};
 
-	Knob * widthKnob = new Knob( knobBright_26, this );
-	widthKnob->setModel( &_controls->m_widthModel );
-	widthKnob->setLabel( tr( "WIDE" ) );
-	widthKnob->setHintText( tr( "Width:" ) , "samples" );
-
-	l->addWidget( widthKnob );
-
-	this->setLayout(l);
-}
-
+#endif

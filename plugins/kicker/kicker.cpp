@@ -280,43 +280,43 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	const int END_COL = COL1 + 48;
 	
 	m_startFreqKnob = new kickerLargeKnob( this );
-	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
+	m_startFreqKnob->setHintText( tr( "Start frequency:" ), "Hz" );
 	m_startFreqKnob->move( COL1, ROW1 );
 
 	m_endFreqKnob = new kickerLargeKnob( this );
-	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
+	m_endFreqKnob->setHintText( tr( "End frequency:" ), "Hz" );
 	m_endFreqKnob->move( END_COL, ROW1 );
 
 	m_slopeKnob = new kickerKnob( this );
-	m_slopeKnob->setHintText( tr( "Frequency Slope:" ) + " ", "" );
+	m_slopeKnob->setHintText( tr( "Frequency Slope:" ), "" );
 	m_slopeKnob->move( COL3, ROW1 );
 
 	m_gainKnob = new kickerKnob( this );
-	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
+	m_gainKnob->setHintText( tr( "Gain:" ), "" );
 	m_gainKnob->move( COL1, ROW3 );
 
 	m_decayKnob = new kickerEnvKnob( this );
-	m_decayKnob->setHintText( tr( "Envelope Length:" ) + " ", "ms" );
+	m_decayKnob->setHintText( tr( "Envelope Length:" ), "ms" );
 	m_decayKnob->move( COL2, ROW3 );
 
 	m_envKnob = new kickerKnob( this );
-	m_envKnob->setHintText( tr( "Envelope Slope:" ) + " ", "" );
+	m_envKnob->setHintText( tr( "Envelope Slope:" ), "" );
 	m_envKnob->move( COL3, ROW3 );
 
 	m_clickKnob = new kickerKnob( this );
-	m_clickKnob->setHintText( tr( "Click:" ) + " ", "" );
+	m_clickKnob->setHintText( tr( "Click:" ), "" );
 	m_clickKnob->move( COL5, ROW1 );
 
 	m_noiseKnob = new kickerKnob( this );
-	m_noiseKnob->setHintText( tr( "Noise:" ) + " ", "" );
+	m_noiseKnob->setHintText( tr( "Noise:" ), "" );
 	m_noiseKnob->move( COL5, ROW3 );
 
 	m_distKnob = new kickerKnob( this );
-	m_distKnob->setHintText( tr( "Distortion Start:" ) + " ", "" );
+	m_distKnob->setHintText( tr( "Distortion Start:" ), "" );
 	m_distKnob->move( COL4, ROW2 );
 
 	m_distEndKnob = new kickerKnob( this );
-	m_distEndKnob->setHintText( tr( "Distortion End:" ) + " ", "" );
+	m_distEndKnob->setHintText( tr( "Distortion End:" ), "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
 	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );

@@ -100,7 +100,7 @@ inline void FxChannel::processed()
 void FxChannel::incrementDeps()
 {
 	m_dependenciesMet.ref();
-	if( m_dependenciesMet >= m_receives.size() )
+	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
 		MixerWorkerThread::addJob( this );
@@ -599,9 +599,6 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		? 1.0f
 		: m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
-
-	m_fxChannels[0]->m_peakLeft *= Engine::mixer()->masterGain();
-	m_fxChannels[0]->m_peakRight *= Engine::mixer()->masterGain();
 
 	// clear all channel buffers and
 	// reset channel process state
