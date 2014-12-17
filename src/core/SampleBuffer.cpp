@@ -957,6 +957,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	_p.drawPolyline( l, nb_frames / fpp );
 	_p.drawPolyline( r, nb_frames / fpp );
 	delete[] l;
+	delete[] r;
 }
 
 

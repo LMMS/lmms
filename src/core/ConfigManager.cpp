@@ -290,7 +290,13 @@ void ConfigManager::loadConfigFile()
 				node = node.nextSibling();
 			}
 
-			if( value( "paths", "artwork" ) != "" )
+			// don't use dated theme folders as they break the UI (i.e. 0.4 != 1.0, etc)
+			bool use_artwork_path = 
+				root.attribute( "version" ).startsWith( 
+					QString::number( LMMS_VERSION_MAJOR ) + "." + 
+					QString::number( LMMS_VERSION_MINOR ) );
+
+			if( use_artwork_path && value( "paths", "artwork" ) != "" )
 			{
 				m_artworkDir = value( "paths", "artwork" );
 				if( !QDir( m_artworkDir ).exists() )
