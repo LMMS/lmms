@@ -46,6 +46,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 	m_pixelsPerUnitHeight = (height() - 4) / ( totalHeight );
 	m_scale = 1.5;
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
+
 }
 
 
@@ -56,6 +57,7 @@ EqParameterWidget::~EqParameterWidget()
 	if(m_bands)
 	{
 		delete m_bands;
+		m_bands = 0;
 	}
 }
 
@@ -210,6 +212,10 @@ EqBand::EqBand() :
 	res ( 0 ),
 	freq ( 0 ),
 	color ( QColor( 255, 255, 255 ) ),
-	name ( QString( "" ) )
+	x( 0 ),
+	y( 0 ),
+	name ( QString( "" ) ),
+	peakL( 0 ),
+	peakR( 0 )
 {
 }

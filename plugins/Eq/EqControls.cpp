@@ -85,6 +85,8 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_para1GainModel.setScaleLogarithmic( true );
 	m_inPeakL = 0;
 	m_inPeakR = 0;
+	m_outPeakL = 0;
+	m_outPeakR = 0;
 	m_lowShelfPeakL = 0; m_lowShelfPeakR = 0;
 	m_para1PeakL = 0; m_para1PeakR = 0;
 	m_para2PeakL = 0; m_para2PeakR = 0;

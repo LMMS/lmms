@@ -32,17 +32,18 @@
 class EqBand
 {
 public :
-    EqBand();
-    FloatModel* gain;
-    FloatModel* res;
-    FloatModel* freq;
-    BoolModel* active;
-    QColor color;
-    int x;
-    int y;
-    QString name;
+	EqBand();
+	FloatModel* gain;
+	FloatModel* res;
+	FloatModel* freq;
+	BoolModel* active;
+	QColor color;
+	int x;
+	int y;
+	QString name;
 	float* peakL;
 	float* peakR;
+
 
 };
 
@@ -52,51 +53,51 @@ class EqParameterWidget : public QWidget
 {
 
 public:
-    explicit EqParameterWidget( QWidget *parent = 0 );
-    ~EqParameterWidget();
-    const int bandCount()
-    {
-        return 8;
-    }
+	explicit EqParameterWidget( QWidget *parent = 0 );
+	~EqParameterWidget();
+	const int bandCount()
+	{
+		return 8;
+	}
 
 
 
-    const int maxDistanceFromHandle()
-    {
-        return 20;
-    }
-
-
-
-
-    EqBand* getBandModels( int i )
-    {
-        return &m_bands[i];
-    }
+	const int maxDistanceFromHandle()
+	{
+		return 20;
+	}
 
 
 
 
-    const int activeAplha()
-    {
-        return 200;
-    }
+	EqBand* getBandModels( int i )
+	{
+		return &m_bands[i];
+	}
 
 
 
 
-    const int inactiveAlpha()
-    {
+	const int activeAplha()
+	{
+		return 200;
+	}
+
+
+
+
+	const int inactiveAlpha()
+	{
 		return 100;
-    }
+	}
 
 
 
 
-    const float resPixelMultiplyer()
-    {
-        return 100;
-    }
+	const float resPixelMultiplyer()
+	{
+		return 100;
+	}
 
 
 signals:
@@ -104,55 +105,55 @@ signals:
 public slots:
 
 protected:
-    virtual void paintEvent ( QPaintEvent * event );
-    virtual void mousePressEvent(QMouseEvent * event );
-    virtual void mouseReleaseEvent(QMouseEvent * event);
-    virtual void mouseMoveEvent(QMouseEvent * event);
-    virtual void mouseDoubleClickEvent(QMouseEvent * event);
+	virtual void paintEvent ( QPaintEvent * event );
+	virtual void mousePressEvent(QMouseEvent * event );
+	virtual void mouseReleaseEvent(QMouseEvent * event);
+	virtual void mouseMoveEvent(QMouseEvent * event);
+	virtual void mouseDoubleClickEvent(QMouseEvent * event);
 
 private:
-    EqBand* m_bands;
-    float m_pixelsPerUnitWidth;
-    float m_pixelsPerUnitHeight;
-    float m_pixelsPerOctave;
-    float m_scale;
-    EqBand* m_selectedBand;
+	EqBand *m_bands;
+	float m_pixelsPerUnitWidth;
+	float m_pixelsPerUnitHeight;
+	float m_pixelsPerOctave;
+	float m_scale;
+	EqBand* m_selectedBand;
 
-    EqBand*  selectNearestHandle( const int x, const int y );
+	EqBand*  selectNearestHandle( const int x, const int y );
 
-    enum MouseAction { none, drag, res } m_mouseAction;
-    int m_oldX, m_oldY;
+	enum MouseAction { none, drag, res } m_mouseAction;
+	int m_oldX, m_oldY;
 	int *m_xGridBands;
 
 
-    inline int freqToXPixel( float freq )
-    {
-        return ( log10( freq ) * m_pixelsPerUnitWidth * m_scale ) - ( width() * 0.5 );
-    }
+	inline int freqToXPixel( float freq )
+	{
+		return ( log10( freq ) * m_pixelsPerUnitWidth * m_scale ) - ( width() * 0.5 );
+	}
 
 
 
 
-    inline float xPixelToFreq( int x )
-    {
-      return   pow( 10, ( x + ( width() * 0.5 ) ) / ( m_pixelsPerUnitWidth * m_scale ) );
-    }
+	inline float xPixelToFreq( int x )
+	{
+		return   pow( 10, ( x + ( width() * 0.5 ) ) / ( m_pixelsPerUnitWidth * m_scale ) );
+	}
 
 
 
 
-    inline int gainToYPixel( float gain )
-    {
-        return ( height() - 3) - ( gain * m_pixelsPerUnitHeight ) - ( (height() -3 ) * 0.5);
-    }
+	inline int gainToYPixel( float gain )
+	{
+		return ( height() - 3) - ( gain * m_pixelsPerUnitHeight ) - ( (height() -3 ) * 0.5);
+	}
 
 
 
 
-    inline float yPixelToGain( int y )
-    {
-        return ( ( 0.5 * height() ) - y) / m_pixelsPerUnitHeight;
-    }
+	inline float yPixelToGain( int y )
+	{
+		return ( ( 0.5 * height() ) - y) / m_pixelsPerUnitHeight;
+	}
 
 };
 

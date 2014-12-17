@@ -336,7 +336,9 @@ class EqLinkwitzRiley : public StereoLinkwitzRiley
 {
 public:
 	EqLinkwitzRiley() :
-		StereoLinkwitzRiley( 44100)
+		StereoLinkwitzRiley( 44100),
+		m_freq(0 ),
+		m_sr( 1 )
 	{
 	}
 

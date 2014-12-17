@@ -32,7 +32,7 @@
 
 
 
-class EqFader : public Fader
+class EXPORT EqFader : public Fader
 {
 
 public:
@@ -48,6 +48,8 @@ public:
 		m_rPeak = rPeak;
 		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
 		m_model = model;
+		setPeak_L( 0 );
+		setPeak_R( 0 );
 	}
 
 

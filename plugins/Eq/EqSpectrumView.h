@@ -46,7 +46,10 @@ public:
 	int m_sr;
 
 
-	EqAnalyser()
+	EqAnalyser() :
+		m_framesFilledUp ( 0 ),
+		m_energy ( 0 ),
+		m_sr ( 1 )
 	{
 		m_inProgress=false;
 		m_specBuf = (fftwf_complex *) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
@@ -73,7 +76,7 @@ public:
 		m_framesFilledUp = 0;
 		m_energy = 0;
 		memset( m_buffer, 0, sizeof( m_buffer ) );
-
+		memset( m_bands, 0, sizeof( m_bands ) );
 	}
 
 

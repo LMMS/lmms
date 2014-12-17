@@ -51,7 +51,8 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 
 EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect( &eq_plugin_descriptor, parent, key ),
-	m_eqControls( this )
+	m_eqControls( this ),
+	m_upBufFrames( 0 )
 {
 	m_dFilterCount = 4;
 	m_downsampleFilters = new EqLinkwitzRiley[m_dFilterCount];
