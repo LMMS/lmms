@@ -57,7 +57,7 @@
 class TextFloat;
 
 
-class Fader : public QWidget, public FloatModelView
+class EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
