@@ -76,7 +76,7 @@ unsigned int fft_length[IMPULSES];
 
 #ifdef __clang__
 void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
-#elif
+#else
 inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
 #endif
 {
