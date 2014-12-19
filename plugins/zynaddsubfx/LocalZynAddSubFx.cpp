@@ -102,6 +102,16 @@ LocalZynAddSubFx::~LocalZynAddSubFx()
 
 void LocalZynAddSubFx::initConfig()
 {
+	//Delete existing objects before recreating them in config.init(). Neccesarry, because the constructor and setLmmsWorkingDir() invoke this function.
+	if( config.cfg.LinuxOSSWaveOutDev != NULL )
+	{
+		delete[] config.cfg.LinuxOSSWaveOutDev;
+		delete[] config.cfg.LinuxOSSSeqInDev;
+
+		for(int i = 0; i < config.winmidimax; ++i)
+			delete[] config.winmididevices[i].name;
+		delete[] config.winmididevices;
+	}
 	config.init();
 
 	config.cfg.GzipCompression = 0;
