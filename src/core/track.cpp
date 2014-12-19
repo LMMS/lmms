@@ -847,7 +847,9 @@ void trackContentObjectView::setAutoResizeEnabled( bool _e )
  */
 trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
-	m_trackView( _parent )
+	m_trackView( _parent ),
+	m_darkerColor( Qt::SolidPattern ),
+	m_lighterColor( Qt::SolidPattern )
 {
 	setAcceptDrops( true );
 

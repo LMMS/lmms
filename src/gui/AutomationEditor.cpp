@@ -98,9 +98,9 @@ AutomationEditor::AutomationEditor() :
 	m_editMode( DRAW ),
 	m_scrollBack( FALSE ),
 	m_gridColor( 0,0,0 ),
-	m_graphColor(),
+	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
-	m_scaleColor()
+	m_scaleColor( Qt::SolidPattern )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
