@@ -537,7 +537,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
-	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
+	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{

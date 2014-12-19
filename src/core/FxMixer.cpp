@@ -100,11 +100,10 @@ inline void FxChannel::processed()
 void FxChannel::incrementDeps()
 {
 	m_dependenciesMet.ref();
-	if( m_dependenciesMet >= m_receives.size() )
+	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
 		MixerWorkerThread::addJob( this );
-		m_dependenciesMet = 0;
 	}
 }
 
@@ -174,7 +173,7 @@ void FxChannel::doProcessing()
 			// only start fxchain when we have input...
 			m_fxChain.startRunning();
 		}
-		
+
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
 		m_peakLeft = qMax( m_peakLeft, Engine::mixer()->peakValueLeft( m_buffer, fpp ) * v );
@@ -184,8 +183,8 @@ void FxChannel::doProcessing()
 	{
 		m_peakLeft = m_peakRight = 0.0f;
 	}
-	
-	// increment dependency counter of all receivers 
+
+	// increment dependency counter of all receivers
 	processed();
 }
 
@@ -430,7 +429,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	// add us to fxmixer's list
 	Engine::fxMixer()->m_fxRoutes.append( route );
 	m_sendsMutex.unlock();
-	
+
 	return route;
 }
 
@@ -601,9 +600,6 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		: m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
-	m_fxChannels[0]->m_peakLeft *= Engine::mixer()->masterGain();
-	m_fxChannels[0]->m_peakRight *= Engine::mixer()->masterGain();
-
 	// clear all channel buffers and
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
@@ -613,6 +609,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		m_fxChannels[i]->m_queued = false;
 		// also reset hasInput
 		m_fxChannels[i]->m_hasInput = false;
+		m_fxChannels[i]->m_dependenciesMet = 0;
 	}
 }
 
@@ -688,7 +685,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
 		}
 	}
-} 
+}
 
 // make sure we have at least num channels
 void FxMixer::allocateChannelsTo(int num)

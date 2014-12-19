@@ -468,7 +468,7 @@ public:
 
 	int numOfTCOs();
 	TrackContentObject * getTCO( int _tco_num );
-	int getTCONum( TrackContentObject * _tco );
+	int getTCONum(const TrackContentObject* _tco );
 
 	const tcoVector & getTCOs() const
 	{

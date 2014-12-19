@@ -1,5 +1,5 @@
 /*
- * AutomatableSlider.h - class automatableSlider, a QSlider with automation
+ * AutomatableSlider.h - class AutomatableSlider, a QSlider with automation
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *

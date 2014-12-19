@@ -87,7 +87,7 @@ const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
-const int PIANO_HEIGHT		= 84;
+const int PIANO_HEIGHT		= 82;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
@@ -849,7 +849,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 							tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
-	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
+	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volumeKnob->move( widgetWidth-2*24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
@@ -858,7 +858,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
-	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
+    m_panningKnob->setHintText( tr( "Panning:" ), "%" );
 	m_panningKnob->move( widgetWidth-24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
@@ -1176,7 +1176,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// set up volume knob
 	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
-	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
+	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
@@ -1185,7 +1185,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// set up panning knob
 	m_panningKnob = new Knob( knobBright_26, NULL, tr( "Panning" ) );
-	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
+	m_panningKnob->setHintText( tr( "Panning:" ), "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 
 	basicControlsLayout->addWidget( m_panningKnob );
@@ -1193,7 +1193,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// set up pitch knob
 	m_pitchKnob = new Knob( knobBright_26, NULL, tr( "Pitch" ) );
-	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
+	m_pitchKnob->setHintText( tr( "Pitch:" ), " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
 	basicControlsLayout->addWidget( m_pitchKnob );

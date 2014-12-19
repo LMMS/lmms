@@ -57,13 +57,14 @@
 class TextFloat;
 
 
-class Fader : public QWidget, public FloatModelView
+class EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
 	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
 	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
+	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
 	virtual ~Fader();
 
 	void setPeak_L( float fPeak );
@@ -76,6 +77,17 @@ public:
 	QColor peakRed() const;
 	void setPeakGreen( const QColor & c );
 	void setPeakRed( const QColor & c );
+	
+	void setDisplayConversion( bool b )
+	{
+		m_displayConversion = b;
+	}
+	inline void setHintText( const QString & _txt_before,
+						const QString & _txt_after )
+	{
+		setDescription( _txt_before );
+		setUnit( _txt_after );
+	}
 
 private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
@@ -91,7 +103,7 @@ private:
 		float fRange = m_model->maxValue() - m_model->minValue();
 		float realVal = m_model->value() - m_model->minValue();
 
-		return height() - ( ( height() - ( *s_knob ).height() ) * ( realVal / fRange ) );
+		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
 	}
 
 	FloatModel * m_model;
@@ -112,6 +124,12 @@ private:
 	static QPixmap * s_back;
 	static QPixmap * s_leds;
 	static QPixmap * s_knob;
+	
+	QPixmap * m_back;
+	QPixmap * m_leds;
+	QPixmap * m_knob;
+	
+	bool m_displayConversion;
 
 	int m_moveStartPoint;
 	float m_startValue;
