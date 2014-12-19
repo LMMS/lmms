@@ -163,6 +163,7 @@ static void cleanupVynil(LADSPA_Handle instance) {
 	free(plugin_data->buffer_m);
 	free(plugin_data->buffer_s);
 	free(plugin_data->click_buffer);
+	free(plugin_data->highp);
 	free(plugin_data->lowp_m);
 	free(plugin_data->lowp_s);
 	free(plugin_data->noise_filt);

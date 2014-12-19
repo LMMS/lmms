@@ -54,6 +54,11 @@ ladspa_instance::ladspa_instance(audio_module_iface *_module, ladspa_plugin_meta
     module->post_instantiate();
 }
 
+ladspa_instance::~ladspa_instance()
+{
+	delete module;
+}
+
 float ladspa_instance::get_param_value(int param_no)
 {
     // XXXKF hack

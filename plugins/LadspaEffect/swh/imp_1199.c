@@ -202,6 +202,11 @@ static void cleanupImp(LADSPA_Handle instance) {
 	local_free(plugin_data->op);
 	local_free(plugin_data->overlap);
 	local_free(plugin_data->opc);
+	unsigned int i;
+	for (i=0; i<IMPULSES; i++) {
+	  local_free(plugin_data->impulse_freq[i]);
+	}
+	local_free(plugin_data->impulse_freq);
 	free(instance);
 }
 
