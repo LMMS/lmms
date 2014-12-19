@@ -46,7 +46,8 @@ QPixmap * FxLine::s_receiveBgArrow = NULL;
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	QWidget( _parent ),
 	m_mv( _mv ),
-	m_channelIndex( _channelIndex )
+	m_channelIndex( _channelIndex ),
+	m_backgroundActive( Qt::SolidPattern )
 {
 	if( ! s_sendBgArrow )
 	{
