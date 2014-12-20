@@ -32,27 +32,27 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 {
-    STRINGIFY( PLUGIN_NAME ),
-    "Delay",
-    QT_TRANSLATE_NOOP( "pluginBrowser", "A native delay plugin" ),
-    "Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
-    0x0100,
-    Plugin::Effect,
-    new PluginPixmapLoader( "logo" ),
-    NULL,
-    NULL
+	STRINGIFY( PLUGIN_NAME ),
+	"Delay",
+	QT_TRANSLATE_NOOP( "pluginBrowser", "A native delay plugin" ),
+	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
+	0x0100,
+	Plugin::Effect,
+	new PluginPixmapLoader( "logo" ),
+	NULL,
+	NULL
 } ;
 
 
 
 
 DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key ) :
-    Effect( &delay_plugin_descriptor, parent, key ),
-    m_delayControls( this )
+	Effect( &delay_plugin_descriptor, parent, key ),
+	m_delayControls( this )
 {
-    m_delay = 0;
-    m_delay = new StereoDelay( 20, Engine::mixer()->processingSampleRate() );
-    m_lfo = new Lfo( Engine::mixer()->processingSampleRate() );
+	m_delay = 0;
+	m_delay = new StereoDelay( 20, Engine::mixer()->processingSampleRate() );
+	m_lfo = new Lfo( Engine::mixer()->processingSampleRate() );
 }
 
 
@@ -60,14 +60,14 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
 
 DelayEffect::~DelayEffect()
 {
-    if( m_delay )
-    {
-        delete m_delay;
-    }
-    if( m_lfo )
-    {
-        delete m_lfo;
-    }
+	if( m_delay )
+	{
+		delete m_delay;
+	}
+	if( m_lfo )
+	{
+		delete m_lfo;
+	}
 }
 
 
@@ -75,37 +75,37 @@ DelayEffect::~DelayEffect()
 
 bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 {
-    if( !isEnabled() || !isRunning () )
-    {
-        return( false );
-    }
-    double outSum = 0.0;
-    const float d = dryLevel();
-    const float w = wetLevel();
-    const float length = m_delayControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
-    const float amplitude = m_delayControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
-    m_lfo->setFrequency( 1.0 / m_delayControls.m_lfoTimeModel.value() );
-    m_delay->setFeedback( m_delayControls.m_feedbackModel.value() );
-    sample_t dryS[2];
-    for( fpp_t f = 0; f < frames; ++f )
-    {
-        dryS[0] = buf[f][0];
-        dryS[1] = buf[f][1];
-        m_delay->setLength( ( float )length + ( amplitude * ( float )m_lfo->tick() ) );
-        m_delay->tick( buf[f] );
+	if( !isEnabled() || !isRunning () )
+	{
+		return( false );
+	}
+	double outSum = 0.0;
+	const float d = dryLevel();
+	const float w = wetLevel();
+	const float length = m_delayControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
+	const float amplitude = m_delayControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
+	m_lfo->setFrequency( 1.0 / m_delayControls.m_lfoTimeModel.value() );
+	m_delay->setFeedback( m_delayControls.m_feedbackModel.value() );
+	sample_t dryS[2];
+	for( fpp_t f = 0; f < frames; ++f )
+	{
+		dryS[0] = buf[f][0];
+		dryS[1] = buf[f][1];
+		m_delay->setLength( ( float )length + ( amplitude * ( float )m_lfo->tick() ) );
+		m_delay->tick( buf[f] );
 
-        buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
-        buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
-        outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
-    }
-    checkGate( outSum / frames );
-    return isRunning();
+		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
+		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
+		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+	}
+	checkGate( outSum / frames );
+	return isRunning();
 }
 
 void DelayEffect::changeSampleRate()
 {
-    m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
-    m_delay->setSampleRate( Engine::mixer()->processingSampleRate() );
+	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
+	m_delay->setSampleRate( Engine::mixer()->processingSampleRate() );
 }
 
 
@@ -117,7 +117,7 @@ extern "C"
 //needed for getting plugin out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
 {
-    return new DelayEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new DelayEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }}
