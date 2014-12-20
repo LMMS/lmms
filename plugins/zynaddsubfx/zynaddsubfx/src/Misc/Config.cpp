@@ -42,10 +42,16 @@ void Config::init()
     cfg.OscilSize  = 1024;
     cfg.SwapStereo = 0;
 
-    cfg.LinuxOSSWaveOutDev = new char[MAX_STRING_SIZE];
-    snprintf(cfg.LinuxOSSWaveOutDev, MAX_STRING_SIZE, "/dev/dsp");
-    cfg.LinuxOSSSeqInDev = new char[MAX_STRING_SIZE];
-    snprintf(cfg.LinuxOSSSeqInDev, MAX_STRING_SIZE, "/dev/sequencer");
+	if( cfg.LinuxOSSWaveOutDev == NULL ) //Check, if object already exists befroe creating it.
+	{
+		cfg.LinuxOSSWaveOutDev = new char[MAX_STRING_SIZE];
+		snprintf(cfg.LinuxOSSWaveOutDev, MAX_STRING_SIZE, "/dev/dsp");
+	}
+	if( cfg.LinuxOSSSeqInDev == NULL ) //Check, if object already exists befroe creating it.
+	{
+		cfg.LinuxOSSSeqInDev = new char[MAX_STRING_SIZE];
+		snprintf(cfg.LinuxOSSSeqInDev, MAX_STRING_SIZE, "/dev/sequencer");
+	}
 
     cfg.DumpFile = "zynaddsubfx_dump.txt";
 
@@ -67,11 +73,14 @@ void Config::init()
     winwavemax = 1;
     winmidimax = 1;
     //try to find out how many input midi devices are there
-    winmididevices = new winmidionedevice[winmidimax];
-    for(int i = 0; i < winmidimax; ++i) {
-        winmididevices[i].name = new char[MAX_STRING_SIZE];
-        for(int j = 0; j < MAX_STRING_SIZE; ++j)
-            winmididevices[i].name[j] = '\0';
+	if( winmididevices == NULL ) //Check, if object already exists befroe creating it.
+	{
+		winmididevices = new winmidionedevice[winmidimax];
+		for(int i = 0; i < winmidimax; ++i) {
+			winmididevices[i].name = new char[MAX_STRING_SIZE];
+			for(int j = 0; j < MAX_STRING_SIZE; ++j)
+				winmididevices[i].name[j] = '\0';
+		}
     }
 
 
