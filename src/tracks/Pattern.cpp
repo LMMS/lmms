@@ -62,7 +62,8 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	trackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_steps( MidiTime::stepsPerTact() )
+	m_steps( MidiTime::stepsPerTact() ),
+	m_resizable(false)
 {
 	setName( _instrument_track->name() );
 	init();
@@ -75,7 +76,8 @@ Pattern::Pattern( const Pattern& other ) :
 	trackContentObject( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
-	m_steps( other.m_steps )
+	m_steps( other.m_steps ),
+	m_resizable(true)
 {
 	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
 	{
@@ -635,7 +637,14 @@ PatternView::PatternView( Pattern* pattern, trackView* parent ) :
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
+	// Disable resizing of instrument tracks as they aren't resizable
+	if(m_pat->m_resizable)
+	{
+		setAutoResizeEnabled( false );
+	}
+	else{
+		setAutoResizeEnabled( true );
+	}
 
 	toolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"

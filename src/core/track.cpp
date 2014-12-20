@@ -720,7 +720,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if( _me->x() > width() - RESIZE_GRIP_WIDTH )
+		if( _me->x() > width() - RESIZE_GRIP_WIDTH && m_autoResize == false )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
