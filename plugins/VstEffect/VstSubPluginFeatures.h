@@ -40,8 +40,13 @@ public:
 
 	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
 											KeyList & _kl ) const;
-
+private:
+	void addPluginsFromDir(QStringList* filenames,  QString path) const;
 } ;
+
+
+
+
 
 #endif
 
