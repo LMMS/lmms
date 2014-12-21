@@ -386,6 +386,21 @@ void Song::processNextBuffer()
 	}
 }
 
+bool Song::isExportDone() const
+{
+	if ( m_exportLoop )
+	{
+		return m_exporting == true &&
+			m_playPos[Mode_PlaySong].getTicks() >= m_playPos[Mode_PlaySong].m_timeLine->loopEnd().getTicks();
+
+	}
+	else
+	{
+		return m_exporting == true &&
+			m_playPos[Mode_PlaySong].getTicks() >= ( length() + 1 ) * ticksPerTact();
+	}
+}
+
 
 
 
@@ -619,7 +634,14 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
-	m_playPos[Mode_PlaySong].setTicks( 0 );
+	if(m_exportLoop)
+	{
+		m_playPos[Mode_PlaySong].setTicks( m_playPos[Mode_PlaySong].m_timeLine->loopBegin().getTicks() );
+	}
+	else
+	{
+		m_playPos[Mode_PlaySong].setTicks( 0 );
+	}
 
 	playSong();
 

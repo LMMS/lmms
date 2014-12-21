@@ -34,6 +34,7 @@
 #include "MeterModel.h"
 #include "VstSyncController.h"
 
+
 class AutomationTrack;
 class Pattern;
 class Timeline;
@@ -169,19 +170,8 @@ public:
 		return m_recording;
 	}
 
-	inline bool isExportDone() const
-	{
-		if ( m_exportLoop )
-		{
-			return m_exporting == true &&
-				m_playPos[Mode_PlaySong].getTicks() >= length() * ticksPerTact();
-		}
-		else
-		{
-			return m_exporting == true &&
-				m_playPos[Mode_PlaySong].getTicks() >= ( length() + 1 ) * ticksPerTact();
-		}
-	}
+	bool isExportDone() const;
+
 
 	inline PlayModes playMode() const
 	{
