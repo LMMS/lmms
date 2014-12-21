@@ -496,6 +496,7 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	_this.setAttribute( "icon", tlb->pixmapFile() );
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
+	m_panningModel.saveSettings( _doc, _this, "pan" );
 }
 
 
@@ -517,6 +518,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		node = node.nextSibling();
 	}
 	m_volumeModel.loadSettings( _this, "vol" );
+	m_panningModel.loadSettings( _this, "pan" );
 }
 
 
