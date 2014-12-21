@@ -619,6 +619,7 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
+	m_playPos[Mode_PlaySong].setTicks( 0 );
 
 	playSong();
 

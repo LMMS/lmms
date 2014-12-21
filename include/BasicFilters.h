@@ -75,68 +75,69 @@ public:
 	inline void setCoeffs( float freq )
 	{
 		// wc
-		const float wc = F_2PI * freq / m_sampleRate;
-		const float wc2 = wc * wc;
-		const float wc3 = wc2 * wc;
+		const double wc = D_2PI * freq;
+		const double wc2 = wc * wc;
+		const double wc3 = wc2 * wc;
 		m_wc4 = wc2 * wc2;
 
 		// k
-		const float k = wc / tan( wc * 0.5 );
-		const float k2 = k * k;
-		const float k3 = k2 * k;
+		const double k = wc / tan( D_PI * freq / m_sampleRate );
+		const double k2 = k * k;
+		const double k3 = k2 * k;
 		m_k4 = k2 * k2;
 
 		// a
 		static const double sqrt2 = sqrt( 2.0 );
-		const float sq_tmp1 = sqrt2 * wc3 * k;
-		const float sq_tmp2 = sqrt2 * wc * k3;
-		m_a = 1.0f / ( 4.0f * wc2 * k2 + 2.0f * sq_tmp1 + m_k4 + 2.0f * sq_tmp2 + m_wc4 );
+		const double sq_tmp1 = sqrt2 * wc3 * k;
+		const double sq_tmp2 = sqrt2 * wc * k3;
+
+		m_a = 1.0 / ( 4.0 * wc2 * k2 + 2.0 * sq_tmp1 + m_k4 + 2.0 * sq_tmp2 + m_wc4 );
 
 		// b
-		m_b1 = ( 4.0f * ( m_wc4 + sq_tmp1 - m_k4 - sq_tmp2 ) ) * m_a;
-		m_b2 = ( 6.0f * m_wc4 - 8.0f * wc2 * k2 + 6.0f * m_k4 ) * m_a;
-		m_b3 = ( 4.0f * ( m_wc4 - sq_tmp1 + sq_tmp2 - m_k4 ) ) * m_a;
-		m_b4 = ( m_k4 - 2.0f * sq_tmp1 + m_wc4 - 2.0f * sq_tmp2 + 4.0f * wc2 * k2 ) * m_a;
+		m_b1 = ( 4.0 * ( m_wc4 + sq_tmp1 - m_k4 - sq_tmp2 ) ) * m_a;
+		m_b2 = ( 6.0 * m_wc4 - 8.0 * wc2 * k2 + 6.0 * m_k4 ) * m_a;
+		m_b3 = ( 4.0 * ( m_wc4 - sq_tmp1 + sq_tmp2 - m_k4 ) ) * m_a;
+		m_b4 = ( m_k4 - 2.0 * sq_tmp1 + m_wc4 - 2.0 * sq_tmp2 + 4.0 * wc2 * k2 ) * m_a;
 	}
 
 	inline void setLowpass( float freq )
 	{
 		setCoeffs( freq );
 		m_a0 = m_wc4 * m_a;
-		m_a1 = 4.0f * m_a0;
-		m_a2 = 6.0f * m_a0;
+		m_a1 = 4.0 * m_a0;
+		m_a2 = 6.0 * m_a0;
 	}
 	
 	inline void setHighpass( float freq )
 	{
 		setCoeffs( freq );
 		m_a0 = m_k4 * m_a;
-		m_a1 = 4.0f * m_a0;
-		m_a2 = 6.0f * m_a0;
+		m_a1 = -4.0 * m_a0;
+		m_a2 = 6.0 * m_a0;
 	}
 
 	inline float update( float in, ch_cnt_t ch )
 	{
-		const float a0in = m_a0 * in;
-		const float a1in = m_a1 * in;
-		const float out = m_z1[ch] + a0in;
+		const double x = in - ( m_z1[ch] * m_b1 ) - ( m_z2[ch] * m_b2 ) -
+			( m_z3[ch] * m_b3 ) - ( m_z4[ch] * m_b4 );
+		const double y = ( m_a0 * x ) + ( m_z1[ch] * m_a1 ) + ( m_z2[ch] * m_a2 ) +
+			( m_z3[ch] * m_a1 ) + ( m_z4[ch] * m_a0 );
+		m_z4[ch] = m_z3[ch];
+		m_z3[ch] = m_z2[ch];
+		m_z2[ch] = m_z1[ch];
+		m_z1[ch] = x;
 		
-		m_z1[ch] = a1in + m_z2[ch] - ( m_b1 * out );
-		m_z2[ch] = ( m_a2 * in ) + m_z3[ch] - ( m_b2 * out );
-		m_z3[ch] = a1in + m_z4[ch] - ( m_b3 * out );
-		m_z4[ch] = a0in - ( m_b4 * out );
-		
-		return out;
+		return y;
 	}
 
 private:
 	float m_sampleRate;
-	float m_wc4;
-	float m_k4;
-	float m_a, m_a0, m_a1, m_a2;
-	float m_b1, m_b2, m_b3, m_b4;
+	double m_wc4;
+	double m_k4;
+	double m_a, m_a0, m_a1, m_a2;
+	double m_b1, m_b2, m_b3, m_b4;
 	
-	typedef float frame[CHANNELS];
+	typedef double frame[CHANNELS];
 	frame m_z1, m_z2, m_z3, m_z4;
 };
 typedef LinkwitzRiley<2> StereoLinkwitzRiley;

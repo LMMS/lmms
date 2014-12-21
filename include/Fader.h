@@ -57,7 +57,7 @@
 class TextFloat;
 
 
-class Fader : public QWidget, public FloatModelView
+class EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
@@ -103,7 +103,7 @@ private:
 		float fRange = m_model->maxValue() - m_model->minValue();
 		float realVal = m_model->value() - m_model->minValue();
 
-		return height() - ( ( height() - ( *s_knob ).height() ) * ( realVal / fRange ) );
+		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
 	}
 
 	FloatModel * m_model;

@@ -497,7 +497,7 @@ void opl2instrument::loadPatch(unsigned char inst[14]) {
 void opl2instrument::tuneEqual(int center, float Hz) {
 	float tmp;
 	for(int n=0; n<128; ++n) {
-		tmp = Hz*pow( 2, ( n - center ) / 12.0 + pitchbend / 1200.0 );
+		tmp = Hz*pow( 2.0, ( n - center ) * ( 1.0 / 12.0 ) + pitchbend * ( 1.0 / 1200.0 ) );
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -505,7 +505,7 @@ void opl2instrument::tuneEqual(int center, float Hz) {
 // Find suitable F number in lowest possible block
 int opl2instrument::Hz2fnum(float Hz) {
 	for(int block=0; block<8; ++block) {
-		unsigned int fnum = Hz * pow(2, 20-block) / 49716;
+		unsigned int fnum = Hz * pow( 2.0, 20.0 - (double)block ) * ( 1.0 / 49716.0 );
 		if(fnum<1023) {
 			return fnum + (block << 10);
 		}
