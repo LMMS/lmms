@@ -31,14 +31,14 @@
 
 StereoDelay::StereoDelay( int maxTime, int sampleRate )
 {
-    m_buffer = 0;
-    m_maxTime = maxTime;
-    m_maxLength = maxTime * sampleRate;
-    m_length = m_maxLength;
+	m_buffer = 0;
+	m_maxTime = maxTime;
+	m_maxLength = maxTime * sampleRate;
+	m_length = m_maxLength;
 
-    m_index = 0;
-    m_feedback = 0.0f;
-    setSampleRate( sampleRate );
+	m_index = 0;
+	m_feedback = 0.0f;
+	setSampleRate( sampleRate );
 }
 
 
@@ -46,10 +46,10 @@ StereoDelay::StereoDelay( int maxTime, int sampleRate )
 
 StereoDelay::~StereoDelay()
 {
-    if( m_buffer )
-    {
-        delete m_buffer;
-    }
+	if( m_buffer )
+	{
+		delete m_buffer;
+	}
 }
 
 
@@ -57,24 +57,24 @@ StereoDelay::~StereoDelay()
 
 void StereoDelay::tick( sampleFrame frame )
 {
-    m_buffer[m_index][0] = frame[0];
-    m_buffer[m_index][1] = frame[1];
+	m_buffer[m_index][0] = frame[0];
+	m_buffer[m_index][1] = frame[1];
 
-    int readIndex = m_index - ( int )m_length;
-    if( readIndex < 0 )
-    {
-        readIndex += m_maxLength;
-    }
-    float fract = fraction( m_length );
-    frame[0] = linearInterpolate( m_buffer[readIndex][0] ,
-            m_buffer[( readIndex+1) % m_maxLength][0], fract );
-    frame[1] = linearInterpolate( m_buffer[readIndex][1] ,
-            m_buffer[( readIndex+1) % m_maxLength][1], fract );
+	int readIndex = m_index - ( int )m_length;
+	if( readIndex < 0 )
+	{
+		readIndex += m_maxLength;
+	}
+	float fract = fraction( m_length );
+	frame[0] = linearInterpolate( m_buffer[readIndex][0] ,
+			m_buffer[( readIndex+1) % m_maxLength][0], fract );
+	frame[1] = linearInterpolate( m_buffer[readIndex][1] ,
+			m_buffer[( readIndex+1) % m_maxLength][1], fract );
 
-    m_buffer[m_index][0] += frame[0] * m_feedback;
-    m_buffer[m_index][1] += frame[1] * m_feedback;
+	m_buffer[m_index][0] += frame[0] * m_feedback;
+	m_buffer[m_index][1] += frame[1] * m_feedback;
 
-    m_index = ( m_index + 1) % m_maxLength;
+	m_index = ( m_index + 1) % m_maxLength;
 }
 
 
@@ -82,13 +82,18 @@ void StereoDelay::tick( sampleFrame frame )
 
 void StereoDelay::setSampleRate( int sampleRate )
 {
-   if( m_buffer )
-   {
-       delete m_buffer;
-   }
+	if( m_buffer )
+	{
+		delete m_buffer;
+	}
 
-
-   m_buffer = new sampleFrame[( int )( sampleRate * m_maxTime )];
+	int bufferSize = ( int )( sampleRate * m_maxTime );
+	m_buffer = new sampleFrame[bufferSize];
+	for( int i = 0 ; i < bufferSize ; i++)
+	{
+		m_buffer[i][0] = 0.0;
+		m_buffer[i][1] = 0.0;
+	}
 }
 
 
