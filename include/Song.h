@@ -303,7 +303,7 @@ public slots:
 	void playAndRecord();
 	void playTrack( Track * _trackToPlay );
 	void playBB();
-	void playPattern( Pattern* patternToPlay, bool _loop = true );
+	void playPattern(const Pattern* patternToPlay, bool _loop = true );
 	void togglePause();
 	void stop();
 
@@ -398,7 +398,7 @@ private:
 	TrackList m_trackList;
 
 	Track * m_trackToPlay;
-	Pattern* m_patternToPlay;
+	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
 	unsigned long m_elapsedFrames;

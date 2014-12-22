@@ -47,6 +47,7 @@
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
 #include "ConfigManager.h"
+#include "panning_constants.h"
 
 
 SampleTCO::SampleTCO( Track * _track, const MidiTime & pos ) :
@@ -405,9 +406,12 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 	Track( Track::SampleTrack, tc ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
 							tr( "Volume" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, NULL )
+	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
+					this, tr( "Panning" ) ),
+	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel )
 {
 	setName( tr( "Sample track" ) );
+	m_panningModel.setCenterValue( DefaultPanning );
 }
 
 
@@ -497,6 +501,7 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	_this.setAttribute( "icon", tlb->pixmapFile() );
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
+	m_panningModel.saveSettings( _doc, _this, "pan" );
 }
 
 
@@ -518,6 +523,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		node = node.nextSibling();
 	}
 	m_volumeModel.loadSettings( _this, "vol" );
+	m_panningModel.loadSettings( _this, "pan" );
 }
 
 
@@ -542,7 +548,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
-	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
+	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
@@ -554,6 +560,14 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	}
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
+
+	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
+							tr( "Panning" ) );
+	m_panningKnob->setModel( &_t->m_panningModel );
+	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
+	m_panningKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24, 2 );
+	m_panningKnob->setLabel( tr( "PAN" ) );
+	m_panningKnob->show();
 
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );

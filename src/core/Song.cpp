@@ -538,7 +538,7 @@ void Song::playBB()
 
 
 
-void Song::playPattern( Pattern* patternToPlay, bool _loop )
+void Song::playPattern( const Pattern* patternToPlay, bool _loop )
 {
 	if( isStopped() == false )
 	{
@@ -684,6 +684,7 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
+	m_playPos[Mode_PlaySong].setTicks( 0 );
 
 	playSong();
 

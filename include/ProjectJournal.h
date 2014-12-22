@@ -74,7 +74,7 @@ public:
 	}
 
 	void clearJournal();
-
+	void stopAllJournalling();
 	JournallingObject * journallingObject( const jo_id_t _id )
 	{
 		if( m_joIDs.contains( _id ) )

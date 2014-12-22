@@ -53,32 +53,32 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_baseKnob = new Knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->setModel( &_controls->m_baseModel );
-	m_baseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
+	m_baseKnob->setHintText( tr( "Base amount:" ) , "" );
 
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->setModel( &_controls->m_amountModel );
-	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
+	m_amountKnob->setHintText( tr( "Modulation amount:" ) , "" );
 
 	m_amountMultKnob = new Knob( knobBright_26, this );
 	m_amountMultKnob->setLabel( tr( "MULT" ) );
 	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
-	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) + " ", "" );
+	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) , "" );
 
 	m_attackKnob = new Knob( knobBright_26, this );
 	m_attackKnob->setLabel( tr( "ATCK" ) );
 	m_attackKnob->setModel( &_controls->m_attackModel );
-	m_attackKnob->setHintText( tr( "Attack:" ) + " ", "" );
+	m_attackKnob->setHintText( tr( "Attack:" ) , "" );
 
 	m_decayKnob = new Knob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DCAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
-	m_decayKnob->setHintText( tr( "Release:" ) + " ", "" );
+	m_decayKnob->setHintText( tr( "Release:" ) , "" );
 	
 	m_tresholdKnob = new Knob( knobBright_26, this );
 	m_tresholdKnob->setLabel( tr( "TRES" ) );
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
-	m_tresholdKnob->setHintText( tr( "Treshold:" ) + " ", "" );
+	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
 
 	l->addWidget( m_baseKnob );
 	l->addWidget( m_amountKnob );

@@ -535,7 +535,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_ampKnob = new Knob( knobBright_26, this );
 	m_ampKnob->setVolumeKnob( true );
 	m_ampKnob->move( 5, 108 );
-	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
+	m_ampKnob->setHintText( tr( "Amplify:" ), "%" );
 	m_ampKnob->setWhatsThis(
 		tr( "With this knob you can set the amplify ratio. When you "
 			"set a value of 100% your sample isn't changed. "
@@ -544,21 +544,21 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_startKnob = new AudioFileProcessorWaveView::knob( this );
 	m_startKnob->move( 45, 108 );
-	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
+	m_startKnob->setHintText( tr( "Startpoint:" ), "" );
 	m_startKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should begin playing your sample. " ) );
 
 	m_endKnob = new AudioFileProcessorWaveView::knob( this );
 	m_endKnob->move( 125, 108 );
-	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
+	m_endKnob->setHintText( tr( "Endpoint:" ), "" );
 	m_endKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should stop playing your sample. " ) );
 
 	m_loopKnob = new AudioFileProcessorWaveView::knob( this );
 	m_loopKnob->move( 85, 108 );
-	m_loopKnob->setHintText( tr( "Loopback point:" )+" ", "" );
+	m_loopKnob->setHintText( tr( "Loopback point:" ), "" );
 	m_loopKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"the loop starts. " ) );
@@ -734,6 +734,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_to( m_sampleBuffer.frames() ),
 	m_last_from( 0 ),
 	m_last_to( 0 ),
+	m_last_amp( 0 ),
 	m_startKnob( 0 ),
 	m_endKnob( 0 ),
 	m_loopKnob( 0 ),

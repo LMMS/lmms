@@ -76,68 +76,69 @@ public:
 	inline void setCoeffs( float freq )
 	{
 		// wc
-		const float wc = F_2PI * freq;
-		const float wc2 = wc * wc;
-		const float wc3 = wc2 * wc;
+		const double wc = D_2PI * freq;
+		const double wc2 = wc * wc;
+		const double wc3 = wc2 * wc;
 		m_wc4 = wc2 * wc2;
 
 		// k
-		const float k = wc / tanf( F_PI * freq / m_sampleRate );
-		const float k2 = k * k;
-		const float k3 = k2 * k;
+		const double k = wc / tan( D_PI * freq / m_sampleRate );
+		const double k2 = k * k;
+		const double k3 = k2 * k;
 		m_k4 = k2 * k2;
 
 		// a
-		static const float sqrt2 = sqrtf( 2.0f );
-		const float sq_tmp1 = sqrt2 * wc3 * k;
-		const float sq_tmp2 = sqrt2 * wc * k3;
-		m_a = 4.0f * wc2 * k2 + 2.0f * sq_tmp1 + m_k4 + 2.0f * sq_tmp2 + m_wc4;
+		static const double sqrt2 = sqrt( 2.0 );
+		const double sq_tmp1 = sqrt2 * wc3 * k;
+		const double sq_tmp2 = sqrt2 * wc * k3;
+
+		m_a = 1.0 / ( 4.0 * wc2 * k2 + 2.0 * sq_tmp1 + m_k4 + 2.0 * sq_tmp2 + m_wc4 );
 
 		// b
-		m_b1 = ( 4.0f * ( m_wc4 + sq_tmp1 - m_k4 - sq_tmp2 ) ) / m_a;
-		m_b2 = ( 6.0f * m_wc4 - 8.0f * wc2 * k2 + 6.0f * m_k4 ) / m_a;
-		m_b3 = ( 4.0f * ( m_wc4 - sq_tmp1 + sq_tmp2 - m_k4 ) ) / m_a;
-		m_b4 = ( m_k4 - 2.0f * sq_tmp1 + m_wc4 - 2.0f * sq_tmp2 + 4.0f * wc2 * k2 ) / m_a;
+		m_b1 = ( 4.0 * ( m_wc4 + sq_tmp1 - m_k4 - sq_tmp2 ) ) * m_a;
+		m_b2 = ( 6.0 * m_wc4 - 8.0 * wc2 * k2 + 6.0 * m_k4 ) * m_a;
+		m_b3 = ( 4.0 * ( m_wc4 - sq_tmp1 + sq_tmp2 - m_k4 ) ) * m_a;
+		m_b4 = ( m_k4 - 2.0 * sq_tmp1 + m_wc4 - 2.0 * sq_tmp2 + 4.0 * wc2 * k2 ) * m_a;
 	}
 
 	inline void setLowpass( float freq )
 	{
 		setCoeffs( freq );
-		m_a0 = m_wc4 / m_a;
-		m_a1 = 4.0f * m_a0;
-		m_a2 = 6.0f * m_a0;
+		m_a0 = m_wc4 * m_a;
+		m_a1 = 4.0 * m_a0;
+		m_a2 = 6.0 * m_a0;
 	}
 	
 	inline void setHighpass( float freq )
 	{
 		setCoeffs( freq );
-		m_a0 = m_k4 / m_a;
-		m_a1 = 4.0f * m_a0;
-		m_a2 = 6.0f * m_a0;
+		m_a0 = m_k4 * m_a;
+		m_a1 = -4.0 * m_a0;
+		m_a2 = 6.0 * m_a0;
 	}
 
 	inline float update( float in, ch_cnt_t ch )
 	{
-		const float a0in = m_a0 * in;
-		const float a1in = m_a1 * in;
-		const float out = m_z1[ch] + a0in;
+		const double x = in - ( m_z1[ch] * m_b1 ) - ( m_z2[ch] * m_b2 ) -
+			( m_z3[ch] * m_b3 ) - ( m_z4[ch] * m_b4 );
+		const double y = ( m_a0 * x ) + ( m_z1[ch] * m_a1 ) + ( m_z2[ch] * m_a2 ) +
+			( m_z3[ch] * m_a1 ) + ( m_z4[ch] * m_a0 );
+		m_z4[ch] = m_z3[ch];
+		m_z3[ch] = m_z2[ch];
+		m_z2[ch] = m_z1[ch];
+		m_z1[ch] = x;
 		
-		m_z1[ch] = a1in + m_z2[ch] - ( m_b1 * out );
-		m_z2[ch] = ( m_a2 * in ) + m_z3[ch] - ( m_b2 * out );
-		m_z3[ch] = a1in + m_z4[ch] - ( m_b3 * out );
-		m_z4[ch] = a0in - ( m_b4 * out );
-		
-		return out;
+		return y;
 	}
 
 private:
 	float m_sampleRate;
-	float m_wc4;
-	float m_k4;
-	float m_a, m_a0, m_a1, m_a2;
-	float m_b1, m_b2, m_b3, m_b4;
+	double m_wc4;
+	double m_k4;
+	double m_a, m_a0, m_a1, m_a2;
+	double m_b1, m_b2, m_b3, m_b4;
 	
-	typedef float frame[CHANNELS];
+	typedef double frame[CHANNELS];
 	frame m_z1, m_z2, m_z3, m_z4;
 };
 typedef LinkwitzRiley<2> StereoLinkwitzRiley;
@@ -290,7 +291,6 @@ public:
 		m_sampleRatio( 1.0f / m_sampleRate ),
 		m_subFilter( NULL )
 	{
-		m_svsr = 1.0f - expf( -4646.39874051f / m_sampleRate );
 		clearHistory();
 	}
 
@@ -327,7 +327,6 @@ public:
 			m_delay2[_chnl] = 0.0f;
 			m_delay3[_chnl] = 0.0f;
 			m_delay4[_chnl] = 0.0f;
-			m_sva[_chnl] = 0.0f;
 		}
 	}
 
@@ -410,7 +409,6 @@ public:
 			case Lowpass_SV:
 			case Bandpass_SV:
 			{
-				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				float highpass;
 				
 				for( int i = 0; i < 2; ++i ) // 2x oversample
@@ -426,14 +424,13 @@ public:
 
 				/* mix filter output into output buffer */
 				return m_type == Lowpass_SV 
-					? atanf( 3.0f * m_delay4[_chnl] * m_sva[_chnl] )
-					: atanf( 3.0f * m_delay3[_chnl] * m_sva[_chnl] );
+					? m_delay4[_chnl]
+					: m_delay3[_chnl];
 				break;
 			}
 			
 			case Highpass_SV:
 			{
-				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				float hp;
 
 				for( int i = 0; i < 2; ++i ) // 2x oversample
@@ -443,13 +440,12 @@ public:
 					m_delay1[_chnl] = m_svf1 * hp + m_delay1[_chnl];
 				}
 				
-				return atanf( 3.0f * hp * m_sva[_chnl] );
+				return hp;
 				break;
 			}
 			
 			case Notch_SV:
 			{
-				m_sva[_chnl] += ( qAbs( _in0 ) - m_sva[_chnl] ) * m_svsr;
 				float hp1, hp2;
 				
 				for( int i = 0; i < 2; ++i ) // 2x oversample
@@ -464,7 +460,7 @@ public:
 				}
 
 				/* mix filter output into output buffer */
-				return atanf( 1.5f * ( m_delay4[_chnl] + hp1 ) * m_sva[_chnl] );
+				return m_delay4[_chnl] + hp1;
 				break;
 			}
 
@@ -900,7 +896,7 @@ private:
 	float m_vfa[4], m_vfb[4], m_vfc[4], m_vfq;
 
 	// coeffs for Lowpass_SV (state-variant lowpass)
-	float m_svf1, m_svf2, m_svq, m_svsr;
+	float m_svf1, m_svf2, m_svq;
 
 	typedef sample_t frame[CHANNELS];
 
@@ -917,7 +913,7 @@ private:
 	frame m_vfbp[6], m_vfhp[6], m_vflast[6];
 
 	// in/out history for Lowpass_SV (state-variant lowpass)
-	frame m_delay1, m_delay2, m_delay3, m_delay4, m_sva;
+	frame m_delay1, m_delay2, m_delay3, m_delay4;
 
 	FilterTypes m_type;
 	bool m_doubleFilter;

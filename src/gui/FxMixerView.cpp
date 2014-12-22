@@ -194,12 +194,13 @@ void FxMixerView::refreshDisplay()
 	for( int i = 1; i<m_fxChannelViews.size(); ++i )
 	{
 		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
+		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );
 		delete m_fxChannelViews[i]->m_fader;
 		delete m_fxChannelViews[i]->m_muteBtn;
 		delete m_fxChannelViews[i]->m_soloBtn;
 		delete m_fxChannelViews[i]->m_fxLine;
+		delete m_fxChannelViews[i]->m_rackView;
 		delete m_fxChannelViews[i];
-		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );
 	}
 	m_channelAreaWidget->adjustSize();
 
@@ -363,15 +364,14 @@ void FxMixerView::deleteChannel(int index)
 
 	// delete the view
 	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
+	m_racksLayout->removeWidget( m_fxChannelViews[index]->m_rackView );
 	delete m_fxChannelViews[index]->m_fader;
 	delete m_fxChannelViews[index]->m_muteBtn;
 	delete m_fxChannelViews[index]->m_soloBtn;
 	delete m_fxChannelViews[index]->m_fxLine;
+	delete m_fxChannelViews[index]->m_rackView;
 	delete m_fxChannelViews[index];
 	m_channelAreaWidget->adjustSize();
-
-	// delete the fx rack
-	m_racksLayout->removeWidget( m_fxChannelViews[index]->m_rackView );
 
 	// make sure every channel knows what index it is
 	for(int i=0; i<m_fxChannelViews.size(); ++i)
@@ -503,6 +503,11 @@ void FxMixerView::clear()
 void FxMixerView::updateFaders()
 {
 	FxMixer * m = Engine::fxMixer();
+
+	// apply master gain
+	m->m_fxChannels[0]->m_peakLeft *= Engine::mixer()->masterGain();
+	m->m_fxChannels[0]->m_peakRight *= Engine::mixer()->masterGain();
+
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();

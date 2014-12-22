@@ -2184,7 +2184,7 @@ TrackContentObject * Track::getTCO( int _tco_num )
  *  \param _tco The TrackContentObject to search for.
  *  \return its number in our array.
  */
-int Track::getTCONum( TrackContentObject * _tco )
+int Track::getTCONum( const TrackContentObject * _tco )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
 	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),

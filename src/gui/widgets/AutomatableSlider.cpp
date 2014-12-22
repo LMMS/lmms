@@ -1,5 +1,5 @@
 /*
- * AutomatableSlider.cpp - implementation of class automatableSlider
+ * AutomatableSlider.cpp - implementation of class AutomatableSlider
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>

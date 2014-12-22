@@ -70,7 +70,9 @@
 #include "TextFloat.h"
 #include "AutomationPattern.h"
 
-
+#if QT_VERSION < 0x040800
+#define MiddleButton MidButton
+#endif
 
 
 extern Keys whiteKeys[];	// defined in piano_widget.cpp

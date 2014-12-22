@@ -131,7 +131,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 		m_failed = false;
 	}
 	QString exec = ConfigManager::inst()->pluginDir() +
-					QDir::separator() + pluginExecutable;
+					 pluginExecutable;
 
 	QStringList args;
 	// swap in and out for bidirectional communication

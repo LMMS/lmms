@@ -870,7 +870,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// Gain
 	m_gainKnob = new sf2Knob( this );
-	m_gainKnob->setHintText( tr("Gain") + " ", "" );
+	m_gainKnob->setHintText( tr("Gain"), "" );
 	m_gainKnob->move( 86, 55 );
 //	vl->addWidget( m_gainKnob );
 
@@ -891,19 +891,19 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 	m_reverbRoomSizeKnob = new sf2Knob( this );
-	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:") + " ", "" );
+	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:"), "" );
 	m_reverbRoomSizeKnob->move( 93, 160 );
 
 	m_reverbDampingKnob = new sf2Knob( this );
-	m_reverbDampingKnob->setHintText( tr("Reverb Damping:") + " ", "" );
+	m_reverbDampingKnob->setHintText( tr("Reverb Damping:"), "" );
 	m_reverbDampingKnob->move( 130, 160 );
 
 	m_reverbWidthKnob = new sf2Knob( this );
-	m_reverbWidthKnob->setHintText( tr("Reverb Width:") + " ", "" );
+	m_reverbWidthKnob->setHintText( tr("Reverb Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
 	m_reverbLevelKnob = new sf2Knob( this );
-	m_reverbLevelKnob->setHintText( tr("Reverb Level:") + " ", "" );
+	m_reverbLevelKnob->setHintText( tr("Reverb Level:"), "" );
 	m_reverbLevelKnob->move( 204, 160 );
 
 /*	hl->addWidget( m_reverbOnLed );
@@ -930,19 +930,19 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 			"files that support it." ) );
 
 	m_chorusNumKnob = new sf2Knob( this );
-	m_chorusNumKnob->setHintText( tr("Chorus Lines:") + " ", "" );
+	m_chorusNumKnob->setHintText( tr("Chorus Lines:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
 	m_chorusLevelKnob = new sf2Knob( this );
-	m_chorusLevelKnob->setHintText( tr("Chorus Level:") + " ", "" );
+	m_chorusLevelKnob->setHintText( tr("Chorus Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
 	m_chorusSpeedKnob = new sf2Knob( this );
-	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:") + " ", "" );
+	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
 	m_chorusDepthKnob = new sf2Knob( this );
-	m_chorusDepthKnob->setHintText( tr("Chorus Depth:") + " ", "" );
+	m_chorusDepthKnob->setHintText( tr("Chorus Depth:"), "" );
 	m_chorusDepthKnob->move( 204 , 206 );
 /*
 	hl->addWidget( m_chorusOnLed );
