@@ -172,6 +172,10 @@ public:
 
 	bool isExportDone() const;
 
+	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
+	{
+		m_renderBetweenMarkers = renderBetweenMarkers;
+	}
 
 	inline PlayModes playMode() const
 	{
@@ -334,6 +338,7 @@ private:
 	volatile bool m_recording;
 	volatile bool m_exporting;
 	volatile bool m_exportLoop;
+	volatile bool m_renderBetweenMarkers;
 	volatile bool m_playing;
 	volatile bool m_paused;
 

@@ -260,6 +260,7 @@ ProjectRenderer* ExportProjectDialog::prepRender()
 			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
+	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
 
 	ProjectRenderer* renderer = new ProjectRenderer( qs, os, m_ft, m_fileName );
 
