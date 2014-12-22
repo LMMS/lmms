@@ -60,7 +60,7 @@ void MonoDelay::tick( sample_t* sample )
     {
         readIndex += m_maxLength;
     }
-    float fract = fraction( m_length );
+	float fract = 1.0f - fraction( m_length );
     if(readIndex != m_maxLength-1 )
     {
     *sample = linearInterpolate(m_buffer[readIndex] ,
