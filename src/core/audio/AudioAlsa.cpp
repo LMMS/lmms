@@ -523,7 +523,7 @@ AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioAlsa::setupWidget::~setupWidget()
 {
-
+	delete m_channels->model();
 }
 
 
