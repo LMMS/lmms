@@ -1,9 +1,9 @@
 /*
- * VstSubPluginFeatures.h - derivation from
- *                          Plugin::Descriptor::SubPluginFeatures for
- *                          hosting VST-plugins
+ * CrossoverEQControlDialog.h - A native 4-band Crossover Equalizer 
+ * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -24,29 +24,27 @@
  *
  */
 
-#ifndef _VST_SUBPLUGIN_FEATURES_H
-#define _VST_SUBPLUGIN_FEATURES_H
+#ifndef CROSSOVEREQ_CONTROL_DIALOG_H
+#define CROSSOVEREQ_CONTROL_DIALOG_H
 
-#include "Effect.h"
+#include <QPixmap>
+#include "EffectControlDialog.h"
 
+class CrossoverEQControls;
 
-class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
+class CrossoverEQControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
-	VstSubPluginFeatures( Plugin::PluginTypes _type );
-
-	virtual void fillDescriptionWidget( QWidget * _parent,
-											const Key * _key ) const;
-
-	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
-											KeyList & _kl ) const;
+	CrossoverEQControlDialog( CrossoverEQControls * controls );
+	virtual ~CrossoverEQControlDialog()
+	{
+	}
+	
 private:
-	void addPluginsFromDir(QStringList* filenames,  QString path) const;
-} ;
-
-
-
-
+	QPixmap m_fader_bg;
+	QPixmap m_fader_empty;
+	QPixmap m_fader_knob;
+};
 
 #endif
-

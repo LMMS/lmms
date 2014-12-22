@@ -172,10 +172,11 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 	QString p = m_plugin;
-	if( QFileInfo( p ).dir().isRelative() )
-	{
-		p = ConfigManager::inst()->vstDir() + QDir::separator() + p;
-	}
+		if( QFileInfo( p ).dir().isRelative() )
+		{
+			p = ConfigManager::inst()->vstDir()  + p;
+		}
+
 
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
 
@@ -420,7 +421,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
-			( *it ).section( ':', 1, 1 ).toFloat()
+			( *it ).section( ':', 2, -1 ).toFloat()
 		} ;
 		m.addInt( item.index );
 		m.addString( item.shortLabel );

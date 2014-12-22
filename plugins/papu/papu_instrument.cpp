@@ -361,11 +361,11 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
 		char sopt=0;
 		char ropt=1;
-		float fopt = 524288.0 / ( ropt * pow( 2, sopt+1 ) );
+		float fopt = 524288.0 / ( ropt * pow( 2.0, sopt + 1.0 ) );
 		float f;
 		for ( char s=0; s<16; s++ )
 		for ( char r=0; r<8; r++ ) {
-			f = 524288.0 / ( r * pow( 2, s+1 ) );
+			f = 524288.0 / ( r * pow( 2.0, s + 1.0 ) );
 			if( fabs( freq-fopt ) > fabs( freq-f ) ) {
 				fopt = f;
 				ropt = r;

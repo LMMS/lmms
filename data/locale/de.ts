@@ -655,6 +655,63 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
     </message>
 </context>
 <context>
+    <name>DelayControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation>Samples verzögern</translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation>Rückkopplung</translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation>LFO-Frequenz</translation>
+    </message>
+    <message>
+        <source>Lfo Amount</source>
+        <translation>LFO-Stärke</translation>
+    </message>
+</context>
+<context>
+    <name>DelayControlsDialog</name>
+    <message>
+        <source>Delay</source>
+        <translation>Verzögerung</translation>
+    </message>
+    <message>
+        <source>Delay Time</source>
+        <translation>Verzögerungszeit</translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Amount</source>
+        <translation>Rückkopplungsstärke</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Rate</translation>
+    </message>
+    <message>
+        <source>Lfo</source>
+        <translation>LFO</translation>
+    </message>
+    <message>
+        <source>Lfo Amt</source>
+        <translation>LFO-Stärke</translation>
+    </message>
+</context>
+<context>
+    <name>DetuningHelper</name>
+    <message>
+        <source>Note detuning</source>
+        <translation>Noten-Verstimmung</translation>
+    </message>
+</context>
+<context>
     <name>DualFilterControlDialog</name>
     <message>
         <source>Filter 1 enabled</source>
@@ -778,6 +835,13 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
     <message>
         <source>Vocal Formant Filter</source>
         <translation>Vokalformant-Filter</translation>
+    </message>
+</context>
+<context>
+    <name>DummyEffect</name>
+    <message>
+        <source>NOT FOUND</source>
+        <translation>NICHT GEFUNDEN</translation>
     </message>
 </context>
 <context>
@@ -3294,7 +3358,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>Bandlimited Ramp wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbegrenzte Sägezahnwelle</translation>
     </message>
     <message>
         <source>Bandlimited Square wave</source>
@@ -3330,7 +3394,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>Digital Ramp wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Digitale Sägezahnwelle</translation>
     </message>
     <message>
         <source>Digital Square wave</source>
@@ -3350,7 +3414,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>Ramp wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -4083,6 +4147,21 @@ Grund: »%2«</translation>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
         <translation>LMMS Plugin %1 hat keinen Plugin-Deskriptor namens %2!</translation>
+    </message>
+</context>
+<context>
+    <name>PluginBrowser</name>
+    <message>
+        <source>Instrument plugins</source>
+        <translation>Instrument-Plugins</translation>
+    </message>
+    <message>
+        <source>Instrument browser</source>
+        <translation>Instrument-Browser</translation>
+    </message>
+    <message>
+        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <translation>Ziehen Sie ein Instrument entweder in den Song-Editor, den Beat+Bassline-Editor oder in eine existierende Instrumentspur.</translation>
     </message>
 </context>
 <context>
@@ -6991,10 +7070,6 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
 <context>
     <name>pluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Instrument-Plugins</translation>
-    </message>
-    <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
         <translation>VST-Host zum Benutzen von VST(i)-Plugins innerhalb von LMMS</translation>
     </message>
@@ -7055,14 +7130,6 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
 This chip was used in the Commodore 64 computer.</source>
         <translation>Emulation des MOS6581 und MOS8580 SID Chips.
 Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
-    </message>
-    <message>
-        <source>Instrument browser</source>
-        <translation>Instrument-Browser</translation>
-    </message>
-    <message>
-        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation>Ziehen Sie ein Instrument entweder in den Song-Editor, den Beat+Bassline-Editor oder in eine existierende Instrumentspur.</translation>
     </message>
     <message>
         <source>Player for SoundFont files</source>
@@ -7147,6 +7214,10 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     <message>
         <source>Carla Patchbay Instrument</source>
         <translation>Carla Patchbay Instrument</translation>
+    </message>
+    <message>
+        <source>A native delay plugin</source>
+        <translation>Ein natives Verzögerung-Plugin</translation>
     </message>
 </context>
 <context>
@@ -7474,6 +7545,57 @@ Latenz: %2 ms</translation>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
         <translation>Wiedergabe-Courser im AudioFileProcessor anzeigen</translation>
+    </message>
+</context>
+<context>
+    <name>setupWidget</name>
+    <message>
+        <source>OSS (Open Sound System)</source>
+        <translation>OSS (Open Sound System)</translation>
+    </message>
+    <message>
+        <source>SDL (Simple DirectMedia Layer)</source>
+        <translation>SDL (Simple DirectMedia Layer)</translation>
+    </message>
+    <message>
+        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA-Sequencer (Advanced Linux Sound Architecture)</translation>
+    </message>
+    <message>
+        <source>JACK (JACK Audio Connection Kit)</source>
+        <translation>JACK (JACK Audio Connection Kit)</translation>
+    </message>
+    <message>
+        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
+    </message>
+    <message>
+        <source>PulseAudio (bad latency!)</source>
+        <translation>PulseAudio (Schlechte Latenz!)</translation>
+    </message>
+    <message>
+        <source>Dummy (no sound output)</source>
+        <translation>Dummy (Keine Soundausgabe)</translation>
+    </message>
+    <message>
+        <source>Dummy (no MIDI support)</source>
+        <translation>Dummy (Keine MIDI-Unterstützung)</translation>
+    </message>
+    <message>
+        <source>WinMM MIDI</source>
+        <translation>WinMM MIDI</translation>
+    </message>
+    <message>
+        <source>OSS Raw-MIDI (Open Sound System)</source>
+        <translation>OSS Raw-MIDI (Open Sound System)</translation>
+    </message>
+    <message>
+        <source>ALSA (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA (Advanced Linux Sound Architecture)</translation>
+    </message>
+    <message>
+        <source>PortAudio</source>
+        <translation>PortAudio</translation>
     </message>
 </context>
 <context>
@@ -7900,6 +8022,13 @@ Latenz: %2 ms</translation>
     <message>
         <source>Right to Right</source>
         <translation>Rechts-nach-rechts</translation>
+    </message>
+</context>
+<context>
+    <name>tabWidget</name>
+    <message>
+        <source>Settings for %1</source>
+        <translation>Einstellungen für %1</translation>
     </message>
 </context>
 <context>

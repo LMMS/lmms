@@ -89,6 +89,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 LocalZynAddSubFx::~LocalZynAddSubFx()
 {
 	delete m_master;
+	delete m_ioEngine;
 
 	if( --s_instanceCount == 0 )
 	{
