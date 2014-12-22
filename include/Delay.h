@@ -245,7 +245,7 @@ class CombFeedbackDualtap
 		m_fraction1 = 1.0 - ( delay1 - floor( delay1 ) );
 		
 		m_delay2 = static_cast<int>( ceil( delay2 ) );
-		m_fraction2 = 2.0 - ( delay2 - floor( delay2 ) );
+		m_fraction2 = 1.0 - ( delay2 - floor( delay2 ) );
 	}
 	
 	inline void setGain( double gain )
