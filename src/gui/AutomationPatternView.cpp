@@ -145,6 +145,26 @@ void AutomationPatternView::toggleRecording()
 }
 
 
+
+
+void AutomationPatternView::flipY()
+{
+	m_pat->flipY(m_pat->getMin(), m_pat->getMax());
+	update();
+}
+
+
+
+
+void AutomationPatternView::flipX()
+{
+	m_pat->flipX( true );
+	update();
+}
+
+
+
+
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
@@ -168,6 +188,12 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "record" ),
 						tr( "Set/clear record" ),
 						this, SLOT( toggleRecording() ) );
+	_cm->addAction( embed::getIconPixmap( "flip_y" ),
+						tr( "Flip Y" ),
+						this, SLOT( flipY() ) );
+	_cm->addAction( embed::getIconPixmap( "flip_x" ),
+						tr( "Flip X" ),
+						this, SLOT( flipX() ) );
 	if( !m_pat->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
