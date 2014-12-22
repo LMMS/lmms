@@ -31,6 +31,7 @@
 #include "ConfigManager.h"
 
 
+
 VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
 	SubPluginFeatures( _type )
 {
@@ -52,16 +53,40 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 														KeyList & _kl ) const
 {
-	QStringList dlls = QDir( ConfigManager::inst()->vstDir() ).
-				entryList( QStringList() << "*.dll",
-						QDir::Files, QDir::Name );
+	QStringList *dlls = new QStringList();
+	const QString path = QString("");
+	addPluginsFromDir(dlls, path );
 	// TODO: eval m_type
-	for( QStringList::ConstIterator it = dlls.begin();
-							it != dlls.end(); ++it )
+	for( QStringList::ConstIterator it = dlls->begin();
+							it != dlls->end(); ++it )
 	{
 		EffectKey::AttributeMap am;
 		am["file"] = *it;
 		_kl.push_back( Key( _desc, QFileInfo( *it ).baseName(), am ) );
+	}
+	delete dlls;
+}
+
+void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString path ) const
+{
+	QStringList dirs = QDir ( ConfigManager::inst()->vstDir() + path ).
+				entryList( QStringList() << "*" ,
+						   QDir::Dirs, QDir::Name );
+	for(int i = 0; i < dirs.size(); i++)
+	{
+		if(dirs.at( i )[0] != '.' )
+		{
+			addPluginsFromDir( filenames, path+QDir::separator() + dirs.at( i ) );
+		}
+	}
+	QStringList dlls = QDir( ConfigManager::inst()->vstDir() + path ).
+				entryList( QStringList() << "*.dll",
+						QDir::Files, QDir::Name );
+	for( int i = 0; i < dlls.size(); i++ )
+	{
+		QString fName = path + QDir::separator() + dlls.at( i );
+		fName.remove( 0, 1 );
+		filenames->append( fName );
 	}
 }
 
