@@ -30,44 +30,44 @@
 class QuadratureLfo
 {
 public:
-    QuadratureLfo( int sampleRate );
-    ~QuadratureLfo()
-    {
-    }
+	QuadratureLfo( int sampleRate );
+	~QuadratureLfo()
+	{
+	}
 
-    inline void setFrequency( double frequency )
-    {
-        if( frequency < 0 || frequency > ( m_samplerate / 2.0 ) || frequency == m_frequency )
-        {
-            return;
-        }
-        m_frequency = frequency;
-        m_increment = m_frequency * m_twoPiOverSr;
+	inline void setFrequency( double frequency )
+	{
+		if( frequency < 0 || frequency > ( m_samplerate / 2.0 ) || frequency == m_frequency )
+		{
+			return;
+		}
+		m_frequency = frequency;
+		m_increment = m_frequency * m_twoPiOverSr;
 
-        if( m_phase >= F_2PI )
-        {
-            m_phase -= F_2PI;
-        }
-    }
-
-
+		if( m_phase >= F_2PI )
+		{
+			m_phase -= F_2PI;
+		}
+	}
 
 
-    inline void setSampleRate ( int samplerate )
-    {
-        m_samplerate = samplerate;
-        m_twoPiOverSr = F_2PI / samplerate;
-        m_increment = m_frequency * m_twoPiOverSr;
-    }
 
-    void tick( float *s, float *c );
+
+	inline void setSampleRate ( int samplerate )
+	{
+		m_samplerate = samplerate;
+		m_twoPiOverSr = F_2PI / samplerate;
+		m_increment = m_frequency * m_twoPiOverSr;
+	}
+
+	void tick( float *s, float *c );
 
 private:
-    double m_frequency;
-    double m_phase;
-    double m_increment;
-    double m_twoPiOverSr;
-    int m_samplerate;
+	double m_frequency;
+	double m_phase;
+	double m_increment;
+	double m_twoPiOverSr;
+	int m_samplerate;
 
 };
 

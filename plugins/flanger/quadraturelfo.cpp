@@ -26,13 +26,13 @@
 
 QuadratureLfo::QuadratureLfo( int sampleRate )
 {
-    setSampleRate(sampleRate);
+	setSampleRate(sampleRate);
 }
 
 void QuadratureLfo::tick( float *s, float *c )
 {
-    *s = sinf( m_phase );
-    *c = cosf( m_phase );
-    m_phase += m_increment;
+	*s = sinf( m_phase );
+	*c = cosf( m_phase );
+	m_phase += m_increment;
 
 }

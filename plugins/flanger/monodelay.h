@@ -30,31 +30,31 @@
 class MonoDelay
 {
 public:
-    MonoDelay( int maxTime , int sampleRate );
-    ~MonoDelay();
-    inline void setLength( float length )
-    {
-        if( length <= m_maxLength && length >= 0 )
-        {
-            m_length = length;
-        }
-    }
+	MonoDelay( int maxTime , int sampleRate );
+	~MonoDelay();
+	inline void setLength( float length )
+	{
+		if( length <= m_maxLength && length >= 0 )
+		{
+			m_length = length;
+		}
+	}
 
-    inline void setFeedback( float feedback )
-    {
-        m_feedback = feedback;
-    }
+	inline void setFeedback( float feedback )
+	{
+		m_feedback = feedback;
+	}
 
-    void tick( sample_t* sample );
-    void setSampleRate( int sampleRate );
+	void tick( sample_t* sample );
+	void setSampleRate( int sampleRate );
 
 private:
-    sample_t* m_buffer;
-    int m_maxLength;
-    float m_length;
-    int m_index;
-    float m_feedback;
-    float m_maxTime;
+	sample_t* m_buffer;
+	int m_maxLength;
+	float m_length;
+	int m_index;
+	float m_feedback;
+	float m_maxTime;
 };
 
 #endif // MONODELAY_H

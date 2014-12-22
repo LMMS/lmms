@@ -32,10 +32,10 @@ class FlangerControls;
 class FlangerControlsDialog : public EffectControlDialog
 {
 public:
-    FlangerControlsDialog( FlangerControls* controls );
-    virtual ~FlangerControlsDialog()
-    {
-    }
+	FlangerControlsDialog( FlangerControls* controls );
+	virtual ~FlangerControlsDialog()
+	{
+	}
 };
 
 #endif // FLANGERCONTROLSDIALOG_H

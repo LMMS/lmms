@@ -36,21 +36,21 @@
 class FlangerEffect : public Effect
 {
 public:
-    FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-    virtual ~FlangerEffect();
-    virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-    virtual EffectControls* controls()
-    {
-        return &m_flangerControls;
-    }
-    void changeSampleRate();
+	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~FlangerEffect();
+	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
+	virtual EffectControls* controls()
+	{
+		return &m_flangerControls;
+	}
+	void changeSampleRate();
 
 private:
-    FlangerControls m_flangerControls;
-    MonoDelay* m_lDelay;
-    MonoDelay* m_rDelay;
-    QuadratureLfo* m_lfo;
-    Noise* m_noise;
+	FlangerControls m_flangerControls;
+	MonoDelay* m_lDelay;
+	MonoDelay* m_rDelay;
+	QuadratureLfo* m_lfo;
+	Noise* m_noise;
 
 };
 

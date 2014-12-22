@@ -34,41 +34,41 @@ class FlangerEffect;
 
 class FlangerControls : public EffectControls
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    FlangerControls( FlangerEffect* effect );
-    virtual ~FlangerControls()
-    {
-    }
-    virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
-    virtual void loadSettings ( const QDomElement &_this );
-    inline virtual QString nodeName() const
-    {
-        return "Flanger";
-    }
-    virtual int controlCount()
-    {
-        return 5;
-    }
-    virtual EffectControlDialog* createView()
-    {
-        return new FlangerControlsDialog( this );
-    }
+	FlangerControls( FlangerEffect* effect );
+	virtual ~FlangerControls()
+	{
+	}
+	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
+	virtual void loadSettings ( const QDomElement &_this );
+	inline virtual QString nodeName() const
+	{
+		return "Flanger";
+	}
+	virtual int controlCount()
+	{
+		return 5;
+	}
+	virtual EffectControlDialog* createView()
+	{
+		return new FlangerControlsDialog( this );
+	}
 
 private slots:
-    void changedSampleRate();
+	void changedSampleRate();
 
 private:
-    FlangerEffect* m_effect;
-    FloatModel m_delayTimeModel;
-    TempoSyncKnobModel m_lfoFrequencyModel;
-    FloatModel m_lfoAmountModel;
-    FloatModel m_feedbackModel;
-    FloatModel m_whiteNoiseAmountModel;
-    BoolModel m_invertFeedbackModel;
+	FlangerEffect* m_effect;
+	FloatModel m_delayTimeModel;
+	TempoSyncKnobModel m_lfoFrequencyModel;
+	FloatModel m_lfoAmountModel;
+	FloatModel m_feedbackModel;
+	FloatModel m_whiteNoiseAmountModel;
+	BoolModel m_invertFeedbackModel;
 
-    friend class FlangerControlsDialog;
-    friend class FlangerEffect;
+	friend class FlangerControlsDialog;
+	friend class FlangerEffect;
 
 };
 
