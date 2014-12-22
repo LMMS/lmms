@@ -24,8 +24,8 @@
 
 #include <QtXml/QDomElement>
 
-#include "flangercontrols.h"
-#include "flangereffect.h"
+#include "FlangerControls.h"
+#include "FlangerEffect.h"
 #include "Engine.h"
 #include "Song.h"
 

@@ -27,7 +27,7 @@
 
 #include "EffectControls.h"
 #include "Knob.h"
-#include "flangercontrolsdialog.h"
+#include "FlangerControlsDialog.h"
 
 
 class FlangerEffect;

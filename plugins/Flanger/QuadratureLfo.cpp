@@ -22,7 +22,7 @@
  *
  */
 
-#include "quadraturelfo.h"
+#include "QuadratureLfo.h"
 
 QuadratureLfo::QuadratureLfo( int sampleRate )
 {

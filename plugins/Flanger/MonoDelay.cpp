@@ -22,7 +22,7 @@
  *
  */
 
-#include "monodelay.h"
+#include "MonoDelay.h"
 #include "interpolation.h"
 #include "lmms_math.h"
 

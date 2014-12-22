@@ -22,7 +22,7 @@
  *
  */
 
-#include "flangereffect.h"
+#include "FlangerEffect.h"
 #include "Engine.h"
 #include "embed.cpp"
 

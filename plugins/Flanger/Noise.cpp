@@ -1,5 +1,5 @@
 /*
- * flangereffect.h - defination of FlangerEffect class.
+ * noise.cpp - defination of Noise class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,36 +22,18 @@
  *
  */
 
+#include "Noise.h"
+#include "lmms_math.h"
 
-#ifndef FLANGEREFFECT_H
-#define FLANGEREFFECT_H
-
-#include "Effect.h"
-#include "flangercontrols.h"
-#include "quadraturelfo.h"
-#include "monodelay.h"
-#include "noise.h"
-
-
-class FlangerEffect : public Effect
+Noise::Noise()
 {
-public:
-	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~FlangerEffect();
-	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-	virtual EffectControls* controls()
-	{
-		return &m_flangerControls;
-	}
-	void changeSampleRate();
+	inv_randmax = 1.0/FAST_RAND_MAX; /* for range of 0 - 1.0 */
+}
 
-private:
-	FlangerControls m_flangerControls;
-	MonoDelay* m_lDelay;
-	MonoDelay* m_rDelay;
-	QuadratureLfo* m_lfo;
-	Noise* m_noise;
 
-};
 
-#endif // FLANGEREFFECT_H
+
+float Noise::tick()
+{
+	return (float) ((2.0 * fast_rand() * inv_randmax) - 1.0);
+}
