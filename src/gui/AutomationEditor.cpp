@@ -2064,7 +2064,7 @@ void AutomationEditor::eraseButtonToggled()
 
 void AutomationEditor::flipYButtonPressed()
 {
-	m_pattern->flipY(m_minLevel, m_maxLevel);
+	m_pattern->flipY( m_minLevel, m_maxLevel );
 }
 
 

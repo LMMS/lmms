@@ -392,9 +392,7 @@ void AutomationPattern::flipY( int min, int max )
 
 	int numPoints = 0;
 
-	//(iterate+1).key() - iterate.key(); gets the number of values until the next point
-
-	for( int i = 0; (iterate + i + 1) != m_timeMap.end() && (iterate + i ) != m_timeMap.end() ; i++)
+	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
 	{
 		numPoints++;
 	}
@@ -402,17 +400,15 @@ void AutomationPattern::flipY( int min, int max )
 	for( int i = 0; i <= numPoints; i++ )
 	{
 
-		if (min < 0)
+		if ( min < 0 )
 		{
-			tempValue = valueAt((iterate + i).key()) * -1;
-			//removeValue((iterate + i).key(), false);
-			putValue( MidiTime((iterate + i).key()) , tempValue, false);
+			tempValue = valueAt( ( iterate + i ).key() ) * -1;
+			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
 		}
 		else
 		{
-			tempValue = max - valueAt((iterate + i).key());
-			//removeValue((iterate).key(), false);
-			putValue( MidiTime((iterate + i).key()) , tempValue, false);
+			tempValue = max - valueAt( ( iterate + i ).key() );
+			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
 		}
 	}
 
@@ -425,7 +421,7 @@ void AutomationPattern::flipY( int min, int max )
 
 
 
-void AutomationPattern::flipX(bool visible)
+void AutomationPattern::flipX( bool visible )
 {
 	timeMap tempMap;
 
@@ -433,22 +429,22 @@ void AutomationPattern::flipX(bool visible)
 	float tempValue = 0;
 	int numPoints = 0;
 
-	//(iterate+1).key() - iterate.key(); gets the number of values until the next point
+	//(iterate+1).key() - iterate.key(); gets the "distance" to the next point
 
-	for( int i = 0; (iterate + i + 1) != m_timeMap.end() && (iterate + i ) != m_timeMap.end() ; i++)
+	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
 	{
 		numPoints++;
 	}
 
-	float realLength = (iterate + numPoints).key();
+	float realLength = ( iterate + numPoints ).key();
 	
 	for( int i = 0; i <= numPoints; i++ )
 	{
-		tempValue = valueAt((iterate + i).key());
+		tempValue = valueAt( ( iterate + i ).key() );
 
 		cleanObjects();
 
-		MidiTime newTime = MidiTime( realLength - (iterate + i).key() );
+		MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
 
 		tempMap[newTime] = tempValue;
 	}

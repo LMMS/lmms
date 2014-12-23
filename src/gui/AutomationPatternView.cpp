@@ -149,7 +149,7 @@ void AutomationPatternView::toggleRecording()
 
 void AutomationPatternView::flipY()
 {
-	m_pat->flipY(m_pat->getMin(), m_pat->getMax());
+	m_pat->flipY( m_pat->getMin(), m_pat->getMax() );
 	update();
 }
 
