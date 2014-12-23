@@ -60,7 +60,7 @@ void StereoDelay::tick( sampleFrame frame )
 	m_buffer[m_index][0] = frame[0];
 	m_buffer[m_index][1] = frame[1];
 
-	int readIndex = m_index - ( int )m_length;
+	int readIndex = m_index - ( int )m_length - 1;
 	if( readIndex < 0 )
 	{
 		readIndex += m_maxLength;
