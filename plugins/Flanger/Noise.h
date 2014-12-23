@@ -1,5 +1,5 @@
 /*
- * delayeffect.h - declaration of DelayEffect class, the Delay plugin
+ * noise.h - defination of Noise class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,30 +22,16 @@
  *
  */
 
-#ifndef DELAYEFFECT_H
-#define DELAYEFFECT_H
+#ifndef NOISE_H
+#define NOISE_H
 
-#include "Effect.h"
-#include "delaycontrols.h"
-#include "lfo.h"
-#include "stereodelay.h"
-
-class DelayEffect : public Effect
+class Noise
 {
 public:
-	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~DelayEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
-	virtual EffectControls* controls()
-	{
-		return &m_delayControls;
-	}
-	void changeSampleRate();
-
+	Noise();
+	float tick();
 private:
-	DelayControls m_delayControls;
-	StereoDelay* m_delay;
-	Lfo* m_lfo;
+	double inv_randmax;
 };
 
-#endif // DELAYEFFECT_H
+#endif // NOISE_H

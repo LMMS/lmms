@@ -32,10 +32,10 @@ class DelayControls;
 class DelayControlsDialog : public EffectControlDialog
 {
 public:
-    DelayControlsDialog( DelayControls* controls );
-    virtual ~DelayControlsDialog()
-    {
-    }
+	DelayControlsDialog( DelayControls* controls );
+	virtual ~DelayControlsDialog()
+	{
+	}
 };
 
 #endif // DELAYCONTROLSDIALOG_H

@@ -1,5 +1,5 @@
 /*
- * monodelay.h - defination of MonoDelay class.
+ * noise.cpp - defination of Noise class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,39 +22,18 @@
  *
  */
 
-#ifndef MONODELAY_H
-#define MONODELAY_H
+#include "Noise.h"
+#include "lmms_math.h"
 
-#include "lmms_basics.h"
-
-class MonoDelay
+Noise::Noise()
 {
-public:
-    MonoDelay( int maxTime , int sampleRate );
-    ~MonoDelay();
-    inline void setLength( float length )
-    {
-        if( length <= m_maxLength && length >= 0 )
-        {
-            m_length = length;
-        }
-    }
+	inv_randmax = 1.0/FAST_RAND_MAX; /* for range of 0 - 1.0 */
+}
 
-    inline void setFeedback( float feedback )
-    {
-        m_feedback = feedback;
-    }
 
-    void tick( sample_t* sample );
-    void setSampleRate( int sampleRate );
 
-private:
-    sample_t* m_buffer;
-    int m_maxLength;
-    float m_length;
-    int m_index;
-    float m_feedback;
-    float m_maxTime;
-};
 
-#endif // MONODELAY_H
+float Noise::tick()
+{
+	return (float) ((2.0 * fast_rand() * inv_randmax) - 1.0);
+}
