@@ -636,14 +636,20 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 		_w = _w->parentWidget();
 	}
 
-	_de.setAttribute( "x", _w->x() );
-	_de.setAttribute( "y", _w->y() );
 	_de.setAttribute( "visible", _w->isVisible() );
 	_de.setAttribute( "minimized", _w->isMinimized() );
 	_de.setAttribute( "maximized", _w->isMaximized() );
 
+	bool maxed = _w->isMaximized();
+	bool mined = _w->isMinimized();
+	if( mined || maxed ) { _w->showNormal(); }
+
+	_de.setAttribute( "x", _w->x() );
+	_de.setAttribute( "y", _w->y() );
 	_de.setAttribute( "width", _w->width() );
 	_de.setAttribute( "height", _w->height() );
+	if( maxed ) { _w->showMaximized(); }
+	if( mined ) { _w->showMinimized(); }
 }
 
 
