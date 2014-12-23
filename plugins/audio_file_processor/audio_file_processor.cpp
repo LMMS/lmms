@@ -630,6 +630,25 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
+void AudioFileProcessorView::newWaveView()
+{
+	if ( m_waveView )
+	{
+		delete m_waveView;
+		m_waveView = 0;
+	}
+	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
+	m_waveView->move( 2, 172 );
+	m_waveView->setKnobs(
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_endKnob ),
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_loopKnob ) );
+	m_waveView->show();
+}
+
+
+
+
 void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
@@ -638,6 +657,7 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( value );
 		_de->accept();
+		newWaveView();
 		return;
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
@@ -691,6 +711,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 void AudioFileProcessorView::sampleUpdated( void )
 {
+	newWaveView();
 	m_waveView->update();
 	update();
 }
@@ -707,6 +728,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
 		engine::getSong()->setModified();
+		newWaveView();
 	}
 }
 
