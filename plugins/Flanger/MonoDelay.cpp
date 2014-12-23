@@ -55,7 +55,7 @@ MonoDelay::~MonoDelay()
 void MonoDelay::tick( sample_t* sample )
 {
 	m_buffer[m_index] = *sample;
-	int readIndex = m_index - ( int )m_length;
+	int readIndex = m_index - ( int )m_length - 1;
 	if(readIndex < 0)
 	{
 		readIndex += m_maxLength;
