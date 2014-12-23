@@ -22,20 +22,20 @@
  *
  */
 
-#include "monodelay.h"
+#include "MonoDelay.h"
 #include "interpolation.h"
 #include "lmms_math.h"
 
 MonoDelay::MonoDelay( int maxTime , int sampleRate )
 {
-    m_buffer = 0;
-    m_maxTime = maxTime;
-    m_maxLength = maxTime * sampleRate;
-    m_length = m_maxLength;
+	m_buffer = 0;
+	m_maxTime = maxTime;
+	m_maxLength = maxTime * sampleRate;
+	m_length = m_maxLength;
 
-    m_index = 0;
-    m_feedback = 0.0f;
-    setSampleRate( sampleRate );
+	m_index = 0;
+	m_feedback = 0.0f;
+	setSampleRate( sampleRate );
 }
 
 
@@ -43,10 +43,10 @@ MonoDelay::MonoDelay( int maxTime , int sampleRate )
 
 MonoDelay::~MonoDelay()
 {
-    if( m_buffer )
-    {
-        delete m_buffer;
-    }
+	if( m_buffer )
+	{
+		delete m_buffer;
+	}
 }
 
 
@@ -54,24 +54,24 @@ MonoDelay::~MonoDelay()
 
 void MonoDelay::tick( sample_t* sample )
 {
-    m_buffer[m_index] = *sample;
-    int readIndex = m_index - ( int )m_length;
-    if(readIndex < 0)
-    {
-        readIndex += m_maxLength;
-    }
-    float fract = fraction( m_length );
-    if(readIndex != m_maxLength-1 )
-    {
-    *sample = linearInterpolate(m_buffer[readIndex] ,
-                               m_buffer[readIndex+1], fract );
-    } else
-    {
-        *sample = linearInterpolate(m_buffer[readIndex] ,
-                                   m_buffer[0], fract );
-    }
-    m_buffer[m_index] += *sample * m_feedback;
-    m_index = ( m_index +1 ) % m_maxLength;
+	m_buffer[m_index] = *sample;
+	int readIndex = m_index - ( int )m_length - 1;
+	if(readIndex < 0)
+	{
+		readIndex += m_maxLength;
+	}
+	float fract = 1.0f - fraction( m_length );
+	if(readIndex != m_maxLength-1 )
+	{
+		*sample = linearInterpolate(m_buffer[readIndex] ,
+									m_buffer[readIndex+1], fract );
+	} else
+	{
+		*sample = linearInterpolate(m_buffer[readIndex] ,
+									m_buffer[0], fract );
+	}
+	m_buffer[m_index] += *sample * m_feedback;
+	m_index = ( m_index +1 ) % m_maxLength;
 }
 
 
@@ -79,11 +79,11 @@ void MonoDelay::tick( sample_t* sample )
 
 void MonoDelay::setSampleRate( int sampleRate )
 {
-    if( m_buffer )
-    {
-        delete m_buffer;
-    }
+	if( m_buffer )
+	{
+		delete m_buffer;
+	}
 
 
-    m_buffer = new sample_t[( int )( sampleRate * m_maxTime )];
+	m_buffer = new sample_t[( int )( sampleRate * m_maxTime )];
 }
