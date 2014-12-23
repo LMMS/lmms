@@ -1,5 +1,5 @@
 /*
- * flangercontrolsdialog.h - defination of FlangerControlsDialog class.
+ * monodelay.h - defination of MonoDelay class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,20 +22,39 @@
  *
  */
 
-#ifndef FLANGERCONTROLSDIALOG_H
-#define FLANGERCONTROLSDIALOG_H
+#ifndef MONODELAY_H
+#define MONODELAY_H
 
-#include "EffectControlDialog.h"
+#include "lmms_basics.h"
 
-class FlangerControls;
-
-class FlangerControlsDialog : public EffectControlDialog
+class MonoDelay
 {
 public:
-    FlangerControlsDialog( FlangerControls* controls );
-    virtual ~FlangerControlsDialog()
-    {
-    }
+	MonoDelay( int maxTime , int sampleRate );
+	~MonoDelay();
+	inline void setLength( float length )
+	{
+		if( length <= m_maxLength && length >= 0 )
+		{
+			m_length = length;
+		}
+	}
+
+	inline void setFeedback( float feedback )
+	{
+		m_feedback = feedback;
+	}
+
+	void tick( sample_t* sample );
+	void setSampleRate( int sampleRate );
+
+private:
+	sample_t* m_buffer;
+	int m_maxLength;
+	float m_length;
+	int m_index;
+	float m_feedback;
+	float m_maxTime;
 };
 
-#endif // FLANGERCONTROLSDIALOG_H
+#endif // MONODELAY_H

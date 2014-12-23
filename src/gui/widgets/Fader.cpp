@@ -170,7 +170,7 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 	{
 		int dy = m_moveStartPoint - mouseEvent->globalY();
 
-		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - ( *s_knob ).height() );
+		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
 		model()->setValue( m_startValue + delta );
 
@@ -186,7 +186,7 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 	if( mouseEvent->button() == Qt::LeftButton &&
 			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
-		if( mouseEvent->y() >= knobPosY() - ( *s_knob ).height() && mouseEvent->y() < knobPosY() )
+		if( mouseEvent->y() >= knobPosY() - ( *m_knob ).height() && mouseEvent->y() < knobPosY() )
 		{
 			updateTextFloat();
 			s_textFloat->show();
@@ -346,13 +346,16 @@ void Fader::paintEvent( QPaintEvent * ev)
 	// background
 	painter.drawPixmap( ev->rect(), *m_back, ev->rect() );
 
-
 	// peak leds
 	//float fRange = abs( m_fMaxPeak ) + abs( m_fMinPeak );
 
+	int height = m_back->height();
+	int width = m_back->width() / 2;
+	int center = m_back->width() - width;
+	
 	int peak_L = calculateDisplayPeak( m_fPeakValue_L - m_fMinPeak );
 	int persistentPeak_L = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_L - m_fMinPeak ) );
-	painter.drawPixmap( QRect( 0, peak_L, 11, 116 - peak_L ), *m_leds, QRect( 0, peak_L, 11, 116 - peak_L ) );
+	painter.drawPixmap( QRect( 0, peak_L, width, height - peak_L ), *m_leds, QRect( 0, peak_L, width, height - peak_L ) );
 
 	if( m_persistentPeak_L > 0.05 )
 	{
@@ -363,7 +366,7 @@ void Fader::paintEvent( QPaintEvent * ev)
 
 	int peak_R = calculateDisplayPeak( m_fPeakValue_R - m_fMinPeak );
 	int persistentPeak_R = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_R - m_fMinPeak ) );
-	painter.drawPixmap( QRect( 11, peak_R, 11, 116 - peak_R ), *m_leds, QRect( 11, peak_R, 11, 116 - peak_R ) );
+	painter.drawPixmap( QRect( center, peak_R, width, height - peak_R ), *m_leds, QRect( center, peak_R, width, height - peak_R ) );
 
 	if( m_persistentPeak_R > 0.05 )
 	{
@@ -373,7 +376,7 @@ void Fader::paintEvent( QPaintEvent * ev)
 	}
 
 	// knob
-	painter.drawPixmap( 0, knobPosY() - ( *m_knob ).height(), *s_knob );
+	painter.drawPixmap( 0, knobPosY() - m_knob->height(), *m_knob );
 }
 
 

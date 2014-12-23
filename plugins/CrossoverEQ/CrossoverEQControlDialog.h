@@ -1,7 +1,9 @@
 /*
- * quadraturelfo.cpp - defination of QuadratureLfo class.
+ * CrossoverEQControlDialog.h - A native 4-band Crossover Equalizer 
+ * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,17 +24,27 @@
  *
  */
 
-#include "quadraturelfo.h"
+#ifndef CROSSOVEREQ_CONTROL_DIALOG_H
+#define CROSSOVEREQ_CONTROL_DIALOG_H
 
-QuadratureLfo::QuadratureLfo( int sampleRate )
+#include <QPixmap>
+#include "EffectControlDialog.h"
+
+class CrossoverEQControls;
+
+class CrossoverEQControlDialog : public EffectControlDialog
 {
-    setSampleRate(sampleRate);
-}
+	Q_OBJECT
+public:
+	CrossoverEQControlDialog( CrossoverEQControls * controls );
+	virtual ~CrossoverEQControlDialog()
+	{
+	}
+	
+private:
+	QPixmap m_fader_bg;
+	QPixmap m_fader_empty;
+	QPixmap m_fader_knob;
+};
 
-void QuadratureLfo::tick( float *s, float *c )
-{
-    *s = sinf( m_phase );
-    *c = cosf( m_phase );
-    m_phase += m_increment;
-
-}
+#endif

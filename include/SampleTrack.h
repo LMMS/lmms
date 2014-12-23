@@ -148,7 +148,9 @@ public:
 
 private:
 	FloatModel m_volumeModel;
+	FloatModel m_panningModel;
 	AudioPort m_audioPort;
+
 
 
 	friend class SampleTrackView;
@@ -181,6 +183,7 @@ private:
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
 	Knob * m_volumeKnob;
+	Knob * m_panningKnob;
 
 } ;
 

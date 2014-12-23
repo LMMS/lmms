@@ -742,6 +742,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_to( m_sampleBuffer.frames() ),
 	m_last_from( 0 ),
 	m_last_to( 0 ),
+	m_last_amp( 0 ),
 	m_startKnob( 0 ),
 	m_endKnob( 0 ),
 	m_loopKnob( 0 ),
