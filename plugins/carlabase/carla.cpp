@@ -251,16 +251,16 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 
     switch (opcode)
     {
-    case HOST_OPCODE_NULL:
+    case NATIVE_HOST_OPCODE_NULL:
         break;
-    case HOST_OPCODE_UPDATE_PARAMETER:
-    case HOST_OPCODE_UPDATE_MIDI_PROGRAM:
-    case HOST_OPCODE_RELOAD_PARAMETERS:
-    case HOST_OPCODE_RELOAD_MIDI_PROGRAMS:
-    case HOST_OPCODE_RELOAD_ALL:
+    case NATIVE_HOST_OPCODE_UPDATE_PARAMETER:
+    case NATIVE_HOST_OPCODE_UPDATE_MIDI_PROGRAM:
+    case NATIVE_HOST_OPCODE_RELOAD_PARAMETERS:
+    case NATIVE_HOST_OPCODE_RELOAD_MIDI_PROGRAMS:
+    case NATIVE_HOST_OPCODE_RELOAD_ALL:
         // nothing
         break;
-    case HOST_OPCODE_UI_UNAVAILABLE:
+    case NATIVE_HOST_OPCODE_UI_UNAVAILABLE:
         handleUiClosed();
         break;
     }
@@ -459,7 +459,7 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 
 void CarlaInstrument::sampleRateChanged()
 {
-    fDescriptor->dispatcher(fHandle, PLUGIN_OPCODE_SAMPLE_RATE_CHANGED, 0, 0, nullptr, handleGetSampleRate());
+    fDescriptor->dispatcher(fHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED, 0, 0, nullptr, handleGetSampleRate());
 }
 
 // -------------------------------------------------------------------

@@ -173,8 +173,11 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			if( dummy )
 				c = dummy;
 			else
+			{
 				c = new Controller( DummyController, NULL,
 								QString() );
+				dummy = c;
+			}
 			break;
 
 		case Controller::LfoController:

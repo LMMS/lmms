@@ -415,7 +415,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
-			( *it ).section( ':', 1, 1 ).toFloat()
+			( *it ).section( ':', 2, -1 ).toFloat()
 		} ;
 		m.addInt( item.index );
 		m.addString( item.shortLabel );

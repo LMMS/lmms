@@ -529,6 +529,11 @@ void MainWindow::finalize()
 		setupDialog sd( setupDialog::AudioSettings );
 		sd.exec();
 	}
+	// reset window title every time we change the state of a subwindow to show the correct title
+	foreach( QMdiSubWindow * subWindow, workspace()->subWindowList() )
+	{
+		connect( subWindow, SIGNAL( windowStateChanged(Qt::WindowStates,Qt::WindowStates) ), this, SLOT( resetWindowTitle() ) );
+	}
 }
 
 
