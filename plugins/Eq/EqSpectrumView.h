@@ -44,12 +44,14 @@ public:
 	float m_bands[MAX_BANDS];
 	float m_energy;
 	int m_sr;
+	bool m_active;
 
 
 	EqAnalyser() :
 		m_framesFilledUp ( 0 ),
 		m_energy ( 0 ),
-		m_sr ( 1 )
+		m_sr ( 1 ),
+		m_active ( true )
 	{
 		m_inProgress=false;
 		m_specBuf = (fftwf_complex *) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
@@ -83,42 +85,46 @@ public:
 
 	void analyze( sampleFrame *buf, const fpp_t frames )
 	{
-		m_inProgress=true;
-		const int FFT_BUFFER_SIZE = 2048;
-		fpp_t f = 0;
-		if( frames > FFT_BUFFER_SIZE )
+		if ( m_active )
 		{
+			m_inProgress=true;
+			const int FFT_BUFFER_SIZE = 2048;
+			fpp_t f = 0;
+			if( frames > FFT_BUFFER_SIZE )
+			{
+				m_framesFilledUp = 0;
+				f = frames - FFT_BUFFER_SIZE;
+			}
+			// meger channels
+			for( ; f < frames; ++f )
+			{
+				m_buffer[m_framesFilledUp] =
+						( buf[f][0] + buf[f][1] ) * 0.5;
+				++m_framesFilledUp;
+			}
+
+			if( m_framesFilledUp < FFT_BUFFER_SIZE )
+			{
+				m_inProgress = false;
+				return;
+			}
+
+			m_sr = Engine::mixer()->processingSampleRate();
+			const int LOWEST_FREQ = 0;
+			const int HIGHEST_FREQ = m_sr / 2;
+
+			fftwf_execute( m_fftPlan );
+			absspec( m_specBuf, m_absSpecBuf, FFT_BUFFER_SIZE+1 );
+
+			compressbands( m_absSpecBuf, m_bands, FFT_BUFFER_SIZE+1,
+						   MAX_BANDS,
+						   ( int )( LOWEST_FREQ * ( FFT_BUFFER_SIZE + 1 ) / ( float )( m_sr / 2 ) ),
+						   ( int )( HIGHEST_FREQ * ( FFT_BUFFER_SIZE +  1) / ( float )( m_sr / 2 ) ) );
+			m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
 			m_framesFilledUp = 0;
-			f = frames - FFT_BUFFER_SIZE;
-		}
-		// meger channels
-		for( ; f < frames; ++f )
-		{
-			m_buffer[m_framesFilledUp] =
-					( buf[f][0] + buf[f][1] ) * 0.5;
-			++m_framesFilledUp;
-		}
-
-		if( m_framesFilledUp < FFT_BUFFER_SIZE )
-		{
 			m_inProgress = false;
-			return;
+			m_active = false;
 		}
-
-		m_sr = Engine::mixer()->processingSampleRate();
-		const int LOWEST_FREQ = 0;
-		const int HIGHEST_FREQ = m_sr / 2;
-
-		fftwf_execute( m_fftPlan );
-		absspec( m_specBuf, m_absSpecBuf, FFT_BUFFER_SIZE+1 );
-
-		compressbands( m_absSpecBuf, m_bands, FFT_BUFFER_SIZE+1,
-					   MAX_BANDS,
-					   ( int )( LOWEST_FREQ * ( FFT_BUFFER_SIZE + 1 ) / ( float )( m_sr / 2 ) ),
-					   ( int )( HIGHEST_FREQ * ( FFT_BUFFER_SIZE +  1) / ( float )( m_sr / 2 ) ) );
-		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
-		m_framesFilledUp = 0;
-		m_inProgress = false;
 	}
 private:
 	bool m_inProgress;
@@ -160,6 +166,7 @@ public:
 	QPainterPath pp;
 	virtual void paintEvent( QPaintEvent* event )
 	{
+		m_sa->m_active = isVisible();
 		const int fh = height();
 		const int LOWER_Y = -60;	// dB
 		QPainter p( this );

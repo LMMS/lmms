@@ -70,6 +70,8 @@ public:
 
 	bool m_inProgress;
 
+	bool visable();
+
 
 
 
