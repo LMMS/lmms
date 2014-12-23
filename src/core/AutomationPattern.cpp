@@ -421,7 +421,7 @@ void AutomationPattern::flipY( int min, int max )
 
 
 
-void AutomationPattern::flipX( bool visible )
+void AutomationPattern::flipX( int length )
 {
 	timeMap tempMap;
 
@@ -429,26 +429,65 @@ void AutomationPattern::flipX( bool visible )
 	float tempValue = 0;
 	int numPoints = 0;
 
-	//(iterate+1).key() - iterate.key(); gets the "distance" to the next point
-
 	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
 	{
 		numPoints++;
 	}
 
 	float realLength = ( iterate + numPoints ).key();
-	
-	for( int i = 0; i <= numPoints; i++ )
+
+	if ( length != -1 && length != realLength)
 	{
-		tempValue = valueAt( ( iterate + i ).key() );
+		if ( realLength < length )
+		{
+			tempValue = valueAt( ( iterate + numPoints ).key() );
+			putValue( MidiTime( length ) , tempValue, false);
+			numPoints++;
+			for( int i = 0; i <= numPoints; i++ )
+			{
+				tempValue = valueAt( ( iterate + i ).key() );
+				cleanObjects();
+				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
+				tempMap[newTime] = tempValue;
+			}
+		}
+		else
+		{
+			//for ( int i = 0; ( iterate + i ).key() < length ; i++ )
+			//{		
+			//	tempValue = valueAt( ( iterate + i ).key() );
+			//}
+			//putValue( MidiTime( length ) , tempValue, false);
+			//numPoints++;
+			for( int i = 0; i <= numPoints; i++ )
+			{
+				tempValue = valueAt( ( iterate + i ).key() );
+				cleanObjects();
+				MidiTime newTime;
 
-		cleanObjects();
-
-		MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
-
-		tempMap[newTime] = tempValue;
+				if ( ( iterate + i ).key() <= length )
+				{
+					newTime = MidiTime( length - ( iterate + i ).key() );
+				}
+				else
+				{
+					newTime = MidiTime( ( iterate + i ).key() );
+				}
+				tempMap[newTime] = tempValue;
+			}
+		}
 	}
-	
+	else
+	{
+		for( int i = 0; i <= numPoints; i++ )
+		{
+			tempValue = valueAt( ( iterate + i ).key() );
+			cleanObjects();
+			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
+			tempMap[newTime] = tempValue;
+		}
+	}
+		
 	m_timeMap.clear();
 
 	m_timeMap = tempMap;

@@ -2072,7 +2072,7 @@ void AutomationEditor::flipYButtonPressed()
 
 void AutomationEditor::flipXButtonPressed()
 {
-	m_pattern->flipX( false );
+	m_pattern->flipX();
 }
 
 

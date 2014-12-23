@@ -171,7 +171,7 @@ public slots:
 	void openInAutomationEditor();
 	void objectDestroyed( jo_id_t );
 	void flipY( int min, int max );
-	void flipX( bool visible );
+	void flipX( int length = -1 );
 
 private:
 	void cleanObjects();

@@ -158,7 +158,8 @@ void AutomationPatternView::flipY()
 
 void AutomationPatternView::flipX()
 {
-	m_pat->flipX( true );
+	//m_pat->flipX( m_pat->length() );
+	m_pat->flipX( m_pat->TrackContentObject::length() );
 	update();
 }
 
@@ -189,10 +190,10 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 						tr( "Set/clear record" ),
 						this, SLOT( toggleRecording() ) );
 	_cm->addAction( embed::getIconPixmap( "flip_y" ),
-						tr( "Flip Y" ),
+						tr( "Flip Vertically (Visible)" ),
 						this, SLOT( flipY() ) );
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
-						tr( "Flip X" ),
+						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT( flipX() ) );
 	if( !m_pat->m_objects.isEmpty() )
 	{
