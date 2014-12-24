@@ -694,7 +694,7 @@ void ADnote::KillNote()
             KillVoice(nvoice);
 
         if(NoteVoicePar[nvoice].VoiceOut)
-			delete[] NoteVoicePar[nvoice].VoiceOut;
+            delete NoteVoicePar[nvoice].VoiceOut;
         NoteVoicePar[nvoice].VoiceOut = NULL;
     }
 
