@@ -71,4 +71,3 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 }
 
 
-#include "moc_delaycontrols.cxx"

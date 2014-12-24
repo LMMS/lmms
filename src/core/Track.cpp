@@ -1009,7 +1009,9 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * _me, int distance
  */
 TrackContentWidget::TrackContentWidget( TrackView * _parent ) :
 	QWidget( _parent ),
-	m_trackView( _parent )
+	m_trackView( _parent ),
+	m_darkerColor( Qt::SolidPattern ),
+	m_lighterColor( Qt::SolidPattern )
 {
 	setAcceptDrops( true );
 

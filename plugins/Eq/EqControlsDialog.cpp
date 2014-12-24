@@ -161,6 +161,8 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	m_analyzeBox->move( cw*1 + ko + 5, 15 );
 	m_analyzeBox->setModel( &controls->m_analyzeModel );
 
+
+
 }
 
 void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent *event)
