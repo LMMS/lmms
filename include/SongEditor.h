@@ -65,6 +65,8 @@ public:
 public slots:
 	void scrolled( int _new_pos );
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 
 private slots:
 	void setHighQuality( bool );

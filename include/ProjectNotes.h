@@ -27,6 +27,7 @@
 #define PROJECT_NOTES_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
 
 #include "JournallingObject.h"
 
@@ -56,6 +57,7 @@ public:
 
 
 protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 	void setupActions();
 
 

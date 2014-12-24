@@ -26,6 +26,7 @@
 #define CONTROLLER_RACK_VIEW_H
 
 #include <QWidget>
+#include <QCloseEvent>
 
 #include "SerializingObject.h"
 #include "lmms_basics.h"
@@ -56,6 +57,8 @@ public:
 public slots:
 	void deleteController( ControllerView * _view );
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 
 private slots:
 	virtual void update();

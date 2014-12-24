@@ -396,4 +396,17 @@ void ProjectNotes::loadSettings( const QDomElement & _this )
 
 
 
+void ProjectNotes::closeEvent( QCloseEvent * _ce )
+{
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
+
 

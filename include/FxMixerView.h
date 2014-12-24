@@ -99,6 +99,9 @@ public:
 	// make sure the display syncs up with the fx mixer.
 	// useful for loading projects
 	void refreshDisplay();
+
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 	
 private slots:
 	void updateFaders();

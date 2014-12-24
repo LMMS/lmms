@@ -195,4 +195,16 @@ void ControllerRackView::addController()
 
 
 
+void ControllerRackView::closeEvent( QCloseEvent * _ce )
+ {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
 
