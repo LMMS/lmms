@@ -86,6 +86,10 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	}
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
+	for( fpp_t f = 0; f < frames; ++f )
+	{
+		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+	}
 	const float outGain = m_eqControls.m_outGainModel.value();
 	const int sampleRate = Engine::mixer()->processingSampleRate() * 2;
 	sampleFrame m_inPeak = { 0, 0 };
@@ -189,10 +193,6 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		m_downsampleFilters[i].processBuffer(m_upBuf , m_upBufFrames );
 	}
 	downSample( buf, frames );
-	for( fpp_t f = 0; f < frames; ++f )
-	{
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
-	}
 	checkGate( outSum / frames );
 	if(m_eqControls.m_analyzeModel.value() )
 	{
