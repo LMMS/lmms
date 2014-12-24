@@ -69,6 +69,8 @@ QPixmap * AutomationEditor::s_toolDraw = NULL;
 QPixmap * AutomationEditor::s_toolErase = NULL;
 QPixmap * AutomationEditor::s_toolSelect = NULL;
 QPixmap * AutomationEditor::s_toolMove = NULL;
+QPixmap * AutomationEditor::s_toolYFlip = NULL;
+QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 
 
@@ -127,6 +129,16 @@ AutomationEditor::AutomationEditor() :
 	{
 		s_toolMove = new QPixmap( embed::getIconPixmap(
 							"edit_move" ) );
+	}
+	if( s_toolYFlip == NULL )
+	{
+		s_toolYFlip = new QPixmap( embed::getIconPixmap(
+							"flip_y" ) );
+	}
+	if( s_toolXFlip == NULL )
+	{
+		s_toolXFlip = new QPixmap( embed::getIconPixmap(
+							"flip_x" ) );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -206,15 +218,25 @@ AutomationEditor::AutomationEditor() :
 					m_toolBar );
 	m_eraseButton->setCheckable( true );
 
+	m_flipYButton = new ToolButton( embed::getIconPixmap( "flip_y" ),
+					tr( "Flip Vertically" ),
+					this, SLOT( flipYButtonPressed() ),
+					m_toolBar );
+
+	m_flipXButton = new ToolButton( embed::getIconPixmap( "flip_x" ),
+					tr( "Flip Horizontally" ),
+					this, SLOT( flipXButtonPressed() ),
+					m_toolBar );
+
 	//TODO: m_selectButton and m_moveButton are broken.
-	/*m_selectButton = new toolButton( embed::getIconPixmap(
+	/*m_selectButton = new ToolButton( embed::getIconPixmap(
 							"edit_select" ),
 					tr( "Select mode (Shift+S)" ),
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
 	m_selectButton->setCheckable( true );
 
-	m_moveButton = new toolButton( embed::getIconPixmap( "edit_move" ),
+	m_moveButton = new ToolButton( embed::getIconPixmap( "edit_move" ),
 					tr( "Move selection mode (Shift+M)" ),
 					this, SLOT( moveButtonToggled() ),
 					m_toolBar );
@@ -223,6 +245,8 @@ AutomationEditor::AutomationEditor() :
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
 	tool_button_group->addButton( m_eraseButton );
+	tool_button_group->addButton( m_flipYButton );
+	tool_button_group->addButton( m_flipXButton );
 	//tool_button_group->addButton( m_selectButton );
 	//tool_button_group->addButton( m_moveButton );
 	tool_button_group->setExclusive( true );
@@ -237,6 +261,12 @@ AutomationEditor::AutomationEditor() :
 		tr( "Click here and erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
+	m_flipYButton->setWhatsThis(
+		tr( "Click here and the pattern will be inverted."
+			"The points are flipped in the y direction. " ) );
+	m_flipXButton->setWhatsThis(
+		tr( "Click here and the pattern will be reversed. "
+			"The points are flipped in the x direction." ) );
 	/*m_selectButton->setWhatsThis(
 		tr( "Click here and select-mode will be activated. In this "
 			"mode you can select values. This is necessary "
@@ -394,6 +424,9 @@ AutomationEditor::AutomationEditor() :
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_drawButton );
 	tb_layout->addWidget( m_eraseButton );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_flipYButton );
+	tb_layout->addWidget( m_flipXButton );
 	//tb_layout->addWidget( m_selectButton );
 	//tb_layout->addWidget( m_moveButton );
 	tb_layout->addSpacing( 10 );
@@ -2024,6 +2057,22 @@ void AutomationEditor::eraseButtonToggled()
 	m_editMode = ERASE;
 	removeSelection();
 	update();
+}
+
+
+
+
+void AutomationEditor::flipYButtonPressed()
+{
+	m_pattern->flipY( m_minLevel, m_maxLevel );
+}
+
+
+
+
+void AutomationEditor::flipXButtonPressed()
+{
+	m_pattern->flipX();
 }
 
 

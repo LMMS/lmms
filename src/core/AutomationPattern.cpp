@@ -384,6 +384,122 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 
 
 
+void AutomationPattern::flipY( int min, int max )
+{
+	timeMap tempMap = m_timeMap;
+	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	float tempValue = 0;
+
+	int numPoints = 0;
+
+	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
+	{
+		numPoints++;
+	}
+	
+	for( int i = 0; i <= numPoints; i++ )
+	{
+
+		if ( min < 0 )
+		{
+			tempValue = valueAt( ( iterate + i ).key() ) * -1;
+			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+		}
+		else
+		{
+			tempValue = max - valueAt( ( iterate + i ).key() );
+			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+		}
+	}
+
+	generateTangents();
+	Engine::automationEditor()->update();
+	emit dataChanged();
+
+}
+
+
+
+
+void AutomationPattern::flipX( int length )
+{
+	timeMap tempMap;
+
+	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	float tempValue = 0;
+	int numPoints = 0;
+
+	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
+	{
+		numPoints++;
+	}
+
+	float realLength = ( iterate + numPoints ).key();
+
+	if ( length != -1 && length != realLength)
+	{
+		if ( realLength < length )
+		{
+			tempValue = valueAt( ( iterate + numPoints ).key() );
+			putValue( MidiTime( length ) , tempValue, false);
+			numPoints++;
+			for( int i = 0; i <= numPoints; i++ )
+			{
+				tempValue = valueAt( ( iterate + i ).key() );
+				cleanObjects();
+				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
+				tempMap[newTime] = tempValue;
+			}
+		}
+		else
+		{
+			//for ( int i = 0; ( iterate + i ).key() < length ; i++ )
+			//{		
+			//	tempValue = valueAt( ( iterate + i ).key() );
+			//}
+			//putValue( MidiTime( length ) , tempValue, false);
+			//numPoints++;
+			for( int i = 0; i <= numPoints; i++ )
+			{
+				tempValue = valueAt( ( iterate + i ).key() );
+				cleanObjects();
+				MidiTime newTime;
+
+				if ( ( iterate + i ).key() <= length )
+				{
+					newTime = MidiTime( length - ( iterate + i ).key() );
+				}
+				else
+				{
+					newTime = MidiTime( ( iterate + i ).key() );
+				}
+				tempMap[newTime] = tempValue;
+			}
+		}
+	}
+	else
+	{
+		for( int i = 0; i <= numPoints; i++ )
+		{
+			tempValue = valueAt( ( iterate + i ).key() );
+			cleanObjects();
+			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
+			tempMap[newTime] = tempValue;
+		}
+	}
+		
+	m_timeMap.clear();
+
+	m_timeMap = tempMap;
+
+	generateTangents();
+	Engine::automationEditor()->update();
+	emit dataChanged();
+}
+
+
+
+
 void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
