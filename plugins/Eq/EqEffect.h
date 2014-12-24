@@ -43,7 +43,25 @@ public:
 	{
 		return &m_eqControls;
 	}
-	void  gain( sampleFrame *buf, const fpp_t frames, float scale, sampleFrame* peak );
+	inline void  gain( sampleFrame *buf, const fpp_t frames, float scale, sampleFrame* peak )
+	{
+		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
+		for( fpp_t f = 0; f < frames; ++f )
+		{
+			buf[f][0] *= scale;
+			buf[f][1] *= scale;
+
+			if( fabs( buf[f][0] ) > peak[0][0] )
+			{
+				peak[0][0] = fabs( buf[f][0] );
+			}
+			if( fabs( buf[f][1] ) > peak[0][1] )
+			{
+				peak[0][1] = fabs( buf[f][0] );
+			}
+
+		}
+	}
 
 private:
 	EqControls m_eqControls;
@@ -70,9 +88,46 @@ private:
 	int m_dFilterCount;
 	sampleFrame* m_upBuf;
 	fpp_t m_upBufFrames;
+	sampleFrame m_lastUpFrame;
 
-	void upsample( sampleFrame *buf, const fpp_t frames );
-	void downSample( sampleFrame *buf, const fpp_t frames );
+	inline void upsample( sampleFrame *buf, const fpp_t frames )
+	{
+
+		if( m_upBufFrames != frames * 2 )
+		{
+			if( m_upBuf )
+			{
+				delete m_upBuf;
+			}
+			m_upBuf = new sampleFrame[frames * 2];
+			m_upBufFrames = frames * 2;
+		}
+		for( int f = 0, f2 = 0; f < frames; ++f, f2 += 2 )
+		{
+			m_upBuf[f2][0] = linearInterpolate( m_lastUpFrame[0],buf[f][0], 0.5 );
+			m_upBuf[f2][1] = linearInterpolate( m_lastUpFrame[1],buf[f][1], 0.5 );
+			m_upBuf[f2+1][0] = buf[f][0];
+			m_upBuf[f2+1][1] = buf[f][1];
+			m_lastUpFrame[0] = buf[f][0];
+			m_lastUpFrame[1] = buf[f][1];
+		}
+	}
+
+
+
+
+	inline void downSample( sampleFrame *buf, const fpp_t frames )
+	{
+		for( int f = 0, f2 = 0; f < frames; ++f, f2 += 2 )
+		{
+			buf[f][0] = m_upBuf[f2+1][0];
+			buf[f][1] = m_upBuf[f2+1][1];
+		}
+	}
+
+
+
+
 	void analyze( sampleFrame *buf, const fpp_t frames, EqAnalyser* fft );
 	float peakBand(float minF, float maxF,EqAnalyser*, int);
 

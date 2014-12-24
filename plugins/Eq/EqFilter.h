@@ -69,7 +69,7 @@ public:
 
 
 
-	virtual void setQ( float res )
+	virtual inline void setQ( float res )
 	{
 		if ( res != m_res )
 		{
@@ -81,13 +81,42 @@ public:
 
 
 
-	virtual void setGain( float gain )
+	virtual inline void setGain( float gain )
 	{
 		if ( gain != m_gain )
 		{
 			m_gain = gain;
 			calcCoefficents();
 		}
+	}
+
+
+
+	virtual inline void setParameters( float sampleRate, float freq, float res, float gain )
+	{
+		bool hasChanged = false;
+		if( sampleRate != m_sampleRate )
+		{
+			m_sampleRate = sampleRate;
+			hasChanged = true;
+		}
+		if ( freq != m_freq )
+		{
+			m_freq = freq;
+			hasChanged = true;
+		}
+		if ( res != m_res )
+		{
+			m_res = res;
+			hasChanged = true;
+		}
+		if ( gain != m_gain )
+		{
+			m_gain = gain;
+			hasChanged = true;
+		}
+
+		if ( hasChanged ) { calcCoefficents(); }
 	}
 
 
@@ -347,8 +376,8 @@ public:
 		if( sampleRate != m_sr )
 		{
 			m_sr = sampleRate;
-			setLowpass(m_freq);
 			setSampleRate( sampleRate );
+			setLowpass(m_freq);
 		}
 	}
 
