@@ -662,8 +662,8 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 
 void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
-	QRect r( qMax( 0, _de.attribute( "x" ).toInt() ),
-			qMax( 0, _de.attribute( "y" ).toInt() ),
+	QRect r( qMax( 1, _de.attribute( "x" ).toInt() ),
+			qMax( 1, _de.attribute( "y" ).toInt() ),
 			qMax( 100, _de.attribute( "width" ).toInt() ),
 			qMax( 100, _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
