@@ -130,11 +130,10 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		s[0] *= output;
 		s[1] *= output;
 
+		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
-
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 	}
 
 	checkGate( out_sum / _frames );

@@ -577,13 +577,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_interpBox->setFont( pointSize<8>( m_interpBox->font() ) );
 
 // wavegraph
-	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
-	m_waveView->move( 2, 172 );
-	m_waveView->setKnobs(
-		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
-		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_endKnob ),
-		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_loopKnob )
-	);
+	m_waveView = 0;
+	newWaveView();
 
 	connect( castModel<audioFileProcessor>(), SIGNAL( isPlaying( f_cnt_t ) ),
 			m_waveView, SLOT( isPlaying( f_cnt_t ) ) );
@@ -632,6 +627,25 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
+void AudioFileProcessorView::newWaveView()
+{
+	if ( m_waveView )
+	{
+		delete m_waveView;
+		m_waveView = 0;
+	}
+	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
+	m_waveView->move( 2, 172 );
+	m_waveView->setKnobs(
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_endKnob ),
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_loopKnob ) );
+	m_waveView->show();
+}
+
+
+
+
 void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
@@ -640,6 +654,7 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( value );
 		_de->accept();
+		newWaveView();
 		return;
 	}
 	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
@@ -693,6 +708,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 void AudioFileProcessorView::sampleUpdated( void )
 {
+	newWaveView();
 	m_waveView->update();
 	update();
 }
@@ -709,6 +725,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
 		Engine::getSong()->setModified();
+		newWaveView();
 	}
 }
 
