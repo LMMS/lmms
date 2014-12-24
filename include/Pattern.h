@@ -137,8 +137,6 @@ private:
 	NoteVector m_notes;
 	int m_steps;
 
-	bool m_resizable;
-
 	friend class PatternView;
 	friend class bbEditor;
 

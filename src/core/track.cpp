@@ -247,7 +247,6 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	m_tco( _tco ),
 	m_trackView( _tv ),
 	m_action( NoAction ),
-	m_autoResize( false ),
 	m_initialMouseX( 0 ),
 	m_hint( NULL ),
 	m_fgColor( 0, 0, 0 ),
@@ -570,7 +569,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 							"a copy." ),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
-		else if( m_autoResize == false )
+		else if( m_tco->getAutoResize() == false )
 		{
 			m_action = Resize;
 			m_oldTime = m_tco->length();
@@ -720,7 +719,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if( _me->x() > width() - RESIZE_GRIP_WIDTH && m_autoResize == false )
+		if( _me->x() > width() - RESIZE_GRIP_WIDTH && m_tco->getAutoResize() == false )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -816,19 +815,6 @@ void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 float trackContentObjectView::pixelsPerTact()
 {
 	return m_trackView->trackContainerView()->pixelsPerTact();
-}
-
-
-
-
-/*! \brief Set whether this trackContentObjectView can resize.
- *
- * \param _e The boolean state of whether this track content object view
- *  is allowed to resize.
- */
-void trackContentObjectView::setAutoResizeEnabled( bool _e )
-{
-	m_autoResize = _e;
 }
 
 
