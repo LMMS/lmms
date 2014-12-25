@@ -7,3 +7,4 @@
 /plugins/zynaddsubfx/zynaddsubfx/ExternalPrograms/Spliter/Makefile
 /plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
 /plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile
+/data/locale/*.qm
