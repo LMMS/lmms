@@ -911,7 +911,10 @@ void Song::loadProject( const QString & _file_name )
 	m_loadingProject = true;
 
 	Engine::projectJournal()->setJournalling( false );
-	Engine::mainWindow()->clearErrors();
+	if( Engine::mainWindow() )
+	{
+		Engine::mainWindow()->clearErrors();
+	}
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -1023,7 +1026,10 @@ void Song::loadProject( const QString & _file_name )
 
 	emit projectLoaded();
 
-	Engine::mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
+	if( Engine::mainWindow() )
+	{
+		Engine::mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
+	}
 
 	m_loadingProject = false;
 	m_modified = false;
