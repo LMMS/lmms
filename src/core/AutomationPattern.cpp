@@ -867,7 +867,7 @@ void AutomationPattern::generateTangents()
 void AutomationPattern::generateTangents( timeMap::const_iterator it,
 							int numToGenerate )
 {
-	if( m_timeMap.size() < 2 )
+	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{
 		m_tangents[it.key()] = 0;
 		return;

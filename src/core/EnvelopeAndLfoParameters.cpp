@@ -446,14 +446,14 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	{
 		sample_t * tmp = m_pahdEnv;
 		m_pahdEnv = new sample_t[m_pahdFrames];
-		delete tmp;
+		delete[] tmp;
 		m_pahdBufSize = m_pahdFrames;
 	}
 	if( m_rBufSize < m_rFrames )
 	{
 		sample_t * tmp = m_rEnv;
 		m_rEnv = new sample_t[m_rFrames];
-		delete tmp;
+		delete[] tmp;
 		m_rBufSize = m_rFrames;
 	}
 
