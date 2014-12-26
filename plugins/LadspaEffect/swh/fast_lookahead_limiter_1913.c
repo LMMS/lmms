@@ -137,6 +137,7 @@ static void cleanupFastLookaheadLimiter(LADSPA_Handle instance) {
 #line 188 "fast_lookahead_limiter_1913.xml"
 	FastLookaheadLimiter *plugin_data = (FastLookaheadLimiter *)instance;
 	free(plugin_data->buffer);
+	free(plugin_data->chunks);
 	free(instance);
 }
 

@@ -48,10 +48,10 @@ using namespace std;
 #define _isinff(x) isinf(x)
 #endif
 #ifndef exp10
-#define exp10(x) pow( 10, x )
+#define exp10(x) pow( 10.0, x )
 #endif
 #ifndef exp10f
-#define exp10f(x) powf( 10, x )
+#define exp10f(x) powf( 10.0f, x )
 #endif
 #endif
 
@@ -188,10 +188,10 @@ static inline float linearToLogScale( float min, float max, float value )
 
 
 
-//! @brief Converts linear amplitude (0-1.0) to dBV scale. 
+//! @brief Converts linear amplitude (0-1.0) to dBV scale. Handles zeroes as -inf.
 //! @param amp Linear amplitude, where 1.0 = 0dBV. 
 //! @return Amplitude in dBV. -inf for 0 amplitude.
-static inline float ampToDbv( float amp )
+static inline float safeAmpToDbv( float amp )
 {
 	return amp == 0.0f
 		? -INFINITY
@@ -199,14 +199,32 @@ static inline float ampToDbv( float amp )
 }
 
 
-//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0
+//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0. Handles infinity as zero.
 //! @param dbv The dBV value to convert: all infinites are treated as -inf and result in 0
 //! @return Linear amplitude
-static inline float dbvToAmp( float dbv )
+static inline float safeDbvToAmp( float dbv )
 {
 	return isinff( dbv )
 		? 0.0f
 		: exp10f( dbv * 0.05f );
+}
+
+
+//! @brief Converts linear amplitude (>0-1.0) to dBV scale. 
+//! @param amp Linear amplitude, where 1.0 = 0dBV. ** Must be larger than zero! **
+//! @return Amplitude in dBV. 
+static inline float ampToDbv( float amp )
+{
+	return log10f( amp ) * 20.0f;
+}
+
+
+//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0
+//! @param dbv The dBV value to convert. ** Must be a real number - not inf/nan! **
+//! @return Linear amplitude
+static inline float dbvToAmp( float dbv )
+{
+	return exp10f( dbv * 0.05f );
 }
 
 

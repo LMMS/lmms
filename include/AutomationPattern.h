@@ -178,6 +178,8 @@ public slots:
 	void clear();
 	void openInAutomationEditor();
 	void scaleTimemapToFit( float oldMin, float oldMax );
+	void flipY( int min, int max );
+	void flipX( int length = -1 );
 
 private:
 	void generateTangents();

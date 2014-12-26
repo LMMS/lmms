@@ -128,6 +128,8 @@ protected slots:
 	void eraseButtonToggled();
 	void selectButtonToggled();
 	void moveButtonToggled();
+	void flipYButtonPressed();
+	void flipXButtonPressed();
 
 	void discreteButtonToggled();
 	void linearButtonToggled();
@@ -185,6 +187,8 @@ private:
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
+	static QPixmap * s_toolYFlip;
+	static QPixmap * s_toolXFlip;
 
 
 	QWidget * m_toolBar;
@@ -196,6 +200,8 @@ private:
 	ToolButton * m_eraseButton;
 	ToolButton * m_selectButton;
 	ToolButton * m_moveButton;
+	ToolButton * m_flipYButton;
+	ToolButton * m_flipXButton;
 
 	ToolButton * m_discreteButton;
 	ToolButton * m_linearButton;
