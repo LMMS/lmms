@@ -708,7 +708,8 @@ Directory::Directory(const QString & filename, const QString & path,
 						const QString & filter ) :
 	QTreeWidgetItem( QStringList( filename ), TypeDirectoryItem ),
 	m_directories( path ),
-	m_filter( filter )
+	m_filter( filter ),
+	m_dirCount( 0 )
 {
 	initPixmaps();
 
@@ -762,6 +763,7 @@ void Directory::update( void )
 	setIcon( 0, *s_folderOpenedPixmap );
 	if( !childCount() )
 	{
+		m_dirCount = 0;
 		for( QStringList::iterator it = m_directories.begin();
 					it != m_directories.end(); ++it )
 		{
@@ -776,7 +778,7 @@ void Directory::update( void )
 						"--- Factory files ---" ) );
 				sep->setIcon( 0, embed::getIconPixmap(
 							"factory_files" ) );
-				insertChild( top_index, sep );
+				insertChild(  m_dirCount + top_index - 1, sep );
 			}
 		}
 	}
@@ -814,6 +816,7 @@ bool Directory::addItems(const QString & path )
 					insertChild( i, new Directory( cur_file,
 							path, m_filter ) );
 					orphan = false;
+					m_dirCount++;
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
@@ -827,6 +830,7 @@ bool Directory::addItems(const QString & path )
 			{
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
+				m_dirCount++;
 			}
 
 			added_something = true;
