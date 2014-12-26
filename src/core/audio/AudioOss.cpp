@@ -356,7 +356,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioOss::setupWidget::~setupWidget()
 {
-
+	delete m_channels->model();
 }
 
 

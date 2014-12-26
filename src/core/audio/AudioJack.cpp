@@ -464,6 +464,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioJack::setupWidget::~setupWidget()
 {
+	delete m_channels->model();
 }
 
 

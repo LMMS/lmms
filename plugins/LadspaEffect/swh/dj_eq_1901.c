@@ -116,6 +116,8 @@ static void activateDj_eq_mono(LADSPA_Handle instance) {
 }
 
 static void cleanupDj_eq_mono(LADSPA_Handle instance) {
+	Dj_eq_mono *plugin_data = (Dj_eq_mono *)instance;
+	free(plugin_data->filters);
 	free(instance);
 }
 
@@ -283,6 +285,8 @@ static void activateDj_eq(LADSPA_Handle instance) {
 }
 
 static void cleanupDj_eq(LADSPA_Handle instance) {
+	Dj_eq *plugin_data = (Dj_eq *)instance;
+	free(plugin_data->filters);
 	free(instance);
 }
 
