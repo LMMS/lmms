@@ -943,7 +943,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
 					/ (float) m_pat->length().getTact() :
-								pixelsPerTact();
+				( width() - 2 * TCO_BORDER_WIDTH )
+					/ (float) m_pat->length().getTact();
+
 
 	const int x_base = TCO_BORDER_WIDTH;
 	p.setPen( c.darker( 300 ) );
