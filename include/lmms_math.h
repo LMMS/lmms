@@ -48,10 +48,10 @@ using namespace std;
 #define _isinff(x) isinf(x)
 #endif
 #ifndef exp10
-#define exp10(x) pow( 10, x )
+#define exp10(x) pow( 10.0, x )
 #endif
 #ifndef exp10f
-#define exp10f(x) powf( 10, x )
+#define exp10f(x) powf( 10.0f, x )
 #endif
 #endif
 
