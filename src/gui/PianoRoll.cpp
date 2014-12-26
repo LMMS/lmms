@@ -963,47 +963,29 @@ inline void PianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	{
 		//step note
 		col.setRgb( 0, 255, 0 );
-		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
 	}
 	else if( _n->selected() )
 	{
 		col.setRgb( 0x00, 0x40, 0xC0 );
-		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
-	}
-	else
-	{
-		// adjust note to make it a bit faded if it has a lower volume
-		// in stereo using gradients
-		QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
-							volVal * leftPercent );
-		QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
-							volVal * rightPercent );
-		col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
-
-		QLinearGradient gradient( _x, _y, _x+_width,
-							_y+KEY_LINE_HEIGHT );
-		gradient.setColorAt( 0, lcol );
-		gradient.setColorAt( 1, rcol );
-		_p.setBrush( gradient );
-		_p.setPen( Qt::NoPen );
-		_p.drawRect( _x, _y, _width, KEY_LINE_HEIGHT-1 );
 	}
 
-	// hilighting lines around the note
-	_p.setPen( Qt::SolidLine );
-	_p.setBrush( Qt::NoBrush );
+	// adjust note to make it a bit faded if it has a lower volume
+	// in stereo using gradients
+	QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
+						volVal * leftPercent );
+	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
+						volVal * rightPercent );
+	col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
 
-	col = QColor( noteCol );
+	QLinearGradient gradient( _x, _y, _x+_width,
+						_y+KEY_LINE_HEIGHT );
+	gradient.setColorAt( 0, lcol );
+	gradient.setColorAt( 1, rcol );
+	_p.setBrush( gradient );
 	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(),
 					qMin<float>( 255, volVal*1.7f ) ) );
-	_p.drawLine( _x, _y, _x + _width, _y );
-	_p.drawLine( _x, _y, _x, _y + KEY_LINE_HEIGHT - 2 );
-
-	col = QColor( noteCol );
-	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(), volVal/1.7 ) );
-	_p.drawLine( _x + _width, _y, _x + _width, _y + KEY_LINE_HEIGHT - 2 );
-	_p.drawLine( _x, _y + KEY_LINE_HEIGHT - 2, _x + _width,
-						_y + KEY_LINE_HEIGHT - 2 );
+	_p.setRenderHint(QPainter::Antialiasing);
+	_p.drawRoundedRect( _x, _y, _width, KEY_LINE_HEIGHT-1, 5, 2 );
 
 	// that little tab thing on the end hinting at the user
 	// to resize the note
