@@ -263,6 +263,7 @@ class mono_audio_module:
     }
 public:
     mono_audio_module();
+	~mono_audio_module();
     void params_changed();
     void activate();
     void set_sample_rate(uint32_t sr);
@@ -291,6 +292,7 @@ class stereo_audio_module:
     }
 public:
     stereo_audio_module();
+	~stereo_audio_module();
     void params_changed();
     void activate();
     void set_sample_rate(uint32_t sr);
