@@ -998,7 +998,7 @@ void PatternView::paintEvent( QPaintEvent * )
 				// qDebug( "keyrange: %d", keyrange );
 
 				// determine height of the pattern view, sans borders
-				const int ht = height() - 1 - TCO_BORDER_WIDTH * 2;
+				const int ht = (height() - 1 - TCO_BORDER_WIDTH * 2) -1;
 
 				// determine maximum height value for drawing bounds checking
 				const int max_ht = height() - 1 - TCO_BORDER_WIDTH;
@@ -1023,7 +1023,7 @@ void PatternView::paintEvent( QPaintEvent * )
 					const float y_key =
 						( float( central_key - ( *it )->key() ) / keyrange + 1.0f ) / 2;
 					// multiply that by pattern height
-					const int y_pos = static_cast<int>( TCO_BORDER_WIDTH + y_key * ht );
+					const int y_pos = static_cast<int>( TCO_BORDER_WIDTH + y_key * ht ) + 1;
 
 					// debug code
 					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
