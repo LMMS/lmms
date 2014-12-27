@@ -387,11 +387,11 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 
-		p.setPen( QColor( 0, 0, 0 ) );	
+		p.setPen( QColor( 0, 0, 0 ) );
 		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( textColor() );	
+		p.setPen( textColor() );
 		p.drawText( 9, p.fontMetrics().height(), "Rec" );
-		
+
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}
@@ -408,7 +408,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 							tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel )
+	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -610,8 +610,3 @@ void SampleTrackView::modelChanged()
 
 	TrackView::modelChanged();
 }
-
-
-
-
-
