@@ -44,7 +44,8 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 	m_name( "unnamed port" ),
 	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL ),
 	m_volumeModel( volumeModel ),
-	m_panningModel( panningModel )
+	m_panningModel( panningModel ),
+	m_isMuted( false )
 {
 	Engine::mixer()->addAudioPort( this );
 	setExtOutputEnabled( true );
@@ -104,13 +105,7 @@ bool AudioPort::processEffects()
 
 void AudioPort::doProcessing()
 {
-	bool isMuted = false;
-	if( m_playHandles.size() )
-	{
-		NotePlayHandle *nph = dynamic_cast<NotePlayHandle*>( m_playHandles.at( 0 ) );
-		if( nph ) { isMuted = nph->instrumentTrack()->isMuted(); }
-		if ( isMuted ) return;
-	}
+	if(m_isMuted) { return; }
 
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 

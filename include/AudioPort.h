@@ -107,6 +107,11 @@ public:
 	void addPlayHandle( PlayHandle * handle );
 	void removePlayHandle( PlayHandle * handle );
 
+	void setMuted( bool muted )
+	{
+		m_isMuted = muted;
+	}
+
 private:
 	volatile bool m_bufferUsage;
 
@@ -125,6 +130,7 @@ private:
 	
 	FloatModel * m_volumeModel;
 	FloatModel * m_panningModel;
+	bool m_isMuted;
 
 	friend class Mixer;
 	friend class MixerWorkerThread;

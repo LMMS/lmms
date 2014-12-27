@@ -160,8 +160,10 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
+		audioPort()->setMuted( true );
 		return;
 	}
+	audioPort()->setMuted( false );
 
 	// Test for silent input data if instrument provides a single stream only (i.e. driven by InstrumentPlayHandle)
 	// We could do that in all other cases as well but the overhead for silence test is bigger than
