@@ -563,7 +563,7 @@ FOREACH(_item ${ts_targets})
 	ADD_DEPENDENCIES(update-locales "${_item}")
 ENDFOREACH(_item ${ts_targets})
 
-ADD_CUSTOM_TARGET(finalize-locales)
+ADD_CUSTOM_TARGET(finalize-locales ALL)
 FOREACH(_item ${qm_targets})
 	ADD_DEPENDENCIES(finalize-locales "${_item}")
 ENDFOREACH(_item ${qm_targets})
