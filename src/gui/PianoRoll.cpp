@@ -286,7 +286,7 @@ PianoRoll::PianoRoll() :
 		s_toolOpen = new QPixmap( embed::getIconPixmap(
 							"automation" ) );
 	}
-	
+
 	// init text-float
 	if( s_textFloat == NULL )
 	{
@@ -623,54 +623,54 @@ PianoRoll::PianoRoll() :
 	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_chordComboBox );
 	tb_layout->addStretch();
-	
+
         m_zoomingComboBox->setWhatsThis(
-		tr( 
-			"This controls the magnification of an axis. " 
+		tr(
+			"This controls the magnification of an axis. "
 			"It can be helpful to choose magnification for a specific "
-			"task. For ordinary editing, the magnification should be " 
+			"task. For ordinary editing, the magnification should be "
 			"fitted to your smallest notes. "
 		) );
-		
+
 		m_quantizeComboBox->setWhatsThis(
 		tr(
-			"The 'Q' stands for quantization, and controls the grid size " 
-			"notes and control points snap to. " 
-			"With smaller quantization values, you can draw shorter notes " 
-			"in Piano Roll, and more exact control points in the " 
-			"Automation Editor." 
+			"The 'Q' stands for quantization, and controls the grid size "
+			"notes and control points snap to. "
+			"With smaller quantization values, you can draw shorter notes "
+			"in Piano Roll, and more exact control points in the "
+			"Automation Editor."
 
-		) );	
-		
+		) );
+
 		m_noteLenComboBox->setWhatsThis(
 		tr(
-			"This lets you select the length of new notes. " 
-			"'Last Note' means that LMMS will use the note length of " 
-                        "the note you last edited" 
-		) );			
-		
+			"This lets you select the length of new notes. "
+			"'Last Note' means that LMMS will use the note length of "
+                        "the note you last edited"
+		) );
+
 		m_scaleComboBox->setWhatsThis(
 		tr(
-			"The feature is directly connected to the context-menu " 
-			"on the virtual keyboard, to the left in Piano Roll. " 
-			"After you have chosen the scale you want " 
-			"in this drop-down menu, " 
-			"you can right click on a desired key in the virtual keyboard, " 
-			"and then choose 'Mark current Scale'. " 
-			"LMMS will highlight all notes that belongs to the chosen scale, " 
-			"and in the key you have selected!" 
+			"The feature is directly connected to the context-menu "
+			"on the virtual keyboard, to the left in Piano Roll. "
+			"After you have chosen the scale you want "
+			"in this drop-down menu, "
+			"you can right click on a desired key in the virtual keyboard, "
+			"and then choose 'Mark current Scale'. "
+			"LMMS will highlight all notes that belongs to the chosen scale, "
+			"and in the key you have selected!"
 					) );
-		
+
 
 		m_chordComboBox->setWhatsThis(
 		tr(
-			"Let you select a chord which LMMS then can draw or highlight." 
-			"You can find the most common chords in this drop-down menu. " 
-			"After you have selected a chord, click anywhere to place the chord, and right " 
-			"click on the virtual keyboard to open context menu and highlight the chord. " 
-			"To return to single note placement, you need to choose 'No chord' " 
-			"in this drop-down menu." 
-		) );	  
+			"Let you select a chord which LMMS then can draw or highlight."
+			"You can find the most common chords in this drop-down menu. "
+			"After you have selected a chord, click anywhere to place the chord, and right "
+			"click on the virtual keyboard to open context menu and highlight the chord. "
+			"To return to single note placement, you need to choose 'No chord' "
+			"in this drop-down menu."
+		) );
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -1580,7 +1580,7 @@ inline int PianoRoll::keyAreaBottom() const
 void PianoRoll::mousePressEvent( QMouseEvent * _me )
 {
 	m_startedWithShift = _me->modifiers() & Qt::ShiftModifier;
-	
+
 	if( hasValidPattern() == false )
 	{
 		return;
@@ -1980,11 +1980,11 @@ void PianoRoll::mouseDoubleClickEvent( QMouseEvent * _me )
 		const int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		const int ticks_middle = x * MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
-		
+
 		// get note-vector of current pattern
-		NoteVector notes; 
+		NoteVector notes;
 		notes += m_pattern->notes();
-		
+
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		foreach( Note * i, notes )
@@ -2016,7 +2016,7 @@ void PianoRoll::mouseDoubleClickEvent( QMouseEvent * _me )
 				{
 					if( ( *it )->pos().getTicks() != closest->pos().getTicks() )
 					{
-						it = nv.erase( it ); 
+						it = nv.erase( it );
 					}
 					else
 					{
@@ -2366,7 +2366,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// if middle-click, set to defaults
 			volume_t vol;
 			panning_t pan;
-			
+
 			if( _me->buttons() & Qt::LeftButton )
 			{
 				vol = tLimit<int>( MinVolume +
@@ -2385,7 +2385,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				vol = DefaultVolume;
 				pan = DefaultPanning;
 			}
-			
+
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				m_lastNoteVolume = vol;
@@ -2473,7 +2473,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 			}
 		}
-		
+
 		else if( _me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
 		{
 			// set move- or resize-cursor
@@ -2938,14 +2938,14 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 {
 	QColor horizCol = QColor( gridColor() );
 	QColor vertCol = QColor( gridColor() );
-	
+
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
 	QBrush bgColor = p.background();
-	
+
 	// fill with bg color
 	p.fillRect( 0,0, width(), height(), bgColor );
 
@@ -3379,6 +3379,7 @@ void PianoRoll::paintEvent( QPaintEvent * _pe )
 	int y = (int) y_base - sel_key_start * KEY_LINE_HEIGHT;
 	int h = (int) y_base - sel_key_end * KEY_LINE_HEIGHT - y;
 	p.setPen( QColor( 0, 64, 192 ) );
+	p.setBrush( Qt::NoBrush );
 	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
 
 	// TODO: Get this out of paint event
@@ -3492,11 +3493,11 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
-		
+
 		// get note-vector of current pattern
-		NoteVector notes; 
+		NoteVector notes;
 		notes += m_pattern->notes();
-		
+
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		foreach( Note * i, notes )
@@ -3509,7 +3510,7 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 				nv += i;
 			}
 		}
-		if( nv.size() > 0 ) 
+		if( nv.size() > 0 )
 		{
 			const int step = _we->delta() > 0 ? 1.0 : -1.0;
 			if( m_noteEditMode == NoteEditVolume )
@@ -3550,7 +3551,7 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 			update();
 		}
 	}
-	
+
 	// not in note edit area, so handle scrolling/zooming and quantization change
 	else
 	if( _we->modifiers() & Qt::ControlModifier && _we->modifiers() & Qt::AltModifier )
@@ -3955,7 +3956,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 			}
 			m_lastNotePanning = new_val;
 		}
-		
+
 	}
 }
 
@@ -4092,7 +4093,7 @@ void PianoRoll::deleteSelectedNotes()
 	bool update_after_delete = false;
 
 	m_pattern->addJournalCheckPoint();
-	
+
 	// get note-vector of current pattern
 	const NoteVector & notes = m_pattern->notes();
 
@@ -4308,10 +4309,3 @@ Note * PianoRoll::noteUnderMouse()
 
 	return *it;
 }
-
-
-
-
-
-
-
