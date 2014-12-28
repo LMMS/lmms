@@ -42,7 +42,7 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_highShelfGainModel(  0.0 , -40, 40, 0.001, this, tr( "High Shelf gain" ) ),
 	m_hpResModel( 0.707,0.003, 10.0 , 0.001, this, tr( "HP res" )  ),
 	m_lowShelfResModel( 1.4,0.55, 10.0 , 0.001, this , tr( "Low Shelf res" ) ),
-	m_para1ResModel( 1.4 ,0.55, 10.0 , 0.001, this , tr( "Peak 1 res" ) ),
+	m_para1ResModel( 1.4, 0.55, 10.0, 0.001, this , tr( "Peak 1 res" ) ),
 	m_para2ResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "Peak 2 res" ) ),
 	m_para3ResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "Peak 3 res" ) ),
 	m_para4ResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "Peak 4 res" ) ),

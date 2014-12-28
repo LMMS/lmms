@@ -84,46 +84,6 @@ private:
 	EqLp12Filter m_lp24;
 	EqLp12Filter m_lp480;
 	EqLp12Filter m_lp481;
-	EqLinkwitzRiley* m_downsampleFilters;
-	int m_dFilterCount;
-	sampleFrame* m_upBuf;
-	fpp_t m_upBufFrames;
-	sampleFrame m_lastUpFrame;
-
-	inline void upsample( sampleFrame *buf, const fpp_t frames )
-	{
-
-		if( m_upBufFrames != frames * 2 )
-		{
-			if( m_upBuf )
-			{
-				delete m_upBuf;
-			}
-			m_upBuf = new sampleFrame[frames * 2];
-			m_upBufFrames = frames * 2;
-		}
-		for( int f = 0, f2 = 0; f < frames; ++f, f2 += 2 )
-		{
-			m_upBuf[f2][0] = linearInterpolate( m_lastUpFrame[0],buf[f][0], 0.5 );
-			m_upBuf[f2][1] = linearInterpolate( m_lastUpFrame[1],buf[f][1], 0.5 );
-			m_upBuf[f2+1][0] = buf[f][0];
-			m_upBuf[f2+1][1] = buf[f][1];
-			m_lastUpFrame[0] = buf[f][0];
-			m_lastUpFrame[1] = buf[f][1];
-		}
-	}
-
-
-
-
-	inline void downSample( sampleFrame *buf, const fpp_t frames )
-	{
-		for( int f = 0, f2 = 0; f < frames; ++f, f2 += 2 )
-		{
-			buf[f][0] = m_upBuf[f2+1][0];
-			buf[f][1] = m_upBuf[f2+1][1];
-		}
-	}
 
 
 
