@@ -48,6 +48,8 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_scale = 1.5;
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
 	m_controls = controls;
+	tf = new TextFloat();
+	tf->hide();
 
 }
 
@@ -154,6 +156,8 @@ void EqParameterWidget::mouseReleaseEvent( QMouseEvent *event )
 	{
 		m_controls->m_analyseOut = !m_controls->m_analyseOut;
 	}
+
+	tf->hide();
 }
 
 
@@ -180,6 +184,15 @@ void EqParameterWidget::mouseMoveEvent( QMouseEvent *event )
 		default:
 			break;
 		}
+	}
+	if( m_oldX > 0 && m_oldX < width() && m_oldY > 0 && m_oldY < height() )
+	{
+		tf->setText( QString::number(xPixelToFreq( m_oldX )) + tr( "Hz ") );
+		tf->show();
+		const int x = event->x() > width() * 0.5 ?
+					m_oldX - tf->width() :
+					m_oldX;
+		tf->moveGlobal(this, QPoint( x, m_oldY - tf->height() ) );
 	}
 }
 

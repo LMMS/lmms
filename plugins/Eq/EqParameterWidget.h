@@ -27,6 +27,7 @@
 #define EQPARAMETERWIDGET_H
 #include <QWidget>
 #include "EffectControls.h"
+#include "TextFloat.h"
 
 class EqControls;
 
@@ -121,6 +122,7 @@ private:
 	float m_pixelsPerOctave;
 	float m_scale;
 	EqBand* m_selectedBand;
+	TextFloat *tf;
 
 	EqBand*  selectNearestHandle( const int x, const int y );
 
