@@ -378,9 +378,9 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				}
 				++m_runningMidiNotes[key];
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
-				emit newNote();
 			}
 			m_midiNotesMutex.unlock();
+			emit newNote();
 			break;
 
 		case MidiNoteOff:
