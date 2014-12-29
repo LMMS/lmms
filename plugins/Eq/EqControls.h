@@ -92,10 +92,10 @@ private:
 
 	FloatModel m_hpResModel;
 	FloatModel m_lowShelfResModel;
-	FloatModel m_para1ResModel;
-	FloatModel m_para2ResModel;
-	FloatModel m_para3ResModel;
-	FloatModel m_para4ResModel;
+	FloatModel m_para1BwModel;
+	FloatModel m_para2BwModel;
+	FloatModel m_para3BwModel;
+	FloatModel m_para4BwModel;
 	FloatModel m_highShelfResModel;
 	FloatModel m_lpResModel;
 

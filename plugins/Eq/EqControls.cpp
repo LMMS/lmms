@@ -42,10 +42,10 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_highShelfGainModel(  0.0 , -40, 40, 0.001, this, tr( "High Shelf gain" ) ),
 	m_hpResModel( 0.707,0.003, 10.0 , 0.001, this, tr( "HP res" )  ),
 	m_lowShelfResModel( 1.4,0.55, 10.0 , 0.001, this , tr( "Low Shelf res" ) ),
-	m_para1ResModel( 1.4, 0.55, 10.0, 0.001, this , tr( "Peak 1 res" ) ),
-	m_para2ResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "Peak 2 res" ) ),
-	m_para3ResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "Peak 3 res" ) ),
-	m_para4ResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "Peak 4 res" ) ),
+	m_para1BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 1 BW" ) ),
+	m_para2BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 2 BW" ) ),
+	m_para3BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 3 BW" ) ),
+	m_para4BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 4 BW" ) ),
 	m_highShelfResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "High Shelf res" ) ),
 	m_lpResModel( 0.707,0.003, 10.0 , 0.001, this , tr( "LP res" ) ),
 	m_hpFeqModel( 31.0, 30.0, 20000, 0.001, this , tr( "HP freq" ) ),
@@ -112,10 +112,10 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_highShelfGainModel.loadSettings( _this , "HighShelfgain");
 	m_hpResModel.loadSettings( _this ,"HPres");
 	m_lowShelfResModel.loadSettings( _this, "LowShelfres" );
-	m_para1ResModel.loadSettings( _this ,"Peak1res" );
-	m_para2ResModel.loadSettings( _this ,"Peak2res" );
-	m_para3ResModel.loadSettings( _this ,"Peak3res" );
-	m_para4ResModel.loadSettings( _this ,"Peak4res" );
+	m_para1BwModel.loadSettings( _this ,"Peak1bw" );
+	m_para2BwModel.loadSettings( _this ,"Peak2bw" );
+	m_para3BwModel.loadSettings( _this ,"Peak3bw" );
+	m_para4BwModel.loadSettings( _this ,"Peak4bw" );
 	m_highShelfResModel.loadSettings( _this, "HighShelfres" );
 	m_lpResModel.loadSettings( _this, "LPres");
 	m_hpFeqModel.loadSettings( _this, "HPfreq" );
@@ -160,10 +160,10 @@ void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_highShelfGainModel.saveSettings( doc, parent, "HighShelfgain");
 	m_hpResModel.saveSettings( doc, parent ,"HPres");
 	m_lowShelfResModel.saveSettings( doc, parent, "LowShelfres" );
-	m_para1ResModel.saveSettings( doc, parent,"Peak1res" );
-	m_para2ResModel.saveSettings( doc, parent,"Peak2res" );
-	m_para3ResModel.saveSettings( doc, parent,"Peak3res" );
-	m_para4ResModel.saveSettings( doc, parent,"Peak4res" );
+	m_para1BwModel.saveSettings( doc, parent,"Peak1bw" );
+	m_para2BwModel.saveSettings( doc, parent,"Peak2bw" );
+	m_para3BwModel.saveSettings( doc, parent,"Peak3bw" );
+	m_para4BwModel.saveSettings( doc, parent,"Peak4bw" );
 	m_highShelfResModel.saveSettings( doc, parent, "HighShelfres" );
 	m_lpResModel.saveSettings( doc, parent, "LPres");
 	m_hpFeqModel.saveSettings( doc, parent, "HPfreq" );

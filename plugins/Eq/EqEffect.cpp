@@ -123,25 +123,25 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 
 	if( m_eqControls.m_para1ActiveModel.value() )
 	{
-		m_para1.setParameters( sampleRate, m_eqControls.m_para1FreqModel.value(), m_eqControls.m_para1ResModel.value(), m_eqControls.m_para1GainModel.value() );
+		m_para1.setParameters( sampleRate, m_eqControls.m_para1FreqModel.value(), m_eqControls.m_para1BwModel.value(), m_eqControls.m_para1GainModel.value() );
 		m_para1.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para2ActiveModel.value() )
 	{
-		m_para2.setParameters( sampleRate, m_eqControls.m_para2FreqModel.value(), m_eqControls.m_para2ResModel.value(), m_eqControls.m_para2GainModel.value() );
+		m_para2.setParameters( sampleRate, m_eqControls.m_para2FreqModel.value(), m_eqControls.m_para2BwModel.value(), m_eqControls.m_para2GainModel.value() );
 		m_para2.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para3ActiveModel.value() )
 	{
-		m_para3.setParameters( sampleRate, m_eqControls.m_para3FreqModel.value(), m_eqControls.m_para3ResModel.value(), m_eqControls.m_para3GainModel.value() );
+		m_para3.setParameters( sampleRate, m_eqControls.m_para3FreqModel.value(), m_eqControls.m_para3BwModel.value(), m_eqControls.m_para3GainModel.value() );
 		m_para3.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para4ActiveModel.value() )
 	{
-		m_para4.setParameters( sampleRate, m_eqControls.m_para4FreqModel.value(), m_eqControls.m_para4ResModel.value(), m_eqControls.m_para4GainModel.value() );
+		m_para4.setParameters( sampleRate, m_eqControls.m_para4FreqModel.value(), m_eqControls.m_para4BwModel.value(), m_eqControls.m_para4GainModel.value() );
 		m_para4.processBuffer( buf, frames );
 	}
 
@@ -217,30 +217,30 @@ void EqEffect::setBandPeaks(EqAnalyser *fft, int samplerate )
 
 	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
 			peakBand( m_eqControls.m_para1FreqModel.value()
-					  - (m_eqControls.m_para1FreqModel.value() / m_eqControls.m_para1ResModel.value() * 0.5),
+					  - (m_eqControls.m_para1FreqModel.value() * m_eqControls.m_para1BwModel.value() * 0.5),
 					  m_eqControls.m_para1FreqModel.value()
-					  + (m_eqControls.m_para1FreqModel.value() / m_eqControls.m_para1ResModel.value() * 0.5),
+					  + (m_eqControls.m_para1FreqModel.value() * m_eqControls.m_para1BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_para2PeakL = m_eqControls.m_para2PeakR =
 			peakBand( m_eqControls.m_para2FreqModel.value()
-					  - (m_eqControls.m_para2FreqModel.value() / m_eqControls.m_para2ResModel.value() * 0.5),
+					  - (m_eqControls.m_para2FreqModel.value() * m_eqControls.m_para2BwModel.value() * 0.5),
 					  m_eqControls.m_para2FreqModel.value()
-					  + (m_eqControls.m_para2FreqModel.value() / m_eqControls.m_para2ResModel.value() * 0.5),
+					  + (m_eqControls.m_para2FreqModel.value() * m_eqControls.m_para2BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_para3PeakL = m_eqControls.m_para3PeakR =
 			peakBand( m_eqControls.m_para3FreqModel.value()
-					  - (m_eqControls.m_para3FreqModel.value() / m_eqControls.m_para3ResModel.value() * 0.5),
+					  - (m_eqControls.m_para3FreqModel.value() * m_eqControls.m_para3BwModel.value() * 0.5),
 					  m_eqControls.m_para3FreqModel.value()
-					  + (m_eqControls.m_para3FreqModel.value() / m_eqControls.m_para3ResModel.value() * 0.5),
+					  + (m_eqControls.m_para3FreqModel.value() * m_eqControls.m_para3BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_para4PeakL = m_eqControls.m_para4PeakR =
 			peakBand( m_eqControls.m_para4FreqModel.value()
-					  - (m_eqControls.m_para4FreqModel.value() / m_eqControls.m_para4ResModel.value() * 0.5),
+					  - (m_eqControls.m_para4FreqModel.value() * m_eqControls.m_para4BwModel.value() * 0.5),
 					  m_eqControls.m_para4FreqModel.value()
-					  + (m_eqControls.m_para4FreqModel.value() / m_eqControls.m_para4ResModel.value() * 0.5),
+					  + (m_eqControls.m_para4FreqModel.value() * m_eqControls.m_para4BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =

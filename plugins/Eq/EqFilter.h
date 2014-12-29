@@ -150,6 +150,7 @@ protected:
 	float m_freq;
 	float m_res;
 	float m_gain;
+	float m_bw;
 };
 
 
@@ -258,7 +259,7 @@ public:
 		float c = cosf( w0 );
 		float s = sinf( w0 );
 		float A =  pow( 10, m_gain * 0.025);
-		float alpha = s / ( 2 * m_res );
+		float alpha = s * sinh( log( 2 ) / 2 * m_bw * w0 / sinf(w0) );
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
@@ -279,6 +280,33 @@ public:
 		a0 = 1;
 
 		setCoeffs( a1, a2, b0, b1, b2 );
+	}
+
+	virtual inline void setParameters( float sampleRate, float freq, float bw, float gain )
+	{
+		bool hasChanged = false;
+		if( sampleRate != m_sampleRate )
+		{
+			m_sampleRate = sampleRate;
+			hasChanged = true;
+		}
+		if ( freq != m_freq )
+		{
+			m_freq = freq;
+			hasChanged = true;
+		}
+		if ( bw != m_bw )
+		{
+			m_bw = bw;
+			hasChanged = true;
+		}
+		if ( gain != m_gain )
+		{
+			m_gain = gain;
+			hasChanged = true;
+		}
+
+		if ( hasChanged ) { calcCoefficents(); }
 	}
 };
 

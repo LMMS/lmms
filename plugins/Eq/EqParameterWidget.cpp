@@ -100,7 +100,7 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 			gain = m_bands[i].gain->value();
 		}
 		y = gainToYPixel( gain );
-		float bw = m_bands[i].freq->value() / m_bands[i].res->value();
+		float bw = m_bands[i].freq->value() * m_bands[i].res->value();
 		m_bands[i].x = x; m_bands[i].y = y;
 		const int radius = 7;
 		painter.drawEllipse( x - radius , y - radius, radius * 2 ,radius * 2 );
@@ -178,7 +178,7 @@ void EqParameterWidget::mouseMoveEvent( QMouseEvent *event )
 			if( m_selectedBand->gain )m_selectedBand->gain->setValue( yPixelToGain( m_oldY ) );
 			break;
 		case res:
-			if( m_selectedBand->res )m_selectedBand->res->incValue( deltaX * resPixelMultiplyer() );
+			if( m_selectedBand->res )m_selectedBand->res->incValue( ( deltaX) * resPixelMultiplyer() );
 			if( m_selectedBand->res )m_selectedBand->res->incValue( (-deltaR) * resPixelMultiplyer() );
 			break;
 		default:
