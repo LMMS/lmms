@@ -58,16 +58,6 @@ public:
 
 	static bool hasGUI();
 
-	static void setSuppressMessages( bool _on )
-	{
-		s_suppressMessages = _on;
-	}
-
-	static bool suppressMessages()
-	{
-		return !hasGUI() || s_suppressMessages;
-	}
-
 	// core
 	static Mixer *mixer()
 	{
@@ -127,7 +117,7 @@ private:
 		delete tmp;
 	}
 
-	static bool s_suppressMessages;
+	static bool s_hasGUI;
 	static float s_framesPerTick;
 
 	// core

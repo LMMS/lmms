@@ -40,8 +40,7 @@
 
 #include "GuiApplication.h"
 
-
-bool Engine::s_suppressMessages = false;
+bool Engine::s_hasGUI = true;
 float Engine::s_framesPerTick;
 Mixer* Engine::s_mixer = NULL;
 FxMixer * Engine::s_fxMixer = NULL;
