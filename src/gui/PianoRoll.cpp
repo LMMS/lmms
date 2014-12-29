@@ -1462,10 +1462,13 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 		}
 
 		case Qt::Key_Control:
-			m_ctrlMode = m_editMode;
-			m_editMode = ModeSelect;
-			QApplication::changeOverrideCursor( Qt::ArrowCursor );
-			event->accept();
+			if ( isActiveWindow() )
+			{
+				m_ctrlMode = m_editMode;
+				m_editMode = ModeSelect;
+				QApplication::changeOverrideCursor( Qt::ArrowCursor );
+				event->accept();
+			}
 			break;
 		default:
 			break;
