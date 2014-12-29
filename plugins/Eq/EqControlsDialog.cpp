@@ -54,7 +54,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	m_outSpec = new EqSpectrumView( &controls->m_outFftBands, this);
 	m_outSpec->move( 51, 2 );
 	m_outSpec->color = QColor(145, 205, 22, 80);
-	m_parameterWidget = new EqParameterWidget( this );
+	m_parameterWidget = new EqParameterWidget( this , controls );
 	m_parameterWidget->move( 51, 2 );
 
 	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255 ,255, 255), tr( "HP" ) ,0,0);
@@ -155,13 +155,6 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	hpBtnGrp->addButton( m_hp24Box );
 	hpBtnGrp->addButton( m_hp48Box );
 	hpBtnGrp->setModel( &m_controls->m_hpTypeModel,false);
-
-	//Analize Box
-	m_analyzeBox = new LedCheckBox( tr( "Analyze" ), this , "" , LedCheckBox::Green );
-	m_analyzeBox->move( cw*1 + ko + 5, 15 );
-	m_analyzeBox->setModel( &controls->m_analyzeModel );
-
-
 
 }
 

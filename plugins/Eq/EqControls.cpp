@@ -70,7 +70,6 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_hp12Model( false, this , tr( "HP 12" ) ),
 	m_hp24Model( false, this , tr( "HP 24" ) ),
 	m_hp48Model( false, this , tr( "HP 48" ) ),
-	m_analyzeModel( true, this , tr( "Analyze enable" ) ),
 	m_lpTypeModel( 0,0,2,this, tr( "low pass type") ) ,
 	m_hpTypeModel( 0,0,2,this, tr( "high pass type") )
 {
@@ -94,6 +93,8 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_para4PeakL = 0; m_para4PeakR = 0;
 	m_highShelfPeakL = 0; m_highShelfPeakR = 0;
 	m_inProgress = false;
+	m_analyseIn = true;
+	m_analyseOut = true;
 }
 
 
@@ -139,7 +140,6 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_hp12Model.loadSettings( _this , "HP12" );
 	m_hp24Model.loadSettings( _this , "HP24" );
 	m_hp48Model.loadSettings( _this , "HP48" );
-	m_analyzeModel.loadSettings( _this, "Analyzeenable");
 	m_lpTypeModel.loadSettings( _this, "LP" );
 	m_hpTypeModel.loadSettings( _this, "HP" );
 }
@@ -188,7 +188,6 @@ void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_hp12Model.saveSettings( doc, parent, "HP12" );
 	m_hp24Model.saveSettings( doc, parent, "HP24" );
 	m_hp48Model.saveSettings( doc, parent, "HP48" );
-	m_analyzeModel.saveSettings( doc, parent, "Analyzeenable");
 	m_lpTypeModel.saveSettings( doc, parent, "LP" );
 	m_hpTypeModel.saveSettings( doc, parent, "HP" );
 }

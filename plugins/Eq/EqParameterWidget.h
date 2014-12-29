@@ -28,6 +28,8 @@
 #include <QWidget>
 #include "EffectControls.h"
 
+class EqControls;
+
 
 class EqBand
 {
@@ -51,9 +53,9 @@ public :
 
 class EqParameterWidget : public QWidget
 {
-
+	Q_OBJECT
 public:
-	explicit EqParameterWidget( QWidget *parent = 0 );
+	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0);
 	~EqParameterWidget();
 	const int bandCount()
 	{
@@ -113,6 +115,7 @@ protected:
 
 private:
 	EqBand *m_bands;
+	EqControls *m_controls;
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_pixelsPerOctave;

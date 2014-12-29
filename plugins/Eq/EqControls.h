@@ -64,6 +64,8 @@ public:
 	float m_para3PeakL, m_para3PeakR;
 	float m_para4PeakL, m_para4PeakR;
 	float m_highShelfPeakL, m_highShelfPeakR;
+	bool m_analyseIn;
+	bool m_analyseOut;
 
 	EqAnalyser m_inFftBands;
 	EqAnalyser m_outFftBands;
@@ -122,8 +124,6 @@ private:
 	BoolModel m_hp12Model;
 	BoolModel m_hp24Model;
 	BoolModel m_hp48Model;
-
-	BoolModel m_analyzeModel;
 
 	IntModel m_lpTypeModel;
 	IntModel m_hpTypeModel;

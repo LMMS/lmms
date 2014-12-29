@@ -28,8 +28,9 @@
 #include "lmms_math.h"
 #include "MainWindow.h"
 #include "QMouseEvent"
+#include "EqControls.h"
 
-EqParameterWidget::EqParameterWidget( QWidget *parent ) :
+EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
 	m_bands ( 0 ),
 	m_selectedBand ( 0 )
@@ -46,6 +47,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 	m_pixelsPerUnitHeight = (height() - 4) / ( totalHeight );
 	m_scale = 1.5;
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
+	m_controls = controls;
 
 }
 
@@ -133,6 +135,25 @@ void EqParameterWidget::mouseReleaseEvent( QMouseEvent *event )
 {
 	m_selectedBand = 0;
 	m_mouseAction = none;
+	const int inXmin = 228;
+	const int inXmax = 250;
+	const int inYmin = 20;
+	const int inYmax = 30;
+
+	const int outXmin = 228;
+	const int outXmax = 250;
+	const int outYmin = 30;
+	const int outYmax = 40;
+
+	if(event->x() > inXmin && event->x() < inXmax && event->y() > inYmin && event->y() < inYmax )
+	{
+		m_controls->m_analyseIn = !m_controls->m_analyseIn;
+	}
+
+	if(event->x() > outXmin && event->x() < outXmax && event->y() > outYmin && event->y() < outYmax )
+	{
+		m_controls->m_analyseOut = !m_controls->m_analyseOut;
+	}
 }
 
 
