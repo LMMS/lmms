@@ -23,7 +23,7 @@
  */
 
 #include "Song.h"
-
+#include <QTextStream>
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
@@ -90,6 +90,7 @@ Song::Song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
+	m_errors( new QList<QString>() ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_trackToPlay( NULL ),
@@ -914,10 +915,6 @@ void Song::loadProject( const QString & _file_name )
 	m_loadingProject = true;
 
 	Engine::projectJournal()->setJournalling( false );
-	if( gui )
-	{
-		gui->mainWindow()->clearErrors();
-	}
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -931,6 +928,8 @@ void Song::loadProject( const QString & _file_name )
 	}
 
 	clearProject();
+
+	clearErrors();
 
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
 
@@ -1029,9 +1028,17 @@ void Song::loadProject( const QString & _file_name )
 
 	emit projectLoaded();
 
-	if( gui )
+	if ( hasErrors())
 	{
-		gui->mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
+		if ( Engine::hasGUI() )
+		{
+			QMessageBox::warning( NULL, "LMMS Error report", *errorSummary(),
+							QMessageBox::Ok );
+		}
+		else
+		{
+			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
+		}
 	}
 
 	m_loadingProject = false;
@@ -1322,5 +1329,38 @@ void Song::removeController( Controller * _controller )
 
 
 
+void Song::clearErrors()
+{
+	m_errors->clear();
+}
 
 
+
+void Song::collectError( const QString error )
+{
+	m_errors->append( error );
+}
+
+
+
+bool Song::hasErrors()
+{
+	return ( m_errors->length() > 0 );
+}
+
+
+
+QString* Song::errorSummary()
+{
+	QString* errors = new QString();
+
+	for ( int i = 0 ; i < m_errors->length() ; i++ )
+	{
+		errors->append( m_errors->value( i ) + "\n" );
+	}
+
+	errors->prepend( "\n\n" );
+	errors->prepend( tr( "The following errors occured while loading: " ) );
+
+	return errors;
+}

@@ -39,7 +39,7 @@
 #include "ControllerConnection.h"
 #include "MemoryManager.h"
 #include "ValueBuffer.h"
-#include "MainWindow.h"
+#include "Song.h"
 
 #include "embed.cpp"
 
@@ -75,12 +75,8 @@ LadspaEffect::LadspaEffect( Model * _parent,
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
 	{
-		if ( Engine::hasGUI() )
-		{
-			Engine::mainWindow()->collectError(
-				tr( "Unknown LADSPA plugin %1 requested." ).arg(
-					m_key.second ) );
-		}
+		Engine::getSong()->collectError(tr( "Unknown LADSPA plugin %1 requested." ).arg(
+											m_key.second ) );
 		setOkay( false );
 		return;
 	}

@@ -65,6 +65,10 @@ public:
 		Mode_Count
 	} ;
 
+	void clearErrors();
+	void collectError( const QString error );
+	bool hasErrors();
+	QString* errorSummary();
 
 	class playPos : public MidiTime
 	{
@@ -343,6 +347,8 @@ private:
 	volatile bool m_paused;
 
 	bool m_loadingProject;
+
+	QList<QString> * m_errors;
 
 	PlayModes m_playMode;
 	playPos m_playPos[Mode_Count];

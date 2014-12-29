@@ -117,7 +117,6 @@ private:
 		delete tmp;
 	}
 
-	static bool s_hasGUI;
 	static float s_framesPerTick;
 
 	// core
