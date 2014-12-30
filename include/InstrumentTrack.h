@@ -38,6 +38,7 @@
 #include "Track.h"
 
 
+
 class QLineEdit;
 template<class T> class QQueue;
 class InstrumentFunctionArpeggioView;
@@ -202,10 +203,10 @@ public:
 		return &m_effectChannelModel;
 	}
 
+	void setIndicator( FadeButton *fb );
 
 signals:
 	void instrumentChanged();
-	void newNote();
 	void midiNoteOn( const Note& );
 	void midiNoteOff( const Note& );
 	void nameChanged();
@@ -249,6 +250,8 @@ private:
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
+
+	FadeButton *m_fb;
 
 
 	Instrument * m_instrument;

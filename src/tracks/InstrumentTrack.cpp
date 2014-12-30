@@ -49,6 +49,7 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FadeButton.h"
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -378,9 +379,10 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				}
 				++m_runningMidiNotes[key];
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
+
 			}
 			m_midiNotesMutex.unlock();
-			emit newNote();
+			m_fb->activate();
 			break;
 
 		case MidiNoteOff:
@@ -560,6 +562,12 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 	QDomNodeList n = _dataFile.elementsByTagName( "midiport" );
 	n.item( 0 ).parentNode().removeChild( n.item( 0 ) );
 }
+
+void InstrumentTrack::setIndicator(FadeButton *fb)
+{
+	m_fb = fb;
+}
+
 
 
 
@@ -910,9 +918,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( activityIndicatorPressed() ) );
 	connect( m_activityIndicator, SIGNAL( released() ),
 				this, SLOT( activityIndicatorReleased() ) );
-	connect( _it, SIGNAL( newNote() ),
-				m_activityIndicator, SLOT( activate() ) );
-
+	_it->setIndicator( m_activityIndicator );
 
 	setModel( _it );
 }
