@@ -318,13 +318,32 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_languages.append( fileNames[i] );
 		QString lang = QLocale( m_languages.last() ).nativeLanguageName();
 		changeLang->addItem( lang );
-		if( m_lang == m_languages.last() )
-		{
-			changeLang->setCurrentIndex( i );
-		}
 	}
 	connect( changeLang, SIGNAL( currentIndexChanged( int ) ),
 							this, SLOT( setLanguage( int ) ) );
+
+	//If language unset, fallback to system language when available
+	if( m_lang == "" )
+	{
+		QString tmp = QLocale::system().name().left( 2 );
+		if( m_languages.contains( tmp ) )
+		{
+			m_lang = tmp;
+		}
+		else
+		{
+			m_lang = "en";
+		}
+	}
+
+	for( int i = 0; i < changeLang->count(); ++i )
+	{
+		if( m_lang == m_languages.at( i ) )
+		{
+			changeLang->setCurrentIndex( i );
+			break;
+		}
+	}
 
 	gen_layout->addWidget( bufsize_tw );
 	gen_layout->addSpacing( 10 );
