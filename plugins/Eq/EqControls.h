@@ -28,8 +28,10 @@
 #include "EffectControls.h"
 #include "EqControlsDialog.h"
 #include "Knob.h"
+#include "DBvModel.h"
 
 class EqEffect;
+
 
 class EqControls : public EffectControls
 {
@@ -81,8 +83,8 @@ public:
 private:
 	EqEffect* m_effect;
 
-	FloatModel m_inGainModel;
-	FloatModel m_outGainModel;
+	DBvModel m_inGainModel;
+	DBvModel m_outGainModel;
 	FloatModel m_lowShelfGainModel;
 	FloatModel m_para1GainModel;
 	FloatModel m_para2GainModel;
