@@ -32,8 +32,8 @@
 EqControls::EqControls( EqEffect *effect ) :
 	EffectControls( effect ),
 	m_effect( effect ),
-	m_inGainModel( 1.0, 0.0, 2.0, 0.001, this, tr( "Input gain") ),
-	m_outGainModel( 1.0, 0.0, 2.0, 0.001, this, tr( "Output gain" ) ),
+	m_inGainModel( 0.0, -60.0, 6.0, 0.01, this, tr( "Input gain") ),
+	m_outGainModel( -.0, -60.0, 6.0, 0.1, this, tr( "Output gain" ) ),
 	m_lowShelfGainModel(  0.0 , -40, 40, 0.001, this, tr( "Low shelf gain" ) ),
 	m_para1GainModel(  0.0 , -40, 40, 0.001, this, tr( "Peak 1 gain" ) ),
 	m_para2GainModel(  0.0 , -40, 40, 0.001, this, tr( "Peak 2 gain" ) ),
@@ -95,6 +95,8 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_inProgress = false;
 	m_analyseIn = true;
 	m_analyseOut = true;
+
+	m_inGainModel.setScaleLogarithmic( true );
 }
 
 

@@ -70,10 +70,15 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 
 	m_inGainFader = new EqFader( &controls->m_inGainModel, tr( "In Gain" ), this,  &controls->m_inPeakL, &controls->m_inPeakR);
 	m_inGainFader->move( 10, 5 );
+	m_inGainFader->setDisplayConversion( false );
+	m_inGainFader->setHintText( tr( "Gain" ), "dBv");
+
 
 
 	m_outGainFader = new EqFader( &controls->m_outGainModel, tr( "Out Gain" ), this, &controls->m_outPeakL, &controls->m_outPeakR );
 	m_outGainFader->move( 315, 5 );
+	m_outGainFader->setDisplayConversion( false );
+	m_outGainFader->setHintText( tr( "Gain" ), "dBv");
 	//gain faders
 
 	int fo = (cw * 0.5) - (m_outGainFader->width() * 0.5 );

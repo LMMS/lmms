@@ -78,7 +78,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	const float outGain = m_eqControls.m_outGainModel.value();
+	const float outGain = dbvToAmp( m_eqControls.m_outGainModel.value() );
 	const int sampleRate = Engine::mixer()->processingSampleRate();
 	sampleFrame m_inPeak = { 0, 0 };
 
@@ -90,7 +90,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		m_eqControls.m_inFftBands.clear();
 	}
-	gain(buf , frames, m_eqControls.m_inGainModel.value(), &m_inPeak );
+	gain(buf , frames, dbvToAmp( m_eqControls.m_inGainModel.value() ), &m_inPeak );
 	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < m_inPeak[0] ? m_inPeak[0] : m_eqControls.m_inPeakL;
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
