@@ -446,15 +446,23 @@ void AutomationPattern::flipX( int length )
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
+				cleanObjects();
 				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
 				tempMap[newTime] = tempValue;
 			}
 		}
 		else
 		{
+			//for ( int i = 0; ( iterate + i ).key() < length ; i++ )
+			//{		
+			//	tempValue = valueAt( ( iterate + i ).key() );
+			//}
+			//putValue( MidiTime( length ) , tempValue, false);
+			//numPoints++;
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
+				cleanObjects();
 				MidiTime newTime;
 
 				if ( ( iterate + i ).key() <= length )

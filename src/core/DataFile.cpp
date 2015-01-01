@@ -775,8 +775,25 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
 	if( root.hasAttribute( "creatorversion" ) &&
-		root.attribute( "creatorversion" ) != LMMS_VERSION )
+		root.attribute( "creatorversion" ) > LMMS_VERSION )
 	{
+		QMessageBox::information( NULL,
+				SongEditor::tr( "Newer Project Version" ),
+				SongEditor::tr( "This project was created "
+						"with an newer version of LMMS " 
+						"than the one installed!"	).
+								arg( _sourceFile ) );
+	}
+
+	if( root.hasAttribute( "creatorversion" ) &&
+		root.attribute( "creatorversion" ) < LMMS_VERSION )
+	{
+		QMessageBox::information( NULL,
+				SongEditor::tr( "Old Project Version" ),
+				SongEditor::tr( "This project was created "
+						"with an older version of LMMS " 
+						"than the one installed."	).
+								arg( _sourceFile ) );
 		upgrade();
 	}
 
