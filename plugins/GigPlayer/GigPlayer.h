@@ -2,7 +2,7 @@
  * GigPlayer.h - a GIG player using libgig (based on Sf2 player plugin)
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

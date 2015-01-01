@@ -2,7 +2,7 @@
  * PresetPreviewPlayHandle.h - a PlayHandle specialization for playback of a short
  *                             preview of a preset or a file processed by a plugin
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

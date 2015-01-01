@@ -2,8 +2,8 @@
   ZynAddSubFX - a software synthesizer
 
   AnalogFilter.cpp - Several analog filters (lowpass, highpass...)
-  Copyright (C) 2002-2005 Nasca Octavian Paul
-  Copyright (C) 2010-2010 Mark McCurry
+  Copyright (C) 2002-2015 Nasca Octavian Paul
+  Copyright (C) 2010-2015 Mark McCurry
   Author: Nasca Octavian Paul
           Mark McCurry
 

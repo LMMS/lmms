@@ -10,7 +10,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Menu_Window.H>
 #include "../Misc/Util.h"
-//Copyright (c) 2003-2005 Nasca Octavian Paul
+//Copyright (c) 2003-2015 Nasca Octavian Paul
 //License: GNU GPL version 2 or later
 
 using namespace std;

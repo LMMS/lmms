@@ -1,7 +1,7 @@
 /*
  * Graph.cpp - a QT widget for displaying and manipulating waveforms
  *
- * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2015 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *               2008 Paul Giblock            <drfaygo/at/gmail/dot/com>
  *
  * This file is part of LMMS - http://lmms.io

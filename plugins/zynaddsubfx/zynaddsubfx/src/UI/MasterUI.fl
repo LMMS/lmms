@@ -2,7 +2,7 @@
 version 1.0110 
 header_name {.h} 
 code_name {.cc}
-decl {//Copyright (c) 2002-2009 Nasca Octavian Paul} {} 
+decl {//Copyright (c) 2002-2015 Nasca Octavian Paul} {} 
 
 decl {//License: GNU GPL version 2 or later} {} 
 
@@ -1045,7 +1045,7 @@ panelwindow->show();}
       xywh {411 344 365 280} type Double hide
     } {
       Fl_Box {} {
-        label {Copyright (c) 2002-2009 Nasca O. PAUL and others. Please read AUTHORS.txt}
+        label {Copyright (c) 2002-2015 Nasca O. PAUL and others. Please read AUTHORS.txt}
         xywh {15 35 335 55} labeltype EMBOSSED_LABEL labelsize 15 align 208
       }
       Fl_Box {} {

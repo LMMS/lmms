@@ -2,7 +2,7 @@
 version 1.0110 
 header_name {.h} 
 code_name {.cc}
-decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
+decl {//Copyright (c) 2002-2015 Nasca Octavian Paul} {} 
 
 decl {//License: GNU GPL version 2 or later} {} 
 

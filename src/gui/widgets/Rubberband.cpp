@@ -2,7 +2,7 @@
  * Rubberband.cpp - rubberband - either own implementation for Qt3 or wrapper
  *                               for Qt4
  *
- * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

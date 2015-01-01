@@ -1,7 +1,7 @@
 /*
  * AudioPort.h - base-class for objects providing sound at a port
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

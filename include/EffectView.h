@@ -1,8 +1,8 @@
 /*
  * EffectView.h - view-component for an effect
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2007-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

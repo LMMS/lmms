@@ -1,8 +1,8 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2012-2015 Paul Giblock    <p/at/pgiblock.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -156,7 +156,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-v" )
 		{
 			printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
-	"Copyright (c) 2004-2014 LMMS developers.\n\n"
+	"Copyright (c) 2004-2015 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
@@ -171,7 +171,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-h" ) )
 		{
 			printf( "LMMS %s\n"
-	"Copyright (c) 2004-2014 LMMS developers.\n\n"
+	"Copyright (c) 2004-2015 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
 	"            [ -u <in> <out> ]\n"
 	"            [ -d <in> ]\n"

@@ -38,7 +38,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2014, LMMS developers</source>
+        <source>Copyright (c) 2004-2015, LMMS developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

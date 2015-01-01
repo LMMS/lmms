@@ -1,7 +1,7 @@
 /*
  * AutomatableButton.h - class automatableButton, the base for all buttons
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

@@ -2,7 +2,7 @@
 // Blip_Synth and Blip_Wave are waveform transition synthesizers for adding
 // waveforms to a Blip_Buffer.
 
-// Blip_Buffer 0.3.4. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
+// Blip_Buffer 0.3.4. Copyright (C) 2003-2015 Shay Green. GNU LGPL license.
 
 #ifndef BLIP_SYNTH_H
 #define BLIP_SYNTH_H

@@ -1,7 +1,7 @@
 /* dynamic.cpp
 
    Computer Music Toolkit - a library of LADSPA plugins. Copyright (C)
-   2000-2002 Richard W.E. Furse. The author may be contacted at
+   2000-2015 Richard W.E. Furse. The author may be contacted at
    richard@muse.demon.co.uk.
 
    This library is free software; you can redistribute it and/or
@@ -508,7 +508,7 @@ initialise_dynamic() {
      LADSPA_PROPERTY_HARD_RT_CAPABLE,
      "Simple Compressor (Peak Envelope Tracking)",
      CMT_MAKER("Richard W.E. Furse"),
-     CMT_COPYRIGHT("2000-2002", "Richard W.E. Furse"),
+     CMT_COPYRIGHT("2000-2015", "Richard W.E. Furse"),
      NULL,
      CMT_Instantiate<CompressorExpander>,
      activateCompressorExpander,
@@ -559,7 +559,7 @@ initialise_dynamic() {
      LADSPA_PROPERTY_HARD_RT_CAPABLE,
      "Simple Compressor (RMS Envelope Tracking)",
      CMT_MAKER("Richard W.E. Furse"),
-     CMT_COPYRIGHT("2000-2002", "Richard W.E. Furse"),
+     CMT_COPYRIGHT("2000-2015", "Richard W.E. Furse"),
      NULL,
      CMT_Instantiate<CompressorExpander>,
      activateCompressorExpander,
@@ -610,7 +610,7 @@ initialise_dynamic() {
      LADSPA_PROPERTY_HARD_RT_CAPABLE,
      "Simple Expander (Peak Envelope Tracking)",
      CMT_MAKER("Richard W.E. Furse"),
-     CMT_COPYRIGHT("2000-2002", "Richard W.E. Furse"),
+     CMT_COPYRIGHT("2000-2015", "Richard W.E. Furse"),
      NULL,
      CMT_Instantiate<CompressorExpander>,
      activateCompressorExpander,
@@ -661,7 +661,7 @@ initialise_dynamic() {
      LADSPA_PROPERTY_HARD_RT_CAPABLE,
      "Simple Expander (RMS Envelope Tracking)",
      CMT_MAKER("Richard W.E. Furse"),
-     CMT_COPYRIGHT("2000-2002", "Richard W.E. Furse"),
+     CMT_COPYRIGHT("2000-2015", "Richard W.E. Furse"),
      NULL,
      CMT_Instantiate<CompressorExpander>,
      activateCompressorExpander,
@@ -712,7 +712,7 @@ initialise_dynamic() {
      LADSPA_PROPERTY_HARD_RT_CAPABLE,
      "Simple Limiter (Peak Envelope Tracking)",
      CMT_MAKER("Richard W.E. Furse"),
-     CMT_COPYRIGHT("2000-2002", "Richard W.E. Furse"),
+     CMT_COPYRIGHT("2000-2015", "Richard W.E. Furse"),
      NULL,
      CMT_Instantiate<Limiter>,
      activateLimiter,
@@ -756,7 +756,7 @@ initialise_dynamic() {
      LADSPA_PROPERTY_HARD_RT_CAPABLE,
      "Simple Limiter (RMS Envelope Tracking)",
      CMT_MAKER("Richard W.E. Furse"),
-     CMT_COPYRIGHT("2000-2002", "Richard W.E. Furse"),
+     CMT_COPYRIGHT("2000-2015", "Richard W.E. Furse"),
      NULL,
      CMT_Instantiate<Limiter>,
      activateLimiter,

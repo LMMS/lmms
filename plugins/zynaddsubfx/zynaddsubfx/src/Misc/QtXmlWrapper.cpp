@@ -27,8 +27,8 @@
   ZynAddSubFX - a software synthesizer
 
   QtXmlWrapper.C - XML wrapper
-  Copyright (C) 2003-2005 Nasca Octavian Paul
-  Copyright (C) 2009-2009 Mark McCurry
+  Copyright (C) 2003-2015 Nasca Octavian Paul
+  Copyright (C) 2009-2015 Mark McCurry
   Author: Nasca Octavian Paul
           Mark McCurry
 

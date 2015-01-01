@@ -1,7 +1,7 @@
 
 // Private oscillators used by Gb_Apu
 
-// Gb_Snd_Emu 0.1.4. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
+// Gb_Snd_Emu 0.1.4. Copyright (C) 2003-2015 Shay Green. GNU LGPL license.
 
 #ifndef GB_OSCS_H
 #define GB_OSCS_H

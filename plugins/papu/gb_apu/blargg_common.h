@@ -4,7 +4,7 @@
 // Don't modify this file directly; #define HAVE_CONFIG_H and put your
 // configuration into "config.h".
 
-// Copyright (C) 2004-2005 Shay Green.
+// Copyright (C) 2004-2015 Shay Green.
 
 #ifndef BLARGG_COMMON_H
 #define BLARGG_COMMON_H

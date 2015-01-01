@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * Reusable audio effect classes - implementation.
  *
- * Copyright (C) 2001-2010 Krzysztof Foltman, Markus Schmidt, Thor Harald Johansen and others
+ * Copyright (C) 2001-2015 Krzysztof Foltman, Markus Schmidt, Thor Harald Johansen and others
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

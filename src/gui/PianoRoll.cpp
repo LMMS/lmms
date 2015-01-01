@@ -2,7 +2,7 @@
  * PianoRoll.cpp - implementation of piano roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
  * This file is part of LMMS - http://lmms.io

@@ -1,7 +1,7 @@
 /*
  * ProjectJournal.h - declaration of class ProjectJournal
  *
- * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

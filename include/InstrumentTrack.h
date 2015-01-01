@@ -2,7 +2,7 @@
  * InstrumentTrack.h - declaration of class InstrumentTrack, a track + window
  *                     which holds an instrument-plugin
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

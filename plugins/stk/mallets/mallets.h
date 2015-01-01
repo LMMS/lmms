@@ -1,7 +1,7 @@
 /*
  * mallets.h - tuned instruments that one would bang upon
  *
- * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * 
  * This file is part of LMMS - http://lmms.io

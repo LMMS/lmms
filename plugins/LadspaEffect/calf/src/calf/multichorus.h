@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * Multitap chorus class.
  *
- * Copyright (C) 2001-2007 Krzysztof Foltman
+ * Copyright (C) 2001-2015 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

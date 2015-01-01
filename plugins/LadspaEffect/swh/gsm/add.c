@@ -125,7 +125,7 @@ word gsm_norm P1((a), longword a )
  *
  *
  * and for negative values on the interval with
- * minimum of -2147483648 (-10000000000000000000000000000000) and
+ * minimum of -2015483648 (-10000000000000000000000000000000) and
  * maximum of -1073741824 ( -1000000000000000000000000000000).
  *
  * in order to normalize the result, the following

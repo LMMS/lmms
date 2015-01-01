@@ -2,9 +2,9 @@
   ZynAddSubFX - a software synthesizer
 
   Phaser.h - Phaser effect
-  Copyright (C) 2002-2005 Nasca Octavian Paul
-  Copyright (C) 2009-2010 Ryan Billing
-  Copyright (C) 2010-2010 Mark McCurry
+  Copyright (C) 2002-2015 Nasca Octavian Paul
+  Copyright (C) 2009-2015 Ryan Billing
+  Copyright (C) 2010-2015 Mark McCurry
   Author: Nasca Octavian Paul
           Ryan Billing
           Mark McCurry

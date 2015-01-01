@@ -2,7 +2,7 @@
  * SongEditor.h - declaration of class SongEditor, a window where you can
  *                 setup your songs
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

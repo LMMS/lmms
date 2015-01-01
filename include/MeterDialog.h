@@ -1,7 +1,7 @@
 /*
  * MeterDialog.h - dialog for entering meter settings
  *
- * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io

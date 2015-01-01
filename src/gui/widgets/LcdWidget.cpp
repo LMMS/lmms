@@ -1,7 +1,7 @@
 /*
  * LcdWidget.cpp - a widget for displaying numbers in LCD style
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
  * This file is part of LMMS - http://lmms.io

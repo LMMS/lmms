@@ -2,7 +2,7 @@
  * EnvelopeAndLfoView.cpp - widget which is m_used by envelope/lfo/filter-
  *                          tab of instrument track window
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - http://lmms.io
  *

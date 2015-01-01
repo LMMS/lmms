@@ -2,7 +2,7 @@
  * TripleOscillator.h - declaration of class TripleOscillator a powerful
  *                      instrument-plugin with 3 oscillators
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

@@ -2,7 +2,7 @@
  * InstrumentMidiIOView.h - widget in instrument-track-window for setting
  *                          up MIDI-related stuff
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

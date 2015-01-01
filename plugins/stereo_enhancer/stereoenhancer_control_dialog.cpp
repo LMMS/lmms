@@ -1,7 +1,7 @@
 /*
  * stereoenhancer_control_dialog.cpp - control-dialog for stereoenhancer-effect
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - http://lmms.io
  *

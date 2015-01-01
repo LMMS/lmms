@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   AdNoteTest.h - CxxTest for Synth/ADnote
-  Copyright (C) 2009-2011 Mark McCurry
+  Copyright (C) 2009-2015 Mark McCurry
   Copyright (C) 2009 Harald Hvaal
   Authors: Mark McCurry, Harald Hvaal
 

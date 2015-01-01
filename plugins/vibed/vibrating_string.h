@@ -1,7 +1,7 @@
 /*
  * vibrating_string.h - model of a vibrating string lifted from pluckedSynth
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of LMMS - http://lmms.io
  *

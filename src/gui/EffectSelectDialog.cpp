@@ -1,7 +1,7 @@
 /*
  * EffectSelectDialog.cpp - dialog to choose effect plugin
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

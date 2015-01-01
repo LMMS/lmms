@@ -28,8 +28,8 @@
         <translation>LMMS - produção musical fácil para todos</translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation>Copyright (c) 2004-2014, LMMS developers</translation>
+        <source>Copyright (c) 2004-2015, LMMS developers</source>
+        <translation>Copyright (c) 2004-2015, LMMS developers</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>

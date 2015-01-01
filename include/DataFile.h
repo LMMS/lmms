@@ -1,8 +1,8 @@
 /*
  * DataFile.h - class for reading and writing LMMS data files
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2012-2015 Paul Giblock <p/at/pgiblock.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

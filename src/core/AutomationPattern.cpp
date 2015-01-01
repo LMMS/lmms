@@ -2,8 +2,8 @@
  * AutomationPattern.cpp - implementation of class AutomationPattern which
  *                         holds dynamic values
  *
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

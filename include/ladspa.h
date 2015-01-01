@@ -1,7 +1,7 @@
 /* ladspa.h
 
    Linux Audio Developer's Simple Plugin API Version 1.1[LGPL].
-   Copyright (C) 2000-2002 Richard W.E. Furse, Paul Barton-Davis,
+   Copyright (C) 2000-2015 Richard W.E. Furse, Paul Barton-Davis,
    Stefan Westerfeld.
    
    This library is free software; you can redistribute it and/or

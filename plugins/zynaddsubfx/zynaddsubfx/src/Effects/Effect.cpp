@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Effect.cpp - this class is inherited by the all effects(Reverb, Echo, ..)
-  Copyright (C) 2002-2005 Nasca Octavian Paul
+  Copyright (C) 2002-2015 Nasca Octavian Paul
   Copyright 2011, Alan Calvert
   Author: Nasca Octavian Paul
 

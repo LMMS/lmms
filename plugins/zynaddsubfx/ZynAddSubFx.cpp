@@ -1,7 +1,7 @@
 /*
  * ZynAddSubFx.cpp - ZynAddSubxFX-embedding plugin
  *
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

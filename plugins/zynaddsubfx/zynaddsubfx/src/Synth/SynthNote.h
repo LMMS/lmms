@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Note.h - Abstract Base Class for synthesizers
-  Copyright (C) 2010-2010 Mark McCurry
+  Copyright (C) 2010-2015 Mark McCurry
   Author: Mark McCurry
 
   This program is free software; you can redistribute it and/or modify

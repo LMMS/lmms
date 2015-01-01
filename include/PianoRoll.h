@@ -2,7 +2,7 @@
  * PianoRoll.h - declaration of class PianoRoll which is a window where you
  *               can set and edit notes in an easy way
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
  * This file is part of LMMS - http://lmms.io

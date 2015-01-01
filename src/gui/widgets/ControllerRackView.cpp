@@ -1,8 +1,8 @@
 /*
  * ControllerRackView.cpp - view for song's controllers
  *
- * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * Copyright (c) 2010-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2010-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

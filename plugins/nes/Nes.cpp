@@ -1,7 +1,7 @@
 /* Nes.cpp - A NES instrument plugin for LMMS
  *                        
  * Copyright (c) 2014 Vesa Kivimäki
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

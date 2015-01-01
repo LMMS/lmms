@@ -1,7 +1,7 @@
 /*
  * nine_button_selector.h
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/yahoo/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - http://lmms.io

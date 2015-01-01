@@ -17,7 +17,7 @@ BEGIN
       VALUE "CompanyName",	"LMMS Developers\0"
       VALUE "FileDescription",	"LMMS\0"
       VALUE "FileVersion",	"@VERSION@\0"
-      VALUE "LegalCopyright",	"Copyright (c) 2004-2014 LMMS Developers\0"
+      VALUE "LegalCopyright",	"Copyright (c) 2004-2015 LMMS Developers\0"
       VALUE "OriginalFilename",	"lmms.exe\0"
       VALUE "ProductName",	"LMMS\0"
       VALUE "ProductVersion",	"@VERSION@\0"

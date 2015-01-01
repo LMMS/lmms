@@ -54,7 +54,7 @@ struct gsm_state {
 #define	MIN_WORD	(-32767 - 1)
 #define	MAX_WORD	  32767
 
-#define	MIN_LONGWORD	(-2147483647 - 1)
+#define	MIN_LONGWORD	(-2015483647 - 1)
 #define	MAX_LONGWORD	  2147483647
 
 #ifdef	SASR		/* flag: >> is a signed arithmetic shift right */

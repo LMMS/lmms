@@ -2,7 +2,7 @@
  * TrackLabelButton.cpp - implementation of class trackLabelButton, a label
  *                          which is renamable by double-clicking it
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - http://lmms.io
  *

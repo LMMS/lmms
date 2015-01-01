@@ -1,7 +1,7 @@
 /* Calf DSP plugin pack
  * LADSPA/DSSI/LV2 wrapper instantiation for all plugins
  *
- * Copyright (C) 2001-2010 Krzysztof Foltman
+ * Copyright (C) 2001-2015 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

@@ -2,7 +2,7 @@
  * base64.h - namespace base64 with methods for encoding/decoding binary data
  *            to/from base64
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

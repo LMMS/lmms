@@ -2,12 +2,12 @@
  * GigPlayer.cpp - a GIG player using libgig (based on Sf2 player plugin)
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * A few lines of code taken from LinuxSampler (also GPLv2) where noted:
  * Copyright (C) 2003,2004 by Benno Senoner and Christian Schoenebeck
- * Copyright (C) 2005-2008 Christian Schoenebeck
- * Copyright (C) 2009-2010 Christian Schoenebeck and Grigor Iliev
+ * Copyright (C) 2005-2015 Christian Schoenebeck
+ * Copyright (C) 2009-2015 Christian Schoenebeck and Grigor Iliev
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

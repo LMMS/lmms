@@ -1,7 +1,7 @@
 /*
  * LocalZynAddSubFx.h - local implementation of ZynAddSubFx plugin
  *
- * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

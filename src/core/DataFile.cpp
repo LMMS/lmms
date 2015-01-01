@@ -1,8 +1,8 @@
 /*
  * DataFile.cpp - implementation of class DataFile
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2012-2015 Paul Giblock    <p/at/pgiblock.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -331,7 +331,7 @@ void DataFile::upgrade()
 		documentElement().attribute( "creatorversion" ).
 							replace( "svn", "" );
 
-	if( version < "0.2.1-20070501" )
+	if( version < "0.2.1-20150501" )
 	{
 		QDomNodeList list = elementsByTagName( "arpandchords" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -447,7 +447,7 @@ void DataFile::upgrade()
 		}
 	}
 
-	if( version < "0.2.1-20070508" )
+	if( version < "0.2.1-20150508" )
 	{
 		QDomNodeList list = elementsByTagName( "arpandchords" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -547,7 +547,7 @@ void DataFile::upgrade()
 		}
 	}
 
-	if( version < "0.4.0-20080104" )
+	if( version < "0.4.0-20150104" )
 	{
 		QDomNodeList list = elementsByTagName( "fx" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -561,7 +561,7 @@ void DataFile::upgrade()
 		}
 	}
 
-	if( version < "0.4.0-20080118" )
+	if( version < "0.4.0-20150118" )
 	{
 		QDomNodeList list;
 		while( !( list = elementsByTagName( "fx" ) ).isEmpty() )
@@ -581,7 +581,7 @@ void DataFile::upgrade()
 		}
 	}
 
-	if( version < "0.4.0-20080129" )
+	if( version < "0.4.0-20150129" )
 	{
 		QDomNodeList list;
 		while( !( list =
@@ -595,7 +595,7 @@ void DataFile::upgrade()
 		}
 	}
 
-	if( version < "0.4.0-20080409" )
+	if( version < "0.4.0-20150409" )
 	{
 		QStringList s;
 		s << "note" << "pattern" << "bbtco" << "sampletco" << "time";
@@ -623,7 +623,7 @@ void DataFile::upgrade()
 		
 	}
 
-	if( version < "0.4.0-20080607" )
+	if( version < "0.4.0-20150607" )
 	{
 		QDomNodeList list;
 		while( !( list = elementsByTagName( "midi" ) ).isEmpty() )
@@ -633,7 +633,7 @@ void DataFile::upgrade()
 		}
 	}
 
-	if( version < "0.4.0-20080622" )
+	if( version < "0.4.0-20150622" )
 	{
 		QDomNodeList list;
 		while( !( list = elementsByTagName(
