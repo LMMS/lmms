@@ -253,8 +253,8 @@ ProjectRenderer* exportProjectDialog::prepRender()
 					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
 					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
-	int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
-	int bitrates[6] = { 64, 128, 160, 192, 256, 320 };
+	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
+	const int bitrates[6] = { 64, 128, 160, 192, 256, 320 };
 
 	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
 			samplerates[ samplerateCB->currentIndex() ],
