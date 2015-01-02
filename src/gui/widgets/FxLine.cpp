@@ -192,14 +192,18 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 	}
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
 	contextMenu->addSeparator();
-	
+
 	if( m_channelIndex != 0 ) // no remove-option in master
 	{
 		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ),
 							this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
-	
+
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ),
+						this, SLOT( removeUnusedChannels() ) );
+	contextMenu->addSeparator();
+
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
@@ -227,6 +231,13 @@ void FxLine::removeChannel()
 {
 	FxMixerView * mix = Engine::fxMixerView();
 	mix->deleteChannel( m_channelIndex );
+}
+
+
+void FxLine::removeUnusedChannels()
+{
+	FxMixerView * mix = Engine::fxMixerView();
+	mix->deleteUnusedChannels();
 }
 
 

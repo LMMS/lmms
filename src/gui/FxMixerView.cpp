@@ -395,6 +395,39 @@ void FxMixerView::deleteChannel(int index)
 
 
 
+void FxMixerView::deleteUnusedChannels()
+{
+	TrackContainer::TrackList tracks;
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::getBBTrackContainer()->tracks();
+
+	// go through all FX Channels
+	for(int i = m_fxChannelViews.size()-1; i>0; --i)
+	{
+		// check if an instrument references to the current channel
+		bool empty=true;
+		foreach( Track* t, tracks )
+		{
+			if( t->type() == Track::InstrumentTrack )
+			{
+				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
+				if( i == inst->effectChannelModel()->value(0) )
+				{
+					empty=false;
+					break;
+				}
+			}
+		}
+		// delete channel if no references found
+		if( empty )
+		{
+			deleteChannel( i );
+		}
+	}
+}
+
+
+
 void FxMixerView::moveChannelLeft(int index)
 {
 	// can't move master or first channel left or last channel right

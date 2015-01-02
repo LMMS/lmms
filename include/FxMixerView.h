@@ -92,6 +92,9 @@ public:
 	// notify the view that an fx channel was deleted
 	void deleteChannel(int index);
 
+	// delete all unused channels
+	void deleteUnusedChannels();
+
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
