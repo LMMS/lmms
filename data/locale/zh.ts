@@ -382,7 +382,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里，选择的值将从剪贴板粘贴到第一个可见的小节。</translation>
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
@@ -682,19 +682,19 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>DualFilterControls</name>
     <message>
         <source>Filter 1 enabled</source>
-        <translation>过滤器 1 已启用</translation>
+        <translation>滤波器 1 已启用</translation>
     </message>
     <message>
         <source>Filter 1 type</source>
-        <translation>过滤器 1 的类型</translation>
+        <translation>滤波器 1 的类型</translation>
     </message>
     <message>
         <source>Cutoff 1 frequency</source>
-        <translation>频谱刀 1 的频率</translation>
+        <translation>滤波器 1 截频</translation>
     </message>
     <message>
         <source>Q/Resonance 1</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波器 1 Q值</translation>
     </message>
     <message>
         <source>Gain 1</source>
@@ -702,23 +702,23 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>混合</translation>
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation>已启用过滤器 2</translation>
+        <translation>滤波器 2 已启用</translation>
     </message>
     <message>
         <source>Filter 2 type</source>
-        <translation>过滤器 2 的类型</translation>
+        <translation>滤波器 2 的类型</translation>
     </message>
     <message>
         <source>Cutoff 2 frequency</source>
-        <translation>频谱刀 2 的频率</translation>
+        <translation>滤波器 2 截频</translation>
     </message>
     <message>
         <source>Q/Resonance 2</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波器 2 Q值</translation>
     </message>
     <message>
         <source>Gain 2</source>
@@ -754,31 +754,31 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation type="unfinished"></translation>
+        <translation>2 个低通串联</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC 低通(12dB)</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC 带通(12dB)</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC 高通(12dB)</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC 低通(24dB)</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC 带通(24dB)</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation type="unfinished"></translation>
+        <translation>RC 高通(24dB)</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
@@ -849,7 +849,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation type="unfinished">湿度：</translation>
+        <translation>效果度：</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
@@ -865,7 +865,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
-        <translation type="unfinished"></translation>
+        <translation>衰减旋钮控制在插件停止工作前，缓冲区中加入的静音时常。较小的数值会降低CPU占用率但是可能导致延迟或混响产生撕裂。</translation>
     </message>
     <message>
         <source>GATE</source>
@@ -877,11 +877,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
-        <translation type="unfinished"></translation>
+        <translation>门限旋钮设置自动静音时，被认为是静音的信号幅度。</translation>
     </message>
     <message>
         <source>Controls</source>
-        <translation>控制</translation>
+        <translation>控制器</translation>
     </message>
     <message>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
@@ -924,7 +924,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Attack</source>
-        <translation>打进声</translation>
+        <translation>起音</translation>
     </message>
     <message>
         <source>Hold</source>
@@ -940,7 +940,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Release</source>
-        <translation>释放</translation>
+        <translation>释音</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -952,7 +952,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO Attack</source>
-        <translation>LFO 打进声（attack）</translation>
+        <translation>LFO 起音</translation>
     </message>
     <message>
         <source>LFO speed</source>
@@ -968,11 +968,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Freq x 100</source>
-        <translation type="unfinished"></translation>
+        <translation>频率 x 100</translation>
     </message>
     <message>
         <source>Modulate Env-Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>调制所有包络</translation>
     </message>
 </context>
 <context>
@@ -983,11 +983,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Predelay:</source>
-        <translation type="unfinished"></translation>
+        <translation>预延迟</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用预延迟旋钮设定此包络的预延迟，较大的值会加长包络开始的时间。</translation>
     </message>
     <message>
         <source>ATT</source>
@@ -995,15 +995,15 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished">打进：</translation>
+        <translation type="unfinished">起音：</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
-        <translation type="unfinished">(ADSR Attack)</translation>
+        <translation>使用起音旋钮设定此包络的起音时间，较大的值会让包络达到起音值的时间增加。为钢琴等乐器选择小值而弦乐选择大值。</translation>
     </message>
     <message>
         <source>HOLD</source>
-        <translation>HOLD</translation>
+        <translation>持续</translation>
     </message>
     <message>
         <source>Hold:</source>
@@ -1011,43 +1011,43 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用持续旋钮设定此包络的持续时间。较大的值会在它衰减到持续值时，保持包络在起音值更久。</translation>
     </message>
     <message>
         <source>DEC</source>
-        <translation>DEC</translation>
+        <translation>衰减</translation>
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished">衰减：</translation>
+        <translation>衰减：</translation>
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation type="unfinished">(ADSR Decay)</translation>
+        <translation>使用衰减旋钮设定此包络的衰减值。较大的值会延长包络从起音值衰减到持续值的时间。为钢琴等乐器选择一个小值。</translation>
     </message>
     <message>
         <source>SUST</source>
-        <translation>SUST</translation>
+        <translation>持续</translation>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation type="unfinished">持幅：</translation>
+        <translation type="unfinished">持续：</translation>
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation type="unfinished">(ADSR Sustain)</translation>
+        <translation>使用持续旋钮设置此包络的持续值，较大的值会增加释放前，包络在此保持的值。</translation>
     </message>
     <message>
         <source>REL</source>
-        <translation type="unfinished">REL</translation>
+        <translation>释音</translation>
     </message>
     <message>
         <source>Release:</source>
-        <translation type="unfinished">消退：</translation>
+        <translation>释音：</translation>
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation type="unfinished">(ADSR Release)</translation>
+        <translation>使用释音旋钮设定此包络的释音时间，较大值会增加包络衰减到零的时间。为弦乐等乐器选择一个大值。</translation>
     </message>
     <message>
         <source>AMT</source>
@@ -1055,15 +1055,15 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>调制量</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用调制量旋钮设置LFO对此包络的调制量，较大的值会对此包络控制的值（如音量或截频）影响更大。</translation>
     </message>
     <message>
         <source>LFO predelay:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 预延迟</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
