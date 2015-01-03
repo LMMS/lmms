@@ -418,8 +418,9 @@ void FxMixerView::deleteUnusedChannels()
 				}
 			}
 		}
+		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
 		// delete channel if no references found
-		if( empty )
+		if( empty && ch->m_receives.isEmpty() )
 		{
 			deleteChannel( i );
 		}
