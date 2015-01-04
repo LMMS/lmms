@@ -29,6 +29,7 @@
 #include "interpolation.h"
 #include "Engine.h"
 #include "MainWindow.h"
+#include "EqFader.h"
 
 extern "C"
 {
@@ -51,17 +52,9 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 
 EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect( &eq_plugin_descriptor, parent, key ),
-	m_eqControls( this ),
-	m_upBufFrames( 0 )
+	m_eqControls( this )
 {
-	m_dFilterCount = 2;
-	m_downsampleFilters = new EqLinkwitzRiley[m_dFilterCount];
-	for( int i = 0; i < m_dFilterCount; i++)
-	{
-		m_downsampleFilters[i].setFrequency(21000);
-		m_downsampleFilters[i].setSR(Engine::mixer()->processingSampleRate() * 2 );
-	}
-	m_upBuf = 0;
+
 }
 
 
@@ -69,10 +62,6 @@ EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 
 EqEffect::~EqEffect()
 {
-	if(m_upBuf)
-	{
-		delete m_upBuf;
-	}
 }
 
 
@@ -90,11 +79,11 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	const float outGain = m_eqControls.m_outGainModel.value();
-	const int sampleRate = Engine::mixer()->processingSampleRate() * 2;
+	const float outGain =  m_eqControls.m_outGainModel.getAmp();
+	const int sampleRate = Engine::mixer()->processingSampleRate();
 	sampleFrame m_inPeak = { 0, 0 };
 
-	if(m_eqControls.m_analyzeModel.value() )
+	if(m_eqControls.m_analyseIn )
 	{
 		m_eqControls.m_inFftBands.analyze( buf, frames );
 	}
@@ -102,99 +91,94 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		m_eqControls.m_inFftBands.clear();
 	}
-	upsample( buf, frames );
-	gain(m_upBuf , m_upBufFrames, m_eqControls.m_inGainModel.value(), &m_inPeak );
+	gain(buf , frames, m_eqControls.m_inGainModel.getAmp() , &m_inPeak );
 	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < m_inPeak[0] ? m_inPeak[0] : m_eqControls.m_inPeakL;
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
 	if(m_eqControls.m_hpActiveModel.value() ){
 
 		m_hp12.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-		m_hp12.processBuffer( m_upBuf , m_upBufFrames );
+		m_hp12.processBuffer( buf, frames );
 
 		if( m_eqControls.m_hp24Model.value() || m_eqControls.m_hp48Model.value() )
 		{
 			m_hp24.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-			m_hp24.processBuffer( m_upBuf , m_upBufFrames );
+			m_hp24.processBuffer( buf, frames );
 		}
 
 		if( m_eqControls.m_hp48Model.value() )
 		{
 			m_hp480.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-			m_hp480.processBuffer( m_upBuf , m_upBufFrames );
+			m_hp480.processBuffer( buf, frames );
 
 			m_hp481.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-			m_hp481.processBuffer( m_upBuf , m_upBufFrames );
+			m_hp481.processBuffer( buf, frames );
 		}
 	}
 
 	if( m_eqControls.m_lowShelfActiveModel.value() )
 	{
 		m_lowShelf.setParameters( sampleRate, m_eqControls.m_lowShelfFreqModel.value(), m_eqControls.m_lowShelfResModel .value(), m_eqControls.m_lowShelfGainModel.value() );
-		m_lowShelf.processBuffer( m_upBuf , m_upBufFrames );
+		m_lowShelf.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para1ActiveModel.value() )
 	{
-		m_para1.setParameters( sampleRate, m_eqControls.m_para1FreqModel.value(), m_eqControls.m_para1ResModel.value(), m_eqControls.m_para1GainModel.value() );
-		m_para1.processBuffer( m_upBuf , m_upBufFrames );
+		m_para1.setParameters( sampleRate, m_eqControls.m_para1FreqModel.value(), m_eqControls.m_para1BwModel.value(), m_eqControls.m_para1GainModel.value() );
+		m_para1.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para2ActiveModel.value() )
 	{
-		m_para2.setParameters( sampleRate, m_eqControls.m_para2FreqModel.value(), m_eqControls.m_para2ResModel.value(), m_eqControls.m_para2GainModel.value() );
-		m_para2.processBuffer( m_upBuf , m_upBufFrames );
+		m_para2.setParameters( sampleRate, m_eqControls.m_para2FreqModel.value(), m_eqControls.m_para2BwModel.value(), m_eqControls.m_para2GainModel.value() );
+		m_para2.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para3ActiveModel.value() )
 	{
-		m_para3.setParameters( sampleRate, m_eqControls.m_para3FreqModel.value(), m_eqControls.m_para3ResModel.value(), m_eqControls.m_para3GainModel.value() );
-		m_para3.processBuffer( m_upBuf , m_upBufFrames );
+		m_para3.setParameters( sampleRate, m_eqControls.m_para3FreqModel.value(), m_eqControls.m_para3BwModel.value(), m_eqControls.m_para3GainModel.value() );
+		m_para3.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_para4ActiveModel.value() )
 	{
-		m_para4.setParameters( sampleRate, m_eqControls.m_para4FreqModel.value(), m_eqControls.m_para4ResModel.value(), m_eqControls.m_para4GainModel.value() );
-		m_para4.processBuffer( m_upBuf , m_upBufFrames );
+		m_para4.setParameters( sampleRate, m_eqControls.m_para4FreqModel.value(), m_eqControls.m_para4BwModel.value(), m_eqControls.m_para4GainModel.value() );
+		m_para4.processBuffer( buf, frames );
 	}
 
 	if( m_eqControls.m_highShelfActiveModel.value() )
 	{
 		m_highShelf.setParameters( sampleRate, m_eqControls.m_highShelfFreqModel.value(), m_eqControls.m_highShelfResModel.value(), m_eqControls.m_highShelfGainModel.value());
-		m_highShelf.processBuffer( m_upBuf , m_upBufFrames );
+		m_highShelf.processBuffer( buf, frames );
 	}
 
 	if(m_eqControls.m_lpActiveModel.value() ){
 		m_lp12.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-		m_lp12.processBuffer( m_upBuf , m_upBufFrames );
+		m_lp12.processBuffer( buf, frames );
 
 		if( m_eqControls.m_lp24Model.value() || m_eqControls.m_lp48Model.value() )
 		{
 			m_lp24.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-			m_lp24.processBuffer( m_upBuf , m_upBufFrames );
+			m_lp24.processBuffer( buf, frames );
 		}
 
 		if( m_eqControls.m_lp48Model.value() )
 		{
 			m_lp480.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-			m_lp480.processBuffer( m_upBuf , m_upBufFrames );
+			m_lp480.processBuffer( buf, frames );
 
 			m_lp481.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-			m_lp481.processBuffer( m_upBuf , m_upBufFrames );
+			m_lp481.processBuffer( buf, frames );
 		}
 	}
 
 	sampleFrame outPeak = { 0, 0 };
-	gain( m_upBuf , m_upBufFrames, outGain, &outPeak );
+	gain( buf, frames, outGain, &outPeak );
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
-	for( int i =0; i < m_dFilterCount; i++)
-	{
-		m_downsampleFilters[i].processBuffer(m_upBuf , m_upBufFrames );
-	}
-	downSample( buf, frames );
+
 	checkGate( outSum / frames );
-	if(m_eqControls.m_analyzeModel.value() )
+	if(m_eqControls.m_analyseOut )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate * 0.5 ) );
@@ -234,30 +218,30 @@ void EqEffect::setBandPeaks(EqAnalyser *fft, int samplerate )
 
 	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
 			peakBand( m_eqControls.m_para1FreqModel.value()
-					  - (m_eqControls.m_para1FreqModel.value() / m_eqControls.m_para1ResModel.value() * 0.5),
+					  - (m_eqControls.m_para1FreqModel.value() * m_eqControls.m_para1BwModel.value() * 0.5),
 					  m_eqControls.m_para1FreqModel.value()
-					  + (m_eqControls.m_para1FreqModel.value() / m_eqControls.m_para1ResModel.value() * 0.5),
+					  + (m_eqControls.m_para1FreqModel.value() * m_eqControls.m_para1BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_para2PeakL = m_eqControls.m_para2PeakR =
 			peakBand( m_eqControls.m_para2FreqModel.value()
-					  - (m_eqControls.m_para2FreqModel.value() / m_eqControls.m_para2ResModel.value() * 0.5),
+					  - (m_eqControls.m_para2FreqModel.value() * m_eqControls.m_para2BwModel.value() * 0.5),
 					  m_eqControls.m_para2FreqModel.value()
-					  + (m_eqControls.m_para2FreqModel.value() / m_eqControls.m_para2ResModel.value() * 0.5),
+					  + (m_eqControls.m_para2FreqModel.value() * m_eqControls.m_para2BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_para3PeakL = m_eqControls.m_para3PeakR =
 			peakBand( m_eqControls.m_para3FreqModel.value()
-					  - (m_eqControls.m_para3FreqModel.value() / m_eqControls.m_para3ResModel.value() * 0.5),
+					  - (m_eqControls.m_para3FreqModel.value() * m_eqControls.m_para3BwModel.value() * 0.5),
 					  m_eqControls.m_para3FreqModel.value()
-					  + (m_eqControls.m_para3FreqModel.value() / m_eqControls.m_para3ResModel.value() * 0.5),
+					  + (m_eqControls.m_para3FreqModel.value() * m_eqControls.m_para3BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_para4PeakL = m_eqControls.m_para4PeakR =
 			peakBand( m_eqControls.m_para4FreqModel.value()
-					  - (m_eqControls.m_para4FreqModel.value() / m_eqControls.m_para4ResModel.value() * 0.5),
+					  - (m_eqControls.m_para4FreqModel.value() * m_eqControls.m_para4BwModel.value() * 0.5),
 					  m_eqControls.m_para4FreqModel.value()
-					  + (m_eqControls.m_para4FreqModel.value() / m_eqControls.m_para4ResModel.value() * 0.5),
+					  + (m_eqControls.m_para4FreqModel.value() * m_eqControls.m_para4BwModel.value() * 0.5),
 					  fft , samplerate );
 
 	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =

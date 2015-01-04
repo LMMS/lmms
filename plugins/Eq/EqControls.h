@@ -28,8 +28,10 @@
 #include "EffectControls.h"
 #include "EqControlsDialog.h"
 #include "Knob.h"
+#include "DBvModel.h"
 
 class EqEffect;
+
 
 class EqControls : public EffectControls
 {
@@ -64,6 +66,8 @@ public:
 	float m_para3PeakL, m_para3PeakR;
 	float m_para4PeakL, m_para4PeakR;
 	float m_highShelfPeakL, m_highShelfPeakR;
+	bool m_analyseIn;
+	bool m_analyseOut;
 
 	EqAnalyser m_inFftBands;
 	EqAnalyser m_outFftBands;
@@ -79,8 +83,8 @@ public:
 private:
 	EqEffect* m_effect;
 
-	FloatModel m_inGainModel;
-	FloatModel m_outGainModel;
+	DBvModel m_inGainModel;
+	DBvModel m_outGainModel;
 	FloatModel m_lowShelfGainModel;
 	FloatModel m_para1GainModel;
 	FloatModel m_para2GainModel;
@@ -90,10 +94,10 @@ private:
 
 	FloatModel m_hpResModel;
 	FloatModel m_lowShelfResModel;
-	FloatModel m_para1ResModel;
-	FloatModel m_para2ResModel;
-	FloatModel m_para3ResModel;
-	FloatModel m_para4ResModel;
+	FloatModel m_para1BwModel;
+	FloatModel m_para2BwModel;
+	FloatModel m_para3BwModel;
+	FloatModel m_para4BwModel;
 	FloatModel m_highShelfResModel;
 	FloatModel m_lpResModel;
 
@@ -122,8 +126,6 @@ private:
 	BoolModel m_hp12Model;
 	BoolModel m_hp24Model;
 	BoolModel m_hp48Model;
-
-	BoolModel m_analyzeModel;
 
 	IntModel m_lpTypeModel;
 	IntModel m_hpTypeModel;

@@ -28,8 +28,9 @@
 #include "lmms_math.h"
 #include "MainWindow.h"
 #include "QMouseEvent"
+#include "EqControls.h"
 
-EqParameterWidget::EqParameterWidget( QWidget *parent ) :
+EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
 	m_bands ( 0 ),
 	m_selectedBand ( 0 )
@@ -46,6 +47,9 @@ EqParameterWidget::EqParameterWidget( QWidget *parent ) :
 	m_pixelsPerUnitHeight = (height() - 4) / ( totalHeight );
 	m_scale = 1.5;
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
+	m_controls = controls;
+	tf = new TextFloat();
+	tf->hide();
 
 }
 
@@ -96,7 +100,7 @@ void EqParameterWidget::paintEvent( QPaintEvent *event )
 			gain = m_bands[i].gain->value();
 		}
 		y = gainToYPixel( gain );
-		float bw = m_bands[i].freq->value() / m_bands[i].res->value();
+		float bw = m_bands[i].freq->value() * m_bands[i].res->value();
 		m_bands[i].x = x; m_bands[i].y = y;
 		const int radius = 7;
 		painter.drawEllipse( x - radius , y - radius, radius * 2 ,radius * 2 );
@@ -133,6 +137,27 @@ void EqParameterWidget::mouseReleaseEvent( QMouseEvent *event )
 {
 	m_selectedBand = 0;
 	m_mouseAction = none;
+	const int inXmin = 228;
+	const int inXmax = 250;
+	const int inYmin = 20;
+	const int inYmax = 30;
+
+	const int outXmin = 228;
+	const int outXmax = 250;
+	const int outYmin = 30;
+	const int outYmax = 40;
+
+	if(event->x() > inXmin && event->x() < inXmax && event->y() > inYmin && event->y() < inYmax )
+	{
+		m_controls->m_analyseIn = !m_controls->m_analyseIn;
+	}
+
+	if(event->x() > outXmin && event->x() < outXmax && event->y() > outYmin && event->y() < outYmax )
+	{
+		m_controls->m_analyseOut = !m_controls->m_analyseOut;
+	}
+
+	tf->hide();
 }
 
 
@@ -153,12 +178,21 @@ void EqParameterWidget::mouseMoveEvent( QMouseEvent *event )
 			if( m_selectedBand->gain )m_selectedBand->gain->setValue( yPixelToGain( m_oldY ) );
 			break;
 		case res:
-			if( m_selectedBand->res )m_selectedBand->res->incValue( deltaX * resPixelMultiplyer() );
+			if( m_selectedBand->res )m_selectedBand->res->incValue( ( deltaX) * resPixelMultiplyer() );
 			if( m_selectedBand->res )m_selectedBand->res->incValue( (-deltaR) * resPixelMultiplyer() );
 			break;
 		default:
 			break;
 		}
+	}
+	if( m_oldX > 0 && m_oldX < width() && m_oldY > 0 && m_oldY < height() )
+	{
+		tf->setText( QString::number(xPixelToFreq( m_oldX )) + tr( "Hz ") );
+		tf->show();
+		const int x = event->x() > width() * 0.5 ?
+					m_oldX - tf->width() :
+					m_oldX;
+		tf->moveGlobal(this, QPoint( x, m_oldY - tf->height() ) );
 	}
 }
 
