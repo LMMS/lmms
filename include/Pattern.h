@@ -94,6 +94,10 @@ public:
 	void checkType();
 
 
+	// next/previous track based on position in the containing track
+	Pattern * previousPattern() const;
+	Pattern * nextPattern() const;
+
 	// settings-management
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -136,6 +140,8 @@ private:
 	// data-stuff
 	NoteVector m_notes;
 	int m_steps;
+
+	Pattern * adjacentPatternByOffset(int offset) const;
 
 	friend class PatternView;
 	friend class BBTrackContainerView;

@@ -434,6 +434,32 @@ void Pattern::loadSettings( const QDomElement & _this )
 
 
 
+Pattern *  Pattern::previousPattern() const
+{
+	return adjacentPatternByOffset(-1);
+}
+
+
+
+
+Pattern *  Pattern::nextPattern() const
+{
+	return adjacentPatternByOffset(1);
+}
+
+
+
+
+Pattern * Pattern::adjacentPatternByOffset(int offset) const
+{
+	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
+	int tcoNum = m_instrumentTrack->getTCONum(this);
+	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, NULL));
+}
+
+
+
+
 void Pattern::clear()
 {
 	addJournalCheckPoint();
