@@ -61,6 +61,9 @@ public slots:
 	void addSteps();
 	void removeSteps();
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
+
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 

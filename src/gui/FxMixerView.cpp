@@ -480,6 +480,21 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 
 
 
+void FxMixerView::closeEvent( QCloseEvent * _ce )
+ {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
+
+
+
 void FxMixerView::setCurrentFxLine( int _line )
 {
 	if( _line >= 0 && _line < m_fxChannelViews.size() )

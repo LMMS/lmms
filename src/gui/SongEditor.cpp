@@ -576,6 +576,21 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 
 
 
+void SongEditor::closeEvent( QCloseEvent * _ce )
+ {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
+
+
+
 
 void SongEditor::masterVolumeChanged( int _new_val )
 {
