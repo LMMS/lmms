@@ -402,7 +402,7 @@ void FxMixerView::deleteUnusedChannels()
 	tracks += Engine::getBBTrackContainer()->tracks();
 
 	// go through all FX Channels
-	for(int i = m_fxChannelViews.size()-1; i>0; --i)
+	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
 	{
 		// check if an instrument references to the current channel
 		bool empty=true;
