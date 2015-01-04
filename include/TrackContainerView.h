@@ -33,7 +33,6 @@
 
 #include "Track.h"
 #include "JournallingObject.h"
-#include "InstrumentTrack.h"
 
 
 class QVBoxLayout;
@@ -183,23 +182,6 @@ signals:
 
 } ;
 
-class InstrumentLoaderThread : public QThread
-{
-	Q_OBJECT
-public:
-	InstrumentLoaderThread( QObject *parent = 0 , InstrumentTrack *it = 0, QString name = "" );
-
-	void run();
-
-
-private:
-
-	InstrumentTrack *m_it;
-	QString m_name;
-
-
-
-};
 
 
 #endif
