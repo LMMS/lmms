@@ -120,7 +120,7 @@ public:
 	{
 		return m_length;
 	}
-	
+
 	virtual void movePosition( const MidiTime & _pos );
 	virtual void changeLength( const MidiTime & _length );
 
@@ -539,7 +539,9 @@ private:
 	QString m_name;
 	int m_height;
 
+protected:
 	BoolModel m_mutedModel;
+private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 

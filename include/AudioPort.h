@@ -35,13 +35,15 @@
 
 class EffectChain;
 class FloatModel;
+class BoolModel;
 
 class AudioPort : public ThreadableJob
 {
 	MM_OPERATORS
 public:
-	AudioPort( const QString & _name, bool _has_effect_chain = true, 
-		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL );
+	AudioPort( const QString & _name, bool _has_effect_chain = true,
+		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL,
+		BoolModel * mutedModel = NULL );
 	virtual ~AudioPort();
 
 	inline sampleFrame * buffer()
@@ -117,14 +119,15 @@ private:
 	fx_ch_t m_nextFxChannel;
 
 	QString m_name;
-	
+
 	EffectChain * m_effects;
 
 	PlayHandleList m_playHandles;
 	QMutex m_playHandleLock;
-	
+
 	FloatModel * m_volumeModel;
 	FloatModel * m_panningModel;
+	BoolModel * m_mutedModel;
 
 	friend class Mixer;
 	friend class MixerWorkerThread;
