@@ -52,7 +52,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 
-	QWidget * contentWidget()
+	QScrollArea * contentWidget()
 	{
 		return( m_scrollArea );
 	}
