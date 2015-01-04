@@ -382,7 +382,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			}
 			m_midiNotesMutex.unlock();
-			m_fb->activate();
+			if( m_fb ) { m_fb->activate(); }
 			break;
 
 		case MidiNoteOff:
