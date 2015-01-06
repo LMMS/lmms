@@ -67,7 +67,7 @@ const int TRACK_OP_WIDTH_COMPACT = 60;
  * Tracks can be resized by shift-dragging anywhere inside the track
  * display.  This sets the minimum size in pixels for a track.
  */
-const int MINIMAL_TRACK_HEIGHT = 8;
+const int MINIMAL_TRACK_HEIGHT = 32;
 const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 2;
