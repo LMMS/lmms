@@ -131,9 +131,6 @@ protected slots:
 	void setEditMode(AutomationEditor::EditModes mode);
 	void setEditMode(int mode);
 
-	void flipYButtonPressed();
-	void flipXButtonPressed();
-
 	void setProgressionType(AutomationPattern::ProgressionTypes type);
 	void setProgressionType(int type);
 	void setTension();
@@ -286,8 +283,8 @@ private:
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;
 
-	ToolButton * m_flipYButton;
-	ToolButton * m_flipXButton;
+	QAction* m_flipYAction;
+	QAction* m_flipXAction;
 
 	Knob * m_tensionKnob;
 

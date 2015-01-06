@@ -408,6 +408,14 @@ void AutomationPattern::flipY( int min, int max )
 
 
 
+void AutomationPattern::flipY()
+{
+	flipY(getMin(), getMax());
+}
+
+
+
+
 void AutomationPattern::flipX( int length )
 {
 	timeMap tempMap;

@@ -1645,21 +1645,6 @@ void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 
 
 
-void AutomationEditor::flipYButtonPressed()
-{
-	m_pattern->flipY( m_minLevel, m_maxLevel );
-}
-
-
-
-
-void AutomationEditor::flipXButtonPressed()
-{
-	m_pattern->flipX();
-}
-
-
-
 void AutomationEditor::setEditMode(int mode)
 {
 	setEditMode((AutomationEditor::EditModes) mode);
@@ -2036,20 +2021,13 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	m_flipYButton = new ToolButton( embed::getIconPixmap( "flip_y" ),
-									tr( "Flip Vertically" ),
-									m_editor, SLOT( flipYButtonPressed() ),
-									m_toolBar );
+	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
+	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
 
-	m_flipXButton = new ToolButton( embed::getIconPixmap( "flip_x" ),
-									tr( "Flip Horizontally" ),
-									m_editor, SLOT( flipXButtonPressed() ),
-									m_toolBar );
-
-	m_flipYButton->setWhatsThis(
+	m_flipYAction->setWhatsThis(
 				tr( "Click here and the pattern will be inverted."
 					"The points are flipped in the y direction. " ) );
-	m_flipXButton->setWhatsThis(
+	m_flipXAction->setWhatsThis(
 				tr( "Click here and the pattern will be reversed. "
 					"The points are flipped in the x direction." ) );
 
@@ -2208,8 +2186,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addAction(eraseAction);
 //	m_toolBar->addAction(m_selectButton);
 //	m_toolBar->addAction(m_moveButton);
-	m_toolBar->addWidget(m_flipXButton);
-	m_toolBar->addWidget(m_flipYButton);
+	m_toolBar->addAction(m_flipXAction);
+	m_toolBar->addAction(m_flipYAction);
 	m_toolBar->addSeparator();
 	m_toolBar->addAction(m_discreteAction);
 	m_toolBar->addAction(m_linearAction);
@@ -2251,13 +2229,17 @@ AutomationEditorWindow::~AutomationEditorWindow()
 
 void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 {
+	// Disconnect our old pattern
 	if (currentPattern() != nullptr)
 	{
 		m_editor->m_pattern->disconnect(this);
+		m_flipXAction->disconnect();
+		m_flipYAction->disconnect();
 	}
 
 	m_editor->setCurrentPattern(pattern);
 
+	// Set our window's title
 	if (pattern == nullptr)
 	{
 		setWindowTitle( tr( "Automation Editor - no pattern" ) );
@@ -2265,6 +2247,7 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	}
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
+
 
 	switch(m_editor->m_pattern->progressionType())
 	{
@@ -2279,8 +2262,15 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 		break;
 	}
 
-	connect(pattern, SIGNAL(dataChanged()), this, SLOT(update()));
-	connect(pattern, SIGNAL(destroyed()), this, SLOT(clearCurrentPattern()));
+	// Connect new pattern
+	if (pattern)
+	{
+		connect(pattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(pattern, SIGNAL(destroyed()), this, SLOT(clearCurrentPattern()));
+
+		connect(m_flipXAction, SIGNAL(triggered()), pattern, SLOT(flipX()));
+		connect(m_flipYAction, SIGNAL(triggered()), pattern, SLOT(flipY()));
+	}
 
 	emit currentPatternChanged();
 }
