@@ -419,26 +419,6 @@ int main( int argc, char * * argv )
 
 	if( render_out.isEmpty() )
 	{
-		// init style and palette
-		LmmsStyle * lmmsstyle = new LmmsStyle();
-		QApplication::setStyle( lmmsstyle );
-
-		LmmsPalette * lmmspal = new LmmsPalette( NULL, lmmsstyle );
-		QPalette lpal = lmmspal->palette();
-
-		QApplication::setPalette( lpal );
-		LmmsStyle::s_palette = &lpal;
-
-
-		// show splash screen
-		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
-		splashScreen.show();
-		splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
-									Qt::AlignRight | Qt::AlignBottom, Qt::white );
-		qApp->processEvents();
-
-		// init central engine which handles all components of LMMS
-		Engine::init(false);
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
@@ -501,7 +481,6 @@ int main( int argc, char * * argv )
 			}
 		}
 
-		splashScreen.finish(gui->mainWindow());
 	}
 	else
 	{

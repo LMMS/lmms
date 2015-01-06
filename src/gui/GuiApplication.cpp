@@ -24,6 +24,11 @@
 
 #include "GuiApplication.h"
 
+#include "lmmsversion.h"
+
+#include "LmmsStyle.h"
+#include "LmmsPalette.h"
+
 #include "AutomationEditor.h"
 #include "BBEditor.h"
 #include "ControllerRackView.h"
@@ -34,7 +39,8 @@
 #include "ProjectNotes.h"
 #include "SongEditor.h"
 
-#include "QApplication"
+#include <QApplication>
+#include <QSplashScreen>
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 
@@ -47,6 +53,26 @@ GuiApplication::GuiApplication()
 {
 	s_instance = this;
 
+	// Init style and palette
+	LmmsStyle* lmmsstyle = new LmmsStyle();
+	QApplication::setStyle(lmmsstyle);
+
+	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
+	QPalette* lpal = new QPalette(lmmspal->palette());
+
+	QApplication::setPalette( *lpal );
+	LmmsStyle::s_palette = lpal;
+
+	// Show splash screen
+	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
+	splashScreen.show();
+	splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
+								Qt::AlignRight | Qt::AlignBottom, Qt::white );
+	qApp->processEvents();
+
+	// Init central engine which handles all components of LMMS
+	Engine::init(false);
+
 	m_mainWindow = new MainWindow;
 
 	m_songEditor = new SongEditorWindow(Engine::getSong());
@@ -58,6 +84,7 @@ GuiApplication::GuiApplication()
 	m_automationEditor = new AutomationEditorWindow;
 
 	m_mainWindow->finalize();
+	splashScreen.finish(m_mainWindow);
 
 	Engine::s_hasGUI = true;
 }
