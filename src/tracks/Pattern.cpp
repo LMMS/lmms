@@ -91,6 +91,8 @@ Pattern::Pattern( const Pattern& other ) :
 			break;
 
 		case TrackContainer::SongContainer:
+			// move down
+		default:
 			setAutoResize( false );
 			break;
 	}

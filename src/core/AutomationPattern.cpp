@@ -63,6 +63,8 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 				break;
 
 			case TrackContainer::SongContainer:
+				// move down
+			default:
 				setAutoResize( false );
 				break;
 		}
@@ -92,6 +94,8 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 			break;
 
 		case TrackContainer::SongContainer:
+			// move down
+		default:
 			setAutoResize( false );
 			break;
 	}

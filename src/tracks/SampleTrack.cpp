@@ -69,6 +69,8 @@ SampleTCO::SampleTCO( Track * _track ) :
 			break;
 
 		case TrackContainer::SongContainer:
+			// move down
+		default:
 			setAutoResize( false );
 			break;
 	}
