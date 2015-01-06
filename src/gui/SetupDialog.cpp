@@ -94,6 +94,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displaydBV( ConfigManager::inst()->value( "app", 
 		      				"displaydbv" ).toInt() ),
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
+	m_disableBackup( !ConfigManager::inst()->value( "app",
+							"disablebackup" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_workingDir( ConfigManager::inst()->workingDir() ),
@@ -299,6 +301,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	disableAutoquit->setChecked( m_disableAutoQuit );
 	connect( disableAutoquit, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableAutoquit( bool ) ) );
+
+	LedCheckBox * disableBackup = new LedCheckBox(
+				tr( "Create backup file when saving a project" ),
+								misc_tw );
+	labelNumber++;
+	disableBackup->move( XDelta, YDelta*labelNumber );
+	disableBackup->setChecked( m_disableBackup );
+	connect( disableBackup, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisableBackup( bool ) ) );
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
@@ -806,6 +817,8 @@ void SetupDialog::accept()
 					QString::number( m_displaydBV ) );
 	ConfigManager::inst()->setValue( "app", "nommpz",
 						QString::number( !m_MMPZ ) );
+	ConfigManager::inst()->setValue( "app", "disablebackup",
+					QString::number( !m_disableBackup ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
@@ -953,6 +966,14 @@ void SetupDialog::toggleDisplaydBV( bool _enabled )
 void SetupDialog::toggleMMPZ( bool _enabled )
 {
 	m_MMPZ = _enabled;
+}
+
+
+
+
+void SetupDialog::toggleDisableBackup( bool _enabled )
+{
+	m_disableBackup = _enabled;
 }
 
 

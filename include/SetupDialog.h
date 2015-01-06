@@ -91,6 +91,7 @@ private slots:
 	void toggleWarnAfterSetup( bool _enabled );
 	void toggleDisplaydBV( bool _enabled );
 	void toggleMMPZ( bool _enabled );
+	void toggleDisableBackup( bool _enabled );
 	void toggleHQAudioDev( bool _enabled );
 
 	void openWorkingDir();
@@ -124,6 +125,7 @@ private:
 	bool m_warnAfterSetup;
 	bool m_displaydBV;
 	bool m_MMPZ;
+	bool m_disableBackup;
 	bool m_hqAudioDev;
 
 
