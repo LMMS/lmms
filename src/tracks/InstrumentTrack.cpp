@@ -49,6 +49,7 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FadeButton.h"
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -104,7 +105,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
-	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel ),
+	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
@@ -338,7 +339,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					break;
 			}
 			break;
-			
+
 		default:
 			break;
 	}
@@ -378,9 +379,10 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				}
 				++m_runningMidiNotes[key];
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
-				emit newNote();
+
 			}
 			m_midiNotesMutex.unlock();
+			if( m_fb ) { m_fb->activate(); }
 			break;
 
 		case MidiNoteOff:
@@ -560,6 +562,12 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 	QDomNodeList n = _dataFile.elementsByTagName( "midiport" );
 	n.item( 0 ).parentNode().removeChild( n.item( 0 ) );
 }
+
+void InstrumentTrack::setIndicator(FadeButton *fb)
+{
+	m_fb = fb;
+}
+
 
 
 
@@ -840,7 +848,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	{
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
 	}
-	else 
+	else
 	{
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
 	}
@@ -910,9 +918,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( activityIndicatorPressed() ) );
 	connect( m_activityIndicator, SIGNAL( released() ),
 				this, SLOT( activityIndicatorReleased() ) );
-	connect( _it, SIGNAL( newNote() ),
-				m_activityIndicator, SLOT( activate() ) );
-
+	_it->setIndicator( m_activityIndicator );
 
 	setModel( _it );
 }
@@ -949,8 +955,8 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 
 
 
-// TODO: Add windows to free list on freeInstrumentTrackWindow. 
-// But, don't NULL m_window or disconnect signals.  This will allow windows 
+// TODO: Add windows to free list on freeInstrumentTrackWindow.
+// But, don't NULL m_window or disconnect signals.  This will allow windows
 // that are being show/hidden frequently to stay connected.
 void InstrumentTrackView::freeInstrumentTrackWindow()
 {
@@ -975,7 +981,7 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 		{
 			delete m_window;
 		}
-		
+
 		m_window = NULL;
 	}
 }
@@ -1002,7 +1008,7 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 	else if( !s_windowCache.isEmpty() )
 	{
 		m_window = s_windowCache.dequeue();
-		
+
 		m_window->setInstrumentTrackView( this );
 		m_window->setModel( model() );
 		m_window->updateInstrumentView();
@@ -1028,7 +1034,7 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 			s_windowCache << m_window;
 		}
 	}
-		
+
 	return m_window;
 }
 
@@ -1059,7 +1065,7 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 {
 	getInstrumentTrackWindow()->toggleVisibility( _on );
-	
+
 	if( !_on )
 	{
 		freeInstrumentTrackWindow();
@@ -1119,10 +1125,10 @@ void InstrumentTrackView::midiConfigChanged()
 
 
 
-class fxLineLcdSpinBox : public LcdSpinBox 
+class fxLineLcdSpinBox : public LcdSpinBox
 {
 	public:
-		fxLineLcdSpinBox( int _num_digits, QWidget * _parent, 
+		fxLineLcdSpinBox( int _num_digits, QWidget * _parent,
 				const QString & _name ) :
 			LcdSpinBox( _num_digits, _parent, _name ) {}
 
@@ -1336,7 +1342,7 @@ void InstrumentTrackWindow::modelChanged()
 			this, SLOT( updateName() ) );
 	connect( m_track, SIGNAL( instrumentChanged() ),
 			this, SLOT( updateInstrumentView() ) );
-	
+
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );

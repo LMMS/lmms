@@ -253,13 +253,17 @@ ProjectRenderer* ExportProjectDialog::prepRender()
 					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
 					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
+	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
+	const int bitrates[6] = { 64, 128, 160, 192, 256, 320 };
+
 	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
-			samplerateCB->currentText().section(" ", 0, 0).toUInt(),
+			samplerates[ samplerateCB->currentIndex() ],
 			false,
-			bitrateCB->currentText().section(" ", 0, 0).toUInt(),
+			bitrates[ bitrateCB->currentIndex() ],
 			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
+	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
 
 	ProjectRenderer* renderer = new ProjectRenderer( qs, os, m_ft, m_fileName );
 

@@ -1,5 +1,5 @@
 /*
- * noise.h - defination of Noise class.
+ * quadraturelfo.h - defination of QuadratureLfo class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,16 +22,53 @@
  *
  */
 
-#ifndef NOISE_H
-#define NOISE_H
+#ifndef QUADRATURELFO_H
+#define QUADRATURELFO_H
 
-class Noise
+#include "lmms_math.h"
+
+class QuadratureLfo
 {
 public:
-    Noise();
-    float tick();
+	QuadratureLfo( int sampleRate );
+	~QuadratureLfo()
+	{
+	}
+
+	inline void setFrequency( double frequency )
+	{
+		if( frequency < 0 || frequency > ( m_samplerate / 2.0 ) || frequency == m_frequency )
+		{
+			return;
+		}
+		m_frequency = frequency;
+		m_increment = m_frequency * m_twoPiOverSr;
+
+		if( m_phase >= F_2PI )
+		{
+			m_phase -= F_2PI;
+		}
+	}
+
+
+
+
+	inline void setSampleRate ( int samplerate )
+	{
+		m_samplerate = samplerate;
+		m_twoPiOverSr = F_2PI / samplerate;
+		m_increment = m_frequency * m_twoPiOverSr;
+	}
+
+	void tick( float *s, float *c );
+
 private:
-     double inv_randmax;
+	double m_frequency;
+	double m_phase;
+	double m_increment;
+	double m_twoPiOverSr;
+	int m_samplerate;
+
 };
 
-#endif // NOISE_H
+#endif // QUADRATURELFO_H

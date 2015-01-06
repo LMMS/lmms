@@ -47,6 +47,7 @@ struct ladspa_instance: public plugin_ctl_iface
 #endif
     
     ladspa_instance(audio_module_iface *_module, ladspa_plugin_metadata_set *_ladspa, int sample_rate);
+	virtual ~ladspa_instance();
     virtual const line_graph_iface *get_line_graph_iface() const { return module->get_line_graph_iface(); }
     virtual float get_param_value(int param_no);
     virtual void set_param_value(int param_no, float value);

@@ -38,7 +38,7 @@ public:
 	}
 	virtual ~RmsHelper() 
 	{
-		if( m_buffer ) delete m_buffer;
+		if( m_buffer ) delete[] m_buffer;
 	}
 
 	inline void setSize( int size )

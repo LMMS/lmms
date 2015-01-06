@@ -167,7 +167,8 @@ activate_eq(LADSPA_Handle instance) {
 static
 void
 cleanup_eq(LADSPA_Handle instance) {
-
+	eq *plugin_data = (eq *)instance;
+	free(plugin_data->filters);
 	free(instance);
 }
 

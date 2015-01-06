@@ -196,9 +196,9 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	double outSum = 0.0;
 	for( int f = 0; f < frames; ++f )
 	{
+		outSum = buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
-		outSum = buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 	
 	checkGate( outSum );

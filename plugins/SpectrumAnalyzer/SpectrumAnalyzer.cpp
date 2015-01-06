@@ -150,7 +150,7 @@ bool SpectrumAnalyzer::processAudioBuffer( sampleFrame* _buf, const fpp_t _frame
 
 	m_framesFilledUp = 0;
 
-	checkGate( 0 );
+	checkGate( 1 );
 
 	return isRunning();
 }

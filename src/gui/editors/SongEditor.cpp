@@ -386,6 +386,21 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 
 
 
+void SongEditor::closeEvent( QCloseEvent * _ce )
+ {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
+
+
+
 
 void SongEditor::setMasterVolume( int _new_val )
 {
@@ -531,7 +546,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 	{
 		const int w = width() - widgetWidth
 							- trackOpWidth
-							- 32;	// rough estimation for width of right scrollbar
+							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
 		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{

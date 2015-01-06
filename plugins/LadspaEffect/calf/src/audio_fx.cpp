@@ -567,6 +567,22 @@ lookahead_limiter::lookahead_limiter() {
     asc_coeff = 1.f;
 }
 
+lookahead_limiter::~lookahead_limiter()
+{
+	if( buffer != NULL)
+	{
+		free(buffer);
+	}
+	if( nextpos != NULL)
+	{
+		free(nextpos);
+	}
+	if( nextdelta != NULL)
+	{
+		free(nextdelta);
+	}
+}
+
 void lookahead_limiter::activate()
 {
     is_active = true;

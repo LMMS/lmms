@@ -1,5 +1,5 @@
 /*
- * quadraturelfo.cpp - defination of QuadratureLfo class.
+ * flangercontrolsdialog.h - defination of FlangerControlsDialog class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,17 +22,20 @@
  *
  */
 
-#include "quadraturelfo.h"
+#ifndef FLANGERCONTROLSDIALOG_H
+#define FLANGERCONTROLSDIALOG_H
 
-QuadratureLfo::QuadratureLfo( int sampleRate )
+#include "EffectControlDialog.h"
+
+class FlangerControls;
+
+class FlangerControlsDialog : public EffectControlDialog
 {
-    setSampleRate(sampleRate);
-}
+public:
+	FlangerControlsDialog( FlangerControls* controls );
+	virtual ~FlangerControlsDialog()
+	{
+	}
+};
 
-void QuadratureLfo::tick( float *s, float *c )
-{
-    *s = sinf( m_phase );
-    *c = cosf( m_phase );
-    m_phase += m_increment;
-
-}
+#endif // FLANGERCONTROLSDIALOG_H

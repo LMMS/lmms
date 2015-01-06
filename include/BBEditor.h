@@ -57,6 +57,9 @@ public slots:
 	void play();
 	void stop();
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
+
 private:
 	BBTrackContainerView* m_trackContainerView;
 	ComboBox * m_bbComboBox;

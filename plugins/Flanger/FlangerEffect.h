@@ -1,5 +1,5 @@
 /*
- * flangercontrolsdialog.h - defination of FlangerControlsDialog class.
+ * flangereffect.h - defination of FlangerEffect class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,20 +22,36 @@
  *
  */
 
-#ifndef FLANGERCONTROLSDIALOG_H
-#define FLANGERCONTROLSDIALOG_H
 
-#include "EffectControlDialog.h"
+#ifndef FLANGEREFFECT_H
+#define FLANGEREFFECT_H
 
-class FlangerControls;
+#include "Effect.h"
+#include "FlangerControls.h"
+#include "QuadratureLfo.h"
+#include "MonoDelay.h"
+#include "Noise.h"
 
-class FlangerControlsDialog : public EffectControlDialog
+
+class FlangerEffect : public Effect
 {
 public:
-    FlangerControlsDialog( FlangerControls* controls );
-    virtual ~FlangerControlsDialog()
-    {
-    }
+	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~FlangerEffect();
+	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
+	virtual EffectControls* controls()
+	{
+		return &m_flangerControls;
+	}
+	void changeSampleRate();
+
+private:
+	FlangerControls m_flangerControls;
+	MonoDelay* m_lDelay;
+	MonoDelay* m_rDelay;
+	QuadratureLfo* m_lfo;
+	Noise* m_noise;
+
 };
 
-#endif // FLANGERCONTROLSDIALOG_H
+#endif // FLANGEREFFECT_H

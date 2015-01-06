@@ -92,6 +92,9 @@ public:
 	// notify the view that an fx channel was deleted
 	void deleteChannel(int index);
 
+	// delete all unused channels
+	void deleteUnusedChannels();
+
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
@@ -99,6 +102,9 @@ public:
 	// make sure the display syncs up with the fx mixer.
 	// useful for loading projects
 	void refreshDisplay();
+
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 	
 private slots:
 	void updateFaders();

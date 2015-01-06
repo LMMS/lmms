@@ -249,3 +249,17 @@ void BBTrackContainerView::updatePosition()
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
 }
+
+void BBEditor::closeEvent( QCloseEvent * _ce )
+ {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
+

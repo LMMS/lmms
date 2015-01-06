@@ -46,7 +46,8 @@ QPixmap * FxLine::s_receiveBgArrow = NULL;
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	QWidget( _parent ),
 	m_mv( _mv ),
-	m_channelIndex( _channelIndex )
+	m_channelIndex( _channelIndex ),
+	m_backgroundActive( Qt::SolidPattern )
 {
 	if( ! s_sendBgArrow )
 	{
@@ -191,14 +192,18 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 	}
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
 	contextMenu->addSeparator();
-	
+
 	if( m_channelIndex != 0 ) // no remove-option in master
 	{
 		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ),
 							this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
-	
+
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ),
+						this, SLOT( removeUnusedChannels() ) );
+	contextMenu->addSeparator();
+
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
@@ -226,6 +231,13 @@ void FxLine::removeChannel()
 {
 	FxMixerView * mix = Engine::fxMixerView();
 	mix->deleteChannel( m_channelIndex );
+}
+
+
+void FxLine::removeUnusedChannels()
+{
+	FxMixerView * mix = Engine::fxMixerView();
+	mix->deleteUnusedChannels();
 }
 
 

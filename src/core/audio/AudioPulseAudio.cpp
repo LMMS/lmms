@@ -307,7 +307,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioPulseAudio::setupWidget::~setupWidget()
 {
-
+	delete m_channels->model();
 }
 
 

@@ -34,6 +34,7 @@
 #include "MeterModel.h"
 #include "VstSyncController.h"
 
+
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
@@ -169,18 +170,11 @@ public:
 		return m_recording;
 	}
 
-	inline bool isExportDone() const
+	bool isExportDone() const;
+
+	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{
-		if ( m_exportLoop )
-		{
-			return m_exporting == true &&
-				m_playPos[Mode_PlaySong].getTicks() >= length() * ticksPerTact();
-		}
-		else
-		{
-			return m_exporting == true &&
-				m_playPos[Mode_PlaySong].getTicks() >= ( length() + 1 ) * ticksPerTact();
-		}
+		m_renderBetweenMarkers = renderBetweenMarkers;
 	}
 
 	inline PlayModes playMode() const
@@ -344,6 +338,7 @@ private:
 	volatile bool m_recording;
 	volatile bool m_exporting;
 	volatile bool m_exportLoop;
+	volatile bool m_renderBetweenMarkers;
 	volatile bool m_playing;
 	volatile bool m_paused;
 

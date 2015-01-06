@@ -288,7 +288,7 @@ PianoRoll::PianoRoll() :
 		s_toolOpen = new QPixmap( embed::getIconPixmap(
 							"automation" ) );
 	}
-	
+
 	// init text-float
 	if( s_textFloat == NULL )
 	{
@@ -658,47 +658,29 @@ inline void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 	{
 		//step note
 		col.setRgb( 0, 255, 0 );
-		p.fillRect( x, y, width, KEY_LINE_HEIGHT - 2, col );
 	}
 	else if( n->selected() )
 	{
 		col.setRgb( 0x00, 0x40, 0xC0 );
-		p.fillRect( x, y, width, KEY_LINE_HEIGHT - 2, col );
-	}
-	else
-	{
-		// adjust note to make it a bit faded if it has a lower volume
-		// in stereo using gradients
-		QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
-							volVal * leftPercent );
-		QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
-							volVal * rightPercent );
-		col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
-
-		QLinearGradient gradient( x, y, x+width,
-							y+KEY_LINE_HEIGHT );
-		gradient.setColorAt( 0, lcol );
-		gradient.setColorAt( 1, rcol );
-		p.setBrush( gradient );
-		p.setPen( Qt::NoPen );
-		p.drawRect( x, y, width, KEY_LINE_HEIGHT-1 );
 	}
 
-	// hilighting lines around the note
-	p.setPen( Qt::SolidLine );
-	p.setBrush( Qt::NoBrush );
+	// adjust note to make it a bit faded if it has a lower volume
+	// in stereo using gradients
+	QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
+						volVal * leftPercent );
+	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
+						volVal * rightPercent );
+	col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
 
-	col = QColor( noteCol );
+	QLinearGradient gradient( x, y, x+width,
+						y+KEY_LINE_HEIGHT );
+	gradient.setColorAt( 0, lcol );
+	gradient.setColorAt( 1, rcol );
+	p.setBrush( gradient );
 	p.setPen( QColor::fromHsv( col.hue(), col.saturation(),
 					qMin<float>( 255, volVal*1.7f ) ) );
-	p.drawLine( x, y, x + width, y );
-	p.drawLine( x, y, x, y + KEY_LINE_HEIGHT - 2 );
-
-	col = QColor( noteCol );
-	p.setPen( QColor::fromHsv( col.hue(), col.saturation(), volVal/1.7 ) );
-	p.drawLine( x + width, y, x + width, y + KEY_LINE_HEIGHT - 2 );
-	p.drawLine( x, y + KEY_LINE_HEIGHT - 2, x + width,
-						y + KEY_LINE_HEIGHT - 2 );
+	p.setRenderHint(QPainter::Antialiasing);
+	p.drawRoundedRect( x, y, width, KEY_LINE_HEIGHT-1, 5, 2 );
 
 	// that little tab thing on the end hinting at the user
 	// to resize the note
@@ -1090,10 +1072,13 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 		}
 
 		case Qt::Key_Control:
-			m_ctrlMode = m_editMode;
-			m_editMode = ModeSelect;
-			QApplication::changeOverrideCursor( Qt::ArrowCursor );
-			ke->accept();
+			if ( isActiveWindow() )
+			{
+				m_ctrlMode = m_editMode;
+				m_editMode = ModeSelect;
+				QApplication::changeOverrideCursor( Qt::ArrowCursor );
+				ke->accept();
+			}
 			break;
 		default:
 			break;
@@ -1208,7 +1193,7 @@ inline int PianoRoll::keyAreaBottom() const
 void PianoRoll::mousePressEvent(QMouseEvent * me )
 {
 	m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
-	
+
 	if( hasValidPattern() == false )
 	{
 		return;
@@ -1610,11 +1595,11 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		const int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		const int ticks_middle = x * MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
-		
+
 		// get note-vector of current pattern
-		NoteVector notes; 
+		NoteVector notes;
 		notes += m_pattern->notes();
-		
+
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		foreach( Note * i, notes )
@@ -1646,7 +1631,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 				{
 					if( ( *it )->pos().getTicks() != closest->pos().getTicks() )
 					{
-						it = nv.erase( it ); 
+						it = nv.erase( it );
 					}
 					else
 					{
@@ -1996,7 +1981,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// if middle-click, set to defaults
 			volume_t vol;
 			panning_t pan;
-			
+
 			if( me->buttons() & Qt::LeftButton )
 			{
 				vol = tLimit<int>( MinVolume +
@@ -2015,7 +2000,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				vol = DefaultVolume;
 				pan = DefaultPanning;
 			}
-			
+
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				m_lastNoteVolume = vol;
@@ -2103,7 +2088,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			}
 		}
-		
+
 		else if( me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
 		{
 			// set move- or resize-cursor
@@ -2568,14 +2553,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 {
 	QColor horizCol = QColor( gridColor() );
 	QColor vertCol = QColor( gridColor() );
-	
+
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
 	QBrush bgColor = p.background();
-	
+
 	// fill with bg color
 	p.fillRect( 0,0, width(), height(), bgColor );
 
@@ -3009,6 +2994,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	int y = (int) y_base - sel_key_start * KEY_LINE_HEIGHT;
 	int h = (int) y_base - sel_key_end * KEY_LINE_HEIGHT - y;
 	p.setPen( QColor( 0, 64, 192 ) );
+	p.setBrush( Qt::NoBrush );
 	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
 
 	// TODO: Get this out of paint event
@@ -3122,11 +3108,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
-		
+
 		// get note-vector of current pattern
-		NoteVector notes; 
+		NoteVector notes;
 		notes += m_pattern->notes();
-		
+
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		foreach( Note * i, notes )
@@ -3139,7 +3125,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 				nv += i;
 			}
 		}
-		if( nv.size() > 0 ) 
+		if( nv.size() > 0 )
 		{
 			const int step = we->delta() > 0 ? 1.0 : -1.0;
 			if( m_noteEditMode == NoteEditVolume )
@@ -3180,7 +3166,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			update();
 		}
 	}
-	
+
 	// not in note edit area, so handle scrolling/zooming and quantization change
 	else
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
@@ -3557,7 +3543,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 			}
 			m_lastNotePanning = new_val;
 		}
-		
+
 	}
 }
 
@@ -3692,7 +3678,7 @@ void PianoRoll::deleteSelectedNotes()
 	bool update_after_delete = false;
 
 	m_pattern->addJournalCheckPoint();
-	
+
 	// get note-vector of current pattern
 	const NoteVector & notes = m_pattern->notes();
 

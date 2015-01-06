@@ -69,6 +69,8 @@ QPixmap * AutomationEditor::s_toolDraw = NULL;
 QPixmap * AutomationEditor::s_toolErase = NULL;
 QPixmap * AutomationEditor::s_toolSelect = NULL;
 QPixmap * AutomationEditor::s_toolMove = NULL;
+QPixmap * AutomationEditor::s_toolYFlip = NULL;
+QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 
 
@@ -98,9 +100,9 @@ AutomationEditor::AutomationEditor() :
 	m_editMode( DRAW ),
 	m_scrollBack( false ),
 	m_gridColor( 0,0,0 ),
-	m_graphColor(),
+	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
-	m_scaleColor()
+	m_scaleColor( Qt::SolidPattern )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -117,6 +119,16 @@ AutomationEditor::AutomationEditor() :
 	for( int i = 0; i < 7; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
+	}
+	if( s_toolYFlip == NULL )
+	{
+		s_toolYFlip = new QPixmap( embed::getIconPixmap(
+							"flip_y" ) );
+	}
+	if( s_toolXFlip == NULL )
+	{
+		s_toolXFlip = new QPixmap( embed::getIconPixmap(
+							"flip_x" ) );
 	}
 
 	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
@@ -191,9 +203,19 @@ AutomationEditor::~AutomationEditor()
 
 void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 {
+	if (m_pattern)
+	{
+		m_pattern->disconnect(this);
+	}
+
 	m_patternMutex.lock();
 	m_pattern = new_pattern;
 	m_patternMutex.unlock();
+
+	if (m_pattern != nullptr)
+	{
+		connect(m_pattern, SIGNAL(dataChanged()), this, SLOT(update()));
+	}
 
 	emit currentPatternChanged();
 }
@@ -1622,6 +1644,22 @@ void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 
 
 
+
+void AutomationEditor::flipYButtonPressed()
+{
+	m_pattern->flipY( m_minLevel, m_maxLevel );
+}
+
+
+
+
+void AutomationEditor::flipXButtonPressed()
+{
+	m_pattern->flipX();
+}
+
+
+
 void AutomationEditor::setEditMode(int mode)
 {
 	setEditMode((AutomationEditor::EditModes) mode);
@@ -1998,6 +2036,23 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
+	m_flipYButton = new ToolButton( embed::getIconPixmap( "flip_y" ),
+									tr( "Flip Vertically" ),
+									m_editor, SLOT( flipYButtonPressed() ),
+									m_toolBar );
+
+	m_flipXButton = new ToolButton( embed::getIconPixmap( "flip_x" ),
+									tr( "Flip Horizontally" ),
+									m_editor, SLOT( flipXButtonPressed() ),
+									m_toolBar );
+
+	m_flipYButton->setWhatsThis(
+				tr( "Click here and the pattern will be inverted."
+					"The points are flipped in the y direction. " ) );
+	m_flipXButton->setWhatsThis(
+				tr( "Click here and the pattern will be reversed. "
+					"The points are flipped in the x direction." ) );
+
 //	TODO: m_selectButton and m_moveButton are broken.
 //	m_selectButton = new QAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"), editModeGroup);
 //	m_moveButton = new QAction(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"), editModeGroup);
@@ -2153,6 +2208,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_toolBar->addAction(eraseAction);
 //	m_toolBar->addAction(m_selectButton);
 //	m_toolBar->addAction(m_moveButton);
+	m_toolBar->addWidget(m_flipXButton);
+	m_toolBar->addWidget(m_flipYButton);
 	m_toolBar->addSeparator();
 	m_toolBar->addAction(m_discreteAction);
 	m_toolBar->addAction(m_linearAction);

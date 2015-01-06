@@ -73,6 +73,8 @@ public slots:
 	void setEditModeDraw();
 	void setEditModeSelect();
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 
 private slots:
 	void setHighQuality( bool );

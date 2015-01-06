@@ -1,5 +1,5 @@
 /*
- * flangereffect.h - defination of FlangerEffect class.
+ * quadraturelfo.cpp - defination of QuadratureLfo class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,36 +22,17 @@
  *
  */
 
+#include "QuadratureLfo.h"
 
-#ifndef FLANGEREFFECT_H
-#define FLANGEREFFECT_H
-
-#include "Effect.h"
-#include "flangercontrols.h"
-#include "quadraturelfo.h"
-#include "monodelay.h"
-#include "noise.h"
-
-
-class FlangerEffect : public Effect
+QuadratureLfo::QuadratureLfo( int sampleRate )
 {
-public:
-    FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-    virtual ~FlangerEffect();
-    virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-    virtual EffectControls* controls()
-    {
-        return &m_flangerControls;
-    }
-    void changeSampleRate();
+	setSampleRate(sampleRate);
+}
 
-private:
-    FlangerControls m_flangerControls;
-    MonoDelay* m_lDelay;
-    MonoDelay* m_rDelay;
-    QuadratureLfo* m_lfo;
-    Noise* m_noise;
+void QuadratureLfo::tick( float *s, float *c )
+{
+	*s = sinf( m_phase );
+	*c = cosf( m_phase );
+	m_phase += m_increment;
 
-};
-
-#endif // FLANGEREFFECT_H
+}

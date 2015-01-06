@@ -73,6 +73,7 @@ private:
 private slots:
 	void renameChannel();
 	void removeChannel();
+	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
 	void displayHelp();

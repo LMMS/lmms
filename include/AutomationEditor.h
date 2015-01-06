@@ -131,6 +131,9 @@ protected slots:
 	void setEditMode(AutomationEditor::EditModes mode);
 	void setEditMode(int mode);
 
+	void flipYButtonPressed();
+	void flipXButtonPressed();
+
 	void setProgressionType(AutomationPattern::ProgressionTypes type);
 	void setProgressionType(int type);
 	void setTension();
@@ -176,6 +179,8 @@ private:
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
+	static QPixmap * s_toolYFlip;
+	static QPixmap * s_toolXFlip;
 
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
@@ -280,6 +285,9 @@ private:
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;
+
+	ToolButton * m_flipYButton;
+	ToolButton * m_flipXButton;
 
 	Knob * m_tensionKnob;
 

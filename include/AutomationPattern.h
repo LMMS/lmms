@@ -158,6 +158,8 @@ public:
 public slots:
 	void clear();
 	void objectDestroyed( jo_id_t );
+	void flipY( int min, int max );
+	void flipX( int length = -1 );
 
 private:
 	void cleanObjects();
