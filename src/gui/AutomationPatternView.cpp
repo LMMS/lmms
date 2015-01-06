@@ -54,7 +54,6 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
 
 	ToolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );

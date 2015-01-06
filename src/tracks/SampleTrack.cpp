@@ -62,6 +62,16 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
+	switch( getTrack()->trackContainer()->type() )
+	{
+		case TrackContainer::BBContainer:
+			setAutoResize( true );
+			break;
+
+		case TrackContainer::SongContainer:
+			setAutoResize( false );
+			break;
+	}
 }
 
 

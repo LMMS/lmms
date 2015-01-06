@@ -114,6 +114,7 @@ Song::Song() :
 			this, SLOT( masterPitchChanged() ) );*/
 
 	qRegisterMetaType<Note>( "note" );
+	setType( SongContainer );
 }
 
 

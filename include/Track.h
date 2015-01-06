@@ -121,6 +121,16 @@ public:
 		return m_length;
 	}
 
+	inline void setAutoResize( const bool _r )
+	{
+		m_autoResize = _r;
+	}
+
+	inline const bool getAutoResize() const
+	{
+		return m_autoResize;
+	}
+
 	virtual void movePosition( const MidiTime & _pos );
 	virtual void changeLength( const MidiTime & _length );
 
@@ -165,6 +175,7 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
+	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
 
@@ -216,7 +227,6 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
-	void setAutoResizeEnabled( bool _e = false );
 	float pixelsPerTact();
 
 	inline TrackView * getTrackView()
@@ -248,7 +258,6 @@ private:
 	TrackContentObject * m_tco;
 	TrackView * m_trackView;
 	Actions m_action;
-	bool m_autoResize;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 
