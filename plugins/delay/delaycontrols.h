@@ -35,38 +35,38 @@ class DelayEffect;
 
 class DelayControls : public EffectControls
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    DelayControls( DelayEffect* effect );
-    virtual ~DelayControls()
-    {
-    }
-    virtual void saveSettings( QDomDocument& doc, QDomElement& parent );
-    virtual void loadSettings( const QDomElement& _this );
-    inline virtual QString nodeName() const
-    {
-        return "Delay";
-    }
-    virtual int controlCount(){
-        return 4;
-    }
-    virtual EffectControlDialog* createView()
-    {
-        return new DelayControlsDialog( this );
-    }
+	DelayControls( DelayEffect* effect );
+	virtual ~DelayControls()
+	{
+	}
+	virtual void saveSettings( QDomDocument& doc, QDomElement& parent );
+	virtual void loadSettings( const QDomElement& _this );
+	inline virtual QString nodeName() const
+	{
+		return "Delay";
+	}
+	virtual int controlCount(){
+		return 4;
+	}
+	virtual EffectControlDialog* createView()
+	{
+		return new DelayControlsDialog( this );
+	}
 
 private slots:
-    void changeSampleRate();
+	void changeSampleRate();
 
 private:
-    DelayEffect* m_effect;
-    TempoSyncKnobModel m_delayTimeModel;
-    FloatModel m_feedbackModel;
-    TempoSyncKnobModel m_lfoTimeModel;
-    TempoSyncKnobModel m_lfoAmountModel;
+	DelayEffect* m_effect;
+	TempoSyncKnobModel m_delayTimeModel;
+	FloatModel m_feedbackModel;
+	TempoSyncKnobModel m_lfoTimeModel;
+	TempoSyncKnobModel m_lfoAmountModel;
 
-    friend class DelayControlsDialog;
-    friend class DelayEffect;
+	friend class DelayControlsDialog;
+	friend class DelayEffect;
 };
 
 #endif // DELAYCONTROLS_H
