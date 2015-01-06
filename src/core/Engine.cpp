@@ -38,8 +38,9 @@
 #include "Song.h"
 #include "BandLimitedWave.h"
 
+#include "GuiApplication.h"
 
-bool Engine::s_hasGUI = true;
+
 bool Engine::s_suppressMessages = false;
 float Engine::s_framesPerTick;
 Mixer* Engine::s_mixer = NULL;
@@ -54,10 +55,8 @@ QMap<QString, QString> Engine::s_pluginFileHandling;
 
 
 
-void Engine::init( const bool _has_gui )
+void Engine::init()
 {
-	s_hasGUI = _has_gui;
-
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
 
@@ -107,6 +106,11 @@ void Engine::destroy()
 	deleteHelper( &s_song );
 
 	delete ConfigManager::inst();
+}
+
+bool Engine::hasGUI()
+{
+	return gui != nullptr;
 }
 
 

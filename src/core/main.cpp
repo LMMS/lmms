@@ -485,7 +485,7 @@ int main( int argc, char * * argv )
 	else
 	{
 		// we're going to render our song
-		Engine::init( false );
+		Engine::init();
 
 		printf( "loading project...\n" );
 		Engine::getSong()->loadProject( file_to_load );

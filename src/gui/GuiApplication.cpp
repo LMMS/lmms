@@ -51,8 +51,6 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication()
 {
-	s_instance = this;
-
 	// Init style and palette
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
@@ -71,7 +69,9 @@ GuiApplication::GuiApplication()
 	qApp->processEvents();
 
 	// Init central engine which handles all components of LMMS
-	Engine::init(false);
+	Engine::init();
+
+	s_instance = this;
 
 	m_mainWindow = new MainWindow;
 
@@ -85,11 +85,10 @@ GuiApplication::GuiApplication()
 
 	m_mainWindow->finalize();
 	splashScreen.finish(m_mainWindow);
-
-	Engine::s_hasGUI = true;
 }
 
 GuiApplication::~GuiApplication()
 {
 	InstrumentTrackView::cleanupWindowCache();
+	s_instance = nullptr;
 }

@@ -53,13 +53,10 @@ class ControllerRackView;
 class EXPORT Engine
 {
 public:
-	static void init( const bool _has_gui = true );
+	static void init();
 	static void destroy();
 
-	static bool hasGUI()
-	{
-		return s_hasGUI;
-	}
+	static bool hasGUI();
 
 	static void setSuppressMessages( bool _on )
 	{
@@ -68,7 +65,7 @@ public:
 
 	static bool suppressMessages()
 	{
-		return !s_hasGUI || s_suppressMessages;
+		return !hasGUI() || s_suppressMessages;
 	}
 
 	// core
@@ -130,7 +127,6 @@ private:
 		delete tmp;
 	}
 
-	static bool s_hasGUI;
 	static bool s_suppressMessages;
 	static float s_framesPerTick;
 
@@ -149,7 +145,7 @@ private:
 	static void initPluginFileHandling();
 
 	friend class GuiApplication;
-} ;
+};
 
 
 
