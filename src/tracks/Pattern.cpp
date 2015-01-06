@@ -84,7 +84,14 @@ Pattern::Pattern( const Pattern& other ) :
 	}
 
 	init();
-	setAutoResize( false );
+	if( getTrack()->trackContainer()->type() == TrackContainer::BBTrackContainer )
+	{
+		setAutoResize( true );
+	}
+	else
+	{
+		setAutoResize( false );
+	}
 }
 
 

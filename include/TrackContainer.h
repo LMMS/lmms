@@ -41,6 +41,12 @@ class EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
+	enum TrackContainerTypes
+	{
+		BBTrackContainer,
+		SongTrackContainer
+	} ;
+
 	typedef QVector<track *> TrackList;
 
 	TrackContainer();
@@ -78,6 +84,16 @@ public:
 		return "trackcontainer";
 	}
 
+	inline void setType( TrackContainerTypes newType )
+	{
+		m_TrackContainerType = newType;
+	}
+
+	inline TrackContainerTypes type() const
+	{
+		return m_TrackContainerType;
+	}
+
 
 signals:
 	void trackAdded( track * _track );
@@ -87,6 +103,8 @@ protected:
 
 private:
 	TrackList m_tracks;
+
+	TrackContainerTypes m_TrackContainerType;
 
 
 	friend class TrackContainerView;

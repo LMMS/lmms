@@ -54,7 +54,14 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( MidiTime( 1, 0 ) );
-	setAutoResize( false );
+	if( getTrack() && getTrack()->trackContainer()->type() == TrackContainer::BBTrackContainer )
+	{
+		setAutoResize( true );
+	}
+	else
+	{
+		setAutoResize( false );
+	}
 }
 
 
@@ -73,7 +80,14 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 		m_timeMap[it.key()] = it.value();
 		m_tangents[it.key()] = _pat_to_copy.m_tangents[it.key()];
 	}
-	setAutoResize( false );
+	if( getTrack()->trackContainer()->type() == TrackContainer::BBTrackContainer )
+	{
+		setAutoResize( true );
+	}
+	else
+	{
+		setAutoResize( false );
+	}
 }
 
 
