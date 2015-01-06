@@ -50,6 +50,7 @@
 #include "ActionGroup.h"
 #include "SongEditor.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "embed.h"
 #include "Engine.h"
 #include "PixmapButton.h"
@@ -296,7 +297,7 @@ void AutomationEditor::update()
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
-		Engine::pianoRoll()->update();
+		gui->pianoRoll()->update();
 	}
 }
 
@@ -1549,7 +1550,7 @@ void AutomationEditor::play()
 		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 		{
 			Engine::getSong()->stop();
-			Engine::getSong()->playPattern( Engine::pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
 		}
 		else if( Engine::getSong()->isStopped() == false )
 		{
@@ -1557,7 +1558,7 @@ void AutomationEditor::play()
 		}
 		else
 		{
-			Engine::getSong()->playPattern( Engine::pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
@@ -1814,7 +1815,7 @@ void AutomationEditor::cutSelectedValues()
 	}
 
 	update();
-	Engine::songEditor()->update();
+	gui->songEditor()->update();
 }
 
 
@@ -1836,7 +1837,7 @@ void AutomationEditor::pasteValues()
 		// least one value...
 		Engine::getSong()->setModified();
 		update();
-		Engine::songEditor()->update();
+		gui->songEditor()->update();
 	}
 }
 
@@ -1866,7 +1867,7 @@ void AutomationEditor::deleteSelectedValues()
 	{
 		Engine::getSong()->setModified();
 		update();
-		Engine::songEditor()->update();
+		gui->songEditor()->update();
 	}
 }
 

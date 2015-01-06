@@ -22,6 +22,8 @@
  *
  */
 
+#include "SongEditor.h"
+
 #include <QTimeLine>
 #include <QAction>
 #include <QButtonGroup>
@@ -36,12 +38,12 @@
 #include <math.h>
 
 #include "ActionGroup.h"
-#include "SongEditor.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
@@ -108,9 +110,9 @@ SongEditor::SongEditor( Song * _song ) :
 
 
 	// add some essential widgets to global tool-bar
-	QWidget * tb = Engine::mainWindow()->toolBar();
+	QWidget * tb = gui->mainWindow()->toolBar();
 
-	Engine::mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 10 );
 
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
@@ -125,7 +127,7 @@ SongEditor::SongEditor( Song * _song ) :
 			"should be played within a minute (or how many measures "
 			"should be played within four minutes)." ) );
 
-	int tempoSpinBoxCol = Engine::mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
+	int tempoSpinBoxCol = gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
@@ -135,18 +137,18 @@ SongEditor::SongEditor( Song * _song ) :
 	connect( hq_btn, SIGNAL( toggled( bool ) ),
 			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
-	Engine::mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
+	gui->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
 
-	Engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
+	gui->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
-	Engine::mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 10 );
 
 	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
-	Engine::mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
+	gui->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
-	Engine::mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 10 );
 
 
 	QLabel * master_vol_lbl = new QLabel( tb );
@@ -175,11 +177,11 @@ SongEditor::SongEditor( Song * _song ) :
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	Engine::mainWindow()->addWidgetToToolBar( master_vol_lbl );
-	Engine::mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
+	gui->mainWindow()->addWidgetToToolBar( master_vol_lbl );
+	gui->mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
 
 
-	Engine::mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 10 );
 
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
@@ -207,10 +209,10 @@ SongEditor::SongEditor( Song * _song ) :
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
-	Engine::mainWindow()->addWidgetToToolBar( master_pitch_lbl );
-	Engine::mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
+	gui->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
+	gui->mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
 
-	Engine::mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 10 );
 
 	// create widget for visualization- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
@@ -225,7 +227,7 @@ SongEditor::SongEditor( Song * _song ) :
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
 
-	Engine::mainWindow()->addWidgetToToolBar( vc_w );
+	gui->mainWindow()->addWidgetToToolBar( vc_w );
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -305,13 +307,13 @@ void SongEditor::setEditModeSelect()
 void SongEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		Engine::mainWindow()->isShiftPressed() == true &&
+		gui->mainWindow()->isShiftPressed() == true &&
 						_ke->key() == Qt::Key_Insert )
 	{
 		m_song->insertBar();
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			Engine::mainWindow()->isShiftPressed() == true &&
+			gui->mainWindow()->isShiftPressed() == true &&
 						_ke->key() == Qt::Key_Delete )
 	{
 		m_song->removeBar();
@@ -347,7 +349,7 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 
 void SongEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( Engine::mainWindow()->isCtrlPressed() == true )
+	if( gui->mainWindow()->isCtrlPressed() == true )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -371,7 +373,7 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( Engine::mainWindow()->isShiftPressed() == true )
+	else if( gui->mainWindow()->isShiftPressed() == true )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -601,7 +603,7 @@ void SongEditor::adjustUiAfterProjectLoad()
 		// make sure to bring us to front as the song editor is the central
 		// widget in a song and when just opening a song in order to listen to
 		// it, it's very annyoing to manually bring up the song editor each time
-		Engine::mainWindow()->workspace()->setActiveSubWindow(
+		gui->mainWindow()->workspace()->setActiveSubWindow(
 				qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	}
 	scrolled( 0 );
@@ -721,5 +723,5 @@ void SongEditorWindow::recordAccompany()
 void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
-	Engine::pianoRoll()->stopRecording();
+	gui->pianoRoll()->stopRecording();
 }

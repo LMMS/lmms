@@ -69,6 +69,7 @@
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "LmmsStyle.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
@@ -102,7 +103,7 @@ int main( int argc, char * * argv )
 	// initialize memory managers
 	MemoryManager::init();
 	NotePlayHandleManager::init();
-	
+
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
@@ -418,28 +419,7 @@ int main( int argc, char * * argv )
 
 	if( render_out.isEmpty() )
 	{
-		// init style and palette
-		LmmsStyle * lmmsstyle = new LmmsStyle();
-		QApplication::setStyle( lmmsstyle );
-
-		LmmsPalette * lmmspal = new LmmsPalette( NULL, lmmsstyle );
-		QPalette lpal = lmmspal->palette();
-
-		QApplication::setPalette( lpal );
-		LmmsStyle::s_palette = &lpal;
-
-
-		// show splash screen
-		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
-		splashScreen.show();
-		splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
-									Qt::AlignRight | Qt::AlignBottom, Qt::white );
-		qApp->processEvents();
-
-		// init central engine which handles all components of LMMS
-		Engine::init();
-		
-		splashScreen.hide();
+		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
@@ -449,7 +429,7 @@ int main( int argc, char * * argv )
 		QString recoveryFile = ConfigManager::inst()->recoveryFile();
 
 		if( QFileInfo(recoveryFile).exists() &&
-			QMessageBox::question( Engine::mainWindow(), MainWindow::tr( "Project recovery" ),
+			QMessageBox::question( gui->mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "
 										"Do you want to recover the project of this session?" ),
 						QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
@@ -460,10 +440,10 @@ int main( int argc, char * * argv )
 		// we try to load given file
 		if( !file_to_load.isEmpty() )
 		{
-			Engine::mainWindow()->show();
+			gui->mainWindow()->show();
 			if( fullscreen )
 			{
-				Engine::mainWindow()->showMaximized();
+				gui->mainWindow()->showMaximized();
 			}
 			if( file_to_load == recoveryFile )
 			{
@@ -482,10 +462,10 @@ int main( int argc, char * * argv )
 				return 0;
 			}
 
-			Engine::mainWindow()->show();
+			gui->mainWindow()->show();
 			if( fullscreen )
 			{
-				Engine::mainWindow()->showMaximized();
+				gui->mainWindow()->showMaximized();
 			}
 		}
 		else
@@ -494,12 +474,13 @@ int main( int argc, char * * argv )
 
 			// [Settel] workaround: showMaximized() doesn't work with
 			// FVWM2 unless the window is already visible -> show() first
-			Engine::mainWindow()->show();
+			gui->mainWindow()->show();
 			if( fullscreen )
 			{
-				Engine::mainWindow()->showMaximized();
+				gui->mainWindow()->showMaximized();
 			}
 		}
+
 	}
 	else
 	{
@@ -536,9 +517,9 @@ int main( int argc, char * * argv )
 
 	const int ret = app->exec();
 	delete app;
-	
+
 	// cleanup memory managers
 	MemoryManager::cleanup();
-	
+
 	return( ret );
 }

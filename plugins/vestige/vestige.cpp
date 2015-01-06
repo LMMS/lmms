@@ -38,6 +38,7 @@
 #include "InstrumentTrack.h"
 #include "VstPlugin.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -873,7 +874,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = Engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
+	m_vi->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
 	m_vi->m_subWindow->setFixedWidth( 960 );

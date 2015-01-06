@@ -97,42 +97,6 @@ public:
 		return s_projectJournal;
 	}
 
-	// GUI
-	static MainWindow * mainWindow()
-	{
-		return s_mainWindow;
-	}
-
-	static FxMixerView * fxMixerView()
-	{
-		return s_fxMixerView;
-	}
-
-	static SongEditorWindow* songEditor()
-	{
-		return s_songEditor;
-	}
-
-	static BBEditor * getBBEditor()
-	{
-		return s_bbEditor;
-	}
-
-	static PianoRollWindow* pianoRoll()
-	{
-		return s_pianoRoll;
-	}
-
-	static ProjectNotes * getProjectNotes()
-	{
-		return s_projectNotes;
-	}
-
-	static AutomationEditorWindow * automationEditor()
-	{
-		return s_automationEditor;
-	}
-
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
@@ -141,11 +105,6 @@ public:
 	static DummyTrackContainer * dummyTrackContainer()
 	{
 		return s_dummyTC;
-	}
-
-	static ControllerRackView * getControllerRackView()
-	{
-		return s_controllerRackView;
 	}
 
 	static float framesPerTick()
@@ -182,22 +141,14 @@ private:
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
-	static ControllerRackView * s_controllerRackView;
 
-	// GUI
-	static MainWindow * s_mainWindow;
-	static FxMixerView * s_fxMixerView;
-	static SongEditorWindow* s_songEditor;
-	static AutomationEditorWindow * s_automationEditor;
-	static BBEditor * s_bbEditor;
-	static PianoRollWindow* s_pianoRoll;
-	static ProjectNotes * s_projectNotes;
 	static Ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_pluginFileHandling;
 
 	static void initPluginFileHandling();
 
+	friend class GuiApplication;
 } ;
 
 

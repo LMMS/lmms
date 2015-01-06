@@ -55,6 +55,7 @@
 #include "debug.h"
 #include "DetuningHelper.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
@@ -799,7 +800,7 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 
 	// we modified the song
 	update();
-	Engine::songEditor()->update();
+	gui->songEditor()->update();
 
 }
 
@@ -835,7 +836,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 
 	// we modified the song
 	update();
-	Engine::songEditor()->update();
+	gui->songEditor()->update();
 }
 
 
@@ -1203,7 +1204,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	{
 		Note* n = noteUnderMouse();
 		if (n->detuning() == NULL) n->createDetuning();
-		Engine::automationEditor()->open( noteUnderMouse()->detuning()->automationPattern() );
+		gui->automationEditor()->open( noteUnderMouse()->detuning()->automationPattern() );
 		return;
 	}
 
@@ -1483,7 +1484,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 							// added new notes, so must update engine, song, etc
 							Engine::getSong()->setModified();
 							update();
-							Engine::songEditor()->update();
+							gui->songEditor()->update();
 						}
 					}
 
@@ -3612,7 +3613,7 @@ void PianoRoll::cutSelectedNotes()
 	}
 
 	update();
-	Engine::songEditor()->update();
+	gui->songEditor()->update();
 }
 
 
@@ -3661,7 +3662,7 @@ void PianoRoll::pasteNotes()
 		// least one note...
 		Engine::getSong()->setModified();
 		update();
-		Engine::songEditor()->update();
+		gui->songEditor()->update();
 	}
 }
 
@@ -3705,7 +3706,7 @@ void PianoRoll::deleteSelectedNotes()
 	{
 		Engine::getSong()->setModified();
 		update();
-		Engine::songEditor()->update();
+		gui->songEditor()->update();
 	}
 
 }

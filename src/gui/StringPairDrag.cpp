@@ -31,7 +31,7 @@
 
 
 #include "StringPairDrag.h"
-#include "Engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 
 
@@ -64,9 +64,9 @@ StringPairDrag::~StringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	if( Engine::mainWindow() )
+	if( gui->mainWindow() )
 	{
-		Engine::mainWindow()->clearKeyModifiers();
+		gui->mainWindow()->clearKeyModifiers();
 	}
 }
 

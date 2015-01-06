@@ -26,6 +26,7 @@
 #include "Fader.h"
 #include "EffectControls.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "qwidget.h"
 #include "TextFloat.h"
 #include "qlist.h"
@@ -46,7 +47,7 @@ public:
 		resize( 23, 116 );
 		m_lPeak = lPeak;
 		m_rPeak = rPeak;
-		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
+		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
 		m_model = model;
 		setPeak_L( 0 );
 		setPeak_R( 0 );

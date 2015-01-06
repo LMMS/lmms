@@ -35,6 +35,7 @@
 #include "CaptionMenu.h"
 #include "Engine.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "templates.h"
 #include "MainWindow.h"
@@ -126,7 +127,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 	if( m_mouseMoving )
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if( Engine::mainWindow()->isShiftPressed() )
+		if( gui->mainWindow()->isShiftPressed() )
 			dy = qBound( -4, dy/4, 4 );
 		if( dy > 1 || dy < -1 )
 		{

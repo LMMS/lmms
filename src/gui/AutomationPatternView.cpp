@@ -30,7 +30,7 @@
 #include "AutomationEditor.h"
 #include "AutomationPattern.h"
 #include "embed.h"
-#include "Engine.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "ProjectJournal.h"
 #include "RenameDialog.h"
@@ -49,7 +49,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 {
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
-	connect( Engine::automationEditor(), SIGNAL( currentPatternChanged() ),
+	connect( gui->automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -123,9 +123,9 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		update();
 
 		//If automation editor is opened, update its display after disconnection
-		if( Engine::automationEditor() )
+		if( gui->automationEditor() )
 		{
-			Engine::automationEditor()->m_editor->updateAfterPatternChange();
+			gui->automationEditor()->m_editor->updateAfterPatternChange();
 		}
 
 		//if there is no more connection connected to the AutomationPattern
@@ -230,7 +230,7 @@ void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
 		_me->ignore();
 		return;
 	}
-	Engine::automationEditor()->open(m_pat);
+	gui->automationEditor()->open(m_pat);
 }
 
 
@@ -269,7 +269,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c );
 
 	p.setBrush( lingrad );
-	if( Engine::automationEditor()->currentPattern() == m_pat )
+	if( gui->automationEditor()->currentPattern() == m_pat )
 		p.setPen( c.lighter( 160 ) );
 	else
 		p.setPen( c.lighter( 130 ) );
@@ -352,7 +352,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	// outer edge
 	p.setBrush( QBrush() );
-	if( Engine::automationEditor()->currentPattern() == m_pat )
+	if( gui->automationEditor()->currentPattern() == m_pat )
 		p.setPen( c.lighter( 130 ) );
 	else
 		p.setPen( c.darker( 300 ) );
@@ -413,10 +413,10 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		}
 		update();
 
-		if( Engine::automationEditor() &&
-			Engine::automationEditor()->currentPattern() == m_pat )
+		if( gui->automationEditor() &&
+			gui->automationEditor()->currentPattern() == m_pat )
 		{
-			Engine::automationEditor()->setCurrentPattern( m_pat );
+			gui->automationEditor()->setCurrentPattern( m_pat );
 		}
 	}
 	else

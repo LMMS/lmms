@@ -28,13 +28,14 @@
 
 #include "TextFloat.h"
 #include "gui_templates.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
 
 
 
 TextFloat::TextFloat() :
-	QWidget( Engine::mainWindow(), Qt::ToolTip ),
+	QWidget( gui->mainWindow(), Qt::ToolTip ),
 	m_title(),
 	m_text(),
 	m_pixmap()
@@ -89,7 +90,7 @@ void TextFloat::setVisibilityTimeOut( int _msecs )
 TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {
-	QWidget * mw = Engine::mainWindow();
+	QWidget * mw = gui->mainWindow();
 	TextFloat * tf = new TextFloat;
 	if( _parent != NULL )
 	{
