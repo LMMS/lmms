@@ -85,6 +85,9 @@ private:
 	EqLp12Filter m_lp480;
 	EqLp12Filter m_lp481;
 
+	float m_inGain;
+	float m_outGain;
+
 
 
 

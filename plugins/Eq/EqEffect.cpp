@@ -52,7 +52,9 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 
 EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect( &eq_plugin_descriptor, parent, key ),
-	m_eqControls( this )
+	m_eqControls( this ),
+	m_inGain( 1.0 ),
+	m_outGain( 1.0 )
 {
 
 }
@@ -73,13 +75,21 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		return( false );
 	}
+	if( m_eqControls.m_outGainModel.isValueChanged() )
+	{
+		m_outGain = dbvToAmp(m_eqControls.m_outGainModel.value());
+	}
+	if( m_eqControls.m_inGainModel.isValueChanged() )
+	{
+		m_inGain = dbvToAmp(m_eqControls.m_inGainModel.value());
+	}
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	const float outGain =  m_eqControls.m_outGainModel.getAmp();
+	const float outGain =  m_outGain;
 	const int sampleRate = Engine::mixer()->processingSampleRate();
 	sampleFrame m_inPeak = { 0, 0 };
 
@@ -91,7 +101,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		m_eqControls.m_inFftBands.clear();
 	}
-	gain(buf , frames, m_eqControls.m_inGainModel.getAmp() , &m_inPeak );
+	gain(buf , frames, m_inGain , &m_inPeak );
 	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < m_inPeak[0] ? m_inPeak[0] : m_eqControls.m_inPeakL;
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
