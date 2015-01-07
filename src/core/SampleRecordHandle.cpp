@@ -30,9 +30,7 @@
 #include "Pattern.h"
 #include "SampleBuffer.h"
 #include "SampleTrack.h"
-#ifdef LMMS_DEBUG
-#include <assert.h>
-#endif
+#include "debug.h"
 
 
 SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
