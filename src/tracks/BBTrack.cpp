@@ -215,7 +215,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	QColor col = m_bbTCO->m_useStyleColor 
+	QColor col = m_bbTCO->m_useStyleColor
 		? p.pen().brush().color()
 		: m_bbTCO->colorObj();
 
@@ -223,10 +223,10 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	{
 		col = QColor( 160, 160, 160 );
 	}
+
 	if( isSelected() == true )
 	{
-		col = QColor( qMax( col.red() - 128, 0 ),
-					qMax( col.green() - 128, 0 ), 255 );
+		col = QColor( qMax( col.red() - 128, 0 ), qMax( col.green() - 128, 0 ), 255 );
 	}
 
 	QLinearGradient lingrad( 0, 0, 0, height() );

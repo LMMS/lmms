@@ -259,11 +259,16 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
+
 	if( !( m_pat->getTrack()->isMuted() || m_pat->isMuted() ) )
-		c = isSelected() ? QColor( 0, 0, 224 )
-						 : styleColor;
+		c = styleColor;
 	else
-		c = QColor( 80,80,80 );
+		c = QColor( 80, 80, 80 );
+
+	if( isSelected() == true )
+	{
+		c = QColor( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
