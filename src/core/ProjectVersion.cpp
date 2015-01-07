@@ -31,38 +31,38 @@
 
 
 
-int ProjectVersion::compare( const ProjectVersion & _v1,
-						const ProjectVersion & _v2 )
+int ProjectVersion::compare( const ProjectVersion & v1, 
+						const ProjectVersion & v2 )
 {
 	int n1, n2;
 
 	// Major
-	n1 = _v1.section( '.', 0, 0 ).toInt();
-	n2 = _v2.section( '.', 0, 0 ).toInt();
+	n1 = v1.section( '.', 0, 0 ).toInt();
+	n2 = v2.section( '.', 0, 0 ).toInt();
 	if( n1 != n2 )
 	{
 		return n1 - n2;
 	}
 
 	// Minor
-	n1 = _v1.section( '.', 1, 1 ).toInt();
-	n2 = _v2.section( '.', 1, 1 ).toInt();
+	n1 = v1.section( '.', 1, 1 ).toInt();
+	n2 = v2.section( '.', 1, 1 ).toInt();
 	if( n1 != n2 )
 	{
 		return n1 - n2;
 	}
 
 	// Release
-	n1 = _v1.section( '.', 2 ).section( '-', 0, 0 ).toInt();
-	n2 = _v2.section( '.', 2 ).section( '-', 0, 0 ).toInt();
+	n1 = v1.section( '.', 2 ).section( '-', 0, 0 ).toInt();
+	n2 = v2.section( '.', 2 ).section( '-', 0, 0 ).toInt();
 	if( n1 != n2 )
 	{
 		return n1 - n2;
 	}
 
 	// Build
-	const QString b1 = _v1.section( '.', 2 ).section( '-', 1 );
-	const QString b2 = _v2.section( '.', 2 ).section( '-', 1 );
+	const QString b1 = v1.section( '.', 2 ).section( '-', 1 );
+	const QString b2 = v2.section( '.', 2 ).section( '-', 1 );
 
 	// make sure 0.x.y > 0.x.y-patch
 	if( b1.isEmpty() )
@@ -76,7 +76,6 @@ int ProjectVersion::compare( const ProjectVersion & _v1,
 
 	return QString::compare( b1, b2 );
 }
-
 
 
 
