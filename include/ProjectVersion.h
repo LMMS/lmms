@@ -39,8 +39,8 @@ enum CompareType { Major, Minor, Release, Build };
 class ProjectVersion
 {
 public:
-	ProjectVersion(QString version, CompareType c = CompareType::Build);
-	ProjectVersion(const char * version, CompareType c = CompareType::Build);
+	ProjectVersion( QString version, CompareType c = CompareType::Build );
+	ProjectVersion( const char * version, CompareType c = CompareType::Build );
 
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
@@ -60,7 +60,6 @@ private:
 	QString m_build;
 	CompareType m_compareType;
 } ;
-
 
 /*
  * ProjectVersion v. ProjectVersion
