@@ -32,22 +32,22 @@
 class ProjectVersion : public QString
 {
 public:
-	ProjectVersion( const QString & _s ) :
-		QString( _s )
+	ProjectVersion( const QString & s ) :
+		QString( s )
 	{
 	}
 
-	static int compare( const ProjectVersion & _v1,
-						const ProjectVersion & _v2 );
+	static int compare( const ProjectVersion & v1, 
+						const ProjectVersion & v2 );
 
 } ;
 
 
 
 
-inline bool operator<( const ProjectVersion & _v1, const char * _str )
+inline bool operator<( const ProjectVersion & v1, const char * str )
 {
-	return ProjectVersion::compare( _v1, ProjectVersion( _str ) ) < 0;
+	return ProjectVersion::compare( v1, ProjectVersion( str ) ) < 0;
 }
 
 
