@@ -53,17 +53,17 @@ QPixmap * TimeLineWidget::s_loopPointEndPixmap = NULL;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 			Song::playPos & pos, const MidiTime & begin,
-							QWidget * _parent ) :
-	QWidget( _parent ),
+							QWidget * parent ) :
+	QWidget( parent ),
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
 	m_changedPosition( true ),
-	m_xOffset( _xoff ),
+	m_xOffset( xoff ),
 	m_posMarkerX( 0 ),
-	m_ppt( _ppt ),
-	m_pos( _pos ),
-	m_begin( _begin ),
+	m_ppt( ppt ),
+	m_pos( pos ),
+	m_begin( begin ),
 	m_savedPos( -1 ),
 	m_hint( NULL ),
 	m_action( NoAction ),
@@ -94,17 +94,17 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	move( 0, _yoff );
+	move( 0, yoff );
 	setFixedHeight( s_timeLinePixmap->height() );
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
 	m_pos.m_timeLine = this;
 
-	QTimer * update_timer = new QTimer( this );
-	connect( update_timer, SIGNAL( timeout() ),
+	QTimer * updateTimer = new QTimer( this );
+	connect( updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updatePosition() ) );
-	update_timer->start( 50 );
+	updateTimer->start( 50 );
 }
 
 
