@@ -51,8 +51,8 @@ QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
 QPixmap * TimeLineWidget::s_loopPointBeginPixmap = NULL;
 QPixmap * TimeLineWidget::s_loopPointEndPixmap = NULL;
 
-TimeLineWidget::TimeLineWidget( const int _xoff, const int _yoff, const float _ppt,
-			Song::playPos & _pos, const MidiTime & _begin,
+TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
+			Song::playPos & pos, const MidiTime & begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_autoScroll( AutoScrollEnabled ),
@@ -388,10 +388,6 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	m_hint = NULL;
 	m_action = NoAction;
 }
-
-
-
-
 
 
 
