@@ -73,9 +73,9 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
 
-#ifdef LMMS_DEBUG
+
 	assert( dynamic_cast<QBoxLayout *>( _w->layout() ) != NULL );
-#endif
+
 	dynamic_cast<QBoxLayout *>( _w->layout() )->addSpacing( 5 );
 	dynamic_cast<QBoxLayout *>( _w->layout() )->addWidget( title );
 	dynamic_cast<QBoxLayout *>( _w->layout() )->addSpacing( 10 );
