@@ -904,16 +904,19 @@ void PatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 
 	QColor c;
-
 	if(( m_pat->m_patternType != Pattern::BeatPattern ) &&
-				!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
+		!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
+	{
 		c = styleColor;
+	}
 	else
+	{
 		c = QColor( 80, 80, 80 );
+	}
 
 	if( isSelected() == true )
 	{
-		c = QColor( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
 	}
 
 	if( m_pat->m_patternType != Pattern::BeatPattern )

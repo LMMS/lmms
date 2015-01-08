@@ -340,13 +340,17 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 
 	QColor c;
 	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
+	{
 		c = styleColor;
+	}
 	else
+	{
 		c = QColor( 80, 80, 80 );
+	}
 
 	if( isSelected() == true )
 	{
-		c = QColor( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
 	}
 
 	QLinearGradient grad( 0, 0, 0, height() );

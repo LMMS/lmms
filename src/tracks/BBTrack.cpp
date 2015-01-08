@@ -215,18 +215,23 @@ void BBTCOView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	QColor col = m_bbTCO->m_useStyleColor
-		? p.pen().brush().color()
-		: m_bbTCO->colorObj();
-
+	QColor col;
 	if( m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted() )
 	{
 		col = QColor( 160, 160, 160 );
 	}
+	else if ( m_bbTCO->m_useStyleColor )
+	{
+		col =  p.pen().brush().color();
+	}
+	else
+	{
+		col = m_bbTCO->colorObj();
+	}
 
 	if( isSelected() == true )
 	{
-		col = QColor( qMax( col.red() - 128, 0 ), qMax( col.green() - 128, 0 ), 255 );
+		col.setRgb( qMax( col.red() - 128, 0 ), qMax( col.green() - 128, 0 ), 255 );
 	}
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
