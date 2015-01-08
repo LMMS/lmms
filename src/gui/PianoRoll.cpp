@@ -4194,9 +4194,9 @@ void PianoRoll::zoomingChanged()
 {
 	const QString & zfac = m_zoomingModel.currentText();
 	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
-#ifdef LMMS_DEBUG
+
 	assert( m_ppt > 0 );
-#endif
+
 	m_timeLine->setPixelsPerTact( m_ppt );
 	update();
 
