@@ -1402,6 +1402,11 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
 		{
 			tco->selectViewOnCreate( true );
 		}
+		//check tco name, if the same as source track name dont copy
+		if( tco->name() == tracks[trackIndex]->name() )
+		{
+			tco->setName( "" );
+		}
 	}
 
 	AutomationPattern::resolveAllIDs();
