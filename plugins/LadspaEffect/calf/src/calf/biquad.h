@@ -1,6 +1,6 @@
 /* Calf DSP Library
  * Biquad filters
- * Copyright (C) 2001-2007 Krzysztof Foltman
+ * Copyright (C) 2001-2015 Krzysztof Foltman
  *
  * Most of code in this file is based on freely
  * available other work of other people (filter equations).

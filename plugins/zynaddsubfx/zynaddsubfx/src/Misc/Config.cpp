@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Config.cpp - Configuration file functions
-  Copyright (C) 2003-2005 Nasca Octavian Paul
+  Copyright (C) 2003-2015 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify

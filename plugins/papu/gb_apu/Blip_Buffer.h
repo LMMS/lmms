@@ -2,7 +2,7 @@
 // Buffer of sound samples into which band-limited waveforms can be synthesized
 // using Blip_Wave or Blip_Synth.
 
-// Blip_Buffer 0.3.4. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
+// Blip_Buffer 0.3.4. Copyright (C) 2003-2015 Shay Green. GNU LGPL license.
 
 #ifndef BLIP_BUFFER_H
 #define BLIP_BUFFER_H

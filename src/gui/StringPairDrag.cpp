@@ -3,7 +3,7 @@
  *                        for drag'n'drop of string-pairs and which is the base
  *                        for all drag'n'drop-actions within LMMS
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

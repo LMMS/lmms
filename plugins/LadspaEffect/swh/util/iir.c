@@ -1,6 +1,6 @@
 /*
  * iir.c
- * Copyright (C) 2000-2003 Alexander Ehlert
+ * Copyright (C) 2000-2015 Alexander Ehlert
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

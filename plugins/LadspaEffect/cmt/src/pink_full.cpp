@@ -5,7 +5,7 @@
    (c) 2002 Nathaniel Virgo
 
    Part of the Computer Music Toolkit - a library of LADSPA plugins. 
-   The Computer Music Toolkit is Copyright (C) 2000-2002 
+   The Computer Music Toolkit is Copyright (C) 2000-2015 
    Richard W.E. Furse. The author may be contacted at
    richard@muse.demon.co.uk.
 

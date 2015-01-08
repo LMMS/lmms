@@ -3,7 +3,7 @@
 
   globals.h - it contains program settings and the program capabilities
               like number of parts, of effects
-  Copyright (C) 2002-2005 Nasca Octavian Paul
+  Copyright (C) 2002-2015 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify

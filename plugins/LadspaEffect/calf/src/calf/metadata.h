@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * Audio module (plugin) metadata - header file
  *
- * Copyright (C) 2007-2008 Krzysztof Foltman
+ * Copyright (C) 2007-2015 Krzysztof Foltman
  * Copyright (C) 2008 Thor Harald Johansen <thj@thj.no>
  *
  * This program is free software; you can redistribute it and/or

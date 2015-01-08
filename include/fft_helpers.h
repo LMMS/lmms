@@ -1,7 +1,7 @@
 /*
  * fft_helpers.h - some functions around FFT analysis
  *
- * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

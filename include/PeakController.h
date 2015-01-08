@@ -1,7 +1,7 @@
 /*
  * PeakController.h - peak-controller class
  *
- * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2015 Paul Giblock <drfaygo/at/gmail.com>
  * 
  * This file is part of LMMS - http://lmms.io
  *

@@ -1,8 +1,8 @@
 /*
  * Combobox.cpp - implementation of LMMS combobox
  *
- * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Paul Giblock <pgib/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

@@ -2,7 +2,7 @@
  * Controller.h - declaration of class controller, which provides a
  *                standard for all controllers and controller plugins
  *
- * Copyright (c) 2008-2009 Paul Giblock <pgllama/at/gmail.com>
+ * Copyright (c) 2008-2015 Paul Giblock <pgllama/at/gmail.com>
  *
  * This file is part of LMMS - http://lmms.io
  *

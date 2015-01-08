@@ -40,8 +40,8 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <translation>Licenza</translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation type="unfinished">Copyright (c) 2004-2009, os desenvolvedores do LMMS {2004-2013,?} {2004-2014,?}</translation>
+        <source>Copyright (c) 2004-2015, LMMS developers</source>
+        <translation type="unfinished">Copyright (c) 2004-2015, os desenvolvedores do LMMS {2004-2015,?} {2004-2015,?}</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>

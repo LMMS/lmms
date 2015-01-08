@@ -1,7 +1,7 @@
 /* freeverb.cpp
 
    Computer Music Toolkit - a library of LADSPA plugins. Copyright (C)
-   2000-2002 Richard W.E. Furse. Freeverb is also Copyright (C) 2000
+   2000-2015 Richard W.E. Furse. Freeverb is also Copyright (C) 2000
    Jezar. Richard may be contacted at richard@muse.demon.co.uk. [V1
    Ported to LADSPA 15/7/2000 Richard W.E. Furse, V3 ported to CMT
    4/11/2000.]

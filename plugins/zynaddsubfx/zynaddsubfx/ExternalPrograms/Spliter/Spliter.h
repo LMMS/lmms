@@ -1,4 +1,4 @@
-//Copyright (c) 2002-2003 Nasca Octavian Paul
+//Copyright (c) 2002-2015 Nasca Octavian Paul
 //License: GNU GPL 2
 
 #ifndef SPLITER_H

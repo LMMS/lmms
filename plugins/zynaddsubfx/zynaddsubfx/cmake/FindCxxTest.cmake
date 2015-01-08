@@ -85,8 +85,8 @@
 #
 
 #=============================================================================
-# Copyright 2008-2010 Kitware, Inc.
-# Copyright 2008-2010 Philip Lowman <philip@yhbt.com>
+# Copyright 2008-2015 Kitware, Inc.
+# Copyright 2008-2015 Philip Lowman <philip@yhbt.com>
 #
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.

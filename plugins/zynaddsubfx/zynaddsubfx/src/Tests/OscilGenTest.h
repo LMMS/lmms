@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   AdNoteTest.h - CxxTest for Synth/OscilGen
-  Copyright (C) 20011-2012 Mark McCurry
+  Copyright (C) 20011-2015 Mark McCurry
   Author: Mark McCurry
 
   This program is free software; you can redistribute it and/or modify

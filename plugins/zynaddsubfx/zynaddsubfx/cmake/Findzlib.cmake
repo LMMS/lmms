@@ -6,7 +6,7 @@
 #  ZLIB_FOUND        - True if zlib found.
 
 #=============================================================================
-# Copyright 2001-2009 Kitware, Inc.
+# Copyright 2001-2015 Kitware, Inc.
 #
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.

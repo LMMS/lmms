@@ -135,7 +135,7 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Copyright (c) 2004-2014, LMMS developers</string>
+          <string>Copyright (c) 2004-2015, LMMS developers</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

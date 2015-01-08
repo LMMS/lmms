@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   PluginTest.h - CxxTest for embedding zyn
-  Copyright (C) 2013-2013 Mark McCurry
+  Copyright (C) 2013-2015 Mark McCurry
   Authors: Mark McCurry
 
   This program is free software; you can redistribute it and/or modify

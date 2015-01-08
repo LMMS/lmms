@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * ADSR envelope class (and other envelopes in future)
  *
- * Copyright (C) 2007-2008 Krzysztof Foltman
+ * Copyright (C) 2007-2015 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

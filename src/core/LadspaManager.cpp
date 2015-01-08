@@ -2,8 +2,8 @@
  * LadspaManager.cpp - a class to manage loading and instantiation
  *                      of ladspa plugins
  *
- * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
- * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2011-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

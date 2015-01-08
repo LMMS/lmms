@@ -2,9 +2,9 @@
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
  *						actual setting of dynamic values
  *
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2008-2013 Paul Giblock <pgib/at/users.sourceforge.net>
- * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2015 Paul Giblock <pgib/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

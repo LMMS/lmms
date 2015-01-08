@@ -2,7 +2,7 @@
  * lb302.h - declaration of class lb302 which is a bass synth attempting to
  *           emulate the Roland TB303 bass synth
  *
- * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Paul Giblock <pgib/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

@@ -2,7 +2,7 @@
  * vst_base.cpp - VST-base-code to be used by any LMMS plugins dealing with VST-
  *                plugins
  *
- * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

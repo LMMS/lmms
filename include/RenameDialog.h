@@ -2,7 +2,7 @@
  * RenameDialog.h - declaration of class renameDialog, a simple dialog for
  *                   changing the content of a string
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

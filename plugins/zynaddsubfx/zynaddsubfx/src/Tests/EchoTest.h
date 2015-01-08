@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   EchoTest.h - CxxTest for Effect/Echo
-  Copyright (C) 2009-2011 Mark McCurry
+  Copyright (C) 2009-2015 Mark McCurry
   Copyright (C) 2009 Harald Hvaal
   Authors: Mark McCurry, Harald Hvaal
 

@@ -198,7 +198,7 @@ initialise_vcf303() {
        LADSPA_PROPERTY_HARD_RT_CAPABLE,
        "VCF 303",
        CMT_MAKER("David A. Bartold"),
-       CMT_COPYRIGHT("1998-2000", "Andy Sloane, David A. Bartold"),
+       CMT_COPYRIGHT("1998-2015", "Andy Sloane, David A. Bartold"),
        NULL,
        CMT_Instantiate<Vcf303>,
        Vcf303::activate,

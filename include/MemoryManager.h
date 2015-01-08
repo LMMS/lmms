@@ -2,7 +2,7 @@
  * MemoryManager.h - A lightweight, generic memory manager for LMMS
  *
  * Copyright (c) 2014 Vesa Kivimäki
- * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

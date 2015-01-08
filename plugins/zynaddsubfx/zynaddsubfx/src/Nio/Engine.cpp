@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Engine.cpp - Audio Driver base class
-  Copyright (C) 2009-2010 Mark McCurry
+  Copyright (C) 2009-2015 Mark McCurry
   Author: Mark McCurry
 
   This program is free software; you can redistribute it and/or modify

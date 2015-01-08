@@ -2,7 +2,7 @@
  * LmmsStyle.cpp - the graphical style used by LMMS to create a consistent
  *				  interface
  *
- * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

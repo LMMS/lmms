@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * Example audio modules - parameters and LADSPA wrapper instantiation
  *
- * Copyright (C) 2001-2008 Krzysztof Foltman
+ * Copyright (C) 2001-2015 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@
 using namespace dsp;
 using namespace calf_plugins;
 
-const char *calf_plugins::calf_copyright_info = "(C) 2001-2009 Krzysztof Foltman, Thor Harald Johanssen, Markus Schmidt and others; license: LGPL";
+const char *calf_plugins::calf_copyright_info = "(C) 2001-2015 Krzysztof Foltman, Thor Harald Johanssen, Markus Schmidt and others; license: LGPL";
 
 ////////////////////////////////////////////////////////////////////////////
 

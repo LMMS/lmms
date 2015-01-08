@@ -1,7 +1,7 @@
 /*
  * ladspa_port_dialog.h - dialog to test a LADSPA plugin
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - http://lmms.io
  *

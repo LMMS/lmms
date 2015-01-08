@@ -2,8 +2,8 @@
   ZynAddSubFX - a software synthesizer
 
   main.cpp  -  Main file of the synthesizer
-  Copyright (C) 2002-2005 Nasca Octavian Paul
-  Copyright (C) 2012-2014 Mark McCurry
+  Copyright (C) 2002-2015 Nasca Octavian Paul
+  Copyright (C) 2012-2015 Mark McCurry
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of version 2 of the GNU General Public License
@@ -177,10 +177,10 @@ int main(int argc, char *argv[])
     dump.startnow();
     int noui = 0;
     cerr
-    << "\nZynAddSubFX - Copyright (c) 2002-2011 Nasca Octavian Paul and others"
+    << "\nZynAddSubFX - Copyright (c) 2002-2015 Nasca Octavian Paul and others"
     << endl;
     cerr
-    << "                Copyright (c) 2009-2014 Mark McCurry [active maintainer]"
+    << "                Copyright (c) 2009-2015 Mark McCurry [active maintainer]"
     << endl;
     cerr << "Compiled: " << __DATE__ << " " << __TIME__ << endl;
     cerr << "This program is free software (GNU GPL v.2 or later) and \n";

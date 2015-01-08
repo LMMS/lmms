@@ -1,7 +1,7 @@
 /*
  * KickerOsc.h - alternative sweeping oscillator
  *
- * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2014 Hannu Haahti <grejppi/at/gmail.com>
  *
  * This file is part of LMMS - http://lmms.io

@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Reverb.h - Reverberation effect
-  Copyright (C) 2002-2009 Nasca Octavian Paul
+  Copyright (C) 2002-2015 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify

@@ -1,7 +1,7 @@
 /*
  * bit_invader.cpp - instrument which uses a usereditable wavetable
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2015 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of LMMS - http://lmms.io
  *

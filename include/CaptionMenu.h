@@ -1,7 +1,7 @@
 /*
  * CaptionMenu.h - context menu with a caption
  *
- * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2007-2015 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

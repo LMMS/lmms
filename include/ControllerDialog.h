@@ -2,7 +2,7 @@
  * ControllerDialog.h - per-controller-specific view for changing a
  *                      controller's settings
  *
- * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2015 Paul Giblock <drfaygo/at/gmail.com>
  *
  * This file is part of LMMS - http://lmms.io
  *

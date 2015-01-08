@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * LV2 wrapper templates
  *
- * Copyright (C) 2001-2008 Krzysztof Foltman
+ * Copyright (C) 2001-2015 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

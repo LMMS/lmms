@@ -1,8 +1,8 @@
 /*
  * LadspaEffect.cpp - class for processing LADSPA effects
  *
- * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2015 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

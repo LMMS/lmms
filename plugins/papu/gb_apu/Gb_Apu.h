@@ -1,7 +1,7 @@
 
 // Nintendo Game Boy PAPU sound chip emulator
 
-// Gb_Snd_Emu 0.1.4. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
+// Gb_Snd_Emu 0.1.4. Copyright (C) 2003-2015 Shay Green. GNU LGPL license.
 
 #ifndef GB_APU_H
 #define GB_APU_H

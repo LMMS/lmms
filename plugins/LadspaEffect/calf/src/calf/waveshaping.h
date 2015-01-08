@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * Placeholder for waveshaping classes
  *
- * Copyright (C) 2001-2009 Krzysztof Foltman
+ * Copyright (C) 2001-2015 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

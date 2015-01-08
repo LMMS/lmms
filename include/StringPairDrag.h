@@ -2,7 +2,7 @@
  * StringPairDrag.h - class StringPairDrag which provides general support
  *                      for drag'n'drop of string-pairs
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

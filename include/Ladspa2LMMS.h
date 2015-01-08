@@ -2,7 +2,7 @@
  * Ladspa2LMMS.h - class that identifies and instantiates LADSPA effects
  *                   for use with LMMS
  *
- * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2015 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of LMMS - http://lmms.io
  * 
