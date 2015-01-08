@@ -172,7 +172,7 @@ FxMixerView::~FxMixerView()
 
 
 
-void FxMixerView::addNewChannel()
+int FxMixerView::addNewChannel()
 {
 	// add new fx mixer channel and redraw the form.
 	FxMixer * mix = Engine::fxMixer();
@@ -186,6 +186,8 @@ void FxMixerView::addNewChannel()
 	updateFxLine(newChannelIndex);
 
 	updateMaxChannelSelector();
+
+	return newChannelIndex;
 }
 
 
