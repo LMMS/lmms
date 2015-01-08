@@ -221,7 +221,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 				it = m_effects.end()-1;
 				printf( "numerical overflow after processing "
 					"plugin \"%s\"\n", ( *it )->
-					publicName().toUtf8().constData() );
+					descriptor()->name);
 				break;
 			}
 		}

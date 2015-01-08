@@ -237,9 +237,9 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 
 void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 {
-#ifdef LMMS_DEBUG
+
 	assert( _outbuf != NULL );
-#endif
+
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
