@@ -195,6 +195,10 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <source>With this knob you can set the point where the loop starts. </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sample not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>

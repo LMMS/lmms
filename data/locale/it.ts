@@ -196,6 +196,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <source>With this knob you can set the point where the loop starts. </source>
         <translation>Con questa modalità puoi impostare il punto dove la ripetizione comincia: la parte del suono tra il LoopBack e il punto di fine è quella che verà ripetuta.</translation>
     </message>
+    <message>
+        <source>Sample not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>

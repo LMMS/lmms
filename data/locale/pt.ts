@@ -197,6 +197,10 @@ Esteban Viveros</translation>
         <source>With this knob you can set the point where the loop starts. </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sample not found: %1</source>
+        <translation>Amostra não encontrada: %1</translation>
+    </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>
