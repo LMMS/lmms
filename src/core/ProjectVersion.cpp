@@ -29,54 +29,35 @@
 #include "ProjectVersion.h"
 
 
-
-
-int ProjectVersion::compare( const ProjectVersion & _v1,
-						const ProjectVersion & _v2 )
+int ProjectVersion::compare( const ProjectVersion & v1,
+						const ProjectVersion & v2 )
 {
-	int n1, n2;
-
-	// Major
-	n1 = _v1.section( '.', 0, 0 ).toInt();
-	n2 = _v2.section( '.', 0, 0 ).toInt();
-	if( n1 != n2 )
+	if( v1.majorVersion() != v2.majorVersion() )
 	{
-		return n1 - n2;
+		return v1.majorVersion() - v2.majorVersion();
 	}
 
-	// Minor
-	n1 = _v1.section( '.', 1, 1 ).toInt();
-	n2 = _v2.section( '.', 1, 1 ).toInt();
-	if( n1 != n2 )
+	if( v1.minorVersion() != v2.minorVersion() )
 	{
-		return n1 - n2;
+		return v1.minorVersion() - v2.minorVersion();
 	}
 
-	// Release
-	n1 = _v1.section( '.', 2 ).section( '-', 0, 0 ).toInt();
-	n2 = _v2.section( '.', 2 ).section( '-', 0, 0 ).toInt();
-	if( n1 != n2 )
+	if(  v1.releaseVersion() != v2.releaseVersion() )
 	{
-		return n1 - n2;
+		return v1.releaseVersion() - v2.releaseVersion();
 	}
-
-	// Build
-	const QString b1 = _v1.section( '.', 2 ).section( '-', 1 );
-	const QString b2 = _v2.section( '.', 2 ).section( '-', 1 );
 
 	// make sure 0.x.y > 0.x.y-patch
-	if( b1.isEmpty() )
+	if( v1.buildVersion().isEmpty() )
 	{
 		return 1;
 	}
-	if( b2.isEmpty() )
+	if( v2.buildVersion().isEmpty() )
 	{
 		return -1;
 	}
 
-	return QString::compare( b1, b2 );
+	return QString::compare( v1.buildVersion(), v2.buildVersion() );
 }
-
-
 
 

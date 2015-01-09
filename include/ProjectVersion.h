@@ -27,27 +27,39 @@
 #define PROJECT_VERSION_H
 
 #include <QtCore/QString>
-
+#include "export.h"
 
 class ProjectVersion : public QString
 {
 public:
-	ProjectVersion( const QString & _s ) :
-		QString( _s )
+	ProjectVersion( const QString & s ) : 
+		QString( s ), 
+		major( section( '.', 0, 0 ).toInt() ) ,
+		minor( section( '.', 1, 1 ).toInt() ) ,
+		release( section( '.', 2 ).section( '-', 0, 0 ).toInt() ) ,
+		build( section( '.', 2 ).section( '-', 1 ) )
 	{
 	}
 
-	static int compare( const ProjectVersion & _v1,
-						const ProjectVersion & _v2 );
-
+	static int compare( const ProjectVersion & v1,
+						const ProjectVersion & v2 );
+	const int majorVersion() const { return major; }
+	const int minorVersion() const { return minor; }
+	const int releaseVersion() const { return release; }
+	const QString buildVersion() const { return build; }
+private:
+	const int major;
+	const int minor;
+	const int release;
+	const QString build;
 } ;
 
 
 
 
-inline bool operator<( const ProjectVersion & _v1, const char * _str )
+inline bool operator<( const ProjectVersion & v1, const char * str )
 {
-	return ProjectVersion::compare( _v1, ProjectVersion( _str ) ) < 0;
+	return ProjectVersion::compare( v1, ProjectVersion( str ) ) < 0;
 }
 
 
