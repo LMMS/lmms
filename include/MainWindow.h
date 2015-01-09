@@ -30,6 +30,8 @@
 #include <QtCore/QList>
 #include <QMainWindow>
 
+#include "export.h"
+
 class QAction;
 class QDomElement;
 class QGridLayout;
@@ -40,7 +42,7 @@ class PluginView;
 class ToolButton;
 
 
-class MainWindow : public QMainWindow
+class EXPORT MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
