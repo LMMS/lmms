@@ -49,10 +49,9 @@ const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 class EXPORT Song : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,getTempo,setTempo,m_tempoModel);
-	mapPropertyFromModel(int,masterPitch,setMasterPitch,m_masterPitchModel);
-	mapPropertyFromModel(int,masterVolume,setMasterVolume,
-							m_masterVolumeModel);
+	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
+	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
+	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
 public:
 	enum PlayModes
 	{
@@ -66,19 +65,19 @@ public:
 	} ;
 
 
-	class playPos : public MidiTime
+	class PlayPos : public MidiTime
 	{
 	public:
-		playPos( const int _abs = 0 ) :
-			MidiTime( _abs ),
+		PlayPos( const int abs = 0 ) :
+			MidiTime( abs ),
 			m_timeLine( NULL ),
 			m_timeLineUpdate( true ),
 			m_currentFrame( 0.0f )
 		{
 		}
-		inline void setCurrentFrame( const float _f )
+		inline void setCurrentFrame( const float f )
 		{
-			m_currentFrame = _f;
+			m_currentFrame = f;
 		}
 		inline float currentFrame() const
 		{
@@ -100,9 +99,9 @@ public:
 	{
 		return m_elapsedMilliSeconds;
 	}
-	inline void setMilliSeconds( float _ellapsedMilliSeconds )
+	inline void setMilliSeconds( float ellapsedMilliSeconds )
 	{
-		m_elapsedMilliSeconds = (_ellapsedMilliSeconds);
+		m_elapsedMilliSeconds = ellapsedMilliSeconds;
 	}
 	inline int getTacts() const
 	{
@@ -119,14 +118,14 @@ public:
 	// Returns the beat position inside the bar, 0-based
 	inline int getBeat() const
 	{
-		return (currentTick() - currentTact()*ticksPerTact()) /
-			(ticksPerTact() / m_timeSigModel.getNumerator() );
+		return ( currentTick() - currentTact() * ticksPerTact() ) /
+			( ticksPerTact() / m_timeSigModel.getNumerator() );
 	}
 	// the remainder after bar and beat are removed
 	inline int getBeatTicks() const
 	{
-		return 	(currentTick() - currentTact()*ticksPerTact()) %
-			(ticksPerTact() / m_timeSigModel.getNumerator() );
+		return 	( currentTick() - currentTact() * ticksPerTact() ) %
+			( ticksPerTact() / m_timeSigModel.getNumerator() );
 	}
 	inline int getTicks() const
 	{
@@ -147,7 +146,7 @@ public:
 
 	inline bool isPlaying() const
 	{
-		return m_playing && m_exporting == false;
+		return m_playing == true && m_exporting == false;
 	}
 
 	inline bool isStopped() const
@@ -182,9 +181,9 @@ public:
 		return m_playMode;
 	}
 
-	inline playPos & getPlayPos( PlayModes _pm )
+	inline PlayPos & getPlayPos( PlayModes pm )
 	{
-		return m_playPos[_pm];
+		return m_playPos[pm];
 	}
 
 	void updateLength();
@@ -204,11 +203,11 @@ public:
 
 	// file management
 	void createNewProject();
-	void createNewProjectFromTemplate( const QString & _template );
-	void loadProject( const QString & _filename );
+	void createNewProjectFromTemplate( const QString & templ );
+	void loadProject( const QString & filename );
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString & _filename );
-	bool saveProjectFile( const QString & _filename );
+	bool guiSaveProjectAs( const QString & filename );
+	bool saveProjectFile( const QString & filename );
 
 	const QString & projectFileName() const
 	{
@@ -235,8 +234,8 @@ public:
 		return false;
 	}
 
-	void addController( Controller * _c );
-	void removeController( Controller * _c );
+	void addController( Controller * c );
+	void removeController( Controller * c );
 	
 
 	const ControllerVector & controllers() const
@@ -255,14 +254,14 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( Track * _trackToPlay );
+	void playTrack( Track * trackToPlay );
 	void playBB();
-	void playPattern(const Pattern* patternToPlay, bool _loop = true );
+	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
 	void importProject();
-	void exportProject(bool multiExport=false);
+	void exportProject( bool multiExport = false );
 	void exportProjectTracks();
 
 	void startExport();
@@ -311,13 +310,14 @@ private:
 	
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + m_playPos[m_playMode].currentFrame();
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
+			m_playPos[m_playMode].currentFrame();
 	}
 	
-	void setPlayPos( tick_t _ticks, PlayModes _play_mode );
+	void setPlayPos( tick_t ticks, PlayModes playMode );
 
-	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
-	void restoreControllerStates( const QDomElement & _this );
+	void saveControllerStates( QDomDocument & doc, QDomElement & element );
+	void restoreControllerStates( const QDomElement & element );
 
 
 	AutomationTrack * m_globalAutomationTrack;
@@ -345,7 +345,7 @@ private:
 	bool m_loadingProject;
 
 	PlayModes m_playMode;
-	playPos m_playPos[Mode_Count];
+	PlayPos m_playPos[Mode_Count];
 	tact_t m_length;
 
 	Track * m_trackToPlay;
@@ -368,10 +368,9 @@ signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
-	void lengthChanged( int _tacts );
-	void tempoChanged( bpm_t _new_bpm );
-	void timeSignatureChanged( int _old_ticks_per_tact,
-							int _ticks_per_tact );
+	void lengthChanged( int tacts );
+	void tempoChanged( bpm_t newBPM );
+	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
 
 } ;
 

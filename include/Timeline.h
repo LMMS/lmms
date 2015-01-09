@@ -60,11 +60,11 @@ public:
 	} ;
 
 
-	Timeline( int _xoff, int _yoff, float _ppt, Song::playPos & _pos,
+	Timeline( int _xoff, int _yoff, float _ppt, Song::PlayPos & _pos,
 				const MidiTime & _begin, QWidget * _parent );
 	virtual ~Timeline();
 
-	inline Song::playPos & pos()
+	inline Song::PlayPos & pos()
 	{
 		return( m_pos );
 	}
@@ -162,7 +162,7 @@ private:
 	int m_xOffset;
 	int m_posMarkerX;
 	float m_ppt;
-	Song::playPos & m_pos;
+	Song::PlayPos & m_pos;
 	const MidiTime & m_begin;
 	MidiTime m_loopPos[2];
 
