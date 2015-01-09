@@ -29,35 +29,34 @@
 #include "ProjectVersion.h"
 
 
-int ProjectVersion::compare( const ProjectVersion & v1,
-						const ProjectVersion & v2 )
+int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2)
 {
-	if( v1.majorVersion() != v2.majorVersion() )
+	if(v1.majorVersion() != v2.majorVersion())
 	{
 		return v1.majorVersion() - v2.majorVersion();
 	}
 
-	if( v1.minorVersion() != v2.minorVersion() )
+	if(v1.minorVersion() != v2.minorVersion())
 	{
 		return v1.minorVersion() - v2.minorVersion();
 	}
 
-	if(  v1.releaseVersion() != v2.releaseVersion() )
+	if(v1.releaseVersion() != v2.releaseVersion())
 	{
 		return v1.releaseVersion() - v2.releaseVersion();
 	}
 
 	// make sure 0.x.y > 0.x.y-patch
-	if( v1.buildVersion().isEmpty() )
+	if(v1.buildVersion().isEmpty())
 	{
 		return 1;
 	}
-	if( v2.buildVersion().isEmpty() )
+	if(v2.buildVersion().isEmpty())
 	{
 		return -1;
 	}
 
-	return QString::compare( v1.buildVersion(), v2.buildVersion() );
+	return QString::compare(v1.buildVersion(), v2.buildVersion());
 }
 
 

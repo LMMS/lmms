@@ -32,26 +32,26 @@
 class ProjectVersion : public QString
 {
 public:
-	ProjectVersion( const QString & s ) : 
-		QString( s ), 
-		major( section( '.', 0, 0 ).toInt() ) ,
-		minor( section( '.', 1, 1 ).toInt() ) ,
-		release( section( '.', 2 ).section( '-', 0, 0 ).toInt() ) ,
-		build( section( '.', 2 ).section( '-', 1 ) )
+	ProjectVersion(const QString & s) : 
+		QString(s), 
+		m_major(section( '.', 0, 0 ).toInt()) ,
+		m_minor(section( '.', 1, 1 ).toInt()) ,
+		m_release(section( '.', 2 ).section( '-', 0, 0 ).toInt()) ,
+		m_build(section( '.', 2 ).section( '-', 1 ))
 	{
 	}
 
-	static int compare( const ProjectVersion & v1,
-						const ProjectVersion & v2 );
-	const int majorVersion() const { return major; }
-	const int minorVersion() const { return minor; }
-	const int releaseVersion() const { return release; }
-	const QString buildVersion() const { return build; }
+	static int compare(const ProjectVersion & v1, const ProjectVersion & v2);
+	const int majorVersion() const { return m_major; }
+	const int minorVersion() const { return m_minor; }
+	const int releaseVersion() const { return m_release; }
+	const QString buildVersion() const { return m_build; }
+
 private:
-	const int major;
-	const int minor;
-	const int release;
-	const QString build;
+	const int m_major;
+	const int m_minor;
+	const int m_release;
+	const QString m_build;
 } ;
 
 
