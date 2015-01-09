@@ -27,7 +27,6 @@
 #define PROJECT_VERSION_H
 
 #include <QtCore/QString>
-#include "export.h"
 
 class ProjectVersion : public QString
 {
