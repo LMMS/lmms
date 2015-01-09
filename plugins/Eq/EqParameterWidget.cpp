@@ -234,7 +234,7 @@ EqBand*  EqParameterWidget::selectNearestHandle( const int x, const  int y )
 	{
 		selectedModel = &m_bands[shortestBand];
 	}
-	delete distanceToHandles;
+	delete[] distanceToHandles;
 	return selectedModel;
 }
 
