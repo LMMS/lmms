@@ -120,6 +120,7 @@ bool AudioFileOgg::startEncoding()
 		printf( "Mode initialization failed: invalid parameters for "
 								"bitrate\n" );
 		vorbis_info_clear( &m_vi );
+		delete[] user_comments;
 		return false;
 	}
 

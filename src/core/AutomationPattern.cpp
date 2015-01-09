@@ -195,7 +195,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 	timeMap::const_iterator it = m_timeMap.find( newTime );
 	if( it != m_timeMap.begin() )
 	{
-		it--;
+		--it;
 	}
 	generateTangents(it, 3);
 
@@ -229,7 +229,7 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
 	if( it != m_timeMap.begin() )
 	{
-		it--;
+		--it;
 	}
 	generateTangents(it, 3);
 
@@ -271,7 +271,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 	//Restore to the state before it the point were being dragged
 	m_timeMap = m_oldTimeMap;
 
-	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); it++ )
+	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
 	{
 		generateTangents(it, 3);
 	}

@@ -99,8 +99,8 @@ PluginDescList::PluginDescList(QWidget *parent) :
 	std::sort(m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore);
 
 
-	for(Plugin::DescriptorList::const_iterator it = m_pluginDescriptors.constBegin();
-		it != m_pluginDescriptors.constEnd(); it++)
+	for( Plugin::DescriptorList::const_iterator it = m_pluginDescriptors.constBegin();
+		it != m_pluginDescriptors.constEnd(); ++it )
 	{
 		if( it->type == Plugin::Instrument )
 		{

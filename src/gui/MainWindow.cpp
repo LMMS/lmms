@@ -1211,7 +1211,7 @@ void MainWindow::collectErrors(const QList<QString>* errors )
 
 
 
-void MainWindow::collectError( const QString error )
+void MainWindow::collectError( const QString & error )
 {
 	m_errors->append( error );
 }
@@ -1225,7 +1225,7 @@ void MainWindow::clearErrors()
 
 
 
-void MainWindow::showErrors( const QString message )
+void MainWindow::showErrors( const QString & message )
 {
     if ( m_errors->length() != 0 )
 	{   QString* errors = new QString();
