@@ -33,7 +33,7 @@ string encode_map(const dictionary &data)
     osctl::string_buffer sb;
     osc_stream<osctl::string_buffer> str(sb);
     str << (uint32_t)data.size();
-    for(dictionary::const_iterator i = data.begin(); i != data.end(); i++)
+    for(dictionary::const_iterator i = data.begin(); i != data.end(); ++i)
     {
         str << i->first << i->second;
     }

@@ -1774,7 +1774,7 @@ void TrackOperationsWidget::recordingOn()
 	if( atv )
 	{
 		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( true ); }
@@ -1790,7 +1790,7 @@ void TrackOperationsWidget::recordingOff()
 	if( atv )
 	{
 		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( false ); }

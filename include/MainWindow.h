@@ -98,9 +98,9 @@ public:
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 	void collectErrors( const QList<QString>* errors );
-	void collectError( const QString error );
+	void collectError( const QString & error );
 	void clearErrors();
-	void showErrors( const QString reason );
+	void showErrors( const QString & reason );
 
 
 public slots:

@@ -25,7 +25,7 @@ using namespace std;
 
 void basic_synth::kill_note(int note, int vel, bool just_one)
 {
-    for (list<dsp::voice *>::iterator it = active_voices.begin(); it != active_voices.end(); it++) {
+    for (list<dsp::voice *>::iterator it = active_voices.begin(); it != active_voices.end(); ++it) {
         // preserve sostenuto notes
         if ((*it)->get_current_note() == note && !(sostenuto && (*it)->sostenuto)) {
             (*it)->note_off(vel);
@@ -58,7 +58,7 @@ dsp::voice *basic_synth::steal_voice()
     std::list<dsp::voice *>::iterator found = active_voices.end();
     float priority = 10000;
     //int idx = 0;
-    for(std::list<dsp::voice *>::iterator i = active_voices.begin(); i != active_voices.end(); i++)
+    for(std::list<dsp::voice *>::iterator i = active_voices.begin(); i != active_voices.end(); ++i)
     {
         //printf("Voice %d priority %f at %p\n", idx++, (*i)->get_priority(), *i);
         if ((*i)->get_priority() < priority)
@@ -79,7 +79,7 @@ void basic_synth::trim_voices()
 {
     // count stealable voices
     unsigned int count = 0;
-    for(std::list<dsp::voice *>::iterator i = active_voices.begin(); i != active_voices.end(); i++)
+    for(std::list<dsp::voice *>::iterator i = active_voices.begin(); i != active_voices.end(); ++i)
     {
         if ((*i)->get_priority() < 10000)
             count++;
@@ -118,7 +118,7 @@ void basic_synth::note_off(int note, int vel)
         kill_note(note, vel, false);
 }
 
-#define for_all_voices(iter) for (std::list<dsp::voice *>::iterator iter = active_voices.begin(); iter != active_voices.end(); iter++)
+#define for_all_voices(iter) for (std::list<dsp::voice *>::iterator iter = active_voices.begin(); iter != active_voices.end(); ++iter)
     
 void basic_synth::on_pedal_release()
 {
@@ -204,7 +204,7 @@ void basic_synth::render_to(float (*output)[2], int nsamples)
             unused_voices.push(v);
             continue;
         }
-        i++;
+        ++i;
     }
 } 
 
@@ -214,7 +214,7 @@ basic_synth::~basic_synth()
         delete unused_voices.top();
         unused_voices.pop();
     }
-    for (list<voice *>::iterator i = active_voices.begin(); i != active_voices.end(); i++)
+    for (list<voice *>::iterator i = active_voices.begin(); i != active_voices.end(); ++i)
         delete *i;
 }
 
