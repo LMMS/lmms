@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2015 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  * 
  * This file is part of LMMS - http://lmms.io
  *
@@ -31,32 +32,46 @@
 
 int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2)
 {
-	if(v1.majorVersion() != v2.majorVersion())
+	if(v1.getMajor() != v2.getMajor())
 	{
-		return v1.majorVersion() - v2.majorVersion();
+		return v1.getMajor() - v2.getMajor();
+	}
+	
+	// return prematurely for Major comparison
+	if(v1.getCompareType() == CompareType::Major || 
+		v1.getCompareType() == CompareType::Major)
+	{
+		return 0;
 	}
 
-	if(v1.minorVersion() != v2.minorVersion())
+	if(v1.getMinor() != v2.getMinor())
 	{
-		return v1.minorVersion() - v2.minorVersion();
+		return v1.getMinor() - v2.getMinor();
 	}
 
-	if(v1.releaseVersion() != v2.releaseVersion())
+	// return prematurely for Minor comparison
+	if(v1.getCompareType() == CompareType::Minor || 
+		v1.getCompareType() == CompareType::Minor)
+
+	if(v1.getRelease() != v2.getRelease())
 	{
-		return v1.releaseVersion() - v2.releaseVersion();
+		return v1.getRelease() - v2.getRelease();
 	}
+
+	if(v1.getCompareType() == CompareType::Build || 
+		v1.getCompareType() == CompareType::Build)
 
 	// make sure 0.x.y > 0.x.y-patch
-	if(v1.buildVersion().isEmpty())
+	if(v1.getBuild().isEmpty())
 	{
 		return 1;
 	}
-	if(v2.buildVersion().isEmpty())
+	if(v2.getBuild().isEmpty())
 	{
 		return -1;
 	}
 
-	return QString::compare(v1.buildVersion(), v2.buildVersion());
+	return QString::compare(v1.getBuild(), v2.getBuild());
 }
 
 

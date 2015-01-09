@@ -2,6 +2,7 @@
  * ProjectVersion.h - version compared in import upgrades
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2015 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -28,32 +29,37 @@
 
 #include <QtCore/QString>
 
+enum CompareType { Major, Minor, Release, Build };
+
 class ProjectVersion : public QString
 {
 public:
-	ProjectVersion(const QString & s) : 
+	ProjectVersion(const QString & s, const CompareType c = CompareType::Build) : 
 		QString(s), 
 		m_major(section( '.', 0, 0 ).toInt()) ,
 		m_minor(section( '.', 1, 1 ).toInt()) ,
 		m_release(section( '.', 2 ).section( '-', 0, 0 ).toInt()) ,
-		m_build(section( '.', 2 ).section( '-', 1 ))
+		m_build(section( '.', 2 ).section( '-', 1 )),
+		m_compareType(c)
 	{
 	}
 
-	static int compare(const ProjectVersion & v1, const ProjectVersion & v2);
-	const int majorVersion() const { return m_major; }
-	const int minorVersion() const { return m_minor; }
-	const int releaseVersion() const { return m_release; }
-	const QString buildVersion() const { return m_build; }
+	static int compare(const ProjectVersion & v1, const ProjectVersion & v2);	
+
+	const int getMajor() const { return m_major; }
+	const int getMinor() const { return m_minor; }
+	const int getRelease() const { return m_release; }
+	const QString getBuild() const { return m_build; }
+	const CompareType getCompareType() const { return m_compareType; }
+	
 
 private:
 	const int m_major;
 	const int m_minor;
 	const int m_release;
 	const QString m_build;
+	const CompareType m_compareType;
 } ;
-
-
 
 
 inline bool operator<( const ProjectVersion & v1, const char * str )
