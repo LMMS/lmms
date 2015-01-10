@@ -325,7 +325,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		it->loadInstrument( value );
+		InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
+					this, it, value );
+		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
@@ -453,6 +455,22 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 
 
 
+InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
+	QThread( parent ),
+	m_it( it ),
+	m_name( name )
+{
+	m_containerThread = thread();
+}
 
 
 
+
+void InstrumentLoaderThread::run()
+{
+	Instrument *i = m_it->loadInstrument( m_name );
+	QObject *parent = i->parent();
+	i->setParent( 0 );
+	i->moveToThread( m_containerThread );
+	i->setParent( parent );
+}
