@@ -230,7 +230,7 @@ int FxMixer::createChannel()
 
 void FxMixer::activateSolo()
 {
-	for (int i = 0; i < m_fxChannels.size(); ++i)
+	for (int i = 1; i < m_fxChannels.size(); ++i)
 	{
 		m_fxChannels[i]->m_muteBeforeSolo = m_fxChannels[i]->m_muteModel.value();
 		m_fxChannels[i]->m_muteModel.setValue( true );
@@ -239,7 +239,7 @@ void FxMixer::activateSolo()
 
 void FxMixer::deactivateSolo()
 {
-	for (int i = 0; i < m_fxChannels.size(); ++i)
+	for (int i = 1; i < m_fxChannels.size(); ++i)
 	{
 		m_fxChannels[i]->m_muteModel.setValue( m_fxChannels[i]->m_muteBeforeSolo );
 	}
