@@ -649,14 +649,19 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	if( m_lastMidiPitch != currentMidiPitch )
 	{
 		m_lastMidiPitch = currentMidiPitch;
+		m_synthMutex.lock();
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
+		m_synthMutex.unlock();
+
 	}
 
 	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
 	if( m_lastMidiPitchRange != currentMidiPitchRange )
 	{
 		m_lastMidiPitchRange = currentMidiPitchRange;
+		m_synthMutex.lock();
 		fluid_synth_pitch_wheel_sens( m_synth, m_channel, m_lastMidiPitchRange );
+		m_synthMutex.unlock();
 	}
 	// if we have no new noteons/noteoffs, just render a period and call it a day
 	if( m_playingNotes.isEmpty() )
