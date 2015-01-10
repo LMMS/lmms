@@ -58,6 +58,7 @@ BBTCO::BBTCO( Track * _track ) :
 		changeLength( MidiTime( t, 0 ) );
 		restoreJournallingState();
 	}
+	setAutoResize( false );
 }
 
 
