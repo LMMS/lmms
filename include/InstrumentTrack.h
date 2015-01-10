@@ -56,6 +56,7 @@ class DataFile;
 class PluginView;
 class TabWidget;
 class TrackLabelButton;
+class LedCheckBox;
 
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -250,6 +251,7 @@ private:
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
+	BoolModel m_useMasterPitchModel;
 
 	FadeButton *m_fb;
 
@@ -414,6 +416,7 @@ private:
 	Knob * m_pitchKnob;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	LcdSpinBox * m_effectChannelNumber;
+	LedCheckBox * m_useMasterPitchBox;
 
 
 	// tab-widget with all children
