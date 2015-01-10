@@ -161,6 +161,8 @@ private:
 	QStringList m_directories;
 	QString m_filter;
 
+	int m_dirCount;
+
 } ;
 
 
