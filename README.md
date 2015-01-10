@@ -1,4 +1,4 @@
-![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
+#![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
 [![Build Status](https://travis-ci.org/LMMS/lmms.png)](https://travis-ci.org/LMMS/lmms)
 
 What is LMMS?
@@ -25,13 +25,17 @@ Features
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
 * Import of MIDI and FLP (FL Studio®/Fruityloops® Project) files
 
-[Latest Stable Release (1.0.3)](https://github.com/LMMS/lmms/releases/tag/v1.0.3)
+[Latest Stable Release (1.1.0)](https://github.com/LMMS/lmms/releases/tag/v1.1.0)
 ---------------------
-* Fix zyn GUI crash on win32
-* Fix SF2 note volume
-* Localization updates
-* Updated LADSPA search paths
-* Bugfixes in plugins
+* New FX Mixer
+* New Instruments
+* Instrument Enhancements
+* Improved Demos/Presets
+* UI Improvements
+* Enabled toggling of knob scale in context menu (Linear/Logarithmic)
+* Added ability to record automations
+* Added support for undo/redo in Piano Roll
+* Bug Fixes
 
 Building
 ---------
