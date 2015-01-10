@@ -56,6 +56,7 @@
 
 #include "embed.cpp"
 #include "math.h"
+#include "debug.h"
 
 #include "Knob.h"
 #include "LcdSpinBox.h"
@@ -92,7 +93,7 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 QMutex opl2instrument::emulatorMutex;
 
 // Weird ordering of voice parameters
-const unsigned int adlib_opadd[9] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &OPL2_plugin_descriptor ),
@@ -141,9 +142,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	Engine::mixer()->addPlayHandle( iph );
 
-	// Voices are laid out in a funny way...
-	// adlib_opadd = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
-
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
@@ -153,9 +151,9 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	emulatorMutex.unlock();
 
 	//Initialize voice values
-	voiceNote[0] = 0;
-	voiceLRU[0] = 0;
-	for(int i=1; i<9; ++i) {
+	// voiceNote[0] = 0;
+	// voiceLRU[0] = 0;
+	for(int i=0; i<OPL2_VOICES; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
@@ -233,7 +231,7 @@ void opl2instrument::reloadEmulator() {
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
-	for(int i=1; i<9; ++i) {
+	for(int i=0; i<OPL2_VOICES; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
@@ -262,24 +260,33 @@ void opl2instrument::setVoiceVelocity(int voice, int vel) {
 			   ( vel_adjusted & 0x3f ) );
 }
 
-// Pop least recently used voice - why does it sometimes lose a voice (mostly 0)?
+// Pop least recently used voice
 int opl2instrument::popVoice() {
 	int tmp = voiceLRU[0];
 	for( int i=0; i<8; ++i) {
 		voiceLRU[i] = voiceLRU[i+1];
 	}
 	voiceLRU[8] = OPL2_NO_VOICE;
+#ifdef false
+	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
+	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+#endif
 	return tmp;
 }
-
+// Push voice into first free slot
 int opl2instrument::pushVoice(int v) {
 	int i;
+	assert(voiceLRU[8]==OPL2_NO_VOICE);
 	for(i=8; i>0; --i) {
 		if( voiceLRU[i-1] != OPL2_NO_VOICE ) {
 			break;
 		}
 	}
 	voiceLRU[i] = v;
+#ifdef false
+	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
+	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+#endif
 	return i;
 }
 
@@ -307,11 +314,11 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
                 break;
         case MidiNoteOff:
                 key = event.key() +12;
-                for(voice=0; voice<9; ++voice) {
+                for(voice=0; voice<OPL2_VOICES; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
                                 theEmulator->write(0xB0+voice, (fnums[key] & 0x1f00) >> 8 );
-                                voiceNote[voice] = OPL2_VOICE_FREE;
+                                voiceNote[voice] |= OPL2_VOICE_FREE;
 				pushVoice(voice);
                         }
                 }
@@ -323,7 +330,7 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
 		}
-		for(voice=0; voice<9; ++voice) {
+		for(voice=0; voice<OPL2_VOICES; ++voice) {
 			if(voiceNote[voice] == key) {
 				setVoiceVelocity(voice, vel);
 			}
@@ -341,12 +348,12 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
 		}
-		// Update pitch of sounding notes
-		for( int v=0; v<9; ++v ) {
-			if( voiceNote[v] != OPL2_VOICE_FREE ) {
-				theEmulator->write(0xA0+v, fnums[voiceNote[v] ] & 0xff);
-				theEmulator->write(0xB0+v, 32 + ((fnums[voiceNote[v]] & 0x1f00) >> 8) );
-			}
+		// Update pitch of all voices (also released ones)
+		for( int v=0; v<OPL2_VOICES; ++v ) {
+			int vn = (voiceNote[v] & ~OPL2_VOICE_FREE); // remove the flag bit
+			int playing = (voiceNote[v] & OPL2_VOICE_FREE) == 0; // just the flag bit
+			theEmulator->write(0xA0+v, fnums[vn] & 0xff);
+			theEmulator->write(0xB0+v, (playing ? 32 : 0) + ((fnums[vn] & 0x1f00) >> 8) );
                 }
                 break;
 	case MidiControlChange:
@@ -363,7 +370,9 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			}
 			break;
 		default:
+#ifdef LMMS_DEBUG	
 			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
+#endif
 			break;
 		}
 		break;
@@ -476,7 +485,7 @@ void opl2instrument::loadSettings( const QDomElement & _this )
 }
 
 // Load a patch into the emulator
-void opl2instrument::loadPatch(unsigned char inst[14]) {
+void opl2instrument::loadPatch(const unsigned char inst[14]) {
 	emulatorMutex.lock();
 	for(int v=0; v<9; ++v) {
 		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
@@ -526,7 +535,7 @@ void opl2instrument::loadGMPatch() {
 
 // Update patch from the models to the chip emulation
 void opl2instrument::updatePatch() {
-	unsigned char *inst = midi_fm_instruments[0];
+	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
 		( op1_perc_mdl.value() ?  0 : 32 ) + // NB. This envelope mode is "perc", not "sus"
@@ -564,7 +573,7 @@ void opl2instrument::updatePatch() {
 
 	// have to do this, as the level knobs might've changed
 	for( int voice = 0; voice < 9 ; ++voice) {
-		if(voiceNote[voice]!=OPL2_VOICE_FREE) {
+		if(voiceNote[voice] && OPL2_VOICE_FREE == 0) {
 			setVoiceVelocity(voice, velocities[voiceNote[voice]] );
 		}
 	}
