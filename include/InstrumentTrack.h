@@ -49,6 +49,7 @@ class FadeButton;
 class Instrument;
 class InstrumentTrackWindow;
 class InstrumentMidiIOView;
+class InstrumentMiscView;
 class Knob;
 class LcdSpinBox;
 class midiPortMenu;
@@ -268,6 +269,7 @@ private:
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class FlpImport;
+	friend class InstrumentMiscView;
 
 } ;
 
@@ -416,7 +418,7 @@ private:
 	Knob * m_pitchKnob;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	LcdSpinBox * m_effectChannelNumber;
-	LedCheckBox * m_useMasterPitchBox;
+
 
 
 	// tab-widget with all children
@@ -427,6 +429,8 @@ private:
 	InstrumentFunctionArpeggioView* m_arpeggioView;
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
+	InstrumentMiscView *m_miscView;
+
 
 	// test-piano at the bottom of every instrument-settings-window
 	PianoView * m_pianoView;

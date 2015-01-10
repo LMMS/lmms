@@ -1217,13 +1217,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( m_pitchRangeSpinBox );
 	basicControlsLayout->addStretch();
 
-	//setup checkbox for use master pitch
-	m_useMasterPitchBox = new LedCheckBox( this, tr( "Use master pitch" ),LedCheckBox::Green );
-	m_useMasterPitchBox->setModel( &m_track->m_useMasterPitchModel );
-	m_useMasterPitchBox->setToolTip( "Master Pitch" );
-
-	basicControlsLayout->addWidget( m_useMasterPitchBox );
-	basicControlsLayout->addStretch();
 
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
@@ -1273,10 +1266,15 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// FX tab
 	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
 
+	// MISC tab
+	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
+
+
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
 	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), 2 );
 	m_tabWidget->addTab( m_effectView, tr( "FX" ), 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
+	m_tabWidget->addTab( m_miscView, tr( "MISC" ), 5 );
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
