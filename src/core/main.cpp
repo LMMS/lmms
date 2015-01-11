@@ -384,7 +384,14 @@ int main( int argc, char * * argv )
 	}
 
 
-	QString pos = QLocale::system().name().left( 2 );
+	ConfigManager::inst()->loadConfigFile();
+
+	// set language
+	QString pos = ConfigManager::inst()->value( "app", "language" );
+	if( pos.isEmpty() )
+	{
+		pos = QLocale::system().name().left( 2 );
+	}
 
 #ifdef LMMS_BUILD_WIN32
 #undef QT_TRANSLATIONS_DIR
@@ -414,8 +421,6 @@ int main( int argc, char * * argv )
 #endif
 #endif
 #endif
-
-	ConfigManager::inst()->loadConfigFile();
 
 	if( render_out.isEmpty() )
 	{

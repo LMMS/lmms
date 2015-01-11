@@ -113,6 +113,8 @@ private slots:
 	void toggleDisplayWaveform( bool en );
 	void toggleDisableAutoquit( bool en );
 
+	void setLanguage( int lang );
+
 
 private:
 	TabBar * m_tabBar;
@@ -127,6 +129,8 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_hqAudioDev;
+	QString m_lang;
+	QStringList m_languages;
 
 
 	QLineEdit * m_wdLineEdit;

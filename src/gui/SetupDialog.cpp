@@ -98,6 +98,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disablebackup" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
+	m_lang( ConfigManager::inst()->value( "app",
+							"language" ) ),
 	m_workingDir( ConfigManager::inst()->workingDir() ),
 	m_vstDir( ConfigManager::inst()->vstDir() ),
 	m_artworkDir( ConfigManager::inst()->artworkDir() ),
@@ -313,10 +315,52 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
+	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
+	lang_tw->setFixedHeight( 48 );
+	QComboBox * changeLang = new QComboBox( lang_tw );
+	changeLang->move( XDelta, YDelta );
+
+	QDir dir( ConfigManager::inst()->localeDir() );
+	QStringList fileNames = dir.entryList( QStringList( "*.qm" ) );
+	for( int i = 0; i < fileNames.size(); ++i )
+	{
+		// get locale extracted by filename
+		fileNames[i].truncate( fileNames[i].lastIndexOf( '.' ) );
+		m_languages.append( fileNames[i] );
+		QString lang = QLocale( m_languages.last() ).nativeLanguageName();
+		changeLang->addItem( lang );
+	}
+	connect( changeLang, SIGNAL( currentIndexChanged( int ) ),
+							this, SLOT( setLanguage( int ) ) );
+
+	//If language unset, fallback to system language when available
+	if( m_lang == "" )
+	{
+		QString tmp = QLocale::system().name().left( 2 );
+		if( m_languages.contains( tmp ) )
+		{
+			m_lang = tmp;
+		}
+		else
+		{
+			m_lang = "en";
+		}
+	}
+
+	for( int i = 0; i < changeLang->count(); ++i )
+	{
+		if( m_lang == m_languages.at( i ) )
+		{
+			changeLang->setCurrentIndex( i );
+			break;
+		}
+	}
 
 	gen_layout->addWidget( bufsize_tw );
 	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( misc_tw );
+	gen_layout->addSpacing( 10 );
+	gen_layout->addWidget( lang_tw );
 	gen_layout->addStretch();
 
 
@@ -839,6 +883,7 @@ void SetupDialog::accept()
 					QString::number( m_displayWaveform ) );
 	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
+	ConfigManager::inst()->setValue( "app", "language", m_lang );
 
 
 	ConfigManager::inst()->setWorkingDir( m_workingDir );
@@ -1045,6 +1090,11 @@ void SetupDialog::toggleDisableAutoquit( bool en )
 void SetupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 {
 	m_oneInstrumentTrackWindow = _enabled;
+}
+
+void SetupDialog::setLanguage( int lang )
+{
+	m_lang = m_languages[lang];
 }
 
 
