@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
 
 PROJECT(lmms)
 
@@ -116,17 +116,16 @@ ELSE()
 	SET(QT_MIN_VERSION "4.6.0" COMPONENTS QtCore QtGui QtXml)
 	FIND_PACKAGE(Qt4 REQUIRED)
 	SET(QT_USE_QTXML 1)
-	EXEC_PROGRAM(${QT_QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_TRANSLATIONS" OUTPUT_VARIABLE QT_TRANSLATIONS_DIR)
 	IF(WIN32)
 		SET(QT_TRANSLATIONS_DIR "${MINGW_PREFIX}/share/qt4/translations/")
 	ENDIF(WIN32)
 	IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 		MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
 		ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
-	ENDIF(EXISTS "${QT_TRANSLATIONS_DIR}")
+	ENDIF()
 	IF(NOT WIN32)
 		STRING(REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
-	ENDIF(NOT WIN32)
+	ENDIF()
 	INCLUDE("${QT_USE_FILE}")
 ENDIF()
 
@@ -385,11 +384,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
 
-FILE(GLOB lmms_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
-FILE(GLOB lmms_UI "${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui" "${CMAKE_SOURCE_DIR}/src/gui/Forms/*.ui")
-FILE(GLOB_RECURSE lmms_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
-
-SET(lmms_MOC ${lmms_INCLUDES})
+FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 
 # Get list of all committers from git history, ordered by number of commits
 FIND_PACKAGE(Git)
@@ -403,46 +398,19 @@ IF(GIT_FOUND)
 		TIMEOUT 1)
 ENDIF(GIT_FOUND)
 
-SET(lmms_EMBEDDED_RESOURCES "${CMAKE_SOURCE_DIR}/AUTHORS" "${CMAKE_SOURCE_DIR}/COPYING" "${CONTRIBUTORS}")
-
-IF(QT5)
-	QT5_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw -I${CMAKE_BINARY_DIR})
-	QT5_WRAP_UI(lmms_UI_out ${lmms_UI})
-ELSE()
-	QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw -I${CMAKE_BINARY_DIR})
-	QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
-ENDIF()
-
 # embedded resources stuff
 IF(WIN32 OR WIN64)
 	# compile buildtools native
 	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
 	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_COMMAND(OUTPUT "${BIN2RES}" COMMAND g++ ARGS "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
+	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
 ELSE(WIN32 OR WIN64)
 	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
 	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
 ENDIF(WIN32 OR WIN64)
 
-SET(LMMS_ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
-
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
-
-ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND "${BIN2RES}" ARGS ${lmms_EMBEDDED_RESOURCES} > "\"${LMMS_ER_H}\"" DEPENDS "${BIN2RES}")
-
-IF(WIN32)
-	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
-	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
-					"-I\"${CMAKE_SOURCE_DIR}\""
-					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
-					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
-				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
-ELSE(WIN32)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
-ENDIF(WIN32)
 
 # set up apple vars before traversing into data/scripts
 SET(MACOSX_BUNDLE_ICON_FILE "lmms.icns")
@@ -457,131 +425,24 @@ SET(MACOSX_BUNDLE_MIMETYPE_ICON "project.icns")
 SET(MACOSX_BUNDLE_MIMETYPE_ID "net.sourceforge.lmms")
 SET(MACOSX_BUNDLE_PROJECT_URL "http://lmms.io")
 
+IF(WIN32)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
+ELSE(WIN32)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
+ENDIF(WIN32)
 
 # make sub-directories
+ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
-# Enable C++11
-ADD_DEFINITIONS("-std=c++0x")
-
-#
-# build LMMS-binary
-#
-IF(LMMS_BUILD_WIN32)
-	SET(EXTRA_LIBRARIES "-lwinmm")
-ENDIF()
-
-# Paths relative to lmms executable
-FILE(RELATIVE_PATH LIB_DIR_RELATIVE "/${BIN_DIR}" "/${LIB_DIR}")
-FILE(RELATIVE_PATH PLUGIN_DIR_RELATIVE "/${BIN_DIR}" "/${PLUGIN_DIR}")
-ADD_DEFINITIONS(-D'LIB_DIR="${LIB_DIR_RELATIVE}/"' -D'PLUGIN_DIR="${PLUGIN_DIR_RELATIVE}/"' ${PULSEAUDIO_DEFINITIONS} ${PORTAUDIO_DEFINITIONS})
-INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}"
-                    "${CMAKE_BINARY_DIR}/include"
-                    "${CMAKE_SOURCE_DIR}"
-                    "${CMAKE_SOURCE_DIR}/include"
-                    ${JACK_INCLUDE_DIRS}
-                    ${SAMPLERATE_INCLUDE_DIRS}
-                    ${SNDFILE_INCLUDE_DIRS})
-
-IF(NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${SDL_INCLUDE_DIR}")
-ENDIF()
-
-IF(NOT ("${PORTAUDIO_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${PORTAUDIO_INCLUDE_DIR}")
-ENDIF()
-
-IF(NOT ("${PULSEAUDIO_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${PULSEAUDIO_INCLUDE_DIR}")
-ENDIF()
-
-IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
-ENDIF()
-
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz" COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\"" DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1" COMMENT "Generating lmms.1.gz")
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${lmms_MOC_out} "${LMMS_ER_H}" ${lmms_UI_out} lmmsconfig.h lmmsversion.h "${WINRC}" "${CMAKE_BINARY_DIR}/lmms.1.gz")
-
-TARGET_LINK_LIBRARIES(lmms ${CMAKE_THREAD_LIBS_INIT} ${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PORTAUDIO_LIBRARIES} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES} ${EXTRA_LIBRARIES})
-
-IF(QT5)
-	TARGET_LINK_LIBRARIES(lmms Qt5::Widgets Qt5::Xml)
-ENDIF()
-
-IF(LMMS_BUILD_WIN32)
-
-	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
-	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "\"${CMAKE_BINARY_DIR}/lmms.exe\"")
-
-	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES
-					"${MINGW_PREFIX}/bin/QtCore4.dll"
-					"${MINGW_PREFIX}/bin/QtGui4.dll"
-					"${MINGW_PREFIX}/bin/QtSvg4.dll"
-					"${MINGW_PREFIX}/bin/QtXml4.dll"
-					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
-					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
-					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
-					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
-					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
-					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
-					"${MINGW_PREFIX}/bin/libogg-0.dll"
-					"${MINGW_PREFIX}/lib/libfltk.dll"
-					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
-					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
-					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
-					"${MINGW_PREFIX}/bin/libpng16-16.dll"
-					"${MINGW_PREFIX}/bin/SDL.dll"
-					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
-					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
-					"${MINGW_PREFIX}/bin/zlib1.dll"
-					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
-				DESTINATION .)
-
-ELSE(LMMS_BUILD_WIN32)
-	IF(NOT LMMS_BUILD_APPLE)
-		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
-	ENDIF(NOT LMMS_BUILD_APPLE)
-
-	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES "${CMAKE_BINARY_DIR}/lmms.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
-
-ENDIF(LMMS_BUILD_WIN32)
-
-#
-# rules for building localizations
-#
-FILE(GLOB lmms_LOCALES data/locale/*.ts)
-SET(ts_targets "")
-SET(qm_targets "")
-FOREACH(_ts_file ${lmms_LOCALES})
-	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target} COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${lmms_SOURCES} ${lmms_INCLUDES} ${lmms_UI} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\"")
-	ADD_CUSTOM_TARGET(${_qm_target} COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\"")
-	LIST(APPEND ts_targets "${_ts_target}")
-	LIST(APPEND qm_targets "${_qm_target}")
-ENDFOREACH(_ts_file ${lmms_LOCALES})
-
-ADD_CUSTOM_TARGET(update-locales)
-FOREACH(_item ${ts_targets})
-	ADD_DEPENDENCIES(update-locales "${_item}")
-ENDFOREACH(_item ${ts_targets})
-
-ADD_CUSTOM_TARGET(finalize-locales ALL)
-FOREACH(_item ${qm_targets})
-	ADD_DEPENDENCIES(finalize-locales "${_item}")
-ENDFOREACH(_item ${qm_targets})
-
 
 # install headers
 
 IF(LMMS_BUILD_LINUX)
-	INSTALL(FILES ${lmms_INCLUDES}
+	INSTALL(FILES ${LMMS_INCLUDES}
 		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
@@ -619,10 +480,6 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
-
-
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h lmms.1.gz")
-
 
 #
 # display configuration information
