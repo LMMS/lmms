@@ -263,28 +263,23 @@ PianoRoll::PianoRoll() :
 	}
 	if( s_toolDraw == NULL )
 	{
-		s_toolDraw = new QPixmap( embed::getIconPixmap(
-							"edit_draw" ) );
+		s_toolDraw = new QPixmap( embed::getIconPixmap( "edit_draw" ) );
 	}
 	if( s_toolErase == NULL )
 	{
-		s_toolErase= new QPixmap( embed::getIconPixmap(
-							"edit_erase" ) );
+		s_toolErase= new QPixmap( embed::getIconPixmap( "edit_erase" ) );
 	}
 	if( s_toolSelect == NULL )
 	{
-		s_toolSelect = new QPixmap( embed::getIconPixmap(
-							"edit_select" ) );
+		s_toolSelect = new QPixmap( embed::getIconPixmap( "edit_select" ) );
 	}
 	if( s_toolMove == NULL )
 	{
-		s_toolMove = new QPixmap( embed::getIconPixmap(
-							"edit_move" ) );
+		s_toolMove = new QPixmap( embed::getIconPixmap( "edit_move" ) );
 	}
 	if( s_toolOpen == NULL )
 	{
-		s_toolOpen = new QPixmap( embed::getIconPixmap(
-							"automation" ) );
+		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
 	}
 
 	// init text-float
