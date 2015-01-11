@@ -578,7 +578,7 @@ void opl2instrument::updatePatch() {
 			setVoiceVelocity(voice, velocities[voiceNote[voice]] );
 		}
 	}
-#ifdef LMMS_DEBUG
+#ifdef false
 		printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
 		       inst[0], inst[1], inst[2], inst[3], inst[4],
 		       inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
@@ -615,15 +615,14 @@ void opl2instrument::loadFile( const QString& file ) {
 			return;
 		}
 
-
-		// If user has changed track name... let's hope my logic is valid.
 		QString sbiname = sbidata.mid(4, 32);
-		if( instrumentTrack()->displayName() == storedname ) {
+		// If user has changed track name... let's hope my logic is valid.
+		if( sbiname.size() > 0 && instrumentTrack()->displayName() == storedname ) {
 			instrumentTrack()->setName(sbiname);
 			storedname = sbiname;
 		}
 
-#ifdef LMMS_DEBUG
+#ifdef false
 		printf("SBI: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
 		       (unsigned char)sbidata[36], (unsigned char)sbidata[37], (unsigned char)sbidata[38], (unsigned char)sbidata[39], (unsigned char)sbidata[40],
 		       (unsigned char)sbidata[41], (unsigned char)sbidata[42], (unsigned char)sbidata[43], (unsigned char)sbidata[44], (unsigned char)sbidata[45], (unsigned char)sbidata[46]);
