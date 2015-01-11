@@ -73,7 +73,8 @@ public:
 	~InstrumentMiscView();
 
 private:
-	LedCheckBox * m_useMasterPitchBox;
+
+	GroupBox * m_pitchGroupBox;
 
 };
 
