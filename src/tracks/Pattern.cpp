@@ -499,12 +499,15 @@ void Pattern::ensureBeatNotes()
 	for( int i = 0; i < m_steps; ++i )
 	{
 		bool found = false;
-		for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it )
+		NoteVector::Iterator it;
+
+		for( it = m_notes.begin(); it != m_notes.end(); ++it )
 		{
+			Note *note = *it;
 			// if a note in this position is the one we want
-			if( ( *it )->pos() ==
+			if( note->pos() ==
 				( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				&& ( *it )->length() <= 0 )
+				&& note->length() <= 0 )
 			{
 				found = true;
 				break;
@@ -524,10 +527,12 @@ void Pattern::ensureBeatNotes()
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
 	{
 		bool needed = false;
+		Note *note = *it;
+
 		for( int i = 0; i < m_steps; ++i )
 		{
-			if( ( *it )->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				|| ( *it )->length() != 0 )
+			if( note->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
+				|| note->length() != 0 )
 			{
 				needed = true;
 				break;
@@ -535,10 +540,12 @@ void Pattern::ensureBeatNotes()
 		}
 		if( needed == false )
 		{
-			delete *it;
+			delete note;
 			it = m_notes.erase( it );
 		}
-		else ++it;
+		else {
+			++it;
+		}
 	}
 }
 

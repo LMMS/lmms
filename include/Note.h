@@ -91,9 +91,9 @@ public:
 	virtual ~Note();
 
 	// used by GUI
-	inline void setSelected( const bool _selected ){ m_selected = _selected; }
-	inline void setOldKey( const int _oldKey ){ m_oldKey = _oldKey; }
-	inline void setOldPos( const MidiTime & _oldPos ){ m_oldPos = _oldPos; }
+	inline void setSelected( const bool _selected ) { m_selected = _selected; }
+	inline void setOldKey( const int _oldKey ) { m_oldKey = _oldKey; }
+	inline void setOldPos( const MidiTime & _oldPos ) { m_oldPos = _oldPos; }
 	inline void setOldLength( const MidiTime & _oldLength )
 	{
 		m_oldLength = _oldLength;
