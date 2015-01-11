@@ -37,7 +37,9 @@
 #include "MidiClient.h"
 #include "Mixer.h"
 #include "ToolTip.h"
-
+#include "InstrumentTrack.h"
+#include "LedCheckbox.h"
+#include "QLabel"
 
 
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
@@ -201,3 +203,29 @@ void InstrumentMidiIOView::modelChanged()
 	}
 }
 
+
+
+InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
+	QWidget( parent )
+{
+	QVBoxLayout* layout = new QVBoxLayout( this );
+	layout->setMargin( 5 );
+
+	QHBoxLayout* masterPitchLayout = new QHBoxLayout( this );
+
+	//setup checkbox for use master pitch
+	m_useMasterPitchBox = new LedCheckBox( this, tr( "Use master pitch" ),LedCheckBox::Green );
+	m_useMasterPitchBox->setModel( &it->m_useMasterPitchModel );
+	m_useMasterPitchBox->setToolTip( "Master Pitch" );
+	masterPitchLayout->addWidget( m_useMasterPitchBox );
+
+	QLabel *label = new QLabel ( tr ("Use Master Pitch " ), this );
+	masterPitchLayout->addWidget( label );
+	layout->addLayout( masterPitchLayout );
+	layout->addStretch();
+}
+
+InstrumentMiscView::~InstrumentMiscView()
+{
+
+}

@@ -110,6 +110,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
+	m_useMasterPitchModel( true, this, tr( "Master Pitch") ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
@@ -140,7 +141,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 int InstrumentTrack::baseNote() const
 {
-	return m_baseNoteModel.value() - Engine::getSong()->masterPitch();
+	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+
+	return m_baseNoteModel.value() - mp;
 }
 
 
@@ -551,6 +554,7 @@ void InstrumentTrack::updatePitchRange()
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
+
 	int key = baseNote();
 	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
 }
@@ -701,6 +705,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
+	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
 
 	if( m_instrument != NULL )
 	{
@@ -732,6 +737,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
 	m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
+	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -1212,6 +1218,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( m_pitchRangeSpinBox );
 	basicControlsLayout->addStretch();
 
+
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX" ) );
@@ -1260,10 +1267,15 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// FX tab
 	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
 
+	// MISC tab
+	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
+
+
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
 	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), 2 );
 	m_tabWidget->addTab( m_effectView, tr( "FX" ), 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
+	m_tabWidget->addTab( m_miscView, tr( "MISC" ), 5 );
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
