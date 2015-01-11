@@ -84,6 +84,7 @@ SET(LMMS_SRCS
 )
 
 set(LMMS_UIS
+	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui
 	gui/dialogs/export_project.ui
 
