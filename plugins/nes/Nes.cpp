@@ -234,7 +234,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 					
 		// update framecounters
 		m_ch1Counter++;
-		m_ch1Counter = m_ch1Counter % m_wlen1;
+		m_ch1Counter = m_wlen1 ? m_ch1Counter % m_wlen1 : 0;
 
 		m_ch1EnvCounter++;
 		if( m_ch1EnvCounter >= ch1EnvLen )
@@ -287,7 +287,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 					
 		// update framecounters
 		m_ch2Counter++;
-		m_ch2Counter = m_ch2Counter % m_wlen2;
+		m_ch2Counter = m_wlen2 ? m_ch2Counter % m_wlen2 : 0;
 		
 		m_ch2EnvCounter++;
 		if( m_ch2EnvCounter >= ch2EnvLen )
@@ -310,13 +310,13 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		////////////////////////////////		
 		
 		// make sure we don't overflow
-		m_ch3Counter %= m_wlen3;
+		m_ch3Counter = m_wlen2 ? m_ch2Counter % m_wlen2 : 0;
 		
 		// render triangle wave
 		if( m_wlen3 <= m_maxWlen && ch3Enabled )
 		{
 			ch3Level = static_cast<int>( m_parent->m_ch3Volume.value() );
-			ch3 = TRIANGLE_WAVETABLE[ ( m_ch3Counter * 32 ) / m_wlen3 ];
+			ch3 = m_wlen3 ? TRIANGLE_WAVETABLE[ ( m_ch3Counter * 32 ) / m_wlen3 ] : 0;
 			ch3 = ( ch3 * ch3Level ) / 15;
 		}
 		else ch3 = ch3Level = 0;
