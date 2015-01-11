@@ -63,6 +63,7 @@ public:
 	void loadSettings( const QDomElement & _this );
 	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
+        virtual void loadFile( const QString& file );
 
 	IntModel m_patchModel;
 
@@ -114,6 +115,7 @@ private slots:
 
 private:
 	Copl *theEmulator;
+	QString storedname;
 	fpp_t frameCount;
 	short *renderbuffer;
 	int voiceNote[9];
