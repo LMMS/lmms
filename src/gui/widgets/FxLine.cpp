@@ -35,6 +35,7 @@
 #include "FxMixerView.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "SendButtonIndicator.h"
 #include "gui_templates.h"
 #include "CaptionMenu.h"
@@ -229,28 +230,28 @@ void FxLine::renameChannel()
 
 void FxLine::removeChannel()
 {
-	FxMixerView * mix = Engine::fxMixerView();
+	FxMixerView * mix = gui->fxMixerView();
 	mix->deleteChannel( m_channelIndex );
 }
 
 
 void FxLine::removeUnusedChannels()
 {
-	FxMixerView * mix = Engine::fxMixerView();
+	FxMixerView * mix = gui->fxMixerView();
 	mix->deleteUnusedChannels();
 }
 
 
 void FxLine::moveChannelLeft()
 {
-	FxMixerView * mix = Engine::fxMixerView();
+	FxMixerView * mix = gui->fxMixerView();
 	mix->moveChannelLeft( m_channelIndex );
 }
 
 
 void FxLine::moveChannelRight()
 {
-	FxMixerView * mix = Engine::fxMixerView();
+	FxMixerView * mix = gui->fxMixerView();
 	mix->moveChannelRight( m_channelIndex );
 }
 

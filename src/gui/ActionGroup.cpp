@@ -1,8 +1,8 @@
 /*
- * ToolButton.cpp - implementation of LMMS-tool-button for common (cool) look
+ * Editor.h - declaration of Editor class
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,37 +21,35 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#include "ToolButton.h"
-#include "ToolTip.h"
+#include "ActionGroup.h"
 
-
-ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
-			QObject * _receiver, const char * _slot,
-			QWidget * _parent ) :
-	QToolButton( _parent )
+ActionGroup::ActionGroup(QObject* parent) : QActionGroup(parent)
 {
-	setAutoFillBackground( false );
-
-	if( _receiver != NULL && _slot != NULL )
-	{
-		connect( this, SIGNAL( clicked() ), _receiver, _slot );
-	}
-	ToolTip::add( this, _tooltip );
-	setFixedSize( 30, 30 );
-	setIcon( _pixmap );
+	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered_(QAction*)));
 }
 
-
-
-
-ToolButton::~ToolButton()
+QAction* ActionGroup::addAction(QAction* a)
 {
+	a->setCheckable(true);
+
+	return QActionGroup::addAction(a);
 }
 
+QAction* ActionGroup::addAction(const QString& text)
+{
+	return addAction(new QAction(text, this));
+}
 
+QAction* ActionGroup::addAction(const QIcon& icon, const QString& text)
+{
+	return addAction(new QAction(icon, text, this));
+}
 
+void ActionGroup::actionTriggered_(QAction* action)
+{
+	Q_ASSERT(action != 0);
+	Q_ASSERT(actions().contains(action));
 
-
-
+	emit triggered(actions().indexOf(action));
+}

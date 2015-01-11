@@ -24,55 +24,39 @@
 
 
 #include "Engine.h"
-#include "AutomationEditor.h"
-#include "BBEditor.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
-#include "ControllerRackView.h"
 #include "FxMixer.h"
-#include "FxMixerView.h"
 #include "InstrumentTrack.h"
 #include "Ladspa2LMMS.h"
-#include "MainWindow.h"
 #include "Mixer.h"
 #include "Pattern.h"
-#include "PianoRoll.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "Plugin.h"
-#include "SongEditor.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 
+#include "GuiApplication.h"
 
-bool Engine::s_hasGUI = true;
+
 bool Engine::s_suppressMessages = false;
 float Engine::s_framesPerTick;
 Mixer* Engine::s_mixer = NULL;
 FxMixer * Engine::s_fxMixer = NULL;
-FxMixerView * Engine::s_fxMixerView = NULL;
-MainWindow * Engine::s_mainWindow = NULL;
 BBTrackContainer * Engine::s_bbTrackContainer = NULL;
 Song * Engine::s_song = NULL;
-SongEditor* Engine::s_songEditor = NULL;
-AutomationEditor * Engine::s_automationEditor = NULL;
-BBEditor * Engine::s_bbEditor = NULL;
-PianoRoll* Engine::s_pianoRoll = NULL;
-ProjectNotes * Engine::s_projectNotes = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
-ControllerRackView * Engine::s_controllerRackView = NULL;
 QMap<QString, QString> Engine::s_pluginFileHandling;
 
 
 
 
-void Engine::init( const bool _has_gui )
+void Engine::init()
 {
-	s_hasGUI = _has_gui;
-
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
 
@@ -90,20 +74,6 @@ void Engine::init( const bool _has_gui )
 
 	s_mixer->initDevices();
 
-	if( s_hasGUI )
-	{
-		s_mainWindow = new MainWindow;
-		s_songEditor = new SongEditor( s_song );
-		s_fxMixerView = new FxMixerView;
-		s_controllerRackView = new ControllerRackView;
-		s_projectNotes = new ProjectNotes;
-		s_bbEditor = new BBEditor( s_bbTrackContainer );
-		s_pianoRoll = new PianoRoll;
-		s_automationEditor = new AutomationEditor;
-
-		s_mainWindow->finalize();
-	}
-
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
@@ -118,15 +88,7 @@ void Engine::destroy()
 	s_projectJournal->stopAllJournalling();
 	s_mixer->stopProcessing();
 
-	deleteHelper( &s_projectNotes );
-	deleteHelper( &s_songEditor );
-	deleteHelper( &s_bbEditor );
-	deleteHelper( &s_pianoRoll );
-	deleteHelper( &s_automationEditor );
-	deleteHelper( &s_fxMixerView );
-
 	PresetPreviewPlayHandle::cleanup();
-	InstrumentTrackView::cleanupWindowCache();
 
 	s_song->clearProject();
 
@@ -141,11 +103,14 @@ void Engine::destroy()
 	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );
 
-	s_mainWindow = NULL;
-
 	deleteHelper( &s_song );
 
 	delete ConfigManager::inst();
+}
+
+bool Engine::hasGUI()
+{
+	return gui != nullptr;
 }
 
 

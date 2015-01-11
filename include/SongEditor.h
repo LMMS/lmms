@@ -27,6 +27,7 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
+#include "Editor.h"
 #include "TrackContainerView.h"
 
 class QLabel;
@@ -34,12 +35,12 @@ class QScrollBar;
 
 class AutomatableSlider;
 class ComboBox;
+class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
 class Song;
 class TextFloat;
-class Timeline;
-class ToolButton;
+class TimeLineWidget;
 
 class positionLine : public QWidget
 {
@@ -56,14 +57,21 @@ class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
+	enum EditMode
+	{
+		DrawMode,
+		SelectMode
+	};
+
 	SongEditor( Song * _song );
-	virtual ~SongEditor();
-
-	void setPauseIcon( bool pause );
-
+	~SongEditor();
 
 public slots:
 	void scrolled( int _new_pos );
+
+	void setEditMode(EditMode mode);
+	void setEditModeDraw();
+	void setEditModeSelect();
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -71,19 +79,15 @@ protected:
 private slots:
 	void setHighQuality( bool );
 
-	void play();
-	void record();
-	void recordAccompany();
-	void stop();
+	void setMasterVolume( int _new_val );
+	void showMasterVolumeFloat();
+	void updateMasterVolumeFloat( int _new_val );
+	void hideMasterVolumeFloat();
 
-	void masterVolumeChanged( int _new_val );
-	void masterVolumePressed();
-	void masterVolumeMoved( int _new_val );
-	void masterVolumeReleased();
-	void masterPitchChanged( int _new_val );
-	void masterPitchPressed();
-	void masterPitchMoved( int _new_val );
-	void masterPitchReleased();
+	void setMasterPitch( int _new_val );
+	void showMasterPitchFloat();
+	void updateMasterPitchFloat( int _new_val );
+	void hideMasterPitchFloat();
 
 	void updateScrollBar( int );
 	void updatePosition( const MidiTime & _t );
@@ -104,15 +108,9 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
-	QWidget * m_toolBar;
-
-	ToolButton * m_playButton;
-	ToolButton * m_recordButton;
-	ToolButton * m_recordAccompanyButton;
-	ToolButton * m_stopButton;
 	LcdSpinBox * m_tempoSpinBox;
 
-	Timeline * m_timeLine;
+	TimeLineWidget * m_timeLine;
 
 	MeterDialog * m_timeSigDisplay;
 	AutomatableSlider * m_masterVolumeSlider;
@@ -121,22 +119,44 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
-	ToolButton * m_addBBTrackButton;
-	ToolButton * m_addSampleTrackButton;
-	ToolButton * m_addAutomationTrackButton;
-
-	ToolButton * m_drawModeButton;
-	ToolButton * m_editModeButton;
-
-	ComboBox * m_zoomingComboBox;
-
 	positionLine * m_positionLine;
+
+	ComboBoxModel* m_zoomingModel;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
 
+	EditMode m_mode;
+
+	friend class SongEditorWindow;
+
 } ;
 
+class SongEditorWindow : public Editor
+{
+	Q_OBJECT
+public:
+	SongEditorWindow(Song* song);
 
+	QSize sizeHint() const;
+
+	SongEditor* m_editor;
+
+protected slots:
+	void play();
+	void record();
+	void recordAccompany();
+	void stop();
+
+private:
+	QAction* m_addBBTrackAction;
+	QAction* m_addSampleTrackAction;
+	QAction* m_addAutomationTrackAction;
+
+	QAction* m_drawModeAction;
+	QAction* m_selectModeAction;
+
+	ComboBox * m_zoomingComboBox;
+};
 
 #endif

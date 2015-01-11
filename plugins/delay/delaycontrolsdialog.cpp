@@ -46,12 +46,12 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	sampleDelayKnob->setLabel( tr( "Delay" ) );
 	sampleDelayKnob->setHintText( tr( "Delay Time" ) + " ", " s" );
 
-    Knob * feedbackKnob = new Knob( knobBright_26, this );
-    feedbackKnob->move( 63,10 );
-    feedbackKnob->setVolumeKnob( true) ;
-    feedbackKnob->setModel( &controls->m_feedbackModel);
-    feedbackKnob->setLabel( tr( "Regen" ) );
-    feedbackKnob->setHintText( tr ( "Feedback Amount" ) + " " , "" );
+	Knob * feedbackKnob = new Knob( knobBright_26, this );
+	feedbackKnob->move( 63,10 );
+	feedbackKnob->setVolumeKnob( true) ;
+	feedbackKnob->setModel( &controls->m_feedbackModel);
+	feedbackKnob->setLabel( tr( "Regen" ) );
+	feedbackKnob->setHintText( tr ( "Feedback Amount" ) + " " , "" );
 
 	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
 	lfoFreqKnob->move( 106,10 );

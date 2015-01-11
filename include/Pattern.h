@@ -138,7 +138,7 @@ private:
 	int m_steps;
 
 	friend class PatternView;
-	friend class BBEditor;
+	friend class BBTrackContainerView;
 
 
 signals:

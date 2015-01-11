@@ -30,6 +30,7 @@
 #include "Engine.h"
 #include "CaptionMenu.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "Song.h"
@@ -86,10 +87,10 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
-	
+
 	float limit = 60000.0f / ( Engine::getSong()->getTempo() *
 							model()->m_scale );
-	
+
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
 						m_tempoSyncDescription );
 	if( limit / 8.0f <= model()->maxValue() )
@@ -149,7 +150,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
-	
+
 	delete syncMenu;
 }
 
@@ -163,7 +164,7 @@ void TempoSyncKnob::updateDescAndIcon()
 		switch( model()->m_tempoSyncMode )
 		{
 			case TempoSyncKnobModel::SyncCustom:
-				m_tempoSyncDescription = tr( "Custom " ) + 
+				m_tempoSyncDescription = tr( "Custom " ) +
 						"(" +
 			QString::number( model()->m_custom.numeratorModel().value() ) +
 						"/" +
@@ -291,8 +292,8 @@ void TempoSyncKnob::showCustom()
 {
 	if( m_custom == NULL )
 	{
-	 	m_custom = new MeterDialog( Engine::mainWindow()->workspace() );
-		Engine::mainWindow()->workspace()->addSubWindow( m_custom );
+		m_custom = new MeterDialog( gui->mainWindow()->workspace() );
+		gui->mainWindow()->workspace()->addSubWindow( m_custom );
 		m_custom->setWindowTitle( "Meter" );
 		m_custom->setModel( &model()->m_custom );
 	}

@@ -37,7 +37,7 @@ DelayControls::DelayControls( DelayEffect* effect ):
 	m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
 	m_lfoAmountModel(0.0, 0.0, 2.0, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) )
 {
-    connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
 }
 
 

@@ -22,6 +22,8 @@
  *
  */
 
+#include "Song.h"
+
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
@@ -30,7 +32,6 @@
 
 #include <math.h>
 
-#include "Song.h"
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
@@ -44,6 +45,7 @@
 #include "ExportProjectDialog.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
+#include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
@@ -60,7 +62,7 @@
 #include "SongEditor.h"
 #include "templates.h"
 #include "TextFloat.h"
-#include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "PeakController.h"
 
 
@@ -181,7 +183,7 @@ void Song::setTimeSignature()
 
 void Song::savePos()
 {
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
+	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 
 	if( tl != NULL )
 	{
@@ -248,7 +250,7 @@ void Song::processNextBuffer()
 	}
 
 	// check for looping-mode and act if necessary
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
+	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
 				tl->loopPointsEnabled();
 	if( check_loop )
@@ -586,7 +588,7 @@ void Song::stop()
 		return;
 	}
 
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
+	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_playing = false;
 	m_paused = false;
 	m_recording = true;
@@ -596,12 +598,12 @@ void Song::stop()
 
 		switch( tl->behaviourAtStop() )
 		{
-			case Timeline::BackToZero:
+			case TimeLineWidget::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
 				m_elapsedMilliSeconds = 0;
 				break;
 
-			case Timeline::BackToStart:
+			case TimeLineWidget::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
@@ -610,7 +612,7 @@ void Song::stop()
 				}
 				break;
 
-			case Timeline::KeepStopPosition:
+			case TimeLineWidget::KeepStopPosition:
 			default:
 				break;
 		}
@@ -756,17 +758,17 @@ void Song::clearProject()
 
 
 	Engine::mixer()->lock();
-	if( Engine::getBBEditor() )
+	if( gui->getBBEditor() )
 	{
-		Engine::getBBEditor()->clearAllTracks();
+		gui->getBBEditor()->trackContainerView()->clearAllTracks();
 	}
-	if( Engine::songEditor() )
+	if( gui->songEditor() )
 	{
-		Engine::songEditor()->clearAllTracks();
+		gui->songEditor()->m_editor->clearAllTracks();
 	}
-	if( Engine::fxMixerView() )
+	if( gui->fxMixerView() )
 	{
-		Engine::fxMixerView()->clear();
+		gui->fxMixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
@@ -774,14 +776,14 @@ void Song::clearProject()
 
 	Engine::fxMixer()->clear();
 
-	if( Engine::automationEditor() )
+	if( gui->automationEditor() )
 	{
-		Engine::automationEditor()->setCurrentPattern( NULL );
+		gui->automationEditor()->setCurrentPattern( NULL );
 	}
 
-	if( Engine::pianoRoll() )
+	if( gui->pianoRoll() )
 	{
-		Engine::pianoRoll()->reset();
+		gui->pianoRoll()->reset();
 	}
 
 	m_tempoModel.reset();
@@ -797,9 +799,9 @@ void Song::clearProject()
 
 	Engine::mixer()->unlock();
 
-	if( Engine::getProjectNotes() )
+	if( gui->getProjectNotes() )
 	{
-		Engine::getProjectNotes()->clear();
+		gui->getProjectNotes()->clear();
 	}
 
 	// Move to function
@@ -878,9 +880,9 @@ void Song::createNewProject()
 
 	m_modified = false;
 
-	if( Engine::mainWindow() )
+	if( gui->mainWindow() )
 	{
-		Engine::mainWindow()->resetWindowTitle();
+		gui->mainWindow()->resetWindowTitle();
 	}
 }
 
@@ -894,9 +896,9 @@ void Song::createNewProjectFromTemplate( const QString & _template )
 	// saving...
 	m_fileName = m_oldFileName = "";
 	// update window title
-	if( Engine::mainWindow() )
+	if( gui->mainWindow() )
 	{
-		Engine::mainWindow()->resetWindowTitle();
+		gui->mainWindow()->resetWindowTitle();
 	}
 
 }
@@ -912,9 +914,9 @@ void Song::loadProject( const QString & _file_name )
 	m_loadingProject = true;
 
 	Engine::projectJournal()->setJournalling( false );
-	if( Engine::mainWindow() )
+	if( gui )
 	{
-		Engine::mainWindow()->clearErrors();
+		gui->mainWindow()->clearErrors();
 	}
 
 	m_fileName = _file_name;
@@ -963,7 +965,7 @@ void Song::loadProject( const QString & _file_name )
 		if( Engine::hasGUI() )
 		{
 			// refresh FxMixerView
-			Engine::fxMixerView()->refreshDisplay();
+			gui->fxMixerView()->refreshDisplay();
 		}
 	}
 
@@ -982,21 +984,21 @@ void Song::loadProject( const QString & _file_name )
 			}
 			else if( Engine::hasGUI() )
 			{
-				if( node.nodeName() == Engine::getControllerRackView()->nodeName() )
+				if( node.nodeName() == gui->getControllerRackView()->nodeName() )
 				{
-					Engine::getControllerRackView()->restoreState( node.toElement() );
+					gui->getControllerRackView()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == Engine::pianoRoll()->nodeName() )
+				else if( node.nodeName() == gui->pianoRoll()->nodeName() )
 				{
-					Engine::pianoRoll()->restoreState( node.toElement() );
+					gui->pianoRoll()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == Engine::automationEditor()->nodeName() )
+				else if( node.nodeName() == gui->automationEditor()->m_editor->nodeName() )
 				{
-					Engine::automationEditor()->restoreState( node.toElement() );
+					gui->automationEditor()->m_editor->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == Engine::getProjectNotes()->nodeName() )
+				else if( node.nodeName() == gui->getProjectNotes()->nodeName() )
 				{
-					 Engine::getProjectNotes()->SerializingObject::restoreState( node.toElement() );
+					 gui->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
 				}
 				else if( node.nodeName() == m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
 				{
@@ -1027,17 +1029,17 @@ void Song::loadProject( const QString & _file_name )
 
 	emit projectLoaded();
 
-	if( Engine::mainWindow() )
+	if( gui )
 	{
-		Engine::mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
+		gui->mainWindow()->showErrors( tr( "The following errors occured while loading: " ) );
 	}
 
 	m_loadingProject = false;
 	m_modified = false;
 
-	if( Engine::mainWindow() )
+	if( gui->mainWindow() )
 	{
-		Engine::mainWindow()->resetWindowTitle();
+		gui->mainWindow()->resetWindowTitle();
 	}
 }
 
@@ -1060,10 +1062,10 @@ bool Song::saveProjectFile( const QString & _filename )
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( Engine::hasGUI() )
 	{
-		Engine::getControllerRackView()->saveState( dataFile, dataFile.content() );
-		Engine::pianoRoll()->saveState( dataFile, dataFile.content() );
-		Engine::automationEditor()->saveState( dataFile, dataFile.content() );
-		Engine::getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );
+		gui->pianoRoll()->saveState( dataFile, dataFile.content() );
+		gui->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
+		gui->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState( dataFile, dataFile.content() );
 	}
 
@@ -1088,7 +1090,7 @@ bool Song::guiSaveProject()
 									2000 );
 		ConfigManager::inst()->addRecentlyOpenedProject( m_fileName );
 		m_modified = false;
-		Engine::mainWindow()->resetWindowTitle();
+		gui->mainWindow()->resetWindowTitle();
 	}
 	else if( Engine::hasGUI() )
 	{
@@ -1191,7 +1193,7 @@ void Song::exportProject(bool multiExport)
 {
 	if( isEmpty() )
 	{
-		QMessageBox::information( Engine::mainWindow(),
+		QMessageBox::information( gui->mainWindow(),
 				tr( "Empty project" ),
 				tr( "This project is empty so exporting makes "
 					"no sense. Please put some items into "
@@ -1199,7 +1201,7 @@ void Song::exportProject(bool multiExport)
 		return;
 	}
 
-	FileDialog efd( Engine::mainWindow() );
+	FileDialog efd( gui->mainWindow() );
 	if (multiExport)
 	{
 		efd.setFileMode( FileDialog::Directory);
@@ -1259,7 +1261,7 @@ void Song::exportProject(bool multiExport)
 		}
 
 		const QString export_file_name = efd.selectedFiles()[0] + suffix;
-		ExportProjectDialog epd( export_file_name, Engine::mainWindow(), multiExport );
+		ExportProjectDialog epd( export_file_name, gui->mainWindow(), multiExport );
 		epd.exec();
 	}
 }
@@ -1280,10 +1282,10 @@ void Song::setModified()
 	if( !m_loadingProject )
 	{
 		m_modified = true;
-		if( Engine::mainWindow() &&
-			QThread::currentThread() == Engine::mainWindow()->thread() )
+		if( Engine::hasGUI() && gui->mainWindow() &&
+			QThread::currentThread() == gui->mainWindow()->thread() )
 		{
-			Engine::mainWindow()->resetWindowTitle();
+			gui->mainWindow()->resetWindowTitle();
 		}
 	}
 }

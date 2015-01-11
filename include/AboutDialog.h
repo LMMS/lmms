@@ -34,7 +34,7 @@
 class AboutDialog : public QDialog, public Ui::AboutDialog
 {
 public:
-	AboutDialog( void );
+	AboutDialog(QWidget* parent=0);
 
 } ;
 

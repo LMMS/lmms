@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 
 #include "TimeDisplayWidget.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
 #include "ToolTip.h"
@@ -53,7 +54,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
 

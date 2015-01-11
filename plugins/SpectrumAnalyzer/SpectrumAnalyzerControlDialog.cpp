@@ -27,6 +27,7 @@
 
 #include "SpectrumAnalyzer.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "embed.h"
 
@@ -59,7 +60,7 @@ public:
 		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
-		connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
+		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
 		setAttribute( Qt::WA_OpaquePaintEvent, true );
 	}
 

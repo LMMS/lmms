@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -549,7 +550,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( Engine::mainWindow()->mayChangeProject() )
+			if( gui->mainWindow()->mayChangeProject() )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -580,7 +581,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 
 		case FileItem::ImportAsProject:
 			if( f->type() == FileItem::FlpFile &&
-				!Engine::mainWindow()->mayChangeProject() )
+				!gui->mainWindow()->mayChangeProject() )
 			{
 				break;
 			}
@@ -663,7 +664,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			Engine::mainWindow()->workspace()->
+			gui->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();

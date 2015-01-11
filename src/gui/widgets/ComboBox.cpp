@@ -105,6 +105,22 @@ QSize ComboBox::sizeHint() const
 
 
 
+
+void ComboBox::selectNext()
+{
+	model()->setInitValue( model()->value() + 1 );
+}
+
+
+
+
+void ComboBox::selectPrevious()
+{
+	model()->setInitValue( model()->value() - 1 );
+}
+
+
+
 void ComboBox::contextMenuEvent( QContextMenuEvent * event )
 {
 	if( model() == NULL || event->x() <= width() - CB_ARROW_BTN_WIDTH )
@@ -157,13 +173,13 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 		}
 		else if( event->button() == Qt::LeftButton )
 		{
-			model()->setInitValue( model()->value() + 1 );
+			selectNext();
 			update();
 		}
 	}
 	else if( event->button() == Qt::RightButton )
 	{
-		model()->setInitValue( model()->value() - 1 );
+		selectPrevious();
 		update();
 	}
 	else

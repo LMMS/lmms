@@ -27,6 +27,7 @@
 #include <QPainter>
 
 #include "VisualizationWidget.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "embed.h"
@@ -90,7 +91,7 @@ void VisualizationWidget::setActive( bool _active )
 	m_active = _active;
 	if( m_active )
 	{
-		connect( Engine::mainWindow(),
+		connect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		connect( Engine::mixer(),
@@ -99,7 +100,7 @@ void VisualizationWidget::setActive( bool _active )
 	}
 	else
 	{
-		disconnect( Engine::mainWindow(),
+		disconnect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		disconnect( Engine::mixer(),

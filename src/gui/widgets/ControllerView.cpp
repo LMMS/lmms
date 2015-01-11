@@ -39,6 +39,7 @@
 #include "gui_templates.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
@@ -62,9 +63,9 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	connect( ctls_btn, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );
 
-	m_controllerDlg = getController()->createDialog( Engine::mainWindow()->workspace() );
+	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
 
-	m_subWindow = Engine::mainWindow()->workspace()->addSubWindow( 
+	m_subWindow = gui->mainWindow()->workspace()->addSubWindow( 
                 m_controllerDlg );
 	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();

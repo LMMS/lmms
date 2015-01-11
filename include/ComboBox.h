@@ -53,6 +53,10 @@ public:
 
 	virtual QSize sizeHint() const;
 
+public slots:
+	void selectNext();
+	void selectPrevious();
+
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent* event );

@@ -43,6 +43,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -458,15 +459,15 @@ float Knob::getValue( const QPoint & _p )
 {
 	float value;
 
-	// arcane mathemagicks for calculating knob movement 
+	// arcane mathemagicks for calculating knob movement
 	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2.5f ), 6.0f ) ) ) / 12.0f;
-	
+
 	// if shift pressed we want slower movement
-	if( Engine::mainWindow()->isShiftPressed() )	
+	if( gui->mainWindow()->isShiftPressed() )
 	{
 		value /= 4.0f;
 		value = qBound( -4.0f, value, 4.0f );
-	}		
+	}
 	return value * pageSize();
 }
 
@@ -483,7 +484,7 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
-	contextMenu.addAction( QPixmap(), 
+	contextMenu.addAction( QPixmap(),
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
@@ -561,7 +562,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			Engine::mainWindow()->isShiftPressed() == true )
+			gui->mainWindow()->isShiftPressed() == true )
 	{
 		new StringPairDrag( "float_value",
 					QString::number( model()->value() ),
@@ -681,7 +682,7 @@ void Knob::setPosition( const QPoint & _p )
 
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
-		const float pos = model()->minValue() < 0 
+		const float pos = model()->minValue() < 0
 			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
 			: ( oldValue - model()->minValue() ) / model()->range();
 		const float ratio = 0.1f + qAbs( pos ) * 15.f;
@@ -697,11 +698,11 @@ void Knob::setPosition( const QPoint & _p )
 		}
 	}
 
-		
+
 	else // linear code
 	{
 		if( qAbs( value ) >= step )
-		{	
+		{
 			model()->setValue( oldValue - value );
 			m_leftOver = 0.0f;
 		}

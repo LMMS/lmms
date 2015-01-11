@@ -43,6 +43,7 @@
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "GroupBox.h"
+#include "GuiApplication.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -1418,7 +1419,7 @@ else
 	{
 		Engine::fxMixer()->createChannel();
 	}
-	Engine::fxMixerView()->refreshDisplay();
+	gui->fxMixerView()->refreshDisplay();
 
 	// set global parameters
 	Engine::getSong()->setMasterVolume( p.mainVolume );
@@ -1426,7 +1427,7 @@ else
 	Engine::getSong()->setTempo( p.tempo );
 
 	// set project notes
-	Engine::getProjectNotes()->setText( p.projectNotes );
+	gui->getProjectNotes()->setText( p.projectNotes );
 
 
 	progressDialog.setMaximum( p.maxPatterns + p.channels.size() +
