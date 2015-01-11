@@ -210,18 +210,13 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 {
 	QVBoxLayout* layout = new QVBoxLayout( this );
 	layout->setMargin( 5 );
-
-	QHBoxLayout* masterPitchLayout = new QHBoxLayout( this );
-
-	//setup checkbox for use master pitch
-	m_useMasterPitchBox = new LedCheckBox( this, tr( "Use master pitch" ),LedCheckBox::Green );
-	m_useMasterPitchBox->setModel( &it->m_useMasterPitchModel );
-	m_useMasterPitchBox->setToolTip( "Master Pitch" );
-	masterPitchLayout->addWidget( m_useMasterPitchBox );
-
-	QLabel *label = new QLabel ( tr ("Use Master Pitch " ), this );
-	masterPitchLayout->addWidget( label );
-	layout->addLayout( masterPitchLayout );
+	m_pitchGroupBox = new GroupBox( tr ( "MASTER PITCH" ) );
+	layout->addWidget( m_pitchGroupBox );
+	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
+	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
+	QLabel *tlabel = new QLabel(tr( "Enables the use of Master Pitch" ) );
+	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
+	masterPitchLayout->addWidget( tlabel );
 	layout->addStretch();
 }
 
