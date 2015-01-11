@@ -78,9 +78,6 @@
 typedef AutomationPattern::timeMap timeMap;
 
 
-extern Keys whiteKeys[];	// defined in piano_widget.cpp
-
-
 // some constants...
 const int INITIAL_PIANOROLL_HEIGHT = 480;
 
