@@ -201,6 +201,10 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <source>With this knob you can set the point where the loop starts. </source>
         <translation>调节此旋钮，以设置循环开始的地方。</translation>
     </message>
+    <message>
+        <source>Sample not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>

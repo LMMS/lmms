@@ -983,7 +983,7 @@ bool drawbar_organ::check_percussion() {
 void drawbar_organ::pitch_bend(int amt)
 {
     parameters->pitch_bend = pow(2.0, (amt * parameters->pitch_bend_range) / (1200.0 * 8192.0));
-    for (list<voice *>::iterator i = active_voices.begin(); i != active_voices.end(); i++)
+    for (list<voice *>::iterator i = active_voices.begin(); i != active_voices.end(); ++i)
     {
         organ_voice *v = dynamic_cast<organ_voice *>(*i);
         v->update_pitch();

@@ -304,7 +304,7 @@ private:
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
 
-	int m_startKey;			// first key when drawing
+	int m_startKey; // first key when drawing
 	int m_lastKey;
 
 	EditModes m_editMode;

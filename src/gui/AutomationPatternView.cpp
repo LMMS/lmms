@@ -54,7 +54,6 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
 
 	ToolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
@@ -267,7 +266,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	if( isSelected() == true )
 	{
-		c = QColor( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
 	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );

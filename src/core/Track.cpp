@@ -249,7 +249,6 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * _tco,
 	m_tco( _tco ),
 	m_trackView( _tv ),
 	m_action( NoAction ),
-	m_autoResize( false ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_hint( NULL ),
@@ -657,7 +656,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * _me )
 							"a copy." ),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
-		else if( m_autoResize == false )
+		else if( !m_tco->getAutoResize() )
 		{
 			m_action = Resize;
 			m_oldTime = m_tco->length();
@@ -847,7 +846,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if( _me->x() > width() - RESIZE_GRIP_WIDTH && !_me->buttons() )
+		if( _me->x() > width() - RESIZE_GRIP_WIDTH && !_me->buttons() && !m_tco->getAutoResize() )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -953,19 +952,6 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 float TrackContentObjectView::pixelsPerTact()
 {
 	return m_trackView->trackContainerView()->pixelsPerTact();
-}
-
-
-
-
-/*! \brief Set whether this trackContentObjectView can resize.
- *
- * \param _e The boolean state of whether this track content object view
- *  is allowed to resize.
- */
-void TrackContentObjectView::setAutoResizeEnabled( bool _e )
-{
-	m_autoResize = _e;
 }
 
 
@@ -1403,6 +1389,11 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * _de )
 		{
 			tco->selectViewOnCreate( true );
 		}
+		//check tco name, if the same as source track name dont copy
+		if( tco->name() == tracks[trackIndex]->name() )
+		{
+			tco->setName( "" );
+		}
 	}
 
 	AutomationPattern::resolveAllIDs();
@@ -1770,7 +1761,7 @@ void TrackOperationsWidget::recordingOn()
 	if( atv )
 	{
 		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( true ); }
@@ -1786,7 +1777,7 @@ void TrackOperationsWidget::recordingOff()
 	if( atv )
 	{
 		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( false ); }

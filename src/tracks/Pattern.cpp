@@ -66,6 +66,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 {
 	setName( _instrument_track->name() );
 	init();
+	setAutoResize( true );
 }
 
 
@@ -83,6 +84,18 @@ Pattern::Pattern( const Pattern& other ) :
 	}
 
 	init();
+	switch( getTrack()->trackContainer()->type() )
+	{
+		case TrackContainer::BBContainer:
+			setAutoResize( true );
+			break;
+
+		case TrackContainer::SongContainer:
+			// move down
+		default:
+			setAutoResize( false );
+			break;
+	}
 }
 
 
@@ -486,12 +499,15 @@ void Pattern::ensureBeatNotes()
 	for( int i = 0; i < m_steps; ++i )
 	{
 		bool found = false;
-		for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it )
+		NoteVector::Iterator it;
+
+		for( it = m_notes.begin(); it != m_notes.end(); ++it )
 		{
+			Note *note = *it;
 			// if a note in this position is the one we want
-			if( ( *it )->pos() ==
+			if( note->pos() ==
 				( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				&& ( *it )->length() <= 0 )
+				&& note->length() <= 0 )
 			{
 				found = true;
 				break;
@@ -511,10 +527,12 @@ void Pattern::ensureBeatNotes()
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
 	{
 		bool needed = false;
+		Note *note = *it;
+
 		for( int i = 0; i < m_steps; ++i )
 		{
-			if( ( *it )->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				|| ( *it )->length() != 0 )
+			if( note->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
+				|| note->length() != 0 )
 			{
 				needed = true;
 				break;
@@ -522,10 +540,12 @@ void Pattern::ensureBeatNotes()
 		}
 		if( needed == false )
 		{
-			delete *it;
+			delete note;
 			it = m_notes.erase( it );
 		}
-		else ++it;
+		else {
+			++it;
+		}
 	}
 }
 
@@ -635,7 +655,6 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
 
 	ToolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
@@ -905,16 +924,19 @@ void PatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 
 	QColor c;
-
 	if(( m_pat->m_patternType != Pattern::BeatPattern ) &&
-				!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
+		!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
+	{
 		c = styleColor;
+	}
 	else
+	{
 		c = QColor( 80, 80, 80 );
+	}
 
 	if( isSelected() == true )
 	{
-		c = QColor( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
 	}
 
 	if( m_pat->m_patternType != Pattern::BeatPattern )

@@ -147,9 +147,19 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	else
 	{
 		DataFile dataFile( _preset_file );
-		s_previewTC->previewInstrumentTrack()->
-			loadTrackSpecificSettings(
-				dataFile.content().firstChild().toElement() );
+		// vestige previews are bug prone; fallback on 3xosc with volume of 0
+		// without an instrument in preview track, it will segfault
+		if(dataFile.content().elementsByTagName( "vestige" ).length() == 0 )
+		{
+			s_previewTC->previewInstrumentTrack()->
+					loadTrackSpecificSettings(
+						dataFile.content().firstChild().toElement() );
+		}
+		else
+		{
+			s_previewTC->previewInstrumentTrack()->loadInstrument("tripleoscillator");
+			s_previewTC->previewInstrumentTrack()->setVolume( 0 );
+		}
 	}
 
 	Engine::setSuppressMessages( false );

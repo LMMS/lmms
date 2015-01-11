@@ -30,6 +30,8 @@
 #include <QtCore/QList>
 #include <QMainWindow>
 
+#include "export.h"
+
 class QAction;
 class QDomElement;
 class QGridLayout;
@@ -40,7 +42,7 @@ class PluginView;
 class ToolButton;
 
 
-class MainWindow : public QMainWindow
+class EXPORT MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
@@ -96,9 +98,9 @@ public:
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 	void collectErrors( const QList<QString>* errors );
-	void collectError( const QString error );
+	void collectError( const QString & error );
 	void clearErrors();
-	void showErrors( const QString reason );
+	void showErrors( const QString & reason );
 
 
 public slots:

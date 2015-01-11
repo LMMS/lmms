@@ -96,7 +96,7 @@ LadspaManager::LadspaManager()
 	
 	l_ladspa_key_t keys = m_ladspaManagerMap.keys();
 	for( l_ladspa_key_t::iterator it = keys.begin();
-		    it != keys.end(); it++ )
+			it != keys.end(); ++it )
 	{
 		m_sortedPlugins.append( qMakePair( getName( *it ), *it ) );
 	}

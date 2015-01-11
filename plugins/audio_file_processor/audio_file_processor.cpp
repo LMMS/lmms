@@ -34,6 +34,8 @@
 #include "audio_file_processor.h"
 #include "Engine.h"
 #include "Song.h"
+#include "MainWindow.h"
+#include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "interpolation.h"
@@ -234,6 +236,14 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	if( _this.attribute( "src" ) != "" )
 	{
 		setAudioFile( _this.attribute( "src" ), false );
+
+		QString absolutePath = m_sampleBuffer.tryToMakeAbsolute( m_sampleBuffer.audioFile() );
+		if ( !QFileInfo( absolutePath ).exists() )
+		{
+			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
+
+			gui->mainWindow()->collectError( message );
+		}
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{

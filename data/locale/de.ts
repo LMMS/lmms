@@ -203,6 +203,10 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
         <source>With this knob you can set the point where the loop starts. </source>
         <translation>Mit diesem Regler können Sie festlegen, wo die Wiederholung beginnt.</translation>
     </message>
+    <message>
+        <source>Sample not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>

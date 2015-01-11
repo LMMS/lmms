@@ -55,6 +55,8 @@ public:
 		m_type = p.m_type;
 		m_offset = p.m_offset;
 		m_affinity = p.m_affinity;
+		m_usesBuffer = p.m_usesBuffer;
+		m_audioPort = p.m_audioPort;
 		return *this;
 	}
 
