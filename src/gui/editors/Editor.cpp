@@ -30,6 +30,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QMdiArea>
+#include <QShortcut>
 
 
 void Editor::setPauseIcon(bool displayPauseIcon)
@@ -39,6 +40,14 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("pause"));
 	else
 		m_playAction->setIcon(embed::getIconPixmap("play"));
+}
+
+void Editor::togglePlayStop()
+{
+	if (Engine::getSong()->isPlaying())
+		stop();
+	else
+		play();
 }
 
 Editor::Editor(bool record) :
@@ -63,13 +72,12 @@ Editor::Editor(bool record) :
 	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
 	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
 
-	m_playAction->setShortcut(Qt::Key_Space);
-
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
 	connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
+	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
 
 	// Add toolbar to window
 	addToolBar(Qt::TopToolBarArea, m_toolBar);

@@ -48,6 +48,10 @@ protected slots:
 	virtual void recordAccompany() {}
 	virtual void stop() {}
 
+private slots:
+	/// Called by pressing the space key. Plays or stops.
+	void togglePlayStop();
+
 signals:
 
 protected:
