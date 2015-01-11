@@ -310,7 +310,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		////////////////////////////////		
 		
 		// make sure we don't overflow
-		m_ch3Counter = m_wlen2 ? m_ch2Counter % m_wlen2 : 0;
+		m_ch3Counter = m_wlen3 ? m_ch3Counter % m_wlen3 : 0;
 		
 		// render triangle wave
 		if( m_wlen3 <= m_maxWlen && ch3Enabled )
