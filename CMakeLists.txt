@@ -399,25 +399,19 @@ IF(GIT_FOUND)
 		TIMEOUT 1)
 ENDIF(GIT_FOUND)
 
-SET(lmms_EMBEDDED_RESOURCES "${CMAKE_SOURCE_DIR}/AUTHORS" "${CMAKE_SOURCE_DIR}/COPYING" "${CONTRIBUTORS}")
-
 # embedded resources stuff
 IF(WIN32 OR WIN64)
 	# compile buildtools native
 	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
 	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_COMMAND(OUTPUT "${BIN2RES}" COMMAND g++ ARGS "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
+	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
 ELSE(WIN32 OR WIN64)
 	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
 	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
 ENDIF(WIN32 OR WIN64)
 
-SET(LMMS_ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
-
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
-
-ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND "${BIN2RES}" ARGS ${lmms_EMBEDDED_RESOURCES} > "\"${LMMS_ER_H}\"" DEPENDS "${BIN2RES}")
 
 # set up apple vars before traversing into data/scripts
 SET(MACOSX_BUNDLE_ICON_FILE "lmms.icns")
@@ -439,10 +433,10 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # make sub-directories
+ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
-ADD_SUBDIRECTORY(src)
 
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz" COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\"" DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1" COMMENT "Generating lmms.1.gz")
 
