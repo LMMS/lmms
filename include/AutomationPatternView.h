@@ -43,6 +43,8 @@ public:
 	virtual ~AutomationPatternView();
 
 public slots:
+	/// Opens this view's pattern in the global automation editor
+	void openInAutomationEditor();
 	virtual void update();
 
 
@@ -56,7 +58,7 @@ protected slots:
 
 protected:
 	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent(QMouseEvent * me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re )
 	{

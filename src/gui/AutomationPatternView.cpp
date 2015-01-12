@@ -73,6 +73,14 @@ AutomationPatternView::~AutomationPatternView()
 
 
 
+void AutomationPatternView::openInAutomationEditor()
+{
+	if(gui) gui->automationEditor()->open(m_pat);
+}
+
+
+
+
 
 void AutomationPatternView::update()
 {
@@ -170,8 +178,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ),
-				m_pat, SLOT( openInAutomationEditor() ) );
+	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
 	_cm->insertSeparator( _cm->actions()[1] );
 
 	_cm->addSeparator();
@@ -222,14 +229,14 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 
 
 
-void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
+void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * me )
 {
-	if( _me->button() != Qt::LeftButton )
+	if(me->button() != Qt::LeftButton)
 	{
-		_me->ignore();
+		me->ignore();
 		return;
 	}
-	gui->automationEditor()->open(m_pat);
+	openInAutomationEditor();
 }
 
 
