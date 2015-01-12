@@ -49,14 +49,19 @@ int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2
 	// return prematurely for Minor comparison
 	if(v1.getCompareType() == CompareType::Minor || 
 		v2.getCompareType() == CompareType::Minor)
+	{
+		return 0;
+	}
 
 	if(v1.getRelease() != v2.getRelease())
 	{
 		return v1.getRelease() - v2.getRelease();
 	}
 
-	if(v1.getCompareType() == CompareType::Build || 
-		v2.getCompareType() == CompareType::Build)
+	if(v1.getCompareType() == CompareType::Release || 
+		v2.getCompareType() == CompareType::Release) {
+		return 0;
+	}
 
 	// make sure 0.x.y > 0.x.y-patch
 	if(v1.getBuild().isEmpty())
