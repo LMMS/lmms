@@ -224,17 +224,17 @@ void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 
 
 
-void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & parent )
+void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & dom_parent)
 {
-	MainWindow::saveWidgetState( this, parent );
+	MainWindow::saveWidgetState(parentWidget(), dom_parent);
 }
 
 
 
 
-void AutomationEditor::loadSettings( const QDomElement & parent )
+void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 {
-	MainWindow::restoreWidgetState( this, parent );
+	MainWindow::restoreWidgetState(parentWidget(), dom_parent);
 }
 
 
