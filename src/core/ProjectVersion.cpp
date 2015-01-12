@@ -29,7 +29,6 @@
 
 #include "ProjectVersion.h"
 
-
 int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2)
 {
 	if(v1.getMajor() != v2.getMajor())
