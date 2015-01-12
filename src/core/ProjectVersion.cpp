@@ -25,8 +25,6 @@
  */
 
 
-
-
 #include "ProjectVersion.h"
 
 int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2)
@@ -38,7 +36,7 @@ int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2
 	
 	// return prematurely for Major comparison
 	if(v1.getCompareType() == CompareType::Major || 
-		v1.getCompareType() == CompareType::Major)
+		v2.getCompareType() == CompareType::Major)
 	{
 		return 0;
 	}
@@ -50,7 +48,7 @@ int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2
 
 	// return prematurely for Minor comparison
 	if(v1.getCompareType() == CompareType::Minor || 
-		v1.getCompareType() == CompareType::Minor)
+		v2.getCompareType() == CompareType::Minor)
 
 	if(v1.getRelease() != v2.getRelease())
 	{
@@ -58,7 +56,7 @@ int ProjectVersion::compare(const ProjectVersion & v1, const ProjectVersion & v2
 	}
 
 	if(v1.getCompareType() == CompareType::Build || 
-		v1.getCompareType() == CompareType::Build)
+		v2.getCompareType() == CompareType::Build)
 
 	// make sure 0.x.y > 0.x.y-patch
 	if(v1.getBuild().isEmpty())

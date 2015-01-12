@@ -58,9 +58,6 @@ public:
 	
 
 private:
-	static int compStr(const ProjectVersion & v1, const char * v2);
-	static int compStr(const ProjectVersion & v1, const QString & v2);
-
 	const int m_major;
 	const int m_minor;
 	const int m_release;
@@ -85,20 +82,6 @@ inline int compStr(const ProjectVersion & v1, const QString & v2)
 
 
 
-inline int compStr(const char * v1, const ProjectVersion & v2)
-{
-	return ProjectVersion::compare(ProjectVersion(v1), v2);
-}
-
-
-
-inline int compStr(const QString & v1, const ProjectVersion & v2)
-{
-	return ProjectVersion::compare(ProjectVersion(v1), v2);
-}
-
-
-
 /*
  * ProjectVersion v. char[]
  */
@@ -109,12 +92,12 @@ inline bool operator>=(const ProjectVersion & v1, const char * v2) { return comp
 inline bool operator==(const ProjectVersion & v1, const char * v2) { return compStr(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const char * v2) { return compStr(v1, v2) != 0; }
 
-inline bool operator<(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) < 0; }
-inline bool operator>(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) > 0; }
-inline bool operator<=(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) <= 0; }
-inline bool operator>=(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) >= 0; }
-inline bool operator==(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) == 0; }
-inline bool operator!=(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) != 0; }
+inline bool operator<(const char * v1, const ProjectVersion & v2) { return 0 < compStr(v2, v1); }
+inline bool operator>(const char * v1, const ProjectVersion & v2) { return 0 > compStr(v2, v1); }
+inline bool operator<=(const char * v1, const ProjectVersion & v2) { return 0 <= compStr(v2, v1); }
+inline bool operator>=(const char * v1, const ProjectVersion & v2) { return 0 >= compStr(v2, v1); }
+inline bool operator==(const char * v1, const ProjectVersion & v2) { return 0 == compStr(v2, v1); }
+inline bool operator!=(const char * v1, const ProjectVersion & v2) { return 0 != compStr(v2, v1); }
 
 /*
  * ProjectVersion v. QString
@@ -126,12 +109,12 @@ inline bool operator>=(const ProjectVersion & v1, const QString & v2) { return c
 inline bool operator==(const ProjectVersion & v1, const QString & v2) { return compStr(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const QString & v2) { return compStr(v1, v2) != 0; }
 
-inline bool operator<(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) < 0; }
-inline bool operator>(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) > 0; }
-inline bool operator<=(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) <= 0; }
-inline bool operator>=(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) >= 0; }
-inline bool operator==(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) == 0; }
-inline bool operator!=(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) != 0; }
+inline bool operator<(const QString & v1, const ProjectVersion & v2) { return 0 < compStr(v2, v1); }
+inline bool operator>(const QString & v1, const ProjectVersion & v2) { return 0 > compStr(v2, v1); }
+inline bool operator<=(const QString & v1, const ProjectVersion & v2) { return 0 <= compStr(v2, v1); }
+inline bool operator>=(const QString & v1, const ProjectVersion & v2) { return 0 >= compStr(v2, v1); }
+inline bool operator==(const QString & v1, const ProjectVersion & v2) { return 0 == compStr(v2, v1); }
+inline bool operator!=(const QString & v1, const ProjectVersion & v2) { return 0 != compStr(v2, v1); }
 
 /*
  * ProjectVersion v. ProjectVersion
