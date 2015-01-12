@@ -100,18 +100,18 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
 							"language" ) ),
-	m_workingDir( ConfigManager::inst()->workingDir() ),
-	m_vstDir( ConfigManager::inst()->vstDir() ),
-	m_artworkDir( ConfigManager::inst()->artworkDir() ),
-	m_flDir( ConfigManager::inst()->flDir() ),
-	m_ladDir( ConfigManager::inst()->ladspaDir() ),
+	m_workingDir( QDir::toNativeSeparators( ConfigManager::inst()->workingDir() ) ),
+	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
+	m_artworkDir( QDir::toNativeSeparators( ConfigManager::inst()->artworkDir() ) ),
+	m_flDir( QDir::toNativeSeparators( ConfigManager::inst()->flDir() ) ),
+	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_defaultSoundfont( ConfigManager::inst()->defaultSoundfont() ),
+	m_defaultSoundfont( QDir::toNativeSeparators( ConfigManager::inst()->defaultSoundfont() ) ),
 #endif
 #ifdef LMMS_HAVE_STK
-	m_stkDir( ConfigManager::inst()->stkDir() ),
+	m_stkDir( QDir::toNativeSeparators( ConfigManager::inst()->stkDir() ) ),
 #endif
-	m_backgroundArtwork( ConfigManager::inst()->backgroundArtwork() ),
+	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
 	m_oneInstrumentTrackWindow( ConfigManager::inst()->value( "ui",
