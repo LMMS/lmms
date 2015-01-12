@@ -437,7 +437,13 @@ ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
-ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz" COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\"" DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1" COMMENT "Generating lmms.1.gz")
+ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
+				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
+				DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1"
+				COMMENT "Generating lmms.1.gz")
+
+ADD_CUSTOM_TARGET(manpage ALL
+				DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
 
 # install headers
 
