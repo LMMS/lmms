@@ -31,7 +31,7 @@
 
 enum CompareType { Major, Minor, Release, Build };
 
-/*! \brief Version number parsing and comparison utility
+/*! \brief Version number parsing and comparison 
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
  */
@@ -40,10 +40,10 @@ class ProjectVersion : public QString
 public:
 	ProjectVersion(const QString & s, const CompareType c = CompareType::Build) : 
 		QString(s), 
-		m_major(section( '.', 0, 0 ).toInt()) ,
-		m_minor(section( '.', 1, 1 ).toInt()) ,
-		m_release(section( '.', 2 ).section( '-', 0, 0 ).toInt()) ,
-		m_build(section( '.', 2 ).section( '-', 1 )),
+		m_major(s.section( '.', 0, 0 ).toInt()) ,
+		m_minor(s.section( '.', 1, 1 ).toInt()) ,
+		m_release(s.section( '.', 2 ).section( '-', 0, 0 ).toInt()) ,
+		m_build(s.section( '.', 2 ).section( '-', 1 )),
 		m_compareType(c)
 	{
 	}
@@ -64,8 +64,8 @@ private:
 	const int m_major;
 	const int m_minor;
 	const int m_release;
-	const QString & m_build;
-	const CompareType & m_compareType;
+	const QString m_build;
+	const CompareType m_compareType;
 } ;
 
 
@@ -83,6 +83,22 @@ inline int compStr(const ProjectVersion & v1, const QString & v2)
 	return ProjectVersion::compare(v1, ProjectVersion(v2));
 }
 
+
+
+inline int compStr(const char * v1, const ProjectVersion & v2)
+{
+	return ProjectVersion::compare(ProjectVersion(v1), v2);
+}
+
+
+
+inline int compStr(const QString & v1, const ProjectVersion & v2)
+{
+	return ProjectVersion::compare(ProjectVersion(v1), v2);
+}
+
+
+
 /*
  * ProjectVersion v. char[]
  */
@@ -93,12 +109,12 @@ inline bool operator>=(const ProjectVersion & v1, const char * v2) { return comp
 inline bool operator==(const ProjectVersion & v1, const char * v2) { return compStr(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const char * v2) { return compStr(v1, v2) != 0; }
 
-inline bool operator<(const char * v1, const ProjectVersion & v2) { return 0 < compStr(v2, v1); }
-inline bool operator>(const char * v1, const ProjectVersion & v2) { return 0 > compStr(v2, v1); }
-inline bool operator<=(const char * v1, const ProjectVersion & v2) { return 0 <= compStr(v2, v1); }
-inline bool operator>=(const char * v1, const ProjectVersion & v2) { return 0 >= compStr(v2, v1); }
-inline bool operator==(const char * v1, const ProjectVersion & v2) { return 0 == compStr(v2, v1); }
-inline bool operator!=(const char * v1, const ProjectVersion & v2) { return 0 != compStr(v2, v1); }
+inline bool operator<(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) < 0; }
+inline bool operator>(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) > 0; }
+inline bool operator<=(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) <= 0; }
+inline bool operator>=(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) >= 0; }
+inline bool operator==(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) == 0; }
+inline bool operator!=(const char * v1, const ProjectVersion & v2) { return compStr(v1, v2) != 0; }
 
 /*
  * ProjectVersion v. QString
@@ -110,12 +126,12 @@ inline bool operator>=(const ProjectVersion & v1, const QString & v2) { return c
 inline bool operator==(const ProjectVersion & v1, const QString & v2) { return compStr(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const QString & v2) { return compStr(v1, v2) != 0; }
 
-inline bool operator<(const QString & v1, const ProjectVersion & v2) { return 0 < compStr(v2, v1); }
-inline bool operator>(const QString & v1, const ProjectVersion & v2) { return 0 > compStr(v2, v1); }
-inline bool operator<=(const QString & v1, const ProjectVersion & v2) { return 0 <= compStr(v2, v1); }
-inline bool operator>=(const QString & v1, const ProjectVersion & v2) { return 0 >= compStr(v2, v1); }
-inline bool operator==(const QString & v1, const ProjectVersion & v2) { return 0 == compStr(v2, v1); }
-inline bool operator!=(const QString & v1, const ProjectVersion & v2) { return 0 != compStr(v2, v1); }
+inline bool operator<(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) < 0; }
+inline bool operator>(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) > 0; }
+inline bool operator<=(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) <= 0; }
+inline bool operator>=(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) >= 0; }
+inline bool operator==(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) == 0; }
+inline bool operator!=(const QString & v1, const ProjectVersion & v2) { return compStr(v1, v2) != 0; }
 
 /*
  * ProjectVersion v. ProjectVersion
