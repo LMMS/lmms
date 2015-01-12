@@ -33,8 +33,11 @@
 #include "Knob.h"
 #include "PixmapButton.h"
 
-#define OPL2_VOICE_FREE 255
+// This one is a flag, MIDI notes take 7 low bits
+#define OPL2_VOICE_FREE 128
 #define OPL2_NO_VOICE 255
+#define OPL2_VOICES 9
+
 // The "normal" range for LMMS pitchbends
 #define DEFAULT_BEND_CENTS 100
 
@@ -58,8 +61,9 @@ public:
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	void loadSettings( const QDomElement & _this );
-	void loadPatch(unsigned char inst[14]);
+	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
+        virtual void loadFile( const QString& file );
 
 	IntModel m_patchModel;
 
@@ -111,6 +115,7 @@ private slots:
 
 private:
 	Copl *theEmulator;
+	QString storedname;
 	fpp_t frameCount;
 	short *renderbuffer;
 	int voiceNote[9];
