@@ -748,6 +748,8 @@ WatsynView::WatsynView( Instrument * _instrument,
 	m_selectedGraphGroup -> addButton( a2_selectButton );
 	m_selectedGraphGroup -> addButton( b1_selectButton );
 	m_selectedGraphGroup -> addButton( b2_selectButton );
+	WatsynInstrument * w = castModel<WatsynInstrument>();
+	m_selectedGraphGroup -> setModel( &w -> m_selectedGraph);
 
 // A-modulation button group
 	pixmapButton * amod_mixButton = new pixmapButton( this, NULL );
