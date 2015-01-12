@@ -103,7 +103,7 @@ ENDIF()
 #
 # rules for building localizations
 #
-FILE(GLOB lmms_LOCALES data/locale/*.ts)
+FILE(GLOB lmms_LOCALES ${CMAKE_SOURCE_DIR}/data/locale/*.ts)
 SET(ts_targets "")
 SET(qm_targets "")
 FOREACH(_ts_file ${lmms_LOCALES})
