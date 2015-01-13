@@ -398,7 +398,6 @@ public:
 				out *= 0.25f;
 				m_last[_chnl] = _in0;
 				return out;
-				break;
 			}
 			
 			// 4-pole state-variant lowpass filter, adapted from Nekobee source code
@@ -425,7 +424,6 @@ public:
 				return m_type == Lowpass_SV 
 					? m_delay4[_chnl]
 					: m_delay3[_chnl];
-				break;
 			}
 			
 			case Highpass_SV:
@@ -440,7 +438,6 @@ public:
 				}
 				
 				return hp;
-				break;
 			}
 			
 			case Notch_SV:
@@ -460,7 +457,6 @@ public:
 
 				/* mix filter output into output buffer */
 				return m_delay4[_chnl] + hp1;
-				break;
 			}
 
 
@@ -492,7 +488,6 @@ public:
 					m_rcbp0[_chnl] = bp;
 				}
 				return lp;
-				break;
 			}
 			case Highpass_RC12:
 			case Bandpass_RC12:
@@ -514,7 +509,6 @@ public:
 					m_rcbp0[_chnl] = bp;
 				}
 				return m_type == Highpass_RC12 ? hp : bp;
-				break;
 			}
 
 			case Lowpass_RC24:
@@ -559,7 +553,6 @@ public:
 					m_rchp1[_chnl] = hp;
 				}
 				return lp;
-				break;
 			}
 			case Highpass_RC24:
 			case Bandpass_RC24:
@@ -599,7 +592,6 @@ public:
 					m_rcbp1[_chnl] = bp;
 				}
 				return m_type == Highpass_RC24 ? hp : bp;
-				break;
 			}
 
 			case Formantfilter:
@@ -697,7 +689,6 @@ public:
 					out += bp;
 				}
             	return m_type == FastFormant ? out * 2.0f : out * 0.5f;
-				break;
 			}
 
 			default:
