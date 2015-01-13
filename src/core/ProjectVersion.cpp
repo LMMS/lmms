@@ -76,4 +76,3 @@ int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 	return QString::compare(v1.getBuild(), v2.getBuild());
 }
 
-
