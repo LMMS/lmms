@@ -68,7 +68,7 @@ QMenu {
 
 QMenu::separator {
 	height: 1px;
-	background: #c9c9c9;
+	background: #8d8d8d;
 	margin-left: 5px;
 	margin-right: 5px;
 }
