@@ -102,7 +102,7 @@ inline int compare(ProjectVersion v1, QString v2)
 
 
 /*
- * ProjectVersion v. char[]
+ * ProjectVersion v. QString
  */
 inline bool operator<(ProjectVersion v1, QString v2) { return compare(v1, v2) < 0; }
 inline bool operator>(ProjectVersion v1, QString v2) { return compare(v1, v2) > 0; }
