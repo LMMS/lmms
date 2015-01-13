@@ -30,7 +30,6 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
-	core/main.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
