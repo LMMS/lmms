@@ -967,6 +967,14 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				int amt = quantized ? quantization() : 1;
 				shiftPos( -amt );
 			}
+			else if( ke->modifiers() & Qt::AltModifier)
+			{
+				Pattern * p = m_pattern->previousPattern();
+				if(p != NULL)
+				{
+					setCurrentPattern(p);
+				}
+			}
 			else
 			{
 				// scroll
@@ -1000,6 +1008,13 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				bool quantized = !( ke->modifiers() & Qt::AltModifier );
 				int amt = quantized ? quantization() : 1;
 				shiftPos( +amt );
+			}
+			else if( ke->modifiers() & Qt::AltModifier) {
+				Pattern * p = m_pattern->nextPattern();
+				if(p != NULL)
+				{
+					setCurrentPattern(p);
+				}
 			}
 			else
 			{
