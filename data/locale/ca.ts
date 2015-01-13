@@ -7931,6 +7931,14 @@ Latència: %2 ms</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Assign to new FX Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Turn all recording on</source>
         <translation type="unfinished"></translation>
     </message>

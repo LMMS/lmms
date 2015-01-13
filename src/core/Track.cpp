@@ -57,6 +57,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
@@ -1706,6 +1707,29 @@ void TrackOperationsWidget::clearTrack()
 
 
 
+/*! \brief Create and assign a new FX Channel for this track */
+void TrackOperationsWidget::createFxLine()
+{
+	int channelIndex = gui->fxMixerView()->addNewChannel();
+
+	Engine::fxMixer()->effectChannel( channelIndex )->m_name = m_trackView->getTrack()->name();
+
+	assignFxLine(channelIndex);
+}
+
+
+
+/*! \brief Assign a specific FX Channel for this track */
+void TrackOperationsWidget::assignFxLine(int channelIndex)
+{
+	Track * track = m_trackView->getTrack();
+	dynamic_cast<InstrumentTrack *>( track )->effectChannelModel()->setValue( channelIndex );
+
+	gui->fxMixerView()->setCurrentFxLine( channelIndex );
+}
+
+
+
 /*! \brief Remove this track from the track list
  *
  */
@@ -1740,12 +1764,36 @@ void TrackOperationsWidget::updateMenu()
 	{
 		to_menu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
-
-	if( dynamic_cast<InstrumentTrackView *>( m_trackView ) )
+	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
+		int channelIndex = trackView->model()->effectChannelModel()->value();
+
+		FxChannel * fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+
+		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), to_menu );
+		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
+
+		fxMenu->addAction("Assign to new FX Channel" , this, SLOT( createFxLine() ) );
+		fxMenu->addSeparator();
+
+
+		for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
+		{
+			FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
+
+			if ( currentChannel != fxChannel )
+			{
+				QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
+				QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
+				fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			}
+		}
+
+		to_menu->addMenu(fxMenu);
+		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
+
 		to_menu->addSeparator();
-		to_menu->addMenu( dynamic_cast<InstrumentTrackView *>(
-						m_trackView )->midiMenu() );
+		to_menu->addMenu( trackView->midiMenu() );
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{

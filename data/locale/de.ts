@@ -8177,6 +8177,14 @@ Latenz: %2 ms</translation>
         <source>Clear this track</source>
         <translation>Diese Spur leeren</translation>
     </message>
+    <message>
+        <source>Assign to new FX Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>vestigeInstrument</name>

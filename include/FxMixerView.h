@@ -103,12 +103,14 @@ public:
 	// useful for loading projects
 	void refreshDisplay();
 
+public slots:
+	int addNewChannel();
+
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	
 private slots:
 	void updateFaders();
-	void addNewChannel();
 	void toggledSolo();
 
 private:
