@@ -190,8 +190,6 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-	m_errors = new QList<QString>();
-
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
@@ -1223,45 +1221,5 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
-	}
-}
-
-
-
-void MainWindow::collectErrors(const QList<QString>* errors )
-{
-	m_errors->append( *errors );
-}
-
-
-
-void MainWindow::collectError( const QString & error )
-{
-	m_errors->append( error );
-}
-
-
-
-void MainWindow::clearErrors()
-{
-	m_errors->clear();
-}
-
-
-
-void MainWindow::showErrors( const QString & message )
-{
-    if ( m_errors->length() != 0 )
-	{   QString* errors = new QString();
-		for ( int i = 0 ; i < m_errors->length() ; i++ )
-		{
-			errors->append( m_errors->value( i ) + "\n" );
-		}
-		errors->prepend( "\n\n" );
-		errors->prepend( message );
-		QMessageBox::warning( NULL,
-			"LMMS Error report",
-			*errors,
-			QMessageBox::Ok );
 	}
 }
