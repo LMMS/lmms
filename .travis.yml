@@ -19,6 +19,8 @@ script:
     - if [ $TARGET_OS == win64 ]; then ../build_mingw64 || ../build_mingw64; fi
     - if [ $TARGET_OS == linux ]; then cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..; fi
     - make -j4 VERBOSE=1
+    - make tests
+    - ./tests/tests
 before_deploy: make package
 deploy:
     provider: releases
