@@ -99,6 +99,9 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 	m_counter2r = 0;
 	m_counter3l = 0;
 	m_counter3r = 0;
+	
+	calcSlopes[0] = &MonstroSynth::calcSlope1;
+    	calcSlopes[1] = &MonstroSynth::calcSlope2;
 }
 
 
@@ -784,7 +787,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 			}
 			else if( m_env_phase[i] < 2.0f ) // attack phase
 			{
-				env[i][f] = calcSlope1( fraction( m_env_phase[i] ) );
+				env[i][f] = (this->*((MonstroSynth*)this)->MonstroSynth::calcSlopes[i])( fraction( m_env_phase[i] ) );
 				m_env_phase[i] = qMin( 2.0f, m_env_phase[i] + m_env_att[i] );
 			}
 			else if( m_env_phase[i] < 3.0f ) // hold phase
@@ -794,7 +797,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 			}
 			else if( m_env_phase[i] < 4.0f ) // decay phase
 			{
-				const sample_t s = calcSlope1( 1.0f - fraction( m_env_phase[i] ) );
+				const sample_t s = (this->*((MonstroSynth*)this)->MonstroSynth::calcSlopes[i])( 1.0f - fraction( m_env_phase[i] ) );
 				if( s <= m_env_sus[i] )
 				{
 					env[i][f] = m_env_sus[i];
@@ -808,7 +811,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 			}
 			else if( m_env_phase[i] < 5.0f ) // release phase
 			{
-				env[i][f] = calcSlope1( 1.0f - fraction( m_env_phase[i] ) );
+				env[i][f] = (this->*((MonstroSynth*)this)->MonstroSynth::calcSlopes[i])( 1.0f - fraction( m_env_phase[i] ) );
 				m_env_phase[i] += m_env_rel[i];
 			}
 			else env[i][f] = 0.0f;
