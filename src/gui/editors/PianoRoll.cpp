@@ -3814,7 +3814,7 @@ int PianoRoll::quantization() const
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	auto chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const auto& chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const InstrumentFunctionNoteStacking::Chord& scale =
 			chord_table.getScaleByName( m_scaleModel.currentText() );
 	const InstrumentFunctionNoteStacking::Chord& chord =
