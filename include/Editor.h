@@ -32,6 +32,8 @@
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
 
+class DropToolBar;
+
 /// \brief Superclass for editors with a toolbar.
 ///
 /// Those editors include the Song Editor, the Automation Editor, B&B Editor,
@@ -63,12 +65,29 @@ protected:
 	virtual ~Editor();
 
 
-	QToolBar* m_toolBar;
+	DropToolBar* m_toolBar;
 
 	QAction* m_playAction;
 	QAction* m_recordAction;
 	QAction* m_recordAccompanyAction;
 	QAction* m_stopAction;
+};
+
+
+/// Small helper class: A QToolBar that accepts and exposes drop events as signals
+class DropToolBar : public QToolBar
+{
+	Q_OBJECT
+public:
+	DropToolBar(QWidget* parent=0);
+
+signals:
+	void dragEntered(QDragEnterEvent* event);
+	void dropped(QDropEvent* event);
+
+protected:
+	void dragEnterEvent(QDragEnterEvent* event);
+	void dropEvent(QDropEvent* event);
 };
 
 

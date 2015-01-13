@@ -51,7 +51,7 @@ void Editor::togglePlayStop()
 }
 
 Editor::Editor(bool record) :
-	m_toolBar(new QToolBar(this)),
+	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
 	m_recordAccompanyAction(nullptr),
@@ -95,4 +95,22 @@ Editor::Editor(bool record) :
 Editor::~Editor()
 {
 
+}
+
+
+
+
+DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
+{
+	setAcceptDrops(true);
+}
+
+void DropToolBar::dragEnterEvent(QDragEnterEvent* event)
+{
+	dragEntered(event);
+}
+
+void DropToolBar::dropEvent(QDropEvent* event)
+{
+	dropped(event);
 }
