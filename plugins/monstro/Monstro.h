@@ -176,6 +176,8 @@ private:
 	{
 		return s1 + ( s2 - s1 ) * x;
 	}*/ // using interpolation.h from now on
+	
+	sample_t (MonstroSynth::*calcSlopes[2])(sample_t);
 
 	inline sample_t calcSlope1( sample_t s );
 
