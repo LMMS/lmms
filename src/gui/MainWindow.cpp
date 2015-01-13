@@ -231,7 +231,7 @@ void MainWindow::finalize()
 
 	// project-popup-menu
 	QMenu * project_menu = new QMenu( this );
-	menuBar()->addMenu( project_menu )->setText( tr( "&Project" ) );
+	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
 					this, SLOT( createNewProject() ),
@@ -254,15 +254,14 @@ void MainWindow::finalize()
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					Qt::CTRL + Qt::Key_S );
-
-	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "Save as New &Version" ),
-					this, SLOT( saveProjectAsNewVersion() ),
-					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as New &Version" ),
+					this, SLOT( saveProjectAsNewVersion() ),
+					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),

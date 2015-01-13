@@ -114,8 +114,12 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target} COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\"")
-	ADD_CUSTOM_TARGET(${_qm_target} COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\"")
+	ADD_CUSTOM_TARGET(${_ts_target}
+		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\""
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	ADD_CUSTOM_TARGET(${_qm_target}
+		COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\""
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 	LIST(APPEND ts_targets "${_ts_target}")
 	LIST(APPEND qm_targets "${_qm_target}")
 ENDFOREACH(_ts_file ${lmms_LOCALES})
