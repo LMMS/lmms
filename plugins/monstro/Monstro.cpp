@@ -824,7 +824,7 @@ inline sample_t MonstroSynth::calcSlope1( sample_t s )
 	return fastPow( s, m_parent->m_slope1 );
 }
 
-inline sample_t MonstroSynth::calcSlope2( sample_t s )
+inline sample_t MonstroSynth::calcSlope2( sample_t s ) // where this function should be called??
 {
 	if( m_parent->m_slope2 == 1.0f ) return s;
 	if( s == 0.0f ) return s;
