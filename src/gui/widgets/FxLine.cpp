@@ -186,7 +186,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	FxMixer * mix = Engine::fxMixer();
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
-	if( m_channelIndex != 0 ) // no move-options in master 
+	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		contextMenu->addAction( tr( "Move &left" ), this, SLOT( moveChannelLeft() ) );
 		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );

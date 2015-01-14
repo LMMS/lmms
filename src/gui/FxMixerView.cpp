@@ -453,7 +453,6 @@ void FxMixerView::moveChannelLeft(int index)
 		delete m_fxChannelViews[i]->m_fader;
 		delete m_fxChannelViews[i]->m_muteBtn;
 		delete m_fxChannelViews[i]->m_soloBtn;
-		delete m_fxChannelViews[i]->m_fxLine;
 		delete m_fxChannelViews[i];
 
 		// add it again
