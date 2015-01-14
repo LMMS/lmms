@@ -322,6 +322,9 @@ private slots:
 	void midiConfigChanged();
 	void muteChanged();
 
+	void assignFxLine( int channelIndex );
+	void createFxLine();
+
 
 private:
 	InstrumentTrackWindow * m_window;
@@ -374,6 +377,11 @@ public:
 	}
 
 	void setInstrumentTrackView( InstrumentTrackView * _tv );
+
+	InstrumentTrackView * instrumentTrackView()
+	{
+		return m_itv;
+	}
 
 	PianoView * pianoView()
 	{

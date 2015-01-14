@@ -391,8 +391,6 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
-	void assignFxLine( int channelIndex );
-	void createFxLine();
 
 private:
 	static QPixmap * s_grip;

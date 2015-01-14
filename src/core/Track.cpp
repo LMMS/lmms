@@ -1711,29 +1711,6 @@ void TrackOperationsWidget::clearTrack()
 
 
 
-/*! \brief Create and assign a new FX Channel for this track */
-void TrackOperationsWidget::createFxLine()
-{
-	int channelIndex = gui->fxMixerView()->addNewChannel();
-
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = m_trackView->getTrack()->name();
-
-	assignFxLine(channelIndex);
-}
-
-
-
-/*! \brief Assign a specific FX Channel for this track */
-void TrackOperationsWidget::assignFxLine(int channelIndex)
-{
-	Track * track = m_trackView->getTrack();
-	dynamic_cast<InstrumentTrack *>( track )->effectChannelModel()->setValue( channelIndex );
-
-	gui->fxMixerView()->setCurrentFxLine( channelIndex );
-}
-
-
-
 /*! \brief Remove this track from the track list
  *
  */
@@ -1777,7 +1754,7 @@ void TrackOperationsWidget::updateMenu()
 		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), to_menu );
 		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
 
-		fxMenu->addAction("Assign to new FX Channel" , this, SLOT( createFxLine() ) );
+		fxMenu->addAction( tr( "Assign to new FX Channel" ), trackView, SLOT( createFxLine() ) );
 		fxMenu->addSeparator();
 
 
@@ -1794,7 +1771,7 @@ void TrackOperationsWidget::updateMenu()
 		}
 
 		to_menu->addMenu(fxMenu);
-		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
+		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), trackView, SLOT(assignFxLine(int)));
 
 		to_menu->addSeparator();
 		to_menu->addMenu( trackView->midiMenu() );

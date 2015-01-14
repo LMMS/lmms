@@ -963,6 +963,30 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 
 
 
+
+/*! \brief Create and assign a new FX Channel for this track */
+void InstrumentTrackView::createFxLine()
+{
+	int channelIndex = gui->fxMixerView()->addNewChannel();
+
+	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+
+	assignFxLine(channelIndex);
+}
+
+
+
+
+/*! \brief Assign a specific FX Channel for this track */
+void InstrumentTrackView::assignFxLine(int channelIndex)
+{
+	model()->effectChannelModel()->setValue( channelIndex );
+
+	gui->fxMixerView()->setCurrentFxLine( channelIndex );
+}
+
+
+
 // TODO: Add windows to free list on freeInstrumentTrackWindow.
 // But, don't NULL m_window or disconnect signals.  This will allow windows
 // that are being show/hidden frequently to stay connected.
