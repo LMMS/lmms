@@ -178,10 +178,7 @@ private:
 		return s1 + ( s2 - s1 ) * x;
 	}*/ // using interpolation.h from now on
 
-	inline sample_t calcSlope1( sample_t s );
-
-	inline sample_t calcSlope2( sample_t s );
-
+	inline sample_t calcSlope( int slope,  sample_t s );
 
 	// checks for lower bound for phase, upper bound is already checked by oscillator-functions in both
 	// oscillator.h and bandlimitedwave.h so we save some cpu by only checking lower bound
