@@ -186,12 +186,12 @@ PianoRoll::PianoRoll() :
 	m_nemStr.push_back( tr( "Note Volume" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
 
-	QSignalMapper *signalMapper = new QSignalMapper( this );
+	QSignalMapper * signalMapper = new QSignalMapper( this );
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
 	for( int i = 0; i < m_nemStr.size(); ++i )
 	{
-		QAction *act = new QAction( m_nemStr.at(i), this );
+		QAction * act = new QAction( m_nemStr.at(i), this );
 		connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 		signalMapper->setMapping( act, i );
 		m_noteEditMenu->addAction( act );
@@ -202,10 +202,10 @@ PianoRoll::PianoRoll() :
 	signalMapper = new QSignalMapper( this );
 	m_semiToneMarkerMenu = new QMenu( this );
 
-	QAction *markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
-	QAction *markScaleAction = new QAction( tr("Mark current scale"), this );
-	QAction *markChordAction = new QAction( tr("Mark current chord"), this );
-	QAction *unmarkAllAction = new QAction( tr("Unmark all"), this );
+	QAction* markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
+	QAction* markScaleAction = new QAction( tr("Mark current scale"), this );
+	QAction* markChordAction = new QAction( tr("Mark current chord"), this );
+	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
 
 	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( markScaleAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
@@ -544,7 +544,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	{
 		// determine the central key so that we can scroll to it
 		int total_notes = 0;
-		for( const Note * const& note : notes )
+		for( const Note* const& note : notes )
 		{
 			if( note->length() > 0 )
 			{
@@ -2962,7 +2962,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
-		p.setPen( QPen( noteColor(), NOTE_EDIT_LINE_WIDTH+2 ) );
+		p.setPen( QPen( noteColor(), NOTE_EDIT_LINE_WIDTH + 2 ) );
 		p.drawPoints( editHandles );
 
 	}
@@ -3919,11 +3919,11 @@ PianoRollWindow::PianoRollWindow() :
 		tr( "Click here to stop playback of current pattern." ) );
 
 	// init edit-buttons at the top
-	ActionGroup *editModeGroup = new ActionGroup(this);
-	QAction *drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	QAction *eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	QAction *selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
-	QAction *detuneAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
+	ActionGroup* editModeGroup = new ActionGroup(this);
+	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	QAction* selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
+	QAction* detuneAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
 
 	drawAction->setChecked( true );
 
@@ -3958,13 +3958,13 @@ PianoRollWindow::PianoRollWindow() :
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Copy + paste actions
-	QAction *cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
 							  tr("Cut selected notes (Ctrl+X)"), this);
 
-	QAction *copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
 							   tr("Copy selected notes (Ctrl+C)"), this);
 
-	QAction *pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
 					tr("Paste notes from clipboard (Ctrl+V)"), this);
 
 	cutAction->setWhatsThis(
@@ -3987,7 +3987,7 @@ PianoRollWindow::PianoRollWindow() :
 	connect(copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
 	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
 
-	QLabel *zoom_lbl = new QLabel( m_toolBar );
+	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	m_zoomingComboBox = new ComboBox( m_toolBar );
@@ -3995,7 +3995,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_zoomingComboBox->setFixedSize( 64, 22 );
 
 	// setup quantize-stuff
-	QLabel *quantize_lbl = new QLabel( m_toolBar );
+	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
@@ -4004,7 +4004,7 @@ PianoRollWindow::PianoRollWindow() :
 
 
 	// setup note-len-stuff
-	QLabel *note_len_lbl = new QLabel( m_toolBar );
+	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
 
@@ -4013,7 +4013,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_noteLenComboBox->setFixedSize( 105, 22 );
 
 	// setup scale-stuff
-	QLabel *scale_lbl = new QLabel( m_toolBar );
+	QLabel * scale_lbl = new QLabel( m_toolBar );
 	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
@@ -4021,7 +4021,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_scaleComboBox->setFixedSize( 105, 22 );
 
 	// setup chord-stuff
-	QLabel *chord_lbl = new QLabel( m_toolBar );
+	QLabel * chord_lbl = new QLabel( m_toolBar );
 	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
 
 	m_chordComboBox = new ComboBox( m_toolBar );
@@ -4127,7 +4127,7 @@ const Pattern* PianoRollWindow::currentPattern() const
 	return m_editor->currentPattern();
 }
 
-void PianoRollWindow::setCurrentPattern(Pattern *pattern)
+void PianoRollWindow::setCurrentPattern(Pattern* pattern)
 {
 	m_editor->setCurrentPattern(pattern);
 }
