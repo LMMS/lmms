@@ -50,6 +50,11 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	setCentralWidget(m_trackContainerView);
 
+	setAcceptDrops(true);
+	m_toolBar->setAcceptDrops(true);
+	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_trackContainerView, SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_trackContainerView, SLOT(dropEvent(QDropEvent*)));
+
 	// TODO: Use style sheet
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )

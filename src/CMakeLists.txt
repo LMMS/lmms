@@ -65,11 +65,15 @@ ENDIF()
 ADD_DEFINITIONS("-std=c++0x")
 
 ADD_EXECUTABLE(lmms
+	core/main.cpp
 	${LMMS_SRCS}
 	${LMMS_INCLUDES}
 	${LMMS_UI_OUT}
 	${LMMS_ER_H}
 	"${WINRC}"
+)
+SET_TARGET_PROPERTIES(lmms PROPERTIES
+	ENABLE_EXPORTS ON
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${LMMS_UI_OUT} lmmsconfig.h lmms.1.gz")
@@ -110,8 +114,12 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target} COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\"")
-	ADD_CUSTOM_TARGET(${_qm_target} COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\"")
+	ADD_CUSTOM_TARGET(${_ts_target}
+		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\""
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	ADD_CUSTOM_TARGET(${_qm_target}
+		COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\""
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 	LIST(APPEND ts_targets "${_ts_target}")
 	LIST(APPEND qm_targets "${_qm_target}")
 ENDFOREACH(_ts_file ${lmms_LOCALES})
@@ -130,7 +138,7 @@ ENDFOREACH(_item ${qm_targets})
 IF(LMMS_BUILD_WIN32)
 	SET_TARGET_PROPERTIES(lmms PROPERTIES
 		LINK_FLAGS "${LINK_FLAGS} -mwindows"
-		ENABLE_EXPORTS ON)
+	)
 	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")

@@ -626,6 +626,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
 	setCentralWidget(m_editor);
+	setAcceptDrops(true);
+	m_toolBar->setAcceptDrops(true);
+	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_editor, SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
 
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));

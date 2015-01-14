@@ -759,15 +759,16 @@ void Song::clearProject()
 
 
 	Engine::mixer()->lock();
-	if( gui->getBBEditor() )
+
+	if( gui && gui->getBBEditor() )
 	{
 		gui->getBBEditor()->trackContainerView()->clearAllTracks();
 	}
-	if( gui->songEditor() )
+	if( gui && gui->songEditor() )
 	{
 		gui->songEditor()->m_editor->clearAllTracks();
 	}
-	if( gui->fxMixerView() )
+	if( gui && gui->fxMixerView() )
 	{
 		gui->fxMixerView()->clear();
 	}
@@ -777,12 +778,12 @@ void Song::clearProject()
 
 	Engine::fxMixer()->clear();
 
-	if( gui->automationEditor() )
+	if( gui && gui->automationEditor() )
 	{
 		gui->automationEditor()->setCurrentPattern( NULL );
 	}
 
-	if( gui->pianoRoll() )
+	if( gui && gui->pianoRoll() )
 	{
 		gui->pianoRoll()->reset();
 	}
@@ -800,7 +801,7 @@ void Song::clearProject()
 
 	Engine::mixer()->unlock();
 
-	if( gui->getProjectNotes() )
+	if( gui && gui->getProjectNotes() )
 	{
 		gui->getProjectNotes()->clear();
 	}
@@ -1044,7 +1045,7 @@ void Song::loadProject( const QString & _file_name )
 	m_loadingProject = false;
 	m_modified = false;
 
-	if( gui->mainWindow() )
+	if( gui && gui->mainWindow() )
 	{
 		gui->mainWindow()->resetWindowTitle();
 	}
