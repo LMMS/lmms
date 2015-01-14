@@ -11,8 +11,6 @@ ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
 	QTestSuite
-
-	core/AutomatableModelTests.h
 )
 
 TARGET_LINK_LIBRARIES(tests
