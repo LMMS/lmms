@@ -306,6 +306,9 @@ public:
 
 	static void cleanupWindowCache();
 
+	// Create a menu for assigning/creating channels for this track
+	QMenu * createFxMenu( QString title, QString newFxLabel );
+
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
@@ -378,10 +381,11 @@ public:
 
 	void setInstrumentTrackView( InstrumentTrackView * _tv );
 
-	InstrumentTrackView * instrumentTrackView()
+	InstrumentTrackView *instrumentTrackView()
 	{
 		return m_itv;
 	}
+
 
 	PianoView * pianoView()
 	{

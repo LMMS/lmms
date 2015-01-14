@@ -36,12 +36,14 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QWidget>
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
 #include "AudioPort.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"
+#include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "debug.h"
@@ -1171,6 +1173,43 @@ void InstrumentTrackView::muteChanged()
 
 
 
+QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
+{
+	int channelIndex = model()->effectChannelModel()->value();
+
+	FxChannel *fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+
+	// If title allows interpolation, pass channel index and name
+	if ( title.contains( "%2" ) )
+	{
+		title = title.arg( channelIndex ).arg( fxChannel->m_name );
+	}
+
+	QMenu *fxMenu = new QMenu( title );
+
+	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
+
+	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
+	fxMenu->addSeparator();
+
+	for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
+	{
+		FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
+
+		if ( currentChannel != fxChannel )
+		{
+			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
+			QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
+			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+		}
+	}
+
+	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
+
+	return fxMenu;
+}
+
+
 
 
 class fxLineLcdSpinBox : public LcdSpinBox
@@ -1189,6 +1228,30 @@ class fxLineLcdSpinBox : public LcdSpinBox
 			gui->fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
 		}
+
+		virtual void contextMenuEvent( QContextMenuEvent* event )
+		{
+			// for the case, the user clicked right while pressing left mouse-
+			// button, the context-menu appears while mouse-cursor is still hidden
+			// and it isn't shown again until user does something which causes
+			// an QApplication::restoreOverrideCursor()-call...
+			mouseReleaseEvent( NULL );
+
+			QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
+
+			// This condition is here just as a safety check, fxLineLcdSpinBox is aways
+			// created inside a TabWidget inside an InstrumentTrackWindow
+			if ( InstrumentTrackWindow* window = dynamic_cast<InstrumentTrackWindow*>( (QWidget *)this->parent()->parent() ) )
+			{
+				QMenu *fxMenu = window->instrumentTrackView()->createFxMenu( tr( "Assign to:" ), tr( "New FX Channel" ) );
+				contextMenu->addMenu( fxMenu );
+
+				contextMenu->addSeparator();
+			}
+			addDefaultActions( contextMenu );
+			contextMenu->exec( QCursor::pos() );
+		}
+
 };
 
 

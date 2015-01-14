@@ -1747,31 +1747,8 @@ void TrackOperationsWidget::updateMenu()
 	}
 	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
-		int channelIndex = trackView->model()->effectChannelModel()->value();
-
-		FxChannel * fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
-
-		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), to_menu );
-		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
-
-		fxMenu->addAction( tr( "Assign to new FX Channel" ), trackView, SLOT( createFxLine() ) );
-		fxMenu->addSeparator();
-
-
-		for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
-		{
-			FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
-
-			if ( currentChannel != fxChannel )
-			{
-				QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-				QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
-				fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
-			}
-		}
-
+		QMenu *fxMenu = trackView->createFxMenu( tr( "FX %1: %2" ), tr( "Assign to new FX Channel" ));
 		to_menu->addMenu(fxMenu);
-		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), trackView, SLOT(assignFxLine(int)));
 
 		to_menu->addSeparator();
 		to_menu->addMenu( trackView->midiMenu() );
