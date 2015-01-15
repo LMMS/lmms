@@ -40,18 +40,17 @@ class ProjectVersion
 {
 public:
 	ProjectVersion(QString version, CompareType c = CompareType::Build);
-
 	ProjectVersion(const char * version, CompareType c = CompareType::Build);
 
-	static int compare(ProjectVersion v1, ProjectVersion v2);
-
-	int getMajor() { return m_major; }
-	int getMinor() { return m_minor; }
-	int getRelease() { return m_release; }
-	QString getBuild() { return m_build; }
-	CompareType getCompareType() { return m_compareType; }
+	int getMajor() const { return m_major; }
+	int getMinor() const { return m_minor; }
+	int getRelease() const { return m_release; }
+	QString getBuild() const { return m_build; }
+	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
+	static int compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c);
+	static int compare(ProjectVersion v1, ProjectVersion v2);
 
 private:
 	QString m_version;

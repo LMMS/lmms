@@ -63,52 +63,50 @@ ProjectVersion::ProjectVersion(const char* version, CompareType c) :
 {
 }
 
-int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
+int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c)
 {
-	if(v1.getMajor() != v2.getMajor())
+	if (a.getMajor() != b.getMajor())
 	{
-		return v1.getMajor() - v2.getMajor();
+		return a.getMajor() - b.getMajor();
 	}
-
-	// return prematurely for Major comparison
-	if(v1.getCompareType() == CompareType::Major ||
-			v2.getCompareType() == CompareType::Major)
+	else if (c == CompareType::Major)
 	{
 		return 0;
 	}
 
-	if(v1.getMinor() != v2.getMinor())
+	if (a.getMinor() != b.getMinor())
 	{
-		return v1.getMinor() - v2.getMinor();
+		return a.getMinor() - b.getMinor();
 	}
-
-	// return prematurely for Minor comparison
-	if(v1.getCompareType() == CompareType::Minor ||
-		v2.getCompareType() == CompareType::Minor)
+	else if (c == CompareType::Minor)
 	{
 		return 0;
 	}
 
-	if(v1.getRelease() != v2.getRelease())
+	if (a.getRelease() != b.getRelease())
 	{
-		return v1.getRelease() - v2.getRelease();
+		return a.getRelease() - b.getRelease();
 	}
-
-	if(v1.getCompareType() == CompareType::Release ||
-		v2.getCompareType() == CompareType::Release) {
+	else if (c == CompareType::Release)
+	{
 		return 0;
 	}
 
 	// make sure 0.x.y > 0.x.y-patch
-	if(v1.getBuild().isEmpty())
+	if(a.getBuild().isEmpty())
 	{
 		return 1;
 	}
-	if(v2.getBuild().isEmpty())
+	if(b.getBuild().isEmpty())
 	{
 		return -1;
 	}
 
-	return QString::compare(v1.getBuild(), v2.getBuild());
+	return QString::compare(a.getBuild(), b.getBuild());
+}
+
+int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
+{
+	return compare(v1, v2, std::min(v1.getCompareType(), v2.getCompareType()));
 }
 
