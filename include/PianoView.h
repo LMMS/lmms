@@ -73,6 +73,7 @@ private:
 	QScrollBar * m_pianoScroll;
 	int m_startKey;			// first key when drawing
 	int m_lastKey;
+	bool m_lshiftPressed; // emulating sustain pedal
 
 
 private slots:
