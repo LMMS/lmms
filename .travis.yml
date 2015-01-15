@@ -7,13 +7,13 @@ os: osx
 #        - env: TARGET_OS=win64
 #        - os: osx
 before_install:
-    - sh ./.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
+    - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
-    - sh ./.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
+    - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
 before_script:
     - mkdir build && cd build
 script:
-    - sh ./.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
+    - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
     - make -j4 VERBOSE=1
     - if [[ $TARGET_OS != win* ]]; then make tests && ./tests/tests; fi;
 before_deploy: make package
