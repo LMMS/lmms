@@ -64,17 +64,32 @@ ENDIF()
 # Enable C++11
 ADD_DEFINITIONS("-std=c++0x")
 
-ADD_LIBRARY(lmmsobjs OBJECT
-	${LMMS_SRCS}
-	${LMMS_INCLUDES}
-	${LMMS_UI_OUT}
-	${LMMS_ER_H}
-)
-ADD_EXECUTABLE(lmms
-	$<TARGET_OBJECTS:lmmsobjs>
-	core/main.cpp
-	"${WINRC}"
-)
+# ADD_LIBRARY's OBJECT is only supported in CMake >=2.8.8
+IF(CMAKE_MAJOR_VERSION GREATER 2 OR
+   CMAKE_MINOR_VERSION GREATER 8 OR
+   CMAKE_PATCH_VERSION GREATER 7)
+
+	ADD_LIBRARY(lmmsobjs OBJECT
+		${LMMS_SRCS}
+		${LMMS_INCLUDES}
+		${LMMS_UI_OUT}
+		${LMMS_ER_H}
+	)
+	ADD_EXECUTABLE(lmms
+		core/main.cpp
+		$<TARGET_OBJECTS:lmmsobjs>
+		"${WINRC}"
+	)
+ELSE()
+	ADD_EXECUTABLE(lmms
+		core/main.cpp
+		${LMMS_SRCS}
+		${LMMS_INCLUDES}
+		${LMMS_UI_OUT}
+		${LMMS_ER_H}
+		"${WINRC}"
+	)
+ENDIF()
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${LMMS_UI_OUT} lmmsconfig.h lmms.1.gz")
 
