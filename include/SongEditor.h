@@ -66,6 +66,9 @@ public:
 	SongEditor( Song * _song );
 	~SongEditor();
 
+	void saveSettings(QDomDocument& doc, QDomElement& element);
+	void loadSettings(QDomElement& element);
+
 public slots:
 	void scrolled( int _new_pos );
 
@@ -93,9 +96,6 @@ private slots:
 	void updatePosition( const MidiTime & _t );
 
 	void zoomingChanged();
-
-	void adjustUiAfterProjectLoad();
-
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
@@ -147,6 +147,8 @@ protected slots:
 	void record();
 	void recordAccompany();
 	void stop();
+
+	void adjustUiAfterProjectLoad();
 
 private:
 	QAction* m_addBBTrackAction;

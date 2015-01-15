@@ -104,11 +104,6 @@ SongEditor::SongEditor( Song * _song ) :
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 
-	// let's get notified when loading a project
-	connect( m_song, SIGNAL( projectLoaded() ),
-				this, SLOT( adjustUiAfterProjectLoad() ) );
-
-
 	// add some essential widgets to global tool-bar
 	QWidget * tb = gui->mainWindow()->toolBar();
 
@@ -262,6 +257,16 @@ SongEditor::SongEditor( Song * _song ) :
 
 SongEditor::~SongEditor()
 {
+}
+
+void SongEditor::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	MainWindow::saveWidgetState(parentWidget(), element);
+}
+
+void SongEditor::loadSettings(QDomElement& element)
+{
+	MainWindow::restoreWidgetState(parentWidget(), element);
 }
 
 
@@ -595,23 +600,6 @@ void SongEditor::zoomingChanged()
 
 
 
-
-void SongEditor::adjustUiAfterProjectLoad()
-{
-	//if( isMaximized() )
-	{
-		// make sure to bring us to front as the song editor is the central
-		// widget in a song and when just opening a song in order to listen to
-		// it, it's very annyoing to manually bring up the song editor each time
-		gui->mainWindow()->workspace()->setActiveSubWindow(
-				qobject_cast<QMdiSubWindow *>( parentWidget() ) );
-	}
-	scrolled( 0 );
-}
-
-
-
-
 bool SongEditor::allowRubberband() const
 {
 	return m_mode == SelectMode;
@@ -691,6 +679,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_toolBar->addSeparator();
 	m_toolBar->addWidget( zoom_lbl );
 	m_toolBar->addWidget( m_zoomingComboBox );
+
+	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 }
 
 QSize SongEditorWindow::sizeHint() const
@@ -728,4 +718,14 @@ void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
 	gui->pianoRoll()->stopRecording();
+}
+
+void SongEditorWindow::adjustUiAfterProjectLoad()
+{
+	// make sure to bring us to front as the song editor is the central
+	// widget in a song and when just opening a song in order to listen to
+	// it, it's very annyoing to manually bring up the song editor each time
+	gui->mainWindow()->workspace()->setActiveSubWindow(
+			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
+	m_editor->scrolled(0);
 }
