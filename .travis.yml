@@ -4,12 +4,9 @@ matrix:
     exclude:
         - os: linux
     include:
-        - os: linux
-          env: TARGET_OS=linux
-        - os: linux
-          env: TARGET_OS=win32
-        - os: linux
-          env: TARGET_OS=win64
+        - env: TARGET_OS=linux
+        - env: TARGET_OS=win32
+        - env: TARGET_OS=win64
         - os: osx
 before_install:
     - if [ $TRAVIS_OS_NAME == linux ]; then
