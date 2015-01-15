@@ -63,11 +63,12 @@ enum TreeWidgetItemTypes
 
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items ) :
+			QWidget * parent, bool dirs_as_items, bool recurse ) :
 	SideBarWidget( title, pm, parent ),
 	m_directories( directories ),
 	m_filter( filter ),
-	m_dirsAsItems( dirs_as_items )
+	m_dirsAsItems( dirs_as_items ),
+	m_recurse( recurse )
 {
 	setWindowTitle( tr( "Browser" ) );
 	m_l = new FileBrowserTreeWidget( contentParent() );
@@ -234,6 +235,19 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
+	for(int i = 0; i < m_l->topLevelItemCount(); ++i)
+	{
+		if ( m_recurse )
+		{
+			m_l->topLevelItem( i )->setExpanded( true);
+		}
+		Directory *d = dynamic_cast<Directory *> ( m_l->topLevelItem( i ) );
+		if( d )
+		{
+			d->update();
+			d->setExpanded( false );
+		}
+	}
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
@@ -245,8 +259,7 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_l->addTopLevelItem( new Directory( path,
-						QString::null, m_filter ) );
+		m_l->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
 		return;
 	}
 
@@ -265,23 +278,27 @@ void FileBrowser::addItems(const QString & path )
 						m_l->topLevelItem( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
-					m_l->insertTopLevelItem( i,
-						new Directory( cur_file, path,
-								m_filter ) );
+					Directory *dd = new Directory( cur_file, path,
+												   m_filter );
+					m_l->insertTopLevelItem( i,dd );
+					dd->update();
 					orphan = false;
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
 					d->addDirectory( path );
+					d->update();
 					orphan = false;
 					break;
 				}
 			}
 			if( orphan )
 			{
-				m_l->addTopLevelItem( new Directory( cur_file,
-							path, m_filter ) );
+				Directory *d = new Directory( cur_file,
+											  path, m_filter );
+				d->update();
+				m_l->addTopLevelItem( d );
 			}
 		}
 	}
@@ -348,6 +365,7 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
+
 }
 
 
@@ -818,6 +836,8 @@ bool Directory::addItems(const QString & path )
 							path, m_filter ) );
 					orphan = false;
 					m_dirCount++;
+					//recurse for each dir
+					addItems( path + cur_file + QDir::separator() );
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
@@ -832,6 +852,8 @@ bool Directory::addItems(const QString & path )
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
 				m_dirCount++;
+				//recurse for each dir
+				addItems( path + cur_file + QDir::separator() );
 			}
 
 			added_something = true;
