@@ -48,6 +48,10 @@
 #include <QPainter>
 #include <QSplashScreen>
 
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
+
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
 #endif
@@ -420,6 +424,13 @@ int main( int argc, char * * argv )
 	}
 #endif
 #endif
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
+	{
+		printf( "Notice: could not set high priority.\n" );
+	}
 #endif
 
 	if( render_out.isEmpty() )
