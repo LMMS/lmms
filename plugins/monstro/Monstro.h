@@ -409,8 +409,7 @@ protected:
 	f_cnt_t m_env1_relF;
 	f_cnt_t m_env2_relF;
 
-	float m_slope1;
-	float m_slope2;
+	float m_slope [2];
 
 	f_cnt_t m_lfo1_att;
 	f_cnt_t m_lfo2_att;
