@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2015 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  * 
  * This file is part of LMMS - http://lmms.io
  *
@@ -24,59 +25,54 @@
  */
 
 
-
-
 #include "ProjectVersion.h"
 
-
-
-
-int ProjectVersion::compare( const ProjectVersion & _v1,
-						const ProjectVersion & _v2 )
+int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 {
-	int n1, n2;
-
-	// Major
-	n1 = _v1.section( '.', 0, 0 ).toInt();
-	n2 = _v2.section( '.', 0, 0 ).toInt();
-	if( n1 != n2 )
+	if(v1.getMajor() != v2.getMajor())
 	{
-		return n1 - n2;
+		return v1.getMajor() - v2.getMajor();
+	}
+	
+	// return prematurely for Major comparison
+	if(v1.getCompareType() == CompareType::Major || 
+		v2.getCompareType() == CompareType::Major)
+	{
+		return 0;
 	}
 
-	// Minor
-	n1 = _v1.section( '.', 1, 1 ).toInt();
-	n2 = _v2.section( '.', 1, 1 ).toInt();
-	if( n1 != n2 )
+	if(v1.getMinor() != v2.getMinor())
 	{
-		return n1 - n2;
+		return v1.getMinor() - v2.getMinor();
 	}
 
-	// Release
-	n1 = _v1.section( '.', 2 ).section( '-', 0, 0 ).toInt();
-	n2 = _v2.section( '.', 2 ).section( '-', 0, 0 ).toInt();
-	if( n1 != n2 )
+	// return prematurely for Minor comparison
+	if(v1.getCompareType() == CompareType::Minor || 
+		v2.getCompareType() == CompareType::Minor)
 	{
-		return n1 - n2;
+		return 0;
 	}
 
-	// Build
-	const QString b1 = _v1.section( '.', 2 ).section( '-', 1 );
-	const QString b2 = _v2.section( '.', 2 ).section( '-', 1 );
+	if(v1.getRelease() != v2.getRelease())
+	{
+		return v1.getRelease() - v2.getRelease();
+	}
+
+	if(v1.getCompareType() == CompareType::Release || 
+		v2.getCompareType() == CompareType::Release) {
+		return 0;
+	}
 
 	// make sure 0.x.y > 0.x.y-patch
-	if( b1.isEmpty() )
+	if(v1.getBuild().isEmpty())
 	{
 		return 1;
 	}
-	if( b2.isEmpty() )
+	if(v2.getBuild().isEmpty())
 	{
 		return -1;
 	}
 
-	return QString::compare( b1, b2 );
+	return QString::compare(v1.getBuild(), v2.getBuild());
 }
-
-
-
 
