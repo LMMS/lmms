@@ -530,12 +530,12 @@ void MainWindow::finalize()
 	}
 
 	// Add editor subwindows
-	for (QWidget* widget : QList<QWidget*>{
-			gui->automationEditor(),
-			gui->getBBEditor(),
-			gui->pianoRoll(),
-			gui->songEditor()
-	})
+	for (QWidget* widget : QList<QWidget*>()
+			<< gui->automationEditor()
+			<< gui->getBBEditor()
+			<< gui->pianoRoll()
+			<< gui->songEditor()
+	)
 	{
 		QMdiSubWindow* window = workspace()->addSubWindow(widget);
 		window->setWindowIcon(widget->windowIcon());
