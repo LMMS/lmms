@@ -116,6 +116,7 @@ int main( int argc, char * * argv )
 	bool core_only = false;
 	bool fullscreen = true;
 	bool exit_after_import = false;
+	bool allow_root = false;
 	QString file_to_load, file_to_save, file_to_import, render_out, profilerOutputFile;
 
 	for( int i = 1; i < argc; ++i )
@@ -127,6 +128,10 @@ int main( int argc, char * * argv )
 		{
 			core_only = true;
 		}
+		else if( argc > i && ( QString( argv[i] ) == "--allowroot" ) )
+		{
+			allow_root = true;				
+		}
 		else if( argc > i && QString( argv[i] ) == "-geometry" )
 		{
 			// option -geometry is filtered by Qt later,
@@ -136,6 +141,14 @@ int main( int argc, char * * argv )
 			fullscreen = false;
 		}
 	}
+
+#ifndef LMMS_BUILD_WIN32
+	if ( ( getuid() == 0 || geteuid() == 0 ) && !allow_root )
+	{
+		printf("LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n");
+		return(EXIT_FAILURE);
+	}	
+#endif
 
 	QCoreApplication * app = core_only ?
 			new QCoreApplication( argc, argv ) :
@@ -196,6 +209,7 @@ int main( int argc, char * * argv )
 	"       standard out is used if no output file is specifed\n"
 	"-d, --dump <in>			dump XML of compressed file <in>\n"
 	"-v, --version			show version information and exit.\n"
+	"    --allowroot                bypass root user startup check (use with caution).\n"
 	"-h, --help			show this usage information and exit.\n\n",
 							LMMS_VERSION );
 			return( EXIT_SUCCESS );
@@ -217,6 +231,17 @@ int main( int argc, char * * argv )
 				fflush( stdout );
 			}
 			return( EXIT_SUCCESS );
+		}
+		else if( argc > i && QString( argv[i] ) == "--allowroot" )
+		{
+			// Ignore, processed earlier
+#ifdef LMMS_BUILD_WIN32
+			if ( allow_root )
+			{
+				printf( "\nOption \"--allowroot\" will be ignored on this platform.\n\n" );
+			}
+#endif
+			
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--dump" ||
 						QString( argv[i] ) == "-d" ) )
