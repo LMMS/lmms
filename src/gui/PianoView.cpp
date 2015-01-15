@@ -618,6 +618,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
+	if( _ke->nativeScanCode()==50 ) m_lshiftPressed=true;// left shift (sustain pedal emulating)
 	const int key_num = getKeyFromKeyEvent( _ke ) +
 				( DefaultOctave - 1 ) * KeysPerOctave;
 
@@ -647,6 +648,18 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
  */
 void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 {
+	if( _ke->nativeScanCode()==50 ) // left shift (sustain pedal emulating)
+	{
+		for( int i = 0; i < NumKeys; ++i )
+		{
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
+			m_piano->setKeyState( i, false );
+		}
+		m_lshiftPressed = false;
+		return;
+	}
+	if(m_lshiftPressed) return;
+	
 	const int key_num = getKeyFromKeyEvent( _ke ) +
 				( DefaultOctave - 1 ) * KeysPerOctave;
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
