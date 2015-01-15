@@ -32,49 +32,16 @@
 enum CompareType { Major, Minor, Release, Build };
 
 
-static inline int parseMajor(QString & version) {
-	return version.section( '.', 0, 0 ).toInt();
-}
-
-static inline int parseMinor(QString & version) {
-	return version.section( '.', 1, 1 ).toInt();
-}
-
-static inline int parseRelease(QString & version) {
-	return version.section( '.', 2 ).section( '-', 0, 0 ).toInt();
-}
-
-static inline QString parseBuild(QString & version) {
-	return version.section( '.', 2 ).section( '-', 1 );
-}
-
-
-/*! \brief Version number parsing and comparison 
+/*! \brief Version number parsing and comparison
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
  */
 class ProjectVersion
 {
 public:
-	ProjectVersion(QString version, CompareType c = CompareType::Build) : 
-		m_version(version), 
-		m_major(parseMajor(m_version)),
-		m_minor(parseMinor(m_version)),
-		m_release(parseRelease(m_version)) ,
-		m_build(parseBuild(m_version)),
-		m_compareType(c)
-	{
-	}
+	ProjectVersion(QString version, CompareType c = CompareType::Build);
 
-	ProjectVersion(const char * version, CompareType c = CompareType::Build) : 
-		m_version(QString(version)), 
-		m_major(parseMajor(m_version)),
-		m_minor(parseMinor(m_version)),
-		m_release(parseRelease(m_version)) ,
-		m_build(parseBuild(m_version)),
-		m_compareType(c)
-	{
-	}
+	ProjectVersion(const char * version, CompareType c = CompareType::Build);
 
 	static int compare(ProjectVersion v1, ProjectVersion v2);
 
@@ -84,7 +51,7 @@ public:
 	QString getBuild() { return m_build; }
 	CompareType getCompareType() { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
-	
+
 
 private:
 	QString m_version;
@@ -95,41 +62,16 @@ private:
 	CompareType m_compareType;
 } ;
 
-inline int compare(ProjectVersion v1, QString v2)
-{
-	return ProjectVersion::compare(v1, ProjectVersion(v2));
-}
-
-
-/*
- * ProjectVersion v. QString
- */
-inline bool operator<(ProjectVersion v1, QString v2) { return compare(v1, v2) < 0; }
-inline bool operator>(ProjectVersion v1, QString v2) { return compare(v1, v2) > 0; }
-inline bool operator<=(ProjectVersion v1, QString v2) { return compare(v1, v2) <= 0; }
-inline bool operator>=(ProjectVersion v1, QString v2) { return compare(v1, v2) >= 0; }
-inline bool operator==(ProjectVersion v1, QString v2) { return compare(v1, v2) == 0; }
-inline bool operator!=(ProjectVersion v1, QString v2) { return compare(v1, v2) != 0; }
-
-inline bool operator<(QString v1, ProjectVersion v2) { return 0 < compare(v2, v1); }
-inline bool operator>(QString v1, ProjectVersion v2) { return 0 > compare(v2, v1); }
-inline bool operator<=(QString v1, ProjectVersion v2) { return 0 <= compare(v2, v1); }
-inline bool operator>=(QString v1, ProjectVersion v2) { return 0 >= compare(v2, v1); }
-inline bool operator==(QString v1, ProjectVersion v2) { return 0 == compare(v2, v1); }
-inline bool operator!=(QString v1, ProjectVersion v2) { return 0 != compare(v2, v1); }
-
-
-
 
 /*
  * ProjectVersion v. ProjectVersion
  */
-inline bool operator<(ProjectVersion & v1, ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) < 0; }
-inline bool operator>(ProjectVersion & v1, ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) > 0; }
-inline bool operator<=(ProjectVersion & v1, ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) <= 0; }
-inline bool operator>=(ProjectVersion & v1, ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) >= 0; }
-inline bool operator==(ProjectVersion & v1, ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) == 0; }
-inline bool operator!=(ProjectVersion & v1, ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) != 0; }
+inline bool operator<(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) < 0; }
+inline bool operator>(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) > 0; }
+inline bool operator<=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) <= 0; }
+inline bool operator>=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) >= 0; }
+inline bool operator==(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) == 0; }
+inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) != 0; }
 
 
 #endif

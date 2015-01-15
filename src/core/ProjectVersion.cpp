@@ -4,7 +4,7 @@
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2015 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -27,16 +27,52 @@
 
 #include "ProjectVersion.h"
 
+int parseMajor(QString & version) {
+	return version.section( '.', 0, 0 ).toInt();
+}
+
+int parseMinor(QString & version) {
+	return version.section( '.', 1, 1 ).toInt();
+}
+
+int parseRelease(QString & version) {
+	return version.section( '.', 2 ).section( '-', 0, 0 ).toInt();
+}
+
+QString parseBuild(QString & version) {
+	return version.section( '.', 2 ).section( '-', 1 );
+}
+
+ProjectVersion::ProjectVersion(QString version, CompareType c) :
+	m_version(version),
+	m_major(parseMajor(m_version)),
+	m_minor(parseMinor(m_version)),
+	m_release(parseRelease(m_version)) ,
+	m_build(parseBuild(m_version)),
+	m_compareType(c)
+{
+}
+
+ProjectVersion::ProjectVersion(const char* version, CompareType c) :
+	m_version(QString(version)),
+	m_major(parseMajor(m_version)),
+	m_minor(parseMinor(m_version)),
+	m_release(parseRelease(m_version)) ,
+	m_build(parseBuild(m_version)),
+	m_compareType(c)
+{
+}
+
 int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 {
 	if(v1.getMajor() != v2.getMajor())
 	{
 		return v1.getMajor() - v2.getMajor();
 	}
-	
+
 	// return prematurely for Major comparison
-	if(v1.getCompareType() == CompareType::Major || 
-		v2.getCompareType() == CompareType::Major)
+	if(v1.getCompareType() == CompareType::Major ||
+			v2.getCompareType() == CompareType::Major)
 	{
 		return 0;
 	}
@@ -47,7 +83,7 @@ int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 	}
 
 	// return prematurely for Minor comparison
-	if(v1.getCompareType() == CompareType::Minor || 
+	if(v1.getCompareType() == CompareType::Minor ||
 		v2.getCompareType() == CompareType::Minor)
 	{
 		return 0;
@@ -58,7 +94,7 @@ int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 		return v1.getRelease() - v2.getRelease();
 	}
 
-	if(v1.getCompareType() == CompareType::Release || 
+	if(v1.getCompareType() == CompareType::Release ||
 		v2.getCompareType() == CompareType::Release) {
 		return 0;
 	}

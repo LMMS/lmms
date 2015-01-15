@@ -18,8 +18,9 @@ ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
 	QTestSuite
-
 	$<TARGET_OBJECTS:lmmsobjs>
+
+	src/core/ProjectVersionTest.cpp
 )
 TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})
