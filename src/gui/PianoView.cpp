@@ -618,7 +618,9 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
+#ifdef LMMS_BUILD_LINUX
 	if( _ke->nativeScanCode()==50 ) m_lshiftPressed=true;// left shift (sustain pedal emulating)
+#endif
 	const int key_num = getKeyFromKeyEvent( _ke ) +
 				( DefaultOctave - 1 ) * KeysPerOctave;
 
@@ -648,6 +650,7 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
  */
 void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 {
+#ifdef LMMS_BUILD_LINUX
 	if( _ke->nativeScanCode()==50 ) // left shift (sustain pedal emulating)
 	{
 		for( int i = 0; i < NumKeys; ++i )
@@ -659,7 +662,7 @@ void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 		return;
 	}
 	if(m_lshiftPressed) return;
-	
+#endif	
 	const int key_num = getKeyFromKeyEvent( _ke ) +
 				( DefaultOctave - 1 ) * KeysPerOctave;
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
