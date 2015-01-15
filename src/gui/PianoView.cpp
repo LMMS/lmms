@@ -106,6 +106,7 @@ PianoView::PianoView( QWidget * _parent ) :
 	m_piano( NULL ),                /*!< Our piano Model */
 	m_startKey( Key_C + Octave_3*KeysPerOctave ), /*!< The first key displayed? */
 	m_lastKey( -1 )                 /*!< The last key displayed? */
+	m_lshiftPressed(false)		/* sustain pedal emulating */
 {
 	if( s_whiteKeyPm == NULL )
 	{
