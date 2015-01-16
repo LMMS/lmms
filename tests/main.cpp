@@ -6,9 +6,13 @@
 
 int main(int argc, char* argv[])
 {
-	qDebug() << ">> Will run" << QTestSuite::suites().size()  << "test suites";
+	int numsuites = QTestSuite::suites().size();
+	qDebug() << ">> Will run" << numsuites << "test suites";
+	int failed = 0;
 	for (QTestSuite*& suite : QTestSuite::suites())
 	{
-		QTest::qExec(suite, argc, argv);
+		failed += QTest::qExec(suite, argc, argv);
 	}
+	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
+	return failed;
 }
