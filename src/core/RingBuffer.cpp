@@ -75,7 +75,7 @@ void RingBuffer::changeSize( f_cnt_t size )
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
 	m_position = 0;
-	delete tmp;
+	delete[] tmp;
 }
 
 
