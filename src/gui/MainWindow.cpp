@@ -530,7 +530,7 @@ void MainWindow::finalize()
 	}
 
 	// Add editor subwindows
-	for (QWidget* widget : QList<QWidget*>()
+	foreach( QWidget* widget, QList<QWidget*>()
 			<< gui->automationEditor()
 			<< gui->getBBEditor()
 			<< gui->pianoRoll()
