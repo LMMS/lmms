@@ -94,24 +94,25 @@ MainWindow::MainWindow() :
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( false );
 
-	QString wdir = ConfigManager::inst()->workingDir();
+	ConfigManager* confMgr = ConfigManager::inst();
+	QString wdir = confMgr->workingDir();
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	sideBar->appendTab( new FileBrowser(
-				ConfigManager::inst()->userProjectsDir() + "*" +
-				ConfigManager::inst()->factoryProjectsDir(),
+				confMgr->userProjectsDir() + "*" +
+				confMgr->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
-				ConfigManager::inst()->userSamplesDir() + "*" +
-				ConfigManager::inst()->factorySamplesDir(),
+				confMgr->userSamplesDir() + "*" +
+				confMgr->factorySamplesDir(),
 					"*", tr( "My Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
-				ConfigManager::inst()->userPresetsDir() + "*" +
-				ConfigManager::inst()->factoryPresetsDir(),
+				confMgr->userPresetsDir() + "*" +
+				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
@@ -121,33 +122,30 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 
+
 	QStringList root_paths;
+	QString title = tr( "Root directory" );
+	bool dirs_as_items = false;
+
 #ifdef LMMS_BUILD_APPLE
+	title = tr( "Volumes" );
 	root_paths += "/Volumes";
-#else
+#elif defined(LMMS_BUILD_WIN32)
+	title = tr( "My Computer" );
+	dirs_as_items = true;
+#endif
+
+#if ! defined(LMMS_BUILD_APPLE)
 	QFileInfoList drives = QDir::drives();
 	foreach( const QFileInfo & drive, drives )
 	{
 		root_paths += drive.absolutePath();
 	}
 #endif
-	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*",
-#ifdef LMMS_BUILD_WIN32
-							tr( "My Computer" ),
-#elif defined(LMMS_BUILD_APPLE)
-							tr( "Volumes" ),
-#else
-							tr( "Root Directory" ),
-#endif
 
+	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*", title,
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
-							splitter,
-#ifdef LMMS_BUILD_WIN32
-							true
-#else
-							false
-#endif
-								) );
+							splitter, dirs_as_items) );
 
 	m_workspace = new QMdiArea( splitter );
 
@@ -190,13 +188,13 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-	m_updateTimer.start( 1000 / 20, this );	// 20 fps
+	m_updateTimer.start( 1000 / 20, this );  // 20 fps
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
-		m_autoSaveTimer.start(1000 * 60); // 1 minute
+		m_autoSaveTimer.start(1000 * 60);  // 1 minute
 	}
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
@@ -208,12 +206,10 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-	for( QList<PluginView *>::iterator it = m_tools.begin();
-						it != m_tools.end(); ++it )
+	for( PluginView *view : m_tools )
 	{
-		Model * m = ( *it )->model();
-		delete *it;
-		delete m;
+		delete view;
+		delete view->model();
 	}
 	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
