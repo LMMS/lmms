@@ -35,6 +35,7 @@ class QPixmap;
 class QToolBar;
 class NStateButton;
 class TextFloat;
+class SongEditor;
 
 
 class TimeLineWidget : public QWidget, public JournallingObject
@@ -171,6 +172,8 @@ private:
 
 
 	TextFloat * m_hint;
+	SongEditor *m_songEditor;
+	int m_initalXSelect;
 
 
 	enum actions
@@ -178,7 +181,8 @@ private:
 		NoAction,
 		MovePositionMarker,
 		MoveLoopBegin,
-		MoveLoopEnd
+		MoveLoopEnd,
+		SelectSongTCO,
 	} m_action;
 
 	int m_moveXOff;

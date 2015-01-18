@@ -39,6 +39,7 @@
 #include "NStateButton.h"
 #include "GuiApplication.h"
 #include "TextFloat.h"
+#include "SongEditor.h"
 
 
 #if QT_VERSION < 0x040800
@@ -105,6 +106,7 @@ TimeLineWidget::TimeLineWidget( const int _xoff, const int _yoff, const float _p
 	connect( update_timer, SIGNAL( timeout() ),
 					this, SLOT( updatePosition() ) );
 	update_timer->start( 50 );
+	m_songEditor = dynamic_cast<SongEditor*>(_parent);
 }
 
 
@@ -280,7 +282,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		return;
 	}
-	if( event->button() == Qt::LeftButton )
+	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
 	{
 		m_action = MovePositionMarker;
 		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
@@ -291,6 +293,11 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		{
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
+	}
+	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) && m_songEditor )
+	{
+		m_action = SelectSongTCO;
+		m_initalXSelect = event->x();
 	}
 	else if( event->button() == Qt::RightButton || event->button() == Qt::MiddleButton )
 	{
@@ -373,6 +380,12 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			update();
 			break;
 		}
+	case SelectSongTCO:
+		if( m_songEditor )
+		{
+			m_songEditor->selectRegionFromPixels( m_initalXSelect , event->x() );
+		}
+		break;
 
 		default:
 			break;
@@ -386,6 +399,7 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = NULL;
+	if(m_action == SelectSongTCO && m_songEditor ) { m_songEditor->stopRubberBand(); }
 	m_action = NoAction;
 }
 
