@@ -81,16 +81,6 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 		!QFileInfo( ConfigManager::inst()->stkDir() + QDir::separator()
 						+ "sinewave.raw" ).exists() )
 {
-	// try to inform user about missing Stk-installation
-	if( m_filesMissing && Engine::hasGUI() )
-	{
-		QMessageBox::information( 0, tr( "Missing files" ),
-				tr( "Your Stk-installation seems to be "
-					"incomplete. Please make sure "
-					"the full Stk-package is installed!" ),
-				QMessageBox::Ok );
-	}
-
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
 	m_scalers.append( 4.0 );
@@ -335,6 +325,18 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
+
+	// try to inform user about missing Stk-installation
+	if( ( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
+		  !QFileInfo( ConfigManager::inst()->stkDir() + QDir::separator()
+						  + "sinewave.raw" ).exists() ) && Engine::hasGUI() )
+	{
+		QMessageBox::information( 0, tr( "Missing files" ),
+				tr( "Your Stk-installation seems to be "
+					"incomplete. Please make sure "
+					"the full Stk-package is installed!" ),
+				QMessageBox::Ok );
+	}
 }
 
 
