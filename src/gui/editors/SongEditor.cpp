@@ -259,12 +259,12 @@ SongEditor::~SongEditor()
 {
 }
 
-void SongEditor::saveSettings(QDomDocument& doc, QDomElement& element)
+void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
 	MainWindow::saveWidgetState(parentWidget(), element);
 }
 
-void SongEditor::loadSettings(QDomElement& element)
+void SongEditor::loadSettings( const QDomElement& element )
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
