@@ -66,8 +66,8 @@ public:
 	SongEditor( Song * _song );
 	~SongEditor();
 
-	void saveSettings(QDomDocument& doc, QDomElement& element);
-	void loadSettings(QDomElement& element);
+	void saveSettings( QDomDocument& doc, QDomElement& element );
+	void loadSettings( const QDomElement& element );
 
 public slots:
 	void scrolled( int _new_pos );
