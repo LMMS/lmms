@@ -45,7 +45,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	m_controls = controls;
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/eq/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 350, 275 );
 	m_inSpec = new EqSpectrumView( &controls->m_inFftBands, this);

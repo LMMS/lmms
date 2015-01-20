@@ -32,6 +32,7 @@
 #include <QPushButton>
 
 #include "ZynAddSubFx.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
@@ -44,7 +45,7 @@
 #include "LocalZynAddSubFx.h"
 #include "ControllerConnection.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -488,8 +489,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/zynaddsubfx/artwork.png" ) );
 	setPalette( pal );
 
 	QGridLayout * l = new QGridLayout( this );

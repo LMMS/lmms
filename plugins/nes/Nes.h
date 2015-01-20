@@ -1,5 +1,5 @@
 /* Nes.h - A NES instrument plugin for LMMS
- *                        
+ *
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -46,20 +46,20 @@
 	name = new PixmapButton( this, NULL ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
-	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_on" ) ); \
-	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_off" ) ); \
+	name -> setActiveGraphic( QPixmap( ":/nes/nesled_on.png" ) ); \
+	name -> setInactiveGraphic( QPixmap( ":/nes/nesled_off.png" ) ); \
 	ToolTip::add( name, tr( ttip ) );
 
 #define makedcled( name, x, y, ttip, active ) \
 	PixmapButton * name = new PixmapButton( this, NULL ); 	\
 	name -> move( x, y );					\
-	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( active ) ); \
-	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesdc_off" ) ); \
+	name -> setActiveGraphic( QPixmap( ":/nes/" active ".png" ) ); \
+	name -> setInactiveGraphic( QPixmap( ":/nes/nesdc_off.png" ) ); \
 	ToolTip::add( name, tr( ttip ) );
 
 const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
 const float NFB = 895000.0f;
-const float NOISE_FREQS[16] = 
+const float NOISE_FREQS[16] =
 	{ NFB/5, NFB/9, NFB/17, NFB/33, NFB/65, NFB/97, NFB/129, NFB/161, NFB/193, NFB/255, NFB/381, NFB/509, NFB/763, NFB/1017, NFB/2035, NFB/4069 };
 const uint16_t LFSR_INIT = 1;
 const float DUTY_CYCLE[4] = { 0.125, 0.25, 0.5, 0.75 };
@@ -85,11 +85,11 @@ class NesObject
 public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject();
-	
+
 	void renderOutput( sampleFrame * buf, fpp_t frames );
 	void updateVibrato( float * freq );
 	void updatePitch();
-	
+
 	void updateLFSR( bool mode )
 	{
 		uint16_t LFSRx;
@@ -105,35 +105,35 @@ public:
 		}
 		m_LFSR ^= LFSRx; // xor bit 14 with bit 8/13 depending on mode
 		m_LFSR <<= 1; // shift bit 14 to bit 15
-		
+
 		// cycle bit 14 to 0
 		if( m_LFSR & ( 1 << 15 ) ) // if bit 15 is set
-		{ 
+		{
 			m_LFSR++; // set bit 0 - we know it to be 0 because of the left shift so we can just inc here
 		}
 	}
-	
+
 	inline bool LFSR() // returns true if bit 14 is set
 	{
-		if( m_LFSR & ( 1 << 14 ) ) 
+		if( m_LFSR & ( 1 << 14 ) )
 		{
-			return true; 
+			return true;
 		}
 		return false;
 	}
-	
+
 	inline int wavelength( float freq )
 	{
 		return static_cast<int>( m_samplerate / freq );
 	}
-	
+
 	inline float signedPow( float f, float e )
 	{
-		return f < 0 
+		return f < 0
 			? powf( qAbs( f ), e ) * -1.0f
 			: powf( f, e );
 	}
-	
+
 	inline int nearestNoiseFreq( float f )
 	{
 		int n = 15;
@@ -146,50 +146,50 @@ public:
 		}
 		return n;
 	}
-	
+
 private:
 	NesInstrument * m_parent;
 	const sample_rate_t m_samplerate;
 	NotePlayHandle * m_nph;
-	
+
 	int m_pitchUpdateCounter;
 	int m_pitchUpdateFreq;
-	
+
 	int m_ch1Counter;
 	int m_ch2Counter;
 	int m_ch3Counter;
 	int m_ch4Counter;
-	
+
 	int m_ch1EnvCounter;
 	int m_ch2EnvCounter;
 	int m_ch4EnvCounter;
-	
+
 	int m_ch1EnvValue;
 	int m_ch2EnvValue;
 	int m_ch4EnvValue;
-	
+
 	int m_ch1SweepCounter;
 	int m_ch2SweepCounter;
 	int m_ch4SweepCounter;
-	
+
 	uint16_t m_LFSR;
-	
+
 	float m_12Last;
 	float m_34Last;
 
 	float m_lastNoteFreq;
 	float m_lastNoiseFreq;
-	
+
 	int m_maxWlen;
-	
+
 	float m_nsf;
 
-// wavelengths	
+// wavelengths
 	int m_wlen1;
 	int m_wlen2;
 	int m_wlen3;
 	int m_wlen4;
-	
+
 // vibrato
 	int m_vibratoPhase;
 };
@@ -201,7 +201,7 @@ class NesInstrument : public Instrument
 public:
 	NesInstrument( InstrumentTrack * instrumentTrack );
 	virtual ~NesInstrument();
-	
+
 	virtual void playNote( NotePlayHandle * n,
 						sampleFrame * workingBuffer );
 	virtual void deleteNotePluginData( NotePlayHandle * n );
@@ -217,9 +217,9 @@ public:
 	{
 		return( 8 );
 	}
-	
+
 	virtual PluginView * instantiateView( QWidget * parent );
-	
+
 public slots:
 	void updateFreq1();
 	void updateFreq2();
@@ -230,38 +230,38 @@ protected:
 	float m_freq1;
 	float m_freq2;
 	float m_freq3;
-	
+
 private:
 	// channel 1
 	BoolModel	m_ch1Enabled;
 	FloatModel	m_ch1Crs;
 	FloatModel	m_ch1Volume;
-	
+
 	BoolModel	m_ch1EnvEnabled;
 	BoolModel	m_ch1EnvLooped;
 	FloatModel	m_ch1EnvLen;
-	
+
 	IntModel	m_ch1DutyCycle;
-	
+
 	BoolModel	m_ch1SweepEnabled;
 	FloatModel	m_ch1SweepAmt;
 	FloatModel	m_ch1SweepRate;
-	
+
 	// channel 2
 	BoolModel	m_ch2Enabled;
 	FloatModel	m_ch2Crs;
 	FloatModel	m_ch2Volume;
-	
+
 	BoolModel	m_ch2EnvEnabled;
 	BoolModel	m_ch2EnvLooped;
 	FloatModel	m_ch2EnvLen;
-	
+
 	IntModel	m_ch2DutyCycle;
-	
+
 	BoolModel	m_ch2SweepEnabled;
 	FloatModel	m_ch2SweepAmt;
-	FloatModel	m_ch2SweepRate;	
-	
+	FloatModel	m_ch2SweepRate;
+
 	//channel 3
 	BoolModel	m_ch3Enabled;
 	FloatModel	m_ch3Crs;
@@ -270,23 +270,23 @@ private:
 	//channel 4
 	BoolModel	m_ch4Enabled;
 	FloatModel	m_ch4Volume;
-	
+
 	BoolModel	m_ch4EnvEnabled;
 	BoolModel	m_ch4EnvLooped;
 	FloatModel	m_ch4EnvLen;
-	
+
 	BoolModel	m_ch4NoiseMode;
 	BoolModel	m_ch4NoiseFreqMode;
 	FloatModel	m_ch4NoiseFreq;
-	
+
 	FloatModel	m_ch4Sweep;
 	BoolModel	m_ch4NoiseQuantize;
-	
+
 	//master
 	FloatModel	m_masterVol;
 	FloatModel	m_vibrato;
-	
-	
+
+
 	friend class NesObject;
 	friend class NesInstrumentView;
 };
@@ -298,41 +298,41 @@ class NesInstrumentView : public InstrumentView
 public:
 	NesInstrumentView( Instrument * instrument,
 					QWidget * parent );
-	virtual ~NesInstrumentView();	
+	virtual ~NesInstrumentView();
 
 private:
 	virtual void modelChanged();
-	
+
 	// channel 1
 	PixmapButton * 	m_ch1EnabledBtn;
 	Knob *			m_ch1CrsKnob;
 	Knob *			m_ch1VolumeKnob;
-	
+
 	PixmapButton *	m_ch1EnvEnabledBtn;
 	PixmapButton *	m_ch1EnvLoopedBtn;
 	Knob *			m_ch1EnvLenKnob;
-	
+
 	automatableButtonGroup *	m_ch1DutyCycleGrp;
-	
+
 	PixmapButton *	m_ch1SweepEnabledBtn;
 	Knob *			m_ch1SweepAmtKnob;
 	Knob *			m_ch1SweepRateKnob;
-	
+
 	// channel 2
 	PixmapButton * 	m_ch2EnabledBtn;
 	Knob *			m_ch2CrsKnob;
 	Knob *			m_ch2VolumeKnob;
-	
+
 	PixmapButton *	m_ch2EnvEnabledBtn;
 	PixmapButton *	m_ch2EnvLoopedBtn;
 	Knob *			m_ch2EnvLenKnob;
-	
+
 	automatableButtonGroup *	m_ch2DutyCycleGrp;
-	
+
 	PixmapButton *	m_ch2SweepEnabledBtn;
 	Knob *			m_ch2SweepAmtKnob;
 	Knob *			m_ch2SweepRateKnob;
-	
+
 	//channel 3
 	PixmapButton * 	m_ch3EnabledBtn;
 	Knob *			m_ch3CrsKnob;
@@ -341,22 +341,22 @@ private:
 	//channel 4
 	PixmapButton * 	m_ch4EnabledBtn;
 	Knob *			m_ch4VolumeKnob;
-	
+
 	PixmapButton * 	m_ch4EnvEnabledBtn;
 	PixmapButton * 	m_ch4EnvLoopedBtn;
 	Knob *			m_ch4EnvLenKnob;
-	
+
 	PixmapButton * 	m_ch4NoiseModeBtn;
 	PixmapButton * 	m_ch4NoiseFreqModeBtn;
 	Knob *			m_ch4NoiseFreqKnob;
-	
+
 	Knob *			m_ch4SweepKnob;
 	PixmapButton *	m_ch4NoiseQuantizeBtn;
-	
+
 	//master
 	Knob *			m_masterVolKnob;
-	Knob *			m_vibratoKnob;	
-	
+	Knob *			m_vibratoKnob;
+
 	static QPixmap *	s_artwork;
 };
 

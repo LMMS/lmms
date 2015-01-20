@@ -42,40 +42,40 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(),	QPixmap( ":/multitapecho/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 245, 300 );
-	
+
 	// graph widgets
-	
+
 	Graph * ampGraph = new Graph( this, Graph::BarStyle, 204, 105 );
 	Graph * lpGraph = new Graph( this, Graph::BarStyle, 204, 105 );
-	
+
 	ampGraph->move( 30, 10 );
 	lpGraph->move( 30, 125 );
-	
+
 	ampGraph->setModel( & controls->m_ampGraph );
 	lpGraph->setModel( & controls->m_lpGraph );
-	
+
 	pal = QPalette();
-	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap("graph_bg") );
-	
+	pal.setBrush( backgroundRole(),	QPixmap( ":/multitapecho/graph_bg.png" ) );
+
 	ampGraph->setAutoFillBackground( true );
 	ampGraph->setPalette( pal );
 	ampGraph->setGraphColor( QColor( 48, 255, 117 ) );
 	ampGraph -> setMaximumSize( 204, 105 );
-	
+
 	lpGraph->setAutoFillBackground( true );
 	lpGraph->setPalette( pal );
 	lpGraph->setGraphColor( QColor( 255, 48, 117 ) );
 	lpGraph -> setMaximumSize( 204, 105 );
-	
+
 	// steps spinbox
-	
+
 	LcdSpinBox * steps = new LcdSpinBox( 2, this, "Steps" );
 	steps->move( 20, 245 );
 	steps->setModel( & controls->m_steps );
-	
+
 	// knobs
 
 	TempoSyncKnob * stepLength = new TempoSyncKnob( knobBright_26, this );
@@ -83,7 +83,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setLabel( tr( "Length" ) );
 	stepLength->setHintText( tr( "Step length:" ) , " ms" );
-	
+
 	Knob * dryGain = new Knob( knobBright_26, this );
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
@@ -96,7 +96,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	stages->setLabel( tr( "Stages" ) );
 	stages->setHintText( tr( "Lowpass stages:" ) , "x" );
 	// switch led
-	
+
 	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );

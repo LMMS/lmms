@@ -23,6 +23,7 @@
  */
 
 
+#include <QFile>
 #include <QImage>
 #include <QHash>
 #include <QImageReader>
@@ -41,9 +42,6 @@ namespace
 {
 	static QHash<QString, QPixmap> s_pixmapCache;
 }
-
-#include "embedded_resources.h"
-
 
 QPixmap getIconPixmap( const char * _name, int _w, int _h )
 {
@@ -69,13 +67,6 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 			candidates << QString( _name ) + "." + formats.at( i ).data();
 		}
 
-#ifdef PLUGIN_NAME
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
-			name = candidates.at( i );
-			p = QPixmap( ConfigManager::inst()->artworkDir() + "plugins/" +
-				     STRINGIFY( PLUGIN_NAME ) + "_" + name );
-		}
-#endif
 		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
 			name = candidates.at( i );
 			p = QPixmap( ConfigManager::inst()->artworkDir() + name );
@@ -90,13 +81,7 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 		
 		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
 			name = candidates.at( i );
-			const embed::descriptor & e = 
-				findEmbeddedData( name.toUtf8().constData() );
-			// found?
-			if( QString( e.name ) == name )
-			{
-				p.loadFromData( e.data, e.size );
-			}
+			p = QPixmap(QString(":/%1").arg(name));
 		}
 		
 		// Fallback
@@ -116,10 +101,11 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 }
 
 
-QString getText( const char * _name )
+QString getText( const char * name )
 {
-	const embed::descriptor & e = findEmbeddedData( _name );
-	return QString::fromUtf8( (const char *) e.data, e.size );
+	QFile f(QString(":/%1").arg(name));
+	f.open(QFile::ReadOnly);
+	return f.readAll();
 }
 
 

@@ -41,7 +41,7 @@
 
 #include <cstring>
 
-#include "embed.cpp"
+#include "embed.h"
 
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
@@ -473,7 +473,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     setAutoFillBackground(true);
 
     QPalette pal;
-    pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
+    pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? QPixmap(":/carlabase/artwork-patchbay.png") : QPixmap(":/carlabase/artwork-rack.png"));
     setPalette(pal);
 
     QVBoxLayout * l = new QVBoxLayout( this );

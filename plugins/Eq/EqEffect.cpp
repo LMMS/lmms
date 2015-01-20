@@ -23,7 +23,7 @@
  */
 
 #include "EqEffect.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "lmms_math.h"
 #include "BasicFilters.h"
 #include "interpolation.h"

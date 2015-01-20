@@ -29,14 +29,12 @@
 #include "AmplifierControls.h"
 #include "embed.h"
 
-
-
 AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	EffectControlDialog( controls )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap(":/amplifier/artwork.png") );
 	setPalette( pal );
 	setFixedSize( 100, 125 );
 

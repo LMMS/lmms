@@ -38,7 +38,7 @@
 #include "Engine.h"
 #include "Graph.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -68,7 +68,7 @@ papuInstrument::papuInstrument( InstrumentTrack * _instrument_track ) :
 						tr( "Sweep RtShift amount" ) ),
 	m_ch1WavePatternDutyModel( 2.0f, 0.0f, 3.0f, 1.0f, this,
 						tr( "Wave Pattern Duty" ) ),
-	m_ch1VolumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, 
+	m_ch1VolumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this,
 						tr( "Channel 1 volume" ) ),
 	m_ch1VolSweepDirModel( false, this,
 						tr( "Volume sweep direction" ) ),
@@ -394,7 +394,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		}
 		datalen = framesleft>avail?avail:framesleft;
 		datalen = datalen>buf_size?buf_size:datalen;
-		
+
 		long count = papu->read_samples( buf, datalen*2)/2;
 
 		for( fpp_t frame = 0; frame < count; ++frame )
@@ -452,7 +452,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/papu/artwork.png" ) );
 	setPalette( pal );
 
 	m_ch1SweepTimeKnob = new papuKnob( this );
@@ -567,18 +567,18 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1SweepDirButton->setCheckable( true );
 	m_ch1SweepDirButton->move( 167, 108 );
 	m_ch1SweepDirButton->setActiveGraphic(
-							PLUGIN_NAME::getIconPixmap( "btn_down" ) );
+							QPixmap( ":/papu/btn_down.png" ) );
 	m_ch1SweepDirButton->setInactiveGraphic(
-							PLUGIN_NAME::getIconPixmap( "btn_up" ) );
+							QPixmap( ":/papu/btn_up.png" ) );
 	ToolTip::add( m_ch1SweepDirButton, tr( "Sweep Direction" ) );
 
 	m_ch1VolSweepDirButton = new PixmapButton( this, NULL );
 	m_ch1VolSweepDirButton->setCheckable( true );
 	m_ch1VolSweepDirButton->move( 207, 108 );
 	m_ch1VolSweepDirButton->setActiveGraphic(
-								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
+								QPixmap( ":/papu/btn_up.png" ) );
 	m_ch1VolSweepDirButton->setInactiveGraphic(
-								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
+								QPixmap( ":/papu/btn_down.png" ) );
 	ToolTip::add( m_ch1VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
 
@@ -588,9 +588,9 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch2VolSweepDirButton->setCheckable( true );
 	m_ch2VolSweepDirButton->move( 102, 156 );
 	m_ch2VolSweepDirButton->setActiveGraphic(
-								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
+								QPixmap( ":/papu/btn_up.png" ) );
 	m_ch2VolSweepDirButton->setInactiveGraphic(
-								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
+								QPixmap( ":/papu/btn_down.png" ) );
 	ToolTip::add( m_ch2VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
 	//m_ch3OnButton = new PixmapButton( this, NULL );
@@ -601,18 +601,18 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch4VolSweepDirButton->setCheckable( true );
 	m_ch4VolSweepDirButton->move( 207, 157 );
 	m_ch4VolSweepDirButton->setActiveGraphic(
-								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
+								QPixmap( ":/papu/btn_up.png" ) );
 	m_ch4VolSweepDirButton->setInactiveGraphic(
-								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
+								QPixmap( ":/papu/btn_down.png" ) );
 	ToolTip::add( m_ch4VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
 	m_ch4ShiftRegWidthButton = new PixmapButton( this, NULL );
 	m_ch4ShiftRegWidthButton->setCheckable( true );
 	m_ch4ShiftRegWidthButton->move( 207, 171 );
 	m_ch4ShiftRegWidthButton->setActiveGraphic(
-									PLUGIN_NAME::getIconPixmap( "btn_7" ) );
+									QPixmap( ":/papu/btn_7.png" ) );
 	m_ch4ShiftRegWidthButton->setInactiveGraphic(
-									PLUGIN_NAME::getIconPixmap( "btn_15" ) );
+									QPixmap( ":/papu/btn_15.png" ) );
 	ToolTip::add( m_ch4ShiftRegWidthButton, tr( "Shift Register Width" ) );
 
 
@@ -621,59 +621,59 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1So1Button = new PixmapButton( this, NULL );
 	m_ch1So1Button->setCheckable( true );
 	m_ch1So1Button->move( 208, 51 );
-	m_ch1So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch1So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch1So1Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch1So1Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch1So1Button, tr( "Channel1 to SO1 (Right)" ) );
 
 	m_ch2So1Button = new PixmapButton( this, NULL );
 	m_ch2So1Button->setCheckable( true );
 	m_ch2So1Button->move( 208, 51 + 12 );
-	m_ch2So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch2So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch2So1Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch2So1Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch2So1Button, tr( "Channel2 to SO1 (Right)" ) );
 
 	m_ch3So1Button = new PixmapButton( this, NULL );
 	m_ch3So1Button->setCheckable( true );
 	m_ch3So1Button->move( 208, 51 + 2*12 );
-	m_ch3So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch3So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch3So1Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch3So1Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch3So1Button, tr( "Channel3 to SO1 (Right)" ) );
 
 	m_ch4So1Button = new PixmapButton( this, NULL );
 	m_ch4So1Button->setCheckable( true );
 	m_ch4So1Button->setChecked( false );
 	m_ch4So1Button->move( 208, 51 + 3*12 );
-	m_ch4So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch4So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch4So1Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch4So1Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch4So1Button, tr( "Channel4 to SO1 (Right)" ) );
 
 	m_ch1So2Button = new PixmapButton( this, NULL );
 	m_ch1So2Button->setCheckable( true );
 	m_ch1So2Button->move( 148, 51 );
-	m_ch1So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch1So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch1So2Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch1So2Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch1So2Button, tr( "Channel1 to SO2 (Left)" ) );
 
 	m_ch2So2Button = new PixmapButton( this, NULL );
 	m_ch2So2Button->setCheckable( true );
 	m_ch2So2Button->move( 148, 51 + 12 );
-	m_ch2So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch2So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch2So2Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch2So2Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch2So2Button, tr( "Channel2 to SO2 (Left)" ) );
 
 	m_ch3So2Button = new PixmapButton( this, NULL );
 	m_ch3So2Button->setCheckable( true );
 	m_ch3So2Button->move( 148, 51 + 2*12 );
-	m_ch3So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch3So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch3So2Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch3So2Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch3So2Button, tr( "Channel3 to SO2 (Left)" ) );
 
 	m_ch4So2Button = new PixmapButton( this, NULL );
 	m_ch4So2Button->setCheckable( true );
 	m_ch4So2Button->setChecked( false );
 	m_ch4So2Button->move( 148, 51 + 3*12 );
-	m_ch4So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
-	m_ch4So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
+	m_ch4So2Button->setActiveGraphic( QPixmap( ":/papu/btn_on.png" ) );
+	m_ch4So2Button->setInactiveGraphic( QPixmap(":/papu/btn_off.png") );
 	ToolTip::add( m_ch4So2Button, tr( "Channel4 to SO2 (Left)" ) );
 
 

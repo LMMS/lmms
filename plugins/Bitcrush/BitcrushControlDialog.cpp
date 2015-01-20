@@ -39,7 +39,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(),	QPixmap( ":/bitcrush/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 215, 120 );
 	

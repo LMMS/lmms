@@ -1,14 +1,14 @@
 /*
- * lb303.cpp - implementation of class lb303 which is a bass synth attempting 
+ * lb303.cpp - implementation of class lb303 which is a bass synth attempting
  *             to emulate the Roland TB303 bass synth
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * lb303FilterIIR2 is based on the gsyn filter code by Andy Sloane.
- * 
- * lb303Filter3Pole is based on the TB303 instrument written by 
+ *
+ * lb303Filter3Pole is based on the TB303 instrument written by
  *   Josep M Comajuncosas for the CSounds library
  *
  * This program is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@
 #include "templates.h"
 #include "audio_port.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -50,10 +50,10 @@
 //
 // New config
 //
-#define LB_24_IGNORE_ENVELOPE   
-#define LB_FILTERED 
+#define LB_24_IGNORE_ENVELOPE
+#define LB_FILTERED
 //#define LB_DECAY
-//#define LB_24_RES_TRICK         
+//#define LB_24_RES_TRICK
 
 #define LB_DIST_RATIO    4.0
 #define LB_24_VOL_ADJUST 3.0
@@ -143,7 +143,7 @@ lb303FilterIIR2::lb303FilterIIR2(lb303FilterKnobState* p_fs) :
 {
 
 	m_dist = new effectLib::distortion<>( 1.0, 1.0f);
-	
+
 };
 
 
@@ -183,7 +183,7 @@ float lb303FilterIIR2::process(const float& samp)
 	vcf_d2 = vcf_d1;
 	vcf_d1 = ret;
 
-	if(fs->dist > 0) 
+	if(fs->dist > 0)
 		ret=m_dist->nextSample(ret);
 
 	// output = IIR2 + dry
@@ -200,7 +200,7 @@ lb303Filter3Pole::lb303Filter3Pole(lb303FilterKnobState *p_fs) :
 	ay1(0),
 	ay2(0),
 	aout(0),
-	lastin(0) 
+	lastin(0)
 {
 };
 
@@ -225,7 +225,7 @@ void lb303Filter3Pole::envRecalc()
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
-	                   (700.f+1500.f*(k)+(1500.f+(k)*(engine::mixer()->processingSampleRate()/2.f-6000.f)) * 
+	                   (700.f+1500.f*(k)+(1500.f+(k)*(engine::mixer()->processingSampleRate()/2.f-6000.f)) *
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
@@ -249,7 +249,7 @@ void lb303Filter3Pole::envRecalc()
 }
 
 
-float lb303Filter3Pole::process(const float& samp) 
+float lb303Filter3Pole::process(const float& samp)
 {
 	float ax1  = lastin;
 	float ay11 = ay1;
@@ -279,7 +279,7 @@ lb303Synth::lb303Synth( InstrumentTrack * _InstrumentTrack ) :
 	slideToggle( false, this, tr( "Slide" ) ),
 	accentToggle( false, this, tr( "Accent" ) ),
 	deadToggle( false, this, tr( "Dead" ) ),
-	db24Toggle( false, this, tr( "24dB/oct Filter" ) )	
+	db24Toggle( false, this, tr( "24dB/oct Filter" ) )
 
 {
 
@@ -330,7 +330,7 @@ lb303Synth::lb303Synth( InstrumentTrack * _InstrumentTrack ) :
 	vca_attack = 1.0 - 0.96406088;
 	vca_decay = 0.99897516;
 
-	vco_shape = SAWTOOTH; 
+	vco_shape = SAWTOOTH;
 
 	// Experimenting with a0 between original (0.5) and 1.0
 	vca_a0 = 0.5;
@@ -472,13 +472,13 @@ int lb303Synth::process(sampleFrame *outbuf, const Uint32 size)
 		note.vco_inc = GET_INC( true_freq );
 		note.dead = deadToggle.value();
 		initNote(&note);
-		
-		current_freq = new_freq; 
+
+		current_freq = new_freq;
 
 		new_freq = -1.0f;
-	} 
+	}
 
-	
+
 
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
@@ -554,7 +554,7 @@ int lb303Synth::process(sampleFrame *outbuf, const Uint32 size)
 				break;
 
 			case MOOG: // Maybe the fall should be exponential/sinsoidal instead of quadric.
-				// [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low 
+				// [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low
 				vco_k = (vco_c*2.0)+0.5;
 				if (vco_k>1.0) {
 					vco_k = -0.5 ;
@@ -563,7 +563,7 @@ int lb303Synth::process(sampleFrame *outbuf, const Uint32 size)
 					w = 2.0*(vco_k-0.5)-1.0;
 					vco_k = 0.5 - sqrtf(1.0-(w*w));
 				}
-				vco_k *= 2.0;  // MOOG wave gets filtered away 
+				vco_k *= 2.0;  // MOOG wave gets filtered away
 				break;
 		}
 
@@ -590,7 +590,7 @@ int lb303Synth::process(sampleFrame *outbuf, const Uint32 size)
 		// Handle Envelope
 		if(vca_mode==0) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*engine::mixer()->processingSampleRate()) 
+			if(sample_cnt>=0.5*engine::mixer()->processingSampleRate())
 				vca_mode = 2;
 		}
 		else if(vca_mode == 1) {
@@ -618,7 +618,7 @@ void lb303Synth::initNote( lb303Note *n)
 	catch_decay = 0;
 
 	vco_inc = n->vco_inc;
-    
+
 	// Always reset vca on non-dead notes, and
 	// Only reset vca on decaying(decayed) and never-played
 	if(n->dead == 0 || (vca_mode==1 || vca_mode==3)) {
@@ -651,14 +651,14 @@ void lb303Synth::initNote( lb303Note *n)
 
 
 	recalcFilter();
-	
+
 	if(n->dead ==0){
 		// Swap next two blocks??
 		vcf->playNote();
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 
-		// Double Check 
+		// Double Check
 		//vca_mode = 0;
 		//vca_a = 0.0;
 	}
@@ -712,7 +712,7 @@ void lb303Synth::play( sampleFrame * _working_buffer )
 	//printf(".");
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
-	process( _working_buffer, frames); 
+	process( _working_buffer, frames);
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames,
 									NULL );
 }
@@ -722,7 +722,7 @@ void lb303Synth::play( sampleFrame * _working_buffer )
 void lb303Synth::deleteNotePluginData( NotePlayHandle * _n )
 {
 	//printf("GONE\n");
-	if( _n->unpitchedFrequency() == current_freq ) 
+	if( _n->unpitchedFrequency() == current_freq )
 	{
 		delete_freq = current_freq;
 	}
@@ -770,7 +770,7 @@ lb303SynthView::lb303SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_deadToggle->move( 10, 220 );
 
 	m_db24Toggle = new LedCheckBox( "24dB/oct", this );
-	m_db24Toggle->setWhatsThis( 
+	m_db24Toggle->setWhatsThis(
 			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 	m_db24Toggle->move( 10, 150);
 
@@ -794,8 +794,7 @@ lb303SynthView::lb303SynthView( Instrument * _instrument, QWidget * _parent ) :
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-			"artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/lb303/artwork.png" ) );
 	setPalette( pal );
 }
 
@@ -808,7 +807,7 @@ lb303SynthView::~lb303SynthView()
 void lb303SynthView::modelChanged()
 {
 	lb303Synth * syn = castModel<lb303Synth>();
-	
+
 	m_vcfCutKnob->setModel( &syn->vcf_cut_knob );
 	m_vcfResKnob->setModel( &syn->vcf_res_knob );
 	m_vcfDecKnob->setModel( &syn->vcf_dec_knob );
@@ -817,7 +816,7 @@ void lb303SynthView::modelChanged()
 
 	m_distKnob->setModel( &syn->dist_knob );
 	m_waveKnob->setModel( &syn->wave_knob );
-    
+
 	m_slideToggle->setModel( &syn->slideToggle );
 	m_accentToggle->setModel( &syn->accentToggle );
 	m_deadToggle->setModel( &syn->deadToggle );

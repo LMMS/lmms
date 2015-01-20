@@ -3,7 +3,7 @@
  *                                             PeakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -32,7 +32,6 @@
 #include "peak_controller_effect_controls.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "embed.h"
 
 
 PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
@@ -41,8 +40,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/peakcontrollereffect/artwork.png" ) );
 	setPalette( pal );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
@@ -74,7 +72,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_decayKnob->setLabel( tr( "DCAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release:" ) , "" );
-	
+
 	m_tresholdKnob = new Knob( knobBright_26, this );
 	m_tresholdKnob->setLabel( tr( "TRES" ) );
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );

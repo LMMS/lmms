@@ -41,8 +41,7 @@ dynProcControlDialog::dynProcControlDialog(
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/dynamicsprocessor/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 224, 340 );
 
@@ -51,8 +50,7 @@ dynProcControlDialog::dynProcControlDialog(
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
 	pal = QPalette();
-	pal.setBrush( backgroundRole(),
-			PLUGIN_NAME::getIconPixmap("wavegraph") );
+	pal.setBrush( backgroundRole(), QPixmap(":/dynamicsprocessor/wavegraph.png") );
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 170, 255, 255 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
@@ -72,7 +70,7 @@ dynProcControlDialog::dynProcControlDialog(
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ) , "" );
-	
+
 	Knob * attackKnob = new Knob( knobBright_26, this);
 	attackKnob -> move( 11, 291 );
 	attackKnob->setModel( &_controls->m_attackModel );
@@ -90,53 +88,53 @@ dynProcControlDialog::dynProcControlDialog(
 	PixmapButton * resetButton = new PixmapButton( this, tr("Reset waveform") );
 	resetButton -> move( 164, 251 );
 	resetButton -> resize( 12, 48 );
-	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
-	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
+	resetButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/reset_active.png" ) );
+	resetButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/reset_inactive.png" ) );
 	ToolTip::add( resetButton, tr( "Click here to reset the wavegraph back to default" ) );
 
 	PixmapButton * smoothButton = new PixmapButton( this, tr("Smooth waveform") );
 	smoothButton -> move( 164, 267 );
 	smoothButton -> resize( 12, 48 );
-	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
-	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
+	smoothButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/smooth_active.png" ) );
+	smoothButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/smooth_inactive.png" ) );
 	ToolTip::add( smoothButton, tr( "Click here to apply smoothing to wavegraph" ) );
 
 	PixmapButton * addOneButton = new PixmapButton( this, tr("Increase wavegraph amplitude by 1dB") );
 	addOneButton -> move( 133, 251 );
 	addOneButton -> resize( 12, 29 );
-	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
-	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
+	addOneButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/add1_active.png" ) );
+	addOneButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/add1_inactive.png" ) );
 	ToolTip::add( addOneButton, tr( "Click here to increase wavegraph amplitude by 1dB" ) );
 
 	PixmapButton * subOneButton = new PixmapButton( this, tr("Decrease wavegraph amplitude by 1dB") );
 	subOneButton -> move( 133, 267 );
 	subOneButton -> resize( 12, 29 );
-	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
-	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
+	subOneButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/sub1_active.png" ) );
+	subOneButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/sub1_inactive.png" ) );
 	ToolTip::add( subOneButton, tr( "Click here to decrease wavegraph amplitude by 1dB" ) );
 
 //stereomode switches
 	PixmapButton * smMaxButton = new PixmapButton( this, tr( "Stereomode Maximum" ) );
 	smMaxButton -> move( 165, 290 );
 	smMaxButton -> resize( 48, 13 );
-	smMaxButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "max_active" ) );
-	smMaxButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "max_inactive" ) );
+	smMaxButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/max_active.png" ) );
+	smMaxButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/max_inactive.png" ) );
 	ToolTip::add( smMaxButton, tr( "Process based on the maximum of both stereo channels" ) );
-	
+
 	PixmapButton * smAvgButton = new PixmapButton( this, tr( "Stereomode Average" ) );
 	smAvgButton -> move( 165, 290 + 13 );
 	smAvgButton -> resize( 48, 13 );
-	smAvgButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "avg_active" ) );
-	smAvgButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "avg_inactive" ) );
+	smAvgButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/avg_active.png" ) );
+	smAvgButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/avg_inactive.png" ) );
 	ToolTip::add( smAvgButton, tr( "Process based on the average of both stereo channels" ) );
 
 	PixmapButton * smUnlButton = new PixmapButton( this, tr( "Stereomode Unlinked" ) );
 	smUnlButton -> move( 165, 290 + (13*2) );
 	smUnlButton -> resize( 48, 13 );
-	smUnlButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_active" ) );
-	smUnlButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_inactive" ) );
+	smUnlButton -> setActiveGraphic( QPixmap( ":/dynamicsprocessor/unl_active.png" ) );
+	smUnlButton -> setInactiveGraphic( QPixmap( ":/dynamicsprocessor/unl_inactive.png" ) );
 	ToolTip::add( smUnlButton, tr( "Process each stereo channel independently" ) );
-	
+
 	automatableButtonGroup * smGroup = new automatableButtonGroup( this );
 	smGroup -> addButton( smMaxButton );
 	smGroup -> addButton( smAvgButton );

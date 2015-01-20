@@ -41,8 +41,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/waveshaper/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 224, 300 );
 
@@ -51,8 +50,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
 	pal = QPalette();
-	pal.setBrush( backgroundRole(),
-			PLUGIN_NAME::getIconPixmap("wavegraph") );
+	pal.setBrush( backgroundRole(), QPixmap(":/waveshaper/wavegraph.png") );
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 170, 255, 255 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
@@ -76,29 +74,29 @@ waveShaperControlDialog::waveShaperControlDialog(
 	PixmapButton * resetButton = new PixmapButton( this, tr("Reset waveform") );
 	resetButton -> move( 164, 251 );
 	resetButton -> resize( 12, 48 );
-	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
-	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
+	resetButton -> setActiveGraphic( QPixmap( ":/waveshaper/reset_active.png" ) );
+	resetButton -> setInactiveGraphic( QPixmap( ":/waveshaper/reset_inactive.png" ) );
 	ToolTip::add( resetButton, tr( "Click here to reset the wavegraph back to default" ) );
 
 	PixmapButton * smoothButton = new PixmapButton( this, tr("Smooth waveform") );
 	smoothButton -> move( 164, 267 );
 	smoothButton -> resize( 12, 48 );
-	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
-	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
+	smoothButton -> setActiveGraphic( QPixmap( ":/waveshaper/smooth_active.png" ) );
+	smoothButton -> setInactiveGraphic( QPixmap( ":/waveshaper/smooth_inactive.png" ) );
 	ToolTip::add( smoothButton, tr( "Click here to apply smoothing to wavegraph" ) );
 
 	PixmapButton * addOneButton = new PixmapButton( this, tr("Increase graph amplitude by 1dB") );
 	addOneButton -> move( 133, 251 );
 	addOneButton -> resize( 12, 29 );
-	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
-	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
+	addOneButton -> setActiveGraphic( QPixmap( ":/waveshaper/add1_active.png" ) );
+	addOneButton -> setInactiveGraphic( QPixmap( ":/waveshaper/add1_inactive.png" ) );
 	ToolTip::add( addOneButton, tr( "Click here to increase wavegraph amplitude by 1dB" ) );
 
 	PixmapButton * subOneButton = new PixmapButton( this, tr("Decrease graph amplitude by 1dB") );
 	subOneButton -> move( 133, 267 );
 	subOneButton -> resize( 12, 29 );
-	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
-	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
+	subOneButton -> setActiveGraphic( QPixmap( ":/waveshaper/sub1_active.png" ) );
+	subOneButton -> setInactiveGraphic( QPixmap( ":/waveshaper/sub1_inactive.png" ) );
 	ToolTip::add( subOneButton, tr( "Click here to decrease wavegraph amplitude by 1dB" ) );
 
 	LedCheckBox * clipInputToggle = new LedCheckBox( "Clip input", this,

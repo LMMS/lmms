@@ -24,7 +24,7 @@
 
 #include "delayeffect.h"
 #include "Engine.h"
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

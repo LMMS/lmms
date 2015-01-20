@@ -2,7 +2,7 @@
  * bit_invader.cpp - instrument which uses a usereditable wavetable
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@
 #include "Song.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -87,10 +87,10 @@ bSynth::~bSynth()
 
 sample_t bSynth::nextStringSample()
 {
-	float sample_step = 
+	float sample_step =
 		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
 
-	
+
 	// check overflow
 	while (sample_realindex >= sample_length) {
 		sample_realindex -= sample_length;
@@ -100,37 +100,37 @@ sample_t bSynth::nextStringSample()
 
 	if (interpolation) {
 
-		// find position in shape 
-		int a = static_cast<int>(sample_realindex);	
+		// find position in shape
+		int a = static_cast<int>(sample_realindex);
 		int b;
 		if (a < (sample_length-1)) {
 			b = static_cast<int>(sample_realindex+1);
 		} else {
 			b = 0;
 		}
-		
+
 		// Nachkommaanteil
 		const float frac = fraction( sample_realindex );
-		
+
 		sample = linearInterpolate( sample_shape[a], sample_shape[b], frac );
 
 	} else {
 		// No interpolation
-		sample_index = static_cast<int>(sample_realindex);	
+		sample_index = static_cast<int>(sample_realindex);
 		sample = sample_shape[sample_index];
 	}
-	
+
 	// progress in shape
 	sample_realindex += sample_step;
 
 	return sample;
-}	
+}
 
 /***********************************************************************
 *
 *	class BitInvader
 *
-*	lmms - plugin 
+*	lmms - plugin
 *
 ***********************************************************************/
 
@@ -177,12 +177,12 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	base64::encode( (const char *)m_graph.samples(),
 		m_graph.length() * sizeof(float), sampleString );
 	_this.setAttribute( "sampleShape", sampleString );
-	
 
-	// save LED normalize 
+
+	// save LED normalize
 	m_interpolation.saveSettings( _doc, _this, "interpolation" );
-	
-	// save LED 
+
+	// save LED
 	m_normalize.saveSettings( _doc, _this, "normalize" );
 }
 
@@ -205,9 +205,9 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	m_graph.setSamples( (float*) dst );
 	delete[] dst;
 
-	// Load LED normalize 
+	// Load LED normalize
 	m_interpolation.loadSettings( _this, "interpolation" );
-	// Load LED 
+	// Load LED
 	m_normalize.loadSettings( _this, "normalize" );
 
 }
@@ -263,7 +263,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-	
+
 		float factor;
 		if( !m_normalize.value() )
 		{
@@ -329,10 +329,9 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap(":/bitinvader/artwork.png") );
 	setPalette( pal );
-	
+
 	m_sampleLengthKnob = new Knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 6, 201 );
 	m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
@@ -348,8 +347,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 
 
 	pal = QPalette();
-	pal.setBrush( backgroundRole(), 
-			PLUGIN_NAME::getIconPixmap("wavegraph") );
+	pal.setBrush( backgroundRole(), QPixmap(":/bitinvader/wavegraph.png") );
 	m_graph->setPalette( pal );
 
 
@@ -410,10 +408,8 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 
 	m_smoothBtn = new PixmapButton( this, tr( "Smooth" ) );
 	m_smoothBtn->move( 131 + 14*6, 205 );
-	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-						"smooth_active" ) );
-	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-						"smooth_inactive" ) );
+	m_smoothBtn->setActiveGraphic( QPixmap( ":/bitinvader/smooth_active.png" ) );
+	m_smoothBtn->setInactiveGraphic( QPixmap( ":/bitinvader/smooth_inactive.png" ) );
 	ToolTip::add( m_smoothBtn,
 			tr( "Click here to smooth waveform." ) );
 
@@ -426,8 +422,8 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_normalizeToggle = new LedCheckBox( "Normalize", this,
 							tr( "Normalize" ), LedCheckBox::Green );
 	m_normalizeToggle->move( 131, 236 );
-	
-	
+
+
 	connect( m_sinWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sinWaveClicked() ) );
 	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
@@ -440,9 +436,9 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 			this, SLOT ( noiseWaveClicked() ) );
 	connect( m_usrWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( usrWaveClicked() ) );
-	
+
 	connect( m_smoothBtn, SIGNAL ( clicked () ),
-			this, SLOT ( smoothClicked() ) );		
+			this, SLOT ( smoothClicked() ) );
 
 	connect( m_interpolationToggle, SIGNAL( toggled( bool ) ),
 			this, SLOT ( interpolationToggled( bool ) ) );
@@ -534,7 +530,7 @@ void bitInvaderView::usrWaveClicked()
 	if ( af != "" )
 	{
 		buffer.setAudioFile( af );
-		
+
 		// copy buffer data
 		sample_length = min( sample_length, static_cast<int>(
 							buffer.frames() ) );

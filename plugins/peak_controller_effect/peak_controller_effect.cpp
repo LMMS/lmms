@@ -30,7 +30,7 @@
 #include "peak_controller_effect.h"
 #include "lmms_math.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -91,7 +91,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	PeakControllerEffectControls & c = m_peakControls;
 
 	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
+	// audio with this effect
 	if( !isEnabled() || !isRunning() )
 	{
 		return false;

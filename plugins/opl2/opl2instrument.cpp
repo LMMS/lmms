@@ -57,7 +57,7 @@
 #include "opl.h"
 #include "temuopl.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "math.h"
 #include "debug.h"
 
@@ -373,7 +373,7 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			}
 			break;
 		default:
-#ifdef LMMS_DEBUG	
+#ifdef LMMS_DEBUG
 			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
 #endif
 			break;
@@ -703,16 +703,16 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
 	buttname = new PixmapButton( this, NULL );\
-        buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_on" ) );\
-        buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_off" ) );\
+        buttname->setActiveGraphic( QPixmap( ":/OPL2/opl2_led_on.png" ) );\
+        buttname->setInactiveGraphic( QPixmap( ":/OPL2/opl2_led_off.png" ) );\
 	buttname->setCheckable( true );\
         ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
 	buttname = new PixmapButton( this, NULL );\
-        buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
-        buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
+		buttname->setActiveGraphic( QPixmap( ":/" STRINGIFY(PLUGIN_NAME) "/" icon_on ".png" ) ); \
+        buttname->setInactiveGraphic( QPixmap( icon_off ) ); \
         ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
@@ -765,8 +765,7 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 
 	setAutoFillBackground( true );
         QPalette pal;
-        pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-                                                                "artwork" ) );
+        pal.setBrush( backgroundRole(), QPixmap( ":/OPL2/artwork.png" ) );
         setPalette( pal );
 }
 opl2instrumentView::~opl2instrumentView() {

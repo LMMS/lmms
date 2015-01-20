@@ -110,10 +110,10 @@ public:
 	{
 		if( !m_name.isEmpty() )
 		{
-			return( PLUGIN_NAME::getIconPixmap(
-					m_name.toLatin1().constData() ) );
+			QString pixmap_path = QString(":/%1/%2.png").arg(STRINGIFY(PLUGIN_NAME), m_name);
+			return QPixmap(pixmap_path);
 		}
-		return( QPixmap() );
+		return QPixmap();
 	}
 
 	virtual QString pixmapName() const
@@ -123,7 +123,5 @@ public:
 
 } ;
 #endif
-
-
 
 #endif

@@ -316,7 +316,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_vi->m_subWindow->setFixedSize( 960, 300);
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( _eff->m_plugin->name() + tr( " - VST parameter control" ) );
-	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	m_vi->m_subWindow->setWindowIcon( QPixmap( ":/vsteffect/logo.png" ) );
 	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 
 

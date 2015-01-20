@@ -61,8 +61,8 @@
 	name = new PixmapButton( view, NULL ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
-	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
-	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
+	name -> setActiveGraphic( QPixmap( ":/monstro/tinyled_on.png" ) ); \
+	name -> setInactiveGraphic( QPixmap( ":/monstro/tinyled_off.png" ) ); \
 	ToolTip::add( name, tr( ttip ) );
 
 // UI constants
@@ -266,7 +266,7 @@ private:
 	sample_t m_lfo_last [2];
 	sample_t m_lfo_next [2];
 	float m_lfo_inc [2];
-	float m_lfo_rate [2];	
+	float m_lfo_rate [2];
 	float m_env_sus [2];
 
 	int m_lfovalue[2];
@@ -293,7 +293,7 @@ private:
 	bool m_invert3l;
 	bool m_invert2r;
 	bool m_invert3r;
-	
+
 	int m_counter2l;
 	int m_counter2r;
 	int m_counter3l;
@@ -369,7 +369,7 @@ public slots:
 	void updateSamplerate();
 	void updateSlope1();
 	void updateSlope2();
-	
+
 protected:
 	float m_osc1l_vol;
 	float m_osc1r_vol;
@@ -416,7 +416,7 @@ protected:
 
 	sample_rate_t m_samplerate;
 	fpp_t m_fpp;
-	
+
 	float m_integrator;
 	float m_fmCorrection;
 	int m_counterMax;

@@ -36,7 +36,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/flanger/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 200, 75 );
 

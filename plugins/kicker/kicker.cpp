@@ -34,7 +34,7 @@
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -278,7 +278,7 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	const int COL4 = COL3 + 41;
 	const int COL5 = COL4 + 41;
 	const int END_COL = COL1 + 48;
-	
+
 	m_startFreqKnob = new kickerLargeKnob( this );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ), "Hz" );
 	m_startFreqKnob->move( COL1, ROW1 );
@@ -327,7 +327,7 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/kicker/artwork.png" ) );
 	setPalette( pal );
 }
 

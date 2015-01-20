@@ -41,7 +41,7 @@
 #include "ToolTip.h"
 #include "BandLimitedWave.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 // Envelope Recalculation period
@@ -475,12 +475,12 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	// Hold on to the current VCF, and use it throughout this period
 	lb302Filter *filter = vcf;
 
-	if( release_frame == 0 || ! m_playingNote ) 
+	if( release_frame == 0 || ! m_playingNote )
 	{
 		vca_mode = 1;
 	}
 
-	if( new_freq ) 
+	if( new_freq )
 	{
 		//printf("  playing new note..\n");
 		lb302Note note;
@@ -496,7 +496,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
 
-	for( int i=0; i<size; i++ ) 
+	for( int i=0; i<size; i++ )
 	{
 		// start decay if we're past release
 		if( i >= release_frame )
@@ -526,7 +526,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 
 		// update vco
 		vco_c += vco_inc;
-		
+
 		if(vco_c > 0.5)
 			vco_c -= 1.0;
 
@@ -635,7 +635,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 		*/
 		//LB302 samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
-		for( int c = 0; c < DEFAULT_CHANNELS; c++ ) 
+		for( int c = 0; c < DEFAULT_CHANNELS; c++ )
 		{
 			outbuf[i][c] = samp;
 		}
@@ -745,7 +745,7 @@ void lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 		m_notes.prepend( _n );
 	}
 	m_notesMutex.unlock();
-	
+
 	release_frame = qMax( release_frame, _n->framesLeft() + _n->offset() );
 }
 
@@ -754,24 +754,24 @@ void lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 void lb302Synth::processNote( NotePlayHandle * _n )
 {
 		/// Start a new note.
-		if( _n->m_pluginData != this ) 
+		if( _n->m_pluginData != this )
 		{
 			m_playingNote = _n;
 			new_freq = true;
 			_n->m_pluginData = this;
 		}
-		
+
 		if( ! m_playingNote && ! _n->isReleased() && release_frame > 0 )
 		{
 			m_playingNote = _n;
-			if ( slideToggle.value() ) 
+			if ( slideToggle.value() )
 			{
 				vco_slideinc = GET_INC( _n->frequency() );
 			}
 		}
 
 		// Check for slide
-		if( m_playingNote == _n ) 
+		if( m_playingNote == _n )
 		{
 			true_freq = _n->frequency();
 
@@ -794,7 +794,7 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 		processNote( m_notes.takeFirst() );
 	};
 	m_notesMutex.unlock();
-	
+
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	process( _working_buffer, frames );
@@ -1010,8 +1010,7 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-			"artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/lb302/artwork.png" ) );
 	setPalette( pal );
 }
 

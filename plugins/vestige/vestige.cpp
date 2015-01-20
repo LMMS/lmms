@@ -32,6 +32,7 @@
 #include <QMenu>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
@@ -45,7 +46,7 @@
 #include "ToolTip.h"
 #include "FileDialog.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -254,7 +255,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	TextFloat * tf = TextFloat::displayMessage(
 			tr( "Loading plugin" ),
 			tr( "Please wait while loading VST-plugin..." ),
-			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+			QPixmap( ":/vestige/logo.png").scaled(24, 24), 0 );
 
 	m_pluginMutex.lock();
 	m_plugin = new VstPlugin( m_pluginDLL );
@@ -395,18 +396,15 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 {
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+		s_artwork = new QPixmap( QPixmap( ":/vestige/artwork.png" ) );
 	}
 
 	m_openPluginButton = new PixmapButton( this, "" );
 	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 216, 81 );
-	m_openPluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"select_file_active" ) );
-	m_openPluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"select_file" ) );
+	m_openPluginButton->setActiveGraphic( QPixmap( ":/vestige/select_file_active.png" ) );
+	m_openPluginButton->setInactiveGraphic( QPixmap( ":/vestige/select_file.png" ) );
 	connect( m_openPluginButton, SIGNAL( clicked() ), this,
 						SLOT( openPlugin() ) );
 	ToolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
@@ -420,10 +418,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_managePluginButton->setCheckable( false );
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
-	m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu_active" ) );
-	m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu" ) );
+	m_managePluginButton->setActiveGraphic( embed::getIconPixmap( "track_op_menu_active" ) );
+	m_managePluginButton->setInactiveGraphic( embed::getIconPixmap( "track_op_menu" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
 	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
@@ -436,10 +432,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
 	m_openPresetButton->move( 200, 224 );
-	m_openPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"project_open", 20, 20 ) );
-	m_openPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"project_open", 20, 20 ) );
+	m_openPresetButton->setActiveGraphic( embed::getIconPixmap( "project_open", 20, 20 ) );
+	m_openPresetButton->setInactiveGraphic( embed::getIconPixmap( "project_open", 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
 	ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
@@ -452,10 +446,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setCheckable( false );
 	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"stepper-left" ) );
+	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap( "stepper-left-press" ) );
+	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap( "stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
 	ToolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
@@ -470,10 +462,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
 	m_savePresetButton->move( 224, 224 );
-	m_savePresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"project_save", 20, 20  ) );
-	m_savePresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"project_save", 20, 20  ) );
+	m_savePresetButton->setActiveGraphic( embed::getIconPixmap( "project_save", 20, 20  ) );
+	m_savePresetButton->setInactiveGraphic( embed::getIconPixmap( "project_save", 20, 20  ) );
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
 	ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
@@ -486,10 +476,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setCheckable( false );
 	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"stepper-right" ) );
+	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap( "stepper-right-press" ) );
+	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap( "stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
 	ToolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
@@ -509,7 +497,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
 
-	m_selPresetButton->setIcon( PLUGIN_NAME::getIconPixmap( "stepper-down" ) );
+	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 	m_selPresetButton->setWhatsThis(
 		tr( "Click here to select presets that are currently loaded in VST." ) );
 
@@ -652,7 +640,7 @@ void VestigeInstrumentView::openPlugin()
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
-									PLUGIN_NAME::getIconPixmap( "logo" ) );
+									QPixmap( ":/vestige/logo.png" ) );
 		}
 	}
 }
@@ -882,7 +870,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
-	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	m_vi->m_subWindow->setWindowIcon( QPixmap( ":/vestige/logo.png" ) );
 	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 
 

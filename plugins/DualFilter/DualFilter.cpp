@@ -25,7 +25,7 @@
 
 #include "DualFilter.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "BasicFilters.h"
 
 
@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
@@ -111,11 +111,11 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
 		m_filter2changed = false;
 	}
-	
+
 	// get mix amounts for wet signals of both filters
 	const float mix2 = ( ( m_dfControls.m_mixModel.value() + 1.0f ) * 0.5f );
 	const float mix1 = 1.0f - mix2;
-	
+
 	const float gain1 = m_dfControls.m_gain1Model.value() * 0.01f;
 	const float gain2 = m_dfControls.m_gain2Model.value() * 0.01f;
 
