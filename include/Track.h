@@ -228,10 +228,6 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
 
-<<<<<<< HEAD
-=======
-	void setAutoResizeEnabled( bool e = false );
->>>>>>> Update coding conventions
 	float pixelsPerTact();
 
 	inline TrackView * getTrackView()

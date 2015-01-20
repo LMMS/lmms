@@ -61,7 +61,7 @@ public:
 	} ;
 
 
-	TimeLineWidget( int xoff, int yoff, float ppt, Song::playPos & pos,
+	TimeLineWidget( int xoff, int yoff, float ppt, Song::PlayPos & pos,
 				const MidiTime & begin, QWidget * parent );
 	virtual ~TimeLineWidget();
 

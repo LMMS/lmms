@@ -958,22 +958,6 @@ float TrackContentObjectView::pixelsPerTact()
 
 
 
-<<<<<<< HEAD
-=======
-/*! \brief Set whether this trackContentObjectView can resize.
- *
- * \param e The boolean state of whether this track content object view
- *  is allowed to resize.
- */
-void TrackContentObjectView::setAutoResizeEnabled( bool e )
-{
-	m_autoResize = e;
-}
-
-
-
-
->>>>>>> Update coding conventions
 /*! \brief Detect whether the mouse moved more than n pixels on screen.
  *
  * \param _me The QMouseEvent.
@@ -1780,12 +1764,11 @@ void TrackOperationsWidget::updateMenu()
 	}
 	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
-<<<<<<< HEAD
 		int channelIndex = trackView->model()->effectChannelModel()->value();
 
 		FxChannel * fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
 
-		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), to_menu );
+		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), toMenu );
 		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
 
 		fxMenu->addAction("Assign to new FX Channel" , this, SLOT( createFxLine() ) );
@@ -1804,16 +1787,11 @@ void TrackOperationsWidget::updateMenu()
 			}
 		}
 
-		to_menu->addMenu(fxMenu);
+		toMenu->addMenu(fxMenu);
 		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
-		to_menu->addSeparator();
-		to_menu->addMenu( trackView->midiMenu() );
-=======
 		toMenu->addSeparator();
-		toMenu->addMenu( dynamic_cast<InstrumentTrackView *>(
-						m_trackView )->midiMenu() );
->>>>>>> Update coding conventions
+		toMenu->addMenu( trackView->midiMenu() );
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
