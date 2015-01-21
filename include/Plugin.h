@@ -134,7 +134,7 @@ public:
 			const Plugin::PluginTypes m_type;
 		} ;
 
-		SubPluginFeatures * subPluginFeatures;
+		SubPluginFeatures *subPluginFeatures;
 
 	} ;
 
@@ -148,7 +148,9 @@ public:
 	// returns display-name out of descriptor
 	virtual QString displayName() const
 	{
-		return Model::displayName().isEmpty() ?  m_descriptor->displayName : Model::displayName();
+		return Model::displayName().isEmpty()
+				? m_descriptor->displayName
+				: Model::displayName();
 	}
 
 	// return plugin-type
@@ -173,13 +175,13 @@ public:
 
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
+	static Plugin * instantiate( const QString& pluginName, Model *parent, void * data );
 
 	// fills given list with descriptors of all available plugins
 	static void getDescriptorsOfAvailPlugins( DescriptorList& pluginDescriptors );
 
 	// create a view for the model 
-	PluginView * createView( QWidget* parent );
+	PluginView* createView( QWidget* parent );
 
 
 protected:
