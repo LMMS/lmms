@@ -83,7 +83,6 @@ MainWindow::MainWindow() :
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
 
-
 	QWidget * w = new QWidget( main_widget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
 	hbox->setSpacing( 0 );
@@ -95,7 +94,7 @@ MainWindow::MainWindow() :
 	splitter->setChildrenCollapsible( false );
 
 	ConfigManager* confMgr = ConfigManager::inst();
-	QString wdir = confMgr->workingDir();
+
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
