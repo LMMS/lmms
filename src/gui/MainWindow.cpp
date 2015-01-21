@@ -207,8 +207,8 @@ MainWindow::~MainWindow()
 {
 	for( PluginView *view : m_tools )
 	{
-		delete view;
 		delete view->model();
+		delete view;
 	}
 	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
