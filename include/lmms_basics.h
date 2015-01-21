@@ -99,7 +99,7 @@ inline float typeInfo<float>::minEps()
 template<>
 inline bool typeInfo<float>::isEqual( float x, float y )
 {
-	if( unlikely( x == y ) )
+	if( x == y )
 	{
 		return true;
 	}
