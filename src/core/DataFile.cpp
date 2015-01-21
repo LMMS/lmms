@@ -37,6 +37,7 @@
 
 #include "ConfigManager.h"
 #include "ProjectVersion.h"
+#include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
@@ -779,10 +780,35 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_type = type( root.attribute( "type" ) );
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-	if( root.hasAttribute( "creatorversion" ) &&
-		root.attribute( "creatorversion" ) != LMMS_VERSION )
+
+	if( root.hasAttribute( "creatorversion" ) )
 	{
-		upgrade();
+		//compareType defaults to Build,so it doesn't have to be set here
+		ProjectVersion createdWith = root.attribute( "creatorversion" );
+		ProjectVersion openedWith = LMMS_VERSION;;
+
+		if (createdWith != openedWith)
+		{
+			//Only one compareType needs to be set, and "[The] ProjectVersion return type
+			//from the setCompareType(...) function [...] saves a few lines of code!" (@tresf)
+			if ( createdWith.setCompareType(Minor) != openedWith)
+			{
+				QMessageBox::information( NULL,
+					SongEditor::tr( "Project Version Mismatch" ),
+					SongEditor::tr( 
+							"This project was created with "
+							"LMMS version %1, but version %2 "
+							"is installed")
+							.arg( root.attribute( "creatorversion" ) )
+							.arg( LMMS_VERSION ) );
+			}
+
+			//The upgrade needs to happen after the warning as it updates the project version.
+			if( createdWith.setCompareType(Build) < openedWith )
+			{
+				upgrade();
+			}
+		}
 	}
 
 	m_content = root.elementsByTagName( typeName( m_type ) ).
