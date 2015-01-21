@@ -92,26 +92,6 @@ public:
 		return( QVector<selectableObject *>() );
 	}
 
-	///
-	/// \brief selectRegionFromPixels
-	/// \param x
-	/// \param y
-	/// Use the rubber band to select TCO from all tracks using x, y pixels
-	void selectRegionFromPixels(int x, int y)
-	{
-		m_rubberBand->setEnabled( true );
-		m_rubberBand->show();
-		m_rubberBand->setGeometry( min( x, y ), 0, max( x, y ) - min( x, y ), std::numeric_limits<int>::max() );
-	}
-
-	///
-	/// \brief stopRubberBand
-	/// Removes the rubber band from display when finished with.
-	void stopRubberBand()
-	{
-		m_rubberBand->hide();
-		m_rubberBand->setEnabled( false );
-	}
 
 	TrackContainer* model()
 	{
@@ -146,6 +126,17 @@ public slots:
 
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	///
+	/// \brief selectRegionFromPixels
+	/// \param x
+	/// \param y
+	/// Use the rubber band to select TCO from all tracks using x, y pixels
+	void selectRegionFromPixels(int x, int y);
+
+	///
+	/// \brief stopRubberBand
+	/// Removes the rubber band from display when finished with.
+	void stopRubberBand();
 
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;

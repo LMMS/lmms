@@ -129,6 +129,11 @@ public:
 					m_ppt / MidiTime::ticksPerTact() );
 	}
 
+signals:
+
+	void regionSelectedFromPixels( int, int );
+	void selectionFinished();
+
 
 public slots:
 	void updatePosition( const MidiTime & );
@@ -172,7 +177,6 @@ private:
 
 
 	TextFloat * m_hint;
-	SongEditor *m_songEditor;
 	int m_initalXSelect;
 
 

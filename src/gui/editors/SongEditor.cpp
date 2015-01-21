@@ -98,6 +98,10 @@ SongEditor::SongEditor( Song * _song ) :
 			SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( updatePosition( const MidiTime & ) ) );
+	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
+			this, SLOT( selectRegionFromPixels( int, int ) ) );
+	connect( m_timeLine, SIGNAL( selectionFinished() ),
+			 this, SLOT( stopRubberBand() ) );
 
 	m_positionLine = new positionLine( this );
 

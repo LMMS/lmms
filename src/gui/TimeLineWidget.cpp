@@ -106,7 +106,6 @@ TimeLineWidget::TimeLineWidget( const int _xoff, const int _yoff, const float _p
 	connect( update_timer, SIGNAL( timeout() ),
 					this, SLOT( updatePosition() ) );
 	update_timer->start( 50 );
-	m_songEditor = dynamic_cast<SongEditor*>(_parent);
 }
 
 
@@ -294,7 +293,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
 	}
-	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) && m_songEditor )
+	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
 	{
 		m_action = SelectSongTCO;
 		m_initalXSelect = event->x();
@@ -381,10 +380,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			break;
 		}
 	case SelectSongTCO:
-		if( m_songEditor )
-		{
-			m_songEditor->selectRegionFromPixels( m_initalXSelect , event->x() );
-		}
+			emit regionSelectedFromPixels( m_initalXSelect , event->x() );
 		break;
 
 		default:
@@ -399,7 +395,7 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = NULL;
-	if(m_action == SelectSongTCO && m_songEditor ) { m_songEditor->stopRubberBand(); }
+	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
 
