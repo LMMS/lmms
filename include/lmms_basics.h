@@ -78,9 +78,9 @@ struct typeInfo
 		return 1;
 	}
 
-	static inline bool isEqual( T _x, T _y )
+	static inline bool isEqual( T x, T y )
 	{
-		return _x == _y;
+		return x == y;
 	}
 
 	static inline T absVal( T t )
