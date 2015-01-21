@@ -375,7 +375,8 @@ PianoRoll::PianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 	// Set up scale model
-	const auto& chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
 	m_scaleModel.addItem( tr("No scale") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
@@ -3814,7 +3815,8 @@ int PianoRoll::quantization() const
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	const auto& chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const InstrumentFunctionNoteStacking::Chord& scale =
 			chord_table.getScaleByName( m_scaleModel.currentText() );
 	const InstrumentFunctionNoteStacking::Chord& chord =
