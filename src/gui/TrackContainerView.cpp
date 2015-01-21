@@ -307,7 +307,7 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,soundfontfile,vstpluginfile,"
+				"importedproject,soundfontfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( Track::InstrumentTrack ).
 						arg( Track::SampleTrack ) );
@@ -360,6 +360,13 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		ImportFilter::import( value, m_tc );
 		_de->accept();
 	}
+
+	else if( type == "projectfile")
+	{
+		Engine::getSong()->loadProject( value );
+		_de->accept();
+	}
+
 	else if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
