@@ -761,12 +761,16 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
-		tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
-	_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
-		tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+	if ( m_pat->type() == Pattern::BeatPattern )
+	{
+		_cm->addSeparator();
+
+		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
+			tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
+		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
+			tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+	}
 }
 
 
