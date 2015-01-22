@@ -1402,6 +1402,8 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setAcceptMode( FileDialog::AcceptSave );
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
+	QString fname = m_track->name();
+	sfd.selectFile(fname.remove(QRegExp("[^a-zA-Z0-9\\d\\s]")).toLower().replace( " ", "_" ) );
 
 	if( sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&

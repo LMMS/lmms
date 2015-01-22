@@ -516,6 +516,10 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 	new StringPairDrag( "importedproject", f->fullName(),
 				QPixmap( "icons:midi_file.png" ), this );
 					break;
+			case FileItem::ProjectFile:
+				new StringPairDrag( "projectfile", f->fullName(),
+							QPixmap( "icons:project_file.png" ), this );
+								break;
 
 				default:
 					break;

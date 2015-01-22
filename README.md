@@ -4,7 +4,11 @@
 What is LMMS?
 --------------
 
-LMMS is a free cross-platform alternative to commercial programs like FL Studio®, which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
+LMMS is a free cross-platform alternative to commercial programs like
+FL Studio®, which allow you to produce music with your computer. This includes
+the creation of melodies and beats, the synthesis and mixing of sounds, and
+arranging of samples. You can have fun with your MIDI-keyboard and much more;
+all in a user-friendly and modern interface.
 
 [Homepage](http://lmms.io)<br>
 [Downloads/Releases](https://github.com/LMMS/lmms/releases)<br>
@@ -40,14 +44,23 @@ Features
 Building
 ---------
 
-See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compiling-lmms) on our wiki for information on how to build LMMS.
+See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compiling-lmms) on our
+wiki for information on how to build LMMS.
 
 
 Join LMMS-development
 ----------------------
 
-If you are interested in LMMS, it's programming, artwork, testing, writing demo-songs, (and improving this readme…) or something like that, you're welcome to participate on the development of LMMS!
+If you are interested in LMMS, its programming, artwork, testing, writing demo
+songs, (and improving this README...) or something like that, you're welcome
+to participate in the development of LMMS!
 
-Information about what you can do and how can be found in the [wiki](https://github.com/LMMS/lmms/wiki).
+Information about what you can do and how can be found in the
+[wiki](https://github.com/LMMS/lmms/wiki).
 
-Before coding a new big feature, please _always_ [file an issue](https://github.com/LMMS/lmms/issues/new) for your idea and suggestions about your feature and about the intended implementation on GitHub or post to the LMMS-devel-mailinglist (lmms-devel@lists.sourceforge.net) and wait for replies! Maybe there're different ideas, improvements, hints or maybe your feature is not welcome/needed at the moment.
+Before coding a new big feature, please _always_
+[file an issue](https://github.com/LMMS/lmms/issues/new) for your idea and
+suggestions about your feature and about the intended implementation on GitHub
+or post to the LMMS developers mailinglist (lmms-devel@lists.sourceforge.net)
+and wait for replies! Maybe there are different ideas, improvements, hints or
+maybe your feature is not welcome/needed at the moment.

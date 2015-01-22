@@ -88,8 +88,6 @@ PluginBrowser::~PluginBrowser()
 
 
 
-
-
 PluginDescList::PluginDescList(QWidget *parent) :
 	QWidget(parent)
 {
@@ -97,7 +95,6 @@ PluginDescList::PluginDescList(QWidget *parent) :
 
 	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 	std::sort(m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore);
-
 
 	for( Plugin::DescriptorList::const_iterator it = m_pluginDescriptors.constBegin();
 		it != m_pluginDescriptors.constEnd(); ++it )
@@ -113,8 +110,6 @@ PluginDescList::PluginDescList(QWidget *parent) :
 	setLayout(layout);
 	layout->addStretch();
 }
-
-
 
 
 
@@ -181,7 +176,6 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 			m_targetHeight = qMax( 60, 25 + br.height() );
 		}
 	}
-
 }
 
 
@@ -237,6 +231,7 @@ void PluginDescWidget::updateHeight()
 		m_updateTimer.stop();
 		return;
 	}
+
 	if( !m_updateTimer.isActive() )
 	{
 		m_updateTimer.start( 15 );
