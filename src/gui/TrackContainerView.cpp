@@ -313,6 +313,19 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 						arg( Track::SampleTrack ) );
 }
 
+void TrackContainerView::selectRegionFromPixels(int x, int y)
+{
+	m_rubberBand->setEnabled( true );
+	m_rubberBand->show();
+	m_rubberBand->setGeometry( min( x, y ), 0, max( x, y ) - min( x, y ), std::numeric_limits<int>::max() );
+}
+
+void TrackContainerView::stopRubberBand()
+{
+	m_rubberBand->hide();
+	m_rubberBand->setEnabled( false );
+}
+
 
 
 

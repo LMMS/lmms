@@ -35,6 +35,7 @@ class QPixmap;
 class QToolBar;
 class NStateButton;
 class TextFloat;
+class SongEditor;
 
 
 class TimeLineWidget : public QWidget, public JournallingObject
@@ -128,6 +129,11 @@ public:
 					m_ppt / MidiTime::ticksPerTact() );
 	}
 
+signals:
+
+	void regionSelectedFromPixels( int, int );
+	void selectionFinished();
+
 
 public slots:
 	void updatePosition( const MidiTime & );
@@ -171,6 +177,7 @@ private:
 
 
 	TextFloat * m_hint;
+	int m_initalXSelect;
 
 
 	enum actions
@@ -178,7 +185,8 @@ private:
 		NoAction,
 		MovePositionMarker,
 		MoveLoopBegin,
-		MoveLoopEnd
+		MoveLoopEnd,
+		SelectSongTCO,
 	} m_action;
 
 	int m_moveXOff;
