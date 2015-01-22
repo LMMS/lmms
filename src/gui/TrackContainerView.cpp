@@ -45,6 +45,7 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
+#include "GuiApplication.h"
 
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
@@ -363,7 +364,10 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 	else if( type == "projectfile")
 	{
-		Engine::getSong()->loadProject( value );
+		if( gui->mainWindow()->mayChangeProject() )
+		{
+			Engine::getSong()->loadProject( value );
+		}
 		_de->accept();
 	}
 
