@@ -6,7 +6,6 @@ LINK_LIBRARIES(vstbase)
 BUILD_PLUGIN(vsteffect
 	VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstSubPluginFeatures.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h VstSubPluginFeatures.h
 	MOCFILES VstEffectControlDialog.h VstEffectControls.h
-	QRESOURCES logo.png
 )
 SET_TARGET_PROPERTIES(vsteffect PROPERTIES COMPILE_FLAGS "-Wno-attributes")
 

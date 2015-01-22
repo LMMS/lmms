@@ -5,5 +5,5 @@ LINK_LIBRARIES(${FFTW3F_LIBRARIES})
 BUILD_PLUGIN(spectrumanalyzer
 	SpectrumAnalyzer.cpp SpectrumAnalyzerControls.cpp SpectrumAnalyzerControlDialog.cpp SpectrumAnalyzer.h SpectrumAnalyzerControls.h SpectrumAnalyzerControlDialog.h
 	MOCFILES SpectrumAnalyzerControlDialog.h SpectrumAnalyzerControls.h
-	QRESOURCES background.png log_x_axis.png log_y_axis.png logo.png spectrum_background.png spectrum_background_plain.png
+	QRESOURCES background.png log_x_axis.png log_y_axis.png spectrum_background.png spectrum_background_plain.png
 )

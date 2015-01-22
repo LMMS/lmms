@@ -2,4 +2,4 @@ INCLUDE(BuildPlugin)
 
 BUILD_PLUGIN(peakcontrollereffect
 	peak_controller_effect.cpp peak_controller_effect_controls.cpp peak_controller_effect_control_dialog.cpp peak_controller_effect.h peak_controller_effect_controls.h peak_controller_effect_control_dialog.h MOCFILES peak_controller_effect_controls.h peak_controller_effect_control_dialog.h
-	QRESOURCES artwork.png logo.png)
+	QRESOURCES artwork.png)

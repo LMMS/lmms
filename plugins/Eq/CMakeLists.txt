@@ -5,4 +5,4 @@ LINK_LIBRARIES(${FFTW3F_LIBRARIES})
 BUILD_PLUGIN(eq
 	EqEffect.cpp EqControls.cpp EqControlsDialog.cpp EqFilter.h EqParameterWidget.cpp EqFader.h EqSpectrumView.h
 	MOCFILES EqControls.h EqParameterWidget.h EqFader.h
-	QRESOURCES artwork.png logo.png)
+	QRESOURCES artwork.png)
