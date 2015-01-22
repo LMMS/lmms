@@ -27,7 +27,6 @@
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
 #include "Engine.h"
-#include "embed.h"
 #include "ProjectJournal.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
@@ -133,7 +132,7 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
         setFixedHeight( 32 );
 	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
-	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
+	tlb->setIcon( QPixmap( "icons:automation_track.png" ) );
 	tlb->move( 3, 1 );
 	tlb->show();
 	setModel( _at );

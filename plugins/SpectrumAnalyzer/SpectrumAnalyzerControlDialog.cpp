@@ -29,7 +29,6 @@
 #include "MainWindow.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
-#include "embed.h"
 
 
 static inline void darken( QImage& img, int x, int y, int w, int h )

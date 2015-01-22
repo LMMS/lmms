@@ -738,7 +738,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( QPixmap( ":/nes/artwork.png" ) );
+		s_artwork = new QPixmap( ":/nes/artwork.png" );
 	}
 
 	pal.setBrush( backgroundRole(),	*s_artwork );

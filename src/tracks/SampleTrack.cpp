@@ -35,7 +35,6 @@
 #include "gui_templates.h"
 #include "SampleTrack.h"
 #include "Song.h"
-#include "embed.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "AudioPort.h"
@@ -253,22 +252,22 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
+		contextMenu.addAction( QPixmap( "icons:cancel.png" ),
 					tr( "Delete (middle mousebutton)" ),
 						this, SLOT( remove() ) );
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
+		contextMenu.addAction( QPixmap( "icons:edit_cut.png" ),
 					tr( "Cut" ), this, SLOT( cut() ) );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
+	contextMenu.addAction( QPixmap( "icons:edit_copy.png" ),
 					tr( "Copy" ), m_tco, SLOT( copy() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+	contextMenu.addAction( QPixmap( "icons:edit_paste.png" ),
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
+	contextMenu.addAction( QPixmap( "icons:muted.png" ),
 				tr( "Mute/unmute (<Ctrl> + middle click)" ),
 						m_tco, SLOT( toggleMute() ) );
-	contextMenu.addAction( embed::getIconPixmap( "record" ),
+	contextMenu.addAction( QPixmap( "icons:record.png" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );
 	constructContextMenu( &contextMenu );
@@ -403,7 +402,7 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 	p.translate( 0, 0 );
 	if( m_tco->isMuted() )
 	{
-		p.drawPixmap( 3, 8, embed::getIconPixmap( "muted", 16, 16 ) );
+		p.drawPixmap( 3, 8, QPixmap( "icons:muted.png" ).scaled( 16, 16 ) );
 	}
 	if( m_tco->isRecord() )
 	{
@@ -557,7 +556,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 						getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
 			this, SLOT( showEffects() ) );
-	tlb->setIcon( embed::getIconPixmap( "sample_track" ) );
+	tlb->setIcon( QPixmap( "icons:sample_track.png" ) );
 	tlb->move( 3, 1 );
 	tlb->show();
 

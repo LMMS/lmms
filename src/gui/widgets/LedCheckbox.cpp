@@ -27,7 +27,6 @@
 #include <QPainter>
 
 #include "LedCheckbox.h"
-#include "embed.h"
 #include "gui_templates.h"
 
 
@@ -114,9 +113,8 @@ void LedCheckBox::initUi( LedColors _color )
 	{
 		_color = Yellow;
 	}
-	m_ledOnPixmap = new QPixmap( embed::getIconPixmap(
-					names[_color].toUtf8().constData() ) );
-	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
+	m_ledOnPixmap = new QPixmap( QString("icons:%1.png").arg(names[_color]) );
+	m_ledOffPixmap = new QPixmap( "icons:led_off.png" );
 
 	setFont( pointSize<7>( font() ) );
 	setText( m_text );

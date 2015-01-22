@@ -30,7 +30,6 @@
 
 #include "BBEditor.h"
 #include "BBTrackContainer.h"
-#include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
 #include "ConfigManager.h"
@@ -46,7 +45,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	Editor(false),
 	m_trackContainerView( new BBTrackContainerView(tc) )
 {
-	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
+	setWindowIcon( QPixmap( "icons:bb_track_btn.png" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	setCentralWidget(m_trackContainerView);
 
@@ -88,18 +87,18 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_toolBar->addWidget( m_bbComboBox );
 
 	m_toolBar->addSeparator();
-	m_toolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
+	m_toolBar->addAction(QPixmap("icons:add_bb_track"), tr("Add beat/bassline.png"),
 						 Engine::getSong(), SLOT(addBBTrack()));
-	m_toolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
+	m_toolBar->addAction(QPixmap("icons:add_automation"), tr("Add automation-track.png"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_toolBar->addWidget(stretch);
 
-	m_toolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
+	m_toolBar->addAction(QPixmap("icons:step_btn_remove"), tr("Remove steps.png"),
 						 m_trackContainerView, SLOT(removeSteps()));
-	m_toolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
+	m_toolBar->addAction(QPixmap("icons:step_btn_add"), tr("Add steps.png"),
 						 m_trackContainerView, SLOT(addSteps()));
 	m_toolBar->addSeparator();
 

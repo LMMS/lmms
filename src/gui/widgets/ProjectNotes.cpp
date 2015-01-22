@@ -2,7 +2,7 @@
  * ProjectNotes.cpp - implementation of project-notes-editor
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -37,7 +37,6 @@
 #include <QToolBar>
 #include <QDomCDATASection>
 
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -69,7 +68,7 @@ ProjectNotes::ProjectNotes() :
 
 	setCentralWidget( m_edit );
 	setWindowTitle( tr( "Project notes" ) );
-	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
+	setWindowIcon( QPixmap( "icons:project_notes.png" ) );
 
 	gui->mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
@@ -114,31 +113,31 @@ void ProjectNotes::setupActions()
 	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );
 	QAction * a;
 
-	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
+	a = new QAction( QPixmap( "icons:edit_undo" ), tr( "&Undo.png" ),
 									this );
 	a->setShortcut( tr( "Ctrl+Z" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( undo() ) );
 	tb->addAction( a );
 
-	a = new QAction( embed::getIconPixmap( "edit_redo" ), tr( "&Redo" ),
+	a = new QAction( QPixmap( "icons:edit_redo" ), tr( "&Redo.png" ),
 									this );
 	a->setShortcut( tr( "Ctrl+Y" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( redo() ) );
 	tb->addAction( a );
 
-	a = new QAction( embed::getIconPixmap( "edit_copy" ), tr( "&Copy" ),
+	a = new QAction( QPixmap( "icons:edit_copy" ), tr( "&Copy.png" ),
 									this );
 	a->setShortcut( tr( "Ctrl+C" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( copy() ) );
 	tb->addAction( a );
 
-	a = new QAction( embed::getIconPixmap( "edit_cut" ), tr( "Cu&t" ),
+	a = new QAction( QPixmap( "icons:edit_cut" ), tr( "Cu&t.png" ),
 									this );
 	a->setShortcut( tr( "Ctrl+X" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( cut() ) );
 	tb->addAction( a );
 
-	a = new QAction( embed::getIconPixmap( "edit_paste" ), tr( "&Paste" ),
+	a = new QAction( QPixmap( "icons:edit_paste" ), tr( "&Paste.png" ),
 									this );
 	a->setShortcut( tr( "Ctrl+V" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( paste() ) );
@@ -168,22 +167,21 @@ void ProjectNotes::setupActions()
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );
 
-	m_actionTextBold = new QAction( embed::getIconPixmap( "text_bold" ),
+	m_actionTextBold = new QAction( QPixmap( "icons:text_bold.png" ),
 							tr( "&Bold" ), this );
 	m_actionTextBold->setShortcut( tr( "Ctrl+B" ) );
 	m_actionTextBold->setCheckable( true );
 	connect( m_actionTextBold, SIGNAL( triggered() ), this,
 							SLOT( textBold() ) );
 
-	m_actionTextItalic = new QAction( embed::getIconPixmap( "text_italic" ),
+	m_actionTextItalic = new QAction( QPixmap( "icons:text_italic.png" ),
 							tr( "&Italic" ), this );
 	m_actionTextItalic->setShortcut( tr( "Ctrl+I" ) );
 	m_actionTextItalic->setCheckable( true );
 	connect( m_actionTextItalic, SIGNAL( triggered() ), this,
 							SLOT( textItalic() ) );
 
-	m_actionTextUnderline = new QAction( embed::getIconPixmap(
-								"text_under" ),
+	m_actionTextUnderline = new QAction( QPixmap( "icons:text_under.png" ),
 						tr( "&Underline" ), this );
 	m_actionTextUnderline->setShortcut( tr( "Ctrl+U" ) );
 	m_actionTextUnderline->setCheckable( true );
@@ -195,29 +193,27 @@ void ProjectNotes::setupActions()
 	connect( grp, SIGNAL( triggered( QAction * ) ), this,
 					SLOT( textAlign( QAction * ) ) );
 
-	m_actionAlignLeft = new QAction( embed::getIconPixmap( "text_left" ),
+	m_actionAlignLeft = new QAction( QPixmap( "icons:text_left.png" ),
 						tr( "&Left" ), m_edit );
 	m_actionAlignLeft->setShortcut( tr( "Ctrl+L" ) );
 	m_actionAlignLeft->setCheckable( true );
 	grp->addAction( m_actionAlignLeft );
 
-	m_actionAlignCenter = new QAction( embed::getIconPixmap(
-								"text_center" ),
+	m_actionAlignCenter = new QAction( QPixmap( "icons:text_center.png" ),
 						tr( "C&enter" ), m_edit );
 	m_actionAlignCenter->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignCenter->setShortcut( tr( "Ctrl+E" ) );
 	m_actionAlignCenter->setCheckable( true );
 	grp->addAction( m_actionAlignCenter );
 
-	m_actionAlignRight = new QAction( embed::getIconPixmap( "text_right" ),
+	m_actionAlignRight = new QAction( QPixmap( "icons:text_right.png" ),
 						tr( "&Right" ), m_edit );
 	m_actionAlignRight->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignRight->setShortcut( tr( "Ctrl+R" ) );
 	m_actionAlignRight->setCheckable( true );
 	grp->addAction( m_actionAlignRight );
 
-	m_actionAlignJustify = new QAction( embed::getIconPixmap(
-								"text_block" ),
+	m_actionAlignJustify = new QAction( QPixmap( "icons:text_block.png" ),
 						tr( "&Justify" ), m_edit );
 	m_actionAlignJustify->setShortcut( tr( "Ctrl+J" ) );
 	m_actionAlignJustify->setCheckable( true );

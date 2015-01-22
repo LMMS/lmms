@@ -396,7 +396,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 {
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( QPixmap( ":/vestige/artwork.png" ) );
+		s_artwork = new QPixmap( ":/vestige/artwork.png" );
 	}
 
 	m_openPluginButton = new PixmapButton( this, "" );
@@ -418,8 +418,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_managePluginButton->setCheckable( false );
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
-	m_managePluginButton->setActiveGraphic( embed::getIconPixmap( "track_op_menu_active" ) );
-	m_managePluginButton->setInactiveGraphic( embed::getIconPixmap( "track_op_menu" ) );
+	m_managePluginButton->setActiveGraphic( QPixmap( "icons:track_op_menu_active.png" ) );
+	m_managePluginButton->setInactiveGraphic( QPixmap( "icons:track_op_menu.png" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
 	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
@@ -432,8 +432,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
 	m_openPresetButton->move( 200, 224 );
-	m_openPresetButton->setActiveGraphic( embed::getIconPixmap( "project_open", 20, 20 ) );
-	m_openPresetButton->setInactiveGraphic( embed::getIconPixmap( "project_open", 20, 20 ) );
+	m_openPresetButton->setActiveGraphic( QPixmap( "icons:project_open.png" ).scaled( 20, 20 ) );
+	m_openPresetButton->setInactiveGraphic( QPixmap( "icons:project_open.png" ).scaled( 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
 	ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
@@ -446,8 +446,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setCheckable( false );
 	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap( "stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap( "stepper-left" ) );
+	m_rolLPresetButton->setActiveGraphic( QPixmap( "icons:stepper-left-press.png" ) );
+	m_rolLPresetButton->setInactiveGraphic( QPixmap( "icons:stepper-left.png" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
 	ToolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
@@ -462,8 +462,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
 	m_savePresetButton->move( 224, 224 );
-	m_savePresetButton->setActiveGraphic( embed::getIconPixmap( "project_save", 20, 20  ) );
-	m_savePresetButton->setInactiveGraphic( embed::getIconPixmap( "project_save", 20, 20  ) );
+	m_savePresetButton->setActiveGraphic( QPixmap( "icons:project_save.png" ).scaled( 20, 20 ) );
+	m_savePresetButton->setInactiveGraphic( QPixmap( "icons:project_save.png" ).scaled( 20, 20 ) );
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
 	ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
@@ -476,8 +476,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setCheckable( false );
 	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap( "stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap( "stepper-right" ) );
+	m_rolRPresetButton->setActiveGraphic( QPixmap( "icons:stepper-right-press.png" ) );
+	m_rolRPresetButton->setInactiveGraphic( QPixmap( "icons:stepper-right.png" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
 	ToolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
@@ -497,7 +497,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
 
-	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
+	m_selPresetButton->setIcon( QPixmap( "icons:stepper-down.png" ) );
 	m_selPresetButton->setWhatsThis(
 		tr( "Click here to select presets that are currently loaded in VST." ) );
 
@@ -506,7 +506,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
-	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+	m_toggleGUIButton->setIcon( QPixmap( "icons:zoom.png" ) );
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
@@ -517,7 +517,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setIcon( QPixmap( "icons:state_stop.png" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
@@ -569,8 +569,8 @@ void VestigeInstrumentView::updateMenu( void )
         		presetActions[i]->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
         		presetActions[i]->setData(i);
 			if (i == lastPosInMenu) {
-        			presetActions[i]->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
-			} else  presetActions[i]->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
+        			presetActions[i]->setIcon(QPixmap( "icons:sample_file.png" ).scaled( 16, 16 ));
+			} else  presetActions[i]->setIcon(QPixmap( "icons:edit_copy.png" ).scaled( 16, 16 ));
 			to_menu->addAction( presetActions[i] );
      		}
 

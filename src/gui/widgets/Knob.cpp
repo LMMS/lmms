@@ -40,7 +40,6 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
-#include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
@@ -110,8 +109,7 @@ void Knob::onKnobNumUpdated()
 {
 	if( m_knobNum != knobStyled )
 	{
-		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
-			QString::number( m_knobNum + 1 ) ).toUtf8().constData() ) );
+		m_knobPixmap = new QPixmap( QString("icons:/knob0%1.png").arg(m_knobNum+1) );
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}

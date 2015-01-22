@@ -71,7 +71,6 @@
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "LmmsStyle.h"

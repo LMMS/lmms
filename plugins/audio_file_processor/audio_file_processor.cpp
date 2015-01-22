@@ -452,7 +452,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 {
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( QPixmap( ":/audiofileprocessor/artwork.png" ) );
+		s_artwork = new QPixmap( ":/audiofileprocessor/artwork.png" );
 	}
 
 	m_openAudioFileButton = new PixmapButton( this );

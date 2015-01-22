@@ -27,7 +27,6 @@
 
 #include "MultitapEchoControlDialog.h"
 #include "MultitapEchoControls.h"
-#include "embed.h"
 #include "Graph.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"

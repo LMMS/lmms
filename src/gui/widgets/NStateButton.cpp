@@ -2,7 +2,7 @@
  * NStateButton.cpp - implementation of n-state-button
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,12 +21,11 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QMouseEvent>
 
 #include "NStateButton.h"
-#include "embed.h"
 #include "ToolTip.h"
 
 

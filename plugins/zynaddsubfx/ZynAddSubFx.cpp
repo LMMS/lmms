@@ -533,7 +533,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setEnabled( false );
 #endif
 	m_toggleUIButton->setChecked( false );
-	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+	m_toggleUIButton->setIcon( QPixmap( "icons:zoom.png" ) );
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );

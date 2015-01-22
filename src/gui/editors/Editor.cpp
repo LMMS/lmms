@@ -25,7 +25,6 @@
 #include "Editor.h"
 
 #include "MainWindow.h"
-#include "embed.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -37,9 +36,9 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
 	if (displayPauseIcon)
-		m_playAction->setIcon(embed::getIconPixmap("pause"));
+		m_playAction->setIcon(QPixmap("icons:pause.png"));
 	else
-		m_playAction->setIcon(embed::getIconPixmap("play"));
+		m_playAction->setIcon(QPixmap("icons:play.png"));
 }
 
 void Editor::togglePlayStop()
@@ -66,11 +65,11 @@ Editor::Editor(bool record) :
 	};
 
 	// Set up play and record actions
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
+	m_playAction = new QAction(QPixmap("icons:play"), tr("Play (Space).png"), this);
+	m_stopAction = new QAction(QPixmap("icons:stop"), tr("Stop (Space).png"), this);
 
-	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
-	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
+	m_recordAction = new QAction(QPixmap("icons:record"), tr("Record.png"), this);
+	m_recordAccompanyAction = new QAction(QPixmap("icons:record_accompany"), tr("Record while playing.png"), this);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));

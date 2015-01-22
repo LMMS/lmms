@@ -353,37 +353,31 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 
 	m_sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
 	m_sinWaveBtn->move( 131, 205 );
-	m_sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"sin_wave_active" ) );
-	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-						"sin_wave_inactive" ) );
+	m_sinWaveBtn->setActiveGraphic( QPixmap( "icons:sin_wave_active.png" ) );
+	m_sinWaveBtn->setInactiveGraphic( QPixmap( "icons:sin_wave_inactive.png" ) );
 	ToolTip::add( m_sinWaveBtn,
 			tr( "Click for a sine-wave." ) );
 
 	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triangleWaveBtn->move( 131 + 14, 205 );
 	m_triangleWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "triangle_wave_active" ) );
+		QPixmap( "icons:triangle_wave_active.png" ) );
 	m_triangleWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "triangle_wave_inactive" ) );
+		QPixmap( "icons:triangle_wave_inactive.png" ) );
 	ToolTip::add( m_triangleWaveBtn,
 			tr( "Click here for a triangle-wave." ) );
 
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
 	m_sawWaveBtn->move( 131 + 14*2, 205  );
-	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"saw_wave_active" ) );
-	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-						"saw_wave_inactive" ) );
+	m_sawWaveBtn->setActiveGraphic( QPixmap( "icons:saw_wave_active.png" ) );
+	m_sawWaveBtn->setInactiveGraphic( QPixmap( "icons:saw_wave_inactive.png" ) );
 	ToolTip::add( m_sawWaveBtn,
 			tr( "Click here for a saw-wave." ) );
 
 	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveBtn->move( 131 + 14*3, 205 );
-	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-					"square_wave_active" ) );
-	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-					"square_wave_inactive" ) );
+	m_sqrWaveBtn->setActiveGraphic( QPixmap( "icons:square_wave_active.png" ) );
+	m_sqrWaveBtn->setInactiveGraphic( QPixmap( "icons:square_wave_inactive.png" ) );
 	ToolTip::add( m_sqrWaveBtn,
 			tr( "Click here for a square-wave." ) );
 
@@ -391,18 +385,16 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 					tr( "White noise wave" ) );
 	m_whiteNoiseWaveBtn->move( 131 + 14*4, 205 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "white_noise_wave_active" ) );
+		QPixmap( "icons:white_noise_wave_active.png" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "white_noise_wave_inactive" ) );
+		QPixmap( "icons:white_noise_wave_inactive.png" ) );
 	ToolTip::add( m_whiteNoiseWaveBtn,
 			tr( "Click here for white-noise." ) );
 
 	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
 	m_usrWaveBtn->move( 131 + 14*5, 205 );
-	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"usr_wave_active" ) );
-	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-						"usr_wave_inactive" ) );
+	m_usrWaveBtn->setActiveGraphic( QPixmap( "icons:usr_wave_active.png" ) );
+	m_usrWaveBtn->setInactiveGraphic( QPixmap( "icons:usr_wave_inactive.png" ) );
 	ToolTip::add( m_usrWaveBtn,
 			tr( "Click here for a user-defined shape." ) );
 

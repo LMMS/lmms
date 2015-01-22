@@ -24,81 +24,10 @@
 
 
 #include <QFile>
-#include <QImage>
-#include <QHash>
-#include <QImageReader>
-#include <QList>
 #include "embed.h"
-#include "ConfigManager.h"
 
-#ifndef PLUGIN_NAME
 namespace embed
-#else
-namespace PLUGIN_NAME
-#endif
 {
-
-namespace
-{
-	static QHash<QString, QPixmap> s_pixmapCache;
-}
-
-QPixmap getIconPixmap( const char * _name, int _w, int _h )
-{
-	if( _w == -1 || _h == -1 )
-	{
-	        // Return cached pixmap
-                QPixmap cached = s_pixmapCache.value( _name );
-		if( !cached.isNull() )
-		{
-			return cached;
-		}
-
-		// Or try to load it
-		QList<QByteArray> formats = 
-			QImageReader::supportedImageFormats();
-		QList<QString> candidates;
-		QPixmap p;
-		QString name;
-		int i;
-		
-		for ( i = 0; i < formats.size() && p.isNull(); ++i )  
-		{
-			candidates << QString( _name ) + "." + formats.at( i ).data();
-		}
-
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
-			name = candidates.at( i );
-			p = QPixmap( ConfigManager::inst()->artworkDir() + name );
-		}
-		
-		// nothing found, so look in default-artwork-dir
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
-			name = candidates.at( i );
-			p = QPixmap( ConfigManager::inst()->defaultArtworkDir() 
-				     + name );
-		}
-		
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
-			name = candidates.at( i );
-			p = QPixmap(QString(":/%1").arg(name));
-		}
-		
-		// Fallback
-		if(p.isNull()) 
-		{
-			p = QPixmap( 1, 1 );
-		}
-		// Save to cache and return
-		s_pixmapCache.insert( _name, p );
-		return p;
-
-	}
-
-	return getIconPixmap( _name ).
-		scaled( _w, _h, Qt::IgnoreAspectRatio, 
-			Qt::SmoothTransformation );
-}
 
 
 QString getText( const char * name )

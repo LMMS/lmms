@@ -15,14 +15,14 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 {
 	if( ! s_qpmOff )
 	{
-		s_qpmOff = new QPixmap( embed::getIconPixmap( "mixer_send_off", 29, 20 ) );
+		s_qpmOff = new QPixmap( QPixmap( "icons:mixer_send_off.png" ).scaled( 29, 20 ) );
 	}
-	
+
 	if( ! s_qpmOn )
 	{
-		s_qpmOn = new QPixmap( embed::getIconPixmap( "mixer_send_on", 29, 20 ) );
+		s_qpmOn = new QPixmap( QPixmap( "icons:mixer_send_on.png" ).scaled( 29, 20 ) );
 	}
-	
+
 	// don't do any initializing yet, because the FxMixerView and FxLine
 	// that were passed to this constructor are not done with their constructors
 	// yet.

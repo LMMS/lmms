@@ -2,7 +2,7 @@
  * VisualizationWidget.cpp - widget for visualization of sound-data
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -30,7 +30,6 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
-#include "embed.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"

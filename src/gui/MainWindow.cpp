@@ -42,6 +42,7 @@
 #include "SongEditor.h"
 #include "Song.h"
 #include "PianoRoll.h"
+
 #include "embed.h"
 #include "Engine.h"
 #include "FxMixerView.h"
@@ -101,24 +102,24 @@ MainWindow::MainWindow() :
 				ConfigManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My Projects" ),
-					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
+					QPixmap( "icons:project_file.png" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userSamplesDir() + "*" +
 				ConfigManager::inst()->factorySamplesDir(),
 					"*", tr( "My Samples" ),
-					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
+					QPixmap( "icons:sample_file.png" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userPresetsDir() + "*" +
 				ConfigManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My Presets" ),
-					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
+					QPixmap( "icons:preset_file.png" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true  ) );
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
-					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
+					QPixmap( "icons:home.png" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 
 	QStringList root_paths;
@@ -140,7 +141,7 @@ MainWindow::MainWindow() :
 							tr( "Root Directory" ),
 #endif
 
-					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
+					QPixmap( "icons:computer.png" ).transformed( QTransform().rotate( 90 ) ),
 							splitter,
 #ifdef LMMS_BUILD_WIN32
 							true
@@ -226,76 +227,76 @@ MainWindow::~MainWindow()
 void MainWindow::finalize()
 {
 	resetWindowTitle();
-	setWindowIcon( embed::getIconPixmap( "icon" ) );
+	setWindowIcon( QPixmap( "icons:icon.png" ) );
 
 
 	// project-popup-menu
 	QMenu * project_menu = new QMenu( this );
 	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
-	project_menu->addAction( embed::getIconPixmap( "project_new" ),
+	project_menu->addAction( QPixmap( "icons:project_new.png" ),
 					tr( "&New" ),
 					this, SLOT( createNewProject() ),
 					Qt::CTRL + Qt::Key_N );
 
-	project_menu->addAction( embed::getIconPixmap( "project_open" ),
+	project_menu->addAction( QPixmap( "icons:project_open.png" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
 					Qt::CTRL + Qt::Key_O );
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
-				embed::getIconPixmap( "project_open_recent" ),
+				QPixmap( "icons:project_open_recent.png" ),
 					tr( "&Recently Opened Projects" ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
 			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
 
-	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+	project_menu->addAction( QPixmap( "icons:project_save.png" ),
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					Qt::CTRL + Qt::Key_S );
-	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
+	project_menu->addAction( QPixmap( "icons:project_saveas.png" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
-	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+	project_menu->addAction( QPixmap( "icons:project_save.png" ),
 					tr( "Save as New &Version" ),
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addSeparator();
-	project_menu->addAction( embed::getIconPixmap( "project_import" ),
+	project_menu->addAction( QPixmap( "icons:project_import.png" ),
 					tr( "Import..." ),
 					Engine::getSong(),
 					SLOT( importProject() ) );
-	project_menu->addAction( embed::getIconPixmap( "project_export" ),
+	project_menu->addAction( QPixmap( "icons:project_export.png" ),
 					tr( "E&xport..." ),
 					Engine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
-	project_menu->addAction( embed::getIconPixmap( "project_export" ),
+	project_menu->addAction( QPixmap( "icons:project_export.png" ),
 					tr( "E&xport Tracks..." ),
 					Engine::getSong(),
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addSeparator();
-	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
+	project_menu->addAction( QPixmap( "icons:exit" ), tr( "&Quit.png" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
 
 
 	QMenu * edit_menu = new QMenu( this );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+	edit_menu->addAction( QPixmap( "icons:edit_undo.png" ),
 					tr( "Undo" ),
 					this, SLOT( undo() ),
 					Qt::CTRL + Qt::Key_Z );
-	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
+	edit_menu->addAction( QPixmap( "icons:edit_redo.png" ),
 					tr( "Redo" ),
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_Y );
 	edit_menu->addSeparator();
-	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
+	edit_menu->addAction( QPixmap( "icons:setup_general.png" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
 
@@ -328,33 +329,33 @@ void MainWindow::finalize()
 	// May use offline help
 	if( true )
 	{
-		help_menu->addAction( embed::getIconPixmap( "help" ),
+		help_menu->addAction( QPixmap( "icons:help.png" ),
 						tr( "Online Help" ),
 						this, SLOT( browseHelp() ) );
 	}
 	else
 	{
-		help_menu->addAction( embed::getIconPixmap( "help" ),
+		help_menu->addAction( QPixmap( "icons:help.png" ),
 							tr( "Help" ),
 							this, SLOT( help() ) );
 	}
-	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
+	help_menu->addAction( QPixmap( "icons:whatsthis.png" ),
 					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
 	help_menu->addSeparator();
-	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
+	help_menu->addAction( QPixmap( "icons:icon" ), tr( "About.png" ),
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
 	ToolButton * project_new = new ToolButton(
-					embed::getIconPixmap( "project_new" ),
+					QPixmap( "icons:project_new.png" ),
 					tr( "Create new project" ),
 					this, SLOT( createNewProject() ),
 							m_toolBar );
 
 	ToolButton * project_new_from_template = new ToolButton(
-			embed::getIconPixmap( "project_new_from_template" ),
+			QPixmap( "icons:project_new_from_template.png" ),
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
 							m_toolBar );
@@ -368,35 +369,35 @@ void MainWindow::finalize()
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_open = new ToolButton(
-					embed::getIconPixmap( "project_open" ),
+					QPixmap( "icons:project_open.png" ),
 					tr( "Open existing project" ),
 					this, SLOT( openProject() ),
 								m_toolBar );
 
 
 	ToolButton * project_open_recent = new ToolButton(
-				embed::getIconPixmap( "project_open_recent" ),
+				QPixmap( "icons:project_open_recent.png" ),
 					tr( "Recently opened project" ),
 					this, SLOT( emptySlot() ), m_toolBar );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_save = new ToolButton(
-					embed::getIconPixmap( "project_save" ),
+					QPixmap( "icons:project_save.png" ),
 					tr( "Save current project" ),
 					this, SLOT( saveProject() ),
 								m_toolBar );
 
 
 	ToolButton * project_export = new ToolButton(
-				embed::getIconPixmap( "project_export" ),
+				QPixmap( "icons:project_export.png" ),
 					tr( "Export current project" ),
 					Engine::getSong(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
 	ToolButton * whatsthis = new ToolButton(
-				embed::getIconPixmap( "whatsthis" ),
+				QPixmap( "icons:whatsthis.png" ),
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ),
 								m_toolBar );
@@ -414,7 +415,7 @@ void MainWindow::finalize()
 
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
-					embed::getIconPixmap( "songeditor" ),
+					QPixmap( "icons:songeditor.png" ),
 					tr( "Show/hide Song-Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
@@ -429,7 +430,7 @@ void MainWindow::finalize()
 
 
 	ToolButton * bb_editor_window = new ToolButton(
-					embed::getIconPixmap( "bb_track_btn" ),
+					QPixmap( "icons:bb_track_btn.png" ),
 					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),
@@ -445,7 +446,7 @@ void MainWindow::finalize()
 
 
 	ToolButton * piano_roll_window = new ToolButton(
-						embed::getIconPixmap( "piano" ),
+						QPixmap( "icons:piano.png" ),
 						tr( "Show/hide Piano-Roll" ) +
 									" (F7)",
 					this, SLOT( togglePianoRollWin() ),
@@ -458,7 +459,7 @@ void MainWindow::finalize()
 				) );
 
 	ToolButton * automation_editor_window = new ToolButton(
-					embed::getIconPixmap( "automation" ),
+					QPixmap( "icons:automation.png" ),
 					tr( "Show/hide Automation Editor" ) +
 									" (F8)",
 					this,
@@ -473,7 +474,7 @@ void MainWindow::finalize()
 				) );
 
 	ToolButton * fx_mixer_window = new ToolButton(
-					embed::getIconPixmap( "fx_mixer" ),
+					QPixmap( "icons:fx_mixer.png" ),
 					tr( "Show/hide FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
@@ -485,7 +486,7 @@ void MainWindow::finalize()
 			"effects into different effect-channels." ) );
 
 	ToolButton * project_notes_window = new ToolButton(
-					embed::getIconPixmap( "project_notes" ),
+					QPixmap( "icons:project_notes.png" ),
 					tr( "Show/hide project notes" ) +
 								" (F10)",
 					this, SLOT( toggleProjectNotesWin() ),
@@ -497,7 +498,7 @@ void MainWindow::finalize()
 			"down your project notes.") );
 
 	ToolButton * controllers_window = new ToolButton(
-					embed::getIconPixmap( "controller" ),
+					QPixmap( "icons:controller.png" ),
 					tr( "Show/hide controller rack" ) +
 								" (F11)",
 					this, SLOT( toggleControllerRack() ),
@@ -778,7 +779,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		m_recentlyOpenedProjectsMenu->addAction(
-				embed::getIconPixmap( "project_file" ), *it );
+				QPixmap( "icons:project_file.png" ), *it );
 	}
 }
 
@@ -1162,7 +1163,7 @@ void MainWindow::fillTemplatesMenu()
 						it != templates.end(); ++it )
 	{
 		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
+					QPixmap( "icons:project_file.png" ),
 					( *it ).left( ( *it ).length() - 4 ) );
 	}
 
@@ -1179,7 +1180,7 @@ void MainWindow::fillTemplatesMenu()
 						it != templates.end(); ++it )
 	{
 		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
+					QPixmap( "icons:project_file.png" ),
 					( *it ).left( ( *it ).length() - 4 ) );
 	}
 }

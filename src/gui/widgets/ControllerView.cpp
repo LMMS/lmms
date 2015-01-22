@@ -37,7 +37,6 @@
 #include "CaptionMenu.h"
 #include "ControllerDialog.h"
 #include "gui_templates.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
@@ -48,7 +47,7 @@
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QWidget( _parent ),
 	ModelView( _model, this ),
-	m_bg( embed::getIconPixmap( "controller_bg" ) ),
+	m_bg( QPixmap( "icons:controller_bg.png" ) ),
 	m_subWindow( NULL ),
 	m_controllerDlg( NULL ),
 	m_show( true )
@@ -56,18 +55,18 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	setFixedSize( 210, 32 );
 
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
-	
+
 	QFont f = ctls_btn->font();
 	ctls_btn->setFont( pointSize<8>( f ) );
 	ctls_btn->setGeometry( 140, 2, 50, 14 );
-	connect( ctls_btn, SIGNAL( clicked() ), 
+	connect( ctls_btn, SIGNAL( clicked() ),
 				this, SLOT( editControls() ) );
 
 	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
 
-	m_subWindow = gui->mainWindow()->workspace()->addSubWindow( 
+	m_subWindow = gui->mainWindow()->workspace()->addSubWindow(
                 m_controllerDlg );
-	
+
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	m_subWindow->setWindowFlags( flags );
@@ -178,7 +177,7 @@ void ControllerView::modelChanged()
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
+	contextMenu->addAction( QPixmap( "icons:cancel.png" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );
 	contextMenu->addSeparator();

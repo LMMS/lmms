@@ -54,7 +54,6 @@
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Clipboard.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "FxMixerView.h"
@@ -259,13 +258,13 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * _tco,
 	if( s_textFloat == NULL )
 	{
 		s_textFloat = new TextFloat;
-		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
+		s_textFloat->setPixmap( QPixmap( "icons:clock.png" ) );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor( QCursor( QPixmap( "icons:hand.png" ), 3, 3 ) );
 	move( 0, 1 );
 	show();
 
@@ -655,7 +654,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> and drag to make "
 							"a copy." ),
-					embed::getIconPixmap( "hint" ), 0 );
+					QPixmap( "icons:hint.png" ), 0 );
 		}
 		else if( !m_tco->getAutoResize() )
 		{
@@ -668,7 +667,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> for free "
 							"resizing." ),
-					embed::getIconPixmap( "hint" ), 0 );
+					QPixmap( "icons:hint.png" ), 0 );
 		}
 //		s_textFloat->reparent( this );
 		// setup text-float as if TCO was already moved/resized
@@ -922,19 +921,19 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
+		contextMenu.addAction( QPixmap( "icons:cancel.png" ),
 					tr( "Delete (middle mousebutton)" ),
 						this, SLOT( remove() ) );
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
+		contextMenu.addAction( QPixmap( "icons:edit_cut.png" ),
 					tr( "Cut" ), this, SLOT( cut() ) );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
+	contextMenu.addAction( QPixmap( "icons:edit_copy.png" ),
 					tr( "Copy" ), m_tco, SLOT( copy() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+	contextMenu.addAction( QPixmap( "icons:edit_paste.png" ),
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
+	contextMenu.addAction( QPixmap( "icons:muted.png" ),
 				tr( "Mute/unmute (<Ctrl> + middle click)" ),
 						m_tco, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
@@ -1550,8 +1549,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * _parent ) :
 {
 	if( s_grip == NULL )
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip" ) );
+		s_grip = new QPixmap( "icons:track_op_grip.png" );
 	}
 
 	ToolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
@@ -1573,13 +1571,13 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * _parent ) :
 
 
 	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
-	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
+	m_muteBtn->setActiveGraphic( QPixmap( "icons:led_off.png" ) );
+	m_muteBtn->setInactiveGraphic( QPixmap( "icons:led_green.png" ) );
 	m_muteBtn->setCheckable( true );
 
 	m_soloBtn = new PixmapButton( this, tr( "Solo" ) );
-	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
-	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
+	m_soloBtn->setActiveGraphic( QPixmap( "icons:led_red.png" ) );
+	m_soloBtn->setInactiveGraphic( QPixmap( "icons:led_off.png" ) );
 	m_soloBtn->setCheckable( true );
 
 	if( ConfigManager::inst()->value( "ui",
@@ -1753,13 +1751,13 @@ void TrackOperationsWidget::updateMenu()
 {
 	QMenu * to_menu = m_trackOps->menu();
 	to_menu->clear();
-	to_menu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
+	to_menu->addAction( QPixmap( "icons:edit_copy.png" ).scaled( 16, 16 ),
 						tr( "Clone this track" ),
 						this, SLOT( cloneTrack() ) );
-	to_menu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
+	to_menu->addAction( QPixmap( "icons:cancel.png" ).scaled( 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-						
+
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		to_menu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );

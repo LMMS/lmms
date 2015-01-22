@@ -24,7 +24,6 @@
 
 #include "delaycontrolsdialog.h"
 #include "delaycontrols.h"
-#include "embed.h"
 #include "TempoSyncKnob.h"
 
 

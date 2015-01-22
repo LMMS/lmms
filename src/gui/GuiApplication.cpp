@@ -29,6 +29,8 @@
 #include "LmmsStyle.h"
 #include "LmmsPalette.h"
 
+#include "ConfigManager.h"
+
 #include "AutomationEditor.h"
 #include "BBEditor.h"
 #include "ControllerRackView.h"
@@ -38,6 +40,8 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
+
+#include <QDir>
 
 #include <QApplication>
 #include <QSplashScreen>
@@ -52,6 +56,9 @@ GuiApplication* GuiApplication::instance()
 GuiApplication::GuiApplication()
 {
 	// Init style and palette
+	QDir::addSearchPath("icons", ConfigManager::inst()->artworkDir());
+	QDir::addSearchPath("icons", ConfigManager::inst()->defaultArtworkDir());
+
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
@@ -62,7 +69,7 @@ GuiApplication::GuiApplication()
 	LmmsStyle::s_palette = lpal;
 
 	// Show splash screen
-	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
+	QSplashScreen splashScreen( QPixmap( "icons:splash.png" ) );
 	splashScreen.show();
 	splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
 								Qt::AlignRight | Qt::AlignBottom, Qt::white );

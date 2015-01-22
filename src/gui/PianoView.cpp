@@ -46,7 +46,6 @@
 
 #include "PianoView.h"
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
@@ -109,19 +108,19 @@ PianoView::PianoView( QWidget * _parent ) :
 {
 	if( s_whiteKeyPm == NULL )
 	{
-		s_whiteKeyPm = new QPixmap( embed::getIconPixmap( "white_key" ) );
+		s_whiteKeyPm = new QPixmap( "icons:white_key.png" );
 	}
 	if( s_blackKeyPm == NULL )
 	{
-		s_blackKeyPm = new QPixmap( embed::getIconPixmap( "black_key" ) );
+		s_blackKeyPm = new QPixmap( "icons:black_key.png" );
 	}
 	if( s_whiteKeyPressedPm == NULL )
 	{
-		s_whiteKeyPressedPm = new QPixmap( embed::getIconPixmap( "white_key_pressed" ) );
+		s_whiteKeyPressedPm = new QPixmap( "icons:white_key_pressed.png" );
 	}
 	if ( s_blackKeyPressedPm == NULL )
 	{
-		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap( "black_key_pressed" ) );
+		s_blackKeyPressedPm = new QPixmap( "icons:black_key_pressed.png" );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );

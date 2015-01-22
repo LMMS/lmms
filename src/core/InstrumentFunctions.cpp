@@ -25,12 +25,12 @@
 #include <QDomElement>
 
 #include "InstrumentFunctions.h"
+
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "PresetPreviewPlayHandle.h"
-
 
 
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
@@ -45,7 +45,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "aug" ), { 0, 4, 8, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "augsus4" ), { 0, 5, 8, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "tri" ), { 0, 3, 6, 9, -1 } },
-	
+
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6" ), { 0, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6sus4" ), { 0, 5, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
@@ -133,7 +133,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Chromatic" ), { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Half-Whole Diminished" ), { 0, 1, 3, 4, 6, 7, 9, 10, -1 } },
-	
+
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } }
 } ;
 
@@ -260,7 +260,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				Engine::mixer()->addPlayHandle( 
+				Engine::mixer()->addPlayHandle(
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking )
 						);
@@ -518,7 +518,7 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	// Keep compatibility with version 0.2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
 	{
-	 	m_arpTimeKnob->setSyncMode( 
+	 	m_arpTimeKnob->setSyncMode(
  		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
  						 "arpsyncmode" ).toInt() );
 	}*/

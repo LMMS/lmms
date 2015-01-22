@@ -3,7 +3,7 @@
  *                          which is renamable by double-clicking it
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -37,7 +37,6 @@
 #include "Engine.h"
 
 
-
 TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
 	m_trackView( _tv ),
@@ -45,7 +44,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAcceptDrops( true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor( QCursor( QPixmap( "icons:hand.png" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 
 	if( ConfigManager::inst()->value( "ui",

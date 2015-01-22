@@ -25,7 +25,6 @@
 
 #include "EqControlsDialog.h"
 #include "EqControls.h"
-#include "embed.h"
 #include "Fader.h"
 #include "EqFader.h"
 #include "Engine.h"

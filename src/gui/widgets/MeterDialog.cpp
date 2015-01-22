@@ -30,7 +30,6 @@
 
 #include "MeterDialog.h"
 #include "MeterModel.h"
-#include "embed.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 

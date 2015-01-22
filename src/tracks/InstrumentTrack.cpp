@@ -47,7 +47,6 @@
 #include "debug.h"
 #include "EffectChain.h"
 #include "EffectRackView.h"
-#include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "FileBrowser.h"
@@ -838,7 +837,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	m_tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_tlb->setCheckable( true );
-	m_tlb->setIcon( embed::getIconPixmap( "instrument_track" ) );
+	m_tlb->setIcon( QPixmap( "icons:instrument_track.png" ) );
 	m_tlb->move( 3, 1 );
 	m_tlb->show();
 
@@ -1228,7 +1227,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addStretch();
 
 
-	QPushButton* saveSettingsBtn = new QPushButton( embed::getIconPixmap( "project_save" ), QString() );
+	QPushButton* saveSettingsBtn = new QPushButton( QPixmap( "icons:project_save.png" ), QString() );
 	saveSettingsBtn->setMinimumSize( 32, 32 );
 
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
@@ -1305,7 +1304,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
   systemMenu->actions().at( 2 )->setVisible( false ); // Size
   systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
 
-  subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
+  subWin->setWindowIcon( QPixmap( "icons:instrument_track.png" ) );
 	subWin->setFixedSize( subWin->size() );
 	subWin->hide();
 }

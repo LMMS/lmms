@@ -30,7 +30,6 @@
 
 #include "CaptionMenu.h"
 #include "Engine.h"
-#include "embed.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 
@@ -209,7 +208,7 @@ void automatableButtonGroup::addButton( AutomatableButton * _btn )
 	_btn->m_group = this;
 	_btn->setCheckable( true );
 	_btn->model()->setValue( false );
-	// disable journalling as we're recording changes of states of 
+	// disable journalling as we're recording changes of states of
 	// button-group members on our own
 	_btn->model()->setJournalling( false );
 

@@ -460,7 +460,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( QPixmap( ":/organic/artwork.png" ) );
+		s_artwork = new QPixmap( ":/organic/artwork.png" );
 	}
 
 }

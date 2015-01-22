@@ -34,7 +34,6 @@
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
 #include "Engine.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "templates.h"

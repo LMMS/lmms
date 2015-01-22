@@ -42,7 +42,6 @@
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -125,7 +124,7 @@ SongEditor::SongEditor( Song * _song ) :
 	int tempoSpinBoxCol = gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
 #if 0
-	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
+	toolButton * hq_btn = new toolButton( QPixmap( "icons:hq_mode.png" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
 	hq_btn->setCheckable( true );
@@ -147,7 +146,7 @@ SongEditor::SongEditor( Song * _song ) :
 
 
 	QLabel * master_vol_lbl = new QLabel( tb );
-	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
+	master_vol_lbl->setPixmap( QPixmap( "icons:master_volume.png" ) );
 
 	m_masterVolumeSlider = new AutomatableSlider( tb,
 							tr( "Master volume" ) );
@@ -170,7 +169,7 @@ SongEditor::SongEditor( Song * _song ) :
 
 	m_mvsStatus = new TextFloat;
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
-	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
+	m_mvsStatus->setPixmap( QPixmap( "icons:master_volume.png" ) );
 
 	gui->mainWindow()->addWidgetToToolBar( master_vol_lbl );
 	gui->mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
@@ -180,7 +179,7 @@ SongEditor::SongEditor( Song * _song ) :
 
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
-	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
+	master_pitch_lbl->setPixmap( QPixmap( "icons:master_pitch.png" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
 	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Master pitch" ) );
@@ -202,7 +201,7 @@ SongEditor::SongEditor( Song * _song ) :
 
 	m_mpsStatus = new TextFloat;
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
-	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
+	m_mpsStatus->setPixmap( QPixmap( "icons:master_pitch.png" ) );
 
 	gui->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
 	gui->mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
@@ -217,7 +216,7 @@ SongEditor::SongEditor( Song * _song ) :
 
 	//vcw_layout->addStretch();
 	vcw_layout->addWidget( new VisualizationWidget(
-			embed::getIconPixmap( "output_graph" ), vc_w ) );
+			QPixmap( "icons:output_graph.png" ), vc_w ) );
 
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
@@ -611,7 +610,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_editor(new SongEditor(song))
 {
 	setWindowTitle( tr( "Song-Editor" ) );
-	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
+	setWindowIcon( QPixmap( "icons:songeditor.png" ) );
 
 	setCentralWidget(m_editor);
 	setAcceptDrops(true);
@@ -625,13 +624,13 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
-	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
+	m_addBBTrackAction = new QAction(QPixmap("icons:add_bb_track.png"),
 									 tr("Add beat/bassline"), this);
 
-	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
+	m_addSampleTrackAction = new QAction(QPixmap("icons:add_sample_track.png"),
 										 tr("Add sample-track"), this);
 
-	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
+	m_addAutomationTrackAction = new QAction(QPixmap("icons:add_automation.png"),
 											 tr("Add automation-track"), this);
 
 	connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
@@ -639,8 +638,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	m_drawModeAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_selectModeAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
+	m_drawModeAction = editModeGroup->addAction(QPixmap("icons:edit_draw"), tr("Draw mode.png"));
+	m_selectModeAction = editModeGroup->addAction(QPixmap("icons:edit_select"), tr("Edit mode (select and move).png"));
 
 	m_drawModeAction->setChecked(true);
 
@@ -658,7 +657,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+	zoom_lbl->setPixmap( QPixmap( "icons:zoom.png" ) );
 
 	// setup zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );

@@ -35,7 +35,6 @@
 #include "CaptionMenu.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
@@ -48,19 +47,19 @@
 
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
-	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
+	m_bg( QPixmap( "icons:effect_plugin.png" ) ),
 	m_subWindow( NULL ),
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
-	
+
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
-	
+
 	ToolTip::add( m_bypass, tr( "On/Off" ) );
 
 
@@ -247,14 +246,14 @@ void EffectView::closeEffects()
 void EffectView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
+	contextMenu->addAction( QPixmap( "icons:arp_up.png" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
+	contextMenu->addAction( QPixmap( "icons:arp_down.png" ),
 						tr( "Move &down" ),
 						this, SLOT( moveDown() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
+	contextMenu->addAction( QPixmap( "icons:cancel.png" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deletePlugin() ) );
 	contextMenu->addSeparator();

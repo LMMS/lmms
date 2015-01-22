@@ -162,7 +162,7 @@ void VstEffectControls::managePlugin( void )
 		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != NULL) {
-		if (m_subWindow->widget()->isVisible() == false ) { 
+		if (m_subWindow->widget()->isVisible() == false ) {
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -218,8 +218,8 @@ void VstEffectControls::updateMenu( void )
         		presetActions[i]->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
         		presetActions[i]->setData(i);
 			if (i == lastPosInMenu) {
-        			presetActions[i]->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
-			} else  presetActions[i]->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
+        			presetActions[i]->setIcon(QPixmap( "icons:sample_file.png" ).scaled( 16, 16 ));
+			} else  presetActions[i]->setIcon(QPixmap( "icons:edit_copy.png" ).scaled( 16, 16 ));
 			to_menu->addAction( presetActions[i] );
      		}
 
@@ -310,7 +310,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
         m_vi->m_scrollArea = new QScrollArea( widget );
 	l = new QGridLayout( widget );
 
-	m_vi->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow | 
+	m_vi->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
@@ -383,9 +383,9 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 			m_vi->vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( ( s_dumpValues.at( 2 ) ).toFloat(), 
+			m_vi->knobFModel[ i ] = new FloatModel( ( s_dumpValues.at( 2 ) ).toFloat(),
 					0.0f, 1.0f, 0.01f, _eff, tr( paramStr ) );
-			connect( m_vi->knobFModel[ i ], SIGNAL( dataChanged() ), this, 
+			connect( m_vi->knobFModel[ i ], SIGNAL( dataChanged() ), this,
 									SLOT( setParameter() ) );
 			m_vi->vstKnobs[ i ] ->setModel( m_vi->knobFModel[ i ] );
 		}
@@ -470,7 +470,7 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 			{
 				m_vi2->vstKnobs[ i ]->hide();
 				m_displayAutomatedOnly->setText( "All" );
-			} else {	
+			} else {
 				m_vi2->vstKnobs[ i ]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
@@ -498,7 +498,7 @@ void manageVSTEffectView::setParameter( void )
 manageVSTEffectView::~manageVSTEffectView()
 {
 	if( m_vi2->knobFModel != NULL )
-	{ 
+	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
@@ -517,18 +517,18 @@ manageVSTEffectView::~manageVSTEffectView()
 		delete [] m_vi2->knobFModel;
 		m_vi2->knobFModel = NULL;
 	}
- 
+
 	if( m_vi2->m_scrollArea != NULL )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = NULL;
 	}
- 
+
 	if( m_vi2->m_subWindow != NULL )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
- 
+
 		if( m_vi2->m_subWindow != NULL )
 		{
 			delete m_vi2->m_subWindow;

@@ -23,8 +23,8 @@
  */
 
 #include "ComboBoxModel.h"
-#include "embed.h"
 
+#include "embed.h"
 
 
 void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
@@ -61,7 +61,7 @@ int ComboBoxModel::findText( const QString& txt ) const
 			return it - m_items.begin();
 		}
 	}
-	return -1; 
+	return -1;
 }
 
 

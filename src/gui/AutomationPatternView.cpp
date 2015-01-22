@@ -29,7 +29,6 @@
 #include "AutomationPatternView.h"
 #include "AutomationEditor.h"
 #include "AutomationPattern.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "ProjectJournal.h"
@@ -58,9 +57,8 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 	ToolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
 	setStyle( QApplication::style() );
-	
-	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
-							"pat_rec" ) ); }
+
+	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( "icons:pat_rec.png" ); }
 }
 
 
@@ -175,7 +173,7 @@ void AutomationPatternView::flipX()
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
-	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
+	QAction * a = new QAction( QPixmap( "icons:automation.png" ),
 				tr( "Open in Automation editor" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
@@ -183,22 +181,22 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
+	_cm->addAction( QPixmap( "icons:edit_erase.png" ),
 			tr( "Clear" ), m_pat, SLOT( clear() ) );
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+	_cm->addAction( QPixmap( "icons:reload" ), tr( "Reset name.png" ),
 						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+	_cm->addAction( QPixmap( "icons:edit_rename.png" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "record" ),
+	_cm->addAction( QPixmap( "icons:record.png" ),
 						tr( "Set/clear record" ),
 						this, SLOT( toggleRecording() ) );
-	_cm->addAction( embed::getIconPixmap( "flip_y" ),
+	_cm->addAction( QPixmap( "icons:flip_y.png" ),
 						tr( "Flip Vertically (Visible)" ),
 						this, SLOT( flipY() ) );
-	_cm->addAction( embed::getIconPixmap( "flip_x" ),
+	_cm->addAction( QPixmap( "icons:flip_x.png" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT( flipX() ) );
 	if( !m_pat->m_objects.isEmpty() )
@@ -384,7 +382,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	if( m_pat->isMuted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
-				embed::getIconPixmap( "muted", 16, 16 ) );
+				QPixmap( "icons:muted.png" ).scaled( 16, 16 ) );
 	}
 
 

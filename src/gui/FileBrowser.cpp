@@ -3,7 +3,7 @@
  *                    sample-file-browser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -36,7 +36,6 @@
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "debug.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
@@ -86,7 +85,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			this, SLOT( filterItems( const QString & ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
-				embed::getIconPixmap( "reload" ),
+				QPixmap( "icons:reload.png" ),
 						QString::null, ops );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
@@ -155,7 +154,7 @@ void FileBrowser::filterItems( const QString & filter )
 			it->setHidden( !it->text( 0 ).
 				contains( filter, Qt::CaseInsensitive ) );
 		}
-	
+
 	}
 }
 
@@ -212,7 +211,7 @@ bool FileBrowser::filterItems(QTreeWidgetItem * item, const QString & filter )
 				contains( filter, Qt::CaseInsensitive );
 			it->setHidden( !cm );
 		}
-	
+
 		if( cm )
 		{
 			matched = true;
@@ -447,8 +446,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 					tr( "Loading sample" ),
 					tr( "Please wait, loading sample for "
 								"preview..." ),
-					embed::getIconPixmap( "sample_file",
-								24, 24 ), 0 );
+					QPixmap( "icons:sample_file.png").scaled( 24, 24 ), 0 );
 			qApp->processEvents(
 					QEventLoop::ExcludeUserInputEvents );
 			SamplePlayHandle * s = new SamplePlayHandle(
@@ -496,27 +494,27 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 	new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
 					"presetfile" : "pluginpresetfile",
 				f->fullName(),
-				embed::getIconPixmap( "preset_file" ), this );
+				QPixmap( "icons:preset_file.png" ), this );
 					break;
 
 				case FileItem::SampleFile:
 	new StringPairDrag( "samplefile", f->fullName(),
-				embed::getIconPixmap( "sample_file" ), this );
+				QPixmap( "icons:sample_file.png" ), this );
 					break;
 				case FileItem::SoundFontFile:
  	new StringPairDrag( "soundfontfile", f->fullName(),
- 				embed::getIconPixmap( "soundfont_file" ), this );
+ 				QPixmap( "icons:soundfont_file.png" ), this );
  					break;
 				case FileItem::VstPluginFile:
 	new StringPairDrag( "vstpluginfile", f->fullName(),
-				embed::getIconPixmap( "vst_plugin_file" ), this );
+				QPixmap( "icons:vst_plugin_file.png" ), this );
 					break;
 				case FileItem::MidiFile:
 // don't allow dragging FLP-files as FLP import filter clears project
 // without asking
 //				case fileItem::FlpFile:
 	new StringPairDrag( "importedproject", f->fullName(),
-				embed::getIconPixmap( "midi_file" ), this );
+				QPixmap( "icons:midi_file.png" ), this );
 					break;
 
 				default:
@@ -752,19 +750,19 @@ void Directory::initPixmaps( void )
 	if( s_folderPixmap == NULL )
 	{
 		s_folderPixmap = new QPixmap(
-					embed::getIconPixmap( "folder" ) );
+					QPixmap( "icons:folder.png" ) );
 	}
 
 	if( s_folderOpenedPixmap == NULL )
 	{
 		s_folderOpenedPixmap = new QPixmap(
-				embed::getIconPixmap( "folder_opened" ) );
+				QPixmap( "icons:folder_opened.png" ) );
 	}
 
 	if( s_folderLockedPixmap == NULL )
 	{
 		s_folderLockedPixmap = new QPixmap(
-				embed::getIconPixmap( "folder_locked" ) );
+				QPixmap( "icons:folder_locked.png" ) );
 	}
 }
 
@@ -795,8 +793,7 @@ void Directory::update( void )
 				sep->setText( 0,
 					FileBrowserTreeWidget::tr(
 						"--- Factory files ---" ) );
-				sep->setIcon( 0, embed::getIconPixmap(
-							"factory_files" ) );
+				sep->setIcon( 0, QPixmap( "icons:factory_files.png" ) );
 				insertChild(  m_dirCount + top_index - 1, sep );
 			}
 		}
@@ -918,52 +915,44 @@ FileItem::FileItem(const QString & name, const QString & path ) :
 
 void FileItem::initPixmaps( void )
 {
-	if( s_projectFilePixmap == NULL )
+	if( s_projectFilePixmap == nullptr )
 	{
-		s_projectFilePixmap = new QPixmap( embed::getIconPixmap(
-						"project_file", 16, 16 ) );
+		s_projectFilePixmap = new QPixmap( QPixmap( "icons:project_file.png" ).scaled( 16, 16 ) );
 	}
 
-	if( s_presetFilePixmap == NULL )
+	if( s_presetFilePixmap == nullptr )
 	{
-		s_presetFilePixmap = new QPixmap( embed::getIconPixmap(
-						"preset_file", 16, 16 ) );
+		s_presetFilePixmap = new QPixmap( QPixmap( "icons:preset_file.png" ).scaled( 16, 16 ) );
 	}
 
-	if( s_sampleFilePixmap == NULL )
+	if( s_sampleFilePixmap == nullptr )
 	{
-		s_sampleFilePixmap = new QPixmap( embed::getIconPixmap(
-						"sample_file", 16, 16 ) );
+		s_sampleFilePixmap = new QPixmap( QPixmap( "icons:sample_file.png" ).scaled( 16, 16 ) );
 	}
 
-	if ( s_soundfontFilePixmap == NULL )
+	if ( s_soundfontFilePixmap == nullptr )
 	{
-		s_soundfontFilePixmap = new QPixmap( embed::getIconPixmap(
-						"soundfont_file", 16, 16 ) );
-	}
-	
-	if ( s_vstPluginFilePixmap == NULL ) 
-	{
-		s_vstPluginFilePixmap = new QPixmap( embed::getIconPixmap(
-						"vst_plugin_file", 16, 16 ) );
+		s_soundfontFilePixmap = new QPixmap( QPixmap( "icons:soundfont_file.png" ).scaled( 16, 16 ) );
 	}
 
-	if( s_midiFilePixmap == NULL )
+	if ( s_vstPluginFilePixmap == nullptr )
 	{
-		s_midiFilePixmap = new QPixmap( embed::getIconPixmap(
-							"midi_file", 16, 16 ) );
+		s_vstPluginFilePixmap = new QPixmap( QPixmap( "icons:vst_plugin_file.png" ).scaled( 16, 16 ) );
 	}
 
-	if( s_flpFilePixmap == NULL )
+	if( s_midiFilePixmap == nullptr )
 	{
-		s_flpFilePixmap = new QPixmap( embed::getIconPixmap(
-							"midi_file", 16, 16 ) );
+		s_midiFilePixmap = new QPixmap( QPixmap( "icons:midi_file.png" ).scaled( 16, 16 ) );
 	}
 
-	if( s_unknownFilePixmap == NULL )
+	if( s_flpFilePixmap == nullptr )
 	{
-		s_unknownFilePixmap = new QPixmap( embed::getIconPixmap(
-							"unknown_file" ) );
+		s_flpFilePixmap = new QPixmap( QPixmap( "icons:midi_file.png" ).scaled( 16, 16 ) );
+	}
+
+	if( s_unknownFilePixmap == nullptr )
+	{
+		s_unknownFilePixmap = new QPixmap( QPixmap( "icons:unknown_file.png" ) );
 	}
 
 	switch( m_type )

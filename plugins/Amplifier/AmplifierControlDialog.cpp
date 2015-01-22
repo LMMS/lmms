@@ -27,7 +27,6 @@
 
 #include "AmplifierControlDialog.h"
 #include "AmplifierControls.h"
-#include "embed.h"
 
 AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	EffectControlDialog( controls )
