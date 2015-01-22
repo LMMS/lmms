@@ -358,7 +358,8 @@ CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in" "${CM
 
 # set compiler flags
 SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
-IF(NOT LMMS_BUILD_APPLE)
+OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
+IF(${USE_WERROR})
    SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
 ENDIF()
 
