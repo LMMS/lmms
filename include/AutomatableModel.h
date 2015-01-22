@@ -25,7 +25,6 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
-#include "lmms_math.h"
 #include <QtCore/QMutex>
 
 #include "JournallingObject.h"
@@ -174,7 +173,7 @@ public:
 	{
 		return castValue<T>( m_step );
 	}
-	
+
 	//! @brief Returns value scaled with the scale type and min/max values of this model
 	float scaledValue( float value ) const;
 	//! @brief Returns value applied with the inverse of this model's scale type
@@ -265,22 +264,22 @@ public:
 	}
 
 	float globalAutomationValueAt( const MidiTime& time );
-	
+
 	bool hasStrictStepSize() const
 	{
 		return m_hasStrictStepSize;
 	}
-	
+
 	void setStrictStepSize( const bool b )
 	{
 		m_hasStrictStepSize = b;
 	}
-	
+
 	static void incrementPeriodCounter()
 	{
 		++s_periodCounter;
 	}
-	
+
 	static void resetPeriodCounter()
 	{
 		s_periodCounter = 0;
@@ -333,13 +332,13 @@ private:
 	float m_step;
 	float m_range;
 	float m_centerValue;
-	
+
 	bool m_valueChanged;
 
 	// currently unused?
 	float m_oldValue;
 	int m_setValueDepth;
-	
+
 	// used to determine if step size should be applied strictly (ie. always)
 	// or only when value set from gui (default)
 	bool m_hasStrictStepSize;
@@ -357,9 +356,9 @@ private:
 	ValueBuffer m_valueBuffer;
 	long m_lastUpdatedPeriod;
 	static long s_periodCounter;
-	
+
 	bool m_hasSampleExactData;
-	
+
 	// prevent several threads from attempting to write the same vb at the same time
 	QMutex m_valueBufferMutex;
 

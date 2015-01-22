@@ -29,7 +29,6 @@
 #include <QtCore/QPair>
 
 #include "AutomatableModel.h"
-#include "templates.h"
 
 class PixmapLoader;
 

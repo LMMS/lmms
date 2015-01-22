@@ -25,6 +25,7 @@
 #ifndef MODEL_VIEW_H
 #define MODEL_VIEW_H
 
+#include <QtCore/QPointer>
 #include "Model.h"
 
 

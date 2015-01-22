@@ -25,8 +25,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <QtCore/QString>
 #include <QtCore/QObject>
-#include <QtCore/QPointer>
 
 #include "export.h"
 

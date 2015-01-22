@@ -22,13 +22,15 @@
  *
  */
 
+#include "BBEditor.h"
+
 #include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
 #include <QMdiArea>
 
-#include "BBEditor.h"
+#include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"

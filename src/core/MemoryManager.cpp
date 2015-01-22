@@ -26,6 +26,7 @@
 
 #include "MemoryManager.h"
 #include <QtGlobal>
+#include <QReadWriteLock>
 #include <stdint.h>
 
 

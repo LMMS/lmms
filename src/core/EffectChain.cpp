@@ -29,7 +29,6 @@
 #include "EffectChain.h"
 #include "Effect.h"
 #include "Engine.h"
-#include "debug.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -148,7 +147,7 @@ void EffectChain::moveDown( Effect * _effect )
 	if( _effect != m_effects.last() )
 	{
 		int i = 0;
-		for( EffectList::Iterator it = m_effects.begin(); 
+		for( EffectList::Iterator it = m_effects.begin();
 					it != m_effects.end(); it++, i++ )
 		{
 			if( *it == _effect )
@@ -156,10 +155,10 @@ void EffectChain::moveDown( Effect * _effect )
 				break;
 			}
 		}
-		
+
 		Effect * temp = m_effects[i + 1];
 		m_effects[i + 1] = _effect;
-		m_effects[i] = temp;	
+		m_effects[i] = temp;
 	}
 }
 
@@ -171,7 +170,7 @@ void EffectChain::moveUp( Effect * _effect )
 	if( _effect != m_effects.first() )
 	{
 		int i = 0;
-		for( EffectList::Iterator it = m_effects.begin(); 
+		for( EffectList::Iterator it = m_effects.begin();
 					it != m_effects.end(); it++, i++ )
 		{
 			if( *it == _effect )
@@ -179,10 +178,10 @@ void EffectChain::moveUp( Effect * _effect )
 				break;
 			}
 		}
-		
+
 		Effect * temp = m_effects[i - 1];
 		m_effects[i - 1] = _effect;
-		m_effects[i] = temp;	
+		m_effects[i] = temp;
 	}
 }
 
@@ -240,8 +239,8 @@ void EffectChain::startRunning()
 	{
 		return;
 	}
-	
-	for( EffectList::Iterator it = m_effects.begin(); 
+
+	for( EffectList::Iterator it = m_effects.begin();
 						it != m_effects.end(); it++ )
 	{
 		( *it )->startRunning();

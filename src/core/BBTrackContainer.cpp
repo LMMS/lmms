@@ -2,7 +2,7 @@
  * BBTrackContainer.cpp - model-component of BB-Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -25,8 +25,6 @@
 
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
-#include "ComboBox.h"
-#include "embed.h"
 #include "Engine.h"
 #include "Song.h"
 

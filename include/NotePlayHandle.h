@@ -26,14 +26,13 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
-#include "lmmsconfig.h"
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
 #include "MemoryManager.h"
-#include <QtCore/QAtomicInt>
-#include <QtCore/QReadWriteLock>
 
+class QAtomicInt;
+class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -59,7 +58,7 @@ public:
 		OriginCount
 	};
 	typedef Origins Origin;
-	
+
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
@@ -83,9 +82,9 @@ public:
 	{
 		return m_midiChannel;
 	}
-	
+
 	/*! convenience function that returns offset for the first period and zero otherwise,
-		used by instruments to handle the offset: instruments have to check this property and 
+		used by instruments to handle the offset: instruments have to check this property and
 		add the correct number of empty frames in the beginning of the period */
 	f_cnt_t noteOffset() const
 	{

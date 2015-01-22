@@ -22,18 +22,14 @@
  *
  */
 
-#include <math.h>
-
 #include "Mixer.h"
+
+#include "AudioPort.h"
 #include "FxMixer.h"
-#include "MixHelpers.h"
 #include "MixerWorkerThread.h"
 #include "Song.h"
-#include "templates.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
-#include "InstrumentTrack.h"
-#include "debug.h"
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
@@ -292,7 +288,7 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
 	int size = m_inputBufferSize[ m_inputBufferWrite ];
 	sampleFrame * buf = m_inputBuffer[ m_inputBufferWrite ];
-	
+
 	if( frames + _frames > size )
 	{
 		size = qMax( size * 2, frames + _frames );
@@ -305,10 +301,10 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 		buf = ab;
 	}
-	
+
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
-	
+
 	unlockInputFrames();
 }
 
@@ -359,7 +355,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		if( it != m_playHandles.end() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle ) 
+			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -415,7 +411,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		if( ( *it )->isFinished() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle ) 
+			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -446,7 +442,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
-	
+
 	// refresh buffer pool
 	BufferManager::refresh();
 
@@ -639,7 +635,7 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 		return true;
 	}
 
-	if( handle->type() == PlayHandle::TypeNotePlayHandle ) 
+	if( handle->type() == PlayHandle::TypeNotePlayHandle )
 	{
 		NotePlayHandleManager::release( (NotePlayHandle*)handle );
 	}
@@ -664,7 +660,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		if( it != m_playHandles.end() )
 		{
 			m_playHandles.erase( it );
-			if( _ph->type() == PlayHandle::TypeNotePlayHandle ) 
+			if( _ph->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) _ph );
 			}
@@ -690,7 +686,7 @@ void Mixer::removePlayHandles( Track * _track, bool removeIPHs )
 		if( ( *it )->isFromTrack( _track ) && ( removeIPHs || ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle ) )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle ) 
+			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -942,8 +938,8 @@ void Mixer::fifoWriter::run()
 #ifdef __SSE__
 /* FTZ flag */
 	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
-#endif	
-	
+#endif
+
 #if 0
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H

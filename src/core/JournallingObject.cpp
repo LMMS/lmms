@@ -29,7 +29,6 @@
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "ProjectJournal.h"
-#include "base64.h"
 #include "Engine.h"
 
 
@@ -70,7 +69,7 @@ void JournallingObject::addJournalCheckPoint()
 QDomElement JournallingObject::saveState( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	if( isJournalling() ) 
+	if( isJournalling() )
 	{
 		QDomElement _this = SerializingObject::saveState( _doc, _parent );
 

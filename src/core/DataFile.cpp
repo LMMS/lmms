@@ -42,9 +42,6 @@
 #include "lmmsversion.h"
 #include "base64.h"
 
-// bbTCO::defaultColor()
-#include "BBTrack.h"
-
 
 
 DataFile::typeDescStruct
@@ -628,7 +625,7 @@ void DataFile::upgrade()
 			el.setAttribute( "lp1pos",
 				el.attribute( "lp1pos" ).toInt()*3 );
 		}
-		
+
 	}
 
 	if( version < "0.4.0-20080607" )

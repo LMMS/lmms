@@ -25,7 +25,6 @@
 #include <QDomElement>
 
 #include "EnvelopeAndLfoParameters.h"
-#include "debug.h"
 #include "Engine.h"
 #include "Mixer.h"
 #include "Oscillator.h"
@@ -379,7 +378,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	with 4.15 file format*/
 
 	if( _this.hasAttribute( "sus" ) )
-	{	
+	{
 		m_sustainModel.loadSettings( _this, "sus" );
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
@@ -392,7 +391,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		( TempoSyncKnob::TtempoSyncMode ) _this.attribute(
 						"lfosyncmode" ).toInt() );
 	}*/
-	
+
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
 	updateSampleVars();

@@ -27,7 +27,6 @@
 #include "FxMixer.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
-#include "Effect.h"
 #include "Song.h"
 
 #include "InstrumentTrack.h"
