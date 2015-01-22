@@ -3378,11 +3378,11 @@ void PianoRoll::finishRecordNote(const Note & n )
 		{
 			if( it->key() == n.key() )
 			{
-				Note n( n.length(), it->pos(),
+				Note n1( n.length(), it->pos(),
 						it->key(), it->getVolume(),
 						it->getPanning() );
-				n.quantizeLength( quantization() );
-				m_pattern->addNote( n );
+				n1.quantizeLength( quantization() );
+				m_pattern->addNote( n1 );
 				update();
 				m_recordingNotes.erase( it );
 				break;
