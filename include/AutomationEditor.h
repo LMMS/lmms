@@ -70,7 +70,6 @@ public:
 
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & parent);
-
 	QString nodeName() const
 	{
 		return "automationeditor";

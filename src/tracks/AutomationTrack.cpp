@@ -127,7 +127,6 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
 	TrackView( _at, tcv )
 {

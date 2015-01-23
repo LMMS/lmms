@@ -241,7 +241,6 @@ void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 
 
 
-
 // qproperty access methods
 
 QColor AutomationEditor::gridColor() const
@@ -2301,9 +2300,9 @@ void AutomationEditorWindow::dropEvent(QDropEvent *_de)
 			{
 				m_editor->m_pattern->objectDestroyed( m_editor->m_pattern->firstObject()->id() );
 			}
+			m_editor->m_pattern->clear();
 			 m_editor->m_pattern->addObject( mod );
 			setCurrentPattern( m_editor->m_pattern );
-
 		}
 	}
 
