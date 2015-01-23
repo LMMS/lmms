@@ -82,7 +82,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Left gain:</source>
-        <translation type="unfinished">Vänster volym:</translation>
+        <translation type="unfinished">Vänster förstärkning:</translation>
     </message>
     <message>
         <source>RIGHT</source>
@@ -90,7 +90,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Right gain:</source>
-        <translation type="unfinished">Höger volym:</translation>
+        <translation type="unfinished">Höger förstärkning:</translation>
     </message>
 </context>
 <context>
@@ -105,11 +105,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Left gain</source>
-        <translation type="unfinished">Vänster volym</translation>
+        <translation type="unfinished">Vänster förstärkning</translation>
     </message>
     <message>
         <source>Right gain</source>
-        <translation type="unfinished">Höger volym</translation>
+        <translation type="unfinished">Höger förstärkning</translation>
     </message>
 </context>
 <context>
@@ -131,7 +131,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation type="unfinished">Klicka här för att öppna en anna ljud fil. En dialogvisas där du väljer din fil. Inställningar som looping, start och slutpunkter, volym och sådant omställs inte. Därför låter det kanske inte som originalfilen.</translation>
+        <translation type="unfinished">Klicka här för att öppna en anna ljud fil. En dialogvisas där du väljer din fil. Inställningar som looping, start och slutpunkter, amplifiering och sådant omställs inte. Därför låter det kanske inte som originalfilen.</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -607,7 +607,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Gain:</source>
-        <translation type="unfinished">Volym:</translation>
+        <translation type="unfinished">Förstärkning:</translation>
     </message>
     <message>
         <source>RATIO</source>
@@ -626,7 +626,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">Volym</translation>
+        <translation type="unfinished">Förstärkning</translation>
     </message>
     <message>
         <source>Ratio</source>
@@ -649,7 +649,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Input Gain:</source>
-        <translation type="unfinished">Input Volym:</translation>
+        <translation type="unfinished">Input Förstärkning:</translation>
     </message>
     <message>
         <source>NOIS</source>
@@ -661,7 +661,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Output Gain:</source>
-        <translation type="unfinished">Output Volym</translation>
+        <translation type="unfinished">Output Förstärkning</translation>
     </message>
     <message>
         <source>CLIP</source>
