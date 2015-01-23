@@ -2223,6 +2223,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );
+	m_toolBar->setAcceptDrops( true );
 }
 
 
@@ -2285,7 +2286,7 @@ const AutomationPattern* AutomationEditorWindow::currentPattern()
 	return m_editor->currentPattern();
 }
 
-void AutomationEditorWindow::dropEvent(QDropEvent *_de)
+void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString val = StringPairDrag::decodeValue( _de );
@@ -2296,20 +2297,14 @@ void AutomationEditorWindow::dropEvent(QDropEvent *_de)
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			if( m_editor->m_pattern->firstObject() )
-			{
-				m_editor->m_pattern->objectDestroyed( m_editor->m_pattern->firstObject()->id() );
-			}
-			m_editor->m_pattern->clear();
-			 m_editor->m_pattern->addObject( mod );
-			setCurrentPattern( m_editor->m_pattern );
+			m_editor->m_pattern->addObject( mod );
 		}
 	}
 
 	update();
 }
 
-void AutomationEditorWindow::dragEnterEvent(QDragEnterEvent *_dee)
+void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
