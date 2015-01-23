@@ -70,6 +70,7 @@ public:
 
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & parent);
+
 	QString nodeName() const
 	{
 		return "automationeditor";
@@ -261,6 +262,9 @@ public:
 
 	void setCurrentPattern(AutomationPattern* pattern);
 	const AutomationPattern* currentPattern();
+
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 
 	void open(AutomationPattern* pattern);
 

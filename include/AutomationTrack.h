@@ -52,6 +52,7 @@ public:
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
+
 private:
 	friend class AutomationTrackView;
 
