@@ -2298,6 +2298,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 		if( mod != NULL )
 		{
 			m_editor->m_pattern->addObject( mod );
+			setCurrentPattern( m_editor->m_pattern );
 		}
 	}
 
