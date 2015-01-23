@@ -64,6 +64,8 @@
 #include "PianoRoll.h"
 #include "debug.h"
 #include "MeterModel.h"
+#include "StringPairDrag.h"
+#include "ProjectJournal.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;
@@ -2220,6 +2222,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
+	setAcceptDrops( true );
+	m_toolBar->setAcceptDrops( true );
 }
 
 
@@ -2280,6 +2284,30 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 const AutomationPattern* AutomationEditorWindow::currentPattern()
 {
 	return m_editor->currentPattern();
+}
+
+void AutomationEditorWindow::dropEvent( QDropEvent *_de )
+{
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
+	if( type == "automatable_model" )
+	{
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
+				Engine::projectJournal()->
+					journallingObject( val.toInt() ) );
+		if( mod != NULL )
+		{
+			m_editor->m_pattern->addObject( mod );
+			setCurrentPattern( m_editor->m_pattern );
+		}
+	}
+
+	update();
+}
+
+void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
+{
+	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
 void AutomationEditorWindow::open(AutomationPattern* pattern)
