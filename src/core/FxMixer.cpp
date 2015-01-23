@@ -327,6 +327,19 @@ void FxMixer::deleteChannel( int index )
 	for( int i = index; i < m_fxChannels.size(); ++i )
 	{
 		validateChannelName( i, i + 1 );
+
+		// set correct channel index
+		m_fxChannels[i]->m_channelIndex = i;
+
+		// now check all routes and update names of the send models
+		foreach( FxRoute * r, m_fxChannels[i]->m_sends )
+		{
+			r->updateName();
+		}
+		foreach( FxRoute * r, m_fxChannels[i]->m_receives )
+		{
+			r->updateName();
+		}
 	}
 }
 
@@ -364,18 +377,9 @@ void FxMixer::moveChannelLeft( int index )
 				{
 					inst->effectChannelModel()->setValue(a);
 				}
-
 			}
 		}
 	}
-
-	// actually do the swap
-	FxChannel * tmpChannel = m_fxChannels[a];
-	m_fxChannels[a] = m_fxChannels[b];
-	m_fxChannels[b] = tmpChannel;
-
-	validateChannelName( a, b );
-	validateChannelName( b, a );
 }
 
 
@@ -758,22 +762,9 @@ void FxMixer::loadSettings( const QDomElement & _this )
 
 void FxMixer::validateChannelName( int index, int oldIndex )
 {
-	FxChannel * fxc = m_fxChannels[ index ];
-	if( fxc->m_name == tr( "FX %1" ).arg( oldIndex ) )
+	if( m_fxChannels[index]->m_name == tr( "FX %1" ).arg( oldIndex ) )
 	{
-		fxc->m_name = tr( "FX %1" ).arg( index );
-	}
-	// set correct channel index
-	fxc->m_channelIndex = index;
-
-	// now check all routes and update names of the send models
-	foreach( FxRoute * r, fxc->m_sends )
-	{
-		r->updateName();
-	}
-	foreach( FxRoute * r, fxc->m_receives )
-	{
-		r->updateName();
+		m_fxChannels[index]->m_name = tr( "FX %1" ).arg( index );
 	}
 }
 
