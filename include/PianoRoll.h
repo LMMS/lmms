@@ -160,7 +160,7 @@ protected slots:
 
 	void hidePattern( Pattern* pattern );
 
-	void selectRegionFromPixels( int x, int y );
+	void selectRegionFromPixels( int xStart, int xEnd );
 
 
 signals:

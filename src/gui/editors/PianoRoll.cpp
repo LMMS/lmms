@@ -593,14 +593,14 @@ void PianoRoll::hidePattern( Pattern* pattern )
 	}
 }
 
-void PianoRoll::selectRegionFromPixels(int x, int y)
+void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 {
 
-	x -= WHITE_KEY_WIDTH;
-	y -= WHITE_KEY_WIDTH;
+	xStart -= WHITE_KEY_WIDTH;
+	xEnd  -= WHITE_KEY_WIDTH;
 
 	// select an area of notes
-	int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
+	int pos_ticks = xStart * MidiTime::ticksPerTact() / m_ppt +
 					m_currentPosition;
 	int key_num = 0;
 	m_selectStartTick = pos_ticks;
@@ -610,7 +610,7 @@ void PianoRoll::selectRegionFromPixels(int x, int y)
 	// change size of selection
 
 	// get tick in which the cursor is posated
-	pos_ticks = y * MidiTime::ticksPerTact() / m_ppt +
+	pos_ticks = xEnd  * MidiTime::ticksPerTact() / m_ppt +
 					m_currentPosition;
 	key_num = 120;
 
