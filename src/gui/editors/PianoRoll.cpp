@@ -417,6 +417,10 @@ PianoRoll::PianoRoll() :
 
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
+
+	//connection for selecion from timeline
+	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
+			this, SLOT( selectRegionFromPixels( int, int ) ) );
 }
 
 
@@ -588,6 +592,44 @@ void PianoRoll::hidePattern( Pattern* pattern )
 		setCurrentPattern( NULL );
 	}
 }
+
+void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
+{
+
+	xStart -= WHITE_KEY_WIDTH;
+	xEnd  -= WHITE_KEY_WIDTH;
+
+	// select an area of notes
+	int pos_ticks = xStart * MidiTime::ticksPerTact() / m_ppt +
+					m_currentPosition;
+	int key_num = 0;
+	m_selectStartTick = pos_ticks;
+	m_selectedTick = 0;
+	m_selectStartKey = key_num;
+	m_selectedKeys = 1;
+	// change size of selection
+
+	// get tick in which the cursor is posated
+	pos_ticks = xEnd  * MidiTime::ticksPerTact() / m_ppt +
+					m_currentPosition;
+	key_num = 120;
+
+	m_selectedTick = pos_ticks - m_selectStartTick;
+	if( (int) m_selectStartTick + m_selectedTick < 0 )
+	{
+		m_selectedTick = -static_cast<int>(
+					m_selectStartTick );
+	}
+	m_selectedKeys = key_num - m_selectStartKey;
+	if( key_num <= m_selectStartKey )
+	{
+		--m_selectedKeys;
+	}
+
+	computeSelectedNotes( false );
+}
+
+
 
 
 
