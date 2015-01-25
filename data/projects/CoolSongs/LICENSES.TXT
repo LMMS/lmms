@@ -13,10 +13,6 @@
 * Farbro-Tectonic.mmpz
   - CC (by)
   - http://lmms.io/lsp/index.php?action=show&file=1327
-  
-* Greippi-ardudar.mmpz
-  - CC (by-sa)
-  - http://lmms.io/lsp/index.php?action=show&file=4916
 
 * Impulslogik-Zen.mmpz
   - Artistic 2.0
