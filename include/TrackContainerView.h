@@ -131,7 +131,7 @@ public slots:
 	/// \param x
 	/// \param y
 	/// Use the rubber band to select TCO from all tracks using x, y pixels
-	void selectRegionFromPixels(int x, int y);
+	void selectRegionFromPixels(int xStart, int xEnd);
 
 	///
 	/// \brief stopRubberBand
