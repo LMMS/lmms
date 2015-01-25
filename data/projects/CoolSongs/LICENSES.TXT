@@ -13,7 +13,11 @@
 * Farbro-Tectonic.mmpz
   - CC (by)
   - http://lmms.io/lsp/index.php?action=show&file=1327
-  
+
+* Greippi - Krem Kaakkuja (Second Flight Remix)
+  - CC (by-nd)
+  - http://lmms.io/lsp/index.php?action=show&file=6337
+
 * Greippi-ardudar.mmpz
   - CC (by-sa)
   - http://lmms.io/lsp/index.php?action=show&file=4916
@@ -57,7 +61,7 @@
 * TameAnderson-MakeMe.mmpz
   - Artistic 2.0
   - http://lmms.io/lsp/index.php?action=show&file=1060
-  
+
 * unfa-Spoken.mmpz
   - CC (by-nc)
   - http://lmms.io/lsp/index.php?action=show&file=4929
