@@ -55,7 +55,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished">Utvecklare ordnade efter mängd bidrag:</translation>
+        <translation type="unfinished">Medverkande, ordnade efter mängd bidrag:</translation>
     </message>
 </context>
 <context>
@@ -147,7 +147,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation type="unfinished">Med detta vred ställer du in förstärkningen. Vid 100% blir det ingen skillnad. Annars blir din ljudfil mer eller mindre högljudd, men källfilen förändras inte.</translation>
+        <translation type="unfinished">Med detta vred ställer du in förstärkningen. Vid 100% blir det ingen skillnad. Annars blir din ljudfil mer eller mindre högljudd, men originalfilen förändras inte.</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -206,7 +206,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioFileProcessorWaveView</name>
     <message>
         <source>Sample length:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ljudfilens lengd:</translation>
     </message>
 </context>
 <context>
@@ -1468,7 +1468,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Klicka här för att använda en annan vågform. Dra sedan en ljudfil till LFO grafen</translation>
     </message>
     <message>
         <source>FREQ x 100</source>
@@ -1504,7 +1504,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Drag a sample from somewhere and drop it in this window.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dra en ljudfil till det här fönstret</translation>
     </message>
     <message>
         <source>Click here for random wave.</source>
@@ -1958,11 +1958,11 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Loading sample</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Laddar ljudfil</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ljudfilen laddas för förhandsvisning...</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
@@ -3559,19 +3559,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>My Samples</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mina Ljudfiler</translation>
     </message>
     <message>
         <source>My Presets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mina Presets</translation>
     </message>
     <message>
         <source>My Home</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mit Hem</translation>
     </message>
     <message>
         <source>My Computer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Min Dator</translation>
     </message>
     <message>
         <source>Root Directory</source>
@@ -3579,15 +3579,15 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Fil</translation>
     </message>
     <message>
         <source>&amp;Recently Opened Projects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Nyligen Öppnade Project</translation>
     </message>
     <message>
         <source>Save as New &amp;Version</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spara som ny &amp;Version</translation>
     </message>
     <message>
         <source>E&amp;xport Tracks...</source>
@@ -3599,15 +3599,15 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>What&apos;s This?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vad är det här?</translation>
     </message>
     <message>
         <source>Open Project</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Öppna Project</translation>
     </message>
     <message>
         <source>Save Project</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SparaProject</translation>
     </message>
 </context>
 <context>
@@ -5323,7 +5323,7 @@ Reason: &quot;%2&quot;</source>
     <name>SampleTrack</name>
     <message>
         <source>Sample track</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ljudfil spår</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -5748,7 +5748,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Add sample-track</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lägg til ljudfil-spår</translation>
     </message>
     <message>
         <source>Add automation-track</source>
@@ -6621,7 +6621,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
     </message>
     <message>
         <source>Click to load a waveform from a sample file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Klicka för att ladda in en vågform från en ljudfil</translation>
     </message>
     <message>
         <source>Phase left</source>
@@ -6802,7 +6802,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
     <name>audioFileProcessor</name>
     <message>
         <source>Reverse sample</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spela baklänges</translation>
     </message>
     <message>
         <source>Amplify</source>
@@ -6810,11 +6810,11 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
     </message>
     <message>
         <source>Start of sample</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Start på ljudfil</translation>
     </message>
     <message>
         <source>End of sample</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Slut på ljudfil</translation>
     </message>
     <message>
         <source>Stutter</source>
@@ -6846,21 +6846,21 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
     </message>
     <message>
         <source>Sample not found: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ljudfil hittades inte: %1</translation>
     </message>
 </context>
 <context>
     <name>bitInvader</name>
     <message>
         <source>Samplelength</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ljudfilslängd</translation>
     </message>
 </context>
 <context>
     <name>bitInvaderView</name>
     <message>
         <source>Sample Length</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ljudfilens längd</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -6868,7 +6868,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished">triganelvåg</translation>
+        <translation type="unfinished">Triganelvåg</translation>
     </message>
     <message>
         <source>Saw wave</source>
