@@ -125,14 +125,18 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		QMessageBox::critical( NULL,
-			SongEditor::tr( "Could not open file" ),
-			SongEditor::tr( "Could not open file %1. You probably "
-					"have no permissions to read this "
-					"file.\n Please make sure to have at "
-					"least read permissions to the file "
-					"and try again." ).arg( _fileName ) );
-			return;
+		if( Engine::hasGUI() )
+		{
+			QMessageBox::critical( NULL,
+				SongEditor::tr( "Could not open file" ),
+				SongEditor::tr( "Could not open file %1. You probably "
+						"have no permissions to read this "
+						"file.\n Please make sure to have at "
+						"least read permissions to the file "
+						"and try again." ).arg( _fileName ) );
+		}
+
+		return;
 	}
 
 	loadData( inFile.readAll(), _fileName );
@@ -220,11 +224,15 @@ bool DataFile::writeFile( const QString& filename )
 
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			SongEditor::tr( "Could not write file" ),
-			SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
-							"write to this file. Please make sure you have write-access to "
-							"the file and try again." ).arg( fullName ) );
+		if( Engine::hasGUI() )
+		{
+			QMessageBox::critical( NULL,
+				SongEditor::tr( "Could not write file" ),
+				SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
+								"write to this file. Please make sure you have write-access to "
+								"the file and try again." ).arg( fullName ) );
+		}
+
 		return false;
 	}
 
@@ -766,12 +774,16 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			QMessageBox::critical( NULL,
-				SongEditor::tr( "Error in file" ),
-				SongEditor::tr( "The file %1 seems to contain "
-						"errors and therefore can't be "
-						"loaded." ).
-							arg( _sourceFile ) );
+			if( Engine::hasGUI() )
+			{
+				QMessageBox::critical( NULL,
+					SongEditor::tr( "Error in file" ),
+					SongEditor::tr( "The file %1 seems to contain "
+							"errors and therefore can't be "
+							"loaded." ).
+								arg( _sourceFile ) );
+			}
+
 			return;
 		}
 	}
@@ -793,14 +805,17 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			//from the setCompareType(...) function [...] saves a few lines of code!" (@tresf)
 			if ( createdWith.setCompareType(Minor) != openedWith)
 			{
-				QMessageBox::information( NULL,
-					SongEditor::tr( "Project Version Mismatch" ),
-					SongEditor::tr( 
-							"This project was created with "
-							"LMMS version %1, but version %2 "
-							"is installed")
-							.arg( root.attribute( "creatorversion" ) )
-							.arg( LMMS_VERSION ) );
+				if( Engine::hasGUI() )
+				{
+					QMessageBox::information( NULL,
+						SongEditor::tr( "Project Version Mismatch" ),
+						SongEditor::tr( 
+								"This project was created with "
+								"LMMS version %1, but version %2 "
+								"is installed")
+								.arg( root.attribute( "creatorversion" ) )
+								.arg( LMMS_VERSION ) );
+				}
 			}
 
 			//The upgrade needs to happen after the warning as it updates the project version.
