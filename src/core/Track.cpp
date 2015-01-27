@@ -49,6 +49,7 @@
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
+#include "AutomationEditor.h"
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -207,6 +208,8 @@ void TrackContentObject::paste()
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 		movePosition( pos );
 	}
+	AutomationPattern::resolveAllIDs();
+	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 }
 
 
