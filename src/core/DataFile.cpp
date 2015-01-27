@@ -37,6 +37,7 @@
 
 #include "ConfigManager.h"
 #include "ProjectVersion.h"
+#include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
@@ -124,14 +125,18 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		QMessageBox::critical( NULL,
-			SongEditor::tr( "Could not open file" ),
-			SongEditor::tr( "Could not open file %1. You probably "
-					"have no permissions to read this "
-					"file.\n Please make sure to have at "
-					"least read permissions to the file "
-					"and try again." ).arg( _fileName ) );
-			return;
+		if( Engine::hasGUI() )
+		{
+			QMessageBox::critical( NULL,
+				SongEditor::tr( "Could not open file" ),
+				SongEditor::tr( "Could not open file %1. You probably "
+						"have no permissions to read this "
+						"file.\n Please make sure to have at "
+						"least read permissions to the file "
+						"and try again." ).arg( _fileName ) );
+		}
+
+		return;
 	}
 
 	loadData( inFile.readAll(), _fileName );
@@ -219,11 +224,15 @@ bool DataFile::writeFile( const QString& filename )
 
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			SongEditor::tr( "Could not write file" ),
-			SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
-							"write to this file. Please make sure you have write-access to "
-							"the file and try again." ).arg( fullName ) );
+		if( Engine::hasGUI() )
+		{
+			QMessageBox::critical( NULL,
+				SongEditor::tr( "Could not write file" ),
+				SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
+								"write to this file. Please make sure you have write-access to "
+								"the file and try again." ).arg( fullName ) );
+		}
+
 		return false;
 	}
 
@@ -765,12 +774,16 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			QMessageBox::critical( NULL,
-				SongEditor::tr( "Error in file" ),
-				SongEditor::tr( "The file %1 seems to contain "
-						"errors and therefore can't be "
-						"loaded." ).
-							arg( _sourceFile ) );
+			if( Engine::hasGUI() )
+			{
+				QMessageBox::critical( NULL,
+					SongEditor::tr( "Error in file" ),
+					SongEditor::tr( "The file %1 seems to contain "
+							"errors and therefore can't be "
+							"loaded." ).
+								arg( _sourceFile ) );
+			}
+
 			return;
 		}
 	}
@@ -779,10 +792,37 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_type = type( root.attribute( "type" ) );
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-	if( root.hasAttribute( "creatorversion" ) &&
-		root.attribute( "creatorversion" ) != LMMS_VERSION )
+
+	if( root.hasAttribute( "creatorversion" ) )
 	{
-		upgrade();
+		// compareType defaults to Build,so it doesn't have to be set here
+		ProjectVersion createdWith = root.attribute( "creatorversion" );
+		ProjectVersion openedWith = LMMS_VERSION;;
+
+		if ( createdWith != openedWith )
+		{
+			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
+			if ( createdWith.setCompareType(Minor) != openedWith)
+			{
+				if( Engine::hasGUI() )
+				{
+					QMessageBox::information( NULL,
+						SongEditor::tr( "Project Version Mismatch" ),
+						SongEditor::tr( 
+								"This project was created with "
+								"LMMS version %1, but version %2 "
+								"is installed")
+								.arg( root.attribute( "creatorversion" ) )
+								.arg( LMMS_VERSION ) );
+				}
+			}
+
+			// the upgrade needs to happen after the warning as it updates the project version.
+			if( createdWith.setCompareType(Build) < openedWith )
+			{
+				upgrade();
+			}
+		}
 	}
 
 	m_content = root.elementsByTagName( typeName( m_type ) ).
