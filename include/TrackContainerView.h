@@ -103,6 +103,11 @@ public:
 		return m_tc;
 	}
 
+	const QList<TrackView *> & trackViews() const
+	{
+		return( m_trackViews );
+	}
+
 	void moveTrackView( TrackView * trackView, int indexTo );
 	void moveTrackViewUp( TrackView * trackView );
 	void moveTrackViewDown( TrackView * trackView );
@@ -122,7 +127,7 @@ public:
 
 public slots:
 	void realignTracks();
-	void createTrackView( Track * _t );
+	TrackView * createTrackView( Track * _t );
 	void deleteTrackView( TrackView * _tv );
 
 	virtual void dropEvent( QDropEvent * _de );
@@ -141,11 +146,6 @@ public slots:
 
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
-
-	const QList<TrackView *> & trackViews() const
-	{
-		return( m_trackViews );
-	}
 
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );

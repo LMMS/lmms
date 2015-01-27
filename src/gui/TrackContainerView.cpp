@@ -222,11 +222,18 @@ void TrackContainerView::realignTracks()
 
 
 
-void TrackContainerView::createTrackView( Track * _t )
+TrackView * TrackContainerView::createTrackView( Track * _t )
 {
 	//m_tc->addJournalCheckPoint();
 
-	_t->createView( this );
+	// Avoid duplicating track views
+	for( trackViewList::iterator it = m_trackViews.begin();
+						it != m_trackViews.end(); ++it )
+	{
+		if ( ( *it )->getTrack() == _t ) { return ( *it ); }
+	}
+
+	return _t->createView( this );
 }
 
 
