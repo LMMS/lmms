@@ -1436,6 +1436,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			!m_trackView->trackContainerView()->fixedTCOs() )
 	{
+		getTrack()->addJournalCheckPoint();
 		const MidiTime pos = getPosition( _me->x() ).getTact() *
 						MidiTime::ticksPerTact();
 		TrackContentObject * tco = getTrack()->createTCO( pos );
