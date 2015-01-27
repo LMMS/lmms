@@ -103,8 +103,9 @@ public:
 		return m_tc;
 	}
 
-	void moveTrackViewUp( TrackView * _tv );
-	void moveTrackViewDown( TrackView * _tv );
+	void moveTrackView( TrackView * trackView, int indexTo );
+	void moveTrackViewUp( TrackView * trackView );
+	void moveTrackViewDown( TrackView * trackView );
 
 	// -- for usage by trackView only ---------------
 	TrackView * addTrackView( TrackView * _tv );

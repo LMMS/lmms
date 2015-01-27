@@ -156,45 +156,48 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 
 
 
-void TrackContainerView::moveTrackViewUp( TrackView * _tv )
+void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 {
-	for( int i = 1; i < m_trackViews.size(); ++i )
-	{
-		TrackView * t = m_trackViews[i];
-		if( t == _tv )
-		{
-			BBTrack::swapBBTracks( t->getTrack(),
-					m_trackViews[i - 1]->getTrack() );
-			m_scrollLayout->removeWidget( t );
-			m_scrollLayout->insertWidget( i - 1, t );
-			qSwap( m_tc->m_tracks[i-1], m_tc->m_tracks[i] );
-			m_trackViews.swap( i - 1, i );
-			realignTracks();
-			break;
-		}
-	}
+	// Can't move out of bounds
+	if ( indexTo >= m_trackViews.size() || indexTo < 0 ) { return; }
+
+	// Does not need to move to itself
+	int indexFrom = m_trackViews.indexOf( trackView );
+	if ( indexFrom == indexTo ) { return; }
+
+	BBTrack::swapBBTracks( trackView->getTrack(),
+			m_trackViews[indexTo]->getTrack() );
+
+	m_scrollLayout->removeWidget( trackView );
+	m_scrollLayout->insertWidget( indexTo, trackView );
+
+	Track * track = m_tc->m_tracks[indexFrom];
+
+	m_tc->m_tracks.remove( indexFrom );
+	m_tc->m_tracks.insert( indexTo, track );
+	m_trackViews.move( indexFrom, indexTo );
+
+	realignTracks();
 }
 
 
 
 
-void TrackContainerView::moveTrackViewDown( TrackView * _tv )
+void TrackContainerView::moveTrackViewUp( TrackView * trackView )
 {
-	for( int i = 0; i < m_trackViews.size()-1; ++i )
-	{
-		TrackView * t = m_trackViews[i];
-		if( t == _tv )
-		{
-			BBTrack::swapBBTracks( t->getTrack(),
-					m_trackViews[i + 1]->getTrack() );
-			m_scrollLayout->removeWidget( t );
-			m_scrollLayout->insertWidget( i + 1, t );
-			qSwap( m_tc->m_tracks[i], m_tc->m_tracks[i+1] );
-			m_trackViews.swap( i, i + 1 );
-			realignTracks();
-			break;
-		}
-	}
+	int index = m_trackViews.indexOf( trackView );
+
+	moveTrackView( trackView, index - 1 );
+}
+
+
+
+
+void TrackContainerView::moveTrackViewDown( TrackView * trackView )
+{
+	int index = m_trackViews.indexOf( trackView );
+
+	moveTrackView( trackView, index + 1 );
 }
 
 
