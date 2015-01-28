@@ -225,6 +225,7 @@ protected slots:
 	void updateBaseNote();
 	void updatePitch();
 	void updatePitchRange();
+	void muteHasChanged();
 
 
 private:

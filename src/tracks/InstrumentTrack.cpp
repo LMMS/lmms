@@ -124,6 +124,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
+	connect( &m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteHasChanged() ) );
 
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
@@ -135,6 +136,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 
 	setName( tr( "Default preset" ) );
+
 
 }
 
@@ -547,6 +549,19 @@ void InstrumentTrack::updatePitchRange()
 	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(),
 								MidiControllerRegisteredParameterNumberMSB, ( MidiPitchBendSensitivityRPN >> 8 ) & 0x7F ) );
 	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(), MidiControllerDataEntry, midiPitchRange() ) );
+}
+
+void InstrumentTrack::muteHasChanged()
+{
+	if( m_mutedModel.value() )
+	{
+		m_fb->setActiveColor( QColor( "red" ) );
+	} else
+	{
+		m_fb->setActiveColor( QApplication::palette().color( QPalette::Active,
+															 QPalette::BrightText ) );
+	}
+
 }
 
 
