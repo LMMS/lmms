@@ -554,7 +554,7 @@ void InstrumentTrack::muteHasChanged()
 {
 	if( m_mutedModel.value() )
 	{
-		m_fb->setActiveColor( QColor( "red" ) );
+		m_fb->setActiveColor( QColor( 0x282828 ) );
 	} else
 	{
 		m_fb->setActiveColor( QApplication::palette().color( QPalette::Active,
