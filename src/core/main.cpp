@@ -298,8 +298,8 @@ int main( int argc, char * * argv )
 			++i;
 		}
 		else if ( argc > i &&
-				  ( QString( argv[i] ) =="--float") ||
-						QString( argv[i] ) == "-32" )
+				  ( QString( argv[i] ) =="--float" ||
+						QString( argv[i] ) == "-32" ) )
 		{
 			os.depth = ProjectRenderer::Depth_32Bit;
 		}
