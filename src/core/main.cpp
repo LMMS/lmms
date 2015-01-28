@@ -191,6 +191,7 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
+	"-32, --float			32bit float bit depth\n"
 	"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
 	"       standard out is used if no output file is specifed\n"
 	"-d, --dump <in>			dump XML of compressed file <in>\n"
@@ -295,6 +296,12 @@ int main( int argc, char * * argv )
 				return( EXIT_FAILURE );
 			}
 			++i;
+		}
+		else if ( argc > i &&
+				  ( QString( argv[i] ) =="--float") ||
+						QString( argv[i] ) == "-32" )
+		{
+			os.depth = ProjectRenderer::Depth_32Bit;
 		}
 		else if( argc > i &&
 				( QString( argv[i] ) == "--interpolation" ||
