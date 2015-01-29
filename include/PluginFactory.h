@@ -28,11 +28,12 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 
+#include "export.h"
 #include "Plugin.h"
 
 class QLibrary;
 
-class PluginFactory
+class EXPORT PluginFactory
 {
 public:
 	struct PluginInfo

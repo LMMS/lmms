@@ -350,7 +350,7 @@ void ConfigManager::loadConfigFile()
 			( !m_ladDir.contains( ':' ) && !QDir( m_ladDir ).exists() ) )
 	{
 #if defined(LMMS_BUILD_WIN32)
-		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
+		m_ladDir = qApp->applicationDirPath() + "/plugins/ladspa" + QDir::separator();
 #elif defined(LMMS_BUILD_APPLE)
 		m_ladDir = qApp->applicationDirPath() + "/../lib/lmms/ladspa/";
 #else
