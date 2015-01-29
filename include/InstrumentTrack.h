@@ -225,7 +225,6 @@ protected slots:
 	void updateBaseNote();
 	void updatePitch();
 	void updatePitchRange();
-	void muteHasChanged();
 
 
 private:
@@ -321,6 +320,7 @@ private slots:
 	void midiInSelected();
 	void midiOutSelected();
 	void midiConfigChanged();
+	void muteHasChanged();
 
 
 private:
