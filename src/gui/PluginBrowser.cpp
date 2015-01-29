@@ -95,16 +95,13 @@ PluginDescList::PluginDescList(QWidget *parent) :
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
-	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors();
+	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
 	std::sort(descs.begin(), descs.end(), pluginBefore);
 	for (const Plugin::Descriptor* desc : descs)
 	{
-		if( desc->type == Plugin::Instrument )
-		{
-			PluginDescWidget* p = new PluginDescWidget( *desc, this );
-			p->show();
-			layout->addWidget(p);
-		}
+		PluginDescWidget* p = new PluginDescWidget( *desc, this );
+		p->show();
+		layout->addWidget(p);
 	}
 
 	setLayout(layout);

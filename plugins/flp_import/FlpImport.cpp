@@ -1638,12 +1638,8 @@ p->putValue( jt->pos, value, false );
 
 	// process all effects
 	EffectKeyList effKeys;
-	for (const Plugin::Descriptor* desc : pluginFactory->descriptors())
+	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Effect))
 	{
-		if( desc->type != Plugin::Effect )
-		{
-			continue;
-		}
 		if( desc->subPluginFeatures )
 		{
 			desc->subPluginFeatures->listSubPluginKeys( desc, effKeys );

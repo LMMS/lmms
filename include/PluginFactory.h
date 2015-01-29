@@ -44,6 +44,7 @@ public:
 		bool isNull() const {return library == 0;}
 	};
 	typedef QList<PluginInfo> PluginInfoList;
+	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
 
 	PluginFactory();
 	~PluginFactory();
@@ -54,6 +55,7 @@ public:
 
 	/// Returns a list of all found plugins' descriptors.
 	const Plugin::DescriptorList descriptors() const;
+	const Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
 
 	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
 	const PluginInfoList& pluginInfos() const;
@@ -71,7 +73,7 @@ public slots:
 	void discoverPlugins();
 
 private:
-	Plugin::DescriptorList m_descriptorList;
+	DescriptorMap m_descriptors;
 	PluginInfoList m_pluginInfos;
 
 	QHash<QString, QString> m_errors;

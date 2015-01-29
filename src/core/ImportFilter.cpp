@@ -60,20 +60,17 @@ void ImportFilter::import( const QString & _file_to_import,
 	const bool j = Engine::projectJournal()->isJournalling();
 	Engine::projectJournal()->setJournalling( false );
 
-	for (const Plugin::Descriptor* desc : pluginFactory->descriptors())
+	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::ImportFilter))
 	{
-		if( desc->type == Plugin::ImportFilter )
+		Plugin * p = Plugin::instantiate( desc->name, NULL, s );
+		if( dynamic_cast<ImportFilter *>( p ) != NULL &&
+			dynamic_cast<ImportFilter *>( p )->tryImport( tc ) == true )
 		{
-			Plugin * p = Plugin::instantiate( desc->name, NULL, s );
-			if( dynamic_cast<ImportFilter *>( p ) != NULL &&
-				dynamic_cast<ImportFilter *>( p )->tryImport( tc ) == true )
-			{
-				delete p;
-				successful = true;
-				break;
-			}
 			delete p;
+			successful = true;
+			break;
 		}
+		delete p;
 	}
 
 	Engine::projectJournal()->setJournalling( j );

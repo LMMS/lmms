@@ -89,7 +89,12 @@ PluginFactory* PluginFactory::instance()
 
 const Plugin::DescriptorList PluginFactory::descriptors() const
 {
-	return m_descriptorList;
+	return m_descriptors.values();
+}
+
+const Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type) const
+{
+	return m_descriptors.values(type);
 }
 
 const QList<PluginFactory::PluginInfo>& PluginFactory::pluginInfos() const
@@ -115,7 +120,7 @@ QString PluginFactory::errorString(QString pluginName) const
 
 void PluginFactory::discoverPlugins()
 {
-	Plugin::DescriptorList descriptors;
+	DescriptorMap descriptors;
 	PluginInfoList pluginInfos;
 
 	const QFileInfoList& files = QDir("plugins:").entryInfoList(nameFilters);
@@ -159,7 +164,7 @@ void PluginFactory::discoverPlugins()
 		info.descriptor = pluginDescriptor;
 		pluginInfos << info;
 
-		descriptors << pluginDescriptor;
+		descriptors.insert(info.descriptor->type, info.descriptor);
 	}
 
 
@@ -168,6 +173,6 @@ void PluginFactory::discoverPlugins()
 		delete info.library;
 	}
 	m_pluginInfos = pluginInfos;
-	m_descriptorList = descriptors;
+	m_descriptors = descriptors;
 }
 

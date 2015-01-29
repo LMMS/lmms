@@ -123,14 +123,11 @@ void Engine::updateFramesPerTick()
 
 void Engine::initPluginFileHandling()
 {
-	for (const Plugin::Descriptor* desc : pluginFactory->descriptors())
+	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Instrument))
 	{
-		if( desc->type == Plugin::Instrument )
+		for(const QString& ext : QString(desc->supportedFileTypes).split(','))
 		{
-			for(const QString& ext : QString(desc->supportedFileTypes).split(','))
-			{
-				s_pluginFileHandling[ext] = desc->name;
-			}
+			s_pluginFileHandling[ext] = desc->name;
 		}
 	}
 }

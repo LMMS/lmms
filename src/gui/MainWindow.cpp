@@ -297,14 +297,11 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
-	for( const Plugin::Descriptor* desc : pluginFactory->descriptors() )
+	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
-		if( desc->type == Plugin::Tool )
-		{
-			m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-			m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
-							   ->createView(this) );
-		}
+		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
+		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
+						   ->createView(this) );
 	}
 	if( !m_toolsMenu->isEmpty() )
 	{
