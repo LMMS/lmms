@@ -26,7 +26,6 @@
 #ifndef FFT_HELPERS_H
 #define FFT_HELPERS_H
 
-#include "lmmsconfig.h"
 #include "export.h"
 
 #include <fftw3.h>

@@ -35,18 +35,13 @@
 #include <pmmintrin.h>
 #endif
 
-#include <QDir>
 #include <QFileInfo>
 #include <QLocale>
-#include <QProcess>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
-#include <QBitmap>
-#include <QDesktopWidget>
 #include <QMessageBox>
-#include <QPainter>
-#include <QSplashScreen>
+#include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -73,13 +68,11 @@
 #include "NotePlayHandle.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "LmmsStyle.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "DataFile.h"
 #include "Song.h"
-#include "LmmsPalette.h"
 
 static inline QString baseName( const QString & _file )
 {

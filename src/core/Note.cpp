@@ -2,7 +2,7 @@
  * note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -29,8 +29,6 @@
 
 #include "Note.h"
 #include "DetuningHelper.h"
-#include "templates.h"
-
 
 
 
@@ -68,7 +66,7 @@ Note::Note( const Note & _note ) :
 	m_selected( _note.m_selected ),
 	m_oldKey( _note.m_oldKey ),
 	m_oldPos( _note.m_oldPos ),
-	m_oldLength( _note.m_oldLength ),	
+	m_oldLength( _note.m_oldLength ),
 	m_isPlaying( _note.m_isPlaying ),
 	m_key( _note.m_key),
 	m_volume( _note.m_volume ),
