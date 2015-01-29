@@ -262,6 +262,9 @@ public:
 	void setCurrentPattern(AutomationPattern* pattern);
 	const AutomationPattern* currentPattern();
 
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+
 	void open(AutomationPattern* pattern);
 
 	AutomationEditor* m_editor;
