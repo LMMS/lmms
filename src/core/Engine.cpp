@@ -32,6 +32,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Plugin.h"
+#include "PluginFactory.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 
@@ -122,20 +123,13 @@ void Engine::updateFramesPerTick()
 
 void Engine::initPluginFileHandling()
 {
-	Plugin::DescriptorList pluginDescriptors;
-	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( Plugin::DescriptorList::ConstIterator it = pluginDescriptors.begin();
-										it != pluginDescriptors.end(); ++it )
+	for (const Plugin::Descriptor* desc : pluginFactory->descriptors())
 	{
-		if( it->type == Plugin::Instrument )
+		if( desc->type == Plugin::Instrument )
 		{
-			const QStringList & ext =
-				QString( it->supportedFileTypes ).
-							split( QChar( ',' ) );
-			for( QStringList::const_iterator itExt = ext.begin();
-						itExt != ext.end(); ++itExt )
+			for(const QString& ext : QString(desc->supportedFileTypes).split(','))
 			{
-				s_pluginFileHandling[*itExt] = it->name;
+				s_pluginFileHandling[ext] = desc->name;
 			}
 		}
 	}

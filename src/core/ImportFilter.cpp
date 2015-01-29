@@ -2,7 +2,7 @@
  * ImportFilter.cpp - base-class for all import-filters (MIDI, FLP etc)
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -28,8 +28,8 @@
 #include "ImportFilter.h"
 #include "Engine.h"
 #include "TrackContainer.h"
+#include "PluginFactory.h"
 #include "ProjectJournal.h"
-
 
 
 ImportFilter::ImportFilter( const QString & _file_name,
@@ -52,9 +52,6 @@ ImportFilter::~ImportFilter()
 void ImportFilter::import( const QString & _file_to_import,
 							TrackContainer* tc )
 {
-	DescriptorList d;
-	Plugin::getDescriptorsOfAvailPlugins( d );
-
 	bool successful = false;
 
 	char * s = qstrdup( _file_to_import.toUtf8().constData() );
@@ -63,12 +60,11 @@ void ImportFilter::import( const QString & _file_to_import,
 	const bool j = Engine::projectJournal()->isJournalling();
 	Engine::projectJournal()->setJournalling( false );
 
-	for( Plugin::DescriptorList::ConstIterator it = d.begin();
-												it != d.end(); ++it )
+	for (const Plugin::Descriptor* desc : pluginFactory->descriptors())
 	{
-		if( it->type == Plugin::ImportFilter )
+		if( desc->type == Plugin::ImportFilter )
 		{
-			Plugin * p = Plugin::instantiate( it->name, NULL, s );
+			Plugin * p = Plugin::instantiate( desc->name, NULL, s );
 			if( dynamic_cast<ImportFilter *>( p ) != NULL &&
 				dynamic_cast<ImportFilter *>( p )->tryImport( tc ) == true )
 			{

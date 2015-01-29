@@ -130,8 +130,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 		reset( new shmFifo(), new shmFifo() );
 		m_failed = false;
 	}
-	QString exec = ConfigManager::inst()->pluginDir() +
-					 pluginExecutable;
+	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
 
 	QStringList args;
 	// swap in and out for bidirectional communication

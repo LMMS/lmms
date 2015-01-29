@@ -55,9 +55,6 @@ class PluginDescList : public QWidget
 	Q_OBJECT
 public:
 	PluginDescList(QWidget* parent);
-
-private:
-	Plugin::DescriptorList m_pluginDescriptors;
 };
 
 

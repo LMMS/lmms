@@ -59,12 +59,6 @@ ConfigManager::ConfigManager() :
 #endif
 									),
 	m_artworkDir( defaultArtworkDir() ),
-#ifdef LMMS_BUILD_WIN32
-	m_pluginDir( qApp->applicationDirPath()
-			+ QDir::separator() + "plugins" + QDir::separator() ),
-#else
-	m_pluginDir( qApp->applicationDirPath() + '/' + PLUGIN_DIR ),
-#endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
 	m_recoveryFile( QDir(m_workingDir).absoluteFilePath("recover.mmp") )

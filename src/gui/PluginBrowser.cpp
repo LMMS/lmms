@@ -22,25 +22,27 @@
  *
  */
 
+#include "PluginBrowser.h"
+
+#include <algorithm> // for std::sort
+
 #include <QLabel>
 #include <QPainter>
 #include <QCursor>
 #include <QMouseEvent>
 #include <QScrollArea>
 
-#include "PluginBrowser.h"
-#include <algorithm> // for std::sort
-
 #include "embed.h"
 #include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"
+#include "PluginFactory.h"
 
 
-bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )
+bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
 {
-	return qstricmp( d1.displayName, d2.displayName ) < 0 ? true : false;
+	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 }
 
 
@@ -93,15 +95,13 @@ PluginDescList::PluginDescList(QWidget *parent) :
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
-	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
-	std::sort(m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore);
-
-	for( Plugin::DescriptorList::const_iterator it = m_pluginDescriptors.constBegin();
-		it != m_pluginDescriptors.constEnd(); ++it )
+	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors();
+	std::sort(descs.begin(), descs.end(), pluginBefore);
+	for (const Plugin::Descriptor* desc : descs)
 	{
-		if( it->type == Plugin::Instrument )
+		if( desc->type == Plugin::Instrument )
 		{
-			PluginDescWidget* p = new PluginDescWidget( *it, this );
+			PluginDescWidget* p = new PluginDescWidget( *desc, this );
 			p->show();
 			layout->addWidget(p);
 		}
