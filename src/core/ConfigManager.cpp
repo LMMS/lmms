@@ -63,6 +63,9 @@ ConfigManager::ConfigManager() :
 	m_flDir( QDir::home().absolutePath() ),
 	m_recoveryFile( QDir(m_workingDir).absoluteFilePath("recover.mmp") )
 {
+	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
+		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
+	QDir::addSearchPath("data", m_dataDir);
 }
 
 
