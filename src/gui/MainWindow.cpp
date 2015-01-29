@@ -831,7 +831,7 @@ bool MainWindow::saveProjectAs()
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		QString fname = sfd.selectedFiles()[0] ;
-		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
+		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) && !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
 		{
 			fname += ".mpt";
 		}
