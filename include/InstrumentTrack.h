@@ -320,7 +320,7 @@ private slots:
 	void midiInSelected();
 	void midiOutSelected();
 	void midiConfigChanged();
-	void muteHasChanged();
+	void muteChanged();
 
 
 private:

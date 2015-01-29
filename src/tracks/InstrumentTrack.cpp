@@ -926,7 +926,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect( m_activityIndicator, SIGNAL( released() ),
 				this, SLOT( activityIndicatorReleased() ) );
 	_it->setIndicator( m_activityIndicator );
-	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteHasChanged() ) );
+	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
 }
@@ -1131,7 +1131,7 @@ void InstrumentTrackView::midiConfigChanged()
 
 
 
-void InstrumentTrackView::muteHasChanged()
+void InstrumentTrackView::muteChanged()
 {
 	if(model()->m_mutedModel.value() )
 	{
