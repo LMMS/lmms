@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,7 @@
 #include "templates.h"
 #include "interpolation.h"
 #include "Mixer.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 vibratingString::vibratingString(	float _pitch, 
@@ -42,7 +42,7 @@ vibratingString::vibratingString(	float _pitch,
 					float _detune,
 					bool _state ) :
 	m_oversample( 2 * _oversample / (int)( _sample_rate /
-				engine::mixer()->baseSampleRate() ) ),
+				Engine::mixer()->baseSampleRate() ) ),
 	m_randomize( _randomize ),
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )

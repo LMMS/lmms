@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _DUMMY_PLUGIN_H
-#define _DUMMY_PLUGIN_H
+#ifndef DUMMY_PLUGIN_H
+#define DUMMY_PLUGIN_H
 
 #include "Plugin.h"
 #include "PluginView.h"

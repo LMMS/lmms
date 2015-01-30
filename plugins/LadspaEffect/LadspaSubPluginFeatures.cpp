@@ -6,7 +6,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,13 +25,13 @@
  *
  */
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QLabel>
 
 #include "LadspaSubPluginFeatures.h"
 #include "AudioDevice.h"
-#include "engine.h"
-#include "ladspa_2_lmms.h"
+#include "Engine.h"
+#include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
 #include "Mixer.h"
 
@@ -48,7 +48,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 													const Key * _key  ) const
 {
 	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
-	ladspa2LMMS * lm = engine::getLADSPAManager();
+	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 
 	QLabel * label = new QLabel( _parent );
 	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
@@ -119,7 +119,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void LadspaSubPluginFeatures::listSubPluginKeys(
 						const Plugin::Descriptor * _desc, KeyList & _kl ) const
 {
-	ladspa2LMMS * lm = engine::getLADSPAManager();
+	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 
 	l_sortable_plugin_t plugins;
 	switch( m_type )
@@ -145,7 +145,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 						it != plugins.end(); ++it )
 	{
 		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  engine::mixer()->audioDev()->channels() )
+				  Engine::mixer()->audioDev()->channels() )
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}
@@ -158,7 +158,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 							const Key * _key )
 {
-	QString file = _key->attributes["file"].toLower();
+	QString file = _key->attributes["file"];
 	return( ladspa_key_t( file.remove( QRegExp( "\\.so$" ) ).
 				remove( QRegExp( "\\.dll$" ) ) +
 #ifdef LMMS_BUILD_WIN32

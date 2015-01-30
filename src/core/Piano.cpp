@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -101,7 +101,7 @@ void Piano::handleKeyPress( int key, int midiVelocity )
 	}
 	if( isValidKey( key ) )
 	{
-		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, 0, key, midiVelocity ) );
+		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, -1, key, midiVelocity ) );
 		m_pressedKeys[key] = true;
 	}
 }
@@ -118,7 +118,7 @@ void Piano::handleKeyRelease( int key )
 {
 	if( isValidKey( key ) )
 	{
-		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOff, 0, key, 0 ) );
+		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOff, -1, key, 0 ) );
 		m_pressedKeys[key] = false;
 	}
 }
@@ -126,5 +126,5 @@ void Piano::handleKeyRelease( int key )
 
 
 
-#include "moc_Piano.cxx"
+
 

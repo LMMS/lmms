@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_CLIENT_H
-#define _MIDI_CLIENT_H
+#ifndef MIDI_CLIENT_H
+#define MIDI_CLIENT_H
 
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
@@ -31,7 +31,7 @@
 
 #include "MidiEvent.h"
 #include "MidiEventProcessor.h"
-#include "tab_widget.h"
+#include "TabWidget.h"
 
 
 class MidiPort;
@@ -107,12 +107,12 @@ public:
 	static MidiClient * openMidiClient();
 
 
-	class setupWidget : public tabWidget
+	class setupWidget : public TabWidget
 	{
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
-			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-					tr( _caption.toAscii() ) ).toUpper(),
+			TabWidget( TabWidget::tr( "Settings for %1" ).arg(
+					tr( _caption.toLatin1() ) ).toUpper(),
 								_parent )
 		{
 		}

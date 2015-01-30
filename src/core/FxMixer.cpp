@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,33 +22,58 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "FxMixer.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
-#include "Effect.h"
-#include "song.h"
+#include "Song.h"
 
 #include "InstrumentTrack.h"
-#include "bb_track_container.h"
+#include "BBTrackContainer.h"
+#include "ValueBuffer.h"
+
+FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
+	m_from( from ),
+	m_to( to ),
+	m_amount( amount, 0, 1, 0.001, NULL,
+			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
+{
+	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
+	// create send amount model
+}
+
+
+FxRoute::~FxRoute()
+{
+}
+
+
+void FxRoute::updateName()
+{
+	m_amount.setDisplayName(
+			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
+}
 
 
 FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_fxChain( NULL ),
+	m_hasInput( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[engine::mixer()->framesPerPeriod()] ),
+	m_buffer( new sampleFrame[Engine::mixer()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
-	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
+	m_soloModel( false, _parent ),
+	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
 	m_lock(),
 	m_channelIndex( idx ),
-	m_queued( false )
+	m_queued( false ),
+	m_dependenciesMet( 0 )
 {
-	engine::mixer()->clearAudioBuffer( m_buffer,
-					engine::mixer()->framesPerPeriod() );
+	Engine::mixer()->clearAudioBuffer( m_buffer,
+					Engine::mixer()->framesPerPeriod() );
 }
 
 
@@ -60,90 +85,130 @@ FxChannel::~FxChannel()
 }
 
 
-
-
-void FxChannel::doProcessing( sampleFrame * _buf )
+inline void FxChannel::processed()
 {
-	FxMixer * fxm = engine::fxMixer();
-	const fpp_t fpp = engine::mixer()->framesPerPeriod();
-
-	// <tobydox> ignore the passed _buf
-	// <tobydox> always use m_buffer
-	// <tobydox> this is just an auxilliary buffer if doProcessing()
-	//			 needs one for processing while running
-	// <tobydox> particularly important for playHandles, so Instruments
-	//			 can operate on this buffer the whole time
-	// <tobydox> this improves cache hit rate
-	_buf = m_buffer;
-
-	// SMF: OK, due to the fact, that the data from the audio-tracks has been
-	//			written into our buffer already, all which needs to be done at this
-	//			stage is to process inter-channel sends. I really don't like the idea
-	//			of using threads for this -- it just doesn't make any sense and wastes
-	//			cpu-cylces... so I just go through every child of this channel and
-	//			call the acc. doProcessing() directly.
-
-	if( m_muteModel.value() == false )
+	foreach( FxRoute * receiverRoute, m_sends )
 	{
-		// OK, we are not muted, so we go recursively through all the channels
-		// which send to us (our children)...
-		foreach( fx_ch_t senderIndex, m_receives )
+		if( receiverRoute->receiver()->m_muted == false )
 		{
-			FxChannel * sender = fxm->effectChannel( senderIndex );
-
-			// wait for the sender job - either it's just been queued yet,
-			// then ThreadableJob::process() will process it now within this
-			// thread - otherwise it has been is is being processed by another
-			// thread and we just have to wait for it to finish
-			while( sender->state() != ThreadableJob::Done )
-			{
-				sender->process();
-			}
-
-			// get the send level...
-			const float amt =
-				fxm->channelSendModel( senderIndex, m_channelIndex )->value();
-
-			// mix it's output with this one's output
-			sampleFrame * ch_buf = sender->m_buffer;
-			const float v = sender->m_volumeModel.value() * amt;
-			for( f_cnt_t f = 0; f < fpp; ++f )
-			{
-				_buf[f][0] += ch_buf[f][0] * v;
-				_buf[f][1] += ch_buf[f][1] * v;
-			}
+			receiverRoute->receiver()->incrementDeps();
 		}
 	}
+}
 
-	const float v = m_volumeModel.value();
+void FxChannel::incrementDeps()
+{
+	m_dependenciesMet.ref();
+	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
+	{
+		m_queued = true;
+		MixerWorkerThread::addJob( this );
+	}
+}
 
-	m_fxChain.startRunning();
-	m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, true );
-	m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
-	m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
+void FxChannel::unmuteForSolo()
+{
+	//TODO: Recursively activate every channel, this channel sends to
+	m_muteModel.setValue(false);
+}
+
+
+
+void FxChannel::doProcessing()
+{
+	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const bool exporting = Engine::getSong()->isExporting();
+
+	if( m_muted == false )
+	{
+		foreach( FxRoute * senderRoute, m_receives )
+		{
+			FxChannel * sender = senderRoute->sender();
+			FloatModel * sendModel = senderRoute->amount();
+			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
+
+			if( sender->m_hasInput || sender->m_stillRunning )
+			{
+				// figure out if we're getting sample-exact input
+				ValueBuffer * sendBuf = sendModel->valueBuffer();
+				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
+
+				// mix it's output with this one's output
+				sampleFrame * ch_buf = sender->m_buffer;
+
+				// use sample-exact mixing if sample-exact values are available
+				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
+				{
+					const float v = sender->m_volumeModel.value() * sendModel->value();
+					if( exporting ) { MixHelpers::addSanitizedMultiplied( m_buffer, ch_buf, v, fpp ); }
+					else { MixHelpers::addMultiplied( m_buffer, ch_buf, v, fpp ); }
+				}
+				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
+				{
+					if( exporting ) { MixHelpers::addSanitizedMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp ); }
+					else { MixHelpers::addMultipliedByBuffers( m_buffer, ch_buf, volBuf, sendBuf, fpp ); }
+				}
+				else if( volBuf ) // volume has sample-exact data but send does not
+				{
+					const float v = sendModel->value();
+					if( exporting ) { MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp ); }
+					else { MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, volBuf, fpp ); }
+				}
+				else // vice versa
+				{
+					const float v = sender->m_volumeModel.value();
+					if( exporting ) { MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp ); }
+					else { MixHelpers::addMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp ); }
+				}
+				m_hasInput = true;
+			}
+		}
+
+
+		const float v = m_volumeModel.value();
+
+		if( m_hasInput )
+		{
+			// only start fxchain when we have input...
+			m_fxChain.startRunning();
+		}
+
+		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
+
+		m_peakLeft = qMax( m_peakLeft, Engine::mixer()->peakValueLeft( m_buffer, fpp ) * v );
+		m_peakRight = qMax( m_peakRight, Engine::mixer()->peakValueRight( m_buffer, fpp ) * v );
+	}
+	else
+	{
+		m_peakLeft = m_peakRight = 0.0f;
+	}
+
+	// increment dependency counter of all receivers
+	processed();
 }
 
 
 
 FxMixer::FxMixer() :
-	JournallingObject(),
 	Model( NULL ),
+	JournallingObject(),
 	m_fxChannels()
 {
 	// create master channel
 	createChannel();
+	m_lastSoloed = -1;
 }
 
 
 
 FxMixer::~FxMixer()
 {
+	while( ! m_fxRoutes.isEmpty() )
+	{
+		deleteChannelSend( m_fxRoutes.first() );
+	}
 	for( int i = 0; i < m_fxChannels.size(); ++i )
 	{
-		for( int j = 0; j < m_fxChannels[i]->m_sendAmount.size(); ++j)
-		{
-			delete m_fxChannels[i]->m_sendAmount[j];
-		}
 		delete m_fxChannels[i];
 	}
 }
@@ -162,19 +227,72 @@ int FxMixer::createChannel()
 	return index;
 }
 
+void FxMixer::activateSolo()
+{
+	for (int i = 1; i < m_fxChannels.size(); ++i)
+	{
+		m_fxChannels[i]->m_muteBeforeSolo = m_fxChannels[i]->m_muteModel.value();
+		m_fxChannels[i]->m_muteModel.setValue( true );
+	}
+}
 
-void FxMixer::deleteChannel(int index)
+void FxMixer::deactivateSolo()
+{
+	for (int i = 1; i < m_fxChannels.size(); ++i)
+	{
+		m_fxChannels[i]->m_muteModel.setValue( m_fxChannels[i]->m_muteBeforeSolo );
+	}
+}
+
+void FxMixer::toggledSolo()
+{
+	int soloedChan = -1;
+	bool resetSolo = m_lastSoloed != -1;
+	//untoggle if lastsoloed is entered
+	if (resetSolo)
+	{
+		m_fxChannels[m_lastSoloed]->m_soloModel.setValue( false );
+	}
+	//determine the soloed channel
+	for (int i = 0; i < m_fxChannels.size(); ++i)
+	{
+		if (m_fxChannels[i]->m_soloModel.value() == true)
+			soloedChan = i;
+	}
+	// if no channel is soloed, unmute everything, else mute everything
+	if (soloedChan != -1)
+	{
+		if (resetSolo)
+		{
+			deactivateSolo();
+			activateSolo();
+		} else {
+			activateSolo();
+		}
+		// unmute the soloed chan and every channel it sends to
+		m_fxChannels[soloedChan]->unmuteForSolo();
+	} else {
+		deactivateSolo();
+	}
+	m_lastSoloed = soloedChan;
+}
+
+
+
+void FxMixer::deleteChannel( int index )
 {
 	m_fxChannels[index]->m_lock.lock();
 
+	FxChannel * ch = m_fxChannels[index];
+
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
-	tracks += engine::getSong()->tracks();
-	tracks += engine::getBBTrackContainer()->tracks();
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::getBBTrackContainer()->tracks();
 
-	foreach( track* t, tracks )
+	foreach( Track* t, tracks )
 	{
-		if( t->type() == track::InstrumentTrack )
+		if( t->type() == Track::InstrumentTrack )
 		{
 			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
 			int val = inst->effectChannelModel()->value(0);
@@ -193,66 +311,48 @@ void FxMixer::deleteChannel(int index)
 	}
 
 	// delete all of this channel's sends and receives
-	for(int i=0; i<m_fxChannels[index]->m_sends.size(); ++i)
+	while( ! ch->m_sends.isEmpty() )
 	{
-		deleteChannelSend(index, m_fxChannels[index]->m_sends[i]);
+		deleteChannelSend( ch->m_sends.first() );
 	}
-	for(int i=0; i<m_fxChannels[index]->m_receives.size(); ++i)
+	while( ! ch->m_receives.isEmpty() )
 	{
-		deleteChannelSend(m_fxChannels[index]->m_receives[i], index);
-	}
-
-	for(int i=0; i<m_fxChannels.size(); ++i)
-	{
-		// for every send/receive, adjust for the channel index change
-		for(int j=0; j<m_fxChannels[i]->m_sends.size(); ++j)
-		{
-			if( m_fxChannels[i]->m_sends[j] > index )
-			{
-				// subtract 1 to make up for the missing channel
-				--m_fxChannels[i]->m_sends[j];
-			}
-		}
-		for(int j=0; j<m_fxChannels[i]->m_receives.size(); ++j)
-		{
-			if( m_fxChannels[i]->m_receives[j] > index )
-			{
-				// subtract 1 to make up for the missing channel
-				--m_fxChannels[i]->m_receives[j];
-			}
-		}
-
+		deleteChannelSend( ch->m_receives.first() );
 	}
 
 	// actually delete the channel
 	delete m_fxChannels[index];
 	m_fxChannels.remove(index);
+
+	for( int i = index; i < m_fxChannels.size(); ++i )
+	{
+		validateChannelName( i, i + 1 );
+	}
 }
 
 
 
-void FxMixer::moveChannelLeft(int index)
+void FxMixer::moveChannelLeft( int index )
 {
 	// can't move master or first channel
 	if( index <= 1 || index >= m_fxChannels.size() )
 	{
 		return;
 	}
-
 	// channels to swap
 	int a = index - 1, b = index;
 
 	// go through every instrument and adjust for the channel index change
-	QVector<track *> songTrackList = engine::getSong()->tracks();
-	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+	QVector<Track *> songTrackList = Engine::getSong()->tracks();
+	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
 
-	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
+	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<track *> trackList = trackLists[tl];
+		QVector<Track *> trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
-			if( trackList[i]->type() == track::InstrumentTrack )
+			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				int val = inst->effectChannelModel()->value(0);
@@ -269,120 +369,132 @@ void FxMixer::moveChannelLeft(int index)
 		}
 	}
 
-	for(int i=0; i<m_fxChannels.size(); ++i)
-	{
-		// for every send/receive, adjust for the channel index change
-		for(int j=0; j<m_fxChannels[i]->m_sends.size(); ++j)
-		{
-			if( m_fxChannels[i]->m_sends[j] == a )
-			{
-				m_fxChannels[i]->m_sends[j] = b;
-			}
-			else if( m_fxChannels[i]->m_sends[j] == b )
-			{
-				m_fxChannels[i]->m_sends[j] = a;
-			}
-		}
-		for(int j=0; j<m_fxChannels[i]->m_receives.size(); ++j)
-		{
-			if( m_fxChannels[i]->m_receives[j] == a )
-			{
-				m_fxChannels[i]->m_receives[j] = b;
-			}
-			else if( m_fxChannels[i]->m_receives[j] == b )
-			{
-				m_fxChannels[i]->m_receives[j] = a;
-			}
-		}
-	}
-
 	// actually do the swap
 	FxChannel * tmpChannel = m_fxChannels[a];
 	m_fxChannels[a] = m_fxChannels[b];
 	m_fxChannels[b] = tmpChannel;
+
+	validateChannelName( a, b );
+	validateChannelName( b, a );
 }
 
 
 
-void FxMixer::moveChannelRight(int index)
+void FxMixer::moveChannelRight( int index )
 {
-	moveChannelLeft(index+1);
+	moveChannelLeft( index + 1 );
 }
 
 
 
-void FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
-								float amount)
+FxRoute * FxMixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
+								float amount )
 {
+//	qDebug( "requested: %d to %d", fromChannel, toChannel );
 	// find the existing connection
 	FxChannel * from = m_fxChannels[fromChannel];
-	for(int i=0; i<from->m_sends.size(); ++i){
-		if( from->m_sends[i] == toChannel )
+	FxChannel * to = m_fxChannels[toChannel];
+
+	for( int i=0; i<from->m_sends.size(); ++i )
+	{
+		if( from->m_sends[i]->receiver() == to )
 		{
 			// simply adjust the amount
-			from->m_sendAmount[i]->setValue(amount);
-			return;
+			from->m_sends[i]->amount()->setValue( amount );
+			return from->m_sends[i];
 		}
 	}
 
 	// connection does not exist. create a new one
-
-	// add to from's sends
-	from->m_sends.push_back(toChannel);
-	from->m_sendAmount.push_back(new FloatModel(amount, 0, 1, 0.001, NULL,
-												tr("Amount to send")));
-
-	// add to to's receives
-	m_fxChannels[toChannel]->m_receives.push_back(fromChannel);
-
+	return createRoute( from, to, amount );
 }
 
 
+FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
+{
+	if( from == to )
+	{
+		return NULL;
+	}
+	m_sendsMutex.lock();
+	FxRoute * route = new FxRoute( from, to, amount );
+
+	// add us to from's sends
+	from->m_sends.append( route );
+
+	// add us to to's receives
+	to->m_receives.append( route );
+
+	// add us to fxmixer's list
+	Engine::fxMixer()->m_fxRoutes.append( route );
+	m_sendsMutex.unlock();
+
+	return route;
+}
+
 
 // delete the connection made by createChannelSend
-void FxMixer::deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
+void FxMixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
 {
 	// delete the send
 	FxChannel * from = m_fxChannels[fromChannel];
 	FxChannel * to	 = m_fxChannels[toChannel];
 
 	// find and delete the send entry
-	for(int i=0; i<from->m_sends.size(); ++i) {
-		if( from->m_sends[i] == toChannel )
-		{
-			// delete this index
-			delete from->m_sendAmount[i];
-			from->m_sendAmount.remove(i);
-			from->m_sends.remove(i);
-			break;
-		}
-	}
-
-	// find and delete the receive entry
-	for(int i=0; i<to->m_receives.size(); ++i)
+	for( int i = 0; i < from->m_sends.size(); ++i )
 	{
-		if( to->m_receives[i] == fromChannel )
+		if( from->m_sends[i]->receiver() == to )
 		{
-			// delete this index
-			to->m_receives.remove(i);
+			deleteChannelSend( from->m_sends[i] );
 			break;
 		}
 	}
 }
 
 
-bool FxMixer::isInfiniteLoop(fx_ch_t sendFrom, fx_ch_t sendTo) {
+void FxMixer::deleteChannelSend( FxRoute * route )
+{
+	m_sendsMutex.lock();
+	// remove us from from's sends
+	route->sender()->m_sends.remove( route->sender()->m_sends.indexOf( route ) );
+	// remove us from to's receives
+	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
+	// remove us from fxmixer's list
+	Engine::fxMixer()->m_fxRoutes.remove( Engine::fxMixer()->m_fxRoutes.indexOf( route ) );
+	delete route;
+	m_sendsMutex.unlock();
+}
+
+
+bool FxMixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
+{
+	if( sendFrom == sendTo ) return true;
+	FxChannel * from = m_fxChannels[sendFrom];
+	FxChannel * to = m_fxChannels[sendTo];
+	bool b = checkInfiniteLoop( from, to );
+	return b;
+}
+
+
+bool FxMixer::checkInfiniteLoop( FxChannel * from, FxChannel * to )
+{
 	// can't send master to anything
-	if( sendFrom == 0 ) return true;
+	if( from == m_fxChannels[0] )
+	{
+		return true;
+	}
 
 	// can't send channel to itself
-	if( sendFrom == sendTo ) return true;
+	if( from == to )
+	{
+		return true;
+	}
 
 	// follow sendTo's outputs recursively looking for something that sends
 	// to sendFrom
-	for(int i=0; i<m_fxChannels[sendTo]->m_sends.size(); ++i)
+	for( int i=0; i < to->m_sends.size(); ++i )
 	{
-		if( isInfiniteLoop( sendFrom, m_fxChannels[sendTo]->m_sends[i] ) )
+		if( checkInfiniteLoop( from, to->m_sends[i]->receiver() ) )
 		{
 			return true;
 		}
@@ -393,13 +505,23 @@ bool FxMixer::isInfiniteLoop(fx_ch_t sendFrom, fx_ch_t sendTo) {
 
 
 // how much does fromChannel send its output to the input of toChannel?
-FloatModel * FxMixer::channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel)
+FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 {
-	FxChannel * from = m_fxChannels[fromChannel];
-	for(int i=0; i<from->m_sends.size(); ++i){
-		if( from->m_sends[i] == toChannel )
-			return from->m_sendAmount[i];
+	if( fromChannel == toChannel )
+	{
+		return NULL;
 	}
+	FxChannel * from = m_fxChannels[fromChannel];
+	FxChannel * to = m_fxChannels[toChannel];
+
+	foreach( FxRoute * route, from->m_sends )
+	{
+		if( route->receiver() == to )
+		{
+			return route->amount();
+		}
+	}
+
 	return NULL;
 }
 
@@ -407,19 +529,14 @@ FloatModel * FxMixer::channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel)
 
 void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
-	// SMF: it seems like here the track-channels are mixed in... but from where
-	//			is this called and when and why...?!?
-	//
-	//			OK, found it (git grep is your friend...): This is the next part,
-	//			where there is a mix between push and pull model inside the core, as
-	//			the audio-tracks *push* their data into the fx-channels hopefully just
-	//			before the Mixer-Channels are processed... Sorry to say this: but this
-	//			took me senseless hours to find out and is silly, too...
-
-	if( m_fxChannels[_ch]->m_muteModel.value() == false )
+	// The first check is for the case where the last fxchannel was deleted but
+	// there was a race condition where it had to be processed.
+	if( _ch < m_fxChannels.size() &&
+			m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
-		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, engine::mixer()->framesPerPeriod() );
+		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::mixer()->framesPerPeriod() );
+		m_fxChannels[_ch]->m_hasInput = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
 }
@@ -429,63 +546,72 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void FxMixer::prepareMasterMix()
 {
-	engine::mixer()->clearAudioBuffer( m_fxChannels[0]->m_buffer,
-					engine::mixer()->framesPerPeriod() );
-}
-
-
-
-void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
-{
-	FxChannel * thisCh = m_fxChannels[_ch];
-
-	// if we're muted or this channel is seen already, discount it
-	if( thisCh->m_queued )
-	{
-		return;
-	}
-
-	foreach( const int senderIndex, thisCh->m_receives )
-	{
-		addChannelLeaf( senderIndex, _buf );
-	}
-
-	// add this channel to job list
-	thisCh->m_queued = true;
-	MixerWorkerThread::addJob( thisCh );
+	Engine::mixer()->clearAudioBuffer( m_fxChannels[0]->m_buffer,
+					Engine::mixer()->framesPerPeriod() );
 }
 
 
 
 void FxMixer::masterMix( sampleFrame * _buf )
 {
-	const int fpp = engine::mixer()->framesPerPeriod();
+	const int fpp = Engine::mixer()->framesPerPeriod();
 
-	// recursively loop through channel dependency chain
-	// and add all channels to job list that have no dependencies
-	// when the channel completes it will check its parent to see if it needs
-	// to be processed.
-	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
-	addChannelLeaf( 0, _buf );
-	while( m_fxChannels[0]->state() != ThreadableJob::Done )
+	if( m_sendsMutex.tryLock() )
 	{
-		MixerWorkerThread::startAndWaitForJobs();
+		// add the channels that have no dependencies (no incoming senders, ie. no receives)
+		// to the jobqueue. The channels that have receives get added when their senders get processed, which
+		// is detected by dependency counting.
+		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
+		// their recipients right away.
+		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
+		foreach( FxChannel * ch, m_fxChannels )
+		{
+			ch->m_muted = ch->m_muteModel.value();
+			if( ch->m_muted ) // instantly "process" muted channels
+			{
+				ch->processed();
+				ch->done();
+			}
+			else if( ch->m_receives.size() == 0 )
+			{
+				ch->m_queued = true;
+				MixerWorkerThread::addJob( ch );
+			}
+		}
+		while( m_fxChannels[0]->state() != ThreadableJob::Done )
+		{
+			MixerWorkerThread::startAndWaitForJobs();
+		}
+		m_sendsMutex.unlock();
 	}
-	//m_fxChannels[0]->doProcessing( NULL );
 
-	const float v = m_fxChannels[0]->m_volumeModel.value();
-	MixHelpers::addMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
+	// handle sample-exact data in master volume fader
+	ValueBuffer * volBuf = m_fxChannels[0]->m_volumeModel.valueBuffer();
 
-	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
-	m_fxChannels[0]->m_peakRight *= engine::mixer()->masterGain();
+	if( volBuf )
+	{
+		for( int f = 0; f < fpp; f++ )
+		{
+			m_fxChannels[0]->m_buffer[f][0] *= volBuf->values()[f];
+			m_fxChannels[0]->m_buffer[f][1] *= volBuf->values()[f];
+		}
+	}
+
+	const float v = volBuf
+		? 1.0f
+		: m_fxChannels[0]->m_volumeModel.value();
+	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
 	// clear all channel buffers and
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		engine::mixer()->clearAudioBuffer( m_fxChannels[i]->m_buffer, engine::mixer()->framesPerPeriod() );
+		Engine::mixer()->clearAudioBuffer( m_fxChannels[i]->m_buffer, Engine::mixer()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;
+		// also reset hasInput
+		m_fxChannels[i]->m_hasInput = false;
+		m_fxChannels[i]->m_dependenciesMet = 0;
 	}
 }
 
@@ -510,32 +636,33 @@ void FxMixer::clearChannel(fx_ch_t index)
 	ch->m_fxChain.clear();
 	ch->m_volumeModel.setValue( 1.0f );
 	ch->m_muteModel.setValue( false );
+	ch->m_soloModel.setValue( false );
 	ch->m_name = ( index == 0 ) ? tr( "Master" ) : tr( "FX %1" ).arg( index );
-	ch->m_volumeModel.setDisplayName(ch->m_name );
+	ch->m_volumeModel.setDisplayName( ch->m_name );
 
 	// send only to master
 	if( index > 0)
 	{
 		// delete existing sends
-		for( int i=0; i<ch->m_sends.size(); ++i)
+		while( ! ch->m_sends.isEmpty() )
 		{
-			deleteChannelSend(index, ch->m_sends[i]);
+			deleteChannelSend( ch->m_sends.first() );
 		}
 
 		// add send to master
-		createChannelSend(index, 0);
+		createChannelSend( index, 0 );
 	}
 
 	// delete receives
-	for( int i=0; i<ch->m_receives.size(); ++i)
+	while( ! ch->m_receives.isEmpty() )
 	{
-		deleteChannelSend(ch->m_receives[i], index);
+		deleteChannelSend( ch->m_receives.first() );
 	}
-
 }
 
 void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	// save channels
 	for( int i = 0; i < m_fxChannels.size(); ++i )
 	{
 		FxChannel * ch = m_fxChannels[i];
@@ -546,6 +673,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_fxChain.saveState( _doc, fxch );
 		ch->m_volumeModel.saveSettings( _doc, fxch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, fxch, "muted" );
+		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
 
@@ -555,8 +683,8 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			QDomElement sendsDom = _doc.createElement( QString( "send" ) );
 			fxch.appendChild( sendsDom );
 
-			sendsDom.setAttribute( "channel", ch->m_sends[si] );
-			ch->m_sendAmount[si]->saveSettings( _doc, sendsDom, "amount");
+			sendsDom.setAttribute( "channel", ch->m_sends[si]->receiverIndex() );
+			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
 		}
 	}
 }
@@ -569,7 +697,7 @@ void FxMixer::allocateChannelsTo(int num)
 		createChannel();
 
 		// delete the default send to master
-		deleteChannelSend(m_fxChannels.size()-1, 0);
+		deleteChannelSend( m_fxChannels.size()-1, 0 );
 	}
 }
 
@@ -592,6 +720,7 @@ void FxMixer::loadSettings( const QDomElement & _this )
 
 		m_fxChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
+		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
@@ -606,9 +735,9 @@ void FxMixer::loadSettings( const QDomElement & _this )
 			{
 				thereIsASend = true;
 				int sendTo = chDataItem.attribute( "channel" ).toInt();
-				allocateChannelsTo( sendTo) ;
-				float amount = chDataItem.attribute( "amount" ).toFloat();
-				createChannelSend( num, sendTo, amount );
+				allocateChannelsTo( sendTo ) ;
+				FxRoute * fxr = createChannelSend( num, sendTo, 1.0f );
+				if( fxr ) fxr->amount()->loadSettings( chDataItem, "amount" );
 			}
 		}
 
@@ -622,10 +751,32 @@ void FxMixer::loadSettings( const QDomElement & _this )
 		// create a send from every channel into master
 		for( int i=1; i<m_fxChannels.size(); ++i )
 		{
-			createChannelSend(i, 0);
+			createChannelSend( i, 0 );
 		}
 	}
 
 	emit dataChanged();
+}
+
+
+void FxMixer::validateChannelName( int index, int oldIndex )
+{
+	FxChannel * fxc = m_fxChannels[ index ];
+	if( fxc->m_name == tr( "FX %1" ).arg( oldIndex ) )
+	{
+		fxc->m_name = tr( "FX %1" ).arg( index );
+	}
+	// set correct channel index
+	fxc->m_channelIndex = index;
+
+	// now check all routes and update names of the send models
+	foreach( FxRoute * r, fxc->m_sends )
+	{
+		r->updateName();
+	}
+	foreach( FxRoute * r, fxc->m_receives )
+	{
+		r->updateName();
+	}
 }
 

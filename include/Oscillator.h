@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _OSCILLATOR_H
-#define _OSCILLATOR_H
+#ifndef OSCILLATOR_H
+#define OSCILLATOR_H
 
 #include "lmmsconfig.h"
 
@@ -36,13 +36,12 @@
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
 
-
-class SampleBuffer;
 class IntModel;
 
 
 class EXPORT Oscillator
 {
+	MM_OPERATORS
 public:
 	enum WaveShapes
 	{

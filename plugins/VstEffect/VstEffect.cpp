@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,11 +22,11 @@
  *
  */
 
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "VstEffect.h"
-#include "song.h"
-#include "text_float.h"
+#include "Song.h"
+#include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
 
 #include "embed.cpp"
@@ -124,7 +124,7 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	textFloat * tf = textFloat::displayMessage(
+	TextFloat * tf = TextFloat::displayMessage(
 		VstPlugin::tr( "Loading plugin" ),
 		VstPlugin::tr( "Please wait while loading VST plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -135,15 +135,12 @@ void VstEffect::openPlugin( const QString & _plugin )
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
-		QMessageBox::information( NULL,
-			VstPlugin::tr( "Failed loading VST plugin" ),
-			VstPlugin::tr( "The VST plugin %1 could not be loaded for some reason." ).arg( _plugin ),
-			QMessageBox::Ok );
+		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
 		return;
 	}
 
-	VstPlugin::connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( engine::getSong()->getTempo() );
+	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
+	m_plugin->setTempo( Engine::getSong()->getTempo() );
 
 	m_pluginMutex.unlock();
 

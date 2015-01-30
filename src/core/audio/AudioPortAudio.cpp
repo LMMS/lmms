@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,21 +38,21 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "LcdSpinBox.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audioportaudio", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_paStream( NULL ),
@@ -78,8 +78,8 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 		return;
 	}
 	
-	const QString& backend = configManager::inst()->value( "audioportaudio", "backend" );
-	const QString& device = configManager::inst()->value( "audioportaudio", "device" );
+	const QString& backend = ConfigManager::inst()->value( "audioportaudio", "backend" );
+	const QString& device = ConfigManager::inst()->value( "audioportaudio", "device" );
 		
 	PaDeviceIndex inDevIdx = -1;
 	PaDeviceIndex outDevIdx = -1;
@@ -232,7 +232,7 @@ void AudioPortAudio::applyQualitySettings()
 	if( hqAudio() )
 	{
 
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 		int samples = mixer()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(
@@ -391,14 +391,14 @@ void AudioPortAudioSetupUtil::updateChannels()
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioPortAudio::name(), _parent )
 {
-	m_backend = new comboBox( this, "BACKEND" );
+	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
 	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
-	m_device = new comboBox( this, "DEVICE" );
+	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
@@ -408,7 +408,7 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 /*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audioportaudio",
+	m->setValue( ConfigManager::inst()->value( "audioportaudio",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -434,9 +434,9 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	Pa_Terminate();
 
 
-	const QString& backend = configManager::inst()->value( "audioportaudio",
+	const QString& backend = ConfigManager::inst()->value( "audioportaudio",
 		"backend" );
-	const QString& device = configManager::inst()->value( "audioportaudio",
+	const QString& device = ConfigManager::inst()->value( "audioportaudio",
 		"device" );
 	
 	int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
@@ -475,11 +475,11 @@ AudioPortAudio::setupWidget::~setupWidget()
 void AudioPortAudio::setupWidget::saveSettings()
 {
 
-	configManager::inst()->setValue( "audioportaudio", "backend",
+	ConfigManager::inst()->setValue( "audioportaudio", "backend",
 							m_setupUtil.m_backendModel.currentText() );
-	configManager::inst()->setValue( "audioportaudio", "device",
+	ConfigManager::inst()->setValue( "audioportaudio", "device",
 							m_setupUtil.m_deviceModel.currentText() );
-/*	configManager::inst()->setValue( "audioportaudio", "channels",
+/*	ConfigManager::inst()->setValue( "audioportaudio", "channels",
 				QString::number( m_channels->value<int>() ) );*/
 
 }
@@ -487,5 +487,5 @@ void AudioPortAudio::setupWidget::saveSettings()
 
 #endif
 
-#include "moc_AudioPortAudio.cxx"
+
 

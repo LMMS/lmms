@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,12 +22,12 @@
  *
  */
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QMutexLocker>
+#include <QFileInfo>
+#include <QMutexLocker>
 
 #include "PresetPreviewPlayHandle.h"
 #include "debug.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MidiPort.h"
@@ -47,9 +47,9 @@ public:
 		m_previewNote( NULL ),
 		m_dataMutex()
 	{
-		setJournalling( FALSE );
-		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( track::create( track::InstrumentTrack, this ) );
-		m_previewInstrumentTrack->setJournalling( FALSE );
+		setJournalling( false );
+		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, this ) );
+		m_previewInstrumentTrack->setJournalling( false );
 	}
 
 	virtual ~PreviewTrackContainer()
@@ -123,10 +123,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	}
 
 
-	const bool j = engine::projectJournal()->isJournalling();
-	engine::projectJournal()->setJournalling( FALSE );
-
-	engine::setSuppressMessages( true );
+	const bool j = Engine::projectJournal()->isJournalling();
+	Engine::projectJournal()->setJournalling( false );
 
 	if( _load_by_plugin )
 	{
@@ -137,7 +135,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		{
 			i = s_previewTC->previewInstrumentTrack()->
 				loadInstrument(
-					engine::pluginFileHandling()[ext] );
+					Engine::pluginFileHandling()[ext] );
 		}
 		if( i != NULL )
 		{
@@ -147,12 +145,20 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	else
 	{
 		DataFile dataFile( _preset_file );
-		s_previewTC->previewInstrumentTrack()->
-			loadTrackSpecificSettings(
-				dataFile.content().firstChild().toElement() );
+		// vestige previews are bug prone; fallback on 3xosc with volume of 0
+		// without an instrument in preview track, it will segfault
+		if(dataFile.content().elementsByTagName( "vestige" ).length() == 0 )
+		{
+			s_previewTC->previewInstrumentTrack()->
+					loadTrackSpecificSettings(
+						dataFile.content().firstChild().toElement() );
+		}
+		else
+		{
+			s_previewTC->previewInstrumentTrack()->loadInstrument("tripleoscillator");
+			s_previewTC->previewInstrumentTrack()->setVolume( 0 );
+		}
 	}
-
-	engine::setSuppressMessages( false );
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
@@ -160,16 +166,17 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 				midiPort()->setMode( MidiPort::Disabled );
 
 	// create note-play-handle for it
-	m_previewNote = new NotePlayHandle(
+	m_previewNote = NotePlayHandleManager::acquire(
 			s_previewTC->previewInstrumentTrack(), 0,
 			typeInfo<f_cnt_t>::max() / 2,
-				note( 0, 0, DefaultKey, 100 ) );
+				Note( 0, 0, DefaultKey, 100 ) );
 
+	setAudioPort( s_previewTC->previewInstrumentTrack()->audioPort() );
 
 	s_previewTC->setPreviewNote( m_previewNote );
 
 	s_previewTC->unlockData();
-	engine::projectJournal()->setJournalling( j );
+	Engine::projectJournal()->setJournalling( j );
 }
 
 
@@ -184,7 +191,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 		// then set according state
 		s_previewTC->setPreviewNote( NULL );
 	}
-	delete m_previewNote;
+	NotePlayHandleManager::release( m_previewNote );
 	s_previewTC->unlockData();
 }
 
@@ -207,7 +214,7 @@ bool PresetPreviewPlayHandle::isFinished() const
 
 
 
-bool PresetPreviewPlayHandle::isFromTrack( const track * _track ) const
+bool PresetPreviewPlayHandle::isFromTrack( const Track * _track ) const
 {
 	return s_previewTC->previewInstrumentTrack() == _track;
 }

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +24,8 @@
 
 
 
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
+#include <QLayout>
+#include <QLabel>
 
 #include "stereomatrix_control_dialog.h"
 #include "stereomatrix_controls.h"
@@ -47,24 +47,24 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	setPalette( pal );
 
 
-	knob * llKnob = new knob( knobSmall_17, this );
+	Knob * llKnob = new Knob( knobSmall_17, this );
 	llKnob->setModel( &_controls->m_llModel );
-	llKnob->setHintText( tr( "Left to Left Vol:" ) + " ", "" );
+	llKnob->setHintText( tr( "Left to Left Vol:" ) , "" );
 	llKnob->move( 40, 60 );
 
-	knob * lrKnob = new knob( knobSmall_17, this );
+	Knob * lrKnob = new Knob( knobSmall_17, this );
 	lrKnob->setModel( &_controls->m_lrModel );
-	lrKnob->setHintText( tr( "Left to Right Vol:" ) + " ", "" );
+	lrKnob->setHintText( tr( "Left to Right Vol:" ) , "" );
 	lrKnob->move( 40+28, 60);
 
-	knob * rlKnob = new knob( knobSmall_17, this );
+	Knob * rlKnob = new Knob( knobSmall_17, this );
 	rlKnob->setModel( &_controls->m_rlModel );
-	rlKnob->setHintText( tr( "Right to Left Vol:" ) + " ", "" );
+	rlKnob->setHintText( tr( "Right to Left Vol:" ) , "" );
 	rlKnob->move( 40, 60+28 );
 
-	knob * rrKnob = new knob( knobSmall_17, this );
+	Knob * rrKnob = new Knob( knobSmall_17, this );
 	rrKnob->setModel( &_controls->m_rrModel );
-	rrKnob->setHintText( tr( "Right to Right Vol:" ) + " ", "" );
+	rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
 	rrKnob->move( 40+28, 60+28 );
 }
 

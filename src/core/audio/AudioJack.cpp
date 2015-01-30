@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,17 +26,17 @@
 
 #ifdef LMMS_HAVE_JACK
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
-#include <QtGui/QMessageBox>
+#include <QLineEdit>
+#include <QLabel>
+#include <QMessageBox>
 
 #include <stdlib.h>
 
-#include "debug.h"
-#include "engine.h"
+#include "Engine.h"
+#include "GuiApplication.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
@@ -45,7 +45,7 @@
 
 
 AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<int>( configManager::inst()->value(
+	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
@@ -106,7 +106,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( gui->mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -115,7 +115,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( engine::mainWindow(),
+		QMessageBox::information( gui->mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "
@@ -131,7 +131,7 @@ void AudioJack::restartAfterZombified()
 
 bool AudioJack::initJackClient()
 {
-	QString clientName = configManager::inst()->value( "audiojack",
+	QString clientName = ConfigManager::inst()->value( "audiojack",
 								"clientname" );
 	if( clientName.isEmpty() )
 	{
@@ -140,7 +140,7 @@ bool AudioJack::initJackClient()
 
 	const char * serverName = NULL;
 	jack_status_t status;
-	m_client = jack_client_open( clientName.toAscii().constData(),
+	m_client = jack_client_open( clientName.toLatin1().constData(),
 						JackNullOption, &status,
 								serverName );
 	if( m_client == NULL )
@@ -156,7 +156,7 @@ bool AudioJack::initJackClient()
 	{
 		printf( "there's already a client with name '%s', so unique "
 			"name '%s' was assigned\n", clientName.
-							toAscii().constData(),
+							toLatin1().constData(),
 					jack_get_client_name( m_client ) );
 	}
 
@@ -179,7 +179,7 @@ bool AudioJack::initJackClient()
 				( ( ch % 2 ) ? "R" : "L" ) +
 				QString::number( ch / 2 + 1 );
 		m_outputPorts.push_back( jack_port_register( m_client,
-						name.toAscii().constData(),
+						name.toLatin1().constData(),
 						JACK_DEFAULT_AUDIO_TYPE,
 						JackPortIsOutput, 0 ) );
 		if( m_outputPorts.back() == NULL )
@@ -259,7 +259,7 @@ void AudioJack::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		if( jack_get_sample_rate( m_client ) != sampleRate() )
 		{
@@ -284,7 +284,7 @@ void AudioJack::registerPort( AudioPort * _port )
 	for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 	{
 		m_portMap[_port].ports[ch] = jack_port_register( m_client,
-						name[ch].toAscii().constData(),
+						name[ch].toLatin1().constData(),
 						JACK_DEFAULT_AUDIO_TYPE,
 							JackPortIsOutput, 0 );
 	}
@@ -325,7 +325,7 @@ void AudioJack::renamePort( AudioPort * _port )
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			jack_port_set_name( m_portMap[_port].ports[ch],
-					name[ch].toAscii().constData() );
+					name[ch].toLatin1().constData() );
 		}
 	}
 #endif
@@ -434,7 +434,7 @@ void AudioJack::shutdownCallback( void * _udata )
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioJack::name(), _parent )
 {
-	QString cn = configManager::inst()->value( "audiojack", "clientname" );
+	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )
 	{
 		cn = "lmms";
@@ -449,7 +449,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audiojack",
+	m->setValue( ConfigManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -464,6 +464,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioJack::setupWidget::~setupWidget()
 {
+	delete m_channels->model();
 }
 
 
@@ -471,15 +472,15 @@ AudioJack::setupWidget::~setupWidget()
 
 void AudioJack::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiojack", "clientname",
+	ConfigManager::inst()->setValue( "audiojack", "clientname",
 							m_clientName->text() );
-	configManager::inst()->setValue( "audiojack", "channels",
+	ConfigManager::inst()->setValue( "audiojack", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 
 
 
-#include "moc_AudioJack.cxx"
+
 
 #endif
 

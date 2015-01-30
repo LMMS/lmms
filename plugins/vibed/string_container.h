@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,14 +24,15 @@
 #ifndef _STRING_CONTAINER_H
 #define _STRING_CONTAINER_H
 
-#include <QtCore/QVector>
+#include <QVector>
 
 #include "vibrating_string.h"
-
+#include "MemoryManager.h"
 
 
 class stringContainer
 {
+	MM_OPERATORS
 public:
 	stringContainer(const float _pitch, 
 			const sample_rate_t _sample_rate,

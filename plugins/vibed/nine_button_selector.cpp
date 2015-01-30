@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,9 +26,9 @@
 
 #include "nine_button_selector.h"
 
-#include <QtGui/QWhatsThis>
+#include <QWhatsThis>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 
 
@@ -60,7 +60,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 	setFixedSize( 50, 50 );
 	move( _x, _y );
 
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 1, 1 );
 	m_button->setActiveGraphic( _button0_on );
 	m_button->setInactiveGraphic( _button0_off );
@@ -69,7 +69,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button0Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 18, 1 );
 	m_button->setActiveGraphic( _button1_on );
 	m_button->setInactiveGraphic( _button1_off );
@@ -78,7 +78,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button1Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 35, 1 );
 	m_button->setActiveGraphic( _button2_on );
 	m_button->setInactiveGraphic( _button2_off );
@@ -87,7 +87,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button2Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 1, 18 );
 	m_button->setActiveGraphic( _button3_on );
 	m_button->setInactiveGraphic( _button3_off );
@@ -96,7 +96,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button3Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 18, 18 );
 	m_button->setActiveGraphic( _button4_on );
 	m_button->setInactiveGraphic( _button4_off );
@@ -105,7 +105,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button4Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 35, 18 );
 	m_button->setActiveGraphic( _button5_on );
 	m_button->setInactiveGraphic( _button5_off );
@@ -114,7 +114,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button5Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 1, 35 );
 	m_button->setActiveGraphic( _button6_on );
 	m_button->setInactiveGraphic( _button6_off );
@@ -123,7 +123,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button6Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 18, 35 );
 	m_button->setActiveGraphic( _button7_on );
 	m_button->setInactiveGraphic( _button7_off );
@@ -132,7 +132,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button7Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL );
+	m_button = new PixmapButton( this, NULL );
 	m_button->move( 35, 35 );
 	m_button->setActiveGraphic( _button8_on );
 	m_button->setInactiveGraphic( _button8_off );
@@ -251,9 +251,8 @@ void nineButtonSelector::updateButton( int _new_button )
 
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
-	captionMenu contextMenu( windowTitle() );
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-			       this, SLOT( displayHelp() ) );
+	CaptionMenu contextMenu( windowTitle(), this );
+	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -269,4 +268,4 @@ void nineButtonSelector::displayHelp()
 
 
 
-#include "moc_nine_button_selector.cxx"
+

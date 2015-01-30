@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,8 +26,7 @@
 #include "InstrumentTrack.h"
 #include "DummyInstrument.h"
 #include "NotePlayHandle.h"
-#include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 Instrument::Instrument( InstrumentTrack * _instrument_track,
@@ -89,7 +88,7 @@ Instrument * Instrument::instantiate( const QString & _plugin_name,
 
 
 
-bool Instrument::isFromTrack( const track * _track ) const
+bool Instrument::isFromTrack( const Track * _track ) const
 {
 	return( m_instrumentTrack == _track );
 }
@@ -100,7 +99,7 @@ bool Instrument::isFromTrack( const track * _track ) const
 void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const fpp_t fpp = engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
 	if( fl <= desiredReleaseFrames()+fpp )
 	{

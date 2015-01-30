@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,14 +22,13 @@
  *
  */
 
-#ifndef _COMBOBOX_MODEL_H
-#define _COMBOBOX_MODEL_H
+#ifndef COMBOBOX_MODEL_H
+#define COMBOBOX_MODEL_H
 
 #include <QtCore/QVector>
 #include <QtCore/QPair>
 
 #include "AutomatableModel.h"
-#include "templates.h"
 
 class PixmapLoader;
 

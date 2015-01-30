@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _MIDI_EVENT_H
-#define _MIDI_EVENT_H
+#ifndef MIDI_EVENT_H
+#define MIDI_EVENT_H
 
 #include <cstdlib>
 #include "Midi.h"

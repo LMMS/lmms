@@ -4,7 +4,7 @@
    the stack and crap like that.
 */
 
-static const float _truncate_half = 0.5f;
+//static const float _truncate_half = 0.5f;
 
 int truncate(float flt) {
 	int i;

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,42 +22,45 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QMenu>
 
 #include "AutomationPatternView.h"
 #include "AutomationEditor.h"
 #include "AutomationPattern.h"
 #include "embed.h"
-#include "engine.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "ProjectJournal.h"
-#include "rename_dialog.h"
-#include "string_pair_drag.h"
-#include "tooltip.h"
+#include "RenameDialog.h"
+#include "StringPairDrag.h"
+#include "ToolTip.h"
 
 
+QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
-						trackView * _parent ) :
-	trackContentObjectView( _pattern, _parent ),
+						TrackView * _parent ) :
+	TrackContentObjectView( _pattern, _parent ),
 	m_pat( _pattern ),
 	m_paintPixmap(),
 	m_needsUpdate( true )
 {
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
-	connect( engine::automationEditor(), SIGNAL( currentPatternChanged() ),
+	connect( gui->automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
 
-	toolTip::add( this, tr( "double-click to open this pattern in "
+	ToolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
 	setStyle( QApplication::style() );
+	
+	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
+							"pat_rec" ) ); }
 }
 
 
@@ -65,6 +68,14 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 AutomationPatternView::~AutomationPatternView()
 {
+}
+
+
+
+
+void AutomationPatternView::openInAutomationEditor()
+{
+	if(gui) gui->automationEditor()->open(m_pat);
 }
 
 
@@ -78,7 +89,7 @@ void AutomationPatternView::update()
 	{
 		m_pat->changeLength( m_pat->length() );
 	}
-	trackContentObjectView::update();
+	TrackContentObjectView::update();
 }
 
 
@@ -95,7 +106,7 @@ void AutomationPatternView::resetName()
 void AutomationPatternView::changeName()
 {
 	QString s = m_pat->name();
-	renameDialog rename_dlg( s );
+	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_pat->setName( s );
 	update();
@@ -106,7 +117,7 @@ void AutomationPatternView::changeName()
 
 void AutomationPatternView::disconnectObject( QAction * _a )
 {
-	JournallingObject * j = engine::projectJournal()->
+	JournallingObject * j = Engine::projectJournal()->
 				journallingObject( _a->data().toInt() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
@@ -119,9 +130,9 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		update();
 
 		//If automation editor is opened, update its display after disconnection
-		if( engine::automationEditor() )
+		if( gui->automationEditor() )
 		{
-			engine::automationEditor()->updateAfterPatternChange();
+			gui->automationEditor()->m_editor->updateAfterPatternChange();
 		}
 
 		//if there is no more connection connected to the AutomationPattern
@@ -134,6 +145,32 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 }
 
 
+void AutomationPatternView::toggleRecording()
+{
+	m_pat->setRecording( ! m_pat->isRecording() );
+	update();
+}
+
+
+
+
+void AutomationPatternView::flipY()
+{
+	m_pat->flipY( m_pat->getMin(), m_pat->getMax() );
+	update();
+}
+
+
+
+
+void AutomationPatternView::flipX()
+{
+	//m_pat->flipX( m_pat->length() );
+	m_pat->flipX( m_pat->TrackContentObject::length() );
+	update();
+}
+
+
 
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
@@ -141,8 +178,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ),
-				m_pat, SLOT( openInAutomationEditor() ) );
+	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
 	_cm->insertSeparator( _cm->actions()[1] );
 
 	_cm->addSeparator();
@@ -156,6 +192,15 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
+	_cm->addAction( embed::getIconPixmap( "record" ),
+						tr( "Set/clear record" ),
+						this, SLOT( toggleRecording() ) );
+	_cm->addAction( embed::getIconPixmap( "flip_y" ),
+						tr( "Flip Vertically (Visible)" ),
+						this, SLOT( flipY() ) );
+	_cm->addAction( embed::getIconPixmap( "flip_x" ),
+						tr( "Flip Horizontally (Visible)" ),
+						this, SLOT( flipX() ) );
 	if( !m_pat->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
@@ -184,14 +229,14 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 
 
 
-void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
+void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * me )
 {
-	if( _me->button() != Qt::LeftButton )
+	if(me->button() != Qt::LeftButton)
 	{
-		_me->ignore();
+		me->ignore();
 		return;
 	}
-	m_pat->openInAutomationEditor();
+	openInAutomationEditor();
 }
 
 
@@ -220,28 +265,27 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
+
 	if( !( m_pat->getTrack()->isMuted() || m_pat->isMuted() ) )
-		c = isSelected() ? QColor( 0, 0, 224 )
-						 : styleColor;
+		c = styleColor;
 	else
-		c = QColor( 80,80,80 );
+		c = QColor( 80, 80, 80 );
+
+	if( isSelected() == true )
+	{
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
 	p.setBrush( lingrad );
-	if( engine::automationEditor()->currentPattern() == m_pat )
+	if( gui->automationEditor()->currentPattern() == m_pat )
 		p.setPen( c.lighter( 160 ) );
 	else
 		p.setPen( c.lighter( 130 ) );
 	p.drawRect( 1, 1, width()-3, height()-3 );
 
-	p.setBrush( QBrush() );
-	if( engine::automationEditor()->currentPattern() == m_pat )
-		p.setPen( c.lighter( 130 ) );
-	else
-		p.setPen( c.darker( 300 ) );
-	p.drawRect( 0, 0, width()-1, height()-1 );
 
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
@@ -310,6 +354,22 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.resetMatrix();
+
+	// recording icon for when recording automation
+	if( m_pat->isRecording() )
+	{
+		p.drawPixmap( 4, 14, *s_pat_rec );
+	}
+
+	// outer edge
+	p.setBrush( QBrush() );
+	if( gui->automationEditor()->currentPattern() == m_pat )
+		p.setPen( c.lighter( 130 ) );
+	else
+		p.setPen( c.darker( 300 ) );
+	p.drawRect( 0, 0, width()-1, height()-1 );
+
+	// pattern name
 	p.setFont( pointSize<8>( p.font() ) );
 
 	QColor text_color = ( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
@@ -327,6 +387,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 				embed::getIconPixmap( "muted", 16, 16 ) );
 	}
 
+
 	p.end();
 
 	_p.drawPixmap( 0, 0, m_paintPixmap );
@@ -338,10 +399,10 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 	if( !_dee->isAccepted() )
 	{
-		trackContentObjectView::dragEnterEvent( _dee );
+		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
 
@@ -350,12 +411,12 @@ void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void AutomationPatternView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString val = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				engine::projectJournal()->
+				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
@@ -363,23 +424,15 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		}
 		update();
 
-		if( engine::automationEditor() &&
-			engine::automationEditor()->currentPattern() == m_pat )
+		if( gui->automationEditor() &&
+			gui->automationEditor()->currentPattern() == m_pat )
 		{
-			engine::automationEditor()->setCurrentPattern( m_pat );
-		}
-
-		//This is the only model that's just added to AutomationPattern.
-		if( m_pat->m_objects.size() == 1 )
-		{
-			//scale the points to fit the new min. and max. value
-			this->scaleTimemapToFit( AutomationPattern::DEFAULT_MIN_VALUE,
-									 AutomationPattern::DEFAULT_MAX_VALUE );
+			gui->automationEditor()->setCurrentPattern( m_pat );
 		}
 	}
 	else
 	{
-		trackContentObjectView::dropEvent( _de );
+		TrackContentObjectView::dropEvent( _de );
 	}
 }
 
@@ -418,5 +471,5 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 
 
 
-#include "moc_AutomationPatternView.cxx"
+
 

@@ -2,8 +2,8 @@
  * aeffectx.h - simple header to allow VeSTige compilation and eventually work
  *
  * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _AEFFECTX_H
-#define _AEFFECTX_H
+#ifndef AEFFECTX_H
+#define AEFFECTX_H
 
 #define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
 				( ( (int) b ) << 16 ) |		\

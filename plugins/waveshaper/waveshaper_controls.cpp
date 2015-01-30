@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,13 +24,14 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "waveshaper_controls.h"
 #include "waveshaper.h"
-#include "graph.h"
-#include "engine.h"
-#include "song.h"
+#include "base64.h"
+#include "Graph.h"
+#include "Engine.h"
+#include "Song.h"
 
 
 #define onedB 1.1220184543019633f
@@ -43,43 +44,18 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_clipModel( false, this )
 {
-	connect( &m_inputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeInput() ) );
-
-	connect( &m_outputModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeOutput() ) );
-	
-	connect( &m_clipModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeClip() ) );
-
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
 
-
 	setDefaultShape();
-
 }
 
 
 
-void waveShaperControls::changeInput()
-{
-	engine::getSong()->setModified();
-}
-
-void waveShaperControls::changeOutput()
-{
-	engine::getSong()->setModified();
-}
-
-void waveShaperControls::changeClip()
-{
-	engine::getSong()->setModified();
-}
 
 void waveShaperControls::samplesChanged( int _begin, int _end)
 {
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -139,13 +115,13 @@ void waveShaperControls::setDefaultShape()
 void waveShaperControls::resetClicked()
 {
 	setDefaultShape();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void waveShaperControls::smoothClicked()
 {
 	m_wavegraphModel.smoothNonCyclic();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void waveShaperControls::addOneClicked()
@@ -154,7 +130,7 @@ void waveShaperControls::addOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 void waveShaperControls::subOneClicked()
@@ -163,9 +139,9 @@ void waveShaperControls::subOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
 	}
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
-#include "moc_waveshaper_controls.cxx"
+
 

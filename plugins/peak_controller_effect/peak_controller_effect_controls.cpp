@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,13 +24,13 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "PeakController.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
-#include "song.h"
+#include "Song.h"
 
 
 PeakControllerEffectControls::
@@ -41,6 +41,7 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Modulation amount" ) ),
 	m_attackModel( 0, 0, 0.999, 0.001, this, tr( "Attack" ) ),
 	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
+	m_tresholdModel( 0, 0, 1.0, 0.001, this, tr( "Treshold" ) ),
 	m_muteModel( false, this, tr( "Mute output" ) ),
 	m_absModel( true, this, tr("Abs Value") ),
 	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount Multiplicator") )
@@ -61,6 +62,8 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 
 	m_absModel.loadSettings( _this, "abs" );
 	m_amountMultModel.loadSettings( _this, "amountmult" );
+	
+	m_tresholdModel.loadSettings( _this, "treshold" );
 
 	/*If the peak controller effect is NOT loaded from project,
 	 * m_effectId stored is useless.
@@ -69,7 +72,7 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	 * m_effectId is copied, then there would be two instruments
 	 * having the same id.
 	 */
-	if( engine::getSong()->isLoadingProject() == true )
+	if( Engine::getSong()->isLoadingProject() == true )
 	{
 		m_effect->m_effectId = _this.attribute( "effectId" ).toInt();
 	}
@@ -102,9 +105,11 @@ void PeakControllerEffectControls::saveSettings( QDomDocument & _doc,
 
 	m_absModel.saveSettings( _doc,  _this, "abs" );
 	m_amountMultModel.saveSettings( _doc, _this, "amountmult" );
+	
+	m_tresholdModel.saveSettings( _doc, _this, "treshold" );
 }
 
 
 
-#include "moc_peak_controller_effect_controls.cxx"
+
 

@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,15 +27,16 @@
 #ifndef DATA_FILE_H
 #define DATA_FILE_H
 
-#include <QtXml/QDomDocument>
-#include <QTextStream>
+#include <QDomDocument>
 
 #include "export.h"
-#include "lmms_basics.h"
+#include "MemoryManager.h"
 
+class QTextStream;
 
 class EXPORT DataFile : public QDomDocument
 {
+	MM_OPERATORS
 public:
 	enum Types
 	{
@@ -76,6 +77,24 @@ public:
 	{
 		return m_type;
 	}
+
+	// small helper class for adjusting application's locale settings
+	// when loading or saving floating point values rendered to strings
+	class LocaleHelper
+	{
+	public:
+		enum Modes
+		{
+			ModeLoad,
+			ModeSave,
+			ModeCount
+		};
+		typedef Modes Mode;
+
+		LocaleHelper( Mode mode );
+		~LocaleHelper();
+
+	};
 
 
 private:

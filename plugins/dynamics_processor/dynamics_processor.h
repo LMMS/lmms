@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,12 +24,12 @@
  */
 
 
-#ifndef _DYNPROC_H
-#define _DYNPROC_H
+#ifndef DYNPROC_H
+#define DYNPROC_H
 
 #include "Effect.h"
 #include "dynamics_processor_controls.h"
-
+#include "RmsHelper.h"
 
 
 class dynProcEffect : public Effect
@@ -48,11 +48,19 @@ public:
 
 
 private:
+	void calcAttack();
+	void calcRelease();
 
 	dynProcControls m_dpControls;
 
 // this member array is needed for peak detection 
-	float currentPeak[2];
+	float m_currentPeak[2];
+	double m_attCoeff;
+	double m_relCoeff;
+	
+	bool m_needsUpdate;
+	
+	RmsHelper * m_rms [2];
 
 	friend class dynProcControls;
 

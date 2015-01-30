@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2010-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,19 +23,20 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPushButton>
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QMdiArea>
+#include <QApplication>
+#include <QLayout>
+#include <QMdiSubWindow>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QMdiArea>
 #include <QMessageBox>
 
-#include "song.h"
+#include "Song.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
-#include "group_box.h"
+#include "GroupBox.h"
 #include "ControllerRackView.h"
 #include "ControllerView.h"
 #include "LfoController.h"
@@ -66,7 +67,7 @@ ControllerRackView::ControllerRackView( ) :
 	connect( m_addButton, SIGNAL( clicked() ),
 			this, SLOT( addController() ) );
 
-	connect( engine::getSong(), SIGNAL( dataChanged() ),
+	connect( Engine::getSong(), SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
 
 	QVBoxLayout * layout = new QVBoxLayout();
@@ -75,7 +76,7 @@ ControllerRackView::ControllerRackView( ) :
 	this->setLayout( layout );
 
 	QMdiSubWindow * subWin =
-			engine::mainWindow()->workspace()->addSubWindow( this );
+			gui->mainWindow()->workspace()->addSubWindow( this );
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -148,7 +149,7 @@ void ControllerRackView::deleteController( ControllerView * _view )
 void ControllerRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
-	song * s = engine::getSong();
+	Song * s = Engine::getSong();
 
 	setUpdatesEnabled( false );
 
@@ -184,7 +185,7 @@ void ControllerRackView::addController()
 {
 	// TODO: Eventually let the user pick from available controller types
 
-	engine::getSong()->addController( new LfoController( engine::getSong() ) );
+	Engine::getSong()->addController( new LfoController( Engine::getSong() ) );
 	update();
 
 	// fix bug which always made ControllerRackView loose focus when adding
@@ -194,5 +195,17 @@ void ControllerRackView::addController()
 
 
 
-#include "moc_ControllerRackView.cxx"
+
+void ControllerRackView::closeEvent( QCloseEvent * _ce )
+ {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
 

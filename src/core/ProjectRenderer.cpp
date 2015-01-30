@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,11 +23,11 @@
  */
 
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "ProjectRenderer.h"
-#include "song.h"
-#include "engine.h"
+#include "Song.h"
+#include "Engine.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -66,10 +66,10 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 					const OutputSettings & _os,
 					ExportFileFormats _file_format,
 					const QString & _out_file ) :
-	QThread( engine::mixer() ),
+	QThread( Engine::mixer() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( _qs ),
-	m_oldQualitySettings( engine::mixer()->currentQualitySettings() ),
+	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
@@ -84,7 +84,7 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
 				_os.depth == Depth_32Bit ? 32 : 16,
-							engine::mixer() );
+							Engine::mixer() );
 	if( success_ful == false )
 	{
 		delete m_fileDev;
@@ -132,7 +132,7 @@ void ProjectRenderer::startProcessing()
 		// have to do mixer stuff with GUI-thread-affinity in order to
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
-		engine::mixer()->setAudioDevice( m_fileDev,
+		Engine::mixer()->setAudioDevice( m_fileDev,
 						m_qualitySettings, false );
 
 		start(
@@ -159,15 +159,17 @@ void ProjectRenderer::run()
 #endif
 
 
-	engine::getSong()->startExport();
+	Engine::getSong()->startExport();
+    //skip first empty buffer
+    Engine::mixer()->nextBuffer();
 
-	song::playPos & pp = engine::getSong()->getPlayPos(
-							song::Mode_PlaySong );
+	Song::playPos & pp = Engine::getSong()->getPlayPos(
+							Song::Mode_PlaySong );
 	m_progress = 0;
-	const int sl = ( engine::getSong()->length() + 1 ) * 192;
+	const int sl = ( Engine::getSong()->length() + 1 ) * 192;
 
-	while( engine::getSong()->isExportDone() == false &&
-				engine::getSong()->isExporting() == true
+	while( Engine::getSong()->isExportDone() == false &&
+				Engine::getSong()->isExporting() == true
 							&& !m_abort )
 	{
 		m_fileDev->processNextBuffer();
@@ -179,12 +181,12 @@ void ProjectRenderer::run()
 		}
 	}
 
-	engine::getSong()->stopExport();
+	Engine::getSong()->stopExport();
 
 	const QString f = m_fileDev->outputFile();
 
-	engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
-	engine::mixer()->changeQuality( m_oldQualitySettings );
+	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
+	Engine::mixer()->changeQuality( m_oldQualitySettings );
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_abort )
@@ -228,5 +230,5 @@ void ProjectRenderer::updateConsoleProgress()
 
 
 
-#include "moc_ProjectRenderer.cxx"
+
 

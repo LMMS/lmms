@@ -5,7 +5,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,13 +24,13 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 
 
-#include "song.h"
-#include "engine.h"
+#include "Song.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "Controller.h"
 #include "ControllerConnection.h"
@@ -40,7 +40,7 @@
 #include "PeakController.h"
 
 
-unsigned int Controller::s_frames = 0;
+long Controller::s_periods = 0;
 QVector<Controller *> Controller::s_controllers;
 
 
@@ -49,6 +49,8 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
+	m_valueBuffer( Engine::mixer()->framesPerPeriod() ),
+	m_bufferLastUpdated( -1 ),
 	m_connectionCount( 0 ),
 	m_type( _type )
 {
@@ -80,6 +82,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 			}
 		}
 	}
+	updateValueBuffer();
 }
 
 
@@ -92,11 +95,12 @@ Controller::~Controller()
 		s_controllers.remove( idx );
 	}
 
-	if( engine::getSong() )
+	if( Engine::getSong() )
 	{
-		engine::getSong()->removeController( this );
+		Engine::getSong()->removeController( this );
 	}
 
+	m_valueBuffer.clear();
 	// Remove connections by destroyed signal
 }
 
@@ -115,17 +119,41 @@ float Controller::currentValue( int _offset )
 
 
 
-float Controller::value( int _offset )
+float Controller::value( int offset )
 {
-	return 0.5f;
+	if( m_bufferLastUpdated != s_periods )
+	{
+		updateValueBuffer();
+	}
+	return m_valueBuffer.values()[ offset ];
 }
 	
+
+ValueBuffer * Controller::valueBuffer()
+{
+	if( m_bufferLastUpdated != s_periods )
+	{
+		updateValueBuffer();
+	}
+	return &m_valueBuffer;
+}
+
+
+void Controller::updateValueBuffer()
+{
+	float * values = m_valueBuffer.values();
+	for( int i = 0; i < m_valueBuffer.length(); i++ )
+	{
+		values[i] = 0.5f;
+	}
+	m_bufferLastUpdated = s_periods;
+}
 
 
 // Get position in frames
 unsigned int Controller::runningFrames()
 {
-	return s_frames;
+	return s_periods * Engine::mixer()->framesPerPeriod();
 }
 
 
@@ -133,7 +161,7 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return s_frames / engine::mixer()->processingSampleRate();
+	return runningFrames() / Engine::mixer()->processingSampleRate();
 }
 
 
@@ -149,7 +177,7 @@ void Controller::triggerFrameCounter()
 		emit s_controllers.at(i)->valueChanged();
 	}
 
-	s_frames += engine::mixer()->framesPerPeriod();
+	s_periods ++;
 	//emit s_signaler.triggerValueChanged();
 }
 
@@ -157,7 +185,11 @@ void Controller::triggerFrameCounter()
 
 void Controller::resetFrameCounter()
 {
-	s_frames = 0;
+	for( int i = 0; i < s_controllers.size(); ++i ) 
+	{
+		s_controllers.at( i )->m_bufferLastUpdated = 0;
+	} 
+	s_periods = 0;
 }
 
 
@@ -173,8 +205,11 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			if( dummy )
 				c = dummy;
 			else
+			{
 				c = new Controller( DummyController, NULL,
 								QString() );
+				dummy = c;
+			}
 			break;
 
 		case Controller::LfoController:
@@ -314,6 +349,6 @@ int Controller::connectionCount() const{
 
 
 
-#include "moc_Controller.cxx"
+
 
 

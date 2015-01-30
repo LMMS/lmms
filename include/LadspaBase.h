@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,10 @@
  *
  */
 
-#ifndef _LADSPA_BASE_H
-#define _LADSPA_BASE_H
+#ifndef LADSPA_BASE_H
+#define LADSPA_BASE_H
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 #include "Plugin.h"
 
 class LadspaControl;

@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -300,7 +300,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -817,7 +817,6 @@ static void runHermesFilter(LADSPA_Handle instance, unsigned long sample_count) 
 	float lfo2_phase = plugin_data->lfo2_phase;
 	blo_h_osc * osc1_d = plugin_data->osc1_d;
 	blo_h_osc * osc2_d = plugin_data->osc2_d;
-	blo_h_tables * tables = plugin_data->tables;
 	sv_filter * xover_b1_data = plugin_data->xover_b1_data;
 	sv_filter * xover_b2_data = plugin_data->xover_b2_data;
 
@@ -926,8 +925,6 @@ static void runHermesFilter(LADSPA_Handle instance, unsigned long sample_count) 
 	dela_fb[0] = dela1_fb;
 	dela_fb[1] = dela2_fb;
 	dela_fb[2] = dela3_fb;
-	
-	tables = tables; // To shut up gcc
 	
 	for (pos = 0; pos < sample_count; pos++) {
 	        count++; // Count of number of samples processed
@@ -1204,7 +1201,6 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	float lfo2_phase = plugin_data->lfo2_phase;
 	blo_h_osc * osc1_d = plugin_data->osc1_d;
 	blo_h_osc * osc2_d = plugin_data->osc2_d;
-	blo_h_tables * tables = plugin_data->tables;
 	sv_filter * xover_b1_data = plugin_data->xover_b1_data;
 	sv_filter * xover_b2_data = plugin_data->xover_b2_data;
 
@@ -1314,8 +1310,6 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	dela_fb[1] = dela2_fb;
 	dela_fb[2] = dela3_fb;
 	
-	tables = tables; // To shut up gcc
-	
 	for (pos = 0; pos < sample_count; pos++) {
 	        count++; // Count of number of samples processed
 	
@@ -1403,7 +1397,7 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	plugin_data->lfo2_phase = lfo2_phase;
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -1998,7 +1992,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (hermesFilterDescriptor) {
 		free((LADSPA_PortDescriptor *)hermesFilterDescriptor->PortDescriptors);
 		free((char **)hermesFilterDescriptor->PortNames);

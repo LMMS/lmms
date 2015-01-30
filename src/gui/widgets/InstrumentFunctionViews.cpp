@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,29 +22,29 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
+#include <QLabel>
+#include <QLayout>
 
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
-#include "combobox.h"
+#include "ComboBox.h"
 #include "embed.h"
-#include "engine.h"
-#include "group_box.h"
+#include "Engine.h"
+#include "GroupBox.h"
 #include "gui_templates.h"
-#include "knob.h"
-#include "pixmap_button.h"
+#include "Knob.h"
+#include "PixmapButton.h"
 #include "TempoSyncKnob.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_cc( cc ),
-	m_chordsGroupBox( new groupBox( tr( "STACKING" ) ) ),
-	m_chordsComboBox( new comboBox() ),
-	m_chordRangeKnob( new knob( knobBright_26 ) )
+	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
+	m_chordsComboBox( new ComboBox() ),
+	m_chordRangeKnob( new Knob( knobBright_26 ) )
 {
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );
@@ -60,7 +60,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
-	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " + tr( "octave(s)" ) );
+	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
 	m_chordRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the chord range in octaves. "
 			"The selected chord will be played within specified "
@@ -100,13 +100,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_a( arp ),
-	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ) ) ),
-	m_arpComboBox( new comboBox() ),
-	m_arpRangeKnob( new knob( knobBright_26 ) ),
+	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
+	m_arpComboBox( new ComboBox() ),
+	m_arpRangeKnob( new Knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
-	m_arpGateKnob( new knob( knobBright_26 ) ),
-	m_arpDirectionComboBox( new comboBox() ),
-	m_arpModeComboBox( new comboBox() )
+	m_arpGateKnob( new Knob( knobBright_26 ) ),
+	m_arpDirectionComboBox( new ComboBox() ),
+	m_arpModeComboBox( new ComboBox() )
 {
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );
@@ -130,7 +130,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
-	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " + tr( "octave(s)" ) );
+	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
 	m_arpRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
@@ -138,7 +138,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
-	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " + tr( "ms" ) );
+	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
 	m_arpTimeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio time in "
 			"milliseconds. The arpeggio time specifies how long "
@@ -146,7 +146,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
-	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ) + " ", tr( "%" ) );
+	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 	m_arpGateKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio gate. The "
 			"arpeggio gate specifies the percent of a whole "
@@ -202,5 +202,5 @@ void InstrumentFunctionArpeggioView::modelChanged()
 
 
 
-#include "moc_InstrumentFunctionViews.cxx"
+
 

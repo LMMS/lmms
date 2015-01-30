@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,12 +27,13 @@
 #define TRACK_CONTAINER_VIEW_H
 
 #include <QtCore/QVector>
-#include <QtGui/QScrollArea>
-#include <QtGui/QWidget>
+#include <QScrollArea>
+#include <QWidget>
 
 
-#include "track.h"
+#include "Track.h"
 #include "JournallingObject.h"
+#include "InstrumentTrack.h"
 
 
 class QVBoxLayout;
@@ -51,7 +52,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 
-	QWidget * contentWidget()
+	QScrollArea * contentWidget()
 	{
 		return( m_scrollArea );
 	}
@@ -73,13 +74,13 @@ public:
 
 	void setPixelsPerTact( int _ppt );
 
-	const trackView * trackViewAt( const int _y ) const;
+	const TrackView * trackViewAt( const int _y ) const;
 
 	virtual bool allowRubberband() const;
 
 	inline bool rubberBandActive() const
 	{
-		return( m_rubberBand->isVisible() );
+		return( m_rubberBand->isEnabled() && m_rubberBand->isVisible() );
 	}
 
 	inline QVector<selectableObject *> selectedObjects()
@@ -102,12 +103,12 @@ public:
 		return m_tc;
 	}
 
-	void moveTrackViewUp( trackView * _tv );
-	void moveTrackViewDown( trackView * _tv );
+	void moveTrackViewUp( TrackView * _tv );
+	void moveTrackViewDown( TrackView * _tv );
 
 	// -- for usage by trackView only ---------------
-	trackView * addTrackView( trackView * _tv );
-	void removeTrackView( trackView * _tv );
+	TrackView * addTrackView( TrackView * _tv );
+	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
 	void clearAllTracks();
@@ -120,20 +121,31 @@ public:
 
 public slots:
 	void realignTracks();
-	void createTrackView( track * _t );
-	void deleteTrackView( trackView * _tv );
+	void createTrackView( Track * _t );
+	void deleteTrackView( TrackView * _tv );
 
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	///
+	/// \brief selectRegionFromPixels
+	/// \param x
+	/// \param y
+	/// Use the rubber band to select TCO from all tracks using x, y pixels
+	void selectRegionFromPixels(int xStart, int xEnd);
+
+	///
+	/// \brief stopRubberBand
+	/// Removes the rubber band from display when finished with.
+	void stopRubberBand();
 
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	const QList<trackView *> & trackViews() const
+	const QList<TrackView *> & trackViews() const
 	{
 		return( m_trackViews );
 	}
 
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
@@ -164,7 +176,7 @@ private:
 	} ;
 
 	TrackContainer* m_tc;
-	typedef QList<trackView *> trackViewList;
+	typedef QList<TrackView *> trackViewList;
 	trackViewList m_trackViews;
 
 	scrollArea * m_scrollArea;
@@ -172,7 +184,7 @@ private:
 
 	float m_ppt;
 
-	rubberBand * m_rubberBand;
+	RubberBand * m_rubberBand;
 	QPoint m_origin;
 
 
@@ -182,6 +194,19 @@ signals:
 
 } ;
 
+class InstrumentLoaderThread : public QThread
+{
+	Q_OBJECT
+public:
+	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
+							QString name = "" );
 
+	void run();
+
+private:
+	InstrumentTrack *m_it;
+	QString m_name;
+	QThread *m_containerThread;
+};
 
 #endif

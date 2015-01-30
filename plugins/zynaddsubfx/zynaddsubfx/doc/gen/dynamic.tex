@@ -1,0 +1,46 @@
+\documentclass[11pt]{report}
+\pagestyle{empty}
+\usepackage{pst-sigsys}
+\usepackage{auto-pst-pdf}
+\begin{document}
+\begin{pspicture}[showgrid=false](0,0)(8,2)
+    %Style
+    \psset{framesize=1 .65}
+    \psset{style=Arrow}
+
+    %In/Out
+    \rput(0,0){\rnode{in}{$x[n]$}}
+    \rput(8,0){\rnode{out}{$y[n]$}}
+
+    %Smoothing
+    \psfblock(1,1){smooth}{LPF}
+    \rput(1,1.6){smooth}
+    
+    %Sensing
+    \pscircleop[operation=times](2.5,1){sense}
+    \rput(2.5,1.5){sense}
+
+    %Combine
+    \pscircleop(4,1){comb}
+
+    %Depth
+    \pscircleop[operation=times](5.5,1){depth}
+    \rput(5.5,1.5){depth}
+
+    %LFO
+    \psfblock(7,1){lfo}{LFO}
+
+    %Filter
+    \psfblock(4,0){fil}{Filter}
+    
+    %Panning
+    \pscircleop[operation=times] (5.5,0){pan}
+    \rput(5.5,-0.5){Panning}
+
+    %Connections
+    \pnode(1,0){decoration}
+    \nclist{ncline}{in,fil,pan,out}
+    \nclist{ncline}{decoration,smooth,sense,comb,fil}
+    \nclist{ncline}{lfo,depth,comb}
+\end{pspicture}
+\end{document}

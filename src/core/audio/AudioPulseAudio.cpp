@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,19 +22,19 @@
  *
  */
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
+#include <QLineEdit>
+#include <QLabel>
 
 #include "AudioPulseAudio.h"
 
 #ifdef LMMS_HAVE_PULSEAUDIO
 
 #include "endian_handling.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
@@ -47,7 +47,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audiopa", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_s( NULL ),
@@ -76,7 +76,7 @@ AudioPulseAudio::~AudioPulseAudio()
 
 QString AudioPulseAudio::probeDevice()
 {
-	QString dev = configManager::inst()->value( "audiopa", "device" );
+	QString dev = ConfigManager::inst()->value( "audiopa", "device" );
 	if( dev.isEmpty() )
 	{
 		if( getenv( "AUDIODEV" ) != NULL )
@@ -179,7 +179,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( engine::mixer()->framesPerPeriod() ) /
+			double latency = (double)( Engine::mixer()->framesPerPeriod() ) /
 													(double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
@@ -292,7 +292,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audiopa",
+	m->setValue( ConfigManager::inst()->value( "audiopa",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -307,7 +307,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioPulseAudio::setupWidget::~setupWidget()
 {
-
+	delete m_channels->model();
 }
 
 
@@ -315,9 +315,9 @@ AudioPulseAudio::setupWidget::~setupWidget()
 
 void AudioPulseAudio::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiopa", "device",
+	ConfigManager::inst()->setValue( "audiopa", "device",
 							m_device->text() );
-	configManager::inst()->setValue( "audiopa", "channels",
+	ConfigManager::inst()->setValue( "audiopa", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 

@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,10 @@
  *
  */
 
-#ifndef _METER_DIALOG_H
-#define _METER_DIALOG_H
+#ifndef METER_DIALOG_H
+#define METER_DIALOG_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 
@@ -35,6 +35,7 @@ class LcdSpinBox;
 
 class MeterDialog : public QWidget, public ModelView
 {
+	Q_OBJECT
 public:
 	MeterDialog( QWidget * _parent, bool _simple = false );
 	virtual ~MeterDialog();

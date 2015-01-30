@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
 
 PROJECT(lmms)
 
@@ -14,7 +14,7 @@ INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
 
 SET(VERSION_MAJOR "1")
-SET(VERSION_MINOR "0")
+SET(VERSION_MINOR "1")
 SET(VERSION_PATCH "0")
 #SET(VERSION_SUFFIX "")
 SET(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
@@ -22,13 +22,13 @@ IF(VERSION_SUFFIX)
 	SET(VERSION "${VERSION}-${VERSION_SUFFIX}")
 ENDIF(VERSION_SUFFIX)
 
-
 INCLUDE(DetectMachine)
 
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
+OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
@@ -36,18 +36,20 @@ OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
+OPTION(WANT_GIG		"Include GIG player plugin" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
+OPTION(WANT_QT5		"Build with Qt5" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
-        SET(WANT_ALSA OFF)
+	SET(WANT_SF2 OFF)
+	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
-	SET(WANT_SWH OFF)
 	SET(WANT_VST OFF)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
@@ -98,22 +100,34 @@ CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-# check for Qt4
-SET(QT_MIN_VERSION "4.3.0" COMPONENTS QtCore QtGui QtXml)
-FIND_PACKAGE(Qt4 REQUIRED)
-SET(QT_USE_QTXML 1)
-EXEC_PROGRAM(${QT_QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_TRANSLATIONS" OUTPUT_VARIABLE QT_TRANSLATIONS_DIR)
-IF(WIN32)
-	SET(QT_TRANSLATIONS_DIR "${MINGW_PREFIX}/share/qt4/translations/")
-ENDIF(WIN32)
-IF(EXISTS "${QT_TRANSLATIONS_DIR}")
-	MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
-	ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
-ENDIF(EXISTS "${QT_TRANSLATIONS_DIR}")
-IF(NOT WIN32)
-	STRING(REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
-ENDIF(NOT WIN32)
-INCLUDE("${QT_USE_FILE}")
+IF(WANT_QT5)
+	SET(QT5 TRUE)
+
+	FIND_PACKAGE(Qt5Core REQUIRED)
+	FIND_PACKAGE(Qt5Gui REQUIRED)
+	FIND_PACKAGE(Qt5Widgets REQUIRED)
+	FIND_PACKAGE(Qt5Xml REQUIRED)
+
+
+ELSE()
+	SET(QT5 FALSE)
+
+	# check for Qt4
+	SET(QT_MIN_VERSION "4.6.0" COMPONENTS QtCore QtGui QtXml)
+	FIND_PACKAGE(Qt4 REQUIRED)
+	SET(QT_USE_QTXML 1)
+	IF(WIN32)
+		SET(QT_TRANSLATIONS_DIR "${MINGW_PREFIX}/share/qt4/translations/")
+	ENDIF(WIN32)
+	IF(EXISTS "${QT_TRANSLATIONS_DIR}")
+		MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
+		ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
+	ENDIF()
+	IF(NOT WIN32)
+		STRING(REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
+	ENDIF()
+	INCLUDE("${QT_USE_FILE}")
+ENDIF()
 
 # check for libsndfile
 PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
@@ -122,39 +136,51 @@ IF(NOT SNDFILE_FOUND)
 ENDIF(NOT SNDFILE_FOUND)
 
 IF(WANT_CALF)
-SET(LMMS_HAVE_CALF TRUE)
-SET(STATUS_CALF "OK")
+	SET(LMMS_HAVE_CALF TRUE)
+	SET(STATUS_CALF "OK")
 ELSE(WANT_CALF)
-SET(STATUS_CALF "not built as requested")
+	SET(STATUS_CALF "not built as requested")
 ENDIF(WANT_CALF)
 
 IF(WANT_CAPS)
-SET(LMMS_HAVE_CAPS TRUE)
-SET(STATUS_CAPS "OK")
+	SET(LMMS_HAVE_CAPS TRUE)
+	SET(STATUS_CAPS "OK")
 ELSE(WANT_CAPS)
-SET(STATUS_CAPS "not built as requested")
+	SET(STATUS_CAPS "not built as requested")
 ENDIF(WANT_CAPS)
 
 IF(WANT_CMT)
-SET(LMMS_HAVE_CMT TRUE)
-SET(STATUS_CMT "OK")
+	SET(LMMS_HAVE_CMT TRUE)
+	SET(STATUS_CMT "OK")
 ELSE(WANT_CMT)
-SET(STATUS_CMT "not built as requested")
+	SET(STATUS_CMT "not built as requested")
 ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
-SET(LMMS_HAVE_SWH TRUE)
-SET(STATUS_SWH "OK")
+	SET(LMMS_HAVE_SWH TRUE)
+	SET(STATUS_SWH "OK")
 ELSE(WANT_SWH)
-SET(STATUS_SWH "not built as requested")
+	SET(STATUS_SWH "not built as requested")
 ENDIF(WANT_SWH)
 
 IF(WANT_TAP)
-SET(LMMS_HAVE_TAP TRUE)
-SET(STATUS_TAP "OK")
+	SET(LMMS_HAVE_TAP TRUE)
+	SET(STATUS_TAP "OK")
 ELSE(WANT_TAP)
-SET(STATUS_TAP "not built as requested")
+	SET(STATUS_TAP "not built as requested")
 ENDIF(WANT_TAP)
+
+
+# check for CARLA
+IF(WANT_CARLA)
+	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	IF(CARLA_FOUND)
+		SET(LMMS_HAVE_CARLA TRUE)
+		SET(STATUS_CARLA "OK")
+	ELSE(CARLA_FOUND)
+		SET(STATUS_CARLA "not found, please install the latest carla")
+	ENDIF(CARLA_FOUND)
+ENDIF(WANT_CARLA)
 
 
 # check for SDL
@@ -165,7 +191,7 @@ IF(WANT_SDL)
 		SET(LMMS_HAVE_SDL TRUE)
 		SET(STATUS_SDL "OK")
 	ELSE(SDL_FOUND)
-		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similiar) "
+		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similar) "
 			"if you require SDL support")
 	ENDIF(SDL_FOUND)
 ENDIF(WANT_SDL)
@@ -186,7 +212,7 @@ IF(WANT_STK)
 		SET(STATUS_STK "OK")
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
-		SET(STATUS_STK "not found, please install libstk0-dev (or similiar) "
+		SET(STATUS_STK "not found, please install libstk0-dev (or similar) "
 			"if you require the Mallets instrument")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
@@ -199,7 +225,7 @@ IF(WANT_PORTAUDIO)
 		SET(LMMS_HAVE_PORTAUDIO TRUE)
 		SET(STATUS_PORTAUDIO "OK")
 	ELSE(PORTAUDIO_FOUND)
-		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similiar, version >= 1.9) "
+		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similar, version >= 1.9) "
 			"if you require PortAudio support")
 	ENDIF(PORTAUDIO_FOUND)
 ENDIF(WANT_PORTAUDIO)
@@ -212,7 +238,7 @@ IF(WANT_PULSEAUDIO)
 		SET(LMMS_HAVE_PULSEAUDIO TRUE)
 		SET(STATUS_PULSEAUDIO "OK")
 	ELSE(PULSEAUDIO_FOUND)
-		SET(STATUS_PULSEAUDIO "not found, please install libpulse-dev (or similiar) "
+		SET(STATUS_PULSEAUDIO "not found, please install libpulse-dev (or similar) "
 			"if you require PulseAudio support")
 	ENDIF(PULSEAUDIO_FOUND)
 ENDIF(WANT_PULSEAUDIO)
@@ -229,7 +255,7 @@ IF(WANT_OGGVORBIS)
 		SET(LMMS_HAVE_OGGVORBIS TRUE)
 		SET(STATUS_OGGVORBIS "OK")
 	ELSE(OGGVORBIS_FOUND)
-		SET(STATUS_OGGVORBIS "not found, libogg-dev and libvorbis-dev (or similiar) "
+		SET(STATUS_OGGVORBIS "not found, libogg-dev and libvorbis-dev (or similar) "
 			"is highly recommended")
 	ENDIF(OGGVORBIS_FOUND)
 ENDIF(WANT_OGGVORBIS)
@@ -251,7 +277,7 @@ IF(WANT_ALSA)
 		SET(LMMS_HAVE_ALSA TRUE)
 		SET(STATUS_ALSA "OK")
 	ELSE(ALSA_FOUND)
-		SET(STATUS_ALSA "not found, please install libasound2-dev (or similiar) "
+		SET(STATUS_ALSA "not found, please install libasound2-dev (or similar) "
 			"if you require ALSA support")
 	ENDIF(ALSA_FOUND)
 ENDIF(WANT_ALSA)
@@ -267,7 +293,7 @@ IF(WANT_JACK)
 		SET(LMMS_HAVE_JACK TRUE)
 		SET(STATUS_JACK "OK")
 	ELSE(JACK_FOUND)
-		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similiar) "
+		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 			"if you require JACK support")
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
@@ -284,10 +310,21 @@ IF(WANT_SF2)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		SET(STATUS_FLUIDSYNTH "OK")
 	ELSE(FLUIDSYNTH_FOUND)
-		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similiar)"
+		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
 	ENDIF(FLUIDSYNTH_FOUND)
 ENDIF(WANT_SF2)
+
+# check for libgig
+If(WANT_GIG)
+	PKG_CHECK_MODULES(GIG gig)
+	IF(GIG_FOUND)
+		SET(LMMS_HAVE_GIG TRUE)
+		SET(STATUS_GIG "OK")
+	ELSE(GIG_FOUND)
+		SET(STATUS_GIG "not found, libgig needed for decoding .gig files")
+	ENDIF(GIG_FOUND)
+ENDIF(WANT_GIG)
 
 # check for pthreads
 IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -301,7 +338,7 @@ IF(WANT_VST)
 		SET(LMMS_SUPPORT_VST TRUE)
 		SET(STATUS_VST "OK")
 	ELSE(WINE_FOUND)
-		SET(STATUS_VST "not found, please install (lib)wine-dev (or similiar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
+		SET(STATUS_VST "not found, please install (lib)wine-dev (or similar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
 	ENDIF(WINE_FOUND)
 ENDIF(WANT_VST)
 IF(LMMS_BUILD_WIN32)
@@ -321,23 +358,34 @@ CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in" "${CM
 
 # set compiler flags
 SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
-IF(NOT LMMS_BUILD_APPLE)
+OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
+IF(${USE_WERROR})
    SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
 ENDIF()
 
-SET(CMAKE_C_FLAGS "-O2 -g ${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "-DLMMS_DEBUG")
+# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
+IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
+   SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds")
+ENDIF()
+
+IF(NOT CMAKE_BUILD_TYPE)
+	message(STATUS "Setting build type to 'Release' as none was specified.")
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+	# Set the possible values of build type for cmake-gui
+	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+  		"MinSizeRel" "RelWithDebInfo")
+ENDIF()
+
+SET(CMAKE_C_FLAGS "${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
+SET(CMAKE_CXX_FLAGS "-fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
+SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
 
-FILE(GLOB lmms_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
-FILE(GLOB lmms_UI "${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui" "${CMAKE_SOURCE_DIR}/src/gui/Forms/*.ui")
-FILE(GLOB_RECURSE lmms_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
-
-SET(lmms_MOC ${lmms_INCLUDES})
+FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 
 # Get list of all committers from git history, ordered by number of commits
 FIND_PACKAGE(Git)
@@ -351,159 +399,58 @@ IF(GIT_FOUND)
 		TIMEOUT 1)
 ENDIF(GIT_FOUND)
 
-SET(lmms_EMBEDDED_RESOURCES "${CMAKE_SOURCE_DIR}/AUTHORS" "${CMAKE_SOURCE_DIR}/COPYING" "${CONTRIBUTORS}")
-
-QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw)
-QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
-
-
 # embedded resources stuff
 IF(WIN32 OR WIN64)
 	# compile buildtools native
 	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
 	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_COMMAND(OUTPUT "${BIN2RES}" COMMAND g++ ARGS "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
+	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
 ELSE(WIN32 OR WIN64)
 	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
 	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
 ENDIF(WIN32 OR WIN64)
 
-SET(LMMS_ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
-
 # we somehow have to make LMMS-binary depend on MOC-files
-ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h" ${lmms_MOC_out})
+ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND "${BIN2RES}" ARGS ${lmms_EMBEDDED_RESOURCES} > "\"${LMMS_ER_H}\"" DEPENDS "${BIN2RES}")
+# set up apple vars before traversing into data/scripts
+SET(MACOSX_BUNDLE_ICON_FILE "lmms.icns")
+SET(MACOSX_BUNDLE_GUI_IDENTIFIER "LMMS")
+SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
+SET(MACOSX_BUNDLE_BUNDLE_NAME "LMMS")
+SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
+SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
+SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
+SET(MACOSX_BUNDLE_MIMETYPE "application/x-lmms-project")
+SET(MACOSX_BUNDLE_MIMETYPE_ICON "project.icns")
+SET(MACOSX_BUNDLE_MIMETYPE_ID "net.sourceforge.lmms")
+SET(MACOSX_BUNDLE_PROJECT_URL "http://lmms.io")
 
 IF(WIN32)
-	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
-	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
-					"-I\"${CMAKE_SOURCE_DIR}\""
-					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
-					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
-				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 ENDIF(WIN32)
 
-
-
 # make sub-directories
+ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
+ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
+ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
+				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
+				DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1"
+				COMMENT "Generating lmms.1.gz")
 
-#
-# build LMMS-binary
-#
-IF(LMMS_BUILD_WIN32)
-	SET(EXTRA_LIBRARIES "-lwinmm")
-ENDIF()
-
-# Paths relative to lmms executable
-FILE(RELATIVE_PATH LIB_DIR_RELATIVE "/${BIN_DIR}" "/${LIB_DIR}")
-FILE(RELATIVE_PATH PLUGIN_DIR_RELATIVE "/${BIN_DIR}" "/${PLUGIN_DIR}")
-ADD_DEFINITIONS(-D'LIB_DIR="${LIB_DIR_RELATIVE}/"' -D'PLUGIN_DIR="${PLUGIN_DIR_RELATIVE}/"' ${PULSEAUDIO_DEFINITIONS} ${PORTAUDIO_DEFINITIONS})
-INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}"
-                    "${CMAKE_BINARY_DIR}/include"
-                    "${CMAKE_SOURCE_DIR}"
-                    "${CMAKE_SOURCE_DIR}/include"
-                    ${JACK_INCLUDE_DIRS}
-                    ${SAMPLERATE_INCLUDE_DIRS}
-                    ${SNDFILE_INCLUDE_DIRS})
-
-IF(NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${SDL_INCLUDE_DIR}")
-ENDIF()
-
-IF(NOT ("${PORTAUDIO_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${PORTAUDIO_INCLUDE_DIR}")
-ENDIF()
-
-IF(NOT ("${PULSEAUDIO_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${PULSEAUDIO_INCLUDE_DIR}")
-ENDIF()
-
-IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
-	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
-ENDIF()
-
-ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz" COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\"" DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1" COMMENT "Generating lmms.1.gz")
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} "${LMMS_ER_H}" ${lmms_UI_out} lmmsconfig.h lmmsversion.h "${WINRC}" "${CMAKE_BINARY_DIR}/lmms.1.gz")
-
-TARGET_LINK_LIBRARIES(lmms ${CMAKE_THREAD_LIBS_INIT} ${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PORTAUDIO_LIBRARIES} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES} ${EXTRA_LIBRARIES})
-
-IF(LMMS_BUILD_WIN32)
-
-	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
-	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "\"${CMAKE_BINARY_DIR}/lmms.exe\"")
-
-	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES
-					"${MINGW_PREFIX}/bin/QtCore4.dll"
-					"${MINGW_PREFIX}/bin/QtGui4.dll"
-					"${MINGW_PREFIX}/bin/QtXml4.dll"
-					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
-					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
-					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
-					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
-					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
-					"${MINGW_PREFIX}/bin/libogg-0.dll"
-					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
-					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
-					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
-					"${MINGW_PREFIX}/bin/libpng16-16.dll"
-					"${MINGW_PREFIX}/bin/SDL.dll"
-					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
-					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
-					"${MINGW_PREFIX}/bin/zlib1.dll"
-				DESTINATION .)
-
-ELSE(LMMS_BUILD_WIN32)
-	IF(NOT LMMS_BUILD_APPLE)
-		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
-	ENDIF(NOT LMMS_BUILD_APPLE)
-
-	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES "${CMAKE_BINARY_DIR}/lmms.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
-
-ENDIF(LMMS_BUILD_WIN32)
-
-#
-# rules for building localizations
-#
-FILE(GLOB lmms_LOCALES data/locale/*.ts)
-SET(ts_targets "")
-SET(qm_targets "")
-FOREACH(_ts_file ${lmms_LOCALES})
-	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target} COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete ${lmms_SOURCES} ${lmms_UI} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp'` -ts "\"${_ts_file}\"")
-	ADD_CUSTOM_TARGET(${_qm_target} COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\"")
-	LIST(APPEND ts_targets "${_ts_target}")
-	LIST(APPEND qm_targets "${_qm_target}")
-ENDFOREACH(_ts_file ${lmms_LOCALES})
-
-ADD_CUSTOM_TARGET(update-locales)
-FOREACH(_item ${ts_targets})
-	ADD_DEPENDENCIES(update-locales "${_item}")
-ENDFOREACH(_item ${ts_targets})
-
-ADD_CUSTOM_TARGET(finalize-locales)
-FOREACH(_item ${qm_targets})
-	ADD_DEPENDENCIES(finalize-locales "${_item}")
-ENDFOREACH(_item ${qm_targets})
-
+ADD_CUSTOM_TARGET(manpage ALL
+				DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
 
 # install headers
 
 IF(LMMS_BUILD_LINUX)
-	INSTALL(FILES ${lmms_INCLUDES}
+	INSTALL(FILES ${LMMS_INCLUDES}
 		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
@@ -541,10 +488,6 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
-
-
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h lmms.1.gz")
-
 
 #
 # display configuration information
@@ -585,6 +528,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
@@ -594,6 +538,7 @@ MESSAGE(
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
+"* GIG player                  : ${STATUS_GIG}\n"
 )
 
 MESSAGE(
@@ -609,13 +554,13 @@ INCLUDE(InstallRequiredSystemLibraries)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "LMMS - easy music production for everyone!")
 SET(CPACK_PACKAGE_VENDOR "LMMS Developers")
 IF(LMMS_BUILD_APPLE)
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/README" "${CMAKE_BINARY_DIR}/README.txt" COPYONLY)
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/COPYING" "${CMAKE_BINARY_DIR}/COPYING.txt" COPYONLY)
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_BINARY_DIR}/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/COPYING.txt")
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/README" "${CMAKE_BINARY_DIR}/README.txt" COPYONLY)
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/COPYING" "${CMAKE_BINARY_DIR}/COPYING.txt" COPYONLY)
+	SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_BINARY_DIR}/README.txt")
+	SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/COPYING.txt")
 ELSE(LMMS_BUILD_APPLE)
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
+	SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README")
+	SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 ENDIF(LMMS_BUILD_APPLE)
 
 SET(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
@@ -626,28 +571,30 @@ IF(VERSION_SUFFIX)
 ENDIF(VERSION_SUFFIX)
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "LMMS")
 IF(WIN32)
-SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/nsis_branding.bmp")
-SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/lmms.ico")
-SET(CPACK_NSIS_INSTALLED_ICON_NAME "lmms.exe")
-SET(CPACK_NSIS_DISPLAY_NAME "LMMS ${VERSION}")
-SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lmms.sourceforge.net")
-SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lmms.sourceforge.net")
-SET(CPACK_NSIS_CONTACT "lmms-devel@lists.sourceforge.net")
-SET(CPACK_PACKAGE_EXECUTABLES "lmms.exe;LMMS")
-SET(CPACK_NSIS_MENU_LINKS "lmms.exe;LMMS")
-SET(CPACK_NSIS_DEFINES "!include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh")
-SET(CPACK_PACKAGE_FILE_NAME "lmms-${VERSION}-win32")
-SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmp\\\" \\\"LMMS Project\\\"
-  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
-  ")
-SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
-  \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
-  \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
-  ")
+	SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/nsis_branding.bmp")
+	SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/lmms.ico")
+	SET(CPACK_NSIS_INSTALLED_ICON_NAME "lmms.exe")
+	SET(CPACK_NSIS_DISPLAY_NAME "LMMS ${VERSION}")
+	SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lmms.io")
+	SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lmms.io")
+	SET(CPACK_NSIS_CONTACT "lmms-devel@lists.sourceforge.net")
+	SET(CPACK_PACKAGE_EXECUTABLES "lmms.exe;LMMS")
+	SET(CPACK_NSIS_MENU_LINKS "lmms.exe;LMMS")
+	SET(CPACK_NSIS_DEFINES "!include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh")
+	SET(CPACK_PACKAGE_FILE_NAME "lmms-${VERSION}-win32")
+	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+	  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmp\\\" \\\"LMMS Project\\\"
+	  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+	  ")
+	SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+	  \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
+	  \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+	  DeleteRegKey HKCR \\\"LMMS Project\\\"
+	  DeleteRegKey HKCR \\\"LMMS Project (compressed)\\\"
+	  ")
 ELSE(WIN32)
-SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")
-SET(CPACK_PACKAGE_EXECUTABLES "lmms" "LMMS binary")
+	SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")
+	SET(CPACK_PACKAGE_EXECUTABLES "lmms" "LMMS binary")
 ENDIF(WIN32)
 
 IF(WIN64)
@@ -655,14 +602,6 @@ IF(WIN64)
 	SET(CPACK_NSIS_DEFINES "${CPACK_NSIS_DEFINES}
 		InstallDir \\\"\\\$PROGRAMFILES64\\\\${CPACK_PACKAGE_INSTALL_DIRECTORY}\\\"")
 ENDIF(WIN64)
-
-SET(MACOSX_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/data/themes/default/icon.png")
-SET(MACOSX_BUNDLE_GUI_IDENTIFIER "LMMS")
-SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
-SET(MACOSX_BUNDLE_BUNDLE_NAME "LMMS")
-SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
-SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
-SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
 
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "lmms-${VERSION}")

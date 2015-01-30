@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,13 +24,14 @@
  */
 
 
-#ifndef _CONTROLLER_H
-#define _CONTROLLER_H
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "Model.h"
 #include "JournallingObject.h"
+#include "ValueBuffer.h"
 
 class ControllerDialog;
 class Controller;
@@ -62,12 +63,12 @@ public:
 	virtual ~Controller();
 
 	virtual float currentValue( int _offset );
+	// The per-controller get-value-in-buffers function
+	virtual ValueBuffer * valueBuffer();
 
 	inline bool isSampleExact() const
 	{
-		return m_sampleExact ||
-			engine::mixer()->currentQualitySettings().
-							sampleExactControllers;
+		return m_sampleExact;
 	}
 
 	void setSampleExact( bool _exact )
@@ -113,6 +114,10 @@ public:
 		return tLimit<float>( _val, 0.0f, 1.0f );
 	}
 
+	static long runningPeriods()
+	{
+		return s_periods;
+	}
 	static unsigned int runningFrames();
 	static float runningTime();
 
@@ -140,6 +145,15 @@ protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
+	virtual void updateValueBuffer();
+
+	// buffer for storing sample-exact values in case there
+	// are more than one model wanting it, so we don't have to create it
+	// again every time
+	ValueBuffer m_valueBuffer;
+	// when we last updated the valuebuffer - so we know if we have to update it
+	long m_bufferLastUpdated;
+
 	float m_currentValue;
 	bool  m_sampleExact;
 	int m_connectionCount;
@@ -149,7 +163,7 @@ protected:
 
 	static ControllerVector s_controllers;
 
-	static unsigned int s_frames;
+	static long s_periods;
 
 
 signals:

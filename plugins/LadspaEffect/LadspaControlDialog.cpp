@@ -5,7 +5,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,13 +25,13 @@
  */
 
 
-#include <QtGui/QGroupBox>
-#include <QtGui/QLayout>
+#include <QGroupBox>
+#include <QLayout>
 
 #include "LadspaEffect.h"
 #include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 
 
 
@@ -52,7 +52,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 		mainLay->addSpacing( 3 );
 		QHBoxLayout * center = new QHBoxLayout();
 		mainLay->addLayout( center );
-		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this );
+		m_stereoLink = new LedCheckBox( tr( "Link Channels" ), this );
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 		center->addWidget( m_stereoLink );
 	}
@@ -107,7 +107,7 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		grouper->setAlignment( Qt::Vertical );
 
 		for( control_list_t::iterator it = controls.begin(); 
-						it != controls.end(); it++ )
+						it != controls.end(); ++it )
 		{
 			if( (*it)->port()->proc == proc )
 			{
@@ -143,5 +143,5 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 }
 
 
-#include "moc_LadspaControlDialog.cxx"
+
 

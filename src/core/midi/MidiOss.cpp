@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,8 +28,8 @@
 #ifdef LMMS_HAVE_OSS
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 
 #ifdef LMMS_HAVE_STDLIB_H
@@ -37,7 +37,7 @@
 #endif
 
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 
 
@@ -74,7 +74,7 @@ MidiOss::~MidiOss()
 
 QString MidiOss::probeDevice()
 {
-	QString dev = configManager::inst()->value( "midioss", "device" );
+	QString dev = ConfigManager::inst()->value( "midioss", "device" );
 	if( dev.isEmpty() )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -137,7 +137,7 @@ MidiOss::setupWidget::~setupWidget()
 
 void MidiOss::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "midioss", "device",
+	ConfigManager::inst()->setValue( "midioss", "device",
 							m_device->text() );
 }
 

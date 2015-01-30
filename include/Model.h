@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,8 +25,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <QtCore/QString>
 #include <QtCore/QObject>
-#include <QtCore/QPointer>
 
 #include "export.h"
 

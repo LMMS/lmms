@@ -1,8 +1,11 @@
 #include "SendButtonIndicator.h"
 
-#include "engine.h"
+#include "Engine.h"
 #include "FxMixer.h"
 #include "Model.h"
+
+QPixmap * SendButtonIndicator::s_qpmOff = NULL;
+QPixmap * SendButtonIndicator::s_qpmOn = NULL;
 
 SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 										   FxMixerView * _mv) :
@@ -10,18 +13,25 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 	m_parent( _owner ),
 	m_mv( _mv )
 {
-	qpmOff = embed::getIconPixmap("mixer_send_off", 23, 16);
-	qpmOn = embed::getIconPixmap("mixer_send_on", 23, 16);
-
+	if( ! s_qpmOff )
+	{
+		s_qpmOff = new QPixmap( embed::getIconPixmap( "mixer_send_off", 29, 20 ) );
+	}
+	
+	if( ! s_qpmOn )
+	{
+		s_qpmOn = new QPixmap( embed::getIconPixmap( "mixer_send_on", 29, 20 ) );
+	}
+	
 	// don't do any initializing yet, because the FxMixerView and FxLine
 	// that were passed to this constructor are not done with their constructors
 	// yet.
-
+	setPixmap( *s_qpmOff );
 }
 
 void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 {
-	FxMixer * mix = engine::fxMixer();
+	FxMixer * mix = Engine::fxMixer();
 	int from = m_mv->currentFxLine()->channelIndex();
 	int to = m_parent->channelIndex();
 	FloatModel * sendModel = mix->channelSendModel(from, to);
@@ -42,12 +52,12 @@ void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 
 FloatModel * SendButtonIndicator::getSendModel()
 {
-	FxMixer * mix = engine::fxMixer();
+	FxMixer * mix = Engine::fxMixer();
 	return mix->channelSendModel(
 		m_mv->currentFxLine()->channelIndex(), m_parent->channelIndex());
 }
 
 void SendButtonIndicator::updateLightStatus()
 {
-	setPixmap( getSendModel() == NULL ? qpmOff : qpmOn );
+	setPixmap( getSendModel() == NULL ? *s_qpmOff : *s_qpmOn );
 }

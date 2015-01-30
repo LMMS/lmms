@@ -2,8 +2,8 @@
  * SampleRecordHandle.h - play-handle for recording a sample
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _SAMPLE_RECORD_HANDLE_H
-#define _SAMPLE_RECORD_HANDLE_H
+#ifndef SAMPLE_RECORD_HANDLE_H
+#define SAMPLE_RECORD_HANDLE_H
 
 #include <QtCore/QList>
 #include <QtCore/QPair>
@@ -32,10 +32,9 @@
 #include "Mixer.h"
 #include "SampleBuffer.h"
 
-class bbTrack;
-class pattern;
+class BBTrack;
 class SampleTCO;
-class track;
+class Track;
 
 
 class SampleRecordHandle : public PlayHandle
@@ -47,7 +46,7 @@ public:
 	virtual void play( sampleFrame * _working_buffer );
 	virtual bool isFinished() const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	f_cnt_t framesRecorded() const;
 	void createSampleBuffer( SampleBuffer * * _sample_buf );
@@ -62,8 +61,8 @@ private:
 	f_cnt_t m_framesRecorded;
 	MidiTime m_minLength;
 
-	track * m_track;
-	bbTrack * m_bbTrack;
+	Track * m_track;
+	BBTrack * m_bbTrack;
 	SampleTCO * m_tco;
 
 } ;

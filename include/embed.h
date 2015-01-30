@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef _EMBED_H
-#define _EMBED_H
+#ifndef EMBED_H
+#define EMBED_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 #include <QtCore/QString>
 
 #include "export.h"
@@ -78,8 +78,7 @@ public:
 	{
 		if( !m_name.isEmpty() )
 		{
-			return( embed::getIconPixmap(
-					m_name.toAscii().constData() ) );
+			return( embed::getIconPixmap( m_name.toLatin1().constData() ) );
 		}
 		return( QPixmap() );
 	}
@@ -112,7 +111,7 @@ public:
 		if( !m_name.isEmpty() )
 		{
 			return( PLUGIN_NAME::getIconPixmap(
-					m_name.toAscii().constData() ) );
+					m_name.toLatin1().constData() ) );
 		}
 		return( QPixmap() );
 	}

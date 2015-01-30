@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -76,9 +76,9 @@ void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
 	// make sure buffer is cleaned up properly at the end...
 	sampleFrame * data_ptr = data;
 
-#ifdef LMMS_DEBUG
+
 	assert( data != NULL );
-#endif
+
 	// now copy all buffers into big buffer
 	for( BufferList::ConstIterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )

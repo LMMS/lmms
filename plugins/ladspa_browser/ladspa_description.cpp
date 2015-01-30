@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,15 +24,15 @@
 
 #include "ladspa_description.h"
 
-#include <QtGui/QGroupBox>
-#include <QtGui/QLabel>
-#include <QtGui/QListWidget>
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QListWidget>
+#include <QScrollArea>
+#include <QVBoxLayout>
 
 #include "AudioDevice.h"
-#include "engine.h"
-#include "ladspa_2_lmms.h"
+#include "Engine.h"
+#include "Ladspa2LMMS.h"
 #include "Mixer.h"
 
 
@@ -41,7 +41,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 						ladspaPluginType _type ) :
 	QWidget( _parent )
 {
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	l_sortable_plugin_t plugins;
 	switch( _type )
@@ -70,11 +70,11 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 
 	QList<QString> pluginNames;
 	for( l_sortable_plugin_t::iterator it = plugins.begin();
-		    it != plugins.end(); it++ )
+			it != plugins.end(); ++it )
 	{
 		if( _type != VALID || 
 			manager->getDescription( ( *it ).second )->inputChannels
-				<= engine::mixer()->audioDev()->channels() )
+				<= Engine::mixer()->audioDev()->channels() )
 		{ 
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );
@@ -128,7 +128,7 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 	QVBoxLayout * layout = new QVBoxLayout( description );
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	QLabel * name = new QLabel( description );
 	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );
@@ -217,4 +217,4 @@ void ladspaDescription::onDoubleClicked( QListWidgetItem * _item )
 
 
 
-#include "moc_ladspa_description.cxx"
+

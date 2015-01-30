@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,19 +24,22 @@
  */
 
 
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
 #include "AudioDevice.h"
-#include "config_mgr.h"
-#include "ladspa_2_lmms.h"
+#include "ConfigManager.h"
+#include "Ladspa2LMMS.h"
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"
 #include "Mixer.h"
 #include "EffectChain.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
+#include "MemoryManager.h"
+#include "ValueBuffer.h"
+#include "Song.h"
 
 #include "embed.cpp"
 
@@ -69,17 +72,12 @@ LadspaEffect::LadspaEffect( Model * _parent,
 	m_maxSampleRate( 0 ),
 	m_key( LadspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
 	{
-		if( !engine::suppressMessages() )
-		{
-			QMessageBox::warning( 0, tr( "Effect" ), 
-				tr( "Unknown LADSPA plugin %1 requested." ).
-							arg( m_key.second ),
-				QMessageBox::Ok, QMessageBox::NoButton );
-		}
-		setOkay( FALSE );
+		Engine::getSong()->collectError(tr( "Unknown LADSPA plugin %1 requested." ).arg(
+											m_key.second ) );
+		setOkay( false );
 		return;
 	}
 
@@ -87,7 +85,7 @@ LadspaEffect::LadspaEffect( Model * _parent,
 
 	pluginInstantiation();
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( changeSampleRate() ) );
 }
 
@@ -138,25 +136,24 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
 	{
 		m_pluginMutex.unlock();
-		return( FALSE );
+		return( false );
 	}
 
 	int frames = _frames;
 	sampleFrame * o_buf = NULL;
+	sampleFrame sBuf [_frames];
 
-	if( m_maxSampleRate < engine::mixer()->processingSampleRate() )
+	if( m_maxSampleRate < Engine::mixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = new sampleFrame[_frames];
+		_buf = &sBuf[0];
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
-				engine::mixer()->processingSampleRate();
+				Engine::mixer()->processingSampleRate();
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
-	// the control ports.  Need to change this to handle non-in-place-broken
-	// plugins--would speed things up to use the same buffer for both
-	// LMMS and LADSPA.
+	// the control ports.  
 	ch_cnt_t channel = 0;
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
 	{
@@ -175,18 +172,28 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					++channel;
 					break;
 				case AUDIO_RATE_INPUT:
-					pp->value = static_cast<LADSPA_Data>( 
-										pp->control->value() / pp->scale );
-					// This only supports control rate ports, so the audio rates are
-					// treated as though they were control rate by setting the
-					// port buffer to all the same value.
-					for( fpp_t frame = 0; 
-						frame < frames; ++frame )
+				{
+					ValueBuffer * vb = pp->control->valueBuffer();
+					if( vb )
 					{
-						pp->buffer[frame] = 
-							pp->value;
+						memcpy( pp->buffer, vb->values(), frames * sizeof(float) );
+					}
+					else
+					{
+						pp->value = static_cast<LADSPA_Data>( 
+											pp->control->value() / pp->scale );
+						// This only supports control rate ports, so the audio rates are
+						// treated as though they were control rate by setting the
+						// port buffer to all the same value.
+						for( fpp_t frame = 0; 
+							frame < frames; ++frame )
+						{
+							pp->buffer[frame] = 
+								pp->value;
+						}
 					}
 					break;
+				}
 				case CONTROL_RATE_INPUT:
 					if( pp->control == NULL )
 					{
@@ -206,6 +213,7 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 			}
 		}
 	}
+
 
 	// Process the buffers.
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
@@ -250,7 +258,6 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( o_buf != NULL )
 	{
 		sampleBack( _buf, o_buf, m_maxSampleRate );
-		delete[] _buf;
 	}
 
 	checkGate( out_sum / frames );
@@ -280,16 +287,24 @@ void LadspaEffect::pluginInstantiation()
 {
 	m_maxSampleRate = maxSamplerate( displayName() );
 
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
-	const ch_cnt_t lmms_chnls = engine::mixer()->audioDev()->channels();
+	const ch_cnt_t lmms_chnls = Engine::mixer()->audioDev()->channels();
 	int effect_channels = manager->getDescription( m_key )->inputChannels;
 	setProcessorCount( lmms_chnls / effect_channels );
+
+	// get inPlaceBroken property
+	m_inPlaceBroken = manager->isInplaceBroken( m_key );
 
 	// Categorize the ports, and create the buffers.
 	m_portCount = manager->getPortCount( m_key );
 
+	int inputch = 0;
+	int outputch = 0;
+	LADSPA_Data * inbuf [2];
+	inbuf[0] = NULL;
+	inbuf[1] = NULL;
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
 		multi_proc_t ports;
@@ -301,39 +316,48 @@ void LadspaEffect::pluginInstantiation()
 			p->proc = proc;
 			p->port_id = port;
 			p->control = NULL;
+			p->buffer = NULL;
 
 			// Determine the port's category.
 			if( manager->isPortAudio( m_key, port ) )
 			{
-				// Nasty manual memory management--was having difficulty
-				// with some prepackaged plugins that were segfaulting
-				// during cleanup.  It was easier to troubleshoot with the
-				// memory management all taking place in one file.
-				p->buffer = 
-					new LADSPA_Data[engine::mixer()->framesPerPeriod()];
-
 				if( p->name.toUpper().contains( "IN" ) &&
 					manager->isPortInput( m_key, port ) )
 				{
 					p->rate = CHANNEL_IN;
+					p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
+					inbuf[ inputch ] = p->buffer;
+					inputch++;
 				}
 				else if( p->name.toUpper().contains( "OUT" ) &&
 					manager->isPortOutput( m_key, port ) )
 				{
 					p->rate = CHANNEL_OUT;
+					if( ! m_inPlaceBroken && inbuf[ outputch ] )
+					{
+						p->buffer = inbuf[ outputch ];
+						outputch++;
+					}
+					else
+					{
+						p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
+						m_inPlaceBroken = true;
+					}
 				}
 				else if( manager->isPortInput( m_key, port ) )
 				{
 					p->rate = AUDIO_RATE_INPUT;
+					p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
 				}
 				else
 				{
 					p->rate = AUDIO_RATE_OUTPUT;
+					p->buffer = MM_ALLOC( LADSPA_Data, Engine::mixer()->framesPerPeriod() );
 				}
 			}
 			else
 			{
-				p->buffer = new LADSPA_Data[1];
+				p->buffer = MM_ALLOC( LADSPA_Data, 1 );
 
 				if( manager->isPortInput( m_key, port ) )
 				{
@@ -453,7 +477,7 @@ void LadspaEffect::pluginInstantiation()
 		QMessageBox::warning( 0, "Effect", 
 			"Can't get LADSPA descriptor function: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
-		setOkay( FALSE );
+		setOkay( false );
 		return;
 	}
 	if( m_descriptor->run == NULL )
@@ -461,7 +485,7 @@ void LadspaEffect::pluginInstantiation()
 		QMessageBox::warning( 0, "Effect",
 			"Plugin has no processor: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
-		setDontRun( TRUE );
+		setDontRun( true );
 	}
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
@@ -472,7 +496,7 @@ void LadspaEffect::pluginInstantiation()
 			QMessageBox::warning( 0, "Effect",
 				"Can't get LADSPA instance: " + m_key.second,
 				QMessageBox::Ok, QMessageBox::NoButton );
-			setOkay( FALSE );
+			setOkay( false );
 			return;
 		}
 		m_handles.append( effect );
@@ -492,7 +516,7 @@ void LadspaEffect::pluginInstantiation()
 				QMessageBox::warning( 0, "Effect", 
 				"Failed to connect port: " + m_key.second, 
 				QMessageBox::Ok, QMessageBox::NoButton );
-				setDontRun( TRUE );
+				setDontRun( true );
 				return;
 			}
 		}
@@ -520,13 +544,16 @@ void LadspaEffect::pluginDestruction()
 
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
-		ladspa2LMMS * manager = engine::getLADSPAManager();
+		Ladspa2LMMS * manager = Engine::getLADSPAManager();
 		manager->deactivate( m_key, m_handles[proc] );
 		manager->cleanup( m_key, m_handles[proc] );
 		for( int port = 0; port < m_portCount; port++ )
 		{
 			port_desc_t * pp = m_ports.at( proc ).at( port );
-			delete[] pp->buffer;
+			if( m_inPlaceBroken || pp->rate != CHANNEL_OUT )
+			{
+				if( pp->buffer) MM_FREE( pp->buffer );
+			}
 			delete pp;
 		}
 		m_ports[proc].clear();
@@ -550,14 +577,13 @@ sample_rate_t LadspaEffect::maxSamplerate( const QString & _name )
 		__buggy_plugins["C* AmpVTS"] = 88200;
 		__buggy_plugins["Chorus2"] = 44100;
 		__buggy_plugins["Notch Filter"] = 96000;
-		__buggy_plugins["Freeverb"] = 44100;
 		__buggy_plugins["TAP Reflector"] = 192000;
 	}
 	if( __buggy_plugins.contains( _name ) )
 	{
 		return( __buggy_plugins[_name] );
 	}
-	return( engine::mixer()->processingSampleRate() );
+	return( Engine::mixer()->processingSampleRate() );
 }
 
 
@@ -577,5 +603,5 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 }
 
 
-#include "moc_LadspaEffect.cxx"
+
 

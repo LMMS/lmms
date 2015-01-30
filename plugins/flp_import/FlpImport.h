@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,12 @@
 #ifndef _FLP_IMPORT_H
 #define _FLP_IMPORT_H
 
-#include <QtCore/QString>
-#include <QtCore/QPair>
-#include <QtCore/QVector>
+#include <QString>
+#include <QPair>
+#include <QVector>
 
 #include "ImportFilter.h"
-#include "note.h"
+#include "Note.h"
 
 
 

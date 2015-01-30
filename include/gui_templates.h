@@ -2,8 +2,8 @@
  * gui_templates.h - GUI-specific templates
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,14 +23,14 @@
  */
 
 
-#ifndef _GUI_TEMPLATES_H
-#define _GUI_TEMPLATES_H
+#ifndef GUI_TEMPLATES_H
+#define GUI_TEMPLATES_H
 
 #include "lmmsconfig.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QFont>
-#include <QtGui/QDesktopWidget>
+#include <QApplication>
+#include <QFont>
+#include <QDesktopWidget>
 
 
 

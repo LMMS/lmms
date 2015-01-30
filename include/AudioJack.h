@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,14 +22,13 @@
  *
  */
 
-#ifndef _AUDIO_JACK_H
-#define _AUDIO_JACK_H
+#ifndef AUDIO_JACK_H
+#define AUDIO_JACK_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
 #include <jack/jack.h>
-#endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
@@ -75,7 +74,6 @@ private slots:
 	void restartAfterZombified();
 
 
-#ifdef LMMS_HAVE_JACK
 private:
 	bool initJackClient();
 
@@ -118,11 +116,12 @@ private:
 	typedef QMap<AudioPort *, StereoPort> JackPortMap;
 	JackPortMap m_portMap;
 #endif
-#endif
 
 signals:
 	void zombified();
 
 } ;
+
+#endif
 
 #endif

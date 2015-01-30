@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,12 +24,12 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "AmplifierControls.h"
 #include "Amplifier.h"
-#include "engine.h"
-#include "song.h"
+#include "Engine.h"
+#include "Song.h"
 
 
 AmplifierControls::AmplifierControls( AmplifierEffect* effect ) :
@@ -40,10 +40,10 @@ AmplifierControls::AmplifierControls( AmplifierEffect* effect ) :
 	m_leftModel( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Left gain" ) ),
 	m_rightModel( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Right gain" ) )
 {
-	connect( &m_volumeModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
+/*	connect( &m_volumeModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
 	connect( &m_panModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
 	connect( &m_leftModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
-	connect( &m_rightModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );
+	connect( &m_rightModel, SIGNAL( dataChanged() ), this, SLOT( changeControl() ) );*/
 }
 
 
@@ -51,7 +51,7 @@ AmplifierControls::AmplifierControls( AmplifierEffect* effect ) :
 
 void AmplifierControls::changeControl()
 {
-	engine::getSong()->setModified();
+//	engine::getSong()->setModified();
 }
 
 
@@ -78,5 +78,5 @@ void AmplifierControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 
 
 
-#include "moc_AmplifierControls.cxx"
+
 

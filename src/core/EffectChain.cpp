@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,14 +24,14 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "EffectChain.h"
 #include "Effect.h"
-#include "engine.h"
-#include "debug.h"
+#include "Engine.h"
 #include "DummyEffect.h"
-
+#include "MixHelpers.h"
+#include "Song.h"
 
 
 EffectChain::EffectChain( Model * _parent ) :
@@ -56,12 +56,19 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "enabled", m_enabledModel.value() );
 	_this.setAttribute( "numofeffects", m_effects.count() );
-	for( EffectList::Iterator it = m_effects.begin(); 
-					it != m_effects.end(); it++ )
+
+	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); it++ )
 	{
-		QDomElement ef = ( *it )->saveState( _doc, _this );
-		ef.setAttribute( "name", ( *it )->descriptor()->name );
-		ef.appendChild( ( *it )->key().saveXML( _doc ) );
+		if( dynamic_cast<DummyEffect *>( *it ) )
+		{
+			_this.appendChild( dynamic_cast<DummyEffect *>( *it )->originalPluginData() );
+		}
+		else
+		{
+			QDomElement ef = ( *it )->saveState( _doc, _this );
+			ef.setAttribute( "name", ( *it )->descriptor()->name );
+			ef.appendChild( ( *it )->key().saveXML( _doc ) );
+		}
 	}
 }
 
@@ -82,26 +89,23 @@ void EffectChain::loadSettings( const QDomElement & _this )
 	{
 		if( node.isElement() && node.nodeName() == "effect" )
 		{
-			QDomElement cn = node.toElement();
-			const QString name = cn.attribute( "name" );
-			EffectKey key( cn.elementsByTagName( "key" ).
-							item( 0 ).toElement() );
-			Effect * e = Effect::instantiate( name, this, &key );
-			if( e->isOkay() )
+			QDomElement effectData = node.toElement();
+
+			const QString name = effectData.attribute( "name" );
+			EffectKey key( effectData.elementsByTagName( "key" ).item( 0 ).toElement() );
+
+			Effect* e = Effect::instantiate( name, this, &key );
+
+			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
 			{
-				if( node.isElement() )
-				{
-					if( e->nodeName() == node.nodeName() )
-					{
-						e->restoreState( node.toElement() );
-					}
-				}
+				e->restoreState( effectData );
 			}
 			else
 			{
 				delete e;
-				e = new DummyEffect( parentModel() );
+				e = new DummyEffect( parentModel(), effectData );
 			}
+
 			m_effects.push_back( e );
 			++fx_loaded;
 		}
@@ -116,9 +120,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	engine::mixer()->lock();
+	Engine::mixer()->lock();
 	m_effects.append( _effect );
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 
 	emit dataChanged();
 }
@@ -128,9 +132,9 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	engine::mixer()->lock();
+	Engine::mixer()->lock();
 	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
-	engine::mixer()->unlock();
+	Engine::mixer()->unlock();
 
 	emit dataChanged();
 }
@@ -143,7 +147,7 @@ void EffectChain::moveDown( Effect * _effect )
 	if( _effect != m_effects.last() )
 	{
 		int i = 0;
-		for( EffectList::Iterator it = m_effects.begin(); 
+		for( EffectList::Iterator it = m_effects.begin();
 					it != m_effects.end(); it++, i++ )
 		{
 			if( *it == _effect )
@@ -151,10 +155,10 @@ void EffectChain::moveDown( Effect * _effect )
 				break;
 			}
 		}
-		
+
 		Effect * temp = m_effects[i + 1];
 		m_effects[i + 1] = _effect;
-		m_effects[i] = temp;	
+		m_effects[i] = temp;
 	}
 }
 
@@ -166,7 +170,7 @@ void EffectChain::moveUp( Effect * _effect )
 	if( _effect != m_effects.first() )
 	{
 		int i = 0;
-		for( EffectList::Iterator it = m_effects.begin(); 
+		for( EffectList::Iterator it = m_effects.begin();
 					it != m_effects.end(); it++, i++ )
 		{
 			if( *it == _effect )
@@ -174,10 +178,10 @@ void EffectChain::moveUp( Effect * _effect )
 				break;
 			}
 		}
-		
+
 		Effect * temp = m_effects[i - 1];
 		m_effects[i - 1] = _effect;
-		m_effects[i] = temp;	
+		m_effects[i] = temp;
 	}
 }
 
@@ -190,6 +194,11 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	{
 		return false;
 	}
+	const bool exporting = Engine::getSong()->isExporting();
+	if( exporting ) // strip infs/nans if exporting
+	{
+		MixHelpers::sanitize( _buf, _frames );
+	}
 
 	bool moreEffects = false;
 	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
@@ -197,6 +206,10 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 		if( hasInputNoise || ( *it )->isRunning() )
 		{
 			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
+			if( exporting ) // strip infs/nans if exporting
+			{
+				MixHelpers::sanitize( _buf, _frames );
+			}
 		}
 
 #ifdef LMMS_DEBUG
@@ -207,7 +220,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 				it = m_effects.end()-1;
 				printf( "numerical overflow after processing "
 					"plugin \"%s\"\n", ( *it )->
-					publicName().toUtf8().constData() );
+					descriptor()->name);
 				break;
 			}
 		}
@@ -226,8 +239,8 @@ void EffectChain::startRunning()
 	{
 		return;
 	}
-	
-	for( EffectList::Iterator it = m_effects.begin(); 
+
+	for( EffectList::Iterator it = m_effects.begin();
 						it != m_effects.end(); it++ )
 	{
 		( *it )->startRunning();
@@ -251,5 +264,5 @@ void EffectChain::clear()
 
 
 
-#include "moc_EffectChain.cxx"
+
 

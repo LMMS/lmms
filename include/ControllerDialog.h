@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,10 @@
  *
  */
 
-#ifndef _CONTROLLER_DIALOG_H
-#define _CONTROLLER_DIALOG_H
+#ifndef CONTROLLER_DIALOG_H
+#define CONTROLLER_DIALOG_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 

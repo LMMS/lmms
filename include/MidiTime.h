@@ -2,9 +2,9 @@
  * MidiTime.h - declaration of class MidiTime which provides data type for
  *              position- and length-variables
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _MIDI_TIME_H
-#define _MIDI_TIME_H
+#ifndef MIDI_TIME_H
+#define MIDI_TIME_H
 
 #include "lmms_basics.h"
 #include "export.h"
@@ -59,6 +59,11 @@ public:
 		{
 			return ( getTact() + 1 ) * s_ticksPerTact;
 		}
+		return getTact() * s_ticksPerTact;
+	}
+
+	MidiTime toAbsoluteTact() const
+	{
 		return getTact() * s_ticksPerTact;
 	}
 
@@ -132,7 +137,8 @@ public:
 
 	static int stepsPerTact()
 	{
-		return qMax( 1, ticksPerTact() / DefaultBeatsPerTact );
+		int steps = ticksPerTact() / DefaultBeatsPerTact;
+		return qMax( 1, steps );
 	}
 
 	static void setTicksPerTact( tick_t _tpt )

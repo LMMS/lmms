@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,6 +26,7 @@
 
 #include "zynaddsubfx/src/Misc/Util.h"
 #include <unistd.h>
+#include <ctime>
 
 #include "LocalZynAddSubFx.h"
 
@@ -52,9 +53,11 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	if( s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 		// (non-portable) initialization of statically linked pthread library
 		pthread_win32_process_attach_np();
 		pthread_win32_thread_attach_np();
+#endif
 #endif
 
 		initConfig();
@@ -86,6 +89,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 LocalZynAddSubFx::~LocalZynAddSubFx()
 {
 	delete m_master;
+	delete m_ioEngine;
 
 	if( --s_instanceCount == 0 )
 	{

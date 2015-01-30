@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,16 +22,17 @@
  *
  */
 
-#ifndef _MIDI_EVENT_PROCESSOR_H
-#define _MIDI_EVENT_PROCESSOR_H
+#ifndef MIDI_EVENT_PROCESSOR_H
+#define MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
 #include "MidiTime.h"
-
+#include "MemoryManager.h"
 
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor
 {
+	MM_OPERATORS
 public:
 	MidiEventProcessor()
 	{
@@ -42,8 +43,8 @@ public:
 	}
 
 	// to be implemented by inheriting classes
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() ) = 0;
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() ) = 0;
+	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
+	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
 
 } ;
 

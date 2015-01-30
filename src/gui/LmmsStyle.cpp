@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,87 +24,16 @@
  */
 
 
-#include <QtCore/QFile>
-#include <QtGui/QApplication>
-#include <QtGui/QFrame>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmapCache>
-#include <QtGui/QStyleOption>
+#include <QFile>
+#include <QApplication>
+#include <QFrame>
+#include <QPainter>
+#include <QPixmapCache>
+#include <QStyleFactory>
+#include <QStyleOption>
 
 #include "LmmsStyle.h"
 #include "LmmsPalette.h"
-
-const int BUTTON_LENGTH = 24;
-
-static const char * const s_scrollbarArrowUpXpm[] = {
-		"7 6 8 1",
-		" 	g None",
-		".	g #000000",
-		"+	g #101010",
-		"@	g #A0A0A0",
-		"#	g #C0C0C0",
-		"$	g #FFFFFF",
-		"%	g #808080",
-		"&	g #202020",
-		"..+@+..",
-		"..#$#..",
-		".%$$$%.",
-		"&$$$$$&",
-		"@$$$$$@",
-		"@#####@"};
-
-static const char * const s_scrollbarArrowRightXpm[] = {
-		"6 7 8 1",
-		" 	c None",
-		".	c #A0A0A0",
-		"+	c #202020",
-		"@	c #000000",
-		"#	c #C0C0C0",
-		"$	c #FFFFFF",
-		"%	c #808080",
-		"&	c #101010",
-		"..+@@@",
-		"#$$%@@",
-		"#$$$#&",
-		"#$$$$.",
-		"#$$$#&",
-		"#$$%@@",
-		"..+@@@"};
-
-static const char * const s_scrollbarArrowDownXpm[] = {
-		"7 6 8 1",
-		" 	g None",
-		".	g #000000",
-		"+	g #101010",
-		"@	g #A0A0A0",
-		"#	g #C0C0C0",
-		"$	g #FFFFFF",
-		"%	g #808080",
-		"&	g #202020",
-		"@#####@",
-		"@$$$$$@",
-		"&$$$$$&",
-		".%$$$%.",
-		"..#$#..",
-		"..+@+.."};
-
-static const char * const s_scrollbarArrowLeftXpm[] = {
-		"6 7 8 1",
-		" 	g None",
-		".	g #000000",
-		"+	g #202020",
-		"@	g #A0A0A0",
-		"#	g #808080",
-		"$	g #FFFFFF",
-		"%	g #C0C0C0",
-		"&	g #101010",
-		"...+@@",
-		"..#$$%",
-		"&%$$$%",
-		"@$$$$%",
-		"&%$$$%",
-		"..#$$%",
-		"...+@@"};
 
 QPalette * LmmsStyle::s_palette = NULL;
 
@@ -197,13 +126,19 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 
 LmmsStyle::LmmsStyle() :
-	QPlastiqueStyle()
+	QProxyStyle()
 {
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
 	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
+
+#if QT_VERSION >= 0x050000
+	setBaseStyle( QStyleFactory::create( "Fusion" ) );
+#else
+	setBaseStyle( QStyleFactory::create( "Plastique" ) );
+#endif
 }
 
 
@@ -213,201 +148,11 @@ QPalette LmmsStyle::standardPalette( void ) const
 {
 	if( s_palette != NULL) { return * s_palette; }
 
-	QPalette pal = QPlastiqueStyle::standardPalette();
+	QPalette pal = QProxyStyle::standardPalette();
 
 	return( pal );
 }
 
-
-
-/*
-void LmmsStyle::drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const
-{
-
-	switch( element )
-	{
-	case CE_ScrollBarAddLine:
-		if( const QStyleOptionSlider * scrollBar = qstyleoption_cast<const QStyleOptionSlider *>( option ) )
-		{
-
-			bool horizontal = scrollBar->orientation == Qt::Horizontal;
-			bool isEnabled = scrollBar->state & State_Enabled;
-			bool sunken = scrollBar->state & State_Sunken;
-			bool hover = scrollBar->state & State_MouseOver;
-
-			QString pixmapName = getCacheKey( QLatin1String( "ScrollBarAddLine" ), option, option->rect.size() );
-
-			QPixmap cache;
-			if( !QPixmapCache::find( pixmapName, cache ) )
-			{
-				cache = QPixmap( option->rect.size() );
-				QPainter cachePainter( &cache );
-
-				cache.fill( QColor( 48, 48, 48 ) );
-				QColor sliderColor;
-				QColor blurColor;
-				hoverColors(sunken, hover,
-						scrollBar->activeSubControls & SC_ScrollBarAddLine && isEnabled,
-						sliderColor, blurColor);
-
-				int scrollBarExtent = pixelMetric( PM_ScrollBarExtent, option, widget );
-				cachePainter.setPen( QPen( sliderColor, 0 ) );
-				if( horizontal )
-				{
-					int r = cache.rect().right();
-					cachePainter.fillRect(0, 2, BUTTON_LENGTH-2,
-							scrollBarExtent-4, sliderColor);
-
-					cachePainter.drawLine( r, 4, r, scrollBarExtent - 5 );
-					cachePainter.drawLine( r - 1, 3, r - 1, scrollBarExtent - 4 );
-
-					const QPointF points[4] = {
-							QPoint( r, 3 ), QPoint( r, scrollBarExtent - 4 ),
-							QPoint( r - 1, 2 ), QPoint( r - 1, scrollBarExtent - 3 )};
-
-					cachePainter.setPen( QPen( blurColor, 0 ) );
-					cachePainter.drawPoints( points, 4 );
-
-					QImage arrow = colorizeXpm( s_scrollbarArrowRightXpm, option->palette.foreground().color() );
-					if( ( scrollBar->activeSubControls & SC_ScrollBarAddLine ) && sunken )
-					{
-						cachePainter.translate( 1, 1 );
-					}
-					cachePainter.drawImage( cache.rect().center() - QPoint( 3, 3 ), arrow );
-				}
-				else
-				{
-					int b = cache.rect().bottom();
-					cachePainter.fillRect( 2, 0, scrollBarExtent - 4, BUTTON_LENGTH - 2, sliderColor );
-					cachePainter.drawLine( 4, b, scrollBarExtent - 5, b );
-					cachePainter.drawLine( 3, b - 1, scrollBarExtent - 4, b - 1 );
-
-					const QPointF points[4] = {
-							QPoint( 3, b ), QPoint( scrollBarExtent - 4, b ),
-							QPoint( 2, b - 1 ), QPoint( scrollBarExtent - 3, b - 1 )};
-
-					cachePainter.setPen( QPen( blurColor, 0 ) );
-					cachePainter.drawPoints( points, 4 );
-
-					QImage arrow = colorizeXpm( s_scrollbarArrowDownXpm, option->palette.foreground().color() );
-					if( ( scrollBar->activeSubControls & SC_ScrollBarAddLine ) && sunken )
-					{
-						cachePainter.translate( 1, 1 );
-					}
-					cachePainter.drawImage( cache.rect().center() - QPoint( 3, 3 ), arrow );
-				}
-				QPixmapCache::insert( pixmapName, cache );
-			}
-			painter->drawPixmap( option->rect.topLeft(), cache );
-
-		}
-		break;
-
-	case CE_ScrollBarSubLine:
-		if(const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>( option ) )
-		{
-			bool horizontal = scrollBar->orientation == Qt::Horizontal;
-			bool isEnabled = scrollBar->state & State_Enabled;
-			bool sunken = scrollBar->state & State_Sunken;
-			bool hover = scrollBar->state & State_MouseOver;
-
-			QString pixmapName = getCacheKey( QLatin1String( "ScrollBarSubLine" ), option, option->rect.size() );
-			QPixmap cache;
-			if( !QPixmapCache::find( pixmapName, cache ) )
-			{
-				cache = QPixmap( option->rect.size() );
-				QPainter cachePainter( &cache );
-
-				cache.fill( QColor( 48, 48, 48 ) ); // TODO: Fill with CSS background
-				QColor sliderColor;
-				QColor blurColor;
-				hoverColors(sunken, hover,
-						scrollBar->activeSubControls & SC_ScrollBarSubLine && isEnabled,
-						sliderColor, blurColor);
-
-				int scrollBarExtent = pixelMetric( PM_ScrollBarExtent, option, widget );
-				cachePainter.setPen( QPen( sliderColor, 0 ) );
-				if( horizontal )
-				{
-					cachePainter.fillRect( 2, 2, BUTTON_LENGTH - 2, scrollBarExtent - 4, sliderColor );
-					cachePainter.drawLine( 0, 4, 0, scrollBarExtent - 5 );
-					cachePainter.drawLine( 1, 3, 1, scrollBarExtent - 4 );
-
-					const QPointF points[4] = {
-							QPoint( 0, 3 ), QPoint( 0, scrollBarExtent - 4 ),
-							QPoint( 1, 2 ), QPoint( 1, scrollBarExtent - 3 )};
-
-					cachePainter.setPen( QPen( blurColor, 0 ) );
-					cachePainter.drawPoints( points, 4 );
-
-					QImage arrow = colorizeXpm( s_scrollbarArrowLeftXpm, option->palette.foreground().color() );
-					if( ( scrollBar->activeSubControls & SC_ScrollBarSubLine ) && sunken )
-					{
-						cachePainter.translate( 1, 1 );
-					}
-					cachePainter.drawImage( cache.rect().center() - QPoint( 3, 3 ), arrow );
-				}
-				else
-				{
-					cachePainter.fillRect( 2, 2, scrollBarExtent - 4, BUTTON_LENGTH - 2, sliderColor );
-					cachePainter.drawLine( 4, 0, scrollBarExtent - 5, 0 );
-					cachePainter.drawLine( 3, 1, scrollBarExtent - 4, 1 );
-
-					const QPointF points[4] = {
-							QPoint( 3, 0 ), QPoint( scrollBarExtent - 4, 0 ),
-							QPoint( 2, 1 ), QPoint( scrollBarExtent - 3, 1 )};
-
-					cachePainter.setPen( QPen( blurColor, 0 ) );
-					cachePainter.drawPoints( points, 4 );
-
-					QImage arrow = colorizeXpm( s_scrollbarArrowUpXpm, option->palette.foreground().color() );
-					if( ( scrollBar->activeSubControls & SC_ScrollBarSubLine ) && sunken )
-					{
-						cachePainter.translate( 1, 1 );
-					}
-					cachePainter.drawImage( cache.rect().center() - QPoint( 3, 3 ), arrow );
-				}
-				QPixmapCache::insert( pixmapName, cache );
-			}
-			painter->drawPixmap( option->rect.topLeft(), cache );
-
-		}
-		break;
-
-	case CE_ScrollBarSubPage:
-	case CE_ScrollBarAddPage:
-		break;
-
-	case CE_ScrollBarSlider:
-		if( const QStyleOptionSlider* scrollBar = qstyleoption_cast<const QStyleOptionSlider *>( option ) )
-		{
-			bool horizontal = scrollBar->orientation == Qt::Horizontal;
-			bool isEnabled = scrollBar->state & State_Enabled;
-			bool sunken = scrollBar->state & State_Sunken;
-			bool hover = scrollBar->state & State_MouseOver;
-
-			QColor sliderColor, blendColor;
-			hoverColors( sunken, hover, (scrollBar->activeSubControls & SC_ScrollBarSlider) && isEnabled, sliderColor, blendColor);
-
-			QRect rc = scrollBar->rect;
-			if( horizontal )
-			{
-				painter->fillRect( rc.left(), rc.top() + 2, rc.width(), rc.height() - 4, sliderColor );
-			}
-			else
-			{
-				painter->fillRect( rc.left() + 2, rc.top(), rc.width() - 4, rc.height(), sliderColor );
-			}
-		}
-		break;
-
-	default:
-		QPlastiqueStyle::drawControl( element, option, painter, widget );
-		break;
-	}
-}
-
-*/
 
 void LmmsStyle::drawComplexControl( ComplexControl control,
 					const QStyleOptionComplex * option,
@@ -429,7 +174,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 						QColor( 192, 192, 192 ) );
 			so.palette.setColor( QPalette::Text,
 							QColor( 64, 64, 64 ) );
-			QPlastiqueStyle::drawComplexControl( control, &so,
+			QProxyStyle::drawComplexControl( control, &so,
 							painter, widget );
 			return;
 		}
@@ -440,7 +185,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 							QPalette::Background ) );
 
 	}*/
-	QPlastiqueStyle::drawComplexControl( control, option, painter, widget );
+	QProxyStyle::drawComplexControl( control, option, painter, widget );
 }
 
 
@@ -551,8 +296,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 	}
 	else
 	{
-		QPlastiqueStyle::drawPrimitive( element, option, painter,
-								widget );
+		QProxyStyle::drawPrimitive( element, option, painter, widget );
 	}
 
 }
@@ -579,178 +323,9 @@ int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 			return 24;
 
 		default:
-			return QPlastiqueStyle::pixelMetric( _metric, _option,
-								_widget );
+			return QProxyStyle::pixelMetric( _metric, _option, _widget );
 	}
 }
-
-// QStyle::SH_TitleBar_NoBorder
-/*
-QSize LmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const
-{
-	if( type == CT_ScrollBar )
-	{
-		if( const QStyleOptionSlider * scrollBar = qstyleoption_cast<const QStyleOptionSlider *>( option ) )
-		{
-			int scrollBarExtent = pixelMetric( PM_ScrollBarExtent, option, widget );
-			int scrollBarSliderMinimum = pixelMetric( PM_ScrollBarSliderMin, option, widget );
-			if( scrollBar->orientation == Qt::Horizontal )
-			{
-				return QSize( BUTTON_LENGTH * 2 + scrollBarSliderMinimum, scrollBarExtent );
-			}
-			else
-			{
-				return QSize( scrollBarExtent, BUTTON_LENGTH * 2 + scrollBarSliderMinimum );
-			}
-		}
-	}
-
-	return QPlastiqueStyle::sizeFromContents( type, option, size, widget );
-}
-*/
-/*
-QRect LmmsStyle::subControlRect( ComplexControl control, const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
-{
-	QRect rect = QPlastiqueStyle::subControlRect( control, option, subControl, widget );
-
-	switch( control )
-	{
-	case CC_ScrollBar:
-		if( const QStyleOptionSlider* scrollBar = qstyleoption_cast<const QStyleOptionSlider *>( option ) )
-		{
-			int scrollBarExtent = pixelMetric( PM_ScrollBarExtent, scrollBar, widget );
-			int sliderMaxLength = (
-					( scrollBar->orientation == Qt::Horizontal ) ?
-							scrollBar->rect.width() :
-							scrollBar->rect.height() ) -
-					( BUTTON_LENGTH * 2 + 6 );
-			int sliderMinLength = pixelMetric( PM_ScrollBarSliderMin, scrollBar, widget );
-			int sliderLength;
-
-			// calculate slider length
-			if( scrollBar->maximum != scrollBar->minimum )
-			{
-				uint valueRange = scrollBar->maximum - scrollBar->minimum;
-				sliderLength = ( scrollBar->pageStep * sliderMaxLength ) /
-						( valueRange + scrollBar->pageStep );
-
-				if( sliderLength < sliderMinLength || valueRange > ( INT_MAX ) / 2 )
-				{
-					sliderLength = sliderMinLength;
-				}
-				if( sliderLength > sliderMaxLength )
-				{
-					sliderLength = sliderMaxLength;
-				}
-			}
-			else
-			{
-				sliderLength = sliderMaxLength;
-			}
-
-			int sliderStart = BUTTON_LENGTH + 3 + sliderPositionFromValue(
-					scrollBar->minimum,
-					scrollBar->maximum,
-					scrollBar->sliderPosition,
-					sliderMaxLength - sliderLength,
-					scrollBar->upsideDown );
-
-			QRect scrollBarRect = scrollBar->rect;
-
-			switch( subControl )
-			{
-			case SC_ScrollBarSubLine: // top/left button
-				if( scrollBar->orientation == Qt::Horizontal )
-				{
-					rect.setRect( scrollBarRect.left() + 2, scrollBarRect.top(),
-							BUTTON_LENGTH,	scrollBarExtent );
-				}
-				else
-				{
-					rect.setRect( scrollBarRect.left(), scrollBarRect.top() + 2,
-							scrollBarExtent, BUTTON_LENGTH );
-				}
-				break;
-
-			case SC_ScrollBarAddLine: // bottom/right button
-				if( scrollBar->orientation == Qt::Horizontal )
-				{
-					rect.setRect( scrollBarRect.right() - 1 - BUTTON_LENGTH,
-							scrollBarRect.top(), BUTTON_LENGTH, scrollBarExtent );
-				}
-				else
-				{
-					rect.setRect( scrollBarRect.left(),
-							scrollBarRect.bottom() - 1 - BUTTON_LENGTH,
-							scrollBarExtent, BUTTON_LENGTH );
-				}
-				break;
-
-			case SC_ScrollBarSubPage:
-				if( scrollBar->orientation == Qt::Horizontal )
-				{
-					rect.setRect( scrollBarRect.left() + 2 + BUTTON_LENGTH,
-							scrollBarRect.top(),
-							sliderStart - ( scrollBarRect.left() + 2 + BUTTON_LENGTH ),
-							scrollBarExtent );
-				}
-				else
-				{
-					rect.setRect( scrollBarRect.left(),
-							scrollBarRect.top() + 2 + BUTTON_LENGTH, scrollBarExtent,
-							sliderStart - ( scrollBarRect.left() + 2 + BUTTON_LENGTH ) );
-				}
-				break;
-
-			case SC_ScrollBarAddPage:
-				if( scrollBar->orientation == Qt::Horizontal )
-				{
-					rect.setRect( sliderStart + sliderLength, 0,
-							sliderMaxLength - sliderStart - sliderLength,
-							scrollBarExtent );
-				}
-				else
-					rect.setRect( 0, sliderStart + sliderLength, scrollBarExtent,
-							sliderMaxLength - sliderStart - sliderLength );
-				break;
-
-			case SC_ScrollBarGroove:
-				if( scrollBar->orientation == Qt::Horizontal )
-				{
-					rect = scrollBarRect.adjusted( BUTTON_LENGTH, 0, -BUTTON_LENGTH, 0 );
-				}
-				else
-				{
-					rect = scrollBarRect.adjusted( 0, BUTTON_LENGTH, 0, -BUTTON_LENGTH );
-				}
-				break;
-
-			case SC_ScrollBarSlider:
-				if( scrollBar->orientation == Qt::Horizontal )
-				{
-					rect.setRect( sliderStart, 0, sliderLength, scrollBarExtent );
-				}
-				else
-				{
-					rect.setRect( 0, sliderStart, scrollBarExtent, sliderLength );
-				}
-				break;
-
-			default:
-				break;
-			}
-			rect = visualRect( scrollBar->direction, scrollBarRect, rect );
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	return rect;
-}
-*/
-
 
 
 QImage LmmsStyle::colorizeXpm( const char * const * xpm, const QBrush& fill ) const

@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,12 +29,12 @@
 
 #include "Instrmnt.h"
 
-#include "combobox.h"
+#include "ComboBox.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 
 // As of Stk 4.4 all classes and types have been moved to the namespace "stk".
 // However in older versions this namespace does not exist, therefore declare it
@@ -133,6 +133,7 @@ protected:
 
 class malletsInstrument : public Instrument
 {
+	Q_OBJECT
 public:
 	malletsInstrument( InstrumentTrack * _instrument_track );
 	virtual ~malletsInstrument();
@@ -203,28 +204,28 @@ private:
 	QWidget * setupBandedWGControls( QWidget * _parent );
 
 	QWidget * m_modalBarWidget;
-	knob * m_hardnessKnob;
-	knob * m_positionKnob;
-	knob * m_vibratoGainKnob;
-	knob * m_vibratoFreqKnob;
-	knob * m_stickKnob;
+	Knob * m_hardnessKnob;
+	Knob * m_positionKnob;
+	Knob * m_vibratoGainKnob;
+	Knob * m_vibratoFreqKnob;
+	Knob * m_stickKnob;
 
 	QWidget * m_tubeBellWidget;
-	knob * m_modulatorKnob;
-	knob * m_crossfadeKnob;
-	knob * m_lfoSpeedKnob;
-	knob * m_lfoDepthKnob;
-	knob * m_adsrKnob;
+	Knob * m_modulatorKnob;
+	Knob * m_crossfadeKnob;
+	Knob * m_lfoSpeedKnob;
+	Knob * m_lfoDepthKnob;
+	Knob * m_adsrKnob;
 
 	QWidget * m_bandedWGWidget;
-	knob * m_pressureKnob;
-	knob * m_motionKnob;
-	knob * m_vibratoKnob;
-	knob * m_velocityKnob;
-	ledCheckBox * m_strikeLED;
+	Knob * m_pressureKnob;
+	Knob * m_motionKnob;
+	Knob * m_vibratoKnob;
+	Knob * m_velocityKnob;
+	LedCheckBox * m_strikeLED;
 
-	comboBox * m_presetsCombo;
-	knob * m_spreadKnob;
+	ComboBox * m_presetsCombo;
+	Knob * m_spreadKnob;
 };
 
 #endif

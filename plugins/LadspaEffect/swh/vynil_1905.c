@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void _init(); // forward declaration
+void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -93,7 +93,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 
 #ifdef WIN32
 	if (bIsFirstTime) {
-		_init();
+		swh_init();
 		bIsFirstTime = 0;
 	}
 #endif
@@ -163,6 +163,7 @@ static void cleanupVynil(LADSPA_Handle instance) {
 	free(plugin_data->buffer_m);
 	free(plugin_data->buffer_s);
 	free(plugin_data->click_buffer);
+	free(plugin_data->highp);
 	free(plugin_data->lowp_m);
 	free(plugin_data->lowp_s);
 	free(plugin_data->noise_filt);
@@ -579,7 +580,7 @@ static void runAddingVynil(LADSPA_Handle instance, unsigned long sample_count) {
 	plugin_data->phi = phi;
 }
 
-void _init() {
+void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -712,7 +713,7 @@ void _init() {
 	}
 }
 
-void _fini() {
+void  __attribute__((destructor)) swh_fini() {
 	if (vynilDescriptor) {
 		free((LADSPA_PortDescriptor *)vynilDescriptor->PortDescriptors);
 		free((char **)vynilDescriptor->PortNames);

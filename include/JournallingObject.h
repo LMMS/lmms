@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _JOURNALLING_OBJECT_H
-#define _JOURNALLING_OBJECT_H
+#ifndef JOURNALLING_OBJECT_H
+#define JOURNALLING_OBJECT_H
 
 #include <QtCore/QStack>
 
@@ -50,7 +50,10 @@ public:
 
 	void restoreJournallingState()
 	{
-		m_journalling = m_journallingStateStack.pop();
+		if( !isJournallingStateStackEmpty())
+		{
+			m_journalling = m_journallingStateStack.pop();
+		}
 	}
 
 	void addJournalCheckPoint();
@@ -77,6 +80,10 @@ public:
 		return oldJournalling;
 	}
 
+	bool isJournallingStateStackEmpty() const
+	{
+		return m_journallingStateStack.isEmpty();
+	}
 
 protected:
 	void changeID( jo_id_t _id );

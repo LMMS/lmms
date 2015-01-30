@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,12 +22,12 @@
  *
  */
 
-#include <QtCore/QList>
-#include <QtCore/QUrl>
-#include <QtGui/QDesktopServices>
-#include <QtGui/QListView>
+#include <QList>
+#include <QUrl>
+#include <QDesktopServices>
+#include <QListView>
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "FileDialog.h"
 
 
@@ -41,16 +41,36 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	// Add additional locations to the sidebar
 	QList<QUrl> urls = sidebarUrls();
+#if QT_VERSION >= 0x050000
+	urls << QUrl::fromLocalFile( QStandardPaths::writableLocation( QStandardPaths::DesktopLocation ) );
+#else
 	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::DesktopLocation ) );
+#endif
 	// Find downloads directory
 	QDir downloadDir( QDir::homePath() + "/Downloads" );
 	if ( ! downloadDir.exists() )
+#if QT_VERSION >= 0x050000
+		downloadDir = QStandardPaths::writableLocation( QStandardPaths::DownloadLocation );
+#else
 		downloadDir = QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ) + "/Downloads";
+#endif
 	if ( downloadDir.exists() )
 		urls << QUrl::fromLocalFile( downloadDir.absolutePath() );
 
+#if QT_VERSION >= 0x050000
+	urls << QUrl::fromLocalFile( QStandardPaths::writableLocation( QStandardPaths::MusicLocation ) );
+#else
 	urls << QUrl::fromLocalFile( QDesktopServices::storageLocation( QDesktopServices::MusicLocation ) );
-	urls << QUrl::fromLocalFile( configManager::inst()->workingDir() );
+#endif
+	urls << QUrl::fromLocalFile( ConfigManager::inst()->workingDir() );
+
+	// Add `/Volumes` directory on OS X systems, this allows the user to browse
+	// external disk drives.
+#ifdef LMMS_BUILD_APPLE
+	QDir volumesDir( QDir("/Volumes") );
+	if ( volumesDir.exists() )
+		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+#endif
 
 	setSidebarUrls(urls);
 }
@@ -65,4 +85,4 @@ void FileDialog::clearSelection()
 }
 
 
-#include "moc_FileDialog.cxx"
+

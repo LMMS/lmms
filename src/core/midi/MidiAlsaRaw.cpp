@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,11 +22,11 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "MidiAlsaRaw.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 
 
@@ -41,7 +41,7 @@ MidiAlsaRaw::MidiAlsaRaw() :
 {
 	int err;
 	if( ( err = snd_rawmidi_open( m_inputp, m_outputp,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 								0 ) ) < 0 )
 	{
 		printf( "cannot open MIDI-device: %s\n", snd_strerror( err ) );
@@ -80,7 +80,7 @@ MidiAlsaRaw::~MidiAlsaRaw()
 
 QString MidiAlsaRaw::probeDevice()
 {
-	QString dev = configManager::inst()->value( "MidiAlsaRaw", "Device" );
+	QString dev = ConfigManager::inst()->value( "MidiAlsaRaw", "Device" );
 	if( dev == "" )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -199,7 +199,7 @@ MidiAlsaRaw::setupWidget::~setupWidget()
 
 void MidiAlsaRaw::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "MidiAlsaRaw", "Device",
+	ConfigManager::inst()->setValue( "MidiAlsaRaw", "Device",
 							m_device->text() );
 }
 

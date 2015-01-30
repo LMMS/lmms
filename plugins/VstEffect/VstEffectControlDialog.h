@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,18 +30,19 @@
 
 #include <QObject>
 #include <QPainter>
-#include <QtGui/QLabel>
+#include <QLabel>
 
 
 class VstEffectControls;
-class pixmapButton;
+class PixmapButton;
 class QPixmap;
 class QPushButton;
-class pixmapButton;
+class PixmapButton;
 
 
 class VstEffectControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	VstEffectControlDialog( VstEffectControls * _controls );
 	virtual ~VstEffectControlDialog();
@@ -52,11 +53,11 @@ protected:
 private:
 	QWidget * m_pluginWidget;
 
-	pixmapButton * m_openPresetButton;
-	pixmapButton * m_rolLPresetButton;
-	pixmapButton * m_rolRPresetButton;
-	pixmapButton * m_managePluginButton;
-	pixmapButton * m_savePresetButton;
+	PixmapButton * m_openPresetButton;
+	PixmapButton * m_rolLPresetButton;
+	PixmapButton * m_rolRPresetButton;
+	PixmapButton * m_managePluginButton;
+	PixmapButton * m_savePresetButton;
 
 	VstPlugin * m_plugin;
 

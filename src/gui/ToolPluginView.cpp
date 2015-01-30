@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,18 +26,19 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
-#include <QtGui/QIcon>
-#include <QtGui/QMdiArea>
+#include <QIcon>
+#include <QMdiArea>
 
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 
 
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 	PluginView( _toolPlugin, NULL )
 {
-	engine::mainWindow()->workspace()->addSubWindow( this );
+	gui->mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 
 	setWindowTitle( _toolPlugin->displayName() );

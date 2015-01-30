@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 Raine M. Ekman <raine/at/iki/fi>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,11 +30,14 @@
 #include "opl.h"
 
 #include "LcdSpinBox.h"
-#include "knob.h"
-#include "pixmap_button.h"
+#include "Knob.h"
+#include "PixmapButton.h"
 
-#define OPL2_VOICE_FREE 255
+// This one is a flag, MIDI notes take 7 low bits
+#define OPL2_VOICE_FREE 128
 #define OPL2_NO_VOICE 255
+#define OPL2_VOICES 9
+
 // The "normal" range for LMMS pitchbends
 #define DEFAULT_BEND_CENTS 100
 
@@ -53,13 +56,14 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
 	virtual void play( sampleFrame * _working_buffer );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	void loadSettings( const QDomElement & _this );
-	void loadPatch(unsigned char inst[14]);
+	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
+        virtual void loadFile( const QString& file );
 
 	IntModel m_patchModel;
 
@@ -111,6 +115,7 @@ private slots:
 
 private:
 	Copl *theEmulator;
+	QString storedname;
 	fpp_t frameCount;
 	short *renderbuffer;
 	int voiceNote[9];
@@ -146,46 +151,46 @@ public:
 	LcdSpinBox *m_patch;
 	void modelChanged();
 
-	knob *op1_a_kn;
-	knob *op1_d_kn;
-	knob *op1_s_kn;
-	knob *op1_r_kn;
-	knob *op1_lvl_kn;
-	knob *op1_scale_kn;
-	knob *op1_mul_kn;
-	knob *feedback_kn;
-	pixmapButton *op1_ksr_btn;
-	pixmapButton *op1_perc_btn;
-	pixmapButton *op1_trem_btn;
-	pixmapButton *op1_vib_btn;
-	pixmapButton *op1_w0_btn;
-	pixmapButton *op1_w1_btn;
-	pixmapButton *op1_w2_btn;
-	pixmapButton *op1_w3_btn;
+	Knob *op1_a_kn;
+	Knob *op1_d_kn;
+	Knob *op1_s_kn;
+	Knob *op1_r_kn;
+	Knob *op1_lvl_kn;
+	Knob *op1_scale_kn;
+	Knob *op1_mul_kn;
+	Knob *feedback_kn;
+	PixmapButton *op1_ksr_btn;
+	PixmapButton *op1_perc_btn;
+	PixmapButton *op1_trem_btn;
+	PixmapButton *op1_vib_btn;
+	PixmapButton *op1_w0_btn;
+	PixmapButton *op1_w1_btn;
+	PixmapButton *op1_w2_btn;
+	PixmapButton *op1_w3_btn;
 	automatableButtonGroup *op1_waveform;
 
 
-	knob *op2_a_kn;
-	knob *op2_d_kn;
-	knob *op2_s_kn;
-	knob *op2_r_kn;
-	knob *op2_lvl_kn;
-	knob *op2_scale_kn;
-	knob *op2_mul_kn;
-	pixmapButton *op2_ksr_btn;
-	pixmapButton *op2_perc_btn;
-	pixmapButton *op2_trem_btn;
-	pixmapButton *op2_vib_btn;
-	pixmapButton *op2_w0_btn;
-	pixmapButton *op2_w1_btn;
-	pixmapButton *op2_w2_btn;
-	pixmapButton *op2_w3_btn;
+	Knob *op2_a_kn;
+	Knob *op2_d_kn;
+	Knob *op2_s_kn;
+	Knob *op2_r_kn;
+	Knob *op2_lvl_kn;
+	Knob *op2_scale_kn;
+	Knob *op2_mul_kn;
+	PixmapButton *op2_ksr_btn;
+	PixmapButton *op2_perc_btn;
+	PixmapButton *op2_trem_btn;
+	PixmapButton *op2_vib_btn;
+	PixmapButton *op2_w0_btn;
+	PixmapButton *op2_w1_btn;
+	PixmapButton *op2_w2_btn;
+	PixmapButton *op2_w3_btn;
 	automatableButtonGroup *op2_waveform;
 
 
-	pixmapButton *fm_btn;
-	pixmapButton *vib_depth_btn;
-	pixmapButton *trem_depth_btn;
+	PixmapButton *fm_btn;
+	PixmapButton *vib_depth_btn;
+	PixmapButton *trem_depth_btn;
 
 
 

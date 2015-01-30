@@ -1,12 +1,10 @@
 /********************
  * LMMS style sheet *
  ********************/
-QLabel {
-	color: #e0e0e0;
-}
 
-QWhatsThat {
-	color: black;
+/* most foreground text items */
+QLabel, QTreeWidget, QListWidget, QGroupBox {
+	color: #e0e0e0;
 }
 
 QMdiArea {
@@ -15,6 +13,18 @@ QMdiArea {
 
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
+	color: #e0e0e0;
+	qproperty-vertexColor: #ff77af;
+	qproperty-gridColor: #808080;
+
+	qproperty-graphColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0, x2:0, y2:1,
+                     stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
+	/*#99afff;*/
+	qproperty-scaleColor: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #333, stop:1 #202020);
+	/*rgb( 32, 32, 32 );*/
 }
 
 /* text box */
@@ -41,6 +51,14 @@ QToolTip {
 	color: #4afd85;
 }
 
+TextFloat {
+	border-radius: 4px;
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
+	opacity: 175;
+	border: 1.0px solid rgba(0,0,0,255);
+	color: #4afd85;
+}
+
 
 QMenu {
 	border:1px solid #747474;
@@ -50,7 +68,7 @@ QMenu {
 
 QMenu::separator {
 	height: 1px;
-	background: #c9c9c9;
+	background: #8d8d8d;
 	margin-left: 5px;
 	margin-right: 5px;
 }
@@ -65,13 +83,11 @@ QMenu::item:selected {
 	color: white;
 	font-weight:bold;
 	background-color: #747474;
-	margin:3px;
 }
 
 QMenu::item:disabled {
 	color: #747474;
 	background-color: #c9c9c9;
-	margin:0px;
 	font-size:12px;
 	font-weight: normal;
 	padding: 4px 32px 4px 20px;
@@ -95,18 +111,22 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: rgb(0, 0, 0);
+	qproperty-gridColor: rgb( 128, 128, 128 );
+	qproperty-noteModeColor: rgb( 255, 255, 255 );
+	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-barColor: #4afd85;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-visualizationWidget  {
+VisualizationWidget  {
 	background: none;
 	border: none;
 }
 
 /* main toolbar cpu load widget - this can have transparent bg now */
 
-cpuloadWidget {
+CPULoadWidget {
 	border: none;
 	background: url(resources:cpuload_bg.png);
 }
@@ -241,7 +261,7 @@ TrackContainerView QFrame{
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
-nStateButton {
+NStateButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -249,20 +269,17 @@ nStateButton {
 }
 
 /* track background colors */
-trackContentWidget {
-	qproperty-darkerColor1: rgb( 50, 50, 50 );
-	qproperty-darkerColor2: rgb( 20, 20, 20 );
-	qproperty-darkerColor3: rgb( 15, 15, 15 );
-	qproperty-lighterColor1: rgb( 50, 50, 50 );
-	qproperty-lighterColor2: rgb( 40, 40, 40 );
-	qproperty-lighterColor3: rgb( 30, 30, 30 );
-	qproperty-gradMidPoint: 0.33;
+TrackContentWidget {
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 40, 40, 40 ), stop:1 rgb( 30, 30, 30 ) );
 }
 
 
 /* gear button in tracks */
 
-trackOperationsWidget > QPushButton {
+TrackOperationsWidget > QPushButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -271,7 +288,7 @@ trackOperationsWidget > QPushButton {
 	border:none;
 }
 
-trackOperationsWidget > QPushButton::menu-indicator {
+TrackOperationsWidget > QPushButton::menu-indicator {
 	image: url(resources:trackop.png);
 	subcontrol-origin: padding;
 	subcontrol-position: center;
@@ -279,13 +296,13 @@ trackOperationsWidget > QPushButton::menu-indicator {
 	top: 2px;
 }
 
-trackOperationsWidget > QPushButton::menu-indicator:hover {
+TrackOperationsWidget > QPushButton::menu-indicator:hover {
 	image: url(resources:trackop_h.png);
 }
 
 
-trackOperationsWidget > QPushButton::menu-indicator:pressed,
-trackOperationsWidget > QPushButton::menu-indicator:checked
+TrackOperationsWidget > QPushButton::menu-indicator:pressed,
+TrackOperationsWidget > QPushButton::menu-indicator:checked
  {
 	image: url(resources:trackop_c.png);
 	position: relative;
@@ -306,7 +323,7 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 
 /* main toolbar sliders (master vol, master pitch) */
 
-automatableSlider::groove:vertical {
+AutomatableSlider::groove:vertical {
 	background: rgba(0,0,0, 128);
 	border: 1px inset rgba(100,100,100, 64);
 	border-radius: 2px;
@@ -314,7 +331,7 @@ automatableSlider::groove:vertical {
 	margin: 2px 2px;
 }
 
-automatableSlider::handle:vertical {
+AutomatableSlider::handle:vertical {
 	background: none;
 	border-image: url(resources:main_slider.png);
 	width: 26px;
@@ -361,9 +378,17 @@ QWidget#mainToolbar {
 
 QToolBar {
 	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
+	border: none;
+	padding: 1px;
+	spacing: 0;
 }
 
-QToolButton, toolButton {
+QToolBar::separator {
+	border: none;
+	width: 5px;
+}
+
+QToolButton {
 	padding: 1px 1px 1px 1px;
 	border-radius: 2px;
 	border: 1px solid rgba(0,0,0,32);
@@ -374,12 +399,12 @@ QToolButton, toolButton {
 
 /* separate corner rounding for play and stop buttons! */
 
-toolButton#playButton {
+QToolButton#playButton {
 	border-top-left-radius: 5px 15px;
 	border-bottom-left-radius: 5px 15px;
 }
 
-toolButton#stopButton {
+QToolButton#stopButton {
 	border-top-right-radius: 5px 15px;
 	border-bottom-right-radius: 5px 15px;
 }
@@ -388,20 +413,20 @@ toolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton:hover, toolButton:hover {
+QToolButton:hover {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
 }
 
-QToolButton:pressed, toolButton:pressed {
+QToolButton:pressed {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
 	padding: 2px 1px 0px 1px;
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
 }
 
-QToolButton:checked, toolButton:checked  {
+QToolButton:checked  {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
 	border-radius: 3px;
 	padding: 2px 1px 0px 1px;
@@ -411,7 +436,7 @@ QToolButton:checked, toolButton:checked  {
 
 /* track label buttons - the part that contains the icon and track title */
 
-trackLabelButton {
+TrackLabelButton {
 	background-color: #5b6571;
 	color: #c9c9c9;
 	font-size: 11px;
@@ -421,7 +446,7 @@ trackLabelButton {
 	padding: 2px 1px;
 }
 
-trackLabelButton:hover {
+TrackLabelButton:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
@@ -429,7 +454,7 @@ trackLabelButton:hover {
 	margin: 0px;
 }
 
-trackLabelButton:pressed {
+TrackLabelButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
@@ -437,7 +462,7 @@ trackLabelButton:pressed {
 	font-weight: bold;
 }
 
-trackLabelButton:checked {
+TrackLabelButton:checked {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,128);
@@ -445,11 +470,11 @@ trackLabelButton:checked {
 	font-weight: bold;
 }
 
-trackLabelButton:checked:hover {
+TrackLabelButton:checked:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 }
 
-trackLabelButton:checked:pressed {
+TrackLabelButton:checked:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 }
 
@@ -469,7 +494,20 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 	font-size: 10px;
 }
 
-timeLine {
+FxLine {
+	background: #5b6571;
+	color: #e0e0e0;
+	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
+								stop:0 #7b838d, stop:1 #6b7581 );
+}
+
+/* persistent peak markers for fx peak meters */
+Fader {
+	qproperty-peakGreen: rgb( 74, 253, 133);
+	qproperty-peakRed: rgb( 255, 100, 100);
+}
+
+TimeLine {
 	font-size: 8px;
 }
 
@@ -485,7 +523,7 @@ TrackContainerView QLabel
 /* Patterns */
 
 /* instrument pattern */
-patternView {
+PatternView {
 	color: rgb( 119, 199, 216 );
 	qproperty-fgColor: rgb( 187, 227, 236 );
 	qproperty-textColor: rgb( 255, 255, 255 );
@@ -495,7 +533,7 @@ patternView {
 SampleTCOView {
 	color: rgb( 74, 253, 133 );
 	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 60, 60 );	
+	qproperty-textColor: rgb( 255, 60, 60 );
 }
 
 /* automation pattern */
@@ -506,13 +544,14 @@ AutomationPatternView {
 }
 
 /* bb-pattern */
-bbTCOView {
+BBTCOView {
+	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
 	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
 /* Plugins */
 
-TripleOscillatorView knob {
+TripleOscillatorView Knob {
 	color: rgb(1, 32, 64);
 	qproperty-outerColor: rgb(0, 0, 0);
 	qproperty-innerRadius: 2;
@@ -523,18 +562,29 @@ TripleOscillatorView knob {
 }
 
 
-kickerInstrumentView knob {
-	color: rgb(240, 147, 14);
-	qproperty-outerColor: rgb(30, 35, 37);
-	qproperty-innerRadius: 4;
-	qproperty-outerRadius: 11.2;
-	qproperty-centerPointX: 18.5;
-	qproperty-centerPointY: 13.5;
+kickerInstrumentView Knob#smallKnob {
+	color: #595959;
+	qproperty-outerColor: black;
+	qproperty-innerRadius: 3;
+	qproperty-outerRadius: 11.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+
+kickerInstrumentView Knob#largeKnob {
+	color: #0c3b89;
+	qproperty-outerColor: #519fff;
+	qproperty-innerRadius: 12.0;
+	qproperty-outerRadius: 14.5;
+	qproperty-centerPointX: 17.0;
+	qproperty-centerPointY: 17.0;
 	qproperty-lineWidth: 3;
 }
 
 
-AudioFileProcessorView knob {
+AudioFileProcessorView Knob {
 	color: rgb(240, 147, 14);
 	qproperty-outerColor: rgb(30, 35, 37);
 	qproperty-innerRadius: 4;
@@ -544,28 +594,33 @@ AudioFileProcessorView knob {
 	qproperty-lineWidth: 3;
 }
 
-organicInstrumentView knob {
-	color: rgb(205, 16, 216);
-	qproperty-outerColor: rgb(23, 9, 24);
-	/*qproperty-outerColor: rgb(64, 21, 67);*/
+organicInstrumentView Knob {
+	color: rgb(124, 207, 98);
+	qproperty-outerColor: rgb(13, 42, 4);
 	qproperty-innerRadius: 2;
-	qproperty-outerRadius: 8.7;
+	qproperty-outerRadius: 7.5;
 	qproperty-centerPointX: 10.5;
 	qproperty-centerPointY: 10.5;
+	qproperty-lineWidth: 1.5;
+}
+
+organicInstrumentView Knob#harmKnob {
+	color: rgb(205, 98, 216);
+	qproperty-outerColor: rgb(18, 4, 18);
+}
+
+organicInstrumentView Knob#fx1Knob,
+organicInstrumentView Knob#volKnob {
+	color: rgb(157, 157, 157);
+	qproperty-outerColor: rgb(37, 37, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 10.0;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 13.8;
 	qproperty-lineWidth: 2;
 }
 
-
-organicInstrumentView knob#fx1Knob,
-organicInstrumentView knob#volKnob {
-	qproperty-innerRadius: 4;
-	qproperty-outerRadius: 11.2;
-	qproperty-centerPointX: 18.5;
-	qproperty-centerPointY: 13.8;
-	qproperty-lineWidth: 3;
-}
-
-sf2InstrumentView knob {
+sf2InstrumentView Knob {
 	color: #ff00ea;
 	qproperty-outerColor: rgb(20, 5, 18);
 	qproperty-innerRadius: 2;
@@ -575,7 +630,7 @@ sf2InstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-sfxrInstrumentView knob {
+sfxrInstrumentView Knob {
 	color: #000;
 	qproperty-outerColor: rgb(194, 177, 145);
 	qproperty-innerRadius: 2;
@@ -583,42 +638,42 @@ sfxrInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-sfxrInstrumentView knob#envKnob {
+sfxrInstrumentView Knob#envKnob {
 	color:	#263352;
 	qproperty-outerColor: #4b66a4;
 }
 
-sfxrInstrumentView knob#freqKnob {
+sfxrInstrumentView Knob#freqKnob {
 	color:	#1e4a22;
 	qproperty-outerColor: #3c9544;
 }
 
-sfxrInstrumentView knob#changeKnob {
+sfxrInstrumentView Knob#changeKnob {
 	color:	#591c1c;
 	qproperty-outerColor: #b23737;
 }
 
-sfxrInstrumentView knob#sqrKnob {
+sfxrInstrumentView Knob#sqrKnob {
 	color:	#3b2714;
 	qproperty-outerColor: #724c27;
 }
 
-sfxrInstrumentView knob#repeatKnob {
+sfxrInstrumentView Knob#repeatKnob {
 	color:	#292929;
 	qproperty-outerColor: #515151;
 }
 
-sfxrInstrumentView knob#phaserKnob {
+sfxrInstrumentView Knob#phaserKnob {
 	color:	#144c4d;
 	qproperty-outerColor: #299899;
 }
 
-sfxrInstrumentView knob#filterKnob {
+sfxrInstrumentView Knob#filterKnob {
 	color:	#47224c;
 	qproperty-outerColor: #8e4397;
 }
 
-opl2instrumentView knob {
+opl2instrumentView Knob {
 	color: rgb(128,128,128);
 	qproperty-outerColor: rgb(255,255,255);
 	qproperty-innerRadius: 2;
@@ -626,7 +681,7 @@ opl2instrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-sidInstrumentView knob {
+sidInstrumentView Knob {
 	color: rgb(113,95,80);
 	qproperty-outerColor: rgb( 255,255,255 );
 	qproperty-innerRadius: 2;
@@ -634,7 +689,7 @@ sidInstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
-WatsynView knob {
+WatsynView Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 9.5;
@@ -642,17 +697,17 @@ WatsynView knob {
 	qproperty-lineWidth: 2;
 }
 
-WatsynView knob#aKnob {
+WatsynView Knob#aKnob {
 	color: #43b2ff;
 	qproperty-outerColor: #43b2ff;
 }
 
-WatsynView knob#bKnob {
+WatsynView Knob#bKnob {
 	color: #fc5431;
 	qproperty-outerColor: #fc5431;
 }
 
-WatsynView knob#mixKnob {
+WatsynView Knob#mixKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 	qproperty-outerRadius: 13;
@@ -660,17 +715,17 @@ WatsynView knob#mixKnob {
 	qproperty-centerPointY: 15.5;
 }
 
-WatsynView knob#mixenvKnob {
+WatsynView Knob#mixenvKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 }
 
-WatsynView knob#xtalkKnob {
+WatsynView Knob#xtalkKnob {
 	color: #fb50fb;
 	qproperty-outerColor: #fb50fb;
 }
 
-MonstroView knob {
+MonstroView Knob {
 	color: #ffffff;
 	qproperty-outerColor: #aaaaaa;
 	qproperty-outerRadius: 9;
@@ -678,6 +733,16 @@ MonstroView knob {
 	qproperty-centerPointX: 10;
 	qproperty-centerPointY: 10;
 	qproperty-lineWidth: 2.5;
+}
+
+NesInstrumentView Knob {
+	color: #e7231b;
+	qproperty-outerColor: #fff;
+	qproperty-outerRadius: 11.0;
+	qproperty-innerRadius: 8.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
 }
 
 /* palette information  */
@@ -693,5 +758,8 @@ LmmsPalette {
 	qproperty-brightText: #4afd85;
 	qproperty-highlight: #202020;
 	qproperty-highlightedText: #ffffff;
+	/* the next two are used for whatsthis dialogs */
+	qproperty-toolTipText: #000;
+	qproperty-toolTipBase: #c9c9c9;
 }
 

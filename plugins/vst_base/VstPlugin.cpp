@@ -1,9 +1,9 @@
 /*
  * VstPlugin.cpp - implementation of VstPlugin class
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,32 +24,34 @@
 
 #include "VstPlugin.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-#include <QtCore/QTemporaryFile>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
+#include <QDir>
+#include <QFileInfo>
+#include <QLocale>
+#include <QTemporaryFile>
+#include <QCloseEvent>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 #ifdef LMMS_BUILD_LINUX
-#include <QtGui/QX11EmbedContainer>
-#include <QtGui/QX11Info>
-#else
-#include <QtGui/QLayout>
+#if QT_VERSION < 0x050000
+#include <QX11EmbedContainer>
+#include <QX11Info>
 #endif
-#include <QtXml/QDomDocument>
+#else
+#include <QLayout>
+#endif
+#include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #endif
 
-#include "config_mgr.h"
-#include "engine.h"
+#include "ConfigManager.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
-#include "song.h"
+#include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
-#include <QtGui/QLayout>
+#include <QLayout>
 
 
 class vstSubWin : public QMdiSubWindow
@@ -106,11 +108,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	}
 #endif
 
-	setTempo( engine::getSong()->getTempo() );
+	setTempo( Engine::getSong()->getTempo() );
 
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ) );
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -170,10 +172,11 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 	QString p = m_plugin;
-	if( QFileInfo( p ).dir().isRelative() )
-	{
-		p = configManager::inst()->vstDir() + QDir::separator() + p;
-	}
+		if( QFileInfo( p ).dir().isRelative() )
+		{
+			p = ConfigManager::inst()->vstDir()  + p;
+		}
+
 
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
 
@@ -186,7 +189,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 	{
 		target->setFixedSize( m_pluginGeometry );
 		vstSubWin * sw = new vstSubWin(
-					engine::mainWindow()->workspace() );
+					gui->mainWindow()->workspace() );
 		sw->setWidget( helper );
 		helper->setWindowTitle( name() );
 		m_pluginWidget = helper;
@@ -235,28 +238,31 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 	if( _parent == NULL )
 	{
 		vstSubWin * sw = new vstSubWin(
-					engine::mainWindow()->workspace() );
+					gui->mainWindow()->workspace() );
 		if( isEffect )
 		{
 			sw->setAttribute( Qt::WA_TranslucentBackground );
 			sw->setWindowFlags( Qt::FramelessWindowHint );
 			sw->setWidget( m_pluginWidget );
-
+#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->show();
+#endif
 		} 
 		else
 		{
 			sw->setWindowFlags( Qt::WindowCloseButtonHint );
 			sw->setWidget( m_pluginWidget );
 
+#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->move( 4, 24 );
 			xe->show();
+#endif
 		}
 	}
 
@@ -372,7 +378,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( engine::mixer()->processingSampleRate() ) );
+			addInt( Engine::mixer()->processingSampleRate() ) );
 	unlock();
 }
 
@@ -415,7 +421,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
-			( *it ).section( ':', 1, 1 ).toFloat()
+			( *it ).section( ':', 2, -1 ).toFloat()
 		} ;
 		m.addInt( item.index );
 		m.addString( item.shortLabel );
@@ -662,5 +668,5 @@ QByteArray VstPlugin::saveChunk()
 }
 
 
-#include "moc_VstPlugin.cxx"
+
 

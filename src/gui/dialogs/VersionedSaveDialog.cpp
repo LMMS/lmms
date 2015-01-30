@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,10 @@
  */
 
 
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QLineEdit>
+#include <QLayout>
+#include <QPushButton>
+#include <QFontMetrics>
+#include <QLineEdit>
 
 #include "VersionedSaveDialog.h"
 
@@ -72,7 +72,7 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 
 bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool increment )
 {
-	static QRegExp regexp( "-\\d+(\\.\\w+)?$" );
+	static QRegExp regexp( "[- ]\\d+(\\.\\w+)?$" );
 
 	int idx = regexp.indexIn( fileName );
 	// For file names without extension (no ".mmpz")
@@ -136,4 +136,4 @@ void VersionedSaveDialog::decrementVersion()
 	selectFile( file );
 }
 
-#include "moc_VersionedSaveDialog.cxx"
+

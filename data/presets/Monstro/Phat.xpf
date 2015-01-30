@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Phat" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="81" vol="100">
+      <instrument name="monstro">
+        <monstro o1pw="79.99" v1e2="0" e2sus="1" l1att_numerator="4" e2rel="0" l1wav="3" e2dec_denominator="4" s3e1="0" o3vol="33" s3e2="0" w1l1="0" o2spo="180" w1l2="0" o2crs="0" o1ssf="0" o1pan="0" p3l1="0" o2wav="11" p3l2="0" l2rat_denominator="4" o2ftl="0" e1dec_numerator="4" e2hol_denominator="4" p2l1="0" p2l2="0" o3wav1="4" o2syn="1" l1phs="180" o3wav2="6" o2ftr="0" o1ssr="1" p1l1="0" p1l2="0" w1e1="0.659" e2hol_numerator="4" w1e2="0" l1rat="4891.4" l1rat_numerator="4" o2synr="1" p3e1="0" p3e2="0" e1att_numerator="4" e1dec_denominator="4" l2wav="0" p2e1="0" p2e2="0" e1dec="0" e1rel_denominator="4" l1att="1032" o3spo="0" p1e1="0.658" o3crs="0" p1e2="-1" e2pre_numerator="4" e1pre="0" o2pan="0" e1hol_denominator="4" syncmode="0" l2att_denominator="4" e1att="992" e1hol="0" o3syn="0" f3l1="0" l2att_numerator="4" l2phs="0" f3l2="0" e2rel_numerator="4" f2l1="0" f2l2="0" e1pre_denominator="4" l2rat="1" e2att_denominator="4" o3synr="1" e2rel_denominator="4" o1vol="33" f1l1="0" f1l2="0" e1slo="0" e2dec_numerator="4" e2dec="0" f3e1="0" f3e2="0" l2att="0" f2e1="0.896" e2pre="0" f2e2="1" o3pan="0" o23mo="3" l1att_denominator="4" f1e1="0" e2att="0" f1e2="0" e2hol="0" e1sus="1" e2pre_denominator="4" v3l1="0" v3l2="0" e2att_numerator="4" e1rel="0" e1att_denominator="4" v2l1="0" v2l2="0" l2rat_numerator="4" e1hol_numerator="4" o2vol="33" v1l1="0" o1spo="0" v1l2="0" o1crs="0" e1pre_numerator="4" e2slo="-0.103" o3sub="-100" v3e1="0" v3e2="0" o1ftl="0" v2e1="0.928" v2e2="0" s3l1="0" o1ftr="0" s3l2="0" l1rat_denominator="4" e1rel_numerator="4" v1e1="0"/>
+      </instrument>
+      <eldata fres="2.08" ftype="0" fcut="4321" fwet="0">
+        <elvol lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0" pdel="0" userwavefile="" dec="0.167" lamt="0" syncmode="0" latt="0" rel="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="1" chord-enabled="1"/>
+      <arpeggiator arptime="187" arprange="2" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="4" arpdir="4" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+      <fxchain numofeffects="1" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="4">
+            <port02 data="0.50197"/>
+            <port03 data="0.302409"/>
+            <port04 data="0.249875"/>
+            <port05 data="0.2"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps" name="file"/>
+            <attribute value="Plate2x2" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

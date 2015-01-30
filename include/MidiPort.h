@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _MIDI_PORT_H
-#define _MIDI_PORT_H
+#ifndef MIDI_PORT_H
+#define MIDI_PORT_H
 
 #include <QtCore/QString>
 #include <QtCore/QList>

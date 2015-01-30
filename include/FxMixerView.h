@@ -1,9 +1,9 @@
 /*
  * FxMixerView.h - effect-mixer-view for LMMS
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,20 +22,21 @@
  *
  */
 
-#ifndef _FX_MIXER_VIEW_H
-#define _FX_MIXER_VIEW_H
+#ifndef FX_MIXER_VIEW_H
+#define FX_MIXER_VIEW_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QScrollArea>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QStackedLayout>
+#include <QScrollArea>
 
 #include "FxLine.h"
 #include "FxMixer.h"
 #include "ModelView.h"
-#include "engine.h"
-#include "fader.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
+#include "Engine.h"
+#include "Fader.h"
+#include "PixmapButton.h"
+#include "ToolTip.h"
 #include "embed.h"
 #include "EffectRackView.h"
 
@@ -47,13 +48,16 @@ class EXPORT FxMixerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	struct FxChannelView
+	class FxChannelView
 	{
+	public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
 		FxLine * m_fxLine;
-		pixmapButton * m_muteBtn;
-		fader * m_fader;
+		PixmapButton * m_muteBtn;
+		PixmapButton * m_soloBtn;
+		Fader * m_fader;
+		EffectRackView * m_rackView;
 	};
 
 
@@ -75,6 +79,7 @@ public:
 		return m_fxChannelViews[index];
 	}
 
+
 	void setCurrentFxLine( FxLine * _line );
 	void setCurrentFxLine( int _line );
 
@@ -87,6 +92,9 @@ public:
 	// notify the view that an fx channel was deleted
 	void deleteChannel(int index);
 
+	// delete all unused channels
+	void deleteUnusedChannels();
+
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
@@ -95,9 +103,15 @@ public:
 	// useful for loading projects
 	void refreshDisplay();
 
+public slots:
+	int addNewChannel();
+
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
+	
 private slots:
 	void updateFaders();
-	void addNewChannel();
+	void toggledSolo();
 
 private:
 
@@ -108,9 +122,12 @@ private:
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
 	QWidget * m_channelAreaWidget;
-	EffectRackView * m_rackView;
+	QStackedLayout * m_racksLayout;
+	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
+	
+	friend class FxChannelView;
 } ;
 
 #endif

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef _AUDIO_DEVICE_H
-#define _AUDIO_DEVICE_H
+#ifndef AUDIO_DEVICE_H
+#define AUDIO_DEVICE_H
 
 #include <QtCore/QPair>
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 
 #include "Mixer.h"
-#include "tab_widget.h"
+#include "TabWidget.h"
 
 
 class AudioPort;
@@ -90,12 +90,12 @@ public:
 
 
 
-	class setupWidget : public tabWidget
+	class setupWidget : public TabWidget
 	{
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
-			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-					tabWidget::tr( _caption.toAscii() ) ).
+			TabWidget( TabWidget::tr( "Settings for %1" ).arg(
+					TabWidget::tr( _caption.toLatin1() ) ).
 							toUpper(), _parent )
 		{
 		}

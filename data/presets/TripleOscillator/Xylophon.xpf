@@ -1,16 +1,17 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.0" type="channelsettings" version="1.0" >
+<multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
-  <channelsettings>
-    <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="Xylophon" basetone="9" tab="2" >
-      <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="0" coarse1="0" userwavefile2="samples/empty.wav" wavetype2="0" coarse2="0" vol0="100" vol1="100" finel0="0" vol2="100" finel1="22" finel2="-25" modalgo1="1" stphdetun0="66" pan0="0" modalgo2="1" stphdetun1="275" pan1="0" stphdetun2="0" pan2="0" phoffset0="0" phoffset1="0" phoffset2="0" finer0="0" finer1="12" finer2="-13" userwavefile0="samples/empty.wav" wavetype0="0" coarse0="0" />
-      <eldata fres="0.5" ftype="1" fcut="820" fwet="0" >
-        <elvol lpdel="0" amt="1" rel="0.38" ctlenvamt="0" latt="0" sus="0.999" lspd="0.01" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0" />
-        <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
-        <elres lpdel="0" amt="0" rel="0" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
+  <instrumenttracksettings>
+    <instrumenttrack fxch="0" vol="59" name="Xylophon" tab="2">
+      <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" userwavefile1="samples/empty.wav" finer0="0" userwavefile2="samples/empty.wav" finer1="12" finer2="-13" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="22" modalgo1="1" finel2="-25" modalgo2="1" pan0="0" pan1="0" stphdetun0="66" pan2="0" stphdetun1="275" stphdetun2="0" wavetype0="0" wavetype1="0" wavetype2="0" vol0="100" vol1="100" phoffset0="0" vol2="100" phoffset1="0"/>
+      <eldata fres="0.5" ftype="1" fcut="820" fwet="0">
+        <elvol lpdel="0" ctlenvamt="0" amt="1" rel="0.38" latt="0" sus="0.999" lspd="0.01" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0"/>
+        <elcut lpdel="0" ctlenvamt="0" amt="0" rel="0.1" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5"/>
+        <elres lpdel="0" ctlenvamt="0" amt="0" rel="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5"/>
       </eldata>
-      <arpandchords chordrange="1" arprange="1" chord="0" arpgate="100" arp="0" arptime="100" arpdir="0" />
-    </channeltrack>
-  </channelsettings>
+      <arpeggiator arptime="100" arprange="1" chord="0" chordrange="1" arp="0" arp-enabled="0" chord-enabled="1" arpdir="0" arpdisabled="1" arpgate="100"/>
+      <chordcreator arptime="100" arprange="1" chord="0" chordrange="1" arp="0" arp-enabled="0" chord-enabled="1" arpdir="0" arpdisabled="1" arpgate="100"/>
+    </instrumenttrack>
+  </instrumenttracksettings>
 </multimediaproject>

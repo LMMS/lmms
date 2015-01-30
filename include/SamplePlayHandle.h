@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,16 +22,16 @@
  *
  */
 
-#ifndef _SAMPLE_PLAY_HANDLE_H
-#define _SAMPLE_PLAY_HANDLE_H
+#ifndef SAMPLE_PLAY_HANDLE_H
+#define SAMPLE_PLAY_HANDLE_H
 
 #include "Mixer.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
-class bbTrack;
+class BBTrack;
 class SampleTCO;
-class track;
+class Track;
 class AudioPort;
 
 
@@ -49,10 +49,10 @@ public:
 	}
 
 
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * buffer );
 	virtual bool isFinished() const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	f_cnt_t totalFrames() const;
 	inline f_cnt_t framesDone() const
@@ -64,7 +64,7 @@ public:
 		m_doneMayReturnTrue = _enable;
 	}
 
-	void setBBTrack( bbTrack * _bb_track )
+	void setBBTrack( BBTrack * _bb_track )
 	{
 		m_bbTrack = _bb_track;
 	}
@@ -82,14 +82,13 @@ private:
 	f_cnt_t m_frame;
 	SampleBuffer::handleState m_state;
 
-	AudioPort * m_audioPort;
 	const bool m_ownAudioPort;
 
 	FloatModel m_defaultVolumeModel;
 	FloatModel * m_volumeModel;
-	track * m_track;
+	Track * m_track;
 
-	bbTrack * m_bbTrack;
+	BBTrack * m_bbTrack;
 
 } ;
 

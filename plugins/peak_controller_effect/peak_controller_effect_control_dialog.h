@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,12 +29,13 @@
 #include "EffectControlDialog.h"
 
 class PeakControllerEffectControls;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 
 
 class PeakControllerEffectControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls );
@@ -44,14 +45,15 @@ public:
 
 
 protected:
-	knob * m_baseKnob;
-	knob * m_amountKnob;
-	knob * m_attackKnob;
-	knob * m_decayKnob;
-	ledCheckBox * m_muteLed;
+	Knob * m_baseKnob;
+	Knob * m_amountKnob;
+	Knob * m_attackKnob;
+	Knob * m_decayKnob;
+	Knob * m_tresholdKnob;
+	LedCheckBox * m_muteLed;
 
-	ledCheckBox * m_absLed;
-	knob * m_amountMultKnob;
+	LedCheckBox * m_absLed;
+	Knob * m_amountMultKnob;
 
 } ;
 

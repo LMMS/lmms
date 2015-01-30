@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,7 @@
 #include <queue>
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
-#include "note.h"
+#include "Note.h"
 #include "RemotePlugin.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
@@ -174,7 +174,7 @@ private:
 
 void RemoteZynAddSubFx::guiThread()
 {
-	int exitProgram;
+	int exitProgram = 0;
 	MasterUI * ui = NULL;
 
 	while( !m_guiExit )
@@ -268,9 +268,11 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
 	pthread_win32_process_attach_np();
 	pthread_win32_thread_attach_np();
+#endif
 #endif
 
 
@@ -283,8 +285,10 @@ int main( int _argc, char * * _argv )
 
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	pthread_win32_thread_detach_np();
 	pthread_win32_process_detach_np();
+#endif
 #endif
 
 	return 0;

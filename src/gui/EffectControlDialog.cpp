@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QCloseEvent>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
@@ -57,5 +57,5 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-#include "moc_EffectControlDialog.cxx"
+
 

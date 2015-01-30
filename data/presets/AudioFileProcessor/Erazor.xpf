@@ -1,30 +1,52 @@
-<?xml version="1.0"?>
-<!DOCTYPE multimedia-project>
-<multimedia-project creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.3.0-svn20071030" type="instrumenttracksettings" version="1.0" >
- <head/>
- <instrumenttracksettings>
-  <instrumenttrack width="250" x="0" surpos-x="0" y="0" surpos-y="0" fxch="0" height="438" basenote="69" vol="100" name="Erazor" tab="0" visible="1" >
-   <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" amp="90" src="drumsynth/misc synth/wowmelodictone.ds" />
-   <eldata fres="3.51" ftype="0" fcut="2940" fwet="0" >
-    <elvol lspd_numerator="4" lpdel="0" amt="1" rel="0.23" ctlenvamt="0" latt="0" syncmode="0" sus="0.05" lspd_denominator="4" lspd="0.1" att="0" pdel="0" lamt="0" dec="0" userwavefile="" x100="0" lshp="0" hold="0" />
-    <elcut lspd_numerator="4" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" syncmode="0" sus="0.5" lspd_denominator="4" lspd="0.01" att="0" pdel="0" lamt="1" dec="0.5" userwavefile="" x100="0" lshp="0" hold="0.5" />
-    <elres lspd_numerator="4" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" syncmode="0" sus="0.5" lspd_denominator="4" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" userwavefile="" x100="0" lshp="0" hold="0.5" />
-   </eldata>
-   <arpandchords arpmode="0" chordrange="3" arp-enabled="0" arptime_numerator="4" arprange="2" chord-enabled="1" arptime_denominator="4" chord="0" syncmode="0" arpgate="100" arp="0" arptime="100" arpdir="0" />
-   <midi defvelout="0" inputchannel="0" outputchannel="1" receive="0" send="0" defvelin="0" />
-   <fx fxdisabled="0" >
-    <rack numofeffects="3" >
-     <effect key="AAAAAgAAAAIAAAADAAAAbABDAEEAUABTADoAIABQAGwAYQB0AGUAMgB4ADIAIAAtACAAVgBlAHIAcwBhAHQAaQBsAGUAIABwAGwAYQB0AGUAIAByAGUAdgBlAHIAYgAsACAAcwB0AGUAcgBlAG8AIABpAG4AcAB1AHQAcwAAAAQAAAACAAAAEABQAGwAYQB0AGUAMgB4ADIAAAAOAGMAYQBwAHMALgBzAG8=" autoquit="0" name="ladspaeffect" gate="0" wet="1" on="1" >
-      <ladspacontrols port02="0.50197" port03="0.3745" port04="0.249875" port05="0.25" ports="4" />
-     </effect>
-     <effect key="AAAAAgAAAAIAAAADAAAATABGAGUAZQBkAGIAYQBjAGsAIABEAGUAbABhAHkAIABMAGkAbgBlACAAKABNAGEAeABpAG0AdQBtACAARABlAGwAYQB5ACAANQBzACkAAAAEAAAAAgAAABQAZgBiAGQAZQBsAGEAeQBfADUAcwAAAAwAYwBtAHQALgBzAG8=" autoquit="0" name="ladspaeffect" gate="0" wet="1" on="1" >
-      <ladspacontrols port10="200" port11="0.24" port00="200" port01="0.24" port10_numerator="4" port14="0.5" port04link="1" port04="0.5" port01link="1" syncmode="0" port00link="1" link="1" ports="6" port10_denominator="4" port00_numerator="4" port00_denominator="4" />
-     </effect>
-     <effect key="AAAAAgAAAAIAAAADAAAAFgBiAGEAcwBzAGIAbwBvAHMAdABlAHIAAAAA/////wAA" autoquit="0" name="bassbooster" gate="0" wet="1" on="1" >
-      <bassboostercontrols ratio="2" freq="100" gain="1" />
-     </effect>
-    </rack>
-   </fx>
-  </instrumenttrack>
- </instrumenttracksettings>
-</multimedia-project>
+<?xml version='1.0'?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Erazor" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="69" vol="100">
+      <instrument name="audiofileprocessor">
+        <audiofileprocessor reversed="0" looped="0" eframe="1" stutter="0" sframe="0" src="drumsynth/misc_synth/wowmelodictone.ds" amp="90"/>
+      </instrument>
+      <eldata fres="3.51" ftype="0" fcut="2940" fwet="0">
+        <elvol lspd_denominator="4" sustain="0.95" userwavefile="" pdel="0" dec="0" lamt="0" syncmode="0" latt="0" rel="0.23" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.5" lamt="1" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.01" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="3" chord-enabled="1"/>
+      <arpeggiator arptime="100" arprange="2" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
+      <fxchain numofeffects="3" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="4">
+            <port02 data="0.50197"/>
+            <port03 data="0.3745"/>
+            <port04 data="0.249875"/>
+            <port05 data="0.25"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps.so" name="file"/>
+            <attribute value="Plate2x2" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols link="1" ports="6">
+            <port00 data_numerator="4" data_denominator="4" syncmode="0" link="1" data="200"/>
+            <port01 link="1" data="0.24"/>
+            <port04 link="1" data="0.5"/>
+            <port10 data_numerator="4" data_denominator="4" syncmode="0" data="200"/>
+            <port11 data="0.24"/>
+            <port14 data="0.5"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="cmt.so" name="file"/>
+            <attribute value="fbdelay_5s" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="bassbooster" wet="1" on="1">
+          <bassboostercontrols ratio="2" freq="100" gain="1"/>
+          <key/>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

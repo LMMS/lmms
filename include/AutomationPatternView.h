@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,12 @@
 #ifndef AUTOMATION_PATTERN_VIEW_H
 #define AUTOMATION_PATTERN_VIEW_H
 
-#include "track.h"
+#include "Track.h"
 
 class AutomationPattern;
 
 
-class AutomationPatternView : public trackContentObjectView
+class AutomationPatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
@@ -39,10 +39,12 @@ class AutomationPatternView : public trackContentObjectView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	AutomationPatternView( AutomationPattern * _pat, trackView * _parent );
+	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
 	virtual ~AutomationPatternView();
 
 public slots:
+	/// Opens this view's pattern in the global automation editor
+	void openInAutomationEditor();
 	virtual void update();
 
 
@@ -50,16 +52,18 @@ protected slots:
 	void resetName();
 	void changeName();
 	void disconnectObject( QAction * _a );
-
+	void toggleRecording();
+	void flipY();
+	void flipX();
 
 protected:
 	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent(QMouseEvent * me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re )
 	{
 		m_needsUpdate = true;
-		trackContentObjectView::resizeEvent( _re );
+		TrackContentObjectView::resizeEvent( _re );
 	}
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
@@ -69,6 +73,8 @@ private:
 	AutomationPattern * m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
+	
+	static QPixmap * s_pat_rec;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;

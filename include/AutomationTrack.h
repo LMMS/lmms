@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,11 +27,12 @@
 #ifndef AUTOMATION_TRACK_H
 #define AUTOMATION_TRACK_H
 
-#include "track.h"
+#include "Track.h"
 
 
-class AutomationTrack : public track
+class AutomationTrack : public Track
 {
+	Q_OBJECT
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
 	virtual ~AutomationTrack();
@@ -44,8 +45,8 @@ public:
 		return "automationtrack";
 	}
 
-	virtual trackView * createView( TrackContainerView* );
-	virtual trackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackView * createView( TrackContainerView* );
+	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
@@ -58,7 +59,7 @@ private:
 
 
 
-class AutomationTrackView : public trackView
+class AutomationTrackView : public TrackView
 {
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );

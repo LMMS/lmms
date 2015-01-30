@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,19 +24,20 @@
  */
 
 
-#ifndef _SF2_PLAYER_H
-#define _SF2_PLAYER_H
+#ifndef SF2_PLAYER_H
+#define SF2_PLAYER_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 
 #include "Instrument.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "InstrumentView.h"
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "led_checkbox.h"
+#include "LedCheckbox.h"
 #include "fluidsynth.h"
 #include "SampleBuffer.h"
+#include "MemoryManager.h"
 
 class sf2InstrumentView;
 class sf2Font;
@@ -45,6 +46,7 @@ class NotePlayHandle;
 class patchesDialog;
 class QLabel;
 
+struct SF2PluginData;
 
 class sf2Instrument : public Instrument
 {
@@ -79,7 +81,7 @@ public:
 
 	virtual Flags flags() const
 	{
-		return IsSingleStreamed | IsMidiBased;
+		return IsSingleStreamed;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
@@ -149,9 +151,14 @@ private:
 	FloatModel m_chorusSpeed;
 	FloatModel m_chorusDepth;
 
+	QVector<NotePlayHandle *> m_playingNotes;
+	QMutex m_playingNotesMutex;
 
 private:
 	void freeFont();
+	void noteOn( SF2PluginData * n );
+	void noteOff( SF2PluginData * n );
+	void renderFrames( f_cnt_t frames, sampleFrame * buf );
 
 	friend class sf2InstrumentView;
 
@@ -167,6 +174,7 @@ signals:
 // A soundfont in our font-map
 class sf2Font
 {
+	MM_OPERATORS
 public:
 	sf2Font( fluid_sfont_t * f ) :
 		fluidFont( f ),
@@ -190,8 +198,8 @@ public:
 private:
 	virtual void modelChanged();
 
-	pixmapButton * m_fileDialogButton;
-	pixmapButton * m_patchDialogButton;
+	PixmapButton * m_fileDialogButton;
+	PixmapButton * m_patchDialogButton;
 
 	LcdSpinBox * m_bankNumLcd;
 	LcdSpinBox * m_patchNumLcd;
@@ -199,19 +207,19 @@ private:
 	QLabel * m_filenameLabel;
 	QLabel * m_patchLabel;
 
-	knob	* m_gainKnob;
+	Knob	* m_gainKnob;
 
-	pixmapButton * m_reverbButton;
-	knob	* m_reverbRoomSizeKnob;
-	knob	* m_reverbDampingKnob;
-	knob	* m_reverbWidthKnob;
-	knob	* m_reverbLevelKnob;
+	PixmapButton * m_reverbButton;
+	Knob	* m_reverbRoomSizeKnob;
+	Knob	* m_reverbDampingKnob;
+	Knob	* m_reverbWidthKnob;
+	Knob	* m_reverbLevelKnob;
 
-	pixmapButton * m_chorusButton;
-	knob * m_chorusNumKnob;
-	knob * m_chorusLevelKnob;
-	knob * m_chorusSpeedKnob;
-	knob * m_chorusDepthKnob;
+	PixmapButton * m_chorusButton;
+	Knob * m_chorusNumKnob;
+	Knob * m_chorusLevelKnob;
+	Knob * m_chorusSpeedKnob;
+	Knob * m_chorusDepthKnob;
 
 	static patchesDialog * s_patchDialog;
 

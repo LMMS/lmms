@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,6 +30,7 @@
 
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
+#include "ValueBuffer.h"
 
 
 typedef struct PortDescription port_desc_t;
@@ -44,6 +45,7 @@ public:
 	~LadspaControl();
 
 	LADSPA_Data value();
+	ValueBuffer * valueBuffer();
 	void setValue( LADSPA_Data _value );
 	void setLink( bool _state );
 

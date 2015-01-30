@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,9 +27,9 @@
 #define _LADSPA_DESCRIPTION_H
 
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 
 
 class QListWidgetItem;

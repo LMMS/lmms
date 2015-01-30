@@ -1,10 +1,10 @@
 /*
  * AutomationEditor.h - declaration of class AutomationEditor which is a window
- *                      where you can edit dynamic values in an easy way
+ *					  where you can edit dynamic values in an easy way
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,58 +23,75 @@
  *
  */
 
-#ifndef _AUTOMATION_EDITOR_H
-#define _AUTOMATION_EDITOR_H
+#ifndef AUTOMATION_EDITOR_H
+#define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
-#include <QtGui/QWidget>
+#include <QWidget>
+
+#include "Editor.h"
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
 #include "MidiTime.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
-#include "knob.h"
-
+#include "Knob.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class comboBox;
+class ComboBox;
 class NotePlayHandle;
-class timeLine;
-class toolButton;
+class TimeLineWidget;
+
 
 
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
+	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
+	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
+	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 public:
-	void setCurrentPattern( AutomationPattern * _new_pattern );
+	void setCurrentPattern(AutomationPattern * new_pattern);
 
 	inline const AutomationPattern * currentPattern() const
 	{
-		return( m_pattern );
+		return m_pattern;
 	}
 
 	inline bool validPattern() const
 	{
-		return( m_pattern != NULL );
+		return m_pattern != nullptr;
 	}
 
-	int quantization() const;
-
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
+	virtual void loadSettings(const QDomElement & parent);
+	QString nodeName() const
 	{
-		return( "automationeditor" );
+		return "automationeditor";
 	}
 
-	void setPauseIcon( bool pause );
+	// qproperty access methods
+	QColor gridColor() const;
+	QBrush graphColor() const;
+	QColor vertexColor() const;
+	QBrush scaleColor() const;
+	void setGridColor(const QColor& c);
+	void setGraphColor(const QBrush& c);
+	void setVertexColor(const QColor& c);
+	void setScaleColor(const QBrush& c);
 
+	enum EditModes
+	{
+		DRAW,
+		ERASE,
+		SELECT,
+		MOVE
+	};
 
 public slots:
 	void update();
@@ -84,67 +101,56 @@ public slots:
 protected:
 	typedef AutomationPattern::timeMap timeMap;
 
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void keyPressEvent(QKeyEvent * ke);
+	virtual void leaveEvent(QEvent * e);
+	virtual void mousePressEvent(QMouseEvent * mouseEvent);
+	virtual void mouseReleaseEvent(QMouseEvent * mouseEvent);
+	virtual void mouseMoveEvent(QMouseEvent * mouseEvent);
+	virtual void paintEvent(QPaintEvent * pe);
+	virtual void resizeEvent(QResizeEvent * re);
+	virtual void wheelEvent(QWheelEvent * we);
 
-	float getLevel( int _y );
-	int xCoordOfTick( int _tick );
-	int yCoordOfLevel( float _level );
-	inline void drawLevelTick( QPainter & _p, int _tick,
-					float _value, bool _is_selected );
+	float getLevel( int y );
+	int xCoordOfTick( int tick );
+	int yCoordOfLevel( float level );
+	inline void drawLevelTick( QPainter & p, int tick,
+					float value, bool is_selected );
 	void removeSelection();
 	void selectAll();
-	void getSelectedValues( timeMap & _selected_values );
+	void getSelectedValues(timeMap & selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	void disableTensionKnob();
 
 protected slots:
 	void play();
 	void stop();
 
-	void horScrolled( int _new_pos );
-	void verScrolled( int _new_pos );
+	void horScrolled( int new_pos );
+	void verScrolled( int new_pos );
 
-	void drawButtonToggled();
-	void eraseButtonToggled();
-	void selectButtonToggled();
-	void moveButtonToggled();
+	void setEditMode(AutomationEditor::EditModes mode);
+	void setEditMode(int mode);
 
-	void discreteButtonToggled();
-	void linearButtonToggled();
-	void cubicHermiteButtonToggled();
-	void tensionChanged();
+	void setProgressionType(AutomationPattern::ProgressionTypes type);
+	void setProgressionType(int type);
+	void setTension();
 
 	void copySelectedValues();
 	void cutSelectedValues();
 	void pasteValues();
 	void deleteSelectedValues();
 
-	void updatePosition( const MidiTime & _t );
+	void updatePosition( const MidiTime & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
 
+	/// Updates the pattern's quantization using the current user selected value.
+	void setQuantization();
 
 private:
 
-	enum editModes
-	{
-		DRAW,
-		ERASE,
-		SELECT,
-		MOVE
-	} ;
-
-	enum actions
+	enum Actions
 	{
 		NONE,
 		MOVE_VALUE,
@@ -153,11 +159,8 @@ private:
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 860;
-	static const int INITIAL_HEIGHT = 480;
-
 	static const int SCROLLBAR_SIZE = 16;
-	static const int TOP_MARGIN = 48;
+	static const int TOP_MARGIN = 16;
 
 	static const int DEFAULT_Y_DELTA = 6;
 	static const int DEFAULT_STEPS_PER_TACT = 16;
@@ -169,40 +172,18 @@ private:
 	AutomationEditor( const AutomationEditor & );
 	virtual ~AutomationEditor();
 
-
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
-
-
-	QWidget * m_toolBar;
-
-	toolButton * m_playButton;
-	toolButton * m_stopButton;
-
-	toolButton * m_drawButton;
-	toolButton * m_eraseButton;
-	toolButton * m_selectButton;
-	toolButton * m_moveButton;
-
-	toolButton * m_discreteButton;
-	toolButton * m_linearButton;
-	toolButton * m_cubicHermiteButton;
-	knob * m_tensionKnob;
-	FloatModel * m_tensionModel;
-
-	toolButton * m_cutButton;
-	toolButton * m_copyButton;
-	toolButton * m_pasteButton;
-
-	comboBox * m_zoomingXComboBox;
-	comboBox * m_zoomingYComboBox;
-	comboBox * m_quantizeComboBox;
+	static QPixmap * s_toolYFlip;
+	static QPixmap * s_toolXFlip;
 
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
+
+	FloatModel * m_tensionModel;
 
 	QMutex m_patternMutex;
 	AutomationPattern * m_pattern;
@@ -220,7 +201,7 @@ private:
 
 	MidiTime m_currentPosition;
 
-	actions m_action;
+	Actions m_action;
 
 	tick_t m_selectStartTick;
 	tick_t m_selectedTick;
@@ -242,26 +223,80 @@ private:
 	timeMap m_selValuesForMove;
 
 
-	editModes m_editMode;
+	EditModes m_editMode;
 
 
-	timeLine * m_timeLine;
+	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void drawCross( QPainter & _p );
+	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 
+	QColor m_gridColor;
+	QBrush m_graphColor;
+	QColor m_vertexColor;
+	QBrush m_scaleColor;
 
-
-	friend class engine;
+	//friend class Engine;
+	friend class AutomationEditorWindow;
 
 
 signals:
 	void currentPatternChanged();
 	void positionChanged( const MidiTime & );
-
 } ;
+
+
+
+class AutomationEditorWindow : public Editor
+{
+	Q_OBJECT
+
+	static const int INITIAL_WIDTH = 860;
+	static const int INITIAL_HEIGHT = 480;
+public:
+	AutomationEditorWindow();
+	~AutomationEditorWindow();
+
+	void setCurrentPattern(AutomationPattern* pattern);
+	const AutomationPattern* currentPattern();
+
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+
+	void open(AutomationPattern* pattern);
+
+	AutomationEditor* m_editor;
+
+	QSize sizeHint() const;
+
+public slots:
+	void clearCurrentPattern();
+
+signals:
+	void currentPatternChanged();
+
+protected slots:
+	void play();
+	void stop();
+
+private:
+	QAction* m_discreteAction;
+	QAction* m_linearAction;
+	QAction* m_cubicHermiteAction;
+
+	QAction* m_flipYAction;
+	QAction* m_flipXAction;
+
+	Knob * m_tensionKnob;
+
+	ComboBox * m_zoomingXComboBox;
+	ComboBox * m_zoomingYComboBox;
+	ComboBox * m_quantizeComboBox;
+
+	friend class Engine;
+};
 
 
 #endif

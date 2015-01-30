@@ -4,7 +4,7 @@
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,14 +23,15 @@
  *
  */
 
-#ifndef _DETUNING_HELPER_H
-#define _DETUNING_HELPER_H
+#ifndef DETUNING_HELPER_H
+#define DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
-
+#include "MemoryManager.h"
 
 class DetuningHelper : public InlineAutomation
 {
+	MM_OPERATORS
 public:
 	DetuningHelper() :
 		InlineAutomation()

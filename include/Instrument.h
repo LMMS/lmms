@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,26 +23,28 @@
  *
  */
 
-#ifndef _INSTRUMENT_H
-#define _INSTRUMENT_H
+#ifndef INSTRUMENT_H
+#define INSTRUMENT_H
 
-#include <QtGui/QWidget>
-
+#include <QString>
+#include <QtGlobal>
+#include "export.h"
+#include "lmms_basics.h"
+#include "MemoryManager.h"
+#include "MidiTime.h"
 #include "Plugin.h"
-#include "Mixer.h"
 
 
 // forward-declarations
 class InstrumentTrack;
-class InstrumentView;
 class MidiEvent;
-class MidiTime;
 class NotePlayHandle;
-class track;
+class Track;
 
 
 class EXPORT Instrument : public Plugin
 {
+	MM_OPERATORS
 public:
 	enum Flag
 	{
@@ -101,7 +103,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime() )
+	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
 	{
 		return true;
 	}
@@ -117,15 +119,15 @@ public:
 	static Instrument * instantiate( const QString & _plugin_name,
 									InstrumentTrack * _instrument_track );
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
-
-protected:
 	inline InstrumentTrack * instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
+
+protected:
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left

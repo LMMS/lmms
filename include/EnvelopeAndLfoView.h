@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,7 @@
 #ifndef ENVELOPE_AND_LFO_VIEW_H
 #define ENVELOPE_AND_LFO_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 
@@ -36,9 +36,9 @@ class QPixmap;
 class EnvelopeAndLfoParameters;
 
 class automatableButtonGroup;
-class knob;
-class ledCheckBox;
-class pixmapButton;
+class Knob;
+class LedCheckBox;
+class PixmapButton;
 class TempoSyncKnob;
 
 
@@ -72,25 +72,26 @@ private:
 
 
 	// envelope stuff
-	knob * m_predelayKnob;
-	knob * m_attackKnob;
-	knob * m_holdKnob;
-	knob * m_decayKnob;
-	knob * m_sustainKnob;
-	knob * m_releaseKnob;
-	knob * m_amountKnob;
+	Knob * m_predelayKnob;
+	Knob * m_attackKnob;
+	Knob * m_holdKnob;
+	Knob * m_decayKnob;
+	Knob * m_sustainKnob;
+	Knob * m_releaseKnob;
+	Knob * m_amountKnob;
 
 	// LFO stuff
-	knob * m_lfoPredelayKnob;
-	knob * m_lfoAttackKnob;
+	Knob * m_lfoPredelayKnob;
+	Knob * m_lfoAttackKnob;
 	TempoSyncKnob * m_lfoSpeedKnob;
-	knob * m_lfoAmountKnob;
-	pixmapButton * m_userLfoBtn;
+	Knob * m_lfoAmountKnob;
+	PixmapButton * m_userLfoBtn;
 	automatableButtonGroup * m_lfoWaveBtnGrp;
 
-	ledCheckBox * m_x100Cb;
-	ledCheckBox * m_controlEnvAmountCb;
-
+	LedCheckBox * m_x100Cb;
+	LedCheckBox * m_controlEnvAmountCb;
+	
+	float m_randomGraph;
 } ;
 
 #endif

@@ -1,0 +1,31 @@
+Zynaddsubfx
+===========
+:Author: Paul Nasca and Mark McCurry
+
+This documentation is a work in progress
+
+include::intro.txt[]
+
+include::filter.txt[]
+
+include::lfo.txt[]
+
+include::envelope.txt[]
+
+include::adsynth.txt[]
+
+include::controller.txt[]
+
+include::effects.txt[]
+
+/////////////////////////////
+include::nrpn.txt[]
+/////////////////////////////
+
+include::saving.txt[]
+
+include::mididefaults.txt[]
+
+include::build.txt[]
+
+include::getting.txt[]

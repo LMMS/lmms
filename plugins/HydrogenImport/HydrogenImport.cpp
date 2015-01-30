@@ -1,22 +1,22 @@
-#include <QtXml/QDomDocument>
-#include <QtCore/QDir>
-#include <QtGui/QApplication>
-#include <QtGui/QMessageBox>
-#include <QtGui/QProgressDialog>
+#include <QDomDocument>
+#include <QDir>
+#include <QApplication>
+#include <QMessageBox>
+#include <QProgressDialog>
 #include <QTextStream>
 #include <stdlib.h>
 
 #include "LocalFileMng.h"
 #include "HydrogenImport.h"
-#include "song.h"
-#include "engine.h"
+#include "Song.h"
+#include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "note.h"
-#include "pattern.h"
-#include "track.h"
-#include "bb_track.h"
-#include "bb_track_container.h"
+#include "Note.h"
+#include "Pattern.h"
+#include "Track.h"
+#include "BBTrack.h"
+#include "BBTrackContainer.h"
 #include "Instrument.h"
 
 #define MAX_LAYERS 4
@@ -143,7 +143,7 @@ bool HydrogenImport::readSong()
 	QHash<QString, int> pattern_length;
 	QHash<QString, int> pattern_id;
 
-	song *s = engine::getSong();
+	Song *s = Engine::getSong();
 	int song_num_tracks = s->tracks().size();
 	if ( QFile( filename ).exists() == false ) 
 	{
@@ -213,7 +213,7 @@ bool HydrogenImport::readSong()
 
 					if ( nLayer == 0 ) 
 					{
-						drum_track[sId] = ( InstrumentTrack * ) track::create( track::InstrumentTrack,engine::getBBTrackContainer() );
+						drum_track[sId] = ( InstrumentTrack * ) Track::create( Track::InstrumentTrack,Engine::getBBTrackContainer() );
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
 						ins = drum_track[sId]->loadInstrument( "audiofileprocessor" );
@@ -237,7 +237,7 @@ bool HydrogenImport::readSong()
 	}
 	QDomNode patterns = songNode.firstChildElement( "patternList" );
 	int pattern_count = 0;
-	int nbb = engine::getBBTrackContainer()->numOfBBs();
+	int nbb = Engine::getBBTrackContainer()->numOfBBs();
 	QDomNode patternNode =  patterns.firstChildElement( "pattern" );
 	int pn = 1;
 	while (  !patternNode.isNull()  ) 
@@ -270,8 +270,8 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + nbb;
 				pattern_id[sName] = pattern_count - 1;
-				pattern *p = dynamic_cast<pattern *>( drum_track[instrId]->getTCO( i ) );
-				note n; 
+				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getTCO( i ) );
+				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
 				{
@@ -305,8 +305,8 @@ bool HydrogenImport::readSong()
 			patternId = ( QDomNode ) patternId.nextSiblingElement( "patternID" );
 
 			int i = pattern_id[patId]+song_num_tracks;
-			track *t = ( bbTrack * ) s->tracks().at( i );
- 			trackContentObject *tco = t->createTCO( pos );      
+			Track *t = ( BBTrack * ) s->tracks().at( i );
+ 			TrackContentObject *tco = t->createTCO( pos );      
 			tco->movePosition( pos );
 
 			

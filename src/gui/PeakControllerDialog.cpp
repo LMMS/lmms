@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,24 +24,24 @@
  */
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
+#include <QLabel>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "MainWindow.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 #include "PeakController.h"
 #include "ControllerDialog.h"
-#include "knob.h"
+#include "Knob.h"
 #include "TempoSyncKnob.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
@@ -51,7 +51,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 256, 64 );
 	
-	toolTip::add( this, tr( "LFO Controller" ) );
+	ToolTip::add( this, tr( "LFO Controller" ) );
 
 	QLabel * l = new QLabel( this );
 	l->setText( "Use FX's controls" );

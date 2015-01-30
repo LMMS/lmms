@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,13 +22,13 @@
  *
  */
 
-#include <QtGui/QStyleOptionToolButton>
-#include <QtGui/QStylePainter>
-#include <QtGui/QToolButton>
+#include <QStyleOptionToolButton>
+#include <QStylePainter>
+#include <QToolButton>
 
 #include "SideBar.h"
 #include "SideBarWidget.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 // internal helper class allowing to create QToolButtons with
@@ -107,57 +107,60 @@ SideBar::~SideBar()
 
 
 
-void SideBar::appendTab( SideBarWidget * _sbw )
+void SideBar::appendTab( SideBarWidget *widget )
 {
-	SideBarButton * btn = new SideBarButton( orientation(), this );
-	btn->setText( _sbw->title() );
-	btn->setIcon( _sbw->icon() );
-	btn->setCheckable( true );
-	m_widgets[btn] = _sbw;
-	m_btnGroup.addButton( btn );
-	addWidget( btn );
+	SideBarButton *button = new SideBarButton( orientation(), this );
+	button->setText( widget->title() );
+	button->setIcon( widget->icon() );
+	button->setCheckable( true );
+	m_widgets[button] = widget;
+	m_btnGroup.addButton( button );
+	addWidget( button );
 
-	_sbw->hide();
-	_sbw->setMinimumWidth( 200 );
+	widget->hide();
+	widget->setMinimumWidth( 200 );
 
-	toolTip::add( btn, _sbw->title() );
+	ToolTip::add( button, widget->title() );
 }
 
 
 
 
-void SideBar::toggleButton( QAbstractButton * _btn )
+void SideBar::toggleButton( QAbstractButton * button )
 {
-	QToolButton * toolButton = NULL;
-	QWidget * activeWidget = NULL;
-	for( ButtonMap::Iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+	QToolButton *toolButton = NULL;
+	QWidget *activeWidget = NULL;
+
+	for( auto it = m_widgets.begin(); it != m_widgets.end(); ++it )
 	{
-		QToolButton * curBtn = it.key();
-		if( curBtn != _btn )
+		QToolButton *curBtn = it.key();
+		QWidget *curWidget = it.value();
+
+		if( curBtn == button )
+		{
+			toolButton = curBtn;
+			activeWidget = curWidget;
+		}
+		else
 		{
 			curBtn->setChecked( false );
 			curBtn->setToolButtonStyle( Qt::ToolButtonIconOnly );
 		}
-		else
+
+		if( curWidget )
 		{
-			toolButton = it.key();
-			activeWidget = it.value();
-		}
-		if( it.value() )
-		{
-			it.value()->hide();
+			curWidget->hide();
 		}
 	}
 
 	if( toolButton && activeWidget )
 	{
-		activeWidget->setVisible( _btn->isChecked() );
-		toolButton->setToolButtonStyle( _btn->isChecked() ?
+		activeWidget->setVisible( button->isChecked() );
+		toolButton->setToolButtonStyle( button->isChecked() ?
 				Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
 	}
 }
 
 
-#include "moc_SideBar.cxx"
+
 

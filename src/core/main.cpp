@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,18 +27,25 @@
 #include "lmmsversion.h"
 #include "versioninfo.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-#include <QtCore/QProcess>
-#include <QtCore/QTimer>
-#include <QtCore/QTranslator>
-#include <QtGui/QApplication>
-#include <QtGui/QBitmap>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QMessageBox>
-#include <QtGui/QPainter>
-#include <QtGui/QSplashScreen>
+// denormals stripping
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
+
+#include <QFileInfo>
+#include <QLocale>
+#include <QTimer>
+#include <QTranslator>
+#include <QApplication>
+#include <QMessageBox>
+#include <QTextStream>
+
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
 
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
@@ -56,16 +63,16 @@
 #include <unistd.h>
 #endif
 
-#include "config_mgr.h"
-#include "embed.h"
-#include "engine.h"
-#include "LmmsStyle.h"
+#include "MemoryManager.h"
+#include "ConfigManager.h"
+#include "NotePlayHandle.h"
+#include "Engine.h"
+#include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "DataFile.h"
-#include "song.h"
-#include "LmmsPalette.h"
+#include "Song.h"
 
 static inline QString baseName( const QString & _file )
 {
@@ -75,7 +82,7 @@ static inline QString baseName( const QString & _file )
 
 
 inline void loadTranslation( const QString & _tname,
-	const QString & _dir = configManager::inst()->localeDir() )
+	const QString & _dir = ConfigManager::inst()->localeDir() )
 {
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = _tname + ".qm";
@@ -89,13 +96,27 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
+	// initialize memory managers
+	MemoryManager::init();
+	NotePlayHandleManager::init();
+
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
+
+	// set denormal protection for this thread
+	#ifdef __SSE3__
+	/* DAZ flag */
+	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
+	#endif
+	#ifdef __SSE__
+	/* FTZ flag */
+	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
+	#endif
 
 	bool core_only = false;
 	bool fullscreen = true;
 	bool exit_after_import = false;
-	QString file_to_load, file_to_save, file_to_import, render_out;
+	QString file_to_load, file_to_save, file_to_import, render_out, profilerOutputFile;
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -131,13 +152,13 @@ int main( int argc, char * * argv )
 		if( QString( argv[i] ) == "--version" ||
 						QString( argv[i] ) == "-v" )
 		{
-			printf( "\nLinux MultiMedia Studio %s\n(%s %s, Qt %s, %s)\n\n"
+			printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
 	"Copyright (c) 2004-2014 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
 	"version 2 of the License, or (at your option) any later version.\n\n"
-	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION, 
+	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
 				PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
 				argv[0] );
 
@@ -146,7 +167,7 @@ int main( int argc, char * * argv )
 		else if( argc > i && ( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) )
 		{
-			printf( "\nLinux MultiMedia Studio %s\n"
+			printf( "LMMS %s\n"
 	"Copyright (c) 2004-2014 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
 	"            [ -u <in> <out> ]\n"
@@ -170,6 +191,7 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
+	"-a, --float			32bit float bit depth\n"
 	"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
 	"       standard out is used if no output file is specifed\n"
 	"-d, --dump <in>			dump XML of compressed file <in>\n"
@@ -275,6 +297,12 @@ int main( int argc, char * * argv )
 			}
 			++i;
 		}
+		else if ( argc > i &&
+				  ( QString( argv[i] ) =="--float" ||
+						QString( argv[i] ) == "-a" ) )
+		{
+			os.depth = ProjectRenderer::Depth_32Bit;
+		}
 		else if( argc > i &&
 				( QString( argv[i] ) == "--interpolation" ||
 						QString( argv[i] ) == "-i" ) )
@@ -341,6 +369,11 @@ int main( int argc, char * * argv )
 				exit_after_import = true;
 			}
 		}
+		else if( argc > i && ( QString( argv[i] ) == "--profile" || QString( argv[i] ) == "-p" ) )
+		{
+			profilerOutputFile = argv[i+1];
+			++i;
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -354,11 +387,18 @@ int main( int argc, char * * argv )
 	}
 
 
-	QString pos = QLocale::system().name().left( 2 );
+	ConfigManager::inst()->loadConfigFile();
+
+	// set language
+	QString pos = ConfigManager::inst()->value( "app", "language" );
+	if( pos.isEmpty() )
+	{
+		pos = QLocale::system().name().left( 2 );
+	}
 
 #ifdef LMMS_BUILD_WIN32
 #undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR configManager::inst()->localeDir()
+#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
 #endif
 
 #ifdef QT_TRANSLATIONS_DIR
@@ -385,43 +425,26 @@ int main( int argc, char * * argv )
 #endif
 #endif
 
-	configManager::inst()->loadConfigFile();
+#ifdef LMMS_BUILD_WIN32
+	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
+	{
+		printf( "Notice: could not set high priority.\n" );
+	}
+#endif
 
 	if( render_out.isEmpty() )
 	{
-		// init style and palette
-		LmmsStyle * lmmsstyle = new LmmsStyle();
-		QApplication::setStyle( lmmsstyle );
-		
-		LmmsPalette * lmmspal = new LmmsPalette( NULL, lmmsstyle );
-		lmmspal->show();	// necessary to get properties
-		lmmspal->hide();		
-		QPalette lpal = lmmspal->palette();
-
-		QApplication::setPalette( lpal );
-		LmmsStyle::s_palette = &lpal;
-
-
-		// show splash screen
-		QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
-		splashScreen.show();
-		splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
-									Qt::AlignRight | Qt::AlignBottom, Qt::white );
-		qApp->processEvents();
-
-		// init central engine which handles all components of LMMS
-		engine::init();
-
-		splashScreen.hide();
+		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.dataFile");
+		QString recoveryFile = ConfigManager::inst()->recoveryFile();
+
 		if( QFileInfo(recoveryFile).exists() &&
-			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
+			QMessageBox::question( gui->mainWindow(), MainWindow::tr( "Project recovery" ),
 						MainWindow::tr( "It looks like the last session did not end properly. "
 										"Do you want to recover the project of this session?" ),
 						QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
@@ -432,53 +455,55 @@ int main( int argc, char * * argv )
 		// we try to load given file
 		if( !file_to_load.isEmpty() )
 		{
-			engine::mainWindow()->show();
+			gui->mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::mainWindow()->showMaximized();
+				gui->mainWindow()->showMaximized();
 			}
 			if( file_to_load == recoveryFile )
 			{
-				engine::getSong()->createNewProjectFromTemplate( file_to_load );
+				Engine::getSong()->createNewProjectFromTemplate( file_to_load );
 			}
 			else
 			{
-				engine::getSong()->loadProject( file_to_load );
+				Engine::getSong()->loadProject( file_to_load );
 			}
 		}
 		else if( !file_to_import.isEmpty() )
 		{
-			ImportFilter::import( file_to_import, engine::getSong() );
+			ImportFilter::import( file_to_import, Engine::getSong() );
 			if( exit_after_import )
 			{
 				return 0;
 			}
 
-			engine::mainWindow()->show();
+			gui->mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::mainWindow()->showMaximized();
+				gui->mainWindow()->showMaximized();
 			}
 		}
 		else
 		{
-			engine::getSong()->createNewProject();
+			Engine::getSong()->createNewProject();
 
 			// [Settel] workaround: showMaximized() doesn't work with
 			// FVWM2 unless the window is already visible -> show() first
-			engine::mainWindow()->show();
+			gui->mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::mainWindow()->showMaximized();
+				gui->mainWindow()->showMaximized();
 			}
 		}
+
 	}
 	else
 	{
 		// we're going to render our song
-		engine::init( false );
+		Engine::init();
+
 		printf( "loading project...\n" );
-		engine::getSong()->loadProject( file_to_load );
+		Engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );
 
 		// create renderer
@@ -496,14 +521,20 @@ int main( int argc, char * * argv )
 				SLOT( updateConsoleProgress() ) );
 		t->start( 200 );
 
+		if( profilerOutputFile.isEmpty() == false )
+		{
+			Engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+		}
+
 		// start now!
 		r->startProcessing();
 	}
 
 	const int ret = app->exec();
 	delete app;
+
+	// cleanup memory managers
+	MemoryManager::cleanup();
+
 	return( ret );
 }
-
-
-/* vim: set tw=0 noexpandtab: */

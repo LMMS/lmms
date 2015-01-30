@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * Code partly taken from (X)FST:
  * 		Copyright (c) 2004 Paul Davis
@@ -427,6 +427,7 @@ RemoteVstPlugin::~RemoteVstPlugin()
 		m_window = NULL;
 	}
 	pluginDispatch( effMainsChanged, 0, 0 );
+	pluginDispatch( effClose );
 #ifndef USE_QT_SHMEM
 	// detach shared memory segment
 	if( shmdt( m_vstSyncData ) == -1)
@@ -1859,9 +1860,11 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
 	pthread_win32_process_attach_np();
 	pthread_win32_thread_attach_np();
+#endif
 #endif
 
 #ifdef LMMS_BUILD_LINUX
@@ -1872,6 +1875,13 @@ int main( int _argc, char * * _argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	sched_setscheduler( 0, SCHED_FIFO, &sparam );
 #endif
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
+	{
+		printf( "Notice: could not set high priority.\n" );
+	}
 #endif
 
 	// constructor automatically will process messages until it receives
@@ -1896,8 +1906,10 @@ int main( int _argc, char * * _argv )
 
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef __WINPTHREADS_VERSION
 	pthread_win32_thread_detach_np();
 	pthread_win32_process_detach_np();
+#endif
 #endif
 
 	return 0;

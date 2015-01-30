@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,14 +28,14 @@
 #include "EffectControls.h"
 #include "VstEffectControlDialog.h"
 
-#include <QtGui/QMenu>
+#include <QMenu>
 #include "embed.h"
-#include <QtGui/QPushButton>
+#include <QPushButton>
 
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QScrollArea>
-#include "knob.h"
-#include <QtGui/QLayout>
+#include <QMdiSubWindow>
+#include <QScrollArea>
+#include "Knob.h"
+#include <QLayout>
 #include <QPainter>
 #include <QObject>
 
@@ -87,7 +87,7 @@ private:
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
-	knob ** vstKnobs;
+	Knob ** vstKnobs;
 	int paramCount;
 
 	QObject * ctrHandle;

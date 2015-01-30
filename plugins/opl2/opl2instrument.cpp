@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Raine M. Ekman <raine/at/iki/fi>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -45,22 +45,26 @@
 #include "mididata.h"
 #include "debug.h"
 #include "Instrument.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
+#include <QFile>
+#include <QFileInfo>
+#include <QByteArray>
 
 #include "opl.h"
 #include "temuopl.h"
 
 #include "embed.cpp"
 #include "math.h"
+#include "debug.h"
 
-#include "knob.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
+#include "PixmapButton.h"
+#include "ToolTip.h"
 
 extern "C"
 {
@@ -75,7 +79,7 @@ Plugin::Descriptor PLUGIN_EXPORT OPL2_plugin_descriptor =
         0x0100,
         Plugin::Instrument,
         new PluginPixmapLoader( "logo" ),
-        NULL,
+        "sbi",
         NULL
 };
 
@@ -92,7 +96,7 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 QMutex opl2instrument::emulatorMutex;
 
 // Weird ordering of voice parameters
-const unsigned int adlib_opadd[9] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &OPL2_plugin_descriptor ),
@@ -138,42 +142,41 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
 {
 	// Connect the plugin to the mixer...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
-	engine::mixer()->addPlayHandle( iph );
-
-	// Voices are laid out in a funny way...
-	// adlib_opadd = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	Engine::mixer()->addPlayHandle( iph );
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
 
 	//Initialize voice values
-	voiceNote[0] = 0;
-	voiceLRU[0] = 0;
-	for(int i=1; i<9; ++i) {
+	// voiceNote[0] = 0;
+	// voiceLRU[0] = 0;
+	for(int i=0; i<OPL2_VOICES; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
 
+	storedname = displayName();
+
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = engine::mixer()->framesPerPeriod();
+	frameCount = Engine::mixer()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane defaults
 	pitchbend = 0;
-	pitchBendRange = 100;
+	pitchBendRange = 100; // cents
 	RPNcoarse = RPNfine = 255;
 
 	tuneEqual(69, 440);
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -221,7 +224,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 opl2instrument::~opl2instrument() {
 	delete theEmulator;
-	engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandles( instrumentTrack() );
 	delete [] renderbuffer;
 }
 
@@ -229,11 +232,11 @@ opl2instrument::~opl2instrument() {
 void opl2instrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
-	for(int i=1; i<9; ++i) {
+	for(int i=0; i<OPL2_VOICES; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
@@ -262,28 +265,37 @@ void opl2instrument::setVoiceVelocity(int voice, int vel) {
 			   ( vel_adjusted & 0x3f ) );
 }
 
-// Pop least recently used voice - why does it sometimes lose a voice (mostly 0)?
+// Pop least recently used voice
 int opl2instrument::popVoice() {
 	int tmp = voiceLRU[0];
 	for( int i=0; i<8; ++i) {
 		voiceLRU[i] = voiceLRU[i+1];
 	}
 	voiceLRU[8] = OPL2_NO_VOICE;
+#ifdef false
+	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
+	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+#endif
 	return tmp;
 }
-
+// Push voice into first free slot
 int opl2instrument::pushVoice(int v) {
 	int i;
+	assert(voiceLRU[8]==OPL2_NO_VOICE);
 	for(i=8; i>0; --i) {
 		if( voiceLRU[i-1] != OPL2_NO_VOICE ) {
 			break;
 		}
 	}
 	voiceLRU[i] = v;
+#ifdef false
+	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
+	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+#endif
 	return i;
 }
 
-bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time )
+bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
@@ -307,11 +319,11 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
                 break;
         case MidiNoteOff:
                 key = event.key() +12;
-                for(voice=0; voice<9; ++voice) {
+                for(voice=0; voice<OPL2_VOICES; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
                                 theEmulator->write(0xB0+voice, (fnums[key] & 0x1f00) >> 8 );
-                                voiceNote[voice] = OPL2_VOICE_FREE;
+                                voiceNote[voice] |= OPL2_VOICE_FREE;
 				pushVoice(voice);
                         }
                 }
@@ -323,7 +335,7 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
 		}
-		for(voice=0; voice<9; ++voice) {
+		for(voice=0; voice<OPL2_VOICES; ++voice) {
 			if(voiceNote[voice] == key) {
 				setVoiceVelocity(voice, vel);
 			}
@@ -331,22 +343,20 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
                 break;
         case MidiPitchBend:
 		// Update fnumber table
-		// Pitchbend should be in the range 0...16383 but the new range knob gets it wrong.
-		// tmp_pb = (2*BEND_CENTS)*((float)event.m_data.m_param[0]/16383)-BEND_CENTS;
 
-		// Something like 100 cents = 8192, but offset by 8192 so the +/-100 cents range goes from 0...16383?
+		// Neutral = 8192, full downbend = 0, full upbend = 16383
 		tmp_pb = ( event.pitchBend()-8192 ) * pitchBendRange / 8192;
 
 		if( tmp_pb != pitchbend ) {
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
 		}
-		// Update pitch of sounding notes
-		for( int v=0; v<9; ++v ) {
-			if( voiceNote[v] != OPL2_VOICE_FREE ) {
-				theEmulator->write(0xA0+v, fnums[voiceNote[v] ] & 0xff);
-				theEmulator->write(0xB0+v, 32 + ((fnums[voiceNote[v]] & 0x1f00) >> 8) );
-			}
+		// Update pitch of all voices (also released ones)
+		for( int v=0; v<OPL2_VOICES; ++v ) {
+			int vn = (voiceNote[v] & ~OPL2_VOICE_FREE); // remove the flag bit
+			int playing = (voiceNote[v] & OPL2_VOICE_FREE) == 0; // just the flag bit
+			theEmulator->write(0xA0+v, fnums[vn] & 0xff);
+			theEmulator->write(0xB0+v, (playing ? 32 : 0) + ((fnums[vn] & 0x1f00) >> 8) );
                 }
                 break;
 	case MidiControlChange:
@@ -363,12 +373,17 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			}
 			break;
 		default:
+#ifdef LMMS_DEBUG	
 			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
+#endif
 			break;
 		}
 		break;
         default:
+#ifdef LMMS_DEBUG
                 printf("Midi event type %d\n",event.type());
+#endif
+		break;
         }
 	emulatorMutex.unlock();
 	return true;
@@ -476,7 +491,7 @@ void opl2instrument::loadSettings( const QDomElement & _this )
 }
 
 // Load a patch into the emulator
-void opl2instrument::loadPatch(unsigned char inst[14]) {
+void opl2instrument::loadPatch(const unsigned char inst[14]) {
 	emulatorMutex.lock();
 	for(int v=0; v<9; ++v) {
 		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
@@ -497,7 +512,7 @@ void opl2instrument::loadPatch(unsigned char inst[14]) {
 void opl2instrument::tuneEqual(int center, float Hz) {
 	float tmp;
 	for(int n=0; n<128; ++n) {
-		tmp = Hz*pow( 2, ( n - center ) / 12.0 + pitchbend / 1200.0 );
+		tmp = Hz*pow( 2.0, ( n - center ) * ( 1.0 / 12.0 ) + pitchbend * ( 1.0 / 1200.0 ) );
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -505,7 +520,7 @@ void opl2instrument::tuneEqual(int center, float Hz) {
 // Find suitable F number in lowest possible block
 int opl2instrument::Hz2fnum(float Hz) {
 	for(int block=0; block<8; ++block) {
-		unsigned int fnum = Hz * pow(2, 20-block) / 49716;
+		unsigned int fnum = Hz * pow( 2.0, 20.0 - (double)block ) * ( 1.0 / 49716.0 );
 		if(fnum<1023) {
 			return fnum + (block << 10);
 		}
@@ -519,14 +534,9 @@ void opl2instrument::loadGMPatch() {
 	loadPatch(inst);
 }
 
-//
-/* void opl2instrument::loadSBIFile() {
-
-   } */
-
 // Update patch from the models to the chip emulation
 void opl2instrument::updatePatch() {
-	unsigned char *inst = midi_fm_instruments[0];
+	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
 		( op1_perc_mdl.value() ?  0 : 32 ) + // NB. This envelope mode is "perc", not "sus"
@@ -537,9 +547,9 @@ void opl2instrument::updatePatch() {
 		( op2_perc_mdl.value() ?  0 : 32 ) + // NB. This envelope mode is "perc", not "sus"
 		( op2_ksr_mdl.value() ?  16 : 0 ) +
 		((int)op2_mul_mdl.value() & 0x0f);
-	inst[2] = ( (int)op1_scale_mdl.value() & 0x03 << 6 ) +
+	inst[2] = ( ((int)op1_scale_mdl.value() & 0x03) << 6 ) +
 		(63 - ( (int)op1_lvl_mdl.value() & 0x3f ) );
-	inst[3] = ( (int)op2_scale_mdl.value() & 0x03 << 6 ) +
+	inst[3] = ( ((int)op2_scale_mdl.value() & 0x03) << 6 ) +
 		(63 - ( (int)op2_lvl_mdl.value() & 0x3f ) );
 	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f ) ) << 4 )+
 		(15 - ( (int)op1_d_mdl.value() & 0x0f ) );
@@ -564,12 +574,110 @@ void opl2instrument::updatePatch() {
 
 	// have to do this, as the level knobs might've changed
 	for( int voice = 0; voice < 9 ; ++voice) {
-		if(voiceNote[voice]!=OPL2_VOICE_FREE) {
+		if(voiceNote[voice] && OPL2_VOICE_FREE == 0) {
 			setVoiceVelocity(voice, velocities[voiceNote[voice]] );
 		}
 	}
+#ifdef false
+		printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
+		       inst[0], inst[1], inst[2], inst[3], inst[4],
+		       inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
+#endif
+
+
 	loadPatch(inst);
 }
+
+// Load an SBI file into the knob models
+void opl2instrument::loadFile( const QString& file ) {
+	// http://cd.textfiles.com/soundsensations/SYNTH/SBINS/
+	// http://cd.textfiles.com/soundsensations/SYNTH/SBI1198/1198SBI.ZIP
+	if( !file.isEmpty() && QFileInfo( file ).exists() )
+	{
+		QFile sbifile(file);
+		if (!sbifile.open(QIODevice::ReadOnly )) {
+			printf("Can't open file\n");
+			return;
+		}
+
+		QByteArray sbidata = sbifile.read(52);
+		if( !sbidata.startsWith("SBI\0x1a") ) {
+			printf("No SBI signature\n");
+			return;
+		}
+		if( sbidata.size() != 52 ) {
+			printf("SBI size error: expected 52, got %d\n",sbidata.size() );
+		}
+
+		// Minimum size of SBI if we ignore "reserved" bytes at end
+		// https://courses.engr.illinois.edu/ece390/resources/sound/cmf.txt.html
+		if( sbidata.size() < 47 ) {
+			return;
+		}
+
+		QString sbiname = sbidata.mid(4, 32);
+		// If user has changed track name... let's hope my logic is valid.
+		if( sbiname.size() > 0 && instrumentTrack()->displayName() == storedname ) {
+			instrumentTrack()->setName(sbiname);
+			storedname = sbiname;
+		}
+
+#ifdef false
+		printf("SBI: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
+		       (unsigned char)sbidata[36], (unsigned char)sbidata[37], (unsigned char)sbidata[38], (unsigned char)sbidata[39], (unsigned char)sbidata[40],
+		       (unsigned char)sbidata[41], (unsigned char)sbidata[42], (unsigned char)sbidata[43], (unsigned char)sbidata[44], (unsigned char)sbidata[45], (unsigned char)sbidata[46]);
+#endif
+		// Modulator Sound Characteristic (Mult, KSR, EG, VIB, AM)
+		op1_trem_mdl.setValue( (sbidata[36] & 0x80 ) == 0x80 ? true : false );
+		op1_vib_mdl.setValue( (sbidata[36] & 0x40 ) == 0x40 ? true : false );
+		op1_perc_mdl.setValue( (sbidata[36] & 0x20 ) == 0x20 ? false : true );
+		op1_ksr_mdl.setValue( (sbidata[36] & 0x10 ) == 0x10 ? true : false );
+		op1_mul_mdl.setValue( sbidata[36] & 0x0f );
+
+		// Carrier Sound Characteristic
+		op2_trem_mdl.setValue( (sbidata[37] & 0x80 ) == 0x80 ? true : false );
+		op2_vib_mdl.setValue( (sbidata[37] & 0x40 ) == 0x40 ? true : false );
+		op2_perc_mdl.setValue( (sbidata[37] & 0x20 ) == 0x20 ? false : true );
+		op2_ksr_mdl.setValue( (sbidata[37] & 0x10 ) == 0x10 ? true : false );
+		op2_mul_mdl.setValue( sbidata[37] & 0x0f );
+
+		// Modulator Scaling/Output Level
+		op1_scale_mdl.setValue( (sbidata[38] & 0xc0 ) >> 6 );
+		op1_lvl_mdl.setValue( 63 - (sbidata[38] & 0x3f) );
+
+		// Carrier Scaling/Output Level
+		op2_scale_mdl.setValue( (sbidata[39] & 0xc0) >> 6 );
+		op2_lvl_mdl.setValue( 63 - (sbidata[39] & 0x3f) );
+
+		// Modulator Attack/Decay
+		op1_a_mdl.setValue( 15 - ( ( sbidata[40] & 0xf0 ) >> 4 ) );
+		op1_d_mdl.setValue( 15 - ( sbidata[40] & 0x0f ) );
+
+		// Carrier Attack/Decay
+		op2_a_mdl.setValue( 15 - ( ( sbidata[41] & 0xf0 ) >> 4 ) );
+		op2_d_mdl.setValue( 15 - ( sbidata[41] & 0x0f ) );
+
+		// Modulator Sustain/Release
+		op1_s_mdl.setValue( 15 - ( ( sbidata[42] & 0xf0 ) >> 4 ) );
+		op1_r_mdl.setValue( 15 - ( sbidata[42] & 0x0f ) );
+
+		// Carrier Sustain/Release
+		op2_s_mdl.setValue( 15 - ( ( sbidata[43] & 0xf0 ) >> 4 ) );
+		op2_r_mdl.setValue( 15 - ( sbidata[43] & 0x0f ) );
+
+		// Modulator Wave Select
+		op1_waveform_mdl.setValue( sbidata[44] & 0x03 );
+
+		// Carrier Wave Select
+		op2_waveform_mdl.setValue( sbidata[45] & 0x03 );
+
+		// Feedback/Connection
+		fm_mdl.setValue( (sbidata[46] & 0x01) == 0x01 ? false : true );
+		feedback_mdl.setValue( ( (sbidata[46] & 0x0e ) >> 1 ) );
+	}
+}
+
+
 
 
 
@@ -585,8 +693,8 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 	*/
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
-	knobname = new knob( knobStyled, this );\
-	knobname->setHintText( tr(hinttext) + "", hintunit );\
+	knobname = new Knob( knobStyled, this );\
+	knobname->setHintText( tr(hinttext), hintunit );\
 	knobname->setFixedSize(22,22);\
 	knobname->setCenterPointX(11.0);\
 	knobname->setCenterPointY(11.0);\
@@ -594,18 +702,18 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 	knobname->move(xpos,ypos);
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new pixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, NULL );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_off" ) );\
 	buttname->setCheckable( true );\
-        toolTip::add( buttname, tr( tooltip ) );\
+        ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new pixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, NULL );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        toolTip::add( buttname, tr( tooltip ) );\
+        ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 
@@ -713,4 +821,4 @@ void opl2instrumentView::modelChanged()
 }
 
 
-#include "moc_opl2instrument.cxx"
+

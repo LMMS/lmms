@@ -69,10 +69,7 @@ class ToneStack
 		// digital coefficients
 		double dcoef_a[Order + 1];
 		double dcoef_b[Order + 1];
-		double af[Order + 1];
-		double bf[Order + 1];
 
-		double fs;
 		TDFII<Order> filter;
 		
 	public:
@@ -209,10 +206,6 @@ class ToneStackLT
 		// digital coefficients
 		double *kcoef;
 		double *vcoef;
-		double af [Order + 1];
-		double bf [Order + 1];
-
-		double fs;
 		LatFilt<Order> filter;
 
 	public:

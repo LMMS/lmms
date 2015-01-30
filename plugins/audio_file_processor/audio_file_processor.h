@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,15 +27,15 @@
 #ifndef AUDIO_FILE_PROCESSOR_H
 #define AUDIO_FILE_PROCESSOR_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "SampleBuffer.h"
-#include "knob.h"
-#include "pixmap_button.h"
-#include "automatable_button.h"
-
+#include "Knob.h"
+#include "PixmapButton.h"
+#include "AutomatableButton.h"
+#include "ComboBox.h"
 
 
 class audioFileProcessor : public Instrument
@@ -75,6 +75,9 @@ private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
 	void loopPointChanged();
+	void startPointChanged();
+	void endPointChanged();
+	void pointChanged();
 	void stutterModelChanged();
 
 
@@ -94,6 +97,7 @@ private:
 	BoolModel m_reverseModel;
 	IntModel m_loopModel;
 	BoolModel m_stutterModel;
+	ComboBoxModel m_interpolationModel;
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
@@ -114,7 +118,7 @@ public:
 	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
 	virtual ~AudioFileProcessorView();
 
-
+	void newWaveView();
 protected slots:
 	void sampleUpdated();
 	void openAudioFile();
@@ -132,15 +136,16 @@ private:
 	static QPixmap * s_artwork;
 
 	AudioFileProcessorWaveView * m_waveView;
-	knob * m_ampKnob;
-	knob * m_startKnob;
-	knob * m_endKnob;
-	knob * m_loopKnob;
+	Knob * m_ampKnob;
+	Knob * m_startKnob;
+	Knob * m_endKnob;
+	Knob * m_loopKnob;
 
-	pixmapButton * m_openAudioFileButton;
-	pixmapButton * m_reverseButton;
+	PixmapButton * m_openAudioFileButton;
+	PixmapButton * m_reverseButton;
 	automatableButtonGroup * m_loopGroup;
-	pixmapButton * m_stutterButton;
+	PixmapButton * m_stutterButton;
+	ComboBox * m_interpBox;
 
 } ;
 
@@ -167,15 +172,15 @@ public:
 		loop
 	} ;
 
-	class knob : public ::knob
+	class knob : public ::Knob
 	{
 		const AudioFileProcessorWaveView * m_waveView;
-		const knob * m_relatedKnob;
+		const Knob * m_relatedKnob;
 
 
 	public:
 		knob( QWidget * _parent ) :
-			::knob( knobBright_26, _parent ),
+			::Knob( knobBright_26, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
@@ -187,7 +192,7 @@ public:
 			m_waveView = _wv;
 		}
 
-		void setRelatedKnob( const knob * _knob )
+		void setRelatedKnob( const Knob * _knob )
 		{
 			m_relatedKnob = _knob;
 		}
@@ -237,6 +242,7 @@ private:
 	f_cnt_t m_to;
 	f_cnt_t m_last_from;
 	f_cnt_t m_last_to;
+	float m_last_amp;
 	knob * m_startKnob;
 	knob * m_endKnob;
 	knob * m_loopKnob;
@@ -252,7 +258,7 @@ private:
 
 public:
 	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
-	void setKnobs( knob * _start, knob * _end, knob * _loop );
+	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 
 private:

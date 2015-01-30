@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,10 +22,11 @@
  *
  */
 
-#ifndef _CONTROLLER_RACK_VIEW_H
-#define _CONTROLLER_RACK_VIEW_H
+#ifndef CONTROLLER_RACK_VIEW_H
+#define CONTROLLER_RACK_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
+#include <QCloseEvent>
 
 #include "SerializingObject.h"
 #include "lmms_basics.h"
@@ -56,6 +57,8 @@ public:
 public slots:
 	void deleteController( ControllerView * _view );
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 
 private slots:
 	virtual void update();

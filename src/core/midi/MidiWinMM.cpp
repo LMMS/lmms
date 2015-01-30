@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,15 +22,15 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "MidiWinMM.h"
-#include "config_mgr.h"
-#include "engine.h"
+#include "ConfigManager.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "MidiPort.h"
-#include "note.h"
+#include "Note.h"
 
 
 #ifdef LMMS_BUILD_WIN32
@@ -147,7 +147,7 @@ void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool
 {
 	if( subscribe && port->isInputEnabled() == false )
 	{
-		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
+		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toLatin1().constData() );
 		return;
 	}
 
@@ -165,7 +165,7 @@ void MidiWinMM::subscribeWritablePort( MidiPort* port, const QString& dest, bool
 {
 	if( subscribe && port->isOutputEnabled() == false )
 	{
-		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toAscii().constData() );
+		qWarning( "port %s can't be (un)subscribed!\n", port->displayName().toLatin1().constData() );
 		return;
 	}
 
@@ -324,7 +324,7 @@ MidiWinMM::setupWidget::~setupWidget()
 
 
 
-#include "moc_MidiWinMM.cxx"
+
 
 
 #endif

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="GhostBoy" solo="0">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="115">
+      <instrument name="tripleoscillator">
+        <tripleoscillator phoffset2="76" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="5" stphdetun2="0" wavetype1="3" wavetype2="1" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33"/>
+      </instrument>
+      <eldata fres="0.62" ftype="6" fcut="6191" fwet="1">
+        <elvol lspd_denominator="4" sustain="0.33" pdel="0" userwavefile="" dec="0.37" lamt="0" syncmode="0" latt="0" rel="0.067" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="1" syncmode="6" latt="0.157" rel="0.1" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.0048" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="25" arprange="4" arptime_denominator="4" syncmode="0" arpmode="1" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="1"/>
+      <midiport inputcontroller="0" inports="" fixedoutputvelocity="-1" inputchannel="1" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="127" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="1"/>
+      <fxchain numofeffects="3" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="4">
+            <port02 data="0.99897"/>
+            <port03 data="0.3745"/>
+            <port04 data="0.0005"/>
+            <port05 data="0.2675"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps" name="file"/>
+            <attribute value="Plate2x2" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="10">
+            <port04 data="149.85"/>
+            <port05 data="16"/>
+            <port06 data="8"/>
+            <port07 data="8"/>
+            <port08 data="0.305"/>
+            <port09 data="0.61"/>
+            <port010 data="2"/>
+            <port011 data="1"/>
+            <port012 data="1"/>
+            <port013 data="1"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="calf" name="file"/>
+            <attribute value="VintageDelay" name="plugin"/>
+          </key>
+        </effect>
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="0">
+          <ladspacontrols link="0" ports="20">
+            <port01 link="1" data="-42.66"/>
+            <port02 link="1" data="-30.42"/>
+            <port03 link="1" data="-11.16"/>
+            <port04 link="1" data="-9.9"/>
+            <port05 link="1" data="0"/>
+            <port06 link="1" data="0"/>
+            <port07 link="1" data="0"/>
+            <port08 link="0" data="2.16"/>
+            <port09 link="0" data="3.96"/>
+            <port010 link="0" data="-5.58"/>
+            <port11 data="-42.66"/>
+            <port12 data="-30.42"/>
+            <port13 data="-11.16"/>
+            <port14 data="-9.9"/>
+            <port15 data="0"/>
+            <port16 data="0"/>
+            <port17 data="0"/>
+            <port18 data="-3.96"/>
+            <port19 data="-3.24"/>
+            <port110 data="5.4"/>
+          </ladspacontrols>
+          <key>
+            <attribute value="caps" name="file"/>
+            <attribute value="Eq" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

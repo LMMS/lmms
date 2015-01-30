@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,8 +40,13 @@ public:
 
 	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
 											KeyList & _kl ) const;
-
+private:
+	void addPluginsFromDir(QStringList* filenames,  QString path) const;
 } ;
+
+
+
+
 
 #endif
 

@@ -1,0 +1,487 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cc}
+decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
+
+decl {//License: GNU GPL version 2 or later} {} 
+
+decl {\#include <stdlib.h>} {public
+} 
+
+decl {\#include <FL/fl_draw.H>} {public
+} 
+
+decl {\#include <FL/Fl_Box.H>} {public
+} 
+
+decl {\#include "../globals.h"} {public
+} 
+
+decl {\#include "../Misc/Master.h"} {public
+} 
+
+decl {\#include "../Misc/Util.h"} {public
+} 
+
+decl {\#include "WidgetPDial.h"} {public
+} 
+
+decl {\#include "common.H"} {public
+} 
+
+decl {\#ifdef NTK_GUI
+     \#include "FL/Fl_Shared_Image.H"
+     \#endif} {public
+} 
+
+decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {} 
+
+decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2qwerty[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {} 
+
+decl {const int keysoct1dw[]={'\\'','2',',','3','.','p','5','y','6','f','7','g','c','9','r','0','l','/',']','=','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0};} {} 
+
+decl {const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\\'','+','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0};} {} 
+
+decl {const int keysoct1az[]={'a',233,'z','\\"','e','r','(','t','-','y',232,'u','i',231,'o',224,'p',65106,'=','$',0};} {} 
+
+decl {const int keysoct2az[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {} 
+
+class VirKeys {: {public Fl_Box}
+} {
+  decl {static const int N_OCT=6;} {}
+  decl {static const int SIZE_WHITE=14;} {}
+  decl {static const int SIZE_BLACK=8;} {}
+  Function {VirKeys(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+    code {master=NULL;} {}
+  }
+  Function {init(Master *master_)} {} {
+    code {master=master_;
+for (int i=0;i<N_OCT*12+1;i++) pressed[i]=0;
+midich=0;
+midivel=100;
+midioct=2;
+
+keyoct1=3;
+keyoct2=2;
+rndvelocity=0;} {}
+  }
+  Function {draw()} {} {
+    code {int ox=x(),oy=y(),lx=w(),ly=h()-1,i;
+
+\#ifdef NTK_GUI
+\#ifdef CARLA_VERSION_STRING
+ Fl_Image *white_up = Fl_Shared_Image::get( gUiPixmapPath + "white_key.png" );
+ Fl_Image *white_down = Fl_Shared_Image::get( gUiPixmapPath + "white_key_pressed.png" );
+ Fl_Image *black_up = Fl_Shared_Image::get( gUiPixmapPath + "black_key.png" );
+ Fl_Image *black_down = Fl_Shared_Image::get( gUiPixmapPath + "black_key_pressed.png" );
+\#else
+ Fl_Image *white_up = Fl_Shared_Image::get( PIXMAP_PATH "white_key.png" );
+ Fl_Image *white_down = Fl_Shared_Image::get( PIXMAP_PATH "white_key_pressed.png" );
+ Fl_Image *black_up = Fl_Shared_Image::get( PIXMAP_PATH "black_key.png" );
+ Fl_Image *black_down = Fl_Shared_Image::get( PIXMAP_PATH "black_key_pressed.png" );
+ \#endif
+
+
+//On error fetch everything from source directory
+if(!(white_up&&white_down&&black_up&&black_down)) {
+    white_up   = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/white_key.png");   
+    white_down = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/white_key_pressed.png");
+    black_up   = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/black_key.png");
+    black_down = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/black_key_pressed.png");
+}
+
+Fl_Image *key;
+
+for (i=0;i<N_OCT*12;i++) {
+   int noct=i/12;
+   int kv=keyspos[i%12];
+
+   if (kv>=0){//white keys
+     if (pressed[i]==0)
+         key = white_up;
+        else
+         key = white_down;
+
+      key->draw( ox + (kv + 7 * noct ) * white_up->w() + 3, oy );
+   } 
+}
+
+for (i=0;i<N_OCT*12;i++){
+   int noct=i/12;
+   int kv=keyspos[i%12];
+
+   if ( kv < 0 ) {
+     kv=keyspos[(i+1)%12];
+     if (pressed[i]==0)
+       key = black_up;
+     else
+       key = black_down;
+
+       key->draw( ox + (kv + 7 * noct ) * white_up->w() - black_up->w() / 2 + 2, oy );
+   }
+}
+\#else
+if (damage()!=1){
+ fl_color(250,240,230);
+ fl_rectf(ox,oy,lx,ly);
+
+ fl_color(FL_BLACK);
+ fl_line(ox,oy,ox+lx,oy);
+ fl_line(ox,oy+ly,ox+lx,oy+ly);
+ for (i=0;i<N_OCT*7+1;i++){
+   fl_line(ox+i*SIZE_WHITE,oy,ox+i*SIZE_WHITE,oy+ly);
+   int ik=i%7;
+   if ((ik==1)||(ik==2)||(ik==4)||(ik==5)||(ik==6)) 
+     fl_rectf(ox+i*SIZE_WHITE-SIZE_BLACK/2,oy,
+              SIZE_BLACK+1,ly*3/5);
+ }
+}
+
+
+for (i=0;i<N_OCT*12;i++){
+  // if (pressed[i]==0) continue;
+
+   int noct=i/12;
+   int kv=keyspos[i%12];
+
+   if (kv>=0){//white keys
+     if (pressed[i]==0) fl_color(250,240,230);
+        else fl_color(FL_BLUE);
+     fl_rectf(ox+(kv+7*noct)*SIZE_WHITE+3,oy+ly*3/5+2,
+       SIZE_WHITE-4,ly*2/5-3);
+   } else {//black keys
+     kv=keyspos[(i+1)%12];
+     if (pressed[i]==0) fl_color(FL_BLACK);
+        else fl_color(FL_BLUE);
+     fl_rectf(ox+(kv+7*noct)*SIZE_WHITE-SIZE_BLACK/2+2,oy+2,
+              SIZE_BLACK-3,ly*3/5-5);
+   }
+}
+\#endif} {}
+  }
+  Function {handle(int event)} {return_type int
+  } {
+    code {int i;
+int ly=h();
+int x_=Fl::event_x()-x();
+int y_=Fl::event_y()-y();
+if ( (x_<0)&&(x_>w()) && (y_<0)&&(y_>h())){
+  return(0);
+};
+
+
+if ((event==FL_PUSH)||(event==FL_DRAG)||(event==FL_RELEASE)){
+   int kpos=-1;
+  
+   if (y_>ly*3/5){//white keys
+       int pos=x_/SIZE_WHITE;
+       if (pos<0) return(1);
+       for (i=0;i<12;i++) {
+          if (pos%7==keyspos[i]) {
+             kpos=pos/7*12+i;
+             break;
+          };
+       };
+   } else {//black keys
+       int pos=(x_+SIZE_WHITE/2)/SIZE_WHITE;
+       if (pos<0) return(1);
+       for (i=1;i<12;i++) {
+          if (pos%7==-keyspos[i]) {
+             kpos=pos/7*12+i;
+             break;
+          };
+       };
+   };
+
+   if ((kpos!=-1)&&((event==FL_PUSH)||(event==FL_DRAG))&&
+       (Fl::event_shift()==0)) {
+        presskey(kpos,1,1);
+   };
+
+   if ((event==FL_PUSH)&&(Fl::event_shift()!=0)) {
+       if (pressed[kpos]==0) presskey(kpos,0,1);
+          else relasekey(kpos,1);
+   };
+   if ((event==FL_RELEASE)&&(Fl::event_shift()==0))
+        relaseallkeys(1);
+   take_focus();
+};
+
+
+const int *keysoct1=keysoct1qwerty;
+const int *keysoct2=keysoct2qwerty;
+
+if (config.cfg.VirKeybLayout==2) {
+	keysoct1=keysoct1dw;
+	keysoct2=keysoct2dw;
+}else if (config.cfg.VirKeybLayout==3) {
+	keysoct1=keysoct1qwertz;
+	keysoct2=keysoct2qwertz;
+}else if (config.cfg.VirKeybLayout==4) {
+	keysoct1=keysoct1az;
+	keysoct2=keysoct2az;
+};
+
+if ((event==FL_KEYDOWN)||(event==FL_KEYUP)){
+   int key=Fl::event_key();
+   int kpos=-1;
+   for (i=0;keysoct1[i]!=0;i++) if (key==keysoct1[i]) kpos=i+12*keyoct1;
+   for (i=0;keysoct2[i]!=0;i++) if (key==keysoct2[i]) kpos=i+12*keyoct2;
+
+
+
+
+   if (kpos==-1) return(0);
+   if ((event==FL_KEYUP) && (Fl::event_key(key)==0) && (Fl::get_key(key)!=0)) return(0);
+   if (event==FL_KEYDOWN) presskey(kpos,0,2);
+      else relasekey(kpos,2);
+};
+
+return(1);} {}
+  }
+  Function {presskey(int nk,int exclusive,int type)} {} {
+    code {//Exclusive means that multiple keys can be pressed at once
+//when the user uses the shift key
+if (nk>=N_OCT*12) return;
+if ((nk<0)&&(exclusive==0)) {
+  relaseallkeys(type);
+  return;
+};
+if (nk<0) return;
+if (pressed[nk]!=0) return;//the key is already pressed
+
+if (exclusive!=0) relaseallkeys(type);
+pressed[nk]=type;
+
+damage(1);
+float vel=midivel;
+if (rndvelocity!=0){
+  vel=midivel*(127.0-rndvelocity)/127.0+RND*rndvelocity;
+};
+
+pthread_mutex_lock(&master->mutex);
+master->noteOn(midich,nk+midioct*12,(int)vel);
+pthread_mutex_unlock(&master->mutex);} {}
+  }
+  Function {relasekey(int nk,int type)} {} {
+    code {if ((nk<0)||(nk>=N_OCT*12)) return;
+if (pressed[nk]==0) return;//the key is not pressed
+if ((type!=0)&&(pressed[nk]!=type)) return;
+
+pressed[nk]=0;
+
+
+damage(1);
+
+pthread_mutex_lock(&master->mutex);
+master->noteOff(midich,nk+12*midioct);
+pthread_mutex_unlock(&master->mutex);} {}
+  }
+  Function {relaseallkeys(int type)} {} {
+    code {for (int i=0;i<N_OCT*12;i++) relasekey(i,type);} {}
+  }
+  decl {Master *master;} {}
+  decl {int pressed[N_OCT*12+1];} {}
+  decl {unsigned char midich;} {public
+  }
+  decl {unsigned char midivel;} {public
+  }
+  decl {char midioct,keyoct1,keyoct2;} {public
+  }
+  decl {unsigned char rndvelocity;} {public
+  }
+} 
+
+class VirKeyboard {open
+} {
+  Function {make_window()} {open
+  } {
+    Fl_Window virkeyboardwindow {
+      label {Virtual Keyboard - ZynAddSubFX}
+      callback {relaseallkeys();
+virkeyboardwindow->hide();} open
+      xywh {100 597 650 130} type Double visible
+    } {
+      Fl_Box virkeys {
+        label Keyboard
+        xywh {10 10 590 80} box FLAT_BOX color 17
+        code0 {o->init(master);}
+        class VirKeys
+      }
+      Fl_Counter {} {
+        label {"qwer.." Oct}
+        callback {relaseallkeys();
+virkeys->keyoct1=(int) o->value();
+virkeys->take_focus();}
+        tooltip {keys "q2w3er5t6y..." octave} xywh {380 95 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
+        code0 {o->value(virkeys->keyoct1);}
+      }
+      Fl_Counter {} {
+        label {"zxcv.." Oct}
+        callback {relaseallkeys();
+virkeys->keyoct2=(int) o->value();
+virkeys->take_focus();}
+        tooltip {keys "zsxdcvgbh..." octave} xywh {380 110 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
+        code0 {o->value(virkeys->keyoct2);}
+      }
+      Fl_Value_Slider {} {
+        label Vel
+        callback {virkeys->midivel=(int) o->value();
+virkeys->take_focus();} selected
+        tooltip Velocity xywh {95 105 100 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum 1 maximum 127 step 1
+        code0 {o->value(virkeys->midivel);}
+      }
+      Fl_Counter {} {
+        label {Oct.}
+        callback {relaseallkeys();
+virkeys->midioct=(int) o->value();
+virkeys->take_focus();}
+        tooltip {Midi Octave} xywh {255 100 55 20} type Simple labelsize 11 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 11
+        code0 {o->value(virkeys->midioct);}
+      }
+      Fl_Button {} {
+        label Close
+        callback {relaseallkeys();
+virkeyboardwindow->hide();}
+        xywh {545 105 55 20} box THIN_UP_BOX
+      }
+      Fl_Value_Slider {} {
+        label Cval
+        callback {int ctl=midictl;
+
+pthread_mutex_lock(&master->mutex);
+master->setController(virkeys->midich,ctl,(int) o->value());
+pthread_mutex_unlock(&master->mutex);
+virkeys->take_focus();}
+        tooltip {Controller value} xywh {605 10 15 115} type {Vert Fill} box ENGRAVED_BOX selection_color 229 labelsize 8 align 5 minimum 127 maximum 0 step 1 value 64 textsize 7
+      }
+      Fl_Choice {} {
+        label Controller
+        callback {switch((int) o->value()+1){
+   case 1: midictl=C_modwheel; break;
+   case 2: midictl=C_volume; break;
+   case 3: midictl=C_panning; break;
+   case 4: midictl=C_expression; break;
+   case 5: midictl=C_sustain; break;
+   case 6: midictl=C_portamento; break;
+   case 7: midictl=C_filterq; break;
+   case 8: midictl=C_filtercutoff; break;
+   case 9: midictl=C_bandwidth; break;
+   case 10: midictl=C_fmamp; break;
+   case 11: midictl=C_resonance_center; break;
+   case 12: midictl=C_resonance_bandwidth; break;
+   default: midictl=C_NULL; break;
+
+};
+
+
+
+virkeys->take_focus();}
+        xywh {435 105 100 15} down_box BORDER_BOX labelsize 10 align 5 when 6 textfont 1 textsize 10
+        code0 {midictl=C_filtercutoff;o->value(7);}
+      } {
+        MenuItem {} {
+          label {01: Mod.Wheel}
+          xywh {0 0 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {07: Volume}
+          xywh {10 10 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {10: Panning}
+          xywh {20 20 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {11: Expression}
+          xywh {30 30 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {64: Sustain}
+          xywh {40 40 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {65: Portamento}
+          xywh {50 50 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {71: Filter Q}
+          xywh {60 60 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {74: Filter Freq.}
+          xywh {70 70 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {75: Bandwidth}
+          xywh {80 80 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {76: FM Gain}
+          xywh {90 90 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {77: Res. c. freq}
+          xywh {100 100 100 20} labelfont 1 labelsize 10
+        }
+        MenuItem {} {
+          label {78: Res. bw.}
+          xywh {110 110 100 20} labelfont 1 labelsize 10
+        }
+      }
+      Fl_Roller pitchwheelroller {
+        label Pwh
+        callback {pthread_mutex_lock(&master->mutex);
+master->setController(virkeys->midich,C_pitchwheel,-(int) o->value());
+pthread_mutex_unlock(&master->mutex);
+virkeys->take_focus();}
+        tooltip {Pitch Wheel} xywh {625 10 20 95} labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
+      }
+      Fl_Button {} {
+        label R
+        callback {pitchwheelroller->value(0);
+pitchwheelroller->do_callback();}
+        tooltip {Reset Pitch Bend} xywh {625 110 20 15} box THIN_UP_BOX labelfont 1
+      }
+      Fl_Dial {} {
+        label Vrnd
+        callback {virkeys->rndvelocity=(int) o->value();}
+        tooltip {Velocity Randomness} xywh {205 105 20 20} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
+        code0 {o->value(virkeys->rndvelocity);}
+        class WidgetPDial
+      }
+      Fl_Choice partrcv {
+        label {MIDI Ch.}
+        callback {relaseallkeys();
+virkeys->midich=(int) o->value();
+virkeys->take_focus();} open
+        tooltip {Send to Midi Channel} xywh {20 105 65 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+        code0 {char nrstr[10]; for(int i=0;i<NUM_MIDI_CHANNELS;i++){sprintf(nrstr,"Chn%d",i+1);if (i!=9) o->add(nrstr); else o->add("Drum10");};}
+        code1 {o->value(virkeys->midich);}
+      } {}
+    }
+  }
+  Function {VirKeyboard(Master *master_)} {} {
+    code {master=master_;
+midictl=75;
+make_window();} {}
+  }
+  Function {~VirKeyboard()} {} {
+    code {delete virkeyboardwindow;} {}
+  }
+  Function {show()} {} {
+    code {virkeyboardwindow->show();} {}
+  }
+  Function {relaseallkeys()} {} {
+    code {virkeys->relaseallkeys(0);} {}
+  }
+  decl {Master *master;} {}
+  decl {int midictl;} {}
+} 

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,21 +24,23 @@
  */
 
 
-#ifndef _BIT_INVADER_H
-#define _BIT_INVADER_H
+#ifndef BIT_INVADER_H
+#define BIT_INVADER_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "graph.h"
-#include "knob.h"
-#include "pixmap_button.h"
-#include "led_checkbox.h"
+#include "Graph.h"
+#include "Knob.h"
+#include "PixmapButton.h"
+#include "LedCheckbox.h"
+#include "MemoryManager.h"
 
 class oscillator;
 class bitInvaderView;
 
 class bSynth
 {
+	MM_OPERATORS
 public:
 	bSynth( float * sample, int length, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 
@@ -133,20 +135,20 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	knob * m_sampleLengthKnob;
-	pixmapButton * m_sinWaveBtn;
-	pixmapButton * m_triangleWaveBtn;
-	pixmapButton * m_sqrWaveBtn;
-	pixmapButton * m_sawWaveBtn;
-	pixmapButton * m_whiteNoiseWaveBtn;
-	pixmapButton * m_smoothBtn;
-	pixmapButton * m_usrWaveBtn;
+	Knob * m_sampleLengthKnob;
+	PixmapButton * m_sinWaveBtn;
+	PixmapButton * m_triangleWaveBtn;
+	PixmapButton * m_sqrWaveBtn;
+	PixmapButton * m_sawWaveBtn;
+	PixmapButton * m_whiteNoiseWaveBtn;
+	PixmapButton * m_smoothBtn;
+	PixmapButton * m_usrWaveBtn;
 
 	static QPixmap * s_artwork;
 
-	graph * m_graph;
-	ledCheckBox * m_interpolationToggle;
-	ledCheckBox * m_normalizeToggle;
+	Graph * m_graph;
+	LedCheckBox * m_interpolationToggle;
+	LedCheckBox * m_normalizeToggle;
 
 } ;
 

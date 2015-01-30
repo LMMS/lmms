@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,7 +23,7 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "stereomatrix_controls.h"
 #include "stereo_matrix.h"
@@ -79,5 +79,5 @@ void stereoMatrixControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "moc_stereomatrix_controls.cxx"
+
 

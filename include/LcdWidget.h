@@ -2,8 +2,8 @@
  * LcdWidget.h - a widget for displaying numbers in LCD style
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,11 +23,11 @@
  */
 
 
-#ifndef _LCD_WIDGET_H
-#define _LCD_WIDGET_H
+#ifndef LCD_WIDGET_H
+#define LCD_WIDGET_H
 
 #include <QtCore/QMap>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "export.h"
 
@@ -61,7 +61,7 @@ public slots:
 
 protected:
 	virtual void paintEvent( QPaintEvent * _me );
-	
+
 	virtual void updateSize();
 
 	int cellHeight() const

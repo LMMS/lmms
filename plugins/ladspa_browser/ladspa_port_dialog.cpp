@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,18 +25,18 @@
 
 #include "ladspa_port_dialog.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QTableWidget>
+#include <QLayout>
+#include <QTableWidget>
 
 #include "embed.h"
-#include "engine.h"
-#include "ladspa_2_lmms.h"
+#include "Engine.h"
+#include "Ladspa2LMMS.h"
 #include "Mixer.h"
 
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 {
-	ladspa2LMMS * manager = engine::getLADSPAManager();
+	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	setWindowIcon( embed::getIconPixmap( "ports" ) );
 	setWindowTitle( tr( "Ports" ) );
@@ -87,11 +87,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= engine::mixer()->processingSampleRate();
+				min *= Engine::mixer()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= engine::mixer()->processingSampleRate();
+				max *= Engine::mixer()->processingSampleRate();
 			}
 		}
 
@@ -172,5 +172,4 @@ ladspaPortDialog::~ladspaPortDialog()
 
 
 
-#include  "moc_ladspa_port_dialog.cxx"
 

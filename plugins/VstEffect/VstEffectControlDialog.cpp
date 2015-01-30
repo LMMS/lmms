@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,23 +22,23 @@
  *
  */
 
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMenu>
-#include <QtGui/QPushButton>
+#include <QLayout>
+#include <QMdiArea>
+#include <QMenu>
+#include <QPushButton>
 
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "embed.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 #include <QObject>
-#include <QtGui/QPainter>
+#include <QPainter>
 #include "gui_templates.h"
-#include <QtGui/QToolBar>
-#include <QtGui/QLabel>
+#include <QToolBar>
+#include <QLabel>
 
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
@@ -84,7 +84,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		btn->setMinimumHeight( 24 );
 		btn->setMaximumHeight( 24 );
 
-		m_managePluginButton = new pixmapButton( this, "" );
+		m_managePluginButton = new PixmapButton( this, "" );
 		m_managePluginButton->setCheckable( false );
 		m_managePluginButton->setCursor( Qt::PointingHandCursor );
 		m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -93,7 +93,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"track_op_menu" ) );
 		connect( m_managePluginButton, SIGNAL( clicked() ),  _ctl,
 						SLOT( managePlugin() ) );
-		toolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
+		ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
 
 		m_managePluginButton->setWhatsThis(
 			tr( "Click here, if you want to control VST-plugin from host." ) );
@@ -103,7 +103,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_managePluginButton->setMinimumHeight( 21 );
 		m_managePluginButton->setMaximumHeight( 21 );
 
-		m_openPresetButton = new pixmapButton( this, "" );
+		m_openPresetButton = new PixmapButton( this, "" );
 		m_openPresetButton->setCheckable( false );
 		m_openPresetButton->setCursor( Qt::PointingHandCursor );
 		m_openPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -112,7 +112,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"stepper-up" ) );
 		connect( m_openPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( openPreset() ) );
-		toolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
+		ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
 
 		m_openPresetButton->setWhatsThis(
 			tr( "Click here, if you want to open another *.fxp, *.fxb VST-plugin preset." ) );
@@ -122,7 +122,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_openPresetButton->setMinimumHeight( 16 );
 		m_openPresetButton->setMaximumHeight( 16 );
 
-		m_rolLPresetButton = new pixmapButton( this, "" );
+		m_rolLPresetButton = new PixmapButton( this, "" );
 		m_rolLPresetButton->setCheckable( false );
 		m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
 		m_rolLPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -135,7 +135,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( update() ) );
 
-		toolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
+		ToolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
 
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
@@ -147,7 +147,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_rolLPresetButton->setMinimumHeight( 16 );
 		m_rolLPresetButton->setMaximumHeight( 16 );
 
-		m_rolRPresetButton = new pixmapButton( this, "" );
+		m_rolRPresetButton = new PixmapButton( this, "" );
 		m_rolRPresetButton->setCheckable( false );
 		m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
 		m_rolRPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -160,7 +160,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( update() ) );
 
-		toolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
+		ToolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
 
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
@@ -187,7 +187,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		_ctl->m_selPresetButton->setMinimumHeight( 16 );
 		_ctl->m_selPresetButton->setMaximumHeight( 16 );
 
-		m_savePresetButton = new pixmapButton( this, "" );
+		m_savePresetButton = new PixmapButton( this, "" );
 		m_savePresetButton->setCheckable( false );
 		m_savePresetButton->setCursor( Qt::PointingHandCursor );
 		m_savePresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -196,7 +196,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"project_save", 21, 21  ) );
 		connect( m_savePresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( savePreset() ) );
-		toolTip::add( m_savePresetButton, tr( "Save preset" ) );
+		ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
 
 		m_savePresetButton->setWhatsThis(
 			tr( "Click here, if you want to save current VST-plugin preset program." ) );
@@ -263,5 +263,4 @@ VstEffectControlDialog::~VstEffectControlDialog()
 {
 	//delete m_pluginWidget;
 }
-
 

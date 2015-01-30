@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _REMOTE_PLUGIN_H
-#define _REMOTE_PLUGIN_H
+#ifndef REMOTE_PLUGIN_H
+#define REMOTE_PLUGIN_H
 
 #include "export.h"
 #include "MidiEvent.h"
@@ -52,13 +52,8 @@
 #include <process.h>
 #endif
 
-#include <Qt/qglobal.h>
-
-#if QT_VERSION >= 0x040400
+#include <QtCore/QtGlobal>
 #include <QtCore/QSystemSemaphore>
-#else
-#error building LMMS on this platform requires at least Qt 4.4.0
-#endif
 
 #else /* USE_QT_SEMAPHORES */
 
@@ -75,13 +70,8 @@
 
 #ifdef USE_QT_SHMEM
 
-#include <Qt/qglobal.h>
-
-#if QT_VERSION >= 0x040400
+#include <QtCore/QtGlobal>
 #include <QtCore/QSharedMemory>
-#else
-#error building LMMS on this platform requires at least Qt 4.4.0
-#endif
 
 typedef int32_t key_t;
 

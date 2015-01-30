@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,12 +23,12 @@
  *
  */
 
-#ifndef _TRACK_CONTAINER_H
-#define _TRACK_CONTAINER_H
+#ifndef TRACK_CONTAINER_H
+#define TRACK_CONTAINER_H
 
 #include <QtCore/QReadWriteLock>
 
-#include "track.h"
+#include "Track.h"
 #include "JournallingObject.h"
 
 
@@ -41,7 +41,12 @@ class EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<track *> TrackList;
+	typedef QVector<Track *> TrackList;
+	enum TrackContainerTypes
+	{
+		BBContainer,
+		SongContainer
+	} ;
 
 	TrackContainer();
 	virtual ~TrackContainer();
@@ -56,11 +61,11 @@ public:
 		return NULL;
 	}
 
-	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
+	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
 
 
-	void addTrack( track * _track );
-	void removeTrack( track * _track );
+	void addTrack( Track * _track );
+	void removeTrack( Track * _track );
 
 	virtual void updateAfterTrackAdd();
 
@@ -78,9 +83,19 @@ public:
 		return "trackcontainer";
 	}
 
+	inline void setType( TrackContainerTypes newType )
+	{
+		m_TrackContainerType = newType;
+	}
+
+	inline TrackContainerTypes type() const
+	{
+		return m_TrackContainerType;
+	}
+
 
 signals:
-	void trackAdded( track * _track );
+	void trackAdded( Track * _track );
 
 protected:
 	mutable QReadWriteLock m_tracksMutex;
@@ -88,9 +103,11 @@ protected:
 private:
 	TrackList m_tracks;
 
+	TrackContainerTypes m_TrackContainerType;
+
 
 	friend class TrackContainerView;
-	friend class track;
+	friend class Track;
 
 } ;
 

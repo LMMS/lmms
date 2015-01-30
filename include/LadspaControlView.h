@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,10 @@
  *
  */
 
-#ifndef _LADSPA_CONTROL_VIEW_H
-#define _LADSPA_CONTROL_VIEW_H
+#ifndef LADSPA_CONTROL_VIEW_H
+#define LADSPA_CONTROL_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 
@@ -39,7 +39,7 @@ class EXPORT LadspaControlView : public QWidget, public ModelView
 public:
 	LadspaControlView( QWidget * _parent, LadspaControl * _ctl );
 	virtual ~LadspaControlView();
-	
+
 private:
 	LadspaControl * m_ctl;
 

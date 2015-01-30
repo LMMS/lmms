@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,13 +23,13 @@
  *
  */
 
-#ifndef _FX_LINE_H
-#define _FX_LINE_H
+#ifndef FX_LINE_H
+#define FX_LINE_H
 
 #include <QWidget>
 #include <QLabel>
 
-#include "knob.h"
+#include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
 
@@ -40,27 +40,45 @@ class FxLine : public QWidget
 {
 	Q_OBJECT
 public:
+	Q_PROPERTY( QBrush backgroundActive READ backgroundActive WRITE setBackgroundActive )
 	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
 	~FxLine();
 
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * );
 	virtual void mouseDoubleClickEvent( QMouseEvent * );
+	virtual void contextMenuEvent( QContextMenuEvent * );
 
 	inline int channelIndex() { return m_channelIndex; }
 	void setChannelIndex(int index);
 
-	knob * m_sendKnob;
+	Knob * m_sendKnob;
 	SendButtonIndicator * m_sendBtn;
 
+	QBrush backgroundActive() const;
+	void setBackgroundActive( const QBrush & c );
+
+	static const int FxLineHeight;
+
 private:
+	static void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
+
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
-
-
 	int m_channelIndex;
+	QBrush m_backgroundActive;
+	static QPixmap * s_sendBgArrow;
+	static QPixmap * s_receiveBgArrow;
 
-} ;
+private slots:
+	void renameChannel();
+	void removeChannel();
+	void removeUnusedChannels();
+	void moveChannelLeft();
+	void moveChannelRight();
+	void displayHelp();
+
+};
 
 
 #endif // FXLINE_H

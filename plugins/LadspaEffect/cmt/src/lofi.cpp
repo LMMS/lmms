@@ -277,8 +277,6 @@ class LoFi : public CMT_PluginInstance {
   BandwidthLimit *bandwidth_l;
   BandwidthLimit *bandwidth_r;
 
-  int         last_trigger;
-
 public:
   LoFi(const LADSPA_Descriptor *,
        unsigned long s_rate)

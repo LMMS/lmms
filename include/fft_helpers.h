@@ -2,8 +2,8 @@
  * fft_helpers.h - some functions around FFT analysis
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,10 +23,9 @@
  */
 
 
-#ifndef _FFT_HELPERS_H
-#define _FFT_HELPERS_H
+#ifndef FFT_HELPERS_H
+#define FFT_HELPERS_H
 
-#include "lmmsconfig.h"
 #include "export.h"
 
 #include <fftw3.h>
@@ -65,7 +64,7 @@ int EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffer,
 /* build fewer subbands from many absolute spectrum values
  * take care that - compressedbands[] array num_new elements long
  *                - num_old > num_new
- *                       
+ *
  *    returns 0 on success, else -1
  */
 int EXPORT compressbands( float * _absspec_buffer, float * _compressedband,

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PRESET_PREVIEW_PLAY_HANDLE_H
-#define _PRESET_PREVIEW_PLAY_HANDLE_H
+#ifndef PRESET_PREVIEW_PLAY_HANDLE_H
+#define PRESET_PREVIEW_PLAY_HANDLE_H
 
 #include "NotePlayHandle.h"
 
@@ -41,7 +41,7 @@ public:
 	virtual void play( sampleFrame* buffer );
 	virtual bool isFinished() const;
 
-	virtual bool isFromTrack( const track * _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	static void init();
 	static void cleanup();

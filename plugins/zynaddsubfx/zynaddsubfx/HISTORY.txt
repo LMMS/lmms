@@ -1,0 +1,239 @@
+2.4.4 (28 Jun 2014)
+        - Add UI Mousewheel Support
+        - Add Spectral Adjust Parameter Rescaling
+        - Add Subnote filter smoothing
+        - Add Unison derandomization options
+        - Add NSM import/export
+        - Add NTK UI compatiability
+        - (re)Add OSX Support
+        - Enhance performance of ADnote and SUBnote
+        - Enhance Installer
+        - Fix JACK2 specific segfault
+        - Fix possible DSSI specific segfaults
+        - Fix Unison Regressions
+        - Documentation additions
+        - Misc bug fixes
+        
+
+2.4.3 (15 Jun 2012)
+        - Non-session manager support
+        - Midi aftertouch support
+        - Documentation additions
+        - Somewhat more sane Nio defaults
+        - Misc bug fixes
+
+2.4.2 (26 Feb 2012)
+        - New IO backend support
+        - MIDI bank select
+        - Spike/Circle waveform
+        - Faster subsynth
+        - --exec-after-init flag
+        - Version information compiled in
+        - Misc Bug fixes
+
+2.4.1 (27 Jun 2010)
+        - Azerty layout
+        - XML bug fixes
+        - Vibrato/Unison additions
+        - Reverb rewrite
+        - DSSI support enabled
+        - Adding APhaser
+        - other bugfixes
+        - code cleanup
+
+2.4.0 (21 Jun 2009)
+	- extended mono functionality
+	- legato mode
+	- export functionality on PADsynth
+	- inclusion of LASH client
+	- inclusion of DSSI audio output
+	- enabled tooltips for knobs (both description and value tooltips)
+	- added support for newer JACK api
+	- added quertz support for virtual keyboard
+	- started to encorperate cxxtest for unit testing
+	- many bugfixes
+	- code cleanup
+
+2.2.1 (28 Apr 2005)
+	- made to work with mxml-2.2 (will NOT work on older versions)
+	- it is possible to remove completely the graphical user interface (e.g. it can run without X). For this you need to modify the DISABLE_GUI option from the Makefile.inc
+	- added a commandline -L which load a instrument (.xiz) - now it only loads to part 0 (you can use this option with -l to load a master file and after this the option -L to replace the part)
+	
+2.2.0 (8 Apr 2005)
+	- the VST version of ZynAddSubFX is removed from the instalation until it will be more stable (hope soon :) )
+	- now, the instrument banks contains over 300 high quality instruments
+	- added "Apply" a button from OscilGen window for PADsynth 
+	- added another parameter to ADsynth that controls the amount of all detunes of voices
+	- adaptive harmonics postprocess
+	- improved the VU-meter and added a RMS plot
+	- Dvorak support for Virtual Keyboard
+	- many bugs fixed and code cleanups
+	
+2.1.1 (2 Oct 2004) 
+	- Removed a big bug that prevented changing the part
+2.1.0 (1 Oct 2004) 
+	- Added a installer for windows (thanks to NSIS installer ( http://nsis.sourceforge.net/ ) ). Both VST and standalone vesions are contained in the same installer.
+	- Added a new user interface for beginners. You can switch the current user interface with that anytime do you want.
+	- All parts, effects, etc. are counted from '1' and not from '0'
+	- Added the posibility to compile the OSS and JACK support in the same binary (look in the Makefile.inc)
+	- VST host should be able to save all zynaddsubfx parameters into their setups (this is untested)
+	- Bugfixes and other 
+
+2.0.0 (27 Aug 2004)
+	- VST version works (there are some issues/bugs but it works)
+	- Added a advanced Clipboard and Preset module - now is possible to add user preset LFOs,Envelopes, Effects, Oscillators, Resonances, Filters, etc.
+	- Completely removed the *.MAS_ZYN formats (masters, instruments,etc) support; use 2.0.0pre1 and 2.0.0pre2 to convert
+	- Corrected a error to pitch bend on VST plugin (thanks to Krzysztof Korpiela)
+	- Impoved the PADsynth module
+	- Because the PADsynth module takes a time to load, the instrument that contains such modules are shown in different colors
+	- Bugfixes 
+	- Other
+	
+2.0.0_pre2 (31 Iul 2004)
+	- Updated the XMLwrapper to mxml-2.0
+	- Many bugfixes
+	- Other 
+
+2.0.0_pre1 (17 Iul 2004)
+	- Added a new powerful synth engine which is called PADsynth, you can make very beautifull pads and even some strange sounds
+	- Now is used the XML format for all zynaddsubfx parameters(.XMZ for master parameters, .XIZ for instrument parameters and .XSZ for scale parameters).You can import older parameters. All parameters files are compressed with gzip algorithm.
+	- Some parameters has changed and you might ecounter different sounds that you saved in the older versions of zynaddsubfx
+	- The instrument banks are no longer single files, but directories that contains instrument .XIZ files (you can organize them even with a file manager). Also, you can use more than 1 banks easily.
+	- Added a new effect called DynamicFilter that allows you to do WahWah,AutoWah, VocalMorpher and other effects
+	- Speedups
+	- Started to write a small sequencer that allows to load and play a midi file from zynaddsubfx (unfinished)
+	- ZynAddSubFX is available from CVS, too. Please look at the sourceforge project page to get more information ( http://sourceforge.net/projects/zynaddsubfx )
+	- The waveform generator (OscilGen) has many new parameters :) also if you press the "Shift" key, you can draw the hamonics amplitude/phases
+	- Many user interface improvements
+	- You can load a file at the start of the program with "-l" command-line parameter and you can run zynaddsubfx w/o user interface with "-U"
+	- It is possible to dump all MIDI notes into a text file
+	- The instruments can contain comments and copyright information in order to encourage sharing of them
+	- FFT3W library is supported
+	- More "randomness" options
+	- Other impovements
+	- Many, many bugfixes
+	- Added the full changelog (since I started to write zynaddsubfx), most is in Romanian 
+	- Other things
+      
+1.4.3 (31 Aug 2003)
+      - added state variable filters and other types to analog filters
+      - small user interface improvememnts 
+      - small bugfixes
+
+1.4.2 (17 Iul 2003)
+      - added full-featured, advanced formantic filters 
+      - added mixer panel which lets you to see/change most important part settings, and shows a vu-meters for each part 
+      - you can choose to process the instrument's kit items only with one Part effect (eg. you can make a instrument kit that contains a reverberated piano and flanged strings)
+      - enabled to launch more instances in Jack
+      - when is launched first time, it searches for default.bnk_zyn file into /usr/share/zynaddsubfx and /usr/local/share/zynaddsubfx directories (useful for binary packages for Linux distributions)
+      - bugfixes
+      
+1.4.1 (8 May 2003)
+      - added single mode to the instrument kit who alows only one item to be played same time
+      - added "Spectrum Adjust" to the ADsynth oscillator
+      - added "drum mode" to the instrument, where all midi keys are mapped to 12tET
+      - added a parameter to the "440Hz" which make the freq to varies a bit according to the key pressed (very usefull to toms and other drums)
+      - (for OSS audio out) if it is launched with root privileges, the synth will gain realtime scheduling priority 
+      - bugfixes
+
+1.4.0 (15 Apr 2003)
+      - added instrument's own effect (effects that are loaded/saved with the instrument)
+      - FreeMode Envelopes: all Envelopes can have any shape (not only ADSR)
+      - Added instrument kits: It is possible to use more than one instruments into one part (used for layered synths or drum kits)
+      - Amplitude envelopes can be linear or logarithmic
+      - added interpolation on the Resonance user interface
+      - user interface improvements and cleanups of it's code
+      - initiated a mailing list to allow users to share patches for ZynAddSubFX. Please share your ZynAddSubFX patches; look at http://lists.sourceforge.net/mailman/listinfo/zynaddsubfx-user for more information about the mailing list.
+
+1.2.1 (6 Apr 2003)
+      - improved filter interpolation
+      - bugfix: wav header is written correctly
+      - bugfix: NRPN works correctly (eg:the controller was 0x98 instead of 98), now you can controll all effects parametrer realtime via MIDI
+      - bugfix: pitch bend works OK in windows
+      - added master fine detune (-64..63 cents)
+      - it is possible to swap effects or copy them
+      - started to port ZynAddSubFX to VST (not functional, yet)
+      - the resonace can protect the fundamental freq. against damping
+      
+1.2.0 (21 Mar 2003)
+      - ZynAddSubFX is ported to Windows ;-)
+      - added internal Virtual Keyboard
+      - added Configuration window
+      - added frequency tracking to filter
+      - improved the OscilGen (harmonic filter, RMS normalisation, etc..)
+      - improved the recorder (uses the WAV file format and it starts only when a key is pressed)
+      - added filter interpolation if the frequency is changed very fast (it removes some annoying clicks)
+      - other improovements, bugfixes, speedups and cleanups of the code
+
+1.0.9 (24 Feb 2003)
+      - added keylimit to Part
+      - you can use multiple filter stages in order to make very steep filter rolloffs (eg. 48 dB/octave)
+      - ADsynth - added noise mode and you can make fixed frequencies; added the "Punch" parameter
+      - added an external program "Controller" which enables you to use the mouse for MIDI controllers
+      - other improvements and bugfixes
+
+1.0.8 (14 Feb 2003)
+      - added mono mode and portamento
+      - added the EQ effect
+      - the output of a system effect can be sent to others system effects
+      - minor bugfixes and improvements      
+
+1.0.7 (7 Feb 2003)
+      - some settings (like samplerate) are set at runtime (by comand line)
+      - added Distorsion effect
+      - added controllers, and NRPNs for changing all effects parameters by midi
+      - bugs removed and other improvements
+
+1.0.6 (30 Jan 2003)
+      - Added JACK output ;-)
+      - Minor improvements and bugfixes
+
+1.0.5 (24 Jan 2003)
+      - The bug that crashed ZynAddSubFX if you change some effect parameters, it is realy removed (I forgot to update the file before upload)
+      - Other bugfixes and code cleanups
+      - Added a Global Filter to SubSynth
+      - Added keyresponse limits to Part
+      - Added presets to Effects
+      - The fade is smaller on high frequecy content and larger on low frequecies; so you'll don't hear starting clicks on basses and audible fadeins on higher pitched sounds
+      - Added tunnings to Reverb: you can choose Random of Freeverb
+
+1.0.4 (7 Jan 2003)
+      - It is possible to load Scala (.scl and .kbm) files
+      - Added mapping from note number to scale degree is possible to load Scala kbm files
+      - Corrected small bugs related to Microtonal
+      - If you want to use ZynAddSubFX with OSS (or you don't have ALSA) you can modify the Makefile.inc file to compile with OSS only.
+      - It is shown the real detune (in cents)
+      - Made a new widget that replaces the Dial widget
+      - Removed a bug that crashed ZynAddSubFX if you change some effect parameters
+
+1.0.3 (23 Dec 2002)
+      - small bugfixes: "Bypass Global Filter" from ADnoteUI dissapears sometimes ;
+	removed the low amplitude noise produced by the reverb;
+	if you "acconect" zynaddsubfx with aseqview no note was processed a long time.
+      - added Notch Filter
+      - added the option to randomize the ressonance function
+      - added VU-Meter      
+      - Change the Insertion effect modes behaves (it sounds a bit louder)
+      - Added to the project an external program called Spliter that splits the
+	keyboard and alows you to play two instruments same time. You can use this
+	program with ZynAddSubFX or any other synthesizer.
+      - Added a new function to OscilGen
+
+1.0.2-1 (13 Dec 2002)
+      - bug found and removed: sometimes when Master/Instrument is saved, the synth crashed
+
+1.0.2 (13 Dec 2002)
+      - Added instrument banks
+      - the BandPass Filter's output amplitude was increased
+      - few fixes of FFTwrapper. See the documentation from "FFTwrapper.h" if you got error messages.
+
+1.0.1 (6 Dec 2002) 
+      - corrected a bug that made ZynAddSubFX to crash(sometimes) if you disable a part
+      - wrote Resonance
+      - added the BandPass filter
+      - added the recording feature      
+      - added "New instrument" menuitem
+
+1.0.0 (25 Sep 2002) 
+      - first release, done a lot before it :-)
+

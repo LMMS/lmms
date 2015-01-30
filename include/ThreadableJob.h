@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _THREADABLE_JOB_H
-#define _THREADABLE_JOB_H
+#ifndef THREADABLE_JOB_H
+#define THREADABLE_JOB_H
 
 #include <QtCore/QAtomicInt>
 
@@ -61,12 +61,17 @@ public:
 	{
 		m_state = Queued;
 	}
+	
+	inline void done()
+	{
+		m_state = Done;
+	}
 
-	void process( sampleFrame* workingBuffer = NULL )
+	void process()
 	{
 		if( m_state.testAndSetOrdered( Queued, InProgress ) )
 		{
-			doProcessing( workingBuffer );
+			doProcessing();
 			m_state = Done;
 		}
 	}
@@ -75,7 +80,7 @@ public:
 
 
 protected:
-	virtual void doProcessing( sampleFrame* workingBuffer) = 0;
+	virtual void doProcessing() = 0;
 
 	QAtomicInt m_state;
 

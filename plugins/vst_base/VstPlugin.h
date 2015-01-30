@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,12 @@
 #ifndef _VST_PLUGIN_H
 #define _VST_PLUGIN_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
-#include <QtCore/QPointer>
-#include <QtCore/QString>
-#include <QtCore/QTimer>
-#include <QtGui/QWidget>
+#include <QMap>
+#include <QMutex>
+#include <QPointer>
+#include <QString>
+#include <QTimer>
+#include <QWidget>
 
 #include "Mixer.h"
 #include "JournallingObject.h"

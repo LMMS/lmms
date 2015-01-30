@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,7 @@
 
 #include "patches_dialog.h"
 
-#include <QtGui/QHeaderView>
+#include <QHeaderView>
 //#include <QFileInfo>
 
 
@@ -75,7 +75,11 @@ patchesDialog::patchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 //	pHeader->setResizeMode(QHeaderView::Custom);
 	pHeader->setDefaultAlignment(Qt::AlignLeft);
 //	pHeader->setDefaultSectionSize(200);
+#if QT_VERSION >= 0x050000
+	pHeader->setSectionsMovable(false);
+#else
 	pHeader->setMovable(false);
+#endif
 	pHeader->setStretchLastSection(true);
 
 	m_progListView->resizeColumnToContents(0);	// Prog.
@@ -367,4 +371,4 @@ void patchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 }
 
 
-#include "moc_patches_dialog.cxx"
+

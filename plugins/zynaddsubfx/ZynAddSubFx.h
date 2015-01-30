@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,8 +25,8 @@
 #ifndef ZYNADDSUBFX_H
 #define ZYNADDSUBFX_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <QMap>
+#include <QMutex>
 
 #include "AutomatableModel.h"
 #include "Instrument.h"
@@ -40,8 +40,8 @@ class QPushButton;
 class LocalZynAddSubFx;
 class ZynAddSubFxView;
 class NotePlayHandle;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 
 
 class ZynAddSubFxRemotePlugin : public QObject, public RemotePlugin
@@ -70,7 +70,7 @@ public:
 
 	virtual void play( sampleFrame * _working_buffer );
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -149,14 +149,14 @@ private:
 	void modelChanged();
 
 	QPushButton * m_toggleUIButton;
-	knob * m_portamento;
-	knob * m_filterFreq;
-	knob * m_filterQ;
-	knob * m_bandwidth;
-	knob * m_fmGain;
-	knob * m_resCenterFreq;
-	knob * m_resBandwidth;
-	ledCheckBox * m_forwardMidiCC;
+	Knob * m_portamento;
+	Knob * m_filterFreq;
+	Knob * m_filterQ;
+	Knob * m_bandwidth;
+	Knob * m_fmGain;
+	Knob * m_resCenterFreq;
+	Knob * m_resBandwidth;
+	LedCheckBox * m_forwardMidiCC;
 
 
 private slots:

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,12 +22,12 @@
  *
  */
 
-#ifndef _SIDE_BAR_H
-#define _SIDE_BAR_H
+#ifndef SIDE_BAR_H
+#define SIDE_BAR_H
 
 #include <QtCore/QMap>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QToolBar>
+#include <QButtonGroup>
+#include <QToolBar>
 
 class QToolButton;
 class SideBarWidget;

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,16 +22,19 @@
  *
  */
 
-#include <QtGui/QMenu>
-#include <QtGui/QMouseEvent>
+#include <QMenu>
+#include <QMouseEvent>
 
 #include "AutomatableModelView.h"
 #include "AutomationPattern.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
-#include "string_pair_drag.h"
+#include "StringPairDrag.h"
+
+#include "AutomationEditor.h"
 
 
 
@@ -41,7 +44,7 @@ AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	m_unit( QString::null )
 {
 	widget()->setAcceptDrops( true );
-	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 }
 
 
@@ -146,7 +149,7 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
 	{
-		new stringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
+		new StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
 	}
 	else if( event->button() == Qt::MidButton )
@@ -177,7 +180,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( (QWidget*) engine::mainWindow(), m );
+	ControllerConnectionDialog d( gui->mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{
@@ -224,7 +227,9 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
-	AutomationPattern::globalAutomationPattern( m_amv->modelUntyped() )->openInAutomationEditor();
+	gui->automationEditor()->open(
+				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
+	);
 }
 
 
@@ -241,4 +246,4 @@ void AutomatableModelViewSlots::unlinkAllModels()
 }
 
 
-#include "moc_AutomatableModelView.cxx"
+

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _PEAK_CONTROLLER_EFFECT_H
-#define _PEAK_CONTROLLER_EFFECT_H
+#ifndef PEAK_CONTROLLER_EFFECT_H
+#define PEAK_CONTROLLER_EFFECT_H
 
 #include "Effect.h"
 #include "peak_controller_effect_controls.h"
@@ -52,6 +52,16 @@ public:
 	{
 		return m_autoController;
 	}
+	
+	FloatModel * attackModel()
+	{
+		return &( m_peakControls.m_attackModel );
+	}
+
+	FloatModel * decayModel()
+	{
+		return &( m_peakControls.m_decayModel );
+	}
 
 	int m_effectId;
 
@@ -59,8 +69,6 @@ private:
 	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;
-	float m_lastRMS;
-	bool m_lastRMSavail;
 
 	PeakController * m_autoController;
 

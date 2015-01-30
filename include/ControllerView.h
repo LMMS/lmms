@@ -2,8 +2,8 @@
  * ControllerView.h - view-component for an control
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef _CONTROLLER_VIEW_H
-#define _CONTROLLER_VIEW_H
+#ifndef CONTROLLER_VIEW_H
+#define CONTROLLER_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "AutomatableModel.h"
 #include "Controller.h"
@@ -36,7 +36,7 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
-class ledCheckBox;
+class LedCheckBox;
 
 
 class ControllerView : public QWidget, public ModelView
@@ -45,7 +45,7 @@ class ControllerView : public QWidget, public ModelView
 public:
 	ControllerView( Controller * _controller, QWidget * _parent );
 	virtual ~ControllerView();
-	
+
 	inline Controller * getController()
 	{
 		return( castModel<Controller>() );
@@ -63,7 +63,7 @@ public slots:
 	void displayHelp();
 	void closeControls();
 
-	
+
 signals:
 	void deleteController( ControllerView * _view );
 

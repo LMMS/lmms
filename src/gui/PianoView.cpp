@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,21 +37,21 @@
  */
 
 
-#include <QtGui/QCursor>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QVBoxLayout>
+#include <QCursor>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QVBoxLayout>
 
 
 #include "PianoView.h"
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "embed.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
-#include "string_pair_drag.h"
+#include "Knob.h"
+#include "StringPairDrag.h"
 #include "MainWindow.h"
 #include "MidiEvent.h"
 #include "templates.h"
@@ -419,7 +419,7 @@ void PianoView::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	captionMenu contextMenu( tr( "Base note" ) );
+	CaptionMenu contextMenu( tr( "Base note" ) );
 	AutomatableModelView amv( m_piano->instrumentTrack()->baseNoteModel(), &contextMenu );
 	amv.addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
@@ -472,7 +472,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
 			// set note on
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 			m_piano->setKeyState( key_num, true );
 			m_lastKey = key_num;
 
@@ -482,7 +482,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 		{
 			if( _me->modifiers() & Qt::ControlModifier )
 			{
-				new stringPairDrag( "automatable_model",
+				new StringPairDrag( "automatable_model",
 					QString::number( m_piano->instrumentTrack()->baseNoteModel()->id() ),
 					QPixmap(), this );
 				_me->accept();
@@ -517,7 +517,7 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 	{
 		if( m_piano != NULL )
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, m_lastKey, 0 ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
 		}
 
@@ -578,7 +578,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	{
 		if( m_lastKey != -1 )
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, m_lastKey, 0 ) );
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
 			m_lastKey = -1;
 		}
@@ -586,7 +586,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		{
 			if( _me->pos().y() > PIANO_BASE )
 			{
-				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, 0, key_num, velocity ) );
+				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 				m_piano->setKeyState( key_num, true );
 				m_lastKey = key_num;
 			}
@@ -600,7 +600,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_piano->isKeyPressed( key_num ) )
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, 0, key_num, velocity ) );
+		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, -1, key_num, velocity ) );
 	}
 
 }
@@ -697,7 +697,7 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// hang otherwise
 	for( int i = 0; i < NumKeys; ++i )
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, 0, i, 0 ) );
+		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		m_piano->setKeyState( i, false );
 	}
 	update();
@@ -918,5 +918,5 @@ void PianoView::paintEvent( QPaintEvent * )
 
 
 
-#include "moc_PianoView.cxx"
+
 

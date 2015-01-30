@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * lb303FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  * 
@@ -29,19 +29,19 @@
  */
 
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 
 #include "lb303.h"
 #include "engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
 #include "templates.h"
 #include "audio_port.h"
 
 #include "embed.cpp"
-#include "moc_lb303.cxx"
+
 
 
 // Envelope Recalculation period
@@ -739,54 +739,54 @@ lb303SynthView::lb303SynthView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
 	// GUI
-	m_vcfCutKnob = new knob( knobBright_26, this );
+	m_vcfCutKnob = new Knob( knobBright_26, this );
 	m_vcfCutKnob->move( 75, 130 );
 	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ) + " ", "" );
 	m_vcfCutKnob->setLabel( tr("CUT") );
 
-	m_vcfResKnob = new knob( knobBright_26, this );
+	m_vcfResKnob = new Knob( knobBright_26, this );
 	m_vcfResKnob->move( 120, 130 );
 	m_vcfResKnob->setHintText( tr( "Resonance:" ) + " ", "" );
 	m_vcfResKnob->setLabel( tr("RES") );
 
-	m_vcfModKnob = new knob( knobBright_26, this );
+	m_vcfModKnob = new Knob( knobBright_26, this );
 	m_vcfModKnob->move( 165, 130 );
 	m_vcfModKnob->setHintText( tr( "Env Mod:" ) + " ", "" );
 	m_vcfModKnob->setLabel( tr("ENV MOD") );
 
-	m_vcfDecKnob = new knob( knobBright_26, this );
+	m_vcfDecKnob = new Knob( knobBright_26, this );
 	m_vcfDecKnob->move( 210, 130 );
 	m_vcfDecKnob->setHintText( tr( "Decay:" ) + " ", "" );
 	m_vcfDecKnob->setLabel( tr("DEC") );
 
-	m_slideToggle = new ledCheckBox( "Slide", this );
+	m_slideToggle = new LedCheckBox( "Slide", this );
 	m_slideToggle->move( 10, 180 );
 
-	m_accentToggle = new ledCheckBox( "Accent", this );
+	m_accentToggle = new LedCheckBox( "Accent", this );
 	m_accentToggle->move( 10, 200 );
 	m_accentToggle->setDisabled(true);
 
-	m_deadToggle = new ledCheckBox( "Dead", this );
+	m_deadToggle = new LedCheckBox( "Dead", this );
 	m_deadToggle->move( 10, 220 );
 
-	m_db24Toggle = new ledCheckBox( "24dB/oct", this );
+	m_db24Toggle = new LedCheckBox( "24dB/oct", this );
 	m_db24Toggle->setWhatsThis( 
 			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 	m_db24Toggle->move( 10, 150);
 
 
-	m_slideDecKnob = new knob( knobBright_26, this );
+	m_slideDecKnob = new Knob( knobBright_26, this );
 	m_slideDecKnob->move( 210, 75 );
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ) + " ", "" );
 	m_slideDecKnob->setLabel( tr( "SLIDE"));
 
-	m_distKnob = new knob( knobBright_26, this );
+	m_distKnob = new Knob( knobBright_26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ) + " ", "" );
 	m_distKnob->setLabel( tr( "DIST"));
 
 
-	m_waveKnob = new knob( knobBright_26, this );
+	m_waveKnob = new Knob( knobBright_26, this );
 	m_waveKnob->move( 120, 75 );
 	m_waveKnob->setHintText( tr( "WAVE:" ) + " ", "" );
 	m_waveKnob->setLabel( tr( "WAVE"));

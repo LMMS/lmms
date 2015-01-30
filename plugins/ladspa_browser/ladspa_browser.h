@@ -5,7 +5,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,11 +27,11 @@
 #ifndef _LADSPA_BROWSER_H
 #define _LADSPA_BROWSER_H
 
-#include "ladspa_manager.h"
+#include "LadspaManager.h"
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
-class tabBar;
+class TabBar;
 
 
 class ladspaBrowserView : public ToolPluginView
@@ -47,7 +47,7 @@ public slots:
 
 
 private:
-	tabBar * m_tabBar;
+	TabBar * m_tabBar;
 
 	QWidget * createTab( QWidget * _parent, const QString & _txt,
 						ladspaPluginType _type );

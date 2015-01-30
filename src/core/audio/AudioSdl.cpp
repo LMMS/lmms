@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,12 +26,12 @@
 
 #ifdef LMMS_HAVE_SDL
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
-#include "engine.h"
+#include "Engine.h"
 #include "debug.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "gui_templates.h"
 #include "templates.h"
 
@@ -131,7 +131,7 @@ void AudioSdl::applyQualitySettings()
 	{
 		SDL_CloseAudio();
 
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		m_audioHandle.freq = sampleRate();
 
@@ -205,7 +205,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioSdl::name(), _parent )
 {
-	QString dev = configManager::inst()->value( "audiosdl", "device" );
+	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
@@ -227,7 +227,7 @@ AudioSdl::setupWidget::~setupWidget()
 
 void AudioSdl::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiosdl", "device",
+	ConfigManager::inst()->setValue( "audiosdl", "device",
 							m_device->text() );
 }
 

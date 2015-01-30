@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,15 +23,15 @@
  *
  */
 
-#ifndef _EFFECT_H
-#define _EFFECT_H
+#ifndef EFFECT_H
+#define EFFECT_H
 
 #include "Plugin.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-
+#include "MemoryManager.h"
 
 class EffectChain;
 class EffectControls;
@@ -39,6 +39,8 @@ class EffectControls;
 
 class EXPORT Effect : public Plugin
 {
+	MM_OPERATORS
+	Q_OBJECT
 public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
@@ -101,8 +103,8 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<int>( samples ) / engine::mixer()->framesPerPeriod() );
+		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		return 1 + ( static_cast<int>( samples ) / Engine::mixer()->framesPerPeriod() );
 	}
 
 	inline float wetLevel() const
@@ -118,8 +120,7 @@ public:
 	inline float gate() const
 	{
 		const float level = m_gateModel.value();
-		return level*level * m_processors *
-				engine::mixer()->framesPerPeriod();
+		return level*level * m_processors;
 	}
 
 	inline f_cnt_t bufferCount() const
@@ -176,9 +177,9 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				engine::mixer()->processingSampleRate(),
+				Engine::mixer()->processingSampleRate(),
 					_dst_buf, _dst_sr,
-					engine::mixer()->framesPerPeriod() );
+					Engine::mixer()->framesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
@@ -186,9 +187,9 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				engine::mixer()->processingSampleRate(),
-			engine::mixer()->framesPerPeriod() * _src_sr /
-				engine::mixer()->processingSampleRate() );
+				Engine::mixer()->processingSampleRate(),
+			Engine::mixer()->framesPerPeriod() * _src_sr /
+				Engine::mixer()->processingSampleRate() );
 	}
 	void reinitSRC();
 
@@ -213,6 +214,8 @@ private:
 	FloatModel m_wetDryModel;
 	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
+	
+	bool m_autoQuitDisabled;
 
 	SRC_DATA m_srcData[2];
 	SRC_STATE * m_srcState[2];

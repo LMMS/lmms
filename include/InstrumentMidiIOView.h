@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,18 +26,21 @@
 #ifndef INSTRUMENT_MIDI_IO_VIEW_H
 #define INSTRUMENT_MIDI_IO_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ModelView.h"
 
 
-class groupBox;
+class GroupBox;
 class LcdSpinBox;
 class QToolButton;
+class LedCheckBox;
+class InstrumentTrack;
 
 
 class InstrumentMidiIOView : public QWidget, public ModelView
 {
+	Q_OBJECT
 public:
 	InstrumentMidiIOView( QWidget* parent );
 	virtual ~InstrumentMidiIOView();
@@ -46,12 +49,12 @@ public:
 private:
 	virtual void modelChanged();
 
-	groupBox * m_midiInputGroupBox;
+	GroupBox * m_midiInputGroupBox;
 	LcdSpinBox * m_inputChannelSpinBox;
 	LcdSpinBox * m_fixedInputVelocitySpinBox;
 	QToolButton * m_rpBtn;
 
-	groupBox * m_midiOutputGroupBox;
+	GroupBox * m_midiOutputGroupBox;
 	LcdSpinBox * m_outputChannelSpinBox;
 	LcdSpinBox * m_fixedOutputVelocitySpinBox;
 	LcdSpinBox * m_outputProgramSpinBox;
@@ -61,5 +64,18 @@ private:
 	LcdSpinBox* m_baseVelocitySpinBox;
 
 } ;
+
+class InstrumentMiscView : public QWidget
+{
+	Q_OBJECT
+public:
+	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
+	~InstrumentMiscView();
+
+private:
+
+	GroupBox * m_pitchGroupBox;
+
+};
 
 #endif

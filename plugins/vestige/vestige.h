@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,15 +27,15 @@
 #define _VESTIGE_H
 
 
-#include <QtCore/QMutex>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QScrollArea>
+#include <QMutex>
+#include <QLayout>
+#include <QMdiSubWindow>
+#include <QScrollArea>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "note.h"
-#include "knob.h"
+#include "Note.h"
+#include "Knob.h"
 
 #include "AutomatableModel.h"
 
@@ -43,7 +43,7 @@
 class QPixmap;
 class QPushButton;
 
-class pixmapButton;
+class PixmapButton;
 class VstPlugin;
 
 
@@ -68,7 +68,7 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time );
+	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
@@ -85,7 +85,7 @@ private:
 	QString m_pluginDLL;
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	knob ** vstKnobs;
+	Knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
@@ -168,14 +168,14 @@ private:
 
 	int lastPosInMenu;
 
-	pixmapButton * m_openPluginButton;
-	pixmapButton * m_openPresetButton;
-	pixmapButton * m_rolLPresetButton;
-	pixmapButton * m_rolRPresetButton;
+	PixmapButton * m_openPluginButton;
+	PixmapButton * m_openPresetButton;
+	PixmapButton * m_rolLPresetButton;
+	PixmapButton * m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
-	pixmapButton * m_managePluginButton;
-	pixmapButton * m_savePresetButton;
+	PixmapButton * m_managePluginButton;
+	PixmapButton * m_savePresetButton;
 
 	Instrument * _instrument2;
 	QWidget * _parent2;

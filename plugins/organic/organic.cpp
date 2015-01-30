@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,20 +26,22 @@
 #include "organic.h"
 
 
-#include <QtXml/QDomElement>
-#include <QtGui/QPainter>
+#include <QDomElement>
+#include <QPainter>
 
 
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "templates.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 #include "embed.cpp"
+
+
 
 
 extern "C"
@@ -62,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 }
 
 QPixmap * organicInstrumentView::s_artwork = NULL;
-
+float * organicInstrument::s_harmonics = NULL;
 
 /***********************************************************************
 *
@@ -90,6 +92,8 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 		// Connect events 
 		connect( &m_osc[i]->m_oscModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT ( oscButtonChanged() ) );
+		connect( &m_osc[i]->m_harmModel, SIGNAL( dataChanged() ),
+				m_osc[i], SLOT( updateDetuning() ) );
 		connect( &m_osc[i]->m_volModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT( updateVolume() ) );
 		connect( &m_osc[i]->m_panModel, SIGNAL( dataChanged() ),
@@ -101,14 +105,37 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 
 	}
 
-	m_osc[0]->m_harmonic = log2f( 0.5f );	// one octave below
+/*	m_osc[0]->m_harmonic = log2f( 0.5f );	// one octave below
 	m_osc[1]->m_harmonic = log2f( 0.75f );	// a fifth below
 	m_osc[2]->m_harmonic = log2f( 1.0f );	// base freq
 	m_osc[3]->m_harmonic = log2f( 2.0f );	// first overtone
 	m_osc[4]->m_harmonic = log2f( 3.0f );	// second overtone
 	m_osc[5]->m_harmonic = log2f( 4.0f );	// .
 	m_osc[6]->m_harmonic = log2f( 5.0f );	// .
-	m_osc[7]->m_harmonic = log2f( 6.0f );	// .
+	m_osc[7]->m_harmonic = log2f( 6.0f );	// .*/
+	
+	if( s_harmonics == NULL )
+	{
+		s_harmonics = new float[ NUM_HARMONICS ];
+		s_harmonics[0] = log2f( 0.5f );
+		s_harmonics[1] = log2f( 0.75f );
+		s_harmonics[2] = log2f( 1.0f );
+		s_harmonics[3] = log2f( 2.0f );
+		s_harmonics[4] = log2f( 3.0f );
+		s_harmonics[5] = log2f( 4.0f );
+		s_harmonics[6] = log2f( 5.0f );
+		s_harmonics[7] = log2f( 6.0f );
+		s_harmonics[8] = log2f( 7.0f );
+		s_harmonics[9] = log2f( 8.0f );
+		s_harmonics[10] = log2f( 9.0f );
+		s_harmonics[11] = log2f( 10.0f );
+		s_harmonics[12] = log2f( 11.0f );
+		s_harmonics[13] = log2f( 12.0f );
+		s_harmonics[14] = log2f( 13.0f );
+		s_harmonics[15] = log2f( 14.0f );
+		s_harmonics[16] = log2f( 15.0f );
+		s_harmonics[17] = log2f( 16.0f );
+	}
 
 	for (int i=0; i < m_numOscillators; i++) {
 		m_osc[i]->updateVolume();
@@ -116,7 +143,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	}
 	
 
-	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( updateAllDetuning() ) );	
 }
 
@@ -142,9 +169,9 @@ void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		QString is = QString::number( i );
 		m_osc[i]->m_volModel.saveSettings( _doc, _this, "vol" + is );
 		m_osc[i]->m_panModel.saveSettings( _doc, _this, "pan" + is );
-		_this.setAttribute( "harmonic" + is, QString::number(
-					powf( 2.0f, m_osc[i]->m_harmonic ) ) );
-		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "detune"
+		m_osc[i]->m_harmModel.saveSettings( _doc, _this, "newharmonic" + is );
+
+		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "newdetune"
 									+ is );
 		m_osc[i]->m_oscModel.saveSettings( _doc, _this, "wavetype"
 									+ is );
@@ -163,9 +190,25 @@ void organicInstrument::loadSettings( const QDomElement & _this )
 	{
 		QString is = QString::number( i );
 		m_osc[i]->m_volModel.loadSettings( _this, "vol" + is );
-		m_osc[i]->m_detuneModel.loadSettings( _this, "detune" + is );
+		if( _this.hasAttribute( "detune" + is ) )
+		{
+			m_osc[i]->m_detuneModel.setValue( _this.attribute( "detune" ).toInt() * 12 );			
+		}
+		else
+		{
+			m_osc[i]->m_detuneModel.loadSettings( _this, "newdetune" + is );
+		}
 		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
 		m_osc[i]->m_oscModel.loadSettings( _this, "wavetype" + is );
+		
+		if( _this.hasAttribute( "newharmonic" + is ) )
+		{
+			m_osc[i]->m_harmModel.loadSettings( _this, "newharmonic" + is );
+		}
+		else
+		{
+			m_osc[i]->m_harmModel.setValue( static_cast<float>( i ) );
+		}
 	}
 	
 	m_volModel.loadSettings( _this, "vol" );
@@ -184,6 +227,9 @@ QString organicInstrument::nodeName() const
 void organicInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
+	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		Oscillator * oscs_l[m_numOscillators];
@@ -253,10 +299,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
 	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData)->oscRight;
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-
-	osc_l->update( _working_buffer, frames, 0 );
-	osc_r->update( _working_buffer, frames, 1 );
+	osc_l->update( _working_buffer + offset, frames, 0 );
+	osc_r->update( _working_buffer + offset, frames, 1 );
 
 
 	// -- fx section --
@@ -274,7 +318,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	// -- --
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -359,11 +403,11 @@ PluginView * organicInstrument::instantiateView( QWidget * _parent )
 
 
 
-class organicKnob : public knob
+class organicKnob : public Knob
 {
 public:
 	organicKnob( QWidget * _parent ) :
-		knob( knobStyled, _parent )
+		Knob( knobStyled, _parent )
 	{
 		setFixedSize( 21, 21 );
 	}
@@ -374,7 +418,8 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent ),
+	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
 
@@ -388,25 +433,30 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob = new organicKnob( this );
 	m_fx1Knob->move( 15, 201 );
 	m_fx1Knob->setFixedSize( 37, 47 );
-	m_fx1Knob->setHintText( tr( "Distortion:" ) + " ", QString() );
+	m_fx1Knob->setHintText( tr( "Distortion:" ), QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
+	m_fx1Knob->setWhatsThis( tr( "The distortion knob adds distortion to the output of the instrument. " ) );
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
 	m_volKnob->setVolumeKnob( true );
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
-	m_volKnob->setHintText( tr( "Volume:" ) + " ", "%" );
+	m_volKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volKnob->setObjectName( "volKnob" );
+	m_volKnob->setWhatsThis( tr( "The volume knob controls the volume of the output of the instrument. "
+									"It is cumulative with the instrument window's volume control. " ) );
 
 	// randomise
-	m_randBtn = new pixmapButton( this, tr( "Randomise" ) );
+	m_randBtn = new PixmapButton( this, tr( "Randomise" ) );
 	m_randBtn->move( 148, 224 );
 	m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"randomise_pressed" ) );
 	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
-
+	m_randBtn->setWhatsThis( tr( "The randomize button randomizes all knobs except the harmonics,"
+									"main volume and distortion knobs. ") );
+	
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );
 
@@ -429,61 +479,88 @@ organicInstrumentView::~organicInstrumentView()
 void organicInstrumentView::modelChanged()
 {
 	organicInstrument * oi = castModel<organicInstrument>();
-	const float y=91.3;
-	const float rowHeight = 26.52f;
-	const float x=53.4;
-	const float colWidth = 23.829f; // 54.4 77.2 220.2
+	
+	const float y=91.0f;
+	const float rowHeight = 26.0f;
+	const float x=53.0f;
+	const float colWidth = 24.0f; 
 
 	m_numOscillators = oi->m_numOscillators;
 	
 	m_fx1Knob->setModel( &oi->m_fx1Model );
 	m_volKnob->setModel( &oi->m_volModel );
 
-	// TODO: Delete existing oscKnobs if they exist
+	if( m_oscKnobs != NULL ) 
+	{
+		delete[] m_oscKnobs;
+	}
 	
 	m_oscKnobs = new OscillatorKnobs[ m_numOscillators ];
 
 	// Create knobs, now that we know how many to make
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
+		// setup harmonic knob
+		Knob * harmKnob = new organicKnob( this );
+		harmKnob->move( x + i * colWidth, y - rowHeight );
+		harmKnob->setObjectName( "harmKnob" );
+		connect( &oi->m_osc[i]->m_harmModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobHint() ) );
+			
 		// setup waveform-knob
-		knob * oscKnob = new organicKnob( this );
+		Knob * oscKnob = new organicKnob( this );
 		oscKnob->move( x + i * colWidth, y );
-		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ) + " ", QString() );
+		connect( &oi->m_osc[i]->m_oscModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobHint() ) );
+
+		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), QString() );
 										
 		// setup volume-knob
-		knob * volKnob = new knob( knobStyled, this );
+		Knob * volKnob = new Knob( knobStyled, this );
 		volKnob->setVolumeKnob( true );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
-							i + 1 ) + " ", "%" );
+								i + 1 ), "%" );
 							
 		// setup panning-knob
-		knob * panKnob = new organicKnob( this );
+		Knob * panKnob = new organicKnob( this );
 		panKnob->move( x + i  * colWidth, y + rowHeight*2 );
 		panKnob->setHintText( tr("Osc %1 panning:").arg(
-							i + 1 ) + " ", "" );
+								i + 1 ), "" );
 							
-		// setup knob for left fine-detuning
-		knob * detuneKnob = new organicKnob( this );
+		// setup knob for fine-detuning
+		Knob * detuneKnob = new organicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
-		detuneKnob->setHintText( tr( "Osc %1 fine detuning "
-							"left:" ).arg( i + 1 )
-							+ " ", " " +
+		detuneKnob->setHintText( tr( "Osc %1 stereo detuning" ).arg( i + 1 )
+							, " " +
 							tr( "cents" ) );
 
-		m_oscKnobs[i] = OscillatorKnobs( volKnob, oscKnob, panKnob, detuneKnob );
+		m_oscKnobs[i] = OscillatorKnobs( harmKnob, volKnob, oscKnob, panKnob, detuneKnob );
 
 		// Attach to models
-		m_oscKnobs[i].m_volKnob->setModel(
-					&oi->m_osc[i]->m_volModel );
-		m_oscKnobs[i].m_oscKnob->setModel(
-					&oi->m_osc[i]->m_oscModel );
-		m_oscKnobs[i].m_panKnob->setModel(
-					&oi->m_osc[i]->m_panModel );
-		m_oscKnobs[i].m_detuneKnob->setModel(
-					&oi->m_osc[i]->m_detuneModel );
+		m_oscKnobs[i].m_harmKnob->setModel( &oi->m_osc[i]->m_harmModel );
+		m_oscKnobs[i].m_volKnob->setModel( &oi->m_osc[i]->m_volModel );
+		m_oscKnobs[i].m_oscKnob->setModel( &oi->m_osc[i]->m_oscModel );
+		m_oscKnobs[i].m_panKnob->setModel( &oi->m_osc[i]->m_panModel );
+		m_oscKnobs[i].m_detuneKnob->setModel( &oi->m_osc[i]->m_detuneModel );
+	}
+	updateKnobHint();
+}
+
+
+void organicInstrumentView::updateKnobHint()
+{
+	organicInstrument * oi = castModel<organicInstrument>();
+	for( int i = 0; i < m_numOscillators; ++i )
+	{
+		const float harm = oi->m_osc[i]->m_harmModel.value();
+		const float wave = oi->m_osc[i]->m_oscModel.value();
+		
+		m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ), " (" +
+			HARMONIC_NAMES[ static_cast<int>( harm ) ] + ")" );
+		m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ), " (" +
+			WAVEFORM_NAMES[ static_cast<int>( wave ) ] + ")" );
 	}
 }
 
@@ -495,11 +572,13 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 	m_waveShape( Oscillator::SineWave, 0, Oscillator::NumWaveShapes-1, this ),
 	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f,
 			this, tr( "Osc %1 waveform" ).arg( _index + 1 ) ),
+	m_harmModel( static_cast<float>( _index ), 0.0f, 17.0f, 1.0f,
+			this, tr( "Osc %1 harmonic" ).arg( _index + 1 ) ),
 	m_volModel( 100.0f, 0.0f, 100.0f, 1.0f,
 			this, tr( "Osc %1 volume" ).arg( _index + 1 ) ),
 	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
 			this, tr( "Osc %1 panning" ).arg( _index + 1 ) ),
-	m_detuneModel( 0.0f, -100.0f, 100.0f, 1.0f, 
+	m_detuneModel( 0.0f, -1200.0f, 1200.0f, 1.0f, 
 			this, tr( "Osc %1 fine detuning left" ).arg( _index + 1 ) )
 {
 }
@@ -547,12 +626,12 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuning()
 {
-	m_detuningLeft = powf( 2.0f, m_harmonic
-				+ (float)m_detuneModel.value() / 100.0f ) /
-				engine::mixer()->processingSampleRate();
-	m_detuningRight = powf( 2.0f, m_harmonic
-				- (float)m_detuneModel.value() / 100.0f ) /
-				engine::mixer()->processingSampleRate();
+	m_detuningLeft = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
+				+ (float)m_detuneModel.value() * CENT ) /
+				Engine::mixer()->processingSampleRate();
+	m_detuningRight = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
+				- (float)m_detuneModel.value() * CENT ) /
+				Engine::mixer()->processingSampleRate();
 }
 
 
@@ -582,4 +661,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 
-#include "moc_organic.cxx"
+

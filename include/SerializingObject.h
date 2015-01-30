@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _SERIALIZING_OBJECT_H
-#define _SERIALIZING_OBJECT_H
+#ifndef SERIALIZING_OBJECT_H
+#define SERIALIZING_OBJECT_H
 
 #include <QtCore/QString>
 

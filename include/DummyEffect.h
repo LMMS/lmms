@@ -1,9 +1,9 @@
 /*
  * DummyEffect.h - effect used as fallback if an effect couldn't be loaded
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _DUMMY_EFFECT_H
-#define _DUMMY_EFFECT_H
+#ifndef DUMMY_EFFECT_H
+#define DUMMY_EFFECT_H
 
 #include "Effect.h"
 #include "EffectControls.h"
@@ -58,15 +58,15 @@ public:
 		return 0;
 	}
 
-	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	inline virtual void loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & )
 	{
 	}
 
-	inline virtual QString nodeName() const
+	virtual QString nodeName() const
 	{
 		return "DummyControls";
 	}
@@ -82,17 +82,19 @@ public:
 class DummyEffect : public Effect
 {
 public:
-	inline DummyEffect( Model * _parent ) :
+	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
 		Effect( NULL, _parent, NULL ),
-		m_controls( this )
+		m_controls( this ),
+		m_originalPluginData( originalPluginData )
+	{
+		setName();
+	}
+
+	virtual ~DummyEffect()
 	{
 	}
 
-	inline virtual ~DummyEffect()
-	{
-	}
-
-	inline virtual EffectControls * controls()
+	virtual EffectControls * controls()
 	{
 		return &m_controls;
 	}
@@ -102,10 +104,38 @@ public:
 		return false;
 	}
 
+	const QDomElement& originalPluginData() const
+	{
+		return m_originalPluginData;
+	}
+
+
 
 private:
 	DummyEffectControls m_controls;
+	const QDomElement m_originalPluginData;
+	
+	// Parse the display name from the dom
+	virtual void setName()
+	{
+		QDomNodeList keys = originalPluginData().elementsByTagName( "key" );
+		for( int i = 0; !keys.item( i ).isNull(); ++i )
+		{
+			QDomNodeList attributes = keys.item( i ).toElement().elementsByTagName( "attribute" );
+			for( int j = 0; !attributes.item( j ).isNull(); ++j )
+			{
+				QDomElement attribute = attributes.item( j ).toElement();
+				if( attribute.hasAttribute( "value" ) )
+				{
+					QString name = tr("NOT FOUND") + " (" + attribute.attribute( "value" ) + ")";
+					setDisplayName(name);
+					return;
+				}
 
+			}
+
+		}
+	}
 } ;
 
 

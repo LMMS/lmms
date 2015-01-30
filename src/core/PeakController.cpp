@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,22 +23,20 @@
  *
  */
 
-#include <math.h>
+#include "PeakController.h"
+
 #include <cstdio>
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
 #include <QMessageBox>
 
-
-#include "song.h"
-#include "engine.h"
+#include "Engine.h"
 #include "Mixer.h"
-#include "PeakController.h"
 #include "EffectChain.h"
-#include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
+
+class ControllerDialog;
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -46,16 +44,22 @@ int PeakController::m_loadCount;
 bool PeakController::m_buggedFile;
 
 
-PeakController::PeakController( Model * _parent, 
+PeakController::PeakController( Model * _parent,
 		PeakControllerEffect * _peak_effect ) :
 	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
-	m_peakEffect( _peak_effect )
+	m_peakEffect( _peak_effect ),
+	m_currentSample( 0.0f )
 {
+	setSampleExact( true );
 	if( m_peakEffect )
 	{
 		connect( m_peakEffect, SIGNAL( destroyed( ) ),
 			this, SLOT( handleDestroyedEffect( ) ) );
 	}
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	m_coeffNeedsUpdate = true;
 }
 
 
@@ -74,16 +78,55 @@ PeakController::~PeakController()
 }
 
 
-
-float PeakController::value( int _offset )
+void PeakController::updateValueBuffer()
 {
+	if( m_coeffNeedsUpdate )
+	{
+		const float ratio = 44100.0f / Engine::mixer()->processingSampleRate();
+		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
+		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
+		m_coeffNeedsUpdate = false;
+	}
+
 	if( m_peakEffect )
 	{
-		return m_peakEffect->lastSample();
+		float targetSample = m_peakEffect->lastSample();
+		if( m_currentSample != targetSample )
+		{
+			const f_cnt_t frames = Engine::mixer()->framesPerPeriod();
+			float * values = m_valueBuffer.values();
+
+			for( f_cnt_t f = 0; f < frames; ++f )
+			{
+				const float diff = ( targetSample - m_currentSample );
+				if( m_currentSample < targetSample ) // going up...
+				{
+					m_currentSample += diff * m_attackCoeff;
+				}
+				else if( m_currentSample > targetSample ) // going down
+				{
+					m_currentSample += diff * m_decayCoeff;
+				}
+				values[f] = m_currentSample;
+			}
+		}
+		else
+		{
+			m_valueBuffer.fill( m_currentSample );
+		}
 	}
-	return( 0 );
+	else
+	{
+		m_valueBuffer.fill( 0 );
+	}
+	m_bufferLastUpdated = s_periods;
 }
 
+
+void PeakController::updateCoeffs()
+{
+	m_coeffNeedsUpdate = true;
+}
 
 
 void PeakController::handleDestroyedEffect( )
@@ -216,5 +259,5 @@ ControllerDialog * PeakController::createDialog( QWidget * _parent )
 }
 
 
-#include "moc_PeakController.cxx"
+
 

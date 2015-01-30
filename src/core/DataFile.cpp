@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,21 +28,20 @@
 
 #include <math.h>
 
-#include <QtCore/QDebug>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QTextStream>
-#include <QtGui/QMessageBox>
+#include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
+#include <QMessageBox>
 
 
-#include "config_mgr.h"
-#include "project_version.h"
+#include "ConfigManager.h"
+#include "ProjectVersion.h"
+#include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "Effect.h"
 #include "lmmsversion.h"
-
-// bbTCO::defaultColor()
-#include "bb_track.h"
+#include "base64.h"
 
 
 
@@ -58,6 +57,38 @@ DataFile::typeDescStruct
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" }
 } ;
+
+
+
+DataFile::LocaleHelper::LocaleHelper( Mode mode )
+{
+	switch( mode )
+	{
+		case ModeLoad:
+			// set a locale for which QString::fromFloat() returns valid values if
+			// floating point separator is a comma - otherwise we would fail to load
+			// older projects made by people from various countries due to their
+			// locale settings
+		    QLocale::setDefault( QLocale::German );
+			break;
+
+		case ModeSave:
+			// set default locale to C so that floating point decimals are rendered to
+			// strings with periods as decimal point instead of commas in some countries
+			QLocale::setDefault( QLocale::C );
+
+		default: break;
+	}
+}
+
+
+
+DataFile::LocaleHelper::~LocaleHelper()
+{
+	// revert to original locale
+	QLocale::setDefault( QLocale::system() );
+}
+
 
 
 
@@ -94,14 +125,18 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		QMessageBox::critical( NULL,
-			SongEditor::tr( "Could not open file" ),
-			SongEditor::tr( "Could not open file %1. You probably "
-					"have no permissions to read this "
-					"file.\n Please make sure to have at "
-					"least read permissions to the file "
-					"and try again." ).arg( _fileName ) );
-			return;
+		if( Engine::hasGUI() )
+		{
+			QMessageBox::critical( NULL,
+				SongEditor::tr( "Could not open file" ),
+				SongEditor::tr( "Could not open file %1. You probably "
+						"have no permissions to read this "
+						"file.\n Please make sure to have at "
+						"least read permissions to the file "
+						"and try again." ).arg( _fileName ) );
+		}
+
+		return;
 	}
 
 	loadData( inFile.readAll(), _fileName );
@@ -137,7 +172,7 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 					_fn.section( '.', -1 ) != "mpt" &&
 					_fn.section( '.', -1 ) != "mmpz" )
 			{
-				if( configManager::inst()->value( "app",
+				if( ConfigManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
 				{
 					return _fn + ".mmpz";
@@ -189,11 +224,15 @@ bool DataFile::writeFile( const QString& filename )
 
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			SongEditor::tr( "Could not write file" ),
-			SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
-							"write to this file. Please make sure you have write-access to "
-							"the file and try again." ).arg( fullName ) );
+		if( Engine::hasGUI() )
+		{
+			QMessageBox::critical( NULL,
+				SongEditor::tr( "Could not write file" ),
+				SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
+								"write to this file. Please make sure you have write-access to "
+								"the file and try again." ).arg( fullName ) );
+		}
+
 		return false;
 	}
 
@@ -215,10 +254,18 @@ bool DataFile::writeFile( const QString& filename )
 	// make sure the file has been written correctly
 	if( QFileInfo( outfile.fileName() ).size() > 0 )
 	{
-		// remove old backup file
-		QFile::remove( fullNameBak );
-		// move current file to backup file
-		QFile::rename( fullName, fullNameBak );
+		if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
+		{
+			// remove current file
+			QFile::remove( fullName );
+		}
+		else
+		{
+			// remove old backup file
+			QFile::remove( fullNameBak );
+			// move current file to backup file
+			QFile::rename( fullName, fullNameBak );
+		}
 		// move temporary file to current file
 		QFile::rename( fullNameTemp, fullName );
 
@@ -294,7 +341,7 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 
 void DataFile::upgrade()
 {
-	projectVersion version =
+	ProjectVersion version =
 		documentElement().attribute( "creatorversion" ).
 							replace( "svn", "" );
 
@@ -587,7 +634,7 @@ void DataFile::upgrade()
 			el.setAttribute( "lp1pos",
 				el.attribute( "lp1pos" ).toInt()*3 );
 		}
-		
+
 	}
 
 	if( version < "0.4.0-20080607" )
@@ -683,28 +730,25 @@ void DataFile::upgrade()
 
 	}
 
-	// new default colour for B&B tracks
-	QDomNodeList list = elementsByTagName( "bbtco" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
+	// update document meta data
+	documentElement().setAttribute( "version", LDF_VERSION_STRING );
+	documentElement().setAttribute( "type", typeName( type() ) );
+	documentElement().setAttribute( "creator", "LMMS" );
+	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
+
+	if( type() == SongProject || type() == SongProjectTemplate )
 	{
-		QDomElement el = list.item( i ).toElement();
-		unsigned int rgb = el.attribute( "color" ).toUInt();
-		if( rgb == qRgb( 64, 128, 255 ) )
+		// Time-signature
+		if ( !m_head.hasAttribute( "timesig_numerator" ) )
 		{
-			el.setAttribute( "color", bbTCO::defaultColor() );
+			m_head.setAttribute( "timesig_numerator", 4 );
+			m_head.setAttribute( "timesig_denominator", 4 );
 		}
-	}
 
-	// Time-signature
-	if ( !m_head.hasAttribute( "timesig_numerator" ) )
-	{
-		m_head.setAttribute( "timesig_numerator", 4 );
-		m_head.setAttribute( "timesig_denominator", 4 );
-	}
-
-	if( !m_head.hasAttribute( "mastervol" ) )
-	{
-		m_head.setAttribute( "mastervol", 100 );
+		if( !m_head.hasAttribute( "mastervol" ) )
+		{
+			m_head.setAttribute( "mastervol", 100 );
+		}
 	}
 //printf("%s\n", toString( 2 ).toUtf8().constData());
 }
@@ -730,12 +774,16 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			QMessageBox::critical( NULL,
-				SongEditor::tr( "Error in file" ),
-				SongEditor::tr( "The file %1 seems to contain "
-						"errors and therefore can't be "
-						"loaded." ).
-							arg( _sourceFile ) );
+			if( Engine::hasGUI() )
+			{
+				QMessageBox::critical( NULL,
+					SongEditor::tr( "Error in file" ),
+					SongEditor::tr( "The file %1 seems to contain "
+							"errors and therefore can't be "
+							"loaded." ).
+								arg( _sourceFile ) );
+			}
+
 			return;
 		}
 	}
@@ -744,10 +792,37 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_type = type( root.attribute( "type" ) );
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-	if( root.hasAttribute( "creatorversion" ) &&
-		root.attribute( "creatorversion" ) != LMMS_VERSION )
+
+	if( root.hasAttribute( "creatorversion" ) )
 	{
-		upgrade();
+		// compareType defaults to Build,so it doesn't have to be set here
+		ProjectVersion createdWith = root.attribute( "creatorversion" );
+		ProjectVersion openedWith = LMMS_VERSION;;
+
+		if ( createdWith != openedWith )
+		{
+			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
+			if ( createdWith.setCompareType(Minor) != openedWith)
+			{
+				if( Engine::hasGUI() )
+				{
+					QMessageBox::information( NULL,
+						SongEditor::tr( "Project Version Mismatch" ),
+						SongEditor::tr( 
+								"This project was created with "
+								"LMMS version %1, but version %2 "
+								"is installed")
+								.arg( root.attribute( "creatorversion" ) )
+								.arg( LMMS_VERSION ) );
+				}
+			}
+
+			// the upgrade needs to happen after the warning as it updates the project version.
+			if( createdWith.setCompareType(Build) < openedWith )
+			{
+				upgrade();
+			}
+		}
 	}
 
 	m_content = root.elementsByTagName( typeName( m_type ) ).

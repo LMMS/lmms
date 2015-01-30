@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,13 +22,14 @@
  *
  */
 
-#include <QtGui/QMouseEvent>
+#include <QMouseEvent>
 
 #include "TimeDisplayWidget.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
-#include "engine.h"
-#include "tooltip.h"
-#include "song.h"
+#include "Engine.h"
+#include "ToolTip.h"
+#include "Song.h"
 
 
 
@@ -48,12 +49,12 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	toolTip::add( this, tr( "click to change time units" ) );
+	ToolTip::add( this, tr( "click to change time units" ) );
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
 
@@ -95,7 +96,7 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 void TimeDisplayWidget::updateTime()
 {
-	song* s = engine::getSong();
+	Song* s = Engine::getSong();
 
 	switch( m_displayMode )
 	{
@@ -106,12 +107,13 @@ void TimeDisplayWidget::updateTime()
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setValue( s->getTacts() + 1 );
-			m_minorLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) / 
-					     ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-;
-			m_milliSecondsLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) %
-						    ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+			int tick;
+			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
+			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
+			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
+						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
+			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
+							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
 			break;
 
 		default: break;
@@ -138,6 +140,6 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 
 
 
-#include "moc_TimeDisplayWidget.cxx"
+
 
 

@@ -4,7 +4,7 @@
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,19 +25,19 @@
 
 #include "patman.h"
 
-#include <QtGui/QDragEnterEvent>
-#include <QtGui/QPainter>
-#include <QtXml/QDomElement>
+#include <QDragEnterEvent>
+#include <QPainter>
+#include <QDomElement>
 
 #include "endian_handling.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
-#include "song.h"
-#include "string_pair_drag.h"
-#include "tooltip.h"
+#include "PixmapButton.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "ToolTip.h"
 #include "FileDialog.h"
 
 #include "embed.cpp"
@@ -105,7 +105,7 @@ void patmanInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void patmanInstrument::loadSettings( const QDomElement & _this )
 {
-	setFile( _this.attribute( "src" ), FALSE );
+	setFile( _this.attribute( "src" ), false );
 	m_loopedModel.loadSettings( _this, "looped" );
 	m_tunedModel.loadSettings( _this, "tuned" );
 }
@@ -138,6 +138,7 @@ void patmanInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	if( !_n->m_pluginData )
 	{
@@ -148,12 +149,12 @@ void patmanInstrument::playNote( NotePlayHandle * _n,
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if( hdata->sample->play( _working_buffer, hdata->state, frames,
+	if( hdata->sample->play( _working_buffer + offset, hdata->state, frames,
 					play_freq, m_loopedModel.value() ? SampleBuffer::LoopOn : SampleBuffer::LoopOff ) )
 	{
 		applyRelease( _working_buffer, _n );
 		instrumentTrack()->processAudioBuffer( _working_buffer,
-								frames, _n );
+								frames + offset, _n );
 	}
 }
 
@@ -440,14 +441,14 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentView( _instrument, _parent ),
 	m_pi( NULL )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 
 
-	m_openFileButton = new pixmapButton( this, NULL );
+	m_openFileButton = new PixmapButton( this, NULL );
 	m_openFileButton->setObjectName( "openFileButton" );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 227, 86 );
@@ -457,35 +458,35 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 							"select_file" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
-	toolTip::add( m_openFileButton, tr( "Open other patch" ) );
+	ToolTip::add( m_openFileButton, tr( "Open other patch" ) );
 
 	m_openFileButton->setWhatsThis(
 		tr( "Click here to open another patch-file. Loop and Tune "
 			"settings are not reset." ) );
 
-	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
+	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");
-	m_loopButton->setCheckable( TRUE );
+	m_loopButton->setCheckable( true );
 	m_loopButton->move( 195, 138 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
-	toolTip::add( m_loopButton, tr( "Loop mode" ) );
+	ToolTip::add( m_loopButton, tr( "Loop mode" ) );
 	m_loopButton->setWhatsThis(
 		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
 			"will use the loop information available in the "
 			"file." ) );
 
-	m_tuneButton = new pixmapButton( this, tr( "Tune" ) );
+	m_tuneButton = new PixmapButton( this, tr( "Tune" ) );
 	m_tuneButton->setObjectName("tuneButton");
-	m_tuneButton->setCheckable( TRUE );
+	m_tuneButton->setCheckable( true );
 	m_tuneButton->move( 223, 138 );
 	m_tuneButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_on" ) );
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_off" ) );
-	toolTip::add( m_tuneButton, tr( "Tune mode" ) );
+	ToolTip::add( m_tuneButton, tr( "Tune mode" ) );
 	m_tuneButton->setWhatsThis(
 		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
 			"will tune the sample to match the note's "
@@ -493,7 +494,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_displayFilename = tr( "No file selected" );
 
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 }
 
 
@@ -513,7 +514,7 @@ void PatmanView::openFile( void )
 
 	QStringList types;
 	types << tr( "Patch-Files (*.pat)" );
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 
 	if( m_pi->m_patchFile == "" )
 	{
@@ -524,16 +525,16 @@ void PatmanView::openFile( void )
 		else
 		{
 			ofd.setDirectory(
-				configManager::inst()->userSamplesDir() );
+				ConfigManager::inst()->userSamplesDir() );
 		}
 	}
 	else if( QFileInfo( m_pi->m_patchFile ).isRelative() )
 	{
-		QString f = configManager::inst()->userSamplesDir()
+		QString f = ConfigManager::inst()->userSamplesDir()
 							+ m_pi->m_patchFile;
-		if( QFileInfo( f ).exists() == FALSE )
+		if( QFileInfo( f ).exists() == false )
 		{
-			f = configManager::inst()->factorySamplesDir()
+			f = ConfigManager::inst()->factorySamplesDir()
 							+ m_pi->m_patchFile;
 		}
 
@@ -550,7 +551,7 @@ void PatmanView::openFile( void )
 		if( f != "" )
 		{
 			m_pi->setFile( f );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 }
@@ -587,10 +588,10 @@ void PatmanView::updateFilename( void )
 
 void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
+						StringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "samplefile" )
 		{
 			_dee->acceptProposedAction();
@@ -611,8 +612,8 @@ void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void PatmanView::dropEvent( QDropEvent * _de )
 {
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString type = StringPairDrag::decodeKey( _de );
+	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
 		m_pi->setFile( value );
@@ -651,4 +652,4 @@ void PatmanView::modelChanged( void )
 
 
 
-#include "moc_patman.cxx"
+

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,17 +22,17 @@
  *
  */
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "MidiAlsaSeq.h"
-#include "config_mgr.h"
-#include "engine.h"
+#include "ConfigManager.h"
+#include "Engine.h"
 #include "gui_templates.h"
-#include "song.h"
+#include "Song.h"
 #include "MidiPort.h"
 #include "MidiTime.h"
-#include "note.h"
+#include "Note.h"
 
 
 #ifdef LMMS_HAVE_ALSA
@@ -82,7 +82,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 {
 	int err;
 	if( ( err = snd_seq_open( &m_seqHandle,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 						SND_SEQ_OPEN_DUPLEX, 0 ) ) < 0 )
 	{
 		fprintf( stderr, "cannot open sequencer: %s\n",
@@ -96,14 +96,14 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_malloc( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
-					engine::getSong()->getTempo() );
+					Engine::getSong()->getTempo() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 	snd_seq_queue_tempo_free( tempo );
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
-	changeQueueTempo( engine::getSong()->getTempo() );
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	changeQueueTempo( Engine::getSong()->getTempo() );
+	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( changeQueueTempo( bpm_t ) ) );
 
 	// initial list-update
@@ -146,7 +146,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 
 QString MidiAlsaSeq::probeDevice()
 {
-	QString dev = configManager::inst()->value( "Midialsaseq", "device" );
+	QString dev = ConfigManager::inst()->value( "Midialsaseq", "device" );
 	if( dev.isEmpty() )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -378,7 +378,7 @@ void MidiAlsaSeq::subscribeReadablePort( MidiPort * _port,
 
 	snd_seq_addr_t sender;
 	if( snd_seq_parse_address( m_seqHandle, &sender,
-			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
+			_dest.section( ' ', 0, 0 ).toLatin1().constData() ) )
 	{
 		fprintf( stderr, "error parsing sender-address!\n" );
 
@@ -429,7 +429,7 @@ void MidiAlsaSeq::subscribeWritablePort( MidiPort * _port,
 
 	snd_seq_addr_t dest;
 	if( snd_seq_parse_address( m_seqHandle, &dest,
-			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
+			_dest.section( ' ', 0, 0 ).toLatin1().constData() ) )
 	{
 		fprintf( stderr, "error parsing dest-address!\n" );
 		m_seqMutex.unlock();
@@ -730,12 +730,12 @@ MidiAlsaSeq::setupWidget::~setupWidget()
 
 void MidiAlsaSeq::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "Midialsaseq", "device",
+	ConfigManager::inst()->setValue( "Midialsaseq", "device",
 							m_device->text() );
 }
 
 
-#include "moc_MidiAlsaSeq.cxx"
+
 
 
 #endif

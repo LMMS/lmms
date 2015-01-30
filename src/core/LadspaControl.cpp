@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -76,7 +76,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
 					&& m_port->max == 10.0f ? 4000.0f :
-								400.0f ) );
+								( m_port->suggests_logscale ? 8000.0f : 800.0f ) ) );
 			m_knobModel.setInitValue( m_port->def );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
@@ -87,7 +87,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 		case TIME:
 			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max,
 					  ( m_port->max -
-						m_port->min ) / 400.0f );
+						m_port->min ) / 800.0f );
 			m_tempoSyncKnobModel.setInitValue( m_port->def );
 			connect( &m_tempoSyncKnobModel, SIGNAL( dataChanged() ),
 					 this, SLOT( tempoKnobChanged() ) );
@@ -129,6 +129,25 @@ LADSPA_Data LadspaControl::value()
 	return 0;
 }
 
+
+ValueBuffer * LadspaControl::valueBuffer()
+{
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+		case INTEGER:
+			return NULL;
+		case FLOATING:
+			return m_knobModel.valueBuffer();
+		case TIME:
+			return m_tempoSyncKnobModel.valueBuffer();
+		default:
+			qWarning( "LadspaControl::valueBuffer(): BAD BAD BAD\n" );
+			break;
+	}
+
+	return NULL;
+}
 
 
 
@@ -320,4 +339,4 @@ void LadspaControl::setLink( bool _state )
 
 
 
-#include "moc_LadspaControl.cxx"
+

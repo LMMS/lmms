@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,13 +24,13 @@
 
 
 #include "SampleRecordHandle.h"
-#include "bb_track.h"
-#include "engine.h"
+#include "BBTrack.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
-#include "pattern.h"
+#include "Pattern.h"
 #include "SampleBuffer.h"
 #include "SampleTrack.h"
-
+#include "debug.h"
 
 
 SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
@@ -68,12 +68,12 @@ SampleRecordHandle::~SampleRecordHandle()
 
 void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = engine::mixer()->inputBuffer();
-	const f_cnt_t frames = engine::mixer()->inputBufferFrames();
+	const sampleFrame * recbuf = Engine::mixer()->inputBuffer();
+	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
-	MidiTime len = (tick_t)( m_framesRecorded / engine::framesPerTick() );
+	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
 //		m_tco->changeLength( len );
@@ -92,7 +92,7 @@ bool SampleRecordHandle::isFinished() const
 
 
 
-bool SampleRecordHandle::isFromTrack( const track * _track ) const
+bool SampleRecordHandle::isFromTrack( const Track * _track ) const
 {
 	return( m_track == _track || m_bbTrack == _track );
 }
@@ -116,9 +116,9 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	// make sure buffer is cleaned up properly at the end...
 	sampleFrame * data_ptr = data;
 
-#ifdef LMMS_DEBUG
+
 	assert( data != NULL );
-#endif
+
 	// now copy all buffers into big buffer
 	for( bufferList::const_iterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )
@@ -129,7 +129,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	}
 	// create according sample-buffer out of big buffer
 	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf)->setSampleRate( engine::mixer()->inputSampleRate() );
+	( *sampleBuf)->setSampleRate( Engine::mixer()->inputSampleRate() );
 	delete[] data;
 }
 

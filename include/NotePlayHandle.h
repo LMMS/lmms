@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,25 +26,27 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
-#include "lmmsconfig.h"
-#include "note.h"
+#include "Note.h"
 #include "PlayHandle.h"
-#include "track.h"
+#include "Track.h"
+#include "MemoryManager.h"
 
-
+class QAtomicInt;
+class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;
 
-template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
+template<ch_cnt_t=DEFAULT_CHANNELS> class BasicFilters;
 typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 
-class EXPORT NotePlayHandle : public PlayHandle, public note
+class EXPORT NotePlayHandle : public PlayHandle, public Note
 {
+	MM_OPERATORS
 public:
 	void * m_pluginData;
-	basicFilters<> * m_filter;
+	BasicFilters<> * m_filter;
 
 	// specifies origin of NotePlayHandle
 	enum Origins
@@ -60,11 +62,17 @@ public:
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
-					const note& noteToPlay,
+					const Note& noteToPlay,
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle();
+	virtual ~NotePlayHandle() {}
+	void done();
+
+	void * operator new ( size_t size, void * p )
+	{
+		return p;
+	}
 
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
@@ -75,12 +83,20 @@ public:
 		return m_midiChannel;
 	}
 
+	/*! convenience function that returns offset for the first period and zero otherwise,
+		used by instruments to handle the offset: instruments have to check this property and
+		add the correct number of empty frames in the beginning of the period */
+	f_cnt_t noteOffset() const
+	{
+		return m_totalFramesPlayed == 0
+			? offset()
+			: 0;
+	}
+
 	const float& frequency() const
 	{
 		return m_frequency;
 	}
-
-	void updateFrequency();
 
 	/*! Returns frequency without pitch wheel influence */
 	float unpitchedFrequency() const
@@ -104,7 +120,7 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const track* _track ) const;
+	virtual bool isFromTrack( const Track* _track ) const;
 
 	/*! Releases the note (and plays release frames */
 	void noteOff( const f_cnt_t offset = 0 );
@@ -194,7 +210,7 @@ public:
 
 	/*! returns list of note-play-handles belonging to given instrument track,
 	    if allPlayHandles = true, also released note-play-handles are returned */
-	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* track, bool allPlayHandles = false );
+	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* Track, bool allPlayHandles = false );
 
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
@@ -206,7 +222,7 @@ public:
 	}
 
 	/*! Sets attached BB track */
-	void setBBTrack( track* t )
+	void setBBTrack( Track* t )
 	{
 		m_bbTrack = t;
 	}
@@ -229,10 +245,15 @@ public:
 		return m_songGlobalParentOffset;
 	}
 
+	void setFrequencyUpdate()
+	{
+		m_frequencyNeedsUpdate = true;
+	}
 
 private:
 	class BaseDetuning
 	{
+		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -252,6 +273,8 @@ private:
 
 	} ;
 
+	void updateFrequency();
+
 	InstrumentTrack* m_instrumentTrack;		// needed for calling
 											// InstrumentTrack::playNote
 	f_cnt_t m_frames;						// total frames to play
@@ -266,16 +289,17 @@ private:
 											// release of note
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
-	bool m_hasParent;
+	bool m_hasParent;						// indicates whether note has parent
+	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	track* m_bbTrack;						// related BB track
+	Track* m_bbTrack;						// related BB track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
 	f_cnt_t m_origFrames;					// original m_frames
 
-	const int m_origBaseNote;
+	int m_origBaseNote;
 
 	float m_frequency;
 	float m_unpitchedFrequency;
@@ -283,9 +307,37 @@ private:
 	BaseDetuning* m_baseDetuning;
 	MidiTime m_songGlobalParentOffset;
 
-	const int m_midiChannel;
-	const Origin m_origin;
+	int m_midiChannel;
+	Origin m_origin;
 
+	bool m_frequencyNeedsUpdate;				// used to update pitch
 } ;
+
+
+const int INITIAL_NPH_CACHE = 256;
+const int NPH_CACHE_INCREMENT = 16;
+
+class NotePlayHandleManager
+{
+	MM_OPERATORS
+public:
+	static void init();
+	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
+					const f_cnt_t offset,
+					const f_cnt_t frames,
+					const Note& noteToPlay,
+					NotePlayHandle* parent = NULL,
+					int midiEventChannel = -1,
+					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+	static void release( NotePlayHandle * nph );
+	static void extend( int i );
+
+private:
+	static NotePlayHandle ** s_available;
+	static QReadWriteLock s_mutex;
+	static QAtomicInt s_availableIndex;
+	static int s_size;
+};
+
 
 #endif

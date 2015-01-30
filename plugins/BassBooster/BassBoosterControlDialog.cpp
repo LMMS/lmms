@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "BassBoosterControlDialog.h"
 #include "BassBoosterControls.h"
@@ -44,20 +44,20 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 
 	QHBoxLayout * l = new QHBoxLayout;
 
-	knob * freqKnob = new knob( knobBright_26, this);
+	Knob * freqKnob = new Knob( knobBright_26, this);
 	freqKnob->setModel( &controls->m_freqModel );
 	freqKnob->setLabel( tr( "FREQ" ) );
-	freqKnob->setHintText( tr( "Frequency:" ) + " ", "Hz" );
+	freqKnob->setHintText( tr( "Frequency:" ) , "Hz" );
 
-	knob * gainKnob = new knob( knobBright_26, this );
+	Knob * gainKnob = new Knob( knobBright_26, this );
 	gainKnob->setModel( &controls->m_gainModel );
 	gainKnob->setLabel( tr( "GAIN" ) );
-	gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
+	gainKnob->setHintText( tr( "Gain:" ) , "" );
 
-	knob * ratioKnob = new knob( knobBright_26, this );
+	Knob * ratioKnob = new Knob( knobBright_26, this );
 	ratioKnob->setModel( &controls->m_ratioModel );
 	ratioKnob->setLabel( tr( "RATIO" ) );
-	ratioKnob->setHintText( tr( "Ratio:" ) + " ", "" );
+	ratioKnob->setHintText( tr( "Ratio:" ) , "" );
 
 	l->addWidget( freqKnob );
 	l->addWidget( gainKnob );
@@ -66,5 +66,4 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	tl->addLayout( l );
 	setLayout( tl );
 }
-
 

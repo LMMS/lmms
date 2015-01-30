@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,22 +23,22 @@
  *
  */
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
 #include "embed.h"
-#include "led_checkbox.h"
-#include "combobox.h"
-#include "tooltip.h"
+#include "LedCheckbox.h"
+#include "ComboBox.h"
+#include "ToolTip.h"
 #include "gui_templates.h"
 
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
-	knob * name = new knob( knobBright_26, this); 			\
+	Knob * name = new Knob( knobBright_26, this); 			\
 	name -> move( x, y );									\
 	name ->setModel( &controls-> model );					\
 	name ->setLabel( tr( label ) );							\
-	name ->setHintText( tr( hint ) + " ", unit );
+	name ->setHintText( tr( hint ) , unit );
 
 
 
@@ -62,25 +62,26 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );
 
-	ledCheckBox * enabled1Toggle = new ledCheckBox( "", this,
-				tr( "Filter 1 enabled" ), ledCheckBox::Green );
-	ledCheckBox * enabled2Toggle = new ledCheckBox( "", this,
-				tr( "Filter 2 enabled" ), ledCheckBox::Green );
+	LedCheckBox * enabled1Toggle = new LedCheckBox( "", this,
+				tr( "Filter 1 enabled" ), LedCheckBox::Green );
+	LedCheckBox * enabled2Toggle = new LedCheckBox( "", this,
+				tr( "Filter 2 enabled" ), LedCheckBox::Green );
 
 	enabled1Toggle -> move( 5, 30 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
-	toolTip::add( enabled1Toggle, tr( "Click to enable/disable Filter 1" ) );
+	ToolTip::add( enabled1Toggle, tr( "Click to enable/disable Filter 1" ) );
 	enabled2Toggle -> move( 5, 145 );
 	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
-	toolTip::add( enabled2Toggle, tr( "Click to enable/disable Filter 2" ) );
+	ToolTip::add( enabled2Toggle, tr( "Click to enable/disable Filter 2" ) );
 
-	comboBox * m_filter1ComboBox = new comboBox( this );
+	ComboBox * m_filter1ComboBox = new ComboBox( this );
 	m_filter1ComboBox->setGeometry( 5, 70, 140, 22 );
 	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
-	comboBox * m_filter2ComboBox = new comboBox( this );
+	ComboBox * m_filter2ComboBox = new ComboBox( this );
 	m_filter2ComboBox->setGeometry( 5, 185, 140, 22 );
 	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
+

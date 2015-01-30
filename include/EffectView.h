@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _EFFECT_VIEW_H
-#define _EFFECT_VIEW_H
+#ifndef EFFECT_VIEW_H
+#define EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
 #include "PluginView.h"
@@ -36,8 +36,8 @@ class QPushButton;
 class QMdiSubWindow;
 
 class EffectControlDialog;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 class TempoSyncKnob;
 
 
@@ -47,7 +47,7 @@ class EffectView : public PluginView
 public:
 	EffectView( Effect * _model, QWidget * _parent );
 	virtual ~EffectView();
-	
+
 	inline Effect * effect()
 	{
 		return castModel<Effect>();
@@ -66,7 +66,7 @@ public slots:
 	void displayHelp();
 	void closeEffects();
 
-	
+
 signals:
 	void moveUp( EffectView * _plugin );
 	void moveDown( EffectView * _plugin );
@@ -81,10 +81,10 @@ protected:
 
 private:
 	QPixmap m_bg;
-	ledCheckBox * m_bypass;
-	knob * m_wetDry;
+	LedCheckBox * m_bypass;
+	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	knob * m_gate;
+	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 

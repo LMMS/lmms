@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,20 +23,21 @@
  */
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "bit_invader.h"
-#include "engine.h"
-#include "graph.h"
+#include "base64.h"
+#include "Engine.h"
+#include "Graph.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "templates.h"
-#include "tooltip.h"
-#include "song.h"
+#include "ToolTip.h"
+#include "Song.h"
 #include "interpolation.h"
 
 #include "embed.cpp"
@@ -278,13 +279,14 @@ void bitInvader::playNote( NotePlayHandle * _n,
 					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
-				engine::mixer()->processingSampleRate() );
+				Engine::mixer()->processingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
-	for( fpp_t frame = 0; frame < frames; ++frame )
+	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample();
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -295,7 +297,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 
 	applyRelease( _working_buffer, _n );
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -331,16 +333,16 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 								"artwork" ) );
 	setPalette( pal );
 	
-	m_sampleLengthKnob = new knob( knobDark_28, this );
+	m_sampleLengthKnob = new Knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 6, 201 );
-	m_sampleLengthKnob->setHintText( tr( "Sample Length" ) + " ", "" );
+	m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
 
-	m_graph = new graph( this, graph::NearestStyle, 204, 134 );
+	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border
 	m_graph->setAutoFillBackground( true );
 	m_graph->setGraphColor( QColor( 255, 255, 255 ) );
 
-	toolTip::add( m_graph, tr ( "Draw your own waveform here "
+	ToolTip::add( m_graph, tr ( "Draw your own waveform here "
 				"by dragging your mouse on this graph."
 	));
 
@@ -351,78 +353,78 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_graph->setPalette( pal );
 
 
-	m_sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ) );
+	m_sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
 	m_sinWaveBtn->move( 131, 205 );
 	m_sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
-	toolTip::add( m_sinWaveBtn,
+	ToolTip::add( m_sinWaveBtn,
 			tr( "Click for a sine-wave." ) );
 
-	m_triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ) );
+	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triangleWaveBtn->move( 131 + 14, 205 );
 	m_triangleWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	m_triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
-	toolTip::add( m_triangleWaveBtn,
+	ToolTip::add( m_triangleWaveBtn,
 			tr( "Click here for a triangle-wave." ) );
 
-	m_sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ) );
+	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
 	m_sawWaveBtn->move( 131 + 14*2, 205  );
 	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
-	toolTip::add( m_sawWaveBtn,
+	ToolTip::add( m_sawWaveBtn,
 			tr( "Click here for a saw-wave." ) );
 
-	m_sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ) );
+	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveBtn->move( 131 + 14*3, 205 );
 	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
-	toolTip::add( m_sqrWaveBtn,
+	ToolTip::add( m_sqrWaveBtn,
 			tr( "Click here for a square-wave." ) );
 
-	m_whiteNoiseWaveBtn = new pixmapButton( this,
+	m_whiteNoiseWaveBtn = new PixmapButton( this,
 					tr( "White noise wave" ) );
 	m_whiteNoiseWaveBtn->move( 131 + 14*4, 205 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
-	toolTip::add( m_whiteNoiseWaveBtn,
+	ToolTip::add( m_whiteNoiseWaveBtn,
 			tr( "Click here for white-noise." ) );
 
-	m_usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ) );
+	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
 	m_usrWaveBtn->move( 131 + 14*5, 205 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
-	toolTip::add( m_usrWaveBtn,
+	ToolTip::add( m_usrWaveBtn,
 			tr( "Click here for a user-defined shape." ) );
 
-	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ) );
+	m_smoothBtn = new PixmapButton( this, tr( "Smooth" ) );
 	m_smoothBtn->move( 131 + 14*6, 205 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_inactive" ) );
-	toolTip::add( m_smoothBtn,
+	ToolTip::add( m_smoothBtn,
 			tr( "Click here to smooth waveform." ) );
 
 
-	m_interpolationToggle = new ledCheckBox( "Interpolation", this,
-							tr( "Interpolation" ), ledCheckBox::Yellow );
+	m_interpolationToggle = new LedCheckBox( "Interpolation", this,
+							tr( "Interpolation" ), LedCheckBox::Yellow );
 	m_interpolationToggle->move( 131, 221 );
 
 
-	m_normalizeToggle = new ledCheckBox( "Normalize", this,
-							tr( "Normalize" ), ledCheckBox::Green );
+	m_normalizeToggle = new LedCheckBox( "Normalize", this,
+							tr( "Normalize" ), LedCheckBox::Green );
 	m_normalizeToggle->move( 131, 236 );
 	
 	
@@ -470,7 +472,7 @@ void bitInvaderView::modelChanged()
 void bitInvaderView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -479,7 +481,7 @@ void bitInvaderView::sinWaveClicked()
 void bitInvaderView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -488,7 +490,7 @@ void bitInvaderView::triangleWaveClicked()
 void bitInvaderView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -497,7 +499,7 @@ void bitInvaderView::sawWaveClicked()
 void bitInvaderView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -506,7 +508,7 @@ void bitInvaderView::sqrWaveClicked()
 void bitInvaderView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -515,11 +517,11 @@ void bitInvaderView::noiseWaveClicked()
 void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
-	toolTip::add( m_usrWaveBtn, fileName );
-	engine::getSong()->setModified();
+	ToolTip::add( m_usrWaveBtn, fileName );
+	Engine::getSong()->setModified();
 	/*
 	m_graph->model()->setWaveToNoise();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 	// zero sample_shape
 	for (int i = 0; i < sample_length; i++)
 	{
@@ -552,7 +554,7 @@ void bitInvaderView::usrWaveClicked()
 void bitInvaderView::smoothClicked()
 {
 	m_graph->model()->smooth();
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -560,8 +562,8 @@ void bitInvaderView::smoothClicked()
 
 void bitInvaderView::interpolationToggled( bool value )
 {
-	m_graph->setGraphStyle( value ? graph::LinearStyle : graph::NearestStyle);
-	engine::getSong()->setModified();
+	m_graph->setGraphStyle( value ? Graph::LinearStyle : Graph::NearestStyle);
+	Engine::getSong()->setModified();
 }
 
 
@@ -569,7 +571,7 @@ void bitInvaderView::interpolationToggled( bool value )
 
 void bitInvaderView::normalizeToggled( bool value )
 {
-	engine::getSong()->setModified();
+	Engine::getSong()->setModified();
 }
 
 
@@ -589,4 +591,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 
-#include "moc_bit_invader.cxx"
+

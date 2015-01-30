@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PROJECT_JOURNAL_H
-#define _PROJECT_JOURNAL_H
+#ifndef PROJECT_JOURNAL_H
+#define PROJECT_JOURNAL_H
 
 #include <QtCore/QHash>
 #include <QtCore/QStack>
@@ -37,6 +37,8 @@ class JournallingObject;
 class ProjectJournal
 {
 public:
+	static const int MAX_UNDO_STATES;
+
 	ProjectJournal();
 	virtual ~ProjectJournal();
 
@@ -72,7 +74,7 @@ public:
 	}
 
 	void clearJournal();
-
+	void stopAllJournalling();
 	JournallingObject * journallingObject( const jo_id_t _id )
 	{
 		if( m_joIDs.contains( _id ) )
@@ -88,7 +90,7 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile&initData = DataFile( DataFile::JournalData ) ) :
+		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::JournalData ) ) :
 			joID( initID ),
 			data( initData )
 		{

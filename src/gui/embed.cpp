@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,12 +23,12 @@
  */
 
 
-#include <QtGui/QImage>
-
+#include <QImage>
+#include <QHash>
+#include <QImageReader>
+#include <QList>
 #include "embed.h"
-#include "config_mgr.h"
-
-
+#include "ConfigManager.h"
 
 #ifndef PLUGIN_NAME
 namespace embed
@@ -37,55 +37,80 @@ namespace PLUGIN_NAME
 #endif
 {
 
+namespace
+{
+	static QHash<QString, QPixmap> s_pixmapCache;
+}
 
 #include "embedded_resources.h"
 
 
-QPixmap getIconPixmap( const char * _name, int _w, int _h )
+QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 {
-	if( _w == -1 || _h == -1 )
+	if( width == -1 || height == -1 )
 	{
-		QString name = QString( _name ) + ".png";
+		// Return cached pixmap
+		QPixmap cached = s_pixmapCache.value( pixmapName );
+		if( !cached.isNull() )
+		{
+			return cached;
+		}
+
+		// Or try to load it
+		QList<QByteArray> formats = QImageReader::supportedImageFormats();
+		QList<QString> candidates;
+		QPixmap pixmap;
+		QString name;
+		int i;
+		
+		for ( i = 0; i < formats.size() && pixmap.isNull(); ++i )  
+		{
+			candidates << QString( pixmapName ) + "." + formats.at( i ).data();
+		}
 
 #ifdef PLUGIN_NAME
-		QPixmap p( configManager::inst()->artworkDir() + "plugins/" +
-					STRINGIFY( PLUGIN_NAME ) + "_" + name );
-		if( p.isNull() )
-		{
-			p = QPixmap( configManager::inst()->artworkDir() +
-									name );
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+			name = candidates.at( i );
+			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + "plugins/" +
+				     STRINGIFY( PLUGIN_NAME ) + "_" + name );
 		}
-#else
-		// look whether icon is in artwork-dir
-		QPixmap p( configManager::inst()->artworkDir() + name );
 #endif
-		if( p.isNull() )
-		{
-			// nothing found, so look in default-artwork-dir
-			p =
-		QPixmap( configManager::inst()->defaultArtworkDir() + name );
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+			name = candidates.at( i );
+			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + name );
 		}
-		if( p.isNull() )
-		{
-			const embed::descriptor & e = findEmbeddedData(
-									name.toUtf8().constData() );
+		
+		// nothing found, so look in default-artwork-dir
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+			name = candidates.at( i );
+			pixmap = QPixmap( ConfigManager::inst()->defaultArtworkDir() + name );
+		}
+		
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+			name = candidates.at( i );
+			const embed::descriptor & e = 
+				findEmbeddedData( name.toUtf8().constData() );
 			// found?
-			if( QString( e.name ) == name )
+			if( name == e.name )
 			{
-				p.loadFromData( e.data, e.size );
-			}
-			else
-			{
-				p = QPixmap( 1, 1 );
+				pixmap.loadFromData( e.data, e.size );
 			}
 		}
-		return p;
+		
+		// Fallback
+		if( pixmap.isNull() )
+		{
+			pixmap = QPixmap( 1, 1 );
+		}
+		// Save to cache and return
+		s_pixmapCache.insert( pixmapName, pixmap );
+		return pixmap;
 	}
-	return getIconPixmap( _name ).
-			scaled( _w, _h, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+
+	return getIconPixmap( pixmapName ).
+		scaled( width, height, Qt::IgnoreAspectRatio,
+			Qt::SmoothTransformation );
 }
-
-
 
 
 QString getText( const char * _name )

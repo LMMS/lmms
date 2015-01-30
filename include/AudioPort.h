@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,54 +22,44 @@
  *
  */
 
-#ifndef _AUDIO_PORT_H
-#define _AUDIO_PORT_H
+#ifndef AUDIO_PORT_H
+#define AUDIO_PORT_H
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
 #include "Mixer.h"
+#include "MemoryManager.h"
+#include "PlayHandle.h"
 
 class EffectChain;
+class FloatModel;
+class BoolModel;
 
 class AudioPort : public ThreadableJob
 {
+	MM_OPERATORS
 public:
-	AudioPort( const QString & _name, bool _has_effect_chain = true );
+	AudioPort( const QString & _name, bool _has_effect_chain = true,
+		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL,
+		BoolModel * mutedModel = NULL );
 	virtual ~AudioPort();
 
-	inline sampleFrame * firstBuffer()
+	inline sampleFrame * buffer()
 	{
-		return m_firstBuffer;
+		return m_portBuffer;
 	}
 
-	inline sampleFrame * secondBuffer()
+	inline void lockBuffer()
 	{
-		return m_secondBuffer;
+		m_portBufferLock.lock();
 	}
 
-	inline void lockFirstBuffer()
+	inline void unlockBuffer()
 	{
-		m_firstBufferLock.lock();
+		m_portBufferLock.unlock();
 	}
-
-	inline void lockSecondBuffer()
-	{
-		m_secondBufferLock.lock();
-	}
-
-	inline void unlockFirstBuffer()
-	{
-		m_firstBufferLock.unlock();
-	}
-
-	inline void unlockSecondBuffer()
-	{
-		m_secondBufferLock.unlock();
-	}
-
-	void nextPeriod();
 
 
 	// indicate whether JACK & Co should provide output-buffer at ext. port
@@ -110,36 +100,34 @@ public:
 	bool processEffects();
 
 	// ThreadableJob stuff
-	virtual void doProcessing( sampleFrame * );
+	virtual void doProcessing();
 	virtual bool requiresProcessing() const
 	{
 		return true;
 	}
 
-
-	enum bufferUsages
-	{
-		NoUsage,
-		FirstBuffer,
-		BothBuffers
-	} ;
-
+	void addPlayHandle( PlayHandle * handle );
+	void removePlayHandle( PlayHandle * handle );
 
 private:
-	volatile bufferUsages m_bufferUsage;
+	volatile bool m_bufferUsage;
 
-	sampleFrame * m_firstBuffer;
-	sampleFrame * m_secondBuffer;
-	QMutex m_firstBufferLock;
-	QMutex m_secondBufferLock;
+	sampleFrame * m_portBuffer;
+	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;
 	fx_ch_t m_nextFxChannel;
 
 	QString m_name;
-	
+
 	EffectChain * m_effects;
 
+	PlayHandleList m_playHandles;
+	QMutex m_playHandleLock;
+
+	FloatModel * m_volumeModel;
+	FloatModel * m_panningModel;
+	BoolModel * m_mutedModel;
 
 	friend class Mixer;
 	friend class MixerWorkerThread;

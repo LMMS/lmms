@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2008 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,18 +23,18 @@
  *
  */
 
-#ifndef _TEMPO_SYNC_KNOB_H
-#define _TEMPO_SYNC_KNOB_H
+#ifndef TEMPO_SYNC_KNOB_H
+#define TEMPO_SYNC_KNOB_H
 
-#include <QtGui/QPixmap>
+#include <QPixmap>
 #include <QtCore/QPointer>
 
-#include "knob.h"
+#include "Knob.h"
 #include "TempoSyncKnobModel.h"
 
 class MeterDialog;
 
-class EXPORT TempoSyncKnob : public knob
+class EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:

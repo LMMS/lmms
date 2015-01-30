@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2007-2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "export.h"
 
 #ifndef LMMSPALETTE_H
@@ -43,6 +43,8 @@ class EXPORT LmmsPalette : public QWidget
 	Q_PROPERTY( QColor brightText READ brightText WRITE setBrightText )
 	Q_PROPERTY( QColor highlight READ highlight WRITE setHighlight )
 	Q_PROPERTY( QColor highlightedText READ highlightedText WRITE setHighlightedText )
+	Q_PROPERTY( QColor toolTipText READ toolTipText WRITE setToolTipText )
+	Q_PROPERTY( QColor toolTipBase READ toolTipBase WRITE setToolTipBase )
 
 public:
 	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
@@ -63,6 +65,8 @@ public:
 	ACCESSMET( brightText, setBrightText )
 	ACCESSMET( highlight, setHighlight )
 	ACCESSMET( highlightedText, setHighlightedText )
+	ACCESSMET( toolTipText, setToolTipText )
+	ACCESSMET( toolTipBase, setToolTipBase )
 
 #undef ACCESSMET
 
@@ -79,6 +83,8 @@ private:
 	QColor m_brightText;
 	QColor m_highlight;
 	QColor m_highlightedText;
+	QColor m_toolTipText;
+	QColor m_toolTipBase;
 };
 
 

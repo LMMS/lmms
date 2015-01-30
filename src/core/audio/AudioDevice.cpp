@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,7 @@
 #include <cstring>
 
 #include "AudioDevice.h"
-#include "config_mgr.h"
+#include "ConfigManager.h"
 #include "debug.h"
 
 
@@ -237,9 +237,9 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 
 void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 {
-#ifdef LMMS_DEBUG
+
 	assert( _outbuf != NULL );
-#endif
+
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
@@ -248,7 +248,7 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 bool AudioDevice::hqAudio() const
 {
-	return configManager::inst()->value( "mixer", "hqaudio" ).toInt();
+	return ConfigManager::inst()->value( "mixer", "hqaudio" ).toInt();
 }
 
 

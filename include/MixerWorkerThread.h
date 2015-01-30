@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef _MIXER_WORKER_THREAD_H
-#define _MIXER_WORKER_THREAD_H
+#ifndef MIXER_WORKER_THREAD_H
+#define MIXER_WORKER_THREAD_H
 
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QThread>
 
-#include "ThreadableJob.h"
-#include "Mixer.h"
-
+class QWaitCondition;
+class Mixer;
+class ThreadableJob;
 
 class MixerWorkerThread : public QThread
 {
@@ -57,7 +57,7 @@ public:
 
 		void addJob( ThreadableJob * _job );
 
-		void run( sampleFrame * _buffer );
+		void run();
 		void wait();
 
 	private:
@@ -109,7 +109,6 @@ private:
 	static QWaitCondition * queueReadyWaitCond;
 	static QList<MixerWorkerThread *> workerThreads;
 
-	sampleFrame * m_workingBuf;
 	volatile bool m_quit;
 
 } ;

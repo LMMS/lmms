@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,16 @@
  *
  */
 
-#ifndef _MIXER_H
-#define _MIXER_H
+#ifndef MIXER_H
+#define MIXER_H
+
+// denormals stripping
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
 
 #include "lmmsconfig.h"
 
@@ -45,8 +53,9 @@
 
 
 #include "lmms_basics.h"
-#include "note.h"
+#include "Note.h"
 #include "fifo_buffer.h"
+#include "MixerProfiler.h"
 
 
 class AudioDevice;
@@ -94,7 +103,7 @@ public:
 			Interpolation_SincFastest,
 			Interpolation_SincMedium,
 			Interpolation_SincBest
-		} ; 
+		} ;
 
 		enum Oversampling
 		{
@@ -106,8 +115,6 @@ public:
 
 		Interpolation interpolation;
 		Oversampling oversampling;
-		bool sampleExactControllers;
-		bool aliasFreeOscillators;
 
 		qualitySettings( Mode _m )
 		{
@@ -116,31 +123,22 @@ public:
 				case Mode_Draft:
 					interpolation = Interpolation_Linear;
 					oversampling = Oversampling_None;
-					sampleExactControllers = false;
-					aliasFreeOscillators = false;
 					break;
 				case Mode_HighQuality:
 					interpolation =
 						Interpolation_SincFastest;
 					oversampling = Oversampling_2x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = false;
 					break;
 				case Mode_FinalMix:
 					interpolation = Interpolation_SincBest;
 					oversampling = Oversampling_8x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = true;
 					break;
 			}
 		}
 
-		qualitySettings( Interpolation _i, Oversampling _o, bool _sec,
-								bool _afo ) :
+		qualitySettings( Interpolation _i, Oversampling _o ) :
 			interpolation( _i ),
-			oversampling( _o ),
-			sampleExactControllers( _sec ),
-			aliasFreeOscillators( _afo )
+			oversampling( _o )
 		{
 		}
 
@@ -218,20 +216,7 @@ public:
 
 
 	// play-handle stuff
-	bool addPlayHandle( PlayHandle* handle )
-	{
-		if( criticalXRuns() == false )
-		{
-			lock();
-			m_playHandles.push_back( handle );
-			unlock();
-			return true;
-		}
-
-		delete handle;
-
-		return false;
-	}
+	bool addPlayHandle( PlayHandle* handle );
 
 	void removePlayHandle( PlayHandle* handle );
 
@@ -240,7 +225,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( track * _track );
+	void removePlayHandles( Track * _track, bool removeIPHs = true );
 
 	bool hasNotePlayHandles();
 
@@ -257,9 +242,14 @@ public:
 	}
 
 
-	inline int cpuLoad() const
+	MixerProfiler& profiler()
 	{
-		return m_cpuLoad;
+		return m_profiler;
+	}
+
+	int cpuLoad() const
+	{
+		return m_profiler.cpuLoad();
 	}
 
 	const qualitySettings & currentQualitySettings() const
@@ -320,13 +310,17 @@ public:
 		m_inputFramesMutex.unlock();
 	}
 
-	// audio-buffer-mgm
-	void bufferToPort( const sampleFrame * _buf,
-					const fpp_t _frames,
-					const f_cnt_t _offset,
-					stereoVolumeVector _volume_vector,
-					AudioPort * _port );
+	void lockPlayHandleRemoval()
+	{
+		m_playHandleRemovalMutex.lock();
+	}
 
+	void unlockPlayHandleRemoval()
+	{
+		m_playHandleRemovalMutex.unlock();
+	}
+
+	// audio-buffer-mgm
 	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );
@@ -348,7 +342,7 @@ public:
 	}
 
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
-	
+
 	inline const sampleFrame * inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
@@ -420,10 +414,10 @@ private:
 	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
-	
+
 	surroundSampleFrame * m_readBuf;
 	surroundSampleFrame * m_writeBuf;
-	
+
 	QVector<surroundSampleFrame *> m_bufferPool;
 	int m_readBuffer;
 	int m_writeBuffer;
@@ -434,12 +428,13 @@ private:
 	fpp_t m_halfStart[SURROUND_CHANNELS];
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
-	
-	int m_cpuLoad;
+
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
 	QWaitCondition m_queueReadyWaitCond;
 
+	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
+	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
 
 	PlayHandleList m_playHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
@@ -460,12 +455,14 @@ private:
 	QMutex m_globalMutex;
 	QMutex m_inputFramesMutex;
 
+	QMutex m_playHandleRemovalMutex;
 
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
+	MixerProfiler m_profiler;
 
-	friend class engine;
+	friend class Engine;
 	friend class MixerWorkerThread;
 
 } ;

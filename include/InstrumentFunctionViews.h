@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,17 +22,17 @@
  *
  */
 
-#ifndef _INSTRUMENT_FUNCTION_VIEWS_H
-#define _INSTRUMENT_FUNCTION_VIEWS_H
+#ifndef INSTRUMENT_FUNCTION_VIEWS_H
+#define INSTRUMENT_FUNCTION_VIEWS_H
 
 #include "ModelView.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class QLabel;
-class comboBox;
-class groupBox;
-class knob;
+class ComboBox;
+class GroupBox;
+class Knob;
 class TempoSyncKnob;
 
 class InstrumentFunctionArpeggio;
@@ -53,9 +53,9 @@ private:
 
 	InstrumentFunctionNoteStacking * m_cc;
 
-	groupBox * m_chordsGroupBox;
-	comboBox * m_chordsComboBox;
-	knob * m_chordRangeKnob;
+	GroupBox * m_chordsGroupBox;
+	ComboBox * m_chordsComboBox;
+	Knob * m_chordRangeKnob;
 
 } ;
 
@@ -75,14 +75,14 @@ private:
 	virtual void modelChanged();
 
 	InstrumentFunctionArpeggio * m_a;
-	groupBox * m_arpGroupBox;
-	comboBox * m_arpComboBox;
-	knob * m_arpRangeKnob;
+	GroupBox * m_arpGroupBox;
+	ComboBox * m_arpComboBox;
+	Knob * m_arpRangeKnob;
 	TempoSyncKnob * m_arpTimeKnob;
-	knob * m_arpGateKnob;
+	Knob * m_arpGateKnob;
 
-	comboBox * m_arpDirectionComboBox;
-	comboBox * m_arpModeComboBox;
+	ComboBox * m_arpDirectionComboBox;
+	ComboBox * m_arpModeComboBox;
 
 } ;
 

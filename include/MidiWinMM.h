@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,15 +22,14 @@
  *
  */
 
-#ifndef _MIDI_WINMM_H
-#define _MIDI_WINMM_H
+#ifndef MIDI_WINMM_H
+#define MIDI_WINMM_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #include <mmsystem.h>
-#endif
 
 #include "MidiClient.h"
 #include "MidiPort.h"
@@ -64,7 +63,6 @@ public:
 	virtual void removePort( MidiPort * _port );
 
 
-#ifdef LMMS_BUILD_WIN32
 	// list devices as ports
 	virtual QStringList readablePorts() const
 	{
@@ -75,12 +73,11 @@ public:
 	{
 		return m_outputDevices.values();
 	}
-#endif
 
 	// return name of port which specified MIDI event came from
 	virtual QString sourcePortName( const MidiEvent & ) const;
 
-	// (un)subscribe given MidiPort to/from destination-port 
+	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe = true );
@@ -128,7 +125,6 @@ private:
 	void openDevices();
 	void closeDevices();
 
-#ifdef LMMS_BUILD_WIN32
 	static void WINAPI CALLBACK inputCallback( HMIDIIN _hm, UINT _msg,
 						DWORD_PTR _inst,
 						DWORD_PTR _param1,
@@ -137,7 +133,6 @@ private:
 
 	QMap<HMIDIIN, QString> m_inputDevices;
 	QMap<HMIDIOUT, QString> m_outputDevices;
-#endif
 
 	// subscriptions
 	typedef QMap<QString, MidiPortList> SubMap;
@@ -150,6 +145,8 @@ signals:
 	void writablePortsChanged();
 
 } ;
+
+#endif
 
 #endif
 

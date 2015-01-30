@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,9 +24,9 @@
  */
 
 
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QLabel>
+#include <QLayout>
+#include <QPushButton>
+#include <QLabel>
 
 #include "MeterDialog.h"
 #include "MeterModel.h"
@@ -112,5 +112,4 @@ void MeterDialog::modelChanged()
 	m_numerator->setModel( &mm->numeratorModel() );
 	m_denominator->setModel( &mm->denominatorModel() );
 }
-
 

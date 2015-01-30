@@ -3,8 +3,8 @@
  *             panning of a note
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PANNING_CONSTANTS_H
-#define _PANNING_CONSTANTS_H
+#ifndef PANNING_CONSTANTS_H
+#define PANNING_CONSTANTS_H
 
 const panning_t PanningRight = ( 0 + 100 );
 const panning_t PanningLeft = - PanningRight;

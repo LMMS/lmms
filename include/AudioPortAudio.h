@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_PORTAUDIO_H
-#define _AUDIO_PORTAUDIO_H
+#ifndef AUDIO_PORTAUDIO_H
+#define AUDIO_PORTAUDIO_H
 
 #include <QtCore/QObject>
 
@@ -36,7 +36,7 @@ class AudioPortAudioSetupUtil : public QObject
 public slots:
 	void updateDevices();
 	void updateChannels();
-		
+
 public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
@@ -56,7 +56,7 @@ public:
 #endif
 
 
-class comboBox;
+class ComboBox;
 class LcdSpinBox;
 
 
@@ -86,8 +86,8 @@ public:
 		virtual void saveSettings();
 
 	private:
-		comboBox * m_backend;
-		comboBox * m_device;
+		ComboBox * m_backend;
+		ComboBox * m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;
@@ -119,7 +119,7 @@ private:
 
 	typedef double PaTime;
 	typedef PaDeviceID PaDeviceIndex;
-	
+
 	typedef struct PaStreamParameters
 	{
 		PaDeviceIndex device;
@@ -136,7 +136,7 @@ private:
 	PaStreamParameters m_inputParameters;
 
 	bool m_wasPAInitError;
- 
+
 	surroundSampleFrame * m_outBuf;
 	int m_outBufPos;
 	int m_outBufSize;

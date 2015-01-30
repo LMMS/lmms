@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,18 +23,19 @@
  *
  */
 
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QStyleOptionFrameV2>
-#include <QtGui/QInputDialog>
+#include <QApplication>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QFontMetrics>
+#include <QStyleOptionFrameV2>
+#include <QInputDialog>
 
 #include "LcdSpinBox.h"
-#include "caption_menu.h"
-#include "engine.h"
+#include "CaptionMenu.h"
+#include "Engine.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "templates.h"
 #include "MainWindow.h"
@@ -87,7 +88,7 @@ void LcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( model()->displayName() );
+	CaptionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -126,7 +127,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 	if( m_mouseMoving )
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if( engine::mainWindow()->isShiftPressed() )
+		if( gui->mainWindow()->isShiftPressed() )
 			dy = qBound( -4, dy/4, 4 );
 		if( dy > 1 || dy < -1 )
 		{
@@ -190,5 +191,5 @@ void LcdSpinBox::enterValue()
 	}
 }
 
-#include "moc_LcdSpinBox.cxx"
+
 

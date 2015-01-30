@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,16 +28,16 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QList>
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 class QAction;
 class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
-class configManager;
+class ConfigManager;
 class PluginView;
-class toolButton;
+class ToolButton;
 
 
 class MainWindow : public QMainWindow
@@ -58,9 +58,20 @@ public:
 	void addSpacingToToolBar( int _size );
 
 
-	// every function that replaces current file (e.g. creates new file,
-	// opens another file...) has to call this before and may only process
-	// if this function returns true
+	///
+	/// \brief	Asks whether changes made to the project are to be saved.
+	///
+	/// Opens a dialog giving the user the choice to (a) confirm his choice
+	/// (such as opening a new file), (b) save the current project before
+	/// proceeding or (c) cancel the process.
+	///
+	/// Every function that replaces the current file (e.g. creates new file,
+	/// opens another file...) must call this before and may only proceed if
+	/// this function returns true.
+	///
+	/// \return	true if the user allows the software to proceed, false if they
+	///         cancel the action.
+	///
 	bool mayChangeProject();
 
 
@@ -83,7 +94,6 @@ public:
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
-
 
 public slots:
 	void resetWindowTitle();
@@ -129,6 +139,7 @@ private:
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
+	void refocus();
 
 
 	QMdiArea * m_workspace;
@@ -159,8 +170,7 @@ private:
 	QBasicTimer m_updateTimer;
 	QTimer m_autoSaveTimer;
 
-
-	friend class engine;
+	friend class GuiApplication;
 
 
 private slots:
@@ -179,4 +189,3 @@ signals:
 } ;
 
 #endif
-

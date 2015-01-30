@@ -1,0 +1,13 @@
+   This is Oliver's hundred, a bank of patch files for ZynAddSubFX.
+There are two bonus combination patches provided as parameter files.
+I strongly encourage you to adapt these sounds to your own use and
+to share your creations.
+
+Important: many of these sounds have directions which you may view by
+selecting "Edit instrument" from the advanced user interface window.
+Many of the lead instruments have a vibrato effect controlled by the
+modulation wheel.  Setting the modulation to zero gives a steady tone,
+but a newly initialized voice assumes the modulation wheel is at 64.
+
+Wishing you well with your musical endeavors,
+Christopher Oliver

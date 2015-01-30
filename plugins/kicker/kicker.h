@@ -3,8 +3,8 @@
  * Copyright (c) 2014 Hannu Haahti <grejppi/at/gmail.com>
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,14 +24,15 @@
  */
 
 
-#ifndef _KICKER_H
-#define _KICKER_H
+#ifndef KICKER_H
+#define KICKER_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "knob.h"
-#include "led_checkbox.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
+#include "TempoSyncKnob.h"
 
 
 #define KICKER_PRESET_VERSION 1
@@ -43,6 +44,7 @@ class NotePlayHandle;
 
 class kickerInstrument : public Instrument
 {
+	Q_OBJECT
 public:
 	kickerInstrument( InstrumentTrack * _instrument_track );
 	virtual ~kickerInstrument();
@@ -72,8 +74,9 @@ public:
 private:
 	FloatModel m_startFreqModel;
 	FloatModel m_endFreqModel;
-	FloatModel m_decayModel;
+	TempoSyncKnobModel m_decayModel;
 	FloatModel m_distModel;
+	FloatModel m_distEndModel;
 	FloatModel m_gainModel;
 	FloatModel m_envModel;
 	FloatModel m_noiseModel;
@@ -101,18 +104,19 @@ public:
 private:
 	virtual void modelChanged();
 
-	knob * m_startFreqKnob;
-	knob * m_endFreqKnob;
-	knob * m_decayKnob;
-	knob * m_distKnob;
-	knob * m_gainKnob;
-	knob * m_envKnob;
-	knob * m_noiseKnob;
-	knob * m_clickKnob;
-	knob * m_slopeKnob;
+	Knob * m_startFreqKnob;
+	Knob * m_endFreqKnob;
+	Knob * m_decayKnob;
+	Knob * m_distKnob;
+	Knob * m_distEndKnob;
+	Knob * m_gainKnob;
+	Knob * m_envKnob;
+	Knob * m_noiseKnob;
+	Knob * m_clickKnob;
+	Knob * m_slopeKnob;
 
-	ledCheckBox * m_startNoteToggle;
-	ledCheckBox * m_endNoteToggle;
+	LedCheckBox * m_startNoteToggle;
+	LedCheckBox * m_endNoteToggle;
 
 } ;
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,21 +22,20 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include <cstdio>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "ProjectJournal.h"
-#include "base64.h"
-#include "engine.h"
+#include "Engine.h"
 
 
 
 JournallingObject::JournallingObject() :
 	SerializingObject(),
-	m_id( engine::projectJournal()->allocID( this ) ),
+	m_id( Engine::projectJournal()->allocID( this ) ),
 	m_journalling( true ),
 	m_journallingStateStack()
 {
@@ -47,9 +46,9 @@ JournallingObject::JournallingObject() :
 
 JournallingObject::~JournallingObject()
 {
-	if( engine::projectJournal() )
+	if( Engine::projectJournal() )
 	{
-		engine::projectJournal()->freeID( id() );
+		Engine::projectJournal()->freeID( id() );
 	}
 }
 
@@ -60,7 +59,7 @@ void JournallingObject::addJournalCheckPoint()
 {
 	if( isJournalling() )
 	{
-		engine::projectJournal()->addJournalCheckPoint( this );
+		Engine::projectJournal()->addJournalCheckPoint( this );
 	}
 }
 
@@ -70,14 +69,19 @@ void JournallingObject::addJournalCheckPoint()
 QDomElement JournallingObject::saveState( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	QDomElement _this = SerializingObject::saveState( _doc, _parent );
+	if( isJournalling() )
+	{
+		QDomElement _this = SerializingObject::saveState( _doc, _parent );
 
-	QDomElement journalNode = _doc.createElement( "journallingObject" );
-	journalNode.setAttribute( "id", id() );
-	journalNode.setAttribute( "metadata", true );
-	_this.appendChild( journalNode );
+		QDomElement journalNode = _doc.createElement( "journallingObject" );
+		journalNode.setAttribute( "id", id() );
+		journalNode.setAttribute( "metadata", true );
+		_this.appendChild( journalNode );
 
-	return _this;
+		return _this;
+	} else {
+		return QDomElement();
+	}
 }
 
 
@@ -114,7 +118,7 @@ void JournallingObject::changeID( jo_id_t _id )
 {
 	if( id() != _id )
 	{
-		JournallingObject * jo = engine::projectJournal()->
+		JournallingObject * jo = Engine::projectJournal()->
 											journallingObject( _id );
 		if( jo != NULL )
 		{
@@ -131,7 +135,7 @@ void JournallingObject::changeID( jo_id_t _id )
 			return;
 		}
 
-		engine::projectJournal()->reallocID( _id, this );
+		Engine::projectJournal()->reallocID( _id, this );
 		m_id = _id;
 	}
 }

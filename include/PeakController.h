@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef _PEAK_CONTROLLER_H
-#define _PEAK_CONTROLLER_H
+#ifndef PEAK_CONTROLLER_H
+#define PEAK_CONTROLLER_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "Model.h"
 #include "AutomatableModel.h"
@@ -33,7 +33,7 @@
 #include "ControllerDialog.h"
 
 class automatableButtonGroup;
-class knob;
+class Knob;
 class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
@@ -61,21 +61,27 @@ public:
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
-	void handleDestroyedEffect( ); 
+	void handleDestroyedEffect( );
+	void updateCoeffs();
 
 protected:
 	// The internal per-controller get-value function
-	virtual float value( int _offset );
+	virtual void updateValueBuffer();
 
 	PeakControllerEffect * m_peakEffect;
 
 	friend class PeakControllerDialog;
 
 private:
+	float m_currentSample;
 	//backward compatibility for <= 0.4.15
 	static int m_getCount;
 	static int m_loadCount;
 	static bool m_buggedFile;
+	
+	float m_attackCoeff;
+	float m_decayCoeff;
+	bool m_coeffNeedsUpdate;
 } ;
 
 

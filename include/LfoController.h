@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef _LFO_CONTROLLER_H
-#define _LFO_CONTROLLER_H
+#ifndef LFO_CONTROLLER_H
+#define LFO_CONTROLLER_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "Model.h"
 #include "AutomatableModel.h"
@@ -35,10 +35,10 @@
 #include "Oscillator.h"
 
 class automatableButtonGroup;
-class knob;
-class ledCheckBox;
+class Knob;
+class LedCheckBox;
 class TempoSyncKnob;
-class pixmapButton;
+class PixmapButton;
 
 
 class LfoController : public Controller 
@@ -59,8 +59,8 @@ public slots:
 
 
 protected:
-	// The internal per-controller get-value function
-	virtual float value( int _offset );
+	// The internal per-controller value updating function
+	virtual void updateValueBuffer();
 
 	FloatModel m_baseModel;
 	TempoSyncKnobModel m_speedModel;
@@ -69,17 +69,19 @@ protected:
 	IntModel m_waveModel;
 	IntModel m_multiplierModel;
 
-	int m_duration;
-	int m_phaseCorrection;
-	int m_phaseOffset;
-	
+	float m_duration;
+	float m_phaseOffset;
+	float m_currentPhase;
+
 	sample_t (*m_sampleFunction)( const float );
 
 private:
 	SampleBuffer * m_userDefSampleBuffer;
 
 protected slots:
+	void updatePhase();
 	void updateSampleFunction();
+	void updateDuration();
 
 	friend class LfoControllerDialog;
 
@@ -101,17 +103,17 @@ protected:
 
 	LfoController * m_lfo;
 
-	knob * m_baseKnob;
+	Knob * m_baseKnob;
 	TempoSyncKnob * m_speedKnob;
-	knob * m_amountKnob;
-	knob * m_phaseKnob;
-	pixmapButton * m_userLfoBtn;
+	Knob * m_amountKnob;
+	Knob * m_phaseKnob;
+	PixmapButton * m_userLfoBtn;
 	automatableButtonGroup * m_waveBtnGrp;
 	automatableButtonGroup * m_multiplierBtnGrp;
 
 
 private:
-	pixmapButton * m_userWaveBtn;
+	PixmapButton * m_userWaveBtn;
 
 private slots:
 	void askUserDefWave();

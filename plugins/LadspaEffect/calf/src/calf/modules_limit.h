@@ -84,6 +84,7 @@ public:
     uint32_t srate;
     bool is_active;
     multibandlimiter_audio_module();
+	~multibandlimiter_audio_module();
     void activate();
     void deactivate();
     void params_changed();

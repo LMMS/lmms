@@ -2,8 +2,8 @@
  * update_event.h - signal GUI updates
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _UPDATE_EVENT_H
-#define _UPDATE_EVENT_H
+#ifndef UPDATE_EVENT_H
+#define UPDATE_EVENT_H
 
 #include "custom_events.h"
 

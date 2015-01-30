@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,13 +26,13 @@
 
 #ifdef LMMS_HAVE_OSS
 
-#include <QtCore/QFileInfo>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QFileInfo>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
-#include "engine.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "templates.h"
 
@@ -58,7 +58,7 @@
 #endif
 
 
-#include "config_mgr.h"
+#include "ConfigManager.h"
 
 
 #ifndef _PATH_DEV_DSP
@@ -73,14 +73,14 @@
 
 AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audiooss", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
 
-	m_audioFD = open( probeDevice().toAscii().constData(), O_WRONLY, 0 );
+	m_audioFD = open( probeDevice().toLatin1().constData(), O_WRONLY, 0 );
 
 	if( m_audioFD == -1 )
 	{
@@ -202,7 +202,7 @@ AudioOss::~AudioOss()
 
 QString AudioOss::probeDevice()
 {
-	QString dev = configManager::inst()->value( "AudioOss", "Device" );
+	QString dev = ConfigManager::inst()->value( "AudioOss", "Device" );
 	if( dev.isEmpty() )
 	{
 		char * adev = getenv( "AUDIODEV" );	// Is there a standard
@@ -268,7 +268,7 @@ void AudioOss::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		unsigned int value = sampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
@@ -341,7 +341,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audiooss",
+	m->setValue( ConfigManager::inst()->value( "audiooss",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -356,7 +356,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioOss::setupWidget::~setupWidget()
 {
-
+	delete m_channels->model();
 }
 
 
@@ -364,9 +364,9 @@ AudioOss::setupWidget::~setupWidget()
 
 void AudioOss::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audiooss", "device",
+	ConfigManager::inst()->setValue( "audiooss", "device",
 							m_device->text() );
-	configManager::inst()->setValue( "audiooss", "channels",
+	ConfigManager::inst()->setValue( "audiooss", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 

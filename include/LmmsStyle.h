@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,11 +27,11 @@
 #ifndef LMMS_STYLE_H
 #define LMMS_STYLE_H
 
-#include <QtGui/QPlastiqueStyle>
+#include <QProxyStyle>
 
 
 
-class LmmsStyle : public QPlastiqueStyle
+class LmmsStyle : public QProxyStyle
 {
 public:
 	enum ColorRole
@@ -69,8 +69,6 @@ public:
 
 	virtual QPalette standardPalette( void ) const;
 
-//	virtual void drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const;
-
 	virtual void drawComplexControl(
 				ComplexControl control,
 				const QStyleOptionComplex * option,
@@ -84,9 +82,6 @@ public:
 	virtual int pixelMetric( PixelMetric metric,
 					const QStyleOption * option = 0,
 					const QWidget * widget = 0 ) const;
-
-//	QSize sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const;
-//	QRect subControlRect( ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget ) const;
 
 	static QPalette * s_palette;
 

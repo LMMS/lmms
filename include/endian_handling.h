@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _ENDIAN_HANDLING_H
-#define _ENDIAN_HANDLING_H
+#ifndef ENDIAN_HANDLING_H
+#define ENDIAN_HANDLING_H
 
 #include <QtCore/QSysInfo>
 

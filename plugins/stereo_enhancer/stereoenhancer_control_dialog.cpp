@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,7 @@
 
 
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #include "stereoenhancer_control_dialog.h"
 #include "stereoenhancer_controls.h"
@@ -37,10 +37,10 @@ stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 {
 	QHBoxLayout * l = new QHBoxLayout( this );
 
-	knob * widthKnob = new knob( knobBright_26, this );
+	Knob * widthKnob = new Knob( knobBright_26, this );
 	widthKnob->setModel( &_controls->m_widthModel );
 	widthKnob->setLabel( tr( "WIDE" ) );
-	widthKnob->setHintText( tr( "Width:" ) + " ", "samples" );
+	widthKnob->setHintText( tr( "Width:" ) , "samples" );
 
 	l->addWidget( widthKnob );
 

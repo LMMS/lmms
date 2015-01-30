@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,15 +24,15 @@
  */
 
 
-#include <QtGui/QApplication>
-#include <QtGui/QProgressDialog>
-#include <QtXml/QDomElement>
+#include <QApplication>
+#include <QProgressDialog>
+#include <QDomElement>
 
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
-#include "engine.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
-#include "song.h"
+#include "Song.h"
 
 
 TrackContainer::TrackContainer() :
@@ -82,14 +82,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( !journalRestore && engine::hasGUI() )
+	if( !journalRestore && Engine::hasGUI() )
 	{
 		if( pd == NULL )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count(),
-						engine::mainWindow() );
+						gui->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -119,7 +119,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			track::create( node.toElement(), this );
+			Track::create( node.toElement(), this );
 		}
 		node = node.nextSibling();
 	}
@@ -138,13 +138,13 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 
 
-int TrackContainer::countTracks( track::TrackTypes _tt ) const
+int TrackContainer::countTracks( Track::TrackTypes _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
 	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		if( m_tracks[i]->type() == _tt || _tt == track::NumTrackTypes )
+		if( m_tracks[i]->type() == _tt || _tt == Track::NumTrackTypes )
 		{
 			++cnt;
 		}
@@ -156,13 +156,15 @@ int TrackContainer::countTracks( track::TrackTypes _tt ) const
 
 
 
-void TrackContainer::addTrack( track * _track )
+void TrackContainer::addTrack( Track * _track )
 {
-	if( _track->type() != track::HiddenAutomationTrack )
+	if( _track->type() != Track::HiddenAutomationTrack )
 	{
+		_track->lock();
 		m_tracksMutex.lockForWrite();
 		m_tracks.push_back( _track );
 		m_tracksMutex.unlock();
+		_track->unlock();
 		emit trackAdded( _track );
 	}
 }
@@ -170,18 +172,22 @@ void TrackContainer::addTrack( track * _track )
 
 
 
-void TrackContainer::removeTrack( track * _track )
+void TrackContainer::removeTrack( Track * _track )
 {
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
+		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
+		if (_track->isSolo()) {
+			_track->setSolo(false);
+		}
 		m_tracksMutex.lockForWrite();
 		m_tracks.remove( index );
 		m_tracksMutex.unlock();
 
-		if( engine::getSong() )
+		if( Engine::getSong() )
 		{
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 		}
 	}
 }
@@ -233,7 +239,7 @@ DummyTrackContainer::DummyTrackContainer() :
 {
 	setJournalling( false );
 	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack,
+				Track::create( Track::InstrumentTrack,
 							this ) );
 	m_dummyInstrumentTrack->setJournalling( false );
 }
@@ -241,5 +247,5 @@ DummyTrackContainer::DummyTrackContainer() :
 
 
 
-#include "moc_TrackContainer.cxx"
+
 

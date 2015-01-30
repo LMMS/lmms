@@ -4,7 +4,7 @@
  * Copyright (c) 2008 <Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,15 +26,15 @@
 #ifndef _PAPU_H
 #define _PAPU_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "knob.h"
-#include "graph.h"
+#include "Knob.h"
+#include "Graph.h"
 
 class papuInstrumentView;
 class NotePlayHandle;
-class pixmapButton;
+class PixmapButton;
 
 class papuInstrument : public Instrument
 {
@@ -116,40 +116,40 @@ public:
 private:
 	virtual void modelChanged();
 
-	knob * m_ch1SweepTimeKnob;
-	pixmapButton * m_ch1SweepDirButton;
-	knob * m_ch1SweepRtShiftKnob;
-	knob * m_ch1WavePatternDutyKnob;
-	knob * m_ch1VolumeKnob;
-	pixmapButton * m_ch1VolSweepDirButton;
-	knob * m_ch1SweepStepLengthKnob;
+	Knob * m_ch1SweepTimeKnob;
+	PixmapButton * m_ch1SweepDirButton;
+	Knob * m_ch1SweepRtShiftKnob;
+	Knob * m_ch1WavePatternDutyKnob;
+	Knob * m_ch1VolumeKnob;
+	PixmapButton * m_ch1VolSweepDirButton;
+	Knob * m_ch1SweepStepLengthKnob;
 
-	knob * m_ch2WavePatternDutyKnob;
-	knob * m_ch2VolumeKnob;
-	pixmapButton * m_ch2VolSweepDirButton;
-	knob * m_ch2SweepStepLengthKnob;
+	Knob * m_ch2WavePatternDutyKnob;
+	Knob * m_ch2VolumeKnob;
+	PixmapButton * m_ch2VolSweepDirButton;
+	Knob * m_ch2SweepStepLengthKnob;
 
-	knob * m_ch3VolumeKnob;
+	Knob * m_ch3VolumeKnob;
 
-	knob * m_ch4VolumeKnob;
-	pixmapButton * m_ch4VolSweepDirButton;
-	knob * m_ch4SweepStepLengthKnob;
-	pixmapButton * m_ch4ShiftRegWidthButton;
+	Knob * m_ch4VolumeKnob;
+	PixmapButton * m_ch4VolSweepDirButton;
+	Knob * m_ch4SweepStepLengthKnob;
+	PixmapButton * m_ch4ShiftRegWidthButton;
 
-	knob * m_so1VolumeKnob;
-	knob * m_so2VolumeKnob;
-	pixmapButton * m_ch1So1Button;
-	pixmapButton * m_ch2So1Button;
-	pixmapButton * m_ch3So1Button;
-	pixmapButton * m_ch4So1Button;
-	pixmapButton * m_ch1So2Button;
-	pixmapButton * m_ch2So2Button;
-	pixmapButton * m_ch3So2Button;
-	pixmapButton * m_ch4So2Button;
-	knob * m_trebleKnob;
-	knob * m_bassKnob;
+	Knob * m_so1VolumeKnob;
+	Knob * m_so2VolumeKnob;
+	PixmapButton * m_ch1So1Button;
+	PixmapButton * m_ch2So1Button;
+	PixmapButton * m_ch3So1Button;
+	PixmapButton * m_ch4So1Button;
+	PixmapButton * m_ch1So2Button;
+	PixmapButton * m_ch2So2Button;
+	PixmapButton * m_ch3So2Button;
+	PixmapButton * m_ch4So2Button;
+	Knob * m_trebleKnob;
+	Knob * m_bassKnob;
 
-	graph * m_graph;
+	Graph * m_graph;
 
 /*protected slots:
 	void updateKnobHint();

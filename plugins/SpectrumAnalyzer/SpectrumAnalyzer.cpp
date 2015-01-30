@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -127,7 +127,7 @@ bool SpectrumAnalyzer::processAudioBuffer( sampleFrame* _buf, const fpp_t _frame
 
 //	hanming( m_buffer, FFT_BUFFER_SIZE, HAMMING );
 
-	const sample_rate_t sr = engine::mixer()->processingSampleRate();
+	const sample_rate_t sr = Engine::mixer()->processingSampleRate();
 	const int LOWEST_FREQ = 0;
 	const int HIGHEST_FREQ = sr / 2;
 
@@ -150,7 +150,7 @@ bool SpectrumAnalyzer::processAudioBuffer( sampleFrame* _buf, const fpp_t _frame
 
 	m_framesFilledUp = 0;
 
-	checkGate( 0 );
+	checkGate( 1 );
 
 	return isRunning();
 }

@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Wong Cho Ching
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,17 +36,17 @@ float frnd(float range)
 }
 
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "sfxr.h"
-#include "engine.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
-#include "knob.h"
+#include "Knob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
+#include "PixmapButton.h"
 #include "templates.h"
-#include "tooltip.h"
-#include "song.h"
+#include "ToolTip.h"
+#include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
 
@@ -451,9 +451,10 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	float currentSampleRate = engine::mixer()->processingSampleRate();
+	float currentSampleRate = Engine::mixer()->processingSampleRate();
 
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
+    const f_cnt_t offset = _n->noteOffset();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new SfxrSynth( this );
@@ -477,7 +478,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	{
 		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
 		{
-			_working_buffer[i][j] = pitchedBuffer[i*pitchedFrameNum/frameNum][j];
+			_working_buffer[i+offset][j] = pitchedBuffer[i*pitchedFrameNum/frameNum][j];
 		}
 	}
 
@@ -485,7 +486,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 
 	applyRelease( _working_buffer, _n );
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum + offset, _n );
 
 }
 
@@ -546,11 +547,11 @@ void sfxrInstrument::resetModels()
 
 
 
-class sfxrKnob : public knob
+class sfxrKnob : public Knob
 {
 public:
 	sfxrKnob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
+			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 20, 20 );
 		setCenterPointX( 10.0 );
@@ -567,27 +568,27 @@ public:
 	_knob = new sfxrKnob( this ); \
 	_knob->setHintText( tr( _name ":" ), "" ); \
 	_knob->move( _x, _y ); \
-	toolTip::add( _knob, tr( _name ) );
+	ToolTip::add( _knob, tr( _name ) );
 
 
 
 
 #define createButton( _button, _x, _y, _name, _resName )\
-	_button = new pixmapButton( this, tr( _name ) );\
+	_button = new PixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( embed::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( embed::getIconPixmap( _resName "_inactive" ) );\
-	toolTip::add( _button, tr( _name ) );
+	ToolTip::add( _button, tr( _name ) );
 
 
 
 
 #define createButtonLocalGraphic( _button, _x, _y, _name, _resName )\
-	_button = new pixmapButton( this, tr( _name ) );\
+	_button = new PixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_inactive" ) );\
-	toolTip::add( _button, tr( _name ) );
+	ToolTip::add( _button, tr( _name ) );
 
 
 
@@ -1125,4 +1126,4 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model*, void* data )
 
 
 
-#include "moc_sfxr.cxx"
+

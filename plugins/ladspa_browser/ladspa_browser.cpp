@@ -5,7 +5,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,15 +28,15 @@
 #include "ladspa_browser.h"
 
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QLabel>
 
 
 #include "gui_templates.h"
 #include "ladspa_description.h"
 #include "ladspa_port_dialog.h"
-#include "tab_bar.h"
-#include "tab_button.h"
+#include "TabBar.h"
+#include "TabButton.h"
 
 #include "embed.cpp"
 
@@ -103,7 +103,7 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 	hlayout->setSpacing( 0 );
 	hlayout->setMargin( 0 );
 
-	m_tabBar = new tabBar( this, QBoxLayout::TopToBottom );
+	m_tabBar = new TabBar( this, QBoxLayout::TopToBottom );
 	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
@@ -235,4 +235,4 @@ void ladspaBrowserView::showPorts( const ladspa_key_t & _key )
 
 
 
-#include "moc_ladspa_browser.cxx"
+

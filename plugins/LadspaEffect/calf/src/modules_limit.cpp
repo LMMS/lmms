@@ -252,6 +252,14 @@ multibandlimiter_audio_module::multibandlimiter_audio_module()
     asc_old = true;
 }
 
+multibandlimiter_audio_module::~multibandlimiter_audio_module()
+{
+	if( buffer != NULL)
+	{
+		free(buffer);
+	}
+}
+
 void multibandlimiter_audio_module::activate()
 {
     is_active = true;

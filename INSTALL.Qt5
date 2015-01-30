@@ -1,0 +1,12 @@
+First of all please note that CMake >= 2.8.11 is required for building with
+Qt5 support. In order to build LMMS with Qt5, add the following flag when
+invoking cmake:
+
+-DWANT_QT5=ON
+
+If your Qt5 installation does not reside in standard installation paths,
+additionally pass e.g.
+
+-DCMAKE_PREFIX_PATH=/opt/qt53/
+
+

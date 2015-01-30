@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,7 @@
 
 #include "EffectControls.h"
 #include "peak_controller_effect_control_dialog.h"
-#include "knob.h"
+#include "Knob.h"
 
 class PeakControllerEffect;
 
@@ -65,6 +65,7 @@ private:
 	FloatModel m_amountModel;
 	FloatModel m_attackModel;
 	FloatModel m_decayModel;
+	FloatModel m_tresholdModel;
 	BoolModel m_muteModel;
 	BoolModel m_absModel;
 	FloatModel m_amountMultModel;

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,22 +25,22 @@
 #ifndef SAMPLE_TRACK_H
 #define SAMPLE_TRACK_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 #include "AudioPort.h"
-#include "track.h"
+#include "Track.h"
 
 class EffectRackView;
-class knob;
+class Knob;
 class SampleBuffer;
 
 
-class SampleTCO : public trackContentObject
+class SampleTCO : public TrackContentObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleTCO( track * _track );
+	SampleTCO( Track * _track );
 	virtual ~SampleTCO();
 
 	virtual void changeLength( const MidiTime & _length );
@@ -60,7 +60,7 @@ public:
 
 	MidiTime sampleLength() const;
 
-	virtual trackContentObjectView * createView( trackView * _tv );
+	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 
 public slots:
@@ -85,7 +85,7 @@ signals:
 
 
 
-class SampleTCOView : public trackContentObjectView
+class SampleTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
 	
@@ -94,7 +94,7 @@ class SampleTCOView : public trackContentObjectView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	SampleTCOView( SampleTCO * _tco, trackView * _tv );
+	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
 	virtual ~SampleTCOView();
 
 
@@ -118,7 +118,7 @@ private:
 
 
 
-class SampleTrack : public track
+class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
@@ -127,8 +127,8 @@ public:
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual trackView * createView( TrackContainerView* tcv );
-	virtual trackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackView * createView( TrackContainerView* tcv );
+	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -147,8 +147,10 @@ public:
 
 
 private:
-	AudioPort m_audioPort;
 	FloatModel m_volumeModel;
+	FloatModel m_panningModel;
+	AudioPort m_audioPort;
+
 
 
 	friend class SampleTrackView;
@@ -157,11 +159,11 @@ private:
 
 
 
-class SampleTrackView : public trackView
+class SampleTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	SampleTrackView( SampleTrack* track, TrackContainerView* tcv );
+	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
 	virtual ~SampleTrackView();
 
 
@@ -180,7 +182,8 @@ protected:
 private:
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
-	knob * m_volumeKnob;
+	Knob * m_volumeKnob;
+	Knob * m_panningKnob;
 
 } ;
 

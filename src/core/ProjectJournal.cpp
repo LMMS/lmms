@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,10 +25,11 @@
 #include <cstdlib>
 
 #include "ProjectJournal.h"
-#include "engine.h"
+#include "Engine.h"
 #include "JournallingObject.h"
-#include "song.h"
+#include "Song.h"
 
+const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
 ProjectJournal::ProjectJournal() :
 	m_joIDs(),
@@ -65,7 +66,7 @@ void ProjectJournal::undo()
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 			break;
 		}
 	}
@@ -90,7 +91,7 @@ void ProjectJournal::redo()
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
-			engine::getSong()->setModified();
+			Engine::getSong()->setModified();
 			break;
 		}
 	}
@@ -109,6 +110,10 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		jo->saveState( dataFile, dataFile.content() );
 
 		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
+		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
+		{
+			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
+		}
 	}
 }
 
@@ -120,7 +125,7 @@ jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 	const jo_id_t EO_ID_MAX = (1 << 23)-1;
 	jo_id_t id;
 	while( m_joIDs.contains( id =
-			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() % 
+			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() %
 								 EO_ID_MAX ) ) )
 	{
 	}
@@ -161,6 +166,18 @@ void ProjectJournal::clearJournal()
 			++it;
 		}
 	}
+}
+
+void ProjectJournal::stopAllJournalling()
+{
+	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
+	{
+		if( it.value() != NULL ) 
+		{
+			it.value()->setJournalling(false);
+		}
+	}
+	setJournalling(false);
 }
 
 

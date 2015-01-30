@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,11 +30,11 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
-#include "automatable_button.h"
+#include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
 #include "NotePlayHandle.h"
-#include "pixmap_button.h"
-#include "combobox.h"
+#include "PixmapButton.h"
+#include "ComboBox.h"
 #include "Oscillator.h"
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
@@ -44,56 +44,26 @@
 //
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new knob( knobStyled, view ); 				\
+	name = new Knob( knobStyled, view ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ) + " ", unit );		\
+	name ->setHintText( tr( hint ), unit );             \
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
 	name = new TempoSyncKnob( knobStyled, view ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ) + " ", unit );		\
+	name ->setHintText( tr( hint ), unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
 #define maketinyled( name, x, y, ttip ) \
-	name = new pixmapButton( view, NULL ); 	\
+	name = new PixmapButton( view, NULL ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
-	toolTip::add( name, tr( ttip ) );
-
-#define setwavemodel( name ) 												\
-	name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
-	name .addItem( tr( "Bandlimited Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-	name .addItem( tr( "Bandlimited Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-	name .addItem( tr( "Bandlimited Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-	name .addItem( tr( "Bandlimited Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-	name .addItem( tr( "Bandlimited Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
-	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
-	name .addItem( tr( "Absolute sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
-	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
-	name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );	\
-	name .addItem( tr( "Digital Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-	name .addItem( tr( "Digital Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-	name .addItem( tr( "Digital Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-	name .addItem( tr( "Digital Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-	name .addItem( tr( "Digital Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
-
-
-#define setlfowavemodel( name ) 												\
-	name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
-	name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-	name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-	name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-	name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-	name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
-	name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
-	name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
-	name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
-	name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
+	ToolTip::add( name, tr( ttip ) );
 
 // UI constants
 const int O1ROW = 22;
@@ -158,6 +128,11 @@ const int WAVE_MOOG_D = 14;
 
 const int NUM_WAVES = 15;
 
+// lfo-specific enumerators
+const int WAVE_RANDOM = 9;
+const int WAVE_RANDOM_SMOOTH = 10;
+const int NUM_LFO_WAVES = 11;
+
 // modulation enumerators
 const int MOD_MIX = 0;
 const int MOD_AM = 1;
@@ -170,10 +145,12 @@ const float MODCLIP = 2.0;
 const float MIN_FREQ = 18.0f;
 const float MAX_FREQ = 48000.0f;
 
-// constants for amp delta capping - these will be divided by samplerate by the synth
-const float ADCAP1 = 44100 / 2;
-const float ADCAP2 = 44100 / 2.25;
+const float INTEGRATOR = 3.0f / 7.0f;
 
+const float FM_AMOUNT = 0.25f;
+
+const float PW_MIN = 0.25f;
+const float PW_MAX = 100.0f - PW_MIN;
 
 class MonstroInstrument;
 class MonstroView;
@@ -181,31 +158,19 @@ class MonstroView;
 
 class MonstroSynth
 {
+	MM_OPERATORS
 public:
-	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph,
-					const sample_rate_t _samplerate, fpp_t _frames );
+	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth();
 
 	void renderOutput( fpp_t _frames, sampleFrame * _buf );
-
-	inline sample_rate_t samplerate() const
-	{
-		return m_samplerate;
-	}
 
 private:
 
 	MonstroInstrument * m_parent;
 	NotePlayHandle * m_nph;
-	const sample_rate_t m_samplerate;
-	fpp_t m_fpp;
 
-	sample_t * m_env1_buf;
-	sample_t * m_env2_buf;
-	sample_t * m_lfo1_buf;
-	sample_t * m_lfo2_buf;
-
-	void renderModulators( fpp_t _frames );
+	inline void updateModulators( float * env1, float * env2, float * lfo1, float * lfo2, int frames );
 
 	// linear interpolation
 /*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
@@ -213,11 +178,13 @@ private:
 		return s1 + ( s2 - s1 ) * x;
 	}*/ // using interpolation.h from now on
 
-	inline sample_t calcSlope( sample_t _s, float _slope )
+	inline sample_t calcSlope( int slope,  sample_t s );
+
+	// checks for lower bound for phase, upper bound is already checked by oscillator-functions in both
+	// oscillator.h and bandlimitedwave.h so we save some cpu by only checking lower bound
+	inline float lowBoundCheck( float ph )
 	{
-		if( _slope == 0.0f ) return _s;
-		const double exp = fastPow( 10.0, static_cast<double>( _slope * -1.0 ) );
-		return fastPow( _s, exp );
+		return ph < 0.0f ? ph - ( static_cast<int>( ph ) - 1.0f ) : ph;
 	}
 
 	inline sample_t oscillate( int _wave, const float _ph, float _wavelen )
@@ -294,23 +261,24 @@ private:
 	float m_osc3l_phase;
 	float m_osc3r_phase;
 
-	sample_t m_env1_phase;
-	sample_t m_env2_phase;
+	sample_t m_env_phase [2];
+	float m_lfo_phase [2];
+	sample_t m_lfo_last [2];
+	sample_t m_lfo_next [2];
+	float m_lfo_inc [2];
+	float m_lfo_rate [2];	
+	float m_env_sus [2];
 
-	float m_lfo1_phase;
-	float m_lfo2_phase;
-
-	sample_t m_lfo1_last;
-	sample_t m_lfo2_last;
+	int m_lfovalue[2];
+	int m_lfoatt[2];
+	float m_env_pre[2];
+	float m_env_att[2];
+	float m_env_hold[2];
+	float m_env_dec[2];
+	float m_env_rel[2];
 
 	sample_t m_osc1l_last;
 	sample_t m_osc1r_last;
-
-	sample_t m_osc2l_last;
-	sample_t m_osc2r_last;
-
-	sample_t m_osc3l_last;
-	sample_t m_osc3r_last;
 
 	sample_t m_l_last;
 	sample_t m_r_last;
@@ -321,13 +289,52 @@ private:
 	float m_ph3l_last;
 	float m_ph3r_last;
 
-	float m_adcap1;
-	float m_adcap2;
+	bool m_invert2l;
+	bool m_invert3l;
+	bool m_invert2r;
+	bool m_invert3r;
+	
+	int m_counter2l;
+	int m_counter2r;
+	int m_counter3l;
+	int m_counter3r;
 };
 
 class MonstroInstrument : public Instrument
 {
 	Q_OBJECT
+
+#define setwavemodel( name ) 												\
+		name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
+		name .addItem( tr( "Bandlimited Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+		name .addItem( tr( "Bandlimited Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+		name .addItem( tr( "Bandlimited Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+		name .addItem( tr( "Bandlimited Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+		name .addItem( tr( "Bandlimited Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+		name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
+		name .addItem( tr( "Absolute sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
+		name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
+		name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );	\
+		name .addItem( tr( "Digital Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+		name .addItem( tr( "Digital Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+		name .addItem( tr( "Digital Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+		name .addItem( tr( "Digital Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+		name .addItem( tr( "Digital Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );
+
+
+#define setlfowavemodel( name ) 												\
+		name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
+		name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
+		name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
+		name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
+		name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
+		name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
+		name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
+		name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
+		name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
+		name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );	\
+		name .addItem( tr( "Random smooth" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
+
 public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );
 	virtual ~MonstroInstrument();
@@ -347,14 +354,22 @@ public:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 public slots:
-	void updateVolumes();
-	void updateFreq();
-	void updatePO();
+	void updateVolume1();
+	void updateVolume2();
+	void updateVolume3();
+	void updateFreq1();
+	void updateFreq2();
+	void updateFreq3();
+	void updatePO1();
+	void updatePO2();
+	void updatePO3();
 	void updateEnvelope1();
 	void updateEnvelope2();
 	void updateLFOAtts();
 	void updateSamplerate();
-
+	void updateSlope1();
+	void updateSlope2();
+	
 protected:
 	float m_osc1l_vol;
 	float m_osc1r_vol;
@@ -394,11 +409,17 @@ protected:
 	f_cnt_t m_env1_relF;
 	f_cnt_t m_env2_relF;
 
+	float m_slope [2];
+
 	f_cnt_t m_lfo1_att;
 	f_cnt_t m_lfo2_att;
 
 	sample_rate_t m_samplerate;
 	fpp_t m_fpp;
+	
+	float m_integrator;
+	float m_fmCorrection;
+	int m_counterMax;
 
 private:
 	inline float leftCh( float _vol, float _pan )
@@ -434,7 +455,8 @@ private:
 	FloatModel	m_osc2Ftr;
 	FloatModel	m_osc2Spo;
 	ComboBoxModel	m_osc2Wave;
-	BoolModel	m_osc2Sync;
+	BoolModel	m_osc2SyncH;
+	BoolModel	m_osc2SyncR;
 
 	FloatModel	m_osc3Vol;
 	FloatModel	m_osc3Pan;
@@ -443,7 +465,8 @@ private:
 	FloatModel	m_osc3Sub;
 	ComboBoxModel	m_osc3Wave1;
 	ComboBoxModel	m_osc3Wave2;
-	BoolModel	m_osc3Sync;
+	BoolModel	m_osc3SyncH;
+	BoolModel	m_osc3SyncR;
 
 	ComboBoxModel	m_lfo1Wave;
 	TempoSyncKnobModel	m_lfo1Att;
@@ -565,59 +588,61 @@ private:
 //                                  //
 //////////////////////////////////////
 
-	knob *	m_osc1VolKnob;
-	knob *	m_osc1PanKnob;
-	knob *	m_osc1CrsKnob;
-	knob *	m_osc1FtlKnob;
-	knob *	m_osc1FtrKnob;
-	knob *	m_osc1SpoKnob;
-	knob *	m_osc1PwKnob;
-	pixmapButton * m_osc1SSRButton;
-	pixmapButton * m_osc1SSFButton;
+	Knob *	m_osc1VolKnob;
+	Knob *	m_osc1PanKnob;
+	Knob *	m_osc1CrsKnob;
+	Knob *	m_osc1FtlKnob;
+	Knob *	m_osc1FtrKnob;
+	Knob *	m_osc1SpoKnob;
+	Knob *	m_osc1PwKnob;
+	PixmapButton * m_osc1SSRButton;
+	PixmapButton * m_osc1SSFButton;
 
-	knob *	m_osc2VolKnob;
-	knob *	m_osc2PanKnob;
-	knob *	m_osc2CrsKnob;
-	knob *	m_osc2FtlKnob;
-	knob *	m_osc2FtrKnob;
-	knob *	m_osc2SpoKnob;
-	comboBox *	m_osc2WaveBox;
-	pixmapButton * m_osc2SyncButton;
+	Knob *	m_osc2VolKnob;
+	Knob *	m_osc2PanKnob;
+	Knob *	m_osc2CrsKnob;
+	Knob *	m_osc2FtlKnob;
+	Knob *	m_osc2FtrKnob;
+	Knob *	m_osc2SpoKnob;
+	ComboBox *	m_osc2WaveBox;
+	PixmapButton * m_osc2SyncHButton;
+	PixmapButton * m_osc2SyncRButton;
 
-	knob *	m_osc3VolKnob;
-	knob *	m_osc3PanKnob;
-	knob *	m_osc3CrsKnob;
-	knob *	m_osc3SpoKnob;
-	knob *	m_osc3SubKnob;
-	comboBox *	m_osc3Wave1Box;
-	comboBox *	m_osc3Wave2Box;
-	pixmapButton * m_osc3SyncButton;
+	Knob *	m_osc3VolKnob;
+	Knob *	m_osc3PanKnob;
+	Knob *	m_osc3CrsKnob;
+	Knob *	m_osc3SpoKnob;
+	Knob *	m_osc3SubKnob;
+	ComboBox *	m_osc3Wave1Box;
+	ComboBox *	m_osc3Wave2Box;
+	PixmapButton * m_osc3SyncHButton;
+	PixmapButton * m_osc3SyncRButton;
 
-	comboBox *	m_lfo1WaveBox;
+	ComboBox *	m_lfo1WaveBox;
 	TempoSyncKnob *	m_lfo1AttKnob;
 	TempoSyncKnob *	m_lfo1RateKnob;
-	knob *	m_lfo1PhsKnob;
+	Knob *	m_lfo1PhsKnob;
 
-	comboBox *	m_lfo2WaveBox;
+	ComboBox *	m_lfo2WaveBox;
 	TempoSyncKnob *	m_lfo2AttKnob;
 	TempoSyncKnob *	m_lfo2RateKnob;
-	knob *	m_lfo2PhsKnob;
+	Knob *	m_lfo2PhsKnob;
 
 	TempoSyncKnob *	m_env1PreKnob;
 	TempoSyncKnob *	m_env1AttKnob;
 	TempoSyncKnob *	m_env1HoldKnob;
 	TempoSyncKnob *	m_env1DecKnob;
-	knob *	m_env1SusKnob;
+	Knob *	m_env1SusKnob;
 	TempoSyncKnob *	m_env1RelKnob;
-	knob *	m_env1SlopeKnob;
+	Knob *	m_env1SlopeKnob;
 
 	TempoSyncKnob *	m_env2PreKnob;
 	TempoSyncKnob *	m_env2AttKnob;
 	TempoSyncKnob *	m_env2HoldKnob;
 	TempoSyncKnob *	m_env2DecKnob;
-	knob *	m_env2SusKnob;
+	Knob *	m_env2SusKnob;
 	TempoSyncKnob *	m_env2RelKnob;
-	knob *	m_env2SlopeKnob;
+	Knob *	m_env2SlopeKnob;
 
 	automatableButtonGroup * m_o23ModGroup;
 
@@ -632,60 +657,60 @@ private:
 //                             //
 /////////////////////////////////
 
-	knob * 	m_vol1env1Knob;
-	knob *	m_vol1env2Knob;
-	knob *	m_vol1lfo1Knob;
-	knob *	m_vol1lfo2Knob;
+	Knob * 	m_vol1env1Knob;
+	Knob *	m_vol1env2Knob;
+	Knob *	m_vol1lfo1Knob;
+	Knob *	m_vol1lfo2Knob;
 
-	knob * 	m_vol2env1Knob;
-	knob *	m_vol2env2Knob;
-	knob *	m_vol2lfo1Knob;
-	knob *	m_vol2lfo2Knob;
+	Knob * 	m_vol2env1Knob;
+	Knob *	m_vol2env2Knob;
+	Knob *	m_vol2lfo1Knob;
+	Knob *	m_vol2lfo2Knob;
 
-	knob * 	m_vol3env1Knob;
-	knob *	m_vol3env2Knob;
-	knob *	m_vol3lfo1Knob;
-	knob *	m_vol3lfo2Knob;
+	Knob * 	m_vol3env1Knob;
+	Knob *	m_vol3env2Knob;
+	Knob *	m_vol3lfo1Knob;
+	Knob *	m_vol3lfo2Knob;
 
-	knob * 	m_phs1env1Knob;
-	knob *	m_phs1env2Knob;
-	knob *	m_phs1lfo1Knob;
-	knob *	m_phs1lfo2Knob;
+	Knob * 	m_phs1env1Knob;
+	Knob *	m_phs1env2Knob;
+	Knob *	m_phs1lfo1Knob;
+	Knob *	m_phs1lfo2Knob;
 
-	knob * 	m_phs2env1Knob;
-	knob *	m_phs2env2Knob;
-	knob *	m_phs2lfo1Knob;
-	knob *	m_phs2lfo2Knob;
+	Knob * 	m_phs2env1Knob;
+	Knob *	m_phs2env2Knob;
+	Knob *	m_phs2lfo1Knob;
+	Knob *	m_phs2lfo2Knob;
 
-	knob * 	m_phs3env1Knob;
-	knob *	m_phs3env2Knob;
-	knob *	m_phs3lfo1Knob;
-	knob *	m_phs3lfo2Knob;
+	Knob * 	m_phs3env1Knob;
+	Knob *	m_phs3env2Knob;
+	Knob *	m_phs3lfo1Knob;
+	Knob *	m_phs3lfo2Knob;
 
-	knob * 	m_pit1env1Knob;
-	knob *	m_pit1env2Knob;
-	knob *	m_pit1lfo1Knob;
-	knob *	m_pit1lfo2Knob;
+	Knob * 	m_pit1env1Knob;
+	Knob *	m_pit1env2Knob;
+	Knob *	m_pit1lfo1Knob;
+	Knob *	m_pit1lfo2Knob;
 
-	knob * 	m_pit2env1Knob;
-	knob *	m_pit2env2Knob;
-	knob *	m_pit2lfo1Knob;
-	knob *	m_pit2lfo2Knob;
+	Knob * 	m_pit2env1Knob;
+	Knob *	m_pit2env2Knob;
+	Knob *	m_pit2lfo1Knob;
+	Knob *	m_pit2lfo2Knob;
 
-	knob * 	m_pit3env1Knob;
-	knob *	m_pit3env2Knob;
-	knob *	m_pit3lfo1Knob;
-	knob *	m_pit3lfo2Knob;
+	Knob * 	m_pit3env1Knob;
+	Knob *	m_pit3env2Knob;
+	Knob *	m_pit3lfo1Knob;
+	Knob *	m_pit3lfo2Knob;
 
-	knob * 	m_pw1env1Knob;
-	knob *	m_pw1env2Knob;
-	knob *	m_pw1lfo1Knob;
-	knob *	m_pw1lfo2Knob;
+	Knob * 	m_pw1env1Knob;
+	Knob *	m_pw1env2Knob;
+	Knob *	m_pw1lfo1Knob;
+	Knob *	m_pw1lfo2Knob;
 
-	knob * 	m_sub3env1Knob;
-	knob *	m_sub3env2Knob;
-	knob *	m_sub3lfo1Knob;
-	knob *	m_sub3lfo2Knob;
+	Knob * 	m_sub3env1Knob;
+	Knob *	m_sub3env2Knob;
+	Knob *	m_sub3lfo1Knob;
+	Knob *	m_sub3lfo2Knob;
 
 };
 

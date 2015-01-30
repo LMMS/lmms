@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,12 +23,12 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
+#include <QVector>
 
-#include "song.h"
-#include "engine.h"
+#include "Song.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "MidiClient.h"
 #include "MidiController.h"
@@ -38,9 +38,10 @@ MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			engine::mixer()->midiClient(), this, this, MidiPort::Input ),
+			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f )
 {
+	setSampleExact( true );
 	connect( &m_midiPort, SIGNAL( modeChanged() ),
 			this, SLOT( updateName() ) );
 }
@@ -55,12 +56,19 @@ MidiController::~MidiController()
 
 
 
-float MidiController::value( int _offset )
+void MidiController::updateValueBuffer()
 {
-	return m_lastValue;
+	if( m_previousValue != m_lastValue )
+	{
+		m_valueBuffer.interpolate( m_previousValue, m_lastValue );
+		m_previousValue = m_lastValue;
+	}
+	else
+	{
+		m_valueBuffer.fill( m_lastValue );
+	}
+	m_bufferLastUpdated = s_periods;
 }
-
-
 
 
 void MidiController::updateName()
@@ -73,7 +81,7 @@ void MidiController::updateName()
 
 
 
-void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time )
+void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	unsigned char controllerNum;
 	switch( event.type() )
@@ -86,6 +94,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 					  m_midiPort.inputChannel() == 0 ) )
 			{
 				unsigned char val = event.controllerValue();
+				m_previousValue = m_lastValue;
 				m_lastValue = (float)( val ) / 127.0f;
 				emit valueChanged();
 			}
@@ -148,5 +157,5 @@ ControllerDialog * MidiController::createDialog( QWidget * _parent )
 }
 
 
-#include "moc_MidiController.cxx"
+
 

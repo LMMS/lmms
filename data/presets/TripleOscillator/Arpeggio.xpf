@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<!DOCTYPE multimedia-project>
+<multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings>
+    <instrumenttrack fxch="0" vol="19" name="Arpeggio 2" tab="2">
+      <tripleoscillator phoffset2="82" userwavefile0="empty.wav" userwavefile1="empty.wav" finer0="13" userwavefile2="empty.wav" finer1="16" finer2="4" coarse0="-12" coarse1="0" coarse2="12" finel0="-10" finel1="10" modalgo1="2" finel2="-2" modalgo2="2" pan0="9" pan1="-20" stphdetun0="232" pan2="10" stphdetun1="110" stphdetun2="109" wavetype0="2" wavetype1="3" wavetype2="2" vol0="100" vol1="100" phoffset0="87" vol2="115" phoffset1="280"/>
+      <eldata fres="0.46" ftype="4" fcut="1250" fwet="1">
+        <elvol lpdel="0" amt="1" rel="0.167" latt="0" sus="0" lspd="0.1" att="0.048" pdel="0" lamt="0" dec="0.999" x100="0" lshp="0" hold="0"/>
+        <elcut lpdel="0" amt="0" rel="0.1" latt="0" sus="0.5" lspd="0.6094" att="0.5" pdel="0" lamt="0" dec="0.5" x100="0" lshp="1" hold="0.5"/>
+        <elres lpdel="0" amt="0" rel="0" latt="0" sus="0.5" lspd="0.1" att="0.5" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5"/>
+      </eldata>
+      <arpeggiator arptime="100" arprange="2" chord="0" chordrange="2" arp="0" arp-enabled="1" chord-enabled="1" arpdir="0" arpgate="51"/>
+      <chordcreator arptime="100" arprange="2" chord="0" chordrange="2" arp="0" arp-enabled="1" chord-enabled="1" arpdir="0" arpgate="51"/>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</multimediaproject>

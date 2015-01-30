@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef _INSTRUMENT_SOUND_SHAPING_VIEW_H
-#define _INSTRUMENT_SOUND_SHAPING_VIEW_H
+#ifndef INSTRUMENT_SOUND_SHAPING_VIEW_H
+#define INSTRUMENT_SOUND_SHAPING_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "InstrumentSoundShaping.h"
 #include "ModelView.h"
@@ -33,10 +33,10 @@
 class QLabel;
 
 class EnvelopeAndLfoView;
-class comboBox;
-class groupBox;
-class knob;
-class tabWidget;
+class ComboBox;
+class GroupBox;
+class Knob;
+class TabWidget;
 
 
 class InstrumentSoundShapingView : public QWidget, public ModelView
@@ -54,14 +54,14 @@ private:
 
 
 	InstrumentSoundShaping * m_ss;
-	tabWidget * m_targetsTabWidget;
+	TabWidget * m_targetsTabWidget;
 	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
 
 	// filter-stuff
-	groupBox * m_filterGroupBox;
-	comboBox * m_filterComboBox;
-	knob * m_filterCutKnob;
-	knob * m_filterResKnob;
+	GroupBox * m_filterGroupBox;
+	ComboBox * m_filterComboBox;
+	Knob * m_filterCutKnob;
+	Knob * m_filterResKnob;
 
 	QLabel* m_singleStreamInfoLabel;
 

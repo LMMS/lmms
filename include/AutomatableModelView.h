@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,14 +22,14 @@
  *
  */
 
-#ifndef _AUTOMATABLE_MODEL_VIEW_H
-#define _AUTOMATABLE_MODEL_VIEW_H
+#ifndef AUTOMATABLE_MODEL_VIEW_H
+#define AUTOMATABLE_MODEL_VIEW_H
 
 #include "ModelView.h"
 #include "AutomatableModel.h"
 
 class QMenu;
-
+class QMouseEvent;
 
 class EXPORT AutomatableModelView : public ModelView
 {

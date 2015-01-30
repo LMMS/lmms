@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,14 +24,14 @@
  */
 
 #include "NotePlayHandle.h"
-#include "basic_filters.h"
-#include "config_mgr.h"
+#include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "MidiEvent.h"
 #include "MidiPort.h"
-#include "song.h"
+#include "Song.h"
 
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
@@ -47,12 +47,12 @@ NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								const f_cnt_t _offset,
 								const f_cnt_t _frames,
-								const note& n,
+								const Note& n,
 								NotePlayHandle *parent,
 								int midiEventChannel,
 								Origin origin ) :
 	PlayHandle( TypeNotePlayHandle, _offset ),
-	note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
+	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
@@ -61,20 +61,24 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
+	m_subNotes(),
 	m_released( false ),
 	m_hasParent( parent != NULL  ),
+	m_parent( parent ),
 	m_hadChildren( false ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
-	m_origTempo( engine::getSong()->getTempo() ),
-	m_origBaseNote( instrumentTrack->baseNoteModel()->value() ),
+	m_origTempo( Engine::getSong()->getTempo() ),
+	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( NULL ),
 	m_songGlobalParentOffset( 0 ),
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
-	m_origin( origin )
+	m_origin( origin ),
+	m_frequencyNeedsUpdate( false )
 {
+	lock();
 	if( hasParent() == false )
 	{
 		m_baseDetuning = new BaseDetuning( detuning() );
@@ -88,6 +92,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		parent->m_hadChildren = true;
 
 		m_bbTrack = parent->m_bbTrack;
+
+		parent->setUsesBuffer( false );
 	}
 
 	updateFrequency();
@@ -100,28 +106,41 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if( !isMasterNote() || !instrumentTrack->isArpeggioEnabled() )
+	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
 	{
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
 			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), engine::framesPerTick() ) );
+			MidiTime::fromFrames( offset(), Engine::framesPerTick() ),
+			offset() );
 	}
+
+	if( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed )
+	{
+		setUsesBuffer( false );
+	}
+
+	setAudioPort( instrumentTrack->audioPort() );
+
+	unlock();
 }
 
 
-
-
-NotePlayHandle::~NotePlayHandle()
+void NotePlayHandle::done()
 {
+	lock();
 	noteOff( 0 );
 
 	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
+	}
+	else
+	{
+		m_parent->m_subNotes.removeOne( this );
 	}
 
 	if( m_pluginData != NULL )
@@ -134,13 +153,13 @@ NotePlayHandle::~NotePlayHandle()
 		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
-	{
-		delete *it;
-	}
 	m_subNotes.clear();
 
 	delete m_filter;
+
+	if( buffer() ) releaseBuffer();
+
+	unlock();
 }
 
 
@@ -148,7 +167,7 @@ NotePlayHandle::~NotePlayHandle()
 
 void NotePlayHandle::setVolume( volume_t _volume )
 {
-	note::setVolume( _volume );
+	Note::setVolume( _volume );
 
 	const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
@@ -160,7 +179,7 @@ void NotePlayHandle::setVolume( volume_t _volume )
 
 void NotePlayHandle::setPanning( panning_t panning )
 {
-	note::setPanning( panning );
+	Note::setPanning( panning );
 
 	MidiEvent event( MidiMetaEvent, midiChannel(), midiKey(), panningToMidi( panning ) );
 	event.setMetaEvent( MidiNotePanning );
@@ -173,7 +192,7 @@ void NotePlayHandle::setPanning( panning_t panning )
 
 int NotePlayHandle::midiKey() const
 {
-	return key() - m_origBaseNote + instrumentTrack()->baseNoteModel()->value();
+	return key() - m_origBaseNote + instrumentTrack()->baseNote();
 }
 
 
@@ -186,11 +205,32 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		return;
 	}
 
+	// if the note offset falls over to next period, then don't start playback yet
+	if( offset() >= Engine::mixer()->framesPerPeriod() )
+	{
+		setOffset( offset() - Engine::mixer()->framesPerPeriod() );
+		return;
+	}
+
+	lock();
+	if( m_frequencyNeedsUpdate )
+	{
+		updateFrequency();
+	}
+
+	// number of frames that can be played this period
+	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0
+		? Engine::mixer()->framesPerPeriod() - offset()
+		: Engine::mixer()->framesPerPeriod();
+
+	// check if we start release during this period
 	if( m_released == false &&
 		instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + engine::mixer()->framesPerPeriod() >= m_frames )
+		m_totalFramesPlayed + framesThisPeriod > m_frames )
 	{
-		noteOff( m_frames - m_totalFramesPlayed );
+		noteOff( m_totalFramesPlayed == 0
+			? ( m_frames + offset() ) // if we have noteon and noteoff during the same period, take offset in account for release frame
+			: ( m_frames - m_totalFramesPlayed ) ); // otherwise, the offset is already negated and can be ignored
 	}
 
 	// under some circumstances we're called even if there's nothing to play
@@ -198,30 +238,36 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	// decreasing release of an instrument-track while the note is active
 	if( framesLeft() > 0 )
 	{
+		// clear offset frames if we're at the first period
+		// skip for single-streamed instruments, because in their case NPH::play() could be called from an IPH without a buffer argument
+		// ... also, they don't actually render the sound in NPH's, which is an even better reason to skip...
+		if( m_totalFramesPlayed == 0 && ! ( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed ) )
+		{
+			memset( _working_buffer, 0, sizeof( sampleFrame ) * offset() );
+		}
 		// play note!
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
 	if( m_released )
 	{
-		f_cnt_t todo = engine::mixer()->framesPerPeriod();
+		f_cnt_t todo = framesThisPeriod;
 
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
 		// because we do not allow NotePlayHandle::isFinished() to be true
 		// until all sub-notes are completely played and no new ones
 		// are inserted by arpAndChordsTabWidget::processNote()
-		if( isMasterNote() )
+		if( ! m_subNotes.isEmpty() )
 		{
-			m_releaseFramesToDo = m_releaseFramesDone + 2 * engine::mixer()->framesPerPeriod();
+			m_releaseFramesToDo = m_releaseFramesDone + 2 * Engine::mixer()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
 		{
 			// yes, then look whether these samples can be played
 			// within one audio-buffer
-			if( m_framesBeforeRelease <=
-				engine::mixer()->framesPerPeriod() )
+			if( m_framesBeforeRelease <= framesThisPeriod )
 			{
 				// yes, then we did less releaseFramesDone
 				todo -= m_framesBeforeRelease;
@@ -233,8 +279,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 				// and wait for next loop... (we're not in
 				// release-phase yet)
 				todo = 0;
-				m_framesBeforeRelease -=
-				engine::mixer()->framesPerPeriod();
+				m_framesBeforeRelease -= framesThisPeriod;
 			}
 		}
 		// look whether we're in release-phase
@@ -257,22 +302,19 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// play sub-notes (e.g. chords)
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); )
+	// handled by mixer now
+/*	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		( *it )->play( _working_buffer );
-		if( ( *it )->isFinished() )
+		n->play( _working_buffer );
+		if( n->isFinished() )
 		{
-			delete *it;
-			it = m_subNotes.erase( it );
+			NotePlayHandleManager::release( n );
 		}
-		else
-		{
-			++it;
-		}
-	}
+	}*/
 
 	// update internal data
-	m_totalFramesPlayed += engine::mixer()->framesPerPeriod();
+	m_totalFramesPlayed += framesThisPeriod;
+	unlock();
 }
 
 
@@ -282,15 +324,15 @@ f_cnt_t NotePlayHandle::framesLeft() const
 {
 	if( instrumentTrack()->isSustainPedalPressed() )
 	{
-		return 4*engine::mixer()->framesPerPeriod();
+		return 4*Engine::mixer()->framesPerPeriod();
 	}
 	else if( m_released && actualReleaseFramesToDo() == 0 )
 	{
 		return m_framesBeforeRelease;
 	}
-	else if( m_released && actualReleaseFramesToDo() >= m_releaseFramesDone )
+	else if( m_released )
 	{
-		return m_framesBeforeRelease + actualReleaseFramesToDo() - m_releaseFramesDone;
+		return m_framesBeforeRelease + m_releaseFramesToDo - m_releaseFramesDone;
 	}
 	return m_frames+actualReleaseFramesToDo()-m_totalFramesPlayed;
 }
@@ -300,13 +342,17 @@ f_cnt_t NotePlayHandle::framesLeft() const
 
 fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
-	return (fpp_t) qMin<f_cnt_t>( framesLeft(), engine::mixer()->framesPerPeriod() );
+	if( m_totalFramesPlayed == 0 )
+	{
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() - offset() );
+	}
+	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() );
 }
 
 
 
 
-bool NotePlayHandle::isFromTrack( const track * _track ) const
+bool NotePlayHandle::isFromTrack( const Track * _track ) const
 {
 	return m_instrumentTrack == _track || m_bbTrack == _track;
 }
@@ -320,33 +366,35 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	{
 		return;
 	}
+	m_released = true;
 
 	// first note-off all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	foreach( NotePlayHandle * n, m_subNotes )
 	{
-		( *it )->noteOff( _s );
+		n->lock();
+		n->noteOff( _s );
+		n->unlock();
 	}
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = qMax<f_cnt_t>( 0, m_instrumentTrack->m_soundShaping.releaseFrames() );
+	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
 
-	if( hasParent() || !instrumentTrack()->isArpeggioEnabled() )
+	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
 	{
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-			MidiTime::fromFrames( m_framesBeforeRelease, engine::framesPerTick() ) );
+				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+				MidiTime::fromFrames( _s, Engine::framesPerTick() ),
+				_s );
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
 	if( m_origin == OriginMidiInput )
 	{
-		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / engine::framesPerTick() ) ) );
+		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
 		m_instrumentTrack->midiNoteOff( *this );
 	}
-
-	m_released = true;
 }
 
 
@@ -396,7 +444,7 @@ void NotePlayHandle::mute()
 
 int NotePlayHandle::index() const
 {
-	const PlayHandleList & playHandles = engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	int idx = 0;
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
@@ -419,7 +467,7 @@ int NotePlayHandle::index() const
 
 ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentTrack * _it, bool _all_ph )
 {
-	const PlayHandleList & playHandles = engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
@@ -460,10 +508,11 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
+	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 	const float pitch =
 		( key() -
 				m_instrumentTrack->baseNoteModel()->value() +
-				engine::getSong()->masterPitch() +
+				mp +
 				m_baseDetuning->value() )
 												 / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
@@ -508,3 +557,72 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 }
 
 
+NotePlayHandle ** NotePlayHandleManager::s_available;
+QReadWriteLock NotePlayHandleManager::s_mutex;
+QAtomicInt NotePlayHandleManager::s_availableIndex;
+int NotePlayHandleManager::s_size;
+
+
+void NotePlayHandleManager::init()
+{
+	s_available = MM_ALLOC( NotePlayHandle*, INITIAL_NPH_CACHE );
+
+	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, INITIAL_NPH_CACHE );
+
+	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
+	{
+		s_available[ i ] = n;
+		++n;
+	}
+	s_availableIndex = INITIAL_NPH_CACHE - 1;
+	s_size = INITIAL_NPH_CACHE;
+}
+
+
+NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrack,
+				const f_cnt_t offset,
+				const f_cnt_t frames,
+				const Note& noteToPlay,
+				NotePlayHandle* parent,
+				int midiEventChannel,
+				NotePlayHandle::Origin origin )
+{
+	if( s_availableIndex < 0 )
+	{
+		s_mutex.lockForWrite();
+		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
+		s_mutex.unlock();
+	}
+	s_mutex.lockForRead();
+	NotePlayHandle * nph = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
+	s_mutex.unlock();
+
+	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
+	return nph;
+}
+
+
+void NotePlayHandleManager::release( NotePlayHandle * nph )
+{
+	nph->done();
+	s_mutex.lockForRead();
+	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
+	s_mutex.unlock();
+}
+
+
+void NotePlayHandleManager::extend( int c )
+{
+	s_size += c;
+	NotePlayHandle ** tmp = MM_ALLOC( NotePlayHandle*, s_size );
+	MM_FREE( s_available );
+	s_available = tmp;
+
+	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, c );
+
+	for( int i=0; i < c; ++i )
+	{
+		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = n;
+		++n;
+	}
+}

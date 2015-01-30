@@ -1,9 +1,9 @@
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,16 +22,16 @@
  *
  */
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
+#include <QLineEdit>
+#include <QLabel>
 
 #include "AudioAlsa.h"
 
 #ifdef LMMS_HAVE_ALSA
 
 #include "endian_handling.h"
-#include "config_mgr.h"
-#include "engine.h"
+#include "ConfigManager.h"
+#include "Engine.h"
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 #include "templates.h"
@@ -40,7 +40,7 @@
 
 AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audioalsa", "channels" ).toInt(),
+		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_handle( NULL ),
@@ -53,7 +53,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	int err;
 
 	if( ( err = snd_pcm_open( &m_handle,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 						SND_PCM_STREAM_PLAYBACK,
 						0 ) ) < 0 )
 	{
@@ -93,6 +93,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 		oldflags |= FD_CLOEXEC;
 		fcntl( fd, F_SETFD, oldflags );
 	}
+	delete[] ufds;
 	_success_ful = true;
 }
 
@@ -123,7 +124,7 @@ AudioAlsa::~AudioAlsa()
 
 QString AudioAlsa::probeDevice()
 {
-	QString dev = configManager::inst()->value( "audioalsa", "device" );
+	QString dev = ConfigManager::inst()->value( "audioalsa", "device" );
 	if( dev == "" )
 	{
 		if( getenv( "AUDIODEV" ) != NULL )
@@ -145,10 +146,11 @@ int AudioAlsa::handleError( int _err )
 		// under-run
 		_err = snd_pcm_prepare( m_handle );
 		if( _err < 0 )
-			printf( "Can't recovery from underrun, prepare "
+			printf( "Can't recover from underrun, prepare "
 					"failed: %s\n", snd_strerror( _err ) );
 		return ( 0 );
 	}
+#ifdef ESTRPIPE
 	else if( _err == -ESTRPIPE )
 	{
 		while( ( _err = snd_pcm_resume( m_handle ) ) == -EAGAIN )
@@ -161,11 +163,12 @@ int AudioAlsa::handleError( int _err )
 		{
 			_err = snd_pcm_prepare( m_handle );
 			if( _err < 0 )
-				printf( "Can't recovery from suspend, prepare "
+				printf( "Can't recover from suspend, prepare "
 					"failed: %s\n", snd_strerror( _err ) );
 		}
 		return ( 0 );
 	}
+#endif
 	return _err;
 }
 
@@ -199,7 +202,7 @@ void AudioAlsa::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::mixer()->processingSampleRate() );
 
 		if( m_handle != NULL )
 		{
@@ -208,7 +211,7 @@ void AudioAlsa::applyQualitySettings()
 
 		int err;
 		if( ( err = snd_pcm_open( &m_handle,
-					probeDevice().toAscii().constData(),
+					probeDevice().toLatin1().constData(),
 						SND_PCM_STREAM_PLAYBACK,
 								0 ) ) < 0 )
 		{
@@ -505,7 +508,7 @@ AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
-	m->setValue( configManager::inst()->value( "audioalsa",
+	m->setValue( ConfigManager::inst()->value( "audioalsa",
 							"channels" ).toInt() );
 
 	m_channels = new LcdSpinBox( 1, this );
@@ -520,7 +523,7 @@ AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioAlsa::setupWidget::~setupWidget()
 {
-
+	delete m_channels->model();
 }
 
 
@@ -528,9 +531,9 @@ AudioAlsa::setupWidget::~setupWidget()
 
 void AudioAlsa::setupWidget::saveSettings()
 {
-	configManager::inst()->setValue( "audioalsa", "device",
+	ConfigManager::inst()->setValue( "audioalsa", "device",
 							m_device->text() );
-	configManager::inst()->setValue( "audioalsa", "channels",
+	ConfigManager::inst()->setValue( "audioalsa", "channels",
 				QString::number( m_channels->value<int>() ) );
 }
 

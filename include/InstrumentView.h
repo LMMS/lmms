@@ -2,8 +2,8 @@
  * instrument_view.h - definition of instrumentView-class
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _INSTRUMENT_VIEW_H
-#define _INSTRUMENT_VIEW_H
+#ifndef INSTRUMENT_VIEW_H
+#define INSTRUMENT_VIEW_H
 
 #include "Instrument.h"
 #include "PluginView.h"
@@ -48,7 +48,7 @@ public:
 		return( castModel<Instrument>() );
 	}
 
-	virtual void setModel( Model * _model, bool = FALSE );
+	virtual void setModel( Model * _model, bool = false );
 
 	InstrumentTrackWindow * instrumentTrackWindow();
 

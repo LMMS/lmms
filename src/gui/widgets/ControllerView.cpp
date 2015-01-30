@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,24 +24,25 @@
  */
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QInputDialog>
-#include <QtGui/QWhatsThis>
+#include <QLabel>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPainter>
+#include <QInputDialog>
+#include <QWhatsThis>
 
 #include "ControllerView.h"
 
-#include "caption_menu.h"
+#include "CaptionMenu.h"
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "engine.h"
-#include "led_checkbox.h"
+#include "Engine.h"
+#include "GuiApplication.h"
+#include "LedCheckbox.h"
 #include "MainWindow.h"
-#include "tooltip.h"
+#include "ToolTip.h"
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
@@ -62,9 +63,9 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	connect( ctls_btn, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );
 
-	m_controllerDlg = getController()->createDialog( engine::mainWindow()->workspace() );
+	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
 
-	m_subWindow = engine::mainWindow()->workspace()->addSubWindow( 
+	m_subWindow = gui->mainWindow()->workspace()->addSubWindow( 
                 m_controllerDlg );
 	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
@@ -176,14 +177,12 @@ void ControllerView::modelChanged()
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName() );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
@@ -198,5 +197,5 @@ void ControllerView::displayHelp()
 
 
 
-#include "moc_ControllerView.cxx"
+
 

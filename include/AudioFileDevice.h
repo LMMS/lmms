@@ -1,10 +1,10 @@
 /*
- * AudioFileDevice.h - base-class for audio-device-classes which write 
+ * AudioFileDevice.h - base-class for audio-device-classes which write
  *                     their output into a file
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_FILE_DEVICE_H
-#define _AUDIO_FILE_DEVICE_H
+#ifndef AUDIO_FILE_DEVICE_H
+#define AUDIO_FILE_DEVICE_H
 
 #include <QtCore/QFile>
 

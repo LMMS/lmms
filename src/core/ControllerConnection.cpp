@@ -1,11 +1,11 @@
 /*
- * ControllerConnection.cpp - implementation of class controller connection 
+ * ControllerConnection.cpp - implementation of class controller connection
  *            which handles the link between AutomatableModels and controllers
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,14 +24,12 @@
  *
  */
 
-#include <QtXml/QDomElement>
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QDomElement>
+#include <QObject>
 
 
-#include "song.h"
-#include "engine.h"
-#include "Mixer.h"
+#include "Song.h"
+#include "Engine.h"
 #include "ControllerConnection.h"
 
 
@@ -123,7 +121,7 @@ void ControllerConnection::setController( Controller * _controller )
 				this, SIGNAL( valueChanged() ) );
 	}
 
-	m_ownsController = 
+	m_ownsController =
 			( _controller->type() == Controller::MidiController );
 
 	// If we don't own the controller, allow deletion of controller
@@ -150,8 +148,8 @@ inline void ControllerConnection::setTargetName( const QString & _name )
 /*
  * A connection may not be finalized.  This means, the connection should exist,
  * but the controller does not yet exist.  This happens when loading.  Even
- * loading connections last won't help, since there can be connections BETWEEN 
- * controllers. So, we remember the controller-ID and use a dummyController 
+ * loading connections last won't help, since there can be connections BETWEEN
+ * controllers. So, we remember the controller-ID and use a dummyController
  * instead.  Once the song is loaded, finalizeConnections() connects to the proper controllers
  */
 void ControllerConnection::finalizeConnections()
@@ -160,9 +158,9 @@ void ControllerConnection::finalizeConnections()
 	{
 		ControllerConnection * c = s_connections[i];
 		if ( !c->isFinalized() && c->m_controllerId <
-				engine::getSong()->controllers().size() )
+				Engine::getSong()->controllers().size() )
 		{
-			c->setController( engine::getSong()->
+			c->setController( Engine::getSong()->
 					controllers().at( c->m_controllerId ) );
 		}
 	}
@@ -173,7 +171,7 @@ void ControllerConnection::finalizeConnections()
 
 void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if( engine::getSong() )
+	if( Engine::getSong() )
 	{
 		if( m_ownsController )
 		{
@@ -181,7 +179,7 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 		}
 		else
 		{
-			int id = engine::getSong()->controllers().indexOf( m_controller );
+			int id = Engine::getSong()->controllers().indexOf( m_controller );
 			if( id >= 0 )
 			{
 				_this.setAttribute( "id", id );
@@ -198,7 +196,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	if( !node.isNull() )
 	{
-		setController( Controller::create( node.toElement(), engine::getSong() ) );
+		setController( Controller::create( node.toElement(), Engine::getSong() ) );
 	}
 	else
 	{
@@ -222,5 +220,5 @@ void ControllerConnection::deleteConnection()
 }
 
 
-#include "moc_ControllerConnection.cxx"
+
 
