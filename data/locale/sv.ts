@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Version %1 (%2/%3, Qt %4, %5)</translation>
     </message>
     <message>
         <source>About</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Authors</source>
-        <translation type="unfinished">Utvecklare</translation>
+        <translation type="unfinished">Medverkande</translation>
     </message>
     <message>
         <source>Translation</source>
@@ -316,7 +316,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Remove song-global automation</source>
-        <translation type="unfinished">Ta bort gloabal automation</translation>
+        <translation type="unfinished">Ta bort global automation</translation>
     </message>
     <message>
         <source>Remove all linked controls</source>
@@ -327,7 +327,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditor</name>
     <message>
         <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation type="unfinished">Öppna ett mönster ifrån en kontrollers kontext meny!</translation>
+        <translation type="unfinished">Öppna ett automationsmönster ifrån en kontrollers kontext meny!</translation>
     </message>
     <message>
         <source>Values copied</source>
@@ -450,7 +450,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">Redigera Automation - inget mönster</translation>
+        <translation type="unfinished">Redigera Automation - inget automationsmönster</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
@@ -472,11 +472,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation type="unfinished">dubbelklicka för att öppna det här mönstret för redigering</translation>
+        <translation type="unfinished">dubbelklicka för att öppna det här automationsmönstret för redigering</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation type="unfinished">Öppna för att redigera</translation>
+        <translation type="unfinished">Öppna för att redigera automationsmönster</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -515,7 +515,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
-        <translation type="unfinished">Automation spår</translation>
+        <translation type="unfinished">Automationsspår</translation>
     </message>
 </context>
 <context>
@@ -546,7 +546,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation type="unfinished">Lägg till automationsmönster</translation>
+        <translation type="unfinished">Lägg till automationsspår</translation>
     </message>
     <message>
         <source>Remove steps</source>
