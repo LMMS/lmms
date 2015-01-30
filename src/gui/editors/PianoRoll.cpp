@@ -2460,6 +2460,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 	// will be our iterator in the following loop
 	NoteVector::ConstIterator it = notes.begin();
+
+	int sNotes = selectionCount();
 	while( it != notes.end() )
 	{
 		Note *note = *it;
@@ -2468,8 +2470,9 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		// When resizing notes:
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
+		// If shift is pressed but only one note is selected, apply sticky
 		if( m_action == ActionResizeNote && shift &&
-			( note->selected() || ctrl ) )
+			( note->selected() || ctrl || sNotes == 1 ) )
 		{
 			int shifted_pos = note->oldPos().getTicks() + shift_offset;
 			if( shifted_pos && pos == shift_ref_pos )
