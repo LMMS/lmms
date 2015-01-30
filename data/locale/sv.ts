@@ -131,7 +131,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation type="unfinished">Klicka här för att öppna en anna ljud fil. En dialogvisas där du väljer din fil. Inställningar som looping, start och slutpunkter, amplifiering och sådant omställs inte. Därför låter det kanske inte som originalfilen.</translation>
+        <translation type="unfinished">Klicka här för att öppna en annan ljudfil. En dialog visas där du väljer din fil. Inställningar som looping, start och slutpunkter, amplifiering och sådant omställs inte. Därför låter det kanske inte som originalfilen.</translation>
     </message>
     <message>
         <source>Reverse sample</source>
