@@ -5,27 +5,27 @@
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
-        <translation type="unfinished">Om LMMS</translation>
+        <translation>Om LMMS</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
-        <translation type="unfinished">Version %1 (%2/%3, Qt %4, %5)</translation>
+        <translation>Version %1 (%2/%3, Qt %4, %5)</translation>
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished">Om</translation>
+        <translation>Om</translation>
     </message>
     <message>
         <source>LMMS - easy music production for everyone</source>
-        <translation type="unfinished">LMMS - enkel musikproduktion för alla</translation>
+        <translation>LMMS - enkel musikproduktion för alla</translation>
     </message>
     <message>
         <source>Authors</source>
-        <translation type="unfinished">Medverkande</translation>
+        <translation>Medverkande</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished">Översättning</translation>
+        <translation>Översättning</translation>
     </message>
     <message>
         <source>Current language not translated (or native English).
@@ -35,11 +35,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
-        <translation type="unfinished">Licens</translation>
+        <translation>Licens</translation>
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation type="unfinished">Copyright (c) 2004-2014, LMMS utvecklare</translation>
+        <translation>Copyright (c) 2004-2014, LMMS utvecklare</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -47,26 +47,26 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>LMMS</source>
-        <translation type="unfinished">LMMS</translation>
+        <translation>LMMS</translation>
     </message>
     <message>
         <source>Involved</source>
-        <translation type="unfinished">Involverad</translation>
+        <translation>Involverad</translation>
     </message>
     <message>
         <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished">Medverkande, ordnade efter mängd bidrag:</translation>
+        <translation>Medverkande, ordnade efter mängd bidrag:</translation>
     </message>
 </context>
 <context>
     <name>AmplifierControlDialog</name>
     <message>
         <source>VOL</source>
-        <translation type="unfinished">VOL</translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished">Volym:</translation>
+        <translation>Volym:</translation>
     </message>
     <message>
         <source>PAN</source>
@@ -78,26 +78,26 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>LEFT</source>
-        <translation type="unfinished">VÄNSTER</translation>
+        <translation>VÄNSTER</translation>
     </message>
     <message>
         <source>Left gain:</source>
-        <translation type="unfinished">Vänster förstärkning:</translation>
+        <translation>Vänster förstärkning:</translation>
     </message>
     <message>
         <source>RIGHT</source>
-        <translation type="unfinished">HÖGER</translation>
+        <translation>HÖGER</translation>
     </message>
     <message>
         <source>Right gain:</source>
-        <translation type="unfinished">Höger förstärkning:</translation>
+        <translation>Höger förstärkning:</translation>
     </message>
 </context>
 <context>
     <name>AmplifierControls</name>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">Volym</translation>
+        <translation>Volym</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -105,571 +105,571 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Left gain</source>
-        <translation type="unfinished">Vänster förstärkning</translation>
+        <translation>Vänster förstärkning</translation>
     </message>
     <message>
         <source>Right gain</source>
-        <translation type="unfinished">Höger förstärkning</translation>
+        <translation>Höger förstärkning</translation>
     </message>
 </context>
 <context>
     <name>AudioAlsa::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">ENHET</translation>
+        <translation>ENHET</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">KANALER</translation>
+        <translation>KANALER</translation>
     </message>
 </context>
 <context>
     <name>AudioFileProcessorView</name>
     <message>
         <source>Open other sample</source>
-        <translation type="unfinished">Oppna annan ljudfil</translation>
+        <translation>Oppna annan ljudfil</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation type="unfinished">Klicka här för att öppna en annan ljudfil. En dialog visas där du väljer din fil. Inställningar som looping, start och slutpunkter, amplifiering och sådant omställs inte. Därför låter det kanske inte som originalfilen.</translation>
+        <translation>Klicka här för att öppna en annan ljudfil. En dialog visas där du väljer din fil. Inställningar som looping, start och slutpunkter, amplifiering och sådant omställs inte. Därför låter det kanske inte som originalfilen.</translation>
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation type="unfinished">Spela baklänges</translation>
+        <translation>Spela baklänges</translation>
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation type="unfinished">Den här knappen gör att ljudfilen spelas baklänges. Den kan användas för intressanta effeker t.ex. en baklänges cymbal.</translation>
+        <translation>Den här knappen gör att ljudfilen spelas baklänges. Den kan användas för intressanta effeker t.ex. en baklänges cymbal.</translation>
     </message>
     <message>
         <source>Amplify:</source>
-        <translation type="unfinished">Förstärkning:</translation>
+        <translation>Förstärkning:</translation>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation type="unfinished">Med detta vred ställer du in förstärkningen. Vid 100% blir det ingen skillnad. Annars blir din ljudfil mer eller mindre högljudd, men originalfilen förändras inte.</translation>
+        <translation>Med detta vred ställer du in förstärkningen. Vid 100% blir det ingen skillnad. Annars blir din ljudfil mer eller mindre högljudd, men originalfilen förändras inte.</translation>
     </message>
     <message>
         <source>Startpoint:</source>
-        <translation type="unfinished">Startpunkt:</translation>
+        <translation>Startpunkt:</translation>
     </message>
     <message>
         <source>Endpoint:</source>
-        <translation type="unfinished">Slutpunkt:</translation>
+        <translation>Slutpunkt:</translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
-        <translation type="unfinished">Forsätt spela ljudfil över noter</translation>
+        <translation>Forsätt spela ljudfil över noter</translation>
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
-        <translation type="unfinished">Denna inställningen gör att ljudfilen förtsätter spela över noter. Om en not avslutas före ljudfilen är slut fortsätter nästa not där den förra slutade. Om du vill starta från början av ljudfilen innan den spelat färdigt, placera en not på botten av pianot (vid 20Hz)</translation>
+        <translation>Denna inställningen gör att ljudfilen förtsätter spela över noter. Om en not avslutas före ljudfilen är slut fortsätter nästa not där den förra slutade. Om du vill starta från början av ljudfilen innan den spelat färdigt, placera en not på botten av pianot (vid 20Hz)</translation>
     </message>
     <message>
         <source>Disable loop</source>
-        <translation type="unfinished">Avaktivera looping</translation>
+        <translation>Avaktivera looping</translation>
     </message>
     <message>
         <source>This button disables looping. The sample plays only once from start to end. </source>
-        <translation type="unfinished">Den här knappen avaktiverar looping.Ljudfilen spelas bara en gång från starttill slut.</translation>
+        <translation>Den här knappen avaktiverar looping. Ljudfilen spelas bara en gång från start till slut.</translation>
     </message>
     <message>
         <source>Enable loop</source>
-        <translation type="unfinished">Aktivera looping</translation>
+        <translation>Aktivera looping</translation>
     </message>
     <message>
         <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
-        <translation type="unfinished">Den här knappen aktiverar looping. Ljudfilen loopar mellan slutpunkten och looppunkten.</translation>
+        <translation>Den här knappen aktiverar looping. Ljudfilen loopar mellan slutpunkten och looppunkten.</translation>
     </message>
     <message>
         <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
-        <translation type="unfinished">Den här knappen aktiverar "ping-pong" looping. Ljudfilen spelar från start till slut, och sen tilbaks, och fortsäter så.</translation>
+        <translation>Den här knappen aktiverar "ping-pong" looping. Ljudfilen spelar från start till slut, och sen tilbaks, och fortsäter så.</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
-        <translation type="unfinished">Med den här vreden ställer du in vartifrån ljudfilen ska börja spela.</translation>
+        <translation>Med den här vreden ställer du in vartifrån ljudfilen ska börja spela.</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
-        <translation type="unfinished">Med den här vreden ställer du in vart ljudfilen slutar spela.</translation>
+        <translation>Med den här vreden ställer du in vart ljudfilen slutar spela.</translation>
     </message>
     <message>
         <source>Loopback point:</source>
-        <translation type="unfinished">Loopback punkt:</translation>
+        <translation>Loopback punkt:</translation>
     </message>
     <message>
         <source>With this knob you can set the point where the loop starts. </source>
-        <translation type="unfinished">Den här vreden ställer in vart loopen startar.</translation>
+        <translation>Den här vreden ställer in vart loopen startar.</translation>
     </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>
     <message>
         <source>Sample length:</source>
-        <translation type="unfinished">Ljudfilens lengd:</translation>
+        <translation>Ljudfilens längd:</translation>
     </message>
 </context>
 <context>
     <name>AudioJack</name>
     <message>
         <source>JACK client restarted</source>
-        <translation type="unfinished">JACK klienten omstartades</translation>
+        <translation>JACK klienten omstartades</translation>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation type="unfinished">LMMS blev bortkopplat från JACK. LMMS JACK backend omstartades därfor. Du får manuellt koppla om igen.</translation>
+        <translation>LMMS blev bortkopplat från JACK. LMMS JACK backend omstartades därfor. Du får manuellt koppla om igen.</translation>
     </message>
     <message>
         <source>JACK server down</source>
-        <translation type="unfinished">JACK server nerstängd</translation>
+        <translation>JACK server nerstängd</translation>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation type="unfinished">JACK servern stängde av och det gick inte starta en ny. LMMS kan inte fortsätta. Du bör spara ditt projekt och starta om både JACK och LMMS.</translation>
+        <translation>JACK servern stängde av och det gick inte starta en ny. LMMS kan inte fortsätta. Du bör spara ditt projekt och starta om både JACK och LMMS.</translation>
     </message>
     <message>
         <source>CLIENT-NAME</source>
-        <translation type="unfinished">KLIENT-NAMN</translation>
+        <translation>KLIENT-NAMN</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">KANALER</translation>
+        <translation>KANALER</translation>
     </message>
 </context>
 <context>
     <name>AudioOss::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">ENHET</translation>
+        <translation>ENHET</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">KANALER</translation>
+        <translation>KANALER</translation>
     </message>
 </context>
 <context>
     <name>AudioPortAudio::setupWidget</name>
     <message>
         <source>BACKEND</source>
-        <translation type="unfinished">BACKEND</translation>
+        <translation>BACKEND</translation>
     </message>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">ENHET</translation>
+        <translation>ENHET</translation>
     </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">ENHET</translation>
+        <translation>ENHET</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">KANALER</translation>
+        <translation>KANALER</translation>
     </message>
 </context>
 <context>
     <name>AudioSdl::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">ENHET</translation>
+        <translation>ENHET</translation>
     </message>
 </context>
 <context>
     <name>AutomatableModel</name>
     <message>
         <source>&amp;Reset (%1%2)</source>
-        <translation type="unfinished">&amp;Nollställ (%1%2)</translation>
+        <translation>&amp;Nollställ (%1%2)</translation>
     </message>
     <message>
         <source>&amp;Copy value (%1%2)</source>
-        <translation type="unfinished">Kopiera värder (%1%2)</translation>
+        <translation>Kopiera värde (%1%2)</translation>
     </message>
     <message>
         <source>&amp;Paste value (%1%2)</source>
-        <translation type="unfinished">&amp;Klistra in värde (%1%2)</translation>
+        <translation>&amp;Klistra in värde (%1%2)</translation>
     </message>
     <message>
         <source>Edit song-global automation</source>
-        <translation type="unfinished">Redigera global automation</translation>
+        <translation>Redigera global automation</translation>
     </message>
     <message>
         <source>Connected to %1</source>
-        <translation type="unfinished">Kopplad till %1</translation>
+        <translation>Kopplad till %1</translation>
     </message>
     <message>
         <source>Connected to controller</source>
-        <translation type="unfinished">Kopplad till controller</translation>
+        <translation>Kopplad till controller</translation>
     </message>
     <message>
         <source>Edit connection...</source>
-        <translation type="unfinished">Redigera koppling...</translation>
+        <translation>Redigera koppling...</translation>
     </message>
     <message>
         <source>Remove connection</source>
-        <translation type="unfinished">Ta bort koppling</translation>
+        <translation>Ta bort koppling</translation>
     </message>
     <message>
         <source>Connect to controller...</source>
-        <translation type="unfinished">Koppla till kontroller...</translation>
+        <translation>Koppla till kontroller...</translation>
     </message>
     <message>
         <source>Remove song-global automation</source>
-        <translation type="unfinished">Ta bort global automation</translation>
+        <translation>Ta bort global automation</translation>
     </message>
     <message>
         <source>Remove all linked controls</source>
-        <translation type="unfinished">Ta bort alla kopplade kontroller</translation>
+        <translation>Ta bort alla kopplade kontroller</translation>
     </message>
 </context>
 <context>
     <name>AutomationEditor</name>
     <message>
         <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation type="unfinished">Öppna ett automationsmönster ifrån en kontrollers kontext meny!</translation>
+        <translation>Öppna ett automationsmönster ifrån en kontrollers kontextmeny!</translation>
     </message>
     <message>
         <source>Values copied</source>
-        <translation type="unfinished">Värden kopierade</translation>
+        <translation>Värden kopierade</translation>
     </message>
     <message>
         <source>All selected values were copied to the clipboard.</source>
-        <translation type="unfinished">Alla valda värden blev kopierade till urklipp.</translation>
+        <translation>Alla valda värden blev kopierade till urklipp.</translation>
     </message>
 </context>
 <context>
     <name>AutomationEditorWindow</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished">Spela/pausa aktuellt mönster (mellanslag)</translation>
+        <translation>Spela/pausa aktuellt mönster (mellanslag)</translation>
     </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation type="unfinished">Clicka här för att spela det aktuella mönstret. Det härär hjälpsamt närman redigerar. Mönstret spelas från början igen när de nått sitt slut.</translation>
+        <translation>Clicka här för att spela det aktuella mönstret. Det här är hjälpsamt när man redigerar. Mönstret spelas från början igen när de nått sitt slut.</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished">Sluta spela  aktuellt mönster (mellanslag)</translation>
+        <translation>Sluta spela aktuellt mönster (mellanslag)</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation type="unfinished">Klicka här för att stoppa uppspelning av de aktuella mönstret.</translation>
+        <translation>Klicka här för att stoppa uppspelning av de aktuella mönstret.</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished">Ritläge (Shift+D)</translation>
+        <translation>Ritläge (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished">Suddläge (Shift+E)</translation>
+        <translation>Suddläge (Shift+E)</translation>
     </message>
     <message>
         <source>Flip vertically</source>
-        <translation type="unfinished">Spegla vertikalt</translation>
+        <translation>Spegla vertikalt</translation>
     </message>
     <message>
         <source>Flip horizontally</source>
-        <translation type="unfinished">Spegla horizontellt</translation>
+        <translation>Spegla horizontellt</translation>
     </message>
     <message>
         <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
-        <translation type="unfinished">Klicka här för att spegla mönstret. Punkterna förflyttas på y-axeln</translation>
+        <translation>Klicka här för att spegla mönstret. Punkterna förflyttas på y-axeln</translation>
     </message>
     <message>
         <source>Click here and the pattern will be reversed. The points are flipped in the x direction.</source>
-        <translation type="unfinished">Klicka här för att spegla mönstret. Punkterna förflyttas på x-axeln</translation>
+        <translation>Klicka här för att spegla mönstret. Punkterna förflyttas på x-axeln</translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">Klicka här för att aktivera ritläget. I detta läget kan du lägga till och förflytta individuella värden. Det här är standardläget. Det går också att trycka &apos;Shift+D&apos; på tangentborded för att aktivera detta läget.</translation>
+        <translation>Klicka här för att aktivera ritläget. I detta läget kan du lägga till och förflytta individuella värden. Det här är standardläget. Det går också att trycka &apos;Shift+D&apos; på tangentborded för att aktivera detta läget.</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">Klicka här för att aktivera suddläget. I detta läget kan du ta bort individuella värden. Det går också att trycka &apos;Shift+E&apos; på tangentborded för att aktivera detta läget.</translation>
+        <translation>Klicka här för att aktivera suddläget. I detta läget kan du ta bort individuella värden. Det går också att trycka &apos;Shift+E&apos; på tangentborded för att aktivera detta läget.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
-        <translation type="unfinished">Diskret talföljd</translation>
+        <translation>Diskret talföljd</translation>
     </message>
     <message>
         <source>Linear progression</source>
-        <translation type="unfinished">Linjär talföljd</translation>
+        <translation>Linjär talföljd</translation>
     </message>
     <message>
         <source>Cubic Hermite progression</source>
-        <translation type="unfinished">Cubic Hermite talföljd</translation>
+        <translation>Cubic Hermite talföljd</translation>
     </message>
     <message>
         <source>Tension value for spline</source>
-        <translation type="unfinished">Spänning i mönstrets spline</translation>
+        <translation>Spänning i mönstrets spline</translation>
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation type="unfinished">Högre spänning ger en mjuk kurva som ibland missar individuella punkter. Med lägre spänning planar kurvan ut nära punkterna.</translation>
+        <translation>Högre spänning ger en mjuk kurva som ibland missar individuella punkter. Med lägre spänning planar kurvan ut nära punkterna.</translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
-        <translation type="unfinished">Klicka här för att aktivera diskret talföljd. Värdet är konstant mella kontroll punkter och ändras direkt när en ny kontrollpunkt nås.</translation>
+        <translation>Klicka här för att aktivera diskret talföljd. Värdet är konstant mella kontroll punkter och ändras direkt när en ny kontrollpunkt nås.</translation>
     </message>
     <message>
         <source>Click here to choose linear progressions for this automation pattern.  The value of the connected object will change at a steady rate over time between control points to reach the correct value at each control point without a sudden change.</source>
-        <translation type="unfinished">Klicka här för att aktivera linjär talföljd. Värdet ändras vid en stadig takt mellan kontrollpunkter för att gradvis nå nästa värde.</translation>
+        <translation>Klicka här för att aktivera linjär talföljd. Värdet ändras vid en stadig takt mellan kontrollpunkter för att gradvis nå nästa värde.</translation>
     </message>
     <message>
         <source>Click here to choose cubic hermite progressions for this automation pattern.  The value of the connected object will change in a smooth curve and ease in to the peaks and valleys.</source>
-        <translation type="unfinished">Klicka här för att aktivera cubic hermite talföljd. Värdet följer en mjuk kurva mellan kontrollpunkter.</translation>
+        <translation>Klicka här för att aktivera cubic hermite talföljd. Värdet följer en mjuk kurva mellan kontrollpunkter.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">Klipp ut valda värden (ctrl+X)</translation>
+        <translation>Klipp ut valda värden (Ctrl+X)</translation>
     </message>
     <message>
         <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">Kopiera valda värden (ctrl+C)</translation>
+        <translation>Kopiera valda värden (ctrl+C)</translation>
     </message>
     <message>
         <source>Paste values from clipboard Ctrl+V)</source>
-        <translation type="unfinished">Klistra värden (Ctrl+V)</translation>
+        <translation>Klistra värden (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">Klicka här för att klippa de valda värderna. Du kan sen klistra dem var som helst genom att klicka på klistra knappen.</translation>
+        <translation>Klicka här för att klippa de valda värderna. Du kan sen klistra dem var som helst genom att klicka på klistra knappen.</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">Klicka här för att kopiera de valda värderna. Du kan sen klistra dem var som helst genom att klicka på klistra knappen.</translation>
+        <translation>Klicka här för att kopiera de valda värderna. Du kan sedan klistra dem var som helst genom att klicka på klistra knappen.</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished">Klicka här för att klistra kopierade värderna vid den första synliga metern.</translation>
+        <translation>Klicka här för att klistra kopierade värderna vid den första synliga metern.</translation>
     </message>
     <message>
         <source>Tension: </source>
-        <translation type="unfinished">Spänning: </translation>
+        <translation>Spänning: </translation>
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">Redigera Automation - inget automationsmönster</translation>
+        <translation>Redigera Automation - inget automationsmönster</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation type="unfinished">Redigera Automation - %1</translation>
+        <translation>Redigera Automation - %1</translation>
     </message>
 </context>
 <context>
     <name>AutomationPattern</name>
     <message>
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation type="unfinished">Dra en kontroll samtidigt som du håller &lt;Ctrl&gt;</translation>
+        <translation>Dra en kontroll samtidigt som du håller &lt;Ctrl&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation type="unfinished">Modellen är redan kopplad till detta mönstret.</translation>
+        <translation>Modellen är redan kopplad till detta mönstret.</translation>
     </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation type="unfinished">dubbelklicka för att öppna det här automationsmönstret för redigering</translation>
+        <translation>dubbelklicka för att öppna det här automationsmönstret för redigering</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation type="unfinished">Öppna för att redigera automationsmönster</translation>
+        <translation>Redigera automationsmönster</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished">Rensa</translation>
+        <translation>Rensa</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished">Nollställ namn</translation>
+        <translation>Nollställ namn</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished">Byt namn</translation>
+        <translation>Byt namn</translation>
     </message>
     <message>
         <source>%1 Connections</source>
-        <translation type="unfinished">%1 Kopplingar</translation>
+        <translation>%1 Kopplingar</translation>
     </message>
     <message>
         <source>Disconnect &quot;%1&quot;</source>
-        <translation type="unfinished">Avkoppla &quot;%1&quot;</translation>
+        <translation>Avkoppla &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation type="unfinished">Set/rensa inspelning</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Flip Vertically (Visible)</source>
-        <translation type="unfinished">Spegla Vertikalt (Synligt)</translation>
+        <translation>Spegla Vertikalt (Synligt)</translation>
     </message>
     <message>
         <source>Flip Horizontally (Visible)</source>
-        <translation type="unfinished">Spegla Horizontellt (Synligt)</translation>
+        <translation>Spegla Horizontellt (Synligt)</translation>
     </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
-        <translation type="unfinished">Automationsspår</translation>
+        <translation>Automationsspår</translation>
     </message>
 </context>
 <context>
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation type="unfinished">Redigera Trummor+Bas</translation>
+        <translation>Redigera Trummor+Bas</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation type="unfinished">Spela/pause Trummor+Bas</translation>
+        <translation>Spela/pause Trummor+Bas</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
-        <translation type="unfinished">Avsluta uppspelning av Trummor+Bas</translation>
+        <translation>Avsluta uppspelning av trummor/bas</translation>
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation type="unfinished">Klicka här för att spela Trummor/Bas.Mönstret loopar när det nåt sitt slut.</translation>
+        <translation>Klicka här för att spela trummor/bas. Mönstret loopar när det nåt sitt slut.</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation type="unfinished">Klicka här för att sluta spela trummor/bas.</translation>
+        <translation>Klicka här för att sluta spela trummor/bas.</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation type="unfinished">Lägg till trummor/bas</translation>
+        <translation>Lägg till trummor/bas</translation>
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation type="unfinished">Lägg till automationsspår</translation>
+        <translation>Lägg till automationsspår</translation>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation type="unfinished">Ta bort steg</translation>
+        <translation>Ta bort steg</translation>
     </message>
     <message>
         <source>Add steps</source>
-        <translation type="unfinished">Lägg till steg</translation>
+        <translation>Lägg till steg</translation>
     </message>
 </context>
 <context>
     <name>BBTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation type="unfinished">Öppna för att redigera Trummor+Bas</translation>
+        <translation>Redigera Trummor+Bas</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished">Nollställ namn</translation>
+        <translation>Nollställ namn</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished">Byt namn</translation>
+        <translation>Byt namn</translation>
     </message>
     <message>
         <source>Change color</source>
-        <translation type="unfinished">Byt färg</translation>
+        <translation>Byt färg</translation>
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation type="unfinished">Byt färg till standard</translation>
+        <translation>Byt färg till standard</translation>
     </message>
 </context>
 <context>
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="unfinished">Trummor/Bas %1</translation>
+        <translation>Trum/Basmönster %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
-        <translation type="unfinished">Kopia av %1</translation>
+        <translation>Kopia av %1</translation>
     </message>
 </context>
 <context>
     <name>BassBoosterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation type="unfinished">FREQ</translation>
+        <translation>FREQ</translation>
     </message>
     <message>
         <source>Frequency:</source>
-        <translation type="unfinished">Frekven:</translation>
+        <translation>Frekvens:</translation>
     </message>
     <message>
         <source>GAIN</source>
-        <translation type="unfinished">VOL</translation>
+        <translation>FÖRST</translation>
     </message>
     <message>
         <source>Gain:</source>
-        <translation type="unfinished">Förstärkning:</translation>
+        <translation>Förstärkning:</translation>
     </message>
     <message>
         <source>RATIO</source>
-        <translation type="unfinished">RATIO</translation>
+        <translation>RATIO</translation>
     </message>
     <message>
         <source>Ratio:</source>
-        <translation type="unfinished">Ratio:</translation>
+        <translation>Ratio:</translation>
     </message>
 </context>
 <context>
     <name>BassBoosterControls</name>
     <message>
         <source>Frequency</source>
-        <translation type="unfinished">Frekvens</translation>
+        <translation>Frekvens</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">Förstärkning</translation>
+        <translation>Förstärkning</translation>
     </message>
     <message>
         <source>Ratio</source>
-        <translation type="unfinished">Ratio</translation>
+        <translation>Ratio</translation>
     </message>
 </context>
 <context>
     <name>BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation type="unfinished">IN</translation>
+        <translation>IN</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation type="unfinished">UT</translation>
+        <translation>UT</translation>
     </message>
     <message>
         <source>GAIN</source>
-        <translation type="unfinished">VOL</translation>
+        <translation>FÖRST</translation>
     </message>
     <message>
         <source>Input Gain:</source>
-        <translation type="unfinished">Input Förstärkning:</translation>
+        <translation>Input Förstärkning:</translation>
     </message>
     <message>
         <source>NOIS</source>
-        <translation type="unfinished">BRUS</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Input Noise:</source>
-        <translation type="unfinished">Input brus:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Output Gain:</source>
-        <translation type="unfinished">Output Förstärkning</translation>
+        <translation>Output Förstärkning</translation>
     </message>
     <message>
         <source>CLIP</source>
-        <translation type="unfinished">CLIP</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Output Clip:</source>
-        <translation type="unfinished">Output Clip:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rate</source>
@@ -709,22 +709,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Levels</source>
-        <translation type="unfinished">Nivåer</translation>
+        <translation>Nivåer</translation>
     </message>
     <message>
         <source>Levels:</source>
-        <translation type="unfinished">Nivåer:</translation>
+        <translation>Nivåer:</translation>
     </message>
 </context>
 <context>
     <name>CaptionMenu</name>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Hjälp</translation>
+        <translation>&amp;Hjälp</translation>
     </message>
     <message>
         <source>Help (not available)</source>
-        <translation type="unfinished">Hjälp (inte tillgängligt)</translation>
+        <translation>Hjälp (inte tillgängligt)</translation>
     </message>
 </context>
 <context>
@@ -735,45 +735,45 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
-        <translation type="unfinished">Klicka här för att öppna eller stänga Carlas GUI.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Controller</name>
     <message>
         <source>Controller %1</source>
-        <translation type="unfinished">Kontroller %1</translation>
+        <translation>Kontroller %1</translation>
     </message>
 </context>
 <context>
     <name>ControllerConnectionDialog</name>
     <message>
         <source>Connection Settings</source>
-        <translation type="unfinished">Kopplingsinställningar</translation>
+        <translation>Kopplingsinställningar</translation>
     </message>
     <message>
         <source>MIDI CONTROLLER</source>
-        <translation type="unfinished">MIDI KONTROLLER</translation>
+        <translation>MIDI KONTROLLER</translation>
     </message>
     <message>
         <source>Input channel</source>
-        <translation type="unfinished">Input kanal</translation>
+        <translation>Inputkanal</translation>
     </message>
     <message>
         <source>CHANNEL</source>
-        <translation type="unfinished">KANAL</translation>
+        <translation>KANAL</translation>
     </message>
     <message>
         <source>Input controller</source>
-        <translation type="unfinished">Input kontroller</translation>
+        <translation>Inputkontroller</translation>
     </message>
     <message>
         <source>CONTROLLER</source>
-        <translation type="unfinished">KONTROLLER</translation>
+        <translation>KONTROLLER</translation>
     </message>
     <message>
         <source>Auto Detect</source>
-        <translation type="unfinished">Upptäck automatiskt</translation>
+        <translation>Upptäck Automatiskt</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
@@ -781,7 +781,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>USER CONTROLLER</source>
-        <translation type="unfinished">ANVÄNDARKONTROLLER</translation>
+        <translation>ANVÄNDARKONTROLLER</translation>
     </message>
     <message>
         <source>MAPPING FUNCTION</source>
@@ -789,15 +789,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS</translation>
     </message>
     <message>
         <source>Cycle Detected.</source>
@@ -812,38 +812,38 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Lägg till</translation>
+        <translation>Lägg till</translation>
     </message>
     <message>
         <source>Confirm Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekräfta Borttagning</translation>
     </message>
     <message>
         <source>Confirm delete? There are existing connection(s) associted with this controller. There is no way to undo.</source>
-        <translation type="unfinished">Vill du verkligen ta bort? Det finns kopplingar till den här kotrollen, och operationen går inte ångra.</translation>
+        <translation>Vill du verkligen ta bort? Det finns kopplingar till den här kontrollern, och operationen går inte ångra.</translation>
     </message>
 </context>
 <context>
     <name>ControllerView</name>
     <message>
         <source>Controls</source>
-        <translation type="unfinished">Kontroller</translation>
+        <translation>Kontroller</translation>
     </message>
     <message>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
-        <translation type="unfinished">Kontroller kan automatisera värdet på en vred, reglage, och andra kontroller</translation>
+        <translation>Kontroller kan automatisera värdet på en vred, reglage, och andra kontroller</translation>
     </message>
     <message>
         <source>Rename controller</source>
-        <translation type="unfinished">Byt namn på kontroller</translation>
+        <translation>Byt namn på kontroller</translation>
     </message>
     <message>
         <source>Enter the new name for this controller</source>
-        <translation type="unfinished">Skriv nya namnet på kontrollern</translation>
+        <translation>Skriv nya namnet på kontrollern</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation type="unfinished">&amp;Ta bort denna pluginen</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1124,7 +1124,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DummyEffect</name>
     <message>
         <source>NOT FOUND</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HITTAS INTE</translation>
     </message>
 </context>
 <context>
