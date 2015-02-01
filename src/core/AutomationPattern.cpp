@@ -24,9 +24,8 @@
  *
  */
 
-#include <QDomElement>
-
 #include "AutomationPattern.h"
+
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
 #include "ProjectJournal.h"
@@ -192,7 +191,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 MidiTime AutomationPattern::length() const
 {
 	if( m_timeMap.isEmpty() ) return 0;
-	timeMap::const_iterator it = m_timeMap.end();	
+	timeMap::const_iterator it = m_timeMap.end();
 	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
 }
 
@@ -412,7 +411,7 @@ void AutomationPattern::flipY( int min, int max )
 	{
 		numPoints++;
 	}
-	
+
 	for( int i = 0; i <= numPoints; i++ )
 	{
 
@@ -501,7 +500,7 @@ void AutomationPattern::flipX( int length )
 			tempMap[newTime] = tempValue;
 		}
 	}
-		
+
 	m_timeMap.clear();
 
 	m_timeMap = tempMap;
@@ -617,7 +616,7 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 					( *it )->setAutomatedValue( val );
 				}
 
-			}	
+			}
 		}
 	}
 	else
@@ -625,7 +624,7 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 		if( time >= 0 && ! m_objects.isEmpty() )
 		{
 			const float value = static_cast<float>( firstObject()->value<float>() );
-			if( value != m_lastRecordedValue ) 
+			if( value != m_lastRecordedValue )
 			{
 				putValue( time, value, true );
 				m_lastRecordedValue = value;
@@ -692,7 +691,7 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 	l += Engine::getSong()->tracks();
 	l += Engine::getBBTrackContainer()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
-	
+
 	// go through all tracks...
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{

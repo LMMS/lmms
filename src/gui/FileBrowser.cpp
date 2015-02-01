@@ -518,6 +518,10 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 	new StringPairDrag( "importedproject", f->fullName(),
 				embed::getIconPixmap( "midi_file" ), this );
 					break;
+			case FileItem::ProjectFile:
+				new StringPairDrag( "projectfile", f->fullName(),
+							embed::getIconPixmap( "project_file" ), this );
+								break;
 
 				default:
 					break;

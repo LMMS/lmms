@@ -26,11 +26,9 @@
 #ifndef BANDLIMITEDWAVE_H
 #define BANDLIMITEDWAVE_H
 
-#include <QString>
-#include <QDataStream>
-#include <QFile>
+class QDataStream;
+class QString;
 
-#include "ConfigManager.h"
 #include "export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"

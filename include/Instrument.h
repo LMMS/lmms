@@ -26,17 +26,18 @@
 #ifndef INSTRUMENT_H
 #define INSTRUMENT_H
 
-#include <QWidget>
-
+#include <QString>
+#include <QtGlobal>
+#include "export.h"
+#include "lmms_basics.h"
+#include "MemoryManager.h"
+#include "MidiTime.h"
 #include "Plugin.h"
-#include "Mixer.h"
 
 
 // forward-declarations
 class InstrumentTrack;
-class InstrumentView;
 class MidiEvent;
-class MidiTime;
 class NotePlayHandle;
 class Track;
 

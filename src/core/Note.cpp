@@ -68,7 +68,7 @@ Note::Note( const Note & note ) :
 	m_selected( note.m_selected ),
 	m_oldKey( note.m_oldKey ),
 	m_oldPos( note.m_oldPos ),
-	m_oldLength( note.m_oldLength ),	
+	m_oldLength( note.m_oldLength ),
 	m_isPlaying( note.m_isPlaying ),
 	m_key( note.m_key),
 	m_volume( note.m_volume ),

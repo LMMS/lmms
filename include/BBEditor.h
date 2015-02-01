@@ -57,9 +57,6 @@ public slots:
 	void play();
 	void stop();
 
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-
 private:
 	BBTrackContainerView* m_trackContainerView;
 	ComboBox * m_bbComboBox;
@@ -80,13 +77,16 @@ public:
 
 	void removeBBView(int bb);
 
+	void saveSettings(QDomDocument& doc, QDomElement& element);
+	void loadSettings(const QDomElement& element);
+
 public slots:
 	void addSteps();
 	void removeSteps();
 	void addAutomationTrack();
 
 protected slots:
-	virtual void dropEvent(QDropEvent * de );
+	void dropEvent(QDropEvent * de );
 	void updatePosition();
 
 private:

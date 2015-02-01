@@ -1,5 +1,5 @@
 /*
- * ControllerConnection.cpp - implementation of class controller connection 
+ * ControllerConnection.cpp - implementation of class controller connection
  *            which handles the link between AutomatableModels and controllers
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -26,12 +26,10 @@
 
 #include <QDomElement>
 #include <QObject>
-#include <QVector>
 
 
 #include "Song.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "ControllerConnection.h"
 
 
@@ -123,7 +121,7 @@ void ControllerConnection::setController( Controller * _controller )
 				this, SIGNAL( valueChanged() ) );
 	}
 
-	m_ownsController = 
+	m_ownsController =
 			( _controller->type() == Controller::MidiController );
 
 	// If we don't own the controller, allow deletion of controller
@@ -150,8 +148,8 @@ inline void ControllerConnection::setTargetName( const QString & _name )
 /*
  * A connection may not be finalized.  This means, the connection should exist,
  * but the controller does not yet exist.  This happens when loading.  Even
- * loading connections last won't help, since there can be connections BETWEEN 
- * controllers. So, we remember the controller-ID and use a dummyController 
+ * loading connections last won't help, since there can be connections BETWEEN
+ * controllers. So, we remember the controller-ID and use a dummyController
  * instead.  Once the song is loaded, finalizeConnections() connects to the proper controllers
  */
 void ControllerConnection::finalizeConnections()

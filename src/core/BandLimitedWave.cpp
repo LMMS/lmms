@@ -25,6 +25,7 @@
 
 #include "BandLimitedWave.h"
 
+#include "ConfigManager.h"
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;
@@ -62,7 +63,7 @@ void BandLimitedWave::generateWaves()
 {
 // don't generate if they already exist
 	if( s_wavesGenerated ) return;
-	
+
 	int i;
 
 // set wavetable directory
@@ -90,7 +91,7 @@ void BandLimitedWave::generateWaves()
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
 			double max = 0.0;
-			
+
 			for( int ph = 0; ph < len; ph++ )
 			{
 				int harm = 1;
@@ -115,7 +116,7 @@ void BandLimitedWave::generateWaves()
 			}
 		}
 	}
-	
+
 // square wave - BLSquare
 // check for file and use it if exists
 	if( sqr_file.exists() )
@@ -132,7 +133,7 @@ void BandLimitedWave::generateWaves()
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
 			double max = 0.0;
-			
+
 			for( int ph = 0; ph < len; ph++ )
 			{
 				int harm = 1;
@@ -173,7 +174,7 @@ void BandLimitedWave::generateWaves()
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
 			double max = 0.0;
-			
+
 			for( int ph = 0; ph < len; ph++ )
 			{
 				int harm = 1;
@@ -184,7 +185,7 @@ void BandLimitedWave::generateWaves()
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
 					const double amp = 1.0 / static_cast<double>( harm * harm );
 					//const double a2 = cos( om * harm * F_2PI );
-					s += amp * /*a2 **/ sin( ( static_cast<double>( ph * harm ) / static_cast<double>( len ) + 
+					s += amp * /*a2 **/ sin( ( static_cast<double>( ph * harm ) / static_cast<double>( len ) +
 							( ( harm + 1 ) % 4 == 0 ? 0.5 : 0.0 ) ) * F_2PI );
 					harm += 2;
 				} while( hlen > 2.0 );
@@ -199,7 +200,7 @@ void BandLimitedWave::generateWaves()
 			}
 		}
 	}
-		
+
 // moog saw wave - BLMoog
 // basically, just add in triangle + 270-phase saw
 	if( moog_file.exists() )
@@ -214,7 +215,7 @@ void BandLimitedWave::generateWaves()
 		for( i = 0; i <= MAXTBL; i++ )
 		{
 			const int len = TLENS[i];
-			
+
 			for( int ph = 0; ph < len; ph++ )
 			{
 				const int sawph = ( ph + static_cast<int>( len * 0.75 ) ) % len;
@@ -224,7 +225,7 @@ void BandLimitedWave::generateWaves()
 			}
 		}
 	}
-	
+
 // set the generated flag so we don't load/generate them again needlessly
 	s_wavesGenerated = true;
 
@@ -232,14 +233,14 @@ void BandLimitedWave::generateWaves()
 // generate files, serialize mipmaps as QDataStreams and save them on disk
 //
 // normally these are now provided with LMMS as pre-generated so we don't have to do this,
-// but I'm leaving the code here in case it's needed in the future 
+// but I'm leaving the code here in case it's needed in the future
 // (maybe we add more waveforms or change the generation code or mipmap format, etc.)
 
 /*
 
-// if you want to generate the files, you need to set the filenames and paths here - 
+// if you want to generate the files, you need to set the filenames and paths here -
 // can't use the usual wavetable directory here as it can require permissions on
-// some systems... 
+// some systems...
 
 QFile sawfile( "path-to-wavetables/saw.bin" );
 QFile sqrfile( "path-to-wavetables/sqr.bin" );

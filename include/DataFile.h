@@ -28,11 +28,11 @@
 #define DATA_FILE_H
 
 #include <QDomDocument>
-#include <QTextStream>
 
 #include "export.h"
-#include "lmms_basics.h"
 #include "MemoryManager.h"
+
+class QTextStream;
 
 class EXPORT DataFile : public QDomDocument
 {

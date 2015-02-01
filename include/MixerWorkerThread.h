@@ -28,15 +28,9 @@
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QThread>
 
-#include "ThreadableJob.h"
-#include "Mixer.h"
-
-#ifdef __SSE__
-#include <xmmintrin.h>
-#endif
-#ifdef __SSE3__
-#include <pmmintrin.h>
-#endif
+class QWaitCondition;
+class Mixer;
+class ThreadableJob;
 
 class MixerWorkerThread : public QThread
 {
