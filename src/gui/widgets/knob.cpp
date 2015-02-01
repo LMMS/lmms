@@ -305,7 +305,7 @@ void knob::setarcColor( const QColor & _c )
 
 QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * M_PI / 180.0;
+	const float rarc = m_angle * F_PI / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
@@ -483,11 +483,19 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 
 	captionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
+	contextMenu.addAction( QPixmap(), 
+		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
+
+void knob::toggleScale()
+{
+	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+}
 
 
 
@@ -726,7 +734,7 @@ void knob::enterValue()
 		}
 		else
 		{
-			new_val = pow( 10.0, ( new_val / 20.0 ) ) * 100.0;
+			new_val = dbvToAmp( new_val ) * 100.0;
 		}
 	}
 	else

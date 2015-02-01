@@ -128,6 +128,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 
 EffectSelectDialog::~EffectSelectDialog()
 {
+	delete ui;
 }
 
 

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _WAVESHAPER_CONTROLS_H
-#define _WAVESHAPER_CONTROLS_H
+#ifndef WAVESHAPER_CONTROLS_H
+#define WAVESHAPER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "waveshaper_control_dialog.h"
@@ -64,10 +64,7 @@ public:
 
 
 private slots:
-	void changeInput();
-	void changeOutput();
 	void samplesChanged( int, int );
-	void changeClip();
 
 	void resetClicked();
 	void smoothClicked();

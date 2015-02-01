@@ -25,7 +25,7 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
-#include <math.h>
+#include "lmms_math.h"
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -70,7 +70,8 @@ public:
 	enum ScaleType
 	{
 		Linear,
-		Logarithmic
+		Logarithmic,
+		Decibel
 	};
 
 	enum DataType
@@ -239,6 +240,19 @@ public:
 		return m_hasLinkedModels;
 	}
 
+	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
+	// note that this method should only be called once per period since it resets the state of the variable - so if your model
+	// has to be accessed by more than one object, then this function shouldn't be used.
+	bool isValueChanged()
+	{
+		if( m_valueChanged )
+		{
+			m_valueChanged = false;
+			return true;
+		}
+		return false;
+	}
+
 	float globalAutomationValueAt( const MidiTime& time );
 
 public slots:
@@ -288,6 +302,8 @@ private:
 	float m_step;
 	float m_range;
 	float m_centerValue;
+	
+	bool m_valueChanged;
 
 	// most objects will need this temporarily (until sampleExact is
 	// standard)

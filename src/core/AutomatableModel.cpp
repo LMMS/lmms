@@ -47,6 +47,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_step( step ),
 	m_range( max - min ),
 	m_centerValue( m_minValue ),
+	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
@@ -86,22 +87,20 @@ bool AutomatableModel::isAutomated() const
 
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
-	bool automatedOrControlled = false;
-
-	if( isAutomated() )
+	if( isAutomated() || m_scaleType != Linear )
 	{
 		// automation needs tuple of data (name, id, value)
+		// scale type also needs an extra value
 		// => it must be appended as a node
 		QDomElement me = doc.createElement( name );
 		me.setAttribute( "id", id() );
 		me.setAttribute( "value", m_value );
+		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
 		element.appendChild( me );
-
-		automatedOrControlled = true;
 	}
 	else
 	{
-		// non automation => can be saved as attribute
+		// non automation, linear scale (default), can be saved as attribute
 		element.setAttribute( name, m_value );
 	}
 
@@ -125,16 +124,6 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		m_controllerConnection->saveSettings( doc, element );
 
 		controllerElement.appendChild( element );
-
-		automatedOrControlled = true;
-	}
-
-	if( automatedOrControlled && ( m_scaleType != Linear ) )
-	{	// note: if we have more scale types than two, make
-		// a mapper function enums <-> string
-		if(m_scaleType == Logarithmic) {
-			element.setAttribute( "scale_type", "log" );
-		}
 	}
 }
 
@@ -143,16 +132,6 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
-	// read scale type and overwrite default scale type
-	if( element.hasAttribute("scale_type") ) // wrong in most cases
-	{
-		if( element.attribute("scale_type") == "log" )
-		 setScaleType( Logarithmic );
-	}
-	else {
-		setScaleType( Linear );
-	}
-
 	// compat code
 	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
 	if( node.isElement() )
@@ -192,14 +171,25 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	// <ladspacontrols port10="4.41">
 	//   <port00 value="4.41" id="4249278"/>
 	// </ladspacontrols>
-	// element => there is automation data
+	// element => there is automation data, or scaletype information
 	node = element.namedItem( name );
-        if( node.isElement() )
-        {
-                changeID( node.toElement().attribute( "id" ).toInt() );
-                setValue( node.toElement().attribute( "value" ).toFloat() );
-        }
-        else if( element.hasAttribute( name ) )
+	if( node.isElement() )
+	{
+			changeID( node.toElement().attribute( "id" ).toInt() );
+			setValue( node.toElement().attribute( "value" ).toFloat() );
+			if( node.toElement().hasAttribute( "scale_type" ) )
+			{
+				if( node.toElement().attribute( "scale_type" ) == "linear" )
+				{
+					setScaleType( Linear );
+				}
+				else if( node.toElement().attribute( "scale_type" ) == "log" )
+				{
+					setScaleType( Logarithmic );
+				}
+			}
+	}
+	else if( element.hasAttribute( name ) )
 	// attribute => read the element's value from the attribute list
 	{
 		setInitValue( element.attribute( name ).toFloat() );
@@ -234,6 +224,7 @@ void AutomatableModel::setValue( const float value )
 				(*it)->setJournalling( journalling );
 			}
 		}
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 	else
@@ -327,6 +318,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 				(*it)->setAutomatedValue( value );
 			}
 		}
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 	--m_setValueDepth;
@@ -471,6 +463,7 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	{
 		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ), this, SIGNAL( dataChanged() ) );
 		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+		m_valueChanged = true;
 		emit dataChanged();
 	}
 }

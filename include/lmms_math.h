@@ -31,7 +31,8 @@
 #include "lmmsconfig.h"
 #include <QtCore/QtGlobal>
 
-#include <math.h>
+#include <cmath>
+using namespace std;
 
 #if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) 
 #ifndef isnanf
@@ -45,6 +46,12 @@
 #endif
 #ifndef _isinff
 #define _isinff(x) isinf(x)
+#endif
+#ifndef exp10
+#define exp10(x) pow( 10, x )
+#endif
+#ifndef exp10f
+#define exp10f(x) powf( 10, x )
 #endif
 #endif
 
@@ -123,7 +130,40 @@ static inline int fast_rand()
 	return( (unsigned)( next / 65536 ) % 32768 );
 }
 
+//! @brief Takes advantage of fmal() function if present in hardware
+static inline long double fastFmal( long double a, long double b, long double c ) {
+#ifdef FP_FAST_FMAL
+	#ifdef __clang__
+		return fma( a, b, c );
+	#else
+		return fmal( a, b, c );
+	#endif
+#else
+	return a * b + c;
+#endif
+}
 
+//! @brief Takes advantage of fmaf() function if present in hardware
+static inline float fastFmaf( float a, float b, float c ) {
+#ifdef FP_FAST_FMAF
+	#ifdef __clang__
+		return fma( a, b, c );
+	#else
+		return fmaf( a, b, c );
+	#endif
+#else
+	return a * b + c;
+#endif
+}
+
+//! @brief Takes advantage of fma() function if present in hardware
+static inline double fastFma( double a, double b, double c ) {
+#ifdef FP_FAST_FMA
+	return fma( a, b, c );
+#else
+	return a * b + c;
+#endif
+}
 
 // source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
 static inline double fastPow( double a, double b )
@@ -202,7 +242,7 @@ static inline float dbvToAmp( float dbv )
 {
 	return isinff( dbv )
 		? 0.0f
-		: powf( 10.0f, dbv * 0.05f );
+		: exp10f( dbv * 0.05f );
 }
 
 

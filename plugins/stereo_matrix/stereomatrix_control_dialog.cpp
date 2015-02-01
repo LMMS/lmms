@@ -68,3 +68,4 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	rrKnob->move( 40+28, 60+28 );
 }
 
+#include "moc_stereomatrix_control_dialog.cxx"

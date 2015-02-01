@@ -118,7 +118,7 @@ public:
 	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
 	virtual ~AudioFileProcessorView();
 
-
+	void newWaveView();
 protected slots:
 	void sampleUpdated();
 	void openAudioFile();

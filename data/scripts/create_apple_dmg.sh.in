@@ -16,10 +16,11 @@ DMG_BACKGROUND_IMG="dmg_branding.png"
 cp "@CMAKE_SOURCE_DIR@/data/${DMG_BACKGROUND_IMG}" .
 
 # you should not need to change these
+OS_VER=`sw_vers -productVersion|cut -d"." -f1-2`
 APP_LOWERCASE=$(echo $APP_NAME|tr '[:upper:]' '[:lower:]')
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_LOWERCASE}"
 
-VOL_NAME="${APP_NAME} ${VERSION}"   # volume name will be "SuperCoolApp 1.0.0"
+VOL_NAME="${APP_LOWERCASE}-${VERSION}-mac${OS_VER}"   # volume name will be "SuperCoolApp 1.0.0"
 DMG_TMP="${VOL_NAME}-temp.dmg"
 DMG_FINAL="${VOL_NAME}.dmg"         # final DMG name will be "SuperCoolApp 1.0.0.dmg"
 STAGING_DIR="./Install"             # we copy all our stuff into this dir

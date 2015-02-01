@@ -31,7 +31,9 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>Deutsche Übersetzung von Tobias Doerffel und Daniel Winzen.</translation>
+        <translation>Deutsche Übersetzung von Tobias Doerffel und Daniel Winzen.
+
+Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder eine bereits existierende Übersetzung verbessern möchten, können Sie uns gerne helfen! Kontaktieren Sie einfach den Betreiber!</translation>
     </message>
     <message>
         <source>License</source>
@@ -42,12 +44,20 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Copyright (c) 2004-2014, LMMS-Entwickler</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>LMMS</source>
+        <translation>LMMS</translation>
     </message>
     <message>
-        <source>LMMS</source>
-        <translation type="unfinished">LMMS</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Involved</source>
+        <translation>Beteiligt</translation>
+    </message>
+    <message>
+        <source>Contributors ordered by number of commits:</source>
+        <translation>Mitwirkende sortiert nach der Anzahl an Einreichungen:</translation>
     </message>
 </context>
 <context>
@@ -131,7 +141,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation>Wenn Sie diesen Button aktivieren, wird das gesamte Sample umgekehrt. Das kann nützlich für coole Effekte sein, wie z.B. eine umgekehrte Crash.</translation>
+        <translation>Wenn Sie diesen Knopf aktivieren, wird das gesamte Sample umgekehrt. Das kann nützlich für coole Effekte sein, wie z.B. eine umgekehrte Crash.</translation>
     </message>
     <message>
         <source>Amplify:</source>
@@ -139,7 +149,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>Mit diesem Knopf können Sie die Verstärkungsrate festlegen. Wenn Sie einen Wert von 100% setzen, wird das Sample nicht geändert. Ansonsten wird es hoch oder runter verstärkt (Ihre Audio-Datei wird dabei nicht verändert!)</translation>
+        <translation>Mit diesem Regler können Sie die Verstärkungsrate festlegen. Wenn Sie einen Wert von 100% setzen, wird das Sample nicht geändert. Ansonsten wird es hoch oder runter verstärkt (Ihre Audio-Datei wird dabei nicht verändert!)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -159,39 +169,39 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Disable loop</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholung deaktivieren</translation>
     </message>
     <message>
         <source>This button disables looping. The sample plays only once from start to end. </source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Regler deaktiviert Wiederholung. Das Sample wird nur einmal vom Anfang bis zum Ende wiedergegeben .</translation>
     </message>
     <message>
         <source>Enable loop</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholung aktivieren</translation>
     </message>
     <message>
         <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Knopf aktiviert Vorwärts-Wiederholung. Das Sample wird zwischen dem Endpunkt und dem Loop-Punkt wiederholt.</translation>
     </message>
     <message>
         <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Knopf aktiviert Ping-Pong-Wiederholung. Das Sample wird zwischen dem Endpunkt und dem Loop-Punkt rückwärts und vorwärts wiederholt.</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
-        <translation type="unfinished"></translation>
+        <translation>Mit diesem Regler können Sie festlegen, wo AudioFileProcessor anfangen soll, Ihr Sample zu spielen. </translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
-        <translation type="unfinished"></translation>
+        <translation>Mit diesem Regler können Sie festlegen, wo AudioFileProcessor aufhören soll, Ihr Sample zu spielen. </translation>
     </message>
     <message>
         <source>Loopback point:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholungspunkt:</translation>
     </message>
     <message>
         <source>With this knob you can set the point where the loop starts. </source>
-        <translation type="unfinished"></translation>
+        <translation>Mit diesem Regler können Sie festlegen, wo die Wiederholung beginnt.</translation>
     </message>
 </context>
 <context>
@@ -219,9 +229,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation>Der JACK-Server scheint heruntergefahren worden zu sein und es war nicht möglich, eine neue Instanz zu starten. LMMS ist daher nicht in der Lage, fortzufahren. Sie sollten Ihr Projekt speichern und JACK und LMMS neustarten.</translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation>CLIENT-NAME</translation>
@@ -346,11 +353,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Klicken Sie hier, um den Zeichnenmodus zu aktivieren. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+        <translation>Klicken Sie hier, um den Zeichnenmodus zu aktivieren. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch »Umschalt+D« auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Klicken Sie hier, um den Radiermodus zu aktivieren. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation>Klicken Sie hier, um den Radiermodus zu aktivieren. In diesem Modus können Sie einzelne Werte löschen. Sie können auch »Umschalt+E« auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
@@ -366,11 +373,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klicken Sie hier, um die markierten Werte auszuschneiden und in die Zwischenablage zu kopieren. Sie können diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation>Klicken Sie hier, um die markierten Werte auszuschneiden und in die Zwischenablage zu kopieren. Sie können diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Knopf klicken.</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klicken Sie hier, um die markierten Werte in die Zwischenablage zu kopieren. Sie können  diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation>Klicken Sie hier, um die markierten Werte in die Zwischenablage zu kopieren. Sie können  diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Knopf klicken.</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
@@ -441,7 +448,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation type="unfinished"></translation>
+        <translation>Modell ist bereits mit diesem Pattern verbunden.</translation>
     </message>
 </context>
 <context>
@@ -472,11 +479,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Disconnect &quot;%1&quot;</source>
-        <translation>&quot;%1&quot; trennen</translation>
+        <translation>»%1« trennen</translation>
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation type="unfinished">Aufnahme setzen/löschen</translation>
+        <translation>Aufnahme setzen/löschen</translation>
     </message>
 </context>
 <context>
@@ -532,11 +539,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>CarlaInstrumentView</name>
     <message>
         <source>Show GUI</source>
-        <translation type="unfinished">GUI anzeigen</translation>
+        <translation>GUI anzeigen</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken Sie hier, um die grafische Oberfläche von Carla anzuzeigen bzw. auszublenden.</translation>
     </message>
 </context>
 <context>
@@ -632,7 +639,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
-        <translation>Mit Controller können Sie den Wert eines Knopfes, Schiebereglers und anderer Steuerelemente automatisieren.</translation>
+        <translation>Mit Controller können Sie den Wert eines Reglers, Schiebereglers und anderer Steuerelemente automatisieren.</translation>
     </message>
     <message>
         <source>Rename controller</source>
@@ -646,9 +653,62 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>&amp;Remove this plugin</source>
         <translation>Plugin entfe&amp;rnen</translation>
     </message>
+</context>
+<context>
+    <name>DelayControls</name>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
+        <source>Delay Samples</source>
+        <translation>Samples verzögern</translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation>Rückkopplung</translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation>LFO-Frequenz</translation>
+    </message>
+    <message>
+        <source>Lfo Amount</source>
+        <translation>LFO-Stärke</translation>
+    </message>
+</context>
+<context>
+    <name>DelayControlsDialog</name>
+    <message>
+        <source>Delay</source>
+        <translation>Verzögerung</translation>
+    </message>
+    <message>
+        <source>Delay Time</source>
+        <translation>Verzögerungszeit</translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Amount</source>
+        <translation>Rückkopplungsstärke</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Rate</translation>
+    </message>
+    <message>
+        <source>Lfo</source>
+        <translation>LFO</translation>
+    </message>
+    <message>
+        <source>Lfo Amt</source>
+        <translation>LFO-Stärke</translation>
+    </message>
+</context>
+<context>
+    <name>DetuningHelper</name>
+    <message>
+        <source>Note detuning</source>
+        <translation>Noten-Verstimmung</translation>
     </message>
 </context>
 <context>
@@ -778,6 +838,13 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
+    <name>DummyEffect</name>
+    <message>
+        <source>NOT FOUND</source>
+        <translation>NICHT GEFUNDEN</translation>
+    </message>
+</context>
+<context>
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
@@ -845,7 +912,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation>Der Wet/Dry-Knopf legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.</translation>
+        <translation>Der Wet/Dry-Regler legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.</translation>
     </message>
     <message>
         <source>DECAY</source>
@@ -857,7 +924,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
-        <translation>Der Abfallzeit-Knopf legt fest, wie viele Puffer mit Stille durchgelaufen sein müssen, bis der Effekt mit der Verarbeitung stoppt. Kleinere Werte reduzieren die CPU-Last, können jedoch unter Umständen das Ende von Delay-Effekten o.ä. abschneiden.</translation>
+        <translation>Der Abfallzeit-Regler legt fest, wie viele Puffer mit Stille durchgelaufen sein müssen, bis der Effekt mit der Verarbeitung stoppt. Kleinere Werte reduzieren die CPU-Last, können jedoch unter Umständen das Ende von Delay-Effekten o.ä. abschneiden.</translation>
     </message>
     <message>
         <source>GATE</source>
@@ -869,7 +936,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
-        <translation>Der Gate-Knopf legt die Stärke des Signals fest, welches als Stille angesehen wird, um zu entscheiden, wann das Plugin mit der Verarbeitung aufhören kann.</translation>
+        <translation>Der Gate-Regler legt die Stärke des Signals fest, welches als »Stille« angesehen wird, um zu entscheiden, wann das Plugin mit der Verarbeitung aufhören soll.</translation>
     </message>
     <message>
         <source>Controls</source>
@@ -893,11 +960,11 @@ Right clicking will bring up a context menu where you can change the order in wh
 
 Der Ein-/Ausschalter ermöglicht es Ihnen ein Plugin jeder Zeit zu umgehen.
 
-Der Wet/Dry-Knopf legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.  Der Eingag dieses Effekts ist der Ausgang des vorherigen Effekts. Somit enthält das »dry«-Signal, für Effekte weiter unten in der Kette, alle vorherigen Effekte.
+Der Wet/Dry-Regler legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.  Der Eingag dieses Effekts ist der Ausgang des vorherigen Effekts. Somit enthält das »dry«-Signal, für Effekte weiter unten in der Kette, alle vorherigen Effekte.
 
-Der Abfallzeit-Knopf legt fest, wie lange das Signal weiterverarbeitet werden soll, nachdem die Noten losgelassen wurde.  Der Effekt hört auf Signale zu verarbeiten, wenn die Lautstärke eines Signals für eine festgelegte Zeit unter einen festgelegten Schwellwert gefallen ist.  Dieser Knopf legt die »festgelegte Zeit« fest.  Längere Zeiten brauchen mehr Rechenleistung, deshalb sollte diese Zahl für die meisten Effekte niedrig sein.  Es muss für Effekte, die über längere Zeit Stille erzeugen, z.B. Verzögerungen, erhöht werden.
+Der Abfallzeit-Regler legt fest, wie lange das Signal weiterverarbeitet werden soll, nachdem die Noten losgelassen wurde.  Der Effekt hört auf Signale zu verarbeiten, wenn die Lautstärke eines Signals für eine festgelegte Zeit unter einen festgelegten Schwellwert gefallen ist.  Dieser Regler legt die »festgelegte Zeit« fest.  Längere Zeiten brauchen mehr Rechenleistung, deshalb sollte diese Zahl für die meisten Effekte niedrig sein.  Es muss für Effekte, die über längere Zeit Stille erzeugen, z.B. Verzögerungen, erhöht werden.
 
-Der Gate-Knopf kontrolliert den »festgelegten Schwellwert« für das automatische Ausschalten des Effekts.  Die Uhr für die »festgelegte Zeit« beginnt sobald der Pegel des verarbeiteten Signals unter den mit diesem Knopf festgelegten Pegel fällt.
+Der Gate-Regler kontrolliert den »festgelegten Schwellwert« für das automatische Ausschalten des Effekts.  Die Uhr für die »festgelegte Zeit« beginnt sobald der Pegel des verarbeiteten Signals unter den mit diesem Knopf festgelegten Pegel fällt.
 
 Der Regler-Knopf öffnet einen Dialog zum Bearbeiten der Parameter des Effekts.
 
@@ -914,10 +981,6 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     <message>
         <source>&amp;Remove this plugin</source>
         <translation>Plugin entfe&amp;rnen</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
     </message>
 </context>
 <context>
@@ -991,7 +1054,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Verzögerung (predelay) für die aktuelle Hüllkurven einzustellen. Je größer dieser Wert, desto länger dauert es, bis die eigentliche Hüllkurve beginnt.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Verzögerung (predelay) für die aktuelle Hüllkurven einzustellen. Je größer dieser Wert, desto länger dauert es, bis die eigentliche Hüllkurve beginnt.</translation>
     </message>
     <message>
         <source>ATT</source>
@@ -1003,7 +1066,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Anschwellzeit (attack) für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto länger braucht die Hüllkurve, um bis zum Anschwellpegel (attack-level) zu steigen. Wählen Sie einen kleinen Wert für Instrumente wie Klavier und einen großen Wert für Streichinstrumente.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Anschwellzeit (attack) für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto länger braucht die Hüllkurve, um bis zum Anschwellpegel (attack-level) zu steigen. Wählen Sie einen kleinen Wert für Instrumente wie Klavier und einen großen Wert für Streichinstrumente.</translation>
     </message>
     <message>
         <source>HOLD</source>
@@ -1015,7 +1078,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Haltezeit (hold) der aktuellen Hüllkurve zu setzen. Je größer der Wert, desto länger hält die Hüllkurve den Anschwellpegel, bevor sie zum Haltepegel (sustain-level) abfällt.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Haltezeit (hold) der aktuellen Hüllkurve zu setzen. Je größer der Wert, desto länger hält die Hüllkurve den Anschwellpegel, bevor sie zum Haltepegel (sustain-level) abfällt.</translation>
     </message>
     <message>
         <source>DEC</source>
@@ -1027,7 +1090,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Abfallzeit (decay) für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto länger braucht die Hüllkurve, um vom Anschwellpegel (attack-level) zum Dauerpegel (sustain-level) abzufallen. Wählen Sie einen kleinen Wert für Instrumente wie Klavier.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Abfallzeit (decay) für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto länger braucht die Hüllkurve, um vom Anschwellpegel (attack-level) zum Dauerpegel (sustain-level) abzufallen. Wählen Sie einen kleinen Wert für Instrumente wie Klavier.</translation>
     </message>
     <message>
         <source>SUST</source>
@@ -1039,7 +1102,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation>Benutzen Sie diesen Knopf, um den Dauerpegel (sustain-level) für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto höher der Pegel, den die Hüllkurve hält, bevor sie auf Null abfällt.</translation>
+        <translation>Benutzen Sie diesen Regler, um den Dauerpegel (sustain-level) für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto höher der Pegel, den die Hüllkurve hält, bevor sie auf Null abfällt.</translation>
     </message>
     <message>
         <source>REL</source>
@@ -1051,7 +1114,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Ausklingzeit der aktuellen Hüllkurve einzustellen. Je größer der Wert, desto länger braucht die Hüllkurve um vom Dauerpegel (sustain-level) auf Null abzufallen. Wählen Sie einen großen Wert für weiche Instrumente, wie z.B. Streicher.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Ausklingzeit der aktuellen Hüllkurve einzustellen. Je größer der Wert, desto länger braucht die Hüllkurve um vom Dauerpegel (sustain-level) auf Null abzufallen. Wählen Sie einen großen Wert für weiche Instrumente, wie z.B. Streicher.</translation>
     </message>
     <message>
         <source>AMT</source>
@@ -1063,7 +1126,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Modulationsintensität für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cutoff-Frequenz) von der Hüllkurve beeinflusst.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität für die aktuelle Hüllkurve einzustellen. Je größer dieser Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cutoff-Frequenz) von der Hüllkurve beeinflusst.</translation>
     </message>
     <message>
         <source>LFO predelay:</source>
@@ -1071,7 +1134,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Verzögerungszeit für den aktuellen LFO einzustellen. Je größer dieser Wert, desto länger die Zeit, bis der LFO anfängt zu schwingen.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Verzögerungszeit für den aktuellen LFO einzustellen. Je größer dieser Wert, desto länger die Zeit, bis der LFO anfängt zu schwingen.</translation>
     </message>
     <message>
         <source>LFO- attack:</source>
@@ -1079,7 +1142,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current LFO. The bigger this value the longer the LFO needs to increase its amplitude to maximum.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Anschwellzeit für den aktuellen LFO einzustellen. Je größer dieser Wert, desto länger dauert es, bis die Amplitude des LFOs bis zum Maximum angestiegen ist.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Anschwellzeit für den aktuellen LFO einzustellen. Je größer dieser Wert, desto länger dauert es, bis die Amplitude des LFOs bis zum Maximum angestiegen ist.</translation>
     </message>
     <message>
         <source>SPD</source>
@@ -1091,11 +1154,11 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Geschwindigkeit für den aktuellen LFO einzustellen. Je größer der Wert, desto schneller schwingt der LFO und desto schneller ist der entsprechende Effekt.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Geschwindigkeit für den aktuellen LFO einzustellen. Je größer der Wert, desto schneller schwingt der LFO und desto schneller ist der entsprechende Effekt.</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Modulationsintensität des aktuellen LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität des aktuellen LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
@@ -1103,7 +1166,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klick für eine Dreieckswelle.</translation>
+        <translation>Klick für eine Dreieckwelle.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave for current.</source>
@@ -1111,7 +1174,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klick für eine Rechteckswelle.</translation>
+        <translation>Klick für eine Rechteckwelle.</translation>
     </message>
     <message>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
@@ -1155,7 +1218,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Click here for random wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick für eine zufällige Welle.</translation>
     </message>
 </context>
 <context>
@@ -1301,41 +1364,41 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     <name>FileBrowser</name>
     <message>
         <source>Browser</source>
-        <translation type="unfinished">Browser</translation>
+        <translation>Browser</translation>
     </message>
 </context>
 <context>
     <name>FileBrowserTreeWidget</name>
     <message>
         <source>Send to active instrument-track</source>
-        <translation type="unfinished">An aktive Instrumentspur senden</translation>
+        <translation>An aktive Instrumentspur senden</translation>
     </message>
     <message>
         <source>Open in new instrument-track/Song-Editor</source>
-        <translation type="unfinished">In neuer Instrumentspur im Song-Editor öffnen</translation>
+        <translation>In neuer Instrumentspur im Song-Editor öffnen</translation>
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation type="unfinished">In neuer Instrumentspur im B+B-Editor öffnen</translation>
+        <translation>In neuer Instrumentspur im B+B-Editor öffnen</translation>
     </message>
     <message>
         <source>Loading sample</source>
-        <translation type="unfinished">Lade Sample</translation>
+        <translation>Lade Sample</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
-        <translation type="unfinished">Bitte warten, lade Sample für Vorschau…</translation>
+        <translation>Bitte warten, lade Sample für Vorschau…</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished">--- Mitgelieferte Dateien ---</translation>
+        <translation>--- Mitgelieferte Dateien ---</translation>
     </message>
 </context>
 <context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal Sendemenge</translation>
     </message>
     <message>
         <source>The FX channel receives input from one or more instrument tracks.
@@ -1345,27 +1408,29 @@ In order to route the channel to another channel, select the FX channel and clic
 
 You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Der FX Kanal erhält von ein oder mehr Instrumentenspuren Eingabesignale.
+ Er kann wiederum durch mehrere andere FX Kanäle gesendet werden. LMMS verhindert Endlosschleifen automatisch für Sie und erlaubt es nicht eine Verbindung zu erstellen, die in einer Endlosschleife resultiert.
+
+Um den Kanal an einen anderen Kanal zu senden, wählen Sie den FX Kanal aus und klicken Sie auf den »Senden« Knopf in dem Kananl, an den Sie den Kanal senden möchten. Der Knopf unter dem Sendeknopf kontrolliert die Stärke des gesendeten Signals.
+
+Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch einen Rechtsklick auf dem FX Kanal aufgerufen wird.
+</translation>
     </message>
     <message>
         <source>Move &amp;left</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach &amp;links verschieben</translation>
     </message>
     <message>
         <source>Move &amp;right</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach &amp;rechts verschieben</translation>
     </message>
     <message>
         <source>Rename &amp;channel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kanal umbenennen</translation>
     </message>
     <message>
         <source>R&amp;emove channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Hilfe</translation>
+        <translation>Kanal &amp;Entfernen</translation>
     </message>
 </context>
 <context>
@@ -1393,27 +1458,24 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation>FX-Mixer</translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
-        <translation type="unfinished">FX Schieber %1</translation>
+        <translation>FX Schieber %1</translation>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished">Stumm</translation>
+        <translation>Stumm</translation>
     </message>
     <message>
         <source>Mute this FX channel</source>
-        <translation type="unfinished">Diesen FX-Kanal stummschalten</translation>
+        <translation>Diesen FX-Kanal stummschalten</translation>
     </message>
 </context>
 <context>
     <name>FxRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Anteil, der von Kanal %1 zu Kanal %2 gesendet werden soll</translation>
     </message>
 </context>
 <context>
@@ -1476,7 +1538,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Down and up</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoch und runter</translation>
     </message>
 </context>
 <context>
@@ -1503,7 +1565,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
-        <translation>Benutzen Sie diesen Knopf, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewähle Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+        <translation>Benutzen Sie diesen Regler, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewähle Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
     </message>
     <message>
         <source>TIME</source>
@@ -1519,7 +1581,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Arpeggio-Zeit in Millisekunden zu setzen. Die Arpeggio-Zeit gibt an, wie lange jeder einzelne Arpeggio-Ton gespielt werden soll.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Arpeggio-Zeit in Millisekunden zu setzen. Die Arpeggio-Zeit gibt an, wie lange jeder einzelne Arpeggio-Ton gespielt werden soll.</translation>
     </message>
     <message>
         <source>GATE</source>
@@ -1535,7 +1597,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato arpeggios.</source>
-        <translation>Benutzen Sie diesen Knopf, um das Arpeggio-Gate zu setzen. Das Arpeggio-Gate gibt an, wie viel Prozent eines ganzen Arpeggio-Tons gespielt werden sollen. Damit können Sie coole Staccato-Arpeggios erzeugen.</translation>
+        <translation>Benutzen Sie diesen Regler, um das Arpeggio-Gate zu setzen. Das Arpeggio-Gate gibt an, wie viel Prozent eines ganzen Arpeggio-Tons gespielt werden sollen. Damit können Sie coole Staccato-Arpeggios erzeugen.</translation>
     </message>
     <message>
         <source>Chord:</source>
@@ -1846,7 +1908,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Jap in sen</source>
-        <translation></translation>
+        <translation>Jap in sen</translation>
     </message>
     <message>
         <source>Major bebop</source>
@@ -1926,11 +1988,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Half-Whole Diminished</source>
-        <translation type="unfinished"></translation>
+        <translation>Halbton-Ganzton-Leiter</translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="unfinished">5</translation>
+        <translation>5</translation>
     </message>
 </context>
 <context>
@@ -1949,7 +2011,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
-        <translation>Benutzen Sie diesen Knopf, um den Akkord-Bereich in Oktaven zu setzen. Der gewähle Akkord wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+        <translation>Benutzen Sie diesen Regler, um den Akkord-Bereich in Oktaven zu setzen. Der gewähle Akkord wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
     </message>
     <message>
         <source>STACKING</source>
@@ -2114,7 +2176,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation>Diese Tabs enthalten Hüllkurven. Diese sind sehr wichtig, um einen Klang zu verändern, insbesondere bei der substraktiven Synthese. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Klang welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann man ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahn-Welle wirklich coole Klänge machen...!</translation>
+        <translation>Diese Tabs enthalten Hüllkurven. Diese sind sehr wichtig, um einen Klang zu verändern, insbesondere bei der substraktiven Synthese. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Klang welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann man ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahnwelle wirklich coole Klänge machen...!</translation>
     </message>
     <message>
         <source>FILTER</source>
@@ -2130,7 +2192,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
-        <translation>Benutzen Sie diesen Knopf, um die Kennfrequenz (cutoff-frequency) für den gewählten Filter einzustellen. Die Kennfrequenz wird vom Filter zum Beschneiden des Signals verwendet. Zum Beispiel filtert ein Tiefpass-Filter alle Frequenzen oberhalb der Kennfrequenz heraus. Ein Hochpass-Filter filtert alle Frequenzen unterhalb der Kennfrequenz heraus usw...</translation>
+        <translation>Benutzen Sie diesen Regler, um die Kennfrequenz (cutoff-frequency) für den gewählten Filter einzustellen. Die Kennfrequenz wird vom Filter zum Beschneiden des Signals verwendet. Zum Beispiel filtert ein Tiefpass-Filter alle Frequenzen oberhalb der Kennfrequenz heraus. Ein Hochpass-Filter filtert alle Frequenzen unterhalb der Kennfrequenz heraus usw...</translation>
     </message>
     <message>
         <source>RESO</source>
@@ -2142,7 +2204,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
-        <translation>Benutzen Sie diesen Knopf, um Q/die Resonanz für den gewählten Filter einzustellen. Q/Resonanz teilt dem Filter mit, wie stark er die Frequenzen in der Nähe der Cutoff-Frequenz verstärken soll.</translation>
+        <translation>Benutzen Sie diesen Regler, um Q/die Resonanz für den gewählten Filter einzustellen. Q/Resonanz teilt dem Filter mit, wie stark er die Frequenzen in der Nähe der Cutoff-Frequenz verstärken soll.</translation>
     </message>
     <message>
         <source>FREQ</source>
@@ -2185,7 +2247,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>With this knob you can set the volume of the opened channel.</source>
-        <translation>Mit diesem Knopf können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
+        <translation>Mit diesem Regler können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
     </message>
     <message>
         <source>Base note</source>
@@ -2323,11 +2385,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Save current instrument track settings in a preset file</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Instrumentenspur-Einstelungen in einer Presetdatei speichern</translation>
     </message>
     <message>
         <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken Sie hier, wenn Sie die aktuellen Instrumentenspur-Einstellungen in einer Presetdatei speichern möchten. Sie können dieses Preset später durch Doppelklicken auf die Datei im Preset-Browser öffnen.</translation>
     </message>
 </context>
 <context>
@@ -2444,7 +2506,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting speed of the LFO. The bigger this value the faster the LFO oscillates and the faster the effect.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Geschwindigkeit des LFOs einzustellen. Je größer der Wert, desto schneller schwingt der LFO und desto schneller ist der entsprechende Effekt.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Geschwindigkeit des LFOs einzustellen. Je größer der Wert, desto schneller schwingt der LFO und desto schneller ist der entsprechende Effekt.</translation>
     </message>
     <message>
         <source>AMT</source>
@@ -2456,7 +2518,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Modulationsintensität des LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität des LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
     </message>
     <message>
         <source>PHS</source>
@@ -2472,7 +2534,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>With this knob you can set the phase offset of the LFO. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation>Mit diesem Knopf können Sie die Phasen-Verschiebung des LFOs einstellen. Das heißt, Sie können den Punkt innerhalb einer Schwingung verschieben, an dem der Oszillator anfangen soll zu schwingen. Wenn Sie zum Beispiel eine Sinus-Welle haben und eine Phasen-Verschiebung von 180 Grad einstellen, wird die Welle zu erst runter gehen. Das gleiche trifft auch bei einer Rechteck-Welle zu.</translation>
+        <translation>Mit diesem Regler können Sie die Phasenverschiebung des LFOs einstellen. Das heißt, Sie können den Punkt innerhalb einer Schwingung verschieben, an dem der Oszillator anfangen soll zu schwingen. Wenn Sie zum Beispiel eine Sinuswelle haben und eine Phasenverschiebung von 180 Grad einstellen, wird die Welle zu erst runter gehen. Das gleiche trifft auch bei einer Rechteckwelle zu.</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
@@ -2480,7 +2542,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klick für eine Dreieckswelle.</translation>
+        <translation>Klick für eine Dreieckwelle.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
@@ -2488,15 +2550,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klick für eine Rechteckswelle.</translation>
-    </message>
-    <message>
-        <source>Click here for a a moog saw-wave.</source>
-        <translation>Klick für eine Moog-ähnliche Welle.</translation>
+        <translation>Klick für eine Rechteckwelle.</translation>
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klick für eine Exponential-Welle.</translation>
+        <translation>Klick für eine exponentielle Welle.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -2507,6 +2565,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 Double click to pick a file.</source>
         <translation>Klicken Sie hier für eine benutzerdefinierte From.
 Doppelklicken Sie, um eine Datei auszuwählen.</translation>
+    </message>
+    <message>
+        <source>Click here for a moog saw-wave.</source>
+        <translation>Klick für eine Moog-Sägezahnwelle.</translation>
     </message>
 </context>
 <context>
@@ -2764,20 +2826,20 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>Version %1</translation>
     </message>
     <message>
+        <source>Undo</source>
+        <translation>Rückgängig</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>Wiederholen</translation>
+    </message>
+    <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
     </message>
     <message>
         <source>Volumes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Volumes</translation>
     </message>
 </context>
 <context>
@@ -2814,7 +2876,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
 </context>
 <context>
-    <name>MidiAlsaSeq::setupWidget</name>
+    <name>MidiAlsaSeq</name>
     <message>
         <source>DEVICE</source>
         <translation>GERÄT</translation>
@@ -2904,400 +2966,510 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     <name>MonstroInstrument</name>
     <message>
         <source>Osc 1 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Lautstärke</translation>
     </message>
     <message>
         <source>Osc 1 Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Balance</translation>
     </message>
     <message>
         <source>Osc 1 Coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Grob-Verstimmung</translation>
     </message>
     <message>
         <source>Osc 1 Fine detune left</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Fein-Verstimmung links</translation>
     </message>
     <message>
         <source>Osc 1 Fine detune right</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Fein-Verstimmung rechts</translation>
     </message>
     <message>
         <source>Osc 1 Stereo phase offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Stereo Phasenverschiebung</translation>
     </message>
     <message>
         <source>Osc 1 Pulse width</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszilator 1 Pulsweite</translation>
     </message>
     <message>
         <source>Osc 1 Sync send on rise</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 1 Sync beim Steigen senden</translation>
     </message>
     <message>
         <source>Osc 1 Sync send on fall</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Sync beim Abfallen senden</translation>
     </message>
     <message>
         <source>Osc 2 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Lautstärke</translation>
     </message>
     <message>
         <source>Osc 2 Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Balance</translation>
     </message>
     <message>
         <source>Osc 2 Coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Grob-Verstimmung</translation>
     </message>
     <message>
         <source>Osc 2 Fine detune left</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Fein-Verstimmung links</translation>
     </message>
     <message>
         <source>Osc 2 Fine detune right</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Fein-Verstimmung rechts</translation>
     </message>
     <message>
         <source>Osc 2 Stereo phase offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Stereo Phasenverschiebung</translation>
     </message>
     <message>
         <source>Osc 2 Waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 Wellenform</translation>
     </message>
     <message>
         <source>Osc 2 Sync Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 hart synchronisieren</translation>
     </message>
     <message>
         <source>Osc 2 Sync Reverse</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 rückwärts synchronisieren</translation>
     </message>
     <message>
         <source>Osc 3 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Lautstärke</translation>
     </message>
     <message>
         <source>Osc 3 Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Balance</translation>
     </message>
     <message>
         <source>Osc 3 Coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Grob-Verstimmung</translation>
     </message>
     <message>
         <source>Osc 3 Stereo phase offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Stereo Phasenverschiebung</translation>
     </message>
     <message>
         <source>Osc 3 Sub-oscillator mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Unter-Oszillator Mischung</translation>
     </message>
     <message>
         <source>Osc 3 Waveform 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Wellenform 1</translation>
     </message>
     <message>
         <source>Osc 3 Waveform 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 3 Wellenform 2</translation>
     </message>
     <message>
         <source>Osc 3 Sync Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 hart synchronisieren</translation>
     </message>
     <message>
         <source>Osc 3 Sync Reverse</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator 2 rückwärts synchronisieren</translation>
     </message>
     <message>
         <source>LFO 1 Waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 1 Wellenform</translation>
     </message>
     <message>
         <source>LFO 1 Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 1 Anschwellzeit</translation>
     </message>
     <message>
         <source>LFO 1 Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 1 Rate</translation>
     </message>
     <message>
         <source>LFO 1 Phase</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 1 Phase</translation>
     </message>
     <message>
         <source>LFO 2 Waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 2 Wellenform</translation>
     </message>
     <message>
         <source>LFO 2 Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 2 Anschwellzeit</translation>
     </message>
     <message>
         <source>LFO 2 Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 2 Rate</translation>
     </message>
     <message>
         <source>LFO 2 Phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Phase</translation>
     </message>
     <message>
         <source>Env 1 Pre-delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Verzögerung</translation>
     </message>
     <message>
         <source>Env 1 Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Anschwellzeit</translation>
     </message>
     <message>
         <source>Env 1 Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Haltezeit</translation>
     </message>
     <message>
         <source>Env 1 Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Abfallzeit</translation>
     </message>
     <message>
         <source>Env 1 Sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Dauerpegel</translation>
     </message>
     <message>
         <source>Env 1 Release</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Ausklingzeit</translation>
     </message>
     <message>
         <source>Env 1 Slope</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 1 Neigung</translation>
     </message>
     <message>
         <source>Env 2 Pre-delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Verzögerung</translation>
     </message>
     <message>
         <source>Env 2 Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Anschwellzeit</translation>
     </message>
     <message>
         <source>Env 2 Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Haltezeit</translation>
     </message>
     <message>
         <source>Env 2 Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Abfallzeit</translation>
     </message>
     <message>
         <source>Env 2 Sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Dauerpegel</translation>
     </message>
     <message>
         <source>Env 2 Release</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Ausklingzeit</translation>
     </message>
     <message>
         <source>Env 2 Slope</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurve 2 Neigung</translation>
     </message>
     <message>
         <source>Osc2-3 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator2-3 Modulation</translation>
     </message>
     <message>
         <source>Selected view</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Ansicht</translation>
     </message>
     <message>
         <source>Vol1-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol1-Env1</translation>
     </message>
     <message>
         <source>Vol1-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol1-Env2</translation>
     </message>
     <message>
         <source>Vol1-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol1-LFO1</translation>
     </message>
     <message>
         <source>Vol1-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol1-LFO2</translation>
     </message>
     <message>
         <source>Vol2-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol2-Env1</translation>
     </message>
     <message>
         <source>Vol2-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol2-Env2</translation>
     </message>
     <message>
         <source>Vol2-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol2-LFO1</translation>
     </message>
     <message>
         <source>Vol2-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol2-LFO2</translation>
     </message>
     <message>
         <source>Vol3-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol3-Env1</translation>
     </message>
     <message>
         <source>Vol3-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol3-Env2</translation>
     </message>
     <message>
         <source>Vol3-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol3-LFO1</translation>
     </message>
     <message>
         <source>Vol3-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vol3-LFO2</translation>
     </message>
     <message>
         <source>Phs1-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs1-Env1</translation>
     </message>
     <message>
         <source>Phs1-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs1-Env2</translation>
     </message>
     <message>
         <source>Phs1-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs1-LFO1</translation>
     </message>
     <message>
         <source>Phs1-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs1-LFO2</translation>
     </message>
     <message>
         <source>Phs2-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs2-Env1</translation>
     </message>
     <message>
         <source>Phs2-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs2-Env2</translation>
     </message>
     <message>
         <source>Phs2-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs2-LFO1</translation>
     </message>
     <message>
         <source>Phs2-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs2-LFO2</translation>
     </message>
     <message>
         <source>Phs3-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs3-Env1</translation>
     </message>
     <message>
         <source>Phs3-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Phs3-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs3-LFO1</translation>
     </message>
     <message>
         <source>Phs3-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phs3-LFO2</translation>
     </message>
     <message>
         <source>Pit1-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit1-Env1</translation>
     </message>
     <message>
         <source>Pit1-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit1-Env2</translation>
     </message>
     <message>
         <source>Pit1-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit1-LFO1</translation>
     </message>
     <message>
         <source>Pit1-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit1-LFO2</translation>
     </message>
     <message>
         <source>Pit2-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit2-Env1</translation>
     </message>
     <message>
         <source>Pit2-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit2-Env2</translation>
     </message>
     <message>
         <source>Pit2-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit2-LFO1</translation>
     </message>
     <message>
         <source>Pit2-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit2-LFO2</translation>
     </message>
     <message>
         <source>Pit3-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit3-Env1</translation>
     </message>
     <message>
         <source>Pit3-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit3-Env2</translation>
     </message>
     <message>
         <source>Pit3-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit3-LFO1</translation>
     </message>
     <message>
         <source>Pit3-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pit3-LFO2</translation>
     </message>
     <message>
         <source>PW1-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>PW1-Env1</translation>
     </message>
     <message>
         <source>PW1-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>PW1-Env2</translation>
     </message>
     <message>
         <source>PW1-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>PW1-LFO1</translation>
     </message>
     <message>
         <source>PW1-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>PW1-LFO2</translation>
     </message>
     <message>
         <source>Sub3-Env1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sub3-Env1</translation>
     </message>
     <message>
         <source>Sub3-Env2</source>
-        <translation type="unfinished"></translation>
+        <translation>Sub3-Env2</translation>
     </message>
     <message>
         <source>Sub3-LFO1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sub3-LFO1</translation>
     </message>
     <message>
         <source>Sub3-LFO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Sub3-LFO2</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinuswelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Triangle wave</source>
+        <translation>Bandlimittierte Dreieckwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Saw wave</source>
+        <translation>Bandbegrenzte Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Ramp wave</source>
+        <translation>Bandbegrenzte Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Square wave</source>
+        <translation>Bandbegrenzte Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Bandlimited Moog saw wave</source>
+        <translation>Bandbegrenzte Moog-Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Soft square wave</source>
+        <translation>Weiche Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Absolute sine wave</source>
+        <translation>Absolute Sinuswelle</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>Exponentielle Welle</translation>
+    </message>
+    <message>
+        <source>White noise</source>
+        <translation>Weißes Rauschen</translation>
+    </message>
+    <message>
+        <source>Digital Triangle wave</source>
+        <translation>Digitale Dreieckwelle</translation>
+    </message>
+    <message>
+        <source>Digital Saw wave</source>
+        <translation>Digitale Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Digital Ramp wave</source>
+        <translation>Digitale Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Digital Square wave</source>
+        <translation>Digitale Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Digital Moog saw wave</source>
+        <translation>Digitale Moog-Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Dreieckwelle</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Ramp wave</source>
+        <translation>Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Rechteckwelle</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation>Moog-Sägezahnwelle</translation>
+    </message>
+    <message>
+        <source>Abs. sine wave</source>
+        <translation>Abs. Sinuswelle</translation>
+    </message>
+    <message>
+        <source>Random</source>
+        <translation>Zufällig</translation>
+    </message>
+    <message>
+        <source>Random smooth</source>
+        <translation>Zufällig gleitend</translation>
     </message>
 </context>
 <context>
     <name>MonstroView</name>
     <message>
         <source>Operators view</source>
-        <translation type="unfinished"></translation>
+        <translation>Operator-Ansicht</translation>
+    </message>
+    <message>
+        <source>Matrix view</source>
+        <translation>Matrix-Ansicht</translation>
+    </message>
+    <message>
+        <source>Mix Osc2 with Osc3</source>
+        <translation>Oszillator 2 mit Oszillator 3 Mischen</translation>
+    </message>
+    <message>
+        <source>Modulate amplitude of Osc3 with Osc2</source>
+        <translation>Amplitude von Oszillator 3 mit Oszillator 2 modulieren</translation>
+    </message>
+    <message>
+        <source>Modulate frequency of Osc3 with Osc2</source>
+        <translation>Frequenz von Oszillator 3 mit Oszillator 2 modulieren</translation>
+    </message>
+    <message>
+        <source>Modulate phase of Osc3 with Osc2</source>
+        <translation>Phase von Oszillator 3 mit Oszillator 2 modulieren</translation>
     </message>
     <message>
         <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matrix view</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Operator-Ansicht enthält alle Operatoren. Diese beinhalten beide, hörbare Operatoren (Oszillatoren) und nicht hörbare Operatoren oder Modulatoren: Niedrig-Frequenz-Oszillatoren und Hüllkurven. 
+
+Regler und andere Dinge in der Operator-Ansicht haben ihren eigenen »Was ist das?« Texte, sodass Sie auf diese Weise spezifischere Hilfe für diese bekommen können. </translation>
     </message>
     <message>
         <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
@@ -3305,236 +3477,234 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
 The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mix Osc2 with Osc3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modulate amplitude of Osc3 with Osc2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modulate frequency of Osc3 with Osc2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modulate phase of Osc3 with Osc2</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Matrix-Ansicht enthält die Modulationsmatrix. Hier können Sie die Modulationsverhältnisse zwischen den verschiedenen Operatoren definieren: Jeder hörbare Oberator (Oszillatorern 1-3) hat 3-4 Einstellungen, die durch jeden der Modulatoren moduliert werden können. Mehr Modulation braucht mehr Rechenleistung. 
+
+Die Ansicht ist in Modulationsziele, gruppiert nach dem Zieloszillator, eingeteilt. Verfügbare Ziele sind Lautstärke, Tonhöhe, Phase, Pulsweite und Unter-Oszillator Rate. Hinweis: einige Ziele sind speziell für einen Oszillator. 
+
+Jedes Modulationsziel hat 4 Regler, einen für jeden Modulator. Standardmäßig sind alle Regler bei 0, was keine Modulation bedeutet. Wenn der Regler auf 1 gestellt wird, wird das Modulationsziel vom Modulator so viel wie möglich beeinflusst. Wenn er auf -1 gestellt wird, passiert das gleiche, aber die Modulation ist invertiert. </translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 1 in semitone steps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der CRS Regler ändert die Stimmung des Oszillators 1 in Halbtonschritten. </translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 2 in semitone steps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der CRS Regler ändert die Stimmung des Oszillators 2 in Halbtonschritten. </translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 3 in semitone steps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der CRS Regler ändert die Stimmung des Oszillators 3 in Halbtonschritten. </translation>
     </message>
     <message>
         <source>FTL and FTR change the finetuning of the oscillator for left and right channels respectively. These can add stereo-detuning to the oscillator which widens the stereo image and causes an illusion of space. </source>
-        <translation type="unfinished"></translation>
+        <translation>FTL und FTR ändern die Feinabstimmung des Oszillators jeweils für den linken und rechten Kanal. Diese können Stereoverstimmug zum Oszillator hinzufügen, was das Stereobild weitet und eine Illusion von Raum erzeugt. </translation>
     </message>
     <message>
         <source>The SPO knob modifies the difference in phase between left and right channels. Higher difference creates a wider stereo image. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der SPO Regler ändert die Phasendifferenz zwischen dem linken und rechten Kanal. Höhere Differenz erzeugt ein breiteres Stereobild. </translation>
     </message>
     <message>
         <source>The PW knob controls the pulse width, also known as duty cycle, of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, it doesn&apos;t produce bandlimited output, which means that you can use it as an audible oscillator but it will cause aliasing. You can also use it as an inaudible source of a sync signal, which can be used to synchronize oscillators 2 and 3. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der PW Regler kontrolliert die Pulsweite, auch bekannt als Tastgrad, von Oszillator 1. Oszillator 1 ist ein digitaler Pulswellen Oszillator, es erzeugt keine bandbegrenzte Ausgabe, was bedeutet, dass Sie es als einen hörbaren Oszillator einsetzen können, aber es wird Aliasing verursachen. Sie können es auch als eine nicht hörbare Quelle für ein sync Signal benutzen, dass benutzt werden kann, um die Oszillatoren 2 und 3 zu synchronisieren. </translation>
     </message>
     <message>
         <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation type="unfinished"></translation>
+        <translation>Sync beim Ansteigen senden: Wenn aktiviert, wird das Sync-Signal jedes Mal gesendet, wenn sich der Zustand von Oszillator 1 von niedrig nach hoch ändert, z.B. wenn sich die Amplitude von -1 nach 1 ändert. Die Tonhöhe, Phase und Pulsweite von Oszillator 1 können das Timing von Syncs beeinflussen, aber die Lautstärke hat keinen Effekt darauf. Sync-Signale werden unabhängig vom linken und rechten Kanal gesendet. </translation>
     </message>
     <message>
         <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation type="unfinished"></translation>
+        <translation>Sync beim Absteigen senden: Wenn aktiviert, wird das Sync-Signal jedes Mal gesendet, wenn sich der Zustand von Oszillator 1 von hoch nach niedrig ändert, z.B. wenn sich die Amplitude von 1 nach -1 ändert. Die Tonhöhe, Phase und Pulsweite von Oszillator 1 können das Timing von Syncs beeinflussen, aber die Lautstärke hat keinen Effekt darauf. Sync-Signale werden unabhängig vom linken und rechten Kanal gesendet. </translation>
     </message>
     <message>
         <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
-        <translation type="unfinished"></translation>
+        <translation>Hard sync: Jedes Mal, wenn der Oszillator ein sync-Signal von Oszillator 1 empfäng, wird die Phase auf 0  zurückgesetzt, egal was die Phasendifferenz ist. </translation>
     </message>
     <message>
         <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
-        <translation type="unfinished"></translation>
+        <translation>Reverse sync: Jedes Mal, wenn der Oszillator ein sync-Signal von Oszillator 1 empfäng, wird die Amplitude des Oszillators invertiert. </translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 2. </source>
-        <translation type="unfinished"></translation>
+        <translation>Wellenform für Oszillator 2 auswählen. </translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 3&apos;s first sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
-        <translation type="unfinished"></translation>
+        <translation>Wellenform für den ersten Unter-Oszillator von Oszillator 3 auswählen. Oszillator 3 kann gleitend zwischen zwei verschiedenen Wellenformen interpolieren. </translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 3&apos;s second sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
-        <translation type="unfinished"></translation>
+        <translation>Wellenform für den zweiten Unter-Oszillator von Oszillator 3 auswählen. Oszillator 3 kann gleitend zwischen zwei verschiedenen Wellenformen interpolieren. </translation>
     </message>
     <message>
         <source>The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. Each sub-osc can be set to produce a different waveform, and oscillator 3 can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied to both sub-oscs/waveforms in the exact same way. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der SUB Regler ändert das Mischverhältnis der beiden Unter-Oszillatoren von Oszillator 3. Jeder Unter-Oszillator kann auf eine andere Wellenform eingestellt werden und Oszillator 3 kann zwischen diesen gleitend interpolieren. Alle eingehenden Modulationen zu Oszillator 3 werden auf beide Unter-Oszillator/Wellenformen auf gleiche Weise angewandt. </translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
-        <translation type="unfinished"></translation>
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
+
+Mix-Modus bedeutet keine Modulation: Die Ausgaben der Oszillatoren werden einfach zusammengemischt. </translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
-        <translation type="unfinished"></translation>
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
+
+AM bedeutet Amplituden-Modulation: Die Amplitude (Lautstärke) von Oszillator 3 wird durch Oszillator 2 moduliert. </translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
-        <translation type="unfinished"></translation>
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
+
+FM bedeutet Frequenz-Modulation: Die Frequenz (Tonhöhe) von Oszillator 3 wird durch Oszillator 2 Moduliert. Die Frequenz-Modulation ist als Phasen-Modulation implementiert, was eine stabielere Gesamttonhöhe erzeugt, als »reine« Frequenz-Modulation. </translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
-        <translation type="unfinished"></translation>
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
+
+PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 2 moduliert. Es unterscheidet sich von der Frequenz-Modulation dadurch, dass die Phasenänderungen nicht zunehmend sind. </translation>
     </message>
     <message>
         <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation type="unfinished"></translation>
+        <translation>Die Wellenform für LFO 1 auswählen. 
+»Zufällig« und »Zufällig gleitend« sind spzielle Wellenformen: Sie erzeugen zufällige Ausgabe, wobei die Rate des LFO kontrolliert, wie oft sich der Zustand des LFO ändert. Die gleitende Version intrpoliert zwischen diesen Zuständen mit Cosinus-Interpolation. Diese zufälligen Modi können benutzt werden um Ihren Presets »Leben« zu geben - Etwas von der analogen Unberechenbarkeit hinzuzufügen… </translation>
     </message>
     <message>
         <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation type="unfinished"></translation>
+        <translation>Die Wellenform für LFO 2 auswählen. 
+»Zufällig« und »Zufällig gleitend« sind spzielle Wellenformen: Sie erzeugen zufällige Ausgabe, wobei die Rate des LFO kontrolliert, wie oft sich der Zustand des LFO ändert. Die gleitende Version intrpoliert zwischen diesen Zuständen mit Cosinus-Interpolation. Diese zufälligen Modi können benutzt werden um Ihren Presets »Leben« zu geben - Etwas von der analogen Unberechenbarkeit hinzuzufügen… </translation>
     </message>
     <message>
         <source>Attack causes the LFO to come on gradually from the start of the note. </source>
-        <translation type="unfinished"></translation>
+        <translation>Anschwellzeit verursacht, dass der LFO allmählich vom Anfang der Note angeht. </translation>
     </message>
     <message>
         <source>Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. </source>
-        <translation type="unfinished"></translation>
+        <translation>Rate setzt die Geschwindigkeit des LFO, in Millisekunden pro Durchlauf gemessen. Kann zum Tempo synchronisiert werden. </translation>
     </message>
     <message>
         <source>PHS controls the phase offset of the LFO. </source>
-        <translation type="unfinished"></translation>
+        <translation>PHS kontrolliert die Phasenverschiebung des LFO. </translation>
     </message>
     <message>
         <source>PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. </source>
-        <translation type="unfinished"></translation>
+        <translation>PRE, oder Vor-Verzögerung, verzögert den Beginn der Hüllkurve vom Anfang der Note. 0 bedeutet keine Verzögerung. </translation>
     </message>
     <message>
         <source>ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. A value of 0 means instant. </source>
-        <translation type="unfinished"></translation>
+        <translation>ATT, oder Anschwellzeit, kontrolliert wie schnell die Hüllkurve am Anfang steigt, in Millisekunden gemessen. Ein Wert von 0 bedeutet sofort. </translation>
     </message>
     <message>
         <source>HOLD controls how long the envelope stays at peak after the attack phase. </source>
-        <translation type="unfinished"></translation>
+        <translation>HOLD kontrolliert, wie lange die Hüllkurve nach der Anschwellphase an der Spitze bleibt. </translation>
     </message>
     <message>
         <source>DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds it would take to go from peak to zero. The actual decay may be shorter if sustain is used. </source>
-        <translation type="unfinished"></translation>
+        <translation>DEC, oder Abschwellzeit, kontrolliert, wie schnell die Hüllkurve von ihrer Spitze auf Null abfällt, in Millisekunden gemessen. Die tatsächliche Abschwellzeit ist möglicherweise kürzer, wenn Dauerpegel benutzt wird. </translation>
     </message>
     <message>
         <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
-        <translation type="unfinished"></translation>
+        <translation>SUS, oder Dauerpegel, kontrolliert den Dauerpgel der Hüllkurve. Die Abfall-Phase geht nicht unter diesen Pegel, solange die Note gehalten wird. </translation>
     </message>
     <message>
         <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
-        <translation type="unfinished"></translation>
+        <translation>REL, oder Ausklingzeit, kontrolliert, wie lange die Ausklingzeit für die Note von ihrer Spitze auf Null ist, gemessen in Millisekunden. Die tatsächliche Ausklingzeit ist möglicherweise kürzer, abhängig davon, in welcher Phase die Note losgelassen wird. </translation>
     </message>
     <message>
         <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der Neigung-Regler kontrolliert die Kurve oder Form der Hüllkurve. Ein Wert von 0 erzeugt einen direkten Anstieg und Abfall. Negative Werte erzeugen Kurven, die langsam starten, schnell die Spitze erreichen und wieder langsam abfallen. Positive Werte erzeugen Kurven, die schnell starten und enden und länger in der Nähe der Spitze bleiben. </translation>
     </message>
 </context>
 <context>
     <name>NesInstrument</name>
     <message>
         <source>Channel 1 Coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 1 Grob-Verstimmung</translation>
     </message>
     <message>
         <source>Channel 1 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 1 Lautstärke</translation>
     </message>
     <message>
         <source>Channel 1 Envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 1 Hüllkurvenlänge</translation>
     </message>
     <message>
         <source>Channel 1 Duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 1 Tastgrad</translation>
     </message>
     <message>
         <source>Channel 1 Sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 1 Streichmenge</translation>
     </message>
     <message>
         <source>Channel 1 Sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 1 Streichrate</translation>
     </message>
     <message>
         <source>Channel 2 Coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 2 Grob-Verstimmung</translation>
     </message>
     <message>
         <source>Channel 2 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 2 Lautstärke</translation>
     </message>
     <message>
         <source>Channel 2 Envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 2 Hüllkurvenlänge</translation>
     </message>
     <message>
         <source>Channel 2 Duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 2 Tastgrad</translation>
     </message>
     <message>
         <source>Channel 2 Sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 2 Streichmenge</translation>
     </message>
     <message>
         <source>Channel 2 Sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 2 Streichrate</translation>
     </message>
     <message>
         <source>Channel 3 Coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 3 Grob-Verstimmung</translation>
     </message>
     <message>
         <source>Channel 3 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 3 Lautstärke</translation>
     </message>
     <message>
         <source>Channel 4 Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 4 Lautstärke</translation>
     </message>
     <message>
         <source>Channel 4 Envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 4 Hüllkurvenlänge</translation>
     </message>
     <message>
         <source>Channel 4 Noise frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 4 Rauschfrequenz</translation>
     </message>
     <message>
         <source>Channel 4 Noise frequency sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal 4 Rauschfrequenz-Streichen</translation>
     </message>
     <message>
         <source>Master volume</source>
-        <translation type="unfinished">Master-Lautstärke</translation>
+        <translation>Master-Lautstärke</translation>
     </message>
     <message>
         <source>Vibrato</source>
-        <translation type="unfinished">Vibrato</translation>
+        <translation>Vibrato</translation>
     </message>
 </context>
 <context>
@@ -3561,11 +3731,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Osc %1 phase-offset</source>
-        <translation>Oszillator %1 Phasen-Verschiebung</translation>
+        <translation>Oszillator %1 Phasenverschiebung</translation>
     </message>
     <message>
         <source>Osc %1 stereo phase-detuning</source>
-        <translation>Oszillator %1 Stereo Phasen-Verschiebung</translation>
+        <translation>Oszillator %1 Stereo Phasenverschiebung</translation>
     </message>
     <message>
         <source>Osc %1 wave shape</source>
@@ -3581,7 +3751,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Osc %1 harmonic</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator %1 Harmonie</translation>
     </message>
 </context>
 <context>
@@ -3636,8 +3806,8 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
-        <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
-Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
+        <translation>Doppelklick, um dieses Pattern im Piano-Roll zu öffnen
+Lautstärke eines Schritts kann mit dem Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
@@ -3840,11 +4010,11 @@ Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klicken Sie hier, um die markierten Noten in die Zwischenablage auszuschneiden. Sie können sie überall in einem beliebigen Pattern wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation>Klicken Sie hier, um die markierten Noten in die Zwischenablage auszuschneiden. Sie können sie überall in einem beliebigen Pattern wieder einfügen, indem Sie auf den Einfügen-Knopf klicken.</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klicken Sie hier, um die markierten Noten in die Zwischenablage zu kopieren. Sie können sie überall in einem beliebigen Pattern wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation>Klicken Sie hier, um die markierten Noten in die Zwischenablage zu kopieren. Sie können sie überall in einem beliebigen Pattern wieder einfügen, indem Sie auf den Einfügen-Knopf klicken.</translation>
     </message>
     <message>
         <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
@@ -3907,44 +4077,44 @@ Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
         <translation>Kein Akkord</translation>
     </message>
     <message>
-        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Volume: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke: %1%</translation>
     </message>
     <message>
         <source>Panning: %1% left</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance: %1% links</translation>
     </message>
     <message>
         <source>Panning: %1% right</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance: %1% rechts</translation>
     </message>
     <message>
         <source>Panning: center</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance: mittig</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
+        <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
+    </message>
+    <message>
+        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
+        <translation>Dies kontrolliert die Vergrößerung einer Axe. Es kann hilfreich für bestimmte Aufgaben sein, eine Vergrößerung auszuwählen. Für normales Bearbeiten, sollte die Vergrößerung an Ihre kleinsten Noten angepasst sein. </translation>
+    </message>
+    <message>
+        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
+        <translation>Das »Q« steht für Quantisierung und kontrolliert die Rastergröße an denen Noten und Kontrollpunkte einrasten. Mit kleineren Quantisierungswerten können Sie kleinere Noten im Piano Roll und exaktere Kontrollpunkte im Automation-Editor eintragen.</translation>
+    </message>
+    <message>
+        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
+        <translation>Dies lässt Sie die Länge von neuen Noten auswählen. »Letzte Note« bedeutet, dass LMMS die Länge der Note benutz, die Sie als letzes bearbeitet haben.</translation>
+    </message>
+    <message>
+        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
+        <translation>Diese Funktion ist direkt mit dem Kontextmenü auf dem virtuellen Keyboard, links im Piano Roll, verbunden. Nachdem Sie die Tonleiter ausgewählt haben, die Sie im Aufklapp-Menü haben möchten, können Sie auf eine gewünschte Taste auf dem virtuellen Keyboard einen Rechtsklick machen und »Aktuelle Tonleiter markieren« auswählen. LMMS markiert dann alle Noten, die zu dieser Tonleiter und Taste gehören, die Sie ausgewählt haben!</translation>
+    </message>
+    <message>
+        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
+        <translation>Lässt Sie einen Akkord auswählen, den LMMS dann eintragen oder markieren kann. Sie können die am häufigsten benutzten Akkorde in diesem Aufklapp-Menü finden. Nachdem Sie einen Akkord ausgewählt haben, klicken Sie irgendwo hin, um den Akkord dort zu platzieren oder machen Sie einen Rechtsklick auf dem virtuellen Keyboard, um das Kontextmenü zu öffnen und den Akkord zu makieren. Um Noten wieder einzeln einzutragen, müssen Sie »Kein Akkord« in diesem Aufklapp-Menü auswählen.</translation>
     </message>
 </context>
 <context>
@@ -3963,8 +4133,8 @@ Lautstärke eines Schritts kann mit Mausrad geändert werden</translation>
     <message>
         <source>The plugin &quot;%1&quot; wasn&apos;t found or could not be loaded!
 Reason: &quot;%2&quot;</source>
-        <translation>Das Plugin &quot;%1&quot; konnte nicht gefunden oder geladen werden!
-Grund: &quot;%2&quot;</translation>
+        <translation>Das Plugin »%1« konnte nicht gefunden oder geladen werden!
+Grund: »%2«</translation>
     </message>
     <message>
         <source>Error while loading plugin</source>
@@ -3972,11 +4142,26 @@ Grund: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Failed to load plugin &quot;%1&quot;!</source>
-        <translation>Das Plugin &quot;%1&quot; konnte nicht geladen werden!</translation>
+        <translation>Das Plugin »%1« konnte nicht geladen werden!</translation>
     </message>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS Plugin %1 hat keinen Plugin-Deskriptor namens %2!</translation>
+    </message>
+</context>
+<context>
+    <name>PluginBrowser</name>
+    <message>
+        <source>Instrument plugins</source>
+        <translation>Instrument-Plugins</translation>
+    </message>
+    <message>
+        <source>Instrument browser</source>
+        <translation>Instrument-Browser</translation>
+    </message>
+    <message>
+        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <translation>Ziehen Sie ein Instrument entweder in den Song-Editor, den Beat+Bassline-Editor oder in eine existierende Instrumentspur.</translation>
     </message>
 </context>
 <context>
@@ -4422,10 +4607,6 @@ Grund: &quot;%2&quot;</translation>
         <translation>Benutzerdefiniert...</translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
-    </message>
-    <message>
         <source>Custom </source>
         <translation> Benutzerdefiniert</translation>
     </message>
@@ -4556,7 +4737,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the volume of oscillator %1. When setting a value of 0 the oscillator is turned off. Otherwise you can hear the oscillator as loud as you set it here.</source>
-        <translation>Mit diesem Knopf können Sie die Lautstärke von Oszillator %1 setzen. Wenn Sie einen Wert von 0 setzen, wird der Oszillator ausgeschaltet. Ansonsten können Sie ihn so laut hören, wie Sie es hier einstellen.</translation>
+        <translation>Mit diesem Regler können Sie die Lautstärke von Oszillator %1 setzen. Wenn Sie einen Wert von 0 setzen, wird der Oszillator ausgeschaltet. Ansonsten können Sie ihn so laut hören, wie Sie es hier einstellen.</translation>
     </message>
     <message>
         <source>Osc %1 panning:</source>
@@ -4564,7 +4745,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the panning of the oscillator %1. A value of -100 means 100% left and a value of 100 moves oscillator-output right.</source>
-        <translation>Mit diesem Knopf können Sie die Balance von Oszillator %1 setzen. Ein Wert von -100 heißt 100% links und ein Wert von 100 verschiebt den Oszillator-Ausgang nach rechts.</translation>
+        <translation>Mit diesem Regler können Sie die Balance von Oszillator %1 setzen. Ein Wert von -100 heißt 100% links und ein Wert von 100 verschiebt den Oszillator-Ausgang nach rechts.</translation>
     </message>
     <message>
         <source>Osc %1 coarse detuning:</source>
@@ -4576,7 +4757,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Mit diesem Knopf können Sie die grobe Verstimmung von Oszillator %1 setzen. Sie können den Oszillator 12 Halbtöne (1 Oktave) nach oben und unten verstimmen. Das ist nützlich, wenn Sie einen Sound mit einem Akkord erstellen möchten.</translation>
+        <translation>Mit diesem Regler können Sie die grobe Verstimmung von Oszillator %1 setzen. Sie können den Oszillator 12 Halbtöne (1 Oktave) nach oben und unten verstimmen. Das ist nützlich, wenn Sie einen Sound mit einem Akkord erstellen möchten.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -4588,7 +4769,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the left channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation>Mit diesem Knopf können Sie die Fein-Verstimmung von Oszillator %1 für den linken Kanal einstellen. Die Fein-Verstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um &quot;fette&quot; Sounds zu erzeugen.</translation>
+        <translation>Mit diesem Regler können Sie die Fein-Verstimmung von Oszillator %1 für den linken Kanal einstellen. Die Fein-Verstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um »fette« Sounds zu erzeugen.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning right:</source>
@@ -4596,11 +4777,11 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the right channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation>Mit diesem Knopf können Sie die Fein-Verstimmung von Oszillator %1 für den rechten Kanal einstellen. Die Fein-Verstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um &quot;fette&quot; Sounds zu erzeugen.</translation>
+        <translation>Mit diesem Regler können Sie die Fein-Verstimmung von Oszillator %1 für den rechten Kanal einstellen. Die Fein-Verstimmung liegt zwischen -100 Cent und +100 Cent. Das ist nützlich, um »fette« Sounds zu erzeugen.</translation>
     </message>
     <message>
         <source>Osc %1 phase-offset:</source>
-        <translation>Oszillator %1 Phasen-Verschiebung:</translation>
+        <translation>Oszillator %1 Phasenverschiebung:</translation>
     </message>
     <message>
         <source>degrees</source>
@@ -4608,15 +4789,15 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the phase-offset of oscillator %1. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation>Mit diesem Knopf können Sie die Phasen-Verschiebung von Oszillator %1 setzen. Das heißt, Sie können den Punkt innerhalb einer Schwingung verschieben, an dem der Oszillator anfangen soll zu schwingen. Wenn Sie zum Beispiel eine Sinus-Welle haben und eine Phasen-Verschiebung von 180 Grad einstellen, wird die Welle zu erst runter gehen. Das gleiche trifft auch bei einer Rechteck-Welle zu.</translation>
+        <translation>Mit diesem Regler können Sie die Phasenverschiebung von Oszillator %1 setzen. Das heißt, Sie können den Punkt innerhalb einer Schwingung verschieben, an dem der Oszillator anfangen soll zu schwingen. Wenn Sie zum Beispiel eine Sinuswelle haben und eine Phasenverschiebung von 180 Grad einstellen, wird die Welle zu erst runter gehen. Das gleiche trifft auch bei einer Rechteckwelle zu.</translation>
     </message>
     <message>
         <source>Osc %1 stereo phase-detuning:</source>
-        <translation>Oszillator %1 Stereo Phasen-Verschiebung:</translation>
+        <translation>Oszillator %1 Stereo Phasenverschiebung:</translation>
     </message>
     <message>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo sounds.</source>
-        <translation>Mit diesem Knopf können Sie die Stereo Phasen-Verschiebung von Oszillator %1 setzen. Die Stereo Phasen-Verschiebung gibt die Differenz zwischen den Phasen-Verschiebungen zwischen dem linken und rechten Kanal an. Dies eignet sich gut, um großräumig-klingende Stereo-Klänge zu erzeugen.</translation>
+        <translation>Mit diesem Regler können Sie die Stereo Phasenverschiebung von Oszillator %1 setzen. Die Stereo Phasenverschiebung gibt die Differenz zwischen den Phasenverschiebungen zwischen dem linken und rechten Kanal an. Dies eignet sich gut, um großräumig-klingende Stereo-Klänge zu erzeugen.</translation>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
@@ -4624,7 +4805,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Use a triangle-wave for current oscillator.</source>
-        <translation>Dreieckswelle für aktuellen Oszillator nutzen.</translation>
+        <translation>Dreieckwelle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
@@ -4632,7 +4813,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Rechteckswelle für aktuellen Oszillator nutzen.</translation>
+        <translation>Rechteckwelle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use a moog-like saw-wave for current oscillator.</source>
@@ -4640,7 +4821,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Use an exponential wave for current oscillator.</source>
-        <translation>Exponentialwelle für aktuellen Oszillator nutzen.</translation>
+        <translation>Exponentielle Welle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
@@ -4649,17 +4830,6 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
         <translation>Benutzerdefinierte Wellenform für aktuellen Oszillator nutzen.</translation>
-    </message>
-</context>
-<context>
-    <name>Ui</name>
-    <message>
-        <source>Contributors ordered by number of commits:</source>
-        <translation>Mitwirkende sortiert nach der Anzahl an Einreichungen:</translation>
-    </message>
-    <message>
-        <source>Involved</source>
-        <translation>Beteiligt</translation>
     </message>
 </context>
 <context>
@@ -4681,7 +4851,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
-        <translation>Klicken Sie hier, um ein anderes VST-Plugin zu öffnen. Nachdem Sie auf diesen Button geklickt haben, erscheint ein Datei-öffnen-Dialog und Sie können Ihre Datei wählen.</translation>
+        <translation>Klicken Sie hier, um ein anderes VST-Plugin zu öffnen. Nachdem Sie auf diesen Knopf geklickt haben, erscheint ein Datei-öffnen-Dialog und Sie können Ihre Datei wählen.</translation>
     </message>
     <message>
         <source>Show/hide GUI</source>
@@ -4882,250 +5052,250 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <name>WatsynInstrument</name>
     <message>
         <source>Volume A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke A1</translation>
     </message>
     <message>
         <source>Volume A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke A2</translation>
     </message>
     <message>
         <source>Volume B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke B1</translation>
     </message>
     <message>
         <source>Volume B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke B2</translation>
     </message>
     <message>
         <source>Panning A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance A1</translation>
     </message>
     <message>
         <source>Panning A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance A2</translation>
     </message>
     <message>
         <source>Panning B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance B1</translation>
     </message>
     <message>
         <source>Panning B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance B2</translation>
     </message>
     <message>
         <source>Freq. multiplier A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenzmultiplikator-A1</translation>
     </message>
     <message>
         <source>Freq. multiplier A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenzmultiplikator-A2</translation>
     </message>
     <message>
         <source>Freq. multiplier B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenzmultiplikator-B1</translation>
     </message>
     <message>
         <source>Freq. multiplier B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenzmultiplikator-B2</translation>
     </message>
     <message>
         <source>Left detune A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Links-Verstimmung A1</translation>
     </message>
     <message>
         <source>Left detune A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Links-Verstimmung A2</translation>
     </message>
     <message>
         <source>Left detune B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Links-Verstimmung B1</translation>
     </message>
     <message>
         <source>Left detune B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Links-Verstimmung B2</translation>
     </message>
     <message>
         <source>Right detune A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts-Verstimmung A1</translation>
     </message>
     <message>
         <source>Right detune A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts-Verstimmung A2</translation>
     </message>
     <message>
         <source>Right detune B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts-Verstimmung B1</translation>
     </message>
     <message>
         <source>Right detune B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts-Verstimmung B2</translation>
     </message>
     <message>
         <source>A-B Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B Mischung</translation>
     </message>
     <message>
         <source>A-B Mix envelope amount</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B Mischung Hüllkurvenintensität</translation>
     </message>
     <message>
         <source>A-B Mix envelope attack</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B Mischung Hüllkurvenanschwellzeit</translation>
     </message>
     <message>
         <source>A-B Mix envelope hold</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B Mischung Hüllkurvenhaltezeit</translation>
     </message>
     <message>
         <source>A-B Mix envelope decay</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B Mischung Hüllkurvenabfallzeit</translation>
     </message>
     <message>
         <source>A1-B2 Crosstalk</source>
-        <translation type="unfinished"></translation>
+        <translation>A1-B2 Überlagerung</translation>
     </message>
     <message>
         <source>A2-A1 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>A2-A1 Modulation</translation>
     </message>
     <message>
         <source>B2-B1 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>B2-B1 Modulation</translation>
     </message>
     <message>
         <source>Selected graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählter Graph</translation>
     </message>
 </context>
 <context>
     <name>WatsynView</name>
     <message>
         <source>Select oscillator A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszilator A1 auswählen</translation>
     </message>
     <message>
         <source>Select oscillator A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszilator A2 auswählen</translation>
     </message>
     <message>
         <source>Select oscillator B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszilator B1 auswählen</translation>
     </message>
     <message>
         <source>Select oscillator B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszilator B2 auswählen</translation>
     </message>
     <message>
         <source>Mix output of A2 to A1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mische Ausgang von A2 zu A1</translation>
     </message>
     <message>
         <source>Modulate amplitude of A1 with output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Amplitude von A1 mit der Ausgabe von A2 modulieren</translation>
     </message>
     <message>
         <source>Ring-modulate A1 and A2</source>
-        <translation type="unfinished"></translation>
+        <translation>A1 und A2 ringmodulieren</translation>
     </message>
     <message>
         <source>Modulate phase of A1 with output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase von A1 mit der Ausgabe von A2 modulieren</translation>
     </message>
     <message>
         <source>Mix output of B2 to B1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mische Ausgang von B2 zu B1</translation>
     </message>
     <message>
         <source>Modulate amplitude of B1 with output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Amplitude von B1 mit der Ausgabe von B2 modulieren</translation>
     </message>
     <message>
         <source>Ring-modulate B1 and B2</source>
-        <translation type="unfinished"></translation>
+        <translation>B1 und B2 ringmodulieren</translation>
     </message>
     <message>
         <source>Modulate phase of B1 with output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase von B1 mit der Ausgabe von B2 modulieren</translation>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
-        <translation type="unfinished">Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen.</translation>
+        <translation>Zeichnen Sie heier eigene Wellenformen, indem Sie die Maus über den Graph ziehen.</translation>
     </message>
     <message>
         <source>Load waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>Wellenform laden</translation>
     </message>
     <message>
         <source>Click to load a waveform from a sample file</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken Sie hier, um eine Wellenform aus einer Sampledatei zu laden</translation>
     </message>
     <message>
         <source>Phase left</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach links verschieben</translation>
     </message>
     <message>
         <source>Click to shift phase by -15 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken Sie hier, um die Phase um -15 Grad zu verscheiben</translation>
     </message>
     <message>
         <source>Phase right</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach rechts verschieben</translation>
     </message>
     <message>
         <source>Click to shift phase by +15 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken Sie hier, um die Phase um +15 Grad zu verscheiben</translation>
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished">Normalisieren</translation>
+        <translation>Normalisieren</translation>
     </message>
     <message>
         <source>Click to normalize</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken zum Normalisieren</translation>
     </message>
     <message>
         <source>Invert</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertieren</translation>
     </message>
     <message>
         <source>Click to invert</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken zum Invertieren</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished">Glätten</translation>
+        <translation>Glätten</translation>
     </message>
     <message>
         <source>Click to smooth</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken zum Glätten</translation>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished">Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Click for sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken für Sinuswelle</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished">Dreiecks-Welle</translation>
+        <translation>Dreieckwelle</translation>
     </message>
     <message>
         <source>Click for triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken für Dreieckwelle</translation>
     </message>
     <message>
         <source>Click for saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken für Sägezahnwelle</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished">Rechtecks-Welle</translation>
+        <translation>Rechteckwelle</translation>
     </message>
     <message>
         <source>Click for square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken für Rechteckwelle</translation>
     </message>
 </context>
 <context>
@@ -5258,27 +5428,27 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Loopback point</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholungspunkt</translation>
     </message>
     <message>
         <source>Loop mode</source>
-        <translation type="unfinished">Modus beim Wiederholen</translation>
+        <translation>Wiederholungsmodus</translation>
     </message>
     <message>
         <source>Interpolation mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolationsmodus</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Keiner</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear</translation>
     </message>
     <message>
         <source>Sinc</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinc</translation>
     </message>
 </context>
 <context>
@@ -5340,7 +5510,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbe auf Standard zurücksetzen</translation>
     </message>
 </context>
 <context>
@@ -5369,19 +5539,19 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Dreiecks-Welle</translation>
+        <translation>Dreieckwelle</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Rechtecks-Welle</translation>
+        <translation>Rechteckwelle</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -5417,7 +5587,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klick für eine Dreieckswelle.</translation>
+        <translation>Klick für eine Dreieckwelle.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
@@ -5425,7 +5595,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klick für eine Rechteckswelle.</translation>
+        <translation>Klick für eine Rechteckwelle.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -5434,6 +5604,17 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <message>
         <source>Click here for a user-defined shape.</source>
         <translation>Klick für eine benutzerdefinierte Wellenform.</translation>
+    </message>
+</context>
+<context>
+    <name>captionMenu</name>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
+    </message>
+    <message>
+        <source>Help (not available)</source>
+        <translation>Hilfe (nicht verfügbar)</translation>
     </message>
 </context>
 <context>
@@ -5609,39 +5790,39 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Länge</translation>
     </message>
     <message>
         <source>Distortion Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzerrungsanfang</translation>
     </message>
     <message>
         <source>Distortion End</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzerrungsende</translation>
     </message>
     <message>
         <source>Envelope Slope</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurvenneigung</translation>
     </message>
     <message>
         <source>Noise</source>
-        <translation type="unfinished">Rauschen</translation>
+        <translation>Rauschen</translation>
     </message>
     <message>
         <source>Click</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick</translation>
     </message>
     <message>
         <source>Frequency Slope</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenzabfall</translation>
     </message>
     <message>
         <source>Start from note</source>
-        <translation type="unfinished"></translation>
+        <translation>Starte bei Note</translation>
     </message>
     <message>
         <source>End to note</source>
-        <translation type="unfinished"></translation>
+        <translation>Ende bei Note</translation>
     </message>
 </context>
 <context>
@@ -5660,39 +5841,35 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>Frequency Slope:</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenzabfall:</translation>
     </message>
     <message>
         <source>Envelope Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurvenlänge:</translation>
     </message>
     <message>
         <source>Envelope Slope:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hüllkurvenneigung:</translation>
     </message>
     <message>
         <source>Click:</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick:</translation>
     </message>
     <message>
         <source>Noise:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rauschen:</translation>
     </message>
     <message>
         <source>Distortion Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzerrungsanfang:</translation>
     </message>
     <message>
         <source>Distortion End:</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzerrungsende:</translation>
     </message>
 </context>
 <context>
     <name>knob</name>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
-    </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
@@ -5700,6 +5877,14 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     <message>
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
         <translation>Bitte geben Sie einen Wert zwischen -96.0 dBV und 6.0 dBV ein:</translation>
+    </message>
+    <message>
+        <source>Set linear</source>
+        <translation>Linear einstellen</translation>
+    </message>
+    <message>
+        <source>Set logarithmic</source>
+        <translation>Logarithmisch einstellen</translation>
     </message>
 </context>
 <context>
@@ -5914,7 +6099,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
@@ -5922,27 +6107,27 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Dreiecks-Welle</translation>
+        <translation>Dreieckwelle</translation>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klick für eine Dreieckswelle.</translation>
+        <translation>Klick für eine Dreieckwelle.</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Rechtecks-Welle</translation>
+        <translation>Rechteckwelle</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klick für eine Rechteckswelle.</translation>
+        <translation>Klick für eine Rechteckwelle.</translation>
     </message>
     <message>
         <source>Rounded square wave</source>
-        <translation>Abgerundete Rechtecks-Welle</translation>
+        <translation>Abgerundete Rechteckwelle</translation>
     </message>
     <message>
         <source>Click here for a square-wave with a rounded end.</source>
-        <translation>Klick für eine abgerundete Rechtecks-Welle.</translation>
+        <translation>Klick für eine abgerundete Rechteckwelle.</translation>
     </message>
     <message>
         <source>Moog wave</source>
@@ -5954,7 +6139,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Click for a sine-wave.</source>
@@ -5966,7 +6151,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klick für eine Exponential-Welle.</translation>
+        <translation>Klick für eine exponentielle-Welle.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -5974,35 +6159,35 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Bandlimited saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbegrenzte Sägezahnwelle</translation>
     </message>
     <message>
         <source>Click here for bandlimited saw wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick für eine bandbegrenzte Sägezahnwelle.</translation>
     </message>
     <message>
         <source>Bandlimited square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbegrenzte Rechteckwelle</translation>
     </message>
     <message>
         <source>Click here for bandlimited square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick für eine bandbegrenzte Rechteckwelle.</translation>
     </message>
     <message>
         <source>Bandlimited triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandlimittierte Dreieckwelle</translation>
     </message>
     <message>
         <source>Click here for bandlimited triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick für eine bandbegrenzte Dreieckwelle.</translation>
     </message>
     <message>
         <source>Bandlimited moog saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbegrenzte Moog-Sägezahnwelle</translation>
     </message>
     <message>
         <source>Click here for bandlimited moog saw wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klick für eine bandbegrenzte Moog-Sägezahnwelle.</translation>
     </message>
 </context>
 <context>
@@ -6401,7 +6586,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Close VST effect knob-controller window.</source>
-        <translation>VST Effekt Knopf-Controllerfenster schließen.</translation>
+        <translation>VST Effekt Regler-Controllerfenster schließen.</translation>
     </message>
 </context>
 <context>
@@ -6432,14 +6617,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Close VST plugin knob-controller window.</source>
-        <translation>VST Effekt Knopf-Controllerfenster schließen.</translation>
-    </message>
-</context>
-<context>
-    <name>nineButtonSelector</name>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
+        <translation>VST Effekt Regler-Controllerfenster schließen.</translation>
     </message>
 </context>
 <context>
@@ -6482,7 +6660,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Op 1 Key Scaling Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Op 1 Tonart Skalierungsrate</translation>
     </message>
     <message>
         <source>Op 1 Percussive Envelope</source>
@@ -6530,7 +6708,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Op 2 Key Scaling Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Op 2 Tonart Skalierungsrate</translation>
     </message>
     <message>
         <source>Op 2 Percussive Envelope</source>
@@ -6604,23 +6782,23 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>The distortion knob adds distortion to the output of the instrument. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der Verzerrungsregler fügt Verzerrung zur Ausgabe des Instruments hinzu.</translation>
     </message>
     <message>
         <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der Lautstärkeregler kontrolliert die Lautstärke des Instruments. Er ist gleich dem Lautstärkeregler des Instrumentenfensters. </translation>
     </message>
     <message>
         <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
-        <translation type="unfinished"></translation>
+        <translation>Der Zufallsknopf setzt alle Regler auf zufällige Werte, außer den Harmonien, der Hauptlautstärke und den Verzerrungsreglern. </translation>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator %1 Stereo Verstimmung</translation>
     </message>
     <message>
         <source>Osc %1 harmonic:</source>
-        <translation type="unfinished"></translation>
+        <translation>Oszillator %1 Harmonie:</translation>
     </message>
 </context>
 <context>
@@ -6707,7 +6885,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Treble</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhe</translation>
     </message>
     <message>
         <source>Bass</source>
@@ -6802,11 +6980,11 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Treble:</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhe:</translation>
     </message>
     <message>
         <source>Treble</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhe</translation>
     </message>
     <message>
         <source>Bass:</source>
@@ -6874,7 +7052,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>The duty cycle is the ratio of the duration (time) that a signal is ON versus the total period of the signal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Tastgrad ist das Verhältnis der Dauter (Zeit), in dem das Signal AN ist, im Gegensatz zur gesamten Periodendauer des Signals.</translation>
     </message>
     <message>
         <source>Square Channel 1 Volume</source>
@@ -6891,10 +7069,6 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
 </context>
 <context>
     <name>pluginBrowser</name>
-    <message>
-        <source>Instrument plugins</source>
-        <translation>Instrument-Plugins</translation>
-    </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
         <translation>VST-Host zum Benutzen von VST(i)-Plugins innerhalb von LMMS</translation>
@@ -6958,14 +7132,6 @@ This chip was used in the Commodore 64 computer.</source>
 Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     </message>
     <message>
-        <source>Instrument browser</source>
-        <translation>Instrument-Browser</translation>
-    </message>
-    <message>
-        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation>Ziehen Sie ein Instrument entweder in den Song-Editor, den Beat+Bassline-Editor oder in eine existierende Instrumentspur.</translation>
-    </message>
-    <message>
         <source>Player for SoundFont files</source>
         <translation>Wiedergabe von SoundFont-Dateien</translation>
     </message>
@@ -7006,16 +7172,32 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
         <translation>Graphisches Spektrumanalyzer Plugin</translation>
     </message>
     <message>
+        <source>A NES-like synthesizer</source>
+        <translation>Ein NES ähnlicher Synthesizer</translation>
+    </message>
+    <message>
         <source>Boost your bass the fast and simple way</source>
         <translation>Verstärken Sie Ihren Bass auf schnellen und einfachen Wege</translation>
+    </message>
+    <message>
+        <source>4-oscillator modulatable wavetable synth</source>
+        <translation>4-Oszillator modulierbarer Wellenformtabellen Synth</translation>
     </message>
     <message>
         <source>plugin for waveshaping</source>
         <translation>Plugin für Wellenformen</translation>
     </message>
     <message>
+        <source>Monstrous 3-oscillator synth with modulation matrix</source>
+        <translation>Monströser 3-Oszillator Synth mit Modulationsmatrix</translation>
+    </message>
+    <message>
         <source>plugin for using arbitrary VST effects inside LMMS.</source>
         <translation>Plugin um beliebige VST-Effekte in LMMS zu benutzen.</translation>
+    </message>
+    <message>
+        <source>Versatile drum synthesizer</source>
+        <translation>Vielseitiger Trommel-Synthesizer</translation>
     </message>
     <message>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
@@ -7023,31 +7205,19 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation>Drei mächtige Oszillatoren, die Sie auf mehrere Arten modulieren können</translation>
-    </message>
-    <message>
-        <source>Monstrous 3-oscillator synth with modulation matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Drei mächtige Oszillatoren, die Sie auf mehrere Weisen modulieren können</translation>
     </message>
     <message>
         <source>Carla Rack Instrument</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4-oscillator modulatable wavetable synth</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Versatile drum synthesizer</source>
-        <translation type="unfinished"></translation>
+        <translation>Carla Rack Instrument</translation>
     </message>
     <message>
         <source>Carla Patchbay Instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>Carla Patchbay Instrument</translation>
     </message>
     <message>
-        <source>A NES-like synthesizer</source>
-        <translation type="unfinished"></translation>
+        <source>A native delay plugin</source>
+        <translation>Ein natives Verzögerung-Plugin</translation>
     </message>
 </context>
 <context>
@@ -7350,7 +7520,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Compact track buttons</source>
-        <translation>Kompakte Track-Buttons</translation>
+        <translation>Kompakte Spur-Knöpfe</translation>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
@@ -7375,6 +7545,57 @@ Latenz: %2 ms</translation>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
         <translation>Wiedergabe-Courser im AudioFileProcessor anzeigen</translation>
+    </message>
+</context>
+<context>
+    <name>setupWidget</name>
+    <message>
+        <source>OSS (Open Sound System)</source>
+        <translation>OSS (Open Sound System)</translation>
+    </message>
+    <message>
+        <source>SDL (Simple DirectMedia Layer)</source>
+        <translation>SDL (Simple DirectMedia Layer)</translation>
+    </message>
+    <message>
+        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA-Sequencer (Advanced Linux Sound Architecture)</translation>
+    </message>
+    <message>
+        <source>JACK (JACK Audio Connection Kit)</source>
+        <translation>JACK (JACK Audio Connection Kit)</translation>
+    </message>
+    <message>
+        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
+    </message>
+    <message>
+        <source>PulseAudio (bad latency!)</source>
+        <translation>PulseAudio (Schlechte Latenz!)</translation>
+    </message>
+    <message>
+        <source>Dummy (no sound output)</source>
+        <translation>Dummy (Keine Soundausgabe)</translation>
+    </message>
+    <message>
+        <source>Dummy (no MIDI support)</source>
+        <translation>Dummy (Keine MIDI-Unterstützung)</translation>
+    </message>
+    <message>
+        <source>WinMM MIDI</source>
+        <translation>WinMM MIDI</translation>
+    </message>
+    <message>
+        <source>OSS Raw-MIDI (Open Sound System)</source>
+        <translation>OSS Raw-MIDI (Open Sound System)</translation>
+    </message>
+    <message>
+        <source>ALSA (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA (Advanced Linux Sound Architecture)</translation>
+    </message>
+    <message>
+        <source>PortAudio</source>
+        <translation>PortAudio</translation>
     </message>
 </context>
 <context>
@@ -7484,7 +7705,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
-        <translation>Dieser knopf aktiviert den Chorus-Effekt. Das ist nützlich für Echo-Effekte, funktioniert jedoch nur mit Dateien, die dies unterstützen.</translation>
+        <translation>Dieser Knopf aktiviert den Chorus-Effekt. Das ist nützlich für Echo-Effekte, funktioniert jedoch nur mit Dateien, die dies unterstützen.</translation>
     </message>
     <message>
         <source>Chorus Lines:</source>
@@ -7609,11 +7830,11 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Triangle Wave</source>
-        <translation>Dreiecks-Welle</translation>
+        <translation>Dreieckwelle</translation>
     </message>
     <message>
         <source>SawTooth</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -7649,7 +7870,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>The Pulse Width resolution allows the width to be smoothly swept with no discernable stepping. The Pulse waveform on Oscillator %1 must be selected to have any audible effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Pulsweitenauflösung ermöglicht es die Weite gleitend, ohne erkennbare Schritte zu ändern. Die Puls-Wellenform von Oszillator %1 muss ausgewählt werden, um eine hörbaren Effekt zu haben.</translation>
     </message>
     <message>
         <source>The Coarse detuning allows to detune Voice %1 one octave up or down.</source>
@@ -7657,11 +7878,11 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Sync synchronizes the fundamental frequency of Oscillator %1 with the fundamental frequency of Oscillator %2 producing &quot;Hard Sync&quot; effects.</source>
-        <translation>Sync synchronisiert die Grundfrequenz von Oszillator %1 mit der Grundfrequenz von Oszillator %2, was einen &quot;Hard Sync&quot; Effekt hervorruft.</translation>
+        <translation>Sync synchronisiert die Grundfrequenz von Oszillator %1 mit der Grundfrequenz von Oszillator %2, was einen »Hard Sync« Effekt hervorruft.</translation>
     </message>
     <message>
         <source>Ring-mod replaces the Triangle Waveform output of Oscillator %1 with a &quot;Ring Modulated&quot; combination of Oscillators %1 and %2.</source>
-        <translation>Ringmodus ersetzt die Dreiecks-Wellenfrom-Ausgabe von Oszillator %1 mit einer ringmodulierten Kombination der Oszillatoren %1 und %2.</translation>
+        <translation>Ringmodus ersetzt die Dreieck-Wellenfrom-Ausgabe von Oszillator %1 mit einer ringmodulierten Kombination der Oszillatoren %1 und %2.</translation>
     </message>
     <message>
         <source>When Filtered is on, Voice %1 will be processed through the Filter. When Filtered is off, Voice %1 appears directly at the output, and the Filter has no effect on it.</source>
@@ -7804,6 +8025,13 @@ Latenz: %2 ms</translation>
     </message>
 </context>
 <context>
+    <name>tabWidget</name>
+    <message>
+        <source>Settings for %1</source>
+        <translation>Einstellungen für %1</translation>
+    </message>
+</context>
+<context>
     <name>timeLine</name>
     <message>
         <source>Enable/disable auto-scrolling</source>
@@ -7915,7 +8143,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation>Drücken Sie &lt;Strg&gt; während des Klicks auf den Verschiebe-Griff, um eine neue Drag&apos;n&apos;Drop-Aktion zu beginnen.</translation>
+        <translation>Drücken Sie &lt;Strg&gt; während des Klicks auf den Verschiebe-Griff, um eine neue Klicken und Ziehen-Aktion zu beginnen.</translation>
     </message>
     <message>
         <source>Actions for this track</source>
@@ -7934,16 +8162,16 @@ Latenz: %2 ms</translation>
         <translation>Solo</translation>
     </message>
     <message>
-        <source>Clear this track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Turn all recording on</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Aufnahmen einschalten</translation>
     </message>
     <message>
         <source>Turn all recording off</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Aufnahmen ausschalten</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation>Diese Spur leeren</translation>
     </message>
 </context>
 <context>
@@ -8018,7 +8246,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
-        <translation>Der &apos;V&apos;-Knopf setzt die Lautstärke der gewählten Saite.</translation>
+        <translation>Der »V«-Regler setzt die Lautstärke der gewählten Saite.</translation>
     </message>
     <message>
         <source>String stiffness:</source>
@@ -8026,7 +8254,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
-        <translation>Der &apos;S&apos;-Knopf setzt die Härte der gewählten Saite.  Die Härte der Saite beeinflusst deren Ausklang-Dauer.  Je kleiner die Einstellung, desto länger klingt die Saite aus.</translation>
+        <translation>Der »S«-Regler setzt die Härte der gewählten Saite.  Die Härte der Saite beeinflusst deren Ausklang-Dauer.  Je kleiner die Einstellung, desto länger klingt die Saite aus.</translation>
     </message>
     <message>
         <source>Pick position:</source>
@@ -8034,7 +8262,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
-        <translation>Der &apos;P&apos;-Knopf bestimmt die Position, an der die Saite angezupft wird.  Je kleiner die Einstellung, desto näher wird am Steg gezupft.</translation>
+        <translation>Der »P«-Regler bestimmt die Position, an der die Saite angezupft wird.  Je kleiner die Einstellung, desto näher wird am Steg gezupft.</translation>
     </message>
     <message>
         <source>Pickup position:</source>
@@ -8042,7 +8270,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
-        <translation>Der &apos;PU&apos;-Knopf bestimmt die Position, an der die Schwingungen an der gewählten Saite abgenommen werden.  Je kleiner die Einstellung, desto näher ist der Abnehmer am Steg.</translation>
+        <translation>Der »PU«-Regler bestimmt die Position, an der die Schwingungen an der gewählten Saite abgenommen werden.  Je kleiner die Einstellung, desto näher ist der Abnehmer am Steg.</translation>
     </message>
     <message>
         <source>Pan:</source>
@@ -8050,7 +8278,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
-        <translation>Der Balance-Knopf bestimmt den Ort der gewählten Saite im Stereo-Raum.</translation>
+        <translation>Der Balance-Regler bestimmt den Ort der gewählten Saite im Stereo-Raum.</translation>
     </message>
     <message>
         <source>Detune:</source>
@@ -8058,7 +8286,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
-        <translation>Der Verstimmungs-Knopf verändert die Tonhöhe der gewählten Saite.  Einstellungen kleiner als 0 lassen die Saite flacher klingen, während Werte über 0 zu einem eher scharfen Klang führen.</translation>
+        <translation>Der Verstimmungs-Regler verändert die Tonhöhe der gewählten Saite.  Einstellungen kleiner als 0 lassen die Saite flacher klingen, während Werte über 0 zu einem eher scharfen Klang führen.</translation>
     </message>
     <message>
         <source>Fuzziness:</source>
@@ -8066,7 +8294,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
-        <translation>Der Unschärfe-Knopf fügt dem Klang der Saite etwas &apos;Fuzz&apos; hinzu, welcher hauptsächlich während des Anschlages zum Tragen kommt, wenngleich er auch genutzt werden kann, um den Klang etwas metallischer zu gestalten.</translation>
+        <translation>Der Unschärfe-Regler fügt dem Klang der Saite etwas »Fuzz« hinzu, welcher hauptsächlich während des Anschlages zum Tragen kommt, wenngleich er auch genutzt werden kann, um den Klang etwas metallischer zu gestalten.</translation>
     </message>
     <message>
         <source>Length:</source>
@@ -8074,7 +8302,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
-        <translation>Der Länge-Knopf bestimmt die Länge der gewählten Saite.  Längere Saiten klingen länger und klingen heller, wobei sie gleichzeitig auch mehr CPU-Leistung fressen.</translation>
+        <translation>Der Länge-Regler bestimmt die Länge der gewählten Saite.  Längere Saiten klingen länger und klingen heller, wobei sie gleichzeitig auch mehr CPU-Leistung fressen.</translation>
     </message>
     <message>
         <source>Impulse or initial state</source>
@@ -8082,7 +8310,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
-        <translation>Mit dem &apos;Imp&apos;-Knopf legen Sie fest, ob die Wellenform in diesem Graph als Impuls zum Anzupfen der Saite oder als Grundstellung für die Saite genutzt werden soll.</translation>
+        <translation>Mit dem »Imp«-Knopf legen Sie fest, ob die Wellenform in diesem Graph als Impuls zum Anzupfen der Saite oder als Grundstellung für die Saite genutzt werden soll.</translation>
     </message>
     <message>
         <source>Octave</source>
@@ -8090,7 +8318,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
-        <translation>Mit dem Oktaven-Wähler kann der Oktavenversatz gegenüber der Note verändert werden.  So meint beispielsweise eine Einstellung von &apos;-2&apos;, dass die Saite zwei Oktaven unterhalb des Grundtons (&apos;F&apos;) schwingen wird und &apos;6&apos; dementsprechend 6 Oktaven über dem Grundton.</translation>
+        <translation>Mit dem Oktaven-Wähler kann der Oktavenversatz gegenüber der Note verändert werden.  So meint beispielsweise eine Einstellung von »-2«, dass die Saite zwei Oktaven unterhalb des Grundtons (»F«) schwingen wird und »6« dementsprechend 6 Oktaven über dem Grundton.</translation>
     </message>
     <message>
         <source>Impulse Editor</source>
@@ -8104,13 +8332,13 @@ The waveform can also be drawn in the graph.
 The &apos;S&apos; button will smooth the waveform.
 
 The &apos;N&apos; button will normalize the waveform.</source>
-        <translation>Der Wellenform-Editor ermöglicht die Kontrolle über die Grundstellung oder den Impuls, der genutzt wird, um die Saite zum Schwingen zu bringen.  Die Buttons rechts des Graphes initialisieren die Wellenform mit dem gewünschten Typ.  Der &apos;?&apos;-Button lässt Sie eine Wellenform aus einer Datei laden - allerdings werden nur die ersten 128 Samples geladen.
+        <translation>Der Wellenform-Editor ermöglicht die Kontrolle über die Grundstellung oder den Impuls, der genutzt wird, um die Saite zum Schwingen zu bringen.  Die Knöpfe rechts des Graphes initialisieren die Wellenform mit dem gewünschten Typ.  Der »?«-Knopf lässt Sie eine Wellenform aus einer Datei laden - allerdings werden nur die ersten 128 Samples geladen.
 
 Die Wellenform kann ebenfalls in dem Graph gezeichnet werden.
 
-Der &apos;S&apos;-Button glättet die Wellenform.
+Der »S«-Knopf glättet die Wellenform.
 
-Der &apos;N&apos;-Button normalisiert die Wellenform.</translation>
+Der »N«-Knopf normalisiert die Wellenform.</translation>
     </message>
     <message>
         <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
@@ -8124,15 +8352,15 @@ The &apos;V&apos; knob controls the volume.  The &apos;S&apos; knob controls the
 The &apos;Length&apos; knob controls the length of the string.
 
 The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
-        <translation>Vibed modelliert bis zu 9 unabhängige schwingende Saiten.  Der Saiten-Wähler ermöglicht die Wahl der gerade aktiven Saite.  Der &apos;Imp&apos;-Knopf bestimmt, ob der Graph einen Impuls oder die Grundstellung der Saite repräsentiert.  Der Oktaven-Wähler gibt den Oktavenversatz der Saite gegenüber dem Grundton an.
+        <translation>Vibed modelliert bis zu 9 unabhängige schwingende Saiten.  Der Saiten-Wähler ermöglicht die Wahl der gerade aktiven Saite.  Der »Imp«-Knopf bestimmt, ob der Graph einen Impuls oder die Grundstellung der Saite repräsentiert.  Der Oktaven-Wähler gibt den Oktavenversatz der Saite gegenüber dem Grundton an.
 
 Der Graph ermöglicht die Kontrolle über die Grundstellung der Saite oder den Impuls, der zum Anzupfen der Saite genutzt wird.
 
-Der &apos;V&apos;-Knopf bestimmt die Lautstärke.  Mit dem &apos;S&apos;-Knopf wird die Härte der Saite eingestellt. Der &apos;P&apos;-Knopf beeinflusst den Ort, an dem die Saite angezupft wird, während der &apos;PU&apos;-Knopf die Position des Abnehmers bestimmt.
+Der »V«-Regler bestimmt die Lautstärke.  Mit dem »S«-Regler wird die Härte der Saite eingestellt. Der »P«-Regler beeinflusst den Ort, an dem die Saite angezupft wird, während der »PU«-Regler die Position des Abnehmers bestimmt.
 
-&apos;Balance&apos; und &apos;Verstimmung&apos; bedürfen hoffentlich keiner Erklärung.  Der Unschärfe-Knopf fügt dem Klang der Saite etwas &apos;Fuzz&apos; hinzu.
+»Balance« und »Verstimmung« bedürfen hoffentlich keiner Erklärung.  Der Unschärfe-Regler fügt dem Klang der Saite etwas »Fuzz« hinzu.
 
-Der Länge-Knopf bestimmt die Länge der Saite.
+Der Länge-Regler bestimmt die Länge der Saite.
 
 Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</translation>
     </message>
@@ -8154,19 +8382,19 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sinus-Welle</translation>
+        <translation>Sinuswelle</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Dreiecks-Welle</translation>
+        <translation>Dreieckwelle</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Sägezahn-Welle</translation>
+        <translation>Sägezahnwelle</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Rechtecks-Welle</translation>
+        <translation>Rechteckwelle</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -8193,16 +8421,12 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
         <translation>Hier klicken, um die Wellenform zu normalisieren.</translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
-    </message>
-    <message>
         <source>Use a sine-wave for current oscillator.</source>
         <translation>Sinuswelle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use a triangle-wave for current oscillator.</source>
-        <translation>Dreieckswelle für aktuellen Oszillator nutzen.</translation>
+        <translation>Dreieckwelle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
@@ -8210,7 +8434,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Rechteckswelle für aktuellen Oszillator nutzen.</translation>
+        <translation>Rechteckwelle für aktuellen Oszillator nutzen.</translation>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>

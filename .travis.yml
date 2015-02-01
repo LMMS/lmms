@@ -1,6 +1,32 @@
 language: cpp
 compiler: gcc
-before_install: sudo apt-get update
-install: sudo apt-get install libqt4-dev libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libasound2-dev libjack-dev libsdl-dev libsamplerate0-dev libstk0-dev libfluidsynth-dev portaudio19-dev wine-dev g++-multilib libfltk1.3-dev
-before_script: mkdir build && cd build
-script: cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j8 VERBOSE=1
+env:
+    - TARGET_OS=linux
+    - TARGET_OS=win32
+    - TARGET_OS=win64
+before_install:
+    - if [ $TARGET_OS != linux ]; then sudo add-apt-repository ppa:tobydox/mingw-x-precise -y; fi
+    - sudo apt-get update -qq
+install:
+    - if [ $TARGET_OS != linux ]; then sudo apt-get install -y nsis cloog-isl libmpc2 mingw32; fi
+    - if [ $TARGET_OS != linux ]; then sudo apt-get install -y mingw32-x-qt mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x-stk mingw32-x-glib2 mingw32-x-portaudio mingw32-x-libsndfile mingw32-x-fftw mingw32-x-flac mingw32-x-fltk mingw32-x-libsamplerate mingw32-x-pkgconfig mingw32-x-binutils mingw32-x-gcc mingw32-x-runtime; fi
+    - if [ $TARGET_OS == win64 ]; then sudo apt-get install -y mingw64-x-qt mingw64-x-sdl mingw64-x-libvorbis mingw64-x-fluidsynth mingw64-x-stk mingw64-x-glib2 mingw64-x-portaudio mingw64-x-libsndfile mingw64-x-fftw mingw64-x-flac mingw64-x-fltk mingw64-x-libsamplerate mingw64-x-pkgconfig mingw64-x-binutils mingw64-x-gcc mingw64-x-runtime; fi
+    - if [ $TARGET_OS == linux ]; then sudo apt-get install -y libqt4-dev libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libasound2-dev libjack-dev libsdl-dev libsamplerate0-dev libstk0-dev libfluidsynth-dev portaudio19-dev wine-dev g++-multilib libfltk1.3-dev; fi
+before_script:
+    - mkdir build && cd build
+script:
+    - if [ $TARGET_OS == win32 ]; then ../build_mingw32 || ../build_mingw32; fi
+    - if [ $TARGET_OS == win64 ]; then ../build_mingw64 || ../build_mingw64; fi
+    - if [ $TARGET_OS == linux ]; then cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j4 VERBOSE=1; fi
+    - if [ $TARGET_OS != linux ]; then make; fi
+before_deploy: make package
+deploy:
+    provider: releases
+    api_key:
+        secure: d4a+x4Gugpss7JK2DcHjyBZDmEFFh4iVfKDfITSD50T6Mc6At4LMgojvEu+6qT6IyOY2vm3UVT6fhyeuWDTRDwW9tfFlaHVA0h8aTRD+eAXOA7pQ8rEMwQO3+WCKuKTfEqUkpL4wxhww8dpkv54tqeIs0S4TBqz9tk8UhzU7XbE=
+    file: lmms-${TRAVIS_TAG:1}-$TARGET_OS.exe
+    on:
+        tags: true
+        all_branches: true
+        condition: "$TARGET_OS != linux"
+    repo: LMMS/lmms

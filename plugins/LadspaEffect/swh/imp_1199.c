@@ -74,7 +74,11 @@ static fftw_real *real_in, *real_out, *comp_in, *comp_out;
 
 unsigned int fft_length[IMPULSES];
 
+#ifdef __clang__
+void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+#else
 inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+#endif
 {
   fftw_real impulse_time[MAX_FFT_LENGTH];
 #ifdef FFTW3
@@ -198,6 +202,11 @@ static void cleanupImp(LADSPA_Handle instance) {
 	local_free(plugin_data->op);
 	local_free(plugin_data->overlap);
 	local_free(plugin_data->opc);
+	unsigned int i;
+	for (i=0; i<IMPULSES; i++) {
+	  local_free(plugin_data->impulse_freq[i]);
+	}
+	local_free(plugin_data->impulse_freq);
 	free(instance);
 }
 

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _BASSBOOSTER_CONTROLS_H
-#define _BASSBOOSTER_CONTROLS_H
+#ifndef BASSBOOSTER_CONTROLS_H
+#define BASSBOOSTER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "BassBoosterControlDialog.h"
@@ -62,9 +62,6 @@ public:
 
 private slots:
 	void changeFrequency();
-	void changeGain();
-	void changeRatio();
-
 
 private:
 	BassBoosterEffect* m_effect;
@@ -73,7 +70,7 @@ private:
 	FloatModel m_ratioModel;
 
 	friend class BassBoosterControlDialog;
-
+	friend class BassBoosterEffect;
 } ;
 
 #endif

@@ -460,6 +460,14 @@ stereo_audio_module::stereo_audio_module() {
     meter_outR = 0.f;
 }
 
+stereo_audio_module::~stereo_audio_module()
+{
+	if( buffer != NULL )
+	{
+		free(buffer);
+	}
+}
+
 void stereo_audio_module::activate() {
     active = true;
 }
@@ -684,6 +692,14 @@ mono_audio_module::mono_audio_module() {
     meter_in  = 0.f;
     meter_outL = 0.f;
     meter_outR = 0.f;
+}
+
+mono_audio_module::~mono_audio_module()
+{
+	if( buffer != NULL )
+	{
+		free(buffer);
+	}
 }
 
 void mono_audio_module::activate() {

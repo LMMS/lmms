@@ -70,6 +70,11 @@
 #include "text_float.h"
 
 
+#if QT_VERSION < 0x040800
+#define MiddleButton MidButton
+#endif
+
+
 typedef AutomationPattern::timeMap timeMap;
 
 
@@ -1232,6 +1237,11 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 				// if nothing selected, shift _everything_
 				shiftSemiTone( +12 );
 			}
+			else if((event->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
+			{
+				// Move selected notes up by one semitone
+				shiftSemiTone( 1 );
+			}
 			else
 			{
 				// scroll
@@ -1259,6 +1269,11 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 				// if nothing selected, shift _everything_
 				shiftSemiTone( -12 );
 			}
+			else if((event->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
+			{
+				// Move selected notes down by one semitone
+				shiftSemiTone( -1 );
+			}
 			else
 			{
 				// scroll
@@ -1282,12 +1297,8 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 		case Qt::Key_Left:
 			if( event->modifiers() & Qt::ControlModifier && m_action == ActionNone )
 			{
-				// move time ticker
-				if( ( m_timeLine->pos() -= 16 ) < 0 )
-				{
-					m_timeLine->pos().setTicks( 0 );
-				}
-				m_timeLine->updatePosition();
+				// Move selected notes by one bar to the left
+				shiftPos( - MidiTime::ticksPerTact() );
 			}
 			else if( event->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
 			{
@@ -1320,9 +1331,8 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 		case Qt::Key_Right:
 			if( event->modifiers() & Qt::ControlModifier && m_action == ActionNone)
 			{
-				// move time ticker
-				m_timeLine->pos() += 16;
-				m_timeLine->updatePosition();
+				// Move selected notes by one bar to the right
+				shiftPos( MidiTime::ticksPerTact() );
 			}
 			else if( event->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
 			{
@@ -1380,7 +1390,6 @@ void PianoRoll::keyPressEvent( QKeyEvent* event )
 			if( event->modifiers() & Qt::ControlModifier )
 			{
 				event->accept();
-				m_selectButton->setChecked( true );
 				selectAll();
 				update();
 			}

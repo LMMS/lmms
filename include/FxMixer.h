@@ -57,6 +57,7 @@ class FxChannel : public ThreadableJob
 		QMutex m_lock;
 		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?
+		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
 
 		// pointers to other channels that this one sends to
 		FxRouteVector m_sends;
@@ -65,7 +66,11 @@ class FxChannel : public ThreadableJob
 		FxRouteVector m_receives;
 
 		virtual bool requiresProcessing() const { return true; }
-
+		
+		QAtomicInt m_dependenciesMet;
+		void incrementDeps();
+		void processed();
+		
 	private:
 		virtual void doProcessing( sampleFrame * _working_buffer );
 };
@@ -73,6 +78,7 @@ class FxChannel : public ThreadableJob
 
 class FxRoute : public QObject
 {
+	Q_OBJECT
 	public:		
 		FxRoute( FxChannel * from, FxChannel * to, float amount );
 		virtual ~FxRoute();
@@ -111,8 +117,9 @@ class FxRoute : public QObject
 };
 
 
-class EXPORT FxMixer : public JournallingObject, public Model
+class EXPORT FxMixer : public Model, public JournallingObject
 {
+	Q_OBJECT
 public:
 	FxMixer();
 	virtual ~FxMixer();
@@ -188,8 +195,6 @@ private:
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
 	QMutex m_sendsMutex;
-
-	void addChannelLeaf( FxChannel * ch, sampleFrame * buf );
 
 	friend class MixerWorkerThread;
 	friend class FxMixerView;

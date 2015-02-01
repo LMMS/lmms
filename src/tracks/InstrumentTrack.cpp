@@ -86,7 +86,7 @@ const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
-const int PIANO_HEIGHT		= 84;
+const int PIANO_HEIGHT		= 82;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
@@ -1266,7 +1266,14 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
+
+  // Hide the Size and Maximize options from the system menu
+  // since the dialog size is fixed.
+  QMenu * systemMenu = subWin->systemMenu();
+  systemMenu->actions().at( 2 )->setVisible( false ); // Size
+  systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
+
+  subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
 	subWin->setFixedSize( subWin->size() );
 	subWin->hide();
 }

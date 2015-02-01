@@ -69,7 +69,8 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_name(),
 	m_lock(),
 	m_channelIndex( idx ),
-	m_queued( false )
+	m_queued( false ),
+	m_dependenciesMet( 0 )
 {
 	engine::mixer()->clearAudioBuffer( m_buffer,
 					engine::mixer()->framesPerPeriod() );
@@ -84,6 +85,26 @@ FxChannel::~FxChannel()
 }
 
 
+inline void FxChannel::processed()
+{
+	foreach( FxRoute * receiverRoute, m_sends )
+	{
+		if( receiverRoute->receiver()->m_muted == false )
+		{
+			receiverRoute->receiver()->incrementDeps();
+		}
+	}
+}
+
+void FxChannel::incrementDeps()
+{
+	m_dependenciesMet.ref();
+	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
+	{
+		m_queued = true;
+		MixerWorkerThread::addJob( this );
+	}
+}
 
 
 void FxChannel::doProcessing( sampleFrame * _buf )
@@ -99,24 +120,13 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 	// <tobydox> this improves cache hit rate
 	_buf = m_buffer;
 
-	if( m_muteModel.value() == false )
+	if( m_muted == false )
 	{
-		// OK, we are not muted, so we go recursively through all the channels
-		// which send to us (our children)...
 		foreach( FxRoute * senderRoute, m_receives )
 		{
 			FxChannel * sender = senderRoute->sender();
 			FloatModel * sendModel = senderRoute->amount();
 			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
-
-			// wait for the sender job - either it's just been queued yet,
-			// then ThreadableJob::process() will process it now within this
-			// thread - otherwise it has been is is being processed by another
-			// thread and we just have to wait for it to finish
-			while( sender->state() != ThreadableJob::Done )
-			{
-				sender->process();
-			}
 
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
@@ -134,27 +144,35 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 				m_hasInput = true;
 			}
 		}
+
+
+		const float v = m_volumeModel.value();
+
+		if( m_hasInput )
+		{
+			// only start fxchain when we have input...
+			m_fxChain.startRunning();
+		}
+		
+		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, m_hasInput );
+
+		m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
+		m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
 	}
-
-	const float v = m_volumeModel.value();
-
-	if( m_hasInput )
+	else
 	{
-		// only start fxchain when we have input...
-		m_fxChain.startRunning();
+		m_peakLeft = m_peakRight = 0.0f;
 	}
-	
-	m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp, m_hasInput );
 
-	m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
-	m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
+	// increment dependency counter of all receivers
+	processed();
 }
 
 
 
 FxMixer::FxMixer() :
-	JournallingObject(),
 	Model( NULL ),
+	JournallingObject(),
 	m_fxChannels()
 {
 	// create master channel
@@ -339,7 +357,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	// add us to fxmixer's list
 	engine::fxMixer()->m_fxRoutes.append( route );
 	m_sendsMutex.unlock();
-	
+
 	return route;
 }
 
@@ -380,11 +398,9 @@ void FxMixer::deleteChannelSend( FxRoute * route )
 bool FxMixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
 {
 	if( sendFrom == sendTo ) return true;
-	//m_sendsMutex.lock();
 	FxChannel * from = m_fxChannels[sendFrom];
 	FxChannel * to = m_fxChannels[sendTo];
 	bool b = checkInfiniteLoop( from, to );
-	//m_sendsMutex.unlock();
 	return b;
 }
 
@@ -462,48 +478,41 @@ void FxMixer::prepareMasterMix()
 
 
 
-void FxMixer::addChannelLeaf( FxChannel * ch, sampleFrame * buf )
-{
-	// if we're muted or this channel is seen already, discount it
-	if( ch->m_queued )
-	{
-		return;
-	}
-
-	foreach( FxRoute * senderRoute, ch->m_receives )
-	{
-		addChannelLeaf( senderRoute->sender(), buf );
-	}
-
-	// add this channel to job list
-	ch->m_queued = true;
-	MixerWorkerThread::addJob( ch );
-}
-
-
-
 void FxMixer::masterMix( sampleFrame * _buf )
 {
 	const int fpp = engine::mixer()->framesPerPeriod();
 
-	// recursively loop through channel dependency chain
-	// and add all channels to job list that have no dependencies
-	// when the channel completes it will check its parent to see if it needs
-	// to be processed.
-	//m_sendsMutex.lock();
-	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
-	addChannelLeaf( m_fxChannels[0], _buf );
-	while( m_fxChannels[0]->state() != ThreadableJob::Done )
+	if( m_sendsMutex.tryLock() )
 	{
-		MixerWorkerThread::startAndWaitForJobs();
+		// add the channels that have no dependencies (no incoming senders, ie. no receives)
+		// to the jobqueue. The channels that have receives get added when their senders get processed, which
+		// is detected by dependency counting.
+		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
+		// their recipients right away.
+		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
+		foreach( FxChannel * ch, m_fxChannels )
+		{
+			ch->m_muted = ch->m_muteModel.value();
+			if( ch->m_muted ) // instantly "process" muted channels
+			{
+				ch->processed();
+				ch->done();
+			}
+			else if( ch->m_receives.size() == 0 )
+			{
+				ch->m_queued = true;
+				MixerWorkerThread::addJob( ch );
+			}
+		}
+		while( m_fxChannels[0]->state() != ThreadableJob::Done )
+		{
+			MixerWorkerThread::startAndWaitForJobs();
+		}
+		m_sendsMutex.unlock();
 	}
-	//m_sendsMutex.unlock();
-
+	
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
-
-	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
-	m_fxChannels[0]->m_peakRight *= engine::mixer()->masterGain();
 
 	// clear all channel buffers and
 	// reset channel process state
@@ -514,6 +523,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		m_fxChannels[i]->m_queued = false;
 		// also reset hasInput
 		m_fxChannels[i]->m_hasInput = false;
+		m_fxChannels[i]->m_dependenciesMet = 0;
 	}
 }
 
@@ -587,7 +597,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
 		}
 	}
-} 
+}
 
 // make sure we have at least num channels
 void FxMixer::allocateChannelsTo(int num)
@@ -678,3 +688,5 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 		r->updateName();
 	}
 }
+
+#include "moc_FxMixer.cxx"
