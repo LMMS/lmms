@@ -519,6 +519,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
+	_this.setAttribute( "mute", QString::number( isMuted() ) );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -553,6 +554,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	setProgressionType( static_cast<ProgressionTypes>( _this.attribute(
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
+	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )
