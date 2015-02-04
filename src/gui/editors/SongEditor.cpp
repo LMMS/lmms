@@ -579,7 +579,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->move( x, 50 );
+		m_positionLine->move( x, m_timeLine->height() );
 	}
 	else
 	{
