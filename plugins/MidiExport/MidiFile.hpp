@@ -186,19 +186,7 @@ struct Event
 	
 	// events are sorted by their time
 	inline bool operator < (const Event& b) const {
-		if (this->time < b.time) return true;
-#if 0
-		if (this->type < b.type) return true;
-		if (this->pitch < b.pitch) return true;
-		if (this->duration < b.duration) return true;
-		if (this->volume < b.volume) return true;
-		#if 1
-		if (this->programNumber < b.programNumber) return true;
-		if (this->channel < b.channel) return true;
-		if (this->trackName < b.trackName) return true;
-		#endif
-#endif
-		return false;
+		return this->time < b.time;
 	}
 };
 
