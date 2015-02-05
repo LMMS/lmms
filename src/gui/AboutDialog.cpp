@@ -37,7 +37,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	setupUi( this );
 
 
-	iconLabel->setPixmap( QPixmap( "icons:icon.png" ).scaled( 64, 64 ) );
+	iconLabel->setPixmap( QPixmap( "icons:icon.png" ).scaled( 64, 64, Qt::IgnoreAspectRatio, Qt::SmoothTransformation ) );
 
 	versionLabel->setText( versionLabel->text().
 					arg( LMMS_VERSION ).

@@ -642,8 +642,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	m_drawModeAction = editModeGroup->addAction(QPixmap("icons:edit_draw"), tr("Draw mode.png"));
-	m_selectModeAction = editModeGroup->addAction(QPixmap("icons:edit_select"), tr("Edit mode (select and move).png"));
+	m_drawModeAction = editModeGroup->addAction(QPixmap("icons:edit_draw.png"), tr("Draw mode"));
+	m_selectModeAction = editModeGroup->addAction(QPixmap("icons:edit_select.png"), tr("Edit mode (select and move)"));
 
 	m_drawModeAction->setChecked(true);
 

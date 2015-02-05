@@ -185,7 +185,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 			tr( "Clear" ), m_pat, SLOT( clear() ) );
 	_cm->addSeparator();
 
-	_cm->addAction( QPixmap( "icons:reload" ), tr( "Reset name.png" ),
+	_cm->addAction( QPixmap( "icons:reload.png" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
 	_cm->addAction( QPixmap( "icons:edit_rename.png" ),
 						tr( "Change name" ),

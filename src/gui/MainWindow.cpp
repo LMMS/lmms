@@ -275,7 +275,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addSeparator();
-	project_menu->addAction( QPixmap( "icons:exit" ), tr( "&Quit.png" ),
+	project_menu->addAction( QPixmap( "icons:exit.png" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
 
@@ -339,7 +339,7 @@ void MainWindow::finalize()
 					this, SLOT( enterWhatsThisMode() ) );
 
 	help_menu->addSeparator();
-	help_menu->addAction( QPixmap( "icons:icon" ), tr( "About.png" ),
+	help_menu->addAction( QPixmap( "icons:icon.png" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons

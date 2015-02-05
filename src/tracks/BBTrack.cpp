@@ -190,7 +190,7 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 			this, SLOT( openInBBEditor() ) );
 	_cm->insertSeparator( _cm->actions()[1] );
 	_cm->addSeparator();
-	_cm->addAction( QPixmap( "icons:reload" ), tr( "Reset name.png" ),
+	_cm->addAction( QPixmap( "icons:reload.png" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
 	_cm->addAction( QPixmap( "icons:edit_rename.png" ),
 						tr( "Change name" ),

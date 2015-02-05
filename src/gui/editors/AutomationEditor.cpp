@@ -2017,14 +2017,14 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	// Edit mode buttons
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(QPixmap("icons:edit_draw"), tr("Draw mode (Shift+D).png"));
+	QAction* drawAction = editModeGroup->addAction(QPixmap("icons:edit_draw.png"), tr("Draw mode (Shift+D)"));
 	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 
-	QAction* eraseAction = editModeGroup->addAction(QPixmap("icons:edit_erase"), tr("Erase mode (Shift+E).png"));
+	QAction* eraseAction = editModeGroup->addAction(QPixmap("icons:edit_erase.png"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	m_flipYAction = new QAction(QPixmap("icons:flip_y"), tr("Flip vertically.png"), this);
-	m_flipXAction = new QAction(QPixmap("icons:flip_x"), tr("Flip horizontally.png"), this);
+	m_flipYAction = new QAction(QPixmap("icons:flip_y.png"), tr("Flip vertically"), this);
+	m_flipXAction = new QAction(QPixmap("icons:flip_x.png"), tr("Flip horizontally"), this);
 
 	m_flipYAction->setWhatsThis(
 				tr( "Click here and the pattern will be inverted."
@@ -2034,8 +2034,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 					"The points are flipped in the x direction." ) );
 
 //	TODO: m_selectButton and m_moveButton are broken.
-//	m_selectButton = new QAction(QPixmap("icons:edit_select"), tr("Select mode (Shift+S).png"), editModeGroup);
-//	m_moveButton = new QAction(QPixmap("icons:edit_move"), tr("Move selection mode (Shift+M).png"), editModeGroup);
+//	m_selectButton = new QAction(QPixmap("icons:edit_select.png"), tr("Select mode (Shift+S)"), editModeGroup);
+//	m_moveButton = new QAction(QPixmap("icons:edit_move.png"), tr("Move selection mode (Shift+M)"), editModeGroup);
 
 	drawAction->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
@@ -2065,11 +2065,11 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	ActionGroup* progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
-				QPixmap("icons:progression_discrete"), tr("Discrete progression.png"));
+				QPixmap("icons:progression_discrete.png"), tr("Discrete progression"));
 	m_linearAction = progression_type_group->addAction(
-				QPixmap("icons:progression_linear"), tr("Linear progression.png"));
+				QPixmap("icons:progression_linear.png"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
-				QPixmap("icons:progression_cubic_hermite"), tr( "Cubic Hermite progression.png"));
+				QPixmap("icons:progression_cubic_hermite.png"), tr( "Cubic Hermite progression"));
 
 	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
 

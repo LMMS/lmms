@@ -89,18 +89,18 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_toolBar->addWidget( m_bbComboBox );
 
 	m_toolBar->addSeparator();
-	m_toolBar->addAction(QPixmap("icons:add_bb_track"), tr("Add beat/bassline.png"),
+	m_toolBar->addAction(QPixmap("icons:add_bb_track.png"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
-	m_toolBar->addAction(QPixmap("icons:add_automation"), tr("Add automation-track.png"),
+	m_toolBar->addAction(QPixmap("icons:add_automation.png"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_toolBar->addWidget(stretch);
 
-	m_toolBar->addAction(QPixmap("icons:step_btn_remove"), tr("Remove steps.png"),
+	m_toolBar->addAction(QPixmap("icons:step_btn_remove.png"), tr("Remove steps"),
 						 m_trackContainerView, SLOT(removeSteps()));
-	m_toolBar->addAction(QPixmap("icons:step_btn_add"), tr("Add steps.png"),
+	m_toolBar->addAction(QPixmap("icons:step_btn_add.png"), tr("Add steps"),
 						 m_trackContainerView, SLOT(addSteps()));
 	m_toolBar->addSeparator();
 

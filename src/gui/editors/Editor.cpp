@@ -65,11 +65,11 @@ Editor::Editor(bool record) :
 	};
 
 	// Set up play and record actions
-	m_playAction = new QAction(QPixmap("icons:play"), tr("Play (Space).png"), this);
-	m_stopAction = new QAction(QPixmap("icons:stop"), tr("Stop (Space).png"), this);
+	m_playAction = new QAction(QPixmap("icons:play.png"), tr("Play (Space)"), this);
+	m_stopAction = new QAction(QPixmap("icons:stop.png"), tr("Stop (Space)"), this);
 
-	m_recordAction = new QAction(QPixmap("icons:record"), tr("Record.png"), this);
-	m_recordAccompanyAction = new QAction(QPixmap("icons:record_accompany"), tr("Record while playing.png"), this);
+	m_recordAction = new QAction(QPixmap("icons:record.png"), tr("Record"), this);
+	m_recordAccompanyAction = new QAction(QPixmap("icons:record_accompany.png"), tr("Record while playing"), this);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));

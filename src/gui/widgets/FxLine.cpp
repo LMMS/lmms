@@ -195,12 +195,12 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 
 	if( m_channelIndex != 0 ) // no remove-option in master
 	{
-		contextMenu->addAction( QPixmap( "icons:cancel" ), tr( "R&emove channel.png" ),
+		contextMenu->addAction( QPixmap( "icons:cancel.png" ), tr( "R&emove channel" ),
 							this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
 
-	contextMenu->addAction( QPixmap( "icons:cancel" ), tr( "Remove &unused channels.png" ),
+	contextMenu->addAction( QPixmap( "icons:cancel.png" ), tr( "Remove &unused channels" ),
 						this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
 

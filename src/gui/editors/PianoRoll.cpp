@@ -3970,10 +3970,10 @@ PianoRollWindow::PianoRollWindow() :
 
 	// init edit-buttons at the top
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(QPixmap("icons:edit_draw"), tr("Draw mode (Shift+D).png"));
-	QAction* eraseAction = editModeGroup->addAction(QPixmap("icons:edit_erase"), tr("Erase mode (Shift+E).png"));
-	QAction* selectAction = editModeGroup->addAction(QPixmap("icons:edit_select"), tr("Select mode (Shift+S).png"));
-	QAction* detuneAction = editModeGroup->addAction(QPixmap("icons:automation"), tr("Detune mode (Shift+T).png"));
+	QAction* drawAction = editModeGroup->addAction(QPixmap("icons:edit_draw.png"), tr("Draw mode (Shift+D)"));
+	QAction* eraseAction = editModeGroup->addAction(QPixmap("icons:edit_erase.png"), tr("Erase mode (Shift+E)"));
+	QAction* selectAction = editModeGroup->addAction(QPixmap("icons:edit_select.png"), tr("Select mode (Shift+S)"));
+	QAction* detuneAction = editModeGroup->addAction(QPixmap("icons:automation.png"), tr("Detune mode (Shift+T)"));
 
 	drawAction->setChecked( true );
 

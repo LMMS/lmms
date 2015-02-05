@@ -113,31 +113,31 @@ void ProjectNotes::setupActions()
 	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );
 	QAction * a;
 
-	a = new QAction( QPixmap( "icons:edit_undo" ), tr( "&Undo.png" ),
+	a = new QAction( QPixmap( "icons:edit_undo.png" ), tr( "&Undo" ),
 									this );
 	a->setShortcut( tr( "Ctrl+Z" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( undo() ) );
 	tb->addAction( a );
 
-	a = new QAction( QPixmap( "icons:edit_redo" ), tr( "&Redo.png" ),
+	a = new QAction( QPixmap( "icons:edit_redo.png" ), tr( "&Redo" ),
 									this );
 	a->setShortcut( tr( "Ctrl+Y" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( redo() ) );
 	tb->addAction( a );
 
-	a = new QAction( QPixmap( "icons:edit_copy" ), tr( "&Copy.png" ),
+	a = new QAction( QPixmap( "icons:edit_copy.png" ), tr( "&Copy" ),
 									this );
 	a->setShortcut( tr( "Ctrl+C" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( copy() ) );
 	tb->addAction( a );
 
-	a = new QAction( QPixmap( "icons:edit_cut" ), tr( "Cu&t.png" ),
+	a = new QAction( QPixmap( "icons:edit_cut.png" ), tr( "Cu&t" ),
 									this );
 	a->setShortcut( tr( "Ctrl+X" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( cut() ) );
 	tb->addAction( a );
 
-	a = new QAction( QPixmap( "icons:edit_paste" ), tr( "&Paste.png" ),
+	a = new QAction( QPixmap( "icons:edit_paste.png" ), tr( "&Paste" ),
 									this );
 	a->setShortcut( tr( "Ctrl+V" ) );
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( paste() ) );
