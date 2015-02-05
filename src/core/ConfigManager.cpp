@@ -66,8 +66,7 @@ ConfigManager::ConfigManager() :
 	m_pluginDir( qApp->applicationDirPath() + '/' + PLUGIN_DIR ),
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
-	m_flDir( QDir::home().absolutePath() ),
-	m_recoveryFile( QDir(m_workingDir).absoluteFilePath("recover.mmp") )
+	m_flDir( QDir::home().absolutePath() )
 {
 }
 

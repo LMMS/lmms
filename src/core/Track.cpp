@@ -1438,6 +1438,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			!m_trackView->trackContainerView()->fixedTCOs() )
 	{
+		getTrack()->addJournalCheckPoint();
 		const MidiTime pos = getPosition( _me->x() ).getTact() *
 						MidiTime::ticksPerTact();
 		TrackContentObject * tco = getTrack()->createTCO( pos );
@@ -1708,29 +1709,6 @@ void TrackOperationsWidget::clearTrack()
 
 
 
-/*! \brief Create and assign a new FX Channel for this track */
-void TrackOperationsWidget::createFxLine()
-{
-	int channelIndex = gui->fxMixerView()->addNewChannel();
-
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = m_trackView->getTrack()->name();
-
-	assignFxLine(channelIndex);
-}
-
-
-
-/*! \brief Assign a specific FX Channel for this track */
-void TrackOperationsWidget::assignFxLine(int channelIndex)
-{
-	Track * track = m_trackView->getTrack();
-	dynamic_cast<InstrumentTrack *>( track )->effectChannelModel()->setValue( channelIndex );
-
-	gui->fxMixerView()->setCurrentFxLine( channelIndex );
-}
-
-
-
 /*! \brief Remove this track from the track list
  *
  */
@@ -1767,31 +1745,8 @@ void TrackOperationsWidget::updateMenu()
 	}
 	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
-		int channelIndex = trackView->model()->effectChannelModel()->value();
-
-		FxChannel * fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
-
-		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), to_menu );
-		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
-
-		fxMenu->addAction("Assign to new FX Channel" , this, SLOT( createFxLine() ) );
-		fxMenu->addSeparator();
-
-
-		for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
-		{
-			FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
-
-			if ( currentChannel != fxChannel )
-			{
-				QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-				QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
-				fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
-			}
-		}
-
+		QMenu *fxMenu = trackView->createFxMenu( tr( "FX %1: %2" ), tr( "Assign to new FX Channel" ));
 		to_menu->addMenu(fxMenu);
-		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 		to_menu->addSeparator();
 		to_menu->addMenu( trackView->midiMenu() );

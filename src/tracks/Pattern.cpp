@@ -834,6 +834,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		}
 		else // note at step found
 		{
+			m_pat->addJournalCheckPoint();
 			if( n->length() < 0 )
 			{
 				n->setLength( 0 );	// set note as enabled beat note

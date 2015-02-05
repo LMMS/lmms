@@ -804,7 +804,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
 			if ( createdWith.setCompareType(Minor) != openedWith)
 			{
-				if( Engine::hasGUI() )
+				if( Engine::hasGUI() && root.attribute( "type" ) == "song" ) //documentElement()
 				{
 					QMessageBox::information( NULL,
 						SongEditor::tr( "Project Version Mismatch" ),

@@ -54,6 +54,11 @@ FadeButton::~FadeButton()
 {
 }
 
+void FadeButton::setActiveColor( const QColor & activated_color )
+{
+	m_activatedColor = activated_color;
+}
+
 
 
 
