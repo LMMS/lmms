@@ -46,7 +46,6 @@ Song * Engine::s_song = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
-QMap<QString, QString> Engine::s_pluginFileHandling;
 
 
 
@@ -55,8 +54,6 @@ void Engine::init()
 {
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
-
-	initPluginFileHandling();
 
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer;
@@ -117,19 +114,3 @@ void Engine::updateFramesPerTick()
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
-
-
-
-
-void Engine::initPluginFileHandling()
-{
-	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Instrument))
-	{
-		for(const QString& ext : QString(desc->supportedFileTypes).split(','))
-		{
-			s_pluginFileHandling[ext] = desc->name;
-		}
-	}
-}
-
-

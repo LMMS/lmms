@@ -38,13 +38,15 @@ class EXPORT PluginFactory
 public:
 	struct PluginInfo
 	{
+		PluginInfo() : library(nullptr), descriptor(nullptr) {}
+		const QString name() const;
 		QFileInfo file;
 		QLibrary* library;
 		Plugin::Descriptor* descriptor;
 
 		bool isNull() const {return library == 0;}
 	};
-	typedef QList<PluginInfo> PluginInfoList;
+	typedef QList<PluginInfo*> PluginInfoList;
 	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
 
 	PluginFactory();
@@ -60,6 +62,8 @@ public:
 
 	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
 	const PluginInfoList& pluginInfos() const;
+	/// Returns a plugin that support the given file extension
+	const PluginInfo pluginSupportingExtension(const QString& ext);
 
 	/// Returns the PluginInfo object of the plugin with the given name.
 	/// If the plugin is not found, an empty PluginInfo is returned (use
@@ -76,6 +80,7 @@ public slots:
 private:
 	DescriptorMap m_descriptors;
 	PluginInfoList m_pluginInfos;
+	QMap<QString, PluginInfo*> m_pluginByExt;
 
 	QHash<QString, QString> m_errors;
 

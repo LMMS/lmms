@@ -45,6 +45,8 @@ public:
 	static void init();
 	static void destroy();
 
+	// TODO: Remove me. Replace calls like `if( Engine::hasGUI() )` with
+	// `if (gui)` (gui defined in "GuiApplication.h"
 	static bool hasGUI();
 
 	// core
@@ -89,12 +91,6 @@ public:
 	}
 	static void updateFramesPerTick();
 
-	static const QMap<QString, QString> & pluginFileHandling()
-	{
-		return s_pluginFileHandling;
-	}
-
-
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
@@ -117,10 +113,6 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
-
-	static QMap<QString, QString> s_pluginFileHandling;
-
-	static void initPluginFileHandling();
 
 	friend class GuiApplication;
 };

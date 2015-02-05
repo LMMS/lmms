@@ -33,6 +33,7 @@
 #include "MidiPort.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
+#include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
 
@@ -134,8 +135,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		if( i == NULL || !i->descriptor()->supportsFileType( ext ) )
 		{
 			i = s_previewTC->previewInstrumentTrack()->
-				loadInstrument(
-					Engine::pluginFileHandling()[ext] );
+				loadInstrument(pluginFactory->pluginSupportingExtension(ext).name());
 		}
 		if( i != NULL )
 		{

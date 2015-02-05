@@ -71,6 +71,7 @@
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "Pattern.h"
+#include "PluginFactory.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
@@ -1558,7 +1559,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
-			i = m_track->loadInstrument( Engine::pluginFileHandling()[ext] );
+			i = m_track->loadInstrument( pluginFactory->pluginSupportingExtension(ext).name() );
 		}
 
 		i->loadFile( value );

@@ -45,6 +45,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "DataFile.h"
+#include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
@@ -586,7 +587,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				i = it->loadInstrument(
-					Engine::pluginFileHandling()[e] );
+					pluginFactory->pluginSupportingExtension(e).name() );
 			}
 			i->loadFile( f->fullName() );
 			break;
@@ -1019,7 +1020,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( ext == "xiz" && Engine::pluginFileHandling().contains( ext ) )
+	else if( ext == "xiz" && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
@@ -1053,7 +1054,7 @@ void FileItem::determineFileType( void )
 	}
 
 	if( m_handling == NotSupported &&
-		!ext.isEmpty() && Engine::pluginFileHandling().contains( ext ) )
+		!ext.isEmpty() && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can

@@ -97,17 +97,23 @@ const Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type
 	return m_descriptors.values(type);
 }
 
-const QList<PluginFactory::PluginInfo>& PluginFactory::pluginInfos() const
+const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
 {
 	return m_pluginInfos;
 }
 
+const PluginFactory::PluginInfo PluginFactory::pluginSupportingExtension(const QString& ext)
+{
+	PluginInfo* info = m_pluginByExt.value(ext, nullptr);
+	return info == nullptr ? PluginInfo() : *info;
+}
+
 const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
 {
-	for (const PluginInfo& info : m_pluginInfos)
+	for (const PluginInfo* info : m_pluginInfos)
 	{
-		if (qstrcmp(info.descriptor->name, name) == 0)
-			return info;
+		if (qstrcmp(info->descriptor->name, name) == 0)
+			return *info;
 	}
 	return PluginInfo();
 }
@@ -122,6 +128,7 @@ void PluginFactory::discoverPlugins()
 {
 	DescriptorMap descriptors;
 	PluginInfoList pluginInfos;
+	m_pluginByExt.clear();
 
 	const QFileInfoList& files = QDir("plugins:").entryInfoList(nameFilters);
 
@@ -158,21 +165,33 @@ void PluginFactory::discoverPlugins()
 			continue;
 		}
 
-		PluginInfo info;
-		info.file = file;
-		info.library = library;
-		info.descriptor = pluginDescriptor;
+		PluginInfo* info = new PluginInfo;
+		info->file = file;
+		info->library = library;
+		info->descriptor = pluginDescriptor;
 		pluginInfos << info;
 
-		descriptors.insert(info.descriptor->type, info.descriptor);
+		for (const QString& ext : QString(info->descriptor->supportedFileTypes).split(','))
+		{
+			m_pluginByExt.insert(ext, info);
+		}
+
+		descriptors.insert(info->descriptor->type, info->descriptor);
 	}
 
 
-	for (PluginInfo& info : m_pluginInfos)
+	for (PluginInfo* info : m_pluginInfos)
 	{
-		delete info.library;
+		delete info->library;
+		delete info;
 	}
 	m_pluginInfos = pluginInfos;
 	m_descriptors = descriptors;
 }
 
+
+
+const QString PluginFactory::PluginInfo::name() const
+{
+	return descriptor ? descriptor->name : QString();
+}
