@@ -372,9 +372,11 @@ void ConfigManager::loadConfigFile()
 	}
 #endif
 
-
-	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
-						<< defaultArtworkDir() );
+	QStringList searchPaths;
+	if(! qgetenv("LMMS_THEME_PATH").isNull())
+		searchPaths << qgetenv("LMMS_THEME_PATH");
+	searchPaths << artworkDir() << defaultArtworkDir();
+	QDir::setSearchPaths( "resources", searchPaths);
 
 	if( !QDir( m_workingDir ).exists() &&
 		QApplication::type() == QApplication::GuiClient &&
