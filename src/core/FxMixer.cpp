@@ -98,12 +98,14 @@ inline void FxChannel::processed()
 
 void FxChannel::incrementDeps()
 {
+	m_lock.lock();
 	m_dependenciesMet.ref();
 	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
 		MixerWorkerThread::addJob( this );
 	}
+	m_lock.unlock();
 }
 
 void FxChannel::unmuteForSolo()
