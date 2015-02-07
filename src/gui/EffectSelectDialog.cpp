@@ -27,7 +27,6 @@
 #include "ui_EffectSelectDialog.h"
 
 #include "gui_templates.h"
-#include "embed.h"
 
 
 EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
@@ -39,7 +38,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 {
 	ui->setupUi( this );
 
-	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
+	setWindowIcon( QPixmap( "icons:setup_audio.png" ) );
 
 	// query effects
 	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
@@ -118,7 +117,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	// try to accept current selection when pressing "OK"
 	connect( ui->buttonBox, SIGNAL( accepted() ),
 				this, SLOT( acceptSelection() ) );
-	
+
 	updateSelection();
 	show();
 }

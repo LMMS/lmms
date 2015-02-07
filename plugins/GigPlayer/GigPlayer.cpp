@@ -50,7 +50,7 @@
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -928,8 +928,8 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	// File Button
 	m_fileDialogButton = new PixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
-	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
+	m_fileDialogButton->setActiveGraphic( QPixmap( ":/gigplayer/fileselect_on.png" ) );
+	m_fileDialogButton->setInactiveGraphic( QPixmap( ":/gigplayer/fileselect_off.png" ) );
 	m_fileDialogButton->move( 223, 68 );
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
@@ -941,8 +941,8 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
-	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
+	m_patchDialogButton->setActiveGraphic( QPixmap( ":/gigplayer/patches_on.png" ) );
+	m_patchDialogButton->setInactiveGraphic( QPixmap( ":/gigplayer/patches_off.png" ) );
 	m_patchDialogButton->setEnabled( false );
 	m_patchDialogButton->move( 223, 94 );
 
@@ -979,7 +979,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/gigplayer/artwork.png" ) );
 	setPalette( pal );
 
 	updateFilename();

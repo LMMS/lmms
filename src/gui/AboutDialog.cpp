@@ -25,9 +25,9 @@
 
 #include "lmmsversion.h"
 #include "AboutDialog.h"
+
 #include "embed.h"
 #include "versioninfo.h"
-
 
 
 AboutDialog::AboutDialog(QWidget* parent) :
@@ -37,7 +37,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	setupUi( this );
 
 
-	iconLabel->setPixmap( embed::getIconPixmap( "icon", 64, 64 ) );
+	iconLabel->setPixmap( QPixmap( "icons:icon.png" ).scaled( 64, 64, Qt::IgnoreAspectRatio, Qt::SmoothTransformation ) );
 
 	versionLabel->setText( versionLabel->text().
 					arg( LMMS_VERSION ).

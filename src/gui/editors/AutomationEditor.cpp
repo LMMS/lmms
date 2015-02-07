@@ -51,7 +51,6 @@
 #include "SongEditor.h"
 #include "MainWindow.h"
 #include "GuiApplication.h"
-#include "embed.h"
 #include "Engine.h"
 #include "PixmapButton.h"
 #include "templates.h"
@@ -125,13 +124,11 @@ AutomationEditor::AutomationEditor() :
 	}
 	if( s_toolYFlip == NULL )
 	{
-		s_toolYFlip = new QPixmap( embed::getIconPixmap(
-							"flip_y" ) );
+		s_toolYFlip = new QPixmap( "icons:flip_y.png" );
 	}
 	if( s_toolXFlip == NULL )
 	{
-		s_toolXFlip = new QPixmap( embed::getIconPixmap(
-							"flip_x" ) );
+		s_toolXFlip = new QPixmap( "icons:flip_x.png" );
 	}
 
 	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
@@ -164,23 +161,19 @@ AutomationEditor::AutomationEditor() :
 	// init pixmaps
 	if( s_toolDraw == NULL )
 	{
-		s_toolDraw = new QPixmap( embed::getIconPixmap(
-							"edit_draw" ) );
+		s_toolDraw = new QPixmap( "icons:edit_draw.png" );
 	}
 	if( s_toolErase == NULL )
 	{
-		s_toolErase= new QPixmap( embed::getIconPixmap(
-							"edit_erase" ) );
+		s_toolErase= new QPixmap( "icons:edit_erase.png" );
 	}
 	if( s_toolSelect == NULL )
 	{
-		s_toolSelect = new QPixmap( embed::getIconPixmap(
-							"edit_select" ) );
+		s_toolSelect = new QPixmap( "icons:edit_select.png" );
 	}
 	if( s_toolMove == NULL )
 	{
-		s_toolMove = new QPixmap( embed::getIconPixmap(
-							"edit_move" ) );
+		s_toolMove = new QPixmap( "icons:edit_move.png" );
 	}
 
 	setCurrentPattern( NULL );
@@ -1202,7 +1195,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin();			
+			timeMap::iterator it = time_map.begin();
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1239,11 +1232,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				{
 					is_selected = true;
 				}
-				
+
 				float *values = m_pattern->valuesAfter( it.key() );
 				for( int i = 0; i < (it+1).key() - it.key(); i++ )
 				{
-					
+
 					drawLevelTick( p, it.key() + i, values[i],
 									is_selected );
 				}
@@ -1398,12 +1391,12 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value,
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
-	
+
 	else
 	{
 		printf("not in range\n");
 	}
-	
+
 }
 
 
@@ -1466,7 +1459,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 			y--;
 		}
 		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y );	
+		m_zoomingYModel.setValue( y );
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
@@ -1787,7 +1780,7 @@ void AutomationEditor::copySelectedValues()
 		TextFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
 								"clipboard." ),
-				embed::getIconPixmap( "edit_copy" ), 2000 );
+				QPixmap( "icons:edit_copy.png" ), 2000 );
 	}
 }
 
@@ -2024,14 +2017,14 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	// Edit mode buttons
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	QAction* drawAction = editModeGroup->addAction(QPixmap("icons:edit_draw.png"), tr("Draw mode (Shift+D)"));
 	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 
-	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	QAction* eraseAction = editModeGroup->addAction(QPixmap("icons:edit_erase.png"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
-	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
+	m_flipYAction = new QAction(QPixmap("icons:flip_y.png"), tr("Flip vertically"), this);
+	m_flipXAction = new QAction(QPixmap("icons:flip_x.png"), tr("Flip horizontally"), this);
 
 	m_flipYAction->setWhatsThis(
 				tr( "Click here and the pattern will be inverted."
@@ -2041,8 +2034,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 					"The points are flipped in the x direction." ) );
 
 //	TODO: m_selectButton and m_moveButton are broken.
-//	m_selectButton = new QAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"), editModeGroup);
-//	m_moveButton = new QAction(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"), editModeGroup);
+//	m_selectButton = new QAction(QPixmap("icons:edit_select.png"), tr("Select mode (Shift+S)"), editModeGroup);
+//	m_moveButton = new QAction(QPixmap("icons:edit_move.png"), tr("Move selection mode (Shift+M)"), editModeGroup);
 
 	drawAction->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
@@ -2072,11 +2065,11 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	ActionGroup* progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
-				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
+				QPixmap("icons:progression_discrete.png"), tr("Discrete progression"));
 	m_linearAction = progression_type_group->addAction(
-				embed::getIconPixmap("progression_linear"), tr("Linear progression"));
+				QPixmap("icons:progression_linear.png"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
-				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
+				QPixmap("icons:progression_cubic_hermite.png"), tr( "Cubic Hermite progression"));
 
 	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
 
@@ -2112,11 +2105,11 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	// Copy paste buttons
 
-	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+	QAction* cutAction = new QAction(QPixmap("icons:edit_cut.png"),
 					tr("Cut selected values (Ctrl+X)"), this);
-	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+	QAction* copyAction = new QAction(QPixmap("icons:edit_copy.png"),
 					tr("Copy selected values (Ctrl+C)"), this);
-	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+	QAction* pasteAction = new QAction(QPixmap("icons:edit_paste.png"),
 					tr("Paste values from clipboard Ctrl+V)"), this);
 
 	cutAction->setWhatsThis(
@@ -2142,7 +2135,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Zoom controls
 
 	QLabel * zoom_x_label = new QLabel( m_toolBar );
-	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
+	zoom_x_label->setPixmap( QPixmap( "icons:zoom_x.png" ) );
 
 	m_zoomingXComboBox = new ComboBox( m_toolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
@@ -2160,7 +2153,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 	QLabel * zoom_y_label = new QLabel( m_toolBar );
-	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
+	zoom_y_label->setPixmap( QPixmap( "icons:zoom_y.png" ) );
 
 	m_zoomingYComboBox = new ComboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
@@ -2182,7 +2175,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Quantization controls
 
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
-	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+	quantize_lbl->setPixmap( QPixmap( "icons:quantize.png" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
@@ -2227,7 +2220,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
-	setWindowIcon( embed::getIconPixmap( "automation" ) );
+	setWindowIcon( QPixmap( "icons:automation.png" ) );
 	setAcceptDrops( true );
 	m_toolBar->setAcceptDrops( true );
 }

@@ -40,7 +40,6 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
-#include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "ExportProjectDialog.h"
 #include "FxMixer.h"
@@ -552,7 +551,7 @@ void Song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
 
 // send a signal if playposition changes during playback
-	if( isPlaying() ) 
+	if( isPlaying() )
 	{
 		emit playbackPositionChanged();
 	}
@@ -1014,7 +1013,7 @@ void Song::loadProject( const QString & _file_name )
 	// BB-tracks
 	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
-	// Connect controller links to their controllers 
+	// Connect controller links to their controllers
 	// now that everything is loaded
 	ControllerConnection::finalizeConnections();
 
@@ -1095,7 +1094,7 @@ bool Song::guiSaveProject()
 		TextFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
 							).arg( m_fileName ),
-				embed::getIconPixmap( "project_save", 24, 24 ),
+				QPixmap( "icons:project_save.png" ).scaled( 24, 24 ),
 									2000 );
 		ConfigManager::inst()->addRecentlyOpenedProject( m_fileName );
 		m_modified = false;
@@ -1106,7 +1105,7 @@ bool Song::guiSaveProject()
 		TextFloat::displayMessage( tr( "Project NOT saved." ),
 				tr( "The project %1 was not saved!" ).arg(
 							m_fileName ),
-				embed::getIconPixmap( "error" ), 4000 );
+				QPixmap( "icons:error.png" ), 4000 );
 		return false;
 	}
 
@@ -1256,8 +1255,8 @@ void Song::exportProject(bool multiExport)
 		{
 			int stx = efd.selectedNameFilter().indexOf( "(*." );
 			int etx = efd.selectedNameFilter().indexOf( ")" );
-	
-			if ( stx > 0 && etx > stx ) 
+
+			if ( stx > 0 && etx > stx )
 			{
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
@@ -1362,7 +1361,7 @@ void Song::setModified()
 
 void Song::addController( Controller * _c )
 {
-	if( _c != NULL && !m_controllers.contains( _c ) ) 
+	if( _c != NULL && !m_controllers.contains( _c ) )
 	{
 		m_controllers.append( _c );
 		emit dataChanged();

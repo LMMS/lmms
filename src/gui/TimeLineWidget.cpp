@@ -2,7 +2,7 @@
  * TimeLineWidget.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@
 
 
 #include "TimeLineWidget.h"
-#include "embed.h"
+
 #include "Engine.h"
 #include "templates.h"
 #include "NStateButton.h"
@@ -75,23 +75,19 @@ TimeLineWidget::TimeLineWidget( const int _xoff, const int _yoff, const float _p
 
 	if( s_timeLinePixmap == NULL )
 	{
-		s_timeLinePixmap = new QPixmap( embed::getIconPixmap(
-								"timeline" ) );
+		s_timeLinePixmap = new QPixmap( "icons:timeline.png" );
 	}
 	if( s_posMarkerPixmap == NULL )
 	{
-		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
-							"playpos_marker" ) );
+		s_posMarkerPixmap = new QPixmap( "icons:playpos_marker.png" );
 	}
 	if( s_loopPointBeginPixmap == NULL )
 	{
-		s_loopPointBeginPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point_b" ) );
+		s_loopPointBeginPixmap = new QPixmap( "icons:loop_point_b.png" );
 	}
 	if( s_loopPointEndPixmap == NULL )
 	{
-		s_loopPointEndPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point_e" ) );
+		s_loopPointEndPixmap = new QPixmap( "icons:loop_point_e.png" );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -127,29 +123,29 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
 	NStateButton * autoScroll = new NStateButton( _tool_bar );
 	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
+	autoScroll->addState( QPixmap( "icons:autoscroll_on.png" ) );
+	autoScroll->addState( QPixmap( "icons:autoscroll_off.png" ) );
 	connect( autoScroll, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleAutoScroll( int ) ) );
 
 	NStateButton * loopPoints = new NStateButton( _tool_bar );
 	loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
-	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
-	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
+	loopPoints->addState( QPixmap( "icons:loop_points_off.png" ) );
+	loopPoints->addState( QPixmap( "icons:loop_points_on.png" ) );
 	connect( loopPoints, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleLoopPoints( int ) ) );
 	connect( this, SIGNAL( loopPointStateLoaded( int ) ), loopPoints,
 					SLOT( changeState( int ) ) );
 
 	NStateButton * behaviourAtStop = new NStateButton( _tool_bar );
-	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
+	behaviourAtStop->addState( QPixmap( "icons:back_to_zero.png" ),
 					tr( "After stopping go back to begin" )
 									);
-	behaviourAtStop->addState( embed::getIconPixmap( "back_to_start" ),
+	behaviourAtStop->addState( QPixmap( "icons:back_to_start.png" ),
 					tr( "After stopping go back to "
 						"position at which playing was "
 						"started" ) );
-	behaviourAtStop->addState( embed::getIconPixmap( "keep_stop_position" ),
+	behaviourAtStop->addState( QPixmap( "icons:keep_stop_position.png" ),
 					tr( "After stopping keep position" ) );
 	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleBehaviourAtStop( int ) ) );
@@ -322,14 +318,14 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <Ctrl> to disable magnetic loop points." ),
-					embed::getIconPixmap( "hint" ), 0 );
+					QPixmap( "icons:hint.png" ), 0 );
 	}
 	else if( m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
-					embed::getIconPixmap( "hint" ), 0 );
+					QPixmap( "icons:hint.png" ), 0 );
 	}
 
 	mouseMoveEvent( event );
@@ -371,7 +367,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			{
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
+				if( m_action == MoveLoopBegin )
 					m_loopPos[0] -= MidiTime::ticksPerTact();
 				else
 					m_loopPos[1] += MidiTime::ticksPerTact();

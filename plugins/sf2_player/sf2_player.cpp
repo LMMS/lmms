@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <QDomDocument>
 
+#include "ConfigManager.h"
 #include "FileDialog.h"
 #include "sf2_player.h"
 #include "Engine.h"
@@ -41,7 +42,7 @@
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -536,7 +537,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	{
 		return;
 	}
-	
+
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if( tfp == 0 )
@@ -551,7 +552,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 			return;
 		}
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
-		
+
 		SF2PluginData * pluginData = new SF2PluginData;
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
@@ -562,7 +563,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->noteOffSent = false;
 
 		_n->m_pluginData = pluginData;
-		
+
 		// insert the nph to the playing notes vector
 		m_playingNotesMutex.lock();
 		m_playingNotes.append( _n );
@@ -573,7 +574,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		SF2PluginData * pluginData = static_cast<SF2PluginData *>( _n->m_pluginData );
 		pluginData->offset = _n->framesBeforeRelease();
 		pluginData->isNew = false;
-		
+
 		m_playingNotesMutex.lock();
 		m_playingNotes.append( _n );
 		m_playingNotesMutex.unlock();
@@ -585,7 +586,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void sf2Instrument::noteOn( SF2PluginData * n )
 {
 	m_synthMutex.lock();
-	
+
 	// get list of current voice IDs so we can easily spot the new
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
@@ -636,7 +637,7 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
 		m_synthMutex.unlock();
 	}
-	
+
 }
 
 
@@ -688,7 +689,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 				currentNote = m_playingNotes[i];
 			}
 		}
-		
+
 		// process the current note:
 		// first see if we're synced in frame count
 		SF2PluginData * currentData = static_cast<SF2PluginData *>( currentNote->m_pluginData );
@@ -716,7 +717,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 			m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
 		}
 	}
-	
+
 	if( currentFrame < frames )
 	{
 		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
@@ -724,7 +725,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
 }
 
-	
+
 void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
@@ -820,8 +821,8 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	// File Button
 	m_fileDialogButton = new PixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
-	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
+	m_fileDialogButton->setActiveGraphic( QPixmap( ":/sf2player/fileselect_on.png" ) );
+	m_fileDialogButton->setInactiveGraphic( QPixmap( ":/sf2player/fileselect_off.png" ) );
 	m_fileDialogButton->move( 217, 107 );
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
@@ -833,8 +834,8 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
-	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
+	m_patchDialogButton->setActiveGraphic( QPixmap( ":/sf2player/patches_on.png" ) );
+	m_patchDialogButton->setInactiveGraphic( QPixmap( ":/sf2player/patches_off.png" ) );
 	m_patchDialogButton->setEnabled( false );
 	m_patchDialogButton->move( 217, 125 );
 
@@ -886,8 +887,8 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton = new PixmapButton( this );
 	m_reverbButton->setCheckable( true );
 	m_reverbButton->move( 14, 180 );
-	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_on" ) );
-	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_off" ) );
+	m_reverbButton->setActiveGraphic( QPixmap( ":/sf2player/reverb_on.png" ) );
+	m_reverbButton->setInactiveGraphic( QPixmap( ":/sf2player/reverb_off.png" ) );
 	ToolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
 	m_reverbButton->setWhatsThis(
 		tr( "This button enables the reverb effect. "
@@ -926,8 +927,8 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton = new PixmapButton( this );
 	m_chorusButton->setCheckable( true );
 	m_chorusButton->move( 14, 226 );
-	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
-	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
+	m_chorusButton->setActiveGraphic( QPixmap( ":/sf2player/chorus_on.png" ) );
+	m_chorusButton->setInactiveGraphic( QPixmap( ":/sf2player/chorus_off.png" ) );
 	ToolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
 	m_chorusButton->setWhatsThis(
 		tr( "This button enables the chorus effect. "
@@ -960,7 +961,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 */
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/sf2player/artwork.png" ) );
 	setPalette( pal );
 
 	updateFilename();

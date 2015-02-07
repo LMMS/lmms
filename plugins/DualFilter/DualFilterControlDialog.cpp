@@ -27,7 +27,6 @@
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
-#include "embed.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
 #include "ToolTip.h"
@@ -47,7 +46,7 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/dualfilter/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 150, 220 );
 

@@ -1,3 +1,6 @@
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(nes Nes.cpp Nes.h MOCFILES Nes.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+BUILD_PLUGIN(nes
+	Nes.cpp Nes.h MOCFILES Nes.h
+	QRESOURCES GLOB *.png
+)

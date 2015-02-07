@@ -25,7 +25,7 @@
 
 #include "stereo_enhancer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
@@ -81,15 +81,15 @@ stereoEnhancerEffect::~stereoEnhancerEffect()
 bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
-	
+
 	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
+	// audio with this effect
 	double out_sum = 0.0;
-	
+
 	float width;
 	int frameIndex = 0;
-	
-	
+
+
 	if( !isEnabled() || !isRunning() )
 	{
 		return( false );
@@ -100,7 +100,7 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		
+
 		// copy samples into the delay buffer
 		m_delayBuffer[m_currFrame][0] = _buf[f][0];
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];

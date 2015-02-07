@@ -39,7 +39,6 @@
 #include "Mixer.h"
 #include "ProjectJournal.h"
 #include "ConfigManager.h"
-#include "embed.h"
 #include "Engine.h"
 #include "debug.h"
 #include "ToolTip.h"
@@ -91,7 +90,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disabled" ).toInt() ),
 	m_warnAfterSetup( !ConfigManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
-	m_displaydBV( ConfigManager::inst()->value( "app", 
+	m_displaydBV( ConfigManager::inst()->value( "app",
 		      				"displaydbv" ).toInt() ),
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_disableBackup( !ConfigManager::inst()->value( "app",
@@ -129,7 +128,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
 						   "disableautoquit").toInt() )
 {
-	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
+	setWindowIcon( QPixmap( "icons:setup_general.png" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
 
@@ -182,14 +181,14 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	setBufferSize( m_bufSizeSlider->value() );
 
 	QPushButton * bufsize_reset_btn = new QPushButton(
-			embed::getIconPixmap( "reload" ), "", bufsize_tw );
+			QPixmap( "icons:reload.png" ), "", bufsize_tw );
 	bufsize_reset_btn->setGeometry( 290, 40, 28, 28 );
 	connect( bufsize_reset_btn, SIGNAL( clicked() ), this,
 						SLOT( resetBufSize() ) );
 	ToolTip::add( bufsize_reset_btn, tr( "Reset to default-value" ) );
 
 	QPushButton * bufsize_help_btn = new QPushButton(
-			embed::getIconPixmap( "help" ), "", bufsize_tw );
+			QPixmap( "icons:help.png" ), "", bufsize_tw );
 	bufsize_help_btn->setGeometry( 320, 40, 28, 28 );
 	connect( bufsize_help_btn, SIGNAL( clicked() ), this,
 						SLOT( displayBufSizeHelp() ) );
@@ -391,7 +390,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				SLOT( setWorkingDir( const QString & ) ) );
 
 	QPushButton * workingdir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 							"", lmms_wd_tw );
 	workingdir_select_btn->setFixedSize( 24, 24 );
 	workingdir_select_btn->move( 320, 16 );
@@ -410,7 +409,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 					SLOT( setVSTDir( const QString & ) ) );
 
 	QPushButton * vstdir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 								"", vst_tw );
 	vstdir_select_btn->setFixedSize( 24, 24 );
 	vstdir_select_btn->move( 320, 16 );
@@ -429,7 +428,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				SLOT( setArtworkDir( const QString & ) ) );
 
 	QPushButton * artworkdir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 							"", artwork_tw );
 	artworkdir_select_btn->setFixedSize( 24, 24 );
 	artworkdir_select_btn->move( 320, 16 );
@@ -443,14 +442,14 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 			"Background artwork" ).toUpper(), paths );
 	backgroundArtwork_tw->setFixedHeight( 48 );
 
-	m_baLineEdit = new QLineEdit( m_backgroundArtwork, 
+	m_baLineEdit = new QLineEdit( m_backgroundArtwork,
 			backgroundArtwork_tw );
 	m_baLineEdit->setGeometry( 10, 20, 300, 16 );
 	connect( m_baLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 			SLOT( setBackgroundArtwork( const QString & ) ) );
 
 	QPushButton * backgroundartworkdir_select_btn = new QPushButton(
-			embed::getIconPixmap( "project_open", 16, 16 ),
+			QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 			"", backgroundArtwork_tw );
 	backgroundartworkdir_select_btn->setFixedSize( 24, 24 );
 	backgroundartworkdir_select_btn->move( 320, 16 );
@@ -473,7 +472,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 					SLOT( setFLDir( const QString & ) ) );
 
 	QPushButton * fldir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 								"", fl_tw );
 	fldir_select_btn->setFixedSize( 24, 24 );
 	fldir_select_btn->move( 320, 16 );
@@ -491,7 +490,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		 		SLOT( setLADSPADir( const QString & ) ) );
 
 	QPushButton * laddir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 								"", lad_tw );
 	laddir_select_btn->setFixedSize( 24, 24 );
 	laddir_select_btn->move( 320, 16 );
@@ -511,7 +510,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		 SLOT( setSTKDir( const QString & ) ) );
 
 	QPushButton * stkdir_select_btn = new QPushButton(
-			embed::getIconPixmap( "project_open", 16, 16 ),
+			QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 								"", stk_tw );
 	stkdir_select_btn->setFixedSize( 24, 24 );
 	stkdir_select_btn->move( 320, 16 );
@@ -531,13 +530,13 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		 		SLOT( setDefaultSoundfont( const QString & ) ) );
 
 	QPushButton * sf_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				QPixmap( "icons:project_open.png" ).scaled( 16, 16 ),
 								"", sf_tw );
 	sf_select_btn->setFixedSize( 24, 24 );
 	sf_select_btn->move( 320, 16 );
 	connect( sf_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openDefaultSoundfont() ) );
-#endif	
+#endif
 
 
 	dir_layout->addWidget( lmms_wd_tw );
@@ -554,11 +553,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_STK
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( stk_tw );
-#endif	
+#endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( sf_tw );
-#endif	
+#endif
 	dir_layout->addStretch();
 
 
@@ -624,7 +623,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QPushButton * audio_help_btn = new QPushButton(
-			embed::getIconPixmap( "help" ), "", audioiface_tw );
+			QPixmap( "icons:help.png" ), "", audioiface_tw );
 	audio_help_btn->setGeometry( 320, 20, 28, 28 );
 	connect( audio_help_btn, SIGNAL( clicked() ), this,
 						SLOT( displayAudioHelp() ) );
@@ -716,7 +715,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QPushButton * midi_help_btn = new QPushButton(
-			embed::getIconPixmap( "help" ), "", midiiface_tw );
+			QPixmap( "icons:help.png" ), "", midiiface_tw );
 	midi_help_btn->setGeometry( 320, 20, 28, 28 );
 	connect( midi_help_btn, SIGNAL( clicked() ), this,
 						SLOT( displayMIDIHelp() ) );
@@ -780,18 +779,16 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	midi_layout->addStretch();
 
 
-	m_tabBar->addTab( general, tr( "General settings" ), 0, false, true 
-			)->setIcon( embed::getIconPixmap( "setup_general" ) );
-	m_tabBar->addTab( paths, tr( "Paths" ), 1, false, true 
-			)->setIcon( embed::getIconPixmap(
-							"setup_directories" ) );
+	m_tabBar->addTab( general, tr( "General settings" ), 0, false, true
+			)->setIcon( QPixmap( "icons:setup_general.png" ) );
+	m_tabBar->addTab( paths, tr( "Paths" ), 1, false, true
+			)->setIcon( QPixmap( "icons:setup_directories.png" ) );
 	m_tabBar->addTab( performance, tr( "Performance settings" ), 2, false,
-				true )->setIcon( embed::getIconPixmap(
-							"setup_performance" ) );
+				true )->setIcon( QPixmap( "icons:setup_performance.png" ) );
 	m_tabBar->addTab( audio, tr( "Audio settings" ), 3, false, true
-			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
+			)->setIcon( QPixmap( "icons:setup_audio.png" ) );
 	m_tabBar->addTab( midi, tr( "MIDI settings" ), 4, true, true
-			)->setIcon( embed::getIconPixmap( "setup_midi" ) );
+			)->setIcon( QPixmap( "icons:setup_midi.png" ) );
 
 
 	m_tabBar->setActiveTab( _tab_to_open );
@@ -806,12 +803,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
 	btn_layout->setSpacing( 0 );
 	btn_layout->setMargin( 0 );
-	QPushButton * ok_btn = new QPushButton( embed::getIconPixmap( "apply" ),
+	QPushButton * ok_btn = new QPushButton( QPixmap( "icons:apply.png" ),
 						tr( "OK" ), buttons );
 	connect( ok_btn, SIGNAL( clicked() ), this, SLOT( accept() ) );
 
-	QPushButton * cancel_btn = new QPushButton( embed::getIconPixmap(
-								"cancel" ),
+	QPushButton * cancel_btn = new QPushButton( QPixmap( "icons:cancel.png" ),
 							tr( "Cancel" ),
 							buttons );
 	connect( cancel_btn, SIGNAL( clicked() ), this, SLOT( reject() ) );
@@ -896,7 +892,7 @@ void SetupDialog::accept()
 #endif
 #ifdef LMMS_HAVE_STK
 	ConfigManager::inst()->setSTKDir( m_stkDir );
-#endif	
+#endif
 	ConfigManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
 
 	// tell all audio-settings-widget to save their settings
@@ -1222,9 +1218,9 @@ void SetupDialog::openDefaultSoundfont()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName( this,
-				tr( "Choose default SoundFont" ), m_defaultSoundfont, 
+				tr( "Choose default SoundFont" ), m_defaultSoundfont,
 				"SoundFont2 Files (*.sf2)" );
-	
+
 	if( new_file != QString::null )
 	{
 		m_sfLineEdit->setText( new_file );
@@ -1255,9 +1251,9 @@ void SetupDialog::openBackgroundArtwork()
 		m_artworkDir :
 		m_backgroundArtwork;
 	QString new_file = FileDialog::getOpenFileName( this,
-			tr( "Choose background artwork" ), dir, 
+			tr( "Choose background artwork" ), dir,
 			"Image Files (" + fileTypes + ")" );
-	
+
 	if( new_file != QString::null )
 	{
 		m_baLineEdit->setText( new_file );

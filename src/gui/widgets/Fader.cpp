@@ -51,7 +51,6 @@
 #include <QPainter>
 
 #include "Fader.h"
-#include "embed.h"
 #include "Engine.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
@@ -86,15 +85,15 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	}
 	if( ! s_back )
 	{
-		s_back = new QPixmap( embed::getIconPixmap( "fader_background" ) );
+		s_back = new QPixmap( "icons:fader_background.png" );
 	}
 	if( ! s_leds )
 	{
-		s_leds = new QPixmap( embed::getIconPixmap( "fader_leds" ) );
+		s_leds = new QPixmap( "icons:fader_leds.png" );
 	}
 	if( ! s_knob )
 	{
-		s_knob = new QPixmap( embed::getIconPixmap( "fader_knob" ) );
+		s_knob = new QPixmap( "icons:fader_knob.png" );
 	}
 
 	m_back = s_back;
@@ -352,7 +351,7 @@ void Fader::paintEvent( QPaintEvent * ev)
 	int height = m_back->height();
 	int width = m_back->width() / 2;
 	int center = m_back->width() - width;
-	
+
 	int peak_L = calculateDisplayPeak( m_fPeakValue_L - m_fMinPeak );
 	int persistentPeak_L = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_L - m_fMinPeak ) );
 	painter.drawPixmap( QRect( 0, peak_L, width, height - peak_L ), *m_leds, QRect( 0, peak_L, width, height - peak_L ) );

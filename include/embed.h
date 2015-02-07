@@ -35,30 +35,9 @@
 namespace embed
 {
 
-struct descriptor
-{
-	int size;
-	const unsigned char * data;
-	const char * name;
-} ;
-
-
-QPixmap EXPORT getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
 QString EXPORT getText( const char * _name );
 
 }
-
-
-#ifdef PLUGIN_NAME
-namespace PLUGIN_NAME
-{
-
-QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
-//QString getText( const char * _name );
-
-}
-#endif
-
 
 
 class PixmapLoader
@@ -78,9 +57,9 @@ public:
 	{
 		if( !m_name.isEmpty() )
 		{
-			return( embed::getIconPixmap( m_name.toLatin1().constData() ) );
+			return QPixmap(QString("icons:%1.png").arg(m_name));
 		}
-		return( QPixmap() );
+		return QPixmap();
 	}
 
 	virtual ~PixmapLoader()
@@ -110,10 +89,10 @@ public:
 	{
 		if( !m_name.isEmpty() )
 		{
-			return( PLUGIN_NAME::getIconPixmap(
-					m_name.toLatin1().constData() ) );
+			QString pixmap_path = QString(":/%1/%2.png").arg(STRINGIFY(PLUGIN_NAME), m_name);
+			return QPixmap(pixmap_path);
 		}
-		return( QPixmap() );
+		return QPixmap();
 	}
 
 	virtual QString pixmapName() const
@@ -123,7 +102,5 @@ public:
 
 } ;
 #endif
-
-
 
 #endif

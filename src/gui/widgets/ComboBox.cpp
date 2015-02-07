@@ -56,17 +56,17 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	if( s_background == NULL )
 	{
-		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );
+		s_background = new QPixmap( "icons:combobox_bg.png" );
 	}
 
 	if( s_arrow == NULL )
 	{
-		s_arrow = new QPixmap( embed::getIconPixmap( "combobox_arrow" ) );
+		s_arrow = new QPixmap( "icons:combobox_arrow.png" );
 	}
 
 	if( s_arrowSelected == NULL )
 	{
-		s_arrowSelected = new QPixmap( embed::getIconPixmap( "combobox_arrow_selected" ) );
+		s_arrowSelected = new QPixmap( "icons:combobox_arrow_selected.png" );
 	}
 
 	setFont( pointSize<9>( font() ) );

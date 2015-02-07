@@ -33,7 +33,6 @@
 
 #include "FxMixer.h"
 #include "FxMixerView.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "SendButtonIndicator.h"
@@ -52,16 +51,16 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 {
 	if( ! s_sendBgArrow )
 	{
-		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
+		s_sendBgArrow = new QPixmap( QPixmap( "icons:send_bg_arrow.png" ).scaled( 29, 56 ) );
 	}
 	if( ! s_receiveBgArrow )
 	{
-		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
+		s_receiveBgArrow = new QPixmap( QPixmap( "icons:receive_bg_arrow.png" ).scaled( 29, 56 ) );
 	}
 
 	setFixedSize( 33, FxLineHeight );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor( QCursor( QPixmap( "icons:hand.png" ), 3, 3 ) );
 
 	// mixer sends knob
 	m_sendKnob = new Knob( knobBright_26, this, tr("Channel send amount") );
@@ -77,18 +76,18 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->move( 4, 58 );
 	m_lcd->setMarginWidth( 1 );
-	
+
 	setWhatsThis( tr(
 	"The FX channel receives input from one or more instrument tracks.\n "
 	"It in turn can be routed to multiple other FX channels. LMMS automatically "
 	"takes care of preventing infinite loops for you and doesn't allow making "
 	"a connection that would result in an infinite loop.\n\n"
-	
+
 	"In order to route the channel to another channel, select the FX channel "
 	"and click on the \"send\" button on the channel you want to send to. "
 	"The knob under the send button controls the level of signal that is sent "
 	"to the channel.\n\n"
-	
+
 	"You can remove and move FX channels in the context menu, which is accessed "
 	"by right-clicking the FX channel.\n") );
 }
@@ -143,10 +142,10 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 	// draw the channel name
 	p->rotate( -90 );
 
-	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );	
+	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );
 	p->setPen( sh_color );
-	p->drawText( -146, 21, name ); 
-	
+	p->drawText( -146, 21, name );
+
 	p->setPen( isActive ? bt_color : te_color );
 
 	p->drawText( -145, 20, name );
@@ -186,7 +185,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	FxMixer * mix = Engine::fxMixer();
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
-	if( m_channelIndex != 0 ) // no move-options in master 
+	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
 		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
@@ -196,12 +195,12 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 
 	if( m_channelIndex != 0 ) // no remove-option in master
 	{
-		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ),
+		contextMenu->addAction( QPixmap( "icons:cancel.png" ), tr( "R&emove channel" ),
 							this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
 
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ),
+	contextMenu->addAction( QPixmap( "icons:cancel.png" ), tr( "Remove &unused channels" ),
 						this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
 

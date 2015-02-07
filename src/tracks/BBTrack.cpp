@@ -30,7 +30,6 @@
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
-#include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
@@ -86,7 +85,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
 	element.setAttribute( "color", color() );
-	
+
 	if( m_useStyleColor )
 	{
 		element.setAttribute( "usestyle", 1 );
@@ -117,10 +116,10 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		setColor( QColor( element.attribute( "color" ).toUInt() ) );
 	}
-	
+
 	if( element.hasAttribute( "usestyle" ) )
 	{
-		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
+		if( element.attribute( "usestyle" ).toUInt() == 1 )
 		{
 			m_useStyleColor = true;
 		}
@@ -183,7 +182,7 @@ BBTCOView::~BBTCOView()
 
 void BBTCOView::constructContextMenu( QMenu * _cm )
 {
-	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
+	QAction * a = new QAction( QPixmap( "icons:bb_track.png" ),
 					tr( "Open in Beat+Bassline-Editor" ),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
@@ -191,14 +190,14 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 			this, SLOT( openInBBEditor() ) );
 	_cm->insertSeparator( _cm->actions()[1] );
 	_cm->addSeparator();
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+	_cm->addAction( QPixmap( "icons:reload.png" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+	_cm->addAction( QPixmap( "icons:edit_rename.png" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
+	_cm->addAction( QPixmap( "icons:colorize.png" ),
 			tr( "Change color" ), this, SLOT( changeColor() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
+	_cm->addAction( QPixmap( "icons:colorize.png" ),
 			tr( "Reset color to default" ), this, SLOT( resetColor() ) );
 }
 
@@ -262,16 +261,16 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	p.setFont( pointSize<8>( p.font() ) );
-	
+
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawText( 4, p.fontMetrics().height()+1, m_bbTCO->name() );
 	p.setPen( textColor() );
 	p.drawText( 3, p.fontMetrics().height(), m_bbTCO->name() );
-	
+
 	if( m_bbTCO->isMuted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
-				embed::getIconPixmap( "muted", 16, 16 ) );
+				QPixmap( "icons:muted.png" ).scaled( 16, 16 ) );
 	}
 }
 
@@ -593,7 +592,7 @@ BBTrackView::BBTrackView( BBTrack * _bbt, TrackContainerView* tcv ) :
 	setAcceptDrops( false );
 
 	m_trackLabel = new TrackLabelButton( this, getTrackSettingsWidget() );
-	m_trackLabel->setIcon( embed::getIconPixmap( "bb_track" ) );
+	m_trackLabel->setIcon( QPixmap( "icons:bb_track.png" ) );
 	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();
 	connect( m_trackLabel, SIGNAL( clicked( bool ) ),

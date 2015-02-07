@@ -28,7 +28,6 @@
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
 #include "ComboBox.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GroupBox.h"
 #include "gui_templates.h"

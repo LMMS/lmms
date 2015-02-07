@@ -32,11 +32,12 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -110,11 +111,11 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Clump" ) );
 	m_scalers.append( 4.0 );
-	
+
 	// TubeBell
 	m_presetsModel.addItem( tr( "Tubular Bells" ) );
 	m_scalers.append( 1.8 );
-	
+
 	// BandedWG
 	m_presetsModel.addItem( tr( "Uniform Bar" ) );
 	m_scalers.append( 25.0 );
@@ -151,7 +152,7 @@ void malletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_lfoSpeedModel.saveSettings( _doc, _this, "lfo_speed" );
 	m_lfoDepthModel.saveSettings( _doc, _this, "lfo_depth" );
 	m_adsrModel.saveSettings( _doc, _this, "adsr" );
-	
+
 	// BandedWG
 	m_pressureModel.saveSettings( _doc, _this, "pressure" );
 	m_motionModel.saveSettings( _doc, _this, "motion" );
@@ -181,7 +182,7 @@ void malletsInstrument::loadSettings( const QDomElement & _this )
 	m_lfoSpeedModel.loadSettings( _this, "lfo_speed" );
 	m_lfoDepthModel.loadSettings( _this, "lfo_depth" );
 	m_adsrModel.loadSettings( _this, "adsr" );
-	
+
 	// BandedWG
 	m_pressureModel.loadSettings( _this, "pressure" );
 	m_motionModel.loadSettings( _this, "motion" );
@@ -213,7 +214,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	int p = m_presetsModel.value();
-	
+
 	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -277,12 +278,12 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	}
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		_working_buffer[frame][0] = ps->nextSampleLeft() * 
+		_working_buffer[frame][0] = ps->nextSampleLeft() *
 				( m_scalers[m_presetsModel.value()] + add_scale );
-		_working_buffer[frame][1] = ps->nextSampleRight() * 
+		_working_buffer[frame][1] = ps->nextSampleRight() *
 				( m_scalers[m_presetsModel.value()] + add_scale );
 	}
-	
+
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
@@ -313,24 +314,24 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	setWidgetBackground( m_modalBarWidget, "artwork" );
 	m_modalBarWidget->show();
 	m_modalBarWidget->move( 0,0 );
-	
+
 	m_tubeBellWidget = setupTubeBellControls( this );
 	setWidgetBackground( m_tubeBellWidget, "artwork" );
 	m_tubeBellWidget->hide();
 	m_tubeBellWidget->move( 0,0 );
-	
+
 	m_bandedWGWidget = setupBandedWGControls( this );
 	setWidgetBackground( m_bandedWGWidget, "artwork" );
 	m_bandedWGWidget->hide();
 	m_bandedWGWidget->move( 0,0 );
-	
+
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
 	m_presetsCombo->setGeometry( 140, 50, 99, 22 );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
-	
+
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
-	
+
 	m_spreadKnob = new Knob( knobVintage_32, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 190, 140 );
@@ -350,8 +351,7 @@ void malletsInstrumentView::setWidgetBackground( QWidget * _widget, const QStrin
 {
 	_widget->setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( _widget->backgroundRole(),
-		PLUGIN_NAME::getIconPixmap( _pic.toLatin1().constData() ) );
+	pal.setBrush( _widget->backgroundRole(), QPixmap( QString(":/malletsstk/%1.png").arg(_pic) ) );
 	_widget->setPalette( pal );
 }
 
@@ -362,7 +362,7 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 {
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
-		
+
 	m_hardnessKnob = new Knob( knobVintage_32, widget );
 	m_hardnessKnob->setLabel( tr( "Hardness" ) );
 	m_hardnessKnob->move( 30, 90 );
@@ -387,7 +387,7 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	m_stickKnob->setLabel( tr( "Stick Mix" ) );
 	m_stickKnob->move( 190, 90 );
 	m_stickKnob->setHintText( tr( "Stick Mix:" ), "" );
-	
+
 	return( widget );
 }
 
@@ -398,7 +398,7 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 {
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
-	
+
 	m_modulatorKnob = new Knob( knobVintage_32, widget );
 	m_modulatorKnob->setLabel( tr( "Modulator" ) );
 	m_modulatorKnob->move( 30, 90 );
@@ -408,17 +408,17 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	m_crossfadeKnob->setLabel( tr( "Crossfade" ) );
 	m_crossfadeKnob->move( 110, 90 );
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
-	
+
 	m_lfoSpeedKnob = new Knob( knobVintage_32, widget );
 	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
 	m_lfoSpeedKnob->move( 30, 140 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ), "" );
-	
+
 	m_lfoDepthKnob = new Knob( knobVintage_32, widget );
 	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
 	m_lfoDepthKnob->move( 110, 140 );
 	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ), "" );
-	
+
 	m_adsrKnob = new Knob( knobVintage_32, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
 	m_adsrKnob->move( 190, 90 );
@@ -435,7 +435,7 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 	// BandedWG
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
-	
+
 	m_strikeLED = new LedCheckBox( tr( "Bowed" ), widget );
 	m_strikeLED->move( 138, 25 );
 
@@ -448,17 +448,17 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 	m_motionKnob->setLabel( tr( "Motion" ) );
 	m_motionKnob->move( 110, 90 );
 	m_motionKnob->setHintText( tr( "Motion:" ), "" );
-	
+
 	m_velocityKnob = new Knob( knobVintage_32, widget );
 	m_velocityKnob->setLabel( tr( "Speed" ) );
 	m_velocityKnob->move( 30, 140 );
 	m_velocityKnob->setHintText( tr( "Speed:" ), "" );
-	
+
 	m_vibratoKnob = new Knob( knobVintage_32, widget, tr( "Vibrato" ) );
 	m_vibratoKnob->setLabel( tr( "Vibrato" ) );
 	m_vibratoKnob->move( 110, 140 );
 	m_vibratoKnob->setHintText( tr( "Vibrato:" ), "" );
-	
+
 	return( widget );
 }
 
@@ -494,7 +494,7 @@ void malletsInstrumentView::changePreset()
 {
 	malletsInstrument * inst = castModel<malletsInstrument>();
 	int _preset = inst->m_presetsModel.value();
-	
+
 	printf("malletsInstrumentView %d\n", _preset);
 	if( _preset < 9 )
 	{
@@ -513,7 +513,7 @@ void malletsInstrumentView::changePreset()
 		m_modalBarWidget->hide();
 		m_tubeBellWidget->hide();
 		m_bandedWGWidget->show();
-	}		
+	}
 }
 
 
@@ -535,9 +535,9 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
 						.toLatin1().constData() );
-	
+
 		m_voice = new ModalBar();
-	
+
 		m_voice->controlChange( 1, _control1 );
 		m_voice->controlChange( 2, _control2 );
 		m_voice->controlChange( 4, _control4 );
@@ -545,14 +545,14 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		m_voice->controlChange( 11, _control11 );
 		m_voice->controlChange( 16, _control16 );
 		m_voice->controlChange( 128, 128.0f );
-		
+
 		m_voice->noteOn( _pitch, _velocity );
 	}
 	catch( ... )
 	{
 		m_voice = NULL;
 	}
-	
+
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
@@ -582,22 +582,22 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
 						.toLatin1().constData() );
-	
+
 		m_voice = new TubeBell();
-	
+
 		m_voice->controlChange( 1, _control1 );
 		m_voice->controlChange( 2, _control2 );
 		m_voice->controlChange( 4, _control4 );
 		m_voice->controlChange( 11, _control11 );
 		m_voice->controlChange( 128, _control128 );
-	
+
 		m_voice->noteOn( _pitch, _velocity );
 	}
 	catch( ... )
 	{
 		m_voice = NULL;
 	}
-	
+
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
@@ -629,7 +629,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 						.toLatin1().constData() );
 
 		m_voice = new BandedWG();
-	
+
 		m_voice->controlChange( 1, 128.0 );
 		m_voice->controlChange( 2, _control2 );
 		m_voice->controlChange( 4, _control4 );
@@ -637,14 +637,14 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		m_voice->controlChange( 16, _control16 );
 		m_voice->controlChange( 64, _control64 );
 		m_voice->controlChange( 128, _control128 );
-	
+
 		m_voice->noteOn( _pitch, _velocity );
 	}
 	catch( ... )
 	{
 		m_voice = NULL;
 	}
-	
+
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;

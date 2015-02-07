@@ -3,7 +3,7 @@
  * controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -32,7 +32,6 @@
 
 #include "CaptionMenu.h"
 #include "gui_templates.h"
-#include "embed.h"
 #include "Engine.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
@@ -48,9 +47,9 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	ControllerDialog( _model, _parent )
 {
 	setWindowTitle( tr( "PEAK" ) );
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowIcon( QPixmap( "icons:controller.png" ) );
 	setFixedSize( 256, 64 );
-	
+
 	ToolTip::add( this, tr( "LFO Controller" ) );
 
 	QLabel * l = new QLabel( this );

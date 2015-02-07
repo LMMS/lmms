@@ -29,7 +29,6 @@
 #include "TempoSyncKnob.h"
 #include "Engine.h"
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
@@ -40,7 +39,7 @@
 TempoSyncKnob::TempoSyncKnob( knobTypes _knob_num, QWidget * _parent,
 						const QString & _name ) :
 	Knob( _knob_num, _parent, _name ),
-	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
+	m_tempoSyncIcon( QPixmap( "icons:tempo_sync.png" ) ),
 	m_tempoSyncDescription( tr( "Tempo Sync" ) ),
 	m_custom( NULL )
 {
@@ -98,48 +97,48 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	connect( syncMenu, SIGNAL( triggered( QAction * ) ),
 			model(), SLOT( setTempoSync( QAction * ) ) );
-	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
+	syncMenu->addAction( QPixmap( "icons:note_none.png" ),
 		tr( "No Sync" ) )->setData( (int) TempoSyncKnobModel::SyncNone );
 	if( limit / 0.125f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
+		syncMenu->addAction( QPixmap( "icons:note_double_whole.png" ),
 				tr( "Eight beats" ) )->setData(
 				(int) TempoSyncKnobModel::SyncDoubleWholeNote );
 	}
 	if( limit / 0.25f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
+		syncMenu->addAction( QPixmap( "icons:note_whole.png" ),
 					tr( "Whole note" ) )->setData(
 					(int) TempoSyncKnobModel::SyncWholeNote );
 	}
 	if( limit / 0.5f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_half" ),
+		syncMenu->addAction( QPixmap( "icons:note_half.png" ),
 					tr( "Half note" ) )->setData(
 					(int) TempoSyncKnobModel::SyncHalfNote );
 	}
 	if( limit <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
+		syncMenu->addAction( QPixmap( "icons:note_quarter.png" ),
 					tr( "Quarter note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncQuarterNote );
 	}
 	if( limit / 2.0f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
+		syncMenu->addAction( QPixmap( "icons:note_eighth.png" ),
 					tr( "8th note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncEighthNote );
 	}
 	if( limit / 4.0f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
+		syncMenu->addAction( QPixmap( "icons:note_sixteenth.png" ),
 					tr( "16th note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncSixteenthNote );
 	}
-	syncMenu->addAction( embed::getIconPixmap( "note_thirtysecond" ),
+	syncMenu->addAction( QPixmap( "icons:note_thirtysecond.png" ),
 					tr( "32nd note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncThirtysecondNote );
-	syncMenu->addAction( embed::getIconPixmap( "dont_know" ),
+	syncMenu->addAction( QPixmap( "icons:dont_know.png" ),
 				tr( "Custom..." ),
 				this, SLOT( showCustom() )
 						)->setData(
@@ -215,31 +214,31 @@ void TempoSyncKnob::updateDescAndIcon()
 	switch( model()->m_tempoSyncMode )
 	{
 		case TempoSyncKnobModel::SyncNone:
-			m_tempoSyncIcon = embed::getIconPixmap( "tempo_sync" );
+			m_tempoSyncIcon = QPixmap( "icons:tempo_sync.png" );
 			break;
 		case TempoSyncKnobModel::SyncCustom:
-			m_tempoSyncIcon = embed::getIconPixmap( "dont_know" );
+			m_tempoSyncIcon = QPixmap( "icons:dont_know.png" );
 			break;
 		case TempoSyncKnobModel::SyncDoubleWholeNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_double_whole" );
+			m_tempoSyncIcon = QPixmap( "icons:note_double_whole.png" );
 			break;
 		case TempoSyncKnobModel::SyncWholeNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_whole" );
+			m_tempoSyncIcon = QPixmap( "icons:note_whole.png" );
 			break;
 		case TempoSyncKnobModel::SyncHalfNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_half" );
+			m_tempoSyncIcon = QPixmap( "icons:note_half.png" );
 			break;
 		case TempoSyncKnobModel::SyncQuarterNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_quarter" );
+			m_tempoSyncIcon = QPixmap( "icons:note_quarter.png" );
 			break;
 		case TempoSyncKnobModel::SyncEighthNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_eighth" );
+			m_tempoSyncIcon = QPixmap( "icons:note_eighth.png" );
 			break;
 		case TempoSyncKnobModel::SyncSixteenthNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_sixteenth" );
+			m_tempoSyncIcon = QPixmap( "icons:note_sixteenth.png" );
 			break;
 		case TempoSyncKnobModel::SyncThirtysecondNote:
-			m_tempoSyncIcon = embed::getIconPixmap( "note_thirtysecond" );
+			m_tempoSyncIcon = QPixmap( "icons:note_thirtysecond.png" );
 			break;
 		default:
 			qWarning( "TempoSyncKnob::calculateTempoSyncTime:"

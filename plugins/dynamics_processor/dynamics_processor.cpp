@@ -28,7 +28,7 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
@@ -105,11 +105,11 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
+
 	const int stereoMode = m_dpControls.m_stereomodeModel.value();
 	const float inputGain = m_dpControls.m_inputModel.value();
 	const float outputGain = m_dpControls.m_outputModel.value();
-	
+
 	const float * samples = m_dpControls.m_wavegraphModel.samples();
 
 // debug code
@@ -205,7 +205,7 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 					gain = samples[199];
 				};
 
-				s[i] *= gain; 
+				s[i] *= gain;
 				s[i] /= sm_peak[i];
 			}
 		}

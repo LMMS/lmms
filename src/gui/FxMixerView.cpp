@@ -40,7 +40,6 @@
 #include "FxMixerView.h"
 #include "Knob.h"
 #include "Engine.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "gui_templates.h"
@@ -64,7 +63,7 @@ FxMixerView::FxMixerView() :
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 
 	setWindowTitle( tr( "FX-Mixer" ) );
-	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
+	setWindowIcon( QPixmap( "icons:fx_mixer.png" ) );
 
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;
@@ -126,16 +125,16 @@ FxMixerView::FxMixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
-	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
+	QPushButton * newChannelBtn = new QPushButton( QPixmap( "icons:new_channel.png" ), QString::null, this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( fxLineSize );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
-	// add the stacked layout for the effect racks of fx channels 
+	// add the stacked layout for the effect racks of fx channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
-	
+
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
 	setLayout( ml );
@@ -215,10 +214,10 @@ void FxMixerView::refreshDisplay()
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 		m_racksLayout->addWidget( m_fxChannelViews[i]->m_rackView );
 	}
-	
+
 	// set selected fx line to 0
 	setCurrentFxLine( 0 );
-	
+
 	// update all fx lines
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
@@ -281,9 +280,9 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_muteBtn = new PixmapButton( m_fxLine, tr( "Mute" ) );
 	m_muteBtn->setModel( &m->effectChannel(_chIndex)->m_muteModel );
 	m_muteBtn->setActiveGraphic(
-				embed::getIconPixmap( "led_off" ) );
+				QPixmap( "icons:led_off.png" ) );
 	m_muteBtn->setInactiveGraphic(
-				embed::getIconPixmap( "led_green" ) );
+				QPixmap( "icons:led_green.png" ) );
 	m_muteBtn->setCheckable( true );
 	m_muteBtn->move( 9,  m_fader->y()-11);
 	ToolTip::add( m_muteBtn, tr( "Mute this FX channel" ) );
@@ -291,15 +290,15 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn = new PixmapButton( m_fxLine, tr( "Solo" ) );
 	m_soloBtn->setModel( &m->effectChannel(_chIndex)->m_soloModel );
 	m_soloBtn->setActiveGraphic(
-				embed::getIconPixmap( "led_red" ) );
+				QPixmap( "icons:led_red.png" ) );
 	m_soloBtn->setInactiveGraphic(
-				embed::getIconPixmap( "led_off" ) );
+				QPixmap( "icons:led_off.png" ) );
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&m->effectChannel(_chIndex)->m_soloModel, SIGNAL( dataChanged() ),
 			_mv, SLOT ( toggledSolo() ) );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
-	
+
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &m->effectChannel(_chIndex)->m_fxChain, _mv->m_racksWidget );
 	m_rackView->setFixedSize( 245, FxLine::FxLineHeight );

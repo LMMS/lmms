@@ -2,7 +2,7 @@
  * ladspa_port_dialog.cpp - dialog to test a LADSPA plugin
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -28,7 +28,6 @@
 #include <QLayout>
 #include <QTableWidget>
 
-#include "embed.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 #include "Mixer.h"
@@ -38,7 +37,7 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 {
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
-	setWindowIcon( embed::getIconPixmap( "ports" ) );
+	setWindowIcon( QPixmap( "icons:ports.png" ) );
 	setWindowTitle( tr( "Ports" ) );
 	setModal( true );
 
@@ -115,7 +114,7 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		}
 		else if( manager->isInteger( _key, row ) )
 		{
-			range += QString::number( static_cast<int>( def ) ) + 
+			range += QString::number( static_cast<int>( def ) ) +
 									" < ";
 		}
 		else

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -40,7 +41,7 @@
 #include "ToolTip.h"
 #include "FileDialog.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -444,7 +445,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+				QPixmap( ":/patman/artwork.png" ) );
 	setPalette( pal );
 
 
@@ -452,10 +453,8 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_openFileButton->setObjectName( "openFileButton" );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 227, 86 );
-	m_openFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"select_file_on" ) );
-	m_openFileButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"select_file" ) );
+	m_openFileButton->setActiveGraphic( QPixmap( ":/patman/select_file_on.png" ) );
+	m_openFileButton->setInactiveGraphic( QPixmap( ":/patman/select_file.png" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
 	ToolTip::add( m_openFileButton, tr( "Open other patch" ) );
@@ -468,10 +467,8 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_loopButton->setObjectName("loopButton");
 	m_loopButton->setCheckable( true );
 	m_loopButton->move( 195, 138 );
-	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_on" ) );
-	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_off" ) );
+	m_loopButton->setActiveGraphic( QPixmap( ":/patman/loop_on.png" ) );
+	m_loopButton->setInactiveGraphic( QPixmap( ":/patman/loop_off.png" ) );
 	ToolTip::add( m_loopButton, tr( "Loop mode" ) );
 	m_loopButton->setWhatsThis(
 		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
@@ -482,10 +479,8 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_tuneButton->setObjectName("tuneButton");
 	m_tuneButton->setCheckable( true );
 	m_tuneButton->move( 223, 138 );
-	m_tuneButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"tune_on" ) );
-	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"tune_off" ) );
+	m_tuneButton->setActiveGraphic( QPixmap( ":/patman/tune_on.png" ) );
+	m_tuneButton->setInactiveGraphic( QPixmap( ":/patman/tune_off.png" ) );
 	ToolTip::add( m_tuneButton, tr( "Tune mode" ) );
 	m_tuneButton->setWhatsThis(
 		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
@@ -632,8 +627,8 @@ void PatmanView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 8, 116, 235, 16, 
-			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter, 
+	p.drawText( 8, 116, 235, 16,
+			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );
 }
 

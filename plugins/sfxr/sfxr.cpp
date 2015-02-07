@@ -50,7 +50,7 @@ float frnd(float range)
 #include "MidiEvent.h"
 #include "MidiTime.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -586,8 +586,8 @@ public:
 #define createButtonLocalGraphic( _button, _x, _y, _name, _resName )\
 	_button = new PixmapButton( this, tr( _name ) );\
 	_button->move( _x, _y );\
-	_button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_active" ) );\
-	_button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_inactive" ) );\
+	_button->setActiveGraphic( QPixmap( ":/sfxr/" _resName "_active.png" ) );\
+	_button->setInactiveGraphic( QPixmap( ":/sfxr/" _resName "_inactive.png" ) );\
 	ToolTip::add( _button, tr( _name ) );
 
 
@@ -600,7 +600,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	srand(time(NULL));
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/sfxr/artwork.png" ) );
 	setPalette( pal );
 
 	createKnob(m_attKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*0, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*0, "Attack Time");
@@ -696,7 +696,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 
 
 	//preview sound on generator/random/mutate button clicked
-/*  // disabled for now	
+/*  // disabled for now
 	connect( m_pickupBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_laserBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_explosionBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );

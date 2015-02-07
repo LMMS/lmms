@@ -1,5 +1,5 @@
 /* Nes.cpp - A NES instrument plugin for LMMS
- *                        
+ *
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -35,7 +35,7 @@
 #include "interpolation.h"
 #include "Oscillator.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -63,39 +63,39 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	m_nph( nph )
 {
 	m_pitchUpdateCounter = 0;
-	m_pitchUpdateFreq = wavelength( 60.0f );	
-	
+	m_pitchUpdateFreq = wavelength( 60.0f );
+
 	m_LFSR = LFSR_INIT;
-	
+
 	m_ch1Counter = 0;
 	m_ch2Counter = 0;
 	m_ch3Counter = 0;
 	m_ch4Counter = 0;
-	
+
 	m_ch1EnvCounter = 0;
 	m_ch2EnvCounter = 0;
 	m_ch4EnvCounter = 0;
-	
+
 	m_ch1EnvValue = 15;
 	m_ch2EnvValue = 15;
 	m_ch4EnvValue = 15;
-	
+
 	m_ch1SweepCounter = 0;
 	m_ch2SweepCounter = 0;
 	m_ch4SweepCounter = 0;
-	
+
 	m_12Last = 0.0f;
 	m_34Last = 0.0f;
-	
+
 	m_maxWlen = wavelength( MIN_FREQ );
-	
+
 	m_nsf = NES_SIMPLE_FILTER * ( m_samplerate / 44100.0 );
-	
+
 	m_lastNoteFreq = 0;
 	m_lastNoiseFreq = -1.0f; // value that is always different than noisefreq so it gets updated at start
-	
+
 	m_vibratoPhase = 0;
-	
+
 	updatePitch();
 }
 
@@ -112,35 +112,35 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	//  variables for processing  //
 	//                            //
 	////////////////////////////////
-	
+
 	bool ch1Enabled = m_parent->m_ch1Enabled.value();
 	bool ch2Enabled = m_parent->m_ch2Enabled.value();
 	bool ch3Enabled = m_parent->m_ch3Enabled.value();
 	bool ch4Enabled = m_parent->m_ch4Enabled.value();
-	
+
 	float ch1DutyCycle = DUTY_CYCLE[ m_parent->m_ch1DutyCycle.value() ];
 	int ch1EnvLen = wavelength( floorf( 240.0 / ( m_parent->m_ch1EnvLen.value() + 1 ) ) );
 	bool ch1EnvLoop = m_parent->m_ch1EnvLooped.value();
-	
+
 	float ch2DutyCycle = DUTY_CYCLE[ m_parent->m_ch2DutyCycle.value() ];
 	int ch2EnvLen = wavelength( floorf( 240.0 / ( m_parent->m_ch2EnvLen.value() + 1 ) ) );
 	bool ch2EnvLoop = m_parent->m_ch2EnvLooped.value();
-	
+
 	int ch4EnvLen = wavelength( floorf( 240.0 / ( m_parent->m_ch4EnvLen.value() + 1 ) ) );
 	bool ch4EnvLoop = m_parent->m_ch4EnvLooped.value();
-	
+
 	// processing variables for operators
 	int ch1;
 	int ch2;
 	int ch3;
 	int ch4;
-	
+
 	// levels for generators (used for dc offset compensation)
 	int ch1Level;
 	int ch2Level;
 	int ch3Level;
 	int ch4Level;
-	
+
 	int ch1SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch1SweepRate.value() + 1 ) ) );
 	int ch2SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch2SweepRate.value() + 1 ) ) );
 	int ch4SweepRate = wavelength( floorf( 60.0f / ( 8.0f - qAbs( m_parent->m_ch4Sweep.value() ) ) ) );
@@ -174,10 +174,10 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	{
 		ch2Sweep = -8 - ch2Sweep;
 	}
-	
-		
+
+
 	// start framebuffer loop
-		
+
 	for( f_cnt_t f = 0; f < frames; f++ )
 	{
 		////////////////////////////////
@@ -185,7 +185,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		//        pitch update        //
 		//                            //
 		////////////////////////////////
-		
+
 		m_pitchUpdateCounter++;
 		if( m_pitchUpdateCounter >= m_pitchUpdateFreq )
 		{
@@ -206,12 +206,12 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 			ch1Level = m_parent->m_ch1EnvEnabled.value()
 				? static_cast<int>( ( m_parent->m_ch1Volume.value() * m_ch1EnvValue ) / 15.0 )
 				: static_cast<int>( m_parent->m_ch1Volume.value() );
-			ch1 = m_ch1Counter > m_wlen1 * ch1DutyCycle 
+			ch1 = m_ch1Counter > m_wlen1 * ch1DutyCycle
 				? 0
 				: ch1Level;
 		}
 		else ch1 = ch1Level = 0;
-		
+
 		// update sweep
 		m_ch1SweepCounter++;
 		if( m_ch1SweepCounter >= ch1SweepRate )
@@ -231,7 +231,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 				}
 			}
 		}
-					
+
 		// update framecounters
 		m_ch1Counter++;
 		m_ch1Counter = m_wlen1 ? m_ch1Counter % m_wlen1 : 0;
@@ -246,7 +246,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 				m_ch1EnvValue = ch1EnvLoop ? 15	: 0;
 			}
 		}
-	
+
 
 		////////////////////////////////
 		//	                          //
@@ -260,19 +260,19 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 			ch2Level = m_parent->m_ch2EnvEnabled.value()
 				? static_cast<int>( ( m_parent->m_ch2Volume.value() * m_ch2EnvValue ) / 15.0 )
 				: static_cast<int>( m_parent->m_ch2Volume.value() );
-			ch2 = m_ch2Counter > m_wlen2 * ch2DutyCycle 
+			ch2 = m_ch2Counter > m_wlen2 * ch2DutyCycle
 				? 0
 				: ch2Level;
 		}
 		else ch2 = ch2Level = 0;
-		
+
 		// update sweep
 		m_ch2SweepCounter++;
 		if( m_ch2SweepCounter >= ch2SweepRate )
 		{
 			m_ch2SweepCounter = 0;
 			if( m_parent->m_ch2SweepEnabled.value() && m_wlen2 <= m_maxWlen && m_wlen2 >= MIN_WLEN )
-			{				
+			{
 				// check if the sweep goes up or down
 				if( ch2Sweep > 0 )
 				{
@@ -284,11 +284,11 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 				}
 			}
 		}
-					
+
 		// update framecounters
 		m_ch2Counter++;
 		m_ch2Counter = m_wlen2 ? m_ch2Counter % m_wlen2 : 0;
-		
+
 		m_ch2EnvCounter++;
 		if( m_ch2EnvCounter >= ch2EnvLen )
 		{
@@ -301,17 +301,17 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 					: 0;
 			}
 		}
-		
-		
+
+
 		////////////////////////////////
 		//	                          //
 		//        channel 3           //
 		//                            //
-		////////////////////////////////		
-		
+		////////////////////////////////
+
 		// make sure we don't overflow
 		m_ch3Counter = m_wlen3 ? m_ch3Counter % m_wlen3 : 0;
-		
+
 		// render triangle wave
 		if( m_wlen3 <= m_maxWlen && ch3Enabled )
 		{
@@ -320,17 +320,17 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 			ch3 = ( ch3 * ch3Level ) / 15;
 		}
 		else ch3 = ch3Level = 0;
-		
+
 		m_ch3Counter++;
-		
-		
+
+
 		////////////////////////////////
 		//	                          //
 		//        channel 4           //
 		//                            //
-		////////////////////////////////			
-		
-		// render pseudo noise 
+		////////////////////////////////
+
+		// render pseudo noise
 		if( ch4Enabled )
 		{
 			ch4Level = m_parent->m_ch4EnvEnabled.value()
@@ -341,7 +341,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 				: 0;
 		}
 		else ch4 = ch4Level = 0;
-		
+
 		// update framecounters
 		m_ch4Counter++;
 		if( m_ch4Counter >= m_wlen4 )
@@ -361,7 +361,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 					: 0;
 			}
 		}
-		
+
 		m_ch4SweepCounter++;
 		if( m_ch4SweepCounter >= ch4SweepRate )
 		{
@@ -381,56 +381,56 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 				}
 			}
 		}
-		
+
 
 		////////////////////////////////
 		//	                          //
 		//  final stage - mixing      //
 		//                            //
-		////////////////////////////////			
-		
-		float pin1 = static_cast<float>( ch1 + ch2 ); 
+		////////////////////////////////
+
+		float pin1 = static_cast<float>( ch1 + ch2 );
 		// add dithering noise
-		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
+		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );
 		pin1 = pin1 / 30.0f;
-		
+
 		pin1 = signedPow( pin1, NES_DIST );
-		
+
 		pin1 = pin1 * 2.0f - 1.0f;
-		
+
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
 		pin1 = linearInterpolate( pin1, m_12Last, m_nsf );
 		m_12Last = pin1;
 
 		// compensate DC offset
 		pin1 += 1.0f - signedPow( static_cast<float>( ch1Level + ch2Level ) / 30.0f, NES_DIST );
-		
+
 		pin1 *= NES_MIXING_12;
 
-		
-		float pin2 = static_cast<float>( ch3 + ch4 ); 
+
+		float pin2 = static_cast<float>( ch3 + ch4 );
 		// add dithering noise
-		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
+		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );
 		pin2 = pin2 / 30.0f;
-		
+
 		pin2 = signedPow( pin2, NES_DIST );
-		
+
 		pin2 = pin2 * 2.0f - 1.0f;
 
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
 		pin2 = linearInterpolate( pin2, m_34Last, m_nsf );
 		m_34Last = pin2;
-		
+
 		// compensate DC offset
 		pin2 += 1.0f - signedPow( static_cast<float>( ch3Level + ch4Level ) / 30.0f, NES_DIST );
-		
+
 		pin2 *= NES_MIXING_34;
-		
+
 		const float mixdown = ( pin1 + pin2 ) * NES_MIXING_ALL * m_parent->m_masterVol.value();
 
 		buf[f][0] = mixdown;
 		buf[f][1] = mixdown;
-		
+
 	} // end framebuffer loop
 
 }
@@ -462,7 +462,7 @@ void NesObject::updatePitch()
 		m_wlen3 = wavelength( freq * m_parent->m_freq3 );
 	}
 	// noise channel can use either note freq or preset freqs
-	if( m_parent->m_ch4NoiseFreqMode.value() && freq != m_lastNoteFreq ) 
+	if( m_parent->m_ch4NoiseFreqMode.value() && freq != m_lastNoteFreq )
 	{
 		float f = freq * 2.0f;
 		if( m_parent->m_ch4NoiseQuantize.value() ) // note freq can be quantized to the preset freqs
@@ -476,7 +476,7 @@ void NesObject::updatePitch()
 		m_wlen4 = wavelength( NOISE_FREQS[ 15 - static_cast<int>( m_parent->m_ch4NoiseFreq.value() ) ] );
 		m_lastNoiseFreq = m_parent->m_ch4NoiseFreq.value();
 	}
-	
+
 	m_lastNoteFreq = freq;
 }
 
@@ -488,31 +488,31 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_ch1Enabled( true, this ),
 	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 Coarse detune" ) ),
 	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Volume" ) ),
-	
+
 	m_ch1EnvEnabled( false, this ),
 	m_ch1EnvLooped( false, this ),
 	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Envelope length" ) ),
-	
+
 	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 Duty cycle" ) ),
-	
+
 	m_ch1SweepEnabled( false, this ),
 	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 Sweep amount" ) ),
 	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 Sweep rate" ) ),
-	
+
 	m_ch2Enabled( true, this ),
 	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 Coarse detune" ) ),
 	m_ch2Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 Volume" ) ),
-	
+
 	m_ch2EnvEnabled( false, this ),
 	m_ch2EnvLooped( false, this ),
 	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 Envelope length" ) ),
-	
+
 	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 Duty cycle" ) ),
-	
+
 	m_ch2SweepEnabled( false, this ),
 	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 Sweep amount" ) ),
 	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 Sweep rate" ) ),
-	
+
 	//channel 3
 	m_ch3Enabled( true, this ),
 	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 Coarse detune" ) ),
@@ -521,18 +521,18 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	//channel 4
 	m_ch4Enabled( true, this ),
 	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Volume" ) ),
-	
+
 	m_ch4EnvEnabled( false, this ),
 	m_ch4EnvLooped( false, this ),
 	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Envelope length" ) ),
-	
+
 	m_ch4NoiseMode( false, this ),
 	m_ch4NoiseFreqMode( false, this ),
-	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Noise frequency" ) ), 
-	
-	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 Noise frequency sweep" ) ), 
+	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Noise frequency" ) ),
+
+	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 Noise frequency sweep" ) ),
 	m_ch4NoiseQuantize( true, this ),
-	
+
 	//master
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
 	m_vibrato( 0.0f, 0.0f, 15.0f, 1.0f, this, tr( "Vibrato" ) )
@@ -540,7 +540,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
 	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
 	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
-	
+
 	updateFreq1();
 	updateFreq2();
 	updateFreq3();
@@ -557,17 +557,17 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 {
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
-	
+
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
-	{	
+	{
 		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
-	
+
 	NesObject * nes = static_cast<NesObject *>( n->m_pluginData );
-	
+
 	nes->renderOutput( workingBuffer + offset, frames );
-	
+
 	applyRelease( workingBuffer, n );
 
 	instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, n );
@@ -585,32 +585,32 @@ void NesInstrument::saveSettings(  QDomDocument & doc, QDomElement & element )
 		m_ch1Enabled.saveSettings( doc, element, "on1" );
 		m_ch1Crs.saveSettings( doc, element, "crs1" );
 		m_ch1Volume.saveSettings( doc, element, "vol1" );
-	
+
 		m_ch1EnvEnabled.saveSettings( doc, element, "envon1" );
 		m_ch1EnvLooped.saveSettings( doc, element, "envloop1" );
 		m_ch1EnvLen.saveSettings( doc, element, "envlen1" );
-	
+
 		m_ch1DutyCycle.saveSettings( doc, element, "dc1" );
-	
+
 		m_ch1SweepEnabled.saveSettings( doc, element, "sweep1" );
 		m_ch1SweepAmt.saveSettings( doc, element, "swamt1" );
 		m_ch1SweepRate.saveSettings( doc, element, "swrate1" );
-	
+
 	// channel 2
 		m_ch2Enabled.saveSettings( doc, element, "on2" );
 		m_ch2Crs.saveSettings( doc, element, "crs2" );
 		m_ch2Volume.saveSettings( doc, element, "vol2" );
-	
+
 		m_ch2EnvEnabled.saveSettings( doc, element, "envon2" );
 		m_ch2EnvLooped.saveSettings( doc, element, "envloop2" );
 		m_ch2EnvLen.saveSettings( doc, element, "envlen2" );
-	
+
 		m_ch2DutyCycle.saveSettings( doc, element, "dc2" );
-	
+
 		m_ch2SweepEnabled.saveSettings( doc, element, "sweep2" );
 		m_ch2SweepAmt.saveSettings( doc, element, "swamt2" );
-		m_ch2SweepRate.saveSettings( doc, element, "swrate2" );	
-	
+		m_ch2SweepRate.saveSettings( doc, element, "swrate2" );
+
 	//channel 3
 		m_ch3Enabled.saveSettings( doc, element, "on3" );
 		m_ch3Crs.saveSettings( doc, element, "crs3" );
@@ -619,21 +619,21 @@ void NesInstrument::saveSettings(  QDomDocument & doc, QDomElement & element )
 	//channel 4
 		m_ch4Enabled.saveSettings( doc, element, "on4" );
 		m_ch4Volume.saveSettings( doc, element, "vol4" );
-	
+
 		m_ch4EnvEnabled.saveSettings( doc, element, "envon4" );
 		m_ch4EnvLooped.saveSettings( doc, element, "envloop4" );
 		m_ch4EnvLen.saveSettings( doc, element, "envlen4" );
-	
+
 		m_ch4NoiseMode.saveSettings( doc, element, "nmode4" );
 		m_ch4NoiseFreqMode.saveSettings( doc, element, "nfrqmode4" );
 		m_ch4NoiseFreq.saveSettings( doc, element, "nfreq4" );
-		
+
 		m_ch4NoiseQuantize.saveSettings( doc, element, "nq4" );
 		m_ch4Sweep.saveSettings( doc, element, "nswp4" );
-	
+
 	//master
 		m_masterVol.saveSettings( doc, element, "vol" );
-		m_vibrato.saveSettings( doc, element, "vibr" );	
+		m_vibrato.saveSettings( doc, element, "vibr" );
 }
 
 
@@ -642,32 +642,32 @@ void NesInstrument::loadSettings( const QDomElement & element )
 		m_ch1Enabled.loadSettings(  element, "on1" );
 		m_ch1Crs.loadSettings(  element, "crs1" );
 		m_ch1Volume.loadSettings(  element, "vol1" );
-	
+
 		m_ch1EnvEnabled.loadSettings(  element, "envon1" );
 		m_ch1EnvLooped.loadSettings(  element, "envloop1" );
 		m_ch1EnvLen.loadSettings(  element, "envlen1" );
-	
+
 		m_ch1DutyCycle.loadSettings(  element, "dc1" );
-	
+
 		m_ch1SweepEnabled.loadSettings(  element, "sweep1" );
 		m_ch1SweepAmt.loadSettings(  element, "swamt1" );
 		m_ch1SweepRate.loadSettings(  element, "swrate1" );
-	
+
 	// channel 2
 		m_ch2Enabled.loadSettings(  element, "on2" );
 		m_ch2Crs.loadSettings(  element, "crs2" );
 		m_ch2Volume.loadSettings(  element, "vol2" );
-	
+
 		m_ch2EnvEnabled.loadSettings(  element, "envon2" );
 		m_ch2EnvLooped.loadSettings(  element, "envloop2" );
 		m_ch2EnvLen.loadSettings(  element, "envlen2" );
-	
+
 		m_ch2DutyCycle.loadSettings(  element, "dc2" );
-	
+
 		m_ch2SweepEnabled.loadSettings(  element, "sweep2" );
 		m_ch2SweepAmt.loadSettings(  element, "swamt2" );
-		m_ch2SweepRate.loadSettings(  element, "swrate2" );	
-	
+		m_ch2SweepRate.loadSettings(  element, "swrate2" );
+
 	//channel 3
 		m_ch3Enabled.loadSettings(  element, "on3" );
 		m_ch3Crs.loadSettings(  element, "crs3" );
@@ -676,22 +676,22 @@ void NesInstrument::loadSettings( const QDomElement & element )
 	//channel 4
 		m_ch4Enabled.loadSettings(  element, "on4" );
 		m_ch4Volume.loadSettings(  element, "vol4" );
-	
+
 		m_ch4EnvEnabled.loadSettings(  element, "envon4" );
 		m_ch4EnvLooped.loadSettings(  element, "envloop4" );
 		m_ch4EnvLen.loadSettings(  element, "envlen4" );
-	
+
 		m_ch4NoiseMode.loadSettings(  element, "nmode4" );
 		m_ch4NoiseFreqMode.loadSettings(  element, "nfrqmode4" );
 		m_ch4NoiseFreq.loadSettings(  element, "nfreq4" );
-		
+
 		m_ch4NoiseQuantize.loadSettings(  element, "nq4" );
 		m_ch4Sweep.loadSettings(  element, "nswp4" );
-	
+
 	//master
 		m_masterVol.loadSettings(  element, "vol" );
-		m_vibrato.loadSettings(  element, "vibr" );	
-}	
+		m_vibrato.loadSettings(  element, "vibr" );
+}
 
 
 QString NesInstrument::nodeName() const
@@ -738,7 +738,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
+		s_artwork = new QPixmap( ":/nes/artwork.png" );
 	}
 
 	pal.setBrush( backgroundRole(),	*s_artwork );
@@ -748,7 +748,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	const int KNOB_Y2 = 81;
 	const int KNOB_Y3 = 138;
 	const int KNOB_Y4 = 195;
-	
+
 	const int KNOB_X1 = 12;
 	const int KNOB_X2 = 46;
 	const int KNOB_X3 = 84;
@@ -756,13 +756,13 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	const int KNOB_X5 = 151;
 	const int KNOB_X6 = 172;
 	const int KNOB_X7 = 206;
-	
+
 	// channel 1
-	
+
 	makeknob( m_ch1VolumeKnob, KNOB_X1, KNOB_Y1, "Volume", "", "" )
 	makeknob( m_ch1CrsKnob, KNOB_X2, KNOB_Y1, "Coarse detune", "", "" )
 	makeknob( m_ch1EnvLenKnob, KNOB_X3, KNOB_Y1, "Envelope length", "", "" )
-	
+
 	makenesled( m_ch1EnabledBtn, KNOB_X1, KNOB_Y1 - 12, "Enable channel 1" )
 	makenesled( m_ch1EnvEnabledBtn, KNOB_X3, KNOB_Y1 - 12, "Enable envelope 1" )
 	makenesled( m_ch1EnvLoopedBtn, 129, KNOB_Y1 - 12, "Enable envelope 1 loop" )
@@ -779,21 +779,21 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	makedcled( ch1_dc3, dcx, 42, "50% Duty cycle", "nesdc3_on" )
 	dcx += 13;
 	makedcled( ch1_dc4, dcx, 42, "75% Duty cycle", "nesdc4_on" )
-		
+
 	m_ch1DutyCycleGrp = new automatableButtonGroup( this );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc1 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc2 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc3 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc4 );
-	
 
-	
+
+
 	// channel 2
-	
+
 	makeknob( m_ch2VolumeKnob, KNOB_X1, KNOB_Y2, "Volume", "", "" )
 	makeknob( m_ch2CrsKnob, KNOB_X2, KNOB_Y2, "Coarse detune", "", "" )
 	makeknob( m_ch2EnvLenKnob, KNOB_X3, KNOB_Y2, "Envelope length", "", "" )
-	
+
 	makenesled( m_ch2EnabledBtn, KNOB_X1, KNOB_Y2 - 12, "Enable channel 2" )
 	makenesled( m_ch2EnvEnabledBtn, KNOB_X3, KNOB_Y2 - 12, "Enable envelope 2" )
 	makenesled( m_ch2EnvLoopedBtn, 129, KNOB_Y2 - 12, "Enable envelope 2 loop" )
@@ -810,7 +810,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	makedcled( ch2_dc3, dcx, 99, "50% Duty cycle", "nesdc3_on" )
 	dcx += 13;
 	makedcled( ch2_dc4, dcx, 99, "75% Duty cycle", "nesdc4_on" )
-		
+
 	m_ch2DutyCycleGrp = new automatableButtonGroup( this );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc1 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc2 );
@@ -818,29 +818,29 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	m_ch2DutyCycleGrp -> addButton( ch2_dc4 );
 
 
-	
+
 	//channel 3
 	makenesled( m_ch3EnabledBtn, KNOB_X1, KNOB_Y3 - 12, "Enable channel 3" )
 	makeknob( m_ch3VolumeKnob, KNOB_X1, KNOB_Y3, "Volume", "", "" )
 	makeknob( m_ch3CrsKnob, KNOB_X2, KNOB_Y3, "Coarse detune", "", "" )
-	
+
 
 	//channel 4
 	makeknob( m_ch4VolumeKnob, KNOB_X1, KNOB_Y4, "Volume", "", "" )
 	makeknob( m_ch4NoiseFreqKnob, KNOB_X2, KNOB_Y4, "Noise Frequency", "", "" )
 	makeknob( m_ch4EnvLenKnob, KNOB_X3, KNOB_Y4, "Envelope length", "", "" )
 	makeknob( m_ch4SweepKnob, KNOB_X4, KNOB_Y4, "Frequency sweep", "", "" )
-	
+
 	makenesled( m_ch4EnabledBtn, KNOB_X1, KNOB_Y4 - 12, "Enable channel 4" )
 	makenesled( m_ch4EnvEnabledBtn, KNOB_X3, KNOB_Y4 - 12, "Enable envelope 4" )
 	makenesled( m_ch4EnvLoopedBtn, 129, KNOB_Y4 - 12, "Enable envelope 4 loop" )
 
 	makenesled( m_ch4NoiseQuantizeBtn, 162, KNOB_Y4 - 12, "Quantize noise frequency when using note frequency" )
-	
+
 	makenesled( m_ch4NoiseFreqModeBtn,  148, 203, "Use note frequency for noise" )
 	makenesled( m_ch4NoiseModeBtn, 148, 224, "Noise mode" )
 
-	
+
 	//master
 	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, "Master Volume", "", "" )
 	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, "Vibrato", "", "" )
@@ -856,7 +856,7 @@ NesInstrumentView::~NesInstrumentView()
 
 void NesInstrumentView::modelChanged()
 {
-	NesInstrument * nes = castModel<NesInstrument>();	
+	NesInstrument * nes = castModel<NesInstrument>();
 
 	m_ch1EnabledBtn->setModel( &nes->m_ch1Enabled );
 	m_ch1CrsKnob->setModel( &nes->m_ch1Crs );
@@ -909,7 +909,7 @@ void NesInstrumentView::modelChanged()
 
 	//master
 	m_masterVolKnob->setModel( &nes->m_masterVol );
-	m_vibratoKnob->setModel( &nes->m_vibrato );		
+	m_vibratoKnob->setModel( &nes->m_vibrato );
 }
 
 

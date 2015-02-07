@@ -41,7 +41,7 @@
 
 #include <cstring>
 
-#include "embed.cpp"
+#include "embed.h"
 
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
@@ -473,7 +473,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     setAutoFillBackground(true);
 
     QPalette pal;
-    pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
+    pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? QPixmap(":/carlabase/artwork-patchbay.png") : QPixmap(":/carlabase/artwork-rack.png"));
     setPalette(pal);
 
     QVBoxLayout * l = new QVBoxLayout( this );
@@ -483,7 +483,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
-    m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+    m_toggleUIButton->setIcon( QPixmap( "icons:zoom.png" ) );
     m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 

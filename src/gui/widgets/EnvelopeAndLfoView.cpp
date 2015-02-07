@@ -3,7 +3,7 @@
  *                          tab of instrument track window
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -28,7 +28,6 @@
 
 #include "EnvelopeAndLfoView.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "Knob.h"
@@ -87,11 +86,11 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 {
 	if( s_envGraph == NULL )
 	{
-		s_envGraph = new QPixmap( embed::getIconPixmap( "envelope_graph" ) );
+		s_envGraph = new QPixmap( "icons:envelope_graph.png" );
 	}
 	if( s_lfoGraph == NULL )
 	{
-		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
+		s_lfoGraph = new QPixmap( "icons:lfo_graph.png" );
 	}
 
 	m_predelayKnob = new Knob( knobBright_26, this );
@@ -216,46 +215,36 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 
 	PixmapButton * sin_lfo_btn = new PixmapButton( this, NULL );
 	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
-	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-							"sin_wave_active" ) );
-	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-							"sin_wave_inactive" ) );
+	sin_lfo_btn->setActiveGraphic( QPixmap( "icons:sin_wave_active.png" ) );
+	sin_lfo_btn->setInactiveGraphic( QPixmap( "icons:sin_wave_inactive.png" ) );
 	sin_lfo_btn->setWhatsThis(
 		tr( "Click here for a sine-wave." ) );
 
 	PixmapButton * triangle_lfo_btn = new PixmapButton( this, NULL );
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
-	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-						"triangle_wave_active" ) );
-	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-						"triangle_wave_inactive" ) );
+	triangle_lfo_btn->setActiveGraphic( QPixmap( "icons:triangle_wave_active.png" ) );
+	triangle_lfo_btn->setInactiveGraphic( QPixmap( "icons:triangle_wave_inactive.png" ) );
 	triangle_lfo_btn->setWhatsThis(
 		tr( "Click here for a triangle-wave." ) );
 
 	PixmapButton * saw_lfo_btn = new PixmapButton( this, NULL );
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
-	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-							"saw_wave_active" ) );
-	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-							"saw_wave_inactive" ) );
+	saw_lfo_btn->setActiveGraphic( QPixmap( "icons:saw_wave_active.png" ) );
+	saw_lfo_btn->setInactiveGraphic( QPixmap( "icons:saw_wave_inactive.png" ) );
 	saw_lfo_btn->setWhatsThis(
 		tr( "Click here for a saw-wave for current." ) );
 
 	PixmapButton * sqr_lfo_btn = new PixmapButton( this, NULL );
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
-	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-						"square_wave_active" ) );
-	sqr_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-						"square_wave_inactive" ) );
+	sqr_lfo_btn->setActiveGraphic( QPixmap( "icons:square_wave_active.png" ) );
+	sqr_lfo_btn->setInactiveGraphic( QPixmap( "icons:square_wave_inactive.png" ) );
 	sqr_lfo_btn->setWhatsThis(
 		tr( "Click here for a square-wave." ) );
 
 	m_userLfoBtn = new PixmapButton( this, NULL );
 	m_userLfoBtn->move( LFO_SHAPES_X+75, LFO_SHAPES_Y );
-	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
-							"usr_wave_active" ) );
-	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
-							"usr_wave_inactive" ) );
+	m_userLfoBtn->setActiveGraphic( QPixmap( "icons:usr_wave_active.png" ) );
+	m_userLfoBtn->setInactiveGraphic( QPixmap( "icons:usr_wave_inactive.png" ) );
 	m_userLfoBtn->setWhatsThis(
 		tr( "Click here for a user-defined wave. "
 			"Afterwards, drag an according sample-"
@@ -266,10 +255,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 
 	PixmapButton * random_lfo_btn = new PixmapButton( this, NULL );
 	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
-	random_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-						"random_wave_active" ) );
-	random_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-						"random_wave_inactive" ) );
+	random_lfo_btn->setActiveGraphic( QPixmap( "icons:random_wave_active.png" ) );
+	random_lfo_btn->setInactiveGraphic( QPixmap( "icons:random_wave_inactive.png" ) );
 	random_lfo_btn->setWhatsThis(
 		tr( "Click here for random wave." ) );
 
@@ -432,7 +419,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 
 	const int y_base = ENV_GRAPH_Y + s_envGraph->height() - 3;
 	const int avail_height = s_envGraph->height() - 6;
-	
+
 	int x1 = static_cast<int>( m_predelayKnob->value<float>() * TIME_UNIT_WIDTH );
 	int x2 = x1 + static_cast<int>( m_attackKnob->value<float>() * TIME_UNIT_WIDTH );
 	int x3 = x2 + static_cast<int>( m_holdKnob->value<float>() * TIME_UNIT_WIDTH );
@@ -469,7 +456,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.fillRect( x3 - 1, y_base - 2 - avail_height, 4, 4,
 							end_points_bg_color );
 	p.fillRect( x3, y_base - 1 - avail_height, 2, 2, end_points_color );
-	
+
 	p.drawLine( x4, static_cast<int>( y_base - avail_height +
 						( 1 - m_sustainKnob->value<float>() ) *
 						avail_height ), x5, y_base );
@@ -583,7 +570,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 			TextFloat::displayMessage( tr( "Hint" ),
 				tr( "Drag a sample from somewhere and drop "
 					"it in this window." ),
-					embed::getIconPixmap( "hint" ), 3000 );
+					QPixmap( "icons:hint.png" ), 3000 );
 		}
 	}
 }

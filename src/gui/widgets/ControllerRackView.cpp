@@ -33,7 +33,6 @@
 #include <QMessageBox>
 
 #include "Song.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "GroupBox.h"
@@ -49,7 +48,7 @@ ControllerRackView::ControllerRackView( ) :
 	setMaximumWidth( 250 );
 	resize( 250, 160 );
 
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowIcon( QPixmap( "icons:controller.png" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
 
 	m_scrollArea = new QScrollArea( this );
@@ -82,7 +81,7 @@ ControllerRackView::ControllerRackView( ) :
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	
+
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 880, 310 );
 }

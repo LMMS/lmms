@@ -233,53 +233,47 @@ PianoRoll::PianoRoll() :
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
 	{
-		s_whiteKeySmallPm = new QPixmap( embed::getIconPixmap(
-						"pr_white_key_small" ) );
+		s_whiteKeySmallPm = new QPixmap( "icons:pr_white_key_small.png" );
 	}
 	if( s_whiteKeySmallPressedPm == NULL )
 	{
-		s_whiteKeySmallPressedPm = new QPixmap( embed::getIconPixmap(
-						"pr_white_key_small_pressed" ) );
+		s_whiteKeySmallPressedPm = new QPixmap( "icons:pr_white_key_small_pressed.png" );
 	}
 	if( s_whiteKeyBigPm == NULL )
 	{
-		s_whiteKeyBigPm = new QPixmap( embed::getIconPixmap(
-							"pr_white_key_big" ) );
+		s_whiteKeyBigPm = new QPixmap( "icons:pr_white_key_big.png" );
 	}
 	if( s_whiteKeyBigPressedPm == NULL )
 	{
-		s_whiteKeyBigPressedPm = new QPixmap( embed::getIconPixmap(
-							"pr_white_key_big_pressed" ) );
+		s_whiteKeyBigPressedPm = new QPixmap( "icons:pr_white_key_big_pressed.png" );
 	}
 	if( s_blackKeyPm == NULL )
 	{
-		s_blackKeyPm = new QPixmap( embed::getIconPixmap(
-							"pr_black_key" ) );
+		s_blackKeyPm = new QPixmap( "icons:pr_black_key.png" );
 	}
 	if( s_blackKeyPressedPm == NULL )
 	{
-		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap(
-							"pr_black_key_pressed" ) );
+		s_blackKeyPressedPm = new QPixmap( "icons:pr_black_key_pressed.png" );
 	}
 	if( s_toolDraw == NULL )
 	{
-		s_toolDraw = new QPixmap( embed::getIconPixmap( "edit_draw" ) );
+		s_toolDraw = new QPixmap( "icons:edit_draw.png" );
 	}
 	if( s_toolErase == NULL )
 	{
-		s_toolErase= new QPixmap( embed::getIconPixmap( "edit_erase" ) );
+		s_toolErase= new QPixmap( "icons:edit_erase.png" );
 	}
 	if( s_toolSelect == NULL )
 	{
-		s_toolSelect = new QPixmap( embed::getIconPixmap( "edit_select" ) );
+		s_toolSelect = new QPixmap( "icons:edit_select.png" );
 	}
 	if( s_toolMove == NULL )
 	{
-		s_toolMove = new QPixmap( embed::getIconPixmap( "edit_move" ) );
+		s_toolMove = new QPixmap( "icons:edit_move.png" );
 	}
 	if( s_toolOpen == NULL )
 	{
-		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
+		s_toolOpen = new QPixmap( "icons:automation.png" );
 	}
 
 	// init text-float
@@ -3976,10 +3970,10 @@ PianoRollWindow::PianoRollWindow() :
 
 	// init edit-buttons at the top
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	QAction* selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
-	QAction* detuneAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
+	QAction* drawAction = editModeGroup->addAction(QPixmap("icons:edit_draw.png"), tr("Draw mode (Shift+D)"));
+	QAction* eraseAction = editModeGroup->addAction(QPixmap("icons:edit_erase.png"), tr("Erase mode (Shift+E)"));
+	QAction* selectAction = editModeGroup->addAction(QPixmap("icons:edit_select.png"), tr("Select mode (Shift+S)"));
+	QAction* detuneAction = editModeGroup->addAction(QPixmap("icons:automation.png"), tr("Detune mode (Shift+T)"));
 
 	drawAction->setChecked( true );
 
@@ -4014,13 +4008,13 @@ PianoRollWindow::PianoRollWindow() :
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Copy + paste actions
-	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
+	QAction* cutAction = new QAction(QPixmap("icons:edit_cut.png"),
 							  tr("Cut selected notes (Ctrl+X)"), this);
 
-	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
+	QAction* copyAction = new QAction(QPixmap("icons:edit_copy.png"),
 							   tr("Copy selected notes (Ctrl+C)"), this);
 
-	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
+	QAction* pasteAction = new QAction(QPixmap("icons:edit_paste.png"),
 					tr("Paste notes from clipboard (Ctrl+V)"), this);
 
 	cutAction->setWhatsThis(
@@ -4044,7 +4038,7 @@ PianoRollWindow::PianoRollWindow() :
 	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+	zoom_lbl->setPixmap( QPixmap( "icons:zoom.png" ) );
 
 	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
@@ -4052,7 +4046,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
-	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+	quantize_lbl->setPixmap( QPixmap( "icons:quantize.png" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
@@ -4061,7 +4055,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
-	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
+	note_len_lbl->setPixmap( QPixmap( "icons:note.png" ) );
 
 
 	m_noteLenComboBox = new ComboBox( m_toolBar );
@@ -4070,7 +4064,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// setup scale-stuff
 	QLabel * scale_lbl = new QLabel( m_toolBar );
-	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
+	scale_lbl->setPixmap( QPixmap( "icons:scale.png" ) );
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
@@ -4078,7 +4072,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// setup chord-stuff
 	QLabel * chord_lbl = new QLabel( m_toolBar );
-	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
+	chord_lbl->setPixmap( QPixmap( "icons:chord.png" ) );
 
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
@@ -4171,7 +4165,7 @@ PianoRollWindow::PianoRollWindow() :
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
-	setWindowIcon( embed::getIconPixmap( "piano" ) );
+	setWindowIcon( QPixmap( "icons:piano.png" ) );
 	setCurrentPattern( NULL );
 
 	// Connections

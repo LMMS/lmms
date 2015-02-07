@@ -34,7 +34,7 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -298,7 +298,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreqA2() ) );
 	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreqB1() ) );
 	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreqB2() ) );
-	
+
 	connect( &a1_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaveA1() ) );
 	connect( &a2_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaveA2() ) );
 	connect( &b1_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaveB1() ) );
@@ -397,8 +397,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 									( bbuf[f][1] * bmix );
 		}
 	}
-	else*/ 
-	
+	else*/
+
 	// if sample-exact is not enabled, use simpler calculations:
 	// if mix envelope is active, and we haven't gone past the envelope end, use envelope-aware calculation...
 	if( envAmt != 0.0f && tfp_ < envLen )
@@ -629,7 +629,7 @@ void WatsynInstrument::updateFreqB2()
 {
 	// calculate frequencies
 	m_lfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_ltune.value() / 1200 );
-	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );	
+	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );
 }
 
 
@@ -670,7 +670,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap(	"artwork" ) );
+	pal.setBrush( backgroundRole(),	QPixmap( ":/watsyn/artwork.png" ) );
 	setPalette( pal );
 
 // knobs... lots of em
@@ -723,26 +723,26 @@ WatsynView::WatsynView( Instrument * _instrument,
 // graph select buttons
 	PixmapButton * a1_selectButton = new PixmapButton( this, NULL );
 	a1_selectButton -> move( 4, 121 );
-	a1_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "a1_active" ) );
-	a1_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "a1_inactive" ) );
+	a1_selectButton -> setActiveGraphic( QPixmap( ":/watsyn/a1_active.png" ) );
+	a1_selectButton -> setInactiveGraphic( QPixmap( ":/watsyn/a1_inactive.png" ) );
 	ToolTip::add( a1_selectButton, tr( "Select oscillator A1") );
 
 	PixmapButton * a2_selectButton = new PixmapButton( this, NULL );
 	a2_selectButton -> move( 44, 121 );
-	a2_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "a2_active" ) );
-	a2_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "a2_inactive" ) );
+	a2_selectButton -> setActiveGraphic( QPixmap( ":/watsyn/a2_active.png" ) );
+	a2_selectButton -> setInactiveGraphic( QPixmap( ":/watsyn/a2_inactive.png" ) );
 	ToolTip::add( a2_selectButton, tr( "Select oscillator A2") );
 
 	PixmapButton * b1_selectButton = new PixmapButton( this, NULL );
 	b1_selectButton -> move( 84, 121 );
-	b1_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "b1_active" ) );
-	b1_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "b1_inactive" ) );
+	b1_selectButton -> setActiveGraphic( QPixmap( ":/watsyn/b1_active.png" ) );
+	b1_selectButton -> setInactiveGraphic( QPixmap( ":/watsyn/b1_inactive.png" ) );
 	ToolTip::add( b1_selectButton, tr( "Select oscillator B1") );
 
 	PixmapButton * b2_selectButton = new PixmapButton( this, NULL );
 	b2_selectButton -> move( 124, 121 );
-	b2_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "b2_active" ) );
-	b2_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "b2_inactive" ) );
+	b2_selectButton -> setActiveGraphic( QPixmap( ":/watsyn/b2_active.png" ) );
+	b2_selectButton -> setInactiveGraphic( QPixmap( ":/watsyn/b2_inactive.png" ) );
 	ToolTip::add( b2_selectButton, tr( "Select oscillator B2") );
 
 	m_selectedGraphGroup = new automatableButtonGroup( this );
@@ -756,26 +756,26 @@ WatsynView::WatsynView( Instrument * _instrument,
 // A-modulation button group
 	PixmapButton * amod_mixButton = new PixmapButton( this, NULL );
 	amod_mixButton -> move( 4, 50 );
-	amod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "amix_active" ) );
-	amod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "amix_inactive" ) );
+	amod_mixButton -> setActiveGraphic( QPixmap( ":/watsyn/amix_active.png" ) );
+	amod_mixButton -> setInactiveGraphic( QPixmap( ":/watsyn/amix_inactive.png" ) );
 	ToolTip::add( amod_mixButton, tr( "Mix output of A2 to A1" ) );
 
 	PixmapButton * amod_amButton = new PixmapButton( this, NULL );
 	amod_amButton -> move( 4, 66 );
-	amod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_active" ) );
-	amod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_inactive" ) );
+	amod_amButton -> setActiveGraphic( QPixmap( ":/watsyn/aam_active.png" ) );
+	amod_amButton -> setInactiveGraphic( QPixmap( ":/watsyn/aam_inactive.png" ) );
 	ToolTip::add( amod_amButton, tr( "Modulate amplitude of A1 with output of A2" ) );
 
 	PixmapButton * amod_rmButton = new PixmapButton( this, NULL );
 	amod_rmButton -> move( 4, 82 );
-	amod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_active" ) );
-	amod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_inactive" ) );
+	amod_rmButton -> setActiveGraphic( QPixmap( ":/watsyn/arm_active.png" ) );
+	amod_rmButton -> setInactiveGraphic( QPixmap( ":/watsyn/arm_inactive.png" ) );
 	ToolTip::add( amod_rmButton, tr( "Ring-modulate A1 and A2" ) );
 
 	PixmapButton * amod_pmButton = new PixmapButton( this, NULL );
 	amod_pmButton -> move( 4, 98 );
-	amod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_active" ) );
-	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_inactive" ) );
+	amod_pmButton -> setActiveGraphic( QPixmap( ":/watsyn/apm_active.png" ) );
+	amod_pmButton -> setInactiveGraphic( QPixmap( ":/watsyn/apm_inactive.png" ) );
 	ToolTip::add( amod_pmButton, tr( "Modulate phase of A1 with output of A2" ) );
 
 	m_aModGroup = new automatableButtonGroup( this );
@@ -787,26 +787,26 @@ WatsynView::WatsynView( Instrument * _instrument,
 // B-modulation button group
 	PixmapButton * bmod_mixButton = new PixmapButton( this, NULL );
 	bmod_mixButton -> move( 44, 50 );
-	bmod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bmix_active" ) );
-	bmod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bmix_inactive" ) );
+	bmod_mixButton -> setActiveGraphic( QPixmap( ":/watsyn/bmix_active.png" ) );
+	bmod_mixButton -> setInactiveGraphic( QPixmap( ":/watsyn/bmix_inactive.png" ) );
 	ToolTip::add( bmod_mixButton, tr( "Mix output of B2 to B1" ) );
 
 	PixmapButton * bmod_amButton = new PixmapButton( this, NULL );
 	bmod_amButton -> move( 44, 66 );
-	bmod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_active" ) );
-	bmod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_inactive" ) );
+	bmod_amButton -> setActiveGraphic( QPixmap( ":/watsyn/bam_active.png" ) );
+	bmod_amButton -> setInactiveGraphic( QPixmap( ":/watsyn/bam_inactive.png" ) );
 	ToolTip::add( bmod_amButton, tr( "Modulate amplitude of B1 with output of B2" ) );
 
 	PixmapButton * bmod_rmButton = new PixmapButton( this, NULL );
 	bmod_rmButton -> move( 44, 82 );
-	bmod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_active" ) );
-	bmod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_inactive" ) );
+	bmod_rmButton -> setActiveGraphic( QPixmap( ":/watsyn/brm_active.png" ) );
+	bmod_rmButton -> setInactiveGraphic( QPixmap( ":/watsyn/brm_inactive.png" ) );
 	ToolTip::add( bmod_rmButton, tr( "Ring-modulate B1 and B2" ) );
 
 	PixmapButton * bmod_pmButton = new PixmapButton( this, NULL );
 	bmod_pmButton -> move( 44, 98 );
-	bmod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_active" ) );
-	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_inactive" ) );
+	bmod_pmButton -> setActiveGraphic( QPixmap( ":/watsyn/bpm_active.png" ) );
+	bmod_pmButton -> setInactiveGraphic( QPixmap( ":/watsyn/bpm_inactive.png" ) );
 	ToolTip::add( bmod_pmButton, tr( "Modulate phase of B1 with output of B2" ) );
 
 	m_bModGroup = new automatableButtonGroup( this );
@@ -818,7 +818,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 // graph widgets
 	pal = QPalette();
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph") );
+	pal.setBrush( backgroundRole(), QPixmap(":/watsyn/wavegraph.png") );
 // a1 graph
 	a1_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
 	a1_graph->move( 4, 141 );
@@ -857,65 +857,65 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 	m_loadButton = new PixmapButton( this, tr( "Load waveform" ) );
 	m_loadButton -> move ( 173, 121 );
-	m_loadButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "load_active" ) );
-	m_loadButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "load_inactive" ) );
+	m_loadButton -> setActiveGraphic( QPixmap( ":/watsyn/load_active.png" ) );
+	m_loadButton -> setInactiveGraphic( QPixmap( ":/watsyn/load_inactive.png" ) );
 	ToolTip::add( m_loadButton, tr( "Click to load a waveform from a sample file" ) );
 
 	m_phaseLeftButton = new PixmapButton( this, tr( "Phase left" ) );
 	m_phaseLeftButton -> move ( 193, 121 );
-	m_phaseLeftButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "phl_active" ) );
-	m_phaseLeftButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "phl_inactive" ) );
+	m_phaseLeftButton -> setActiveGraphic( QPixmap( ":/watsyn/phl_active.png" ) );
+	m_phaseLeftButton -> setInactiveGraphic( QPixmap( ":/watsyn/phl_inactive.png" ) );
 	ToolTip::add( m_phaseLeftButton, tr( "Click to shift phase by -15 degrees" ) );
 
 	m_phaseRightButton = new PixmapButton( this, tr( "Phase right" ) );
 	m_phaseRightButton -> move ( 210, 121 );
-	m_phaseRightButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "phr_active" ) );
-	m_phaseRightButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "phr_inactive" ) );
+	m_phaseRightButton -> setActiveGraphic( QPixmap( ":/watsyn/phr_active.png" ) );
+	m_phaseRightButton -> setInactiveGraphic( QPixmap( ":/watsyn/phr_inactive.png" ) );
 	ToolTip::add( m_phaseRightButton, tr( "Click to shift phase by +15 degrees" ) );
 
 	m_normalizeButton = new PixmapButton( this, tr( "Normalize" ) );
 	m_normalizeButton -> move ( 230, 121 );
-	m_normalizeButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "norm_active" ) );
-	m_normalizeButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "norm_inactive" ) );
+	m_normalizeButton -> setActiveGraphic( QPixmap( ":/watsyn/norm_active.png" ) );
+	m_normalizeButton -> setInactiveGraphic( QPixmap( ":/watsyn/norm_inactive.png" ) );
 	ToolTip::add( m_normalizeButton, tr( "Click to normalize" ) );
 
 
 	m_invertButton = new PixmapButton( this, tr( "Invert" ) );
 	m_invertButton -> move ( 230, 138 );
-	m_invertButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "inv_active" ) );
-	m_invertButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "inv_inactive" ) );
+	m_invertButton -> setActiveGraphic( QPixmap( ":/watsyn/inv_active.png" ) );
+	m_invertButton -> setInactiveGraphic( QPixmap( ":/watsyn/inv_inactive.png" ) );
 	ToolTip::add( m_invertButton, tr( "Click to invert" ) );
 
 	m_smoothButton = new PixmapButton( this, tr( "Smooth" ) );
 	m_smoothButton -> move ( 230, 155 );
-	m_smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
-	m_smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
+	m_smoothButton -> setActiveGraphic( QPixmap( ":/watsyn/smooth_active.png" ) );
+	m_smoothButton -> setInactiveGraphic( QPixmap( ":/watsyn/smooth_inactive.png" ) );
 	ToolTip::add( m_smoothButton, tr( "Click to smooth" ) );
 
 // waveforms
 
 	m_sinWaveButton = new PixmapButton( this, tr( "Sine wave" ) );
 	m_sinWaveButton -> move ( 230, 176 );
-	m_sinWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sin_active" ) );
-	m_sinWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sin_inactive" ) );
+	m_sinWaveButton -> setActiveGraphic( QPixmap( ":/watsyn/sin_active.png" ) );
+	m_sinWaveButton -> setInactiveGraphic( QPixmap( ":/watsyn/sin_inactive.png" ) );
 	ToolTip::add( m_sinWaveButton, tr( "Click for sine wave" ) );
 
 	m_triWaveButton = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triWaveButton -> move ( 230, 194 );
-	m_triWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tri_active" ) );
-	m_triWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tri_inactive" ) );
+	m_triWaveButton -> setActiveGraphic( QPixmap( ":/watsyn/tri_active.png" ) );
+	m_triWaveButton -> setInactiveGraphic( QPixmap( ":/watsyn/tri_inactive.png" ) );
 	ToolTip::add( m_triWaveButton, tr( "Click for triangle wave" ) );
 
 	m_sawWaveButton = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_sawWaveButton -> move ( 230, 212 );
-	m_sawWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "saw_active" ) );
-	m_sawWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "saw_inactive" ) );
+	m_sawWaveButton -> setActiveGraphic( QPixmap( ":/watsyn/saw_active.png" ) );
+	m_sawWaveButton -> setInactiveGraphic( QPixmap( ":/watsyn/saw_inactive.png" ) );
 	ToolTip::add( m_sawWaveButton, tr( "Click for saw wave" ) );
 
 	m_sqrWaveButton = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveButton -> move ( 230, 230 );
-	m_sqrWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sqr_active" ) );
-	m_sqrWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sqr_inactive" ) );
+	m_sqrWaveButton -> setActiveGraphic( QPixmap( ":/watsyn/sqr_active.png" ) );
+	m_sqrWaveButton -> setInactiveGraphic( QPixmap( ":/watsyn/sqr_inactive.png" ) );
 	ToolTip::add( m_sqrWaveButton, tr( "Click for square wave" ) );
 
 

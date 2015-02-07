@@ -32,7 +32,6 @@
 #include <math.h>
 
 #include "GroupBox.h"
-#include "embed.h"
 #include "gui_templates.h"
 
 
@@ -48,8 +47,8 @@ GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	m_led = new PixmapButton( this, _caption );
 	m_led->setCheckable( true );
 	m_led->move( 3, 0 );
-	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
-	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
+	m_led->setActiveGraphic( QPixmap( "icons:led_green.png" ) );
+	m_led->setInactiveGraphic( QPixmap( "icons:led_off.png" ) );
 
 	setModel( new BoolModel( false, NULL, _caption, true ) );
 	setAutoFillBackground( true );

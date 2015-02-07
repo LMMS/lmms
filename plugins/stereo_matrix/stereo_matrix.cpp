@@ -2,7 +2,7 @@
  * stereo_matrix.cpp - stereo-matrix-effect-plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 
 #include "stereo_matrix.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
@@ -69,9 +69,9 @@ stereoMatrixEffect::~stereoMatrixEffect()
 bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
-	
+
 	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
+	// audio with this effect
 	if( !isEnabled() || !isRunning() )
 	{
 		return( false );
@@ -80,10 +80,10 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 	double out_sum = 0.0;
 
 	for( fpp_t f = 0; f < _frames; ++f )
-	{	
+	{
 		const float d = dryLevel();
 		const float w = wetLevel();
-		
+
 		sample_t l = _buf[f][0];
 		sample_t r = _buf[f][1];
 

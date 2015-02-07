@@ -29,7 +29,6 @@
 #include "MainWindow.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
-#include "embed.h"
 
 
 static inline void darken( QImage& img, int x, int y, int w, int h )
@@ -56,8 +55,8 @@ public:
 	SpectrumView( SpectrumAnalyzer* s, QWidget * _parent ) :
 		QWidget( _parent ),
 		m_sa( s ),
-		m_backgroundPlain( PLUGIN_NAME::getIconPixmap( "spectrum_background_plain" ).toImage() ),
-		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
+		m_backgroundPlain( QPixmap( ":/spectrumanalyzer/spectrum_background_plain.png" ).toImage() ),
+		m_background( QPixmap( ":/spectrumanalyzer/spectrum_background.png" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
 		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
@@ -146,12 +145,12 @@ private:
 SpectrumAnalyzerControlDialog::SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls ) :
 	EffectControlDialog( controls ),
 	m_controls( controls ),
-	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
-	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )
+	m_logXAxis( QPixmap( ":/spectrumanalyzer/log_x_axis.png" ) ),
+	m_logYAxis( QPixmap( ":/spectrumanalyzer/log_y_axis.png" ) )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "background" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/spectrumanalyzer/background.png" ) );
 	setFixedSize( 280, 243 );
 	setPalette( pal );
 /*	QVBoxLayout * l = new QVBoxLayout( this );*/

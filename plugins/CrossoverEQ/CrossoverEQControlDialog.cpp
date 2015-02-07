@@ -1,5 +1,5 @@
 /*
- * CrossoverEQControlDialog.cpp - A native 4-band Crossover Equalizer 
+ * CrossoverEQControlDialog.cpp - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -23,13 +23,12 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include <QLayout>
 #include <QLabel>
 
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
-#include "embed.h"
 #include "ToolTip.h"
 #include "LedCheckbox.h"
 #include "Knob.h"
@@ -40,74 +39,74 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(),	QPixmap(":/crossovereq/artwork.png") );
 	setPalette( pal );
 	setFixedSize( 167, 188 );
-	
+
 	// knobs
 	Knob * xover12 = new Knob( knobBright_26, this );
 	xover12->move( 29, 15 );
 	xover12->setModel( & controls->m_xover12 );
 	xover12->setLabel( "1/2" );
 	xover12->setHintText( tr( "Band 1/2 Crossover:" ), " Hz" );
-	
+
 	Knob * xover23 = new Knob( knobBright_26, this );
 	xover23->move( 69, 15 );
 	xover23->setModel( & controls->m_xover23 );
 	xover23->setLabel( "2/3" );
 	xover23->setHintText( tr( "Band 2/3 Crossover:" ), " Hz" );
-	
+
 	Knob * xover34 = new Knob( knobBright_26, this );
 	xover34->move( 109, 15 );
 	xover34->setModel( & controls->m_xover34 );
 	xover34->setLabel( "3/4" );
 	xover34->setHintText( tr( "Band 3/4 Crossover:" ), " Hz" );
-	
-	m_fader_bg = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_bg" ) );
-	m_fader_empty = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_empty" ) );
-	m_fader_knob = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_knob2" ) );
-	
+
+	m_fader_bg = QPixmap(":/crossovereq/fader_bg");
+	m_fader_empty = QPixmap(":/crossovereq/fader_empty");
+	m_fader_knob = QPixmap(":/crossovereq/fader_knob2");
+
 	// faders
-	Fader * gain1 = new Fader( &controls->m_gain1, "Band 1 Gain", this, 
+	Fader * gain1 = new Fader( &controls->m_gain1, "Band 1 Gain", this,
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain1->move( 7, 56 );
 	gain1->setDisplayConversion( false );
 	gain1->setHintText( tr( "Band 1 Gain:" ), " dBV" );
-	
-	Fader * gain2 = new Fader( &controls->m_gain2, "Band 2 Gain", this, 
+
+	Fader * gain2 = new Fader( &controls->m_gain2, "Band 2 Gain", this,
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain2->move( 47, 56 );
 	gain2->setDisplayConversion( false );
 	gain2->setHintText( tr( "Band 2 Gain:" ), " dBV" );
-	
-	Fader * gain3 = new Fader( &controls->m_gain3, "Band 3 Gain", this, 
+
+	Fader * gain3 = new Fader( &controls->m_gain3, "Band 3 Gain", this,
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain3->move( 87, 56 );
 	gain3->setDisplayConversion( false );
 	gain3->setHintText( tr( "Band 3 Gain:" ), " dBV" );
-	
-	Fader * gain4 = new Fader( &controls->m_gain4, "Band 4 Gain", this, 
+
+	Fader * gain4 = new Fader( &controls->m_gain4, "Band 4 Gain", this,
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain4->move( 127, 56 );
 	gain4->setDisplayConversion( false );
 	gain4->setHintText( tr( "Band 4 Gain:" ), " dBV" );
-	
+
 	// leds
 	LedCheckBox * mute1 = new LedCheckBox( "M", this, tr( "Band 1 Mute" ), LedCheckBox::Red );
 	mute1->move( 11, 158 );
 	mute1->setModel( & controls->m_mute1 );
 	ToolTip::add( mute1, tr( "Mute Band 1" ) );
-	
+
 	LedCheckBox * mute2 = new LedCheckBox( "M", this, tr( "Band 2 Mute" ), LedCheckBox::Red );
 	mute2->move( 51, 158 );
 	mute2->setModel( & controls->m_mute2 );
 	ToolTip::add( mute2, tr( "Mute Band 2" ) );
-	
+
 	LedCheckBox * mute3 = new LedCheckBox( "M", this, tr( "Band 3 Mute" ), LedCheckBox::Red );
 	mute3->move( 91, 158 );
 	mute3->setModel( & controls->m_mute3 );
 	ToolTip::add( mute3, tr( "Mute Band 3" ) );
-	
+
 	LedCheckBox * mute4 = new LedCheckBox( "M", this, tr( "Band 4 Mute" ), LedCheckBox::Red );
 	mute4->move( 131, 158 );
 	mute4->setModel( & controls->m_mute4 );

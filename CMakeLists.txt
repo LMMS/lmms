@@ -24,7 +24,6 @@ ENDIF(VERSION_SUFFIX)
 
 INCLUDE(DetectMachine)
 
-
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
@@ -398,17 +397,6 @@ IF(GIT_FOUND)
 		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 		TIMEOUT 1)
 ENDIF(GIT_FOUND)
-
-# embedded resources stuff
-IF(WIN32 OR WIN64)
-	# compile buildtools native
-	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
-	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
-ELSE(WIN32 OR WIN64)
-	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
-	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
-ENDIF(WIN32 OR WIN64)
 
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")

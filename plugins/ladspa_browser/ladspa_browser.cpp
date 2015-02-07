@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@
 #include "TabBar.h"
 #include "TabButton.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Tool,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
@@ -118,23 +118,21 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
 
 
-	m_tabBar->addTab( available, tr( "Available Effects" ), 
-				0, false, true 
-			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
-	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 
-				1, false, true 
-			)->setIcon( embed::getIconPixmap(
-						"unavailable_sound" ) );
-	m_tabBar->addTab( instruments, tr( "Instruments" ), 
-				2, false, true 
-			)->setIcon( embed::getIconPixmap(
-							"setup_midi" ) );
-	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 
+	m_tabBar->addTab( available, tr( "Available Effects" ),
+				0, false, true
+			)->setIcon( QPixmap( "icons:setup_audio.png" ) );
+	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ),
+				1, false, true
+			)->setIcon( QPixmap( "icons:unavailable_sound.png" ) );
+	m_tabBar->addTab( instruments, tr( "Instruments" ),
+				2, false, true
+			)->setIcon( QPixmap( "icons:setup_midi.png" ) );
+	m_tabBar->addTab( analysis, tr( "Analysis Tools" ),
 				3, false, true
-			)->setIcon( embed::getIconPixmap( "analysis" ) );
-	m_tabBar->addTab( other, tr( "Don't know" ), 
+			)->setIcon( QPixmap( "icons:analysis.png" ) );
+	m_tabBar->addTab( other, tr( "Don't know" ),
 				4, true, true
-			)->setIcon( embed::getIconPixmap( "uhoh" ) );
+			)->setIcon( QPixmap( "icons:uhoh.png" ) );
 
 
 	m_tabBar->setActiveTab( 0 );
@@ -178,7 +176,7 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(
 							QLayout::SetFixedSize );
-		
+
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		flags &= ~Qt::WindowMaximizeButtonHint;

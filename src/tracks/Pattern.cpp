@@ -37,7 +37,7 @@
 #include "InstrumentTrack.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "embed.h"
+
 #include "GuiApplication.h"
 #include "PianoRoll.h"
 #include "TrackContainer.h"
@@ -658,26 +658,22 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 
 	if( s_stepBtnOn == NULL )
 	{
-		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
-							"step_btn_on_100" ) );
+		s_stepBtnOn = new QPixmap( "icons:step_btn_on_100.png" );
 	}
 
 	if( s_stepBtnOverlay == NULL )
 	{
-		s_stepBtnOverlay = new QPixmap( embed::getIconPixmap(
-						"step_btn_on_yellow" ) );
+		s_stepBtnOverlay = new QPixmap( "icons:step_btn_on_yellow.png" );
 	}
 
 	if( s_stepBtnOff == NULL )
 	{
-		s_stepBtnOff = new QPixmap( embed::getIconPixmap(
-							"step_btn_off" ) );
+		s_stepBtnOff = new QPixmap( "icons:step_btn_off.png" );
 	}
 
 	if( s_stepBtnOffLight == NULL )
 	{
-		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
-						"step_btn_off_light" ) );
+		s_stepBtnOffLight = new QPixmap( "icons:step_btn_off_light.png" );
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
@@ -743,7 +739,7 @@ void PatternView::changeName()
 
 void PatternView::constructContextMenu( QMenu * _cm )
 {
-	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
+	QAction * a = new QAction( QPixmap( "icons:piano.png" ),
 					tr( "Open in piano-roll" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
@@ -752,13 +748,13 @@ void PatternView::constructContextMenu( QMenu * _cm )
 
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
+	_cm->addAction( QPixmap( "icons:edit_erase.png" ),
 			tr( "Clear all notes" ), m_pat, SLOT( clear() ) );
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+	_cm->addAction( QPixmap( "icons:reload.png" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+	_cm->addAction( QPixmap( "icons:edit_rename.png" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 
@@ -766,9 +762,9 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	{
 		_cm->addSeparator();
 
-		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
+		_cm->addAction( QPixmap( "icons:step_btn_add.png" ),
 			tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
-		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
+		_cm->addAction( QPixmap( "icons:step_btn_remove.png" ),
 			tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
 	}
 }
@@ -1069,7 +1065,7 @@ void PatternView::paintEvent( QPaintEvent * )
 				}
 				else
 				{
-					p.setPen( fgColor() );	
+					p.setPen( fgColor() );
 				}
 
 				// scan through all the notes and draw them on the pattern
@@ -1196,7 +1192,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	if( m_pat->isMuted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
-				embed::getIconPixmap( "muted", 16, 16 ) );
+				QPixmap( "icons:muted.png" ).scaled( 16, 16 ) );
 	}
 
 	p.end();

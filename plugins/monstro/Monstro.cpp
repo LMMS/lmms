@@ -35,7 +35,7 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -83,7 +83,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 
 	m_lfo_next[0] = Oscillator::noiseSample( 0.0f );
 	m_lfo_next[1] = Oscillator::noiseSample( 0.0f );
-	
+
 	m_osc1l_last = 0.0f;
 	m_osc1r_last = 0.0f;
 
@@ -342,7 +342,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// modulators
 	float lfo[2][ m_parent->m_fpp ];
 	float env[2][ m_parent->m_fpp ];
-	
+
 	// render modulators: envelopes, lfos
 	updateModulators( &env[0][0], &env[1][0], &lfo[0][0], &lfo[1][0], _frames );
 
@@ -652,14 +652,14 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 {
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
-	
+
 	float * lfo [2];
 	float * env [2];
 	lfo[0] = lfo1;
 	lfo[1] = lfo2;
 	env[0] = env1;
 	env[1] = env2;
-	
+
 	for( int i = 0; i < 2; ++i )
 	{
 		switch( m_lfovalue[i] )
@@ -740,7 +740,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 				{
 					const f_cnt_t tm = ( tfp + f ) % static_cast<int>( m_lfo_rate[i] );
 					if( tm == 0 )
-					{ 
+					{
 						m_lfo_last[i] = m_lfo_next[i];
 						m_lfo_next[i] = Oscillator::noiseSample( 0.0f );
 					}
@@ -755,9 +755,9 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 		{
 			if( tfp + f < m_lfoatt[i] ) lfo[i][f] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
 		}
-		
-		
-		
+
+
+
 	/////////////////////////////////////////////
 	//                                         //
 	//                                         //
@@ -765,7 +765,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 	//                                         //
 	//                                         //
 	/////////////////////////////////////////////
-		
+
 		for( f_cnt_t f = 0; f < frames; ++f )
 		{
 			if( m_env_phase[i] < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
@@ -1419,7 +1419,7 @@ void MonstroInstrument::updateLFOAtts()
 void MonstroInstrument::updateSamplerate()
 {
 	m_samplerate = Engine::mixer()->processingSampleRate();
-	
+
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
 	m_counterMax = ( m_samplerate * 5 ) / 44100;
@@ -1449,12 +1449,12 @@ MonstroView::MonstroView( Instrument * _instrument,
 					InstrumentView( _instrument, _parent )
 {
 	m_operatorsView = setupOperatorsView( this );
-	setWidgetBackground( m_operatorsView, "artwork_op" );
+	setWidgetBackground( m_operatorsView, ":/monstro/artwork_op.png" );
 	m_operatorsView->show();
 	m_operatorsView->move( 0, 0 );
 
 	m_matrixView = setupMatrixView( this );
-	setWidgetBackground( m_matrixView, "artwork_mat" );
+	setWidgetBackground( m_matrixView, ":/monstro/artwork_mat.png" );
 	m_matrixView->hide();
 	m_matrixView->move( 0, 0 );
 
@@ -1462,8 +1462,8 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 	PixmapButton * m_opViewButton = new PixmapButton( this, NULL );
 	m_opViewButton -> move( 0,0 );
-	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
-	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
+	m_opViewButton -> setActiveGraphic( QPixmap( ":/monstro/opview_active.png" ) );
+	m_opViewButton -> setInactiveGraphic( QPixmap( ":/monstro/opview_inactive.png" ) );
 	ToolTip::add( m_opViewButton, tr( "Operators view" ) );
 	m_opViewButton -> setWhatsThis( tr( "The Operators view contains all the operators. These include both audible "
 										"operators (oscillators) and inaudible operators, or modulators: "
@@ -1473,8 +1473,8 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 	PixmapButton * m_matViewButton = new PixmapButton( this, NULL );
 	m_matViewButton -> move( 125,0 );
-	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
-	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
+	m_matViewButton -> setActiveGraphic( QPixmap( ":/monstro/matview_active.png" ) );
+	m_matViewButton -> setInactiveGraphic( QPixmap( ":/monstro/matview_inactive.png" ) );
 	ToolTip::add( m_matViewButton, tr( "Matrix view" ) );
 	m_matViewButton -> setWhatsThis( tr( "The Matrix view contains the modulation matrix. Here you can define "
 										"the modulation relationships between the various operators: Each "
@@ -1645,7 +1645,7 @@ void MonstroView::setWidgetBackground( QWidget * _widget, const QString & _pic )
 	_widget->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( _widget->backgroundRole(),
-		PLUGIN_NAME::getIconPixmap( _pic.toLatin1().constData() ) );
+		QPixmap( _pic.toLatin1().constData() ) );
 	_widget->setPalette( pal );
 }
 
@@ -1738,26 +1738,26 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	// mod selector
 	PixmapButton * m_mixButton = new PixmapButton( view, NULL );
 	m_mixButton -> move( 225, 185 );
-	m_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
-	m_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
+	m_mixButton -> setActiveGraphic( QPixmap( ":/monstro/mix_active.png" ) );
+	m_mixButton -> setInactiveGraphic( QPixmap( ":/monstro/mix_inactive.png" ) );
 	ToolTip::add( m_mixButton, tr( "Mix Osc2 with Osc3" ) );
 
 	PixmapButton * m_amButton = new PixmapButton( view, NULL );
 	m_amButton -> move( 225, 185 + 15 );
-	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
-	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
+	m_amButton -> setActiveGraphic( QPixmap( ":/monstro/am_active.png" ) );
+	m_amButton -> setInactiveGraphic( QPixmap( ":/monstro/am_inactive.png" ) );
 	ToolTip::add( m_amButton, tr( "Modulate amplitude of Osc3 with Osc2" ) );
 
 	PixmapButton * m_fmButton = new PixmapButton( view, NULL );
 	m_fmButton -> move( 225, 185 + 15*2 );
-	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
-	m_fmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_inactive" ) );
+	m_fmButton -> setActiveGraphic( QPixmap( ":/monstro/fm_active.png" ) );
+	m_fmButton -> setInactiveGraphic( QPixmap( ":/monstro/fm_inactive.png" ) );
 	ToolTip::add( m_fmButton, tr( "Modulate frequency of Osc3 with Osc2" ) );
 
 	PixmapButton * m_pmButton = new PixmapButton( view, NULL );
 	m_pmButton -> move( 225, 185 + 15*3 );
-	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
-	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
+	m_pmButton -> setActiveGraphic( QPixmap( ":/monstro/pm_active.png" ) );
+	m_pmButton -> setInactiveGraphic( QPixmap( ":/monstro/pm_inactive.png" ) );
 	ToolTip::add( m_pmButton, tr( "Modulate phase of Osc3 with Osc2" ) );
 
 	m_o23ModGroup = new automatableButtonGroup( view );

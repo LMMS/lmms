@@ -24,7 +24,6 @@
 
 #include "delaycontrolsdialog.h"
 #include "delaycontrols.h"
-#include "embed.h"
 #include "TempoSyncKnob.h"
 
 
@@ -35,7 +34,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/delay/artwork.png" ) );
 	setPalette( pal );
 	setFixedSize( 200, 75 );
 

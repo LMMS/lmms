@@ -29,7 +29,7 @@
 #include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	new VstSubPluginFeatures( Plugin::Effect )
 } ;
@@ -127,7 +127,7 @@ void VstEffect::openPlugin( const QString & _plugin )
 	TextFloat * tf = TextFloat::displayMessage(
 		VstPlugin::tr( "Loading plugin" ),
 		VstPlugin::tr( "Please wait while loading VST plugin..." ),
-			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+			QPixmap( ":/vsteffect/logo.png").scaled(24, 24), 0 );
 	m_pluginMutex.lock();
 	m_plugin = new VstPlugin( _plugin );
 	if( m_plugin->failed() )

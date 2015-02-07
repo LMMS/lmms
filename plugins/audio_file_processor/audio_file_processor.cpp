@@ -32,6 +32,7 @@
 #include <samplerate.h>
 
 #include "audio_file_processor.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Song.h"
 #include "InstrumentTrack.h"
@@ -42,7 +43,7 @@
 #include "StringPairDrag.h"
 #include "DataFile.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -95,13 +96,13 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 	    		this, SLOT( stutterModelChanged() ) );
-	    		
+
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
 	m_interpolationModel.addItem( tr( "Linear" ) );
 	m_interpolationModel.addItem( tr( "Sinc" ) );
 	m_interpolationModel.setValue( 1 );
-	
+
 	pointChanged();
 }
 
@@ -362,7 +363,7 @@ void audioFileProcessor::stutterModelChanged()
 }
 
 
-void audioFileProcessor::startPointChanged( void ) 
+void audioFileProcessor::startPointChanged( void )
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -389,7 +390,7 @@ void audioFileProcessor::startPointChanged( void )
 	{
 		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
-	
+
 	pointChanged();
 
 }
@@ -451,17 +452,14 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 {
 	if( s_artwork == NULL )
 	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+		s_artwork = new QPixmap( ":/audiofileprocessor/artwork.png" );
 	}
 
 	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 227, 72 );
-	m_openAudioFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"select_file" ) );
-	m_openAudioFileButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"select_file" ) );
+	m_openAudioFileButton->setActiveGraphic( QPixmap( ":/audiofileprocessor/select_file.png" ) );
+	m_openAudioFileButton->setInactiveGraphic( QPixmap( ":/audiofileprocessor/select_file.png" ) );
 	connect( m_openAudioFileButton, SIGNAL( clicked() ),
 					this, SLOT( openAudioFile() ) );
 	ToolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
@@ -476,10 +474,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_reverseButton = new PixmapButton( this );
 	m_reverseButton->setCheckable( true );
 	m_reverseButton->move( 164, 105 );
-	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"reverse_on" ) );
-	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"reverse_off" ) );
+	m_reverseButton->setActiveGraphic( QPixmap( ":/audiofileprocessor/reverse_on.png" ) );
+	m_reverseButton->setInactiveGraphic( QPixmap( ":/audiofileprocessor/reverse_off.png" ) );
 	ToolTip::add( m_reverseButton, tr( "Reverse sample" ) );
 	m_reverseButton->setWhatsThis(
 		tr( "If you enable this button, the whole sample is reversed. "
@@ -491,10 +487,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	PixmapButton * m_loopOffButton = new PixmapButton( this );
 	m_loopOffButton->setCheckable( true );
 	m_loopOffButton->move( 190, 105 );
-	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_off_on" ) );
-	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_off_off" ) );
+	m_loopOffButton->setActiveGraphic( QPixmap( ":/audiofileprocessor/loop_off_on.png" ) );
+	m_loopOffButton->setInactiveGraphic( QPixmap( ":/audiofileprocessor/loop_off_off.png" ) );
 	ToolTip::add( m_loopOffButton, tr( "Disable loop" ) );
 	m_loopOffButton->setWhatsThis(
 		tr( "This button disables looping. "
@@ -504,10 +498,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	PixmapButton * m_loopOnButton = new PixmapButton( this );
 	m_loopOnButton->setCheckable( true );
 	m_loopOnButton->move( 190, 124 );
-	m_loopOnButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_on_on" ) );
-	m_loopOnButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_on_off" ) );
+	m_loopOnButton->setActiveGraphic( QPixmap( ":/audiofileprocessor/loop_on_on.png" ) );
+	m_loopOnButton->setInactiveGraphic( QPixmap( ":/audiofileprocessor/loop_on_off.png" ) );
 	ToolTip::add( m_loopOnButton, tr( "Enable loop" ) );
 	m_loopOnButton->setWhatsThis(
 		tr( "This button enables forwards-looping. "
@@ -516,10 +508,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	PixmapButton * m_loopPingPongButton = new PixmapButton( this );
 	m_loopPingPongButton->setCheckable( true );
 	m_loopPingPongButton->move( 216, 124 );
-	m_loopPingPongButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_pingpong_on" ) );
-	m_loopPingPongButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"loop_pingpong_off" ) );
+	m_loopPingPongButton->setActiveGraphic( QPixmap( ":/audiofileprocessor/loop_pingpong_on.png" ) );
+	m_loopPingPongButton->setInactiveGraphic( QPixmap( ":/audiofileprocessor/loop_pingpong_off.png" ) );
 	ToolTip::add( m_loopPingPongButton, tr( "Enable loop" ) );
 	m_loopPingPongButton->setWhatsThis(
 		tr( "This button enables ping-pong-looping. "
@@ -534,10 +524,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_stutterButton = new PixmapButton( this );
 	m_stutterButton->setCheckable( true );
 	m_stutterButton->move( 164, 124 );
-	m_stutterButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"stutter_on" ) );
-	m_stutterButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"stutter_off" ) );
+	m_stutterButton->setActiveGraphic( QPixmap( ":/audiofileprocessor/stutter_on.png" ) );
+	m_stutterButton->setInactiveGraphic( QPixmap( ":/audiofileprocessor/stutter_off.png" ) );
 	ToolTip::add( m_stutterButton,
 		tr( "Continue sample playback across notes" ) );
 	m_stutterButton->setWhatsThis(

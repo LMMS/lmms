@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@
 #include "PixmapButton.h"
 #include "ToolTip.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 #define C64_PAL_CYCLES_PER_SEC  985248
 
@@ -118,11 +118,11 @@ voiceObject::~voiceObject()
 
 sidInstrument::sidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
-	// filter	
+	// filter
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
 	m_filterModeModel( LowPass, 0, NumFilterTypes-1, this, tr( "Filter type" )),
-	
+
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
@@ -172,11 +172,11 @@ void sidInstrument::saveSettings( QDomDocument & _doc,
 										_doc, _this, "test" + is );
 	}
 
-	// filter	
+	// filter
 	m_filterFCModel.saveSettings( _doc, _this, "filterFC" );
 	m_filterResonanceModel.saveSettings( _doc, _this, "filterResonance" );
 	m_filterModeModel.saveSettings( _doc, _this, "filterMode" );
-	
+
 	// misc
 	m_voice3OffModel.saveSettings( _doc, _this, "voice3Off" );
 	m_volumeModel.saveSettings( _doc, _this, "volume" );
@@ -205,12 +205,12 @@ void sidInstrument::loadSettings( const QDomElement & _this )
 		m_voice[i]->m_filteredModel.loadSettings( _this, "filtered" + is );
 		m_voice[i]->m_testModel.loadSettings( _this, "test" + is );
 	}
-	
-	// filter	
+
+	// filter
 	m_filterFCModel.loadSettings( _this, "filterFC" );
 	m_filterResonanceModel.loadSettings( _this, "filterResonance" );
 	m_filterModeModel.loadSettings( _this, "filterMode" );
-	
+
 	// misc
 	m_voice3OffModel.loadSettings( _this, "voice3Off" );
 	m_volumeModel.loadSettings( _this, "volume" );
@@ -358,7 +358,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 		sidreg[base+1] = (data16>>8)&0x00FF;
 		// pw
 		data16 = (int)m_voice[i]->m_pulseWidthModel.value();
-		
+
 		sidreg[base+2] = data16&0x00FF;
 		sidreg[base+3] = (data16>>8)&0x000F;
 		// control: wave form, (test), ringmod, sync, gate
@@ -367,7 +367,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
 		data8 += m_voice[i]->m_testModel.value()?8:0;
 		switch( m_voice[i]->m_waveFormModel.value() )
-		{	
+		{
 			default: break;
 			case voiceObject::NoiseWave:	data8 += 128; break;
 			case voiceObject::SquareWave:	data8 += 64; break;
@@ -398,7 +398,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	data16 = (int)m_filterFCModel.value();
 	sidreg[21] = data16&0x0007;
 	sidreg[22] = (data16>>3)&0x00FF;
-	
+
 	// res, filt ex,3,2,1
 	data16 = (int)m_filterResonanceModel.value();
 	data8 = (data16&0x000F)<<4;
@@ -413,7 +413,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	data8 += m_voice3OffModel.value()?128:0;
 
 	switch( m_filterModeModel.value() )
-	{	
+	{
 		default: break;
 		case LowPass:	data8 += 16; break;
 		case BandPass:	data8 += 32; break;
@@ -421,7 +421,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	sidreg[24] = data8&0x00FF;
-		
+
 	int num = sid_fillbuffer(sidreg, sid,delta_t,buf, frames);
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
@@ -483,7 +483,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/sid/artwork.png" ) );
 	setPalette( pal );
 
 	m_volKnob = new sidKnob( this );
@@ -500,20 +500,20 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 	PixmapButton * hp_btn = new PixmapButton( this, NULL );
 	hp_btn->move( 140, 77 );
-	hp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "hpred" ) );
-	hp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "hp" ) );
+	hp_btn->setActiveGraphic( QPixmap( ":/sid/hpred.png" ) );
+	hp_btn->setInactiveGraphic( QPixmap( ":/sid/hp.png" ) );
 	ToolTip::add( hp_btn, tr( "High-Pass filter ") );
 
 	PixmapButton * bp_btn = new PixmapButton( this, NULL );
 	bp_btn->move( 164, 77 );
-	bp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpred" ) );
-	bp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bp" ) );
+	bp_btn->setActiveGraphic( QPixmap( ":/sid/bpred.png" ) );
+	bp_btn->setInactiveGraphic( QPixmap( ":/sid/bp.png" ) );
 	ToolTip::add( bp_btn, tr( "Band-Pass filter ") );
 
 	PixmapButton * lp_btn = new PixmapButton( this, NULL );
 	lp_btn->move( 185, 77 );
-	lp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "lpred" ) );
-	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
+	lp_btn->setActiveGraphic( QPixmap( ":/sid/lpred.png" ) );
+	lp_btn->setInactiveGraphic( QPixmap( ":/sid/lp.png" ) );
 	ToolTip::add( lp_btn, tr( "Low-Pass filter ") );
 
 	m_passBtnGrp = new automatableButtonGroup( this );
@@ -524,27 +524,27 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	m_offButton = new PixmapButton( this, NULL );
 	m_offButton->setCheckable( true );
 	m_offButton->move( 207, 77 );
-	m_offButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "3offred" ) );
-	m_offButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "3off" ) );
+	m_offButton->setActiveGraphic( QPixmap( ":/sid/3offred.png" ) );
+	m_offButton->setInactiveGraphic( QPixmap( ":/sid/3off.png" ) );
 	ToolTip::add( m_offButton, tr( "Voice3 Off ") );
 
 	PixmapButton * mos6581_btn = new PixmapButton( this, NULL );
 	mos6581_btn->move( 170, 59 );
-	mos6581_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "6581red" ) );
-	mos6581_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "6581" ) );
+	mos6581_btn->setActiveGraphic( QPixmap( ":/sid/6581red.png" ) );
+	mos6581_btn->setInactiveGraphic( QPixmap( ":/sid/6581.png" ) );
 	ToolTip::add( mos6581_btn, tr( "MOS6581 SID ") );
 
 	PixmapButton * mos8580_btn = new PixmapButton( this, NULL );
 	mos8580_btn->move( 207, 59 );
-	mos8580_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "8580red" ) );
-	mos8580_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "8580" ) );
+	mos8580_btn->setActiveGraphic( QPixmap( ":/sid/8580red.png" ) );
+	mos8580_btn->setInactiveGraphic( QPixmap( ":/sid/8580.png" ) );
 	ToolTip::add( mos8580_btn, tr( "MOS8580 SID ") );
 
 	m_sidTypeBtnGrp = new automatableButtonGroup( this );
 	m_sidTypeBtnGrp->addButton( mos6581_btn );
 	m_sidTypeBtnGrp->addButton( mos8580_btn );
 
-	for( int i = 0; i < 3; i++ ) 
+	for( int i = 0; i < 3; i++ )
 	{
 		Knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:"), "" );
@@ -587,34 +587,26 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 
 		PixmapButton * pulse_btn = new PixmapButton( this, NULL );
 		pulse_btn->move( 187, 101 + i*50 );
-		pulse_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "pulsered" ) );
-		pulse_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "pulse" ) );
+		pulse_btn->setActiveGraphic( QPixmap( ":/sid/pulsered.png" ) );
+		pulse_btn->setInactiveGraphic( QPixmap( ":/sid/pulse.png" ) );
 		ToolTip::add( pulse_btn, tr( "Pulse Wave" ) );
 
 		PixmapButton * triangle_btn = new PixmapButton( this, NULL );
 		triangle_btn->move( 168, 101 + i*50 );
-		triangle_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "trianglered" ) );
-		triangle_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "triangle" ) );
+		triangle_btn->setActiveGraphic( QPixmap( ":/sid/trianglered.png" ) );
+		triangle_btn->setInactiveGraphic( QPixmap( ":/sid/triangle.png" ) );
 		ToolTip::add( triangle_btn, tr( "Triangle Wave" ) );
 
 		PixmapButton * saw_btn = new PixmapButton( this, NULL );
 		saw_btn->move( 207, 101 + i*50 );
-		saw_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "sawred" ) );
-		saw_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "saw" ) );
+		saw_btn->setActiveGraphic( QPixmap( ":/sid/sawred.png" ) );
+		saw_btn->setInactiveGraphic( QPixmap( ":/sid/saw.png" ) );
 		ToolTip::add( saw_btn, tr( "SawTooth" ) );
 
 		PixmapButton * noise_btn = new PixmapButton( this, NULL );
 		noise_btn->move( 226, 101 + i*50 );
-		noise_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "noisered" ) );
-		noise_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "noise" ) );
+		noise_btn->setActiveGraphic( QPixmap( ":/sid/noisered.png" ) );
+		noise_btn->setInactiveGraphic( QPixmap( ":/sid/noise.png" ) );
 		ToolTip::add( noise_btn, tr( "Noise" ) );
 
 		automatableButtonGroup * wfbg =
@@ -630,10 +622,8 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		PixmapButton * sync_btn = new PixmapButton( this, NULL );
 		sync_btn->setCheckable( true );
 		sync_btn->move( 207, 134 + i*50 );
-		sync_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "syncred" ) );
-		sync_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "sync" ) );
+		sync_btn->setActiveGraphic( QPixmap( ":/sid/syncred.png" ) );
+		sync_btn->setInactiveGraphic( QPixmap( ":/sid/sync.png" ) );
 		ToolTip::add( sync_btn, tr( "Sync" ) );
 		sync_btn->setWhatsThis( tr ( "Sync synchronizes the fundamental "
 			"frequency of Oscillator %1 with the fundamental frequency of "
@@ -643,10 +633,8 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		PixmapButton * ringMod_btn = new PixmapButton( this, NULL );
 		ringMod_btn->setCheckable( true );
 		ringMod_btn->move( 170, 116 + i*50 );
-		ringMod_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "ringred" ) );
-		ringMod_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "ring" ) );
+		ringMod_btn->setActiveGraphic( QPixmap( ":/sid/ringred.png" ) );
+		ringMod_btn->setInactiveGraphic( QPixmap( ":/sid/ring.png" ) );
 		ToolTip::add( ringMod_btn, tr( "Ring-Mod" ) );
 		ringMod_btn->setWhatsThis( tr ( "Ring-mod replaces the Triangle "
 			"Waveform output of Oscillator %1 with a \"Ring Modulated\" "
@@ -656,10 +644,8 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		PixmapButton * filter_btn = new PixmapButton( this, NULL );
 		filter_btn->setCheckable( true );
 		filter_btn->move( 207, 116 + i*50 );
-		filter_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "filterred" ) );
-		filter_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "filter" ) );
+		filter_btn->setActiveGraphic( QPixmap( ":/sid/filterred.png" ) );
+		filter_btn->setInactiveGraphic( QPixmap( ":/sid/filter.png" ) );
 		ToolTip::add( filter_btn, tr( "Filtered" ) );
 		filter_btn->setWhatsThis( tr ( "When Filtered is on, Voice %1 will be "
 			"processed through the Filter. When Filtered is off, Voice %1 "
@@ -669,10 +655,8 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		PixmapButton * test_btn = new PixmapButton( this, NULL );
 		test_btn->setCheckable( true );
 		test_btn->move( 170, 134 + i*50 );
-		test_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "testred" ) );
-		test_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap( "test" ) );
+		test_btn->setActiveGraphic( QPixmap( ":/sid/testred.png" ) );
+		test_btn->setInactiveGraphic( QPixmap( ":/sid/test.png" ) );
 		ToolTip::add( test_btn, tr( "Test" ) );
 		test_btn->setWhatsThis( tr ( "Test, when set, resets and locks "
 			"Oscillator %1 at zero until Test is turned off." ).arg( i+1 ) );
@@ -710,7 +694,7 @@ void sidInstrumentView::updateKnobHint()
 				m_releaseModel.value()] )  + ")" );
 		ToolTip::add( m_voiceKnobs[i].m_relKnob,
 						decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]);
-	
+
 		m_voiceKnobs[i].m_pwKnob->setHintText( tr( "Pulse Width:" )+ " ", " (" +
 				QString::number(  (double)k->m_voice[i]->
 				m_pulseWidthModel.value() / 40.95 ) + "%)" );
@@ -800,7 +784,7 @@ void sidInstrumentView::modelChanged()
 		connect( &k->m_voice[i]->m_coarseModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobToolTip() ) );
 	}
-	
+
 	connect( &k->m_volumeModel, SIGNAL( dataChanged() ),
 		this, SLOT( updateKnobToolTip() ) );
 	connect( &k->m_filterResonanceModel, SIGNAL( dataChanged() ),

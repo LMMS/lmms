@@ -24,7 +24,7 @@
  */
 
 #include "MultitapEcho.h"
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -95,7 +95,7 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	{
 		return( false );
 	}
-	
+
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -105,17 +105,17 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	const float stepLength = m_controls.m_stepLength.value();
 	const float dryGain = dbvToAmp( m_controls.m_dryGain.value() );
 	const bool swapInputs = m_controls.m_swapInputs.value();
-	
+
 	// check if number of stages has changed
 	if( m_controls.m_stages.isValueChanged() )
 	{
 		m_stages = static_cast<int>( m_controls.m_stages.value() );
 		updateFilters( 0, steps - 1 );
 	}
-	
+
 	// add dry buffer - never swap inputs for dry
 	m_buffer.writeAddingMultiplied( buf, 0, frames, dryGain );
-	
+
 	// swapped inputs?
 	if( swapInputs )
 	{
@@ -143,7 +143,7 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 			offset += stepLength;
 		}
 	}
-	
+
 	// pop the buffer and mix it into output
 	m_buffer.pop( m_work );
 
@@ -153,10 +153,10 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	
+
 	checkGate( outSum / frames );
 
-	return isRunning();	
+	return isRunning();
 }
 
 

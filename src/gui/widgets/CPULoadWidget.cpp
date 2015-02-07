@@ -3,7 +3,7 @@
  *                      Hydrogen's CPU-load-widget)
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 #include <QPainter>
 
 #include "CPULoadWidget.h"
-#include "embed.h"
 #include "Engine.h"
 #include "Mixer.h"
 
@@ -36,8 +35,8 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
 	m_currentLoad( 0 ),
 	m_temp(),
-	m_background( embed::getIconPixmap( "cpuload_bg" ) ),
-	m_leds( embed::getIconPixmap( "cpuload_leds" ) ),
+	m_background( QPixmap( "icons:cpuload_bg.png" ) ),
+	m_leds( QPixmap( "icons:cpuload_leds.png" ) ),
 	m_changed( true ),
 	m_updateTimer()
 {
@@ -45,7 +44,7 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	setFixedSize( m_background.width(), m_background.height() );
 
 	m_temp = QPixmap( width(), height() );
-	
+
 
 	connect( &m_updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updateCpuLoad() ) );
@@ -67,7 +66,7 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 	if( m_changed == true )
 	{
 		m_changed = false;
-		
+
 		m_temp.fill( QColor(0,0,0,0) );
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );

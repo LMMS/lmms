@@ -32,6 +32,7 @@
 #include <QPushButton>
 
 #include "ZynAddSubFx.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
@@ -44,7 +45,7 @@
 #include "LocalZynAddSubFx.h"
 #include "ControllerConnection.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -488,8 +489,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 {
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+	pal.setBrush( backgroundRole(), QPixmap( ":/zynaddsubfx/artwork.png" ) );
 	setPalette( pal );
 
 	QGridLayout * l = new QGridLayout( this );
@@ -533,7 +533,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setEnabled( false );
 #endif
 	m_toggleUIButton->setChecked( false );
-	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+	m_toggleUIButton->setIcon( QPixmap( "icons:zoom.png" ) );
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
