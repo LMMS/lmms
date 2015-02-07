@@ -98,8 +98,8 @@ inline void FxChannel::processed()
 
 void FxChannel::incrementDeps()
 {
-	m_dependenciesMet.ref();
-	if( m_dependenciesMet >= m_receives.size() && ! m_queued )
+	int i = m_dependenciesMet.fetchAndAddOrdered( 1 ) + 1;
+	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
 		MixerWorkerThread::addJob( this );
