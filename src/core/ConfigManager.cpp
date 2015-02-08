@@ -28,9 +28,9 @@
 #include <QMessageBox>
 #include <QApplication>
 
-#include "lmmsversion.h"
 #include "ConfigManager.h"
 #include "MainWindow.h"
+#include "ProjectVersion.h"
 
 
 static inline QString ensureTrailingSlash( const QString & _s )
@@ -66,7 +66,8 @@ ConfigManager::ConfigManager() :
 	m_pluginDir( qApp->applicationDirPath() + '/' + PLUGIN_DIR ),
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
-	m_flDir( QDir::home().absolutePath() )
+	m_flDir( QDir::home().absolutePath() ),
+	m_version( defaultVersion() )
 {
 }
 
@@ -79,6 +80,36 @@ ConfigManager::~ConfigManager()
 }
 
 
+
+
+void ConfigManager::upgrade()
+{
+	// Skip the upgrade if versions match
+	if ( m_version == LMMS_VERSION )
+	{
+		return;
+	}
+
+	ProjectVersion createdWith = m_version;
+	
+	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
+	if ( createdWith.setCompareType(Build) < "1.1.90" )
+	{
+		if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
+		{
+			setValue("mixer", "audiodev", "PulseAudio");
+		}
+	}
+	
+	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
+	if ( createdWith.setCompareType(Minor) != LMMS_VERSION )
+	{
+		m_artworkDir = defaultArtworkDir();
+	}
+
+	// Bump the version, now that we are upgraded
+	m_version = LMMS_VERSION;
+}
 
 
 void ConfigManager::setWorkingDir( const QString & _wd )
@@ -251,6 +282,11 @@ void ConfigManager::loadConfigFile()
 
 			QDomNode node = root.firstChild();
 
+			// Cache the config version for upgrade()
+			if ( !root.attribute( "version" ).isNull() ) {
+				m_version = root.attribute( "version" );
+			}
+
 			// create the settings-map out of the DOM
 			while( !node.isNull() )
 			{
@@ -289,13 +325,7 @@ void ConfigManager::loadConfigFile()
 				node = node.nextSibling();
 			}
 
-			// don't use dated theme folders as they break the UI (i.e. 0.4 != 1.0, etc)
-			bool use_artwork_path = 
-				root.attribute( "version" ).startsWith( 
-					QString::number( LMMS_VERSION_MAJOR ) + "." + 
-					QString::number( LMMS_VERSION_MINOR ) );
-
-			if( use_artwork_path && value( "paths", "artwork" ) != "" )
+			if( value( "paths", "artwork" ) != "" )
 			{
 				m_artworkDir = value( "paths", "artwork" );
 				if( !QDir( m_artworkDir ).exists() )
@@ -396,6 +426,8 @@ void ConfigManager::loadConfigFile()
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
 	}
+
+	upgrade();
 }
 
 
@@ -419,7 +451,7 @@ void ConfigManager::saveConfigFile()
 	QDomDocument doc( "lmms-config-file" );
 
 	QDomElement lmms_config = doc.createElement( "lmms" );
-	lmms_config.setAttribute( "version", LMMS_VERSION );
+	lmms_config.setAttribute( "version", m_version );
 	doc.appendChild( lmms_config );
 
 	for( settingsMap::iterator it = m_settings.begin();

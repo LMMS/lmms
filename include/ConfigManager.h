@@ -35,6 +35,7 @@
 
 #include "export.h"
 #include "MemoryManager.h"
+#include "lmmsversion.h"
 
 class Engine;
 
@@ -100,6 +101,11 @@ public:
 		return dataDir() + SAMPLES_PATH;
 	}
 
+	QString defaultVersion() const
+	{
+		return LMMS_VERSION;
+	}
+
 	QString defaultArtworkDir() const
 	{
 		return m_dataDir + DEFAULT_THEME_PATH;
@@ -144,6 +150,11 @@ public:
 	{
 		return m_workingDir + "recover.mmp";
 	}
+	
+	const QString & version() const
+	{
+		return m_version;
+	}
 
 #ifdef LMMS_HAVE_STK
 	const QString & stkDir() const
@@ -185,6 +196,7 @@ public:
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _fd );
+	void setVersion( const QString & _cv );
 	void setSTKDir( const QString & _fd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
@@ -197,6 +209,8 @@ private:
 	ConfigManager( const ConfigManager & _c );
 	~ConfigManager();
 
+	
+	void upgrade();
 
 	const QString m_lmmsRcFile;
 	QString m_workingDir;
@@ -206,6 +220,7 @@ private:
 	QString m_vstDir;
 	QString m_flDir;
 	QString m_ladDir;
+	QString m_version;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
