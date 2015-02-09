@@ -1,5 +1,5 @@
 /*
- * lfo.cpp - defination of Lfo class.
+ * delayeffect.h - declaration of DelayEffect class, the Delay plugin
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,25 +22,30 @@
  *
  */
 
-#include "lfo.h"
-#include "lmms_math.h"
+#ifndef DELAYEFFECT_H
+#define DELAYEFFECT_H
 
+#include "Effect.h"
+#include "DelayControls.h"
+#include "Lfo.h"
+#include "StereoDelay.h"
 
-
-
-Lfo::Lfo( int samplerate )
+class DelayEffect : public Effect
 {
-	m_samplerate = samplerate;
-	m_twoPiOverSr = F_2PI / samplerate;
-}
+public:
+	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~DelayEffect();
+	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual EffectControls* controls()
+	{
+		return &m_delayControls;
+	}
+	void changeSampleRate();
 
+private:
+	DelayControls m_delayControls;
+	StereoDelay* m_delay;
+	Lfo* m_lfo;
+};
 
-
-
-float Lfo::tick()
-{
-	float output = sinf( m_phase );
-	m_phase += m_increment;
-
-	return output;
-}
+#endif // DELAYEFFECT_H

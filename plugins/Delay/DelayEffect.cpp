@@ -22,7 +22,7 @@
  *
  */
 
-#include "delayeffect.h"
+#include "DelayEffect.h"
 #include "Engine.h"
 #include "embed.cpp"
 

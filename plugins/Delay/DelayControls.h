@@ -27,7 +27,7 @@
 
 #include "EffectControls.h"
 #include "Knob.h"
-#include "delaycontrolsdialog.h"
+#include "DelayControlsDialog.h"
 
 
 

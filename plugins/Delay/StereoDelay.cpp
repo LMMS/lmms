@@ -22,7 +22,7 @@
  *
  */
 
-#include "stereodelay.h"
+#include "StereoDelay.h"
 #include <cstdlib>
 #include "lmms_basics.h"
 #include "interpolation.h"

@@ -24,8 +24,8 @@
 
 #include <QtXml/QDomElement>
 
-#include "delaycontrols.h"
-#include "delayeffect.h"
+#include "DelayControls.h"
+#include "DelayEffect.h"
 #include "Engine.h"
 #include "Song.h"
 
