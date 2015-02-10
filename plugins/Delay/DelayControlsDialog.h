@@ -26,6 +26,7 @@
 #define DELAYCONTROLSDIALOG_H
 
 #include "EffectControlDialog.h"
+#include "AutomatableModel.h"
 
 class DelayControls;
 
@@ -36,6 +37,25 @@ public:
 	virtual ~DelayControlsDialog()
 	{
 	}
+};
+
+class XyPad : public QWidget
+{
+	Q_OBJECT
+public:
+	XyPad( QWidget *parent = 0, FloatModel *xModel = 0, FloatModel *yModel = 0 );
+	~XyPad() {}
+
+protected:
+	virtual void paintEvent ( QPaintEvent * event );
+	virtual void mousePressEvent(QMouseEvent * event );
+	virtual void mouseReleaseEvent(QMouseEvent * event);
+	virtual void mouseMoveEvent(QMouseEvent * event);
+
+private:
+	FloatModel *m_xModel;
+	FloatModel *m_yModel;
+	bool m_acceptInput;
 };
 
 #endif // DELAYCONTROLSDIALOG_H

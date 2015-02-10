@@ -46,6 +46,8 @@ private:
 	DelayControls m_delayControls;
 	StereoDelay* m_delay;
 	Lfo* m_lfo;
+	float m_outGain;
+	float m_currentLength;
 };
 
 #endif // DELAYEFFECT_H

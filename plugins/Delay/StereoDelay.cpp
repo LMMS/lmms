@@ -74,7 +74,7 @@ void StereoDelay::tick( sampleFrame frame )
 	m_buffer[m_index][0] += frame[0] * m_feedback;
 	m_buffer[m_index][1] += frame[1] * m_feedback;
 
-	m_index = ( m_index + 1) % m_maxLength;
+	m_index = ( m_index + 1) % (int) m_maxLength;
 }
 
 
