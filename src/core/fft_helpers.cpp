@@ -2,7 +2,7 @@
  * fft_helpers.cpp - some functions around FFT analysis
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 
 #include "fft_helpers.h"
 
-#include "lmms_math.h"
-
+#include <cmath>
+#include "lmms_constants.h"
 
 /* returns biggest value from abs_spectrum[spec_size] array
 
@@ -36,10 +36,10 @@ float maximum(float *abs_spectrum, unsigned int spec_size)
 {
 	float maxi=0;
 	unsigned int i;
-	
+
 	if ( abs_spectrum==NULL )
 		return -1;
-		
+
 	if (spec_size<=0)
 		return -1;
 
@@ -48,7 +48,7 @@ float maximum(float *abs_spectrum, unsigned int spec_size)
 		if ( abs_spectrum[i]>maxi )
 			maxi=abs_spectrum[i];
 	}
-	
+
 	return maxi;
 }
 
@@ -60,21 +60,21 @@ int hanming(float *timebuffer, int length, WINDOWS type)
 {
 	int i;
 	float alpha;
-	
+
 	if ( (timebuffer==NULL)||(length<=0) )
 		return -1;
-	
+
 	switch (type)
 	{
 		case HAMMING: alpha=0.54; break;
-		case HANNING: 
+		case HANNING:
 		default: alpha=0.5; break;
 	}
-	
+
 	for ( i=0; i<length; i++ )
 	{
 		timebuffer[i]=timebuffer[i]*(alpha+(1-alpha)*cos(2*F_PI*i/((float)length-1.0)));
-	}	
+	}
 
 	return 0;
 }
@@ -88,7 +88,7 @@ int hanming(float *timebuffer, int length, WINDOWS type)
 int absspec(fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length)
 {
 	int i;
-	
+
 	if ( (complex_buffer==NULL)||(absspec_buffer==NULL) )
 		return -1;
 	if ( compl_length<=0 )
@@ -98,7 +98,7 @@ int absspec(fftwf_complex *complex_buffer, float *absspec_buffer, int compl_leng
 	{
 		absspec_buffer[i]=(float )sqrt(complex_buffer[i][0]*complex_buffer[i][0] + complex_buffer[i][1]*complex_buffer[i][1]);
 	}
-		
+
 	return 0;
 }
 
@@ -106,7 +106,7 @@ int absspec(fftwf_complex *complex_buffer, float *absspec_buffer, int compl_leng
 /* build fewer subbands from many absolute spectrum values
    take care that - compressedbands[] array num_new elements long
                   - num_old > num_new
- 
+
      returns 0 on success, else -1          */
 int compressbands(float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top)
 {
@@ -114,13 +114,13 @@ int compressbands(float *absspec_buffer, float *compressedband, int num_old, int
 	int i, usefromold;
 	float j;
 	float j_min, j_max;
-	
+
 	if ( (absspec_buffer==NULL)||(compressedband==NULL) )
 		return -1;
-		
+
 	if ( num_old<num_new )
 		return -1;
-		
+
 	if ( (num_old<=0)||(num_new<=0) )
 		return -1;
 
@@ -138,15 +138,15 @@ int compressbands(float *absspec_buffer, float *compressedband, int num_old, int
 	for ( i=0; i<num_new; i++ )
 	{
 		compressedband[i]=0;
-		
+
 		j_min=(i*ratio)+bottom;
 
 		if ( j_min<0 )
 			j_min=bottom;
-			
+
 		j_max=j_min+ratio;
 
-		for ( j=(int)j_min; j<=j_max; j++ ) 
+		for ( j=(int)j_min; j<=j_max; j++ )
 		{
 			compressedband[i]+=absspec_buffer[(int)j];
 		}
@@ -188,16 +188,16 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 	for ( i=0; i<31; i++ )
 	{
 		subbands[i]=0;
-		
+
 		// calculate bandwith for subband
 		frequency=onethirdoctavecenterfr[i];
 
 		bandwith=(pow(2, 1.0/3.0)-1)*frequency;
-		
+
 		f_min=frequency-bandwith/2.0;
 		f_max=frequency+bandwith/2.0;
 
-		j_min=(int)(f_min/max_frequency*(float)num_spec);		
+		j_min=(int)(f_min/max_frequency*(float)num_spec);
 
 		j_max=(int)(f_max/max_frequency*(float)num_spec);
 
@@ -215,7 +215,7 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 		}
 
 	} //for
-	
+
 
 	return 0;
 }
@@ -231,13 +231,13 @@ float signalpower(float *timesignal, int num_values)
 
 	if( timesignal==NULL )
 		return -1;
-		
+
 	float power=0;
-	for ( int i=0; i<num_values; i++ )	
+	for ( int i=0; i<num_values; i++ )
 	{
 		power+=timesignal[i]*timesignal[i];
 	}
-	
-	return power;	
+
+	return power;
 }
 

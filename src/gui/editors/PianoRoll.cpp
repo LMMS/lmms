@@ -375,7 +375,8 @@ PianoRoll::PianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 	// Set up scale model
-	const auto& chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
 	m_scaleModel.addItem( tr("No scale") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
@@ -416,6 +417,10 @@ PianoRoll::PianoRoll() :
 
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
+
+	//connection for selecion from timeline
+	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
+			this, SLOT( selectRegionFromPixels( int, int ) ) );
 }
 
 
@@ -587,6 +592,44 @@ void PianoRoll::hidePattern( Pattern* pattern )
 		setCurrentPattern( NULL );
 	}
 }
+
+void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
+{
+
+	xStart -= WHITE_KEY_WIDTH;
+	xEnd  -= WHITE_KEY_WIDTH;
+
+	// select an area of notes
+	int pos_ticks = xStart * MidiTime::ticksPerTact() / m_ppt +
+					m_currentPosition;
+	int key_num = 0;
+	m_selectStartTick = pos_ticks;
+	m_selectedTick = 0;
+	m_selectStartKey = key_num;
+	m_selectedKeys = 1;
+	// change size of selection
+
+	// get tick in which the cursor is posated
+	pos_ticks = xEnd  * MidiTime::ticksPerTact() / m_ppt +
+					m_currentPosition;
+	key_num = 120;
+
+	m_selectedTick = pos_ticks - m_selectStartTick;
+	if( (int) m_selectStartTick + m_selectedTick < 0 )
+	{
+		m_selectedTick = -static_cast<int>(
+					m_selectStartTick );
+	}
+	m_selectedKeys = key_num - m_selectStartKey;
+	if( key_num <= m_selectStartKey )
+	{
+		--m_selectedKeys;
+	}
+
+	computeSelectedNotes( false );
+}
+
+
 
 
 
@@ -906,7 +949,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
 								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier );
+								ke->modifiers() & Qt::ShiftModifier,
+								ke->modifiers() & Qt::ControlModifier );
 				}
 			}
 			ke->accept();
@@ -938,7 +982,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
 								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier );
+								ke->modifiers() & Qt::ShiftModifier,
+								ke->modifiers() & Qt::ControlModifier );
 				}
 			}
 			ke->accept();
@@ -979,7 +1024,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
 								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier );
+								ke->modifiers() & Qt::ShiftModifier,
+								ke->modifiers() & Qt::ControlModifier );
 				}
 
 			}
@@ -1020,7 +1066,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
 								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier );
+								ke->modifiers() & Qt::ShiftModifier,
+								ke->modifiers() & Qt::ControlModifier );
 				}
 
 			}
@@ -1077,7 +1124,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 		}
 
 		case Qt::Key_Control:
-			if ( isActiveWindow() )
+			// Enter selection mode if:
+			// -> this window is active
+			// -> shift is not pressed
+			// (<S-C-drag> is shortcut for sticky note resize)
+			if ( !( ke->modifiers() & Qt::ShiftModifier ) && isActiveWindow() )
 			{
 				m_ctrlMode = m_editMode;
 				m_editMode = ModeSelect;
@@ -1222,7 +1273,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	// if holding control, go to selection mode
+	// if holding control, go to selection mode unless shift is also pressed
 	if( me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect )
 	{
 		m_ctrlMode = m_editMode;
@@ -1948,12 +1999,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				pauseTestNotes();
 			}
 
-			dragNotes(
-				me->x(),
-				me->y(),
+			dragNotes( me->x(), me->y(),
 				me->modifiers() & Qt::AltModifier,
-				me->modifiers() & Qt::ShiftModifier
-			);
+				me->modifiers() & Qt::ShiftModifier,
+				me->modifiers() & Qt::ControlModifier );
 
 			if( replay_note && m_action == ActionMoveNote && ! ( ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
 			{
@@ -2365,7 +2414,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 
 
-void PianoRoll::dragNotes( int x, int y, bool alt, bool shift )
+void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 {
 	// dragging one or more notes around
 
@@ -2411,13 +2460,19 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 
 	// will be our iterator in the following loop
 	NoteVector::ConstIterator it = notes.begin();
+
+	int sNotes = selectionCount();
 	while( it != notes.end() )
 	{
 		Note *note = *it;
 		const int pos = note->pos().getTicks();
-		// when resizing a note and holding shift: shift the following
-		// notes to preserve the melody
-		if( m_action == ActionResizeNote && shift )
+
+		// When resizing notes:
+		// If shift is pressed we resize and rearrange only the selected notes
+		// If shift + ctrl then we also rearrange all posterior notes (sticky)
+		// If shift is pressed but only one note is selected, apply sticky
+		if( m_action == ActionResizeNote && shift &&
+			( note->selected() || ctrl || sNotes == 1 ) )
 		{
 			int shifted_pos = note->oldPos().getTicks() + shift_offset;
 			if( shifted_pos && pos == shift_ref_pos )
@@ -3377,11 +3432,11 @@ void PianoRoll::finishRecordNote(const Note & n )
 		{
 			if( it->key() == n.key() )
 			{
-				Note n( n.length(), it->pos(),
+				Note n1( n.length(), it->pos(),
 						it->key(), it->getVolume(),
 						it->getPanning() );
-				n.quantizeLength( quantization() );
-				m_pattern->addNote( n );
+				n1.quantizeLength( quantization() );
+				m_pattern->addNote( n1 );
 				update();
 				m_recordingNotes.erase( it );
 				break;
@@ -3814,7 +3869,8 @@ int PianoRoll::quantization() const
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	const auto& chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const InstrumentFunctionNoteStacking::Chord& scale =
 			chord_table.getScaleByName( m_scaleModel.currentText() );
 	const InstrumentFunctionNoteStacking::Chord& chord =

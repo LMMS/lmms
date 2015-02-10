@@ -160,6 +160,8 @@ protected slots:
 
 	void hidePattern( Pattern* pattern );
 
+	void selectRegionFromPixels( int xStart, int xEnd );
+
 
 signals:
 	void currentPatternChanged();
@@ -229,7 +231,7 @@ private:
 	inline int noteEditRight() const;
 	inline int noteEditLeft() const;
 
-	void dragNotes( int x, int y, bool alt, bool shift );
+	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -295,7 +297,7 @@ private:
 
 	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
-	int m_ppt;
+	int m_ppt;  // pixels per tact
 	int m_totalKeysToScroll;
 
 	// remember these values to use them

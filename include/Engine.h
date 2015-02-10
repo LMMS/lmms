@@ -26,28 +26,17 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include "lmmsconfig.h"
-#include "MemoryManager.h"
-
 #include <QtCore/QMap>
 
 #include "export.h"
 
-class AutomationEditorWindow;
-class BBEditor;
 class BBTrackContainer;
 class DummyTrackContainer;
 class FxMixer;
-class FxMixerView;
 class ProjectJournal;
-class MainWindow;
 class Mixer;
-class PianoRollWindow;
-class ProjectNotes;
 class Song;
-class SongEditorWindow;
 class Ladspa2LMMS;
-class ControllerRackView;
 
 
 class EXPORT Engine

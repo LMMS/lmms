@@ -23,17 +23,14 @@
  *
  */
 
-#include <math.h>
 #include <QDomElement>
 #include <QObject>
-#include <QVector>
 
 
 #include "Song.h"
 #include "Engine.h"
 #include "Mixer.h"
 #include "LfoController.h"
-#include "ControllerDialog.h"
 #include "lmms_math.h"
 
 
@@ -47,7 +44,7 @@ LfoController::LfoController( Model * _parent ) :
 			this, tr( "Oscillator waveform" ) ),
 	m_multiplierModel( 0, 0, 2, this, tr( "Frequency Multiplier" ) ),
 	m_duration( 1000 ),
-	m_phaseOffset( 0 ),	
+	m_phaseOffset( 0 ),
 	m_currentPhase( 0 ),
 	m_sampleFunction( &Oscillator::sinSample ),
 	m_userDefSampleBuffer( new SampleBuffer )
@@ -55,19 +52,19 @@ LfoController::LfoController( Model * _parent ) :
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleFunction() ) );
-	
+
 	connect( &m_speedModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateDuration() ) );
 	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateDuration() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), 
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateDuration() ) );
-	
+
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 			this, SLOT( updatePhase() ) );
 	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
 			this, SLOT( updatePhase() ) );
-			
+
 	updateDuration();
 }
 
@@ -88,12 +85,12 @@ LfoController::~LfoController()
 
 void LfoController::updateValueBuffer()
 {
-	m_phaseOffset = m_phaseModel.value() / 360.0;	
-	float * values = m_valueBuffer.values();	
+	m_phaseOffset = m_phaseModel.value() / 360.0;
+	float * values = m_valueBuffer.values();
 	float phase = m_currentPhase + m_phaseOffset;
 
 	// roll phase up until we're in sync with period counter
-	m_bufferLastUpdated++; 
+	m_bufferLastUpdated++;
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
@@ -103,16 +100,16 @@ void LfoController::updateValueBuffer()
 
 
 	for( int i = 0; i < m_valueBuffer.length(); i++ )
-	{		
-		const float currentSample = m_sampleFunction != NULL 
+	{
+		const float currentSample = m_sampleFunction != NULL
 			? m_sampleFunction( phase )
 			: m_userDefSampleBuffer->userWaveSample( phase );
-			
+
 		values[i] = qBound( 0.0f, m_baseModel.value() + ( m_amountModel.value() * currentSample / 2.0f ), 1.0f );
 
 		phase += 1.0 / m_duration;
 	}
-	
+
 	m_currentPhase = absFraction( phase - m_phaseOffset );
 }
 
@@ -141,7 +138,7 @@ void LfoController::updateDuration()
 		default:
 			break;
 	}
-	
+
 	m_duration = newDurationF;
 }
 

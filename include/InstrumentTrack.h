@@ -306,6 +306,9 @@ public:
 
 	static void cleanupWindowCache();
 
+	// Create a menu for assigning/creating channels for this track
+	QMenu * createFxMenu( QString title, QString newFxLabel );
+
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
@@ -320,6 +323,10 @@ private slots:
 	void midiInSelected();
 	void midiOutSelected();
 	void midiConfigChanged();
+	void muteChanged();
+
+	void assignFxLine( int channelIndex );
+	void createFxLine();
 
 
 private:
@@ -373,6 +380,12 @@ public:
 	}
 
 	void setInstrumentTrackView( InstrumentTrackView * _tv );
+
+	InstrumentTrackView *instrumentTrackView()
+	{
+		return m_itv;
+	}
+
 
 	PianoView * pianoView()
 	{

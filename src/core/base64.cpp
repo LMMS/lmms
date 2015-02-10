@@ -3,7 +3,7 @@
  *              to/from base64
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 
 
 #include "base64.h"
-#include "lmms_basics.h"
 
 #include <QBuffer>
 #include <QVariant>
@@ -34,7 +33,7 @@
 namespace base64
 {
 
-	
+
 QString encode( const QVariant & _data )
 {
 	QBuffer buf;

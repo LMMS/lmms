@@ -497,6 +497,15 @@ bool MidiImport::readSMF( TrackContainer* tc )
 		}
 	}
 
+	// Set channel 10 to drums as per General MIDI's orders
+	if( chs[9].hasNotes && chs[9].it_inst && chs[9].isSF2 )
+	{
+		// AFAIK, 128 should be the standard bank for drums in SF2.
+		// If not, this has to be made configurable.
+		chs[9].it_inst->childModel( "bank" )->setValue( 128 );
+		chs[9].it_inst->childModel( "patch" )->setValue( 0 );
+	}
+
 	return true;
 }
 

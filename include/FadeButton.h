@@ -39,6 +39,7 @@ public:
 					_activated_color, QWidget * _parent );
 
 	virtual ~FadeButton();
+	void setActiveColor( const QColor & activated_color );
 
 
 public slots:

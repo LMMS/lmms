@@ -22,9 +22,8 @@
  *
  */
 
-#include <QDomElement>
-
 #include "AutomatableModel.h"
+
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
 #include "lmms_math.h"
@@ -75,7 +74,7 @@ AutomatableModel::~AutomatableModel()
 	{
 		delete m_controllerConnection;
 	}
-	
+
 	m_valueBuffer.clear();
 
 	emit destroyed( id() );
@@ -171,7 +170,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 			//m_controllerConnection->setTargetName( displayName() );
 		}
 	}
-	
+
 	// models can be stored as elements (port00) or attributes (port10):
 	// <ladspacontrols port10="4.41">
 	//   <port00 value="4.41" id="4249278"/>
@@ -566,7 +565,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		}
 	}
 	AutomatableModel* lm = NULL;
-	if( m_hasLinkedModels ) 
+	if( m_hasLinkedModels )
 	{
 		lm = m_linkedModels.first();
 	}
@@ -583,7 +582,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		m_hasSampleExactData = true;
 		return &m_valueBuffer;
 	}
-	
+
 	if( m_oldValue != val )
 	{
 		m_valueBuffer.interpolate( m_oldValue, val );
@@ -592,7 +591,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		m_hasSampleExactData = true;
 		return &m_valueBuffer;
 	}
-	
+
 	// if we have no sample-exact source for a ValueBuffer, return NULL to signify that no data is available at the moment
 	// in which case the recipient knows to use the static value() instead
 	m_lastUpdatedPeriod = s_periodCounter;
@@ -667,11 +666,11 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 		{
 			int s = ( *it )->startPosition();
 			int e = ( *it )->endPosition();
-			if( s <= time && e >= time ) { patternsInRange += ( *it ); } 
+			if( s <= time && e >= time ) { patternsInRange += ( *it ); }
 		}
-		
+
 		AutomationPattern * latestPattern = NULL;
-		
+
 		if( ! patternsInRange.isEmpty() )
 		{
 			// if there are more than one overlapping patterns, just use the first one because
@@ -682,7 +681,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
 		{
 			int latestPosition = 0;
-			
+
 			for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 			{
 				int e = ( *it )->endPosition();
@@ -693,7 +692,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 				}
 			}
 		}
-		
+
 		if( latestPattern )
 		{
 			// scale/fit the value appropriately and return it
@@ -701,7 +700,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 			const float scaled_value = scaledValue( value );
 			return fittedValue( scaled_value );
 		}
-		// if we still find no pattern, the value at that time is undefined so 
+		// if we still find no pattern, the value at that time is undefined so
 		// just return current value as the best we can do
 		else return m_value;
 	}

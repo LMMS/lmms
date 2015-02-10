@@ -28,10 +28,11 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QMutex>
-#include <QtCore/QReadWriteLock>
 #include <QtCore/QHash>
 #include "MemoryHelper.h"
 #include "export.h"
+
+class QReadWriteLock;
 
 const int MM_CHUNK_SIZE = 64; // granularity of managed memory
 const int MM_INITIAL_CHUNKS = 1024 * 1024; // how many chunks to allocate at startup - TODO: make configurable

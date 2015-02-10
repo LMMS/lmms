@@ -761,12 +761,16 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
-		tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
-	_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
-		tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+	if ( m_pat->type() == Pattern::BeatPattern )
+	{
+		_cm->addSeparator();
+
+		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
+			tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
+		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
+			tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+	}
 }
 
 
@@ -834,6 +838,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		}
 		else // note at step found
 		{
+			m_pat->addJournalCheckPoint();
 			if( n->length() < 0 )
 			{
 				n->setLength( 0 );	// set note as enabled beat note

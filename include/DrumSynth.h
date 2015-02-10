@@ -3,7 +3,7 @@
  *
  * Copyright (c) 1998-2000 Paul Kellett (mda-vst.com)
  * Copyright (c) 2007 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -42,11 +42,11 @@ class DrumSynth {
         void  GetEnv(int env, const char *sec, const char *key, const char *ini);
 
         float waveform(float ph, int form);
-        
+
         int GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, const char *file);
         int GetPrivateProfileInt(const char *sec, const char *key, int def, const char *file);
         float GetPrivateProfileFloat(const char *sec, const char *key, float def, const char *file);
 
 };
 
-#endif 
+#endif

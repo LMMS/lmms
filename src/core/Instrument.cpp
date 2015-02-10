@@ -26,7 +26,6 @@
 #include "InstrumentTrack.h"
 #include "DummyInstrument.h"
 #include "NotePlayHandle.h"
-#include "embed.h"
 #include "Engine.h"
 
 

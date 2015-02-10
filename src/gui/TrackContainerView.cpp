@@ -45,6 +45,7 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
+#include "GuiApplication.h"
 
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
@@ -307,10 +308,23 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,soundfontfile,vstpluginfile,"
+				"importedproject,soundfontfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( Track::InstrumentTrack ).
 						arg( Track::SampleTrack ) );
+}
+
+void TrackContainerView::selectRegionFromPixels(int xStart, int xEnd)
+{
+	m_rubberBand->setEnabled( true );
+	m_rubberBand->show();
+	m_rubberBand->setGeometry( min( xStart, xEnd ), 0, max( xStart, xEnd ) - min( xStart, xEnd ), std::numeric_limits<int>::max() );
+}
+
+void TrackContainerView::stopRubberBand()
+{
+	m_rubberBand->hide();
+	m_rubberBand->setEnabled( false );
 }
 
 
@@ -360,6 +374,16 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		ImportFilter::import( value, m_tc );
 		_de->accept();
 	}
+
+	else if( type == "projectfile")
+	{
+		if( gui->mainWindow()->mayChangeProject() )
+		{
+			Engine::getSong()->loadProject( value );
+		}
+		_de->accept();
+	}
+
 	else if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
