@@ -27,7 +27,7 @@
 
 #include "EffectControls.h"
 #include "Knob.h"
-#include "delaycontrolsdialog.h"
+#include "DelayControlsDialog.h"
 
 
 
@@ -48,12 +48,16 @@ public:
 		return "Delay";
 	}
 	virtual int controlCount(){
-		return 4;
+		return 5;
 	}
 	virtual EffectControlDialog* createView()
 	{
 		return new DelayControlsDialog( this );
 	}
+
+	float m_outPeakL;
+	float m_outPeakR;
+
 
 private slots:
 	void changeSampleRate();
@@ -64,6 +68,7 @@ private:
 	FloatModel m_feedbackModel;
 	TempoSyncKnobModel m_lfoTimeModel;
 	TempoSyncKnobModel m_lfoAmountModel;
+	FloatModel m_outGainModel;
 
 	friend class DelayControlsDialog;
 	friend class DelayEffect;

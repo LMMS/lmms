@@ -1,5 +1,5 @@
 /*
- * delaycontrolsdialog.h - declaration of DelayControlsDialog class.
+ * delayeffect.h - declaration of DelayEffect class, the Delay plugin
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,20 +22,32 @@
  *
  */
 
-#ifndef DELAYCONTROLSDIALOG_H
-#define DELAYCONTROLSDIALOG_H
+#ifndef DELAYEFFECT_H
+#define DELAYEFFECT_H
 
-#include "EffectControlDialog.h"
+#include "Effect.h"
+#include "DelayControls.h"
+#include "Lfo.h"
+#include "StereoDelay.h"
 
-class DelayControls;
-
-class DelayControlsDialog : public EffectControlDialog
+class DelayEffect : public Effect
 {
 public:
-	DelayControlsDialog( DelayControls* controls );
-	virtual ~DelayControlsDialog()
+	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~DelayEffect();
+	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual EffectControls* controls()
 	{
+		return &m_delayControls;
 	}
+	void changeSampleRate();
+
+private:
+	DelayControls m_delayControls;
+	StereoDelay* m_delay;
+	Lfo* m_lfo;
+	float m_outGain;
+	float m_currentLength;
 };
 
-#endif // DELAYCONTROLSDIALOG_H
+#endif // DELAYEFFECT_H

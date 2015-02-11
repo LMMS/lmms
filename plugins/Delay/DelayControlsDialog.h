@@ -1,5 +1,5 @@
 /*
- * delayeffect.h - declaration of DelayEffect class, the Delay plugin
+ * delaycontrolsdialog.h - declaration of DelayControlsDialog class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
@@ -22,30 +22,40 @@
  *
  */
 
-#ifndef DELAYEFFECT_H
-#define DELAYEFFECT_H
+#ifndef DELAYCONTROLSDIALOG_H
+#define DELAYCONTROLSDIALOG_H
 
-#include "Effect.h"
-#include "delaycontrols.h"
-#include "lfo.h"
-#include "stereodelay.h"
+#include "EffectControlDialog.h"
+#include "AutomatableModel.h"
 
-class DelayEffect : public Effect
+class DelayControls;
+
+class DelayControlsDialog : public EffectControlDialog
 {
 public:
-	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~DelayEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
-	virtual EffectControls* controls()
+	DelayControlsDialog( DelayControls* controls );
+	virtual ~DelayControlsDialog()
 	{
-		return &m_delayControls;
 	}
-	void changeSampleRate();
-
-private:
-	DelayControls m_delayControls;
-	StereoDelay* m_delay;
-	Lfo* m_lfo;
 };
 
-#endif // DELAYEFFECT_H
+class XyPad : public QWidget
+{
+	Q_OBJECT
+public:
+	XyPad( QWidget *parent = 0, FloatModel *xModel = 0, FloatModel *yModel = 0 );
+	~XyPad() {}
+
+protected:
+	virtual void paintEvent ( QPaintEvent * event );
+	virtual void mousePressEvent(QMouseEvent * event );
+	virtual void mouseReleaseEvent(QMouseEvent * event);
+	virtual void mouseMoveEvent(QMouseEvent * event);
+
+private:
+	FloatModel *m_xModel;
+	FloatModel *m_yModel;
+	bool m_acceptInput;
+};
+
+#endif // DELAYCONTROLSDIALOG_H
