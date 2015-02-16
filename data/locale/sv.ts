@@ -31,7 +31,7 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation type="unfinished"></translation>
+        <translation>Om du är intresserad av att översätta LMMS till ett annat språk eller om du vill förbättra nuvarande översättningar så är du välkommen att hjälpa oss! Kontakta underhållaren för att komma igång!</translation>
     </message>
     <message>
         <source>License</source>
@@ -39,11 +39,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation>Copyright (c) 2004-2014, LMMS utvecklare</translation>
+        <translation>Copyright (c) 2004-2014, LMMS-utvecklare</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>LMMS</source>
@@ -70,11 +70,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Panering</translation>
     </message>
     <message>
         <source>LEFT</source>
@@ -101,7 +101,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Panering</translation>
     </message>
     <message>
         <source>Left gain</source>
@@ -139,7 +139,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation>Den här knappen gör att ljudfilen spelas baklänges. Den kan användas för intressanta effeker t.ex. en baklänges cymbal.</translation>
+        <translation>Om du aktiverar den här knappen så spelas hela ljudklippet upp baklänges. Det här är användbart för coola effeker, exempelvis vid användning av en baklänges-cymbal.</translation>
     </message>
     <message>
         <source>Amplify:</source>
@@ -147,7 +147,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>Med detta vred ställer du in förstärkningen. Vid 100% blir det ingen skillnad. Annars blir din ljudfil mer eller mindre högljudd, men originalfilen förändras inte.</translation>
+        <translation>Med detta vred så kan du ställa in kvoten för förstärkning. När du ställer in ett värde av 100% så förändras inte ljudklippet. Annars så blir din ljudfil förstärkt upp eller ned (den faktiska originalfilen rörs inte!)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -159,7 +159,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Continue sample playback across notes</source>
-        <translation>Forsätt spela ljudfil över noter</translation>
+        <translation>Forsätt sampla ljudfilen över noter</translation>
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
@@ -195,41 +195,41 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Loopback point:</source>
-        <translation>Loopback punkt:</translation>
+        <translation>Loopback-punkt:</translation>
     </message>
     <message>
         <source>With this knob you can set the point where the loop starts. </source>
-        <translation>Den här vreden ställer in vart loopen startar.</translation>
+        <translation>Med det här vredet så kan du ställa in var loopen börjar.</translation>
     </message>
 </context>
 <context>
     <name>AudioFileProcessorWaveView</name>
     <message>
         <source>Sample length:</source>
-        <translation>Ljudfilens längd:</translation>
+        <translation>Ljudklippets längd:</translation>
     </message>
 </context>
 <context>
     <name>AudioJack</name>
     <message>
         <source>JACK client restarted</source>
-        <translation>JACK klienten omstartades</translation>
+        <translation>JACK-klienten startades om</translation>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation>LMMS blev bortkopplat från JACK. LMMS JACK backend omstartades därfor. Du får manuellt koppla om igen.</translation>
+        <translation>LMMS blev sparkat av JACK av någon anledning. LMMS's JACK-bakände startades därfor om. Du måste ansluta manuellt igen.</translation>
     </message>
     <message>
         <source>JACK server down</source>
-        <translation>JACK server nerstängd</translation>
+        <translation>JACK-servern är nere</translation>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation>JACK servern stängde av och det gick inte starta en ny. LMMS kan inte fortsätta. Du bör spara ditt projekt och starta om både JACK och LMMS.</translation>
+        <translation>Det ser ut som att JACK-servern har stängts av och att starta en ny instans gick inte. Därför kan inte LMMS fortsätta. Du borde spara ditt projekt och starta om både JACK och LMMS.</translation>
     </message>
     <message>
         <source>CLIENT-NAME</source>
-        <translation>KLIENT-NAMN</translation>
+        <translation>KLIENTNAMN</translation>
     </message>
     <message>
         <source>CHANNELS</source>
@@ -251,7 +251,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioPortAudio::setupWidget</name>
     <message>
         <source>BACKEND</source>
-        <translation>BACKEND</translation>
+        <translation>BAKÄNDE</translation>
     </message>
     <message>
         <source>DEVICE</source>
@@ -362,11 +362,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation>Suddläge (Shift+E)</translation>
+        <translation>Raderingsläge (Shift+E)</translation>
     </message>
     <message>
         <source>Flip vertically</source>
-        <translation>Spegla vertikalt</translation>
+        <translation>Vänd vertikalt</translation>
     </message>
     <message>
         <source>Flip horizontally</source>
@@ -374,11 +374,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
-        <translation>Klicka här för att spegla mönstret. Punkterna förflyttas på y-axeln</translation>
+        <translation>Klicka här och mönstret kommer att bli innåtvänd. Punkterna vänds i y-riktningen</translation>
     </message>
     <message>
         <source>Click here and the pattern will be reversed. The points are flipped in the x direction.</source>
-        <translation>Klicka här för att spegla mönstret. Punkterna förflyttas på x-axeln</translation>
+        <translation>Klicka här och mönstret kommer att bli omvänt. Punkterna förflyttas på x-axeln</translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
@@ -386,39 +386,39 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Klicka här för att aktivera suddläget. I detta läget kan du ta bort individuella värden. Det går också att trycka &apos;Shift+E&apos; på tangentborded för att aktivera detta läget.</translation>
+        <translation>Klicka här för att aktivera raderingsläget. I detta läget kan du ta bort individuella värden. Det går också att trycka &apos;Shift+E&apos; på tangentborded för att aktivera detta läget.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
-        <translation>Diskret talföljd</translation>
+        <translation>Diskret tongång</translation>
     </message>
     <message>
         <source>Linear progression</source>
-        <translation>Linjär talföljd</translation>
+        <translation>Linjär tongång</translation>
     </message>
     <message>
         <source>Cubic Hermite progression</source>
-        <translation>Cubic Hermite talföljd</translation>
+        <translation>Cubic Hermite-tongång</translation>
     </message>
     <message>
         <source>Tension value for spline</source>
-        <translation>Spänning i mönstrets spline</translation>
+        <translation>Spänningsvärde för spline</translation>
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation>Högre spänning ger en mjuk kurva som ibland missar individuella punkter. Med lägre spänning planar kurvan ut nära punkterna.</translation>
+        <translation>Ett högre spänningsvärde kan ge en mjukare kurva, men som skjuter över några värden. Ett lågt spänningsvärde kommer att få kurvans lutning att plana ut vid varje kontrollpunkt.</translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
-        <translation>Klicka här för att aktivera diskret talföljd. Värdet är konstant mella kontroll punkter och ändras direkt när en ny kontrollpunkt nås.</translation>
+        <translation>Klicka här för att välja diskret tongång för det här automatiska mönstret. Värdet för det anslutna objektet kommer att hållas konstant mellan kontrollpunkter och blir direkt inställd till det nya värdet när varje kontrollpunkt nås.</translation>
     </message>
     <message>
         <source>Click here to choose linear progressions for this automation pattern.  The value of the connected object will change at a steady rate over time between control points to reach the correct value at each control point without a sudden change.</source>
-        <translation>Klicka här för att aktivera linjär talföljd. Värdet ändras vid en stadig takt mellan kontrollpunkter för att gradvis nå nästa värde.</translation>
+        <translation>Klicka här för att välja linjär tongång för det här automatiska mönstret. Värdet av det anslutna objektet kommer att förändras i en stadig takt över tiden mellan kontrollpunkter för att nå det korrekta värdet vid nästa kontrollpunkt utan en plötslig ändring.</translation>
     </message>
     <message>
         <source>Click here to choose cubic hermite progressions for this automation pattern.  The value of the connected object will change in a smooth curve and ease in to the peaks and valleys.</source>
-        <translation>Klicka här för att aktivera cubic hermite talföljd. Värdet följer en mjuk kurva mellan kontrollpunkter.</translation>
+        <translation>Klicka här för att välja cubic hermite-tongången för det här automatiska mönstret. Värdet av det anslutna objektet kommer att förändras i en mjuk kurva och sjunka ner till pikarna och kullarna.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
@@ -430,7 +430,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Paste values from clipboard Ctrl+V)</source>
-        <translation>Klistra värden (Ctrl+V)</translation>
+        <translation>Klistra in värden från klippbordet (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -450,18 +450,18 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation>Redigera Automation - inget automationsmönster</translation>
+        <translation>Automatisk redigerare - inget mönster</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation>Redigera Automation - %1</translation>
+        <translation>Automatisk redigerare - %1</translation>
     </message>
 </context>
 <context>
     <name>AutomationPattern</name>
     <message>
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Dra en kontroll samtidigt som du håller &lt;Ctrl&gt;</translation>
+        <translation>Dra en kontroll medans du håller in &lt;Ctrl&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -472,11 +472,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation>dubbelklicka för att öppna det här automationsmönstret för redigering</translation>
+        <translation>dubbelklicka för att öppna det här mönstret för automatisk redigering</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation>Redigera automationsmönster</translation>
+        <translation>Öppna i den automatiska redigeraren</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -492,61 +492,61 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>%1 Connections</source>
-        <translation>%1 Kopplingar</translation>
+        <translation>%1 anslutningar</translation>
     </message>
     <message>
         <source>Disconnect &quot;%1&quot;</source>
-        <translation>Avkoppla &quot;%1&quot;</translation>
+        <translation>Koppla ur &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ställ in/rensa rekord</translation>
     </message>
     <message>
         <source>Flip Vertically (Visible)</source>
-        <translation>Spegla Vertikalt (Synligt)</translation>
+        <translation>Vänd vertikalt (Synligt)</translation>
     </message>
     <message>
         <source>Flip Horizontally (Visible)</source>
-        <translation>Spegla Horizontellt (Synligt)</translation>
+        <translation>Vänd horizontellt (Synligt)</translation>
     </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
-        <translation>Automationsspår</translation>
+        <translation>Automatiskt spår</translation>
     </message>
 </context>
 <context>
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Redigera Trummor+Bas</translation>
+        <translation>Redigerare för Takt+Basljud</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation>Spela/pause Trummor+Bas</translation>
+        <translation>Spela upp/pausea den nuvarande takten/basljudet (Mellanslag)</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
-        <translation>Avsluta uppspelning av trummor/bas</translation>
+        <translation>Stoppa uppspelning av den nuvarande takten/basljudet (Mellanslag)</translation>
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation>Klicka här för att spela trummor/bas. Mönstret loopar när det nåt sitt slut.</translation>
+        <translation>Klicka här för att spela upp den nuvarande takten/basljudet.  Takten/basljudet loopas automatiskt när det har nått sitt slut.</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation>Klicka här för att sluta spela trummor/bas.</translation>
+        <translation>Klicka här för att sluta spela den nuvarande takten/basljudet.</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation>Lägg till trummor/bas</translation>
+        <translation>Lägg till takt/basljud</translation>
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation>Lägg till automationsspår</translation>
+        <translation>Lägg till automatiskt spår</translation>
     </message>
     <message>
         <source>Remove steps</source>
@@ -561,7 +561,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>BBTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation>Redigera Trummor+Bas</translation>
+        <translation>Öppna i redigeraren för Takt+Basljud</translation>
     </message>
     <message>
         <source>Reset name</source>
@@ -577,7 +577,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation>Byt färg till standard</translation>
+        <translation>Återställ färgen till standard</translation>
     </message>
 </context>
 <context>
@@ -665,7 +665,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>CLIP</source>
-        <translation type="unfinished"></translation>
+        <translation>KLIPP</translation>
     </message>
     <message>
         <source>Output Clip:</source>
@@ -685,7 +685,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Depth</source>
-        <translation type="unfinished">Djup</translation>
+        <translation>Djup</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
@@ -731,7 +731,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>CarlaInstrumentView</name>
     <message>
         <source>Show GUI</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa grafiskt gränssnitt</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
@@ -749,11 +749,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>ControllerConnectionDialog</name>
     <message>
         <source>Connection Settings</source>
-        <translation>Kopplingsinställningar</translation>
+        <translation>Anslutningsinställningar</translation>
     </message>
     <message>
         <source>MIDI CONTROLLER</source>
-        <translation>MIDI KONTROLLER</translation>
+        <translation>MIDIKONTROLLER</translation>
     </message>
     <message>
         <source>Input channel</source>
@@ -765,7 +765,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Input controller</source>
-        <translation>Inputkontroller</translation>
+        <translation>Kontroller för indata</translation>
     </message>
     <message>
         <source>CONTROLLER</source>
@@ -773,11 +773,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Auto Detect</source>
-        <translation>Upptäck Automatiskt</translation>
+        <translation>Upptäck automatiskt</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI-enheter att ta emot MIDI-händelser från</translation>
     </message>
     <message>
         <source>USER CONTROLLER</source>
@@ -816,11 +816,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Confirm Delete</source>
-        <translation>Bekräfta Borttagning</translation>
+        <translation>Bekräfta borttagning</translation>
     </message>
     <message>
         <source>Confirm delete? There are existing connection(s) associted with this controller. There is no way to undo.</source>
-        <translation>Vill du verkligen ta bort? Det finns kopplingar till den här kontrollern, och operationen går inte ångra.</translation>
+        <translation>Bekräfta borttagning? Det finns existerande anslutning(ar) som associeras med den här kontrollern. Det finns inget sätt att ångra det på.</translation>
     </message>
 </context>
 <context>
@@ -843,7 +843,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ta bort det här insticksprogrammet</translation>
     </message>
 </context>
 <context>
@@ -932,11 +932,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DelayControlsDialog</name>
     <message>
         <source>Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Fördröjning</translation>
     </message>
     <message>
         <source>Delay Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsfördröjning</translation>
     </message>
     <message>
         <source>Regen</source>
@@ -952,7 +952,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Lfo</source>
-        <translation type="unfinished"></translation>
+        <translation>Lfo</translation>
     </message>
     <message>
         <source>Lfo Amt</source>
@@ -970,19 +970,19 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DualFilterControlDialog</name>
     <message>
         <source>Filter 1 enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter 1 aktiverat</translation>
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter 2 aktiverat</translation>
     </message>
     <message>
         <source>Click to enable/disable Filter 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicka för att aktivera/inaktivera Filter 1</translation>
     </message>
     <message>
         <source>Click to enable/disable Filter 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicka för att aktivera/inaktivera Filter 2</translation>
     </message>
 </context>
 <context>
@@ -1124,33 +1124,33 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DummyEffect</name>
     <message>
         <source>NOT FOUND</source>
-        <translation type="unfinished">HITTAS INTE</translation>
+        <translation>HITTAS INTE</translation>
     </message>
 </context>
 <context>
     <name>Editor</name>
     <message>
         <source>Play (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela upp (Mellanslag)</translation>
     </message>
     <message>
         <source>Stop (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stoppa (Mellanslag)</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela in</translation>
     </message>
     <message>
         <source>Record while playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela in under uppspelning</translation>
     </message>
 </context>
 <context>
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Effekt aktiverad</translation>
     </message>
     <message>
         <source>Wet/Dry mix</source>
