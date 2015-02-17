@@ -172,6 +172,7 @@ private:
 
 	friend class GuiApplication;
 
+	QMenu * m_viewMenu;
 
 private slots:
 	void browseHelp();
@@ -179,6 +180,8 @@ private slots:
 	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
 	void updateRecentlyOpenedProjectsMenu();
+	void updateViewMenu( void );
+	void updateConfig( QAction * _who );
 
 
 	void autoSave();
