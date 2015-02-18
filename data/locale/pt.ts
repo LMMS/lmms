@@ -8540,7 +8540,7 @@ Este chip foi utilizado no computador Commodore 64.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -8568,7 +8568,7 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
         <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation>PulseAudio (Schlechte Latenz!)</translation>
     </message>
     <message>
