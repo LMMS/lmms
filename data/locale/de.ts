@@ -3574,12 +3574,12 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
     </message>
     <message>
-        <source>LMMS Project </source>
-        <translation>LMMS Projekt </translation>
+		<source>LMMS Project</source>
+		<translation>LMMS Projekt</translation>
     </message>
     <message>
-        <source>LMMS Project Template </source>
-        <translation>LMMS Projektvorlage </translation>
+		<source>LMMS Project Template</source>
+		<translation>LMMS Projektvorlage</translation>
     </message>
     <message>
         <source>Volumes</source>

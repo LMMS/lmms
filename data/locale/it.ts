@@ -3574,11 +3574,11 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Rifai</translation>
     </message>
     <message>
-        <source>LMMS Project </source>
+		<source>LMMS Project</source>
         <translation>Progetto LMMS</translation>
     </message>
     <message>
-        <source>LMMS Project Template </source>
+		<source>LMMS Project Template</source>
         <translation>Progetto Template LMMS</translation>
     </message>
     <message>
