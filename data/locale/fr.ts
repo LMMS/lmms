@@ -584,7 +584,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="unfinished">Ryhtme ou ligne de basse %1</translation>
+        <translation type="unfinished">Rythme ou ligne de basse %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
