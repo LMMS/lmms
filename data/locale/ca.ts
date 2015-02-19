@@ -3557,6 +3557,14 @@ Per favor, visita http://lmms.sf.net/wiki per a documentació sobre LMMS.</trans
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>My Projects</source>
         <translation type="unfinished"></translation>
     </message>

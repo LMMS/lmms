@@ -3557,6 +3557,14 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>My Projects</source>
         <translation type="unfinished"></translation>
     </message>
