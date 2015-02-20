@@ -1535,7 +1535,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 							//put notes from vector into piano roll
 							for( int i = 0; i < newNotes.size(); ++i)
 							{
-								Note * newNote = m_pattern->addNote( newNotes[i] );
+								Note * newNote = m_pattern->addNote( newNotes[i], false );
 								newNote->setSelected( false );
 							}
 
