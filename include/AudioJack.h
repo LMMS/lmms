@@ -97,8 +97,6 @@ private:
 	bool m_active;
 	bool m_stopped;
 
-	QSemaphore m_stopSemaphore;
-
 	QVector<jack_port_t *> m_outputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
 	surroundSampleFrame * m_outBuf;
