@@ -217,9 +217,11 @@ static inline float logToLinearScale( float min, float max, float value )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
 		const float val = value * ( max - min ) + min;
-		return signedPowf( val / mmax, F_E ) * mmax;
+		float result = signedPowf( val / mmax, F_E ) * mmax;
+		return isnan( result ) ? 0 : result;
 	}
-	return powf( value, F_E ) * ( max - min ) + min;
+	float result = powf( value, F_E ) * ( max - min ) + min;
+	return isnan( result ) ? 0 : result;
 }
 
 
@@ -231,9 +233,11 @@ static inline float linearToLogScale( float min, float max, float value )
 	if( min < 0 )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
-		return signedPowf( value / mmax, EXP ) * mmax;
+		float result = signedPowf( value / mmax, EXP ) * mmax;
+		return isnan( result ) ? 0 : result;
 	}
-	return powf( val, EXP ) * ( max - min ) + min;
+	float result = powf( val, EXP ) * ( max - min ) + min;
+	return isnan( result ) ? 0 : result;
 }
 
 
