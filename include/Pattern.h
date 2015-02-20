@@ -31,10 +31,12 @@
 #include <QDialog>
 #include <QtCore/QThread>
 #include <QPixmap>
+#include <QTime>
 
 
 #include "Note.h"
 #include "Track.h"
+#include "ProjectJournal.h"
 
 
 class QAction;
@@ -199,6 +201,7 @@ private:
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
+	QTime m_lastClickChange;
 } ;
 
 

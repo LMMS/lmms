@@ -653,6 +653,7 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	m_paintPixmap(),
 	m_needsUpdate( true )
 {
+	m_lastClickChange = QTime::currentTime();
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
@@ -789,6 +790,10 @@ void PatternView::mouseDoubleClickEvent( QMouseEvent * _me )
 	  			m_pat->m_steps != MidiTime::stepsPerTact() ) &&
 		_me->y() > height() - s_stepBtnOff->height() ) )
 	{
+		if( m_lastClickChange.msecsTo( QTime::currentTime() ) < QApplication::doubleClickInterval() )
+		{
+			Engine::projectJournal()->undo();
+		}
 		openInPianoRoll();
 	}
 }
@@ -839,6 +844,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		else // note at step found
 		{
 			m_pat->addJournalCheckPoint();
+			m_lastClickChange = QTime::currentTime();
 			if( n->length() < 0 )
 			{
 				n->setLength( 0 );	// set note as enabled beat note
