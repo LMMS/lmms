@@ -114,6 +114,45 @@ DataFile::DataFile( Type type ) :
 
 }
 
+DataFile::Type DataFile::fileTypeFromData(const QString fileName)
+{
+	QString errorMsg;
+	DataFile::Type t;
+	QDomDocument doc;
+
+	QFile inFile( fileName );
+	if( !inFile.open( QIODevice::ReadOnly ) )
+	{
+		return DataFile::Type::UnknownType;
+	}
+
+	QByteArray data = inFile.readAll();
+	inFile.close();
+
+	int line = -1, col = -1;
+	if( !doc.setContent( data, &errorMsg, &line, &col ) )
+	{
+		// parsing failed? then try to uncompress data
+		QByteArray uncompressed = qUncompress( data );
+		if( !uncompressed.isEmpty() )
+		{
+			if( doc.setContent( uncompressed, &errorMsg, &line, &col ) )
+			{
+				line = col = -1;
+			}
+		}
+		if( line >= 0 && col >= 0 )
+		{
+			return DataFile::Type::UnknownType;
+		}
+	}
+
+	QDomElement root = doc.documentElement();
+	t = type( root.attribute( "type" ) );
+
+	return t;
+}
+
 
 
 
