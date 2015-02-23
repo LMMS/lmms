@@ -459,7 +459,8 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		}
 		else if( f->type() != FileItem::VstPluginFile &&
 				( f->handling() == FileItem::LoadAsPreset ||
-				f->handling() == FileItem::LoadByPlugin ) )
+				f->handling() == FileItem::LoadByPlugin )
+				 && DataFile::fileTypeFromData( f->fullName() ) == DataFile::Type::InstrumentTrackSettings )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
 		}
