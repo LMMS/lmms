@@ -776,26 +776,6 @@ void PatternView::constructContextMenu( QMenu * _cm )
 
 
 
-void PatternView::mouseDoubleClickEvent( QMouseEvent * _me )
-{
-	if( _me->button() != Qt::LeftButton )
-	{
-		_me->ignore();
-		return;
-	}
-	if( m_pat->type() == Pattern::MelodyPattern ||
-		!( m_pat->type() == Pattern::BeatPattern &&
-		( pixelsPerTact() >= 192 ||
-	  			m_pat->m_steps != MidiTime::stepsPerTact() ) &&
-		_me->y() > height() - s_stepBtnOff->height() ) )
-	{
-		openInPianoRoll();
-	}
-}
-
-
-
-
 void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
