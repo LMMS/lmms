@@ -91,13 +91,14 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	sample_t dryS[2];
 	float lPeak = 0.0;
 	float rPeak = 0.0;
+	float incr = ( m_currentLength - length ) / frames;
 	if( m_delayControls.m_outGainModel.isValueChanged() )
 	{
 		m_outGain = dbvToAmp( m_delayControls.m_outGainModel.value() );
 	}
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		m_currentLength = linearInterpolate( length, m_currentLength, 0.9999 );
+		m_currentLength -= incr;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_delay->setLength( ( float )m_currentLength + ( amplitude * ( float )m_lfo->tick() ) );
