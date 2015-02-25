@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMessageBox>
 
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
@@ -459,10 +460,18 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		}
 		else if( f->type() != FileItem::VstPluginFile &&
 				( f->handling() == FileItem::LoadAsPreset ||
-				f->handling() == FileItem::LoadByPlugin )
-				 && DataFile::fileTypeFromData( f->fullName() ) == DataFile::Type::InstrumentTrackSettings )
+				f->handling() == FileItem::LoadByPlugin ) )
 		{
-			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
+			DataFile dataFile( f->fullName() );
+			if( !dataFile.validate( f->extension() ) )
+			{
+				QMessageBox::warning( 0, "Corrupt File",
+					"File :  " + f->fullName() + " contains invalid data",
+					QMessageBox::Ok, QMessageBox::NoButton );
+				m_pphMutex.unlock();
+				return;
+			}
+			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin, &dataFile );
 		}
 		if( m_previewPlayHandle != NULL )
 		{
