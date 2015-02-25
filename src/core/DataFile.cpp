@@ -114,45 +114,6 @@ DataFile::DataFile( Type type ) :
 
 }
 
-DataFile::Type DataFile::fileTypeFromData(const QString fileName)
-{
-	QString errorMsg;
-	DataFile::Type t;
-	QDomDocument doc;
-
-	QFile inFile( fileName );
-	if( !inFile.open( QIODevice::ReadOnly ) )
-	{
-		return DataFile::Type::UnknownType;
-	}
-
-	QByteArray data = inFile.readAll();
-	inFile.close();
-
-	int line = -1, col = -1;
-	if( !doc.setContent( data, &errorMsg, &line, &col ) )
-	{
-		// parsing failed? then try to uncompress data
-		QByteArray uncompressed = qUncompress( data );
-		if( !uncompressed.isEmpty() )
-		{
-			if( doc.setContent( uncompressed, &errorMsg, &line, &col ) )
-			{
-				line = col = -1;
-			}
-		}
-		if( line >= 0 && col >= 0 )
-		{
-			return DataFile::Type::UnknownType;
-		}
-	}
-
-	QDomElement root = doc.documentElement();
-	t = type( root.attribute( "type" ) );
-
-	return t;
-}
-
 
 
 
@@ -197,6 +158,54 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 DataFile::~DataFile()
 {
+}
+
+
+
+
+bool DataFile::validate( QString extension )
+{
+	bool result = false;
+	switch( m_type )
+	{
+	case Type::SongProject:
+		if( extension == "mmp" || extension == "mmpz" )
+		{
+			result = true;
+		}
+		break;
+	case Type::SongProjectTemplate:
+		if(  extension == "mpt" )
+		{
+			result = true;
+		}
+		break;
+	case Type::InstrumentTrackSettings:
+		if ( extension == "xpf" || extension == "xml" )
+		{
+			result = true;
+		}
+		break;
+	case Type::UnknownType:
+		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
+				extension == "xpf" || extension == "xml" ||
+				( extension == "xiz" && Engine::pluginFileHandling().contains( extension ) ) ||
+				extension == "sf2" || extension == "pat" || extension == "mid" ||
+				extension == "flp" || extension == "dll"
+				) )
+		{
+			result = true;
+		}
+		if( extension == "wav" || extension == "ogg" ||
+				extension == "ds" )
+		{
+			result = true;
+		}
+		break;
+	default:
+		return true;
+	}
+	return result;
 }
 
 

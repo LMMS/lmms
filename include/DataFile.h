@@ -56,12 +56,9 @@ public:
 	DataFile( const QByteArray& data );
 	DataFile( Type type );
 
-	/// \brief fileTypeFromData
-	/// Reads the given file and checks the xml for the type
-	/// returns UnknownType if the file is not reconised
-	static DataFile::Type fileTypeFromData( const QString fileName);
-
 	virtual ~DataFile();
+
+	bool validate( QString extension );
 
 	QString nameWithExtension( const QString& fn ) const;
 
