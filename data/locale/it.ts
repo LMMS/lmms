@@ -3574,8 +3574,12 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Rifai</translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
-        <translation>Progetto LMMS (*mmpz *.mmp);;Progetto Template LMMS (*.mpt)</translation>
+		<source>LMMS Project</source>
+        <translation>Progetto LMMS</translation>
+    </message>
+    <message>
+		<source>LMMS Project Template</source>
+        <translation>Progetto Template LMMS</translation>
     </message>
     <message>
         <source>My Projects</source>

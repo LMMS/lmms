@@ -3566,7 +3566,11 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>

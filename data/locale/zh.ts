@@ -3557,8 +3557,12 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>重做</translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
-        <translation>LMMS 工程 (*.mmpz *.mmp);;LMMS 工程模板 (*.mpt)</translation>
+		<source>LMMS Project</source>
+        <translation>LMMS 工程</translation>
+    </message>
+    <message>
+		<source>LMMS Project Template</source>
+		<translation>LMMS 工程模板</translation>
     </message>
     <message>
         <source>Volumes</source>
