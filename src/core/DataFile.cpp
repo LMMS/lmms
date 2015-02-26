@@ -165,25 +165,24 @@ DataFile::~DataFile()
 
 bool DataFile::validate( QString extension )
 {
-	bool result = false;
 	switch( m_type )
 	{
 	case Type::SongProject:
 		if( extension == "mmp" || extension == "mmpz" )
 		{
-			result = true;
+			return true;
 		}
 		break;
 	case Type::SongProjectTemplate:
 		if(  extension == "mpt" )
 		{
-			result = true;
+			return true;
 		}
 		break;
 	case Type::InstrumentTrackSettings:
 		if ( extension == "xpf" || extension == "xml" )
 		{
-			result = true;
+			return true;
 		}
 		break;
 	case Type::UnknownType:
@@ -194,18 +193,18 @@ bool DataFile::validate( QString extension )
 				extension == "flp" || extension == "dll"
 				) )
 		{
-			result = true;
+			return true;
 		}
 		if( extension == "wav" || extension == "ogg" ||
 				extension == "ds" )
 		{
-			result = true;
+			return true;
 		}
 		break;
 	default:
 		return true;
 	}
-	return result;
+	return false;
 }
 
 

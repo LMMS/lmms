@@ -465,8 +465,8 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			DataFile dataFile( f->fullName() );
 			if( !dataFile.validate( f->extension() ) )
 			{
-				QMessageBox::warning( 0, "Corrupt File",
-					"File :  " + f->fullName() + " contains invalid data",
+				QMessageBox::warning( 0, tr ( "Error" ),
+					f->fullName() + " " + tr( "does not appear to be a valid") + " " + f->extension(),
 					QMessageBox::Ok, QMessageBox::NoButton );
 				m_pphMutex.unlock();
 				return;
