@@ -151,15 +151,13 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 			dataFileCreated = true;
 		}
 
-		DataFile data(*dataFile);
-
 		// vestige previews are bug prone; fallback on 3xosc with volume of 0
 		// without an instrument in preview track, it will segfault
-		if(data.content().elementsByTagName( "vestige" ).length() == 0 )
+		if(dataFile->content().elementsByTagName( "vestige" ).length() == 0 )
 		{
 			s_previewTC->previewInstrumentTrack()->
 					loadTrackSpecificSettings(
-						data.content().firstChild().toElement() );
+						dataFile->content().firstChild().toElement() );
 		}
 		else
 		{
