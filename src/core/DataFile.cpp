@@ -202,7 +202,7 @@ bool DataFile::validate( QString extension )
 		}
 		break;
 	default:
-		return true;
+		return false;
 	}
 	return false;
 }
