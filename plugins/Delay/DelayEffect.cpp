@@ -84,24 +84,24 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float length = m_delayControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
 	const float amplitude = m_delayControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
 	m_lfo->setFrequency( 1.0 / m_delayControls.m_lfoTimeModel.value() );
 	m_delay->setFeedback( m_delayControls.m_feedbackModel.value() );
 	sample_t dryS[2];
 	float lPeak = 0.0;
 	float rPeak = 0.0;
-	float incr = ( m_currentLength - length ) / frames;
+	ValueBuffer *lengthBuffer = m_delayControls.m_delayTimeModel.valueBuffer();
 	if( m_delayControls.m_outGainModel.isValueChanged() )
 	{
 		m_outGain = dbvToAmp( m_delayControls.m_outGainModel.value() );
 	}
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		m_currentLength -= incr;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
-		m_delay->setLength( ( float )m_currentLength + ( amplitude * ( float )m_lfo->tick() ) );
+		float length = lengthBuffer ? lengthBuffer->values()[ f ] : m_delayControls.m_delayTimeModel.value();
+		length *= Engine::mixer()->processingSampleRate();
+		m_delay->setLength( length + ( amplitude * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
 
 		buf[f][0] *= m_outGain;
