@@ -41,6 +41,7 @@ class Engine;
 
 
 const QString PROJECTS_PATH = "projects/";
+const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
