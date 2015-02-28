@@ -136,6 +136,12 @@ public:
 		}
 	}
 
+	virtual void tick( sampleFrame *frame )
+	{
+		frame[0][0] = update( frame[0][0], 0);
+		frame[0][1] = update( frame[0][1], 1);
+	}
+
 protected:
 	///
 	/// \brief calcCoefficents
