@@ -25,7 +25,6 @@
 
 #include "NotePlayHandle.h"
 #include "BasicFilters.h"
-#include "ConfigManager.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
@@ -93,14 +92,14 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		parent->m_hadChildren = true;
 
 		m_bbTrack = parent->m_bbTrack;
-		
+
 		parent->setUsesBuffer( false );
 	}
 
 	updateFrequency();
 
 	setFrames( _frames );
-	
+
 	// inform attached components about new MIDI note (used for recording in Piano Roll)
 	if( m_origin == OriginMidiInput )
 	{
@@ -114,7 +113,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
 			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), Engine::framesPerTick() ), 
+			MidiTime::fromFrames( offset(), Engine::framesPerTick() ),
 			offset() );
 	}
 
@@ -122,9 +121,9 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	{
 		setUsesBuffer( false );
 	}
-	
+
 	setAudioPort( instrumentTrack->audioPort() );
-	
+
 	unlock();
 }
 
@@ -133,7 +132,7 @@ void NotePlayHandle::done()
 {
 	lock();
 	noteOff( 0 );
-	
+
 	if( hasParent() == false )
 	{
 		delete m_baseDetuning;
@@ -157,7 +156,7 @@ void NotePlayHandle::done()
 	m_subNotes.clear();
 
 	delete m_filter;
-	
+
 	if( buffer() ) releaseBuffer();
 
 	unlock();
@@ -212,7 +211,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		setOffset( offset() - Engine::mixer()->framesPerPeriod() );
 		return;
 	}
-	
+
 	lock();
 	if( m_frequencyNeedsUpdate )
 	{
@@ -220,7 +219,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// number of frames that can be played this period
-	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0 
+	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0
 		? Engine::mixer()->framesPerPeriod() - offset()
 		: Engine::mixer()->framesPerPeriod();
 
@@ -386,7 +385,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
-				MidiTime::fromFrames( _s, Engine::framesPerTick() ), 
+				MidiTime::fromFrames( _s, Engine::framesPerTick() ),
 				_s );
 	}
 
@@ -597,7 +596,7 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 	s_mutex.lockForRead();
 	NotePlayHandle * nph = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
 	s_mutex.unlock();
-	
+
 	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
 	return nph;
 }
@@ -618,7 +617,7 @@ void NotePlayHandleManager::extend( int c )
 	NotePlayHandle ** tmp = MM_ALLOC( NotePlayHandle*, s_size );
 	MM_FREE( s_available );
 	s_available = tmp;
-	
+
 	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, c );
 
 	for( int i=0; i < c; ++i )

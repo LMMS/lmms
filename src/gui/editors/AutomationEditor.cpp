@@ -64,6 +64,8 @@
 #include "PianoRoll.h"
 #include "debug.h"
 #include "MeterModel.h"
+#include "StringPairDrag.h"
+#include "ProjectJournal.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;
@@ -445,7 +447,6 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 	{
 		return;
 	}
-
 	if( mouseEvent->y() > TOP_MARGIN )
 	{
 		float level = getLevel( mouseEvent->y() );
@@ -491,6 +492,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == DRAW )
 			{
+				m_pattern->addJournalCheckPoint();
 				// Connect the dots
 				if( mouseEvent->modifiers() & Qt::ShiftModifier )
 				{
@@ -535,6 +537,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_editMode == DRAW ) ||
 					m_editMode == ERASE )
 			{
+				m_pattern->addJournalCheckPoint();
 				// erase single value
 				if( it != time_map.end() )
 				{
@@ -564,6 +567,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			else if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == MOVE )
 			{
+				m_pattern->addJournalCheckPoint();
 				// move selection (including selected values)
 
 				// save position where move-process began
@@ -1658,6 +1662,7 @@ void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes ty
 {
 	if (validPattern())
 	{
+		m_pattern->addJournalCheckPoint();
 		QMutexLocker m(&m_patternMutex);
 		m_pattern->setProgressionType(type);
 		Engine::getSong()->setModified();
@@ -1797,6 +1802,7 @@ void AutomationEditor::cutSelectedValues()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	m_valuesToCopy.clear();
 
 	timeMap selected_values;
@@ -1826,6 +1832,7 @@ void AutomationEditor::pasteValues()
 	QMutexLocker m( &m_patternMutex );
 	if( validPattern() && !m_valuesToCopy.isEmpty() )
 	{
+		m_pattern->addJournalCheckPoint();
 		for( timeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
 		{
@@ -1852,6 +1859,7 @@ void AutomationEditor::deleteSelectedValues()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	timeMap selected_values;
 	getSelectedValues( selected_values );
 
@@ -2220,6 +2228,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
+	setAcceptDrops( true );
+	m_toolBar->setAcceptDrops( true );
 }
 
 
@@ -2280,6 +2290,30 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 const AutomationPattern* AutomationEditorWindow::currentPattern()
 {
 	return m_editor->currentPattern();
+}
+
+void AutomationEditorWindow::dropEvent( QDropEvent *_de )
+{
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
+	if( type == "automatable_model" )
+	{
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
+				Engine::projectJournal()->
+					journallingObject( val.toInt() ) );
+		if( mod != NULL )
+		{
+			m_editor->m_pattern->addObject( mod );
+			setCurrentPattern( m_editor->m_pattern );
+		}
+	}
+
+	update();
+}
+
+void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
+{
+	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
 void AutomationEditorWindow::open(AutomationPattern* pattern)

@@ -49,6 +49,7 @@
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
+#include "AutomationEditor.h"
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -207,6 +208,8 @@ void TrackContentObject::paste()
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 		movePosition( pos );
 	}
+	AutomationPattern::resolveAllIDs();
+	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 }
 
 
@@ -847,11 +850,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else
 	{
-<<<<<<< HEAD
-		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() )
-=======
 		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
->>>>>>> coding
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -962,22 +961,6 @@ float TrackContentObjectView::pixelsPerTact()
 
 
 
-<<<<<<< HEAD
-/*! \brief Set whether this trackContentObjectView can resize.
- *
- * \param e The boolean state of whether this track content object view
- *  is allowed to resize.
- */
-void TrackContentObjectView::setAutoResizeEnabled( bool e )
-{
-	m_autoResize = e;
-}
-
-
-
-
-=======
->>>>>>> coding
 /*! \brief Detect whether the mouse moved more than n pixels on screen.
  *
  * \param _me The QMouseEvent.
@@ -1456,6 +1439,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 	else if( me->button() == Qt::LeftButton &&
 			!m_trackView->trackContainerView()->fixedTCOs() )
 	{
+		getTrack()->addJournalCheckPoint();
 		const MidiTime pos = getPosition( me->x() ).getTact() *
 						MidiTime::ticksPerTact();
 		TrackContentObject * tco = getTrack()->createTCO( pos );
@@ -1725,29 +1709,6 @@ void TrackOperationsWidget::clearTrack()
 
 
 
-/*! \brief Create and assign a new FX Channel for this track */
-void TrackOperationsWidget::createFxLine()
-{
-	int channelIndex = gui->fxMixerView()->addNewChannel();
-
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = m_trackView->getTrack()->name();
-
-	assignFxLine(channelIndex);
-}
-
-
-
-/*! \brief Assign a specific FX Channel for this track */
-void TrackOperationsWidget::assignFxLine(int channelIndex)
-{
-	Track * track = m_trackView->getTrack();
-	dynamic_cast<InstrumentTrack *>( track )->effectChannelModel()->setValue( channelIndex );
-
-	gui->fxMixerView()->setCurrentFxLine( channelIndex );
-}
-
-
-
 /*! \brief Remove this track from the track list
  *
  */
@@ -1784,40 +1745,11 @@ void TrackOperationsWidget::updateMenu()
 	}
 	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
-<<<<<<< HEAD
-		toMenu->addSeparator();
-		toMenu->addMenu( dynamic_cast<InstrumentTrackView *>(
-						m_trackView )->midiMenu() );
-=======
-		int channelIndex = trackView->model()->effectChannelModel()->value();
-
-		FxChannel * fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
-
-		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), toMenu );
-		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
-
-		fxMenu->addAction("Assign to new FX Channel" , this, SLOT( createFxLine() ) );
-		fxMenu->addSeparator();
-
-
-		for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
-		{
-			FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
-
-			if ( currentChannel != fxChannel )
-			{
-				QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-				QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
-				fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
-			}
-		}
-
+		QMenu *fxMenu = trackView->createFxMenu( tr( "FX %1: %2" ), tr( "Assign to new FX Channel" ));
 		toMenu->addMenu(fxMenu);
-		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 		toMenu->addSeparator();
 		toMenu->addMenu( trackView->midiMenu() );
->>>>>>> coding
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
@@ -2636,7 +2568,11 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 
 
-	if( m_trackContainerView->allowRubberband() == true )
+	int widgetTotal = ConfigManager::inst()->value( "ui",
+							"compacttrackbuttons" ).toInt()==1 ?
+		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
+		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	if( m_trackContainerView->allowRubberband() == true  && me->x() > widgetTotal )
 	{
 		QWidget::mousePressEvent( me );
 	}
@@ -2690,8 +2626,11 @@ void TrackView::mousePressEvent( QMouseEvent * me )
  */
 void TrackView::mouseMoveEvent( QMouseEvent * me )
 {
-
-	if( m_trackContainerView->allowRubberband() == true )
+	int widgetTotal = ConfigManager::inst()->value( "ui",
+							"compacttrackbuttons" ).toInt()==1 ?
+		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
+		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	if( m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal )
 	{
 		QWidget::mouseMoveEvent( me );
 	}

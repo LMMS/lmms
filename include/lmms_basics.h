@@ -78,9 +78,9 @@ struct typeInfo
 		return 1;
 	}
 
-	static inline bool isEqual( T _x, T _y )
+	static inline bool isEqual( T x, T y )
 	{
-		return _x == _y;
+		return x == y;
 	}
 
 	static inline T absVal( T t )
@@ -97,13 +97,13 @@ inline float typeInfo<float>::minEps()
 }
 
 template<>
-inline bool typeInfo<float>::isEqual( float _x, float _y )
+inline bool typeInfo<float>::isEqual( float x, float y )
 {
-	if( likely( _x == _y ) )
+	if( x == y )
 	{
 		return true;
 	}
-	return absVal( _x - _y ) < minEps();
+	return absVal( x - y ) < minEps();
 }
 
 

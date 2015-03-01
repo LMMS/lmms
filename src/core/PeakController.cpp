@@ -23,24 +23,20 @@
  *
  */
 
+#include "PeakController.h"
+
 #include <cstdio>
 #include <QDomElement>
 #include <QObject>
-#include <QVector>
 #include <QMessageBox>
 
-
-#include "Song.h"
 #include "Engine.h"
 #include "Mixer.h"
-#include "PeakController.h"
 #include "EffectChain.h"
-#include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
-#include "lmms_math.h"
-#include "interpolation.h"
 
+class ControllerDialog;
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -48,7 +44,7 @@ int PeakController::m_loadCount;
 bool PeakController::m_buggedFile;
 
 
-PeakController::PeakController( Model * _parent, 
+PeakController::PeakController( Model * _parent,
 		PeakControllerEffect * _peak_effect ) :
 	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect ),
@@ -99,7 +95,7 @@ void PeakController::updateValueBuffer()
 		{
 			const f_cnt_t frames = Engine::mixer()->framesPerPeriod();
 			float * values = m_valueBuffer.values();
-			
+
 			for( f_cnt_t f = 0; f < frames; ++f )
 			{
 				const float diff = ( targetSample - m_currentSample );

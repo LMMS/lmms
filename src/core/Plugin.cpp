@@ -131,11 +131,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 
 void Plugin::collectErrorForUI( QString errMsg )
 {
-<<<<<<< HEAD
-	Engine::mainWindow()->collectError( errMsg );
-=======
 	Engine::getSong()->collectError( errMsg );
->>>>>>> coding
 }
 
 

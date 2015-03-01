@@ -35,18 +35,13 @@
 #include <pmmintrin.h>
 #endif
 
-#include <QDir>
 #include <QFileInfo>
 #include <QLocale>
-#include <QProcess>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
-#include <QBitmap>
-#include <QDesktopWidget>
 #include <QMessageBox>
-#include <QPainter>
-#include <QSplashScreen>
+#include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -71,16 +66,13 @@
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "LmmsStyle.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "DataFile.h"
 #include "Song.h"
-#include "LmmsPalette.h"
 
 static inline QString baseName( const QString & _file )
 {
@@ -199,6 +191,7 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
+	"-a, --float			32bit float bit depth\n"
 	"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
 	"       standard out is used if no output file is specifed\n"
 	"-d, --dump <in>			dump XML of compressed file <in>\n"
@@ -303,6 +296,12 @@ int main( int argc, char * * argv )
 				return( EXIT_FAILURE );
 			}
 			++i;
+		}
+		else if ( argc > i &&
+				  ( QString( argv[i] ) =="--float" ||
+						QString( argv[i] ) == "-a" ) )
+		{
+			os.depth = ProjectRenderer::Depth_32Bit;
 		}
 		else if( argc > i &&
 				( QString( argv[i] ) == "--interpolation" ||

@@ -22,13 +22,15 @@
  *
  */
 
+#include "BBEditor.h"
+
 #include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
 #include <QMdiArea>
 
-#include "BBEditor.h"
+#include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -156,16 +158,12 @@ void BBEditor::stop()
 
 
 
-
-
 BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
 	TrackContainerView(tc),
 	m_bbtc(tc)
 {
 	setModel( tc );
 }
-
-
 
 
 
@@ -224,6 +222,18 @@ void BBTrackContainerView::removeBBView(int bb)
 
 
 
+void BBTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	MainWindow::saveWidgetState(parentWidget(), element);
+}
+
+void BBTrackContainerView::loadSettings(const QDomElement& element)
+{
+	MainWindow::restoreWidgetState(parentWidget(), element);
+}
+
+
+
 
 void BBTrackContainerView::dropEvent(QDropEvent* de)
 {
@@ -254,17 +264,3 @@ void BBTrackContainerView::updatePosition()
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
 }
-
-void BBEditor::closeEvent( QCloseEvent * _ce )
- {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
-

@@ -23,8 +23,18 @@
  */
 
 #include "MixerWorkerThread.h"
-#include "Engine.h"
 
+#include <QMutex>
+#include <QWaitCondition>
+#include "ThreadableJob.h"
+#include "Mixer.h"
+
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;
@@ -157,7 +167,7 @@ void MixerWorkerThread::run()
 #ifdef __SSE__
 /* FTZ flag */
 	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
-#endif	
+#endif
 	QMutex m;
 	while( m_quit == false )
 	{

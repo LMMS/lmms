@@ -27,7 +27,6 @@
 #include "FxMixer.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
-#include "Effect.h"
 #include "Song.h"
 
 #include "InstrumentTrack.h"
@@ -530,7 +529,10 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 
 void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
-	if( m_fxChannels[_ch]->m_muteModel.value() == false )
+	// The first check is for the case where the last fxchannel was deleted but
+	// there was a race condition where it had to be processed.
+	if( _ch < m_fxChannels.size() &&
+			m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
 		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::mixer()->framesPerPeriod() );

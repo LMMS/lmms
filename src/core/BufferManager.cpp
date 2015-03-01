@@ -25,6 +25,10 @@
 
 #include "BufferManager.h"
 
+#include <QtCore/QtGlobal>
+#include <QtCore/QAtomicInt>
+
+#include "MemoryManager.h"
 
 sampleFrame ** BufferManager::s_available;
 QAtomicInt BufferManager::s_availableIndex = 0;
@@ -41,7 +45,7 @@ void BufferManager::init( fpp_t framesPerPeriod )
 
 	int c = framesPerPeriod * BM_INITIAL_BUFFERS;
 	sampleFrame * b = MM_ALLOC( sampleFrame, c );
-	
+
 	for( int i = 0; i < BM_INITIAL_BUFFERS; ++i )
 	{
 		s_available[ i ] = b;
@@ -58,10 +62,10 @@ sampleFrame * BufferManager::acquire()
 	{
 		qFatal( "BufferManager: out of buffers" );
 	}
-	
+
 	int i = s_availableIndex.fetchAndAddOrdered( -1 );
 	sampleFrame * b = s_available[ i ];
-	
+
 	//qDebug( "acquired buffer: %p - index %d", b, i );
 	return b;
 }
@@ -79,7 +83,7 @@ void BufferManager::refresh() // non-threadsafe, hence it's called periodically 
 {
 	if( s_releasedIndex == 0 ) return;
 	//qDebug( "refresh: %d buffers", int( s_releasedIndex ) );
-	
+
 	int j = s_availableIndex;
 	for( int i = 0; i < s_releasedIndex; ++i )
 	{
@@ -101,7 +105,7 @@ void BufferManager::extend( int c )
 
 	int cc = c * Engine::mixer()->framesPerPeriod();
 	sampleFrame * b = MM_ALLOC( sampleFrame, cc );
-	
+
 	for( int i = 0; i < c; ++i )
 	{
 		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = b;

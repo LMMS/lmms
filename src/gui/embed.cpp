@@ -45,73 +45,70 @@ namespace
 #include "embedded_resources.h"
 
 
-QPixmap getIconPixmap( const char * _name, int _w, int _h )
+QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 {
-	if( _w == -1 || _h == -1 )
+	if( width == -1 || height == -1 )
 	{
-	        // Return cached pixmap
-                QPixmap cached = s_pixmapCache.value( _name );
+		// Return cached pixmap
+		QPixmap cached = s_pixmapCache.value( pixmapName );
 		if( !cached.isNull() )
 		{
 			return cached;
 		}
 
 		// Or try to load it
-		QList<QByteArray> formats = 
-			QImageReader::supportedImageFormats();
+		QList<QByteArray> formats = QImageReader::supportedImageFormats();
 		QList<QString> candidates;
-		QPixmap p;
+		QPixmap pixmap;
 		QString name;
 		int i;
 		
-		for ( i = 0; i < formats.size() && p.isNull(); ++i )  
+		for ( i = 0; i < formats.size() && pixmap.isNull(); ++i )  
 		{
-			candidates << QString( _name ) + "." + formats.at( i ).data();
+			candidates << QString( pixmapName ) + "." + formats.at( i ).data();
 		}
 
 #ifdef PLUGIN_NAME
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
 			name = candidates.at( i );
-			p = QPixmap( ConfigManager::inst()->artworkDir() + "plugins/" +
+			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + "plugins/" +
 				     STRINGIFY( PLUGIN_NAME ) + "_" + name );
 		}
 #endif
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
 			name = candidates.at( i );
-			p = QPixmap( ConfigManager::inst()->artworkDir() + name );
+			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + name );
 		}
 		
 		// nothing found, so look in default-artwork-dir
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
 			name = candidates.at( i );
-			p = QPixmap( ConfigManager::inst()->defaultArtworkDir() 
-				     + name );
+			pixmap = QPixmap( ConfigManager::inst()->defaultArtworkDir() + name );
 		}
 		
-		for ( i = 0; i < candidates.size() && p.isNull(); ++i )  {
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
 			name = candidates.at( i );
 			const embed::descriptor & e = 
 				findEmbeddedData( name.toUtf8().constData() );
 			// found?
-			if( QString( e.name ) == name )
+			if( name == e.name )
 			{
-				p.loadFromData( e.data, e.size );
+				pixmap.loadFromData( e.data, e.size );
 			}
 		}
 		
 		// Fallback
-		if(p.isNull()) 
+		if( pixmap.isNull() )
 		{
-			p = QPixmap( 1, 1 );
+			pixmap = QPixmap( 1, 1 );
 		}
 		// Save to cache and return
-		s_pixmapCache.insert( _name, p );
-		return p;
-
+		s_pixmapCache.insert( pixmapName, pixmap );
+		return pixmap;
 	}
 
-	return getIconPixmap( _name ).
-		scaled( _w, _h, Qt::IgnoreAspectRatio, 
+	return getIconPixmap( pixmapName ).
+		scaled( width, height, Qt::IgnoreAspectRatio,
 			Qt::SmoothTransformation );
 }
 

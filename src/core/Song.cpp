@@ -116,7 +116,7 @@ Song::Song() :
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 
-	qRegisterMetaType<Note>( "note" );
+	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
 }
 
@@ -252,16 +252,10 @@ void Song::processNextBuffer()
 	}
 
 	// check for looping-mode and act if necessary
-<<<<<<< HEAD
-	Timeline * tl = m_playPos[m_playMode].m_timeLine;
-	bool checkLoop = tl != NULL && m_exporting == false &&
-				tl->loopPointsEnabled();
-=======
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
-	bool checkLoop = tl != NULL && m_exporting == false &&
-				tl->loopPointsEnabled();
+	bool checkLoop = 
+		tl != NULL && m_exporting == false && tl->loopPointsEnabled();
 
->>>>>>> coding
 	if( checkLoop )
 	{
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
@@ -1233,11 +1227,8 @@ void Song::exportProject( bool multiExport )
 		return;
 	}
 
-<<<<<<< HEAD
-	FileDialog efd( Engine::mainWindow() );
-=======
 	FileDialog efd( gui->mainWindow() );
->>>>>>> coding
+
 	if ( multiExport )
 	{
 		efd.setFileMode( FileDialog::Directory);
@@ -1297,11 +1288,7 @@ void Song::exportProject( bool multiExport )
 		}
 
 		const QString exportFileName = efd.selectedFiles()[0] + suffix;
-<<<<<<< HEAD
-		ExportProjectDialog epd( exportFileName, Engine::mainWindow(), multiExport );
-=======
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
->>>>>>> coding
 		epd.exec();
 	}
 }
@@ -1362,8 +1349,6 @@ void Song::removeController( Controller * controller )
 
 
 
-<<<<<<< HEAD
-=======
 
 void Song::clearErrors()
 {
@@ -1404,4 +1389,3 @@ QString* Song::errorSummary()
 
 
 
->>>>>>> coding
