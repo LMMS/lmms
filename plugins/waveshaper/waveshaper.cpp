@@ -82,18 +82,27 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float input = m_wsControls.m_inputModel.value();
-	const float output = m_wsControls.m_outputModel.value();
+	float input = m_wsControls.m_inputModel.value();
+	float output = m_wsControls.m_outputModel.value();
 	const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
+
+	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
+	ValueBuffer *outputBufer = m_wsControls.m_outputModel.valueBuffer();
+
+	int inputInc = inputBuffer ? 1 : 0;
+	int outputInc = outputBufer ? 1 : 0;
+
+	float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
+	float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
 		float s[2] = { _buf[f][0], _buf[f][1] };
 
 // apply input gain
-		s[0] *= input;
-		s[1] *= input;
+		s[0] *= *inputPtr;
+		s[1] *= *inputPtr;
 
 // clip if clip enabled
 		if( clip )
@@ -127,13 +136,16 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 
 // apply output gain
-		s[0] *= output;
-		s[1] *= output;
+		s[0] *= *outputPtr;
+		s[1] *= *outputPtr;
 
 		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
+
+		outputPtr += outputInc;
+		inputPtr += inputInc;
 	}
 
 	checkGate( out_sum / _frames );
