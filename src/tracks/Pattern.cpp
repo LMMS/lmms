@@ -846,6 +846,19 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	}
 }
 
+void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
+{
+	if( _me->button() != Qt::LeftButton )
+	{
+		_me->ignore();
+		return;
+	}
+	if( !fixedTCOs() )
+	{
+		openInPianoRoll();
+	}
+}
+
 
 
 
