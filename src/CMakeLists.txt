@@ -1,0 +1,200 @@
+SET(LMMS_SRCS "")
+SET(LMMS_UIS "")
+
+SET(CMAKE_AUTOMOC ON)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+ADD_SUBDIRECTORY(core)
+ADD_SUBDIRECTORY(gui)
+ADD_SUBDIRECTORY(tracks)
+
+IF(QT5)
+	QT5_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
+ELSE()
+	QT4_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
+ENDIF()
+INCLUDE_DIRECTORIES(
+	"${CMAKE_CURRENT_BINARY_DIR}"
+	"${CMAKE_BINARY_DIR}"
+	"${CMAKE_BINARY_DIR}/include"
+	"${CMAKE_SOURCE_DIR}"
+	"${CMAKE_SOURCE_DIR}/include"
+)
+
+IF(WIN32)
+	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
+	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
+				COMMAND "${WINDRES}"
+					"-I\"${CMAKE_SOURCE_DIR}\""
+					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
+					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
+				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
+ENDIF()
+
+SET(lmms_EMBEDDED_RESOURCES "${CMAKE_SOURCE_DIR}/AUTHORS" "${CMAKE_SOURCE_DIR}/COPYING" "${CONTRIBUTORS}")
+SET(LMMS_ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
+ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND "${BIN2RES}" ARGS ${lmms_EMBEDDED_RESOURCES} > "\"${LMMS_ER_H}\"" DEPENDS bin2res)
+
+# Paths relative to lmms executable
+FILE(RELATIVE_PATH LIB_DIR_RELATIVE "/${BIN_DIR}" "/${LIB_DIR}")
+FILE(RELATIVE_PATH PLUGIN_DIR_RELATIVE "/${BIN_DIR}" "/${PLUGIN_DIR}")
+ADD_DEFINITIONS(-D'LIB_DIR="${LIB_DIR_RELATIVE}/"' -D'PLUGIN_DIR="${PLUGIN_DIR_RELATIVE}/"' ${PULSEAUDIO_DEFINITIONS} ${PORTAUDIO_DEFINITIONS})
+INCLUDE_DIRECTORIES(
+	${JACK_INCLUDE_DIRS}
+	${SAMPLERATE_INCLUDE_DIRS}
+	${SNDFILE_INCLUDE_DIRS}
+)
+
+IF(NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${SDL_INCLUDE_DIR}")
+ENDIF()
+
+IF(NOT ("${PORTAUDIO_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${PORTAUDIO_INCLUDE_DIR}")
+ENDIF()
+
+IF(NOT ("${PULSEAUDIO_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${PULSEAUDIO_INCLUDE_DIR}")
+ENDIF()
+
+IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
+ENDIF()
+
+# Enable C++11
+ADD_DEFINITIONS("-std=c++0x")
+
+# ADD_LIBRARY's OBJECT is only supported in CMake >=2.8.8
+IF(CMAKE_MAJOR_VERSION GREATER 2 OR
+   CMAKE_MINOR_VERSION GREATER 8 OR
+   CMAKE_PATCH_VERSION GREATER 7)
+
+	ADD_LIBRARY(lmmsobjs OBJECT
+		${LMMS_SRCS}
+		${LMMS_INCLUDES}
+		${LMMS_UI_OUT}
+		${LMMS_ER_H}
+	)
+	ADD_EXECUTABLE(lmms
+		core/main.cpp
+		$<TARGET_OBJECTS:lmmsobjs>
+		"${WINRC}"
+	)
+ELSE()
+	ADD_EXECUTABLE(lmms
+		core/main.cpp
+		${LMMS_SRCS}
+		${LMMS_INCLUDES}
+		${LMMS_UI_OUT}
+		${LMMS_ER_H}
+		"${WINRC}"
+	)
+ENDIF()
+
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${LMMS_UI_OUT} lmmsconfig.h lmms.1.gz")
+
+IF(LMMS_BUILD_WIN32)
+	SET(EXTRA_LIBRARIES "-lwinmm")
+ENDIF()
+
+SET(LMMS_REQUIRED_LIBS
+	${CMAKE_THREAD_LIBS_INIT}
+	${QT_LIBRARIES}
+	${ASOUND_LIBRARY}
+	${SDL_LIBRARY}
+	${PORTAUDIO_LIBRARIES}
+	${PULSEAUDIO_LIBRARIES}
+	${JACK_LIBRARIES}
+	${OGGVORBIS_LIBRARIES}
+	${SAMPLERATE_LIBRARIES}
+	${SNDFILE_LIBRARIES}
+	${EXTRA_LIBRARIES}
+)
+# Expose required libs for tests binary
+SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS} PARENT_SCOPE)
+
+TARGET_LINK_LIBRARIES(lmms
+	${LMMS_REQUIRED_LIBS}
+)
+
+IF(QT5)
+	TARGET_LINK_LIBRARIES(lmms
+		Qt5::Widgets
+		Qt5::Xml
+)
+ENDIF()
+
+
+#
+# rules for building localizations
+#
+FILE(GLOB lmms_LOCALES ${CMAKE_SOURCE_DIR}/data/locale/*.ts)
+SET(ts_targets "")
+SET(qm_targets "")
+FOREACH(_ts_file ${lmms_LOCALES})
+	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
+	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
+	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
+	ADD_CUSTOM_TARGET(${_ts_target}
+		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\""
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	ADD_CUSTOM_TARGET(${_qm_target}
+		COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\""
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	LIST(APPEND ts_targets "${_ts_target}")
+	LIST(APPEND qm_targets "${_qm_target}")
+ENDFOREACH(_ts_file ${lmms_LOCALES})
+
+ADD_CUSTOM_TARGET(update-locales)
+FOREACH(_item ${ts_targets})
+	ADD_DEPENDENCIES(update-locales "${_item}")
+ENDFOREACH(_item ${ts_targets})
+
+ADD_CUSTOM_TARGET(finalize-locales ALL)
+FOREACH(_item ${qm_targets})
+	ADD_DEPENDENCIES(finalize-locales "${_item}")
+ENDFOREACH(_item ${qm_targets})
+
+# Install
+IF(LMMS_BUILD_WIN32)
+	SET_TARGET_PROPERTIES(lmms PROPERTIES
+		LINK_FLAGS "${LINK_FLAGS} -mwindows"
+		ENABLE_EXPORTS ON
+	)
+	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
+
+	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+	INSTALL(FILES
+					"${MINGW_PREFIX}/bin/QtCore4.dll"
+					"${MINGW_PREFIX}/bin/QtGui4.dll"
+					"${MINGW_PREFIX}/bin/QtSvg4.dll"
+					"${MINGW_PREFIX}/bin/QtXml4.dll"
+					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
+					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
+					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
+					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
+					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
+					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
+					"${MINGW_PREFIX}/bin/libogg-0.dll"
+					"${MINGW_PREFIX}/lib/libfltk.dll"
+					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
+					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
+					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
+					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
+					"${MINGW_PREFIX}/bin/libpng16-16.dll"
+					"${MINGW_PREFIX}/bin/SDL.dll"
+					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
+					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
+					"${MINGW_PREFIX}/bin/zlib1.dll"
+					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
+				DESTINATION .)
+
+ELSE(LMMS_BUILD_WIN32)
+	IF(NOT LMMS_BUILD_APPLE)
+		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
+	ENDIF(NOT LMMS_BUILD_APPLE)
+
+	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+	INSTALL(FILES "${CMAKE_BINARY_DIR}/lmms.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+
+ENDIF(LMMS_BUILD_WIN32)

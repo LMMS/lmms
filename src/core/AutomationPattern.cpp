@@ -25,12 +25,9 @@
  */
 
 #include <QDomElement>
-#include <QMouseEvent>
-#include <QPainter>
 
 #include "AutomationPattern.h"
 #include "AutomationPatternView.h"
-#include "AutomationEditor.h"
 #include "AutomationTrack.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
@@ -38,7 +35,7 @@
 #include "TextFloat.h"
 #include "embed.h"
 
-
+int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
 const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
@@ -54,6 +51,21 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( MidiTime( 1, 0 ) );
+	if( getTrack() )
+	{
+		switch( getTrack()->trackContainer()->type() )
+		{
+			case TrackContainer::BBContainer:
+				setAutoResize( true );
+				break;
+
+			case TrackContainer::SongContainer:
+				// move down
+			default:
+				setAutoResize( false );
+				break;
+		}
+	}
 }
 
 
@@ -72,6 +84,18 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 		m_timeMap[it.key()] = it.value();
 		m_tangents[it.key()] = _pat_to_copy.m_tangents[it.key()];
 	}
+	switch( getTrack()->trackContainer()->type() )
+	{
+		case TrackContainer::BBContainer:
+			setAutoResize( true );
+			break;
+
+		case TrackContainer::SongContainer:
+			// move down
+		default:
+			setAutoResize( false );
+			break;
+	}
 }
 
 
@@ -79,11 +103,6 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 
 AutomationPattern::~AutomationPattern()
 {
-	if( Engine::automationEditor() &&
-		Engine::automationEditor()->currentPattern() == this )
-	{
-		Engine::automationEditor()->setCurrentPattern( NULL );
-	}
 }
 
 
@@ -186,16 +205,15 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-		Note::quantized( _time,
-			Engine::automationEditor()->quantization() ) :
-		_time;
+	MidiTime newTime = _quant_pos ?
+				Note::quantized( _time, quantization() ) :
+				_time;
 
 	m_timeMap[newTime] = _value;
 	timeMap::const_iterator it = m_timeMap.find( newTime );
 	if( it != m_timeMap.begin() )
 	{
-		it--;
+		--it;
 	}
 	generateTangents(it, 3);
 
@@ -219,17 +237,16 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-		Note::quantized( _time,
-			Engine::automationEditor()->quantization() ) :
-		_time;
+	MidiTime newTime = _quant_pos ?
+				Note::quantized( _time, quantization() ) :
+				_time;
 
 	m_timeMap.remove( newTime );
 	m_tangents.remove( newTime );
 	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
 	if( it != m_timeMap.begin() )
 	{
-		it--;
+		--it;
 	}
 	generateTangents(it, 3);
 
@@ -259,10 +276,9 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 {
 	if( m_dragging == false )
 	{
-		MidiTime newTime = _quant_pos && Engine::automationEditor() ?
-			Note::quantized( _time,
-				Engine::automationEditor()->quantization() ) :
-			_time;
+		MidiTime newTime = _quant_pos  ?
+					Note::quantized( _time, quantization() ) :
+					_time;
 		this->removeValue( newTime );
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
@@ -271,7 +287,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 	//Restore to the state before it the point were being dragged
 	m_timeMap = m_oldTimeMap;
 
-	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); it++ )
+	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
 	{
 		generateTangents(it, 3);
 	}
@@ -413,9 +429,15 @@ void AutomationPattern::flipY( int min, int max )
 	}
 
 	generateTangents();
-	Engine::automationEditor()->update();
 	emit dataChanged();
+}
 
+
+
+
+void AutomationPattern::flipY()
+{
+	flipY(getMin(), getMax());
 }
 
 
@@ -446,23 +468,15 @@ void AutomationPattern::flipX( int length )
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
-				cleanObjects();
 				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
 				tempMap[newTime] = tempValue;
 			}
 		}
 		else
 		{
-			//for ( int i = 0; ( iterate + i ).key() < length ; i++ )
-			//{		
-			//	tempValue = valueAt( ( iterate + i ).key() );
-			//}
-			//putValue( MidiTime( length ) , tempValue, false);
-			//numPoints++;
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
-				cleanObjects();
 				MidiTime newTime;
 
 				if ( ( iterate + i ).key() <= length )
@@ -493,7 +507,6 @@ void AutomationPattern::flipX( int length )
 	m_timeMap = tempMap;
 
 	generateTangents();
-	Engine::automationEditor()->update();
 	emit dataChanged();
 }
 
@@ -791,22 +804,6 @@ void AutomationPattern::clear()
 	m_tangents.clear();
 
 	emit dataChanged();
-
-	if( Engine::automationEditor() &&
-		Engine::automationEditor()->currentPattern() == this )
-	{
-		Engine::automationEditor()->update();
-	}
-}
-
-
-
-
-void AutomationPattern::openInAutomationEditor()
-{
-	Engine::automationEditor()->setCurrentPattern( this );
-	Engine::automationEditor()->parentWidget()->show();
-	Engine::automationEditor()->setFocus();
 }
 
 

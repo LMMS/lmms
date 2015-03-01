@@ -34,47 +34,15 @@ class ToolButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
-			QObject * _receiver, const char * _slot,
-			QWidget * _parent );
+	ToolButton(const QPixmap & _pixmap, const QString & _tooltip,
+			QObject * _receiver=nullptr, const char * _slot=nullptr,
+			QWidget * _parent=nullptr);
 
-	inline ToolButton( QWidget * _parent ) :
-		QToolButton( _parent ),
-		m_colorStandard( s_stdColor ),
-		m_colorHighlighted( s_hlColor )
-	{
-		// setup colors
-		leaveEvent( NULL );
-	}
+	inline ToolButton(QWidget * _parent) :
+		QToolButton(_parent)
+	{ }
 
 	virtual ~ToolButton();
-
-	inline void setStandardColor( const QColor & _color )
-	{
-		m_colorStandard = _color;
-	}
-
-	inline void setHighlightedColor( const QColor & _color )
-	{
-		m_colorHighlighted = _color;
-	}
-
-
-protected:
-	virtual void enterEvent( QEvent * _ev );
-	virtual void leaveEvent( QEvent * _ev );
-
-
-private slots:
-	void toggledBool( bool _on );
-
-
-private:
-	static const QColor s_stdColor;
-	static const QColor s_hlColor;
-
-	QColor m_colorStandard;
-	QColor m_colorHighlighted;
 
 } ;
 

@@ -37,7 +37,7 @@
 
 class AutomationTrack;
 class Pattern;
-class Timeline;
+class TimeLineWidget;
 
 
 const bpm_t MinTempo = 10;
@@ -64,6 +64,10 @@ public:
 		Mode_Count
 	} ;
 
+	void clearErrors();
+	void collectError( const QString error );
+	bool hasErrors();
+	QString* errorSummary();
 
 	class PlayPos : public MidiTime
 	{
@@ -83,7 +87,7 @@ public:
 		{
 			return m_currentFrame;
 		}
-		Timeline * m_timeLine;
+		TimeLineWidget * m_timeLine;
 		bool m_timeLineUpdate;
 
 	private:
@@ -343,6 +347,8 @@ private:
 	volatile bool m_paused;
 
 	bool m_loadingProject;
+
+	QList<QString> * m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];

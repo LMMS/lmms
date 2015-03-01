@@ -29,6 +29,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QWidget>
+#include <QSignalMapper>
 #include <QColor>
 #include <QMimeData>
 
@@ -67,7 +68,7 @@ const int TRACK_OP_WIDTH_COMPACT = 60;
  * Tracks can be resized by shift-dragging anywhere inside the track
  * display.  This sets the minimum size in pixels for a track.
  */
-const int MINIMAL_TRACK_HEIGHT = 8;
+const int MINIMAL_TRACK_HEIGHT = 32;
 const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 2;
@@ -121,6 +122,16 @@ public:
 		return m_length;
 	}
 
+	inline void setAutoResize( const bool r )
+	{
+		m_autoResize = r;
+	}
+
+	inline const bool getAutoResize() const
+	{
+		return m_autoResize;
+	}
+
 	virtual void movePosition( const MidiTime & pos );
 	virtual void changeLength( const MidiTime & length );
 
@@ -165,6 +176,7 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
+	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
 
@@ -216,7 +228,6 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
 
-	void setAutoResizeEnabled( bool e = false );
 	float pixelsPerTact();
 
 	inline TrackView * getTrackView()
@@ -248,7 +259,6 @@ private:
 	TrackContentObject * m_tco;
 	TrackView * m_trackView;
 	Actions m_action;
-	bool m_autoResize;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 
@@ -381,6 +391,8 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
+	void assignFxLine( int channelIndex );
+	void createFxLine();
 
 private:
 	static QPixmap * s_grip;

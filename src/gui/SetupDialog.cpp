@@ -73,9 +73,9 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
 
-#ifdef LMMS_DEBUG
+
 	assert( dynamic_cast<QBoxLayout *>( _w->layout() ) != NULL );
-#endif
+
 	dynamic_cast<QBoxLayout *>( _w->layout() )->addSpacing( 5 );
 	dynamic_cast<QBoxLayout *>( _w->layout() )->addWidget( title );
 	dynamic_cast<QBoxLayout *>( _w->layout() )->addSpacing( 10 );
@@ -94,20 +94,24 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displaydBV( ConfigManager::inst()->value( "app", 
 		      				"displaydbv" ).toInt() ),
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
+	m_disableBackup( !ConfigManager::inst()->value( "app",
+							"disablebackup" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
-	m_workingDir( ConfigManager::inst()->workingDir() ),
-	m_vstDir( ConfigManager::inst()->vstDir() ),
-	m_artworkDir( ConfigManager::inst()->artworkDir() ),
-	m_flDir( ConfigManager::inst()->flDir() ),
-	m_ladDir( ConfigManager::inst()->ladspaDir() ),
+	m_lang( ConfigManager::inst()->value( "app",
+							"language" ) ),
+	m_workingDir( QDir::toNativeSeparators( ConfigManager::inst()->workingDir() ) ),
+	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
+	m_artworkDir( QDir::toNativeSeparators( ConfigManager::inst()->artworkDir() ) ),
+	m_flDir( QDir::toNativeSeparators( ConfigManager::inst()->flDir() ) ),
+	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_defaultSoundfont( ConfigManager::inst()->defaultSoundfont() ),
+	m_defaultSoundfont( QDir::toNativeSeparators( ConfigManager::inst()->defaultSoundfont() ) ),
 #endif
 #ifdef LMMS_HAVE_STK
-	m_stkDir( ConfigManager::inst()->stkDir() ),
+	m_stkDir( QDir::toNativeSeparators( ConfigManager::inst()->stkDir() ) ),
 #endif
-	m_backgroundArtwork( ConfigManager::inst()->backgroundArtwork() ),
+	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
 	m_oneInstrumentTrackWindow( ConfigManager::inst()->value( "ui",
@@ -300,12 +304,63 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( disableAutoquit, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableAutoquit( bool ) ) );
 
+	LedCheckBox * disableBackup = new LedCheckBox(
+				tr( "Create backup file when saving a project" ),
+								misc_tw );
+	labelNumber++;
+	disableBackup->move( XDelta, YDelta*labelNumber );
+	disableBackup->setChecked( m_disableBackup );
+	connect( disableBackup, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisableBackup( bool ) ) );
+
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
+	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
+	lang_tw->setFixedHeight( 48 );
+	QComboBox * changeLang = new QComboBox( lang_tw );
+	changeLang->move( XDelta, YDelta );
+
+	QDir dir( ConfigManager::inst()->localeDir() );
+	QStringList fileNames = dir.entryList( QStringList( "*.qm" ) );
+	for( int i = 0; i < fileNames.size(); ++i )
+	{
+		// get locale extracted by filename
+		fileNames[i].truncate( fileNames[i].lastIndexOf( '.' ) );
+		m_languages.append( fileNames[i] );
+		QString lang = QLocale( m_languages.last() ).nativeLanguageName();
+		changeLang->addItem( lang );
+	}
+	connect( changeLang, SIGNAL( currentIndexChanged( int ) ),
+							this, SLOT( setLanguage( int ) ) );
+
+	//If language unset, fallback to system language when available
+	if( m_lang == "" )
+	{
+		QString tmp = QLocale::system().name().left( 2 );
+		if( m_languages.contains( tmp ) )
+		{
+			m_lang = tmp;
+		}
+		else
+		{
+			m_lang = "en";
+		}
+	}
+
+	for( int i = 0; i < changeLang->count(); ++i )
+	{
+		if( m_lang == m_languages.at( i ) )
+		{
+			changeLang->setCurrentIndex( i );
+			break;
+		}
+	}
 
 	gen_layout->addWidget( bufsize_tw );
 	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( misc_tw );
+	gen_layout->addSpacing( 10 );
+	gen_layout->addWidget( lang_tw );
 	gen_layout->addStretch();
 
 
@@ -806,6 +861,8 @@ void SetupDialog::accept()
 					QString::number( m_displaydBV ) );
 	ConfigManager::inst()->setValue( "app", "nommpz",
 						QString::number( !m_MMPZ ) );
+	ConfigManager::inst()->setValue( "app", "disablebackup",
+					QString::number( !m_disableBackup ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
@@ -826,6 +883,7 @@ void SetupDialog::accept()
 					QString::number( m_displayWaveform ) );
 	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
+	ConfigManager::inst()->setValue( "app", "language", m_lang );
 
 
 	ConfigManager::inst()->setWorkingDir( m_workingDir );
@@ -958,6 +1016,14 @@ void SetupDialog::toggleMMPZ( bool _enabled )
 
 
 
+void SetupDialog::toggleDisableBackup( bool _enabled )
+{
+	m_disableBackup = _enabled;
+}
+
+
+
+
 void SetupDialog::toggleHQAudioDev( bool _enabled )
 {
 	m_hqAudioDev = _enabled;
@@ -1024,6 +1090,11 @@ void SetupDialog::toggleDisableAutoquit( bool en )
 void SetupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 {
 	m_oneInstrumentTrackWindow = _enabled;
+}
+
+void SetupDialog::setLanguage( int lang )
+{
+	m_lang = m_languages[lang];
 }
 
 

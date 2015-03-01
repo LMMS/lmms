@@ -30,6 +30,7 @@
 #include <QWidget>
 #include <QInputDialog>
 
+#include "Editor.h"
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
@@ -47,10 +48,9 @@ class QSignalMapper;
 class ComboBox;
 class NotePlayHandle;
 class Pattern;
-class Timeline;
-class ToolButton;
+class TimeLineWidget;
 
-class PianoRoll : public QWidget, public SerializingObject
+class PianoRoll : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
@@ -58,6 +58,14 @@ class PianoRoll : public QWidget, public SerializingObject
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 public:
+	enum EditModes
+	{
+		ModeDraw,
+		ModeErase,
+		ModeSelect,
+		ModeEditDetuning,
+	};
+
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
 
@@ -86,47 +94,36 @@ public:
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
 	int quantization() const;
-
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-
-	inline virtual QString nodeName() const
-	{
-		return "pianoroll";
-	}
-
-	void setPauseIcon( bool pause );
 	
 	// qproperty acces functions
 	QColor gridColor() const;
-	void setGridColor( const QColor & _c );
+	void setGridColor( const QColor & c );
 	QColor noteModeColor() const;
-	void setNoteModeColor( const QColor & _c );
+	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
-	void setNoteColor( const QColor & _c );
+	void setNoteColor( const QColor & c );
 	QColor barColor() const;
-	void setBarColor( const QColor & _c );
+	void setBarColor( const QColor & c );
+
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void keyReleaseEvent( QKeyEvent * _ke );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+	virtual void leaveEvent( QEvent * e );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * me );
+	virtual void mouseReleaseEvent( QMouseEvent * me );
+	virtual void mouseMoveEvent( QMouseEvent * me );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void resizeEvent( QResizeEvent * re );
+	virtual void wheelEvent( QWheelEvent * we );
 
-	int getKey( int _y ) const;
-	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width, Note * _n, const QColor & noteCol );
+	int getKey( int y ) const;
+	static inline void drawNoteRect( QPainter & p, int x, int y,
+					int  width, Note * n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
-	void getSelectedNotes( NoteVector & _selected_notes );
+	void getSelectedNotes( NoteVector & selected_notes );
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -137,24 +134,21 @@ protected slots:
 	void recordAccompany();
 	void stop();
 
-	void startRecordNote( const Note & _n );
-	void finishRecordNote( const Note & _n );
+	void startRecordNote( const Note & n );
+	void finishRecordNote( const Note & n );
 
-	void horScrolled( int _new_pos );
-	void verScrolled( int _new_pos );
+	void horScrolled( int new_pos );
+	void verScrolled( int new_pos );
 
-	void drawButtonToggled();
-	void eraseButtonToggled();
-	void selectButtonToggled();
-	void detuneButtonToggled();
+	void setEditMode(int mode);
 
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
 	void deleteSelectedNotes();
 
-	void updatePosition( const MidiTime & _t );
-	void updatePositionAccompany( const MidiTime & _t );
+	void updatePosition(const MidiTime & t );
+	void updatePositionAccompany(const MidiTime & t );
 
 	void zoomingChanged();
 	void quantizeChanged();
@@ -174,15 +168,7 @@ signals:
 
 
 private:
-	enum editModes
-	{
-		ModeDraw,
-		ModeErase,
-		ModeSelect,
-		ModeEditDetuning,
-	};
-
-	enum actions
+	enum Actions
 	{
 		ActionNone,
 		ActionMoveNote,
@@ -192,14 +178,14 @@ private:
 		ActionResizeNoteEditArea
 	};
 
-	enum noteEditMode
+	enum NoteEditMode
 	{
 		NoteEditVolume,
 		NoteEditPanning,
 		NoteEditCount // make sure this one is always last
 	};
 
-	enum semiToneMarkerAction
+	enum SemiToneMarkerAction
 	{
 		stmaUnmarkAll,
 		stmaMarkCurrentSemiTone,
@@ -224,7 +210,7 @@ private:
 	PianoRoll( const PianoRoll & );
 	virtual ~PianoRoll();
 
-	void autoScroll( const MidiTime & _t );
+	void autoScroll(const MidiTime & t );
 
 	MidiTime newNoteLen() const;
 
@@ -234,7 +220,7 @@ private:
 	int selectionCount() const;
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
-	void pauseTestNotes( bool _pause = true );
+	void pauseTestNotes(bool pause = true );
 
 	inline int noteEditTop() const;
 	inline int keyAreaBottom() const;
@@ -264,34 +250,11 @@ private:
 
 	static TextFloat * s_textFloat;
 
-	QWidget * m_toolBar;
-
-	ToolButton * m_playButton;
-	ToolButton * m_recordButton;
-	ToolButton * m_recordAccompanyButton;
-	ToolButton * m_stopButton;
-
-	ToolButton * m_drawButton;
-	ToolButton * m_eraseButton;
-	ToolButton * m_selectButton;
-	ToolButton * m_detuneButton;
-
-	ToolButton * m_cutButton;
-	ToolButton * m_copyButton;
-	ToolButton * m_pasteButton;
-
-	ComboBox * m_zoomingComboBox;
-	ComboBox * m_quantizeComboBox;
-	ComboBox * m_noteLenComboBox;
-	ComboBox * m_scaleComboBox;
-	ComboBox * m_chordComboBox;
-
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
-
 
 
 	Pattern* m_pattern;
@@ -303,8 +266,8 @@ private:
 	QList<Note> m_recordingNotes;
 
 	Note * m_currentNote;
-	actions m_action;
-	noteEditMode m_noteEditMode;
+	Actions m_action;
+	NoteEditMode m_noteEditMode;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -341,19 +304,19 @@ private:
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
 
-	int m_startKey;			// first key when drawing
+	int m_startKey; // first key when drawing
 	int m_lastKey;
 
-	editModes m_editMode;
-	editModes m_ctrlMode; // mode they were in before they hit ctrl
+	EditModes m_editMode;
+	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
 
-	Timeline * m_timeLine;
+	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void copy_to_clipboard( const NoteVector & _notes ) const;
+	void copy_to_clipboard(const NoteVector & notes ) const;
 
 	void drawDetuningInfo( QPainter & _p, Note * _n, int _x, int _y );
 	bool mouseOverNote();
@@ -367,6 +330,7 @@ private:
 	bool m_startedWithShift;
 
 	friend class Engine;
+	friend class PianoRollWindow;
 
 	// qproperty fields
 	QColor m_gridColor;
@@ -378,6 +342,55 @@ signals:
 	void positionChanged( const MidiTime & );
 
 } ;
+
+
+class PianoRollWindow : public Editor, SerializingObject
+{
+	Q_OBJECT
+public:
+	PianoRollWindow();
+
+	const Pattern* currentPattern() const;
+	void setCurrentPattern(Pattern* pattern);
+
+	int quantization() const;
+
+	void play();
+	void stop();
+	void record();
+	void recordAccompany();
+	void stopRecording();
+
+	bool isRecording() const;
+
+	/*! \brief Resets settings to default when e.g. creating a new project */
+	void reset();
+
+	using SerializingObject::saveState;
+	using SerializingObject::restoreState;
+	virtual void saveSettings(QDomDocument & doc, QDomElement & de );
+	virtual void loadSettings( const QDomElement & de );
+
+	inline virtual QString nodeName() const
+	{
+		return "pianoroll";
+	}
+
+	QSize sizeHint() const;
+
+signals:
+	void currentPatternChanged();
+
+private:
+	PianoRoll* m_editor;
+
+	ComboBox * m_zoomingComboBox;
+	ComboBox * m_quantizeComboBox;
+	ComboBox * m_noteLenComboBox;
+	ComboBox * m_scaleComboBox;
+	ComboBox * m_chordComboBox;
+
+};
 
 
 #endif

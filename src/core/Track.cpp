@@ -56,6 +56,8 @@
 #include "Clipboard.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
+#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
@@ -248,7 +250,6 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_tco( tco ),
 	m_trackView( tv ),
 	m_action( NoAction ),
-	m_autoResize( false ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_hint( NULL ),
@@ -656,7 +657,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 							"a copy." ),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
-		else if( m_autoResize == false )
+		else if( !m_tco->getAutoResize() )
 		{
 			m_action = Resize;
 			m_oldTime = m_tco->length();
@@ -846,7 +847,11 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else
 	{
+<<<<<<< HEAD
 		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() )
+=======
+		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
+>>>>>>> coding
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -957,6 +962,7 @@ float TrackContentObjectView::pixelsPerTact()
 
 
 
+<<<<<<< HEAD
 /*! \brief Set whether this trackContentObjectView can resize.
  *
  * \param e The boolean state of whether this track content object view
@@ -970,6 +976,8 @@ void TrackContentObjectView::setAutoResizeEnabled( bool e )
 
 
 
+=======
+>>>>>>> coding
 /*! \brief Detect whether the mouse moved more than n pixels on screen.
  *
  * \param _me The QMouseEvent.
@@ -1136,7 +1144,7 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const MidiTime & newPos )
 {
-	if( m_trackView->trackContainerView() == Engine::getBBEditor() )
+	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
 	{
 		const int curBB = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
@@ -1402,6 +1410,11 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		{
 			tco->selectViewOnCreate( true );
 		}
+		//check tco name, if the same as source track name dont copy
+		if( tco->name() == tracks[trackIndex]->name() )
+		{
+			tco->setName( "" );
+		}
 	}
 
 	AutomationPattern::resolveAllIDs();
@@ -1467,7 +1480,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	int ppt = static_cast<int>( tcv->pixelsPerTact() );
 	QPainter p( this );
 	// Don't draw background on BB-Editor
-	if( m_trackView->trackContainerView() != Engine::getBBEditor() )
+	if( m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView() )
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getTact() * ppt, 0 ) );
@@ -1712,6 +1725,29 @@ void TrackOperationsWidget::clearTrack()
 
 
 
+/*! \brief Create and assign a new FX Channel for this track */
+void TrackOperationsWidget::createFxLine()
+{
+	int channelIndex = gui->fxMixerView()->addNewChannel();
+
+	Engine::fxMixer()->effectChannel( channelIndex )->m_name = m_trackView->getTrack()->name();
+
+	assignFxLine(channelIndex);
+}
+
+
+
+/*! \brief Assign a specific FX Channel for this track */
+void TrackOperationsWidget::assignFxLine(int channelIndex)
+{
+	Track * track = m_trackView->getTrack();
+	dynamic_cast<InstrumentTrack *>( track )->effectChannelModel()->setValue( channelIndex );
+
+	gui->fxMixerView()->setCurrentFxLine( channelIndex );
+}
+
+
+
 /*! \brief Remove this track from the track list
  *
  */
@@ -1746,12 +1782,42 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
-
-	if( dynamic_cast<InstrumentTrackView *>( m_trackView ) )
+	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
+<<<<<<< HEAD
 		toMenu->addSeparator();
 		toMenu->addMenu( dynamic_cast<InstrumentTrackView *>(
 						m_trackView )->midiMenu() );
+=======
+		int channelIndex = trackView->model()->effectChannelModel()->value();
+
+		FxChannel * fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+
+		QMenu * fxMenu = new QMenu( tr( "FX %1: %2" ).arg( channelIndex ).arg( fxChannel->m_name ), toMenu );
+		QSignalMapper * fxMenuSignalMapper = new QSignalMapper(this);
+
+		fxMenu->addAction("Assign to new FX Channel" , this, SLOT( createFxLine() ) );
+		fxMenu->addSeparator();
+
+
+		for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
+		{
+			FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
+
+			if ( currentChannel != fxChannel )
+			{
+				QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
+				QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
+				fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			}
+		}
+
+		toMenu->addMenu(fxMenu);
+		connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
+
+		toMenu->addSeparator();
+		toMenu->addMenu( trackView->midiMenu() );
+>>>>>>> coding
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
@@ -1767,7 +1833,7 @@ void TrackOperationsWidget::recordingOn()
 	if( atv )
 	{
 		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( true ); }
@@ -1783,7 +1849,7 @@ void TrackOperationsWidget::recordingOff()
 	if( atv )
 	{
 		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); it++ )
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
 			if( ap ) { ap->setRecording( false ); }

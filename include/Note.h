@@ -91,9 +91,10 @@ public:
 	virtual ~Note();
 
 	// used by GUI
-	inline void setSelected( const bool selected ){ m_selected = selected; }
-	inline void setOldKey( const int oldKey ){ m_oldKey = oldKey; }
-	inline void setOldPos( const MidiTime & oldPos ){ m_oldPos = oldPos; }
+	inline void setSelected( const bool selected ) { m_selected = selected; }
+	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
+	inline void setOldPos( const MidiTime & oldPos ) { m_oldPos = oldPos; }
+
 	inline void setOldLength( const MidiTime & oldLength )
 	{
 		m_oldLength = oldLength;
@@ -202,10 +203,9 @@ public:
 	{
 		return m_detuning;
 	}
-
-	void editDetuningPattern();
-
 	bool hasDetuningInfo() const;
+
+	void createDetuning();
 
 
 protected:
@@ -227,10 +227,7 @@ private:
 	MidiTime m_length;
 	MidiTime m_pos;
 	DetuningHelper * m_detuning;
-
-	void createDetuning();
-
-} ;
+};
 
 
 typedef QVector<Note *> NoteVector;

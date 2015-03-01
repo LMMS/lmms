@@ -33,6 +33,7 @@
 
 #include "Track.h"
 #include "JournallingObject.h"
+#include "InstrumentTrack.h"
 
 
 class QVBoxLayout;
@@ -123,6 +124,8 @@ public slots:
 	void createTrackView( Track * _t );
 	void deleteTrackView( TrackView * _tv );
 
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
@@ -132,8 +135,6 @@ protected:
 		return( m_trackViews );
 	}
 
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
@@ -182,6 +183,19 @@ signals:
 
 } ;
 
+class InstrumentLoaderThread : public QThread
+{
+	Q_OBJECT
+public:
+	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
+							QString name = "" );
 
+	void run();
+
+private:
+	InstrumentTrack *m_it;
+	QString m_name;
+	QThread *m_containerThread;
+};
 
 #endif

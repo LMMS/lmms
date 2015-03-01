@@ -44,6 +44,7 @@
 #include "StringPairDrag.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
 #include "ConfigManager.h"
@@ -62,6 +63,18 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
+	switch( getTrack()->trackContainer()->type() )
+	{
+		case TrackContainer::BBContainer:
+			setAutoResize( true );
+			break;
+
+		case TrackContainer::SongContainer:
+			// move down
+		default:
+			setAutoResize( false );
+			break;
+	}
 }
 
 
@@ -340,9 +353,18 @@ void SampleTCOView::paintEvent( QPaintEvent * _pe )
 
 	QColor c;
 	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
-		c = isSelected() ? QColor( 0, 0, 224 )
-						 : styleColor;
-	else c = QColor( 80, 80, 80 );
+	{
+		c = styleColor;
+	}
+	else
+	{
+		c = QColor( 80, 80, 80 );
+	}
+
+	if( isSelected() == true )
+	{
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+	}
 
 	QLinearGradient grad( 0, 0, 0, height() );
 
@@ -567,7 +589,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
 
-	m_effWindow = Engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
+	m_effWindow = gui->mainWindow()->workspace()->addSubWindow( m_effectRack );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
  	m_effWindow->setWindowTitle( _t->name() );

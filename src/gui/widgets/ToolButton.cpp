@@ -27,24 +27,12 @@
 #include "ToolTip.h"
 
 
-const QColor ToolButton::s_stdColor = QColor( 216, 216, 216 );
-const QColor ToolButton::s_hlColor = QColor( 240, 240, 240 );
-
-
-
 ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 			QObject * _receiver, const char * _slot,
 			QWidget * _parent ) :
-	QToolButton( _parent ),
-	m_colorStandard( s_stdColor ),
-	m_colorHighlighted( s_hlColor )
+	QToolButton( _parent )
 {
 	setAutoFillBackground( false );
-	QPalette pal = palette();
-	pal.setColor( backgroundRole(), m_colorStandard );
-	pal.setColor( QPalette::Window, m_colorStandard );
-	pal.setColor( QPalette::Button, m_colorStandard );
-	setPalette( pal );
 
 	if( _receiver != NULL && _slot != NULL )
 	{
@@ -53,9 +41,6 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	ToolTip::add( this, _tooltip );
 	setFixedSize( 30, 30 );
 	setIcon( _pixmap );
-	leaveEvent( NULL );
-	connect( this, SIGNAL( toggled( bool ) ), this,
-						SLOT( toggledBool( bool ) ) );
 }
 
 
@@ -63,41 +48,6 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 
 ToolButton::~ToolButton()
 {
-}
-
-
-
-
-void ToolButton::enterEvent( QEvent * )
-{
-	QPalette pal = palette();
-	pal.setColor( backgroundRole(), m_colorHighlighted );
-	pal.setColor( QPalette::Window, m_colorHighlighted );
-	pal.setColor( QPalette::Button, m_colorHighlighted );
-	setPalette( pal );
-}
-
-
-
-
-void ToolButton::leaveEvent( QEvent * )
-{
-	QPalette pal = palette();
-	pal.setColor( backgroundRole(), m_colorStandard );
-	pal.setColor( QPalette::Window, m_colorStandard );
-	pal.setColor( QPalette::Button, m_colorStandard );
-	setPalette( pal );
-}
-
-
-
-
-void ToolButton::toggledBool( bool _on )
-{
-	if( _on == true )
-	{
-		emit( clicked() );
-	}
 }
 
 

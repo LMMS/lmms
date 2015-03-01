@@ -51,6 +51,14 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <source>LMMS</source>
         <translation type="unfinished">LMMS</translation>
     </message>
+    <message>
+        <source>Involved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contributors ordered by number of commits:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AmplifierControlDialog</name>
@@ -221,16 +229,13 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation>Semella que o servidor de JACK foi apagado e non foi posíbel iniciar unha instancia nova. En consecuencia, o LMMS non pode preseguir. Hai que gravar este proxecto e reiniciar o JACK e o LMMS.</translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
-        <translation>CLINTE-NOME</translation>
+        <translation type="unfinished">CLINTE-NOME</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>CANLES</translation>
+        <translation type="unfinished">CANLES</translation>
     </message>
 </context>
 <context>
@@ -323,42 +328,6 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
 <context>
     <name>AutomationEditor</name>
     <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>Reproducir/Deter o padrón actual (Espazo)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>Parar a execución do padrón actual (Espazo)</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>Modo de debuxo (Maiúsculas+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>Modo de borrado (Maiúsculas+E)</translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Recortar os valores escollidos (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Copiar os valores escollidos (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation>Apegar os valores do porta-retallos (Ctrl+V)</translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation>Editor de automatización - non hai ningún padrón</translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation>Editor de automatización - %1</translation>
-    </message>
-    <message>
         <source>Please open an automation pattern with the context menu of a control!</source>
         <translation>Abra un padrón de automatización co menú de contexto dun control!</translation>
     </message>
@@ -370,33 +339,56 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <source>All selected values were copied to the clipboard.</source>
         <translation>Copiáronse todos os valores escollidos no porta-retallos.</translation>
     </message>
+</context>
+<context>
+    <name>AutomationEditorWindow</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished">Reproducir/Deter o padrón actual (Espazo)</translation>
+    </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation>Prema aquí se desexa reproducir este padrón. Isto é útil mentres se edita. O padrón repítese en bucle automaticamente ao chegar ao final.</translation>
+        <translation type="unfinished">Prema aquí se desexa reproducir este padrón. Isto é útil mentres se edita. O padrón repítese en bucle automaticamente ao chegar ao final.</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">Parar a execución do padrón actual (Espazo)</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation>Prema aquí se desexa parar a reprodución deste padrón.</translation>
+        <translation type="unfinished">Prema aquí se desexa parar a reprodución deste padrón.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished">Modo de debuxo (Maiúsculas+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished">Modo de borrado (Maiúsculas+E)</translation>
+    </message>
+    <message>
+        <source>Flip vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip horizontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the pattern will be reversed. The points are flipped in the x direction.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Prema aquí e o activarase o modo de debuxo. Neste modo pode engadir e mover valores individuais. Este é o modo por omisión que se emprega a maior parte do tempo. Tamén pode premer «Maiúsculas+D» no teclado para activar este modo.</translation>
+        <translation type="unfinished">Prema aquí e o activarase o modo de debuxo. Neste modo pode engadir e mover valores individuais. Este é o modo por omisión que se emprega a maior parte do tempo. Tamén pode premer «Maiúsculas+D» no teclado para activar este modo.</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Prema aquí e activarase o modo de borrado. Neste modo pódense borrar valores individuais. Tamén pode premer «Maiúsculas+E» no teclado para activar este modo.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Prema aquí e os valores escollidos recórtanse e van para o porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Prema aquí e os valores escollidos cópianse no porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation>Prema aquí e os valores do porta-retallos apegaranse no primeiro compás visíbel.</translation>
+        <translation type="unfinished">Prema aquí e activarase o modo de borrado. Neste modo pódense borrar valores individuais. Tamén pode premer «Maiúsculas+E» no teclado para activar este modo.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
@@ -411,7 +403,11 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tension: </source>
+        <source>Tension value for spline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -427,12 +423,40 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tension value for spline</source>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation type="unfinished">Recortar os valores escollidos (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation type="unfinished">Copiar os valores escollidos (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard Ctrl+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A higher tension value may make a smoother curve but overshoot some values.  A low tension value will cause the slope of the curve to level off at each control point.</source>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">Prema aquí e os valores escollidos recórtanse e van para o porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">Prema aquí e os valores escollidos cópianse no porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished">Prema aquí e os valores do porta-retallos apegaranse no primeiro compás visíbel.</translation>
+    </message>
+    <message>
+        <source>Tension: </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation type="unfinished">Editor de automatización - non hai ningún padrón</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation type="unfinished">Editor de automatización - %1</translation>
     </message>
 </context>
 <context>
@@ -480,12 +504,93 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <source>Set/clear record</source>
         <translation type="unfinished">Indicar/Limpar a gravación</translation>
     </message>
+    <message>
+        <source>Flip Vertically (Visible)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Horizontally (Visible)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
         <translation type="unfinished">Pista de automatización</translation>
+    </message>
+</context>
+<context>
+    <name>BBEditor</name>
+    <message>
+        <source>Beat+Bassline Editor</source>
+        <translation type="unfinished">Editor de ritmos e liña do baixo</translation>
+    </message>
+    <message>
+        <source>Play/pause current beat/bassline (Space)</source>
+        <translation type="unfinished">Reproducir/Deter o ritmo/a liña do baixo actual (Espazo)</translation>
+    </message>
+    <message>
+        <source>Stop playback of current beat/bassline (Space)</source>
+        <translation type="unfinished">Parar a reprodución do ritmo/da liña do baixo actual (Espazo)</translation>
+    </message>
+    <message>
+        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
+        <translation type="unfinished">Prema aquí para reproducir o ritmo/liña do baixo actual. O ritmo/liña do baixo repítese en bucle automaticamente ao chegar ao final.</translation>
+    </message>
+    <message>
+        <source>Click here to stop playing of current beat/bassline.</source>
+        <translation type="unfinished">Prema aquí para parar a reprodución do ritmo/liña do baixo actual.</translation>
+    </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation type="unfinished">Engadir un ritmo/liña do baixo</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove steps</source>
+        <translation type="unfinished">Eliminar pasos</translation>
+    </message>
+    <message>
+        <source>Add steps</source>
+        <translation type="unfinished">Engadir pasos</translation>
+    </message>
+</context>
+<context>
+    <name>BBTCOView</name>
+    <message>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation type="unfinished">Abrir no editor de ritmos e liña do baixo</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation type="unfinished">Restaurar o nome</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation type="unfinished">Mudar o nome</translation>
+    </message>
+    <message>
+        <source>Change color</source>
+        <translation type="unfinished">Mudar a cor</translation>
+    </message>
+    <message>
+        <source>Reset color to default</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BBTrack</name>
+    <message>
+        <source>Beat/Bassline %1</source>
+        <translation type="unfinished">Ritmo/Liña do baixo %1</translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -528,6 +633,100 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <message>
         <source>Ratio</source>
         <translation type="unfinished">Taxa</translation>
+    </message>
+</context>
+<context>
+    <name>BitcrushControlDialog</name>
+    <message>
+        <source>IN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation type="unfinished">GAIN</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Noise:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Clip:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished">Taxa</translation>
+    </message>
+    <message>
+        <source>Rate Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable samplerate-crushing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable bitdepth-crushing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo difference:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Levels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Levels:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CaptionMenu</name>
+    <message>
+        <source>&amp;Help</source>
+        <translation type="unfinished">&amp;Axuda</translation>
+    </message>
+    <message>
+        <source>Help (not available)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -648,9 +847,125 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
         <source>&amp;Remove this plugin</source>
         <translation>Elimina&amp;r este engadido</translation>
     </message>
+</context>
+<context>
+    <name>CrossoverEQControlDialog</name>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
+        <source>Band 1/2 Crossover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 2/3 Crossover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 3/4 Crossover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 1 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 2 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 3 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 4 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 1 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 2 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 3 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 4 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DelayControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DelayControlsDialog</name>
+    <message>
+        <source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished">Taxa</translation>
+    </message>
+    <message>
+        <source>Lfo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Amt</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DetuningHelper</name>
+    <message>
+        <source>Note detuning</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -777,6 +1092,60 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <message>
         <source>Vocal Formant Filter</source>
         <translation type="unfinished">Filtro de formante vocal</translation>
+    </message>
+    <message>
+        <source>2x Moog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV BandPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV HighPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV Notch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Formant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tripole</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DummyEffect</name>
+    <message>
+        <source>NOT FOUND</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Editor</name>
+    <message>
+        <source>Play (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record while playing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -916,10 +1285,6 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     <message>
         <source>&amp;Remove this plugin</source>
         <translation>Elimina&amp;r este engadido</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
     </message>
 </context>
 <context>
@@ -1161,6 +1526,255 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
 </context>
 <context>
+    <name>EqControls</name>
+    <message>
+        <source>Input gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low shelf gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Shelf gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Shelf res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Shelf res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Shelf freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High shelf freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low shelf active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High shelf active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP 24</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP 48</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP 24</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP 48</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>low pass type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>high pass type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EqControlsDialog</name>
+    <message>
+        <source>HP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Shelf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Shelf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">Ganancia</translation>
+    </message>
+    <message>
+        <source>Out Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance : </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency:</source>
+        <translation type="unfinished">Frecuencia:</translation>
+    </message>
+    <message>
+        <source>12dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>24dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>48dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lp grp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hp grp</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EqParameterWidget</name>
+    <message>
+        <source>Hz </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExportProjectDialog</name>
     <message>
         <source>Export project</source>
@@ -1298,6 +1912,43 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
         <source>Export as loop (remove end silence)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Export between loop markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation type="unfinished">Non foi posíbel abrir o ficheiro</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished">Non foi posíbel abrir o ficheiro %1 para escribir nel.
+Asegúrese de ter permisos sobre o ficheiro e o directorio que o contén e tente de novo!</translation>
+    </message>
+    <message>
+        <source>Export project to %1</source>
+        <translation type="unfinished">Exportar o proxecto a %1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Erro</translation>
+    </message>
+    <message>
+        <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
+        <translation type="unfinished">Produciuse un erro ao determinar o dispositivo codificador do ficheiro. Tente escollendo un formato de saída diferente.</translation>
+    </message>
+    <message>
+        <source>Rendering: %1%</source>
+        <translation type="unfinished">A renderizar: %1%</translation>
+    </message>
+</context>
+<context>
+    <name>Fader</name>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation type="unfinished">Introduza un valor novo entre %1 e %2:</translation>
+    </message>
 </context>
 <context>
     <name>FileBrowser</name>
@@ -1334,6 +1985,76 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
 </context>
 <context>
+    <name>FlangerControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation type="unfinished">Ruído</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FlangerControlsDialog</name>
+    <message>
+        <source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amt:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation type="unfinished">Ruído</translation>
+    </message>
+    <message>
+        <source>White Noise Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
@@ -1366,8 +2087,8 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Axuda</translation>
+        <source>Remove &amp;unused channels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1395,9 +2116,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation>Mesturador de efectos especiais</translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation type="unfinished">Fader de efectos %1</translation>
@@ -1410,11 +2128,81 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Mute this FX channel</source>
         <translation type="unfinished">Silenciar esta canle de efectos especiais</translation>
     </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">Solo</translation>
+    </message>
+    <message>
+        <source>Solo FX channel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GigInstrument</name>
+    <message>
+        <source>Bank</source>
+        <translation type="unfinished">Banco</translation>
+    </message>
+    <message>
+        <source>Patch</source>
+        <translation type="unfinished">Parche</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">Ganancia</translation>
+    </message>
+</context>
+<context>
+    <name>GigInstrumentView</name>
+    <message>
+        <source>Open other GIG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to open another GIG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the patch</source>
+        <translation type="unfinished">Escoller o parche</translation>
+    </message>
+    <message>
+        <source>Click here to change which patch of the GIG file to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change which instrument of the GIG file is being played</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Which GIG file is currently being used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Which patch of the GIG file is currently being used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">Ganancia</translation>
+    </message>
+    <message>
+        <source>Factor to multiply samples by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open GIG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GIG Files (*.gig)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2010,6 +2798,17 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
+    <name>InstrumentMiscView</name>
+    <message>
+        <source>MASTER PITCH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of Master Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>InstrumentSoundShaping</name>
     <message>
         <source>VOLUME</source>
@@ -2107,6 +2906,34 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Vocal Formant Filter</source>
         <translation>Filtro de formante vocal</translation>
     </message>
+    <message>
+        <source>2x Moog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV BandPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV HighPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV Notch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Formant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tripole</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstrumentSoundShapingView</name>
@@ -2195,6 +3022,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Pitch range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Pitch</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2331,6 +3162,29 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>MISC</source>
+        <translation type="unfinished">DIVERSOS</translation>
+    </message>
+</context>
+<context>
+    <name>Knob</name>
+    <message>
+        <source>Set linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set logarithmic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation type="unfinished">Introduza un valor novo entre -96,0 dBV e 6,0 dBV:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation type="unfinished">Introduza un valor novo entre %1 e %2:</translation>
+    </message>
 </context>
 <context>
     <name>LadspaControl</name>
@@ -2367,10 +3221,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 </context>
 <context>
     <name>LadspaEffect</name>
-    <message>
-        <source>Effect</source>
-        <translation>Efecto</translation>
-    </message>
     <message>
         <source>Unknown LADSPA plugin %1 requested.</source>
         <translation>Solicitouse un engadido de LADSPA, %1, que é descoñecido.</translation>
@@ -2493,10 +3343,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Prema aquí para unha onda cadrada.</translation>
     </message>
     <message>
-        <source>Click here for a a moog saw-wave.</source>
-        <translation>Prema aquí para unha onda de dente de serra tipo Moog.</translation>
-    </message>
-    <message>
         <source>Click here for an exponential wave.</source>
         <translation>Prema aquí para unha onda exponencial.</translation>
     </message>
@@ -2507,6 +3353,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>Click here for a user-defined shape.
 Double click to pick a file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a moog saw-wave.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2528,10 +3378,6 @@ Double click to pick a file.</source>
         <source>Could not save configuration file %1. You&apos;re probably not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation>Non foi posíbel gravar o ficheiro de configuración %1. Probabelmente non se lle permita escribir neste ficheiro. Asegúrese de dispor de acceso para escribir neste ficheiro e ténteo de novo.</translation>
-    </message>
-    <message>
-        <source>&amp;Project</source>
-        <translation>&amp;Proxecto</translation>
     </message>
     <message>
         <source>&amp;New</source>
@@ -2576,10 +3422,6 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>&amp;Help</source>
         <translation>&amp;Axuda</translation>
-    </message>
-    <message>
-        <source>Online help</source>
-        <translation>Axuda na Internet</translation>
     </message>
     <message>
         <source>Help</source>
@@ -2686,14 +3528,6 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Este proxecto foi modificado desde que se gardou a última vez. Desexa gardalo agora?</translation>
     </message>
     <message>
-        <source>Open project</source>
-        <translation>Abrir un proxecto</translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation>Gardar o proxecto</translation>
-    </message>
-    <message>
         <source>Help not available</source>
         <translation>Non hai axuda dispoñíbel</translation>
     </message>
@@ -2704,51 +3538,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     </message>
     <message>
-        <source>My projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My samples</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My presets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My computer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Root directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E&amp;xport tracks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project recovery</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>It looks like the last session did not end properly. Do you want to recover the project of this session?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Configuration file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save as new &amp;version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2764,10 +3558,6 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Recently opened projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2777,6 +3567,62 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     </message>
     <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Root Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Recently Opened Projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as New &amp;Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xport Tracks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What&apos;s This?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Project</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2814,10 +3660,10 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     </message>
 </context>
 <context>
-    <name>MidiAlsaSeq::setupWidget</name>
+    <name>MidiAlsaSeq</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation type="unfinished">DISPOSITIVO</translation>
     </message>
 </context>
 <context>
@@ -3282,6 +4128,98 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
         <source>Sub3-LFO2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sine wave</source>
+        <translation type="unfinished">Onda senoidal</translation>
+    </message>
+    <message>
+        <source>Bandlimited Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absolute sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation type="unfinished">Onda triangular</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation type="unfinished">Onda de dente de serra</translation>
+    </message>
+    <message>
+        <source>Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation type="unfinished">Onda cadrada</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abs. sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Random</source>
+        <translation type="unfinished">Aleatorio</translation>
+    </message>
+    <message>
+        <source>Random smooth</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MonstroView</name>
@@ -3451,6 +4389,41 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MultitapEchoControlDialog</name>
+    <message>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Step length:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dry Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowpass stages:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap left and right input channel for reflections</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3732,6 +4705,14 @@ empregue a roda do rato para modificar o volume un paso</translation>
         <source>DCAY</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TRES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Treshold:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PeakControllerEffectControls</name>
@@ -3763,29 +4744,13 @@ empregue a roda do rato para modificar o volume un paso</translation>
         <source>Amount Multiplicator</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Treshold</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PianoRoll</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>Reproducir/Deter o padrón actual (Espazo)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>Parar a execución do padrón actual (Espazo)</translation>
-    </message>
-    <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation>Recortar as notas escollidas (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation>Copiar as notas escollidas (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation>Apegar as notas do porta-retallos (Ctrl+V)</translation>
-    </message>
     <message>
         <source>Piano-Roll - no pattern</source>
         <translation>Pianola - non hai ningún padrón</translation>
@@ -3799,56 +4764,8 @@ empregue a roda do rato para modificar o volume un paso</translation>
         <translation>Abra un padrón facendo duplo clic nel!</translation>
     </message>
     <message>
-        <source>Record notes from MIDI-device/channel-piano</source>
-        <translation>Gravar notas dun dispositivo MIDI/piano de canle</translation>
-    </message>
-    <message>
-        <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
-        <translation>Gravar notas dun dispositivo MIDI/piano de canle mentres se reproduce a canción ou pista de ritmos/liña do baixo</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>Modo de debuxo (Maiúsculas+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>Modo de borrado (Maiúsculas+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>Modo de selección (Maiúscula+S)</translation>
-    </message>
-    <message>
         <source>Last note</source>
         <translation>Última nota</translation>
-    </message>
-    <message>
-        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation>Prema aquí para reproducir este padrón. Isto é útil mentres se edita. O padrón repítese en bucle automaticamente ao chegar ao final.</translation>
-    </message>
-    <message>
-        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation>Prema aquí para gravar notas desde un dispositivo MIDI ou desde o piano de proba virtual da xanela da canle correspondente no padrón actual. As notas tocadas ao gravar escríbense neste padrón e despois pódense editar.</translation>
-    </message>
-    <message>
-        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
-        <translation>Prema aquí para gravar notas desde un dispositivo MIDI ou desde o piano de proba virtual da xanela da canle correspondente no padrón actual. As notas tocadas ao gravar escríbense neste padrón e escóitase a canción ou pista de ritmos/liña do baixo no fondo.</translation>
-    </message>
-    <message>
-        <source>Click here to stop playback of current pattern.</source>
-        <translation>Prema aquí para parar a reprodución deste padrón.</translation>
-    </message>
-    <message>
-        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Prema aquí e os valores escollidos recórtanse e van para o porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
-    </message>
-    <message>
-        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Prema aquí e os valores escollidos cópianse no porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
-    </message>
-    <message>
-        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
-        <translation>Prema aquí e os valores do porta-retallos apegaranse no primeiro compás visíbel.</translation>
     </message>
     <message>
         <source>Note lock</source>
@@ -3861,26 +4778,6 @@ empregue a roda do rato para modificar o volume un paso</translation>
     <message>
         <source>Note Panning</source>
         <translation>Panormámica das notas</translation>
-    </message>
-    <message>
-        <source>Detune mode (Shift+T)</source>
-        <translation>Modo de desafinación (Maiúsculas+T)</translation>
-    </message>
-    <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation>Prema aquí e o activarase o modo de debuxo. Neste modo pode engadir e mover valores individuais. Este é o modo por omisión que se emprega a maior parte do tempo. Tamén pode premer «Maiúsculas+D» no teclado para activar este modo. Neste modo, manteña Ctrl para ir temporalmente ao modo de selección.</translation>
-    </message>
-    <message>
-        <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Prema aquí e activarase o modo de borrado. Neste modo pódense borrar valores individuais. Tamén pode premer «Maiúsculas+E» no teclado para activar este modo.</translation>
-    </message>
-    <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation>Prema aquí e activarase o modo de borrado. Neste modo pódense borrar valores individuais. Como alternativa pode premer Ctrl no modo de debuxo para empregar temporalmente o modo de selección.</translation>
-    </message>
-    <message>
-        <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
-        <translation>Prema aquí e actívase o modo de desafinación.Neste modo pódese premer unhanota para abrir a súa desafinación de automatización. Pódese empregar isto para escorregar entre as notas. Tamén se pode premer «Maiúsculas+T» no teclado para activar este mdo.</translation>
     </message>
     <message>
         <source>Mark/unmark current semitone</source>
@@ -3907,26 +4804,6 @@ empregue a roda do rato para modificar o volume un paso</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Volume: %1%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3945,6 +4822,117 @@ empregue a roda do rato para modificar o volume un paso</translation>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation type="unfinished">Introduza un valor novo entre %1 e %2:</translation>
+    </message>
+</context>
+<context>
+    <name>PianoRollWindow</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished">Reproducir/Deter o padrón actual (Espazo)</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano</source>
+        <translation type="unfinished">Gravar notas dun dispositivo MIDI/piano de canle</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
+        <translation type="unfinished">Gravar notas dun dispositivo MIDI/piano de canle mentres se reproduce a canción ou pista de ritmos/liña do baixo</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">Parar a execución do padrón actual (Espazo)</translation>
+    </message>
+    <message>
+        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation type="unfinished">Prema aquí para reproducir este padrón. Isto é útil mentres se edita. O padrón repítese en bucle automaticamente ao chegar ao final.</translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
+        <translation type="unfinished">Prema aquí para gravar notas desde un dispositivo MIDI ou desde o piano de proba virtual da xanela da canle correspondente no padrón actual. As notas tocadas ao gravar escríbense neste padrón e despois pódense editar.</translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
+        <translation type="unfinished">Prema aquí para gravar notas desde un dispositivo MIDI ou desde o piano de proba virtual da xanela da canle correspondente no padrón actual. As notas tocadas ao gravar escríbense neste padrón e escóitase a canción ou pista de ritmos/liña do baixo no fondo.</translation>
+    </message>
+    <message>
+        <source>Click here to stop playback of current pattern.</source>
+        <translation type="unfinished">Prema aquí para parar a reprodución deste padrón.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished">Modo de debuxo (Maiúsculas+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished">Modo de borrado (Maiúsculas+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished">Modo de selección (Maiúscula+S)</translation>
+    </message>
+    <message>
+        <source>Detune mode (Shift+T)</source>
+        <translation type="unfinished">Modo de desafinación (Maiúsculas+T)</translation>
+    </message>
+    <message>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <translation type="unfinished">Prema aquí e o activarase o modo de debuxo. Neste modo pode engadir e mover valores individuais. Este é o modo por omisión que se emprega a maior parte do tempo. Tamén pode premer «Maiúsculas+D» no teclado para activar este modo. Neste modo, manteña Ctrl para ir temporalmente ao modo de selección.</translation>
+    </message>
+    <message>
+        <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">Prema aquí e activarase o modo de borrado. Neste modo pódense borrar valores individuais. Tamén pode premer «Maiúsculas+E» no teclado para activar este modo.</translation>
+    </message>
+    <message>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <translation type="unfinished">Prema aquí e activarase o modo de borrado. Neste modo pódense borrar valores individuais. Como alternativa pode premer Ctrl no modo de debuxo para empregar temporalmente o modo de selección.</translation>
+    </message>
+    <message>
+        <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">Prema aquí e actívase o modo de desafinación.Neste modo pódese premer unhanota para abrir a súa desafinación de automatización. Pódese empregar isto para escorregar entre as notas. Tamén se pode premer «Maiúsculas+T» no teclado para activar este mdo.</translation>
+    </message>
+    <message>
+        <source>Cut selected notes (Ctrl+X)</source>
+        <translation type="unfinished">Recortar as notas escollidas (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected notes (Ctrl+C)</source>
+        <translation type="unfinished">Copiar as notas escollidas (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <translation type="unfinished">Apegar as notas do porta-retallos (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">Prema aquí e os valores escollidos recórtanse e van para o porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">Prema aquí e os valores escollidos cópianse no porta-retallos. Pódeos apegar en calquera lugar de calquera padrón premendo o botón de apegar.</translation>
+    </message>
+    <message>
+        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished">Prema aquí e os valores do porta-retallos apegaranse no primeiro compás visíbel.</translation>
+    </message>
+    <message>
+        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3977,6 +4965,140 @@ Razón: «%2»</translation>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PluginBrowser</name>
+    <message>
+        <source>Instrument plugins</source>
+        <translation type="unfinished">Engadidos de instrumento</translation>
+    </message>
+    <message>
+        <source>Instrument browser</source>
+        <translation type="unfinished">Navegador de instrumentos</translation>
+    </message>
+    <message>
+        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <translation type="unfinished">Arrastre un instrumento para o Editor de cancións, o Editor de ritmos+liña do baixo ou para unha pista de instrumento existente.</translation>
+    </message>
+</context>
+<context>
+    <name>ProjectNotes</name>
+    <message>
+        <source>Project notes</source>
+        <translation type="unfinished">Notas do proxecto</translation>
+    </message>
+    <message>
+        <source>Put down your project notes here.</source>
+        <translation type="unfinished">Anote aquí as súas notas sobre o proxecto.</translation>
+    </message>
+    <message>
+        <source>Edit Actions</source>
+        <translation type="unfinished">Editar as accións</translation>
+    </message>
+    <message>
+        <source>&amp;Undo</source>
+        <translation type="unfinished">Desfa&amp;cer</translation>
+    </message>
+    <message>
+        <source>Ctrl+Z</source>
+        <translation type="unfinished">Ctrl+Z</translation>
+    </message>
+    <message>
+        <source>&amp;Redo</source>
+        <translation type="unfinished">&amp;Refacer</translation>
+    </message>
+    <message>
+        <source>Ctrl+Y</source>
+        <translation type="unfinished">Ctrl+Y</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished">&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>Ctrl+C</source>
+        <translation type="unfinished">Ctrl+C</translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished">Cor&amp;tar</translation>
+    </message>
+    <message>
+        <source>Ctrl+X</source>
+        <translation type="unfinished">Ctrl+X</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished">A&amp;pegar</translation>
+    </message>
+    <message>
+        <source>Ctrl+V</source>
+        <translation type="unfinished">Ctrl+V</translation>
+    </message>
+    <message>
+        <source>Format Actions</source>
+        <translation type="unfinished">Accións de formato</translation>
+    </message>
+    <message>
+        <source>&amp;Bold</source>
+        <translation type="unfinished">&amp;Negrita</translation>
+    </message>
+    <message>
+        <source>Ctrl+B</source>
+        <translation type="unfinished">Ctrl+B</translation>
+    </message>
+    <message>
+        <source>&amp;Italic</source>
+        <translation type="unfinished">Cursi&amp;va</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <translation type="unfinished">Ctrl+I</translation>
+    </message>
+    <message>
+        <source>&amp;Underline</source>
+        <translation type="unfinished">S&amp;ubliñado</translation>
+    </message>
+    <message>
+        <source>Ctrl+U</source>
+        <translation type="unfinished">Ctrl+U</translation>
+    </message>
+    <message>
+        <source>&amp;Left</source>
+        <translation type="unfinished">&amp;Esquerda</translation>
+    </message>
+    <message>
+        <source>Ctrl+L</source>
+        <translation type="unfinished">Ctrl+L</translation>
+    </message>
+    <message>
+        <source>C&amp;enter</source>
+        <translation type="unfinished">C&amp;entro</translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation type="unfinished">Ctrl+E</translation>
+    </message>
+    <message>
+        <source>&amp;Right</source>
+        <translation type="unfinished">De&amp;reita</translation>
+    </message>
+    <message>
+        <source>Ctrl+R</source>
+        <translation type="unfinished">Ctrl+R</translation>
+    </message>
+    <message>
+        <source>&amp;Justify</source>
+        <translation type="unfinished">&amp;Xustificar</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <translation type="unfinished">Ctrl+J</translation>
+    </message>
+    <message>
+        <source>&amp;Color...</source>
+        <translation type="unfinished">&amp;Cor...</translation>
     </message>
 </context>
 <context>
@@ -4130,6 +5252,13 @@ Razón: «%2»</translation>
     </message>
 </context>
 <context>
+    <name>RenameDialog</name>
+    <message>
+        <source>Rename...</source>
+        <translation type="unfinished">Mudar o nome...</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -4217,6 +5346,10 @@ Razón: «%2»</translation>
         <source>Volume</source>
         <translation type="unfinished">Volume</translation>
     </message>
+    <message>
+        <source>Panning</source>
+        <translation type="unfinished">Panorámica</translation>
+    </message>
 </context>
 <context>
     <name>SampleTrackView</name>
@@ -4232,37 +5365,309 @@ Razón: «%2»</translation>
         <source>VOL</source>
         <translation type="unfinished">VOL</translation>
     </message>
+    <message>
+        <source>Panning</source>
+        <translation type="unfinished">Panorámica</translation>
+    </message>
+    <message>
+        <source>Panning:</source>
+        <translation type="unfinished">Panorámica:</translation>
+    </message>
+    <message>
+        <source>PAN</source>
+        <translation type="unfinished">PAN</translation>
+    </message>
+</context>
+<context>
+    <name>SetupDialog</name>
+    <message>
+        <source>Setup LMMS</source>
+        <translation type="unfinished">Configuración do LMMS</translation>
+    </message>
+    <message>
+        <source>General settings</source>
+        <translation type="unfinished">Configuración xeral</translation>
+    </message>
+    <message>
+        <source>BUFFER SIZE</source>
+        <translation type="unfinished">TAMAÑO DO BÚFER</translation>
+    </message>
+    <message>
+        <source>Reset to default-value</source>
+        <translation type="unfinished">Restaurar o valor por omisión</translation>
+    </message>
+    <message>
+        <source>MISC</source>
+        <translation type="unfinished">DIVERSOS</translation>
+    </message>
+    <message>
+        <source>Enable tooltips</source>
+        <translation type="unfinished">Activar as axudiñas</translation>
+    </message>
+    <message>
+        <source>Show restart warning after changing settings</source>
+        <translation type="unfinished">Mostrar o aviso sobre o reinicio despois de cambiar a configuración</translation>
+    </message>
+    <message>
+        <source>Display volume as dBV </source>
+        <translation type="unfinished">Mostrar o volume como dBV </translation>
+    </message>
+    <message>
+        <source>Compress project files per default</source>
+        <translation type="unfinished">Comprimir os ficheiros dos proxectos por omisión</translation>
+    </message>
+    <message>
+        <source>One instrument track window mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HQ-mode for output audio-device</source>
+        <translation type="unfinished">Modo de calidade alta para o dispositivo de son de saída</translation>
+    </message>
+    <message>
+        <source>Compact track buttons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync VST plugins to host playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable note labels in piano roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable waveform display by default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep effects running even without input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create backup file when saving a project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LANGUAGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paths</source>
+        <translation type="unfinished">Rutas</translation>
+    </message>
+    <message>
+        <source>LMMS working directory</source>
+        <translation type="unfinished">Directorio de traballo do LMMS</translation>
+    </message>
+    <message>
+        <source>VST-plugin directory</source>
+        <translation type="unfinished">Directorio dos engadidos de VST</translation>
+    </message>
+    <message>
+        <source>Artwork directory</source>
+        <translation type="unfinished">Directorio do material gráfico</translation>
+    </message>
+    <message>
+        <source>Background artwork</source>
+        <translation type="unfinished">Gráficos do fondo</translation>
+    </message>
+    <message>
+        <source>FL Studio installation directory</source>
+        <translation type="unfinished">Directorio de instalación do FL Studio</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin paths</source>
+        <translation type="unfinished">Rutas aos engadidos de LADSPA</translation>
+    </message>
+    <message>
+        <source>STK rawwave directory</source>
+        <translation type="unfinished">Directorio de ondas cruas de STK</translation>
+    </message>
+    <message>
+        <source>Default Soundfont File</source>
+        <translation type="unfinished">Ficheiro Soundfont por omisión</translation>
+    </message>
+    <message>
+        <source>Performance settings</source>
+        <translation type="unfinished">Configuración do desempeño</translation>
+    </message>
+    <message>
+        <source>UI effects vs. performance</source>
+        <translation type="unfinished">Efectos da interface fronte a desempeño</translation>
+    </message>
+    <message>
+        <source>Smooth scroll in Song Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto save feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show playback cursor in AudioFileProcessor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio settings</source>
+        <translation type="unfinished">Configuración do son</translation>
+    </message>
+    <message>
+        <source>AUDIO INTERFACE</source>
+        <translation type="unfinished">INTERFACE DO SON</translation>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation type="unfinished">Configuración do MIDI</translation>
+    </message>
+    <message>
+        <source>MIDI INTERFACE</source>
+        <translation type="unfinished">INTERFACE MIDI</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Aceptar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <source>Restart LMMS</source>
+        <translation type="unfinished">Reiniciar o LMMS</translation>
+    </message>
+    <message>
+        <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
+        <translation type="unfinished">Teña en conta que a maioría dos cambios non serán efectivos até que se reinicie o LMMS!</translation>
+    </message>
+    <message>
+        <source>Frames: %1
+Latency: %2 ms</source>
+        <translation type="unfinished">Cadencia: %1
+Latencia: %2 ms</translation>
+    </message>
+    <message>
+        <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
+        <translation type="unfinished">Aquí pódese configurar o tamaño do búfer interno empregado polo LMMS. Valores máis pequenos resultan nunha latencia menor mais poden tamén causar son non usábel ou desempeño inadecuado, especialmente en computadores vellos ou en sistemas cun kernel que non sexa de tempo real.</translation>
+    </message>
+    <message>
+        <source>Choose LMMS working directory</source>
+        <translation type="unfinished">Escoller o directorio de traballo do LMMS</translation>
+    </message>
+    <message>
+        <source>Choose your VST-plugin directory</source>
+        <translation type="unfinished">Escoller o directorio dos engadidos de VST</translation>
+    </message>
+    <message>
+        <source>Choose artwork-theme directory</source>
+        <translation type="unfinished">Escoller o directorio do material gráfico</translation>
+    </message>
+    <message>
+        <source>Choose FL Studio installation directory</source>
+        <translation type="unfinished">Escoller o directorio de instalación do FL Studio</translation>
+    </message>
+    <message>
+        <source>Choose LADSPA plugin directory</source>
+        <translation type="unfinished">Escoller o directorio dos engadidos de LADSPA</translation>
+    </message>
+    <message>
+        <source>Choose STK rawwave directory</source>
+        <translation type="unfinished">Escoller o directorio de ondas cruas de STK</translation>
+    </message>
+    <message>
+        <source>Choose default SoundFont</source>
+        <translation type="unfinished">Escoller a SoundFont por omisión</translation>
+    </message>
+    <message>
+        <source>Choose background artwork</source>
+        <translation type="unfinished">Escoller os gráficos do fondo</translation>
+    </message>
+    <message>
+        <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
+        <translation type="unfinished">Aquí pódese escoller a interface de son preferida. Dependendo da configuración do sistema durante a compilación pódese escoller entre ALSA, JACK, OSS e máis. Embaixo vese unha caixa que oferece controles para configurar a interface de son escollida.</translation>
+    </message>
+    <message>
+        <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
+        <translation type="unfinished">Aquí pódese escoller a interface de MIDI preferida. Dependendo da configuración do sistema durante a compilación pódese escoller entre ALSA, OSS e máis. Embaixo vese unha caixa que oferece controles para configurar a interface de MIDI escollida.</translation>
+    </message>
+</context>
+<context>
+    <name>Song</name>
+    <message>
+        <source>Tempo</source>
+        <translation type="unfinished">Tempo</translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation type="unfinished">Volume global</translation>
+    </message>
+    <message>
+        <source>Master pitch</source>
+        <translation type="unfinished">Altura global</translation>
+    </message>
+    <message>
+        <source>Project saved</source>
+        <translation type="unfinished">Proxecto gravado</translation>
+    </message>
+    <message>
+        <source>The project %1 is now saved.</source>
+        <translation type="unfinished">O proxecto %1 xa está gravado.</translation>
+    </message>
+    <message>
+        <source>Project NOT saved.</source>
+        <translation type="unfinished">O proxecto NON está gravado.</translation>
+    </message>
+    <message>
+        <source>The project %1 was not saved!</source>
+        <translation type="unfinished">O proxecto %1 no nestá gravado!</translation>
+    </message>
+    <message>
+        <source>Import file</source>
+        <translation type="unfinished">Importar un ficheiro</translation>
+    </message>
+    <message>
+        <source>MIDI sequences</source>
+        <translation type="unfinished">Secuencias de MIDI</translation>
+    </message>
+    <message>
+        <source>FL Studio projects</source>
+        <translation type="unfinished">Proxectos de FL Studio</translation>
+    </message>
+    <message>
+        <source>Hydrogen projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All file types</source>
+        <translation type="unfinished">Todos os tipos de ficheiro</translation>
+    </message>
+    <message>
+        <source>Empty project</source>
+        <translation type="unfinished">Proxecto baleiro</translation>
+    </message>
+    <message>
+        <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
+        <translation type="unfinished">Este proxecto está baleiro, polo que exportalo non ten xeito. Poña algo primeiro no Editor de cancións!</translation>
+    </message>
+    <message>
+        <source>Select directory for writing exported tracks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>untitled</source>
+        <translation type="unfinished">sen título</translation>
+    </message>
+    <message>
+        <source>Select file for project-export...</source>
+        <translation type="unfinished">Escolla o ficheiro para a exportación do proxecto...</translation>
+    </message>
+    <message>
+        <source>The following errors occured while loading: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SongEditor</name>
-    <message>
-        <source>Song-Editor</source>
-        <translation>Editor de cancións</translation>
-    </message>
-    <message>
-        <source>Play song (Space)</source>
-        <translation>Reproducir unha canción (Espazo)</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation>Prema aquí se desexa reproducir a canción enteira. A reprodución comeza no marcador de posición da canción (verde). Tamén se pode mover durante a reprodución.</translation>
-    </message>
-    <message>
-        <source>Stop song (Space)</source>
-        <translation>Parar a canción (Espazo)</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation>Prema aquí se desexa parar a reprodución da canción. O marcador de posición da canción irá para o principio da canción.</translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
-        <translation>Engadir un ritmo/liña do baixo</translation>
-    </message>
-    <message>
-        <source>Add sample-track</source>
-        <translation>Engadir unha pista de mostra</translation>
-    </message>
     <message>
         <source>Could not open file</source>
         <translation>Non foi posíbel abrir o ficheiro</translation>
@@ -4270,26 +5675,6 @@ Razón: «%2»</translation>
     <message>
         <source>Could not write file</source>
         <translation>Non foi posíbel escribir no ficheiro</translation>
-    </message>
-    <message>
-        <source>Add automation-track</source>
-        <translation>Engaidr unha pista de automatización</translation>
-    </message>
-    <message>
-        <source>Draw mode</source>
-        <translation>Modo de debuxo</translation>
-    </message>
-    <message>
-        <source>Edit mode (select and move)</source>
-        <translation>Modo de edición (escoller e mover)</translation>
-    </message>
-    <message>
-        <source>Record samples from Audio-device</source>
-        <translation>Gravar mostras dun dispositivo de son</translation>
-    </message>
-    <message>
-        <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation>Gravar mostras dun dispositivo de son mentres se reproduce a canción ou pista de ritmos/liña do baixo</translation>
     </message>
     <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
@@ -4354,6 +5739,57 @@ Razón: «%2»</translation>
     </message>
 </context>
 <context>
+    <name>SongEditorWindow</name>
+    <message>
+        <source>Song-Editor</source>
+        <translation type="unfinished">Editor de cancións</translation>
+    </message>
+    <message>
+        <source>Play song (Space)</source>
+        <translation type="unfinished">Reproducir unha canción (Espazo)</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device</source>
+        <translation type="unfinished">Gravar mostras dun dispositivo de son</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device while playing song or BB track</source>
+        <translation type="unfinished">Gravar mostras dun dispositivo de son mentres se reproduce a canción ou pista de ritmos/liña do baixo</translation>
+    </message>
+    <message>
+        <source>Stop song (Space)</source>
+        <translation type="unfinished">Parar a canción (Espazo)</translation>
+    </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation type="unfinished">Engadir un ritmo/liña do baixo</translation>
+    </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation type="unfinished">Engadir unha pista de mostra</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw mode</source>
+        <translation type="unfinished">Modo de debuxo</translation>
+    </message>
+    <message>
+        <source>Edit mode (select and move)</source>
+        <translation type="unfinished">Modo de edición (escoller e mover)</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
+        <translation type="unfinished">Prema aquí se desexa reproducir a canción enteira. A reprodución comeza no marcador de posición da canción (verde). Tamén se pode mover durante a reprodución.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
+        <translation type="unfinished">Prema aquí se desexa parar a reprodución da canción. O marcador de posición da canción irá para o principio da canción.</translation>
+    </message>
+</context>
+<context>
     <name>SpectrumAnalyzerControlDialog</name>
     <message>
         <source>Linear spectrum</source>
@@ -4377,6 +5813,13 @@ Razón: «%2»</translation>
     <message>
         <source>Channel mode</source>
         <translation type="unfinished">Modo da canle</translation>
+    </message>
+</context>
+<context>
+    <name>TabWidget</name>
+    <message>
+        <source>Settings for %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4422,10 +5865,6 @@ Razón: «%2»</translation>
         <translation>Personalizada...</translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
-    </message>
-    <message>
         <source>Custom </source>
         <translation>Personalizada </translation>
     </message>
@@ -4463,6 +5902,52 @@ Razón: «%2»</translation>
     <message>
         <source>click to change time units</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TimeLineWidget</name>
+    <message>
+        <source>Enable/disable auto-scrolling</source>
+        <translation type="unfinished">Activar/Desactivar o desprazamento automático</translation>
+    </message>
+    <message>
+        <source>Enable/disable loop-points</source>
+        <translation type="unfinished">Activar/Desactivar os puntos de bucle</translation>
+    </message>
+    <message>
+        <source>After stopping go back to begin</source>
+        <translation type="unfinished">Despois de parar voltar ao principio</translation>
+    </message>
+    <message>
+        <source>After stopping go back to position at which playing was started</source>
+        <translation type="unfinished">Despois de parar voltar á posición na que se iniciou a reprodución</translation>
+    </message>
+    <message>
+        <source>After stopping keep position</source>
+        <translation type="unfinished">Despois de parar manter a posición</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation type="unfinished">Suxestión</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Track</name>
+    <message>
+        <source>Muted</source>
+        <translation type="unfinished">Silenciado</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">Solo</translation>
     </message>
 </context>
 <context>
@@ -4506,6 +5991,107 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
     <message>
         <source>Importing FLP-file...</source>
         <translation type="unfinished">A importar un ficheiro FLP...</translation>
+    </message>
+</context>
+<context>
+    <name>TrackContentObject</name>
+    <message>
+        <source>Muted</source>
+        <translation type="unfinished">Silenciado</translation>
+    </message>
+</context>
+<context>
+    <name>TrackContentObjectView</name>
+    <message>
+        <source>Current position</source>
+        <translation type="unfinished">Posición actual</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation type="unfinished">Suxestión</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
+        <translation type="unfinished">Prema &lt;Ctrl&gt; e arrastre para facer unha copia.</translation>
+    </message>
+    <message>
+        <source>Current length</source>
+        <translation type="unfinished">Duración actual</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <translation type="unfinished">Prema &lt;Ctrl&gt; para modificar o tamaño libremente</translation>
+    </message>
+    <message>
+        <source>%1:%2 (%3:%4 to %5:%6)</source>
+        <translation type="unfinished">%1:%2 (%3:%4 a %5:%6)</translation>
+    </message>
+    <message>
+        <source>Delete (middle mousebutton)</source>
+        <translation type="unfinished">Eliminar (botón do medio do rato)</translation>
+    </message>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished">Recortar</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished">Copiar</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished">Apegar</translation>
+    </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation type="unfinished">Silenciar/Darlle volume (&lt;Ctrl&gt; + botón central do rato)</translation>
+    </message>
+</context>
+<context>
+    <name>TrackOperationsWidget</name>
+    <message>
+        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="unfinished">Prema &lt;Ctrl&gt; mentres ten a asa de mover premida para iniciar unha acción de arrastrar e soltar.</translation>
+    </message>
+    <message>
+        <source>Actions for this track</source>
+        <translation type="unfinished">Accións para esta pista</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished">Silenciar</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">Solo</translation>
+    </message>
+    <message>
+        <source>Mute this track</source>
+        <translation type="unfinished">Silenciar esta pista</translation>
+    </message>
+    <message>
+        <source>Clone this track</source>
+        <translation type="unfinished">Clonar esta pista</translation>
+    </message>
+    <message>
+        <source>Remove this track</source>
+        <translation type="unfinished">Eliminar esta pista</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn all recording on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn all recording off</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4652,17 +6238,6 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
     </message>
 </context>
 <context>
-    <name>Ui</name>
-    <message>
-        <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Involved</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>VersionedSaveDialog</name>
     <message>
         <source>Increment version number</source>
@@ -4762,6 +6337,17 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
     <message>
         <source> - VST plugin control</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VisualizationWidget</name>
+    <message>
+        <source>click to enable/disable visualization of master-output</source>
+        <translation type="unfinished">Prema para des/activar a visualización da saída global</translation>
+    </message>
+    <message>
+        <source>Click to enable</source>
+        <translation type="unfinished">Prema para activar</translation>
     </message>
 </context>
 <context>
@@ -4870,11 +6456,7 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed loading VST plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The VST plugin %1 could not be loaded for some reason.</source>
+        <source>The VST plugin %1 could not be loaded.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5280,77 +6862,8 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
         <source>Sinc</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>bbEditor</name>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation>Editor de ritmos e liña do baixo</translation>
-    </message>
-    <message>
-        <source>Play/pause current beat/bassline (Space)</source>
-        <translation>Reproducir/Deter o ritmo/a liña do baixo actual (Espazo)</translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
-        <translation>Engadir un ritmo/liña do baixo</translation>
-    </message>
-    <message>
-        <source>Add automation-track</source>
-        <translation>Engadir unha pista de automatización</translation>
-    </message>
-    <message>
-        <source>Stop playback of current beat/bassline (Space)</source>
-        <translation>Parar a reprodución do ritmo/da liña do baixo actual (Espazo)</translation>
-    </message>
-    <message>
-        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation>Prema aquí para reproducir o ritmo/liña do baixo actual. O ritmo/liña do baixo repítese en bucle automaticamente ao chegar ao final.</translation>
-    </message>
-    <message>
-        <source>Click here to stop playing of current beat/bassline.</source>
-        <translation>Prema aquí para parar a reprodución do ritmo/liña do baixo actual.</translation>
-    </message>
-    <message>
-        <source>Remove steps</source>
-        <translation type="unfinished">Eliminar pasos</translation>
-    </message>
-    <message>
-        <source>Add steps</source>
-        <translation type="unfinished">Engadir pasos</translation>
-    </message>
-</context>
-<context>
-    <name>bbTCOView</name>
-    <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation>Abrir no editor de ritmos e liña do baixo</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>Restaurar o nome</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>Mudar o nome</translation>
-    </message>
-    <message>
-        <source>Change color</source>
-        <translation>Mudar a cor</translation>
-    </message>
-    <message>
-        <source>Reset color to default</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>bbTrack</name>
-    <message>
-        <source>Beat/Bassline %1</source>
-        <translation>Ritmo/Liña do baixo %1</translation>
-    </message>
-    <message>
-        <source>Clone of %1</source>
+        <source>Sample not found: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5551,42 +7064,6 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
     </message>
 </context>
 <context>
-    <name>exportProjectDialog</name>
-    <message>
-        <source>Export project to %1</source>
-        <translation type="unfinished">Exportar o proxecto a %1</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="unfinished">Erro</translation>
-    </message>
-    <message>
-        <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation type="unfinished">Produciuse un erro ao determinar o dispositivo codificador do ficheiro. Tente escollendo un formato de saída diferente.</translation>
-    </message>
-    <message>
-        <source>Rendering: %1%</source>
-        <translation type="unfinished">A renderizar: %1%</translation>
-    </message>
-    <message>
-        <source>Could not open file</source>
-        <translation type="unfinished">Non foi posíbel abrir o ficheiro</translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished">Non foi posíbel abrir o ficheiro %1 para escribir nel.
-Asegúrese de ter permisos sobre o ficheiro e o directorio que o contén e tente de novo!</translation>
-    </message>
-</context>
-<context>
-    <name>fader</name>
-    <message>
-        <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Introduza un valor novo entre %1 e %2:</translation>
-    </message>
-</context>
-<context>
     <name>graphModel</name>
     <message>
         <source>Graph</source>
@@ -5685,21 +7162,6 @@ Asegúrese de ter permisos sobre o ficheiro e o directorio que o contén e tente
     <message>
         <source>Distortion End:</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>knob</name>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
-    </message>
-    <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>Introduza un valor novo entre -96,0 dBV e 6,0 dBV:</translation>
-    </message>
-    <message>
-        <source>Please enter a new value between %1 and %2:</source>
-        <translation>Introduza un valor novo entre %1 e %2:</translation>
     </message>
 </context>
 <context>
@@ -6436,13 +7898,6 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     </message>
 </context>
 <context>
-    <name>nineButtonSelector</name>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
-    </message>
-</context>
-<context>
     <name>opl2instrument</name>
     <message>
         <source>Patch</source>
@@ -6896,10 +8351,6 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
         <translation>sen descrición</translation>
     </message>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Engadidos de instrumento</translation>
-    </message>
-    <message>
         <source>Incomplete monophonic imitation tb303</source>
         <translation>Imitación monofónica incompleta tb303</translation>
     </message>
@@ -6950,14 +8401,6 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     <message>
         <source>Filter for importing MIDI-files into LMMS</source>
         <translation>Filtro para importar ficheiros MIDI ao LMMS</translation>
-    </message>
-    <message>
-        <source>Instrument browser</source>
-        <translation>Navegador de instrumentos</translation>
-    </message>
-    <message>
-        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation>Arrastre un instrumento para o Editor de cancións, o Editor de ritmos+liña do baixo ou para unha pista de instrumento existente.</translation>
     </message>
     <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
@@ -7049,335 +8492,83 @@ Este chip empregábase no computador Commodore 64.</translation>
         <source>A NES-like synthesizer</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>projectNotes</name>
     <message>
-        <source>Project notes</source>
-        <translation>Notas do proxecto</translation>
+        <source>Player for GIG files</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Put down your project notes here.</source>
-        <translation>Anote aquí as súas notas sobre o proxecto.</translation>
+        <source>A multitap echo delay plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Actions</source>
-        <translation>Editar as accións</translation>
+        <source>A native flanger plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Undo</source>
-        <translation>Desfa&amp;cer</translation>
+        <source>A native delay plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation>Ctrl+Z</translation>
+        <source>An oversampling bitcrusher</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Redo</source>
-        <translation>&amp;Refacer</translation>
+        <source>A native eq plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation>Ctrl+Y</translation>
-    </message>
-    <message>
-        <source>&amp;Copy</source>
-        <translation>&amp;Copiar</translation>
-    </message>
-    <message>
-        <source>Ctrl+C</source>
-        <translation>Ctrl+C</translation>
-    </message>
-    <message>
-        <source>Cu&amp;t</source>
-        <translation>Cor&amp;tar</translation>
-    </message>
-    <message>
-        <source>Ctrl+X</source>
-        <translation>Ctrl+X</translation>
-    </message>
-    <message>
-        <source>&amp;Paste</source>
-        <translation>A&amp;pegar</translation>
-    </message>
-    <message>
-        <source>Ctrl+V</source>
-        <translation>Ctrl+V</translation>
-    </message>
-    <message>
-        <source>Format Actions</source>
-        <translation>Accións de formato</translation>
-    </message>
-    <message>
-        <source>&amp;Bold</source>
-        <translation>&amp;Negrita</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
-    </message>
-    <message>
-        <source>&amp;Italic</source>
-        <translation>Cursi&amp;va</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <translation>Ctrl+I</translation>
-    </message>
-    <message>
-        <source>&amp;Underline</source>
-        <translation>S&amp;ubliñado</translation>
-    </message>
-    <message>
-        <source>Ctrl+U</source>
-        <translation>Ctrl+U</translation>
-    </message>
-    <message>
-        <source>&amp;Left</source>
-        <translation>&amp;Esquerda</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>C&amp;enter</source>
-        <translation>C&amp;entro</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>&amp;Right</source>
-        <translation>De&amp;reita</translation>
-    </message>
-    <message>
-        <source>Ctrl+R</source>
-        <translation>Ctrl+R</translation>
-    </message>
-    <message>
-        <source>&amp;Justify</source>
-        <translation>&amp;Xustificar</translation>
-    </message>
-    <message>
-        <source>Ctrl+J</source>
-        <translation>Ctrl+J</translation>
-    </message>
-    <message>
-        <source>&amp;Color...</source>
-        <translation>&amp;Cor...</translation>
+        <source>A 4-band Crossover Equalizer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>renameDialog</name>
+    <name>setupWidget</name>
     <message>
-        <source>Rename...</source>
-        <translation>Mudar o nome...</translation>
-    </message>
-</context>
-<context>
-    <name>setupDialog</name>
-    <message>
-        <source>Setup LMMS</source>
-        <translation>Configuración do LMMS</translation>
-    </message>
-    <message>
-        <source>General settings</source>
-        <translation>Configuración xeral</translation>
-    </message>
-    <message>
-        <source>BUFFER SIZE</source>
-        <translation>TAMAÑO DO BÚFER</translation>
-    </message>
-    <message>
-        <source>Reset to default-value</source>
-        <translation>Restaurar o valor por omisión</translation>
-    </message>
-    <message>
-        <source>MISC</source>
-        <translation>DIVERSOS</translation>
-    </message>
-    <message>
-        <source>Enable tooltips</source>
-        <translation>Activar as axudiñas</translation>
-    </message>
-    <message>
-        <source>Show restart warning after changing settings</source>
-        <translation>Mostrar o aviso sobre o reinicio despois de cambiar a configuración</translation>
-    </message>
-    <message>
-        <source>Display volume as dBV </source>
-        <translation>Mostrar o volume como dBV </translation>
-    </message>
-    <message>
-        <source>Compress project files per default</source>
-        <translation>Comprimir os ficheiros dos proxectos por omisión</translation>
-    </message>
-    <message>
-        <source>HQ-mode for output audio-device</source>
-        <translation>Modo de calidade alta para o dispositivo de son de saída</translation>
-    </message>
-    <message>
-        <source>LMMS working directory</source>
-        <translation>Directorio de traballo do LMMS</translation>
-    </message>
-    <message>
-        <source>VST-plugin directory</source>
-        <translation>Directorio dos engadidos de VST</translation>
-    </message>
-    <message>
-        <source>Artwork directory</source>
-        <translation>Directorio do material gráfico</translation>
-    </message>
-    <message>
-        <source>FL Studio installation directory</source>
-        <translation>Directorio de instalación do FL Studio</translation>
-    </message>
-    <message>
-        <source>STK rawwave directory</source>
-        <translation>Directorio de ondas cruas de STK</translation>
-    </message>
-    <message>
-        <source>Performance settings</source>
-        <translation>Configuración do desempeño</translation>
-    </message>
-    <message>
-        <source>UI effects vs. performance</source>
-        <translation>Efectos da interface fronte a desempeño</translation>
-    </message>
-    <message>
-        <source>Audio settings</source>
-        <translation>Configuración do son</translation>
-    </message>
-    <message>
-        <source>AUDIO INTERFACE</source>
-        <translation>INTERFACE DO SON</translation>
-    </message>
-    <message>
-        <source>MIDI settings</source>
-        <translation>Configuración do MIDI</translation>
-    </message>
-    <message>
-        <source>MIDI INTERFACE</source>
-        <translation>INTERFACE MIDI</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>Aceptar</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Cancelar</translation>
-    </message>
-    <message>
-        <source>Restart LMMS</source>
-        <translation>Reiniciar o LMMS</translation>
-    </message>
-    <message>
-        <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
-        <translation>Teña en conta que a maioría dos cambios non serán efectivos até que se reinicie o LMMS!</translation>
-    </message>
-    <message>
-        <source>Frames: %1
-Latency: %2 ms</source>
-        <translation>Cadencia: %1
-Latencia: %2 ms</translation>
-    </message>
-    <message>
-        <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation>Aquí pódese configurar o tamaño do búfer interno empregado polo LMMS. Valores máis pequenos resultan nunha latencia menor mais poden tamén causar son non usábel ou desempeño inadecuado, especialmente en computadores vellos ou en sistemas cun kernel que non sexa de tempo real.</translation>
-    </message>
-    <message>
-        <source>Choose LMMS working directory</source>
-        <translation>Escoller o directorio de traballo do LMMS</translation>
-    </message>
-    <message>
-        <source>Choose your VST-plugin directory</source>
-        <translation>Escoller o directorio dos engadidos de VST</translation>
-    </message>
-    <message>
-        <source>Choose artwork-theme directory</source>
-        <translation>Escoller o directorio do material gráfico</translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
-        <translation>Escoller o directorio de instalación do FL Studio</translation>
-    </message>
-    <message>
-        <source>Choose LADSPA plugin directory</source>
-        <translation>Escoller o directorio dos engadidos de LADSPA</translation>
-    </message>
-    <message>
-        <source>Choose STK rawwave directory</source>
-        <translation>Escoller o directorio de ondas cruas de STK</translation>
-    </message>
-    <message>
-        <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
-        <translation>Aquí pódese escoller a interface de son preferida. Dependendo da configuración do sistema durante a compilación pódese escoller entre ALSA, JACK, OSS e máis. Embaixo vese unha caixa que oferece controles para configurar a interface de son escollida.</translation>
-    </message>
-    <message>
-        <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
-        <translation>Aquí pódese escoller a interface de MIDI preferida. Dependendo da configuración do sistema durante a compilación pódese escoller entre ALSA, OSS e máis. Embaixo vese unha caixa que oferece controles para configurar a interface de MIDI escollida.</translation>
-    </message>
-    <message>
-        <source>Paths</source>
-        <translation>Rutas</translation>
-    </message>
-    <message>
-        <source>LADSPA plugin paths</source>
-        <translation>Rutas aos engadidos de LADSPA</translation>
-    </message>
-    <message>
-        <source>Default Soundfont File</source>
-        <translation>Ficheiro Soundfont por omisión</translation>
-    </message>
-    <message>
-        <source>Background artwork</source>
-        <translation>Gráficos do fondo</translation>
-    </message>
-    <message>
-        <source>Choose default SoundFont</source>
-        <translation>Escoller a SoundFont por omisión</translation>
-    </message>
-    <message>
-        <source>Choose background artwork</source>
-        <translation>Escoller os gráficos do fondo</translation>
-    </message>
-    <message>
-        <source>One instrument track window mode</source>
+        <source>JACK (JACK Audio Connection Kit)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Compact track buttons</source>
+        <source>OSS Raw-MIDI (Open Sound System)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sync VST plugins to host playback</source>
+        <source>SDL (Simple DirectMedia Layer)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Smooth scroll in Song Editor</source>
+        <source>PulseAudio (bad latency!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable auto save feature</source>
+        <source>Dummy (no MIDI support)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show playback cursor in AudioFileProcessor</source>
+        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable note labels in piano roll</source>
+        <source>PortAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable waveform display by default</source>
+        <source>Dummy (no sound output)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep effects running even without input</source>
+        <source>ALSA (Advanced Linux Sound Architecture)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSS (Open Sound System)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WinMM MIDI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7434,6 +8625,10 @@ Latencia: %2 ms</translation>
     <message>
         <source>Chorus Depth</source>
         <translation>Profundidade do coro</translation>
+    </message>
+    <message>
+        <source>A soundfont %1 could not be loaded.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7681,77 +8876,6 @@ Latencia: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>song</name>
-    <message>
-        <source>Tempo</source>
-        <translation>Tempo</translation>
-    </message>
-    <message>
-        <source>Master volume</source>
-        <translation>Volume global</translation>
-    </message>
-    <message>
-        <source>Master pitch</source>
-        <translation>Altura global</translation>
-    </message>
-    <message>
-        <source>Project saved</source>
-        <translation>Proxecto gravado</translation>
-    </message>
-    <message>
-        <source>The project %1 is now saved.</source>
-        <translation>O proxecto %1 xa está gravado.</translation>
-    </message>
-    <message>
-        <source>Project NOT saved.</source>
-        <translation>O proxecto NON está gravado.</translation>
-    </message>
-    <message>
-        <source>The project %1 was not saved!</source>
-        <translation>O proxecto %1 no nestá gravado!</translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation>Importar un ficheiro</translation>
-    </message>
-    <message>
-        <source>untitled</source>
-        <translation>sen título</translation>
-    </message>
-    <message>
-        <source>Select file for project-export...</source>
-        <translation>Escolla o ficheiro para a exportación do proxecto...</translation>
-    </message>
-    <message>
-        <source>Empty project</source>
-        <translation>Proxecto baleiro</translation>
-    </message>
-    <message>
-        <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
-        <translation>Este proxecto está baleiro, polo que exportalo non ten xeito. Poña algo primeiro no Editor de cancións!</translation>
-    </message>
-    <message>
-        <source>MIDI sequences</source>
-        <translation>Secuencias de MIDI</translation>
-    </message>
-    <message>
-        <source>FL Studio projects</source>
-        <translation>Proxectos de FL Studio</translation>
-    </message>
-    <message>
-        <source>All file types</source>
-        <translation>Todos os tipos de ficheiro</translation>
-    </message>
-    <message>
-        <source>Hydrogen projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>stereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
@@ -7808,149 +8932,6 @@ Latencia: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>timeLine</name>
-    <message>
-        <source>Enable/disable auto-scrolling</source>
-        <translation>Activar/Desactivar o desprazamento automático</translation>
-    </message>
-    <message>
-        <source>Enable/disable loop-points</source>
-        <translation>Activar/Desactivar os puntos de bucle</translation>
-    </message>
-    <message>
-        <source>After stopping go back to begin</source>
-        <translation>Despois de parar voltar ao principio</translation>
-    </message>
-    <message>
-        <source>After stopping go back to position at which playing was started</source>
-        <translation>Despois de parar voltar á posición na que se iniciou a reprodución</translation>
-    </message>
-    <message>
-        <source>After stopping keep position</source>
-        <translation>Despois de parar manter a posición</translation>
-    </message>
-    <message>
-        <source>Hint</source>
-        <translation>Suxestión</translation>
-    </message>
-    <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>track</name>
-    <message>
-        <source>Muted</source>
-        <translation>Silenciado</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation>Solo</translation>
-    </message>
-</context>
-<context>
-    <name>trackContentObject</name>
-    <message>
-        <source>Muted</source>
-        <translation>Silenciado</translation>
-    </message>
-</context>
-<context>
-    <name>trackContentObjectView</name>
-    <message>
-        <source>Current position</source>
-        <translation>Posición actual</translation>
-    </message>
-    <message>
-        <source>Hint</source>
-        <translation>Suxestión</translation>
-    </message>
-    <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation>Prema &lt;Ctrl&gt; e arrastre para facer unha copia.</translation>
-    </message>
-    <message>
-        <source>Current length</source>
-        <translation>Duración actual</translation>
-    </message>
-    <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation>Prema &lt;Ctrl&gt; para modificar o tamaño libremente</translation>
-    </message>
-    <message>
-        <source>%1:%2 (%3:%4 to %5:%6)</source>
-        <translation>%1:%2 (%3:%4 a %5:%6)</translation>
-    </message>
-    <message>
-        <source>Delete (middle mousebutton)</source>
-        <translation>Eliminar (botón do medio do rato)</translation>
-    </message>
-    <message>
-        <source>Cut</source>
-        <translation>Recortar</translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation>Copiar</translation>
-    </message>
-    <message>
-        <source>Paste</source>
-        <translation>Apegar</translation>
-    </message>
-    <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Silenciar/Darlle volume (&lt;Ctrl&gt; + botón central do rato)</translation>
-    </message>
-</context>
-<context>
-    <name>trackOperationsWidget</name>
-    <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation>Prema &lt;Ctrl&gt; mentres ten a asa de mover premida para iniciar unha acción de arrastrar e soltar.</translation>
-    </message>
-    <message>
-        <source>Actions for this track</source>
-        <translation>Accións para esta pista</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Silenciar</translation>
-    </message>
-    <message>
-        <source>Mute this track</source>
-        <translation>Silenciar esta pista</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation>Solo</translation>
-    </message>
-    <message>
-        <source>Clone this track</source>
-        <translation>Clonar esta pista</translation>
-    </message>
-    <message>
-        <source>Remove this track</source>
-        <translation>Eliminar esta pista</translation>
-    </message>
-    <message>
-        <source>Clear this track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn all recording on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn all recording off</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>vestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
@@ -7959,16 +8940,6 @@ Latencia: %2 ms</translation>
     <message>
         <source>Please wait while loading VST-plugin...</source>
         <translation>Agarde mentres se carga o engadido de VST...</translation>
-    </message>
-    <message>
-        <source>Failed loading VST-plugin</source>
-        <translation>Fallou a carga do engadido de VST</translation>
-    </message>
-    <message>
-        <source>The VST-plugin %1 could not be loaded for some reason.
-If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
-        <translation>Non foi posíbel cargar o engadido de VST %1 por algunha razón.
-Se funciona con outro software de VST en Linux, contacte cun desenvolvedor do LMMS!</translation>
     </message>
 </context>
 <context>
@@ -8197,10 +9168,6 @@ O LED do recanto inferior dereito do editor da forma da onda determina se a cord
         <translation>Prema aquí para normalizar a forma da onda.</translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
-    </message>
-    <message>
         <source>Use a sine-wave for current oscillator.</source>
         <translation>Empregar unha onda senoidal para este oscilador.</translation>
     </message>
@@ -8223,17 +9190,6 @@ O LED do recanto inferior dereito do editor da forma da onda determina se a cord
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
         <translation>Empregar unha forma de onda predefinida para este oscilador.</translation>
-    </message>
-</context>
-<context>
-    <name>visualizationWidget</name>
-    <message>
-        <source>click to enable/disable visualization of master-output</source>
-        <translation>Prema para des/activar a visualización da saída global</translation>
-    </message>
-    <message>
-        <source>Click to enable</source>
-        <translation>Prema para activar</translation>
     </message>
 </context>
 <context>

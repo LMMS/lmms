@@ -107,7 +107,7 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		grouper->setAlignment( Qt::Vertical );
 
 		for( control_list_t::iterator it = controls.begin(); 
-						it != controls.end(); it++ )
+						it != controls.end(); ++it )
 		{
 			if( (*it)->port()->proc == proc )
 			{

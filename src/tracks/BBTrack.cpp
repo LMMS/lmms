@@ -34,6 +34,7 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "RenameDialog.h"
 #include "Song.h"
@@ -58,6 +59,7 @@ BBTCO::BBTCO( Track * _track ) :
 		changeLength( MidiTime( t, 0 ) );
 		restoreJournallingState();
 	}
+	setAutoResize( false );
 }
 
 
@@ -215,18 +217,23 @@ void BBTCOView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	QColor col = m_bbTCO->m_useStyleColor 
-		? p.pen().brush().color()
-		: m_bbTCO->colorObj();
-
+	QColor col;
 	if( m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted() )
 	{
 		col = QColor( 160, 160, 160 );
 	}
+	else if ( m_bbTCO->m_useStyleColor )
+	{
+		col =  p.pen().brush().color();
+	}
+	else
+	{
+		col = m_bbTCO->colorObj();
+	}
+
 	if( isSelected() == true )
 	{
-		col = QColor( qMax( col.red() - 128, 0 ),
-					qMax( col.green() - 128, 0 ), 255 );
+		col.setRgb( qMax( col.red() - 128, 0 ), qMax( col.green() - 128, 0 ), 255 );
 	}
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
@@ -275,7 +282,7 @@ void BBTCOView::openInBBEditor()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
 
-	Engine::mainWindow()->toggleBBEditorWin( true );
+	gui->mainWindow()->toggleBBEditorWin( true );
 }
 
 
@@ -310,7 +317,7 @@ void BBTCOView::changeColor()
 	if( isSelected() )
 	{
 		QVector<selectableObject *> selected =
-				Engine::songEditor()->selectedObjects();
+				gui->songEditor()->m_editor->selectedObjects();
 		for( QVector<selectableObject *>::iterator it =
 							selected.begin();
 						it != selected.end(); ++it )
@@ -599,7 +606,7 @@ BBTrackView::BBTrackView( BBTrack * _bbt, TrackContainerView* tcv ) :
 
 BBTrackView::~BBTrackView()
 {
-	Engine::getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	gui->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 }
 
 
@@ -607,7 +614,7 @@ BBTrackView::~BBTrackView()
 
 bool BBTrackView::close()
 {
-	Engine::getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	gui->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 	return TrackView::close();
 }
 
@@ -617,7 +624,7 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	Engine::getBBEditor()->show();
+	gui->getBBEditor()->show();
 /*	foreach( bbTrackView * tv,
 			trackContainerView()->findChildren<bbTrackView *>() )
 	{

@@ -48,7 +48,7 @@ StereoDelay::~StereoDelay()
 {
 	if( m_buffer )
 	{
-		delete m_buffer;
+		delete[] m_buffer;
 	}
 }
 
@@ -84,7 +84,7 @@ void StereoDelay::setSampleRate( int sampleRate )
 {
 	if( m_buffer )
 	{
-		delete m_buffer;
+		delete[] m_buffer;
 	}
 
 	int bufferSize = ( int )( sampleRate * m_maxTime );

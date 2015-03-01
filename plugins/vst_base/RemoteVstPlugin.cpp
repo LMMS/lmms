@@ -1877,6 +1877,13 @@ int main( int _argc, char * * _argv )
 #endif
 #endif
 
+#ifdef LMMS_BUILD_WIN32
+	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
+	{
+		printf( "Notice: could not set high priority.\n" );
+	}
+#endif
+
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );

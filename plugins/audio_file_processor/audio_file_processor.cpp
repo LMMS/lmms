@@ -234,6 +234,14 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	if( _this.attribute( "src" ) != "" )
 	{
 		setAudioFile( _this.attribute( "src" ), false );
+
+		QString absolutePath = m_sampleBuffer.tryToMakeAbsolute( m_sampleBuffer.audioFile() );
+		if ( !QFileInfo( absolutePath ).exists() )
+		{
+			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
+
+			Engine::getSong()->collectError( message );
+		}
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{

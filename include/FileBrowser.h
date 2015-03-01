@@ -50,7 +50,7 @@ class FileBrowser : public SideBarWidget
 public:
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false );
+			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
 	virtual ~FileBrowser();
 
 
@@ -73,6 +73,7 @@ private:
 	QString m_filter;
 
 	bool m_dirsAsItems;
+	bool m_recurse;
 
 } ;
 
@@ -160,6 +161,8 @@ private:
 
 	QStringList m_directories;
 	QString m_filter;
+
+	int m_dirCount;
 
 } ;
 

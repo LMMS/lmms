@@ -33,7 +33,7 @@
 
 #include "export.h"
 
-class AutomationEditor;
+class AutomationEditorWindow;
 class BBEditor;
 class BBTrackContainer;
 class DummyTrackContainer;
@@ -42,10 +42,10 @@ class FxMixerView;
 class ProjectJournal;
 class MainWindow;
 class Mixer;
-class PianoRoll;
+class PianoRollWindow;
 class ProjectNotes;
 class Song;
-class SongEditor;
+class SongEditorWindow;
 class Ladspa2LMMS;
 class ControllerRackView;
 
@@ -53,23 +53,10 @@ class ControllerRackView;
 class EXPORT Engine
 {
 public:
-	static void init( const bool _has_gui = true );
+	static void init();
 	static void destroy();
 
-	static bool hasGUI()
-	{
-		return s_hasGUI;
-	}
-
-	static void setSuppressMessages( bool _on )
-	{
-		s_suppressMessages = _on;
-	}
-
-	static bool suppressMessages()
-	{
-		return !s_hasGUI || s_suppressMessages;
-	}
+	static bool hasGUI();
 
 	// core
 	static Mixer *mixer()
@@ -97,42 +84,6 @@ public:
 		return s_projectJournal;
 	}
 
-	// GUI
-	static MainWindow * mainWindow()
-	{
-		return s_mainWindow;
-	}
-
-	static FxMixerView * fxMixerView()
-	{
-		return s_fxMixerView;
-	}
-
-	static SongEditor* songEditor()
-	{
-		return s_songEditor;
-	}
-
-	static BBEditor * getBBEditor()
-	{
-		return s_bbEditor;
-	}
-
-	static PianoRoll* pianoRoll()
-	{
-		return s_pianoRoll;
-	}
-
-	static ProjectNotes * getProjectNotes()
-	{
-		return s_projectNotes;
-	}
-
-	static AutomationEditor * automationEditor()
-	{
-		return s_automationEditor;
-	}
-
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
@@ -141,11 +92,6 @@ public:
 	static DummyTrackContainer * dummyTrackContainer()
 	{
 		return s_dummyTC;
-	}
-
-	static ControllerRackView * getControllerRackView()
-	{
-		return s_controllerRackView;
 	}
 
 	static float framesPerTick()
@@ -171,8 +117,6 @@ private:
 		delete tmp;
 	}
 
-	static bool s_hasGUI;
-	static bool s_suppressMessages;
 	static float s_framesPerTick;
 
 	// core
@@ -182,23 +126,15 @@ private:
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
-	static ControllerRackView * s_controllerRackView;
 
-	// GUI
-	static MainWindow * s_mainWindow;
-	static FxMixerView * s_fxMixerView;
-	static SongEditor* s_songEditor;
-	static AutomationEditor * s_automationEditor;
-	static BBEditor * s_bbEditor;
-	static PianoRoll* s_pianoRoll;
-	static ProjectNotes * s_projectNotes;
 	static Ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_pluginFileHandling;
 
 	static void initPluginFileHandling();
 
-} ;
+	friend class GuiApplication;
+};
 
 
 

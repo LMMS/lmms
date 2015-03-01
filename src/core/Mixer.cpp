@@ -37,6 +37,7 @@
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
+#include "GuiApplication.h"
 #include "PianoRoll.h"
 
 // platform-specific audio-interface-classes
@@ -323,7 +324,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	Song::PlayPos p = Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern );
 	if( Engine::getSong()->playMode() == Song::Mode_PlayPattern &&
-		Engine::pianoRoll()->isRecording() == true &&
+		gui->pianoRoll()->isRecording() == true &&
 		p != last_metro_pos )
 	{
 		if ( p.getTicks() % (MidiTime::ticksPerTact() / 1 ) == 0 )

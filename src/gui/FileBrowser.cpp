@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -62,11 +63,12 @@ enum TreeWidgetItemTypes
 
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items ) :
+			QWidget * parent, bool dirs_as_items, bool recurse ) :
 	SideBarWidget( title, pm, parent ),
 	m_directories( directories ),
 	m_filter( filter ),
-	m_dirsAsItems( dirs_as_items )
+	m_dirsAsItems( dirs_as_items ),
+	m_recurse( recurse )
 {
 	setWindowTitle( tr( "Browser" ) );
 	m_l = new FileBrowserTreeWidget( contentParent() );
@@ -233,6 +235,19 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
+	for(int i = 0; i < m_l->topLevelItemCount(); ++i)
+	{
+		if ( m_recurse )
+		{
+			m_l->topLevelItem( i )->setExpanded( true);
+		}
+		Directory *d = dynamic_cast<Directory *> ( m_l->topLevelItem( i ) );
+		if( d )
+		{
+			d->update();
+			d->setExpanded( false );
+		}
+	}
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
@@ -244,8 +259,7 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_l->addTopLevelItem( new Directory( path,
-						QString::null, m_filter ) );
+		m_l->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
 		return;
 	}
 
@@ -264,23 +278,27 @@ void FileBrowser::addItems(const QString & path )
 						m_l->topLevelItem( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
-					m_l->insertTopLevelItem( i,
-						new Directory( cur_file, path,
-								m_filter ) );
+					Directory *dd = new Directory( cur_file, path,
+												   m_filter );
+					m_l->insertTopLevelItem( i,dd );
+					dd->update();
 					orphan = false;
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
 					d->addDirectory( path );
+					d->update();
 					orphan = false;
 					break;
 				}
 			}
 			if( orphan )
 			{
-				m_l->addTopLevelItem( new Directory( cur_file,
-							path, m_filter ) );
+				Directory *d = new Directory( cur_file,
+											  path, m_filter );
+				d->update();
+				m_l->addTopLevelItem( d );
 			}
 		}
 	}
@@ -347,6 +365,7 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
+
 }
 
 
@@ -549,7 +568,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( Engine::mainWindow()->mayChangeProject() )
+			if( gui->mainWindow()->mayChangeProject() )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -580,7 +599,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 
 		case FileItem::ImportAsProject:
 			if( f->type() == FileItem::FlpFile &&
-				!Engine::mainWindow()->mayChangeProject() )
+				!gui->mainWindow()->mayChangeProject() )
 			{
 				break;
 			}
@@ -663,7 +682,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			Engine::mainWindow()->workspace()->
+			gui->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -708,7 +727,8 @@ Directory::Directory(const QString & filename, const QString & path,
 						const QString & filter ) :
 	QTreeWidgetItem( QStringList( filename ), TypeDirectoryItem ),
 	m_directories( path ),
-	m_filter( filter )
+	m_filter( filter ),
+	m_dirCount( 0 )
 {
 	initPixmaps();
 
@@ -762,6 +782,7 @@ void Directory::update( void )
 	setIcon( 0, *s_folderOpenedPixmap );
 	if( !childCount() )
 	{
+		m_dirCount = 0;
 		for( QStringList::iterator it = m_directories.begin();
 					it != m_directories.end(); ++it )
 		{
@@ -776,7 +797,7 @@ void Directory::update( void )
 						"--- Factory files ---" ) );
 				sep->setIcon( 0, embed::getIconPixmap(
 							"factory_files" ) );
-				insertChild( top_index, sep );
+				insertChild(  m_dirCount + top_index - 1, sep );
 			}
 		}
 	}
@@ -814,6 +835,9 @@ bool Directory::addItems(const QString & path )
 					insertChild( i, new Directory( cur_file,
 							path, m_filter ) );
 					orphan = false;
+					m_dirCount++;
+					//recurse for each dir
+					addItems( path + cur_file + QDir::separator() );
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
@@ -827,6 +851,9 @@ bool Directory::addItems(const QString & path )
 			{
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
+				m_dirCount++;
+				//recurse for each dir
+				addItems( path + cur_file + QDir::separator() );
 			}
 
 			added_something = true;

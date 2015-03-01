@@ -30,8 +30,11 @@
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
+
+#include "AutomationEditor.h"
 
 
 
@@ -177,7 +180,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( (QWidget*) Engine::mainWindow(), m );
+	ControllerConnectionDialog d( gui->mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{
@@ -224,7 +227,9 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
-	AutomationPattern::globalAutomationPattern( m_amv->modelUntyped() )->openInAutomationEditor();
+	gui->automationEditor()->open(
+				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
+	);
 }
 
 

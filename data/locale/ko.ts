@@ -49,6 +49,14 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>LMMS</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Involved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contributors ordered by number of commits:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AmplifierControlDialog</name>
@@ -219,9 +227,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation type="unfinished">클라이언트명</translation>
@@ -321,16 +326,31 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationEditor</name>
     <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation type="unfinished">제어 문맥 메뉴를 가진 자동화 패턴으로 열어주세요!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation type="unfinished">복사된 값</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation type="unfinished">전체 선택된 값을 클립보드로 복사했습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationEditorWindow</name>
+    <message>
         <source>Play/pause current pattern (Space)</source>
         <translation type="unfinished">현재 패턴 재생/잠시 중지 (Space)</translation>
     </message>
     <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished">현재 패턴 재생을 중지 (Space)</translation>
-    </message>
-    <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">현재 패턴 재생을 중지 (Space)</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
@@ -345,56 +365,28 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished">지우기 모드 (Shift+E)</translation>
     </message>
     <message>
+        <source>Flip vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip horizontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the pattern will be reversed. The points are flipped in the x direction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">선택된 값 잘라내기 (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">선택된 값 복사 (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">클립보드에서 값 붙여넣기 (Ctrl+V)</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">자동화 편집기 - 패턴 없음</translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation type="unfinished">자동화 편집기 - %1</translation>
-    </message>
-    <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation type="unfinished">제어 문맥 메뉴를 가진 자동화 패턴으로 열어주세요!</translation>
-    </message>
-    <message>
-        <source>Values copied</source>
-        <translation type="unfinished">복사된 값</translation>
-    </message>
-    <message>
-        <source>All selected values were copied to the clipboard.</source>
-        <translation type="unfinished">전체 선택된 값을 클립보드로 복사했습니다.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
@@ -409,7 +401,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tension: </source>
+        <source>Tension value for spline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -425,12 +421,40 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tension value for spline</source>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation type="unfinished">선택된 값 잘라내기 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation type="unfinished">선택된 값 복사 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard Ctrl+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A higher tension value may make a smoother curve but overshoot some values.  A low tension value will cause the slope of the curve to level off at each control point.</source>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tension: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation type="unfinished">자동화 편집기 - 패턴 없음</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation type="unfinished">자동화 편집기 - %1</translation>
     </message>
 </context>
 <context>
@@ -478,12 +502,93 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Set/clear record</source>
         <translation type="unfinished">녹음 설정/해제</translation>
     </message>
+    <message>
+        <source>Flip Vertically (Visible)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Horizontally (Visible)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
         <translation type="unfinished">자동화 트랙</translation>
+    </message>
+</context>
+<context>
+    <name>BBEditor</name>
+    <message>
+        <source>Beat+Bassline Editor</source>
+        <translation type="unfinished">Beat+Bassline 편집기</translation>
+    </message>
+    <message>
+        <source>Play/pause current beat/bassline (Space)</source>
+        <translation type="unfinished">현재 beat/bassline 재생/잠시 정지(Space)</translation>
+    </message>
+    <message>
+        <source>Stop playback of current beat/bassline (Space)</source>
+        <translation type="unfinished">현재 beat/bassline 재생 중지 (Space)</translation>
+    </message>
+    <message>
+        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
+        <translation type="unfinished">현재 beat/bassline를 재생하기 위하여 여기를 클릭. beat/bassline은 끝에 도달시 자동으로 반복됩니다.</translation>
+    </message>
+    <message>
+        <source>Click here to stop playing of current beat/bassline.</source>
+        <translation type="unfinished">현재 beat/bassline 재생을 정지하기 위하여 여기를 클릭.</translation>
+    </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation type="unfinished">beat/bassline 더하기</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation type="unfinished">자동화 트랙 더하기</translation>
+    </message>
+    <message>
+        <source>Remove steps</source>
+        <translation type="unfinished">단계 제거</translation>
+    </message>
+    <message>
+        <source>Add steps</source>
+        <translation type="unfinished">단계 더하기</translation>
+    </message>
+</context>
+<context>
+    <name>BBTCOView</name>
+    <message>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation type="unfinished">Beat+Bassline 편집기에서 ㅇ려기</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation type="unfinished">이름 초기화</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation type="unfinished">이름 변경</translation>
+    </message>
+    <message>
+        <source>Change color</source>
+        <translation type="unfinished">색상 변경</translation>
+    </message>
+    <message>
+        <source>Reset color to default</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BBTrack</name>
+    <message>
+        <source>Beat/Bassline %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -526,6 +631,100 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Ratio</source>
         <translation type="unfinished">비</translation>
+    </message>
+</context>
+<context>
+    <name>BitcrushControlDialog</name>
+    <message>
+        <source>IN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation type="unfinished">이득</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Noise:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Clip:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished">비</translation>
+    </message>
+    <message>
+        <source>Rate Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable samplerate-crushing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable bitdepth-crushing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo difference:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Levels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Levels:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CaptionMenu</name>
+    <message>
+        <source>&amp;Help</source>
+        <translation type="unfinished">도움말(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Help (not available)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -646,9 +845,125 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>&amp;Remove this plugin</source>
         <translation type="unfinished">이 플러그인 제거(&amp;R)</translation>
     </message>
+</context>
+<context>
+    <name>CrossoverEQControlDialog</name>
     <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">도움말(&amp;H)</translation>
+        <source>Band 1/2 Crossover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 2/3 Crossover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 3/4 Crossover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 1 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 2 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 3 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 4 Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 1 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 2 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 3 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band 4 Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Band 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DelayControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DelayControlsDialog</name>
+    <message>
+        <source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished">비</translation>
+    </message>
+    <message>
+        <source>Lfo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Amt</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DetuningHelper</name>
+    <message>
+        <source>Note detuning</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -774,6 +1089,60 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Vocal Formant Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x Moog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV BandPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV HighPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV Notch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Formant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tripole</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DummyEffect</name>
+    <message>
+        <source>NOT FOUND</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Editor</name>
+    <message>
+        <source>Play (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record while playing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -902,10 +1271,6 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>&amp;Remove this plugin</source>
         <translation type="unfinished">이 플러그인 제거(&amp;R)</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">도움말(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -1147,6 +1512,255 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
+    <name>EqControls</name>
+    <message>
+        <source>Input gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low shelf gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Shelf gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Shelf res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Shelf res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Shelf freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High shelf freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low shelf active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4 active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High shelf active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP 24</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP 48</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP 24</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP 48</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>low pass type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>high pass type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EqControlsDialog</name>
+    <message>
+        <source>HP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Shelf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Peak 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Shelf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">이득</translation>
+    </message>
+    <message>
+        <source>Out Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance : </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency:</source>
+        <translation type="unfinished">주파수:</translation>
+    </message>
+    <message>
+        <source>12dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>24dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>48dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lp grp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hp grp</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EqParameterWidget</name>
+    <message>
+        <source>Hz </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExportProjectDialog</name>
     <message>
         <source>Export project</source>
@@ -1284,6 +1898,42 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>Export as loop (remove end silence)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Export between loop markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation type="unfinished">파일을 열 수 없음</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export project to %1</source>
+        <translation type="unfinished">%1로 프로젝트 내보내기</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Fader</name>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation type="unfinished">%1 과 %2 사이 새로운 값을 입력하시오:</translation>
+    </message>
 </context>
 <context>
     <name>FileBrowser</name>
@@ -1320,6 +1970,76 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
+    <name>FlangerControls</name>
+    <message>
+        <source>Delay Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation type="unfinished">잡음</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FlangerControlsDialog</name>
+    <message>
+        <source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lfo:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amt:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation type="unfinished">잡음</translation>
+    </message>
+    <message>
+        <source>White Noise Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
@@ -1352,8 +2072,8 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">도움말(&amp;H)</translation>
+        <source>Remove &amp;unused channels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1381,9 +2101,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation type="unfinished"></translation>
@@ -1396,11 +2113,81 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Mute this FX channel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">솔로</translation>
+    </message>
+    <message>
+        <source>Solo FX channel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GigInstrument</name>
+    <message>
+        <source>Bank</source>
+        <translation type="unfinished">뱅크</translation>
+    </message>
+    <message>
+        <source>Patch</source>
+        <translation type="unfinished">패치</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">이득</translation>
+    </message>
+</context>
+<context>
+    <name>GigInstrumentView</name>
+    <message>
+        <source>Open other GIG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to open another GIG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the patch</source>
+        <translation type="unfinished">패치 선택</translation>
+    </message>
+    <message>
+        <source>Click here to change which patch of the GIG file to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change which instrument of the GIG file is being played</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Which GIG file is currently being used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Which patch of the GIG file is currently being used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">이득</translation>
+    </message>
+    <message>
+        <source>Factor to multiply samples by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open GIG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GIG Files (*.gig)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1996,6 +2783,17 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
+    <name>InstrumentMiscView</name>
+    <message>
+        <source>MASTER PITCH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of Master Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>InstrumentSoundShaping</name>
     <message>
         <source>VOLUME</source>
@@ -2093,6 +2891,34 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Vocal Formant Filter</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>2x Moog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV LowPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV BandPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV HighPass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SV Notch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Formant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tripole</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstrumentSoundShapingView</name>
@@ -2181,6 +3007,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Pitch range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Pitch</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2317,6 +3147,29 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>MISC</source>
+        <translation type="unfinished">기타</translation>
+    </message>
+</context>
+<context>
+    <name>Knob</name>
+    <message>
+        <source>Set linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set logarithmic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation type="unfinished">-96.0 dBV 과 6.0 dBV 사이 새로운 값을 입력하시오:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation type="unfinished">%1 과 %2 사이 새로운 값을 입력하시오:</translation>
+    </message>
 </context>
 <context>
     <name>LadspaControl</name>
@@ -2353,10 +3206,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 </context>
 <context>
     <name>LadspaEffect</name>
-    <message>
-        <source>Effect</source>
-        <translation type="unfinished">효과</translation>
-    </message>
     <message>
         <source>Unknown LADSPA plugin %1 requested.</source>
         <translation type="unfinished">요청된 미지의 LADSPA 플러그인 %1</translation>
@@ -2479,10 +3328,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here for a a moog saw-wave.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Click here for an exponential wave.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2493,6 +3338,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>Click here for a user-defined shape.
 Double click to pick a file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a moog saw-wave.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2514,10 +3363,6 @@ Double click to pick a file.</source>
         <source>Could not save configuration file %1. You&apos;re probably not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Project</source>
-        <translation type="unfinished">프로젝트(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;New</source>
@@ -2562,10 +3407,6 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>&amp;Help</source>
         <translation type="unfinished">도움말(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Online help</source>
-        <translation type="unfinished">온라인 도움말</translation>
     </message>
     <message>
         <source>Help</source>
@@ -2672,14 +3513,6 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">마지막 저장 후 현재 프로젝트가 수정되었습니다. 지금 저장하겠습니까?</translation>
     </message>
     <message>
-        <source>Open project</source>
-        <translation type="unfinished">프로젝트 열기</translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation type="unfinished">프로젝트 저장</translation>
-    </message>
-    <message>
         <source>Help not available</source>
         <translation type="unfinished">도움말을 이용할 수 없습니다</translation>
     </message>
@@ -2690,51 +3523,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
     </message>
     <message>
-        <source>My projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My samples</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My presets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My computer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Root directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save as new &amp;version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E&amp;xport tracks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LMMS (*.mmp *.mmpz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project recovery</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>It looks like the last session did not end properly. Do you want to recover the project of this session?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2750,10 +3543,6 @@ LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Recently opened projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2763,6 +3552,62 @@ LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
     </message>
     <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Root Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Recently Opened Projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as New &amp;Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xport Tracks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What&apos;s This?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Project</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2800,7 +3645,7 @@ LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
     </message>
 </context>
 <context>
-    <name>MidiAlsaSeq::setupWidget</name>
+    <name>MidiAlsaSeq</name>
     <message>
         <source>DEVICE</source>
         <translation type="unfinished">기기</translation>
@@ -3268,6 +4113,98 @@ LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
         <source>Sub3-LFO2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sine wave</source>
+        <translation type="unfinished">사인 파형</translation>
+    </message>
+    <message>
+        <source>Bandlimited Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandlimited Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absolute sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation type="unfinished">삼각 파형</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation type="unfinished">톱니 파형</translation>
+    </message>
+    <message>
+        <source>Ramp wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation type="unfinished">사각 파형</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abs. sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Random</source>
+        <translation type="unfinished">무작위</translation>
+    </message>
+    <message>
+        <source>Random smooth</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MonstroView</name>
@@ -3437,6 +4374,41 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MultitapEchoControlDialog</name>
+    <message>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Step length:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dry Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowpass stages:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap left and right input channel for reflections</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3718,6 +4690,14 @@ use mouse wheel to set volume of a step</source>
         <source>DCAY</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TRES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Treshold:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PeakControllerEffectControls</name>
@@ -3749,29 +4729,13 @@ use mouse wheel to set volume of a step</source>
         <source>Amount Multiplicator</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Treshold</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PianoRoll</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>현재 패턴 재생/잠시 중지 (Space)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>현재 패턴 재생을 중지 (Space)</translation>
-    </message>
-    <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation>선택 박자를 잘라내기 (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation>선택 박자를 복사 (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation>클립보드에서 박자 붙여넣기 (Ctrl+V)</translation>
-    </message>
     <message>
         <source>Piano-Roll - no pattern</source>
         <translation>피아노-롤 - 패턴 없음</translation>
@@ -3785,56 +4749,8 @@ use mouse wheel to set volume of a step</source>
         <translation>이것을 이중 클릭을 함으로서 패턴을 열어주세요.</translation>
     </message>
     <message>
-        <source>Record notes from MIDI-device/channel-piano</source>
-        <translation>미디 기기/채널 피아노에서 박자 기록</translation>
-    </message>
-    <message>
-        <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
-        <translation>노래 또는 BB 트랙 재생시 미디 기기/채널에서 박자 기록</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>그리기 모드 (Shift+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>지우기 모드 (Shift+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>선택 모드 (Shift+S)</translation>
-    </message>
-    <message>
         <source>Last note</source>
         <translation>마지막 박자</translation>
-    </message>
-    <message>
-        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here to stop playback of current pattern.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
-        <translation></translation>
     </message>
     <message>
         <source>Note lock</source>
@@ -3846,26 +4762,6 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Note Panning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Detune mode (Shift+T)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3893,26 +4789,6 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Volume: %1%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3931,6 +4807,117 @@ use mouse wheel to set volume of a step</source>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation type="unfinished">%1 과 %2 사이 새로운 값을 입력하시오:</translation>
+    </message>
+</context>
+<context>
+    <name>PianoRollWindow</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished">현재 패턴 재생/잠시 중지 (Space)</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano</source>
+        <translation type="unfinished">미디 기기/채널 피아노에서 박자 기록</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
+        <translation type="unfinished">노래 또는 BB 트랙 재생시 미디 기기/채널에서 박자 기록</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">현재 패턴 재생을 중지 (Space)</translation>
+    </message>
+    <message>
+        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to stop playback of current pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished">그리기 모드 (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished">지우기 모드 (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished">선택 모드 (Shift+S)</translation>
+    </message>
+    <message>
+        <source>Detune mode (Shift+T)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut selected notes (Ctrl+X)</source>
+        <translation type="unfinished">선택 박자를 잘라내기 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected notes (Ctrl+C)</source>
+        <translation type="unfinished">선택 박자를 복사 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <translation type="unfinished">클립보드에서 박자 붙여넣기 (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3963,6 +4950,140 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PluginBrowser</name>
+    <message>
+        <source>Instrument plugins</source>
+        <translation type="unfinished">기기 플러그인</translation>
+    </message>
+    <message>
+        <source>Instrument browser</source>
+        <translation type="unfinished">기기 브라우저</translation>
+    </message>
+    <message>
+        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <translation type="unfinished">각 노래 편집기, Beat+Bassline 편집기 또는 기존 기기 트랙으로 끌기</translation>
+    </message>
+</context>
+<context>
+    <name>ProjectNotes</name>
+    <message>
+        <source>Project notes</source>
+        <translation type="unfinished">프로젝트 박자</translation>
+    </message>
+    <message>
+        <source>Put down your project notes here.</source>
+        <translation type="unfinished">프로젝트 박자를 여기에 두시오.</translation>
+    </message>
+    <message>
+        <source>Edit Actions</source>
+        <translation type="unfinished">작업 편집</translation>
+    </message>
+    <message>
+        <source>&amp;Undo</source>
+        <translation type="unfinished">작업 취소(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Ctrl+Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Redo</source>
+        <translation type="unfinished">작업 재실행(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Ctrl+Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished">복사(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Ctrl+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished">잘라내기(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Ctrl+X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished">붙여넣기(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Ctrl+V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Format Actions</source>
+        <translation type="unfinished">형식 작업</translation>
+    </message>
+    <message>
+        <source>&amp;Bold</source>
+        <translation type="unfinished">진하게(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Ctrl+B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Italic</source>
+        <translation type="unfinished">기울임(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Underline</source>
+        <translation type="unfinished">밑줄(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Ctrl+U</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Left</source>
+        <translation type="unfinished">왼쪽(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Ctrl+L</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C&amp;enter</source>
+        <translation type="unfinished">중앙(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Right</source>
+        <translation type="unfinished">오른쪽(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Ctrl+R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Justify</source>
+        <translation type="unfinished">양쪽 배분(&amp;J)</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Color...</source>
+        <translation type="unfinished">색상(&amp;C)...</translation>
     </message>
 </context>
 <context>
@@ -4116,6 +5237,13 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>RenameDialog</name>
+    <message>
+        <source>Rename...</source>
+        <translation type="unfinished">다른 이름으로...</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -4203,6 +5331,10 @@ Reason: &quot;%2&quot;</source>
         <source>Volume</source>
         <translation type="unfinished">볼륨</translation>
     </message>
+    <message>
+        <source>Panning</source>
+        <translation type="unfinished">패닝</translation>
+    </message>
 </context>
 <context>
     <name>SampleTrackView</name>
@@ -4218,33 +5350,310 @@ Reason: &quot;%2&quot;</source>
         <source>VOL</source>
         <translation type="unfinished">볼륨</translation>
     </message>
+    <message>
+        <source>Panning</source>
+        <translation type="unfinished">패닝</translation>
+    </message>
+    <message>
+        <source>Panning:</source>
+        <translation type="unfinished">패닝:</translation>
+    </message>
+    <message>
+        <source>PAN</source>
+        <translation type="unfinished">패닝</translation>
+    </message>
+</context>
+<context>
+    <name>SetupDialog</name>
+    <message>
+        <source>Setup LMMS</source>
+        <translation type="unfinished">LMMS 설정</translation>
+    </message>
+    <message>
+        <source>General settings</source>
+        <translation type="unfinished">일반 설정</translation>
+    </message>
+    <message>
+        <source>BUFFER SIZE</source>
+        <translation type="unfinished">버퍼 크기</translation>
+    </message>
+    <message>
+        <source>Reset to default-value</source>
+        <translation type="unfinished">기본값으로 초기화</translation>
+    </message>
+    <message>
+        <source>MISC</source>
+        <translation type="unfinished">기타</translation>
+    </message>
+    <message>
+        <source>Enable tooltips</source>
+        <translation type="unfinished">도구 도움말 가능</translation>
+    </message>
+    <message>
+        <source>Show restart warning after changing settings</source>
+        <translation type="unfinished">설정 변경후 재실행 경고 보이기</translation>
+    </message>
+    <message>
+        <source>Display volume as dBV </source>
+        <translation type="unfinished">dBV로 볼륨 보이기</translation>
+    </message>
+    <message>
+        <source>Compress project files per default</source>
+        <translation type="unfinished">기본 당 프로젝트 파일 압축</translation>
+    </message>
+    <message>
+        <source>One instrument track window mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HQ-mode for output audio-device</source>
+        <translation type="unfinished">출력 오디오 기기의 HQ 모드</translation>
+    </message>
+    <message>
+        <source>Compact track buttons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync VST plugins to host playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable note labels in piano roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable waveform display by default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep effects running even without input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create backup file when saving a project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LANGUAGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paths</source>
+        <translation type="unfinished">경로</translation>
+    </message>
+    <message>
+        <source>LMMS working directory</source>
+        <translation type="unfinished">LMMS 작업 폴더</translation>
+    </message>
+    <message>
+        <source>VST-plugin directory</source>
+        <translation type="unfinished">VST-플러그인 폴더</translation>
+    </message>
+    <message>
+        <source>Artwork directory</source>
+        <translation type="unfinished">아트작업 폴더</translation>
+    </message>
+    <message>
+        <source>Background artwork</source>
+        <translation type="unfinished">배경 아트워크</translation>
+    </message>
+    <message>
+        <source>FL Studio installation directory</source>
+        <translation type="unfinished">FL Studio 설치 폴더</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin paths</source>
+        <translation type="unfinished">LADSPA 플러그인 폴더</translation>
+    </message>
+    <message>
+        <source>STK rawwave directory</source>
+        <translation type="unfinished">STK 원시 파형 폴더</translation>
+    </message>
+    <message>
+        <source>Default Soundfont File</source>
+        <translation type="unfinished">기본 사운드글꼴 파일</translation>
+    </message>
+    <message>
+        <source>Performance settings</source>
+        <translation type="unfinished">실행 설정</translation>
+    </message>
+    <message>
+        <source>UI effects vs. performance</source>
+        <translation type="unfinished">UI 효과 대 실행</translation>
+    </message>
+    <message>
+        <source>Smooth scroll in Song Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto save feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show playback cursor in AudioFileProcessor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio settings</source>
+        <translation type="unfinished">오디오 설정</translation>
+    </message>
+    <message>
+        <source>AUDIO INTERFACE</source>
+        <translation type="unfinished">오디오 인터페이스</translation>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation type="unfinished">미디 설정</translation>
+    </message>
+    <message>
+        <source>MIDI INTERFACE</source>
+        <translation type="unfinished">미디 인터페이스</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">확인</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">취소</translation>
+    </message>
+    <message>
+        <source>Restart LMMS</source>
+        <translation type="unfinished">LMMS 재실행</translation>
+    </message>
+    <message>
+        <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
+        <translation type="unfinished">LMMS 재실행 전까지는 변경이 영향을 미치지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Frames: %1
+Latency: %2 ms</source>
+        <translation type="unfinished">
+		프레임: %1
+래턴시: %2 ms</translation>
+    </message>
+    <message>
+        <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose LMMS working directory</source>
+        <translation type="unfinished">LMMS 작업 폴더 선택</translation>
+    </message>
+    <message>
+        <source>Choose your VST-plugin directory</source>
+        <translation type="unfinished">VST 플러그인 폴더 선택</translation>
+    </message>
+    <message>
+        <source>Choose artwork-theme directory</source>
+        <translation type="unfinished">아트워크 테마 폴더 선택</translation>
+    </message>
+    <message>
+        <source>Choose FL Studio installation directory</source>
+        <translation type="unfinished">FL Studio 설치 폴더 선택</translation>
+    </message>
+    <message>
+        <source>Choose LADSPA plugin directory</source>
+        <translation type="unfinished">LADSPA 플러그인 폴더 선택</translation>
+    </message>
+    <message>
+        <source>Choose STK rawwave directory</source>
+        <translation type="unfinished">STK 원시 파형 폴더 선택</translation>
+    </message>
+    <message>
+        <source>Choose default SoundFont</source>
+        <translation type="unfinished">기본 사운드글꼴 선택</translation>
+    </message>
+    <message>
+        <source>Choose background artwork</source>
+        <translation type="unfinished">배경 아트워크 선택</translation>
+    </message>
+    <message>
+        <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Song</name>
+    <message>
+        <source>Tempo</source>
+        <translation type="unfinished">탬포</translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation type="unfinished">마스터 볼륨</translation>
+    </message>
+    <message>
+        <source>Master pitch</source>
+        <translation type="unfinished">마스터 피치</translation>
+    </message>
+    <message>
+        <source>Project saved</source>
+        <translation type="unfinished">저장된 프로젝트</translation>
+    </message>
+    <message>
+        <source>The project %1 is now saved.</source>
+        <translation type="unfinished">프로젝트 %1 이 지금 저장됨.</translation>
+    </message>
+    <message>
+        <source>Project NOT saved.</source>
+        <translation type="unfinished">프로젝트가 저장 안됨</translation>
+    </message>
+    <message>
+        <source>The project %1 was not saved!</source>
+        <translation type="unfinished">프로젝트 %1이 저장되지 않음!</translation>
+    </message>
+    <message>
+        <source>Import file</source>
+        <translation type="unfinished">파일 읽어오기</translation>
+    </message>
+    <message>
+        <source>MIDI sequences</source>
+        <translation type="unfinished">미디 시퀀스</translation>
+    </message>
+    <message>
+        <source>FL Studio projects</source>
+        <translation type="unfinished">FL Studio 프로젝트</translation>
+    </message>
+    <message>
+        <source>Hydrogen projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All file types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Empty project</source>
+        <translation type="unfinished">빈 프로젝트</translation>
+    </message>
+    <message>
+        <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
+        <translation type="unfinished">이 프로젝트가 비어있어 내보내기가 무의미함. 몇 항목을 노래 편집기에 우선 두세요!</translation>
+    </message>
+    <message>
+        <source>Select directory for writing exported tracks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>untitled</source>
+        <translation type="unfinished">무제</translation>
+    </message>
+    <message>
+        <source>Select file for project-export...</source>
+        <translation type="unfinished">내보내기 위한 프로젝트 파일 선택...</translation>
+    </message>
+    <message>
+        <source>The following errors occured while loading: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SongEditor</name>
-    <message>
-        <source>Song-Editor</source>
-        <translation>노래-편집기</translation>
-    </message>
-    <message>
-        <source>Play song (Space)</source>
-        <translation>노래 재생 (Space)</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop song (Space)</source>
-        <translation>노래 정지 (Space)</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Add sample-track</source>
-        <translation>샘플 트랙 더하기</translation>
-    </message>
     <message>
         <source>Could not open file</source>
         <translation>파일을 열 수 없음</translation>
@@ -4252,26 +5661,6 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Could not write file</source>
         <translation>파일을 쓸 수 없음</translation>
-    </message>
-    <message>
-        <source>Add automation-track</source>
-        <translation>자동화 트랙 더하기</translation>
-    </message>
-    <message>
-        <source>Draw mode</source>
-        <translation>그리기 모드</translation>
-    </message>
-    <message>
-        <source>Edit mode (select and move)</source>
-        <translation>편집 모드(선택 및 이동)</translation>
-    </message>
-    <message>
-        <source>Record samples from Audio-device</source>
-        <translation>오디오 기기에서 샘플 녹음</translation>
-    </message>
-    <message>
-        <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation>노래 재생 또는 BB트랙 동안 오디오 기기에서 샘플 녹음</translation>
     </message>
     <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
@@ -4285,10 +5674,6 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
-        <translation type="unfinished">beat/bassline 더하기</translation>
     </message>
     <message>
         <source>Tempo</source>
@@ -4340,6 +5725,57 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>SongEditorWindow</name>
+    <message>
+        <source>Song-Editor</source>
+        <translation type="unfinished">노래-편집기</translation>
+    </message>
+    <message>
+        <source>Play song (Space)</source>
+        <translation type="unfinished">노래 재생 (Space)</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device</source>
+        <translation type="unfinished">오디오 기기에서 샘플 녹음</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device while playing song or BB track</source>
+        <translation type="unfinished">노래 재생 또는 BB트랙 동안 오디오 기기에서 샘플 녹음</translation>
+    </message>
+    <message>
+        <source>Stop song (Space)</source>
+        <translation type="unfinished">노래 정지 (Space)</translation>
+    </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation type="unfinished">beat/bassline 더하기</translation>
+    </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation type="unfinished">샘플 트랙 더하기</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation type="unfinished">자동화 트랙 더하기</translation>
+    </message>
+    <message>
+        <source>Draw mode</source>
+        <translation type="unfinished">그리기 모드</translation>
+    </message>
+    <message>
+        <source>Edit mode (select and move)</source>
+        <translation type="unfinished">편집 모드(선택 및 이동)</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SpectrumAnalyzerControlDialog</name>
     <message>
         <source>Linear spectrum</source>
@@ -4363,6 +5799,13 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Channel mode</source>
         <translation type="unfinished">채널 모드</translation>
+    </message>
+</context>
+<context>
+    <name>TabWidget</name>
+    <message>
+        <source>Settings for %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4408,10 +5851,6 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">사용자...</translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">도움말(&amp;H)</translation>
-    </message>
-    <message>
         <source>Custom </source>
         <translation type="unfinished">사용자</translation>
     </message>
@@ -4449,6 +5888,52 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>click to change time units</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TimeLineWidget</name>
+    <message>
+        <source>Enable/disable auto-scrolling</source>
+        <translation type="unfinished">자동 스크롤링 가능/불가능</translation>
+    </message>
+    <message>
+        <source>Enable/disable loop-points</source>
+        <translation type="unfinished">순환 점 가능/불가능</translation>
+    </message>
+    <message>
+        <source>After stopping go back to begin</source>
+        <translation type="unfinished">중지 후 처음으로 뒤로 이동</translation>
+    </message>
+    <message>
+        <source>After stopping go back to position at which playing was started</source>
+        <translation type="unfinished">중지 후 재생을 시작한 위치로 뒤로 이동</translation>
+    </message>
+    <message>
+        <source>After stopping keep position</source>
+        <translation type="unfinished">중지 후 위치 유지</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation type="unfinished">힌트</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Track</name>
+    <message>
+        <source>Muted</source>
+        <translation type="unfinished">무음</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">솔로</translation>
     </message>
 </context>
 <context>
@@ -4490,6 +5975,107 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Importing FLP-file...</source>
         <translation type="unfinished">FLP 파일 읽어오는 중...</translation>
+    </message>
+</context>
+<context>
+    <name>TrackContentObject</name>
+    <message>
+        <source>Muted</source>
+        <translation type="unfinished">무음</translation>
+    </message>
+</context>
+<context>
+    <name>TrackContentObjectView</name>
+    <message>
+        <source>Current position</source>
+        <translation type="unfinished">현재 위치</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation type="unfinished">힌트</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
+        <translation type="unfinished">&lt;Ctrl&gt; 누르고 복사본을 만들기 위하여 끌기</translation>
+    </message>
+    <message>
+        <source>Current length</source>
+        <translation type="unfinished">현재 길이</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <translation type="unfinished">자유 크기 재조정하기 위하여 &lt;Ctrl&gt; 누르기</translation>
+    </message>
+    <message>
+        <source>%1:%2 (%3:%4 to %5:%6)</source>
+        <translation type="unfinished">%1:%2 (%3:%4 를 %5:%6 로)</translation>
+    </message>
+    <message>
+        <source>Delete (middle mousebutton)</source>
+        <translation type="unfinished">삭제 (중간 마우스버튼)</translation>
+    </message>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished">잘라내기</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished">복사</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished">붙여넣기</translation>
+    </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation type="unfinished">무음/무음해제 (&lt;Ctrl&gt; + 중간 클릭)</translation>
+    </message>
+</context>
+<context>
+    <name>TrackOperationsWidget</name>
+    <message>
+        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions for this track</source>
+        <translation type="unfinished">이 트랙의 작업</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished">무음</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation type="unfinished">솔로</translation>
+    </message>
+    <message>
+        <source>Mute this track</source>
+        <translation type="unfinished">이 트랙을 무음</translation>
+    </message>
+    <message>
+        <source>Clone this track</source>
+        <translation type="unfinished">이 트랙을 복제</translation>
+    </message>
+    <message>
+        <source>Remove this track</source>
+        <translation type="unfinished">이 트랙을 제거</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn all recording on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn all recording off</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4636,17 +6222,6 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>Ui</name>
-    <message>
-        <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Involved</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>VersionedSaveDialog</name>
     <message>
         <source>Increment version number</source>
@@ -4745,6 +6320,17 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source> - VST plugin control</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VisualizationWidget</name>
+    <message>
+        <source>click to enable/disable visualization of master-output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to enable</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4854,11 +6440,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed loading VST plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The VST plugin %1 could not be loaded for some reason.</source>
+        <source>The VST plugin %1 could not be loaded.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5264,77 +6846,8 @@ Please make sure you have read-permission to the file and the directory containi
         <source>Sinc</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>bbEditor</name>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation>Beat+Bassline 편집기</translation>
-    </message>
-    <message>
-        <source>Play/pause current beat/bassline (Space)</source>
-        <translation>현재 beat/bassline 재생/잠시 정지(Space)</translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
-        <translation>beat/bassline 더하기</translation>
-    </message>
-    <message>
-        <source>Add automation-track</source>
-        <translation>자동화 트랙 더하기</translation>
-    </message>
-    <message>
-        <source>Stop playback of current beat/bassline (Space)</source>
-        <translation>현재 beat/bassline 재생 중지 (Space)</translation>
-    </message>
-    <message>
-        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation>현재 beat/bassline를 재생하기 위하여 여기를 클릭. beat/bassline은 끝에 도달시 자동으로 반복됩니다.</translation>
-    </message>
-    <message>
-        <source>Click here to stop playing of current beat/bassline.</source>
-        <translation>현재 beat/bassline 재생을 정지하기 위하여 여기를 클릭.</translation>
-    </message>
-    <message>
-        <source>Remove steps</source>
-        <translation type="unfinished">단계 제거</translation>
-    </message>
-    <message>
-        <source>Add steps</source>
-        <translation type="unfinished">단계 더하기</translation>
-    </message>
-</context>
-<context>
-    <name>bbTCOView</name>
-    <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation>Beat+Bassline 편집기에서 ㅇ려기</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>이름 초기화</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>이름 변경</translation>
-    </message>
-    <message>
-        <source>Change color</source>
-        <translation>색상 변경</translation>
-    </message>
-    <message>
-        <source>Reset color to default</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>bbTrack</name>
-    <message>
-        <source>Beat/Bassline %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Clone of %1</source>
+        <source>Sample not found: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5535,41 +7048,6 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>exportProjectDialog</name>
-    <message>
-        <source>Could not open file</source>
-        <translation type="unfinished">파일을 열 수 없음</translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rendering: %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export project to %1</source>
-        <translation type="unfinished">%1로 프로젝트 내보내기</translation>
-    </message>
-</context>
-<context>
-    <name>fader</name>
-    <message>
-        <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">%1 과 %2 사이 새로운 값을 입력하시오:</translation>
-    </message>
-</context>
-<context>
     <name>graphModel</name>
     <message>
         <source>Graph</source>
@@ -5668,21 +7146,6 @@ Please make sure you have write-permission to the file and the directory contain
     <message>
         <source>Distortion End:</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>knob</name>
-    <message>
-        <source>&amp;Help</source>
-        <translation>도움말(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>-96.0 dBV 과 6.0 dBV 사이 새로운 값을 입력하시오:</translation>
-    </message>
-    <message>
-        <source>Please enter a new value between %1 and %2:</source>
-        <translation>%1 과 %2 사이 새로운 값을 입력하시오:</translation>
     </message>
 </context>
 <context>
@@ -6407,13 +7870,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>nineButtonSelector</name>
-    <message>
-        <source>&amp;Help</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>opl2instrument</name>
     <message>
         <source>Patch</source>
@@ -6867,10 +8323,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation>요약 없음</translation>
     </message>
     <message>
-        <source>Instrument plugins</source>
-        <translation>기기 플러그인</translation>
-    </message>
-    <message>
         <source>Incomplete monophonic imitation tb303</source>
         <translation></translation>
     </message>
@@ -6921,14 +8373,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <message>
         <source>Filter for importing MIDI-files into LMMS</source>
         <translation>미디 파일을 LMMS로 읽어오기 위한 필터</translation>
-    </message>
-    <message>
-        <source>Instrument browser</source>
-        <translation>기기 브라우저</translation>
-    </message>
-    <message>
-        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation>각 노래 편집기, Beat+Bassline 편집기 또는 기존 기기 트랙으로 끌기</translation>
     </message>
     <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
@@ -7019,336 +8463,83 @@ This chip was used in the Commodore 64 computer.</source>
         <source>A NES-like synthesizer</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>projectNotes</name>
     <message>
-        <source>Project notes</source>
-        <translation>프로젝트 박자</translation>
+        <source>Player for GIG files</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Put down your project notes here.</source>
-        <translation>프로젝트 박자를 여기에 두시오.</translation>
+        <source>A multitap echo delay plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Actions</source>
-        <translation>작업 편집</translation>
+        <source>A native flanger plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Undo</source>
-        <translation>작업 취소(&amp;U)</translation>
+        <source>A native delay plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation></translation>
+        <source>An oversampling bitcrusher</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Redo</source>
-        <translation>작업 재실행(&amp;R)</translation>
+        <source>A native eq plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Copy</source>
-        <translation>복사(&amp;C)</translation>
-    </message>
-    <message>
-        <source>Ctrl+C</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cu&amp;t</source>
-        <translation>잘라내기(&amp;T)</translation>
-    </message>
-    <message>
-        <source>Ctrl+X</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Paste</source>
-        <translation>붙여넣기(&amp;P)</translation>
-    </message>
-    <message>
-        <source>Ctrl+V</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Format Actions</source>
-        <translation>형식 작업</translation>
-    </message>
-    <message>
-        <source>&amp;Bold</source>
-        <translation>진하게(&amp;B)</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Italic</source>
-        <translation>기울임(&amp;I)</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Underline</source>
-        <translation>밑줄(&amp;U)</translation>
-    </message>
-    <message>
-        <source>Ctrl+U</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Left</source>
-        <translation>왼쪽(&amp;L)</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>C&amp;enter</source>
-        <translation>중앙(&amp;E)</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Right</source>
-        <translation>오른쪽(&amp;R)</translation>
-    </message>
-    <message>
-        <source>Ctrl+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Justify</source>
-        <translation>양쪽 배분(&amp;J)</translation>
-    </message>
-    <message>
-        <source>Ctrl+J</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&amp;Color...</source>
-        <translation>색상(&amp;C)...</translation>
+        <source>A 4-band Crossover Equalizer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>renameDialog</name>
+    <name>setupWidget</name>
     <message>
-        <source>Rename...</source>
-        <translation>다른 이름으로...</translation>
-    </message>
-</context>
-<context>
-    <name>setupDialog</name>
-    <message>
-        <source>Setup LMMS</source>
-        <translation>LMMS 설정</translation>
-    </message>
-    <message>
-        <source>General settings</source>
-        <translation>일반 설정</translation>
-    </message>
-    <message>
-        <source>BUFFER SIZE</source>
-        <translation>버퍼 크기</translation>
-    </message>
-    <message>
-        <source>Reset to default-value</source>
-        <translation>기본값으로 초기화</translation>
-    </message>
-    <message>
-        <source>MISC</source>
-        <translation>기타</translation>
-    </message>
-    <message>
-        <source>Enable tooltips</source>
-        <translation>도구 도움말 가능</translation>
-    </message>
-    <message>
-        <source>Show restart warning after changing settings</source>
-        <translation>설정 변경후 재실행 경고 보이기</translation>
-    </message>
-    <message>
-        <source>Display volume as dBV </source>
-        <translation>dBV로 볼륨 보이기</translation>
-    </message>
-    <message>
-        <source>Compress project files per default</source>
-        <translation>기본 당 프로젝트 파일 압축</translation>
-    </message>
-    <message>
-        <source>HQ-mode for output audio-device</source>
-        <translation>출력 오디오 기기의 HQ 모드</translation>
-    </message>
-    <message>
-        <source>LMMS working directory</source>
-        <translation>LMMS 작업 폴더</translation>
-    </message>
-    <message>
-        <source>VST-plugin directory</source>
-        <translation>VST-플러그인 폴더</translation>
-    </message>
-    <message>
-        <source>Artwork directory</source>
-        <translation>아트작업 폴더</translation>
-    </message>
-    <message>
-        <source>FL Studio installation directory</source>
-        <translation>FL Studio 설치 폴더</translation>
-    </message>
-    <message>
-        <source>STK rawwave directory</source>
-        <translation>STK 원시 파형 폴더</translation>
-    </message>
-    <message>
-        <source>Performance settings</source>
-        <translation>실행 설정</translation>
-    </message>
-    <message>
-        <source>UI effects vs. performance</source>
-        <translation>UI 효과 대 실행</translation>
-    </message>
-    <message>
-        <source>Audio settings</source>
-        <translation>오디오 설정</translation>
-    </message>
-    <message>
-        <source>AUDIO INTERFACE</source>
-        <translation>오디오 인터페이스</translation>
-    </message>
-    <message>
-        <source>MIDI settings</source>
-        <translation>미디 설정</translation>
-    </message>
-    <message>
-        <source>MIDI INTERFACE</source>
-        <translation>미디 인터페이스</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>확인</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>취소</translation>
-    </message>
-    <message>
-        <source>Restart LMMS</source>
-        <translation>LMMS 재실행</translation>
-    </message>
-    <message>
-        <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
-        <translation>LMMS 재실행 전까지는 변경이 영향을 미치지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Frames: %1
-Latency: %2 ms</source>
-        <translation>
-		프레임: %1
-래턴시: %2 ms</translation>
-    </message>
-    <message>
-        <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Choose LMMS working directory</source>
-        <translation>LMMS 작업 폴더 선택</translation>
-    </message>
-    <message>
-        <source>Choose your VST-plugin directory</source>
-        <translation>VST 플러그인 폴더 선택</translation>
-    </message>
-    <message>
-        <source>Choose artwork-theme directory</source>
-        <translation>아트워크 테마 폴더 선택</translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
-        <translation>FL Studio 설치 폴더 선택</translation>
-    </message>
-    <message>
-        <source>Choose LADSPA plugin directory</source>
-        <translation>LADSPA 플러그인 폴더 선택</translation>
-    </message>
-    <message>
-        <source>Choose STK rawwave directory</source>
-        <translation>STK 원시 파형 폴더 선택</translation>
-    </message>
-    <message>
-        <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Paths</source>
-        <translation>경로</translation>
-    </message>
-    <message>
-        <source>LADSPA plugin paths</source>
-        <translation>LADSPA 플러그인 폴더</translation>
-    </message>
-    <message>
-        <source>Default Soundfont File</source>
-        <translation>기본 사운드글꼴 파일</translation>
-    </message>
-    <message>
-        <source>Background artwork</source>
-        <translation>배경 아트워크</translation>
-    </message>
-    <message>
-        <source>Choose default SoundFont</source>
-        <translation>기본 사운드글꼴 선택</translation>
-    </message>
-    <message>
-        <source>Choose background artwork</source>
-        <translation>배경 아트워크 선택</translation>
-    </message>
-    <message>
-        <source>One instrument track window mode</source>
+        <source>JACK (JACK Audio Connection Kit)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Compact track buttons</source>
+        <source>OSS Raw-MIDI (Open Sound System)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sync VST plugins to host playback</source>
+        <source>SDL (Simple DirectMedia Layer)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable note labels in piano roll</source>
+        <source>PulseAudio (bad latency!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable waveform display by default</source>
+        <source>Dummy (no MIDI support)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Smooth scroll in Song Editor</source>
+        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable auto save feature</source>
+        <source>PortAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show playback cursor in AudioFileProcessor</source>
+        <source>Dummy (no sound output)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep effects running even without input</source>
+        <source>ALSA (Advanced Linux Sound Architecture)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSS (Open Sound System)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WinMM MIDI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7405,6 +8596,10 @@ Latency: %2 ms</source>
     <message>
         <source>Chorus Depth</source>
         <translation>코러스 깊이</translation>
+    </message>
+    <message>
+        <source>A soundfont %1 could not be loaded.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7652,77 +8847,6 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>song</name>
-    <message>
-        <source>Tempo</source>
-        <translation>탬포</translation>
-    </message>
-    <message>
-        <source>Master volume</source>
-        <translation>마스터 볼륨</translation>
-    </message>
-    <message>
-        <source>Master pitch</source>
-        <translation>마스터 피치</translation>
-    </message>
-    <message>
-        <source>Project saved</source>
-        <translation>저장된 프로젝트</translation>
-    </message>
-    <message>
-        <source>The project %1 is now saved.</source>
-        <translation>프로젝트 %1 이 지금 저장됨.</translation>
-    </message>
-    <message>
-        <source>Project NOT saved.</source>
-        <translation>프로젝트가 저장 안됨</translation>
-    </message>
-    <message>
-        <source>The project %1 was not saved!</source>
-        <translation>프로젝트 %1이 저장되지 않음!</translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation>파일 읽어오기</translation>
-    </message>
-    <message>
-        <source>untitled</source>
-        <translation>무제</translation>
-    </message>
-    <message>
-        <source>Select file for project-export...</source>
-        <translation>내보내기 위한 프로젝트 파일 선택...</translation>
-    </message>
-    <message>
-        <source>Empty project</source>
-        <translation>빈 프로젝트</translation>
-    </message>
-    <message>
-        <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
-        <translation>이 프로젝트가 비어있어 내보내기가 무의미함. 몇 항목을 노래 편집기에 우선 두세요!</translation>
-    </message>
-    <message>
-        <source>MIDI sequences</source>
-        <translation>미디 시퀀스</translation>
-    </message>
-    <message>
-        <source>FL Studio projects</source>
-        <translation>FL Studio 프로젝트</translation>
-    </message>
-    <message>
-        <source>All file types</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hydrogen projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>stereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
@@ -7779,149 +8903,6 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>timeLine</name>
-    <message>
-        <source>Enable/disable auto-scrolling</source>
-        <translation>자동 스크롤링 가능/불가능</translation>
-    </message>
-    <message>
-        <source>Enable/disable loop-points</source>
-        <translation>순환 점 가능/불가능</translation>
-    </message>
-    <message>
-        <source>After stopping go back to begin</source>
-        <translation>중지 후 처음으로 뒤로 이동</translation>
-    </message>
-    <message>
-        <source>After stopping go back to position at which playing was started</source>
-        <translation>중지 후 재생을 시작한 위치로 뒤로 이동</translation>
-    </message>
-    <message>
-        <source>After stopping keep position</source>
-        <translation>중지 후 위치 유지</translation>
-    </message>
-    <message>
-        <source>Hint</source>
-        <translation>힌트</translation>
-    </message>
-    <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>track</name>
-    <message>
-        <source>Muted</source>
-        <translation>무음</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation>솔로</translation>
-    </message>
-</context>
-<context>
-    <name>trackContentObject</name>
-    <message>
-        <source>Muted</source>
-        <translation>무음</translation>
-    </message>
-</context>
-<context>
-    <name>trackContentObjectView</name>
-    <message>
-        <source>Current position</source>
-        <translation>현재 위치</translation>
-    </message>
-    <message>
-        <source>Hint</source>
-        <translation>힌트</translation>
-    </message>
-    <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation>&lt;Ctrl&gt; 누르고 복사본을 만들기 위하여 끌기</translation>
-    </message>
-    <message>
-        <source>Current length</source>
-        <translation>현재 길이</translation>
-    </message>
-    <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation>자유 크기 재조정하기 위하여 &lt;Ctrl&gt; 누르기</translation>
-    </message>
-    <message>
-        <source>%1:%2 (%3:%4 to %5:%6)</source>
-        <translation>%1:%2 (%3:%4 를 %5:%6 로)</translation>
-    </message>
-    <message>
-        <source>Delete (middle mousebutton)</source>
-        <translation>삭제 (중간 마우스버튼)</translation>
-    </message>
-    <message>
-        <source>Cut</source>
-        <translation>잘라내기</translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation>복사</translation>
-    </message>
-    <message>
-        <source>Paste</source>
-        <translation>붙여넣기</translation>
-    </message>
-    <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>무음/무음해제 (&lt;Ctrl&gt; + 중간 클릭)</translation>
-    </message>
-</context>
-<context>
-    <name>trackOperationsWidget</name>
-    <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Actions for this track</source>
-        <translation>이 트랙의 작업</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>무음</translation>
-    </message>
-    <message>
-        <source>Mute this track</source>
-        <translation>이 트랙을 무음</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation>솔로</translation>
-    </message>
-    <message>
-        <source>Clone this track</source>
-        <translation>이 트랙을 복제</translation>
-    </message>
-    <message>
-        <source>Remove this track</source>
-        <translation>이 트랙을 제거</translation>
-    </message>
-    <message>
-        <source>Clear this track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn all recording on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn all recording off</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>vestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
@@ -7930,15 +8911,6 @@ Latency: %2 ms</source>
     <message>
         <source>Please wait while loading VST-plugin...</source>
         <translation>VST 플러그인 읽은 동안 잠시 대기...</translation>
-    </message>
-    <message>
-        <source>Failed loading VST-plugin</source>
-        <translation>VST 플러그인 읽는 중 오류</translation>
-    </message>
-    <message>
-        <source>The VST-plugin %1 could not be loaded for some reason.
-If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -8151,10 +9123,6 @@ The LED in the lower right corner of the waveform editor determines whether the 
         <translation></translation>
     </message>
     <message>
-        <source>&amp;Help</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Use a sine-wave for current oscillator.</source>
         <translation></translation>
     </message>
@@ -8177,17 +9145,6 @@ The LED in the lower right corner of the waveform editor determines whether the 
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>visualizationWidget</name>
-    <message>
-        <source>click to enable/disable visualization of master-output</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click to enable</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

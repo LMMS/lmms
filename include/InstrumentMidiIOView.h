@@ -34,6 +34,8 @@
 class GroupBox;
 class LcdSpinBox;
 class QToolButton;
+class LedCheckBox;
+class InstrumentTrack;
 
 
 class InstrumentMidiIOView : public QWidget, public ModelView
@@ -62,5 +64,18 @@ private:
 	LcdSpinBox* m_baseVelocitySpinBox;
 
 } ;
+
+class InstrumentMiscView : public QWidget
+{
+	Q_OBJECT
+public:
+	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
+	~InstrumentMiscView();
+
+private:
+
+	GroupBox * m_pitchGroupBox;
+
+};
 
 #endif

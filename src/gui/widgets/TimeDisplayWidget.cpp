@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 
 #include "TimeDisplayWidget.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
 #include "ToolTip.h"
@@ -53,7 +54,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
 
@@ -106,12 +107,13 @@ void TimeDisplayWidget::updateTime()
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setValue( s->getTacts() + 1 );
-			m_minorLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) / 
-					     ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-;
-			m_milliSecondsLCD.setValue( ( s->getTicks() % s->ticksPerTact() ) %
-						    ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+			int tick;
+			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
+			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
+			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
+						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
+			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
+							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
 			break;
 
 		default: break;

@@ -30,11 +30,12 @@
 #include "Plugin.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "ConfigManager.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
-#include "MainWindow.h"
+#include "Song.h"
 
 
 static PixmapLoader __dummyLoader;
@@ -130,7 +131,11 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 
 void Plugin::collectErrorForUI( QString errMsg )
 {
+<<<<<<< HEAD
 	Engine::mainWindow()->collectError( errMsg );
+=======
+	Engine::getSong()->collectError( errMsg );
+>>>>>>> coding
 }
 
 

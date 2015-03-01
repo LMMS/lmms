@@ -68,7 +68,7 @@ QMenu {
 
 QMenu::separator {
 	height: 1px;
-	background: #c9c9c9;
+	background: #8d8d8d;
 	margin-left: 5px;
 	margin-right: 5px;
 }
@@ -378,9 +378,17 @@ QWidget#mainToolbar {
 
 QToolBar {
 	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
+	border: none;
+	padding: 1px;
+	spacing: 0;
 }
 
-QToolButton, ToolButton {
+QToolBar::separator {
+	border: none;
+	width: 5px;
+}
+
+QToolButton {
 	padding: 1px 1px 1px 1px;
 	border-radius: 2px;
 	border: 1px solid rgba(0,0,0,32);
@@ -391,12 +399,12 @@ QToolButton, ToolButton {
 
 /* separate corner rounding for play and stop buttons! */
 
-ToolButton#playButton {
+QToolButton#playButton {
 	border-top-left-radius: 5px 15px;
 	border-bottom-left-radius: 5px 15px;
 }
 
-ToolButton#stopButton {
+QToolButton#stopButton {
 	border-top-right-radius: 5px 15px;
 	border-bottom-right-radius: 5px 15px;
 }
@@ -405,20 +413,20 @@ ToolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton:hover, ToolButton:hover {
+QToolButton:hover {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
 }
 
-QToolButton:pressed, ToolButton:pressed {
+QToolButton:pressed {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
 	padding: 2px 1px 0px 1px;
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
 }
 
-QToolButton:checked, ToolButton:checked  {
+QToolButton:checked  {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
 	border-radius: 3px;
 	padding: 2px 1px 0px 1px;

@@ -22,6 +22,7 @@
  *
  */
 
+#include "MainWindow.h"
 
 #include <QDomElement>
 #include <QUrl>
@@ -36,7 +37,7 @@
 #include <QWhatsThis>
 
 #include "lmmsversion.h"
-#include "MainWindow.h"
+#include "GuiApplication.h"
 #include "BBEditor.h"
 #include "SongEditor.h"
 #include "Song.h"
@@ -101,24 +102,24 @@ MainWindow::MainWindow() :
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter ) );
+							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userSamplesDir() + "*" +
 				ConfigManager::inst()->factorySamplesDir(),
 					"*", tr( "My Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter ) );
+							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
 				ConfigManager::inst()->userPresetsDir() + "*" +
 				ConfigManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter ) );
+							splitter , false, true  ) );
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
-							splitter ) );
+							splitter, false, true ) );
 
 	QStringList root_paths;
 #ifdef LMMS_BUILD_APPLE
@@ -189,8 +190,6 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-	m_errors = new QList<QString>();
-
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
@@ -232,7 +231,7 @@ void MainWindow::finalize()
 
 	// project-popup-menu
 	QMenu * project_menu = new QMenu( this );
-	menuBar()->addMenu( project_menu )->setText( tr( "&Project" ) );
+	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
 					this, SLOT( createNewProject() ),
@@ -255,15 +254,14 @@ void MainWindow::finalize()
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					Qt::CTRL + Qt::Key_S );
-
-	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "Save as New &Version" ),
-					this, SLOT( saveProjectAsNewVersion() ),
-					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as New &Version" ),
+					this, SLOT( saveProjectAsNewVersion() ),
+					Qt::CTRL + Qt::ALT + Qt::Key_S );
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
@@ -530,6 +528,29 @@ void MainWindow::finalize()
 		SetupDialog sd( SetupDialog::AudioSettings );
 		sd.exec();
 	}
+
+	// Add editor subwindows
+	for (QWidget* widget :  std::list<QWidget*>{
+			gui->automationEditor(),
+			gui->getBBEditor(),
+			gui->pianoRoll(),
+			gui->songEditor()
+	})
+	{
+		QMdiSubWindow* window = workspace()->addSubWindow(widget);
+		window->setWindowIcon(widget->windowIcon());
+		window->setAttribute(Qt::WA_DeleteOnClose, false);
+		window->resize(widget->sizeHint());
+	}
+
+	gui->automationEditor()->parentWidget()->hide();
+	gui->getBBEditor()->parentWidget()->move( 610, 5 );
+	gui->getBBEditor()->parentWidget()->show();
+	gui->pianoRoll()->parentWidget()->move(5, 5);
+	gui->pianoRoll()->parentWidget()->hide();
+	gui->songEditor()->parentWidget()->move(5, 5);
+	gui->songEditor()->parentWidget()->show();
+
 	// reset window title every time we change the state of a subwindow to show the correct title
 	foreach( QMdiSubWindow * subWindow, workspace()->subWindowList() )
 	{
@@ -855,7 +876,7 @@ void MainWindow::showSettingsDialog()
 
 void MainWindow::aboutLMMS()
 {
-	AboutDialog().exec();
+	AboutDialog(this).exec();
 }
 
 
@@ -912,10 +933,10 @@ void MainWindow::refocus()
 {
 	QList<QWidget*> editors;
 	editors
-		<< Engine::songEditor()->parentWidget()
-		<< Engine::getBBEditor()->parentWidget()
-		<< Engine::pianoRoll()->parentWidget()
-		<< Engine::automationEditor()->parentWidget();
+		<< gui->songEditor()->parentWidget()
+		<< gui->getBBEditor()->parentWidget()
+		<< gui->pianoRoll()->parentWidget()
+		<< gui->automationEditor()->parentWidget();
 
 	bool found = false;
 	QList<QWidget*>::Iterator editor;
@@ -937,7 +958,7 @@ void MainWindow::refocus()
 
 void MainWindow::toggleBBEditorWin( bool forceShow )
 {
-	toggleWindow( Engine::getBBEditor(), forceShow );
+	toggleWindow( gui->getBBEditor(), forceShow );
 }
 
 
@@ -945,7 +966,7 @@ void MainWindow::toggleBBEditorWin( bool forceShow )
 
 void MainWindow::toggleSongEditorWin()
 {
-	toggleWindow( Engine::songEditor() );
+	toggleWindow( gui->songEditor() );
 }
 
 
@@ -953,7 +974,7 @@ void MainWindow::toggleSongEditorWin()
 
 void MainWindow::toggleProjectNotesWin()
 {
-	toggleWindow( Engine::getProjectNotes() );
+	toggleWindow( gui->getProjectNotes() );
 }
 
 
@@ -961,7 +982,7 @@ void MainWindow::toggleProjectNotesWin()
 
 void MainWindow::togglePianoRollWin()
 {
-	toggleWindow( Engine::pianoRoll() );
+	toggleWindow( gui->pianoRoll() );
 }
 
 
@@ -969,7 +990,7 @@ void MainWindow::togglePianoRollWin()
 
 void MainWindow::toggleAutomationEditorWin()
 {
-	toggleWindow( Engine::automationEditor() );
+	toggleWindow( gui->automationEditor() );
 }
 
 
@@ -977,7 +998,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleFxMixerWin()
 {
-	toggleWindow( Engine::fxMixerView() );
+	toggleWindow( gui->fxMixerView() );
 }
 
 
@@ -985,7 +1006,7 @@ void MainWindow::toggleFxMixerWin()
 
 void MainWindow::toggleControllerRack()
 {
-	toggleWindow( Engine::getControllerRackView() );
+	toggleWindow( gui->getControllerRackView() );
 }
 
 
@@ -993,29 +1014,29 @@ void MainWindow::toggleControllerRack()
 
 void MainWindow::updatePlayPauseIcons()
 {
-	Engine::songEditor()->setPauseIcon( false );
-	Engine::automationEditor()->setPauseIcon( false );
-	Engine::getBBEditor()->setPauseIcon( false );
-	Engine::pianoRoll()->setPauseIcon( false );
+	gui->songEditor()->setPauseIcon( false );
+	gui->automationEditor()->setPauseIcon( false );
+	gui->getBBEditor()->setPauseIcon( false );
+	gui->pianoRoll()->setPauseIcon( false );
 
 	if( Engine::getSong()->isPlaying() )
 	{
 		switch( Engine::getSong()->playMode() )
 		{
 			case Song::Mode_PlaySong:
-				Engine::songEditor()->setPauseIcon( true );
+				gui->songEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayAutomationPattern:
-				Engine::automationEditor()->setPauseIcon( true );
+				gui->automationEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayBB:
-				Engine::getBBEditor()->setPauseIcon( true );
+				gui->getBBEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayPattern:
-				Engine::pianoRoll()->setPauseIcon( true );
+				gui->pianoRoll()->setPauseIcon( true );
 				break;
 
 			default:
@@ -1199,45 +1220,5 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
-	}
-}
-
-
-
-void MainWindow::collectErrors(const QList<QString>* errors )
-{
-	m_errors->append( *errors );
-}
-
-
-
-void MainWindow::collectError( const QString error )
-{
-	m_errors->append( error );
-}
-
-
-
-void MainWindow::clearErrors()
-{
-	m_errors->clear();
-}
-
-
-
-void MainWindow::showErrors( const QString message )
-{
-    if ( m_errors->length() != 0 )
-	{   QString* errors = new QString();
-		for ( int i = 0 ; i < m_errors->length() ; i++ )
-		{
-			errors->append( m_errors->value( i ) + "\n" );
-		}
-		errors->prepend( "\n\n" );
-		errors->prepend( message );
-		QMessageBox::warning( NULL,
-			"LMMS Error report",
-			*errors,
-			QMessageBox::Ok );
 	}
 }

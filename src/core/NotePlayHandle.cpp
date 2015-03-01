@@ -509,10 +509,11 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
+	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 	const float pitch =
 		( key() -
 				m_instrumentTrack->baseNoteModel()->value() +
-				Engine::getSong()->masterPitch() +
+				mp +
 				m_baseDetuning->value() )
 												 / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );

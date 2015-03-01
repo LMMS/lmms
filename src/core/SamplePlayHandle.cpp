@@ -98,14 +98,15 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( sampleFrame * buffer )
 {
+	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
+		memset( buffer, 0, sizeof( sampleFrame ) * fpp );
 		return;
 	}
 
 	sampleFrame * workingBuffer = buffer;
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period

@@ -209,14 +209,6 @@ void Note::loadSettings( const QDomElement & _this )
 
 
 
-void Note::editDetuningPattern()
-{
-	createDetuning();
-	m_detuning->automationPattern()->openInAutomationEditor();
-}
-
-
-
 
 void Note::createDetuning()
 {

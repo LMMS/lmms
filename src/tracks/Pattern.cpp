@@ -38,7 +38,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
+#include "GuiApplication.h"
 #include "PianoRoll.h"
 #include "TrackContainer.h"
 #include "RenameDialog.h"
@@ -66,6 +66,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 {
 	setName( _instrument_track->name() );
 	init();
+	setAutoResize( true );
 }
 
 
@@ -83,6 +84,18 @@ Pattern::Pattern( const Pattern& other ) :
 	}
 
 	init();
+	switch( getTrack()->trackContainer()->type() )
+	{
+		case TrackContainer::BBContainer:
+			setAutoResize( true );
+			break;
+
+		case TrackContainer::SongContainer:
+			// move down
+		default:
+			setAutoResize( false );
+			break;
+	}
 }
 
 
@@ -170,9 +183,9 @@ MidiTime Pattern::beatPatternLength() const
 Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
 	Note * new_note = new Note( _new_note );
-	if( _quant_pos && Engine::pianoRoll() )
+	if( _quant_pos && gui->pianoRoll() )
 	{
-		new_note->quantizePos( Engine::pianoRoll()->quantization() );
+		new_note->quantizePos( gui->pianoRoll()->quantization() );
 	}
 
 	instrumentTrack()->lock();
@@ -421,6 +434,32 @@ void Pattern::loadSettings( const QDomElement & _this )
 
 
 
+Pattern *  Pattern::previousPattern() const
+{
+	return adjacentPatternByOffset(-1);
+}
+
+
+
+
+Pattern *  Pattern::nextPattern() const
+{
+	return adjacentPatternByOffset(1);
+}
+
+
+
+
+Pattern * Pattern::adjacentPatternByOffset(int offset) const
+{
+	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
+	int tcoNum = m_instrumentTrack->getTCONum(this);
+	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, NULL));
+}
+
+
+
+
 void Pattern::clear()
 {
 	addJournalCheckPoint();
@@ -486,12 +525,15 @@ void Pattern::ensureBeatNotes()
 	for( int i = 0; i < m_steps; ++i )
 	{
 		bool found = false;
-		for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it )
+		NoteVector::Iterator it;
+
+		for( it = m_notes.begin(); it != m_notes.end(); ++it )
 		{
+			Note *note = *it;
 			// if a note in this position is the one we want
-			if( ( *it )->pos() ==
+			if( note->pos() ==
 				( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				&& ( *it )->length() <= 0 )
+				&& note->length() <= 0 )
 			{
 				found = true;
 				break;
@@ -511,10 +553,12 @@ void Pattern::ensureBeatNotes()
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
 	{
 		bool needed = false;
+		Note *note = *it;
+
 		for( int i = 0; i < m_steps; ++i )
 		{
-			if( ( *it )->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				|| ( *it )->length() != 0 )
+			if( note->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
+				|| note->length() != 0 )
 			{
 				needed = true;
 				break;
@@ -522,10 +566,12 @@ void Pattern::ensureBeatNotes()
 		}
 		if( needed == false )
 		{
-			delete *it;
+			delete note;
 			it = m_notes.erase( it );
 		}
-		else ++it;
+		else {
+			++it;
+		}
 	}
 }
 
@@ -539,9 +585,9 @@ void Pattern::updateBBTrack()
 		Engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( Engine::pianoRoll() && Engine::pianoRoll()->currentPattern() == this )
+	if( gui && gui->pianoRoll() && gui->pianoRoll()->currentPattern() == this )
 	{
-		Engine::pianoRoll()->update();
+		gui->pianoRoll()->update();
 	}
 }
 
@@ -607,7 +653,7 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	m_paintPixmap(),
 	m_needsUpdate( true )
 {
-	connect( Engine::pianoRoll(), SIGNAL( currentPatternChanged() ),
+	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	if( s_stepBtnOn == NULL )
@@ -635,7 +681,6 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
 
 	ToolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
@@ -668,9 +713,10 @@ void PatternView::update()
 
 void PatternView::openInPianoRoll()
 {
-	Engine::pianoRoll()->setCurrentPattern( m_pat );
-	Engine::pianoRoll()->parentWidget()->show();
-	Engine::pianoRoll()->setFocus();
+	gui->pianoRoll()->setCurrentPattern( m_pat );
+	gui->pianoRoll()->parentWidget()->show();
+	gui->pianoRoll()->show();
+	gui->pianoRoll()->setFocus();
 }
 
 
@@ -801,9 +847,9 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		Engine::getSong()->setModified();
 		update();
 
-		if( Engine::pianoRoll()->currentPattern() == m_pat )
+		if( gui->pianoRoll()->currentPattern() == m_pat )
 		{
-			Engine::pianoRoll()->update();
+			gui->pianoRoll()->update();
 		}
 	}
 	else
@@ -862,9 +908,9 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 
 			Engine::getSong()->setModified();
 			update();
-			if( Engine::pianoRoll()->currentPattern() == m_pat )
+			if( gui->pianoRoll()->currentPattern() == m_pat )
 			{
-				Engine::pianoRoll()->update();
+				gui->pianoRoll()->update();
 			}
 		}
 		_we->accept();
@@ -904,13 +950,20 @@ void PatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 
 	QColor c;
-
 	if(( m_pat->m_patternType != Pattern::BeatPattern ) &&
-				!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
-		c = isSelected() ? QColor( 0, 0, 224 )
-	  				   : styleColor;
+		!( m_pat->getTrack()->isMuted() || m_pat->isMuted() ))
+	{
+		c = styleColor;
+	}
 	else
+	{
 		c = QColor( 80, 80, 80 );
+	}
+
+	if( isSelected() == true )
+	{
+		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
+	}
 
 	if( m_pat->m_patternType != Pattern::BeatPattern )
 	{
@@ -924,7 +977,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setBrush( lingrad );
-	if( Engine::pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != Pattern::BeatPattern )
+	if( gui->pianoRoll()->currentPattern() == m_pat && m_pat->m_patternType != Pattern::BeatPattern )
 		p.setPen( c.lighter( 130 ) );
 	else
 		p.setPen( c.darker( 300 ) );
@@ -933,7 +986,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	p.setBrush( QBrush() );
 	if( m_pat->m_patternType != Pattern::BeatPattern )
 	{
-		if( Engine::pianoRoll()->currentPattern() == m_pat )
+		if( gui->pianoRoll()->currentPattern() == m_pat )
 			p.setPen( c.lighter( 160 ) );
 		else
 			p.setPen( c.lighter( 130 ) );

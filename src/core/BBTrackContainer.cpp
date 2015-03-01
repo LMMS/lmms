@@ -42,6 +42,7 @@ BBTrackContainer::BBTrackContainer() :
 	// not change upon setCurrentBB()-call
 	connect( &m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
 			this, SLOT( currentBBChanged() ) );
+	setType( BBContainer );
 }
 
 

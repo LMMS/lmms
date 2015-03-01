@@ -41,6 +41,7 @@
 #include "Knob.h"
 #include "Engine.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
@@ -141,13 +142,13 @@ FxMixerView::FxMixerView() :
 	updateGeometry();
 
 	// timer for updating faders
-	connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateFaders() ) );
 
 
 	// add ourself to workspace
 	QMdiSubWindow * subWin =
-		Engine::mainWindow()->workspace()->addSubWindow( this );
+		gui->mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
@@ -171,7 +172,7 @@ FxMixerView::~FxMixerView()
 
 
 
-void FxMixerView::addNewChannel()
+int FxMixerView::addNewChannel()
 {
 	// add new fx mixer channel and redraw the form.
 	FxMixer * mix = Engine::fxMixer();
@@ -185,6 +186,8 @@ void FxMixerView::addNewChannel()
 	updateFxLine(newChannelIndex);
 
 	updateMaxChannelSelector();
+
+	return newChannelIndex;
 }
 
 

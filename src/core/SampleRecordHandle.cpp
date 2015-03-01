@@ -30,7 +30,7 @@
 #include "Pattern.h"
 #include "SampleBuffer.h"
 #include "SampleTrack.h"
-
+#include "debug.h"
 
 
 SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
@@ -116,9 +116,9 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	// make sure buffer is cleaned up properly at the end...
 	sampleFrame * data_ptr = data;
 
-#ifdef LMMS_DEBUG
+
 	assert( data != NULL );
-#endif
+
 	// now copy all buffers into big buffer
 	for( bufferList::const_iterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )

@@ -2,7 +2,7 @@
  * AboutDialog.cpp - implementation of about-dialog
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -26,14 +26,12 @@
 #include "lmmsversion.h"
 #include "AboutDialog.h"
 #include "embed.h"
-#include "Engine.h"
-#include "MainWindow.h"
 #include "versioninfo.h"
 
 
 
-AboutDialog::AboutDialog() :
-	QDialog( Engine::mainWindow() ),
+AboutDialog::AboutDialog(QWidget* parent) :
+	QDialog(parent),
 	Ui::AboutDialog()
 {
 	setupUi( this );
