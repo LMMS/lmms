@@ -204,6 +204,7 @@ public:
 		return m_detuning;
 	}
 	bool hasDetuningInfo() const;
+	bool withinRange(int tickStart, int tickEnd) const;
 
 	void createDetuning();
 

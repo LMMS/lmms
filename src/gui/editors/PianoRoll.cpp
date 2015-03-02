@@ -1657,13 +1657,11 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		notes += m_pattern->notes();
 
 		// go through notes to figure out which one we want to change
+		bool altPressed = me->modifiers() & Qt::AltModifier;
 		NoteVector nv;
 		foreach( Note * i, notes )
 		{
-			if( i->pos().getTicks() >= ticks_start
-				&& i->pos().getTicks() <= ticks_end
-				&& i->length().getTicks() != 0
-				&& ( i->selected() || ! isSelection() ) )
+			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
 				nv += i;
 			}
@@ -2077,27 +2075,22 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 			}
 
-
-
-			// loop through vector
-			bool on_note = false;
-			bool use_selection = isSelection();
+			// When alt is pressed we only edit the note under the cursor
+			bool altPressed = me->modifiers() & Qt::AltModifier;
+			// We iterate from last note in pattern to the first,
+			// chronologically
 			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 			for( int i = 0; i < notes.size(); ++i )
 			{
-				Note * n = *it;
-				if( n->pos().getTicks() >= ticks_start
-					&& n->pos().getTicks() <= ticks_end
-					&& n->length().getTicks() != 0
-					&& ( n->selected() || ! use_selection ) )
+				Note* n = *it;
+
+				bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
+				// Play note under the cursor
+				if ( isUnderPosition ) { testPlayNote( n ); }
+				// If note is the one under the cursor or is selected when alt is
+				// not pressed
+				if ( isUnderPosition || ( n->selected() && !altPressed ) )
 				{
-					on_note = true;
-					m_pattern->dataChanged();
-
-					// play the note so that the user can tell how loud it is
-					// and where it is panned
-					testPlayNote( n );
-
 					if( m_noteEditMode == NoteEditVolume )
 					{
 						n->setVolume( vol );
@@ -2114,31 +2107,23 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 						m_pattern->instrumentTrack()->processInEvent( evt );
 					}
 				}
-				else
+				else if( n->isPlaying() )
 				{
-					if( n->isPlaying() )
-					{
-						// mouse not over this note, stop playing it.
-						m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
+					// mouse not over this note, stop playing it.
+					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
 
-						n->setIsPlaying( false );
-					}
+					n->setIsPlaying( false );
 				}
 
-				// set textfloat visible if we're on a note
-				if( on_note )
-				{
-					s_textFloat->moveGlobal( this,	QPoint( me->x() + 4, me->y() + 16 ) );
-					s_textFloat->show();
-				}
-				else
-				{
-					s_textFloat->hide();
-				}
 
 				--it;
-
 			}
+
+			// Emit pattern has changed
+			m_pattern->dataChanged();
+			// Show the new volume value
+			s_textFloat->moveGlobal( this, QPoint( me->x() + 4, me->y() + 16 ) );
+			s_textFloat->show();
 		}
 
 		else if( me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
@@ -3165,14 +3150,13 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		NoteVector notes;
 		notes += m_pattern->notes();
 
+		// When alt is pressed we only edit the note under the cursor
+		bool altPressed = we->modifiers() & Qt::AltModifier;
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		foreach( Note * i, notes )
 		{
-			if( i->pos().getTicks() >= ticks_start
-				&& i->pos().getTicks() <= ticks_end
-				&& i->length().getTicks() != 0
-				&& ( i->selected() || ! isSelection() ) )
+			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
 				nv += i;
 			}
