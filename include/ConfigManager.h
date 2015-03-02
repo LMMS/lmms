@@ -77,6 +77,11 @@ public:
 		return workingDir() + PROJECTS_PATH;
 	}
 
+	QString userTemplateDir() const
+	{
+		return workingDir() + TEMPLATE_PATH;
+	}
+
 	QString userPresetsDir() const
 	{
 		return workingDir() + PRESETS_PATH;

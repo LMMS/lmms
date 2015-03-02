@@ -423,7 +423,7 @@ void ConfigManager::loadConfigFile()
 	if( QDir( m_workingDir ).exists() )
 	{
 		QDir().mkpath( userProjectsDir() );
-		QDir().mkpath( userProjectsDir() + TEMPLATE_PATH );
+		QDir().mkpath( userTemplateDir() );
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
 	}

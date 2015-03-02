@@ -847,8 +847,10 @@ void Song::clearProject()
 // create new file
 void Song::createNewProject()
 {
-	QString defaultTemplate = ConfigManager::inst()->userProjectsDir()
-						+ "templates/default.mpt";
+
+	QString defaultTemplate = ConfigManager::inst()->userTemplateDir()
+						+ "default.mpt";
+
 
 	if( QFile::exists( defaultTemplate ) )
 	{
