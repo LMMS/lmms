@@ -65,70 +65,72 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 {
 }
 
-ProjectVersion::ProjectVersion( const char* version, CompareType c ) :
-	m_version( QString( version ) ),
-	m_major(parseMajor( m_version ) ),
-	m_minor(parseMinor( m_version ) ),
-	m_release(parseRelease( m_version ) ),
-	m_build(parseBuild( m_version ) ),
-	m_compareType( c )
+
+
+
+ProjectVersion::ProjectVersion(const char* version, CompareType c) :
+	m_version(QString(version)),
+	m_major(parseMajor(m_version)),
+	m_minor(parseMinor(m_version)),
+	m_release(parseRelease(m_version)),
+	m_build(parseBuild(m_version)),
+	m_compareType(c)
 {
 }
 
 
 
 
-int ProjectVersion::compare( const ProjectVersion & a, const ProjectVersion & b, CompareType c )
+int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, CompareType c)
 {
-	if( a.getMajor() != b.getMajor() )
+	if(a.getMajor() != b.getMajor())
 	{
 		return a.getMajor() - b.getMajor();
 	}
 
-	else if( c == CompareType::Major )
+	else if(c == CompareType::Major)
 	{
 		return 0;
 	}
 
-	if( a.getMinor() != b.getMinor() )
+	if(a.getMinor() != b.getMinor())
 	{
 		return a.getMinor() - b.getMinor();
 	}
-	else if( c == CompareType::Minor )
+	else if(c == CompareType::Minor)
 	{
 		return 0;
 	}
 
-	if( a.getRelease() != b.getRelease() )
+	if(a.getRelease() != b.getRelease())
 	{
 		return a.getRelease() - b.getRelease();
 	}
-	else if( c == CompareType::Release )
+	else if(c == CompareType::Release)
 	{
 		return 0;
 	}
 
 	// make sure 0.x.y > 0.x.y-patch
-	if( a.getBuild().isEmpty() )
+	if(a.getBuild().isEmpty())
 	{
 		return 1;
 	}
-	if( b.getBuild().isEmpty() )
+	if(b.getBuild().isEmpty())
 	{
 		return -1;
 	}
 
-	return QString::compare( a.getBuild(), b.getBuild() );
+	return QString::compare(a.getBuild(), b.getBuild());
 }
 
 
 
 
-int ProjectVersion::compare( ProjectVersion v1, ProjectVersion v2 )
+int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 {
-	return compare( v1, v2, std::min( v1.getCompareType(), v2.getCompareType() ) );
+	return compare(v1, v2, std::min(v1.getCompareType(), v2.getCompareType()));
 }
-
 
 
 
