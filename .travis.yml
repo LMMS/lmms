@@ -13,7 +13,7 @@ before_script:
     - mkdir build && cd build
 script:
     - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
-    - make -j4 VERBOSE=1
+    - make -j4
     - if [[ $TARGET_OS != win* ]]; then make tests && ./tests/tests; fi;
 before_deploy: make package
 deploy:

@@ -51,7 +51,6 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 								_mixer ),
 	m_client( NULL ),
 	m_active( false ),
-	m_stopSemaphore( 1 ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
@@ -60,8 +59,6 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
-		m_stopSemaphore.acquire();
-
 		connect( this, SIGNAL( zombified() ),
 				this, SLOT( restartAfterZombified() ),
 				Qt::QueuedConnection );
@@ -74,8 +71,6 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 
 AudioJack::~AudioJack()
 {
-	m_stopSemaphore.release();
-
 #ifdef AUDIO_PORT_SUPPORT
 	while( m_portMap.size() )
 	{
@@ -249,7 +244,6 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
-	m_stopSemaphore.acquire();
 }
 
 
@@ -390,7 +384,6 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 			if( !m_framesToDoInCurBuf )
 			{
 				m_stopped = true;
-				m_stopSemaphore.release();
 			}
 			m_framesDoneInCurBuf = 0;
 		}
@@ -446,7 +439,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
+	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiojack",
@@ -483,4 +476,3 @@ void AudioJack::setupWidget::saveSettings()
 
 
 #endif
-

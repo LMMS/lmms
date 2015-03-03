@@ -237,7 +237,7 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	delete t;
+	t->deleteLater();
 }
 
 

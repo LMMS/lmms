@@ -47,6 +47,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
+#include "ExportFilter.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "FileDialog.h"
@@ -1293,6 +1294,64 @@ void Song::exportProject( bool multiExport )
 	}
 }
 
+
+void Song::exportProjectMidi()
+{
+	if( isEmpty() )
+	{
+		QMessageBox::information( gui->mainWindow(),
+				tr( "Empty project" ),
+				tr( "This project is empty so exporting makes "
+					"no sense. Please put some items into "
+					"Song Editor first!" ) );
+		return;
+	}
+
+	FileDialog efd( gui->mainWindow() );
+	
+	efd.setFileMode( FileDialog::AnyFile );
+	
+	QStringList types;
+	types << tr("MIDI File (*.mid)");
+	efd.setNameFilters( types );
+	QString base_filename;
+	if( !m_fileName.isEmpty() )
+	{
+		efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
+		base_filename = QFileInfo( m_fileName ).completeBaseName();
+	}
+	else
+	{
+		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+		base_filename = tr( "untitled" );
+	}
+	efd.selectFile( base_filename + ".mid" );
+	efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	{
+		const QString suffix = ".mid";
+
+		QString export_filename = efd.selectedFiles()[0];
+		if (!export_filename.endsWith(suffix)) export_filename += suffix;
+		
+		// NOTE start midi export
+		
+		// instantiate midi export plugin
+		TrackContainer::TrackList tracks;
+		tracks += Engine::getSong()->tracks();
+		tracks += Engine::getBBTrackContainer()->tracks();
+		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
+		if (exf==NULL) {
+			qDebug() << "failed to load midi export filter!";
+			return;
+		}
+		exf->tryExport(tracks, Engine::getSong()->getTempo(), export_filename);
+	}
+}
 
 
 

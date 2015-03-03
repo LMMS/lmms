@@ -3574,6 +3574,14 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
     </message>
     <message>
+		<source>LMMS Project</source>
+		<translation>LMMS Projekt</translation>
+    </message>
+    <message>
+		<source>LMMS Project Template</source>
+		<translation>LMMS Projektvorlage</translation>
+    </message>
+    <message>
         <source>Volumes</source>
         <translation>Volumes</translation>
     </message>
@@ -8568,7 +8576,7 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
         <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation>PulseAudio (Schlechte Latenz!)</translation>
     </message>
     <message>
