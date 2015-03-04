@@ -31,17 +31,29 @@ int parseMajor(QString & version) {
 	return version.section( '.', 0, 0 ).toInt();
 }
 
+
+
+
 int parseMinor(QString & version) {
 	return version.section( '.', 1, 1 ).toInt();
 }
+
+
+
 
 int parseRelease(QString & version) {
 	return version.section( '.', 2 ).section( '-', 0, 0 ).toInt();
 }
 
+
+
+
 QString parseBuild(QString & version) {
 	return version.section( '.', 2 ).section( '-', 1 );
 }
+
+
+
 
 ProjectVersion::ProjectVersion(QString version, CompareType c) :
 	m_version(version),
@@ -53,41 +65,48 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 {
 }
 
+
+
+
 ProjectVersion::ProjectVersion(const char* version, CompareType c) :
 	m_version(QString(version)),
 	m_major(parseMajor(m_version)),
 	m_minor(parseMinor(m_version)),
-	m_release(parseRelease(m_version)) ,
+	m_release(parseRelease(m_version)),
 	m_build(parseBuild(m_version)),
 	m_compareType(c)
 {
 }
 
-int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c)
+
+
+
+int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, CompareType c)
 {
-	if (a.getMajor() != b.getMajor())
+	if(a.getMajor() != b.getMajor())
 	{
 		return a.getMajor() - b.getMajor();
 	}
-	else if (c == CompareType::Major)
+
+	else if(c == CompareType::Major)
 	{
 		return 0;
 	}
 
-	if (a.getMinor() != b.getMinor())
+	if(a.getMinor() != b.getMinor())
 	{
 		return a.getMinor() - b.getMinor();
 	}
-	else if (c == CompareType::Minor)
+	else if(c == CompareType::Minor)
 	{
 		return 0;
 	}
 
-	if (a.getRelease() != b.getRelease())
+	if(a.getRelease() != b.getRelease())
 	{
 		return a.getRelease() - b.getRelease();
 	}
-	else if (c == CompareType::Release)
+	else if(c == CompareType::Release)
 	{
 		return 0;
 	}
@@ -105,8 +124,13 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 	return QString::compare(a.getBuild(), b.getBuild());
 }
 
+
+
+
 int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 {
 	return compare(v1, v2, std::min(v1.getCompareType(), v2.getCompareType()));
 }
+
+
 

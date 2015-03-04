@@ -85,19 +85,19 @@ public:
 			{
 				typedef QMap<QString, QString> AttributeMap;
 
-				inline Key( const Plugin::Descriptor * _desc = NULL,
-							const QString & _name = QString(),
-							const AttributeMap & _am = AttributeMap() )
+				inline Key( const Plugin::Descriptor * desc = NULL,
+							const QString & name = QString(),
+							const AttributeMap & am = AttributeMap() )
 					:
-					desc( _desc ),
-					name( _name ),
-					attributes( _am )
+					desc( desc ),
+					name( name ),
+					attributes( am )
 				{
 				}
 
-				Key( const QDomElement & _key );
+				Key( const QDomElement & key );
 
-				QDomElement saveXML( QDomDocument & _doc ) const;
+				QDomElement saveXML( QDomDocument & doc ) const;
 
 				inline bool isValid() const
 				{
@@ -134,7 +134,7 @@ public:
 			const Plugin::PluginTypes m_type;
 		} ;
 
-		SubPluginFeatures *subPluginFeatures;
+		SubPluginFeatures * subPluginFeatures;
 
 	} ;
 
@@ -142,15 +142,15 @@ public:
 	typedef QList<Descriptor> DescriptorList;
 
 	// contructor of a plugin
-	Plugin( const Descriptor* descriptor, Model* parent );
+	Plugin( const Descriptor * descriptor, Model * parent );
 	virtual ~Plugin();
 
 	// returns display-name out of descriptor
 	virtual QString displayName() const
 	{
 		return Model::displayName().isEmpty()
-				? m_descriptor->displayName
-				: Model::displayName();
+			? m_descriptor->displayName
+			: Model::displayName();
 	}
 
 	// return plugin-type
@@ -160,41 +160,41 @@ public:
 	}
 
 	// return plugin-descriptor for further information
-	inline const Descriptor* descriptor() const
+	inline const Descriptor * descriptor() const
 	{
 		return m_descriptor;
 	}
 
 	// can be called if a file matching supportedFileTypes should be
 	// loaded/processed with the help of this plugin
-	virtual void loadFile( const QString& file );
+	virtual void loadFile( const QString & file );
 
 	// Called if external source needs to change something but we cannot
 	// reference the class header.  Should return null if not key not found.
-	virtual AutomatableModel* childModel( const QString& modelName );
+	virtual AutomatableModel* childModel( const QString & modelName );
 
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const QString& pluginName, Model *parent, void * data );
+	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
 
 	// fills given list with descriptors of all available plugins
-	static void getDescriptorsOfAvailPlugins( DescriptorList& pluginDescriptors );
+	static void getDescriptorsOfAvailPlugins( DescriptorList & pluginDescriptors );
 
 	// create a view for the model 
-	PluginView* createView( QWidget* parent );
+	PluginView * createView( QWidget * parent );
 
 
 protected:
 	// create a view for the model 
-	virtual PluginView* instantiateView( QWidget* ) = 0;
-	void collectErrorForUI( QString err_msg );
+	virtual PluginView* instantiateView( QWidget * ) = 0;
+	void collectErrorForUI( QString errMsg );
 
 
 private:
-	const Descriptor* m_descriptor;
+	const Descriptor * m_descriptor;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model*, void* );
+	typedef Plugin * ( * InstantiationHook )( Model * , void * );
 
 } ;
 

@@ -81,7 +81,7 @@ class TrackContentObject : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	TrackContentObject( Track * _track );
+	TrackContentObject( Track * track );
 	virtual ~TrackContentObject();
 
 	inline Track * getTrack() const
@@ -94,9 +94,9 @@ public:
 		return m_name;
 	}
 
-	inline void setName( const QString & _name )
+	inline void setName( const QString & name )
 	{
-		m_name = _name;
+		m_name = name;
 		emit dataChanged();
 	}
 
@@ -122,9 +122,9 @@ public:
 		return m_length;
 	}
 
-	inline void setAutoResize( const bool _r )
+	inline void setAutoResize( const bool r )
 	{
-		m_autoResize = _r;
+		m_autoResize = r;
 	}
 
 	inline const bool getAutoResize() const
@@ -132,10 +132,10 @@ public:
 		return m_autoResize;
 	}
 
-	virtual void movePosition( const MidiTime & _pos );
-	virtual void changeLength( const MidiTime & _length );
+	virtual void movePosition( const MidiTime & pos );
+	virtual void changeLength( const MidiTime & length );
 
-	virtual TrackContentObjectView * createView( TrackView * _tv ) = 0;
+	virtual TrackContentObjectView * createView( TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -195,7 +195,7 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
-	TrackContentObjectView( TrackContentObject * _tco, TrackView * _tv );
+	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
 	virtual ~TrackContentObjectView();
 
 	bool fixedTCOs();
@@ -207,8 +207,8 @@ public:
 // qproperty access func
 	QColor fgColor() const;
 	QColor textColor() const;
-	void setFgColor( const QColor & _c );
-	void setTextColor( const QColor & _c );
+	void setFgColor( const QColor & c );
+	void setTextColor( const QColor & c );
 
 public slots:
 	virtual bool close();
@@ -220,13 +220,13 @@ protected:
 	{
 	}
 
-	virtual void contextMenuEvent( QContextMenuEvent * _cme );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void contextMenuEvent( QContextMenuEvent * cme );
+	virtual void dragEnterEvent( QDragEnterEvent * dee );
+	virtual void dropEvent( QDropEvent * de );
+	virtual void leaveEvent( QEvent * e );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void mouseMoveEvent( QMouseEvent * me );
+	virtual void mouseReleaseEvent( QMouseEvent * me );
 
 	float pixelsPerTact();
 
@@ -276,7 +276,7 @@ private:
 		m_initialMouseGlobalPos = mapToGlobal( pos );
 	}
 
-	bool mouseMovedDistance( QMouseEvent * _me, int distance );
+	bool mouseMovedDistance( QMouseEvent * me, int distance );
 
 } ;
 
@@ -293,46 +293,46 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
 
 public:
-	TrackContentWidget( TrackView * _parent );
+	TrackContentWidget( TrackView * parent );
 	virtual ~TrackContentWidget();
 
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
 
-	void addTCOView( TrackContentObjectView * _tcov );
-	void removeTCOView( TrackContentObjectView * _tcov );
-	void removeTCOView( int _tco_num )
+	void addTCOView( TrackContentObjectView * tcov );
+	void removeTCOView( TrackContentObjectView * tcov );
+	void removeTCOView( int tcoNum )
 	{
-		if( _tco_num >= 0 && _tco_num < m_tcoViews.size() )
+		if( tcoNum >= 0 && tcoNum < m_tcoViews.size() )
 		{
-			removeTCOView( m_tcoViews[_tco_num] );
+			removeTCOView( m_tcoViews[tcoNum] );
 		}
 	}
 
 	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
-	bool pasteSelection( MidiTime tcoPos, QDropEvent * _de );
+	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
 
-	MidiTime endPosition( const MidiTime & _pos_start );
+	MidiTime endPosition( const MidiTime & posStart );
 
 	// qproperty access methods
 
 	QBrush darkerColor() const;
 	QBrush lighterColor() const;
 
-	void setDarkerColor( const QBrush & _c );
-	void setLighterColor( const QBrush & _c );
+	void setDarkerColor( const QBrush & c );
+	void setLighterColor( const QBrush & c );
 
 public slots:
 	void update();
-	void changePosition( const MidiTime & _new_pos = MidiTime( -1 ) );
+	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
+	virtual void dragEnterEvent( QDragEnterEvent * dee );
+	virtual void dropEvent( QDropEvent * de );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void resizeEvent( QResizeEvent * re );
 
 	virtual QString nodeName() const
 	{
@@ -353,7 +353,7 @@ protected:
 
 private:
 	Track * getTrack();
-	MidiTime getPosition( int _mouse_x );
+	MidiTime getPosition( int mouseX );
 
 	TrackView * m_trackView;
 
@@ -375,13 +375,13 @@ class TrackOperationsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TrackOperationsWidget( TrackView * _parent );
+	TrackOperationsWidget( TrackView * parent );
 	~TrackOperationsWidget();
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void paintEvent( QPaintEvent * pe );
 
 
 private slots:
@@ -405,7 +405,7 @@ private:
 	friend class TrackView;
 
 signals:
-	void trackRemovalScheduled( TrackView * _t );
+	void trackRemovalScheduled( TrackView * t );
 
 } ;
 
@@ -435,12 +435,12 @@ public:
 		NumTrackTypes
 	} ;
 
-	Track( TrackTypes _type, TrackContainer * _tc );
+	Track( TrackTypes type, TrackContainer * tc );
 	virtual ~Track();
 
-	static Track * create( TrackTypes _tt, TrackContainer * _tc );
-	static Track * create( const QDomElement & _this,
-							TrackContainer * _tc );
+	static Track * create( TrackTypes tt, TrackContainer * tc );
+	static Track * create( const QDomElement & element,
+							TrackContainer * tc );
 	void clone();
 
 
@@ -450,20 +450,20 @@ public:
 		return m_type;
 	}
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) = 0;
+	virtual bool play( const MidiTime & start, const fpp_t frames,
+						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
 
 
-	virtual TrackView * createView( TrackContainerView * _view ) = 0;
-	virtual TrackContentObject * createTCO( const MidiTime & _pos ) = 0;
+	virtual TrackView * createView( TrackContainerView * view ) = 0;
+	virtual TrackContentObject * createTCO( const MidiTime & pos ) = 0;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-						QDomElement & _parent ) = 0;
-	virtual void loadTrackSpecificSettings( const QDomElement & _this ) = 0;
+	virtual void saveTrackSpecificSettings( QDomDocument & doc,
+						QDomElement & parent ) = 0;
+	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element );
+	virtual void loadSettings( const QDomElement & element );
 
 	void setSimpleSerializing()
 	{
@@ -471,26 +471,26 @@ public:
 	}
 
 	// -- for usage by TrackContentObject only ---------------
-	TrackContentObject * addTCO( TrackContentObject * _tco );
-	void removeTCO( TrackContentObject * _tco );
+	TrackContentObject * addTCO( TrackContentObject * tco );
+	void removeTCO( TrackContentObject * tco );
 	// -------------------------------------------------------
 	void deleteTCOs();
 
 	int numOfTCOs();
-	TrackContentObject * getTCO( int _tco_num );
-	int getTCONum(const TrackContentObject* _tco );
+	TrackContentObject * getTCO( int tcoNum );
+	int getTCONum(const TrackContentObject* tco );
 
 	const tcoVector & getTCOs() const
 	{
-		return( m_trackContentObjects );
+		return m_trackContentObjects;
 	}
-	void getTCOsInRange( tcoVector & _tco_v, const MidiTime & _start,
-							const MidiTime & _end );
-	void swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
+	void getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
+							const MidiTime & end );
+	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
 
 
-	void insertTact( const MidiTime & _pos );
-	void removeTact( const MidiTime & _pos );
+	void insertTact( const MidiTime & pos );
+	void removeTact( const MidiTime & pos );
 
 	tact_t length() const;
 
@@ -503,21 +503,25 @@ public:
 	// name-stuff
 	virtual const QString & name() const
 	{
-		return( m_name );
+		return m_name;
 	}
 
 	virtual QString displayName() const
 	{
-		return( name() );
+		return name();
 	}
 
 	using Model::dataChanged;
 
-	inline int getHeight() {
-	  return ( m_height >= MINIMAL_TRACK_HEIGHT ? m_height : DEFAULT_TRACK_HEIGHT );
+	inline int getHeight() 
+	{
+		return m_height >= MINIMAL_TRACK_HEIGHT
+			? m_height 
+			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int _height ) {
-	  m_height = _height;
+	inline void setHeight( int height ) 
+	{
+		m_height = height;
 	}
 
 	void lock()
@@ -534,9 +538,9 @@ public:
 	}
 
 public slots:
-	virtual void setName( const QString & _new_name )
+	virtual void setName( const QString & newName )
 	{
-		m_name = _new_name;
+		m_name = newName;
 		emit nameChanged();
 	}
 
@@ -583,12 +587,12 @@ public:
 
 	inline const Track * getTrack() const
 	{
-		return( m_track );
+		return m_track;
 	}
 
 	inline Track * getTrack()
 	{
-		return( m_track );
+		return m_track;
 	}
 
 	inline TrackContainerView* trackContainerView()
@@ -598,22 +602,22 @@ public:
 
 	inline TrackOperationsWidget * getTrackOperationsWidget()
 	{
-		return( &m_trackOperationsWidget );
+		return &m_trackOperationsWidget;
 	}
 
 	inline trackSettingsWidget * getTrackSettingsWidget()
 	{
-		return( &m_trackSettingsWidget );
+		return &m_trackSettingsWidget;
 	}
 
 	inline TrackContentWidget * getTrackContentWidget()
 	{
-		return( &m_trackContentWidget );
+		return &m_trackContentWidget;
 	}
 
 	bool isMovingTrack() const
 	{
-		return( m_action == MoveTrack );
+		return m_action == MoveTrack;
 	}
 
 	virtual void update();
@@ -643,13 +647,13 @@ protected:
 	}
 
 
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
+	virtual void dragEnterEvent( QDragEnterEvent * dee );
+	virtual void dropEvent( QDropEvent * de );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void mouseMoveEvent( QMouseEvent * me );
+	virtual void mouseReleaseEvent( QMouseEvent * me );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void resizeEvent( QResizeEvent * re );
 
 
 private:
@@ -674,7 +678,7 @@ private:
 
 
 private slots:
-	void createTCOView( TrackContentObject * _tco );
+	void createTCOView( TrackContentObject * tco );
 
 } ;
 

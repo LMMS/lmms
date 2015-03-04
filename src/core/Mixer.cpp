@@ -315,9 +315,9 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	m_profiler.startPeriod();
 
-	static Song::playPos last_metro_pos = -1;
+	static Song::PlayPos last_metro_pos = -1;
 
-	Song::playPos p = Engine::getSong()->getPlayPos(
+	Song::PlayPos p = Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern );
 	if( Engine::getSong()->playMode() == Song::Mode_PlayPattern &&
 		gui->pianoRoll()->isRecording() == true &&
@@ -962,9 +962,6 @@ void Mixer::fifoWriter::run()
 
 	m_fifo->write( NULL );
 }
-
-
-
 
 
 

@@ -81,36 +81,37 @@ const float MaxDetuning = 4 * 12.0f;
 class EXPORT Note : public SerializingObject
 {
 public:
-	Note( const MidiTime & _length = MidiTime( 0 ),
-		const MidiTime & _pos = MidiTime( 0 ),
+	Note( const MidiTime & length = MidiTime( 0 ),
+		const MidiTime & pos = MidiTime( 0 ),
 		int key = DefaultKey,
-		volume_t _volume = DefaultVolume,
-		panning_t _panning = DefaultPanning,
-		DetuningHelper * _detuning = NULL );
-	Note( const Note & _note );
+		volume_t volume = DefaultVolume,
+		panning_t panning = DefaultPanning,
+		DetuningHelper * detuning = NULL );
+	Note( const Note & note );
 	virtual ~Note();
 
 	// used by GUI
-	inline void setSelected( const bool _selected ) { m_selected = _selected; }
-	inline void setOldKey( const int _oldKey ) { m_oldKey = _oldKey; }
-	inline void setOldPos( const MidiTime & _oldPos ) { m_oldPos = _oldPos; }
-	inline void setOldLength( const MidiTime & _oldLength )
+	inline void setSelected( const bool selected ) { m_selected = selected; }
+	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
+	inline void setOldPos( const MidiTime & oldPos ) { m_oldPos = oldPos; }
+
+	inline void setOldLength( const MidiTime & oldLength )
 	{
-		m_oldLength = _oldLength;
+		m_oldLength = oldLength;
 	}
-	inline void setIsPlaying( const bool _isPlaying )
+	inline void setIsPlaying( const bool isPlaying )
 	{
-		m_isPlaying = _isPlaying;
+		m_isPlaying = isPlaying;
 	}
 
 
-	void setLength( const MidiTime & _length );
-	void setPos( const MidiTime & _pos );
-	void setKey( const int _key );
+	void setLength( const MidiTime & length );
+	void setPos( const MidiTime & pos );
+	void setKey( const int key );
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
-	void quantizeLength( const int _q_grid );
-	void quantizePos( const int _q_grid );
+	void quantizeLength( const int qGrid );
+	void quantizePos( const int qGrid );
 
 	static inline bool lessThan( Note * &lhs, Note * &rhs )
 	{
@@ -160,9 +161,9 @@ public:
 		return m_pos;
 	}
 
-	inline MidiTime pos( MidiTime _base_pos ) const
+	inline MidiTime pos( MidiTime basePos ) const
 	{
-		const int bp = _base_pos;
+		const int bp = basePos;
 		return m_pos - bp;
 	}
 
@@ -196,7 +197,7 @@ public:
 		return classNodeName();
 	}
 
-	static MidiTime quantized( const MidiTime & _m, const int _q_grid );
+	static MidiTime quantized( const MidiTime & m, const int qGrid );
 
 	DetuningHelper * detuning() const
 	{
@@ -208,8 +209,7 @@ public:
 
 
 protected:
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+	virtual void saveSettings( QDomDocument & doc, QDomElement & parent );
 	virtual void loadSettings( const QDomElement & _this );
 
 
@@ -234,4 +234,3 @@ typedef QVector<Note *> NoteVector;
 
 
 #endif
-

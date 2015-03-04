@@ -2,7 +2,7 @@
  * note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
+ * 
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -29,28 +29,30 @@
 
 #include "Note.h"
 #include "DetuningHelper.h"
+#include "templates.h"
 
 
 
 
-Note::Note( const MidiTime & _length, const MidiTime & _pos,
-		int _key, volume_t _volume, panning_t _panning,
-						DetuningHelper * _detuning ) :
+
+Note::Note( const MidiTime & length, const MidiTime & pos,
+		int key, volume_t volume, panning_t panning,
+						DetuningHelper * detuning ) :
 	m_selected( false ),
-	m_oldKey( qBound( 0, _key, NumKeys ) ),
-	m_oldPos( _pos ),
-	m_oldLength( _length ),
+	m_oldKey( qBound( 0, key, NumKeys ) ),
+	m_oldPos( pos ),
+	m_oldLength( length ),
 	m_isPlaying( false ),
-	m_key( qBound( 0, _key, NumKeys ) ),
-	m_volume( qBound( MinVolume, _volume, MaxVolume ) ),
-	m_panning( qBound( PanningLeft, _panning, PanningRight ) ),
-	m_length( _length ),
-	m_pos( _pos ),
+	m_key( qBound( 0, key, NumKeys ) ),
+	m_volume( qBound( MinVolume, volume, MaxVolume ) ),
+	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
+	m_length( length ),
+	m_pos( pos ),
 	m_detuning( NULL )
 {
-	if( _detuning )
+	if( detuning )
 	{
-		m_detuning = sharedObject::ref( _detuning );
+		m_detuning = sharedObject::ref( detuning );
 	}
 	else
 	{
@@ -61,23 +63,23 @@ Note::Note( const MidiTime & _length, const MidiTime & _pos,
 
 
 
-Note::Note( const Note & _note ) :
-	SerializingObject( _note ),
-	m_selected( _note.m_selected ),
-	m_oldKey( _note.m_oldKey ),
-	m_oldPos( _note.m_oldPos ),
-	m_oldLength( _note.m_oldLength ),
-	m_isPlaying( _note.m_isPlaying ),
-	m_key( _note.m_key),
-	m_volume( _note.m_volume ),
-	m_panning( _note.m_panning ),
-	m_length( _note.m_length ),
-	m_pos( _note.m_pos ),
+Note::Note( const Note & note ) :
+	SerializingObject( note ),
+	m_selected( note.m_selected ),
+	m_oldKey( note.m_oldKey ),
+	m_oldPos( note.m_oldPos ),
+	m_oldLength( note.m_oldLength ),
+	m_isPlaying( note.m_isPlaying ),
+	m_key( note.m_key),
+	m_volume( note.m_volume ),
+	m_panning( note.m_panning ),
+	m_length( note.m_length ),
+	m_pos( note.m_pos ),
 	m_detuning( NULL )
 {
-	if( _note.m_detuning )
+	if( note.m_detuning )
 	{
-		m_detuning = sharedObject::ref( _note.m_detuning );
+		m_detuning = sharedObject::ref( note.m_detuning );
 	}
 }
 
@@ -95,93 +97,93 @@ Note::~Note()
 
 
 
-void Note::setLength( const MidiTime & _length )
+void Note::setLength( const MidiTime & length )
 {
-	m_length = _length;
+	m_length = length;
 }
 
 
 
 
-void Note::setPos( const MidiTime & _pos )
+void Note::setPos( const MidiTime & pos )
 {
-	m_pos = _pos;
+	m_pos = pos;
 }
 
 
 
 
-void Note::setKey( const int _key )
+void Note::setKey( const int key )
 {
-	const int k = qBound( 0, _key, NumKeys );
+	const int k = qBound( 0, key, NumKeys );
 	m_key = k;
 }
 
 
 
 
-void Note::setVolume( volume_t _volume )
+void Note::setVolume( volume_t volume )
 {
-	const volume_t v = qBound( MinVolume, _volume, MaxVolume );
+	const volume_t v = qBound( MinVolume, volume, MaxVolume );
 	m_volume = v;
 }
 
 
 
 
-void Note::setPanning( panning_t _panning )
+void Note::setPanning( panning_t panning )
 {
-	const panning_t p = qBound( PanningLeft, _panning, PanningRight );
+	const panning_t p = qBound( PanningLeft, panning, PanningRight );
 	m_panning = p;
 }
 
 
 
 
-MidiTime Note::quantized( const MidiTime & _m, const int _q_grid )
+MidiTime Note::quantized( const MidiTime & m, const int qGrid )
 {
-	float p = ( (float) _m / _q_grid );
+	float p = ( (float) m / qGrid );
 	if( p - floorf( p ) < 0.5f )
 	{
-		return( static_cast<int>( p ) * _q_grid );
+		return static_cast<int>( p ) * qGrid;
 	}
-	return( static_cast<int>( p + 1 ) * _q_grid );
+	return static_cast<int>( p + 1 ) * qGrid;
 }
 
 
 
 
-void Note::quantizeLength( const int _q_grid )
+void Note::quantizeLength( const int qGrid )
 {
-	setLength( quantized( length(), _q_grid ) );
+	setLength( quantized( length(), qGrid ) );
 	if( length() == 0 )
 	{
-		setLength( _q_grid );
+		setLength( qGrid );
 	}
 }
 
 
 
 
-void Note::quantizePos( const int _q_grid )
+void Note::quantizePos( const int qGrid )
 {
-	setPos( quantized( pos(), _q_grid ) );
+	setPos( quantized( pos(), qGrid ) );
 }
 
 
 
 
-void Note::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 {
-	_this.setAttribute( "key", m_key );
-	_this.setAttribute( "vol", m_volume );
-	_this.setAttribute( "pan", m_panning );
-	_this.setAttribute( "len", m_length );
-	_this.setAttribute( "pos", m_pos );
+	parent.setAttribute( "key", m_key );
+	parent.setAttribute( "vol", m_volume );
+	parent.setAttribute( "pan", m_panning );
+	parent.setAttribute( "len", m_length );
+	parent.setAttribute( "pos", m_pos );
 
 	if( m_detuning && m_length )
 	{
-		m_detuning->saveSettings( _doc, _this );
+		m_detuning->saveSettings( doc, parent );
 	}
 }
 
@@ -226,7 +228,6 @@ bool Note::hasDetuningInfo() const
 {
 	return m_detuning && m_detuning->hasAutomation();
 }
-
 
 
 

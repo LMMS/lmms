@@ -38,9 +38,9 @@
 #include "Song.h"
 
 
-static PixmapLoader __dummy_loader;
+static PixmapLoader __dummyLoader;
 
-static Plugin::Descriptor dummy_plugin_descriptor =
+static Plugin::Descriptor dummyPluginDescriptor =
 {
 	"dummy",
 	"dummy",
@@ -48,21 +48,21 @@ static Plugin::Descriptor dummy_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Undefined,
-	&__dummy_loader,
+	&__dummyLoader,
 	NULL
 } ;
 
 
 
 
-Plugin::Plugin( const Descriptor * _descriptor, Model * parent ) :
+Plugin::Plugin( const Descriptor * descriptor, Model * parent ) :
 	Model( parent ),
 	JournallingObject(),
-	m_descriptor( _descriptor )
+	m_descriptor( descriptor )
 {
 	if( m_descriptor == NULL )
 	{
-		m_descriptor = &dummy_plugin_descriptor;
+		m_descriptor = &dummyPluginDescriptor;
 	}
 }
 
@@ -109,7 +109,7 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 		return new DummyPlugin();
 	}
 
-	InstantiationHook instantiationHook = ( InstantiationHook ) pluginLibrary.resolve( "lmms_plugin_main" );
+	InstantiationHook instantiationHook = ( InstantiationHook )pluginLibrary.resolve( "lmms_plugin_main" );
 	if( instantiationHook == NULL )
 	{
 		if( Engine::hasGUI() )
@@ -126,10 +126,14 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 	return inst;
 }
 
-void Plugin::collectErrorForUI( QString err_msg )
+
+
+
+void Plugin::collectErrorForUI( QString errMsg )
 {
-	Engine::getSong()->collectError( err_msg );
+	Engine::getSong()->collectError( errMsg );
 }
+
 
 
 
@@ -189,13 +193,13 @@ PluginView * Plugin::createView( QWidget * parent )
 
 
 
-Plugin::Descriptor::SubPluginFeatures::Key::Key(
-						const QDomElement & _key ) :
+
+Plugin::Descriptor::SubPluginFeatures::Key::Key( const QDomElement & key ) :
 	desc( NULL ),
-	name( _key.attribute( "key" ) ),
+	name( key.attribute( "key" ) ),
 	attributes()
 {
-	QDomNodeList l = _key.elementsByTagName( "attribute" );
+	QDomNodeList l = key.elementsByTagName( "attribute" );
 	for( int i = 0; !l.item( i ).isNull(); ++i )
 	{
 		QDomElement e = l.item( i ).toElement();
@@ -208,17 +212,19 @@ Plugin::Descriptor::SubPluginFeatures::Key::Key(
 
 
 QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
-						QDomDocument & _doc ) const
+						QDomDocument & doc ) const
 {
-	QDomElement e = _doc.createElement( "key" );
-	for( AttributeMap::ConstIterator it = attributes.begin();
-									it != attributes.end(); ++it )
+	QDomElement e = doc.createElement( "key" );
+	for( AttributeMap::ConstIterator it = attributes.begin(); 
+		it != attributes.end(); ++it )
 	{
-		QDomElement a = _doc.createElement( "attribute" );
+		QDomElement a = doc.createElement( "attribute" );
 		a.setAttribute( "name", it.key() );
 		a.setAttribute( "value", it.value() );
 		e.appendChild( a );
 	}
 	return e;
 }
+
+
 
