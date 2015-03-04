@@ -34,7 +34,7 @@
 #include <cmath>
 using namespace std;
 
-#if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) 
+#if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE)  || defined (__FreeBSD__)
 #ifndef isnanf
 #define isnanf(x)	isnan(x)
 #endif

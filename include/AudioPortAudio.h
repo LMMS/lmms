@@ -45,7 +45,11 @@ public:
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
+#if defined(__FreeBSD__)
+#include <portaudio2/portaudio.h>
+#else
 #include <portaudio.h>
+#endif
 
 #include "AudioDevice.h"
 
