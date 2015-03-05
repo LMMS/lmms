@@ -27,3 +27,7 @@
 #ifdef LMMS_BUILD_WIN32
 #define PLATFORM "win32"
 #endif
+
+#ifdef LMMS_BUILD_HAIKU
+#define PLATFORM "Haiku"
+#endif
