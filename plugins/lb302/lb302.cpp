@@ -458,10 +458,6 @@ void lb302Synth::recalcFilter()
 	vcf_envpos = ENVINC; // Trigger filter update in process()
 }
 
-inline int MIN(int a, int b) {
-	return (a<b)?a:b;
-}
-
 inline float GET_INC(float freq) {
 	return freq/Engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 }
