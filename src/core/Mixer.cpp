@@ -49,6 +49,7 @@
 // platform-specific midi-interface-classes
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
+#include "MidiJack.h"
 #include "MidiOss.h"
 #include "MidiWinMM.h"
 #include "MidiApple.h"
@@ -869,6 +870,19 @@ MidiClient * Mixer::tryMidiClients()
 			return malsar;
 		}
 		delete malsar;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if( client_name == MidiJack::name() || client_name == "" )
+	{
+		MidiJack * moss = new MidiJack;
+		if( moss->isRunning() )
+		{
+			m_midiClientName = MidiJack::name();
+			return moss;
+		}
+		delete moss;
 	}
 #endif
 

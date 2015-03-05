@@ -63,6 +63,7 @@
 // platform-specific midi-interface-classes
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
+#include "MidiJack.h"
 #include "MidiOss.h"
 #include "MidiWinMM.h"
 #include "MidiApple.h"
@@ -837,6 +838,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 					MidiSetupWidget::create<MidiAlsaSeq>( msw );
 	m_midiIfaceSetupWidgets[MidiAlsaRaw::name()] =
 					MidiSetupWidget::create<MidiAlsaRaw>( msw );
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	m_midiIfaceSetupWidgets[MidiJack::name()] =
+					new MidiJack::setupWidget( msw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
