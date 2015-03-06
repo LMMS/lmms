@@ -33,8 +33,6 @@
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "GuiApplication.h"
-#include "PianoRoll.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -57,7 +55,7 @@
 
 
 
-Mixer::Mixer() :
+Mixer::Mixer( bool renderOnly ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_workingBuf( NULL ),
 	m_inputBufferRead( 0 ),
@@ -82,48 +80,46 @@ Mixer::Mixer() :
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
-	// just rendering?
-	if( !Engine::hasGUI() )
-	{
-		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		m_fifo = new fifo( 1 );
-	}
-	else if( ConfigManager::inst()->value( "mixer", "framesperaudiobuffer"
-						).toInt() >= 32 )
-	{
-		m_framesPerPeriod =
-			(fpp_t) ConfigManager::inst()->value( "mixer",
-					"framesperaudiobuffer" ).toInt();
+	int fifoSize = 1;
 
-		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
+	if( !renderOnly )
+	{
+		int fpab = ConfigManager::inst()
+			->value( "mixer", "framesperaudiobuffer").toInt();
+
+		if( fpab >= 32 )
 		{
-			m_fifo = new fifo( m_framesPerPeriod
-							/ DEFAULT_BUFFER_SIZE );
-			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
+			m_framesPerPeriod = (fpp_t) fpab;
+
+			if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
+			{
+				fifoSize = 
+					m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
+
+				m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
+			}
 		}
 		else
 		{
-			m_fifo = new fifo( 1 );
+			ConfigManager::inst()->setValue(
+				"mixer",
+				"framesperaudiobuffer",
+				QString::number( m_framesPerPeriod ) );
 		}
 	}
-	else
-	{
-		ConfigManager::inst()->setValue( "mixer",
-							"framesperaudiobuffer",
-				QString::number( m_framesPerPeriod ) );
-		m_fifo = new fifo( 1 );
-	}
+
+	m_fifo = new Fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	m_workingBuf = (sampleFrame*) MemoryHelper::alignedMalloc( m_framesPerPeriod *
-							sizeof( sampleFrame ) );
+	m_workingBuf = (sampleFrame*) MemoryHelper::alignedMalloc( 
+				m_framesPerPeriod * sizeof( sampleFrame ) );
+
 	for( int i = 0; i < 3; i++ )
 	{
-		m_readBuf = (surroundSampleFrame*)
-			MemoryHelper::alignedMalloc( m_framesPerPeriod *
-						sizeof( surroundSampleFrame ) );
+		m_readBuf = (surroundSampleFrame*) MemoryHelper::alignedMalloc( 
+			m_framesPerPeriod * sizeof( surroundSampleFrame ) );
 
 		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
@@ -199,7 +195,7 @@ void Mixer::startProcessing( bool _needs_fifo )
 {
 	if( _needs_fifo )
 	{
-		m_fifoWriter = new fifoWriter( this, m_fifo );
+		m_fifoWriter = new FifoWriter( this, m_fifo );
 		m_fifoWriter->start( QThread::HighPriority );
 	}
 	else
@@ -315,24 +311,19 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	m_profiler.startPeriod();
 
-	static Song::PlayPos last_metro_pos = -1;
-
-	Song::PlayPos p = Engine::getSong()->getPlayPos(
-						Song::Mode_PlayPattern );
-	if( Engine::getSong()->playMode() == Song::Mode_PlayPattern &&
-		gui->pianoRoll()->isRecording() == true &&
-		p != last_metro_pos )
+	// play metronome sample if needed
+	switch( Engine::updateMetronome() )
 	{
-		if ( p.getTicks() % (MidiTime::ticksPerTact() / 1 ) == 0 )
-		{
-			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
-		}
-		else if ( p.getTicks() % (MidiTime::ticksPerTact() /
-			Engine::getSong()->getTimeSigModel().getNumerator() ) == 0 )
-		{
+		case 1:
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
-		}
-		last_metro_pos = p;
+			break;
+
+		case 2:
+			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
+			break;
+
+		default:
+			break;
 	}
 
 	lockInputFrames();
@@ -910,7 +901,7 @@ MidiClient * Mixer::tryMidiClients()
 
 
 
-Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
+Mixer::FifoWriter::FifoWriter( Mixer* mixer, Fifo * _fifo ) :
 	m_mixer( mixer ),
 	m_fifo( _fifo ),
 	m_writing( true )
@@ -920,7 +911,7 @@ Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
 
 
 
-void Mixer::fifoWriter::finish()
+void Mixer::FifoWriter::finish()
 {
 	m_writing = false;
 }
@@ -928,7 +919,7 @@ void Mixer::fifoWriter::finish()
 
 
 
-void Mixer::fifoWriter::run()
+void Mixer::FifoWriter::run()
 {
 // set denormal protection for this thread
 #ifdef __SSE3__

@@ -35,8 +35,8 @@ class DummyTrackContainer;
 class FxMixer;
 class ProjectJournal;
 class Mixer;
-class Song;
 class Ladspa2LMMS;
+class Song;
 
 
 class EXPORT Engine
@@ -83,6 +83,15 @@ public:
 		return s_dummyTC;
 	}
 
+	static void activateMetronome( bool b )
+	{
+		s_metronomeActive = b;
+	}
+
+	// updates the metronome position and returns the number of the sample
+	// to play (zero if no sample should be player)
+	static int updateMetronome();
+
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
@@ -116,13 +125,15 @@ private:
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
 
+	static bool s_metronomeActive;
+
 	static Ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_pluginFileHandling;
 
 	static void initPluginFileHandling();
 
-	friend class GuiApplication;
+	//friend class GuiApplication;
 };
 
 

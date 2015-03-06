@@ -47,6 +47,7 @@ Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
 QMap<QString, QString> Engine::s_pluginFileHandling;
 
+bool Engine::s_metronomeActive = false;
 
 
 
@@ -58,7 +59,7 @@ void Engine::init()
 	initPluginFileHandling();
 
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer;
+	s_mixer = new Mixer( !hasGUI() );
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
@@ -106,6 +107,33 @@ void Engine::destroy()
 bool Engine::hasGUI()
 {
 	return gui != nullptr;
+}
+
+
+
+
+int Engine::updateMetronome()
+{
+	int ret = 0;
+
+	if( s_metronomeActive )
+	{
+		int posTicks = Engine::getSong()->getPlayPos(
+					Song::Mode_PlayPattern ).getTicks();
+
+		if ( posTicks % (MidiTime::ticksPerTact() / 1 ) == 0 )
+		{
+			ret = 2;
+		}
+		else if ( posTicks % (MidiTime::ticksPerTact() /
+			s_song->getTimeSigModel().getNumerator() ) == 0 )
+		{
+			ret = 1;
+		}
+
+	}
+
+	return ret;
 }
 
 

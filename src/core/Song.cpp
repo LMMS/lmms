@@ -623,10 +623,12 @@ void Song::stop()
 		return;
 	}
 
+	Engine::activateMetronome(false);
+
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_playing = false;
 	m_paused = false;
-	m_recording = true;
+	m_recording = false;
 
 	if(tl != NULL)
 	{
