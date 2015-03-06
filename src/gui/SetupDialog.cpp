@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QSlider>
 #include <QWhatsThis>
+#include <QScrollArea>
 
 #include "SetupDialog.h"
 #include "TabBar.h"
@@ -378,15 +379,34 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
 	labelWidget( paths, tr( "Paths" ) );
+	QLabel * title = new QLabel( tr( "Directories" ), paths );
+	QFont f = title->font();
+	f.setBold( true );
+	title->setFont( pointSize<12>( f ) );
+
+
+	QScrollArea *pathScroll = new QScrollArea( paths );
+
+	QWidget *pathSelectors = new QWidget( ws );
+	QVBoxLayout *pathSelectorLayout = new QVBoxLayout;
+	pathScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	pathScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	pathScroll->resize( 360, pathsHeight - 50  );
+	pathScroll->move( 0, 50 );
+	pathSelectors->resize( 360, pathsHeight );
+
+	const int txtLength = 285;
+	const int btnStart = 305;
+
 
 	// working-dir
 	TabWidget * lmms_wd_tw = new TabWidget( tr(
 					"LMMS working directory" ).toUpper(),
-								paths );
+								pathSelectors );
 	lmms_wd_tw->setFixedHeight( 48 );
 
 	m_wdLineEdit = new QLineEdit( m_workingDir, lmms_wd_tw );
-	m_wdLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_wdLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_wdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 				SLOT( setWorkingDir( const QString & ) ) );
 
@@ -394,37 +414,19 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 							"", lmms_wd_tw );
 	workingdir_select_btn->setFixedSize( 24, 24 );
-	workingdir_select_btn->move( 320, 16 );
+	workingdir_select_btn->move( btnStart, 16 );
 	connect( workingdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openWorkingDir() ) );
 
-	// vst-dir
-	TabWidget * vst_tw = new TabWidget( tr(
-					"VST-plugin directory" ).toUpper(),
-								paths );
-	vst_tw->setFixedHeight( 48 );
-
-	m_vdLineEdit = new QLineEdit( m_vstDir, vst_tw );
-	m_vdLineEdit->setGeometry( 10, 20, 300, 16 );
-	connect( m_vdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
-					SLOT( setVSTDir( const QString & ) ) );
-
-	QPushButton * vstdir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
-								"", vst_tw );
-	vstdir_select_btn->setFixedSize( 24, 24 );
-	vstdir_select_btn->move( 320, 16 );
-	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
-						SLOT( openVSTDir() ) );
 
 	// artwork-dir
 	TabWidget * artwork_tw = new TabWidget( tr(
-					"Artwork directory" ).toUpper(),
-								paths );
+					"Themes directory" ).toUpper(),
+								pathSelectors );
 	artwork_tw->setFixedHeight( 48 );
 
 	m_adLineEdit = new QLineEdit( m_artworkDir, artwork_tw );
-	m_adLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_adLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_adLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 				SLOT( setArtworkDir( const QString & ) ) );
 
@@ -432,7 +434,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 							"", artwork_tw );
 	artworkdir_select_btn->setFixedSize( 24, 24 );
-	artworkdir_select_btn->move( 320, 16 );
+	artworkdir_select_btn->move( btnStart, 16 );
 	connect( artworkdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openArtworkDir() ) );
 
@@ -445,7 +447,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	m_baLineEdit = new QLineEdit( m_backgroundArtwork, 
 			backgroundArtwork_tw );
-	m_baLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_baLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_baLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 			SLOT( setBackgroundArtwork( const QString & ) ) );
 
@@ -453,7 +455,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 			embed::getIconPixmap( "project_open", 16, 16 ),
 			"", backgroundArtwork_tw );
 	backgroundartworkdir_select_btn->setFixedSize( 24, 24 );
-	backgroundartworkdir_select_btn->move( 320, 16 );
+	backgroundartworkdir_select_btn->move( btnStart, 16 );
 	connect( backgroundartworkdir_select_btn, SIGNAL( clicked() ), this,
 					SLOT( openBackgroundArtwork() ) );
 
@@ -468,7 +470,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	fl_tw->setFixedHeight( 48 );
 
 	m_fdLineEdit = new QLineEdit( m_flDir, fl_tw );
-	m_fdLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_fdLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_fdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 					SLOT( setFLDir( const QString & ) ) );
 
@@ -476,27 +478,48 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 								"", fl_tw );
 	fldir_select_btn->setFixedSize( 24, 24 );
-	fldir_select_btn->move( 320, 16 );
+	fldir_select_btn->move( btnStart, 16 );
 	connect( fldir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openFLDir() ) );
+
+	// vst-dir
+	TabWidget * vst_tw = new TabWidget( tr(
+					"VST-plugin directory" ).toUpper(),
+								pathSelectors );
+	vst_tw->setFixedHeight( 48 );
+
+	m_vdLineEdit = new QLineEdit( m_vstDir, vst_tw );
+	m_vdLineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_vdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setVSTDir( const QString & ) ) );
+
+	QPushButton * vstdir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", vst_tw );
+	vstdir_select_btn->setFixedSize( 24, 24 );
+	vstdir_select_btn->move( btnStart, 16 );
+	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openVSTDir() ) );
+
 	// LADSPA-dir
 	TabWidget * lad_tw = new TabWidget( tr(
-			"LADSPA plugin paths" ).toUpper(),
+			"LADSPA plugin directories" ).toUpper(),
 							paths );
 	lad_tw->setFixedHeight( 48 );
 
 	m_ladLineEdit = new QLineEdit( m_ladDir, lad_tw );
-	m_ladLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_ladLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_ladLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 		SLOT( setLADSPADir( const QString & ) ) );
 
 	QPushButton * laddir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				embed::getIconPixmap( "project_new_from_template", 16, 16 ),
 								"", lad_tw );
 	laddir_select_btn->setFixedSize( 24, 24 );
-	laddir_select_btn->move( 320, 16 );
+	laddir_select_btn->move( btnStart, 16 );
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openLADSPADir() ) );
+
 
 #ifdef LMMS_HAVE_STK
 	// STK-dir
@@ -506,7 +529,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	stk_tw->setFixedHeight( 48 );
 
 	m_stkLineEdit = new QLineEdit( m_stkDir, stk_tw );
-	m_stkLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_stkLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_stkLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 SLOT( setSTKDir( const QString & ) ) );
 
@@ -514,7 +537,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 			embed::getIconPixmap( "project_open", 16, 16 ),
 								"", stk_tw );
 	stkdir_select_btn->setFixedSize( 24, 24 );
-	stkdir_select_btn->move( 320, 16 );
+	stkdir_select_btn->move( btnStart, 16 );
 	connect( stkdir_select_btn, SIGNAL( clicked() ), this,
 		 SLOT( openSTKDir() ) );
 #endif
@@ -526,7 +549,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	sf_tw->setFixedHeight( 48 );
 
 	m_sfLineEdit = new QLineEdit( m_defaultSoundfont, sf_tw );
-	m_sfLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_sfLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_sfLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 		SLOT( setDefaultSoundfont( const QString & ) ) );
 
@@ -534,34 +557,37 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 								"", sf_tw );
 	sf_select_btn->setFixedSize( 24, 24 );
-	sf_select_btn->move( 320, 16 );
+	sf_select_btn->move( btnStart, 16 );
 	connect( sf_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openDefaultSoundfont() ) );
 #endif	
 
+	pathSelectors->setLayout( pathSelectorLayout );
 
-	dir_layout->addWidget( lmms_wd_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( vst_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( artwork_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( backgroundArtwork_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( fl_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( lad_tw );
+	pathSelectorLayout->addWidget( lmms_wd_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( artwork_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( backgroundArtwork_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( fl_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( vst_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( lad_tw );
 #ifdef LMMS_HAVE_STK
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( stk_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( stk_tw );
 #endif	
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( sf_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( sf_tw );
 #endif	
-	dir_layout->addStretch();
+	pathSelectorLayout->addStretch();
 
+	dir_layout->addWidget( pathSelectors );
 
+	pathScroll->setWidget( pathSelectors );
 
 
 
@@ -1215,7 +1241,6 @@ void SetupDialog::openLADSPADir()
 		}
 	}
 }
-
 
 
 

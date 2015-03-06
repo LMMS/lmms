@@ -1,3 +1,4 @@
+
 /*
  * SetupDialog.h - dialog for setting up LMMS
  *
