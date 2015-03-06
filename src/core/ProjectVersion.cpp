@@ -65,6 +65,9 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 {
 }
 
+
+
+
 ProjectVersion::ProjectVersion(const char* version, CompareType c) :
 	m_version(QString(version)),
 	m_major(parseMajor(m_version)),
