@@ -67,6 +67,7 @@ ConfigManager::ConfigManager() :
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
+	m_gigDir( m_workingDir + GIG_PATH ),
 	m_version( defaultVersion() )
 {
 }
@@ -177,6 +178,11 @@ void ConfigManager::setBackgroundArtwork( const QString & _ba )
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
 #endif
+}
+
+void ConfigManager::setGIGDir(const QString &gd)
+{
+	m_gigDir = gd;
 }
 
 
@@ -339,6 +345,8 @@ void ConfigManager::loadConfigFile()
 				}
 			}
 			setWorkingDir( value( "paths", "workingdir" ) );
+
+			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
 			setFLDir( value( "paths", "fldir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
@@ -425,6 +433,7 @@ void ConfigManager::loadConfigFile()
 		QDir().mkpath( userProjectsDir() );
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
+		QDir().mkpath( userGigDir() );
 	}
 
 	upgrade();
@@ -439,6 +448,7 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "fldir", m_flDir );
+	setValue( "paths", "gigdir", m_gigDir );
 	setValue( "paths", "laddir", m_ladDir );
 #ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );

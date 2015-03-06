@@ -72,6 +72,7 @@ private slots:
 	// path settings widget
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
+	void setGIGDir( const QString & _gd);
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _ld );
@@ -97,6 +98,7 @@ private slots:
 
 	void openWorkingDir();
 	void openVSTDir();
+	void openGIGDir();
 	void openArtworkDir();
 	void openFLDir();
 	void openLADSPADir();
@@ -139,6 +141,7 @@ private:
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
+	QLineEdit * m_gigLineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QLineEdit * m_sfLineEdit;
 #endif
@@ -152,6 +155,7 @@ private:
 	QString m_artworkDir;
 	QString m_flDir;
 	QString m_ladDir;
+	QString m_gigDir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_defaultSoundfont;
 #endif

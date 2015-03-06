@@ -106,6 +106,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_artworkDir( QDir::toNativeSeparators( ConfigManager::inst()->artworkDir() ) ),
 	m_flDir( QDir::toNativeSeparators( ConfigManager::inst()->flDir() ) ),
 	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
+	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont( QDir::toNativeSeparators( ConfigManager::inst()->defaultSoundfont() ) ),
 #endif
@@ -501,6 +502,25 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openVSTDir() ) );
 
+	// gig-dir
+	TabWidget * gig_tw = new TabWidget( tr(
+					"GIG directory" ).toUpper(),
+								pathSelectors );
+	gig_tw->setFixedHeight( 48 );
+
+	m_gigLineEdit = new QLineEdit( m_gigDir, gig_tw );
+	m_gigLineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_gigLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setGIGDir( const QString & ) ) );
+
+	QPushButton * gigdir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", gig_tw );
+	gigdir_select_btn->setFixedSize( 24, 24 );
+	gigdir_select_btn->move( btnStart, 16 );
+	connect( gigdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openGIGDir() ) );
+
 	// LADSPA-dir
 	TabWidget * lad_tw = new TabWidget( tr(
 			"LADSPA plugin directories" ).toUpper(),
@@ -565,6 +585,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathSelectors->setLayout( pathSelectorLayout );
 
 	pathSelectorLayout->addWidget( lmms_wd_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( gig_tw );
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( artwork_tw );
 	pathSelectorLayout->addSpacing( 10 );
@@ -931,6 +953,7 @@ void SetupDialog::accept()
 
 	ConfigManager::inst()->setWorkingDir( m_workingDir );
 	ConfigManager::inst()->setVSTDir( m_vstDir );
+	ConfigManager::inst()->setGIGDir( m_gigDir );
 	ConfigManager::inst()->setArtworkDir( m_artworkDir );
 	ConfigManager::inst()->setFLDir( m_flDir );
 	ConfigManager::inst()->setLADSPADir( m_ladDir );
@@ -1154,6 +1177,17 @@ void SetupDialog::openWorkingDir()
 	}
 }
 
+void SetupDialog::openGIGDir()
+{
+	QString new_dir = FileDialog::getExistingDirectory( this,
+				tr( "Choose your GIG directory" ),
+							m_gigDir );
+	if( new_dir != QString::null )
+	{
+		m_gigLineEdit->setText( new_dir );
+	}
+}
+
 
 
 
@@ -1182,6 +1216,11 @@ void SetupDialog::openVSTDir()
 void SetupDialog::setVSTDir( const QString & _vd )
 {
 	m_vstDir = _vd;
+}
+
+void SetupDialog::setGIGDir(const QString &_gd)
+{
+
 }
 
 
