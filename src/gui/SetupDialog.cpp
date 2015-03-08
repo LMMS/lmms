@@ -107,6 +107,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_flDir( QDir::toNativeSeparators( ConfigManager::inst()->flDir() ) ),
 	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
 	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
+	m_sf2Dir( QDir::toNativeSeparators( ConfigManager::inst()->sf2Dir() ) ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont( QDir::toNativeSeparators( ConfigManager::inst()->defaultSoundfont() ) ),
 #endif
@@ -392,7 +393,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	QVBoxLayout *pathSelectorLayout = new QVBoxLayout;
 	pathScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	pathScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	pathScroll->resize( 360, pathsHeight - 50  );
+	pathScroll->resize( 362, pathsHeight - 50  );
 	pathScroll->move( 0, 30 );
 	pathSelectors->resize( 360, pathsHeight - 50 );
 
@@ -521,6 +522,27 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( gigdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openGIGDir() ) );
 
+	// sf2-dir
+	TabWidget * sf2_tw = new TabWidget( tr(
+					"SF2 directory" ).toUpper(),
+								pathSelectors );
+	sf2_tw->setFixedHeight( 48 );
+
+	m_sf2LineEdit = new QLineEdit( m_sf2Dir, sf2_tw );
+	m_sf2LineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_sf2LineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setSF2Dir( const QString & ) ) );
+
+	QPushButton * sf2dir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", sf2_tw );
+	sf2dir_select_btn->setFixedSize( 24, 24 );
+	sf2dir_select_btn->move( btnStart, 16 );
+	connect( sf2dir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openSF2Dir() ) );
+
+
+
 	// LADSPA-dir
 	TabWidget * lad_tw = new TabWidget( tr(
 			"LADSPA plugin directories" ).toUpper(),
@@ -588,6 +610,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( gig_tw );
 	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( sf2_tw );
+	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( artwork_tw );
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( backgroundArtwork_tw );
@@ -610,6 +634,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->addWidget( pathSelectors );
 
 	pathScroll->setWidget( pathSelectors );
+	pathScroll->setWidgetResizable( true );
 
 
 
@@ -954,6 +979,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setWorkingDir( m_workingDir );
 	ConfigManager::inst()->setVSTDir( m_vstDir );
 	ConfigManager::inst()->setGIGDir( m_gigDir );
+	ConfigManager::inst()->setSF2Dir( m_sf2Dir );
 	ConfigManager::inst()->setArtworkDir( m_artworkDir );
 	ConfigManager::inst()->setFLDir( m_flDir );
 	ConfigManager::inst()->setLADSPADir( m_ladDir );
@@ -1188,6 +1214,17 @@ void SetupDialog::openGIGDir()
 	}
 }
 
+void SetupDialog::openSF2Dir()
+{
+	QString new_dir = FileDialog::getExistingDirectory( this,
+				tr( "Choose your SF2 directory" ),
+							m_sf2Dir );
+	if( new_dir != QString::null )
+	{
+		m_sf2LineEdit->setText( new_dir );
+	}
+}
+
 
 
 
@@ -1220,7 +1257,12 @@ void SetupDialog::setVSTDir( const QString & _vd )
 
 void SetupDialog::setGIGDir(const QString &_gd)
 {
+	m_gigDir = _gd;
+}
 
+void SetupDialog::setSF2Dir(const QString &_sfd)
+{
+	m_sf2Dir = _sfd;
 }
 
 

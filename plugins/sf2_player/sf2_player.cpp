@@ -1068,7 +1068,7 @@ void sf2InstrumentView::showFileDialog()
 		QString f = k->m_filename;
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = ConfigManager::inst()->userSamplesDir() + f;
+			f = ConfigManager::inst()->sf2Dir() + f;
 			if( QFileInfo( f ).exists() == false )
 			{
 				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
@@ -1079,7 +1079,7 @@ void sf2InstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->userSamplesDir() );
+		ofd.setDirectory( ConfigManager::inst()->sf2Dir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );

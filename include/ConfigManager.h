@@ -44,6 +44,7 @@ const QString PROJECTS_PATH = "projects/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString GIG_PATH = "samples/gig";
+const QString SF2_PATH = "samples/sf2";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
@@ -137,6 +138,11 @@ public:
 		return m_gigDir;
 	}
 
+	const QString & sf2Dir() const
+	{
+		return m_sf2Dir;
+	}
+
 	const QString & pluginDir() const
 	{
 		return m_pluginDir;
@@ -212,6 +218,7 @@ public:
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
 	void setGIGDir( const QString & gd );
+	void setSF2Dir( const QString & sfd );
 
 
 private:
@@ -233,6 +240,7 @@ private:
 	QString m_flDir;
 	QString m_ladDir;
 	QString m_gigDir;
+	QString m_sf2Dir;
 	QString m_version;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;

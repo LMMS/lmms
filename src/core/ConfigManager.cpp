@@ -68,6 +68,7 @@ ConfigManager::ConfigManager() :
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
 	m_gigDir( m_workingDir + GIG_PATH ),
+	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
 }
@@ -183,6 +184,11 @@ void ConfigManager::setBackgroundArtwork( const QString & _ba )
 void ConfigManager::setGIGDir(const QString &gd)
 {
 	m_gigDir = gd;
+}
+
+void ConfigManager::setSF2Dir(const QString &sfd)
+{
+	m_sf2Dir = sfd;
 }
 
 
@@ -347,6 +353,7 @@ void ConfigManager::loadConfigFile()
 			setWorkingDir( value( "paths", "workingdir" ) );
 
 			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
+			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
 			setFLDir( value( "paths", "fldir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
@@ -434,6 +441,7 @@ void ConfigManager::loadConfigFile()
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
 		QDir().mkpath( userGigDir() );
+		QDir().mkpath( sf2Dir() );
 	}
 
 	upgrade();
@@ -449,6 +457,7 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "fldir", m_flDir );
 	setValue( "paths", "gigdir", m_gigDir );
+	setValue( "paths", "sf2dir", m_sf2Dir );
 	setValue( "paths", "laddir", m_ladDir );
 #ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );
