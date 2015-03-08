@@ -3319,7 +3319,7 @@ Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 
 void PianoRoll::play()
 {
-	if( ! hasValidPattern() )
+	if( !hasValidPattern() )
 	{
 		return;
 	}
@@ -3331,6 +3331,11 @@ void PianoRoll::play()
 	else
 	{
 		Engine::getSong()->togglePause();
+
+		if ( m_recording )
+		{
+			Engine::activateMetronome( Engine::getSong()->isPaused() == false );
+		}
 	}
 }
 
@@ -3351,6 +3356,7 @@ void PianoRoll::record()
 	m_recording = true;
 
 	Engine::getSong()->playPattern( m_pattern, false );
+	Engine::activateMetronome( true );
 }
 
 

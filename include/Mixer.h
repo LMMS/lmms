@@ -360,7 +360,6 @@ public:
 
 	void changeQuality( const struct qualitySettings & _qs );
 
-
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
@@ -368,19 +367,19 @@ signals:
 
 
 private:
-	typedef fifoBuffer<surroundSampleFrame *> fifo;
+	typedef fifoBuffer<surroundSampleFrame *> Fifo;
 
-	class fifoWriter : public QThread
+	class FifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * _mixer, fifo * _fifo );
+		FifoWriter( Mixer * _mixer, Fifo * _fifo );
 
 		void finish();
 
 
 	private:
 		Mixer * m_mixer;
-		fifo * m_fifo;
+		Fifo * m_fifo;
 		volatile bool m_writing;
 
 		virtual void run();
@@ -388,7 +387,7 @@ private:
 	} ;
 
 
-	Mixer();
+	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
 	void startProcessing( bool _needs_fifo = true );
@@ -457,13 +456,12 @@ private:
 
 	QMutex m_playHandleRemovalMutex;
 
-	fifo * m_fifo;
-	fifoWriter * m_fifoWriter;
+	Fifo * m_fifo;
+	FifoWriter * m_fifoWriter;
 
 	MixerProfiler m_profiler;
 
 	friend class Engine;
-	friend class MixerWorkerThread;
 
 } ;
 

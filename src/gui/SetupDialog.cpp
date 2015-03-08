@@ -830,8 +830,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	vlayout->addStretch();
 
 	show();
-
-
 }
 
 
@@ -884,7 +882,6 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
-
 
 	ConfigManager::inst()->setWorkingDir( m_workingDir );
 	ConfigManager::inst()->setVSTDir( m_vstDir );
