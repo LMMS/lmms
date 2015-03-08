@@ -942,7 +942,7 @@ void Song::loadProject( const QString & fileName )
 	DataFile dataFile( m_fileName );
 	// if file could not be opened, head-node is null and we create
 	// new project
-	if( dataFile.head().isNull() )
+	if( dataFile.validate( fileName.right( fileName.lastIndexOf(".") ) ) )
 	{
 		return;
 	}

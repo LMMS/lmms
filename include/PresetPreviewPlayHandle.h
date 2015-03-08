@@ -35,7 +35,7 @@ class PreviewTrackContainer;
 class EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
-	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false );
+	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
 	virtual ~PresetPreviewPlayHandle();
 
 	virtual void play( sampleFrame* buffer );

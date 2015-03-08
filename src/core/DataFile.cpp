@@ -163,6 +163,53 @@ DataFile::~DataFile()
 
 
 
+bool DataFile::validate( QString extension )
+{
+	switch( m_type )
+	{
+	case Type::SongProject:
+		if( extension == "mmp" || extension == "mmpz" )
+		{
+			return true;
+		}
+		break;
+	case Type::SongProjectTemplate:
+		if(  extension == "mpt" )
+		{
+			return true;
+		}
+		break;
+	case Type::InstrumentTrackSettings:
+		if ( extension == "xpf" || extension == "xml" )
+		{
+			return true;
+		}
+		break;
+	case Type::UnknownType:
+		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
+				extension == "xpf" || extension == "xml" ||
+				( extension == "xiz" && Engine::pluginFileHandling().contains( extension ) ) ||
+				extension == "sf2" || extension == "pat" || extension == "mid" ||
+				extension == "flp" || extension == "dll"
+				) )
+		{
+			return true;
+		}
+		if( extension == "wav" || extension == "ogg" ||
+				extension == "ds" )
+		{
+			return true;
+		}
+		break;
+	default:
+		return false;
+	}
+	return false;
+}
+
+
+
+
 QString DataFile::nameWithExtension( const QString & _fn ) const
 {
 	switch( type() )

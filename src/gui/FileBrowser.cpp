@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMessageBox>
 
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
@@ -461,7 +462,17 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 				( f->handling() == FileItem::LoadAsPreset ||
 				f->handling() == FileItem::LoadByPlugin ) )
 		{
-			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
+			DataFile dataFile( f->fullName() );
+			if( !dataFile.validate( f->extension() ) )
+			{
+				QMessageBox::warning( 0, tr ( "Error" ),
+					f->fullName() + " " + tr( "does not appear to be a valid" ) + " " + f->extension() +
+									  " " + tr( "file" ),
+					QMessageBox::Ok, QMessageBox::NoButton );
+				m_pphMutex.unlock();
+				return;
+			}
+			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin, &dataFile );
 		}
 		if( m_previewPlayHandle != NULL )
 		{

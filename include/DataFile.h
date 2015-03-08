@@ -58,6 +58,12 @@ public:
 
 	virtual ~DataFile();
 
+	///
+	/// \brief validate
+	/// performs basic validation, compared to file extension.
+	///
+	bool validate( QString extension );
+
 	QString nameWithExtension( const QString& fn ) const;
 
 	void write( QTextStream& strm );
