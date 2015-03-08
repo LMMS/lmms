@@ -393,8 +393,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	pathScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	pathScroll->resize( 360, pathsHeight - 50  );
-	pathScroll->move( 0, 50 );
-	pathSelectors->resize( 360, pathsHeight );
+	pathScroll->move( 0, 30 );
+	pathSelectors->resize( 360, pathsHeight - 50 );
 
 	const int txtLength = 285;
 	const int btnStart = 305;
@@ -533,7 +533,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		 		SLOT( setLADSPADir( const QString & ) ) );
 
 	QPushButton * laddir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_new_from_template", 16, 16 ),
+				embed::getIconPixmap( "add_folder", 16, 16 ),
 								"", lad_tw );
 	laddir_select_btn->setFixedSize( 24, 24 );
 	laddir_select_btn->move( btnStart, 16 );
