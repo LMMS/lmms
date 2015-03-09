@@ -127,6 +127,7 @@ protected:
 
 protected slots:
 	void addSteps();
+	void cloneSteps();
 	void removeSteps();
 	void clear();
 	void changeTimeSignature();

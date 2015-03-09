@@ -82,6 +82,7 @@ public:
 
 public slots:
 	void addSteps();
+	void cloneSteps();
 	void removeSteps();
 	void addAutomationTrack();
 
@@ -91,6 +92,7 @@ protected slots:
 
 private:
 	BBTrackContainer * m_bbtc;
+	void makeSteps( bool clone );
 };
 
 

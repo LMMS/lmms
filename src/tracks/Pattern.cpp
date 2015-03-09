@@ -478,6 +478,29 @@ void Pattern::addSteps()
 	updateBBTrack();
 }
 
+void Pattern::cloneSteps()
+{
+	int oldLength = m_steps;
+	m_steps += MidiTime::stepsPerTact();
+	ensureBeatNotes();
+	for(int i = 0; i < MidiTime::stepsPerTact(); ++i )
+	{
+		Note *toCopy = noteAtStep( i );
+		if( toCopy )
+		{
+			setStep( oldLength + i, true );
+			Note *newNote = noteAtStep( oldLength + i );
+			newNote->setKey( toCopy->key() );
+			newNote->setLength( toCopy->length() );
+			newNote->setPanning( toCopy->getPanning() );
+			newNote->setVolume( toCopy->getVolume() );
+		}
+	}
+	ensureBeatNotes();
+	emit dataChanged();
+	updateBBTrack();
+}
+
 
 
 
