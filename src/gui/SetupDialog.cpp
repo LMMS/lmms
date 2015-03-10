@@ -686,7 +686,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-			tr( Engine::mixer()->audioDevName().toLatin1() ) ) );
+			ConfigManager::inst()->value( "mixer", "audiodev" ) ) );
 	m_audioIfaceSetupWidgets[Engine::mixer()->audioDevName()]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
@@ -767,7 +767,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	}
 
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-		tr( Engine::mixer()->midiClientName().toLatin1() ) ) );
+		 ConfigManager::inst()->value( "mixer", "mididev" ) ) );
 	m_midiIfaceSetupWidgets[Engine::mixer()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
