@@ -767,6 +767,8 @@ void MainWindow::openProject()
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
+            Engine::getSong()->stop();
+
 			setCursor( Qt::WaitCursor );
 			Engine::getSong()->loadProject(
 						ofd.selectedFiles()[0] );
