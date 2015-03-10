@@ -1314,8 +1314,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	if( validPattern() )
+	if( validPattern() && GuiApplication::instance()->automationEditor()->hasFocus() )
 	{
+
 		drawCross( p );
 	}
 
