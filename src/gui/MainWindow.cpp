@@ -618,8 +618,11 @@ void MainWindow::resetWindowTitle()
 
 
 
-bool MainWindow::mayChangeProject()
+bool MainWindow::mayChangeProject(bool stopPlayback)
 {
+	if( stopPlayback )
+		Engine::getSong()->stop();
+
 	if( !Engine::getSong()->isModified() )
 	{
 		return( true );
@@ -731,7 +734,7 @@ void MainWindow::enterWhatsThisMode()
 
 void MainWindow::createNewProject()
 {
-	if( mayChangeProject() )
+	if( mayChangeProject(true) )
 	{
 		Engine::getSong()->createNewProject();
 	}
@@ -742,7 +745,7 @@ void MainWindow::createNewProject()
 
 void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
-	if( m_templatesMenu != NULL && mayChangeProject() )
+	if( m_templatesMenu != NULL && mayChangeProject(true) )
 	{
 		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
 						>= m_custom_templates_count ?
@@ -758,7 +761,7 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 void MainWindow::openProject()
 {
-	if( mayChangeProject() )
+	if( mayChangeProject(false) )
 	{
 		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
 
@@ -796,7 +799,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
-	if ( mayChangeProject() )
+	if ( mayChangeProject(true) )
 	{
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
@@ -1185,7 +1188,7 @@ void MainWindow::redo()
 
 void MainWindow::closeEvent( QCloseEvent * _ce )
 {
-	if( mayChangeProject() )
+	if( mayChangeProject(true) )
 	{
 		// delete recovery file
 		QFile::remove(ConfigManager::inst()->recoveryFile());

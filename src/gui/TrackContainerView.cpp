@@ -377,7 +377,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 	else if( type == "projectfile")
 	{
-		if( gui->mainWindow()->mayChangeProject() )
+		if( gui->mainWindow()->mayChangeProject(true) )
 		{
 			Engine::getSong()->loadProject( value );
 		}
