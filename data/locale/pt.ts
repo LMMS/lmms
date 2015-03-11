@@ -6121,7 +6121,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Ajuste fino esquerdo Osc %1:</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
         <translation>Com este botão você pode modificar Ajuste bruto do oscilador %1. Você pode descer o tom  do oscilador 12 semitons (1 oitava) para cima e para baixo. Isto é útil para criar sons com um acorde.</translation>
     </message>
     <message>
