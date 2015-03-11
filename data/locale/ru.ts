@@ -6223,7 +6223,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Грубая регулировка подстройки осциллятора %1. Возможна подстройка до 12 полутонов (до одной октавы) вверх и вниз. Полезно для создания аккордов.</translation>
+        <translation>Грубая регулировка подстройки осциллятора %1. Возможна подстройка до 24 полутонов (до 2 октавы) вверх и вниз. Полезно для создания аккордов.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
