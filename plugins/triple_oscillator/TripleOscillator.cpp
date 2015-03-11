@@ -581,7 +581,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		ck->setWhatsThis(
 			tr( "With this knob you can set the coarse detuning of "
 				"oscillator %1. You can detune the oscillator "
-				"12 semitones (1 octave) up and down. This is "
+				"24 semitones (2 octaves) up and down. This is "
 				"useful for creating sounds with a chord." ).
 				arg( i + 1 ) );
 
