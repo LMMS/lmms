@@ -6171,7 +6171,7 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation>półtony</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
         <translation>Za pomocą tego pokrętła możesz ustawić zgrubne odstrojenie oscylatora %1. Możesz odstrajać oscylator o 12 półtonów (całą oktawę) w górę lub w dół.</translation>
     </message>
     <message>

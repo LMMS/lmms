@@ -6155,7 +6155,7 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i el direct
         <translation type="unfinished">semitons</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
         <translation type="unfinished">Amb aquesta roda pots ajustar el desafinament gruixut de l&apos;oscil·lador %1. Pots desafinar l&apos;oscil·lador 12 semitons (1 octava) cap a dalt i a baix. Això és útil per a crear sons amb un acord.</translation>
     </message>
     <message>

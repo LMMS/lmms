@@ -6165,7 +6165,7 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
         <translation>semitóns</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
         <translation>Con este botón pódese definir a desafinación bruta do oscilador %1. Pódese desafinar o oscilador 12 semitóns (unha oitava) para arriba e para abaixo. Isto é útil para crear sons cun acorde.</translation>
     </message>
     <message>
