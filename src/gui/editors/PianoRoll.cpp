@@ -863,6 +863,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 	}
 
 	m_pattern->rearrangeAllNotes();
+	m_pattern->dataChanged();
 
 	// we modified the song
 	update();
