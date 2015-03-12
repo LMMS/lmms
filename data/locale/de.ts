@@ -6194,7 +6194,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Mit diesem Regler können Sie die grobe Verstimmung von Oszillator %1 setzen. Sie können den Oszillator 12 Halbtöne (1 Oktave) nach oben und unten verstimmen. Das ist nützlich, wenn Sie einen Sound mit einem Akkord erstellen möchten.</translation>
+        <translation>Mit diesem Regler können Sie die grobe Verstimmung von Oszillator %1 setzen. Sie können den Oszillator 24 Halbtöne (2 Oktaven) nach oben und unten verstimmen. Das ist nützlich, wenn Sie einen Sound mit einem Akkord erstellen möchten.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>

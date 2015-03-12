@@ -6145,7 +6145,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
-        <translation type="unfinished">Con este control usted podrá establecer la desintonización gruesa del oscilador %1. Usted puede desintonizar el oscilador 12 semitonos (1 octava) arriba y abajo. Esto es útil para la creación de sonidos con acorde.</translation>
+        <translation type="unfinished">Con este control usted podrá establecer la desintonización gruesa del oscilador %1. Usted puede desintonizar el oscilador 24 semitonos (2 octavas) arriba y abajo. Esto es útil para la creación de sonidos con acorde.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
