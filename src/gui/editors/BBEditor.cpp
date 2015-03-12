@@ -102,7 +102,9 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_toolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
 						 m_trackContainerView, SLOT(removeSteps()));
 	m_toolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
-						 m_trackContainerView, SLOT(addSteps()));
+						 m_trackContainerView, SLOT( addSteps()));
+	m_toolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
+						  m_trackContainerView, SLOT( cloneSteps() ) );
 	m_toolBar->addSeparator();
 
 	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
@@ -170,17 +172,12 @@ BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
 
 void BBTrackContainerView::addSteps()
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	makeSteps( false );
+}
 
-	for( TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end(); ++it )
-	{
-		if( ( *it )->type() == Track::InstrumentTrack )
-		{
-			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
-			p->addSteps();
-		}
-	}
+void BBTrackContainerView::cloneSteps()
+{
+	makeSteps( true );
 }
 
 
@@ -263,4 +260,28 @@ void BBTrackContainerView::updatePosition()
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
+}
+
+
+
+
+void BBTrackContainerView::makeSteps( bool clone )
+{
+	TrackContainer::TrackList tl = model()->tracks();
+
+	for( TrackContainer::TrackList::iterator it = tl.begin();
+		it != tl.end(); ++it )
+	{
+		if( ( *it )->type() == Track::InstrumentTrack )
+		{
+			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
+			if( clone )
+			{
+				p->cloneSteps();
+			} else
+			{
+				p->addSteps();
+			}
+		}
+	}
 }
