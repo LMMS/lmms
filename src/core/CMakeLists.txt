@@ -23,7 +23,6 @@ set(LMMS_SRCS
 	core/InlineAutomation.cpp
 	core/Instrument.cpp
 	core/InstrumentFunctions.cpp
-	core/InstrumentPlayHandle.cpp
 	core/InstrumentSoundShaping.cpp
 	core/JournallingObject.cpp
 	core/Ladspa2LMMS.cpp
@@ -39,21 +38,16 @@ set(LMMS_SRCS
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/Note.cpp
-	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
 	core/PeakController.cpp
 	core/Piano.cpp
-	core/PlayHandle.cpp
 	core/Plugin.cpp
-	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
 	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
 	core/RingBuffer.cpp
 	core/SampleBuffer.cpp
-	core/SamplePlayHandle.cpp
-	core/SampleRecordHandle.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
@@ -82,6 +76,13 @@ set(LMMS_SRCS
 	core/midi/MidiOss.cpp
 	core/midi/MidiPort.cpp
 	core/midi/MidiWinMM.cpp
+
+	core/PlayHandles/PlayHandle.cpp
+	core/PlayHandles/InstrumentPlayHandle.cpp
+	core/PlayHandles/NotePlayHandle.cpp
+	core/PlayHandles/PresetPreviewPlayHandle.cpp
+	core/PlayHandles/SamplePlayHandle.cpp
+	core/PlayHandles/SampleRecordHandle.cpp
 
 	PARENT_SCOPE
 )
