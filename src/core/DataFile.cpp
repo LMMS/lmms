@@ -856,9 +856,12 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 					QMessageBox::information( NULL,
 						SongEditor::tr( "Project Version Mismatch" ),
 						SongEditor::tr( 
-								"This project was created with "
-								"LMMS version %1, but version %2 "
+								"This %1 was created with "
+								"LMMS version %2, but version %3 "
 								"is installed")
+								.arg( _sourceFile.endsWith( ".mpt" ) ?
+									"template" : 
+									"project" )
 								.arg( root.attribute( "creatorversion" ) )
 								.arg( LMMS_VERSION ) );
 				}
