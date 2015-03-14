@@ -1850,53 +1850,49 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 
 
-void PianoRoll::mouseReleaseEvent(QMouseEvent * me )
+void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 {
-	s_textFloat->hide();
 	bool mustRepaint = false;
+
+	s_textFloat->hide();
 
 	if( me->button() & Qt::LeftButton )
 	{
 		m_mouseDownLeft = false;
 		mustRepaint = true;
+
+		if( m_action == ActionSelectNotes && m_editMode == ModeSelect )
+		{
+			// select the notes within the selection rectangle and
+			// then destroy the selection rectangle
+			computeSelectedNotes( 
+					me->modifiers() & Qt::ShiftModifier );
+		}
+		else if( m_action == ActionMoveNote )
+		{
+			// we moved one or more notes so they have to be
+			// moved properly according to new starting-
+			// time in the note-array of pattern
+			m_pattern->rearrangeAllNotes();
+
+		}
+
+		if( m_action == ActionMoveNote || m_action == ActionResizeNote )
+		{
+			// if we only moved one note, deselect it so we can
+			// edit the notes in the note edit area
+			if( selectionCount() == 1 )
+			{
+				clearSelectedNotes();
+			}
+		}
 	}
+
 	if( me->button() & Qt::RightButton )
 	{
 		m_mouseDownRight = false;
 		mustRepaint = true;
 	}
-
-	if( me->button() & Qt::LeftButton &&
-					m_editMode == ModeSelect &&
-					m_action == ActionSelectNotes )
-	{
-		// select the notes within the selection rectangle and
-		// then destroy the selection rectangle
-
-		computeSelectedNotes( me->modifiers() & Qt::ShiftModifier );
-
-	}
-	else if( me->button() & Qt::LeftButton &&
-					m_action == ActionMoveNote )
-	{
-		// we moved one or more notes so they have to be
-		// moved properly according to new starting-
-		// time in the note-array of pattern
-
-		m_pattern->rearrangeAllNotes();
-
-	}
-	if( me->button() & Qt::LeftButton &&
-	   ( m_action == ActionMoveNote || m_action == ActionResizeNote ) )
-	{
-		// if we only moved one note, deselect it so we can
-		// edit the notes in the note edit area
-		if( selectionCount() == 1 )
-		{
-			clearSelectedNotes();
-		}
-	}
-
 
 	if( hasValidPattern() )
 	{
@@ -1909,7 +1905,8 @@ void PianoRoll::mouseReleaseEvent(QMouseEvent * me )
 			Note *note = *it;
 			if( note->isPlaying() )
 			{
-				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( note->key() );
+				m_pattern->instrumentTrack()->pianoModel()->
+						handleKeyRelease( note->key() );
 				note->setIsPlaying( false );
 			}
 
@@ -1917,11 +1914,11 @@ void PianoRoll::mouseReleaseEvent(QMouseEvent * me )
 		}
 
 		// stop playing keys that we let go of
-		m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
+		m_pattern->instrumentTrack()->pianoModel()->
+						handleKeyRelease( m_lastKey );
 	}
 
 	m_currentNote = NULL;
-
 	m_action = ActionNone;
 
 	if( m_editMode == ModeDraw )
