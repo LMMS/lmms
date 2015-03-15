@@ -24,9 +24,6 @@
 #define SUB_NOTE_PARAMETERS_H
 
 #include "../globals.h"
-#include "../Misc/XMLwrapper.h"
-#include "EnvelopeParams.h"
-#include "FilterParams.h"
 #include "Presets.h"
 
 class SUBnoteParameters:public Presets
@@ -39,6 +36,7 @@ class SUBnoteParameters:public Presets
         void defaults();
         void getfromXML(XMLwrapper *xml);
         void updateFrequencyMultipliers(void);
+        void paste(SUBnoteParameters &sub);
 
         //Parameters
         //AMPLITUDE PARAMETRERS
@@ -105,8 +103,7 @@ class SUBnoteParameters:public Presets
         //how the harmonics start("0"=0,"1"=random,"2"=1)
         unsigned char Pstart;
 
-
-    private:
+        static rtosc::Ports &ports;
 };
 
 #endif

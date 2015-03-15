@@ -12,6 +12,13 @@ using std::set;
 using std::cerr;
 using std::endl;
 
+#ifndef IN_DEFAULT
+#define IN_DEFAULT "NULL"
+#endif
+#ifndef OUT_DEFAULT
+#define OUT_DEFAULT "NULL"
+#endif
+
 InMgr     *in  = NULL;
 OutMgr    *out = NULL;
 EngineMgr *eng = NULL;
@@ -21,17 +28,22 @@ bool   Nio::autoConnect   = false;
 string Nio::defaultSource = IN_DEFAULT;
 string Nio::defaultSink   = OUT_DEFAULT;
 
-void Nio::init(void)
+void Nio::init(class Master *master)
 {
     in  = &InMgr::getInstance(); //Enable input wrapper
     out = &OutMgr::getInstance(); //Initialize the Output Systems
     eng = &EngineMgr::getInstance(); //Initialize The Engines
+
+    in->setMaster(master);
+    out->setMaster(master);
 }
 
 bool Nio::start()
 {
-    init();
-    return eng->start();
+    if(eng)
+        return eng->start();
+    else
+        return false;
 }
 
 void Nio::stop()
@@ -116,6 +128,12 @@ void Nio::preferedSampleRate(unsigned &rate)
 void Nio::preferedSampleRate(unsigned &)
 {}
 #endif
+
+void Nio::masterSwap(Master *master)
+{
+    in->setMaster(master);
+    out->setMaster(master);
+}
 
 void Nio::waveNew(class WavFile *wave)
 {

@@ -22,10 +22,10 @@
 #ifndef VST_AUDIO_OUTPUT_H
 #define VST_AUDIO_OUTPUT_H
 
-#include <pthread.h>
+#include <thread>
 
 #include "../globals.h"
-#include "../Misc/Master.h"
+#include "../Misc/MiddleWare.h"
 
 #include <dssi.h>
 #include <ladspa.h>
@@ -105,7 +105,8 @@ class DSSIaudiooutput
         LADSPA_Data *outl;
         LADSPA_Data *outr;
         long    sampleRate;
-        Master *master;
+        MiddleWare *middleware;
+        std::thread *loadThread;
         static DSSI_Descriptor *dssiDescriptor;
         static std::string      bankDirNames[];
         static

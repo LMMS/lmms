@@ -213,7 +213,6 @@ void AnalogFilter::computefiltercoefs(void)
         case 7: //Low Shelf - 2 poles
             if(!zerocoefs) {
                 tmpq  = sqrtf(tmpq);
-                alpha = sn / (2.0f * tmpq);
                 beta  = sqrtf(tmpgain) / tmpq;
                 tmp   = (tmpgain + 1.0f) + (tmpgain - 1.0f) * cs + beta * sn;
 
@@ -239,7 +238,6 @@ void AnalogFilter::computefiltercoefs(void)
         case 8: //High Shelf - 2 poles
             if(!zerocoefs) {
                 tmpq  = sqrtf(tmpq);
-                alpha = sn / (2.0f * tmpq);
                 beta  = sqrtf(tmpgain) / tmpq;
                 tmp   = (tmpgain + 1.0f) - (tmpgain - 1.0f) * cs + beta * sn;
 

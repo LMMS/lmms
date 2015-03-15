@@ -9,12 +9,14 @@
 #include "NulEngine.h"
 #if OSS
 #include "OssEngine.h"
+#include "OssMultiEngine.h"
 #endif
 #if ALSA
 #include "AlsaEngine.h"
 #endif
 #if JACK
 #include "JackEngine.h"
+#include "JackMultiEngine.h"
 #endif
 #if PORTAUDIO
 #include "PaEngine.h"
@@ -36,12 +38,14 @@ EngineMgr::EngineMgr()
     engines.push_back(defaultEng);
 #if OSS
     engines.push_back(new OssEngine());
+    engines.push_back(new OssMultiEngine());
 #endif
 #if ALSA
     engines.push_back(new AlsaEngine());
 #endif
 #if JACK
     engines.push_back(new JackEngine());
+    engines.push_back(new JackMultiEngine());
 #endif
 #if PORTAUDIO
     engines.push_back(new PaEngine());

@@ -24,8 +24,56 @@
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
-#include <stdint.h>
 
+#if defined(__clang__)
+#define REALTIME __attribute__((annotate("realtime")))
+#define NONREALTIME __attribute__((annotate("nonrealtime")))
+#else
+#define REALTIME
+#define NONREALTIME
+#endif
+
+//Forward declarations
+namespace rtosc{struct Ports; class ThreadLink;};
+extern rtosc::ThreadLink *bToU;
+extern rtosc::ThreadLink *uToB;
+
+//Forward Declarations
+class  EffectMgr;
+class  ADnoteParameters;
+struct ADnoteGlobalParam;
+class  SUBnoteParameters;
+class  PADnoteParameters;
+class  SynthNote;
+
+class  Allocator;
+
+class  Microtonal;
+class  XMLwrapper;
+class  Resonance;
+class  FFTwrapper;
+class  EnvelopeParams;
+class  LFOParams;
+class  FilterParams;
+
+class  LFO;
+class  Envelope;
+class  OscilGen;
+
+class  Controller;
+class  Master;
+class  Part;
+
+#if defined(__APPLE__) || defined(__FreeBSD__)
+#include <complex>
+#else
+namespace std {
+    template<class T> struct complex;
+};
+#endif
+
+typedef float fftw_real;
+typedef std::complex<fftw_real> fft_t;
 
 /**
  * The number of harmonics of additive synth
@@ -122,6 +170,12 @@
 #define LOG_2 0.693147181f
 #define PI 3.1415926536f
 #define LOG_10 2.302585093f
+
+/*
+ * Envelope Limits
+ */
+#define MAX_ENVELOPE_POINTS 40
+#define MIN_ENVELOPE_DB -400
 
 /*
  * The threshold for the amplitude interpolation used if the amplitude

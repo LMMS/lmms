@@ -29,6 +29,7 @@
 #include <string>
 #include "../Misc/Master.h"
 #include "../Misc/Util.h"
+#include "../Misc/Allocator.h"
 #include "../Synth/ADnote.h"
 #include "../Params/Presets.h"
 #include "../DSP/FFTwrapper.h"
@@ -46,6 +47,7 @@ class AdNoteTest:public CxxTest::TestSuite
         Master       *master;
         FFTwrapper   *fft;
         Controller   *controller;
+        Allocator     memory;
         unsigned char testnote;
 
 
@@ -102,14 +104,9 @@ class AdNoteTest:public CxxTest::TestSuite
             //lets go with.... 50! as a nice note
             testnote = 50;
             float freq = 440.0f * powf(2.0f, (testnote - 69.0f) / 12.0f);
+            SynthParams pars{memory, *controller, freq, 120, 0, testnote, false};
 
-            note = new ADnote(defaultPreset,
-                              controller,
-                              freq,
-                              120,
-                              0,
-                              testnote,
-                              false);
+            note = new ADnote(defaultPreset, pars);
 
             delete defaultPreset;
             delete wrap;

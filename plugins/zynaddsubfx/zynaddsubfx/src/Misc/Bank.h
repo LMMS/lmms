@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include "../globals.h"
 
 //entries in a bank
 #define BANK_SIZE 160
@@ -38,26 +39,26 @@ class Bank
         ~Bank();
         std::string getname(unsigned int ninstrument);
         std::string getnamenumbered(unsigned int ninstrument);
-        void setname(unsigned int ninstrument,
+        //if newslot==-1 then this is ignored, else it will be put on that slot
+        int setname(unsigned int ninstrument,
                      const std::string &newname,
-                     int newslot);                                                       //if newslot==-1 then this is ignored, else it will be put on that slot
-        bool isPADsynth_used(unsigned int ninstrument);
+                     int newslot);
 
         /**returns true when slot is empty*/
         bool emptyslot(unsigned int ninstrument);
 
         /**Empties out the selected slot*/
-        void clearslot(unsigned int ninstrument);
+        int clearslot(unsigned int ninstrument);
         /**Saves the given Part to slot*/
-        void savetoslot(unsigned int ninstrument, class Part * part);
+        int savetoslot(unsigned int ninstrument, class Part * part);
         /**Loads the given slot into a Part*/
-        void loadfromslot(unsigned int ninstrument, class Part * part);
+        int loadfromslot(unsigned int ninstrument, class Part * part);
 
         /**Swaps Slots*/
-        void swapslot(unsigned int n1, unsigned int n2);
+        int swapslot(unsigned int n1, unsigned int n2);
 
-        int loadbank(std::string bankdirname);
-        int newbank(std::string newbankdirname);
+        int loadbank(std::string bankdirname) NONREALTIME;
+        int newbank(std::string newbankdirname) NONREALTIME;
 
         std::string bankfiletitle; //this is shown on the UI of the bank (the title of the window)
         int locked();
@@ -71,6 +72,14 @@ class Bank
         };
 
         std::vector<bankstruct> banks;
+        int bankpos;
+        
+        struct ins_t {
+            ins_t(void);
+            std::string name;
+            //All valid instruments must have a non-empty filename
+            std::string filename;
+        } ins[BANK_SIZE];
 
     private:
 
@@ -84,17 +93,6 @@ class Bank
         void clearbank();
 
         std::string defaultinsname;
-
-        struct ins_t {
-            ins_t();
-            bool used;
-            std::string name;
-            std::string filename;
-            struct {
-                bool PADsynth_used;
-            } info;
-        } ins[BANK_SIZE];
-
         std::string dirname;
 
         void scanrootdir(std::string rootdir); //scans a root dir for banks

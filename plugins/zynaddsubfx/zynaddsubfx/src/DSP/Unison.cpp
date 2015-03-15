@@ -25,9 +25,10 @@
 #include <err.h>
 #endif
 
+#include "../Misc/Allocator.h"
 #include "Unison.h"
 
-Unison::Unison(int update_period_samples_, float max_delay_sec_, float srate_f)
+Unison::Unison(Allocator *alloc_, int update_period_samples_, float max_delay_sec_, float srate_f)
     :unison_size(0),
       base_freq(1.0f),
       uv(NULL),
@@ -39,18 +40,19 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, float srate_f)
       delay_buffer(NULL),
       unison_amplitude_samples(0.0f),
       unison_bandwidth_cents(10.0f),
-      samplerate_f(srate_f)
+      samplerate_f(srate_f),
+      alloc(*alloc_)
 {
     if(max_delay < 10)
         max_delay = 10;
-    delay_buffer = new float[max_delay];
+    delay_buffer = alloc.valloc<float>(max_delay);
     memset(delay_buffer, 0, max_delay * sizeof(float));
     setSize(1);
 }
 
 Unison::~Unison() {
-    delete [] delay_buffer;
-    delete [] uv;
+    alloc.devalloc(delay_buffer);
+    alloc.devalloc(uv);
 }
 
 void Unison::setSize(int new_size)
@@ -58,9 +60,8 @@ void Unison::setSize(int new_size)
     if(new_size < 1)
         new_size = 1;
     unison_size = new_size;
-    if(uv)
-        delete [] uv;
-    uv = new UnisonVoice[unison_size];
+    alloc.devalloc(uv);
+    uv = alloc.valloc<UnisonVoice>(unison_size);
     first_time = true;
     updateParameters();
 }

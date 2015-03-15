@@ -1,7 +1,7 @@
 /*
  * LocalZynAddSubFx.h - local implementation of ZynAddSubFx plugin
  *
- * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -29,6 +29,7 @@
 #include "Note.h"
 
 class Master;
+class MiddleWare;
 class NulEngine;
 
 class LocalZynAddSubFx
@@ -68,6 +69,8 @@ protected:
 	std::string m_presetsDir;
 
 	int m_runningNotes[NumKeys];
+
+	MiddleWare* m_middleWare;
 	Master * m_master;
 	NulEngine* m_ioEngine;
 

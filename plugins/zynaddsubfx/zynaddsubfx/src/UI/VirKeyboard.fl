@@ -1,68 +1,81 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
-decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
-
-decl {//License: GNU GPL version 2 or later} {} 
-
-decl {\#include <stdlib.h>} {public
+decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {private local
 } 
 
-decl {\#include <FL/fl_draw.H>} {public
+decl {//License: GNU GPL version 2 or later} {private local
 } 
 
-decl {\#include <FL/Fl_Box.H>} {public
+decl {\#include <cstdlib>} {public local
 } 
 
-decl {\#include "../globals.h"} {public
+decl {\#include <FL/fl_draw.H>} {public local
 } 
 
-decl {\#include "../Misc/Master.h"} {public
+decl {\#include <FL/Fl_Box.H>} {public local
 } 
 
-decl {\#include "../Misc/Util.h"} {public
+decl {\#include "../globals.h"} {public local
 } 
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "../Misc/Util.h"} {public local
 } 
 
-decl {\#include "common.H"} {public
+decl {\#include "WidgetPDial.h"} {public local
+} 
+
+decl {\#include "common.H"} {public local
 } 
 
 decl {\#ifdef NTK_GUI
      \#include "FL/Fl_Shared_Image.H"
-     \#endif} {public
+     \#endif} {public local
 } 
 
-decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {} 
+decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
+} 
 
-decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {} 
+decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {private local
+} 
 
-decl {const int keysoct2qwerty[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {} 
+decl {const int keysoct2qwerty[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {private local
+} 
 
-decl {const int keysoct1dw[]={'\\'','2',',','3','.','p','5','y','6','f','7','g','c','9','r','0','l','/',']','=','\\\\',FL_Enter,0};} {} 
+decl {const int keysoct1dw[]={'\\'','2',',','3','.','p','5','y','6','f','7','g','c','9','r','0','l','/',']','=','\\\\',FL_Enter,0};} {private local
+} 
 
-decl {const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0};} {} 
+decl {const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0};} {private local
+} 
 
-decl {const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\\'','+','\\\\',FL_Enter,0};} {} 
+decl {const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\\'','+','\\\\',FL_Enter,0};} {private local
+} 
 
-decl {const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0};} {} 
+decl {const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0};} {private local
+} 
 
-decl {const int keysoct1az[]={'a',233,'z','\\"','e','r','(','t','-','y',232,'u','i',231,'o',224,'p',65106,'=','$',0};} {} 
+decl {const int keysoct1az[]={'a',233,'z','\\"','e','r','(','t','-','y',232,'u','i',231,'o',224,'p',65106,'=','$',0};} {private local
+} 
 
-decl {const int keysoct2az[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {} 
+decl {const int keysoct2az[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {private local
+} 
 
-class VirKeys {: {public Fl_Box}
+class VirKeys {open : {public Fl_Box}
 } {
-  decl {static const int N_OCT=6;} {}
-  decl {static const int SIZE_WHITE=14;} {}
-  decl {static const int SIZE_BLACK=8;} {}
-  Function {VirKeys(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
-    code {master=NULL;} {}
+  decl {static const int N_OCT=6;} {private local
   }
-  Function {init(Master *master_)} {} {
-    code {master=master_;
+  decl {static const int SIZE_WHITE=14;} {private local
+  }
+  decl {static const int SIZE_BLACK=8;} {private local
+  }
+  Function {VirKeys(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+    code {} {}
+  }
+  Function {init(Fl_Osc_Interface *osc_, std::string loc_)} {open
+  } {
+    code {osc=osc_;
+loc=loc_;
 for (int i=0;i<N_OCT*12+1;i++) pressed[i]=0;
 midich=0;
 midivel=100;
@@ -70,7 +83,8 @@ midioct=2;
 
 keyoct1=3;
 keyoct2=2;
-rndvelocity=0;} {}
+rndvelocity=0;} {selected
+    }
   }
   Function {draw()} {} {
     code {int ox=x(),oy=y(),lx=w(),ly=h()-1,i;
@@ -91,10 +105,10 @@ rndvelocity=0;} {}
 
 //On error fetch everything from source directory
 if(!(white_up&&white_down&&black_up&&black_down)) {
-    white_up   = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/white_key.png");   
-    white_down = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/white_key_pressed.png");
-    black_up   = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/black_key.png");
-    black_down = Fl_Shared_Image::get(SOURCE_DIR "/../../pixmaps/black_key_pressed.png");
+    white_up   = Fl_Shared_Image::get(SOURCE_DIR "/pixmaps/white_key.png");
+    white_down = Fl_Shared_Image::get(SOURCE_DIR "/pixmaps/white_key_pressed.png");
+    black_up   = Fl_Shared_Image::get(SOURCE_DIR "/pixmaps/black_key.png");
+    black_down = Fl_Shared_Image::get(SOURCE_DIR "/pixmaps/black_key_pressed.png");
 }
 
 Fl_Image *key;
@@ -266,9 +280,7 @@ if (rndvelocity!=0){
   vel=midivel*(127.0-rndvelocity)/127.0+RND*rndvelocity;
 };
 
-pthread_mutex_lock(&master->mutex);
-master->noteOn(midich,nk+midioct*12,(int)vel);
-pthread_mutex_unlock(&master->mutex);} {}
+osc->write(loc+"noteOn", "iii", midich,nk+midioct*12,(int)vel);} {}
   }
   Function {relasekey(int nk,int type)} {} {
     code {if ((nk<0)||(nk>=N_OCT*12)) return;
@@ -280,22 +292,24 @@ pressed[nk]=0;
 
 damage(1);
 
-pthread_mutex_lock(&master->mutex);
-master->noteOff(midich,nk+12*midioct);
-pthread_mutex_unlock(&master->mutex);} {}
+osc->write(loc+"noteOff", "ii", midich,nk+12*midioct);} {}
   }
   Function {relaseallkeys(int type)} {} {
     code {for (int i=0;i<N_OCT*12;i++) relasekey(i,type);} {}
   }
-  decl {Master *master;} {}
-  decl {int pressed[N_OCT*12+1];} {}
-  decl {unsigned char midich;} {public
+  decl {int pressed[N_OCT*12+1];} {private local
   }
-  decl {unsigned char midivel;} {public
+  decl {unsigned char midich;} {public local
   }
-  decl {char midioct,keyoct1,keyoct2;} {public
+  decl {unsigned char midivel;} {public local
   }
-  decl {unsigned char rndvelocity;} {public
+  decl {char midioct,keyoct1,keyoct2;} {public local
+  }
+  decl {unsigned char rndvelocity;} {public local
+  }
+  decl {Fl_Osc_Interface *osc;} {private local
+  }
+  decl {std::string loc;} {private local
   }
 } 
 
@@ -307,12 +321,12 @@ class VirKeyboard {open
       label {Virtual Keyboard - ZynAddSubFX}
       callback {relaseallkeys();
 virkeyboardwindow->hide();} open
-      xywh {100 597 650 130} type Double visible
+      xywh {103 620 650 130} type Double visible
     } {
       Fl_Box virkeys {
         label Keyboard
         xywh {10 10 590 80} box FLAT_BOX color 17
-        code0 {o->init(master);}
+        code0 {o->init(osc,loc);}
         class VirKeys
       }
       Fl_Counter {} {
@@ -334,8 +348,8 @@ virkeys->take_focus();}
       Fl_Value_Slider {} {
         label Vel
         callback {virkeys->midivel=(int) o->value();
-virkeys->take_focus();} selected
-        tooltip Velocity xywh {95 105 100 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum 1 maximum 127 step 1
+virkeys->take_focus();}
+        tooltip Velocity xywh {95 105 100 15} type {Horz Knob} box NO_BOX labelsize 10 align 5 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
       }
       Fl_Counter {} {
@@ -356,9 +370,7 @@ virkeyboardwindow->hide();}
         label Cval
         callback {int ctl=midictl;
 
-pthread_mutex_lock(&master->mutex);
-master->setController(virkeys->midich,ctl,(int) o->value());
-pthread_mutex_unlock(&master->mutex);
+osc->write("/setController", "iii", virkeys->midich,ctl,(int) o->value());
 virkeys->take_focus();}
         tooltip {Controller value} xywh {605 10 15 115} type {Vert Fill} box ENGRAVED_BOX selection_color 229 labelsize 8 align 5 minimum 127 maximum 0 step 1 value 64 textsize 7
       }
@@ -438,9 +450,7 @@ virkeys->take_focus();}
       }
       Fl_Roller pitchwheelroller {
         label Pwh
-        callback {pthread_mutex_lock(&master->mutex);
-master->setController(virkeys->midich,C_pitchwheel,-(int) o->value());
-pthread_mutex_unlock(&master->mutex);
+        callback {osc->write("/setController", "iii", virkeys->midich,C_pitchwheel,-(int) o->value());
 virkeys->take_focus();}
         tooltip {Pitch Wheel} xywh {625 10 20 95} labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
       }
@@ -468,20 +478,29 @@ virkeys->take_focus();} open
       } {}
     }
   }
-  Function {VirKeyboard(Master *master_)} {} {
-    code {master=master_;
+  Function {VirKeyboard(Fl_Osc_Interface *osc_, std::string loc_)} {open
+  } {
+    code {osc=osc_;
+loc=loc_;
 midictl=75;
 make_window();} {}
   }
-  Function {~VirKeyboard()} {} {
+  Function {~VirKeyboard()} {open
+  } {
     code {delete virkeyboardwindow;} {}
   }
-  Function {show()} {} {
+  Function {show()} {open
+  } {
     code {virkeyboardwindow->show();} {}
   }
-  Function {relaseallkeys()} {} {
+  Function {relaseallkeys()} {open
+  } {
     code {virkeys->relaseallkeys(0);} {}
   }
-  decl {Master *master;} {}
-  decl {int midictl;} {}
+  decl {int midictl;} {private local
+  }
+  decl {Fl_Osc_Interface *osc;} {private local
+  }
+  decl {std::string loc;} {private local
+  }
 } 

@@ -24,8 +24,7 @@
 #define FFT_WRAPPER_H
 #include <fftw3.h>
 #include <complex>
-typedef float	fftw_real;
-typedef std::complex<fftw_real> fft_t;
+#include "../globals.h"
 
 /**A wrapper for the FFTW library (Fast Fourier Transforms)*/
 class FFTwrapper
@@ -47,6 +46,25 @@ class FFTwrapper
         fftwf_complex *fft;
         fftwf_plan     planfftw, planfftw_inv;
 };
+
+/*
+ * The "std::polar" template has no clear definition for the range of
+ * the input parameters, and some C++ standard library implementations
+ * don't accept negative amplitude among others. Define our own
+ * FFTpolar template, which works like we expect it to.
+ */
+template<class _Tp>
+std::complex<_Tp>
+FFTpolar(const _Tp& __rho, const _Tp& __theta = _Tp(0))
+{
+        _Tp __x = __rho * cos(__theta);
+        if (isnan(__x))
+                __x = 0;
+        _Tp __y = __rho * sin(__theta);
+        if (isnan(__y))
+                __y = 0;
+        return std::complex<_Tp>(__x, __y);
+}
 
 void FFT_cleanup();
 #endif

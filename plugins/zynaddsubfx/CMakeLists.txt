@@ -8,6 +8,9 @@ ELSE(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
 	ADD_DEFINITIONS(-DOS_WINDOWS)
 ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
 
+# build against FLTK - to be changed once we support NTK as well
+ADD_DEFINITIONS(-DFLTK_GUI)
+
 # do not conflict with LMMS' Controller class
 ADD_DEFINITIONS(-DController=ZynController)
 
@@ -17,7 +20,7 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 # build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -std=c++11")
 
 # link system-libraries when on win32
 IF(LMMS_BUILD_WIN32)
@@ -76,12 +79,15 @@ SET(zynaddsubfx_core_SRCS
 	zynaddsubfx/src/Effects/EQ.cpp
 	zynaddsubfx/src/Effects/Phaser.cpp
 	zynaddsubfx/src/Effects/Reverb.cpp
+	zynaddsubfx/src/Misc/Allocator.cpp
 	zynaddsubfx/src/Misc/Bank.cpp
 	zynaddsubfx/src/Misc/Config.cpp
 	zynaddsubfx/src/Misc/Dump.cpp
 	zynaddsubfx/src/Misc/Master.cpp
 	zynaddsubfx/src/Misc/Microtonal.cpp
+	zynaddsubfx/src/Misc/MiddleWare.cpp
 	zynaddsubfx/src/Misc/Part.cpp
+	zynaddsubfx/src/Misc/PresetExtractor.cpp
 	zynaddsubfx/src/Misc/Util.cpp
 	zynaddsubfx/src/Misc/QtXmlWrapper.cpp
 	zynaddsubfx/src/Misc/Recorder.cpp
@@ -105,6 +111,7 @@ SET(zynaddsubfx_core_SRCS
 	zynaddsubfx/src/Synth/PADnote.cpp
 	zynaddsubfx/src/Synth/Resonance.cpp
 	zynaddsubfx/src/Synth/SUBnote.cpp
+	zynaddsubfx/tlsf/tlsf.c
     )
 
 
@@ -138,7 +145,7 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ZynAddSubFxCore ${FLTK_LIBRARIES} -lpthread )
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ZynAddSubFxCore ${FLTK_LIBRARIES} -lpthread -lrtosc-cpp -lrtosc -llo)
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)

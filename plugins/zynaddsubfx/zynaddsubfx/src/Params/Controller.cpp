@@ -21,8 +21,44 @@
 */
 
 #include "Controller.h"
-#include <math.h>
-#include <stdio.h>
+#include "../Misc/Util.h"
+#include "../Misc/XMLwrapper.h"
+#include <cmath>
+#include <cstdio>
+
+#include <rtosc/ports.h>
+#include <rtosc/port-sugar.h>
+using namespace rtosc;
+
+#define rObject Controller
+rtosc::Ports Controller::ports = {
+    rParamZyn(panning.depth, "Depth of Panning MIDI Control"),
+    rParamZyn(filtercutoff.depth, "Depth of Filter Cutoff MIDI Control"),
+    rParamZyn(filterq.depth, "Depth of Filter Q MIDI Control"),
+    rParamZyn(bandwidth.depth, "Depth of Bandwidth MIDI Control"),
+    rToggle(bandwidth.exponential, "Bandwidth Exponential Mode"),
+    rParamZyn(modwheel.depth, "Depth of Modwheel MIDI Control"),
+    rToggle(modwheel.exponential, "Modwheel Exponential Mode"),
+    rParamI(pitchwheel.bendrange, "Range of MIDI Pitch Wheel"),
+    rToggle(expression.receive, "Expression MIDI Receive"),
+    rToggle(fmamp.receive,      "FM amplitude MIDI Receive"),
+    rToggle(volume.receive,     "Volume MIDI Receive"),
+    rToggle(sustain.receive,    "Sustain MIDI Receive"),
+    rToggle(portamento.receive, "Portamento MIDI Receive"),
+    rToggle(portamento.portamento, "UNDOCUMENTED"),
+    rParamZyn(portamento.time, "Portamento Length"),
+    rToggle(portamento.proportional, "If all portamentos are proportional to the distance they span"),
+    rParamZyn(portamento.propRate, "Portamento proportional rate"),
+    rParamZyn(portamento.propDepth, "Portamento proportional depth"),
+    rParamZyn(portamento.pitchthresh, "Threshold for portamento"),
+    rToggle(portamento.pitchthreshtype, "Type of threshold"),
+    rParamZyn(portamento.updowntimestretch, "UNDOCUMENTED"),
+    rParamZyn(resonancecenter.depth, "Resonance Center MIDI Depth"),
+    rParamZyn(resonancebandwidth.depth, "Resonance Bandwidth MIDI Depth"),
+    rToggle(NRPN.receive, "NRPN MIDI Enable"),
+    rAction(defaults),
+};
+
 
 Controller::Controller()
 {

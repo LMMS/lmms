@@ -31,6 +31,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include "../Misc/Allocator.h"
 #include "Phaser.h"
 
 using namespace std;
@@ -39,8 +40,8 @@ using namespace std;
 #define ONE_  0.99999f        // To prevent LFO ever reaching 1.0f for filter stability purposes
 #define ZERO_ 0.00001f        // Same idea as above.
 
-Phaser::Phaser(const int &insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize)
-    :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, srate, bufsize), lfo(srate, bufsize), old(NULL), xn1(NULL),
+Phaser::Phaser(EffectParams pars)
+    :Effect(pars), lfo(pars.srate, pars.bufsize), old(NULL), xn1(NULL),
       yn1(NULL), diff(0.0f), oldgain(0.0f), fb(0.0f)
 {
     analog_setup();
@@ -78,18 +79,12 @@ void Phaser::analog_setup()
 
 Phaser::~Phaser()
 {
-    if(old.l)
-        delete[] old.l;
-    if(xn1.l)
-        delete[] xn1.l;
-    if(yn1.l)
-        delete[] yn1.l;
-    if(old.r)
-        delete[] old.r;
-    if(xn1.r)
-        delete[] xn1.r;
-    if(yn1.r)
-        delete[] yn1.r;
+    memory.devalloc(old.l);
+    memory.devalloc(old.r);
+    memory.devalloc(xn1.l);
+    memory.devalloc(xn1.r);
+    memory.devalloc(yn1.l);
+    memory.devalloc(yn1.r);
 }
 
 /*
@@ -303,30 +298,23 @@ void Phaser::setoffset(unsigned char Poffset)
 
 void Phaser::setstages(unsigned char Pstages)
 {
-    if(old.l)
-        delete[] old.l;
-    if(xn1.l)
-        delete[] xn1.l;
-    if(yn1.l)
-        delete[] yn1.l;
-    if(old.r)
-        delete[] old.r;
-    if(xn1.r)
-        delete[] xn1.r;
-    if(yn1.r)
-        delete[] yn1.r;
-
+    memory.devalloc(old.l);
+    memory.devalloc(old.r);
+    memory.devalloc(xn1.l);
+    memory.devalloc(xn1.r);
+    memory.devalloc(yn1.l);
+    memory.devalloc(yn1.r);
 
     this->Pstages = min(MAX_PHASER_STAGES, (int)Pstages);
 
-    old = Stereo<float *>(new float[Pstages * 2],
-                          new float[Pstages * 2]);
+    old = Stereo<float *>(memory.valloc<float>(Pstages * 2),
+                          memory.valloc<float>(Pstages * 2));
 
-    xn1 = Stereo<float *>(new float[Pstages],
-                          new float[Pstages]);
+    xn1 = Stereo<float *>(memory.valloc<float>(Pstages),
+                          memory.valloc<float>(Pstages));
 
-    yn1 = Stereo<float *>(new float[Pstages],
-                          new float[Pstages]);
+    yn1 = Stereo<float *>(memory.valloc<float>(Pstages),
+                          memory.valloc<float>(Pstages));
 
     cleanup();
 }

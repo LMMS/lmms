@@ -27,7 +27,7 @@ Controller::Controller() {
     snd_seq_open(&midi_out, "default", SND_SEQ_OPEN_OUTPUT, 0);
 
     char portname[50]; sprintf(portname, "Controller");
-    int  alsaport = snd_seq_create_simple_port(
+    snd_seq_create_simple_port(
         midi_out,
         portname,
         SND_SEQ_PORT_CAP_READ

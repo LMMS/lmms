@@ -27,9 +27,10 @@
 #include "../Misc/XMLwrapper.h"
 #include "PresetsArray.h"
 
-class FilterParams:public PresetsArray
+class FilterParams
 {
     public:
+        FilterParams();
         FilterParams(unsigned char Ptype_,
                      unsigned char Pfreq,
                      unsigned char Pq_);
@@ -40,6 +41,7 @@ class FilterParams:public PresetsArray
         void defaults();
         void getfromXML(XMLwrapper *xml);
         void getfromXMLsection(XMLwrapper *xml, int n);
+        void paste(FilterParams &);
 
 
         void getfromFilterParams(FilterParams *pars);
@@ -63,8 +65,8 @@ class FilterParams:public PresetsArray
         unsigned char Pvowelclearness; //how vowels are kept clean (how much try to avoid "mixed" vowels)
         unsigned char Pcenterfreq, Poctavesfreq; //the center frequency of the res. func., and the number of octaves
 
-        struct {
-            struct {
+        struct Pvowels_t {
+            struct formants_t {
                 unsigned char freq, amp, q; //frequency,amplitude,Q
             } formants[FF_MAX_FORMANTS];
         } Pvowels[FF_MAX_VOWELS];
@@ -90,6 +92,7 @@ class FilterParams:public PresetsArray
 
         bool changed;
 
+        static rtosc::Ports ports;
     private:
         void defaults(int n);
 

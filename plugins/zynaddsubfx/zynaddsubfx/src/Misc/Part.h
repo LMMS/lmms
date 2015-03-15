@@ -27,18 +27,8 @@
 
 #include "../globals.h"
 #include "../Params/Controller.h"
-#include "../Misc/Microtonal.h"
 
-#include <pthread.h>
-#include <list> // For the monomemnotes list.
-
-class EffectMgr;
-class ADnoteParameters;
-class SUBnoteParameters;
-class PADnoteParameters;
-class SynthNote;
-class XMLWrapper;
-class FFTwrapper;
+#include <functional>
 
 /** Part implementation*/
 class Part
@@ -46,29 +36,29 @@ class Part
     public:
         /**Constructor
          * @param microtonal_ Pointer to the microtonal object
-         * @param fft_ Pointer to the FFTwrapper
-         * @param mutex_ Pointer to the master pthread_mutex_t*/
-        Part(Microtonal *microtonal_, FFTwrapper *fft_, pthread_mutex_t *mutex_);
+         * @param fft_ Pointer to the FFTwrapper*/
+        Part(Allocator &alloc, Microtonal *microtonal_, FFTwrapper *fft_);
         /**Destructor*/
         ~Part();
+
+        // Copy misc parameters not stored in .xiz format
+        void cloneTraits(Part &part) const REALTIME;
 
         // Midi commands implemented
         void NoteOn(unsigned char note,
                     unsigned char velocity,
-                    int masterkeyshift);
-        void NoteOff(unsigned char note);
+                    int masterkeyshift) REALTIME;
+        void NoteOff(unsigned char note) REALTIME;
         void PolyphonicAftertouch(unsigned char note,
                                   unsigned char velocity,
-                                  int masterkeyshift);
-        void AllNotesOff(); //panic
-        void SetController(unsigned int type, int par);
-        void RelaseSustainedKeys(); //this is called when the sustain pedal is relased
-        void RelaseAllKeys(); //this is called on AllNotesOff controller
+                                  int masterkeyshift) REALTIME;
+        void AllNotesOff() REALTIME; //panic
+        void SetController(unsigned int type, int par) REALTIME;
+        void RelaseSustainedKeys() REALTIME; //this is called when the sustain pedal is relased
+        void RelaseAllKeys() REALTIME; //this is called on AllNotesOff controller
 
         /* The synthesizer part output */
-        void ComputePartSmps(); //Part output
-
-        //instrumentonly: 0 - save all, 1 - save only instrumnet, 2 - save only instrument without the name(used in bank)
+        void ComputePartSmps() REALTIME; //Part output
 
 
         //saves the instrument settings to a XML file
@@ -82,7 +72,11 @@ class Part
         void defaults();
         void defaultsinstrument();
 
-        void applyparameters(bool lockmutex = true);
+        void applyparameters(void) NONREALTIME;
+        void applyparameters(std::function<bool()> do_abort) NONREALTIME;
+
+        void initialize_rt(void) REALTIME;
+        void kill_rt(void) REALTIME;
 
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
@@ -90,22 +84,25 @@ class Part
         void cleanup(bool final = false);
 
         //the part's kit
-        struct {
-            unsigned char      Penabled, Pmuted, Pminkey, Pmaxkey;
-            unsigned char     *Pname;
-            unsigned char      Padenabled, Psubenabled, Ppadenabled;
+        struct Kit {
+            bool               Penabled, Pmuted;
+            unsigned char      Pminkey, Pmaxkey;
+            char              *Pname;
+            bool               Padenabled, Psubenabled, Ppadenabled;
             unsigned char      Psendtoparteffect;
             ADnoteParameters  *adpars;
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
+
+            static rtosc::Ports &ports;
         } kit[NUM_KIT_ITEMS];
 
 
         //Part parameters
         void setkeylimit(unsigned char Pkeylimit);
-        void setkititemstatus(int kititem, int Penabled_);
+        void setkititemstatus(unsigned kititem, bool Penabled_);
 
-        unsigned char Penabled; /**<if the part is enabled*/
+        bool          Penabled; /**<if the part is enabled*/
         unsigned char Pvolume; /**<part volume*/
         unsigned char Pminkey; /**<the minimum key that the part receives noteon messages*/
         unsigned char Pmaxkey; //the maximum key that the part receives noteon messages
@@ -116,19 +113,19 @@ class Part
         void setPpanning(char Ppanning);
         unsigned char Pvelsns; //velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs; //velocity offset
-        unsigned char Pnoteon; //if the part receives NoteOn messages
-        unsigned char Pkitmode; //if the kitmode is enabled
-        unsigned char Pdrummode; //if all keys are mapped and the system is 12tET (used for drums)
+        bool Pnoteon; //if the part receives NoteOn messages
+        int Pkitmode; //if the kitmode is enabled
+        bool Pdrummode; //if all keys are mapped and the system is 12tET (used for drums)
 
-        unsigned char Ppolymode; //Part mode - 0=monophonic , 1=polyphonic
-        unsigned char Plegatomode; // 0=normal, 1=legato
+        bool Ppolymode; //Part mode - 0=monophonic , 1=polyphonic
+        bool Plegatomode; // 0=normal, 1=legato
         unsigned char Pkeylimit; //how many keys are alowed to be played same time (0=off), the older will be relased
 
-        unsigned char *Pname; //name of the instrument
+        char *Pname; //name of the instrument
         struct { //instrument additional information
             unsigned char Ptype;
-            unsigned char Pauthor[MAX_INFO_TEXT_SIZE + 1];
-            unsigned char Pcomments[MAX_INFO_TEXT_SIZE + 1];
+            char          Pauthor[MAX_INFO_TEXT_SIZE + 1];
+            char          Pcomments[MAX_INFO_TEXT_SIZE + 1];
         } info;
 
 
@@ -151,11 +148,9 @@ class Part
         unsigned char Pefxroute[NUM_PART_EFX]; //how the effect's output is routed(to next effect/to out)
         bool Pefxbypass[NUM_PART_EFX]; //if the effects are bypassed
 
-
-        pthread_mutex_t *mutex;
-        pthread_mutex_t load_mutex;
-
         int lastnote;
+
+        static rtosc::Ports &ports;
 
     private:
         void RunNote(unsigned k);
@@ -170,9 +165,7 @@ class Part
             int note; //if there is no note playing, the "note"=-1
             int itemsplaying;
             struct {
-                SynthNote *adnote,
-                   *subnote,
-                   *padnote;
+                SynthNote *adnote, *subnote, *padnote;
                 int sendtoparteffect;
             } kititem[NUM_KIT_ITEMS];
             int time;
@@ -182,7 +175,13 @@ class Part
         bool lastlegatomodevalid; // To keep track of previous legatomodevalid.
 
         // MonoMem stuff
-        std::list<unsigned char> monomemnotes; // A list to remember held notes.
+        void monomemPush(char note);
+        void monomemPop(char note);
+        char monomemBack(void) const;
+        bool monomemEmpty(void) const;
+        void monomemClear(void);
+
+        short monomemnotes[256]; // A list to remember held notes.
         struct {
             unsigned char velocity;
             int mkeyshift; // I'm not sure masterkeyshift should be remembered.
@@ -197,6 +196,7 @@ class Part
         float oldfreq;    //this is used for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;
+        Allocator  &memory;
 };
 
 #endif

@@ -23,16 +23,17 @@
 #include <cmath>
 #include <cstdio>
 #include "../Misc/Util.h"
+#include "../Misc/Allocator.h"
 #include "FormantFilter.h"
 #include "AnalogFilter.h"
 #include "../Params/FilterParams.h"
 
-FormantFilter::FormantFilter(FilterParams *pars, unsigned int srate, int bufsize)
-    : Filter(srate, bufsize)
+FormantFilter::FormantFilter(FilterParams *pars, Allocator *alloc, unsigned int srate, int bufsize)
+    : Filter(srate, bufsize), memory(*alloc)
 {
     numformants = pars->Pnumformants;
     for(int i = 0; i < numformants; ++i)
-        formant[i] = new AnalogFilter(4 /*BPF*/, 1000.0f, 10.0f, pars->Pstages, srate, bufsize);
+        formant[i] = memory.alloc<AnalogFilter>(4 /*BPF*/, 1000.0f, 10.0f, pars->Pstages, srate, bufsize);
     cleanup();
 
     for(int j = 0; j < FF_MAX_VOWELS; ++j)
@@ -78,7 +79,7 @@ FormantFilter::FormantFilter(FilterParams *pars, unsigned int srate, int bufsize
 FormantFilter::~FormantFilter()
 {
     for(int i = 0; i < numformants; ++i)
-        delete (formant[i]);
+        memory.dealloc(formant[i]);
 }
 
 void FormantFilter::cleanup()

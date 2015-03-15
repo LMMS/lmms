@@ -23,10 +23,11 @@
 #include <cmath>
 #include "DynamicFilter.h"
 #include "../DSP/Filter.h"
+#include "../Misc/Allocator.h"
 
-DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize)
-    :Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64), 0, srate, bufsize),
-      lfo(srate, bufsize),
+DynamicFilter::DynamicFilter(EffectParams pars)
+    :Effect(pars),
+      lfo(pars.srate, pars.bufsize),
       Pvolume(110),
       Pdepth(0),
       Pampsns(90),
@@ -35,15 +36,16 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, 
       filterl(NULL),
       filterr(NULL)
 {
+    filterpars = memory.alloc<FilterParams>(0,0,0);
     setpreset(Ppreset);
     cleanup();
 }
 
 DynamicFilter::~DynamicFilter()
 {
-    delete filterpars;
-    delete filterl;
-    delete filterr;
+    memory.dealloc(filterpars);
+    memory.dealloc(filterl);
+    memory.dealloc(filterr);
 }
 
 
@@ -129,10 +131,10 @@ void DynamicFilter::setampsns(unsigned char _Pampsns)
 
 void DynamicFilter::reinitfilter(void)
 {
-    delete filterl;
-    delete filterr;
-    filterl = Filter::generate(filterpars, samplerate, buffersize);
-    filterr = Filter::generate(filterpars, samplerate, buffersize);
+    memory.dealloc(filterl);
+    memory.dealloc(filterr);
+    filterl = Filter::generate(memory, filterpars, samplerate, buffersize);
+    filterr = Filter::generate(memory, filterpars, samplerate, buffersize);
 }
 
 void DynamicFilter::setpreset(unsigned char npreset)

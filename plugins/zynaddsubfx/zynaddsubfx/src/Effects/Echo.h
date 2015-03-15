@@ -30,7 +30,7 @@
 class Echo:public Effect
 {
     public:
-        Echo(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
+        Echo(EffectParams pars);
         ~Echo();
 
         void out(const Stereo<float *> &input);

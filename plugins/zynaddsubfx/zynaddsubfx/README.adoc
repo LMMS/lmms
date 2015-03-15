@@ -1,0 +1,72 @@
+ZynAddSubFX
+-----------
+It is a feature heavy realtime software synthesizer for Linux, OSX,
+and Windows. 
+
+Originally written by Nasca Octavian Paul <zynaddsubfx AT yahoo D0T com>
+
+Maintained by Mark McCurry 2009+.
+
+ZynAddSubFX is free program and is distributed WITH NO WARRANTY.
+It is licensed under GNU General Public License version 2 (and only version 2).
+
+The project page is
+http://sourceforge.net/projects/zynaddsubfx
+or
+http://zynaddsubfx.sourceforge.net
+     
+Mailing List:
+http://lists.sourceforge.net/mailman/listinfo/zynaddsubfx-user
+
+Public Forum:
+http://www.kvraudio.com/forum/viewforum.php?f=47
+
+Requirements:
+~~~~~~~~~~~~~
+- FFTW 3.x.x  - necessary for Fast Fourier computations
+- MXML-2.5+ from www.minixml.org
+- zlib library from http://www.zlib.org
+- Jack Audio (may be optional in the future)
+
+Optional:
+~~~~~~~~~
+- FLTK 1.x.x (tested with fltk 1.3+)
+- a VST host for the VST version [For more information see:
+  http://www.kvraudio.com/forum/viewtopic.php?t=268277&sid=95be0b6c9909300d566006428bcbb97d]
+
+Compilation:
+~~~~~~~~~~~~
+  For the main program see doc/build.txt.
+  To compile the Spliter, run "make" from the "Spliter" directory.
+  To compile the Controller, run "make" from the "Controller" directory.
+
+Running on Linux
+~~~~~~~~~~~~~~~~
+Under linux there are several options for both audio output and MIDI input.
+Defaults are set at compile time and the desired backend can be set when
+starting ZynAddSubFX with the '-I' and '-O' options.
+The currently supported backends are:
+
+- Audio Output
+    * ALSA (Advanced Linux Sound Architecture)
+    * OSS (Open Sound System)
+    * JACK (JACK Audio Connection Kit)
+    * Port Audio
+
+- MIDI Input
+    * ALSA
+    * OSS
+    * JACK
+
+Running on OSX
+~~~~~~~~~~~~~~
+Under OSX simply download the binary available on http://sourceforge.net/projects/zynaddsubfx
+and run with JACK
+
+Running on Windows
+~~~~~~~~~~~~~~~~~~
+NOTE: At this time only older versions of ZynAddSubFX were compiled on windows
+      See older versions on sf.net (ie version 2.2.1)
+
+Have fun! :-)
+--The ZynAddSubFX team

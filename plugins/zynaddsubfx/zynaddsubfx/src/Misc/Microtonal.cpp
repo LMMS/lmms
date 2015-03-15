@@ -20,16 +20,63 @@
 
 */
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
+#include <cstdio>
+
+#include <rtosc/ports.h>
+#include <rtosc/port-sugar.h>
+
+
+#include "XMLwrapper.h"
+#include "Util.h"
 #include "Microtonal.h"
+
 
 #define MAX_LINE_SIZE 80
 
+#define rObject Microtonal
+using namespace rtosc;
+
+/**
+ * TODO
+ * Consider how much of this should really exist on the rt side of things.
+ * All the rt side needs is a function to map notes at various keyshifts to
+ * frequencies, which does not require this many parameters...
+ *
+ * A good lookup table should be a good finalization of this
+ */
+rtosc::Ports Microtonal::ports = {
+    rToggle(Pinvertupdown, "key mapping inverse"),
+    rParamZyn(Pinvertupdowncenter, "center of the inversion"),
+    rToggle(Penabled, "Enable for microtonal mode"),
+    rParamZyn(PAnote, "The note for 'A'"),
+    rParamF(PAfreq, "Frequency of the 'A' note"),
+    rParamZyn(Pscaleshift, "UNDOCUMENTED"),
+    rParamZyn(Pfirstkey, "First key to retune"),
+    rParamZyn(Plastkey,  "Last key to retune"),
+    rParamZyn(Pmiddlenote, "Scale degree 0 note"),
+
+    //TODO check to see if this should be exposed
+    rParamZyn(Pmapsize, "UNDOCUMENTED"),
+    rToggle(Pmappingenabled, "Mapping Enable"),
+
+    rParams(Pmapping, "UNDOCUMENTED"),
+    rParamZyn(Pglobalfinedetune, "Fine detune for all notes"),
+
+    rString(Pname, MICROTONAL_MAX_NAME_LEN, "Microtonal Name"),
+    rString(Pcomment, MICROTONAL_MAX_NAME_LEN, "Microtonal Name"),
+
+    {"octavesize:", 0, 0, [](const char*, RtData &d)
+        {
+            Microtonal &m = *(Microtonal*)d.obj;
+            d.reply(d.loc, "i", m.getoctavesize());
+        }},
+};
+
+
 Microtonal::Microtonal()
 {
-    Pname    = new unsigned char[MICROTONAL_MAX_NAME_LEN];
-    Pcomment = new unsigned char[MICROTONAL_MAX_NAME_LEN];
     defaults();
 }
 
@@ -76,10 +123,7 @@ void Microtonal::defaults()
 }
 
 Microtonal::~Microtonal()
-{
-    delete [] Pname;
-    delete [] Pcomment;
-}
+{}
 
 /*
  * Get the size of the octave
@@ -106,13 +150,13 @@ float Microtonal::getnotefreq(int note, int keyshift) const
         note = (int) Pinvertupdowncenter * 2 - note;
 
     //compute global fine detune
-    float globalfinedetunerap = powf(2.0f,
-                                     (Pglobalfinedetune - 64.0f) / 1200.0f);       //-64.0f .. 63.0f cents
+    float globalfinedetunerap =
+        powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);       //-64.0f .. 63.0f cents
 
-    if(Penabled == 0)
+    if(Penabled == 0) //12tET
         return powf(2.0f,
                     (note - PAnote
-                     + keyshift) / 12.0f) * PAfreq * globalfinedetunerap;                     //12tET
+                     + keyshift) / 12.0f) * PAfreq * globalfinedetunerap;
 
     int scaleshift =
         ((int)Pscaleshift - 64 + (int) octavesize * 100) % octavesize;
@@ -127,7 +171,7 @@ float Microtonal::getnotefreq(int note, int keyshift) const
     }
 
     //if the mapping is enabled
-    if(Pmappingenabled != 0) {
+    if(Pmappingenabled) {
         if((note < Pfirstkey) || (note > Plastkey))
             return -1.0f;
         //Compute how many mapped keys are from middle note to reference note
@@ -144,11 +188,11 @@ float Microtonal::getnotefreq(int note, int keyshift) const
         float rap_anote_middlenote =
             (deltanote ==
              0) ? (1.0f) : (octave[(deltanote - 1) % octavesize].tuning);
-        if(deltanote != 0)
+        if(deltanote)
             rap_anote_middlenote *=
                 powf(octave[octavesize - 1].tuning,
                      (deltanote - 1) / octavesize);
-        if(minus != 0)
+        if(minus)
             rap_anote_middlenote = 1.0f / rap_anote_middlenote;
 
         //Convert from note (midi) to degree (note from the tunning)
@@ -175,7 +219,7 @@ float Microtonal::getnotefreq(int note, int keyshift) const
         freq *= powf(octave[octavesize - 1].tuning, degoct);
         freq *= PAfreq / rap_anote_middlenote;
         freq *= globalfinedetunerap;
-        if(scaleshift != 0)
+        if(scaleshift)
             freq /= octave[scaleshift - 1].tuning;
         return freq * rap_keyshift;
     }
@@ -189,11 +233,10 @@ float Microtonal::getnotefreq(int note, int keyshift) const
             octave[(ntkey + octavesize - 1) % octavesize].tuning * powf(oct,
                                                                         ntoct)
             * PAfreq;
-        if(ntkey == 0)
+        if(!ntkey)
             freq /= oct;
-        if(scaleshift != 0)
+        if(scaleshift)
             freq /= octave[scaleshift - 1].tuning;
-//	fprintf(stderr,"note=%d freq=%.3f cents=%d\n",note,freq,(int)floor(logf(freq/PAfreq)/logf(2.0f)*1200.0f+0.5f));
         freq *= globalfinedetunerap;
         return freq * rap_keyshift;
     }
@@ -460,77 +503,51 @@ int Microtonal::loadkbm(const char *filename)
 {
     FILE *file = fopen(filename, "r");
     int   x;
+    float tmpPAfreq = 440.0f;
     char  tmp[500];
 
     fseek(file, 0, SEEK_SET);
     //loads the mapsize
-    if(loadline(file, &tmp[0]) != 0)
+    if(loadline(file, tmp) != 0 || sscanf(tmp, "%d", &x) == 0)
         return 2;
-    if(sscanf(&tmp[0], "%d", &x) == 0)
-        return 2;
-    if(x < 1)
-        x = 0;
-    if(x > 127)
-        x = 127;     //just in case...
-    Pmapsize = x;
+    Pmapsize = limit(x, 0, 127);
+
     //loads first MIDI note to retune
-    if(loadline(file, &tmp[0]) != 0)
+    if(loadline(file, tmp) != 0 || sscanf(tmp, "%d", &x) == 0)
         return 2;
-    if(sscanf(&tmp[0], "%d", &x) == 0)
-        return 2;
-    if(x < 1)
-        x = 0;
-    if(x > 127)
-        x = 127;     //just in case...
-    Pfirstkey = x;
+    Pfirstkey = limit(x, 0, 127);
+
     //loads last MIDI note to retune
-    if(loadline(file, &tmp[0]) != 0)
+    if(loadline(file, tmp) != 0 || sscanf(tmp, "%d", &x) == 0)
         return 2;
-    if(sscanf(&tmp[0], "%d", &x) == 0)
-        return 2;
-    if(x < 1)
-        x = 0;
-    if(x > 127)
-        x = 127;     //just in case...
-    Plastkey = x;
+    Plastkey = limit(x, 0, 127);
+
     //loads last the middle note where scale fro scale degree=0
-    if(loadline(file, &tmp[0]) != 0)
+    if(loadline(file, tmp) != 0 || sscanf(tmp, "%d", &x) == 0)
         return 2;
-    if(sscanf(&tmp[0], "%d", &x) == 0)
-        return 2;
-    if(x < 1)
-        x = 0;
-    if(x > 127)
-        x = 127;     //just in case...
-    Pmiddlenote = x;
+    Pmiddlenote = limit(x, 0, 127);
+
     //loads the reference note
-    if(loadline(file, &tmp[0]) != 0)
+    if(loadline(file, tmp) != 0 || sscanf(tmp, "%d", &x) == 0)
         return 2;
-    if(sscanf(&tmp[0], "%d", &x) == 0)
-        return 2;
-    if(x < 1)
-        x = 0;
-    if(x > 127)
-        x = 127;     //just in case...
-    PAnote = x;
+    PAnote = limit(x,0,127);
+
     //loads the reference freq.
-    if(loadline(file, &tmp[0]) != 0)
-        return 2;
-    float tmpPAfreq = 440.0f;
-    if(sscanf(&tmp[0], "%f", &tmpPAfreq) == 0)
+    if(loadline(file, tmp) != 0 || sscanf(tmp, "%f", &tmpPAfreq) == 0)
         return 2;
     PAfreq = tmpPAfreq;
 
-    //the scale degree(which is the octave) is not loaded, it is obtained by the tunnings with getoctavesize() method
+    //the scale degree(which is the octave) is not loaded,
+    //it is obtained by the tunnings with getoctavesize() method
     if(loadline(file, &tmp[0]) != 0)
         return 2;
 
     //load the mappings
     if(Pmapsize != 0) {
         for(int nline = 0; nline < Pmapsize; ++nline) {
-            if(loadline(file, &tmp[0]) != 0)
+            if(loadline(file, tmp) != 0)
                 return 2;
-            if(sscanf(&tmp[0], "%d", &x) == 0)
+            if(sscanf(tmp, "%d", &x) == 0)
                 x = -1;
             Pmapping[nline] = x;
         }

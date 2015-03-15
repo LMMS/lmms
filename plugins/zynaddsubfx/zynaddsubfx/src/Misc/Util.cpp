@@ -87,7 +87,7 @@ float getdetune(unsigned char type,
             findet = fabs(fdetune / 8192.0f) * 10.0f;
             break;
         case 3:
-            cdet   = fabs(cdetune * 100);
+            cdet   = fabs(cdetune * 100.0f);
             findet = powf(10, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
             break;
         case 4:
@@ -227,4 +227,10 @@ float cinterpolate(const float *data, size_t len, float pos)
               r_pos      = (l_pos + 1) % len;
     const float leftness = pos - l_pos;
     return data[l_pos] * leftness + data[r_pos] * (1.0f - leftness);
+}
+
+const char *message_snip(const char *m)
+{
+    while(*m && *m!='/')++m;
+    return *m?m+1:m;
 }

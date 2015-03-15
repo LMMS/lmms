@@ -21,16 +21,17 @@
 */
 
 #include <cmath>
+#include "../Misc/Allocator.h"
 #include "Chorus.h"
 #include <iostream>
 
 using namespace std;
 
-Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, unsigned int srate, int bufsize)
-    :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, srate, bufsize),
-      lfo(srate, bufsize),
+Chorus::Chorus(EffectParams pars)
+    :Effect(pars),
+      lfo(pars.srate, pars.bufsize),
       maxdelay((int)(MAX_CHORUS_DELAY / 1000.0f * samplerate_f)),
-      delaySample(new float[maxdelay], new float[maxdelay])
+      delaySample(memory.valloc<float>(maxdelay), memory.valloc<float>(maxdelay))
 {
     dlk = 0;
     drk = 0;
@@ -44,8 +45,8 @@ Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, unsigned
 
 Chorus::~Chorus()
 {
-    delete [] delaySample.l;
-    delete [] delaySample.r;
+    memory.devalloc(delaySample.l);
+    memory.devalloc(delaySample.r);
 }
 
 //get the delay value in samples; xlfo is the current lfo value

@@ -25,16 +25,20 @@
 #include "../Params/FilterParams.h"
 #include <cmath>
 
-Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
-               FilterParams *filterpars_, unsigned char Ppreset_,
-               unsigned int srate, int bufsize)
-    :Ppreset(Ppreset_),
-      efxoutl(efxoutl_),
-      efxoutr(efxoutr_),
-      filterpars(filterpars_),
-      insertion(insertion_),
-      samplerate(srate),
-      buffersize(bufsize)
+EffectParams::EffectParams(Allocator &alloc_, bool insertion_, float *efxoutl_, float *efxoutr_,
+            unsigned char Ppreset_, unsigned int srate_, int bufsize_, FilterParams *filterpars_)
+    :alloc(alloc_), insertion(insertion_), efxoutl(efxoutl_), efxoutr(efxoutr_),
+     Ppreset(Ppreset_), srate(srate_), bufsize(bufsize_), filterpars(filterpars_)
+{}
+Effect::Effect(EffectParams pars)
+    :Ppreset(pars.Ppreset),
+      efxoutl(pars.efxoutl),
+      efxoutr(pars.efxoutr),
+      filterpars(pars.filterpars),
+      insertion(pars.insertion),
+      memory(pars.alloc),
+      samplerate(pars.srate),
+      buffersize(pars.bufsize)
 {
     alias();
 }

@@ -2,8 +2,10 @@
 #include "../globals.h"
 #include <cstring>
 
-SynthNote::SynthNote(float freq, float vel, int port, int note, bool quiet)
-    :legato(freq, vel, port, note, quiet)
+SynthNote::SynthNote(SynthParams &pars)
+    :legato(pars.frequency, pars.velocity, pars.portamento,
+            pars.note, pars.quiet),
+     memory(pars.memory), ctl(pars.ctl)
 {}
 
 SynthNote::Legato::Legato(float freq, float vel, int port,
@@ -24,17 +26,16 @@ SynthNote::Legato::Legato(float freq, float vel, int port,
     silent   = quiet;
 }
 
-int SynthNote::Legato::update(float freq, float velocity, int portamento_,
-                              int midinote_, bool externcall)
+int SynthNote::Legato::update(LegatoParams pars)
 {
-    if(externcall)
+    if(pars.externcall)
         msg = LM_Norm;
     if(msg != LM_CatchUp) {
         lastfreq   = param.freq;
-        param.freq = freq;
-        param.vel  = velocity;
-        param.portamento = portamento_;
-        param.midinote   = midinote_;
+        param.freq = pars.frequency;
+        param.vel  = pars.velocity;
+        param.portamento = pars.portamento;
+        param.midinote   = pars.midinote;
         if(msg == LM_Norm) {
             if(silent) {
                 fade.m = 0.0f;
@@ -71,8 +72,9 @@ void SynthNote::Legato::apply(SynthNote &note, float *outl, float *outr)
                     // the note to the actual parameters.
                     decounter = -10;
                     msg = LM_ToNorm;
-                    note.legatonote(param.freq, param.vel, param.portamento,
-                                    param.midinote, false);
+                    LegatoParams pars{param.freq, param.vel, param.portamento,
+                                    param.midinote, false};
+                    note.legatonote(pars);
                     break;
                 }
             }
@@ -112,8 +114,9 @@ void SynthNote::Legato::apply(SynthNote &note, float *outl, float *outr)
                     //with the heard note for the same length it stayed at the
                     //previous freq during the fadeout.
                     float catchupfreq = param.freq * (param.freq / lastfreq);
-                    note.legatonote(catchupfreq, param.vel, param.portamento,
-                                    param.midinote, false);
+                    LegatoParams pars{catchupfreq, param.vel, param.portamento,
+                        param.midinote, false};
+                    note.legatonote(pars);
                     break;
                 }
                 fade.m  -= fade.step;
@@ -128,7 +131,8 @@ void SynthNote::Legato::apply(SynthNote &note, float *outl, float *outr)
 
 void SynthNote::setVelocity(float velocity_) {
     legato.setSilent(true); //Let legato.update(...) returns 0.
-    legatonote(legato.getFreq(), velocity_,
-               legato.getPortamento(), legato.getMidinote(), true);
+    LegatoParams pars{legato.getFreq(), velocity_,
+               legato.getPortamento(), legato.getMidinote(), true};
+    legatonote(pars);
     legato.setDecounter(0); //avoid chopping sound due fade-in
 }

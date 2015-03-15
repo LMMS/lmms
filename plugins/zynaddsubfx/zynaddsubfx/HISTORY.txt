@@ -1,3 +1,22 @@
+2.5.0 (25 Feb 2015)
+        - Add Rtosc
+        - Add tlsf RT Memory Allocator
+        - Add --dump-oscdoc Flag
+        - Add OSC API
+        - Add Jack-OSC Support
+        - Add MIDI Learn
+        - Add Undo/Redo
+        - Add Multi-Out JACK Engine
+        - Add Multi-Out OSS Engine
+        - Add Top Level Window Icon
+        - Add OSS env Vars MIDI_DEVICE/DSP_DEVICE
+        - Add OSC port/PID file
+        - Remove Master::mutex
+        - Remove Almost All RT Unsafe Actions
+        - Disable (temporarily) DSSI
+        - Disable (temporarily) Copy/Paste
+        - Massive Internal Refactoring
+
 2.4.4 (28 Jun 2014)
         - Add UI Mousewheel Support
         - Add Spectral Adjust Parameter Rescaling
@@ -13,7 +32,6 @@
         - Fix Unison Regressions
         - Documentation additions
         - Misc bug fixes
-        
 
 2.4.3 (15 Jun 2012)
         - Non-session manager support

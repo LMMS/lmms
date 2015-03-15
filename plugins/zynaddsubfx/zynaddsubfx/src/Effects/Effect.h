@@ -29,22 +29,38 @@
 #include "../Misc/Stereo.h"
 
 class FilterParams;
+class Allocator;
+
+struct EffectParams
+{
+    /**
+     * Effect Parameter Constructor
+     * @param alloc        Realtime Memory Allocator
+     * @param insertion_   1 when it is an insertion Effect
+     * @param efxoutl_     Effect output buffer Left channel
+     * @param efxoutr_     Effect output buffer Right channel
+     * @param filterpars_  pointer to FilterParams array
+     * @param Ppreset_     chosen preset
+     * @return Initialized Effect Parameter object*/
+    EffectParams(Allocator &alloc_, bool insertion_, float *efxoutl_, float *efxoutr_,
+            unsigned char Ppreset_, unsigned int srate, int bufsize, FilterParams *filterpars_=0);
+
+
+    Allocator &alloc;
+    bool insertion;
+    float *efxoutl;
+    float *efxoutr;
+    unsigned char Ppreset;
+    unsigned int srate;
+    int bufsize;
+    FilterParams *filterpars;
+};
 
 /**this class is inherited by the all effects(Reverb, Echo, ..)*/
 class Effect
 {
     public:
-        /**
-         * Effect Constructor
-         * @param insertion_ 1 when it is an insertion Effect
-         * @param efxoutl_ Effect output buffer Left channel
-         * @param efxoutr_ Effect output buffer Right channel
-         * @param filterpars_ pointer to FilterParams array
-         * @param Ppreset_ chosen preset
-         * @return Initialized Effect object*/
-        Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
-               FilterParams *filterpars_, unsigned char Ppreset_,
-               unsigned int srate, int bufsize);
+        Effect(EffectParams pars);
         virtual ~Effect() {}
         /**
          * Choose a preset
@@ -101,6 +117,9 @@ class Effect
         float pangainR;
         char  Plrcross; // L/R mix
         float lrcross;
+
+        //Allocator
+        Allocator &memory;
 
         // current setup
         unsigned int samplerate;

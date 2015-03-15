@@ -23,17 +23,8 @@
 #ifndef AD_NOTE_PARAMETERS_H
 #define AD_NOTE_PARAMETERS_H
 
-
 #include "../globals.h"
-#include "../Misc/Util.h"
 #include "PresetsArray.h"
-
-class EnvelopeParams;
-class LFOParams;
-class FilterParams;
-class Resonance;
-class OscilGen;
-class FFTwrapper;
 
 enum FMTYPE {
     NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD
@@ -111,6 +102,8 @@ struct ADnoteGlobalParam {
 
     //how the randomness is applied to the harmonics on more voices using the same oscillator
     unsigned char Hrandgrouping;
+
+    static rtosc::Ports &ports;
 };
 
 
@@ -121,9 +114,10 @@ struct ADnoteGlobalParam {
 struct ADnoteVoiceParam {
     void getfromXML(XMLwrapper *xml, unsigned nvoice);
     void add2XML(XMLwrapper *xml, bool fmoscilused);
-    void defaults();
+    void defaults(void);
     void enable(FFTwrapper *fft, Resonance *Reson);
-    void kill();
+    void kill(void);
+    float getUnisonFrequencySpreadCents(void) const;
     /** If the voice is enabled */
     unsigned char Enabled;
 
@@ -286,6 +280,8 @@ struct ADnoteVoiceParam {
     /* Frequency Envelope of the Modullator */
     unsigned char   PFMAmpEnvelopeEnabled;
     EnvelopeParams *FMAmpEnvelope;
+
+    static rtosc::Ports &ports;
 };
 
 class ADnoteParameters:public PresetsArray
@@ -301,10 +297,11 @@ class ADnoteParameters:public PresetsArray
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
 
-        float getBandwidthDetuneMultiplier();
-        float getUnisonFrequencySpreadCents(int nvoice);
-        int get_unison_size_index(int nvoice);
+        float getBandwidthDetuneMultiplier() const;
+        float getUnisonFrequencySpreadCents(int nvoice) const;
+        int get_unison_size_index(int nvoice) const;
         void set_unison_size_index(int nvoice, int index);
+        static rtosc::Ports &ports;
     private:
         void defaults(int n); //n is the nvoice
 

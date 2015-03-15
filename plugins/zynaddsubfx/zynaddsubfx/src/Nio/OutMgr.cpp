@@ -22,11 +22,10 @@ OutMgr::OutMgr()
     :wave(new WavEngine()),
       priBuf(new float[4096],
              new float[4096]), priBuffCurrent(priBuf),
-      master(Master::getInstance())
+      master(NULL)
 {
     currentOut = NULL;
     stales     = 0;
-    master     = Master::getInstance();
 
     //init samples
     outr = new float[synth->buffersize];
@@ -61,13 +60,9 @@ const Stereo<float *> OutMgr::tick(unsigned int frameSize)
     int i=0;
     while(frameSize > storedSmps()) {
         if(!midi.empty()) {
-            pthread_mutex_lock(&(master.mutex));
             midi.flush(i*synth->buffersize, (i+1)*synth->buffersize);
-            pthread_mutex_unlock(&(master.mutex));
         }
-        pthread_mutex_lock(&(master.mutex));
-        master.AudioOut(outl, outr);
-        pthread_mutex_unlock(&(master.mutex));
+        master->AudioOut(outl, outr);
         addSmps(outl, outr);
         i++;
     }
@@ -116,6 +111,16 @@ string OutMgr::getSink() const
         return "ERROR";
     }
     return "ERROR";
+}
+
+void OutMgr::setMaster(Master *master_)
+{
+    master=master_;
+}
+
+void OutMgr::applyOscEventRt(const char *msg)
+{
+    master->applyOscEvent(msg);
 }
 
 //perform a cheap linear interpolation for resampling
