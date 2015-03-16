@@ -122,25 +122,6 @@ public:
 
 
 
-	///
-	/// \brief processBuffer
-	/// \param buf Audio Buffer
-	/// \param frames Count of sampleFrames in Audio Buffer
-	///
-	virtual void processBuffer( sampleFrame* buf, const fpp_t frames )
-	{
-		for ( fpp_t f = 0 ; f < frames ; ++f)
-		{
-			buf[f][0] = update( buf[f][0] , 0);
-			buf[f][1] = update( buf[f][1] , 1);
-		}
-	}
-
-	virtual void tick( sampleFrame *frame )
-	{
-		frame[0][0] = update( frame[0][0], 0);
-		frame[0][1] = update( frame[0][1], 1);
-	}
 
 protected:
 	///
