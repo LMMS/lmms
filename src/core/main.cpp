@@ -251,7 +251,7 @@ int main( int argc, char * * argv )
 		}
 	}
 
-#ifndef LMMS_BUILD_WIN32
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_HAIKU)
 	if ( ( getuid() == 0 || geteuid() == 0 ) && !allowRoot )
 	{
 		printf( "LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n" );
