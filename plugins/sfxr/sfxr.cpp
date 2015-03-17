@@ -139,8 +139,9 @@ void SfxrSynth::resetSample( bool restart )
 		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*100000.0f);
 
 		// These will be used as divisors later, let's avoid division by 0
-		for(int i=0; i<3; ++i) {
-		  env_length[i] = (env_length[i] == 0 ) ? 1 : env_length[i];
+		for(int i = 0; i < 3; ++i) 
+		{
+			env_length[i] = (env_length[i] == 0) ? 1 : env_length[i];
 		}
 
 		fphase=pow(s->m_phaserOffsetModel.value(), 2.0f)*1020.0f;
