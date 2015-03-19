@@ -1079,13 +1079,12 @@ void MainWindow::updateViewMenu()
 	*/
 
 	// Should be doable.
-	/* qa = new QAction(tr( "Smooth scroll" ), this);
+	qa = new QAction(tr( "Smooth scroll" ), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).
 			toInt() ? true : false );
 	m_viewMenu->addAction(qa);
-	*/
 
 	// Not yet.
 	/* qa = new QAction(tr( "One instrument track window" ), this);
