@@ -199,14 +199,17 @@ void Song::savePos()
 
 void Song::processNextBuffer()
 {
+	// if not playing, nothing to do
 	if( m_playing == false )
 	{
 		return;
 	}
 
 	TrackList trackList;
-	int tcoNum = -1;
+	int tcoNum = -1; // track content object number
 
+	// determine the list of tracks to play and the track content object
+	// (TCO) number
 	switch( m_playMode )
 	{
 		case Mode_PlaySong:
@@ -247,6 +250,7 @@ void Song::processNextBuffer()
 
 	}
 
+	// if we have no tracks to play, nothing to do
 	if( trackList.empty() == true )
 	{
 		return;
@@ -259,6 +263,8 @@ void Song::processNextBuffer()
 
 	if( checkLoop )
 	{
+		// if looping-mode is enabled and we are outside of the looping
+		// range, go to the beginning of the range
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
@@ -269,15 +275,12 @@ void Song::processNextBuffer()
 		}
 	}
 
-	f_cnt_t totalFramesPlayed = 0;
+	f_cnt_t framesPlayed = 0;
 	const float framesPerTick = Engine::framesPerTick();
 
-	while( totalFramesPlayed < Engine::mixer()->framesPerPeriod() )
+	while( framesPlayed < Engine::mixer()->framesPerPeriod() )
 	{
 		m_vstSyncController.update();
-
-		f_cnt_t playedFrames = Engine::mixer()->framesPerPeriod() - 
-			totalFramesPlayed;
 
 		float currentFrame = m_playPos[m_playMode].currentFrame();
 		// did we play a tick?
@@ -335,6 +338,9 @@ void Song::processNextBuffer()
 				m_vstSyncController.startCycle( 
 					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
 
+				// if looping-mode is enabled and we have got
+				// past the looping range, return to the 
+				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
@@ -353,23 +359,26 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t lastFrames = ( f_cnt_t )framesPerTick - 
-			( f_cnt_t )currentFrame;
+		f_cnt_t framesToPlay = 
+			Engine::mixer()->framesPerPeriod() - framesPlayed;
+
+		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick - 
+						( f_cnt_t )currentFrame;
 		// skip last frame fraction
-		if( lastFrames == 0 )
+		if( framesLeft == 0 )
 		{
-			++totalFramesPlayed;
+			++framesPlayed;
 			m_playPos[m_playMode].setCurrentFrame( currentFrame
 								+ 1.0f );
 			continue;
 		}
-		// do we have some samples left in this tick but these are
-		// less then samples we have to play?
-		if( lastFrames < playedFrames )
+		// do we have samples left in this tick but these are less 
+		// than samples we have to play?
+		if( framesLeft < framesToPlay )
 		{
-			// then set played_samples to remaining samples, the
+			// then set framesToPlay to remaining samples, the
 			// rest will be played in next loop
-			playedFrames = lastFrames;
+			framesToPlay = framesLeft;
 		}
 
 		if( ( f_cnt_t ) currentFrame == 0 )
@@ -378,25 +387,25 @@ void Song::processNextBuffer()
 			{
 				m_globalAutomationTrack->play(
 						m_playPos[m_playMode],
-						playedFrames,
-						totalFramesPlayed, tcoNum );
+						framesToPlay,
+						framesPlayed, tcoNum );
 			}
 
 			// loop through all tracks and play them
 			for( int i = 0; i < trackList.size(); ++i )
 			{
 				trackList[i]->play( m_playPos[m_playMode],
-						playedFrames,
-						totalFramesPlayed, tcoNum );
+						framesToPlay,
+						framesPlayed, tcoNum );
 			}
 		}
 
 		// update frame-counters
-		totalFramesPlayed += playedFrames;
-		m_playPos[m_playMode].setCurrentFrame( playedFrames +
+		framesPlayed += framesToPlay;
+		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
 		m_elapsedMilliSeconds += 
-			( ( playedFrames / framesPerTick ) * 60 * 1000 / 48 ) 
+			( ( framesToPlay / framesPerTick ) * 60 * 1000 / 48 ) 
 				/ getTempo();
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
