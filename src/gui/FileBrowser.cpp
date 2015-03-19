@@ -458,6 +458,10 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
+		else if( f->extension ()== "xiz" && Engine::pluginFileHandling().contains( f->extension() ) )
+		{
+			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
+		}
 		else if( f->type() != FileItem::VstPluginFile &&
 				( f->handling() == FileItem::LoadAsPreset ||
 				f->handling() == FileItem::LoadByPlugin ) )
