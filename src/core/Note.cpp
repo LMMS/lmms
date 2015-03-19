@@ -231,3 +231,8 @@ bool Note::hasDetuningInfo() const
 
 
 
+bool Note::withinRange(int tickStart, int tickEnd) const
+{
+	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
+		&& length().getTicks() != 0;
+}
