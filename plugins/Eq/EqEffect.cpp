@@ -71,6 +71,101 @@ EqEffect::~EqEffect()
 
 bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
+	// setup sample exact controls
+	float hpRes = m_eqControls.m_hpResModel.value();
+	float lowShelfRes = m_eqControls.m_lowShelfResModel.value();
+	float para1Bw = m_eqControls.m_para1BwModel.value();
+	float para2Bw = m_eqControls.m_para2BwModel.value();
+	float para3Bw = m_eqControls.m_para3BwModel.value();
+	float para4Bw = m_eqControls.m_para4BwModel.value();
+	float highShelfRes = m_eqControls.m_highShelfResModel.value();
+	float lpRes = m_eqControls.m_lpResModel.value();
+
+	float hpFreq = m_eqControls.m_hpFeqModel.value();
+	float lowShelfFreq = m_eqControls.m_lowShelfFreqModel.value();
+	float para1Freq = m_eqControls.m_para1FreqModel.value();
+	float para2Freq = m_eqControls.m_para2FreqModel.value();
+	float para3Freq = m_eqControls.m_para3FreqModel.value();
+	float para4Freq = m_eqControls.m_para4FreqModel.value();
+	float highShelfFreq = m_eqControls.m_highShelfFreqModel.value();
+	float lpFreq = m_eqControls.m_lpFreqModel.value();
+
+	ValueBuffer *hpResBuffer = m_eqControls.m_hpResModel.valueBuffer();
+	ValueBuffer *lowShelfResBuffer = m_eqControls.m_lowShelfResModel.valueBuffer();
+	ValueBuffer *para1BwBuffer = m_eqControls.m_para1BwModel.valueBuffer();
+	ValueBuffer *para2BwBuffer = m_eqControls.m_para2BwModel.valueBuffer();
+	ValueBuffer *para3BwBuffer = m_eqControls.m_para3BwModel.valueBuffer();
+	ValueBuffer *para4BwBuffer = m_eqControls.m_para4BwModel.valueBuffer();
+	ValueBuffer *highShelfResBuffer = m_eqControls.m_highShelfResModel.valueBuffer();
+	ValueBuffer *lpResBuffer = m_eqControls.m_lpResModel.valueBuffer();
+
+	ValueBuffer *hpFreqBuffer = m_eqControls.m_hpFeqModel.valueBuffer();
+	ValueBuffer *lowShelfFreqBuffer = m_eqControls.m_lowShelfFreqModel.valueBuffer();
+	ValueBuffer *para1FreqBuffer = m_eqControls.m_para1FreqModel.valueBuffer();
+	ValueBuffer *para2FreqBuffer = m_eqControls.m_para2FreqModel.valueBuffer();
+	ValueBuffer *para3FreqBuffer = m_eqControls.m_para3FreqModel.valueBuffer();
+	ValueBuffer *para4FreqBuffer = m_eqControls.m_para4FreqModel.valueBuffer();
+	ValueBuffer *highShelfFreqBuffer = m_eqControls.m_highShelfFreqModel.valueBuffer();
+	ValueBuffer *lpFreqBuffer = m_eqControls.m_lpFreqModel.valueBuffer();
+
+	int hpResInc = hpResBuffer ? 1 : 0;
+	int lowShelfResInc = lowShelfResBuffer ? 1 : 0;
+	int para1BwInc = para1BwBuffer ? 1 : 0;
+	int para2BwInc = para2BwBuffer ? 1 : 0;
+	int para3BwInc = para3BwBuffer ? 1 : 0;
+	int para4BwInc = para4BwBuffer ? 1 : 0;
+	int highShelfResInc = highShelfResBuffer ? 1 : 0;
+	int lpResInc = lpResBuffer ? 1 : 0;
+
+	int hpFreqInc = hpFreqBuffer ? 1 : 0;
+	int lowShelfFreqInc = lowShelfFreqBuffer ? 1 : 0;
+	int para1FreqInc = para1FreqBuffer ? 1 : 0;
+	int para2FreqInc = para2FreqBuffer ? 1 : 0;
+	int para3FreqInc = para3FreqBuffer ? 1 : 0;
+	int para4FreqInc = para4FreqBuffer ? 1 : 0;
+	int highShelfFreqInc = highShelfFreqBuffer ? 1 : 0;
+	int lpFreqInc = lpFreqBuffer ? 1 : 0;
+
+	float *hpResPtr = hpResBuffer ? &( hpResBuffer->values()[ 0 ] ) : &hpRes;
+	float *lowShelfResPtr = lowShelfResBuffer ? &( lowShelfResBuffer->values()[ 0 ] ) : &lowShelfRes;
+	float *para1BwPtr = para1BwBuffer ? &( para1BwBuffer->values()[ 0 ] ) : &para1Bw;
+	float *para2BwPtr = para2BwBuffer ? &( para2BwBuffer->values()[ 0 ] ) : &para2Bw;
+	float *para3BwPtr = para3BwBuffer ? &( para3BwBuffer->values()[ 0 ] ) : &para3Bw;
+	float *para4BwPtr = para4BwBuffer ? &( para4BwBuffer->values()[ 0 ] ) : &para4Bw;
+	float *highShelfResPtr = highShelfResBuffer ? &( highShelfResBuffer->values()[ 0 ] ) : &highShelfRes;
+	float *lpResPtr = lpResBuffer ? &( lpResBuffer->values()[ 0 ] ) : &lpRes;
+
+	float *hpFreqPtr = hpFreqBuffer ? &( hpFreqBuffer->values()[ 0 ] ) : &hpFreq;
+	float *lowShelfFreqPtr = lowShelfFreqBuffer ? &( lowShelfFreqBuffer->values()[ 0 ] ) : &lowShelfFreq;
+	float *para1FreqPtr = para1FreqBuffer ? &(para1FreqBuffer->values()[ 0 ] ) : &para1Freq;
+	float *para2FreqPtr = para2FreqBuffer ? &(para2FreqBuffer->values()[ 0 ] ) : &para2Freq;
+	float *para3FreqPtr = para3FreqBuffer ? &(para3FreqBuffer->values()[ 0 ] ) : &para3Freq;
+	float *para4FreqPtr = para4FreqBuffer ? &(para4FreqBuffer->values()[ 0 ] ) : &para4Freq;
+	float *hightShelfFreqPtr = highShelfFreqBuffer ? &(highShelfFreqBuffer->values()[ 0 ] ) : &highShelfFreq;
+	float *lpFreqPtr = lpFreqBuffer ? &(lpFreqBuffer ->values()[ 0 ] ) : &lpFreq;
+
+	bool hpActive = m_eqControls.m_hpActiveModel.value();
+	bool hp24Active = m_eqControls.m_hp24Model.value();
+	bool hp48Active = m_eqControls.m_hp48Model.value();
+	bool lowShelfActive = m_eqControls.m_lowShelfActiveModel.value();
+	bool para1Active = m_eqControls.m_para1ActiveModel.value();
+	bool para2Active = m_eqControls.m_para2ActiveModel.value();
+	bool para3Active = m_eqControls.m_para3ActiveModel.value();
+	bool para4Active = m_eqControls.m_para4ActiveModel.value();
+	bool highShelfActive = m_eqControls.m_highShelfActiveModel.value();
+	bool lpActive = m_eqControls.m_lpActiveModel.value();
+	bool lp24Active = m_eqControls.m_lp24Model.value();
+	bool lp48Active = m_eqControls.m_lp48Model.value();
+
+	float lowShelfGain = m_eqControls.m_lowShelfGainModel.value();
+	float para1Gain = m_eqControls.m_para1GainModel.value();
+	float para2Gain = m_eqControls.m_para2GainModel.value();
+	float para3Gain = m_eqControls.m_para3GainModel.value();
+	float para4Gain = m_eqControls.m_para4GainModel.value();
+	float highShelfGain = m_eqControls.m_highShelfGainModel.value();
+
+
+
 	if( !isEnabled() || !isRunning () )
 	{
 		return( false );
@@ -105,82 +200,125 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < m_inPeak[0] ? m_inPeak[0] : m_eqControls.m_inPeakL;
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
-	if(m_eqControls.m_hpActiveModel.value() ){
+	for( fpp_t f = 0; f < frames; f++)
+	{
+		if( hpActive ){
 
-		m_hp12.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-		m_hp12.processBuffer( buf, frames );
+			m_hp12.setParameters( sampleRate, *hpFreqPtr, *hpResPtr, 1 );
+			buf[f][0] = m_hp12.update( buf[f][0], 0 );
+			buf[f][1] = m_hp12.update( buf[f][1], 1 );
 
-		if( m_eqControls.m_hp24Model.value() || m_eqControls.m_hp48Model.value() )
-		{
-			m_hp24.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-			m_hp24.processBuffer( buf, frames );
+			if( hp24Active || hp48Active )
+			{
+				m_hp24.setParameters( sampleRate, *hpFreqPtr, *hpResPtr, 1 );
+				buf[f][0] = m_hp24.update( buf[f][0], 0 );
+				buf[f][1] = m_hp24.update( buf[f][1], 1 );
+			}
+
+			if( hp48Active )
+			{
+				m_hp480.setParameters( sampleRate, *hpFreqPtr, *hpResPtr, 1 );
+				buf[f][0] = m_hp480.update( buf[f][0], 0 );
+				buf[f][1] = m_hp480.update( buf[f][1], 1 );
+
+				m_hp481.setParameters( sampleRate, *hpFreqPtr, *hpResPtr, 1 );
+				buf[f][0] = m_hp481.update( buf[f][0], 0 );
+				buf[f][1] = m_hp481.update( buf[f][1], 1 );
+			}
 		}
 
-		if( m_eqControls.m_hp48Model.value() )
+		if( lowShelfActive )
 		{
-			m_hp480.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-			m_hp480.processBuffer( buf, frames );
-
-			m_hp481.setParameters( sampleRate, m_eqControls.m_hpFeqModel.value(), m_eqControls.m_hpResModel.value(), 1 );
-			m_hp481.processBuffer( buf, frames );
-		}
-	}
-
-	if( m_eqControls.m_lowShelfActiveModel.value() )
-	{
-		m_lowShelf.setParameters( sampleRate, m_eqControls.m_lowShelfFreqModel.value(), m_eqControls.m_lowShelfResModel .value(), m_eqControls.m_lowShelfGainModel.value() );
-		m_lowShelf.processBuffer( buf, frames );
-	}
-
-	if( m_eqControls.m_para1ActiveModel.value() )
-	{
-		m_para1.setParameters( sampleRate, m_eqControls.m_para1FreqModel.value(), m_eqControls.m_para1BwModel.value(), m_eqControls.m_para1GainModel.value() );
-		m_para1.processBuffer( buf, frames );
-	}
-
-	if( m_eqControls.m_para2ActiveModel.value() )
-	{
-		m_para2.setParameters( sampleRate, m_eqControls.m_para2FreqModel.value(), m_eqControls.m_para2BwModel.value(), m_eqControls.m_para2GainModel.value() );
-		m_para2.processBuffer( buf, frames );
-	}
-
-	if( m_eqControls.m_para3ActiveModel.value() )
-	{
-		m_para3.setParameters( sampleRate, m_eqControls.m_para3FreqModel.value(), m_eqControls.m_para3BwModel.value(), m_eqControls.m_para3GainModel.value() );
-		m_para3.processBuffer( buf, frames );
-	}
-
-	if( m_eqControls.m_para4ActiveModel.value() )
-	{
-		m_para4.setParameters( sampleRate, m_eqControls.m_para4FreqModel.value(), m_eqControls.m_para4BwModel.value(), m_eqControls.m_para4GainModel.value() );
-		m_para4.processBuffer( buf, frames );
-	}
-
-	if( m_eqControls.m_highShelfActiveModel.value() )
-	{
-		m_highShelf.setParameters( sampleRate, m_eqControls.m_highShelfFreqModel.value(), m_eqControls.m_highShelfResModel.value(), m_eqControls.m_highShelfGainModel.value());
-		m_highShelf.processBuffer( buf, frames );
-	}
-
-	if(m_eqControls.m_lpActiveModel.value() ){
-		m_lp12.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-		m_lp12.processBuffer( buf, frames );
-
-		if( m_eqControls.m_lp24Model.value() || m_eqControls.m_lp48Model.value() )
-		{
-			m_lp24.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-			m_lp24.processBuffer( buf, frames );
+			m_lowShelf.setParameters( sampleRate, *lowShelfFreqPtr, *lowShelfResPtr, lowShelfGain );
+			buf[f][0] = m_lowShelf.update( buf[f][0], 0 );
+			buf[f][1] = m_lowShelf.update( buf[f][1], 1 );
 		}
 
-		if( m_eqControls.m_lp48Model.value() )
+		if( para1Active )
 		{
-			m_lp480.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-			m_lp480.processBuffer( buf, frames );
-
-			m_lp481.setParameters( sampleRate, m_eqControls.m_lpFreqModel.value(), m_eqControls.m_lpResModel.value(), 1 );
-			m_lp481.processBuffer( buf, frames );
+			m_para1.setParameters( sampleRate, *para1FreqPtr, *para1BwPtr, para1Gain );
+			buf[f][0] = m_para1.update( buf[f][0], 0 );
+			buf[f][1] = m_para1.update( buf[f][1], 1 );
 		}
+
+		if( para2Active )
+		{
+			m_para2.setParameters( sampleRate, *para2FreqPtr, *para2BwPtr, para2Gain );
+			buf[f][0] = m_para2.update( buf[f][0], 0 );
+			buf[f][1] = m_para2.update( buf[f][1], 1 );
+		}
+
+		if( para3Active )
+		{
+			m_para3.setParameters( sampleRate, *para3FreqPtr, *para3BwPtr, para3Gain );
+			buf[f][0] = m_para3.update( buf[f][0], 0 );
+			buf[f][1] = m_para3.update( buf[f][1], 1 );
+		}
+
+		if( para4Active )
+		{
+			m_para4.setParameters( sampleRate, *para4FreqPtr, *para4BwPtr, para4Gain );
+			buf[f][0] = m_para4.update( buf[f][0], 0 );
+			buf[f][1] = m_para4.update( buf[f][1], 1 );
+		}
+
+		if( highShelfActive )
+		{
+			m_highShelf.setParameters( sampleRate, *hightShelfFreqPtr, *highShelfResPtr, highShelfGain );
+			buf[f][0] = m_highShelf.update( buf[f][0], 0 );
+			buf[f][1] = m_highShelf.update( buf[f][1], 1 );
+		}
+
+		if( lpActive ){
+			m_lp12.setParameters( sampleRate, *lpFreqPtr, *lpResPtr, 1 );
+			buf[f][0] = m_lp12.update( buf[f][0], 0 );
+			buf[f][1] = m_lp12.update( buf[f][1], 1 );
+
+			if( lp24Active || lp48Active )
+			{
+				m_lp24.setParameters( sampleRate, *lpFreqPtr, *lpResPtr, 1 );
+				buf[f][0] = m_lp24.update( buf[f][0], 0 );
+				buf[f][1] = m_lp24.update( buf[f][1], 1 );
+			}
+
+			if( lp48Active )
+			{
+				m_lp480.setParameters( sampleRate, *lpFreqPtr, *lpResPtr, 1 );
+				buf[f][0] = m_lp480.update( buf[f][0], 0 );
+				buf[f][1] = m_lp480.update( buf[f][1], 1 );
+
+				m_lp481.setParameters( sampleRate,  *lpFreqPtr, *lpResPtr, 1 );
+				buf[f][0] = m_lp481.update( buf[f][0], 0 );
+				buf[f][1] = m_lp481.update( buf[f][1], 1 );
+			}
+		}
+
+		//increment pointers if needed
+		hpResPtr += hpResInc;
+		lowShelfResPtr += lowShelfResInc;
+		para1BwPtr += para1BwInc;
+		para2BwPtr += para2BwInc;
+		para3BwPtr += para3BwInc;
+		para4BwPtr += para4BwInc;
+		highShelfResPtr += highShelfResInc;
+		lpResPtr += lpResInc;
+
+		hpFreqPtr += hpFreqInc;
+		lowShelfFreqPtr += lowShelfFreqInc;
+		para1FreqPtr += para1FreqInc;
+		para2FreqPtr += para2FreqInc;
+		para3FreqPtr += para3FreqInc;
+		para4FreqPtr += para4FreqInc;
+		hightShelfFreqPtr += highShelfFreqInc;
+		lpFreqPtr += lpFreqInc;
 	}
+
+
+
+
+
+
+
 
 	sampleFrame outPeak = { 0, 0 };
 	gain( buf, frames, outGain, &outPeak );

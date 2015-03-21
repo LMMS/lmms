@@ -1,7 +1,7 @@
 /*
- * FadeButton.h - declaration of class fadeButton
+ * MidiExport.h - support for Exporting MIDI-files
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Author: Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,44 +22,37 @@
  *
  */
 
+#ifndef _MIDI_EXPORT_H
+#define _MIDI_EXPORT_H
 
-#ifndef FADE_BUTTON_H
-#define FADE_BUTTON_H
+#include <QString>
 
-#include <QtCore/QTime>
-#include <QAbstractButton>
-#include <QColor>
+#include "ExportFilter.h"
+#include "MidiFile.hpp"
 
 
-class FadeButton : public QAbstractButton
+
+class MidiExport: public ExportFilter
 {
-	Q_OBJECT
+// 	Q_OBJECT
 public:
-	FadeButton( const QColor & _normal_color, const QColor &
-					_activated_color, QWidget * _parent );
+	MidiExport( );
+	~MidiExport();
 
-	virtual ~FadeButton();
-	void setActiveColor( const QColor & activated_color );
+	virtual PluginView * instantiateView( QWidget * )
+	{
+		return( NULL );
+	}
 
-
-public slots:
-	void activate();
-
-
-protected:
-	virtual void customEvent( QEvent * );
-	virtual void paintEvent( QPaintEvent * _pe );
-
-
+	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename );
+	
 private:
-	QTime m_stateTimer;
-	QColor m_normalColor;
-	QColor m_activatedColor;
+	
 
-	void signalUpdate();
+	void error( void );
+
 
 } ;
 
 
 #endif
-

@@ -685,9 +685,18 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		asw_layout->addWidget( audioWidget );
 		m_audioInterfaces->addItem( it.key() );
 	}
-	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-			tr( Engine::mixer()->audioDevName().toLatin1() ) ) );
-	m_audioIfaceSetupWidgets[Engine::mixer()->audioDevName()]->show();
+
+	QString audioDevName = 
+		ConfigManager::inst()->value( "mixer", "audiodev" );
+	if( audioDevName.length() == 0 )
+	{
+		audioDevName = Engine::mixer()->audioDevName();
+		ConfigManager::inst()->setValue(
+					"mixer", "audiodev", audioDevName );
+	}
+	m_audioInterfaces->
+		setCurrentIndex( m_audioInterfaces->findText( audioDevName ) );
+	m_audioIfaceSetupWidgets[audioDevName]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( audioInterfaceChanged( const QString & ) ) );
@@ -766,9 +775,17 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_midiInterfaces->addItem( it.key() );
 	}
 
-	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-		tr( Engine::mixer()->midiClientName().toLatin1() ) ) );
-	m_midiIfaceSetupWidgets[Engine::mixer()->midiClientName()]->show();
+	QString midiDevName = 
+		ConfigManager::inst()->value( "mixer", "mididev" );
+	if( midiDevName.length() == 0 )
+	{
+		midiDevName = Engine::mixer()->midiClientName();
+		ConfigManager::inst()->setValue(
+					"mixer", "mididev", midiDevName );
+	}
+	m_midiInterfaces->setCurrentIndex( 
+		m_midiInterfaces->findText( midiDevName ) );
+	m_midiIfaceSetupWidgets[midiDevName]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( midiInterfaceChanged( const QString & ) ) );
@@ -1369,8 +1386,6 @@ void SetupDialog::displayMIDIHelp()
 					"controls to setup the selected "
 					"MIDI-interface." ) );
 }
-
-
 
 
 

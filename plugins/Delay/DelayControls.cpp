@@ -24,8 +24,8 @@
 
 #include <QtXml/QDomElement>
 
-#include "delaycontrols.h"
-#include "delayeffect.h"
+#include "DelayControls.h"
+#include "DelayEffect.h"
 #include "Engine.h"
 #include "Song.h"
 
@@ -35,9 +35,12 @@ DelayControls::DelayControls( DelayEffect* effect ):
 	m_delayTimeModel( 0.5, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
 	m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
 	m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
-	m_lfoAmountModel(0.0, 0.0, 2.0, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) )
+	m_lfoAmountModel(0.0, 0.0, 2.0, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) ),
+	m_outGainModel( 0.0, -60.0, 20.0, 0.01, this, tr( "Output gain" ) )
 {
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
+	m_outPeakL = 0.0;
+	m_outPeakR = 0.0;
 }
 
 
@@ -49,6 +52,7 @@ void DelayControls::loadSettings( const QDomElement &_this )
 	m_feedbackModel.loadSettings( _this, "FeebackAmount" );
 	m_lfoTimeModel.loadSettings( _this , "LfoFrequency");
 	m_lfoAmountModel.loadSettings( _this, "LfoAmount");
+	m_outGainModel.loadSettings( _this, "OutGain" );
 }
 
 
@@ -60,6 +64,7 @@ void DelayControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 	m_feedbackModel.saveSettings( doc, _this ,"FeebackAmount" );
 	m_lfoTimeModel.saveSettings( doc, _this, "LfoFrequency" );
 	m_lfoAmountModel.saveSettings( doc, _this ,"LfoAmount" );
+	m_outGainModel.saveSettings( doc, _this, "OutGain" );
 }
 
 

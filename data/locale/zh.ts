@@ -3557,8 +3557,12 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>重做</translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
-        <translation>LMMS 工程 (*.mmpz *.mmp);;LMMS 工程模板 (*.mpt)</translation>
+		<source>LMMS Project</source>
+        <translation>LMMS 工程</translation>
+    </message>
+    <message>
+		<source>LMMS Project Template</source>
+		<translation>LMMS 工程模板</translation>
     </message>
     <message>
         <source>Volumes</source>
@@ -6155,7 +6159,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8517,7 +8521,7 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

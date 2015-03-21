@@ -318,8 +318,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 									it != m_linkedModels.end(); ++it )
 		{
 			if( (*it)->m_setValueDepth < 1 &&
-				!(*it)->fittedValue( m_value ) !=
-							 (*it)->m_value )
+				(*it)->fittedValue( m_value ) != (*it)->m_value )
 			{
 				(*it)->setAutomatedValue( value );
 			}

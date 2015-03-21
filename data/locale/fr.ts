@@ -584,7 +584,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="unfinished">Ryhtme ou ligne de basse %1</translation>
+        <translation type="unfinished">Rythme ou ligne de basse %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
@@ -3566,7 +3566,11 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6162,8 +6166,8 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
         <translation>demi-tons</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Avec ce bouton vous pouvez régler le désaccord grossier de l&apos;oscillateur %1. Vous pouvez désaccorder l&apos;oscillateur de 12 demi-tons (1 octave) vers le haut et vers le bas. Ceci est utile pour la création de sons avec un accord.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation>Avec ce bouton vous pouvez régler le désaccord grossier de l&apos;oscillateur %1. Vous pouvez désaccorder l&apos;oscillateur de 24 demi-tons (2 octaves) vers le haut et vers le bas. Ceci est utile pour la création de sons avec un accord.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -8537,7 +8541,7 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

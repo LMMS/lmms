@@ -30,12 +30,7 @@
 #include "lmmsconfig.h"
 #include "Mixer.h"
 #include "VstSyncController.h"
-
-#ifdef LMMS_BUILD_WIN32
-#ifndef USE_QT_SHMEM
-#define USE_QT_SHMEM
-#endif
-#endif
+#include "RemotePlugin.h"
 
 #ifndef USE_QT_SHMEM
 #include <stdio.h>

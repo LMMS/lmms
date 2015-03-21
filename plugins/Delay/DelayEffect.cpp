@@ -22,9 +22,10 @@
  *
  */
 
-#include "delayeffect.h"
+#include "DelayEffect.h"
 #include "Engine.h"
 #include "embed.cpp"
+#include "interpolation.h"
 
 
 extern "C"
@@ -53,6 +54,7 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
 	m_delay = 0;
 	m_delay = new StereoDelay( 20, Engine::mixer()->processingSampleRate() );
 	m_lfo = new Lfo( Engine::mixer()->processingSampleRate() );
+	m_outGain = 1.0;
 }
 
 
@@ -80,25 +82,65 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		return( false );
 	}
 	double outSum = 0.0;
+	const float sr = Engine::mixer()->processingSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float length = m_delayControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
-	const float amplitude = m_delayControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
-	m_lfo->setFrequency( 1.0 / m_delayControls.m_lfoTimeModel.value() );
-	m_delay->setFeedback( m_delayControls.m_feedbackModel.value() );
 	sample_t dryS[2];
+	float lPeak = 0.0;
+	float rPeak = 0.0;
+	float length = m_delayControls.m_delayTimeModel.value();
+	float amplitude = m_delayControls.m_lfoAmountModel.value() * sr;
+	float lfoTime = 1.0 / m_delayControls.m_lfoTimeModel.value();
+	float feedback =  m_delayControls.m_feedbackModel.value();
+	ValueBuffer *lengthBuffer = m_delayControls.m_delayTimeModel.valueBuffer();
+	ValueBuffer *feedbackBuffer = m_delayControls.m_feedbackModel.valueBuffer();
+	ValueBuffer *lfoTimeBuffer = m_delayControls.m_lfoTimeModel.valueBuffer();
+	ValueBuffer *lfoAmountBuffer = m_delayControls.m_lfoAmountModel.valueBuffer();
+	int lengthInc = lengthBuffer ? 1 : 0;
+	int amplitudeInc = lfoAmountBuffer ? 1 : 0;
+	int lfoTimeInc = lfoTimeBuffer ? 1 : 0;
+	int feedbackInc = feedbackBuffer ? 1 : 0;
+	float *lengthPtr = lengthBuffer ? &( lengthBuffer->values()[ 0 ] ) : &length;
+	float *amplitudePtr = lfoAmountBuffer ? &( lfoAmountBuffer->values()[ 0 ] ) : &amplitude;
+	float *lfoTimePtr = lfoTimeBuffer ? &( lfoTimeBuffer->values()[ 0 ] ) : &lfoTime;
+	float *feedbackPtr = feedbackBuffer ? &( feedbackBuffer->values()[ 0 ] ) : &feedback;
+
+	if( m_delayControls.m_outGainModel.isValueChanged() )
+	{
+		m_outGain = dbvToAmp( m_delayControls.m_outGainModel.value() );
+	}
+	int sampleLength;
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
-		m_delay->setLength( ( float )length + ( amplitude * ( float )m_lfo->tick() ) );
+
+		m_delay->setFeedback( *feedbackPtr );
+		m_lfo->setFrequency( *lfoTimePtr );
+		sampleLength = *lengthPtr * Engine::mixer()->processingSampleRate();
+		m_currentLength = linearInterpolate( sampleLength, m_currentLength, 0.9999 );
+		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
+
+		buf[f][0] *= m_outGain;
+		buf[f][1] *= m_outGain;
+
+		lPeak = buf[f][0] > lPeak ? buf[f][0] : lPeak;
+		rPeak = buf[f][1] > rPeak ? buf[f][1] : rPeak;
 
 		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
 		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+
+		lengthPtr += lengthInc;
+		amplitudePtr += amplitudeInc;
+		lfoTimePtr += lfoTimeInc;
+		feedbackPtr += feedbackInc;
 	}
 	checkGate( outSum / frames );
+	m_delayControls.m_outPeakL = lPeak;
+	m_delayControls.m_outPeakR = rPeak;
+
 	return isRunning();
 }
 

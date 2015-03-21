@@ -127,6 +127,7 @@ protected:
 
 protected slots:
 	void addSteps();
+	void cloneSteps();
 	void removeSteps();
 	void clear();
 	void changeTimeSignature();
@@ -179,8 +180,8 @@ protected slots:
 
 protected:
 	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re )
 	{

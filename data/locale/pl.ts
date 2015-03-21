@@ -3571,7 +3571,11 @@ Odwiedź witrynę http://lmms.sf.net/wiki for documentation on LMMS.</translatio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6167,8 +6171,8 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation>półtony</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Za pomocą tego pokrętła możesz ustawić zgrubne odstrojenie oscylatora %1. Możesz odstrajać oscylator o 12 półtonów (całą oktawę) w górę lub w dół.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation>Za pomocą tego pokrętła możesz ustawić zgrubne odstrojenie oscylatora %1. Możesz odstrajać oscylator o 24 półtonów (dwie oktawy) w górę lub w dół.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -8542,7 +8546,7 @@ Te układy scalone były stosowane w komputerach Commodore 64.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

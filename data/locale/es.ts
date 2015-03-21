@@ -3550,7 +3550,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6140,8 +6144,8 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished">semitonos</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation type="unfinished">Con este control usted podrá establecer la desintonización gruesa del oscilador %1. Usted puede desintonizar el oscilador 12 semitonos (1 octava) arriba y abajo. Esto es útil para la creación de sonidos con acorde.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation type="unfinished">Con este control usted podrá establecer la desintonización gruesa del oscilador %1. Usted puede desintonizar el oscilador 24 semitonos (2 octavas) arriba y abajo. Esto es útil para la creación de sonidos con acorde.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -8503,7 +8507,7 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

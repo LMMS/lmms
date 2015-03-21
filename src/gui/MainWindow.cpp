@@ -75,7 +75,8 @@ MainWindow::MainWindow() :
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
-	m_autoSaveTimer( this )
+	m_autoSaveTimer( this ),
+	m_viewMenu( NULL )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -274,6 +275,12 @@ void MainWindow::finalize()
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
+	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
+					tr( "E&xport MIDI..." ),
+					Engine::getSong(),
+					SLOT( exportProjectMidi() ),
+					Qt::CTRL + Qt::Key_M );
+
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
@@ -294,6 +301,13 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+
+	m_viewMenu = new QMenu( this );
+	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
+	connect( m_viewMenu, SIGNAL( aboutToShow() ),
+		 this, SLOT( updateViewMenu() ) );
+	connect( m_viewMenu, SIGNAL(triggered(QAction*)), this,
+		SLOT(updateConfig(QAction*)));
 
 
 	m_toolsMenu = new QMenu( this );
@@ -598,9 +612,10 @@ void MainWindow::resetWindowTitle()
 
 
 
-bool MainWindow::mayChangeProject()
+bool MainWindow::mayChangeProject(bool stopPlayback)
 {
-	Engine::getSong()->stop();
+	if( stopPlayback )
+		Engine::getSong()->stop();
 
 	if( !Engine::getSong()->isModified() )
 	{
@@ -713,7 +728,7 @@ void MainWindow::enterWhatsThisMode()
 
 void MainWindow::createNewProject()
 {
-	if( mayChangeProject() )
+	if( mayChangeProject(true) )
 	{
 		Engine::getSong()->createNewProject();
 	}
@@ -724,7 +739,7 @@ void MainWindow::createNewProject()
 
 void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
-	if( m_templatesMenu != NULL && mayChangeProject() )
+	if( m_templatesMenu != NULL && mayChangeProject(true) )
 	{
 		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
 						>= m_custom_templates_count ?
@@ -740,7 +755,7 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 void MainWindow::openProject()
 {
-	if( mayChangeProject() )
+	if( mayChangeProject(false) )
 	{
 		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
 
@@ -749,6 +764,8 @@ void MainWindow::openProject()
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
+            Engine::getSong()->stop();
+
 			setCursor( Qt::WaitCursor );
 			Engine::getSong()->loadProject(
 						ofd.selectedFiles()[0] );
@@ -776,7 +793,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
-	if ( mayChangeProject() )
+	if ( mayChangeProject(true) )
 	{
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
@@ -808,8 +825,8 @@ bool MainWindow::saveProject()
 bool MainWindow::saveProjectAs()
 {
 	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
-			tr( "LMMS Project (*.mmpz *.mmp);;"
-				"LMMS Project Template (*.mpt)" ) );
+			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
+				tr( "LMMS Project Template" ) + " (*.mpt)" );
 	QString f = Engine::getSong()->projectFileName();
 	if( f != "" )
 	{
@@ -824,8 +841,13 @@ bool MainWindow::saveProjectAs()
 	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
+		QString fname = sfd.selectedFiles()[0] ;
+		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) && !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
+		{
+			fname += ".mpt";
+		}
 		Engine::getSong()->guiSaveProjectAs(
-						sfd.selectedFiles()[0] );
+						fname );
 		return( true );
 	}
 	return( false );
@@ -991,6 +1013,110 @@ void MainWindow::toggleFxMixerWin()
 }
 
 
+void MainWindow::updateViewMenu()
+{
+	m_viewMenu->clear();
+	// TODO: get current visibility for these and indicate in menu?
+	// Not that it's straight visible <-> invisible, more like
+	// not on top -> top <-> invisible
+	m_viewMenu->addAction(embed::getIconPixmap( "songeditor" ),
+			      tr( "Song Editor" ) + " (F5)",
+			      this, SLOT( toggleSongEditorWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "bb_track" ),
+					tr( "Pattern Editor" ) + " (F6)",
+					this, SLOT( toggleBBEditorWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
+			      tr( "Piano Roll" ) + " (F7)",
+			      this, SLOT( togglePianoRollWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "automation" ),
+			      tr( "Automation Editor" ) + " (F8)",
+			      this,
+			      SLOT( toggleAutomationEditorWin())
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
+			      tr( "FX Mixer" ) + " (F9)",
+			      this, SLOT( toggleFxMixerWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
+			      tr( "Project Notes" ) +	" (F10)",
+			      this, SLOT( toggleProjectNotesWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
+			      tr( "Show/hide controller rack" ) +
+			      " (F11)",
+			      this, SLOT( toggleControllerRack() )
+		);
+
+	m_viewMenu->addSeparator();
+
+	// Here we should put all look&feel -stuff from configmanager
+	// that is safe to change on the fly. There is probably some
+	// more elegant way to do this.
+	QAction *qa;
+	qa = new QAction(tr( "Volume as dBV" ), this);
+	qa->setData("displaydbv");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).
+		       toInt() ? true : false );
+	m_viewMenu->addAction(qa);
+
+	// Maybe this is impossible?
+	/* qa = new QAction(tr( "Tooltips" ), this);
+	qa->setData("tooltips");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "tooltips", "disabled" ).
+			toInt() ? false : true );
+	m_viewMenu->addAction(qa);
+	*/
+
+	// Should be doable.
+	qa = new QAction(tr( "Smooth scroll" ), this);
+	qa->setData("smoothscroll");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).
+			toInt() ? true : false );
+	m_viewMenu->addAction(qa);
+
+	// Not yet.
+	/* qa = new QAction(tr( "One instrument track window" ), this);
+	qa->setData("oneinstrument");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "oneinstrumenttrackwindow" ).
+			toInt() ? true : false );
+	m_viewMenu->addAction(qa);
+	*/
+}
+
+
+void MainWindow::updateConfig( QAction * _who )
+{
+	QString tag = _who->data().toString();
+	bool checked = _who->isChecked();
+
+	if( tag == "displaydbv" )
+	{
+		ConfigManager::inst()->setValue( "app", "displaydbv",
+						 QString::number(checked) );
+	}
+	else if ( tag == "tooltips" )
+	{
+		ConfigManager::inst()->setValue( "tooltips", "disabled",
+						 QString::number(!checked) );
+	}
+	else if ( tag == "smoothscroll" )
+	{
+		ConfigManager::inst()->setValue( "ui", "smoothscroll",
+						 QString::number(checked) );
+	}
+	else if ( tag == "oneinstrument" )
+	{
+		ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
+						 QString::number(checked) );
+	}
+}
 
 
 void MainWindow::toggleControllerRack()
@@ -1055,7 +1181,7 @@ void MainWindow::redo()
 
 void MainWindow::closeEvent( QCloseEvent * _ce )
 {
-	if( mayChangeProject() )
+	if( mayChangeProject(true) )
 	{
 		// delete recovery file
 		QFile::remove(ConfigManager::inst()->recoveryFile());

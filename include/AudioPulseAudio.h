@@ -46,7 +46,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "PulseAudio (bad latency!)" );
+		return QT_TRANSLATE_NOOP( "setupWidget", "PulseAudio" );
 	}
 
 	static QString probeDevice();

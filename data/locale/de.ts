@@ -3574,6 +3574,14 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>LMMS Projekt (*.mmpz *.mmp);;LMMS Projektvorlage (*.mpt)</translation>
     </message>
     <message>
+		<source>LMMS Project</source>
+		<translation>LMMS Projekt</translation>
+    </message>
+    <message>
+		<source>LMMS Project Template</source>
+		<translation>LMMS Projektvorlage</translation>
+    </message>
+    <message>
         <source>Volumes</source>
         <translation>Volumes</translation>
     </message>
@@ -6185,8 +6193,8 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
         <translation>Halbtöne</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Mit diesem Regler können Sie die grobe Verstimmung von Oszillator %1 setzen. Sie können den Oszillator 12 Halbtöne (1 Oktave) nach oben und unten verstimmen. Das ist nützlich, wenn Sie einen Sound mit einem Akkord erstellen möchten.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation>Mit diesem Regler können Sie die grobe Verstimmung von Oszillator %1 setzen. Sie können den Oszillator 24 Halbtöne (2 Oktaven) nach oben und unten verstimmen. Das ist nützlich, wenn Sie einen Sound mit einem Akkord erstellen möchten.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -8568,7 +8576,7 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
         <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation>PulseAudio (Schlechte Latenz!)</translation>
     </message>
     <message>

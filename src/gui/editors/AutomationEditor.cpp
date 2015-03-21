@@ -447,7 +447,6 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 	{
 		return;
 	}
-
 	if( mouseEvent->y() > TOP_MARGIN )
 	{
 		float level = getLevel( mouseEvent->y() );
@@ -493,6 +492,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == DRAW )
 			{
+				m_pattern->addJournalCheckPoint();
 				// Connect the dots
 				if( mouseEvent->modifiers() & Qt::ShiftModifier )
 				{
@@ -537,6 +537,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_editMode == DRAW ) ||
 					m_editMode == ERASE )
 			{
+				m_pattern->addJournalCheckPoint();
 				// erase single value
 				if( it != time_map.end() )
 				{
@@ -566,6 +567,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			else if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == MOVE )
 			{
+				m_pattern->addJournalCheckPoint();
 				// move selection (including selected values)
 
 				// save position where move-process began
@@ -1312,8 +1314,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	if( validPattern() )
+	if( validPattern() && GuiApplication::instance()->automationEditor()->hasFocus() )
 	{
+
 		drawCross( p );
 	}
 
@@ -1660,6 +1663,7 @@ void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes ty
 {
 	if (validPattern())
 	{
+		m_pattern->addJournalCheckPoint();
 		QMutexLocker m(&m_patternMutex);
 		m_pattern->setProgressionType(type);
 		Engine::getSong()->setModified();
@@ -1799,6 +1803,7 @@ void AutomationEditor::cutSelectedValues()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	m_valuesToCopy.clear();
 
 	timeMap selected_values;
@@ -1828,6 +1833,7 @@ void AutomationEditor::pasteValues()
 	QMutexLocker m( &m_patternMutex );
 	if( validPattern() && !m_valuesToCopy.isEmpty() )
 	{
+		m_pattern->addJournalCheckPoint();
 		for( timeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
 		{
@@ -1854,6 +1860,7 @@ void AutomationEditor::deleteSelectedValues()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	timeMap selected_values;
 	getSelectedValues( selected_values );
 

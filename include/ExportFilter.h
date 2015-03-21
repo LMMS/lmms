@@ -1,7 +1,8 @@
 /*
- * delaycontrolsdialog.h - declaration of DelayControlsDialog class.
+ * ExportFilter.h - declaration of class ExportFilter, the base-class for all
+ *                  file export filters
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,20 +23,42 @@
  *
  */
 
-#ifndef DELAYCONTROLSDIALOG_H
-#define DELAYCONTROLSDIALOG_H
+#ifndef EXPORT_FILTER_H
+#define EXPORT_FILTER_H
 
-#include "EffectControlDialog.h"
+#include <QtCore/QFile>
 
-class DelayControls;
+#include "TrackContainer.h"
+#include "Plugin.h"
 
-class DelayControlsDialog : public EffectControlDialog
+
+class EXPORT ExportFilter : public Plugin
 {
 public:
-	DelayControlsDialog( DelayControls* controls );
-	virtual ~DelayControlsDialog()
+	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}
+	virtual ~ExportFilter() {}
+
+
+	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename ) = 0;
+protected:
+
+	virtual void saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
-};
 
-#endif // DELAYCONTROLSDIALOG_H
+	virtual void loadSettings( const QDomElement & )
+	{
+	}
+
+	virtual QString nodeName() const
+	{
+		return "import_filter";
+	}
+
+
+private:
+
+} ;
+
+
+#endif

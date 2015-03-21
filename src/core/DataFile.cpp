@@ -36,6 +36,7 @@
 
 
 #include "ConfigManager.h"
+#include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
@@ -158,6 +159,53 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 DataFile::~DataFile()
 {
+}
+
+
+
+
+bool DataFile::validate( QString extension )
+{
+	switch( m_type )
+	{
+	case Type::SongProject:
+		if( extension == "mmp" || extension == "mmpz" )
+		{
+			return true;
+		}
+		break;
+	case Type::SongProjectTemplate:
+		if(  extension == "mpt" )
+		{
+			return true;
+		}
+		break;
+	case Type::InstrumentTrackSettings:
+		if ( extension == "xpf" || extension == "xml" )
+		{
+			return true;
+		}
+		break;
+	case Type::UnknownType:
+		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
+				extension == "xpf" || extension == "xml" ||
+				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
+				extension == "sf2" || extension == "pat" || extension == "mid" ||
+				extension == "flp" || extension == "dll"
+				) )
+		{
+			return true;
+		}
+		if( extension == "wav" || extension == "ogg" ||
+				extension == "ds" )
+		{
+			return true;
+		}
+		break;
+	default:
+		return false;
+	}
+	return false;
 }
 
 
@@ -804,14 +852,17 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
 			if ( createdWith.setCompareType(Minor) != openedWith)
 			{
-				if( Engine::hasGUI() )
+				if( Engine::hasGUI() && root.attribute( "type" ) == "song" ) //documentElement()
 				{
 					QMessageBox::information( NULL,
 						SongEditor::tr( "Project Version Mismatch" ),
 						SongEditor::tr( 
-								"This project was created with "
-								"LMMS version %1, but version %2 "
+								"This %1 was created with "
+								"LMMS version %2, but version %3 "
 								"is installed")
+								.arg( _sourceFile.endsWith( ".mpt" ) ?
+									"template" : 
+									"project" )
 								.arg( root.attribute( "creatorversion" ) )
 								.arg( LMMS_VERSION ) );
 				}

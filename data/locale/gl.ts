@@ -3566,7 +3566,11 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6161,8 +6165,8 @@ Asegúrese de ter permiso de lectura sobre o ficheiro e o directorio que o cont�
         <translation>semitóns</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Con este botón pódese definir a desafinación bruta do oscilador %1. Pódese desafinar o oscilador 12 semitóns (unha oitava) para arriba e para abaixo. Isto é útil para crear sons cun acorde.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation>Con este botón pódese definir a desafinación bruta do oscilador %1. Pódese desafinar o oscilador 24 semitóns (2 oitavas) para arriba e para abaixo. Isto é útil para crear sons cun acorde.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -8536,7 +8540,7 @@ Este chip empregábase no computador Commodore 64.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

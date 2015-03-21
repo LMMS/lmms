@@ -238,7 +238,7 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	delete t;
+	t->deleteLater();
 }
 
 
@@ -377,7 +377,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 	else if( type == "projectfile")
 	{
-		if( gui->mainWindow()->mayChangeProject() )
+		if( gui->mainWindow()->mayChangeProject(true) )
 		{
 			Engine::getSong()->loadProject( value );
 		}

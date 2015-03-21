@@ -555,6 +555,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled) ||
 							m_scrollBack == true )
 	{
+		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
@@ -579,7 +580,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->move( x, 50 );
+		m_positionLine->move( x, m_timeLine->height() );
 	}
 	else
 	{

@@ -3569,7 +3569,11 @@ Por favor certifique-se que você tem permissão de escrita para este arquivo e 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6117,8 +6121,8 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Ajuste fino esquerdo Osc %1:</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Com este botão você pode modificar Ajuste bruto do oscilador %1. Você pode descer o tom  do oscilador 12 semitons (1 oitava) para cima e para baixo. Isto é útil para criar sons com um acorde.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation>Com este botão você pode modificar Ajuste bruto do oscilador %1. Você pode descer o tom  do oscilador 24 semitons (2 oitavas) para cima e para baixo. Isto é útil para criar sons com um acorde.</translation>
     </message>
     <message>
         <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
@@ -8540,7 +8544,7 @@ Este chip foi utilizado no computador Commodore 64.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

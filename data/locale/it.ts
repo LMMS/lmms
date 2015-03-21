@@ -3574,8 +3574,12 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Rifai</translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
-        <translation>Progetto LMMS (*mmpz *.mmp);;Progetto Template LMMS (*.mpt)</translation>
+		<source>LMMS Project</source>
+        <translation>Progetto LMMS</translation>
+    </message>
+    <message>
+		<source>LMMS Project Template</source>
+        <translation>Progetto Template LMMS</translation>
     </message>
     <message>
         <source>My Projects</source>
@@ -6186,7 +6190,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
         <translation>semitoni</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
         <translation>Questa manopola regola l&apos;intonazione, con la precisione di 1 semitono, dell&apos;oscillatore %1. L&apos;intonazione può essere variata di 24 semitoni (due ottave) in positivo e in negativo. Può essere usata per creare suoni con un accordo.</translation>
     </message>
     <message>
@@ -8561,7 +8565,7 @@ Questo chip era utilizzato nel Commode 64.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
+        <source>PulseAudio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

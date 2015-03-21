@@ -1,7 +1,7 @@
 /*
- * FadeButton.h - declaration of class fadeButton
+ * delayeffect.h - declaration of DelayEffect class, the Delay plugin
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,44 +22,33 @@
  *
  */
 
+#ifndef DELAYEFFECT_H
+#define DELAYEFFECT_H
 
-#ifndef FADE_BUTTON_H
-#define FADE_BUTTON_H
+#include "Effect.h"
+#include "DelayControls.h"
+#include "Lfo.h"
+#include "StereoDelay.h"
+#include "ValueBuffer.h"
 
-#include <QtCore/QTime>
-#include <QAbstractButton>
-#include <QColor>
-
-
-class FadeButton : public QAbstractButton
+class DelayEffect : public Effect
 {
-	Q_OBJECT
 public:
-	FadeButton( const QColor & _normal_color, const QColor &
-					_activated_color, QWidget * _parent );
-
-	virtual ~FadeButton();
-	void setActiveColor( const QColor & activated_color );
-
-
-public slots:
-	void activate();
-
-
-protected:
-	virtual void customEvent( QEvent * );
-	virtual void paintEvent( QPaintEvent * _pe );
-
+	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	virtual ~DelayEffect();
+	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual EffectControls* controls()
+	{
+		return &m_delayControls;
+	}
+	void changeSampleRate();
 
 private:
-	QTime m_stateTimer;
-	QColor m_normalColor;
-	QColor m_activatedColor;
+	DelayControls m_delayControls;
+	StereoDelay* m_delay;
+	Lfo* m_lfo;
+	float m_outGain;
+	float m_currentLength;
+};
 
-	void signalUpdate();
-
-} ;
-
-
-#endif
-
+#endif // DELAYEFFECT_H

@@ -98,6 +98,10 @@ void LfoController::updateValueBuffer()
 		m_bufferLastUpdated += diff;
 	}
 
+	float amount = m_amountModel.value();
+	ValueBuffer *amountBuffer = m_amountModel.valueBuffer();
+	int amountInc = amountBuffer ? 1 : 0;
+	float *amountPtr = amountBuffer ? &(amountBuffer->values()[ 0 ] ) : &amount;
 
 	for( int i = 0; i < m_valueBuffer.length(); i++ )
 	{
@@ -105,14 +109,14 @@ void LfoController::updateValueBuffer()
 			? m_sampleFunction( phase )
 			: m_userDefSampleBuffer->userWaveSample( phase );
 
-		values[i] = qBound( 0.0f, m_baseModel.value() + ( m_amountModel.value() * currentSample / 2.0f ), 1.0f );
+		values[i] = qBound( 0.0f, m_baseModel.value() + ( *amountPtr * currentSample / 2.0f ), 1.0f );
 
 		phase += 1.0 / m_duration;
+		amountPtr += amountInc;
 	}
 
 	m_currentPhase = absFraction( phase - m_phaseOffset );
 }
-
 
 void LfoController::updatePhase()
 {

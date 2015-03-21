@@ -478,6 +478,29 @@ void Pattern::addSteps()
 	updateBBTrack();
 }
 
+void Pattern::cloneSteps()
+{
+	int oldLength = m_steps;
+	m_steps += MidiTime::stepsPerTact();
+	ensureBeatNotes();
+	for(int i = 0; i < MidiTime::stepsPerTact(); ++i )
+	{
+		Note *toCopy = noteAtStep( i );
+		if( toCopy )
+		{
+			setStep( oldLength + i, true );
+			Note *newNote = noteAtStep( oldLength + i );
+			newNote->setKey( toCopy->key() );
+			newNote->setLength( toCopy->length() );
+			newNote->setPanning( toCopy->getPanning() );
+			newNote->setVolume( toCopy->getVolume() );
+		}
+	}
+	ensureBeatNotes();
+	emit dataChanged();
+	updateBBTrack();
+}
+
 
 
 
@@ -776,26 +799,6 @@ void PatternView::constructContextMenu( QMenu * _cm )
 
 
 
-void PatternView::mouseDoubleClickEvent( QMouseEvent * _me )
-{
-	if( _me->button() != Qt::LeftButton )
-	{
-		_me->ignore();
-		return;
-	}
-	if( m_pat->type() == Pattern::MelodyPattern ||
-		!( m_pat->type() == Pattern::BeatPattern &&
-		( pixelsPerTact() >= 192 ||
-	  			m_pat->m_steps != MidiTime::stepsPerTact() ) &&
-		_me->y() > height() - s_stepBtnOff->height() ) )
-	{
-		openInPianoRoll();
-	}
-}
-
-
-
-
 void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
@@ -838,6 +841,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		}
 		else // note at step found
 		{
+			m_pat->addJournalCheckPoint();
 			if( n->length() < 0 )
 			{
 				n->setLength( 0 );	// set note as enabled beat note
@@ -862,6 +866,19 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 
 	{
 		TrackContentObjectView::mousePressEvent( _me );
+	}
+}
+
+void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
+{
+	if( _me->button() != Qt::LeftButton )
+	{
+		_me->ignore();
+		return;
+	}
+	if( !fixedTCOs() )
+	{
+		openInPianoRoll();
 	}
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru_RU">
+<TS version="2.1" language="ru_RU">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -32,9 +32,13 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>На этом языке не переведено (или установлен Английский).
+        <translation>Перевод выполнили:
+Alexey Kouznetsov &lt;alexey/dot/kouznetsov/at/gmail/dot/com&gt;
+Oe Ai &lt;oeai/at/symbiants/dot/com&gt;
 
-Если Вы заинтересованы в переводе LMMS на другой язык или хотите улучшить существующий перевод, мы приветствуем любую помощь! Просто свяжитесь с разработчиками!</translation>
+Музыкльные термины можно нйти в словаре dic.academic.ru/dic.nsf/enc_colier/6207/ТЕРМИНЫ 
+Если Вы заинтересованы в переводе LMMS на другой язык или хотите улучшить существующий перевод, мы приветствуем любую помощь! Просто свяжитесь с разработчиками!
+</translation>
     </message>
     <message>
         <source>License</source>
@@ -50,15 +54,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>LMMS</source>
-        <translation type="unfinished">ЛММС</translation>
+        <translation>ЛММС</translation>
     </message>
     <message>
         <source>Involved</source>
-        <translation type="unfinished">Участники</translation>
+        <translation>Участники</translation>
     </message>
     <message>
         <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished">Разработчики сортированные по числу коммитов:</translation>
+        <translation>Разработчики сортированные по числу коммитов:</translation>
     </message>
 </context>
 <context>
@@ -69,7 +73,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="unfinished">Громкость:</translation>
+        <translation>Громкость:</translation>
     </message>
     <message>
         <source>PAN</source>
@@ -77,42 +81,42 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Балансировка:</translation>
     </message>
     <message>
         <source>LEFT</source>
-        <translation type="unfinished"></translation>
+        <translation>Лево</translation>
     </message>
     <message>
         <source>Left gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Лево мощность:</translation>
     </message>
     <message>
         <source>RIGHT</source>
-        <translation type="unfinished"></translation>
+        <translation>Право</translation>
     </message>
     <message>
         <source>Right gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Право мощность:</translation>
     </message>
 </context>
 <context>
     <name>AmplifierControls</name>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">Громкость</translation>
+        <translation>Громкость</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс</translation>
     </message>
     <message>
         <source>Left gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Лево мощн</translation>
     </message>
     <message>
         <source>Right gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Право мощн</translation>
     </message>
 </context>
 <context>
@@ -171,39 +175,39 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Disable loop</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить петлю</translation>
     </message>
     <message>
         <source>This button disables looping. The sample plays only once from start to end. </source>
-        <translation type="unfinished"></translation>
+        <translation>Эта кнопка отключает петлю (loop-цикл). Запись проигрывается только один раз от начала до конца. </translation>
     </message>
     <message>
         <source>Enable loop</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить петлю</translation>
     </message>
     <message>
         <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта кнопка включает переднюю петлю. Сэмпл кольцуется между конечной точкой и точкой петли. </translation>
     </message>
     <message>
         <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта кнопка включает пинг-понг петлю. Сэмпл кольцуется обратно и вперёд между конечной точкой и точкой петли.</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
-        <translation type="unfinished"></translation>
+        <translation>Этим регулятором можно установить точку где АудиоФайлПроцессор должен начать воспроизведение сэмпла.</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
-        <translation type="unfinished"></translation>
+        <translation>Этот регулятор устанавливает точку в которой АудиоФайлПроцессор должен перестать воспроизвдение сэмпла.</translation>
     </message>
     <message>
         <source>Loopback point:</source>
-        <translation type="unfinished"></translation>
+        <translation>Точка возврата петли:</translation>
     </message>
     <message>
         <source>With this knob you can set the point where the loop starts. </source>
-        <translation type="unfinished"></translation>
+        <translation>Этот регулятор ставит точку начала петли.</translation>
     </message>
 </context>
 <context>
@@ -233,11 +237,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>CLIENT-NAME</source>
-        <translation type="unfinished">ИМЯ КЛИЕНТА</translation>
+        <translation>ИМЯ КЛИЕНТА</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished">КАНАЛЫ</translation>
+        <translation>КАНАЛЫ</translation>
     </message>
 </context>
 <context>
@@ -347,109 +351,109 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditorWindow</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Игра/Пауза текущей мелодии (Пробел)</translation>
     </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation type="unfinished">Нажмите здесь чтобы проиграть текущий шаблон. Это может пригодиться при его редактировании. Шаблон автоматически закольцуется при достижении конца.</translation>
+        <translation>Нажмите здесь чтобы проиграть текущую мелодию. Это может пригодиться при его редактировании. Мелодия автоматически закольцуется при достижении конца.</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить воспроизведение текущей мелодии (Пробел)</translation>
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation type="unfinished">Нажмите здесь, если вы хотите остановить воспроизведение текущего шаблона.</translation>
+        <translation>Нажмите здесь, если вы хотите остановить воспроизведение текущей мелодии.</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished">Режим рисования (Shift+D)</translation>
+        <translation>Режим рисования (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим стирания (Shift-E)</translation>
     </message>
     <message>
         <source>Flip vertically</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Перевернуть вертикально</translation>
     </message>
     <message>
         <source>Flip horizontally</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Перевернуть горизонтально</translation>
     </message>
     <message>
         <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь и мелодия перевернётся. Точки переворачиваются в Y направлении.</translation>
     </message>
     <message>
         <source>Click here and the pattern will be reversed. The points are flipped in the x direction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь и мелодия перевернётся в направлении X.</translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">При нажатии на эту кнопку активируется режим рисования нот, в нём вы можете добавлять/перемещать и изменять длительность одиночных нот.  Это основной режим и используется большую часть времени.
+        <translation>При нажатии на эту кнопку активируется режим рисования нот, в нём вы можете добавлять/перемещать и изменять длительность одиночных нот.  Это основной режим и используется большую часть времени.
 Для включения этого режима можно использовать комбинацию клавиш Shift+D.</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">При нажатии на эту кнопку активируется режим стирания. В этом режиме вы можете стирать ноты по одной.
+        <translation>При нажатии на эту кнопку активируется режим стирания. В этом режиме вы можете стирать ноты по одной.
 Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
-        <translation type="unfinished">Дискретная прогрессия</translation>
+        <translation>Дискретная прогрессия</translation>
     </message>
     <message>
         <source>Linear progression</source>
-        <translation type="unfinished">Линейная прогрессия</translation>
+        <translation>Линейная прогрессия</translation>
     </message>
     <message>
         <source>Cubic Hermite progression</source>
-        <translation type="unfinished">Кубическая Эрмитова прогрессия</translation>
+        <translation>Кубическая Эрмитова прогрессия</translation>
     </message>
     <message>
         <source>Tension value for spline</source>
-        <translation type="unfinished">Величина напряжения для сплайна</translation>
+        <translation>Величина напряжения для сплайна</translation>
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Более высокое напряжение может сделать кривую более мягкой, но перегрузит некоторые величины. Низкое напряжение сделает наклон кривой ниже в каждой контрольной точке.</translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
-        <translation type="unfinished">Выбор дискретной прогрессии для этого шаблона автоматизации. Кол-во подсоединенных объектов будет оставаться постоянным между управляющими точками и будет установлено на новое значение сразу по достижении каждой  управляющей точки. </translation>
+        <translation>Выбор дискретной прогрессии для этого шаблона автоматизации. Кол-во подсоединенных объектов будет оставаться постоянным между управляющими точками и будет установлено на новое значение сразу по достижении каждой  управляющей точки. </translation>
     </message>
     <message>
         <source>Click here to choose linear progressions for this automation pattern.  The value of the connected object will change at a steady rate over time between control points to reach the correct value at each control point without a sudden change.</source>
-        <translation type="unfinished">Выбор линейной прогрессии для этого шаблона автоматизации. Кол-во подсоединенных объектов будет меняться с постоянной скоростью во времени между управляющими точками для достижения точного значения в каждой управляющей точки без внезапных изменений. </translation>
+        <translation>Выбор линейной прогрессии для этого шаблона автоматизации. Кол-во подсоединенных объектов будет меняться с постоянной скоростью во времени между управляющими точками для достижения точного значения в каждой управляющей точки без внезапных изменений. </translation>
     </message>
     <message>
         <source>Click here to choose cubic hermite progressions for this automation pattern.  The value of the connected object will change in a smooth curve and ease in to the peaks and valleys.</source>
-        <translation type="unfinished">Кубическая Эрмитова прогрессия для этого шаблона автоматизации. Кол-во подсоединенных объектов изменится по сглаженной кривой и смягчится на пиках и спадах.</translation>
+        <translation>Кубическая Эрмитова прогрессия для этого шаблона автоматизации. Кол-во подсоединенных объектов изменится по сглаженной кривой и смягчится на пиках и спадах.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">Вырезать выбранные ноты (Ctrl+X)</translation>
+        <translation>Вырезать выбранные ноты (Ctrl+X)</translation>
     </message>
     <message>
         <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">Копировать выбранные ноты в буфер (Ctrl+C)</translation>
+        <translation>Копировать выбранные ноты в буфер (Ctrl+C)</translation>
     </message>
     <message>
         <source>Paste values from clipboard Ctrl+V)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить запомненные значения (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">При нажатии на эту кнопку выделеные ноты будут вырезаны в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+        <translation>При нажатии на эту кнопку выделеные ноты будут вырезаны в буфер. Позже вы можете вставить их в любое место любой мелодии с помощью кнопки &quot;Вставить&quot;.</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+        <translation>При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любой мелодии с помощью кнопки &quot;Вставить&quot;.</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished">При нажатии на эту кнопку ноты из буфера будут вставлены в первый видимый такт.</translation>
+        <translation>При нажатии на эту кнопку ноты из буфера будут вставлены в первый видимый такт.</translation>
     </message>
     <message>
         <source>Tension: </source>
@@ -457,11 +461,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">Редактор автоматизаци — нет шаблона</translation>
+        <translation>Редактор автоматизаци — нет шаблона</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation type="unfinished">Редактор автоматизации — %1</translation>
+        <translation>Редактор автоматизации — %1</translation>
     </message>
 </context>
 <context>
@@ -472,14 +476,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>паттерн - шаблон, мелодия</translatorcomment>
+        <translation>Модель уже подключена к этому шаблону.</translation>
     </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation>Дважды щёлкните мышью чтобы настроить автоматизацию для этого шаблона</translation>
+        <translation>Дважды щёлкните мышью чтобы настроить автоматизацию этого шаблона</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
@@ -507,15 +512,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation type="unfinished">Установить/очистить запись</translation>
+        <translation>Установить/очистить запись</translation>
     </message>
     <message>
         <source>Flip Vertically (Visible)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Перевернуть вертикально (Видимое)</translation>
     </message>
     <message>
         <source>Flip Horizontally (Visible)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Перевернуть горизонтально (Видимое)</translation>
     </message>
 </context>
 <context>
@@ -529,115 +534,115 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation type="unfinished">Ритм Басс Редактор</translation>
+        <translation>Ритм+Бас Редактор</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation type="unfinished">Игра/пауза текущей линии ритма/басса (&lt;Space&gt;)</translation>
+        <translation>Игра/пауза текущей линии ритма/баса (&lt;Space&gt;)</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
-        <translation type="unfinished">Остановить воспроизведение текущей линии ритм-басса (ПРОБЕЛ)</translation>
+        <translation>Остановить воспроизведение текущей линии ритм-баса (ПРОБЕЛ)</translation>
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation type="unfinished">Нажмите чтобы проиграть текущую линию ритм-басса. Она будет закольцована по достижении окончания.</translation>
+        <translation>Нажмите чтобы проиграть текущую линию ритм-баса. Она будет закольцована по достижении окончания.</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation type="unfinished">Остановить воспроизведение (Пробел).</translation>
+        <translation>Остановить воспроизведение (Пробел).</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить ритм/бас</translation>
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation type="unfinished">Добавить дорожку автоматизации</translation>
+        <translation>Добавить дорожку автоматизации</translation>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation type="unfinished"></translation>
+        <translation>Убрать такты</translation>
     </message>
     <message>
         <source>Add steps</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить такты</translation>
     </message>
 </context>
 <context>
     <name>BBTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation type="unfinished">Открыть в редакторе ритма и басса</translation>
+        <translation>Открыть в редакторе ритм + баса</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished">Сбросить название</translation>
+        <translation>Сбросить название</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished">Переименовать</translation>
+        <translation>Переименовать</translation>
     </message>
     <message>
         <source>Change color</source>
-        <translation type="unfinished">Изменить цвет</translation>
+        <translation>Изменить цвет</translation>
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить цвет по умолчанию</translation>
     </message>
 </context>
 <context>
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="unfinished">Ритм-Басс Линия %1</translation>
+        <translation>Ритм-Бас Линия %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
-        <translation type="unfinished">Копия %1</translation>
+        <translation>Копия %1</translation>
     </message>
 </context>
 <context>
     <name>BassBoosterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation type="unfinished"></translation>
+        <translation>ЧАСТ</translation>
     </message>
     <message>
         <source>Frequency:</source>
-        <translation type="unfinished">Частота:</translation>
+        <translation>Частота:</translation>
     </message>
     <message>
         <source>GAIN</source>
-        <translation type="unfinished">УСИЛ</translation>
+        <translation>МОЩ</translation>
     </message>
     <message>
         <source>Gain:</source>
-        <translation type="unfinished">Усиление:</translation>
+        <translation>Мощность:</translation>
     </message>
     <message>
         <source>RATIO</source>
-        <translation type="unfinished">ОТН</translation>
+        <translation>ОТН</translation>
     </message>
     <message>
         <source>Ratio:</source>
-        <translation type="unfinished">Отношение:</translation>
+        <translation>Отношение:</translation>
     </message>
 </context>
 <context>
     <name>BassBoosterControls</name>
     <message>
         <source>Frequency</source>
-        <translation type="unfinished">Частота</translation>
+        <translation>Частота</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">Усиление</translation>
+        <translation>Мощность</translation>
     </message>
     <message>
         <source>Ratio</source>
-        <translation type="unfinished">Отношение</translation>
+        <translation>Отношение</translation>
     </message>
 </context>
 <context>
@@ -652,11 +657,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>GAIN</source>
-        <translation type="unfinished">УСИЛ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Input Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Входная мощность:</translation>
     </message>
     <message>
         <source>NOIS</source>
@@ -664,7 +669,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Input Noise:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Входной шум:</translation>
     </message>
     <message>
         <source>Output Gain:</source>
@@ -712,37 +717,37 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Stereo difference:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Стерео разница:</translation>
     </message>
     <message>
         <source>Levels</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровни</translation>
     </message>
     <message>
         <source>Levels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровни:</translation>
     </message>
 </context>
 <context>
     <name>CaptionMenu</name>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished">&amp;H Справка</translation>
+        <translation>&amp;H Справка</translation>
     </message>
     <message>
         <source>Help (not available)</source>
-        <translation type="unfinished"></translation>
+        <translation>Справка (не доступна)</translation>
     </message>
 </context>
 <context>
     <name>CarlaInstrumentView</name>
     <message>
         <source>Show GUI</source>
-        <translation type="unfinished">Показать интерфейс</translation>
+        <translation>Показать интерфейс</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите сюда, чтобы показать или скрыть графический интерфейс Карла.</translation>
     </message>
 </context>
 <context>
@@ -920,11 +925,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DelayControls</name>
     <message>
         <source>Delay Samples</source>
-        <translation type="unfinished"></translation>
+        <translation>Задержка сэмплов</translation>
     </message>
     <message>
         <source>Feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>Возврат</translation>
     </message>
     <message>
         <source>Lfo Frequency</source>
@@ -939,11 +944,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DelayControlsDialog</name>
     <message>
         <source>Delay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Задержка</translation>
     </message>
     <message>
         <source>Delay Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Время задержки</translation>
     </message>
     <message>
         <source>Regen</source>
@@ -970,26 +975,26 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DetuningHelper</name>
     <message>
         <source>Note detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Расстройка нот</translation>
     </message>
 </context>
 <context>
     <name>DualFilterControlDialog</name>
     <message>
         <source>Filter 1 enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр 1 включен</translation>
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр 2 включен</translation>
     </message>
     <message>
         <source>Click to enable/disable Filter 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Кликнуть для включения/выключения Фильтра 1</translation>
     </message>
     <message>
         <source>Click to enable/disable Filter 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Кликнуть для включения/выключения Фильтра 2</translation>
     </message>
 </context>
 <context>
@@ -1131,26 +1136,26 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>DummyEffect</name>
     <message>
         <source>NOT FOUND</source>
-        <translation type="unfinished"></translation>
+        <translation>НЕ НАЙДЕН</translation>
     </message>
 </context>
 <context>
     <name>Editor</name>
     <message>
         <source>Play (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Игра (Пробел)</translation>
     </message>
     <message>
         <source>Stop (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоп (Пробел)</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись</translation>
     </message>
     <message>
         <source>Record while playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись при игре</translation>
     </message>
 </context>
 <context>
@@ -1532,18 +1537,18 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Click here for random wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите сюда для случайной волны.</translation>
     </message>
 </context>
 <context>
     <name>EqControls</name>
     <message>
         <source>Input gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Входная мощность</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Выходная мощность</translation>
     </message>
     <message>
         <source>Low shelf gain</source>
@@ -1738,7 +1743,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">Усиление</translation>
+        <translation>Мощность</translation>
     </message>
     <message>
         <source>Out Gain</source>
@@ -1746,15 +1751,15 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Bandwidth: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Полоса:</translation>
     </message>
     <message>
         <source>Resonance : </source>
-        <translation type="unfinished"></translation>
+        <translation>Резонанс:</translation>
     </message>
     <message>
         <source>Frequency:</source>
-        <translation type="unfinished">Частота:</translation>
+        <translation>Частота:</translation>
     </message>
     <message>
         <source>12dB</source>
@@ -1781,7 +1786,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>EqParameterWidget</name>
     <message>
         <source>Hz </source>
-        <translation type="unfinished"></translation>
+        <translation>Гц</translation>
     </message>
 </context>
 <context>
@@ -1924,74 +1929,74 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Export between loop markers</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт между метками петли</translation>
     </message>
     <message>
         <source>Could not open file</source>
-        <translation type="unfinished">Не могу открыть файл</translation>
+        <translation>Не могу открыть файл</translation>
     </message>
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished">Не могу открыть файл %1 для записи.
+        <translation>Не могу открыть файл %1 для записи.
 Проверьте, обладаете ли вы правами на запись в выбранный файл и содержащий его каталог и попробуйте снова!</translation>
     </message>
     <message>
         <source>Export project to %1</source>
-        <translation type="unfinished">Экспорт проекта в %1</translation>
+        <translation>Экспорт проекта в %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation type="unfinished">Ошибка при определении кодека файла. Попробуйте выбрать другой формат вывода.</translation>
+        <translation>Ошибка при определении кодека файла. Попробуйте выбрать другой формат вывода.</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
-        <translation type="unfinished">Обработка: %1%</translation>
+        <translation>Обработка: %1%</translation>
     </message>
 </context>
 <context>
     <name>Fader</name>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Введите новое значение от %1 до %2:</translation>
+        <translation>Введите новое значение от %1 до %2:</translation>
     </message>
 </context>
 <context>
     <name>FileBrowser</name>
     <message>
         <source>Browser</source>
-        <translation type="unfinished">Обозреватель файлов</translation>
+        <translation>Обозреватель файлов</translation>
     </message>
 </context>
 <context>
     <name>FileBrowserTreeWidget</name>
     <message>
         <source>Send to active instrument-track</source>
-        <translation type="unfinished">Соединить с активным инструментом-дорожкой</translation>
+        <translation>Послать на активную инструментальную-дорожку</translation>
     </message>
     <message>
         <source>Open in new instrument-track/Song-Editor</source>
-        <translation type="unfinished">Отркрыть в новой дорожке инструмента/редакторе песни</translation>
+        <translation>Отркрыть в новой инструментальной дорожке/редакторе песни</translation>
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation type="unfinished">Открыть в новой инструментальной дорожке/Бит+Басс редакторе</translation>
+        <translation>Открыть в новой инструментальной дорожке/Б+Б редакторе</translation>
     </message>
     <message>
         <source>Loading sample</source>
-        <translation type="unfinished">Загрузка записи</translation>
+        <translation>Загрузка записи</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
-        <translation type="unfinished">Пж. ждите, запись загружается для просмотра...</translation>
+        <translation>Пж. ждите, запись загружается для просмотра...</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished">--- Заводские файлы ---</translation>
+        <translation>--- Заводские файлы ---</translation>
     </message>
 </context>
 <context>
@@ -2025,11 +2030,11 @@ Please make sure you have write-permission to the file and the directory contain
     <name>FlangerControlsDialog</name>
     <message>
         <source>Delay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Задержка</translation>
     </message>
     <message>
         <source>Delay Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Время задержки:</translation>
     </message>
     <message>
         <source>Lfo Hz</source>
@@ -2061,14 +2066,14 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>White Noise Amount:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Объём белого шума:</translation>
     </message>
 </context>
 <context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Величина отправки канала</translation>
     </message>
     <message>
         <source>The FX channel receives input from one or more instrument tracks.
@@ -2078,27 +2083,31 @@ In order to route the channel to another channel, select the FX channel and clic
 
 You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Канал эффектов (ЭФ) получает сигнал на вход от одной или нескольких инструментальных дорожек.
+В свою очередь его можно подключить к нескольким другим каналам эффектов. ЛММС автоматически предотвращает бесконечные циклы и не позволяет создавать соединения, которые приведут к бесконечному циклу.
+Чтобы соединить один канал с другим, выберите канал ЭФфектов и кликните кнопку послать (Send) на канале, куда нужно послать. Регулятор под кнопкой &quot;послать&quot; контролирует уровень сигнала, посылаемого на канал.
+Можно убирать и двигать каналы эффектов через контекстное меню, если кликнуть правой кнопкой мыши по каналу эффектов.
+</translation>
     </message>
     <message>
         <source>Move &amp;left</source>
-        <translation type="unfinished"></translation>
+        <translation>Двигать влево &amp;L</translation>
     </message>
     <message>
         <source>Move &amp;right</source>
-        <translation type="unfinished"></translation>
+        <translation>Двигать вправо &amp;r</translation>
     </message>
     <message>
         <source>Rename &amp;channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать канал &amp;c</translation>
     </message>
     <message>
         <source>R&amp;emove channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить канал &amp;e</translation>
     </message>
     <message>
         <source>Remove &amp;unused channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить неиспользуемые каналы &amp;u</translation>
     </message>
 </context>
 <context>
@@ -2144,76 +2153,76 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Solo FX channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Соло канал ЭФ</translation>
     </message>
 </context>
 <context>
     <name>FxRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Величина отправки с канала %1 на канал %2</translation>
     </message>
 </context>
 <context>
     <name>GigInstrument</name>
     <message>
         <source>Bank</source>
-        <translation type="unfinished">Банк</translation>
+        <translation>Банк</translation>
     </message>
     <message>
         <source>Patch</source>
-        <translation type="unfinished">Патч</translation>
+        <translation>Патч</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">Усиление</translation>
+        <translation>Мощность</translation>
     </message>
 </context>
 <context>
     <name>GigInstrumentView</name>
     <message>
         <source>Open other GIG file</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть другой GIG файл</translation>
     </message>
     <message>
         <source>Click here to open another GIG file</source>
-        <translation type="unfinished"></translation>
+        <translation>Кликните сюда, чтобы открыть другой GIG файл</translation>
     </message>
     <message>
         <source>Choose the patch</source>
-        <translation type="unfinished">Выбрать патч</translation>
+        <translation>Выбрать патч</translation>
     </message>
     <message>
         <source>Click here to change which patch of the GIG file to use</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь для смены используемого патча GIG файла</translation>
     </message>
     <message>
         <source>Change which instrument of the GIG file is being played</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить инструмент, который воспроизводит GIG файл</translation>
     </message>
     <message>
         <source>Which GIG file is currently being used</source>
-        <translation type="unfinished"></translation>
+        <translation>Какой GIG файл сейчас используется</translation>
     </message>
     <message>
         <source>Which patch of the GIG file is currently being used</source>
-        <translation type="unfinished"></translation>
+        <translation>Какой патч GIG файла сейчас используется</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">Усиление</translation>
+        <translation>Мощность</translation>
     </message>
     <message>
         <source>Factor to multiply samples by</source>
-        <translation type="unfinished"></translation>
+        <translation>Фактор умножения сэмплов</translation>
     </message>
     <message>
         <source>Open GIG file</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть GIG файл</translation>
     </message>
     <message>
         <source>GIG Files (*.gig)</source>
-        <translation type="unfinished"></translation>
+        <translation>GIG Файлы (*.gig)</translation>
     </message>
 </context>
 <context>
@@ -2276,7 +2285,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Down and up</source>
-        <translation type="unfinished"></translation>
+        <translation>Вниз и вверх</translation>
     </message>
 </context>
 <context>
@@ -2394,7 +2403,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>6</source>
-        <translation type="unfinished">8х {6?}</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>6sus4</source>
@@ -2414,7 +2423,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>7</source>
-        <translation type="unfinished">8х {7?}</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>7sus4</source>
@@ -2797,15 +2806,15 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>CUSTOM BASE VELOCITY</source>
-        <translation type="unfinished"></translation>
+        <translation>ПРОИЗВОЛЬНАЯ БАЗОВАЯ СКОРОСТЬ</translation>
     </message>
     <message>
         <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Опрделяет базовую скорость нормальизации для MiDi инструментов при громкости ноты 100%</translation>
     </message>
     <message>
         <source>BASE VELOCITY</source>
-        <translation type="unfinished"></translation>
+        <translation>БАЗОВАЯ СКОРОСТЬ</translation>
     </message>
 </context>
 <context>
@@ -2816,7 +2825,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Enables the use of Master Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>Включает использование основной тональности</translation>
     </message>
 </context>
 <context>
@@ -2856,7 +2865,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>Q/Resonance</source>
         <translatorcomment>или качество?</translatorcomment>
-        <translation type="unfinished">Кол./Резонанса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>LowPass</source>
@@ -2996,7 +3005,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
-        <translation type="unfinished"></translation>
+        <translation>Огибающие, LFO и фильтры не поддерживаются этим инструментом.</translation>
     </message>
 </context>
 <context>
@@ -3165,38 +3174,38 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>RANGE</source>
-        <translation>ДИАПАЗОН</translation>
+        <translation>ДИАП</translation>
     </message>
     <message>
         <source>Save current instrument track settings in a preset file</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить текущую инструментаьную дорожку в файл предустановок</translation>
     </message>
     <message>
         <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажать здесь, чтобы сохранить настройки текущей инстр. дорожки в файл предустановок. Позже можно загрузить эту предустановку двойным кликом в браузере предустановок.</translation>
     </message>
     <message>
         <source>MISC</source>
-        <translation type="unfinished">РАЗНОЕ</translation>
+        <translation>РАЗН</translation>
     </message>
 </context>
 <context>
     <name>Knob</name>
     <message>
         <source>Set linear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установить линейно</translation>
     </message>
     <message>
         <source>Set logarithmic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установить логарифмически</translation>
     </message>
     <message>
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation type="unfinished">Введите новое значение от –96,0 дБВ до 6,0 дБВ:</translation>
+        <translation>Введите новое значение от –96,0 дБВ до 6,0 дБВ:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Введите новое значение от %1 до %2:</translation>
+        <translation>Введите новое значение от %1 до %2:</translation>
     </message>
 </context>
 <context>
@@ -3243,7 +3252,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>LcdSpinBox</name>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Введите новое значение от %1 до %2:</translation>
+        <translation>Введите новое значение от %1 до %2:</translation>
     </message>
 </context>
 <context>
@@ -3376,7 +3385,7 @@ Double click to pick a file.</source>
     </message>
     <message>
         <source>Click here for a moog saw-wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажать здесь для зигзагообразной муг волны.</translation>
     </message>
 </context>
 <context>
@@ -3490,11 +3499,11 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <source>Show/hide Beat+Bassline Editor</source>
-        <translation>Показать/скрыть ритм-басс редактор</translation>
+        <translation>Показать/скрыть ритм-бас редактор</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation>Сим запускается ритм-басс редактор. Он необходим для установки ритма, открытия, добавления и удаления каналов, а также  вырезания, копирования и вставки ритм-басс шаблонов и т. п.</translation>
+        <translation>Сим запускается ритм-бас редактор. Он необходим для установки ритма, открытия, добавления и удаления каналов, а также  вырезания, копирования и вставки ритм-бас шаблонов, мелодий и т. п.</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
@@ -3576,75 +3585,80 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Volumes</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Объёмы?</translatorcomment>
+        <translation type="unfinished">Громкости</translation>
     </message>
     <message>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Откатить действие</translation>
     </message>
     <message>
         <source>Redo</source>
+        <translation>Возврат действия</translation>
+    </message>
+    <message>
+        <source>LMMS Project </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <source>LMMS Project Template </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>My Projects</source>
-        <translation type="unfinished"></translation>
+        <translation>Мои проекты</translation>
     </message>
     <message>
         <source>My Samples</source>
-        <translation type="unfinished"></translation>
+        <translation>Мои сэмплы</translation>
     </message>
     <message>
         <source>My Presets</source>
-        <translation type="unfinished"></translation>
+        <translation>Мои предустановки</translation>
     </message>
     <message>
         <source>My Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Моя домашняя папка</translation>
     </message>
     <message>
         <source>My Computer</source>
-        <translation type="unfinished"></translation>
+        <translation>Мой компьютер</translation>
     </message>
     <message>
         <source>Root Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Корневая директория</translation>
     </message>
     <message>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;F Файл</translation>
     </message>
     <message>
         <source>&amp;Recently Opened Projects</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;R Недавние проекты</translation>
     </message>
     <message>
         <source>Save as New &amp;Version</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;V Сохранить как новую версию</translation>
     </message>
     <message>
         <source>E&amp;xport Tracks...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;x Экспорт дорожек...</translation>
     </message>
     <message>
         <source>Online Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Помощь онлайн</translation>
     </message>
     <message>
         <source>What&apos;s This?</source>
-        <translation type="unfinished"></translation>
+        <translation>Что это?</translation>
     </message>
     <message>
         <source>Open Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть проект</translation>
     </message>
     <message>
         <source>Save Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить проект</translation>
     </message>
 </context>
 <context>
@@ -3686,7 +3700,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>MidiAlsaSeq</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">УСТРОЙСТВО</translation>
+        <translation>УСТРОЙСТВО</translation>
     </message>
 </context>
 <context>
@@ -3767,7 +3781,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Base velocity</source>
-        <translation type="unfinished"></translation>
+        <translation>Базовая скорость</translation>
     </message>
 </context>
 <context>
@@ -4249,17 +4263,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>MonstroView</name>
     <message>
         <source>Operators view</source>
-        <translation type="unfinished"></translation>
+        <translation>Операторский вид</translation>
     </message>
     <message>
         <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
-        <translation type="unfinished"></translation>
+        <translation>Операторский вид содержит все операторы. Они включают и звучащие операторы (осцилляторы) и беззвучные операторы или модуляторы: Низко-частотные осцилляторы и огибающие.
+
+Регуляторы и другие виджеты в Операторском виде имеют свои подписи &quot;Что это?&quot;, можно получить по ним более детальную справку таким образом.</translation>
     </message>
     <message>
         <source>Matrix view</source>
-        <translation type="unfinished"></translation>
+        <translation>Матричный вид</translation>
     </message>
     <message>
         <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
@@ -4267,153 +4283,171 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
 The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
-        <translation type="unfinished"></translation>
+        <translation>Матричный вид содержит матрицу модуляции. Здесь можно определить модуляционное отношение между разными операторами. Каждый слышимый оператор (осцилляторы 1-3) имеют 3-4 свойства, которые можно модулировать любыми модуляторами. Используя больше модуляций увеличивается нагрузка на процессор.
+
+Вид делится на цели модуляции, сгруппированные на целевой осциллятор. Доступные цели : громкость, тон, фаза, ширина пульсации и отношение с подчиненным (под-) осциллятором. Отметим что некоторые цели определены только для одного осциллятора.
+
+Каждая цель модуляции имеет 4 регулятора, один на каждый модулятор. По умолчанию регуляторы установлены на 0, то есть без модуляции. Включая регулятор на 1 ведёт к тому, что модулятор влияет на цель модуляции на столько на сколько возможно. Включая его на -1 делает то же, но с обратной модуляцией.</translation>
     </message>
     <message>
         <source>Mix Osc2 with Osc3</source>
-        <translation type="unfinished"></translation>
+        <translation>Смешать Осц2 с Осц3</translation>
     </message>
     <message>
         <source>Modulate amplitude of Osc3 with Osc2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать амплитуду осциллятора 3 сигналом с осц2</translation>
     </message>
     <message>
         <source>Modulate frequency of Osc3 with Osc2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать частоту осциллятора 3 сигналом с осц2</translation>
     </message>
     <message>
         <source>Modulate phase of Osc3 with Osc2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать фазу Осц3 осциллятором2</translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 1 in semitone steps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Регулятор CRS меняет настройку осциллятора 1 в размере полутона.</translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 2 in semitone steps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Регулятор CRS меняет настройку осциллятора 2 в размере полутона.</translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 3 in semitone steps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Регулятор CRS меняет настройку осциллятора 3 в размере полутона.</translation>
     </message>
     <message>
         <source>FTL and FTR change the finetuning of the oscillator for left and right channels respectively. These can add stereo-detuning to the oscillator which widens the stereo image and causes an illusion of space. </source>
-        <translation type="unfinished"></translation>
+        <translation>FTL и FTR меняют подстройку осциллятора для левого и правого канала соответственно. Они могут добавить стерео расстраивания осциллятора, которое расширяет стерео картину и создаёт иллюзию космоса.</translation>
     </message>
     <message>
         <source>The SPO knob modifies the difference in phase between left and right channels. Higher difference creates a wider stereo image. </source>
-        <translation type="unfinished"></translation>
+        <translation>Регулятор SPO меняет  фазовую разницу между левым и правым каналами. Высокая разница создаёт более широкую стерео картину.</translation>
     </message>
     <message>
         <source>The PW knob controls the pulse width, also known as duty cycle, of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, it doesn&apos;t produce bandlimited output, which means that you can use it as an audible oscillator but it will cause aliasing. You can also use it as an inaudible source of a sync signal, which can be used to synchronize oscillators 2 and 3. </source>
-        <translation type="unfinished"></translation>
+        <translation>PW регулятор контролирует ширину пульсаций, также известную как рабочий цикл осциллятора 1. Осциллятор 1 это цифровой импульсный волновой генератор, он не воспроизводит сигнал с ограниченной полосой, это значит, что его можно использовать как слышимый осциллятор, но приведёт к наложению сигналов (или сглаживанию). Его можно использовать и как не слышимый источник синхронизирующего сигнала, для использования в синхронизации осцилляторов 2 и 3. </translation>
     </message>
     <message>
         <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation type="unfinished"></translation>
+        <translation>Посылать синхронизацию при повышении: при включении, сигнал синхронизации посылается каждый раз когда состояние осциллятора 1 меняется с низкого на высокое, т.е. когда амплитуда меняется от -1 до 1. 
+Тон осциллятора 1, фаза и ширина пульсаций может влиять на время синхронизации, но громкость не имеет эффекта. Сигнал синхронизации посылается независимо для левого и правого каналов.</translation>
     </message>
     <message>
         <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation type="unfinished"></translation>
+        <translation>Посылать синхронизацию при падении: при включении, сигнал синхронизации посылается каждый раз когда состояние осциллятора 1 меняется с выского на низкое, т.е. когда амплитуда меняется от 1 до -1. 
+Тон осциллятора 1, фаза и ширина пульсаций может влиять на время синхронизации, но громкость не имеет эффекта. Сигнал синхронизации посылается независимо для левого и правого каналов.</translation>
     </message>
     <message>
         <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
-        <translation type="unfinished"></translation>
+        <translation>Жесткая синхр. : Каждый раз при получении осциллятором сигнала синхронизации от осциллятора 1, его фаза сбрасывается до 0 + его граница фазы, какой бы она ни была.</translation>
     </message>
     <message>
         <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
-        <translation type="unfinished"></translation>
+        <translation>Обратная синхронизация: Каждый раз при получении сигнала синхронизации от осциллятора 1, амплитуда осцилятора переворачивается.</translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 2. </source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать форму волны для осциллятора 2.</translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 3&apos;s first sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите форму волны для первого доп. осциллятора осциллятора 3. Осциллятор 3 может мягко переходить между двумя разными волнами.</translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 3&apos;s second sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите форму волны для второго доп. осциллятора осциллятора 3. Осциллятор 3 может мягко переходить между двумя разными волнами.</translation>
     </message>
     <message>
         <source>The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. Each sub-osc can be set to produce a different waveform, and oscillator 3 can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied to both sub-oscs/waveforms in the exact same way. </source>
-        <translation type="unfinished"></translation>
+        <translation>SUB меняет смешивание двух доп. осяцилляторов осциллятора 3. Каждый доп. осц. может быть установлен для создания разных волн и осциллятор 3 может мягко переходить между ними. Все входящие модуляции для осциллятора 3 применяются на оба доп.осц./волны одним и тем же образом.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
-        <translation type="unfinished"></translation>
+        <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
+
+Смешанный (Mix) режим значит без модуляции: выходы осцилляторов просто смешиваются друг с другом.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
-        <translation type="unfinished"></translation>
+        <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
+
+AM режим значит Амплитуда Модуляции: Осциллятор 2 модулирует амплитуду (громкость) осциллятора 3.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
-        <translation type="unfinished"></translation>
+        <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
+
+FM (ЧМ) режим значит Частотная Модуляция: Осциллятор 2 модулирует частоту (pitch, тональность) осциллятора 3. Частота модуляции происходит в фазе модуляции, которая даёт более стабильный общий тон, чем &quot;чистая&quot; частотная модуляция.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
-        <translation type="unfinished"></translation>
+        <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
+
+PM (ФМ) режим значит фазовая модуляция: Осциллятор 2 модулирует фазу осциллятора 3. Это отличается от частотной модуляции тем, что изменения фаз не суммируются.</translation>
     </message>
     <message>
         <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите форму волны для LFO 1 (НизкоЧастотныйГенератор).
+&quot;Random&quot; (Случайно) и &quot;Random-smooth&quot; (случайное сглаживание) - это специальные волны: они создают случаный сигнал, где частота LFO контролирует как часто изменяется состояние генератора (LFO).
+Сглаженная версия переходит между этими состояниями с косинусоидальной интерплояцией. Эти случайные режимы могут быть использованы, чтобы дать &quot;жизни&quot; вашим настройкам - добавить немного аналоговой непредсказуемости...</translation>
     </message>
     <message>
         <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите форму волны для LFO 2 (НизкоЧастотныйГенератор).
+&quot;Random&quot; (Случайно) и &quot;Random-smooth&quot; (случайное сглаживание) - это специальные волны: они создают случаный сигнал, где частота LFO контролирует как часто изменяется состояние генератора (LFO).
+Сглаженная версия переходит между этими состояниями с косинусоидальной интерплояцией. Эти случайные режимы могут быть использованы, чтобы дать &quot;жизни&quot; вашим настройкам - добавить немного аналоговой непредсказуемости...</translation>
     </message>
     <message>
         <source>Attack causes the LFO to come on gradually from the start of the note. </source>
-        <translation type="unfinished"></translation>
+        <translation>Атака отвечает за плавность поведения LFO от начала ноты.</translation>
     </message>
     <message>
         <source>Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. </source>
-        <translation type="unfinished"></translation>
+        <translation>Rate (Частота) устанавливает скорость LFO, измеряемую в миллисекундах за цикл. Может синхронизироваться с темпом.</translation>
     </message>
     <message>
         <source>PHS controls the phase offset of the LFO. </source>
-        <translation type="unfinished"></translation>
+        <translation>PHS контролирует сдвиг фазы LFO (НЧГ). </translation>
     </message>
     <message>
         <source>PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. </source>
-        <translation type="unfinished"></translation>
+        <translation>PRE предзадержка, задерживает старт огибающей от начала ноты. 0 значит без задержки.</translation>
     </message>
     <message>
         <source>ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. A value of 0 means instant. </source>
-        <translation type="unfinished"></translation>
+        <translation>ATT атака контролирует как быстро огибающая наращивается на старте, измеряясь в милисекундах. Значение 0 значит мгновенно.</translation>
     </message>
     <message>
         <source>HOLD controls how long the envelope stays at peak after the attack phase. </source>
-        <translation type="unfinished"></translation>
+        <translation>HOLD (УДЕРЖ) контролирует как долго огибающая остаётся на пике после фазы атаки.</translation>
     </message>
     <message>
         <source>DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds it would take to go from peak to zero. The actual decay may be shorter if sustain is used. </source>
-        <translation type="unfinished"></translation>
+        <translation>DEC (decay) затухание контролирует как быстро огибающая спадает с пикового значения, измеряется в милисекундах, как долго будет идти с пика до нуля. Реальное затухание может быть короче, если используется выдержка.</translation>
     </message>
     <message>
         <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
-        <translation type="unfinished"></translation>
+        <translation>SUS (sustain) выдержка, контролирует уровень огибающей. Затухание фазы не пойдёт ниже этого уровня пока нота удерживается.</translation>
     </message>
     <message>
         <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
-        <translation type="unfinished"></translation>
+        <translation>REL (release) отпуск контролирует как долго нота отпускается, измеряясь в долготе падения от пика до нуля. Реальный отпуск может быть короче, в зависимости от фазы, в которой нота отпущена.</translation>
     </message>
     <message>
         <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
-        <translation type="unfinished"></translation>
+        <translation>Регулятор наклона контролирует кривую или образ огибающей. Значение 0 создаёт прямые подъёмы и спады. Отрицательные величины создают кривые с замедленным началом, быстрым пиком и снова замедленным спадом. Позитивные значения создают кривые которые начинаются и кончаются быстро, но долбше остаются на пиках.</translation>
     </message>
 </context>
 <context>
@@ -4448,7 +4482,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Swap left and right input channel for reflections</source>
-        <translation type="unfinished"></translation>
+        <translation>Поменять вход левого и правого канала для отзвуков</translation>
     </message>
 </context>
 <context>
@@ -4578,7 +4612,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Osc %1 harmonic</source>
-        <translation type="unfinished"></translation>
+        <translation>Осц %1 гармонический</translation>
     </message>
 </context>
 <context>
@@ -4633,8 +4667,8 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
-        <translation>Чтобы открыть этот шаблон в нотном редакторе, дважды на нём щёлкните
-Используйте колёсико мыши для установки громкости отдельного шага</translation>
+        <translation>Чтобы открыть эту мелодию в нотном редакторе, дважды на нём щёлкните
+Используйте колёсико мыши для установки громкости отдельного такта</translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
@@ -4654,11 +4688,11 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Add steps</source>
-        <translation>Добавить шаги</translation>
+        <translation>Добавить такты</translation>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation>Удалить шаги</translation>
+        <translation>Удалить такты</translation>
     </message>
 </context>
 <context>
@@ -4770,14 +4804,14 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Treshold</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Порог</translation>
     </message>
 </context>
 <context>
     <name>PianoRoll</name>
     <message>
         <source>Piano-Roll - no pattern</source>
-        <translation>Нотный редактор - без шаблона</translation>
+        <translation type="unfinished">Нотный редактор - нет мелодии</translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
@@ -4785,7 +4819,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Please open a pattern by double-clicking on it!</source>
-        <translation>Откройте шаблон с помощью двойного щелчка мышью!</translation>
+        <translation>Откройте мелодию с помощью двойного щелчка мышью!</translation>
     </message>
     <message>
         <source>Last note</source>
@@ -4829,135 +4863,135 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Volume: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Громкость %1%</translation>
     </message>
     <message>
         <source>Panning: %1% left</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс: %1% лево</translation>
     </message>
     <message>
         <source>Panning: %1% right</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс: %1% право</translation>
     </message>
     <message>
         <source>Panning: center</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс: центр</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished">Введите новое значение от %1 до %2:</translation>
+        <translation>Введите новое значение от %1 до %2:</translation>
     </message>
 </context>
 <context>
     <name>PianoRollWindow</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Игра/Пауза текущей мелодии (Пробел)</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano</source>
-        <translation type="unfinished">Записать ноты с цифрового музыкального инструмента (MIDI)</translation>
+        <translation>Записать ноты с музыкального инструмента (MIDI)/канала</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
-        <translation type="unfinished">Записать ноты с цифрового музыкального инструмента (MIDI) во время воспроизведения композиции или дорожки Ритм-Басса</translation>
+        <translation>Записать ноты с цифрового музыкального инструмента (MIDI) во время воспроизведения композиции или дорожки Ритм-Баса</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить воспроизведение текущей мелодии (Пробел)</translation>
     </message>
     <message>
         <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation type="unfinished">Нажмите здесь чтобы проиграть текущий шаблон. Это может пригодиться при его редактировании. По окончании шаблона воспроизведение начнётся сначала.</translation>
+        <translation>Нажмите здесь чтобы проиграть текущую мелодию. Это может пригодиться при её редактировании. По окончании мелодии воспроизведение начнётся сначала.</translation>
     </message>
     <message>
         <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation type="unfinished">Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального синтезатора соответствующего канала. Позже вы сможете отредактировать записанный шаблон.</translation>
+        <translation>Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального синтезатора соответствующего канала. Позже вы сможете отредактировать записанную мелодию.</translation>
     </message>
     <message>
         <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
-        <translation type="unfinished">Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального синтезатора соответствующего канала.  Во время записи все ноты записываются в этот шаблон, и вы будете слышать композицию или РБ дорожку на заднем плане.</translation>
+        <translation>Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального синтезатора соответствующего канала.  Во время записи все ноты записываются в эту мелодию, и вы будете слышать композицию или РБ дорожку на заднем плане.</translation>
     </message>
     <message>
         <source>Click here to stop playback of current pattern.</source>
-        <translation type="unfinished">Нажмите здесь, если вы хотите остановить воспроизведение текущего шаблона.</translation>
+        <translation>Нажмите здесь, если вы хотите остановить воспроизведение текущей мелодии.</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished">Режим рисования (Shift+D)</translation>
+        <translation>Режим рисования (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим стирания (Shift+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished">Режим выбора нот (Shift+S)</translation>
+        <translation>Режим выбора нот (Shift+S)</translation>
     </message>
     <message>
         <source>Detune mode (Shift+T)</source>
-        <translation type="unfinished">Режим подстраивания (Shift+T)</translation>
+        <translation>Режим подстраивания (Shift+T)</translation>
     </message>
     <message>
         <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation type="unfinished">Режим рисования нот, в нём вы можете добавлять/перемещать и изменять длительность одиночных нот.  Это режим по умолчанию и используется большую часть времени.
+        <translation>Режим рисования нот, в нём вы можете добавлять/перемещать и изменять длительность одиночных нот.  Это режим по умолчанию и используется большую часть времени.
 Для включения этого режима можно использовать комбинацию клавиш Shift+D, удерживайте Ctrl для временного переключения в режим выбора.</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">Режим стирания. В этом режиме вы можете стирать ноты. Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+        <translation>Режим стирания. В этом режиме вы можете стирать ноты. Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
     </message>
     <message>
         <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished">Режим выделения. В этом режиме можно выделять ноты, можно также удерживать Ctrl в режиме рисования, чтобы можно было на время войти в режим выделения.</translation>
+        <translation>Режим выделения. В этом режиме можно выделять ноты, можно также удерживать Ctrl в режиме рисования, чтобы можно было на время войти в режим выделения.</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">Режим подстройки. В этом режиме можно выбирать ноты для автоматизации их подстраивания. Можно использовать это для переходов нот от одной к другой. Для активации с клавиатуры &lt;Shift+T&gt;.</translation>
+        <translation>Режим подстройки. В этом режиме можно выбирать ноты для автоматизации их подстраивания. Можно использовать это для переходов нот от одной к другой. Для активации с клавиатуры &lt;Shift+T&gt;.</translation>
     </message>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">Переместить выделенные ноты в буфер (Ctrl+X)</translation>
+        <translation>Переместить выделенные ноты в буфер (Ctrl+X)</translation>
     </message>
     <message>
         <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">Копировать выделенные ноты в буфер (Ctrl+X)</translation>
+        <translation>Копировать выделенные ноты в буфер (Ctrl+X)</translation>
     </message>
     <message>
         <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">Вставить ноты из буфера (Ctrl+V)</translation>
+        <translation>Вставить ноты из буфера (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">При нажатии на эту кнопку выделеные ноты будут вырезаны в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+        <translation>При нажатии на эту кнопку выделеные ноты будут вырезаны в буфер. Позже вы можете вставить их в любое место любой мелодии с помощью кнопки &quot;Вставить&quot;.</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+        <translation>При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любой мелодии с помощью кнопки &quot;Вставить&quot;.</translation>
     </message>
     <message>
         <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished">При нажатии на эту кнопку ноты из буфера будут вставлены в первый видимый такт.</translation>
+        <translation>При нажатии на эту кнопку ноты из буфера будут вставлены в первый видимый такт.</translation>
     </message>
     <message>
         <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
-        <translation type="unfinished"></translation>
+        <translation>Этим контролируется масштаб оси. Это может быть полезно для специальных задач. Для обычного редактирования, масштаб следует устанавливать по наименьшей ноте.</translation>
     </message>
     <message>
         <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Q&quot; обозначает квантизацию и контролирует размер нотной сетки и контрольные точки притяжения. С меньшей величиной квантизации, можно рисовать короткие ноты в редаторе нот и более точно контролировать точки в Редакторе Автоматизации.</translation>
     </message>
     <message>
         <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Позволяет выбрть длину новой ноты. &quot;Последняя Нота&quot; значит, что LMMS будет использовать длину ноты, изменённой в последний раз</translation>
     </message>
     <message>
         <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция напрямую связана с контекстным меню на виртуальной клавиатуре слева в нотном редакторе. После того, как выбран масштаб в выпадающем меню, можно кликнуть правой кнопкой в виртуальной клавиатуре и выбрать &quot;Mark Current Scale&quot; (Отметить текущий масштаб). LMMS подсветит все ноты лежащие в выбранном масштабе для выбранной клавиши!</translation>
     </message>
     <message>
         <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Позволяет выбрать аккорд, который LMMS затем сможет нарисовать или подсветить. В этом меню можно найти ниболее популярные аккорды. После того, как вы выбрали аккорд, кликните в любом месте, чтобы поставить его и правым кликом по виртуальной клавиатуре открывается контекстное меню и подсветка аккорда. Для возврата в режим одной ноты нужно выбрать &quot;Без аккорда&quot; в этом выпадающем меню.</translation>
     </message>
 </context>
 <context>
@@ -4989,117 +5023,117 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
-        <translation type="unfinished"></translation>
+        <translation>ЛММС плагин %1 не имеет описания плагина с именем %2!</translation>
     </message>
 </context>
 <context>
     <name>PluginBrowser</name>
     <message>
         <source>Instrument plugins</source>
-        <translation type="unfinished">Инструменты</translation>
+        <translation>Плагины инструментов</translation>
     </message>
     <message>
         <source>Instrument browser</source>
-        <translation type="unfinished">Обзор инструментов</translation>
+        <translation>Обзор инструментов</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation type="unfinished">Вы можете переносить нужные вам инструменты из этой панели в музыкальный, ритм-басс редактор или в существующую дорожку инструмента.</translation>
+        <translation>Вы можете переносить нужные вам инструменты из этой панели в музыкальный, ритм-бас редактор или в существующую дорожку инструмента.</translation>
     </message>
 </context>
 <context>
     <name>ProjectNotes</name>
     <message>
         <source>Project notes</source>
-        <translation type="unfinished">Заметки к проекту</translation>
+        <translation>Заметки к проекту</translation>
     </message>
     <message>
         <source>Put down your project notes here.</source>
-        <translation type="unfinished">Здесь вы можете держать заметки к своему проекту.</translation>
+        <translation>Здесь вы можете держать заметки к своему проекту.</translation>
     </message>
     <message>
         <source>Edit Actions</source>
-        <translation type="unfinished">Правка</translation>
+        <translation>Правка</translation>
     </message>
     <message>
         <source>&amp;Undo</source>
-        <translation type="unfinished">&amp;U Отменить</translation>
+        <translation>&amp;U Отменить</translation>
     </message>
     <message>
         <source>Ctrl+Z</source>
-        <translation type="unfinished">Ctrl+Z</translation>
+        <translation>Ctrl+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
-        <translation type="unfinished">&amp;R Повторить</translation>
+        <translation>&amp;R Повторить</translation>
     </message>
     <message>
         <source>Ctrl+Y</source>
-        <translation type="unfinished">Ctrl+Y</translation>
+        <translation>Ctrl+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation type="unfinished">&amp;C Копировать</translation>
+        <translation>&amp;C Копировать</translation>
     </message>
     <message>
         <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <translation>Ctrl+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation type="unfinished">&amp;t Вырезать</translation>
+        <translation>&amp;t Вырезать</translation>
     </message>
     <message>
         <source>Ctrl+X</source>
-        <translation type="unfinished">Ctrl+X</translation>
+        <translation>Ctrl+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation type="unfinished">&amp;P Вставить</translation>
+        <translation>&amp;P Вставить</translation>
     </message>
     <message>
         <source>Ctrl+V</source>
-        <translation type="unfinished">Ctrl+V</translation>
+        <translation>Ctrl+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
-        <translation type="unfinished">Форматирование</translation>
+        <translation>Форматирование</translation>
     </message>
     <message>
         <source>&amp;Bold</source>
-        <translation type="unfinished">Полу&amp;жирный</translation>
+        <translation>&amp;b Полужирный</translation>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished">Ctrl+B</translation>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
-        <translation type="unfinished">&amp;Курсив</translation>
+        <translation>&amp;i Курсив</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
-        <translation type="unfinished">&amp;Подчеркнуть</translation>
+        <translation>&amp;U Подчеркнутый</translation>
     </message>
     <message>
         <source>Ctrl+U</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
-        <translation type="unfinished">По &amp;левому краю</translation>
+        <translation>&amp;L По левому краю</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
-        <translation type="unfinished">По &amp;центру</translation>
+        <translation>По &amp;центру</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
@@ -5261,7 +5295,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation type="unfinished">Вместо сломанного:</translation>
+        <translation>Вместо сломанного:</translation>
     </message>
     <message>
         <source>Channels In: </source>
@@ -5273,14 +5307,14 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>File: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл: %1</translation>
     </message>
 </context>
 <context>
     <name>RenameDialog</name>
     <message>
         <source>Rename...</source>
-        <translation type="unfinished">Переименовать...</translation>
+        <translation>Переименовать...</translation>
     </message>
 </context>
 <context>
@@ -5327,7 +5361,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все аудио файлы (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
 </context>
 <context>
@@ -5374,7 +5408,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс</translation>
     </message>
 </context>
 <context>
@@ -5393,162 +5427,162 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс</translation>
     </message>
     <message>
         <source>Panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Баланс:</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished">БАЛ</translation>
+        <translation>БАЛ</translation>
     </message>
 </context>
 <context>
     <name>SetupDialog</name>
     <message>
         <source>Setup LMMS</source>
-        <translation type="unfinished">Настройка LMMS</translation>
+        <translation>Настройка LMMS</translation>
     </message>
     <message>
         <source>General settings</source>
-        <translation type="unfinished">Общие параметры</translation>
+        <translation>Общие параметры</translation>
     </message>
     <message>
         <source>BUFFER SIZE</source>
-        <translation type="unfinished">РАЗМЕР БУФЕРА</translation>
+        <translation>РАЗМЕР БУФЕРА</translation>
     </message>
     <message>
         <source>Reset to default-value</source>
-        <translation type="unfinished">Восстановить значение по умолчанию</translation>
+        <translation>Восстановить значение по умолчанию</translation>
     </message>
     <message>
         <source>MISC</source>
-        <translation type="unfinished">РАЗНОЕ</translation>
+        <translation>РАЗНОЕ</translation>
     </message>
     <message>
         <source>Enable tooltips</source>
-        <translation type="unfinished">Включить подсказки</translation>
+        <translation>Включить подсказки</translation>
     </message>
     <message>
         <source>Show restart warning after changing settings</source>
-        <translation type="unfinished">Показывать предупреждение о перезапуске при изменении настроек</translation>
+        <translation>Показывать предупреждение о перезапуске при изменении настроек</translation>
     </message>
     <message>
         <source>Display volume as dBV </source>
-        <translation type="unfinished">Отображать громкости в децибелах (напр.) </translation>
+        <translation>Отображать громкость в децибелах dBV</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
-        <translation type="unfinished">По умолчанию сжимать файлы проектов</translation>
+        <translation>По умолчанию сжимать файлы проектов</translation>
     </message>
     <message>
         <source>One instrument track window mode</source>
-        <translation type="unfinished">Режим окна одной инструментальной дорожки</translation>
+        <translation>Режим окна одной инструментальной дорожки</translation>
     </message>
     <message>
         <source>HQ-mode for output audio-device</source>
-        <translation type="unfinished">Режим высокого качества для вывода звука</translation>
+        <translation>Режим высокого качества для устройства вывода звука</translation>
     </message>
     <message>
         <source>Compact track buttons</source>
-        <translation type="unfinished">Ужать кнопки дорожки</translation>
+        <translation>Ужать кнопки дорожки</translation>
     </message>
     <message>
         <source>Sync VST plugins to host playback</source>
-        <translation type="unfinished">Синхронизировать VST плагины с хостом воспроизведения</translation>
+        <translation>Синхронизировать VST плагины с хостом воспроизведения</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation type="unfinished">Включить обозначение нот в музыкальном редакторе</translation>
+        <translation>Включить обозначение нот в музыкальном редакторе</translation>
     </message>
     <message>
         <source>Enable waveform display by default</source>
-        <translation type="unfinished">Включить отображение формы звуков по умолчанию</translation>
+        <translation>Включить отображение формы звуков по умолчанию</translation>
     </message>
     <message>
         <source>Keep effects running even without input</source>
-        <translation type="unfinished"></translation>
+        <translation>Продолжать работу эффектов даже без входящего сигнала</translation>
     </message>
     <message>
         <source>Create backup file when saving a project</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать запасной файл при сохранении проекта</translation>
     </message>
     <message>
         <source>LANGUAGE</source>
-        <translation type="unfinished"></translation>
+        <translation>ЯЗЫК</translation>
     </message>
     <message>
         <source>Paths</source>
-        <translation type="unfinished">Пути</translation>
+        <translation>Пути</translation>
     </message>
     <message>
         <source>LMMS working directory</source>
-        <translation type="unfinished">Рабочий каталог LMMS</translation>
+        <translation>Рабочий каталог LMMS</translation>
     </message>
     <message>
         <source>VST-plugin directory</source>
-        <translation type="unfinished">Каталог модулей VST</translation>
+        <translation>Каталог модулей VST</translation>
     </message>
     <message>
         <source>Artwork directory</source>
-        <translation type="unfinished">Каталог с элементами оформления</translation>
+        <translation>Каталог с элементами оформления</translation>
     </message>
     <message>
         <source>Background artwork</source>
-        <translation type="unfinished">Фоновое изображение</translation>
+        <translation>Фоновое изображение</translation>
     </message>
     <message>
         <source>FL Studio installation directory</source>
-        <translation type="unfinished">Каталог установки FL Studio</translation>
+        <translation>Каталог установки FL Studio</translation>
     </message>
     <message>
         <source>LADSPA plugin paths</source>
-        <translation type="unfinished">Пути модулей LADSPA</translation>
+        <translation>Пути модулей LADSPA</translation>
     </message>
     <message>
         <source>STK rawwave directory</source>
-        <translation type="unfinished">Каталог STK rawwave</translation>
+        <translation>Каталог STK rawwave</translation>
     </message>
     <message>
         <source>Default Soundfont File</source>
-        <translation type="unfinished">Основной Soundfont файл </translation>
+        <translation>Основной Soundfont файл </translation>
     </message>
     <message>
         <source>Performance settings</source>
-        <translation type="unfinished">Параметры производительности</translation>
+        <translation>Параметры производительности</translation>
     </message>
     <message>
         <source>UI effects vs. performance</source>
-        <translation type="unfinished">Визуальные эффекты/производительность</translation>
+        <translation>Визуальные эффекты/производительность</translation>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished">Плавная прокрутка в музыкальном редакторе</translation>
+        <translation>Плавная прокрутка в музыкальном редакторе</translation>
     </message>
     <message>
         <source>Enable auto save feature</source>
-        <translation type="unfinished">Включить функцию авто-сохранения</translation>
+        <translation>Включить функцию авто-сохранения</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
-        <translation type="unfinished">Показывать указатель воспроизведения в процессоре аудио файлов</translation>
+        <translation>Показывать указатель воспроизведения в процессоре аудио файлов (AFP)</translation>
     </message>
     <message>
         <source>Audio settings</source>
-        <translation type="unfinished">Параметры звука</translation>
+        <translation>Параметры звука</translation>
     </message>
     <message>
         <source>AUDIO INTERFACE</source>
-        <translation type="unfinished">ЗВУКОВАЯ СИСТЕМА</translation>
+        <translation>ЗВУКОВАЯ СИСТЕМА</translation>
     </message>
     <message>
         <source>MIDI settings</source>
-        <translation type="unfinished">Параметры MIDI</translation>
+        <translation>Параметры MIDI</translation>
     </message>
     <message>
         <source>MIDI INTERFACE</source>
-        <translation type="unfinished">ИНТЕРФЕЙС MIDI</translation>
+        <translation>MIDI СИСТЕМА</translation>
     </message>
     <message>
         <source>OK</source>
@@ -5556,65 +5590,65 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Отменить</translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <source>Restart LMMS</source>
-        <translation type="unfinished">Перезапустите LMMS</translation>
+        <translation>Перезапустить LMMS</translation>
     </message>
     <message>
         <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
-        <translation type="unfinished">Учтите, что большинство настроек не вступят в силу до перезапуска программы!</translation>
+        <translation>Учтите, что большинство настроек не вступят в силу до перезапуска ЛММС!</translation>
     </message>
     <message>
         <source>Frames: %1
 Latency: %2 ms</source>
-        <translation type="unfinished">Фрагментов: %1
+        <translation>Фрагментов: %1
 Отклик: %2</translation>
     </message>
     <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation type="unfinished">Здесь вы можете настроить размер внутреннего звукового буфера LMMS. Меньшие значения дают меньшее время отклика программы, но повышают потребление ресурсов - это особенно заметно на старых машинах и системах, ядро которых не поддерживает приоритета реального времени. Если наблюдается прерывистый звук, попробуйте увеличить размер буфера.</translation>
+        <translation>Здесь вы можете настроить размер внутреннего звукового буфера LMMS. Меньшие значения дают меньшее время отклика программы, но повышают потребление ресурсов - это особенно заметно на старых машинах и системах, ядро которых не поддерживает приоритета реального времени. Если наблюдается прерывистый звук, попробуйте увеличить размер буфера.</translation>
     </message>
     <message>
         <source>Choose LMMS working directory</source>
-        <translation type="unfinished">Выбор рабочего каталога LMMS</translation>
+        <translation>Выбор рабочего каталога LMMS</translation>
     </message>
     <message>
         <source>Choose your VST-plugin directory</source>
-        <translation type="unfinished">Выбор своего каталога для модулей VST</translation>
+        <translation>Выбор своего каталога для модулей VST</translation>
     </message>
     <message>
         <source>Choose artwork-theme directory</source>
-        <translation type="unfinished">Выбор каталога с темой оформления для LMMS</translation>
+        <translation>Выбор каталога с темой оформления для LMMS</translation>
     </message>
     <message>
         <source>Choose FL Studio installation directory</source>
-        <translation type="unfinished">Выбор каталога установленной FL Studio</translation>
+        <translation>Выбор каталога установленной FL Studio</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
-        <translation type="unfinished">Выбор каталога с модулями LADSPA </translation>
+        <translation>Выбор каталога с модулями LADSPA </translation>
     </message>
     <message>
         <source>Choose STK rawwave directory</source>
-        <translation type="unfinished">Выбор каталога STK rawwave</translation>
+        <translation>Выбор каталога STK rawwave</translation>
     </message>
     <message>
         <source>Choose default SoundFont</source>
-        <translation type="unfinished">Выбрать главный SoundFont</translation>
+        <translation>Выбрать главный SoundFont</translation>
     </message>
     <message>
         <source>Choose background artwork</source>
-        <translation type="unfinished">Выбрать фоновое изображение</translation>
+        <translation>Выбрать фоновое изображение</translation>
     </message>
     <message>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
-        <translation type="unfinished">Пожалуйста, выберите звуковую систему. В зависимости от конфигурации во время компилирования программы, вы можете использовать ALSA, JACK, OSS и другие. В нижней части окна настройки можно задать специфические параметры выбранной системы.</translation>
+        <translation>Пожалуйста, выберите желаемую звуковую систему. В зависимости от конфигурации во время компилирования программы вы можете использовать ALSA, JACK, OSS и другие. В нижней части окна настройки можно задать специфические параметры выбранной системы.</translation>
     </message>
     <message>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
-        <translation type="unfinished">Пожалуйста, выберите интерфейс MIDI. В зависимости от конфигурации во время компилирования программы, вы можете использовать ALSA, OSS и другие. В нижней части окна настройки можно задать специфические параметры выбранного интерфейса.</translation>
+        <translation>Пожалуйста, выберите интерфейс MIDI. В зависимости от конфигурации во время компилирования программы вы можете использовать ALSA, OSS и другие. В нижней части окна настройки можно задать специфические параметры выбранного интерфейса.</translation>
     </message>
 </context>
 <context>
@@ -5633,63 +5667,63 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Project saved</source>
-        <translation type="unfinished">Проект сохранён</translation>
+        <translation>Проект сохранён</translation>
     </message>
     <message>
         <source>The project %1 is now saved.</source>
-        <translation type="unfinished">Проект %1 сохранён.</translation>
+        <translation>Проект %1 сохранён.</translation>
     </message>
     <message>
         <source>Project NOT saved.</source>
-        <translation type="unfinished">Проект НЕ СОХРАНЁН.</translation>
+        <translation>Проект НЕ СОХРАНЁН.</translation>
     </message>
     <message>
         <source>The project %1 was not saved!</source>
-        <translation type="unfinished">Проект %1 не сохранён!</translation>
+        <translation>Проект %1 не сохранён!</translation>
     </message>
     <message>
         <source>Import file</source>
-        <translation type="unfinished">Импорт файла</translation>
+        <translation>Импорт файла</translation>
     </message>
     <message>
         <source>MIDI sequences</source>
-        <translation type="unfinished">MiDi последовательности</translation>
+        <translation>MiDi последовательности</translation>
     </message>
     <message>
         <source>FL Studio projects</source>
-        <translation type="unfinished">FL Studio проекты</translation>
+        <translation>FL Studio проекты</translation>
     </message>
     <message>
         <source>Hydrogen projects</source>
-        <translation type="unfinished">Hydrogen проекты</translation>
+        <translation>Hydrogen проекты</translation>
     </message>
     <message>
         <source>All file types</source>
-        <translation type="unfinished">Все типы файлов</translation>
+        <translation>Все типы файлов</translation>
     </message>
     <message>
         <source>Empty project</source>
-        <translation type="unfinished">Проект пуст</translation>
+        <translation>Пустой проект</translation>
     </message>
     <message>
         <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
-        <translation type="unfinished">Проект ничего не содержит, так что и экспортировать нечего. Сначала добавьте хотя бы одну дорожку с помощью музыкального редактора!</translation>
+        <translation>Проект ничего не содержит, так что и экспортировать нечего. Сначала добавьте хотя бы одну дорожку в музыкальном редакторе!</translation>
     </message>
     <message>
         <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished">Выберите папку для записи экспортированных дорожек...</translation>
+        <translation>Выберите папку для записи экспортированных дорожек...</translation>
     </message>
     <message>
         <source>untitled</source>
-        <translation type="unfinished">Неназванное</translation>
+        <translation>Неназванное</translation>
     </message>
     <message>
         <source>Select file for project-export...</source>
-        <translation type="unfinished">Выбор файла для экспорта проекта...</translation>
+        <translation>Выбор файла для экспорта проекта...</translation>
     </message>
     <message>
         <source>The following errors occured while loading: </source>
-        <translation type="unfinished"></translation>
+        <translation>Следующие ошибки возникли при загрузке:</translation>
     </message>
 </context>
 <context>
@@ -5769,84 +5803,84 @@ Latency: %2 ms</source>
     <name>SongEditorWindow</name>
     <message>
         <source>Song-Editor</source>
-        <translation type="unfinished">Музыкальный редактор</translation>
+        <translation>Музыкальный редактор</translation>
     </message>
     <message>
         <source>Play song (Space)</source>
-        <translation type="unfinished">Начать воспроизведение (Пробел)</translation>
+        <translation>Начать воспроизведение (Пробел)</translation>
     </message>
     <message>
         <source>Record samples from Audio-device</source>
-        <translation type="unfinished">Записать сэмпл со звукового устройства</translation>
+        <translation>Записать сэмпл со звукового устройства</translation>
     </message>
     <message>
         <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation type="unfinished">Записать сэмпл с аудио-устройства во время воспроизведения в музыкальном или ритм/басс редакторе</translation>
+        <translation>Записать сэмпл с аудио-устройства во время воспроизведения в музыкальном или ритм/бас редакторе</translation>
     </message>
     <message>
         <source>Stop song (Space)</source>
-        <translation type="unfinished">Остановить воспроизведение (Пробел)</translation>
+        <translation>Остановить воспроизведение (Пробел)</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить ритм/бас</translation>
     </message>
     <message>
         <source>Add sample-track</source>
-        <translation type="unfinished">Добавить дорожку записи</translation>
+        <translation>Добавить дорожку записи</translation>
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation type="unfinished">Добавить дорожку автоматизации</translation>
+        <translation>Добавить дорожку автоматизации</translation>
     </message>
     <message>
         <source>Draw mode</source>
-        <translation type="unfinished">Режим рисования</translation>
+        <translation>Режим рисования</translation>
     </message>
     <message>
         <source>Edit mode (select and move)</source>
-        <translation type="unfinished">Правка (выделение/перемещение)</translation>
+        <translation>Правка (выделение/перемещение)</translation>
     </message>
     <message>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation type="unfinished">Нажмите, чтобы прослушать созданную мелодию. Воспроизведение начнётся с позиции курсора (зелёный треугольник); вы можете двигать его во время проигрывания.</translation>
+        <translation>Нажмите, чтобы прослушать созданную мелодию. Воспроизведение начнётся с позиции курсора (зелёный треугольник); вы можете двигать его во время проигрывания.</translation>
     </message>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation type="unfinished">Нажмите сюда, если вы хотите остановить воспроизведение мелодии. Курсор при этом будет установлен на начало композиции.</translation>
+        <translation>Нажмите сюда, если вы хотите остановить воспроизведение мелодии. Курсор при этом будет установлен на начало композиции.</translation>
     </message>
 </context>
 <context>
     <name>SpectrumAnalyzerControlDialog</name>
     <message>
         <source>Linear spectrum</source>
-        <translation type="unfinished">Линейный спектр</translation>
+        <translation>Линейный спектр</translation>
     </message>
     <message>
         <source>Linear Y axis</source>
-        <translation type="unfinished">Линейная ось ординат</translation>
+        <translation>Линейная ось ординат (Y)</translation>
     </message>
 </context>
 <context>
     <name>SpectrumAnalyzerControls</name>
     <message>
         <source>Linear spectrum</source>
-        <translation type="unfinished">Линейный спектр</translation>
+        <translation>Линейный спектр</translation>
     </message>
     <message>
         <source>Linear Y axis</source>
-        <translation type="unfinished">Линейная ось ординат</translation>
+        <translation>Линейная ось ординат (Y)</translation>
     </message>
     <message>
         <source>Channel mode</source>
-        <translation type="unfinished">Режим канала</translation>
+        <translation>Режим канала</translation>
     </message>
 </context>
 <context>
     <name>TabWidget</name>
     <message>
         <source>Settings for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки для %1</translation>
     </message>
 </context>
 <context>
@@ -5935,46 +5969,46 @@ Latency: %2 ms</source>
     <name>TimeLineWidget</name>
     <message>
         <source>Enable/disable auto-scrolling</source>
-        <translation type="unfinished">Вкл/выкл автопрокрутку</translation>
+        <translation>Вкл/выкл автопрокрутку</translation>
     </message>
     <message>
         <source>Enable/disable loop-points</source>
-        <translation type="unfinished">Вкл/выкл точки кольцевания</translation>
+        <translation>Вкл/выкл точки петли</translation>
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="unfinished">После остановки переходить к началу</translation>
+        <translation>После остановки переходить к началу</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="unfinished">После остановки переходить к месту, с которого началось воспроизведение</translation>
+        <translation>После остановки переходить к месту, с которого началось воспроизведение</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
-        <translation type="unfinished">Оставаться на месте остановки</translation>
+        <translation>Оставаться на месте остановки</translation>
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished">Подсказка</translation>
+        <translation>Подсказка</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">Нажмите &lt;Ctrl&gt;, чтобы убрать прилипание точек цикла</translation>
+        <translation>Нажмите &lt;Ctrl&gt;, чтобы убрать прилипание точек петли.</translation>
     </message>
     <message>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">Зажмите &lt;Shift&gt; чтобы сдвинуть начало точек цикла; Нажмите &lt;Ctrl&gt;, чтобы убрать прилипание точек цикла</translation>
+        <translation>Зажмите &lt;Shift&gt; чтобы сдвинуть начало точек петли; Нажмите &lt;Ctrl&gt;, чтобы убрать прилипание точек петли.</translation>
     </message>
 </context>
 <context>
     <name>Track</name>
     <message>
         <source>Muted</source>
-        <translation type="unfinished">Тихо</translation>
+        <translation>Тихо</translation>
     </message>
     <message>
         <source>Solo</source>
-        <translation type="unfinished">Соло</translation>
+        <translation>Соло</translation>
     </message>
 </context>
 <context>
@@ -6024,101 +6058,101 @@ Please make sure you have read-permission to the file and the directory containi
     <name>TrackContentObject</name>
     <message>
         <source>Muted</source>
-        <translation type="unfinished">Тихо</translation>
+        <translation>Тихо</translation>
     </message>
 </context>
 <context>
     <name>TrackContentObjectView</name>
     <message>
         <source>Current position</source>
-        <translation type="unfinished">Позиция</translation>
+        <translation>Текущая позиция</translation>
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished">Подсказка</translation>
+        <translation>Подсказка</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation type="unfinished">Нажмите &lt;Ctrl&gt; и перетащите, чтобы создать копию.</translation>
+        <translation>Нажмите &lt;Ctrl&gt; и тащите мышью, чтобы создать копию.</translation>
     </message>
     <message>
         <source>Current length</source>
-        <translation type="unfinished">Длительность</translation>
+        <translation>Текущая длительность</translation>
     </message>
     <message>
         <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation type="unfinished">Для свободного изменения размера нажмите &lt;Ctrl&gt;.</translation>
+        <translation>Для свободного изменения размера нажмите &lt;Ctrl&gt;.</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
-        <translation type="unfinished">%1:%2 (от %3:%4 до %5:%6)</translation>
+        <translation>%1:%2 (от %3:%4 до %5:%6)</translation>
     </message>
     <message>
         <source>Delete (middle mousebutton)</source>
-        <translation type="unfinished">Удалить (средняя кнопка мыши)</translation>
+        <translation>Удалить (средняя кнопка мыши)</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished">Вырезать</translation>
+        <translation>Вырезать</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Копировать</translation>
+        <translation>Копировать</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished">Вставить</translation>
+        <translation>Вставить</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished"></translation>
+        <translation>Тихо/громко (&lt;Ctrl&gt; + middle click)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished">Зажмите &lt;Сtrl&gt; и нажимайте мышь во время движения, чтобы начать новую переброску.</translation>
+        <translation>Зажмите &lt;Сtrl&gt; и нажимайте мышь во время движения, чтобы начать новую переброску.</translation>
     </message>
     <message>
         <source>Actions for this track</source>
-        <translation type="unfinished">Действия для этой дорожки</translation>
+        <translation>Действия для этой дорожки</translation>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished">Заглушить</translation>
+        <translation>Тихо</translation>
     </message>
     <message>
         <source>Solo</source>
-        <translation type="unfinished">Соло</translation>
+        <translation>Соло</translation>
     </message>
     <message>
         <source>Mute this track</source>
-        <translation type="unfinished">Отключить дорожку</translation>
+        <translation>Заглушить эту дорожку</translation>
     </message>
     <message>
         <source>Clone this track</source>
-        <translation type="unfinished">Клонировать дорожку</translation>
+        <translation>Клонировать дорожку</translation>
     </message>
     <message>
         <source>Remove this track</source>
-        <translation type="unfinished">Удалить дорожку</translation>
+        <translation>Удалить дорожку</translation>
     </message>
     <message>
         <source>Clear this track</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить эту дорожку</translation>
     </message>
     <message>
         <source>FX %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>ЭФ %1: %2</translation>
     </message>
     <message>
         <source>Turn all recording on</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить всё на запись</translation>
     </message>
     <message>
         <source>Turn all recording off</source>
-        <translation type="unfinished"></translation>
+        <translation>Выключить всю запись</translation>
     </message>
 </context>
 <context>
@@ -6188,8 +6222,8 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>полутон[а,ов]</translation>
     </message>
     <message>
-        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 12 semitones (1 octave) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Грубая регулировка подстройки осциллятора %1. Возможна подстройка до 12 полутонов (до одной октавы) вверх и вниз. Полезно для создания аккордов.</translation>
+        <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
+        <translation>Грубая регулировка подстройки осциллятора %1. Возможна подстройка до 24 полутонов (до 2 октавы) вверх и вниз. Полезно для создания аккордов.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -6370,11 +6404,11 @@ Please make sure you have read-permission to the file and the directory containi
     <name>VisualizationWidget</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
-        <translation type="unfinished">Нажмите, чтобы включить/выключить визуализацию главного вывода</translation>
+        <translation>Нажмите, чтобы включить/выключить визуализацию главного вывода</translation>
     </message>
     <message>
         <source>Click to enable</source>
-        <translation type="unfinished">Нажать для включения</translation>
+        <translation>Нажать для включения</translation>
     </message>
 </context>
 <context>
@@ -6480,11 +6514,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Please wait while loading VST plugin...</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, подождите пока грузится VST плагин...</translation>
     </message>
     <message>
         <source>The VST plugin %1 could not be loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST плагин %1 не может быть загружен.</translation>
     </message>
 </context>
 <context>
@@ -6603,7 +6637,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Selected graph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбранный граф</translation>
     </message>
 </context>
 <context>
@@ -6630,15 +6664,15 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Modulate amplitude of A1 with output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать амплитуду A1 сигналом с A2</translation>
     </message>
     <message>
         <source>Ring-modulate A1 and A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Кольцевая модуляция А1 и А2</translation>
     </message>
     <message>
         <source>Modulate phase of A1 with output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать фазу A1 сигналом с A2</translation>
     </message>
     <message>
         <source>Mix output of B2 to B1</source>
@@ -6646,19 +6680,19 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Modulate amplitude of B1 with output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать амплитуду B1 сигналом с B2</translation>
     </message>
     <message>
         <source>Ring-modulate B1 and B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Кольцевая модуляция B1 и B2</translation>
     </message>
     <message>
         <source>Modulate phase of B1 with output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>Модулировать фазу B1 сигналом с B2</translation>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
-        <translation type="unfinished">Здесь вы можете рисовать собственный сигнал.</translation>
+        <translation>Здесь вы можете рисовать собственный сигнал передвигая зажатой мышью по этому графу.</translation>
     </message>
     <message>
         <source>Load waveform</source>
@@ -6666,11 +6700,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click to load a waveform from a sample file</source>
-        <translation type="unfinished"></translation>
+        <translation>Кликнуть для загрузки формы звука из файла с образцом</translation>
     </message>
     <message>
         <source>Phase left</source>
-        <translation type="unfinished"></translation>
+        <translation>Фаза слева</translation>
     </message>
     <message>
         <source>Click to shift phase by -15 degrees</source>
@@ -6678,7 +6712,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Phase right</source>
-        <translation type="unfinished"></translation>
+        <translation>Фаза справа</translation>
     </message>
     <message>
         <source>Click to shift phase by +15 degrees</source>
@@ -6686,7 +6720,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished">Нормализовать</translation>
+        <translation>Нормализовать</translation>
     </message>
     <message>
         <source>Click to normalize</source>
@@ -6702,7 +6736,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished">Сгладить</translation>
+        <translation>Сгладить</translation>
     </message>
     <message>
         <source>Click to smooth</source>
@@ -6710,7 +6744,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished">Синусоида</translation>
+        <translation>Синусоида</translation>
     </message>
     <message>
         <source>Click for sine wave</source>
@@ -6984,7 +7018,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Input gain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Входная мощность:</translation>
     </message>
     <message>
         <source>OUTPUT</source>
@@ -6992,7 +7026,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Output gain:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выходная мощность:</translation>
     </message>
     <message>
         <source>ATTACK</source>
@@ -7000,7 +7034,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Peak attack time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Время пиковой атаки:</translation>
     </message>
     <message>
         <source>RELEASE</source>
@@ -7008,7 +7042,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Peak release time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Время отпуска пика:</translation>
     </message>
     <message>
         <source>Reset waveform</source>
@@ -7016,7 +7050,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь, чтобы скинуть граф волны обратно по умолчанию</translation>
     </message>
     <message>
         <source>Smooth waveform</source>
@@ -7024,7 +7058,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here to apply smoothing to wavegraph</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь, чтобы применить сглаживание графа волны </translation>
     </message>
     <message>
         <source>Increase wavegraph amplitude by 1dB</source>
@@ -7032,7 +7066,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here to increase wavegraph amplitude by 1dB</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь, чтобы увеличить амплитуду графа волны на 1дБ</translation>
     </message>
     <message>
         <source>Decrease wavegraph amplitude by 1dB</source>
@@ -7040,7 +7074,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here to decrease wavegraph amplitude by 1dB</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите здесь, чтобы снизить амплитуду графа волны на 1дБ</translation>
     </message>
     <message>
         <source>Stereomode Maximum</source>
@@ -7048,7 +7082,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Process based on the maximum of both stereo channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Процесс основанный на максимуме от обоих каналов</translation>
     </message>
     <message>
         <source>Stereomode Average</source>
@@ -7056,7 +7090,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Process based on the average of both stereo channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Процесс основанный на средней обоих каналов</translation>
     </message>
     <message>
         <source>Stereomode Unlinked</source>
@@ -7064,7 +7098,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Process each stereo channel independently</source>
-        <translation type="unfinished"></translation>
+        <translation>Обрабатывает каждый стерео канал независимо</translation>
     </message>
 </context>
 <context>
@@ -7227,7 +7261,7 @@ Analysis Tools are plugins for which only input channels were identified.
 Don&apos;t Knows are plugins for which no input or output channels were identified.
 
 Double clicking any of the plugins will bring up information on the ports.</source>
-        <translation type="unfinished">В этом окне показана информация обо всех модулях LADSPA, которые обнаружила LMMS. Они разделены на пять категорий, в зависимости от названий и типов портов.
+        <translation>В этом окне показана информация обо всех модулях LADSPA, которые обнаружила LMMS. Они разделены на пять категорий, в зависимости от названий и типов портов.
 
 Доступные эффекты — это те, которые могут быть использоаны в LMMS. Чтобы эффект LADSPA мог быть использован, он должен, во-первых, быть собственно эффектом, т. е. иметь как входные так и выходные каналы. LMMS в качестве входного канала воспринимает аудиопорт, содержащий в названии „in“, а выходные узнаёт по подстроке „out“. Для использования в LMMS число входных каналов должно совпадать с числом выходных, и эффект должен иметь возможность использования в реальном времени.
 
@@ -7239,7 +7273,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
 
 Неизвестные — модули, у которых не было обнаружено ни входных, ни выходных каналов.
 
-Двойной щелчок лувой кнопкой мыши по модулю даст информацию о его портах.</translation>
+Двойной щелчок левой кнопкой мыши по модулю даст информацию о его портах.</translation>
     </message>
     <message>
         <source>Type:</source>
@@ -7472,7 +7506,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for bandlimited saw wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажать здесь для пилообразной волны с ограниченной полосой.</translation>
     </message>
     <message>
         <source>Bandlimited square wave</source>
@@ -7480,7 +7514,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for bandlimited square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажать здесь для квадратной волны с ограниченной полосой.</translation>
     </message>
     <message>
         <source>Bandlimited triangle wave</source>
@@ -7488,7 +7522,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for bandlimited triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажать здесь для треуголной волны с ограниченной полосой.</translation>
     </message>
     <message>
         <source>Bandlimited moog saw wave</source>
@@ -7496,7 +7530,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for bandlimited moog saw wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажать здесь для пилообразной муг (moog) волны с ограниченной полосой.</translation>
     </message>
 </context>
 <context>
@@ -8091,23 +8125,23 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>The distortion knob adds distortion to the output of the instrument. </source>
-        <translation type="unfinished"></translation>
+        <translation>Дисторшн добавляет искажения к выводу инструмента.</translation>
     </message>
     <message>
         <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
-        <translation type="unfinished"></translation>
+        <translation>Регулятор громкости вывода инструмента, суммируется с регулятором громкости окна инструмента.</translation>
     </message>
     <message>
         <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
-        <translation type="unfinished"></translation>
+        <translation>Кнопка рандомизации случайно устанавливает все регуляторы, кроме гармоник, основной громкости и регулятора искажений (дисторшн).</translation>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Осц %1 стерео расстройка</translation>
     </message>
     <message>
         <source>Osc %1 harmonic:</source>
-        <translation type="unfinished"></translation>
+        <translation>Осц %1 гармоника:</translation>
     </message>
 </context>
 <context>
@@ -8237,11 +8271,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Length of each step in sweep:</source>
-        <translation>Длина каждого шага в развёртке:</translation>
+        <translation type="unfinished">Длина каждого такта в развёртке:</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation>Длина каждого шага в развёртке</translation>
+        <translation type="unfinished">Длина каждого такта в развёртке</translation>
     </message>
     <message>
         <source>Wave pattern duty</source>
@@ -8369,7 +8403,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>The delay between step change</source>
-        <translation>Задержка между изменениями шага</translation>
+        <translation>Задержка между изменениями такта</translation>
     </message>
     <message>
         <source>Draw the wave here</source>
@@ -8470,19 +8504,19 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Monstrous 3-oscillator synth with modulation matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Монстро 3-осциляторный синт с матрицей модуляции</translation>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation type="unfinished"></translation>
+        <translation>Три мощных осциллятора, которые можно модулировать несколькими способами</translation>
     </message>
     <message>
         <source>A native amplifier plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>Родной плагин усилителя</translation>
     </message>
     <message>
         <source>Carla Rack Instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>Карла инструментальная стойка</translation>
     </message>
     <message>
         <source>4-oscillator modulatable wavetable synth</source>
@@ -8490,11 +8524,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>plugin for waveshaping</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин для сглаживания волн</translation>
     </message>
     <message>
         <source>Boost your bass the fast and simple way</source>
-        <translation type="unfinished"></translation>
+        <translation>Накачай свой бас быстро и просто</translation>
     </message>
     <message>
         <source>Versatile drum synthesizer</source>
@@ -8546,7 +8580,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A native eq plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>Родной плагин эквалайзера</translation>
     </message>
     <message>
         <source>A 4-band Crossover Equalizer</source>
@@ -8568,12 +8602,12 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PulseAudio (bad latency!)</source>
-        <translation type="unfinished"></translation>
+        <source>PulseAudio</source>
+        <translation>PulseAudio (большая задержка!)</translation>
     </message>
     <message>
         <source>Dummy (no MIDI support)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dummy (без поддержки MIDI)</translation>
     </message>
     <message>
         <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
@@ -8585,7 +8619,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Dummy (no sound output)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dummy (без вывода звука)</translation>
     </message>
     <message>
         <source>ALSA (Advanced Linux Sound Architecture)</source>
@@ -8660,7 +8694,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A soundfont %1 could not be loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Soundfont %1 не удаётся загрузить.</translation>
     </message>
 </context>
 <context>
@@ -9283,19 +9317,19 @@ The LED in the lower right corner of the waveform editor determines whether the 
     <name>waveShaperControlDialog</name>
     <message>
         <source>INPUT</source>
-        <translation type="unfinished"></translation>
+        <translation>ВХОД</translation>
     </message>
     <message>
         <source>Input gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Входная мощность:</translation>
     </message>
     <message>
         <source>OUTPUT</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <source>Output gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Выходная мощность:</translation>
     </message>
     <message>
         <source>Reset waveform</source>
@@ -9303,7 +9337,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить граф волны обратно по умолчанию</translation>
     </message>
     <message>
         <source>Smooth waveform</source>
@@ -9311,7 +9345,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Click here to apply smoothing to wavegraph</source>
-        <translation type="unfinished"></translation>
+        <translation>Применить сглаживание к графу волны</translation>
     </message>
     <message>
         <source>Increase graph amplitude by 1dB</source>
@@ -9319,7 +9353,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Click here to increase wavegraph amplitude by 1dB</source>
-        <translation type="unfinished"></translation>
+        <translation>Повыситьить амплитуду графа волны на 1дБ</translation>
     </message>
     <message>
         <source>Decrease graph amplitude by 1dB</source>
@@ -9327,7 +9361,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Click here to decrease wavegraph amplitude by 1dB</source>
-        <translation type="unfinished"></translation>
+        <translation>Снизить амплитуду графа волны на 1дБ</translation>
     </message>
     <message>
         <source>Clip input</source>
@@ -9335,18 +9369,18 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Clip input signal to 0dB</source>
-        <translation type="unfinished"></translation>
+        <translation>Срезать входной сигнал до 0дБ</translation>
     </message>
 </context>
 <context>
     <name>waveShaperControls</name>
     <message>
         <source>Input gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Входная мощность</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Выходная мощность</translation>
     </message>
 </context>
 </TS>
