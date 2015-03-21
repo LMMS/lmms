@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Tool,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;

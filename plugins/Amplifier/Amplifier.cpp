@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;

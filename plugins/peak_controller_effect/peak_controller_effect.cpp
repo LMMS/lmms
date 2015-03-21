@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
