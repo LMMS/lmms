@@ -34,7 +34,7 @@
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

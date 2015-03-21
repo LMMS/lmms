@@ -40,7 +40,7 @@
 #include "templates.h"
 #include "audio_port.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 

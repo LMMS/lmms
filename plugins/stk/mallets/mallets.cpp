@@ -32,11 +32,12 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

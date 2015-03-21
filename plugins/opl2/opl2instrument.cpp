@@ -57,7 +57,7 @@
 #include "opl.h"
 #include "temuopl.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "math.h"
 #include "debug.h"
 

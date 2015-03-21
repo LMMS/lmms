@@ -38,7 +38,7 @@
 #include "TabBar.h"
 #include "TabButton.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 

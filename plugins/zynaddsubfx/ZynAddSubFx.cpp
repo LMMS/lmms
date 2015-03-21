@@ -32,6 +32,7 @@
 #include <QPushButton>
 
 #include "ZynAddSubFx.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
@@ -44,7 +45,7 @@
 #include "LocalZynAddSubFx.h"
 #include "ControllerConnection.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 

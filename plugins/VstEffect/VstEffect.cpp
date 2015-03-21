@@ -29,7 +29,7 @@
 #include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

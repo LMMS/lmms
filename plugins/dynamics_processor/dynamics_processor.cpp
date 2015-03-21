@@ -28,7 +28,7 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {

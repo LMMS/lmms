@@ -26,16 +26,10 @@
 #include <QImage>
 #include <QHash>
 #include <QImageReader>
-#include <QList>
 #include <QResource>
 #include "embed.h"
-#include "ConfigManager.h"
 
-#ifndef PLUGIN_NAME
 namespace embed
-#else
-namespace PLUGIN_NAME
-#endif
 {
 
 namespace
@@ -44,7 +38,7 @@ namespace
 }
 
 
-QPixmap getIconPixmap( const char * pixmapName, int width, int height )
+QPixmap getIconPixmap(const QString& pixmapName, int width, int height )
 {
 	// Return cached pixmap
 	QPixmap cached = s_pixmapCache.value( pixmapName );
@@ -53,12 +47,7 @@ QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 		return cached;
 	}
 
-#ifdef PLUGIN_NAME
-	QString name(QString("artwork:%1/%2").arg(STRINGIFY(PLUGIN_NAME), pixmapName));
-#else
-	QString name(QString("artwork:%1").arg(pixmapName));
-#endif
-	QImageReader reader(name);
+	QImageReader reader(QString("artwork:%1").arg(pixmapName));
 
 	if (width > 0 && height > 0)
 	{
@@ -68,7 +57,7 @@ QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 	QImage image = reader.read();
 	if (image.isNull())
 	{
-		qWarning().nospace() << "Error loading icon pixmap " << name << ": " <<
+		qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " <<
 								reader.errorString().toLocal8Bit().data();
 		return QPixmap(1,1);
 	}

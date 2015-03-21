@@ -25,7 +25,7 @@
 
 #include "stereo_matrix.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

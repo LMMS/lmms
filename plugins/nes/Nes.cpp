@@ -35,7 +35,7 @@
 #include "interpolation.h"
 #include "Oscillator.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {

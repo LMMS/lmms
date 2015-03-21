@@ -25,7 +25,7 @@
 
 #include "DualFilter.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "BasicFilters.h"
 
 

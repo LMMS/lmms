@@ -32,6 +32,7 @@
 #include <samplerate.h>
 
 #include "audio_file_processor.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Song.h"
 #include "InstrumentTrack.h"
@@ -42,7 +43,7 @@
 #include "StringPairDrag.h"
 #include "DataFile.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

@@ -40,7 +40,7 @@
 #include "Song.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {

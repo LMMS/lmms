@@ -26,7 +26,7 @@
 
 #include "waveshaper.h"
 #include "lmms_math.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "interpolation.h"
 
 

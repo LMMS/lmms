@@ -25,7 +25,7 @@
 
 #include "stereo_enhancer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

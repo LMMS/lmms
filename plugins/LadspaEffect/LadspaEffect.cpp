@@ -41,7 +41,7 @@
 #include "ValueBuffer.h"
 #include "Song.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

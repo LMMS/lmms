@@ -35,7 +35,7 @@
 namespace embed
 {
 
-QPixmap EXPORT getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
+QPixmap EXPORT getIconPixmap( const QString&  _name, int _w = -1, int _h = -1 );
 QString EXPORT getText( const char * _name );
 
 }
@@ -45,7 +45,10 @@ QString EXPORT getText( const char * _name );
 namespace PLUGIN_NAME
 {
 
-QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
+inline QPixmap getIconPixmap( const QString&  _name, int _w = -1, int _h = -1 )
+{
+	return embed::getIconPixmap(QString("%1/%2").arg(STRINGIFY(PLUGIN_NAME), _name), _w, _h);
+}
 //QString getText( const char * _name );
 
 }

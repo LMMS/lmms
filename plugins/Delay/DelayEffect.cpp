@@ -24,7 +24,7 @@
 
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "interpolation.h"
 
 

@@ -50,7 +50,7 @@
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

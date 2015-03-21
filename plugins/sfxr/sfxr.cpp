@@ -50,7 +50,7 @@ float frnd(float range)
 #include "MidiEvent.h"
 #include "MidiTime.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
