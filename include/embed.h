@@ -35,14 +35,6 @@
 namespace embed
 {
 
-struct descriptor
-{
-	int size;
-	const unsigned char * data;
-	const char * name;
-} ;
-
-
 QPixmap EXPORT getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
 QString EXPORT getText( const char * _name );
 
