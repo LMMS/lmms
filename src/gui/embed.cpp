@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <QDebug>
 #include <QImage>
 #include <QHash>
 #include <QImageReader>
@@ -46,67 +46,38 @@ namespace
 
 QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 {
-	if( width == -1 || height == -1 )
+	// Return cached pixmap
+	QPixmap cached = s_pixmapCache.value( pixmapName );
+	if( !cached.isNull() )
 	{
-		// Return cached pixmap
-		QPixmap cached = s_pixmapCache.value( pixmapName );
-		if( !cached.isNull() )
-		{
-			return cached;
-		}
-
-		// Or try to load it
-		QList<QByteArray> formats = QImageReader::supportedImageFormats();
-		QList<QString> candidates;
-		QPixmap pixmap;
-		QString name;
-		int i;
-
-		for ( i = 0; i < formats.size() && pixmap.isNull(); ++i )  
-		{
-			candidates << QString( pixmapName ) + "." + formats.at( i ).data();
-		}
-
-#ifdef PLUGIN_NAME
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + "plugins/" +
-				     STRINGIFY( PLUGIN_NAME ) + "_" + name );
-		}
-#endif
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + name );
-		}
-		
-		// nothing found, so look in default-artwork-dir
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			pixmap = QPixmap( ConfigManager::inst()->defaultArtworkDir() + name );
-		}
-		
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-#ifdef PLUGIN_NAME
-			pixmap = QPixmap( ":/" STRINGIFY( PLUGIN_NAME ) "/" + name );
-#else
-			pixmap = QPixmap( ":/" + name );
-#endif
-		}
-		
-		// Fallback
-		if( pixmap.isNull() )
-		{
-			pixmap = QPixmap( 1, 1 );
-		}
-		// Save to cache and return
-		s_pixmapCache.insert( pixmapName, pixmap );
-		return pixmap;
+		return cached;
 	}
 
-	return getIconPixmap( pixmapName ).
-		scaled( width, height, Qt::IgnoreAspectRatio,
-			Qt::SmoothTransformation );
+#ifdef PLUGIN_NAME
+	QString name(QString("artwork:%1/%2").arg(STRINGIFY(PLUGIN_NAME), pixmapName));
+#else
+	QString name(QString("artwork:%1").arg(pixmapName));
+#endif
+	QImageReader reader(name);
+
+	if (width > 0 && height > 0)
+	{
+		reader.setScaledSize(QSize(width, height));
+	}
+
+	QImage image = reader.read();
+	if (image.isNull())
+	{
+		qWarning().nospace() << "Error loading icon pixmap " << name << ": " <<
+								reader.errorString().toLocal8Bit().data();
+		return QPixmap(1,1);
+	}
+
+	QPixmap pixmap = QPixmap::fromImage(image);
+
+	// Save to cache and return
+	s_pixmapCache.insert( pixmapName, pixmap );
+	return pixmap;
 }
 
 
