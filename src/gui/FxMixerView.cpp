@@ -145,6 +145,7 @@ FxMixerView::FxMixerView() :
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateFaders() ) );
 
+	connect(this, SIGNAL(deletedChannel(int)), this, SLOT(deleteMixerChannel(int)), Qt::QueuedConnection);
 
 	// add ourself to workspace
 	QMdiSubWindow * subWin =
@@ -354,27 +355,20 @@ void FxMixerView::updateFxLine(int index)
 }
 
 
-void FxMixerView::deleteChannel(int index)
-{
-	// can't delete master
-	if( index == 0 ) return;
 
+// This intermediary slot is needed for the deletedChannel signal to
+// run this at the GUI thread instead of the Mixer thread
+void FxMixerView::deleteMixerChannel(int index)
+{
 	// remember selected line
 	int selLine = m_currentFxLine->channelIndex();
 
-	// delete the real channel
-	Engine::fxMixer()->deleteChannel(index);
-
-	// delete the view
-	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
-	m_racksLayout->removeWidget( m_fxChannelViews[index]->m_rackView );
 	delete m_fxChannelViews[index]->m_fader;
 	delete m_fxChannelViews[index]->m_muteBtn;
 	delete m_fxChannelViews[index]->m_soloBtn;
-	delete m_fxChannelViews[index]->m_fxLine;
 	delete m_fxChannelViews[index]->m_rackView;
+	delete m_fxChannelViews[index]->m_fxLine;
 	delete m_fxChannelViews[index];
-	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
 	for(int i=0; i<m_fxChannelViews.size(); ++i)
@@ -394,6 +388,25 @@ void FxMixerView::deleteChannel(int index)
 	setCurrentFxLine(selLine);
 
 	updateMaxChannelSelector();
+}
+
+
+
+void FxMixerView::deleteChannel(int index)
+{
+	// can't delete master
+	if( index == 0 ) return;
+
+	// delete the real channel
+	Engine::fxMixer()->deleteChannel(index);
+
+	// delete the view
+	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
+	m_racksLayout->removeWidget( m_fxChannelViews[index]->m_rackView );
+	m_channelAreaWidget->adjustSize();
+
+	// schedule mixer channel for removal
+	emit deletedChannel( index );
 }
 
 
