@@ -23,30 +23,33 @@
  */
 
 #include <QDebug>
-#include <QImage>
-#include <QHash>
 #include <QImageReader>
+#include <QPixmapCache>
 #include <QResource>
 #include "embed.h"
 
 namespace embed
 {
 
-namespace
-{
-	static QHash<QString, QPixmap> s_pixmapCache;
-}
-
 
 QPixmap getIconPixmap(const QString& pixmapName, int width, int height )
 {
-	// Return cached pixmap
-	QPixmap cached = s_pixmapCache.value( pixmapName );
-	if( !cached.isNull() )
+	QString cacheName;
+	if (width > 0 && height > 0)
 	{
-		return cached;
+		cacheName = QString("%1_%2_%3").arg(pixmapName, width, height);
+	}
+	else
+	{
+		cacheName = pixmapName;
 	}
 
+	// Return cached pixmap
+	QPixmap pixmap;
+	if( QPixmapCache::find(cacheName, &pixmap) )
+	{
+		return pixmap;
+	}
 	QImageReader reader(QString("artwork:%1").arg(pixmapName));
 
 	if (width > 0 && height > 0)
@@ -54,18 +57,16 @@ QPixmap getIconPixmap(const QString& pixmapName, int width, int height )
 		reader.setScaledSize(QSize(width, height));
 	}
 
-	QImage image = reader.read();
-	if (image.isNull())
+	pixmap = QPixmap::fromImageReader(&reader);
+	if (pixmap.isNull())
 	{
 		qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " <<
 								reader.errorString().toLocal8Bit().data();
 		return QPixmap(1,1);
 	}
 
-	QPixmap pixmap = QPixmap::fromImage(image);
-
 	// Save to cache and return
-	s_pixmapCache.insert( pixmapName, pixmap );
+	QPixmapCache::insert(cacheName, pixmap);
 	return pixmap;
 }
 
