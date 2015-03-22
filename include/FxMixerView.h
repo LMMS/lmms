@@ -113,6 +113,9 @@ private slots:
 	void updateFaders();
 	void toggledSolo();
 
+	// Remove the real mixer channel
+	void deleteMixerChannel(int index);
+
 private:
 
 	QVector<FxChannelView *> m_fxChannelViews;
@@ -128,6 +131,11 @@ private:
 	void updateMaxChannelSelector();
 	
 	friend class FxChannelView;
+
+signals:
+	// Signal to schedule channel removal through deleteMixerChannel
+	void deletedChannel(int index);
+
 } ;
 
 #endif
