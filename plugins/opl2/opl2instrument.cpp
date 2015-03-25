@@ -141,9 +141,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	vib_depth_mdl(false, this, tr( "Vibrato Depth" )   ),
 	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
 {
-	// Connect the plugin to the mixer...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
@@ -220,6 +217,10 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( fm_mdl );
 	MOD_CON( vib_depth_mdl );
 	MOD_CON( trem_depth_mdl );
+
+	// Connect the plugin to the mixer...
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	Engine::mixer()->addPlayHandle( iph );
 }
 
 opl2instrument::~opl2instrument() {
