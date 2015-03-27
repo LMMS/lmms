@@ -41,6 +41,7 @@ class Engine;
 
 
 const QString PROJECTS_PATH = "projects/";
+const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
@@ -74,6 +75,11 @@ public:
 	QString userProjectsDir() const
 	{
 		return workingDir() + PROJECTS_PATH;
+	}
+
+	QString userTemplateDir() const
+	{
+		return workingDir() + TEMPLATE_PATH;
 	}
 
 	QString userPresetsDir() const

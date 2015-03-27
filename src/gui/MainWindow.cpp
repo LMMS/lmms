@@ -738,6 +738,14 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
+	QString default_template = ConfigManager::inst()->userTemplateDir()
+						+ "default.mpt";
+
+	//if we dont have a user default template, make one
+	if( !QFile::exists( default_template ) )
+	{
+		Engine::getSong()->saveProjectFile( default_template );
+	}
 }
 
 
