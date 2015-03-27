@@ -384,7 +384,7 @@ void ConfigManager::loadConfigFile()
 		m_vstDir = windowsConfigPath( CSIDL_PROGRAM_FILES ) +
 											QDir::separator() + "VstPlugins";
 #else
-		m_vstDir = ensureTrailingSlash( QDir::home().absolutePath() );
+		m_vstDir =  m_workingDir + "plugins/vst" + QDir::separator();
 #endif
 	}
 
@@ -403,6 +403,7 @@ void ConfigManager::loadConfigFile()
 #else
 		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/ladspa/";
 #endif
+		m_ladDir += ","+userLadspaDir();
 	}
 
 #ifdef LMMS_HAVE_STK
@@ -441,7 +442,10 @@ void ConfigManager::loadConfigFile()
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
 		QDir().mkpath( userGigDir() );
-		QDir().mkpath( sf2Dir() );
+		QDir().mkpath( userSf2Dir() );
+		QDir().mkpath( vstDir() );
+		QDir().mkpath( userLadspaDir() );
+
 	}
 
 	upgrade();

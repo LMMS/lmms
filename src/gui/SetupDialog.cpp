@@ -612,12 +612,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( sf2_tw );
 	pathSelectorLayout->addSpacing( 10 );
-	pathSelectorLayout->addWidget( artwork_tw );
-	pathSelectorLayout->addSpacing( 10 );
-	pathSelectorLayout->addWidget( backgroundArtwork_tw );
-	pathSelectorLayout->addSpacing( 10 );
-	pathSelectorLayout->addWidget( fl_tw );
-	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( vst_tw );
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( lad_tw );
@@ -629,7 +623,13 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( sf_tw );
 #endif	
+	pathSelectorLayout->addWidget( fl_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( artwork_tw );
+	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addStretch();
+	pathSelectorLayout->addWidget( backgroundArtwork_tw );
+	pathSelectorLayout->addSpacing( 10 );
 
 	dir_layout->addWidget( pathSelectors );
 
