@@ -431,12 +431,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 						}
 					}
 				}
-				else if( update == "tracknames" )
-				{
-					QString trackName( evt->get_string_value() );
-					ch->it->setName( trackName );
-					//ch.p->setName( trackName );
-				}
 
 				else if( update.startsWith( "control" ) || update == "bendr" )
 				{
