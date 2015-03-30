@@ -443,7 +443,7 @@ void ConfigManager::loadConfigFile()
 		QDir().mkpath( userPresetsDir() );
 		QDir().mkpath( userGigDir() );
 		QDir().mkpath( userSf2Dir() );
-		QDir().mkpath( vstDir() );
+		QDir().mkpath( userVstDir() );
 		QDir().mkpath( userLadspaDir() );
 
 	}

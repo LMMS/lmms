@@ -104,6 +104,11 @@ public:
 		return workingDir() + LADSPA_PATH;
 	}
 
+	QString userVstDir() const
+	{
+		return m_vstDir;
+	}
+
 	QString factoryProjectsDir() const
 	{
 		return dataDir() + PROJECTS_PATH;
