@@ -624,11 +624,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		float level = getLevel( mouseEvent->y() );
 		int x = mouseEvent->x();
 
-		if( mouseEvent->x() <= VALUES_WIDTH )
-		{
-			update();
-			return;
-		}
 		x -= VALUES_WIDTH;
 		if( m_action == MOVE_VALUE )
 		{
@@ -699,12 +694,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			{
 				if( QApplication::overrideCursor() )
 				{
-	if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
+					if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
 					{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
+						while( QApplication::overrideCursor() != NULL )
+						{
+							QApplication::restoreOverrideCursor();
+						}
 
 						QCursor c( Qt::SizeAllCursor );
 						QApplication::setOverrideCursor(
