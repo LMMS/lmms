@@ -96,7 +96,9 @@ MainWindow::MainWindow() :
 
 	ConfigManager* confMgr = ConfigManager::inst();
 
+	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
+	emit initProgress(tr("Preparing file browsers"));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
@@ -150,6 +152,7 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
+	emit initProgress(tr("Loading background artwork"));
 	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
 	QImage bgImage;
 	if( !bgArtwork.isEmpty() )

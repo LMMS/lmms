@@ -52,11 +52,16 @@ QMap<QString, QString> Engine::s_pluginFileHandling;
 
 void Engine::init()
 {
+	Engine *engine = inst();
+
+	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
 
+	emit engine->initProgress(tr("Locating plugins"));
 	initPluginFileHandling();
 
+	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer;
 	s_song = new Song;
@@ -67,11 +72,13 @@ void Engine::init()
 
 	s_projectJournal->setJournalling( true );
 
+	emit engine->initProgress(tr("Opening audio and midi devices"));
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
+	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
 }
 
@@ -142,3 +149,4 @@ void Engine::initPluginFileHandling()
 }
 
 
+Engine * Engine::s_instanceOfMe = NULL;

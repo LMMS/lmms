@@ -190,6 +190,7 @@ private slots:
 
 signals:
 	void periodicUpdate();
+	void initProgress(const QString &msg);
 
 } ;
 
