@@ -108,7 +108,7 @@ GuiApplication::GuiApplication()
 	m_controllerRackView = new ControllerRackView;
 	displayInitProgress(tr("Preparing project notes"));
 	m_projectNotes = new ProjectNotes;
-	displayInitProgress(tr("Preparing beat/baseline editor"));
+	displayInitProgress(tr("Preparing beat/bassline editor"));
 	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
 	displayInitProgress(tr("Preparing piano roll"));
 	m_pianoRoll = new PianoRollWindow();
