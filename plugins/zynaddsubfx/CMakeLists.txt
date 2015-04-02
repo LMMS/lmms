@@ -111,12 +111,14 @@ SET(zynaddsubfx_core_SRCS
 	zynaddsubfx/src/Synth/PADnote.cpp
 	zynaddsubfx/src/Synth/Resonance.cpp
 	zynaddsubfx/src/Synth/SUBnote.cpp
+	zynaddsubfx/src/UI/Connection.cpp
 	zynaddsubfx/tlsf/tlsf.c
+
     )
 
 
 ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
+TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lpthread -lrtosc-cpp -lrtosc -llo -lz )
 IF(QT5)
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
 ENDIF()
@@ -129,7 +131,7 @@ ELSE(LMMS_BUILD_WIN32)
 ENDIF(LMMS_BUILD_WIN32)
 
 BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
-TARGET_LINK_LIBRARIES(zynaddsubfx ZynAddSubFxCore)
+TARGET_LINK_LIBRARIES(zynaddsubfx ZynAddSubFxCore -lrtosc-cpp -lrtosc -llo )
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")

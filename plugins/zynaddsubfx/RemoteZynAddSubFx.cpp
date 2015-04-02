@@ -211,9 +211,9 @@ void RemoteZynAddSubFx::guiThread()
 					{
 						Fl::scheme( "plastic" );
 
-						gui = GUI::createUi( m_middleWare->spawnUiApi(), &exitProgram );
-					    m_middleWare->setUiCallback( GUI::raiseUi, gui );
-						m_middleWare->setIdleCallback([](){GUI::tickUi(gui);});
+//						gui = GUI::createUi( m_middleWare->spawnUiApi(), &exitProgram );
+//					    m_middleWare->setUiCallback( GUI::raiseUi, gui );
+//						m_middleWare->setIdleCallback([](){GUI::tickUi(gui);});
 
 						ui = static_cast<MasterUI *>( gui );
 					}
