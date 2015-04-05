@@ -153,7 +153,7 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 			if( ( ( *cut1Ptr != m_currentCut1 ||
 				*res1Ptr != m_currentRes1 ) ) || m_filter1changed )
 			{
-				m_filter1->calcFilterCoeffs( *cut1Ptr, *res2Ptr );
+				m_filter1->calcFilterCoeffs( *cut1Ptr, *res1Ptr );
 				m_filter1changed = false;
 				m_currentCut1 = *cut1Ptr;
 				m_currentRes1 = *res1Ptr;
