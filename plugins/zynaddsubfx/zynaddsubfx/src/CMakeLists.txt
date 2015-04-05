@@ -354,7 +354,8 @@ target_link_libraries(zynaddsubfx_core
 	${MXML_LIBRARIES}
 	${OS_LIBRARIES}
 	pthread
-    rtosc rtosc-cpp)
+	rtosc rtosc-cpp
+	lm)
 
 if(CompileTests)
 	add_subdirectory(Tests)
@@ -368,6 +369,7 @@ add_executable(zynaddsubfx main.cpp)
 target_link_libraries(zynaddsubfx
     zynaddsubfx_core
 	zynaddsubfx_nio
+
 	${GUI_LIBRARIES}
 	${NIO_LIBRARIES}
 	${AUDIO_LIBRARIES}

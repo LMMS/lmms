@@ -420,7 +420,10 @@ GEN_CC_SLOT(updateResBandwidth,C_resonance_bandwidth,m_resBandwidthModel);
 void ZynAddSubFxInstrument::initPlugin()
 {
 	m_pluginMutex.lock();
-	delete m_plugin;
+	if(m_plugin )
+	{
+//		delete m_plugin;
+	}
 	delete m_remotePlugin;
 	m_plugin = NULL;
 	m_remotePlugin = NULL;

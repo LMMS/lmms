@@ -21,6 +21,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set_source_files_properties(UI/MasterUI.h PROPERTIES GENERATED 1)
 fltk_wrap_ui(zynaddsubfx_gui ${UI_fl_files})
+set(LibloEnable true)
 
 if(LibloEnable)
     set(zynaddsubfx_gui_FLTK_UI_SRCS ${zynaddsubfx_gui_FLTK_UI_SRCS} NSM.C NSM/Client.C)
@@ -32,7 +33,6 @@ endif()
 
 add_library(zynaddsubfx_gui STATIC
 	${UI_objs}
-	${zynaddsubfx_gui_FLTK_UI_SRCS}
         NioUI.cpp
         WidgetPDial.cpp
         PartNameButton.cpp
@@ -55,13 +55,15 @@ add_library(zynaddsubfx_gui STATIC
         FormantFilterGraph.cpp
         EnvelopeFreeEdit.cpp
         BankView.cpp
-        Connection.cpp
+		Connection.cpp
+	${zynaddsubfx_gui_FLTK_UI_SRCS}
 	)
 
 if(NtkGui)
   target_link_libraries(zynaddsubfx_gui ${NTK_LIBRARIES} ${NTK_IMAGES_LIBRARIES})
 endif(NtkGui)
 
-if(FltkGui)
+set(FltkGui true)
+#if(FltkGui)
   target_link_libraries(zynaddsubfx_gui ${FLTK_LIBRARIES})
-endif(FltkGui)
+#endif(FltkGui)

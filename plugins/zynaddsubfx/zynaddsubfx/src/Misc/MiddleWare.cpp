@@ -769,8 +769,8 @@ MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
     cb = [](void*, const char*){};
     idle = 0;
 
-    master = new Master();
-    osc    = GUI::genOscInterface(mw);
+	master = new Master();
+	osc    = GUI::genOscInterface(mw);
 
     //Grab objects of interest from master
     obj_store.extractMaster(master);
@@ -786,7 +786,7 @@ MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
            // printf("undo callback <%s>\n", msg);
             char buf[1024];
             rtosc_message(buf, 1024, "/undo_pause","");
-            handleMsg(buf);
+			handleMsg(buf);
             handleMsg(msg);
             rtosc_message(buf, 1024, "/undo_resume","");
             handleMsg(buf);
