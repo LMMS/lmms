@@ -871,8 +871,6 @@ bool Directory::addItems(const QString & path )
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
 				m_dirCount++;
-				//recurse for each dir
-				addItems( path + cur_file + QDir::separator() );
 			}
 
 			added_something = true;
