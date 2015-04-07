@@ -1086,7 +1086,6 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addAction(qa);
 	*/
 
-	// Should be doable.
 	qa = new QAction(tr( "Smooth scroll" ), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
@@ -1102,6 +1101,14 @@ void MainWindow::updateViewMenu()
 			toInt() ? true : false );
 	m_viewMenu->addAction(qa);
 	*/
+
+	qa = new QAction(tr( "Enable note labels in piano roll" ), this);
+	qa->setData("printnotelabels");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "printnotelabels" ).
+			toInt() ? true : false );
+	m_viewMenu->addAction(qa);
+
 }
 
 
@@ -1128,6 +1135,11 @@ void MainWindow::updateConfig( QAction * _who )
 	else if ( tag == "oneinstrument" )
 	{
 		ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
+						 QString::number(checked) );
+	}
+	else if ( tag == "printnotelabels" )
+	{
+		ConfigManager::inst()->setValue( "ui", "printnotelabels",
 						 QString::number(checked) );
 	}
 }
