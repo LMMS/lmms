@@ -716,7 +716,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 void AudioFileProcessorView::sampleUpdated( void )
 {
-	newWaveView();
+	m_waveView->updateFromTo();
 	m_waveView->update();
 	update();
 }
@@ -733,7 +733,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
 		Engine::getSong()->setModified();
-		newWaveView();
+		m_waveView->updateFromTo();
 	}
 }
 
@@ -759,6 +759,16 @@ void AudioFileProcessorView::modelChanged( void )
 
 
 
+void AudioFileProcessorWaveView::updateFromTo()
+{
+	if( m_sampleBuffer.frames() > 1 )
+	{
+		const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
+		m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
+		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
+	}
+}
+
 AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf ) :
 	QWidget( _parent ),
 	m_sampleBuffer( buf ),
@@ -779,12 +789,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	setFixedSize( _w, _h );
 	setMouseTracking( true );
 
-	if( m_sampleBuffer.frames() > 1 )
-	{
-		const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
-		m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
-		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
-	}
+	updateFromTo();
 
 	m_graph.fill( Qt::transparent );
 	update();

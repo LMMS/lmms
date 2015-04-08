@@ -261,6 +261,7 @@ public:
 	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 
+	void updateFromTo();
 private:
 	void zoom( const bool _out = false );
 	void slide( int _px );
