@@ -1073,40 +1073,35 @@ void MainWindow::updateViewMenu()
 	qa = new QAction(tr( "Volume as dBV" ), this);
 	qa->setData("displaydbv");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).
-		       toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 	// Maybe this is impossible?
 	/* qa = new QAction(tr( "Tooltips" ), this);
 	qa->setData("tooltips");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "tooltips", "disabled" ).
-			toInt() ? false : true );
+	qa->setChecked( !ConfigManager::inst()->value( "tooltips", "disabled" ).toInt() );
 	m_viewMenu->addAction(qa);
 	*/
 
 	qa = new QAction(tr( "Smooth scroll" ), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).
-			toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 	// Not yet.
 	/* qa = new QAction(tr( "One instrument track window" ), this);
 	qa->setData("oneinstrument");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "oneinstrumenttrackwindow" ).
-			toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "oneinstrumenttrackwindow" ).toInt() );
 	m_viewMenu->addAction(qa);
 	*/
 
 	qa = new QAction(tr( "Enable note labels in piano roll" ), this);
 	qa->setData("printnotelabels");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "printnotelabels" ).
-			toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "printnotelabels" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 }
