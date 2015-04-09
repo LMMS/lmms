@@ -798,8 +798,8 @@ MiddleWareImpl::~MiddleWareImpl(void)
 
     warnMemoryLeaks();
 
-    delete master;
-    delete osc;
+	delete master;
+	delete osc;
 }
 
 /** Threading When Saving

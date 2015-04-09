@@ -107,8 +107,8 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
 	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
 	m_hasGUI( false ),
-	m_plugin( NULL ),
-	m_remotePlugin( NULL ),
+	m_plugin( 0 ),
+	m_remotePlugin( 0 ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
 	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter Frequency" ) ),
 	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter Resonance" ) ),
@@ -420,9 +420,9 @@ GEN_CC_SLOT(updateResBandwidth,C_resonance_bandwidth,m_resBandwidthModel);
 void ZynAddSubFxInstrument::initPlugin()
 {
 	m_pluginMutex.lock();
-	if(m_plugin )
+	if( m_plugin )
 	{
-//		delete m_plugin;
+		delete m_plugin;
 	}
 	delete m_remotePlugin;
 	m_plugin = NULL;

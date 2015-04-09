@@ -52,7 +52,7 @@ public:
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
-		Nio::start();
+//		Nio::start();
 
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
@@ -197,6 +197,7 @@ void RemoteZynAddSubFx::guiThread()
 		{
 			sendMessage( IdHideUI );
 			exitProgram = 0;
+			printf("exit message sent\n");
 		}
 		pthread_mutex_lock( &m_guiMutex );
 		while( m_guiMessages.size() )
@@ -211,9 +212,9 @@ void RemoteZynAddSubFx::guiThread()
 					{
 						Fl::scheme( "plastic" );
 
-//						gui = GUI::createUi( m_middleWare->spawnUiApi(), &exitProgram );
-//					    m_middleWare->setUiCallback( GUI::raiseUi, gui );
-//						m_middleWare->setIdleCallback([](){GUI::tickUi(gui);});
+						gui = GUI::createUi( m_middleWare->spawnUiApi(), &exitProgram );
+						m_middleWare->setUiCallback( GUI::raiseUi, gui );
+						m_middleWare->setIdleCallback([](){GUI::tickUi(gui);});
 
 						ui = static_cast<MasterUI *>( gui );
 					}

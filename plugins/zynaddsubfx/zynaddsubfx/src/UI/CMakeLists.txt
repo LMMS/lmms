@@ -64,6 +64,6 @@ if(NtkGui)
 endif(NtkGui)
 
 set(FltkGui true)
-#if(FltkGui)
+if(FltkGui)
   target_link_libraries(zynaddsubfx_gui ${FLTK_LIBRARIES})
-#endif(FltkGui)
+endif(FltkGui)

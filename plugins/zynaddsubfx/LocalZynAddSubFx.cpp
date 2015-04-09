@@ -99,7 +99,7 @@ LocalZynAddSubFx::~LocalZynAddSubFx()
 {
 	Nio::stop();
 
-	delete m_master;
+//	delete m_master;
 	delete m_ioEngine;
 	delete m_middleWare;
 
