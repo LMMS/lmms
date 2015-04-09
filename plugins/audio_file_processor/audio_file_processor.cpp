@@ -716,7 +716,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 void AudioFileProcessorView::sampleUpdated( void )
 {
-	m_waveView->updateFromTo();
+	m_waveView->updateSampleRange();
 	m_waveView->update();
 	update();
 }
@@ -733,7 +733,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
 		Engine::getSong()->setModified();
-		m_waveView->updateFromTo();
+		m_waveView->updateSampleRange();
 	}
 }
 
@@ -759,7 +759,7 @@ void AudioFileProcessorView::modelChanged( void )
 
 
 
-void AudioFileProcessorWaveView::updateFromTo()
+void AudioFileProcessorWaveView::updateSampleRange()
 {
 	if( m_sampleBuffer.frames() > 1 )
 	{
@@ -789,7 +789,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	setFixedSize( _w, _h );
 	setMouseTracking( true );
 
-	updateFromTo();
+	updateSampleRange();
 
 	m_graph.fill( Qt::transparent );
 	update();
