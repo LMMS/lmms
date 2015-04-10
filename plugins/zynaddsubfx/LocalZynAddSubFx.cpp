@@ -64,9 +64,11 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 #endif
 #endif
 
-		initConfig();
+		++s_instanceCount;
+
 
 		synth = new SYNTH_T;
+		initConfig();
 		synth->oscilsize = config.cfg.OscilSize;
 		synth->alias();
 
@@ -78,9 +80,6 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 			denormalkillbuf[i] = (RND-0.5)*1e-16;
 		}
 	}
-
-	++s_instanceCount;
-
 	m_middleWare = new MiddleWare();
 	middleware = m_middleWare;
 
@@ -90,6 +89,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master->swaplr = 0;
 
 	Nio::init( m_master );
+
 }
 
 

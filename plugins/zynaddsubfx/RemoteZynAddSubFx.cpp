@@ -53,6 +53,7 @@ public:
 		m_guiExit( false )
 	{
 //		Nio::start();
+		Nio::init( m_master ); //curlymorphic
 
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
@@ -131,6 +132,8 @@ public:
 			default:
 				return RemotePluginClient::processMessage( _m );
 		}
+		GUI::tickUi(gui);
+		m_middleWare->tick();
 		return true;
 	}
 
@@ -184,6 +187,7 @@ void RemoteZynAddSubFx::guiThread()
 		if( ui )
 		{
 			Fl::wait( m_guiSleepTime / 1000.0 );
+
 		}
 		else
 		{
@@ -215,6 +219,7 @@ void RemoteZynAddSubFx::guiThread()
 						gui = GUI::createUi( m_middleWare->spawnUiApi(), &exitProgram );
 						m_middleWare->setUiCallback( GUI::raiseUi, gui );
 						m_middleWare->setIdleCallback([](){GUI::tickUi(gui);});
+						middlewarepointer = m_middleWare; //added curlymorphic
 
 						ui = static_cast<MasterUI *>( gui );
 					}
@@ -254,11 +259,16 @@ void RemoteZynAddSubFx::guiThread()
 				default:
 					break;
 			}
+
 		}
 		pthread_mutex_unlock( &m_guiMutex );
+//		ui->refresh_master_ui();
+//		ui->npartcounter->do_callback();
+//		ui->updatepanel();
+GUI::tickUi(gui); //this line updates ui
+m_middleWare->tick();
 	}
 	Fl::flush();
-
     GUI::destroyUi( gui );
 }
 
