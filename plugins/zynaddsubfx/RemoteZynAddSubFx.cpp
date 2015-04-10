@@ -219,6 +219,8 @@ void RemoteZynAddSubFx::guiThread()
 						ui = static_cast<MasterUI *>( gui );
 					}
 					ui->showUI();
+					ui->npartcounter->do_callback();
+					ui->updatepanel();
 					ui->refresh_master_ui();
 					break;
 
@@ -227,6 +229,8 @@ void RemoteZynAddSubFx::guiThread()
 					LocalZynAddSubFx::loadXML( m.getString() );
 					if( ui )
 					{
+						ui->npartcounter->do_callback();
+						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
 					sendMessage( IdLoadSettingsFromFile );

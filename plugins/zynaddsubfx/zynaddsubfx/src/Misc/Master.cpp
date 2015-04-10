@@ -107,12 +107,11 @@ static Ports localports = {
     rRecur(ctl, "Controller"),
     rParamZyn(Pkeyshift,  "Global Key Shift"),
     rArrayI(Pinsparts, NUM_INS_EFX, "Part to insert part onto"),
-    {"echo", rDoc("Hidden port to echo messages"), 0, [](const char *m, RtData&) {
-       bToU->raw_write(m-1);}},
+	{"echo", rDoc("Hidden port to echo messages"), 0, [](const char *m, RtData&d) {
+	   d.reply(m-1);}},
     {"get-vu", rDoc("Grab VU Data"), 0, [](const char *, RtData &d) {
        Master *m = (Master*)d.obj;
-       bToU->write("/vu-meter", "bb", sizeof(m->vu), &m->vu, sizeof(float)*NUM_MIDI_PARTS, m->vuoutpeakpart);}},
-    {"reset-vu", rDoc("Grab VU Data"), 0, [](const char *, RtData &d) {
+	   d.reply("/vu-meter", "bb", sizeof(m->vu), &m->vu, sizeof(float)*NUM_MIDI_PARTS, m->vuoutpeakpart);}},    {"reset-vu", rDoc("Grab VU Data"), 0, [](const char *, RtData &d) {
        Master *m = (Master*)d.obj;
        m->vuresetpeaks();}},
     {"load-part:ib", rProp(internal) rDoc("Load Part From Middleware"), 0, [](const char *msg, RtData &d) {
@@ -193,8 +192,8 @@ static Ports localports = {
             Master *M =  (Master*)d.obj;
             printf("learning '%s'\n", rtosc_argument(m,0).s);
             M->midi.learn(rtosc_argument(m,0).s);}},
-    {"close-ui", rDoc("Request to close any connection named \"GUI\""), 0, [](const char *, RtData &) {
-       bToU->write("/close-ui", "");}},
+	{"close-ui", rDoc("Request to close any connection named \"GUI\""), 0, [](const char *, RtData &d) {
+	   d.reply("/close-ui", "");}},
     {"add-rt-memory:bi", rProp(internal) rDoc("Add Additional Memory To RT MemPool"), 0,
         [](const char *msg, RtData &d)
         {
@@ -213,7 +212,9 @@ static Ports localports = {
 
 
 Ports &Master::ports = localports;
+//XXX HACKS
 Master *the_master;
+rtosc::ThreadLink *the_bToU;
 
 class DataObj:public rtosc::RtData
 {
@@ -268,6 +269,8 @@ vuData::vuData(void)
 Master::Master()
 :midi(Master::ports), frozenState(false), pendingMemory(false)
 {
+	bToU = NULL;
+	uToB = NULL;
     memory = new Allocator();
     the_master = this;
     swaplr = 0;
@@ -301,7 +304,7 @@ Master::Master()
     midi.event_cb = [](const char *m)
     {
         char loc_buf[1024];
-        DataObj d{loc_buf, 1024, the_master, bToU};
+		DataObj d{loc_buf, 1024, the_master, the_bToU};
         memset(loc_buf, sizeof(loc_buf), 0);
         //printf("sending an event to the owner of '%s'\n", m);
         Master::ports.dispatch(m+1, d);

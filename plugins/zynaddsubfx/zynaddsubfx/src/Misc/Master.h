@@ -165,6 +165,8 @@ class Master
 
         bool   frozenState;//read-only parameters for threadsafe actions
         Allocator *memory;
+		rtosc::ThreadLink *bToU;
+		rtosc::ThreadLink *uToB;
         bool pendingMemory;
     private:
         float  sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];

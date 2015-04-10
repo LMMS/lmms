@@ -33,12 +33,8 @@
 #define NONREALTIME
 #endif
 
-//Forward declarations
-namespace rtosc{struct Ports; class ThreadLink;};
-extern rtosc::ThreadLink *bToU;
-extern rtosc::ThreadLink *uToB;
-
 //Forward Declarations
+namespace rtosc{struct Ports; class ThreadLink;};
 class  EffectMgr;
 class  ADnoteParameters;
 struct ADnoteGlobalParam;

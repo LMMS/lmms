@@ -98,8 +98,7 @@ void InMgr::flush(unsigned frameStart, unsigned frameStop)
                 for(int i=0; i < NUM_MIDI_PARTS; ++i) {
                     //set the program of the parts assigned to the midi channel
                     if(master->part[i]->Prcvchn == ev.channel) {
-                        bToU->write("/setprogram", "cc", i, ev.num);
-                        middleware->pendingSetProgram(i);
+						middleware->pendingSetProgram(i, ev.num);
                     }
                 }
                 break;
