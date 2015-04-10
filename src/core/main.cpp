@@ -42,6 +42,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QTime>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -62,6 +63,8 @@
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#include <stdio.h>
 
 #include "MemoryManager.h"
 #include "ConfigManager.h"
@@ -92,10 +95,43 @@ inline void loadTranslation( const QString & _tname,
 	QCoreApplication::instance()->installTranslator( t );
 }
 
+static void qtMessageHandler(QtMsgType type, const char *msg)
+{
+	// code based on http://stackoverflow.com/a/20069304/216292
+
+    QString timeStamp = QTime::currentTime().toString("hh:mm:ss:zzz");
+    switch (type) {
+	    case QtDebugMsg:
+	        fprintf(stdout, "[%s]", timeStamp.toStdString().c_str());
+	        fprintf(stdout, "[Debug] %s\n", msg);
+	        break;
+	    case QtWarningMsg:
+	        fprintf(stdout, "[%s]", timeStamp.toStdString().c_str());
+	        fprintf(stdout, "[Warning] %s\n", msg);
+	        break;
+	    case QtCriticalMsg:
+	        fprintf(stdout, "[%s]", timeStamp.toStdString().c_str());
+	        fprintf(stdout, "[Critical] %s\n", msg);
+	        break;
+	    case QtFatalMsg:
+	        fprintf(stderr, "[%s]", timeStamp.toStdString().c_str());
+	        fprintf(stderr, "[Fatal] %s\n", msg);
+	        abort();
+    }
+}
+
+static void configureLogging()
+{
+	// redirect all Qt error/warning messages to a custom handler
+	qInstallMsgHandler(qtMessageHandler);
+}
+
 
 
 int main( int argc, char * * argv )
 {
+	configureLogging();
+
 	// initialize memory managers
 	MemoryManager::init();
 	NotePlayHandleManager::init();
