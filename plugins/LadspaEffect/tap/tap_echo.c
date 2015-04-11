@@ -108,15 +108,19 @@ instantiate_Echo(const LADSPA_Descriptor * Descriptor,
 		if ((((Echo *)ptr)->ringbuffer_L = 
 		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
 			    sizeof(LADSPA_Data))) == NULL)
-			exit(1);
+			fprintf( stderr, "out 1" );
+//			exit(1);
 		if ((((Echo *)ptr)->ringbuffer_R = 
 		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
 			    sizeof(LADSPA_Data))) == NULL)
-			exit(1);
+			fprintf( stderr, "out 2" );
+//			exit(1);
 		if ((((Echo *)ptr)->buffer_pos_L = calloc(1, sizeof(unsigned long))) == NULL)
-			exit(1);
+			fprintf( stderr, "out 3" );
+//			exit(1);
 		if ((((Echo *)ptr)->buffer_pos_R = calloc(1, sizeof(unsigned long))) == NULL)
-			exit(1);
+			fprintf( stderr, "out 4" );
+//			exit(1);
 		
 		*(((Echo *)ptr)->buffer_pos_L) = 0;
 		*(((Echo *)ptr)->buffer_pos_R) = 0;
@@ -446,8 +450,8 @@ __attribute__((constructor)) tap_init() {
 	LADSPA_PortRangeHint * port_range_hints;
 	
 	if ((stereo_descriptor =
-	     (LADSPA_Descriptor *)malloc(sizeof(LADSPA_Descriptor))) == NULL)
-		exit(1);		
+		 (LADSPA_Descriptor *)malloc(sizeof(LADSPA_Descriptor))) == NULL)
+		exit(1);
 	
 
 	/* init the stereo Echo */
@@ -462,7 +466,7 @@ __attribute__((constructor)) tap_init() {
 
 	if ((port_descriptors = 
 	     (LADSPA_PortDescriptor *)calloc(PORTCOUNT_STEREO, sizeof(LADSPA_PortDescriptor))) == NULL)
-		exit(1);		
+		exit(1);
 
 	stereo_descriptor->PortDescriptors = (const LADSPA_PortDescriptor *)port_descriptors;
 	port_descriptors[DELAYTIME_L] = LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL;
@@ -483,7 +487,7 @@ __attribute__((constructor)) tap_init() {
 
 	if ((port_names = 
 	     (char **)calloc(PORTCOUNT_STEREO, sizeof(char *))) == NULL)
-		exit(1);		
+		exit(1);
 
 	stereo_descriptor->PortNames = (const char **)port_names;
 
@@ -505,7 +509,7 @@ __attribute__((constructor)) tap_init() {
 
 	if ((port_range_hints = 
 	     ((LADSPA_PortRangeHint *)calloc(PORTCOUNT_STEREO, sizeof(LADSPA_PortRangeHint)))) == NULL)
-		exit(1);		
+		exit(1);
 
 	stereo_descriptor->PortRangeHints = (const LADSPA_PortRangeHint *)port_range_hints;
 

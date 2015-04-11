@@ -564,6 +564,7 @@ void dump_msg(const char* ptr, std::ostream& os = std::cerr)
 		//	case 's':
 		//		_dump_prim_arg<char, const char*>(argptr, os); break;
 			default:
+			fprintf( stderr, "master exit" );
 				exit(1);
 		}
 	}

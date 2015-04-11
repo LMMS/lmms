@@ -69,7 +69,7 @@ class Echo:public Effect
         int getnumparams(void);
         void cleanup(void);
     private:
-		int samplerate;
+//		int samplerate;
 
         //Parameters
         unsigned char Pvolume;  /**<#1 Volume or Dry/Wetness*/

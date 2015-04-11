@@ -129,6 +129,11 @@ public:
 				LocalZynAddSubFx::setPitchWheelBendRange( _m.getInt() );
 				break;
 
+			case IdSampleRateInformation:
+				fprintf( stderr, "remote set samplerate\n");
+				LocalZynAddSubFx::setSampleRate( _m.getInt() );
+				break;
+
 			default:
 				return RemotePluginClient::processMessage( _m );
 		}
@@ -255,6 +260,11 @@ void RemoteZynAddSubFx::guiThread()
 					sendMessage( IdLoadPresetFile );
 					break;
 				}
+
+			case IdSampleRateInformation:
+				LocalZynAddSubFx::setSampleRate( m.getInt() );
+				fprintf( stderr, "remote set samplerate\n");
+				break;
 
 				default:
 					break;
