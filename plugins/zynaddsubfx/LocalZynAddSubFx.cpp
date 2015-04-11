@@ -54,7 +54,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 		m_runningNotes[i] = 0;
 	}
 
-	if( s_instanceCount == 0 )
+	if( true ) //s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION

@@ -446,7 +446,7 @@ class MiddleWareImpl
         if(0 == access(tmp_nam.c_str(), F_OK)) {
             fprintf(stderr, "Error: Cannot overwrite file %s. "
                     "You should probably remove it.", tmp_nam.c_str());
-            exit(EXIT_FAILURE);
+//curlymorphic            exit(EXIT_FAILURE);
         }
         FILE* tmp_fp = fopen(tmp_nam.c_str(), "w");
         if(!tmp_fp)
