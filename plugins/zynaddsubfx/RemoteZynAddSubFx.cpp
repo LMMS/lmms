@@ -52,8 +52,7 @@ public:
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
-//		Nio::start();
-		Nio::init( m_master ); //curlymorphic
+//		Nio::init( m_master ); //curlymorphic
 
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
@@ -130,7 +129,6 @@ public:
 				break;
 
 			case IdSampleRateInformation:
-				fprintf( stderr, "remote set samplerate\n");
 				LocalZynAddSubFx::setSampleRate( _m.getInt() );
 				break;
 
@@ -263,7 +261,6 @@ void RemoteZynAddSubFx::guiThread()
 
 			case IdSampleRateInformation:
 				LocalZynAddSubFx::setSampleRate( m.getInt() );
-				fprintf( stderr, "remote set samplerate\n");
 				break;
 
 				default:
@@ -272,11 +269,9 @@ void RemoteZynAddSubFx::guiThread()
 
 		}
 		pthread_mutex_unlock( &m_guiMutex );
-//		ui->refresh_master_ui();
-//		ui->npartcounter->do_callback();
-//		ui->updatepanel();
-GUI::tickUi(gui); //this line updates ui
-m_middleWare->tick();
+
+//		GUI::tickUi(gui); //this line updates ui
+		m_middleWare->tick();
 	}
 	Fl::flush();
     GUI::destroyUi( gui );

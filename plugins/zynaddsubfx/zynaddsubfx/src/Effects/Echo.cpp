@@ -99,8 +99,6 @@ void Echo::out(const Stereo<float *> &input)
         rdl = input.r[i] * pangainR - rdl * fb;
 
         //LowPass Filter
-//		samplerate = 44.100; //curlymorphic
-//		fprintf( stderr, "%d \n %d \n", MAX_DELAY, samplerate );
 		old.l = delay.l[(pos.l + delta.l) % (MAX_DELAY * samplerate)] =
                     ldl * hidamp + old.l * (1.0f - hidamp);
 		old.r = delay.r[(pos.r + delta.r) % (MAX_DELAY * samplerate)] =

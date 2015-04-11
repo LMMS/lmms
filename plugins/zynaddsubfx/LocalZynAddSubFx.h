@@ -59,7 +59,7 @@ public:
 
 	inline Master * master()
 	{
-		return 0; //m_master;
+		return m_master;
 	}
 
 

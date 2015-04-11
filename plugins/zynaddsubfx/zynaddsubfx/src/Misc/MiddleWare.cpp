@@ -446,6 +446,8 @@ class MiddleWareImpl
         if(0 == access(tmp_nam.c_str(), F_OK)) {
             fprintf(stderr, "Error: Cannot overwrite file %s. "
                     "You should probably remove it.", tmp_nam.c_str());
+			//commented out the exit, This is a check for standalone zyn
+			//that causes crashes whith multiple interal instances
 //curlymorphic            exit(EXIT_FAILURE);
         }
         FILE* tmp_fp = fopen(tmp_nam.c_str(), "w");

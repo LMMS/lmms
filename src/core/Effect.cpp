@@ -69,7 +69,7 @@ Effect::~Effect()
 	{
 		if( m_srcState[i] != NULL )
 		{
-//			src_delete( m_srcState[i] );
+			src_delete( m_srcState[i] );
 		}
 	}
 }
