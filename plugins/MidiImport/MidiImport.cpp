@@ -215,8 +215,9 @@ public:
 	bool isSF2; 
 	bool hasNotes;
 	MidiTime lastEnd;
+	QString trackName;
 	
-	smfMidiChannel * create( TrackContainer* tc )
+	smfMidiChannel * create( TrackContainer* tc, QString tn )
 	{
 		if( !it ) {
 			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
@@ -238,7 +239,10 @@ public:
 #else
 			it_inst = it->loadInstrument( "patman" );
 #endif
-			
+			trackName = tn;
+			if( trackName != "") {
+				it->setName( tn );
+			}
 			lastEnd = 0;
 		}
 		return this;
@@ -353,6 +357,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// Tracks
 	for( int t = 0; t < seq->tracks(); ++t )
 	{
+		QString trackName = "";
 		Alg_track_ptr trk = seq->track( t );
 		pd.setValue( t + preTrackSteps );
 
@@ -368,15 +373,26 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 			if( evt->chan == -1 )
 			{
-				printf("MISSING GLOBAL THINGY\n");
-				printf("     %d %d %f %s\n", (int) evt->chan, 
-					evt->get_type_code(), evt->time,
-							evt->get_attribute() );
-				// Global stuff
+				bool handled = false;
+				if( evt->is_update() )
+				{
+					QString attr = evt->get_attribute();
+					if( attr == "tracknames" ) {
+						trackName = evt->get_atom_value();
+						handled = true;
+					}
+				}
+				if(!handled) {
+					printf("MISSING GLOBAL THINGY\n");
+					printf("     %d %d %f %s %s\n", (int) evt->chan,
+					       evt->get_type_code(), evt->time,
+					       evt->get_attribute(), evt->get_atom_value() );
+					// Global stuff
+				}
 			}
 			else if( evt->is_note() && evt->chan < 256 )
 			{
-				smfMidiChannel * ch = chs[evt->chan].create( tc );
+				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
 
 				Note n( noteEvt->get_duration() * ticksPerBeat,
@@ -389,7 +405,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			
 			else if( evt->is_update() )
 			{
-				smfMidiChannel * ch = chs[evt->chan].create( tc );
+				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
 
 				double time = evt->time*ticksPerBeat;
 				QString update( evt->get_attribute() );
@@ -414,12 +430,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 							ch->it_inst->loadFile( dir+files.front() );
 						}
 					}
-				}
-				else if( update == "tracknames" )
-				{
-					QString trackName( evt->get_string_value() );
-					ch->it->setName( trackName );
-					//ch.p->setName( trackName );
 				}
 
 				else if( update.startsWith( "control" ) || update == "bendr" )
