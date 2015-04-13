@@ -1069,7 +1069,7 @@ void GigInstrumentView::showFileDialog()
 
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = ConfigManager::inst()->userSamplesDir() + f;
+			f = ConfigManager::inst()->gigDir() + f;
 
 			if( QFileInfo( f ).exists() == false )
 			{
@@ -1082,7 +1082,7 @@ void GigInstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->userSamplesDir() );
+		ofd.setDirectory( ConfigManager::inst()->gigDir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );

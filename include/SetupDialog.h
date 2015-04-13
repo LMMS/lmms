@@ -1,3 +1,4 @@
+
 /*
  * SetupDialog.h - dialog for setting up LMMS
  *
@@ -71,6 +72,8 @@ private slots:
 	// path settings widget
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
+	void setGIGDir( const QString & _gd );
+	void setSF2Dir( const QString & _sfd );
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _ld );
@@ -96,6 +99,8 @@ private slots:
 
 	void openWorkingDir();
 	void openVSTDir();
+	void openGIGDir();
+	void openSF2Dir();
 	void openArtworkDir();
 	void openFLDir();
 	void openLADSPADir();
@@ -138,6 +143,8 @@ private:
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
+	QLineEdit * m_gigLineEdit;
+	QLineEdit * m_sf2LineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QLineEdit * m_sfLineEdit;
 #endif
@@ -151,6 +158,8 @@ private:
 	QString m_artworkDir;
 	QString m_flDir;
 	QString m_ladDir;
+	QString m_gigDir;
+	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_defaultSoundfont;
 #endif
