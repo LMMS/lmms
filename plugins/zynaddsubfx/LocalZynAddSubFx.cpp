@@ -97,16 +97,17 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 
 LocalZynAddSubFx::~LocalZynAddSubFx()
 {
-	Nio::stop();
+//	Nio::stop();
 
 //	delete m_master;
-	delete m_ioEngine;
-	delete m_middleWare;
+//	delete m_ioEngine;
+//	delete m_middleWare;
 
 	if( --s_instanceCount == 0 )
 	{
 		delete[] denormalkillbuf;
 	}
+
 }
 
 

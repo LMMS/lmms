@@ -1,3 +1,4 @@
+
 /*
  * Effect.h - base class for effects
  *
