@@ -36,7 +36,7 @@ struct AllocatorImpl
 Allocator::Allocator(void)
 {
     impl = new AllocatorImpl;
-	size_t default_size = 50*1024*1024; //curlymorphic was 5Mib
+	size_t default_size = 5*1024*1024; //curlymorphic was 5Mib
     impl->pools = (next_t*)malloc(default_size);
     impl->pools->next = 0x0;
     impl->pools->pool_size = default_size;

@@ -812,13 +812,13 @@ MiddleWareImpl::~MiddleWareImpl(void)
 
     warnMemoryLeaks();
 
+	//curlymorphic
 	//valgrind was reporting memory leak with rtosc buffers
 	delete bToU;// = new rtosc::ThreadLink(4096*2,1024);
 	delete uToB; // = new rtosc::ThreadLink(4096*2,1024);
 
 	delete master;
 	delete osc;
-	//curlymorphic
 }
 
 /** Threading When Saving

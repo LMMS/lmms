@@ -821,18 +821,18 @@ void Master::GetAudioOutSamples(size_t nsamples,
 
 Master::~Master()
 {
-    delete []bufl;
-    delete []bufr;
+	delete []bufl;
+	delete []bufr;
 
-    for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        delete part[npart];
-    for(int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-        delete insefx[nefx];
-    for(int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-        delete sysefx[nefx];
+	for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+		delete part[npart];
+	for(int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+		delete insefx[nefx];
+	for(int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+		delete sysefx[nefx];
 
-    delete fft;
-    delete memory;
+	delete fft;
+	delete memory;
 }
 
 
