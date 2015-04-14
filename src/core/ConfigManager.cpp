@@ -242,6 +242,7 @@ void ConfigManager::setValue( const QString & _class,
 
 #ifdef LMMS_BUILD_WIN32
 #include <QLibrary>
+#include <basetyps.h>
 #include <shlobj.h>
 
 // taken from qt-win-opensource-src-4.2.2/src/corelib/io/qsettings.cpp
