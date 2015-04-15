@@ -60,17 +60,17 @@ Allocator::~Allocator(void)
 void *Allocator::alloc_mem(size_t mem_size)
 {
 	impl->totalAlloced += mem_size;
-//	void *mem = tlsf_malloc(impl->tlsf, mem_size);
+	void *mem = tlsf_malloc(impl->tlsf, mem_size);
 	//printf("Allocator.malloc(%p, %d) = %p\n", impl, mem_size, mem);
-	void *mem = malloc(mem_size);
+//	void *mem = malloc(mem_size);
 	//printf("Allocator result = %p\n", mem);
     return mem;
 }
 void Allocator::dealloc_mem(void *memory)
 {
 	//printf("dealloc_mem(%d)\n", tlsf_block_size(memory));
-//	tlsf_free(impl->tlsf, memory);
-	free(memory);
+	tlsf_free(impl->tlsf, memory);
+//	free(memory);
 }
 
 bool Allocator::lowMemory(unsigned n, size_t chunk_size)
