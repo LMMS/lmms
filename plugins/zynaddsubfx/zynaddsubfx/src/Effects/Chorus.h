@@ -29,7 +29,7 @@
 #define MAX_CHORUS_DELAY 250.0f //ms
 
 /**Chorus and Flange effects*/
-class Chorus:public Effect
+class Chorus:public Zyn::Effect
 {
     public:
         Chorus(EffectParams pars);

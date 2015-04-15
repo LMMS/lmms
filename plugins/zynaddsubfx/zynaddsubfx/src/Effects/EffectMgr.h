@@ -39,6 +39,9 @@ class Allocator;
 #include "../Params/FilterParams.h"
 #include "../Params/Presets.h"
 
+using namespace Zyn;
+
+
 /**Effect manager, an interface betwen the program and effects*/
 class EffectMgr:public Presets
 {
@@ -83,7 +86,7 @@ class EffectMgr:public Presets
 
         static rtosc::Ports ports;
         int     nefx;
-        Effect *efx;
+		Zyn::Effect *efx;
     private:
 
         //Parameters Prior to initialization

@@ -25,6 +25,9 @@
 #include "../Params/FilterParams.h"
 #include <cmath>
 
+using namespace Zyn;
+
+
 EffectParams::EffectParams(Allocator &alloc_, bool insertion_, float *efxoutl_, float *efxoutr_,
             unsigned char Ppreset_, unsigned int srate_, int bufsize_, FilterParams *filterpars_)
     :alloc(alloc_), insertion(insertion_), efxoutl(efxoutl_), efxoutr(efxoutr_),

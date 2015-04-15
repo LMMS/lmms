@@ -28,6 +28,7 @@
 #include <complex>
 
 #define MAX_ALIENWAH_DELAY 100
+using namespace Zyn;
 
 /**"AlienWah" Effect*/
 class Alienwah:public Effect

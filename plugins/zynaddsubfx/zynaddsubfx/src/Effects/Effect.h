@@ -56,6 +56,8 @@ struct EffectParams
     FilterParams *filterpars;
 };
 
+namespace Zyn
+{
 /**this class is inherited by the all effects(Reverb, Echo, ..)*/
 class Effect
 {
@@ -139,5 +141,6 @@ class Effect
             bufferbytes      = buffersize * sizeof(float);
         }
 };
+}
 
 #endif

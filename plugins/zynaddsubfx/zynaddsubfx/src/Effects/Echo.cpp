@@ -28,6 +28,9 @@
 
 #define MAX_DELAY 2
 
+using namespace Zyn;
+
+
 Echo::Echo(EffectParams pars)
     :Effect(pars),
       Pvolume(50),

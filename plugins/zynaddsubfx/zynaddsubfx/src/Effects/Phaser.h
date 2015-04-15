@@ -32,6 +32,9 @@
 
 #define MAX_PHASER_STAGES 12
 
+using namespace Zyn;
+
+
 class Phaser:public Effect
 {
     public:

@@ -25,8 +25,10 @@
 
 #include "Effect.h"
 
+using namespace Zyn;
+
 /**Distortion Effect*/
-class Distorsion:public Effect
+class Distorsion:public Zyn::Effect
 {
     public:
         Distorsion(EffectParams pars);

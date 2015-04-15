@@ -26,7 +26,7 @@
 #include "Effect.h"
 
 /**EQ Effect*/
-class EQ:public Effect
+class EQ:public Zyn::Effect
 {
     public:
         EQ(EffectParams pars);

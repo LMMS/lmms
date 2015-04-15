@@ -27,7 +27,7 @@
 #include "EffectLFO.h"
 
 /**DynamicFilter Effect*/
-class DynamicFilter:public Effect
+class DynamicFilter:public Zyn::Effect
 {
     public:
         DynamicFilter(EffectParams pars);
