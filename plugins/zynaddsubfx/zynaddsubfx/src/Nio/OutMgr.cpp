@@ -107,7 +107,7 @@ string OutMgr::getSink() const
     if(currentOut)
         return currentOut->name;
     else {
-        cerr << "BUG: No current output in OutMgr " << __LINE__ << endl;
+//        cerr << "BUG: No current output in OutMgr " << __LINE__ << endl;
         return "ERROR";
     }
     return "ERROR";

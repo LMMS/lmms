@@ -444,8 +444,8 @@ class MiddleWareImpl
     {
         std::string tmp_nam = get_tmp_nam();
         if(0 == access(tmp_nam.c_str(), F_OK)) {
-            fprintf(stderr, "Error: Cannot overwrite file %s. "
-                    "You should probably remove it.", tmp_nam.c_str());
+//            fprintf(stderr, "Error: Cannot overwrite file %s. "
+//                    "You should probably remove it.", tmp_nam.c_str());
 			//commented out the exit, This is a check for standalone zyn
 			//that causes crashes whith multiple interal instances
 //curlymorphic            exit(EXIT_FAILURE);
@@ -479,9 +479,9 @@ class MiddleWareImpl
 
                     if(!ifs.good())
                     {
-                        fprintf(stderr, "Note: trying to remove %s - the "
-                                        "process does not exist anymore.\n",
-                                name.c_str());
+//                        fprintf(stderr, "Note: trying to remove %s - the "
+//                                        "process does not exist anymore.\n",
+//                                name.c_str());
                         remove = true;
                     }
                     else
@@ -493,10 +493,10 @@ class MiddleWareImpl
                                             "zynaddsubfx with PID %s.\n",
                                     name.c_str() + strlen(tmp_nam_prefix));
                         else {
-                            fprintf(stderr, "Note: trying to remove %s - the "
-                                            "PID is owned by\n  another "
-                                            "process: %s\n",
-                                    name.c_str(), comm_name.c_str());
+//                            fprintf(stderr, "Note: trying to remove %s - the "
+//                                            "PID is owned by\n  another "
+//                                            "process: %s\n",
+//                                    name.c_str(), comm_name.c_str());
                             remove = true;
                         }
                     }
@@ -514,10 +514,11 @@ class MiddleWareImpl
                         {
                             ifs2 >> udp_port;
                             if(ifs.good())
-                                fprintf(stderr, "Warning: could not remove "
-                                                "%s, \n  it has not been "
-                                                "written by zynaddsubfx\n",
-                                        name.c_str());
+//                                fprintf(stderr, "Warning: could not remove "
+//                                                "%s, \n  it has not been "
+//                                                "written by zynaddsubfx\n",
+//                                        name.c_str());
+								; //here to keep if statement
                             else
                             {
                                 if(std::remove(name.c_str()) != 0)
@@ -771,7 +772,7 @@ MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
 	uToB = new rtosc::ThreadLink(4096*2,1024);
     server = lo_server_new_with_proto(NULL, LO_UDP, liblo_error_cb);
 	lo_server_add_method(server, NULL, NULL, handler_function, mw);
-    fprintf(stderr, "lo server running on %d\n", lo_server_get_port(server));
+//    fprintf(stderr, "lo server running on %d\n", lo_server_get_port(server));
 
     clean_up_tmp_nams();
     create_tmp_file((unsigned)lo_server_get_port(server));
@@ -892,7 +893,7 @@ void MiddleWareImpl::bToUhandle(const char *rtmsg)
     }
 
     //Activity dot
-    printf(".");fflush(stdout);
+//    printf(".");fflush(stdout);
 
     if(!strcmp(rtmsg, "/echo")
             && !strcmp(rtosc_argument_string(rtmsg),"ss")

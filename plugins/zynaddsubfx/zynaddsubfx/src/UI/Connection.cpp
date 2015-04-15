@@ -279,8 +279,8 @@ class UI_Interface:public Fl_Osc_Interface
 
         void renameLink(string old, string newer, Fl_Osc_Widget *w) override
         {
-            fprintf(stdout, "renameLink('%s','%s',%p)\n",
-                    old.c_str(), newer.c_str(), w);
+//            fprintf(stdout, "renameLink('%s','%s',%p)\n",
+//                    old.c_str(), newer.c_str(), w);
             removeLink(old, w);
             createLink(newer, w);
         }

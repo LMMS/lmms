@@ -274,7 +274,7 @@ int QtXmlWrapper::loadXMLfile(const std::string &filename)
     const char *xmldata = doloadfile(filename.c_str());
     if(xmldata == NULL)
 	{
-		qDebug() << "QtXmlWrapper::loadXMLfile(): empty data";
+//		qDebug() << "QtXmlWrapper::loadXMLfile(): empty data";
         return -1;                //the file could not be loaded or uncompressed
 	}
 

@@ -452,7 +452,7 @@ void ZynAddSubFxInstrument::initPlugin()
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
 
 		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
-		fprintf(stderr, "send message to set samplerate : %d \n" ,Engine::mixer()->processingSampleRate() );
+//		fprintf(stderr, "send message to set samplerate : %d \n" ,Engine::mixer()->processingSampleRate() );
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
 		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( Engine::mixer()->framesPerPeriod() ) );

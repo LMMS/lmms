@@ -617,7 +617,7 @@ void Master::AudioOut(float *outl, float *outr)
         events++;
         if(!d.matches) {// && !ports.apropos(msg)) {
             fprintf(stderr, "%c[%d;%d;%dm", 0x1B, 1, 7 + 30, 0 + 40);
-            fprintf(stderr, "Unknown address<BACKEND> '%s:%s'\n", uToB->peak(), rtosc_argument_string(uToB->peak()));
+//            fprintf(stderr, "Unknown address<BACKEND> '%s:%s'\n", uToB->peak(), rtosc_argument_string(uToB->peak()));
 #if 0
             if(strstr(msg, "PFMVelocity"))
                 dump_msg(msg);
