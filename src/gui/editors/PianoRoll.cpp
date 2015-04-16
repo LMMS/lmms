@@ -1081,7 +1081,16 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 			if( ke->modifiers() & Qt::ControlModifier )
 			{
 				ke->accept();
-				selectAll();
+				if (ke->modifiers() & Qt::ShiftModifier)
+				{
+					// Ctrl + Shift + A = deselect all notes
+					clearSelectedNotes();
+				}
+				else
+				{
+					// Ctrl + A = select all notes
+					selectAll();
+				}
 				update();
 			}
 			break;
