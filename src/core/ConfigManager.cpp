@@ -244,9 +244,7 @@ void ConfigManager::setValue( const QString & _class,
 #include <QLibrary>
 
 // FIXME Only shlobj.h should be needed here.  Please see bug #1952
-#include <basetyps.h>
 #include <shlobj.h>
-#include <windef.h>
 #include <wtypesbase.h>
 #include <wincrypt.h>
 
