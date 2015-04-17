@@ -75,7 +75,6 @@ public:
 		PlayPos( const int abs = 0 ) :
 			MidiTime( abs ),
 			m_timeLine( NULL ),
-			m_timeLineUpdate( true ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -88,7 +87,6 @@ public:
 			return m_currentFrame;
 		}
 		TimeLineWidget * m_timeLine;
-		bool m_timeLineUpdate;
 
 	private:
 		float m_currentFrame;
