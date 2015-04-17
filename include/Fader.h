@@ -100,13 +100,11 @@ private:
 
 	int knobPosY() const
 	{
-		float fRange = m_model->maxValue() - m_model->minValue();
-		float realVal = m_model->value() - m_model->minValue();
+		float fRange = model()->maxValue() - model()->minValue();
+		float realVal = model()->value() - model()->minValue();
 
 		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
 	}
-
-	FloatModel * m_model;
 
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
 	int calculateDisplayPeak( float fPeak );

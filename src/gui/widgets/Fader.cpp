@@ -67,7 +67,6 @@ QPixmap * Fader::s_knob = NULL;
 Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
 	FloatModelView( _model, this ),
-	m_model( _model ),
 	m_fPeakValue_L( 0.0 ),
 	m_fPeakValue_R( 0.0 ),
 	m_persistentPeak_L( 0.0 ),
@@ -114,7 +113,6 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob ) :
 	QWidget( parent ),
 	FloatModelView( model, this ),
-	m_model( model ),
 	m_fPeakValue_L( 0.0 ),
 	m_fPeakValue_R( 0.0 ),
 	m_persistentPeak_L( 0.0 ),
@@ -170,7 +168,7 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 	{
 		int dy = m_moveStartPoint - mouseEvent->globalY();
 
-		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - ( *m_knob ).height() );
+		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
 		model()->setValue( m_startValue + delta );
 
@@ -256,11 +254,11 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 
 	if ( ev->delta() > 0 )
 	{
-		m_model->incValue( 1 );
+		model()->incValue( 1 );
 	}
 	else
 	{
-		m_model->incValue( -1 );
+		model()->incValue( -1 );
 	}
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut( 1000 );
@@ -326,7 +324,7 @@ void Fader::updateTextFloat()
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( m_displayConversion ? m_model->value() * 100 : m_model->value() ) + " " + m_unit );
+		s_textFloat->setText( m_description + " " + QString("%1 ").arg( m_displayConversion ? model()->value() * 100 : model()->value() ) + " " + m_unit );
 	}
 	s_textFloat->moveGlobal( this, QPoint( width() - ( *m_knob ).width() - 5, knobPosY() - 46 ) );
 }

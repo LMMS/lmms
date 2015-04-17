@@ -53,6 +53,8 @@ public:
 	public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
+		void setChannelIndex( int index );
+
 		FxLine * m_fxLine;
 		PixmapButton * m_muteBtn;
 		PixmapButton * m_soloBtn;
@@ -97,6 +99,7 @@ public:
 
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
+	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
 	// make sure the display syncs up with the fx mixer.
