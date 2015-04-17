@@ -254,7 +254,11 @@ void ConfigManager::setValue( const QString & _class,
 
 #ifdef LMMS_BUILD_WIN32
 #include <QLibrary>
+
+// FIXME Only shlobj.h should be needed here.  Please see bug #1952
 #include <shlobj.h>
+#include <wtypesbase.h>
+#include <wincrypt.h>
 
 // taken from qt-win-opensource-src-4.2.2/src/corelib/io/qsettings.cpp
 static QString windowsConfigPath( int _type )
