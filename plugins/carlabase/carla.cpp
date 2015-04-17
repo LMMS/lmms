@@ -263,6 +263,9 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
     case NATIVE_HOST_OPCODE_UI_UNAVAILABLE:
         handleUiClosed();
         break;
+    case NATIVE_HOST_OPCODE_HOST_IDLE:
+        qApp->processEvents();
+        break;
     }
 
     return ret;
