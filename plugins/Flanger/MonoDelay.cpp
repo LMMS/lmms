@@ -25,6 +25,7 @@
 #include "MonoDelay.h"
 #include "interpolation.h"
 #include "lmms_math.h"
+#include "string.h"
 
 MonoDelay::MonoDelay( int maxTime , int sampleRate )
 {
@@ -51,27 +52,14 @@ MonoDelay::~MonoDelay()
 
 
 
-
 void MonoDelay::tick( sample_t* sample )
 {
-	m_buffer[m_index] = *sample;
-	int readIndex = m_index - ( int )m_length - 1;
-	if(readIndex < 0)
-	{
-		readIndex += m_maxLength;
-	}
-	float fract = 1.0f - fraction( m_length );
-	if(readIndex != m_maxLength-1 )
-	{
-		*sample = linearInterpolate(m_buffer[readIndex] ,
-									m_buffer[readIndex+1], fract );
-	} else
-	{
-		*sample = linearInterpolate(m_buffer[readIndex] ,
-									m_buffer[0], fract );
-	}
-	m_buffer[m_index] += *sample * m_feedback;
-	m_index = ( m_index +1 ) % m_maxLength;
+	m_index = ( int )m_length > 0
+			? ( m_index + 1 ) % ( int ) m_length
+			: m_index;
+	float out = m_buffer[ m_index ];
+	m_buffer[ m_index ] = *sample + ( out * m_feedback );
+	*sample = out;
 }
 
 
@@ -85,5 +73,6 @@ void MonoDelay::setSampleRate( int sampleRate )
 	}
 
 
-	m_buffer = new sample_t[( int )( sampleRate * m_maxTime )];
+	m_buffer = new sample_t[( int )( sampleRate * m_maxTime ) ];
+	memset( m_buffer, 0, sizeof(float) * ( int )( sampleRate * m_maxTime ) );
 }

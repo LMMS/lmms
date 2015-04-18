@@ -57,24 +57,15 @@ StereoDelay::~StereoDelay()
 
 void StereoDelay::tick( sampleFrame frame )
 {
-	m_buffer[m_index][0] = frame[0];
-	m_buffer[m_index][1] = frame[1];
-
-	int readIndex = m_index - ( int )m_length - 1;
-	if( readIndex < 0 )
-	{
-		readIndex += m_maxLength;
-	}
-	float fract = 1.0f -  fraction( m_length );
-	frame[0] = linearInterpolate( m_buffer[readIndex][0] ,
-			m_buffer[( readIndex+1) % m_maxLength][0], fract );
-	frame[1] = linearInterpolate( m_buffer[readIndex][1] ,
-			m_buffer[( readIndex+1) % m_maxLength][1], fract );
-
-	m_buffer[m_index][0] += frame[0] * m_feedback;
-	m_buffer[m_index][1] += frame[1] * m_feedback;
-
-	m_index = ( m_index + 1) % (int) m_maxLength;
+	m_index = ( int )m_length > 0
+			? ( m_index + 1 ) % ( int ) m_length
+			: m_index;
+	float lOut = m_buffer[ m_index ][ 0 ];
+	float rOut = m_buffer[ m_index ] [1 ];
+	m_buffer[ m_index ][ 0 ] = frame[ 0 ] + ( lOut * m_feedback );
+	m_buffer[ m_index ][ 1 ] = frame[ 1 ] + ( rOut * m_feedback );
+	frame[ 0 ] = lOut;
+	frame[ 1 ] = rOut;
 }
 
 
