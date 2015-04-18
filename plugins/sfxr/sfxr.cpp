@@ -337,8 +337,8 @@ sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_changeAmtModel(0.0f, this, "Change Amount"),
 	m_changeSpeedModel(0.0f, this, "Change Speed"),
 
-	m_sqrDutyModel(0.0f, this, "Squre Duty"),
-	m_sqrSweepModel(0.0f, this, "Squre Sweep"),
+	m_sqrDutyModel(0.0f, this, "Square Duty"),
+	m_sqrSweepModel(0.0f, this, "Duty Sweep"),
 
 	m_repeatSpeedModel(0.0f, this, "Repeat Speed"),
 
@@ -633,8 +633,8 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	m_changeAmtKnob		->setObjectName( "changeKnob" );
 	m_changeSpeedKnob	->setObjectName( "changeKnob" );
 
-	createKnob(m_sqrDutyKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Duty(Square wave only)");
-    createKnob(m_sqrSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Sweep(Square wave only)");
+	createKnob(m_sqrDutyKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Square Duty (Square wave only)");
+    createKnob(m_sqrSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Duty Sweep (Square wave only)");
 
 	m_sqrDutyKnob	->setObjectName( "sqrKnob" );
 	m_sqrSweepKnob	->setObjectName( "sqrKnob" );
