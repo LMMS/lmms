@@ -510,6 +510,9 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 				setCurrentFxLine( m_currentFxLine->channelIndex()+1 );
 			}
 			break;
+		case Qt::Key_Insert:
+			addNewChannel();
+			break;
 	}
 }
 
