@@ -55,7 +55,7 @@ MonoDelay::~MonoDelay()
 void MonoDelay::tick( sample_t* sample )
 {
 	m_index = ( int )m_length > 0
-			? ( m_index + 1 ) % ( int ) m_length
+			? ( m_index + 1 ) % ( int )m_length
 			: m_index;
 	float out = m_buffer[ m_index ];
 	m_buffer[ m_index ] = *sample + ( out * m_feedback );
