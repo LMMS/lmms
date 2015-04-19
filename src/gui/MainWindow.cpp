@@ -53,6 +53,7 @@
 #include "PluginBrowser.h"
 #include "SideBar.h"
 #include "ConfigManager.h"
+#include "Messenger.h"
 #include "Mixer.h"
 #include "PluginView.h"
 #include "ProjectNotes.h"
@@ -96,7 +97,9 @@ MainWindow::MainWindow() :
 
 	ConfigManager* confMgr = ConfigManager::inst();
 
+	Messenger::broadcast(tr("Preparing plugin browser"), Message::INIT_STATUS);
 	sideBar->appendTab( new PluginBrowser( splitter ) );
+	Messenger::broadcast(tr("Preparing file browsers"), Message::INIT_STATUS);
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
@@ -150,6 +153,7 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
+	Messenger::broadcast(tr("Loading background artwork"), Message::INIT_STATUS);
 	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
 	QImage bgImage;
 	if( !bgArtwork.isEmpty() )

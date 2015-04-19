@@ -27,11 +27,14 @@
 
 #include "export.h"
 
+class QLabel;
+
 class AutomationEditorWindow;
 class BBEditor;
 class ControllerRackView;
 class FxMixerView;
 class MainWindow;
+class Message;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
@@ -54,6 +57,8 @@ public:
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
 private:
+	void onInitProgress(const Message &msg);
+
 	static GuiApplication* s_instance;
 
 	MainWindow* m_mainWindow;
@@ -64,6 +69,7 @@ private:
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
 	ControllerRackView* m_controllerRackView;
+	QLabel* m_loadingProgressLabel;
 };
 
 #define gui GuiApplication::instance()
