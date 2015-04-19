@@ -33,6 +33,7 @@ set(LMMS_SRCS
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
+	core/Messenger.cpp
 	core/Mixer.cpp
 	core/MixerProfiler.cpp
 	core/MixerWorkerThread.cpp
