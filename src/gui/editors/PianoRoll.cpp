@@ -4236,3 +4236,9 @@ QSize PianoRollWindow::sizeHint() const
 {
 	return {m_toolBar->sizeHint().width() + 10, INITIAL_PIANOROLL_HEIGHT};
 }
+
+void PianoRollWindow::focusInEvent(QFocusEvent * event)
+{
+	// when the window is given focus, also give focus to the actual piano roll
+	m_editor->setFocus(event->reason());
+}

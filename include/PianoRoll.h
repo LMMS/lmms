@@ -384,6 +384,8 @@ signals:
 	void currentPatternChanged();
 
 private:
+	void focusInEvent(QFocusEvent * event);
+
 	PianoRoll* m_editor;
 
 	ComboBox * m_zoomingComboBox;
