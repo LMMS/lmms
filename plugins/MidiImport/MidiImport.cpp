@@ -374,19 +374,22 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			if( evt->chan == -1 )
 			{
 				bool handled = false;
-				if( evt->is_update() )
+                if( evt->is_update() )
 				{
 					QString attr = evt->get_attribute();
-					if( attr == "tracknames" ) {
+                    if( attr == "tracknames" && evt->get_update_type() == 'a' ) {
 						trackName = evt->get_atom_value();
 						handled = true;
 					}
 				}
-				if(!handled) {
+                if( !handled ) {
 					printf("MISSING GLOBAL THINGY\n");
-					printf("     %d %d %f %s %s\n", (int) evt->chan,
-					       evt->get_type_code(), evt->time,
-					       evt->get_attribute(), evt->get_atom_value() );
+                    if ( evt->is_update() && evt->get_update_type() == 'a' )
+                    {
+                        printf("     %d %d %f %s %s\n", (int) evt->chan,
+                               evt->get_type_code(), evt->time,
+                               evt->get_attribute(), evt->get_atom_value() );
+                    }
 					// Global stuff
 				}
 			}
