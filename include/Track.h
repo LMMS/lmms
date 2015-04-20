@@ -441,7 +441,7 @@ public:
 	static Track * create( TrackTypes tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
-	void clone();
+	Track * clone();
 
 
 	// pure virtual functions

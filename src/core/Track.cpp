@@ -1683,13 +1683,18 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 
 
-
 /*! \brief Clone this track
  *
  */
 void TrackOperationsWidget::cloneTrack()
 {
-	m_trackView->getTrack()->clone();
+	TrackContainerView *tcView = m_trackView->trackContainerView();
+
+	Track *newTrack = m_trackView->getTrack()->clone();
+	TrackView *newTrackView = tcView->createTrackView( newTrack );
+
+	int index = tcView->trackViews().indexOf( m_trackView );
+	tcView->moveTrackView( newTrackView, index + 1 );
 }
 
 
@@ -1899,12 +1904,12 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 /*! \brief Clone a track from this track
  *
  */
-void Track::clone()
+Track * Track::clone()
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
 	saveState( doc, parent );
-	create( parent.firstChild().toElement(), m_trackContainer );
+	return create( parent.firstChild().toElement(), m_trackContainer );
 }
 
 
