@@ -36,7 +36,7 @@ struct AllocatorImpl
 Allocator::Allocator(void)
 {
     impl = new AllocatorImpl;
-	size_t default_size = 5*1024*1024; //curlymorphic was 5Mib
+	size_t default_size = 5*1024*1024;
     impl->pools = (next_t*)malloc(default_size);
     impl->pools->next = 0x0;
     impl->pools->pool_size = default_size;
@@ -62,7 +62,7 @@ void *Allocator::alloc_mem(size_t mem_size)
 	impl->totalAlloced += mem_size;
 	void *mem = tlsf_malloc(impl->tlsf, mem_size);
 	//printf("Allocator.malloc(%p, %d) = %p\n", impl, mem_size, mem);
-//	void *mem = malloc(mem_size);
+	//void *mem = malloc(mem_size);
 	//printf("Allocator result = %p\n", mem);
     return mem;
 }
@@ -70,7 +70,7 @@ void Allocator::dealloc_mem(void *memory)
 {
 	//printf("dealloc_mem(%d)\n", tlsf_block_size(memory));
 	tlsf_free(impl->tlsf, memory);
-//	free(memory);
+	//free(memory);
 }
 
 bool Allocator::lowMemory(unsigned n, size_t chunk_size)

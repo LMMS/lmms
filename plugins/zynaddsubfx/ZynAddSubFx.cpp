@@ -422,11 +422,6 @@ GEN_CC_SLOT(updateResBandwidth,C_resonance_bandwidth,m_resBandwidthModel);
 void ZynAddSubFxInstrument::initPlugin()
 {
 	m_pluginMutex.lock();
-	if( m_plugin )
-	{
-//		delete m_plugin;
-//		m_plugin = 0;
-	}
 	if(m_remotePlugin)
 	{
 		delete m_remotePlugin;
@@ -454,7 +449,6 @@ void ZynAddSubFxInstrument::initPlugin()
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
 
 		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
-//		fprintf(stderr, "send message to set samplerate : %d \n" ,Engine::mixer()->processingSampleRate() );
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
 		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( Engine::mixer()->framesPerPeriod() ) );

@@ -52,8 +52,6 @@ public:
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
-//		Nio::init( m_master ); //curlymorphic
-
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
@@ -190,7 +188,6 @@ void RemoteZynAddSubFx::guiThread()
 		if( ui )
 		{
 			Fl::wait( m_guiSleepTime / 1000.0 );
-
 		}
 		else
 		{
@@ -204,7 +201,6 @@ void RemoteZynAddSubFx::guiThread()
 		{
 			sendMessage( IdHideUI );
 			exitProgram = 0;
-			printf("exit message sent\n");
 		}
 		pthread_mutex_lock( &m_guiMutex );
 		while( m_guiMessages.size() )
@@ -270,7 +266,6 @@ void RemoteZynAddSubFx::guiThread()
 		}
 		pthread_mutex_unlock( &m_guiMutex );
 
-//		GUI::tickUi(gui); //this line updates ui
 		m_middleWare->tick();
 	}
 	Fl::flush();

@@ -72,7 +72,7 @@ class Echo:public Zyn::Effect
         int getnumparams(void);
         void cleanup(void);
     private:
-//		int samplerate;
+//		int samplerate; // removed to stop clsh with sub class
 
         //Parameters
         unsigned char Pvolume;  /**<#1 Volume or Dry/Wetness*/

@@ -305,7 +305,7 @@ Master::Master()
     {
         char loc_buf[1024];
 		DataObj d{loc_buf, 1024, the_master, the_bToU};
-        memset(loc_buf, sizeof(loc_buf), 0);
+		memset(loc_buf, 0, sizeof(loc_buf));
         //printf("sending an event to the owner of '%s'\n", m);
         Master::ports.dispatch(m+1, d);
     };
@@ -320,7 +320,7 @@ void Master::applyOscEvent(const char *msg)
 {
     char loc_buf[1024];
     DataObj d{loc_buf, 1024, this, bToU};
-    memset(loc_buf, sizeof(loc_buf), 0);
+	memset(loc_buf, 0, sizeof(loc_buf));
     d.matches = 0;
     ports.dispatch(msg+1, d);
     if(d.matches == 0)
@@ -590,7 +590,7 @@ void Master::AudioOut(float *outl, float *outr)
     //Handle user events TODO move me to a proper location
     char loc_buf[1024];
     DataObj d{loc_buf, 1024, this, bToU};
-    memset(loc_buf, sizeof(loc_buf), 0);
+	memset(loc_buf, 0, sizeof(loc_buf));
     int events = 0;
     while(uToB->hasNext() && events < 10) {
         const char *msg = uToB->read();

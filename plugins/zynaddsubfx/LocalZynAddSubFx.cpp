@@ -54,7 +54,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 		m_runningNotes[i] = 0;
 	}
 
-	if( s_instanceCount == 0 ) // did have commented out
+	if( s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
@@ -65,7 +65,6 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 #endif
 
 		++s_instanceCount;
-
 
 		synth = new SYNTH_T;
 		initConfig();

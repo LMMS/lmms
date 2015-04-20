@@ -108,19 +108,15 @@ instantiate_Echo(const LADSPA_Descriptor * Descriptor,
 		if ((((Echo *)ptr)->ringbuffer_L = 
 		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
 			    sizeof(LADSPA_Data))) == NULL)
-			fprintf( stderr, "out 1" );
-//			exit(1);
+			exit(1);
 		if ((((Echo *)ptr)->ringbuffer_R = 
 		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
 			    sizeof(LADSPA_Data))) == NULL)
-			fprintf( stderr, "out 2" );
-//			exit(1);
+			exit(1);
 		if ((((Echo *)ptr)->buffer_pos_L = calloc(1, sizeof(unsigned long))) == NULL)
-			fprintf( stderr, "out 3" );
-//			exit(1);
+			exit(1);
 		if ((((Echo *)ptr)->buffer_pos_R = calloc(1, sizeof(unsigned long))) == NULL)
-			fprintf( stderr, "out 4" );
-//			exit(1);
+			exit(1);
 		
 		*(((Echo *)ptr)->buffer_pos_L) = 0;
 		*(((Echo *)ptr)->buffer_pos_R) = 0;
@@ -450,7 +446,7 @@ __attribute__((constructor)) tap_init() {
 	LADSPA_PortRangeHint * port_range_hints;
 	
 	if ((stereo_descriptor =
-		 (LADSPA_Descriptor *)malloc(sizeof(LADSPA_Descriptor))) == NULL)
+	 (LADSPA_Descriptor *)malloc(sizeof(LADSPA_Descriptor))) == NULL)
 		exit(1);
 	
 
