@@ -78,11 +78,6 @@
  */
 const int RESIZE_GRIP_WIDTH = 4;
 
-/*! The size of the track buttons in pixels
- */
-const int TRACK_OP_BTN_WIDTH = 20;
-const int TRACK_OP_BTN_HEIGHT = 14;
-
 
 /*! A pointer for that text bubble used when moving segments, etc.
  *
