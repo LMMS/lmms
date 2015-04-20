@@ -50,7 +50,6 @@ const int CD_KNOB_X_SPACING = 32;
 const int CD_LFO_SHAPES_X = 6;
 const int CD_LFO_SHAPES_Y = 36;
 
-const int CD_LFO_GRAPH_X = 6;
 const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y+15;
 const int CD_LFO_CD_KNOB_Y = CD_LFO_GRAPH_Y-2;
 const int CD_LFO_BASE_CD_KNOB_X = CD_LFO_SHAPES_X + 64;
@@ -243,7 +242,6 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 LfoControllerDialog::~LfoControllerDialog()
 {
 	m_userWaveBtn->disconnect( this );
-	//delete m_subWindow;
 }
 
 
@@ -286,13 +284,6 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 	*/
 }
 
-
-/*
-void lfoControllerDialog::paintEvent( QPaintEvent * _pe )
-{
-	QWidget::paintEvent( _pe );
-}
-*/
 
 
 void LfoControllerDialog::modelChanged()
