@@ -511,7 +511,10 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			}
 			break;
 		case Qt::Key_Insert:
-			addNewChannel();
+			if ( e->modifiers() & Qt::ShiftModifier )
+			{
+				addNewChannel();
+			}
 			break;
 	}
 }
