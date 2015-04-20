@@ -384,9 +384,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				}
 				if(!handled) {
 					printf("MISSING GLOBAL THINGY\n");
-					printf("     %d %d %f %s %s\n", (int) evt->chan,
+					printf("     %d %d %f %s\n", (int) evt->chan,
 					       evt->get_type_code(), evt->time,
-					       evt->get_attribute(), evt->get_atom_value() );
+					       evt->get_attribute() );
 					// Global stuff
 				}
 			}
