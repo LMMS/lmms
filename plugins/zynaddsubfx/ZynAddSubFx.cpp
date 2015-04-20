@@ -350,14 +350,16 @@ bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiT
 		return true;
 	}
 
+	MidiEvent localEvent = event;
+	localEvent.setChannel( 0 );
 	m_pluginMutex.lock();
 	if( m_remotePlugin )
 	{
-		m_remotePlugin->processMidiEvent( event, 0 );
+		m_remotePlugin->processMidiEvent( localEvent, 0 );
 	}
 	else
 	{
-		m_plugin->processMidiEvent( event );
+		m_plugin->processMidiEvent( localEvent );
 	}
 	m_pluginMutex.unlock();
 
