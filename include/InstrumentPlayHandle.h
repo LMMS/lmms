@@ -84,7 +84,6 @@ public:
 
 private:
 	Instrument* m_instrument;
-	InstrumentTrack * m_instrumentTrack;
 
 } ;
 
