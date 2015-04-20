@@ -383,14 +383,19 @@ bool MidiImport::readSMF( TrackContainer* tc )
 					}
 				}
                 if( !handled ) {
-					printf("MISSING GLOBAL THINGY\n");
-                    if ( evt->is_update() && evt->get_update_type() == 'a' )
+                    // Write debug output
+                    printf("MISSING GLOBAL HANDLER\n");
+                    printf("     Chn: %d, Type Code: %d, Time: %f", (int) evt->chan,
+                           evt->get_type_code(), evt->time );
+                    if ( evt->is_update() )
                     {
-                        printf("     %d %d %f %s %s\n", (int) evt->chan,
-                               evt->get_type_code(), evt->time,
-                               evt->get_attribute(), evt->get_atom_value() );
+                        printf( ", Update Type: %s", evt->get_attribute() );
+                        if ( evt->get_update_type() == 'a' )
+                        {
+                            printf( ", Atom: %s", evt->get_atom_value() );
+                        }
                     }
-					// Global stuff
+                    printf( "\n" );
 				}
 			}
 			else if( evt->is_note() && evt->chan < 256 )
