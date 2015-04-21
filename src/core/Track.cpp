@@ -103,7 +103,7 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
-	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate( false )
 {
 	if( getTrack() )
@@ -1810,7 +1810,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_trackContainer( tc ),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
-	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Mute" ) ),
 					 /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
