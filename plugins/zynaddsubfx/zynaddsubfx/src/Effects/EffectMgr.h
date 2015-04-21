@@ -86,7 +86,7 @@ class EffectMgr:public Presets
 
         static rtosc::Ports ports;
         int     nefx;
-		Zyn::Effect *efx;
+        Zyn::Effect *efx;
     private:
 
         //Parameters Prior to initialization

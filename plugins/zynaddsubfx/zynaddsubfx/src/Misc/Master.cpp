@@ -107,11 +107,11 @@ static Ports localports = {
     rRecur(ctl, "Controller"),
     rParamZyn(Pkeyshift,  "Global Key Shift"),
     rArrayI(Pinsparts, NUM_INS_EFX, "Part to insert part onto"),
-	{"echo", rDoc("Hidden port to echo messages"), 0, [](const char *m, RtData&d) {
-	   d.reply(m-1);}},
+    {"echo", rDoc("Hidden port to echo messages"), 0, [](const char *m, RtData&d) {
+       d.reply(m-1);}},
     {"get-vu", rDoc("Grab VU Data"), 0, [](const char *, RtData &d) {
        Master *m = (Master*)d.obj;
-	   d.reply("/vu-meter", "bb", sizeof(m->vu), &m->vu, sizeof(float)*NUM_MIDI_PARTS, m->vuoutpeakpart);}},    {"reset-vu", rDoc("Grab VU Data"), 0, [](const char *, RtData &d) {
+       d.reply("/vu-meter", "bb", sizeof(m->vu), &m->vu, sizeof(float)*NUM_MIDI_PARTS, m->vuoutpeakpart);}},    {"reset-vu", rDoc("Grab VU Data"), 0, [](const char *, RtData &d) {
        Master *m = (Master*)d.obj;
        m->vuresetpeaks();}},
     {"load-part:ib", rProp(internal) rDoc("Load Part From Middleware"), 0, [](const char *msg, RtData &d) {
@@ -192,8 +192,8 @@ static Ports localports = {
             Master *M =  (Master*)d.obj;
             printf("learning '%s'\n", rtosc_argument(m,0).s);
             M->midi.learn(rtosc_argument(m,0).s);}},
-	{"close-ui", rDoc("Request to close any connection named \"GUI\""), 0, [](const char *, RtData &d) {
-	   d.reply("/close-ui", "");}},
+    {"close-ui", rDoc("Request to close any connection named \"GUI\""), 0, [](const char *, RtData &d) {
+       d.reply("/close-ui", "");}},
     {"add-rt-memory:bi", rProp(internal) rDoc("Add Additional Memory To RT MemPool"), 0,
         [](const char *msg, RtData &d)
         {
@@ -304,8 +304,8 @@ Master::Master()
     midi.event_cb = [](const char *m)
     {
         char loc_buf[1024];
-		DataObj d{loc_buf, 1024, the_master, the_bToU};
-		memset(loc_buf, 0, sizeof(loc_buf));
+        DataObj d{loc_buf, 1024, the_master, the_bToU};
+        memset(loc_buf, 0, sizeof(loc_buf));
         //printf("sending an event to the owner of '%s'\n", m);
         Master::ports.dispatch(m+1, d);
     };
@@ -320,7 +320,7 @@ void Master::applyOscEvent(const char *msg)
 {
     char loc_buf[1024];
     DataObj d{loc_buf, 1024, this, bToU};
-	memset(loc_buf, 0, sizeof(loc_buf));
+    memset(loc_buf, 0, sizeof(loc_buf));
     d.matches = 0;
     ports.dispatch(msg+1, d);
     if(d.matches == 0)
@@ -590,7 +590,7 @@ void Master::AudioOut(float *outl, float *outr)
     //Handle user events TODO move me to a proper location
     char loc_buf[1024];
     DataObj d{loc_buf, 1024, this, bToU};
-	memset(loc_buf, 0, sizeof(loc_buf));
+    memset(loc_buf, 0, sizeof(loc_buf));
     int events = 0;
     while(uToB->hasNext() && events < 10) {
         const char *msg = uToB->read();
@@ -821,18 +821,18 @@ void Master::GetAudioOutSamples(size_t nsamples,
 
 Master::~Master()
 {
-	delete []bufl;
-	delete []bufr;
+    delete []bufl;
+    delete []bufr;
 
-	for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-		delete part[npart];
-	for(int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-		delete insefx[nefx];
-	for(int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-		delete sysefx[nefx];
+    for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        delete part[npart];
+    for(int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+        delete insefx[nefx];
+    for(int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+        delete sysefx[nefx];
 
-	delete fft;
-	delete memory;
+    delete fft;
+    delete memory;
 }
 
 

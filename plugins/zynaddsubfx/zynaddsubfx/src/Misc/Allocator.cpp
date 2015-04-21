@@ -36,7 +36,7 @@ struct AllocatorImpl
 Allocator::Allocator(void)
 {
     impl = new AllocatorImpl;
-	size_t default_size = 5*1024*1024;
+    size_t default_size = 5*1024*1024;
     impl->pools = (next_t*)malloc(default_size);
     impl->pools->next = 0x0;
     impl->pools->pool_size = default_size;
@@ -59,18 +59,18 @@ Allocator::~Allocator(void)
 
 void *Allocator::alloc_mem(size_t mem_size)
 {
-	impl->totalAlloced += mem_size;
-	void *mem = tlsf_malloc(impl->tlsf, mem_size);
-	//printf("Allocator.malloc(%p, %d) = %p\n", impl, mem_size, mem);
-	//void *mem = malloc(mem_size);
-	//printf("Allocator result = %p\n", mem);
+    impl->totalAlloced += mem_size;
+    void *mem = tlsf_malloc(impl->tlsf, mem_size);
+    //printf("Allocator.malloc(%p, %d) = %p\n", impl, mem_size, mem);
+    //void *mem = malloc(mem_size);
+    //printf("Allocator result = %p\n", mem);
     return mem;
 }
 void Allocator::dealloc_mem(void *memory)
 {
-	//printf("dealloc_mem(%d)\n", tlsf_block_size(memory));
-	tlsf_free(impl->tlsf, memory);
-	//free(memory);
+    //printf("dealloc_mem(%d)\n", tlsf_block_size(memory));
+    tlsf_free(impl->tlsf, memory);
+    //free(memory);
 }
 
 bool Allocator::lowMemory(unsigned n, size_t chunk_size)
@@ -110,15 +110,15 @@ void Allocator::addMemory(void *v, size_t mem_size)
 //From tlsf internals
 typedef struct block_header_t
 {
-	/* Points to the previous physical block. */
-	struct block_header_t* prev_phys_block;
+    /* Points to the previous physical block. */
+    struct block_header_t* prev_phys_block;
 
-	/* The size of this block, excluding the block header. */
-	size_t size;
+    /* The size of this block, excluding the block header. */
+    size_t size;
 
-	/* Next and previous free blocks. */
-	struct block_header_t* next_free;
-	struct block_header_t* prev_free;
+    /* Next and previous free blocks. */
+    struct block_header_t* next_free;
+    struct block_header_t* prev_free;
 } block_header_t;
 static const size_t block_header_free_bit = 1 << 0;
 

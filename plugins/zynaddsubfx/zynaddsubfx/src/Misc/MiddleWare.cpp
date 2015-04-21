@@ -102,7 +102,7 @@ void path_search(const char *m)
     char buffer[1024*20];
     size_t length = rtosc_amessage(buffer, sizeof(buffer), "/paths", types, args);
     if(length) {
-	lo_message msg  = lo_message_deserialise((void*)buffer, length, NULL);
+    lo_message msg  = lo_message_deserialise((void*)buffer, length, NULL);
         lo_address addr = lo_address_new_from_url(last_url.c_str());
         if(addr)
             lo_send_message(addr, buffer, msg);
@@ -115,12 +115,12 @@ static int handler_function(const char *path, const char *types, lo_arg **argv,
     (void) types;
     (void) argv;
     (void) argc;
-	MiddleWare *mw = (MiddleWare*)user_data;
+    MiddleWare *mw = (MiddleWare*)user_data;
     lo_address addr = lo_message_get_source(msg);
     if(addr) {
         const char *tmp = lo_address_get_url(addr);
         if(tmp != last_url) {
-			mw->transmitMsg("/echo", "ss", "OSC_URL", tmp);
+        mw->transmitMsg("/echo", "ss", "OSC_URL", tmp);
             last_url = tmp;
         }
 
@@ -169,7 +169,7 @@ void preparePadSynth(string path, PADnoteParameters *p, rtosc::ThreadLink *uToB)
     path += "sample";
 
     unsigned max = 0;
-	p->sampleGenerator([&max,&path,uToB]
+    p->sampleGenerator([&max,&path,uToB]
             (unsigned N, PADnoteParameters::Sample &s)
             {
             max = max<N ? N : max;
@@ -255,7 +255,7 @@ class DummyDataObj:public rtosc::RtData
 {
     public:
         DummyDataObj(char *loc_, size_t loc_size_, void *obj_, cb_t cb_, void *ui_,
-				Fl_Osc_Interface *osc_, rtosc::ThreadLink *uToB_)
+                Fl_Osc_Interface *osc_, rtosc::ThreadLink *uToB_)
         {
             memset(loc_, 0, sizeof(loc_size_));
             buffer = new char[4*4096];
@@ -266,7 +266,7 @@ class DummyDataObj:public rtosc::RtData
             cb       = cb_;
             ui       = ui_;
             osc      = osc_;
-			uToB     = uToB_;
+            uToB     = uToB_;
         }
         ~DummyDataObj(void)
         {
@@ -308,7 +308,7 @@ class DummyDataObj:public rtosc::RtData
         cb_t cb;
         void *ui;
         Fl_Osc_Interface *osc;
-		rtosc::ThreadLink *uToB;
+        rtosc::ThreadLink *uToB;
 };
 
 
@@ -446,8 +446,8 @@ class MiddleWareImpl
         if(0 == access(tmp_nam.c_str(), F_OK)) {
 //            fprintf(stderr, "Error: Cannot overwrite file %s. "
 //                    "You should probably remove it.", tmp_nam.c_str());
-			//commented out the exit, This is a check for standalone zyn
-			//that causes crashes whith multiple interal instances
+            //commented out the exit, This is a check for standalone zyn
+            //that causes crashes whith multiple interal instances
 //curlymorphic            exit(EXIT_FAILURE);
         }
         FILE* tmp_fp = fopen(tmp_nam.c_str(), "w");
@@ -518,7 +518,7 @@ class MiddleWareImpl
 //                                                "%s, \n  it has not been "
 //                                                "written by zynaddsubfx\n",
 //                                        name.c_str());
-								; //here to keep if statement
+                            ; //here to keep if statement
                             else
                             {
                                 if(std::remove(name.c_str()) != 0)
@@ -665,8 +665,8 @@ public:
     void loadMaster(const char *filename)
     {
         Master *m = new Master();
-		m->uToB = uToB;
-		m->bToU = bToU;
+        m->uToB = uToB;
+        m->bToU = bToU;
         if(filename) {
             m->loadXML(filename);
             m->applyparameters();
@@ -761,17 +761,17 @@ public:
     std::atomic_int pending_load[NUM_MIDI_PARTS];
     std::atomic_int actual_load[NUM_MIDI_PARTS];
 
-	//Link To the Realtime
-	rtosc::ThreadLink *bToU;
-	rtosc::ThreadLink *uToB;
+    //Link To the Realtime
+    rtosc::ThreadLink *bToU;
+    rtosc::ThreadLink *uToB;
 };
 
 MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
 {
-	bToU = new rtosc::ThreadLink(4096*2,1024);
-	uToB = new rtosc::ThreadLink(4096*2,1024);
+    bToU = new rtosc::ThreadLink(4096*2,1024);
+    uToB = new rtosc::ThreadLink(4096*2,1024);
     server = lo_server_new_with_proto(NULL, LO_UDP, liblo_error_cb);
-	lo_server_add_method(server, NULL, NULL, handler_function, mw);
+    lo_server_add_method(server, NULL, NULL, handler_function, mw);
 //    fprintf(stderr, "lo server running on %d\n", lo_server_get_port(server));
 
     clean_up_tmp_nams();
@@ -781,11 +781,11 @@ MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
     cb = [](void*, const char*){};
     idle = 0;
 
-	the_bToU = bToU;
-	master = new Master();
-	master->bToU = bToU;
-	master->uToB = uToB;
-	osc    = GUI::genOscInterface(mw);
+    the_bToU = bToU;
+    master = new Master();
+    master->bToU = bToU;
+    master->uToB = uToB;
+    osc    = GUI::genOscInterface(mw);
 
     //Grab objects of interest from master
     obj_store.extractMaster(master);
@@ -801,7 +801,7 @@ MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
            // printf("undo callback <%s>\n", msg);
             char buf[1024];
             rtosc_message(buf, 1024, "/undo_pause","");
-			handleMsg(buf);
+            handleMsg(buf);
             handleMsg(msg);
             rtosc_message(buf, 1024, "/undo_resume","");
             handleMsg(buf);
@@ -813,11 +813,11 @@ MiddleWareImpl::~MiddleWareImpl(void)
 
     warnMemoryLeaks();
 
-	delete bToU;// = new rtosc::ThreadLink(4096*2,1024);
-	delete uToB; // = new rtosc::ThreadLink(4096*2,1024);
+    delete bToU;// = new rtosc::ThreadLink(4096*2,1024);
+    delete uToB; // = new rtosc::ThreadLink(4096*2,1024);
 
-	delete master;
-	delete osc;
+    delete master;
+    delete osc;
 }
 
 
@@ -950,7 +950,7 @@ bool MiddleWareImpl::handleOscil(string path, const char *msg, void *v)
     printf("handleOscil...\n");
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
-	DummyDataObj d(buffer, 1024, v, cb, ui, osc, uToB);
+    DummyDataObj d(buffer, 1024, v, cb, ui, osc, uToB);
     strcpy(buffer, path.c_str());
     if(!v)
         return true;
@@ -1085,7 +1085,7 @@ void MiddleWareImpl::handleMsg(const char *msg)
             //else if(strstr(obj_rl.c_str(), "kititem"))
             //    handleKitItem(obj_rl, objmap[obj_rl],atoi(rindex(msg,'m')+1),rtosc_argument(msg,0).T);
         } else if(strstr(msg, "padpars/prepare"))
-			preparePadSynth(obj_rl,(PADnoteParameters *) obj_store.get(obj_rl), uToB);
+            preparePadSynth(obj_rl,(PADnoteParameters *) obj_store.get(obj_rl), uToB);
         else if(strstr(msg, "padpars")) {
             if(!handlePAD(obj_rl, last_path+1, obj_store.get(obj_rl)))
                 uToB->raw_write(msg);
@@ -1218,7 +1218,7 @@ void MiddleWare::transmitMsg(const char *path, const char *args, va_list va)
 void MiddleWare::pendingSetProgram(int part, int program)
 {
     impl->pending_load[part]++;
-	impl->bToU->write("/setprogram", "cc", part, program);
+    impl->bToU->write("/setprogram", "cc", part, program);
 }
 
 std::string MiddleWare::activeUrl(void)
