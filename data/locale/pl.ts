@@ -5952,7 +5952,7 @@ Upewnij się, że masz przynajmniej uprawnienia odczytu tego pliku a następnie 
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Wyciszone</translation>
     </message>
     <message>

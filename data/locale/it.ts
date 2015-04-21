@@ -5971,7 +5971,7 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Muto</translation>
     </message>
     <message>

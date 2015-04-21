@@ -5932,7 +5932,7 @@ Latency: %2 ms</source>
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">무음</translation>
     </message>
     <message>

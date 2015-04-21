@@ -5946,7 +5946,7 @@ Latencia: %2 ms</translation>
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Silenciado</translation>
     </message>
     <message>
