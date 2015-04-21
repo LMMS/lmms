@@ -86,6 +86,16 @@ public:
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
+	
+	bool isLoading()
+	{
+		return m_isLoading;
+	}
+	
+	void setIsLoading ( bool loading )
+	{
+		m_isLoading = loading;
+	}
 
 
 private slots:
@@ -122,6 +132,8 @@ private:
 
 	QMap<int, bool> m_modifiedControllers;
 
+	bool m_isLoading;
+	bool m_isPlaying;
 	friend class ZynAddSubFxView;
 
 

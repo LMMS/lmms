@@ -116,7 +116,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM Gain" ) ),
 	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance Center Frequency" ) ),
 	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance Bandwidth" ) ),
-	m_forwardMidiCcModel( true, this, tr( "Forward MIDI Control Change Events" ) )
+	m_forwardMidiCcModel( true, this, tr( "Forward MIDI Control Change Events" ) ),
+	m_isLoading( true ),
+	m_isPlaying( false )
 {
 	initPlugin();
 
@@ -323,7 +325,13 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 {
+	//dont process audio, if plugin is loading
+	while ( isLoading() )
+	{
+		return;
+	}
 	m_pluginMutex.lock();
+	m_isPlaying = true;
 	if( m_remotePlugin )
 	{
 		m_remotePlugin->process( NULL, _buf );
@@ -333,7 +341,9 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
+	
 	instrumentTrack()->processAudioBuffer( _buf, Engine::mixer()->framesPerPeriod(), NULL );
+	m_isPlaying = false;
 }
 
 
@@ -421,6 +431,11 @@ GEN_CC_SLOT(updateResBandwidth,C_resonance_bandwidth,m_resBandwidthModel);
 
 void ZynAddSubFxInstrument::initPlugin()
 {
+	while( m_isPlaying )
+	{
+		usleep(20);
+	}
+	m_isLoading = true;
 	m_pluginMutex.lock();
 	if(m_remotePlugin)
 	{
@@ -464,6 +479,7 @@ void ZynAddSubFxInstrument::initPlugin()
 	}
 
 	m_pluginMutex.unlock();
+	m_isLoading = false;
 }
 
 
@@ -637,8 +653,9 @@ void ZynAddSubFxView::modelChanged()
 void ZynAddSubFxView::toggleUI()
 {
 	ZynAddSubFxInstrument * model = castModel<ZynAddSubFxInstrument>();
-	if( model->m_hasGUI != m_toggleUIButton->isChecked() )
+	if( model->m_hasGUI != m_toggleUIButton->isChecked() && !model->isLoading() )
 	{
+		model->setIsLoading( true );
 		model->m_hasGUI = m_toggleUIButton->isChecked();
 		model->reloadPlugin();
 
