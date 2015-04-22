@@ -1,5 +1,7 @@
 INCLUDE(BuildPlugin)
 
+ADD_DEFINITIONS("override")
+
 # build ZynAddSubFX with full optimizations
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -Wno-write-strings -Wno-deprecated-declarations -std=c++0x ")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions")
