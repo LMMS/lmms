@@ -1,5 +1,24 @@
 INCLUDE(BuildPlugin)
 
+#Include RTOSC
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/rtosc/CMakeLists.txt")
+    message(STATUS "RTOSC NOT FOUND")
+    message(STATUS "Attempting to checkout submodule")
+    find_package(Git REQUIRED)
+    execute_process(COMMAND git submodule update --init)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/rtosc/CMakeLists.txt")
+        message(FATAL_ERROR "FAILED TO CHECKOUT RTOSC\n"
+        "please check file permissions and your network")
+    endif()
+else()
+    message(STATUS "Found Rtosc Submodule...")
+endif()
+
+set(RTOSC_NO_INSTALL TRUE)
+include("rtosc/cmake/ColorMessage.cmake")
+add_subdirectory(rtosc)
+include_directories(rtosc/include)
+
 
 # definitions for ZynAddSubFX
 IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -130,7 +149,7 @@ ENDIF(LMMS_BUILD_WIN32)
 
 BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
 TARGET_LINK_LIBRARIES(zynaddsubfx zynaddsubfx_gui zynaddsubfx_nio
-	 ZynAddSubFxCore -lrtosc-cpp -lrtosc -llo -lm )
+	 ZynAddSubFxCore -llo -lm )
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
