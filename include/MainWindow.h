@@ -138,6 +138,7 @@ protected:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void keyReleaseEvent( QKeyEvent * _ke );
 	virtual void timerEvent( QTimerEvent * _ev );
+	bool eventFilter(QObject *obj, QEvent *event);
 
 
 private:
@@ -173,6 +174,8 @@ private:
 		bool m_alt;
 	} m_keyMods;
 
+	int m_numKeysPressedAfterAlt;
+
 	QMenu * m_toolsMenu;
 	QAction * m_undoAction;
 	QAction * m_redoAction;
@@ -197,7 +200,8 @@ private slots:
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 
-
+	void toggleAppMenuVisible();
+	void revealAppMenu();
 	void autoSave();
 
 signals:

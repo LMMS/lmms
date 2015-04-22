@@ -76,6 +76,7 @@ MainWindow::MainWindow() :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
+	m_numKeysPressedAfterAlt( 0 ), 
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
@@ -206,6 +207,8 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
+
+	qApp->installEventFilter(this);
 }
 
 
@@ -238,7 +241,7 @@ void MainWindow::finalize()
 
 
 	// project-popup-menu
-	QMenu * project_menu = new QMenu( this );
+	QMenu * project_menu = new QMenu( menuBar() );
 	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
@@ -309,7 +312,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::Key_Q );
 
 
-	QMenu * edit_menu = new QMenu( this );
+	QMenu * edit_menu = new QMenu( menuBar() );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
 	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
@@ -335,7 +338,7 @@ void MainWindow::finalize()
 					this, SLOT( showSettingsDialog() ) );
 	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()) );
 
-	m_viewMenu = new QMenu( this );
+	m_viewMenu = new QMenu( menuBar() );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
 	connect( m_viewMenu, SIGNAL( aboutToShow() ),
 		 this, SLOT( updateViewMenu() ) );
@@ -343,7 +346,7 @@ void MainWindow::finalize()
 		SLOT(updateConfig(QAction*)));
 
 
-	m_toolsMenu = new QMenu( this );
+	m_toolsMenu = new QMenu( menuBar() );
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
@@ -359,7 +362,7 @@ void MainWindow::finalize()
 
 
 	// help-popup-menu
-	QMenu * help_menu = new QMenu( this );
+	QMenu * help_menu = new QMenu( menuBar() );
 	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
 	// May use offline help
 	if( true )
@@ -381,6 +384,8 @@ void MainWindow::finalize()
 	help_menu->addSeparator();
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
+
+	menuBar()->hide();
 
 	// create tool-buttons
 	ToolButton * project_new = new ToolButton(
@@ -1330,6 +1335,12 @@ void MainWindow::focusOutEvent( QFocusEvent * _fe )
 
 void MainWindow::keyPressEvent( QKeyEvent * _ke )
 {
+	// track the number of keys pressed after alt so that we can detect a lone alt release event to toggle app menu
+	if (m_keyMods.m_alt)
+	{
+		m_numKeysPressedAfterAlt += 1;
+	}
+
 	switch( _ke->key() )
 	{
 		case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
@@ -1337,6 +1348,19 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Alt: m_keyMods.m_alt = true; break;
 		default:
 		{
+			if (m_keyMods.m_alt)
+			{
+				if (_ke->key() == Qt::Key_F || _ke->key() == Qt::Key_E || 
+					_ke->key() == Qt::Key_V || _ke->key() == Qt::Key_T || _ke->key() == Qt::Key_H)
+				{
+					// alt+F, etc should reveal the application menu and expand the &File submenu
+					_ke->accept();
+					revealAppMenu();
+					QKeyEvent *clone = new QKeyEvent(_ke->type(), _ke->key(), _ke->modifiers());
+					QCoreApplication::postEvent (this, clone);
+					break;
+				}
+			}
 			InstrumentTrackWindow * w =
 						InstrumentTrackView::topLevelInstrumentTrackWindow();
 			if( w )
@@ -1360,7 +1384,16 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 	{
 		case Qt::Key_Control: m_keyMods.m_ctrl = false; break;
 		case Qt::Key_Shift: m_keyMods.m_shift = false; break;
-		case Qt::Key_Alt: m_keyMods.m_alt = false; break;
+		case Qt::Key_Alt: 
+			m_keyMods.m_alt = false; 
+
+			// if no other key was pressed between pressing and releasing alt, toggle app menu
+			if (m_numKeysPressedAfterAlt == 0)
+			{
+				toggleAppMenuVisible();
+			}
+			m_numKeysPressedAfterAlt = 0;
+			break;
 		default:
 			if( InstrumentTrackView::topLevelInstrumentTrackWindow() )
 			{
@@ -1382,6 +1415,28 @@ void MainWindow::timerEvent( QTimerEvent * _te)
 	emit periodicUpdate();
 }
 
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+	if (event->type() == QEvent::MouseButtonRelease)
+	{
+		// Unless the mouse event was targeted at the menuBar(), hide it
+		bool wasMenuBarClicked = false;
+		for(QWidget *target = static_cast<QWidget*>(obj); target != NULL; target=target->parentWidget())
+		{
+			if (target == menuBar())
+			{
+				wasMenuBarClicked = true;
+			}
+		}
+
+		if (!wasMenuBarClicked)
+		{
+			menuBar()->hide();
+		}
+	}
+	// return false to propagate the event
+	return false;
+}
 
 
 
@@ -1443,6 +1498,19 @@ void MainWindow::browseHelp()
 }
 
 
+void MainWindow::toggleAppMenuVisible()
+{
+	menuBar()->setVisible(!menuBar()->isVisible());
+	menuBar()->setEnabled(true);
+}
+
+void MainWindow::revealAppMenu()
+{
+	menuBar()->show();
+	// shortcuts aren't delivered to the keyPressEvent function, but keyReleaseEvent does get triggered, 
+	// so have to manually track m_numKeysPressedAfterAlt here.
+	m_numKeysPressedAfterAlt += 1;
+}
 
 
 void MainWindow::autoSave()
