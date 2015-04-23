@@ -24,7 +24,7 @@ fltk_wrap_ui(zynaddsubfx_gui ${UI_fl_files})
 set(LibloEnable true)
 
 if(LibloEnable)
-    set(zynaddsubfx_gui_FLTK_UI_SRCS ${zynaddsubfx_gui_FLTK_UI_SRCS} NSM.C NSM/Client.C)
+    set(zynaddsubfx_gui_FLTK_UI_SRCS ${zynaddsubfx_gui_FLTK_UI_SRCS} )# remove nsm NSM.C NSM/Client.C
 endif()
 if(NtkGui)
     add_definitions(-DPIXMAP_PATH="${CMAKE_INSTALL_PREFIX}/share/zynaddsubfx/pixmaps/")
