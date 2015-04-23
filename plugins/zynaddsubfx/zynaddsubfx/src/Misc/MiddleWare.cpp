@@ -653,7 +653,7 @@ public:
 
         //Load the part
         if(idle) {
-            while(alloc.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+            while(alloc.wait_for(sleep(0)) != std::future_status::ready) {
                 idle();
             }
         }
