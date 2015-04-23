@@ -32,7 +32,7 @@ class Fl_OscilSpectrum : public Fl_Box, Fl_Osc_Widget
             osc->requestValue(loc);
         }
 
-        virtual void OSC_value(unsigned N, void *data) override
+        virtual void OSC_value(unsigned N, void *data) 
         {
             assert(!(N%4));
             const size_t new_samples = N / 4;

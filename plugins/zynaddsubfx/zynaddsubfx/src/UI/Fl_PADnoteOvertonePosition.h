@@ -62,7 +62,6 @@ class PADnoteOvertonePosition: public Fl_Box, Fl_Osc_Widget
         }
 
         virtual void OSC_value(unsigned N, void *data, const char *name)
-            override
         {
             assert(N==(4*nsamples));
             float *d = (float*)data;
@@ -73,7 +72,7 @@ class PADnoteOvertonePosition: public Fl_Box, Fl_Osc_Widget
             else
                 assert(false);
         }
-        virtual void OSC_value(char x, const char *name) override
+        virtual void OSC_value(char x, const char *name) 
         {
             assert(!strcmp(name, "mode"));
             mode = x;
