@@ -643,9 +643,10 @@ public:
 
         //Load the part
         if(idle) {
-            while(alloc.wait_for(sleep(1)) != std::future_status::ready) {
-                idle();
-            }
+//            while(alloc.wait_for( sleep(1)) != std::future_status::ready) {
+//                idle();
+//            }
+			sleep(1);
         }
 
         Part *p = alloc.get();
