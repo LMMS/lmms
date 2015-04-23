@@ -686,9 +686,9 @@ public:
     }
 
     //If currently broadcasting messages
-    bool broadcast = false;
+    bool broadcast; 
     //If accepting undo events as user driven
-    bool recording_undo = true;
+    bool recording_undo; 
     void bToUhandle(const char *rtmsg);
 
     void tick(void)
@@ -1155,7 +1155,11 @@ void MiddleWareImpl::warnMemoryLeaks(void)
  ******************************************************************************/
     MiddleWare::MiddleWare(void)
 :impl(new MiddleWareImpl(this))
-{}
+{
+		// added for compatability with gcc 4.6
+		broadcast = false;
+		recording_undo = true;
+	}
 MiddleWare::~MiddleWare(void)
 {
     delete impl;
