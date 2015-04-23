@@ -24,18 +24,19 @@ void *data(next_t *n)
 
 struct AllocatorImpl
 {
-    void *tlsf = 0;
+    void *tlsf; // = 0;
 
     //singly linked list of memory pools
     //XXX this may violate alignment on some platforms if malloc doesn't return
     //nice values
-    next_t *pools = 0;
-    unsigned long long totalAlloced = 0;
+    next_t *pools; //= 0;
+    unsigned long long totalAlloced; // = 0;
 };
 
 Allocator::Allocator(void)
 {
     impl = new AllocatorImpl;
+	impl->totalAlloced = 0;
     size_t default_size = 5*1024*1024;
     impl->pools = (next_t*)malloc(default_size);
     impl->pools->next = 0x0;
