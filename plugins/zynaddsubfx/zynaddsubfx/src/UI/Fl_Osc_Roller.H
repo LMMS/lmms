@@ -10,7 +10,7 @@ class Fl_Osc_Roller:public Fl_Roller, Fl_Osc_Widget
         virtual ~Fl_Osc_Roller(void);
         void init(const char *path);
         //void OSC_value(float);
-        void OSC_value(char) override;
+        void OSC_value(char);
         using Fl_Osc_Widget::OSC_value;
 
         //Refetch parameter information

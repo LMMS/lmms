@@ -21,8 +21,8 @@ class FormantFilterGraph : public Fl_Box, Fl_Osc_Widget {
         void draw();
         virtual ~FormantFilterGraph(void);
 
-        void OSC_value(int x, const char *) override;
-        void OSC_value(unsigned x, void *v) override;
+        void OSC_value(int x, const char *);
+        void OSC_value(unsigned x, void *v);
 
         void updateVowel(int);
         void updateFormant(int);
