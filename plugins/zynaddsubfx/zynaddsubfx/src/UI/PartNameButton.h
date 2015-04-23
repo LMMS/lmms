@@ -12,5 +12,5 @@ class PartNameButton:public Fl_Button, public Fl_Osc_Widget
         virtual void OSC_value(const char *);
         std::string the_string;
 
-        //virtual void rebase(std::string) override;
+        //virtual void rebase(std::string)  ;
 };

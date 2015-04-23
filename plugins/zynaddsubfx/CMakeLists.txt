@@ -1,6 +1,6 @@
 INCLUDE(BuildPlugin)
 
-ADD_DEFINITIONS("-Doverride")
+# ADD_DEFINITIONS("-Doverride")   removed because removed overrides statements
 
 # build ZynAddSubFX with full optimizations
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -Wno-write-strings -Wno-deprecated-declarations -std=c++0x ")
