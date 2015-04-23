@@ -543,17 +543,7 @@ class MiddleWareImpl
     }
 
 public:
-    //If currently broadcasting messages
-    bool broadcast; 
-    //If accepting undo events as user driven
-    bool recording_undo; 
-    MiddleWareImpl(MiddleWare *mw)
-    {
-                // added for compatability with gcc 4.6
-        broadcast = false;
-        recording_undo = true;
-	}
-
+    MiddleWareImpl(MiddleWare *mw);
     ~MiddleWareImpl(void);
 
     void warnMemoryLeaks(void);
@@ -653,7 +643,7 @@ public:
 
         //Load the part
         if(idle) {
-            while(alloc.wait_for(sleep(0)) != std::future_status::ready) {
+            while(alloc.wait_for(sleep(1)) != std::future_status::ready) {
                 idle();
             }
         }
@@ -771,9 +761,18 @@ public:
     rtosc::ThreadLink *bToU;
     rtosc::ThreadLink *uToB;
 };
+    //If currently broadcasting messages
+    bool broadcast; 
+    //If accepting undo events as user driven
+    bool recording_undo; 
 
 MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
 {
+
+    // added for compatability with gcc 4.6
+    broadcast = false;
+    recording_undo = true;
+
     bToU = new rtosc::ThreadLink(4096*2,1024);
     uToB = new rtosc::ThreadLink(4096*2,1024);
     server = lo_server_new_with_proto(NULL, LO_UDP, liblo_error_cb);
