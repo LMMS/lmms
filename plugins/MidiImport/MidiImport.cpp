@@ -182,8 +182,8 @@ public:
 			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
+			ap->addObject( objModel );
 		}
-		ap->addObject( objModel );
 
 		lastPos = time;
 		time = time - ap->startPosition();
