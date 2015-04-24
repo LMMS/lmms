@@ -357,7 +357,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// Tracks
 	for( int t = 0; t < seq->tracks(); ++t )
 	{
-		QString trackName = "";
+		QString trackName = QString("Track %1").arg(t);
 		Alg_track_ptr trk = seq->track( t );
 		pd.setValue( t + preTrackSteps );
 
@@ -402,8 +402,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			{
 				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
-
-				Note n( noteEvt->get_duration() * ticksPerBeat,
+				double ticks = MidiTime( noteEvt->get_duration() * ticksPerBeat );
+				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
 						noteEvt->get_loud());
