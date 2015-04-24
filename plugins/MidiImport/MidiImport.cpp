@@ -156,11 +156,14 @@ public:
 	AutomationPattern * ap;
 	MidiTime lastPos;
 	
-	smfMidiCC & create( TrackContainer* tc )
+	smfMidiCC & create( TrackContainer* tc, QString tn )
 	{
 		if( !at )
 		{
 			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
+		}
+		if( tn != "") {
+			at->setName( tn );
 		}
 		return *this;
 	}
@@ -487,7 +490,11 @@ bool MidiImport::readSMF( TrackContainer* tc )
 							}
 							else
 							{
-								ccs[ccid].create( tc );
+								if( ccs[ccid].at == NULL ) {
+									ccs[ccid].create( tc, trackName + 
+											  (ccid == 128 ? " Pitch bend" : 
+											   QString(" CC %1").arg(ccid) ) );
+								}
 								ccs[ccid].putValue( time, objModel, cc );
 							}
 						}
