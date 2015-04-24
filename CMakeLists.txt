@@ -24,6 +24,25 @@ ENDIF(VERSION_SUFFIX)
 
 INCLUDE(DetectMachine)
 
+#Include RTOSC
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/rtosc/CMakeLists.txt")
+    message(STATUS "RTOSC NOT FOUND")
+    message(STATUS "Attempting to checkout submodule")
+    find_package(Git REQUIRED)
+    execute_process(COMMAND git submodule update --init)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/rtosc/CMakeLists.txt")
+        message(FATAL_ERROR "FAILED TO CHECKOUT RTOSC\n"
+        "please check file permissions and your network")
+    endif()
+else()
+    message(STATUS "Found Rtosc Submodule...")
+endif()
+
+set(RTOSC_NO_INSTALL TRUE)
+include("rtosc/cmake/ColorMessage.cmake")
+add_subdirectory(rtosc)
+include_directories(rtosc/include)
+
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
