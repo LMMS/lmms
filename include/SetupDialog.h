@@ -97,6 +97,7 @@ private slots:
 	void toggleWarnAfterSetup( bool _enabled );
 	void toggleDisplaydBV( bool _enabled );
 	void toggleMMPZ( bool _enabled );
+	void toggleHideableMenuBar( bool _enabled );
 	void toggleDisableBackup( bool _enabled );
 	void toggleOpenLastProject( bool _enabled );
 	void toggleHQAudioDev( bool _enabled );
@@ -182,6 +183,7 @@ private:
 	bool m_printNoteLabels;
 	bool m_displayWaveform;
 	bool m_disableAutoQuit;
+	bool m_hideableMenuBar;
 
 	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
 	typedef QMap<QString, MidiSetupWidget *> MswMap;

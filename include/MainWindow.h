@@ -202,6 +202,7 @@ private slots:
 
 	void toggleAppMenuVisible();
 	void revealAppMenu();
+	void hideAppMenu();
 	void autoSave();
 
 signals:

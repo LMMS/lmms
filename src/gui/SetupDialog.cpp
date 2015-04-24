@@ -135,7 +135,9 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
-						   "disableautoquit").toInt() )
+						   "disableautoquit").toInt() ),
+	m_hideableMenuBar(ConfigManager::inst()->value( "ui",
+							"hideablemenubar").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -311,6 +313,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	disableAutoquit->setChecked( m_disableAutoQuit );
 	connect( disableAutoquit, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableAutoquit( bool ) ) );
+
+	LedCheckBox * hideableMenuBar = new LedCheckBox(
+				tr( "Allow hiding of the application menu bar with <tab>" ),
+								misc_tw );
+	labelNumber++;
+	hideableMenuBar->move( XDelta, YDelta*labelNumber );
+	hideableMenuBar->setChecked( m_hideableMenuBar );
+	connect( hideableMenuBar, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleHideableMenuBar( bool ) ) );
 
 	LedCheckBox * disableBackup = new LedCheckBox(
 				tr( "Create backup file when saving a project" ),
@@ -999,6 +1010,8 @@ void SetupDialog::accept()
 					QString::number( m_displayWaveform ) );
 	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
+	ConfigManager::inst()->setValue( "ui", "hideablemenubar",
+					QString::number( m_hideableMenuBar ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 
 
@@ -1129,6 +1142,14 @@ void SetupDialog::toggleDisplaydBV( bool _enabled )
 void SetupDialog::toggleMMPZ( bool _enabled )
 {
 	m_MMPZ = _enabled;
+}
+
+
+
+
+void SetupDialog::toggleHideableMenuBar( bool _enabled)
+{
+	m_hideableMenuBar = _enabled;
 }
 
 

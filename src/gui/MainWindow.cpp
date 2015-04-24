@@ -385,7 +385,7 @@ void MainWindow::finalize()
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
-	menuBar()->hide();
+	hideAppMenu();
 
 	// create tool-buttons
 	ToolButton * project_new = new ToolButton(
@@ -1431,7 +1431,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 		if (!wasMenuBarClicked)
 		{
-			menuBar()->hide();
+			hideAppMenu();
 		}
 	}
 	// return false to propagate the event
@@ -1500,8 +1500,14 @@ void MainWindow::browseHelp()
 
 void MainWindow::toggleAppMenuVisible()
 {
-	menuBar()->setVisible(!menuBar()->isVisible());
-	menuBar()->setEnabled(true);
+	if (menuBar()->isVisible()) 
+	{
+		hideAppMenu();
+	} 
+	else 
+	{
+		revealAppMenu();
+	}
 }
 
 void MainWindow::revealAppMenu()
@@ -1510,6 +1516,15 @@ void MainWindow::revealAppMenu()
 	// shortcuts aren't delivered to the keyPressEvent function, but keyReleaseEvent does get triggered, 
 	// so have to manually track m_numKeysPressedAfterAlt here.
 	m_numKeysPressedAfterAlt += 1;
+}
+
+void MainWindow::hideAppMenu()
+{
+	// only hide the menu bar if the user configured that
+	if (ConfigManager::inst()->value( "ui", "hideablemenubar").toInt())
+	{
+		menuBar()->hide();
+	}
 }
 
 
