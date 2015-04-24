@@ -385,7 +385,7 @@ void MainWindow::finalize()
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
-	hideAppMenu();
+	tryHideMenuBar();
 
 	// create tool-buttons
 	ToolButton * project_new = new ToolButton(
@@ -1355,7 +1355,12 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 				{
 					// alt+F, etc should reveal the application menu and expand the &File submenu
 					_ke->accept();
-					revealAppMenu();
+					revealMenuBar();
+
+					// shortcuts aren't delivered to the keyPressEvent function, but keyReleaseEvent does get triggered, 
+					// so have to manually track m_numKeysPressedAfterAlt here.
+					m_numKeysPressedAfterAlt += 1;
+					// propagate the actual event to its target
 					QKeyEvent *clone = new QKeyEvent(_ke->type(), _ke->key(), _ke->modifiers());
 					QCoreApplication::postEvent (this, clone);
 					break;
@@ -1390,7 +1395,7 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 			// if no other key was pressed between pressing and releasing alt, toggle app menu
 			if (m_numKeysPressedAfterAlt == 0)
 			{
-				toggleAppMenuVisible();
+				toggleMenuBarVisible();
 			}
 			m_numKeysPressedAfterAlt = 0;
 			break;
@@ -1429,9 +1434,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			}
 		}
 
-		if (!wasMenuBarClicked)
+		if (!isMenuBarHideable())
 		{
-			hideAppMenu();
+			// in case the setting was disabled, re-enable the menu bar.
+			revealMenuBar();
+		}
+		else if (!wasMenuBarClicked)
+		{
+			tryHideMenuBar();
 		}
 	}
 	// return false to propagate the event
@@ -1498,30 +1508,32 @@ void MainWindow::browseHelp()
 }
 
 
-void MainWindow::toggleAppMenuVisible()
+void MainWindow::toggleMenuBarVisible()
 {
 	if (menuBar()->isVisible()) 
 	{
-		hideAppMenu();
+		tryHideMenuBar();
 	} 
 	else 
 	{
-		revealAppMenu();
+		revealMenuBar();
 	}
 }
 
-void MainWindow::revealAppMenu()
+void MainWindow::revealMenuBar()
 {
 	menuBar()->show();
-	// shortcuts aren't delivered to the keyPressEvent function, but keyReleaseEvent does get triggered, 
-	// so have to manually track m_numKeysPressedAfterAlt here.
-	m_numKeysPressedAfterAlt += 1;
 }
 
-void MainWindow::hideAppMenu()
+bool MainWindow::isMenuBarHideable() const
+{
+	return ConfigManager::inst()->value( "ui", "hideablemenubar").toInt();
+}
+
+void MainWindow::tryHideMenuBar()
 {
 	// only hide the menu bar if the user configured that
-	if (ConfigManager::inst()->value( "ui", "hideablemenubar").toInt())
+	if (isMenuBarHideable())
 	{
 		menuBar()->hide();
 	}

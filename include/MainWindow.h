@@ -151,6 +151,10 @@ private:
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
 
+	bool isMenuBarHideable() const;
+	void revealMenuBar();
+	void tryHideMenuBar();
+	void toggleMenuBarVisible();
 
 	QMdiArea * m_workspace;
 
@@ -200,9 +204,6 @@ private slots:
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 
-	void toggleAppMenuVisible();
-	void revealAppMenu();
-	void hideAppMenu();
 	void autoSave();
 
 signals:
