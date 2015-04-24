@@ -29,15 +29,15 @@ class XMLwrapper;
 class LFOParams
 {
     public:
-        LFOParams();
-        LFOParams(char Pfreq_,
-                  char Pintensity_,
-                  char Pstartphase_,
-                  char PLFOtype_,
-                  char Prandomness_,
-                  char Pdelay_,
-                  char Pcontinous,
-                  char fel_);
+//        LFOParams();
+        LFOParams(char Pfreq_ = 64,
+                  char Pintensity_ = 0,
+                  char Pstartphase_ = 0,
+                  char PLFOtype_ = 0,
+                  char Prandomness_ = 0,
+                  char Pdelay_ = 0,
+                  char Pcontinous = 0,
+                  char fel_ = 0);
         ~LFOParams();
 
         void add2XML(XMLwrapper *xml);

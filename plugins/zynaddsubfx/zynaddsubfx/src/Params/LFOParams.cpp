@@ -51,20 +51,20 @@ rtosc::Ports &LFOParams::ports = _ports;
 
 int LFOParams::time;
 
-LFOParams::LFOParams()
-{
-    Dfreq       = 64;
-    Dintensity  = 0;
-    Dstartphase = 0;
-    DLFOtype    = 0;
-    Drandomness = 0;
-    Ddelay      = 0;
-    Dcontinous  = 0;
-    fel  = 0;
-    time = 0;
+//LFOParams::LFOParams()
+//{
+//    Dfreq       = 64;
+//    Dintensity  = 0;
+//    Dstartphase = 0;
+//    DLFOtype    = 0;
+//    Drandomness = 0;
+//    Ddelay      = 0;
+//    Dcontinous  = 0;
+//    fel  = 0;
+//    time = 0;
 
-    defaults();
-}
+//    defaults();
+//}
 
 LFOParams::LFOParams(char Pfreq_,
                      char Pintensity_,

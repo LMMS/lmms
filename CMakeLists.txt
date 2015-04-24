@@ -29,11 +29,13 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/zynaddsubfx/rtosc/CMakeLists.
     message(STATUS "RTOSC NOT FOUND")
     message(STATUS "Attempting to checkout submodule")
     find_package(Git REQUIRED)
-    execute_process(COMMAND git submodule update --init)
+	set(THISDIR ${CMAKE_BINARY_DIR})
+    execute_process(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/zynaddsubfx/rtosc/CMakeLists.txt")
         message(FATAL_ERROR "FAILED TO CHECKOUT RTOSC\n"
         "please check file permissions and your network")
     endif()
+	execute_process(COMMAND git branch WORKING_DIRECTORY ${THISDIR}) #return to corrent folder
 else()
     message(STATUS "Found Rtosc Submodule...")
 endif()
