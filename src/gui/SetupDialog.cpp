@@ -315,7 +315,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleDisableAutoquit( bool ) ) );
 
 	LedCheckBox * hideableMenuBar = new LedCheckBox(
-				tr( "Auto-hide the application menu bar (toggle visibility with <tab>)" ),
+				tr( "Auto-hide the application menu bar (toggle visibility with <Alt>)" ),
 								misc_tw );
 	labelNumber++;
 	hideableMenuBar->move( XDelta, YDelta*labelNumber );
