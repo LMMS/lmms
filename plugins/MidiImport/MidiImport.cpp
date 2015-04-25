@@ -160,6 +160,7 @@ public:
 	{
 		if( !at )
 		{
+			qApp->processEvents();
 			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
 		}
 		if( tn != "") {
@@ -223,6 +224,7 @@ public:
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
 	{
 		if( !it ) {
+			qApp->processEvents();
 			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
