@@ -45,6 +45,9 @@ public:
 	void undo();
 	void redo();
 
+	bool canUndo() const;
+	bool canRedo() const;
+
 	void addJournalCheckPoint( JournallingObject *jo );
 
 	bool isJournalling() const
