@@ -1424,13 +1424,18 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
 	if (event->type() == QEvent::MouseButtonRelease)
 	{
-		// Unless the mouse event was targeted at the menuBar(), hide it
+		// Unless the mouse event was targeted at the menuBar() or at a different window, hide it
 		bool wasMenuBarClicked = false;
+		bool wasMyWindowClicked = false;
 		for(QWidget *target = static_cast<QWidget*>(obj); target != NULL; target=target->parentWidget())
 		{
 			if (target == menuBar())
 			{
 				wasMenuBarClicked = true;
+			}
+			if (target == this)
+			{
+				wasMyWindowClicked = true;
 			}
 		}
 
@@ -1439,7 +1444,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			// in case the setting was disabled, re-enable the menu bar.
 			revealMenuBar();
 		}
-		else if (!wasMenuBarClicked)
+		else if (!wasMenuBarClicked && wasMyWindowClicked)
 		{
 			tryHideMenuBar();
 		}
