@@ -176,10 +176,8 @@ static Ports localports = {
     {"freeze_state:", rDoc("Internal Read-only Mode"), 0,
         [](const char *,RtData &d) {
             Master *M =  (Master*)d.obj;
-		 //  ************************************************************************************************
-		 //  ///////////// HACK MUST REMOVE BEFORE SUBMIT <<<<<<<<<<<<<<<<<<<<<<<<
-		 //  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //            std::atomic_thread_fence(std::memory_order_release);
+            __sync_synchronize();
             M->frozenState = true;
             d.reply("/state_frozen", "");}},
     {"thaw_state:", rDoc("Internal Read-only Mode"), 0,

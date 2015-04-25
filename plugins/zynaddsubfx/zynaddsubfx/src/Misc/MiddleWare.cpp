@@ -871,10 +871,8 @@ void MiddleWareImpl::doReadOnlyOp(std::function<void()> read_only_fn)
     }
 
     assert(tries < 10000);//if this happens, the backend must be dead
-//  ************************************************************************************************
-//  ///////////// HACK MUST REMOVE BEFORE SUBMIT <<<<<<<<<<<<<<<<<<<<<<<<
-//  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //    std::atomic_thread_fence(std::memory_order_acquire);
+    __sync_synchronize();
 
     //Now it is safe to do any read only operation
     read_only_fn();
