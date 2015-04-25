@@ -30,7 +30,7 @@ class Fl_Osc_Dial:public WidgetPDial, public Fl_Osc_Widget
         int handle(int);
 
         void mark_dead(void);
-        virtual void rebase(std::string new_base) override;
+        virtual void rebase(std::string new_base) ;
 
         void cb(void);
     private:

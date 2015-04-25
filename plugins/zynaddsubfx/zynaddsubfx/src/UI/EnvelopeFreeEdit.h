@@ -21,7 +21,7 @@ class EnvelopeFreeEdit : public Fl_Box, Fl_Osc_Widget
         int handle(int event);
 
         void draw(void);
-        void OSC_raw(const char *msg) override;
+        void OSC_raw(const char *msg)  ;
         void update(void);
 
 

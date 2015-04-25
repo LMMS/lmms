@@ -643,9 +643,10 @@ public:
 
         //Load the part
         if(idle) {
-            while(alloc.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
-                idle();
-            }
+//            while(alloc.wait_for( sleep(1)) != std::future_status::ready) {
+//                idle();
+//            }
+			sleep(1);
         }
 
         Part *p = alloc.get();
@@ -685,10 +686,6 @@ public:
         uToB->write("/load-master", "b", sizeof(Master*), &m);
     }
 
-    //If currently broadcasting messages
-    bool broadcast = false;
-    //If accepting undo events as user driven
-    bool recording_undo = true;
     void bToUhandle(const char *rtmsg);
 
     void tick(void)
@@ -765,9 +762,18 @@ public:
     rtosc::ThreadLink *bToU;
     rtosc::ThreadLink *uToB;
 };
+    //If currently broadcasting messages
+    bool broadcast; 
+    //If accepting undo events as user driven
+    bool recording_undo; 
 
 MiddleWareImpl::MiddleWareImpl(MiddleWare *mw)
 {
+
+    // added for compatability with gcc 4.6
+    broadcast = false;
+    recording_undo = true;
+
     bToU = new rtosc::ThreadLink(4096*2,1024);
     uToB = new rtosc::ThreadLink(4096*2,1024);
     server = lo_server_new_with_proto(NULL, LO_UDP, liblo_error_cb);
@@ -865,8 +871,10 @@ void MiddleWareImpl::doReadOnlyOp(std::function<void()> read_only_fn)
     }
 
     assert(tries < 10000);//if this happens, the backend must be dead
-
-    std::atomic_thread_fence(std::memory_order_acquire);
+//  ************************************************************************************************
+//  ///////////// HACK MUST REMOVE BEFORE SUBMIT <<<<<<<<<<<<<<<<<<<<<<<<
+//  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//    std::atomic_thread_fence(std::memory_order_acquire);
 
     //Now it is safe to do any read only operation
     read_only_fn();

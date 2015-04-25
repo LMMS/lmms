@@ -176,7 +176,10 @@ static Ports localports = {
     {"freeze_state:", rDoc("Internal Read-only Mode"), 0,
         [](const char *,RtData &d) {
             Master *M =  (Master*)d.obj;
-            std::atomic_thread_fence(std::memory_order_release);
+		 //  ************************************************************************************************
+		 //  ///////////// HACK MUST REMOVE BEFORE SUBMIT <<<<<<<<<<<<<<<<<<<<<<<<
+		 //  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//            std::atomic_thread_fence(std::memory_order_release);
             M->frozenState = true;
             d.reply("/state_frozen", "");}},
     {"thaw_state:", rDoc("Internal Read-only Mode"), 0,
@@ -228,7 +231,7 @@ class DataObj:public rtosc::RtData
             bToU     = bToU_;
         }
 
-        virtual void reply(const char *path, const char *args, ...) override
+        virtual void reply(const char *path, const char *args, ...)  
         {
             va_list va;
             va_start(va,args);
@@ -237,13 +240,13 @@ class DataObj:public rtosc::RtData
             reply(buffer);
             va_end(va);
         }
-        virtual void reply(const char *msg) override
+        virtual void reply(const char *msg)  
         {
             if(rtosc_message_length(msg, -1) == 0)
                 fprintf(stderr, "Warning: Invalid Rtosc message '%s'\n", msg);
             bToU->raw_write(msg);
         }
-        virtual void broadcast(const char *path, const char *args, ...) override{
+        virtual void broadcast(const char *path, const char *args, ...)  {
             va_list va;
             va_start(va,args);
             reply("/broadcast", "");
@@ -252,7 +255,7 @@ class DataObj:public rtosc::RtData
             reply(buffer);
             va_end(va);
         }
-        virtual void broadcast(const char *msg) override
+        virtual void broadcast(const char *msg)  
         {
             reply("/broadcast");
             reply(msg);

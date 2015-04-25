@@ -42,7 +42,7 @@ class Fl_Oscilloscope : public Fl_Box, public Fl_Osc_Widget
             oscWrite(ext);
         }
 
-        virtual void OSC_value(unsigned N, void *data) override
+        virtual void OSC_value(unsigned N, void *data) 
         {
             assert(N==(unsigned)(synth->oscilsize*4));
 

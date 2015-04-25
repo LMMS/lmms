@@ -14,7 +14,7 @@ class Fl_Osc_Check:public Fl_Check_Button, public Fl_Osc_Widget
         //        const char *metadata);
 
         virtual ~Fl_Osc_Check(void);
-        virtual void OSC_value(bool) override;
+        virtual void OSC_value(bool);
         using Fl_Osc_Widget::OSC_value;
 
         void init(std::string loc, char type = 'T');

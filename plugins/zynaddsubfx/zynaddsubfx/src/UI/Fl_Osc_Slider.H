@@ -12,9 +12,9 @@ class Fl_Osc_Slider:public Fl_Slider, public Fl_Osc_Widget
         //        const char *metadata);
 
         virtual ~Fl_Osc_Slider(void);
-        void OSC_value(int) override;
-        void OSC_value(float) override;
-        void OSC_value(char) override;
+        void OSC_value(int);
+        void OSC_value(float);
+        void OSC_value(char);
         void init(std::string, char type = 'f');
 
         //Refetch parameter information

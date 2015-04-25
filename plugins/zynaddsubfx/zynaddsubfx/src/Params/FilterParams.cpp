@@ -123,10 +123,10 @@ rtosc::Ports FilterParams::ports = {
 
 
 
-FilterParams::FilterParams()
-    :FilterParams(0,64,64)
-{
-}
+//FilterParams::FilterParams()
+//    :FilterParams(0,64,64)
+//{
+//}
 FilterParams::FilterParams(unsigned char Ptype_,
                            unsigned char Pfreq_,
                            unsigned char Pq_)

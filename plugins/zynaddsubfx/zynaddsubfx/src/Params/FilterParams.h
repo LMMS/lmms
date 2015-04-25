@@ -30,10 +30,10 @@
 class FilterParams
 {
     public:
-        FilterParams();
-        FilterParams(unsigned char Ptype_,
-                     unsigned char Pfreq,
-                     unsigned char Pq_);
+//        FilterParams();
+        FilterParams(unsigned char Ptype_ = 0,
+                     unsigned char Pfreq = 64,
+                     unsigned char Pq_ = 0 );
         ~FilterParams();
 
         void add2XML(XMLwrapper *xml);

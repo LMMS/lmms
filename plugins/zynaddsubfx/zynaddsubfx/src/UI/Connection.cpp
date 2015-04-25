@@ -213,7 +213,7 @@ class UI_Interface:public Fl_Osc_Interface
             :impl(impl_)
         {}
 
-        void requestValue(string s) override
+        void requestValue(string s)  
         {
             //Fl_Osc_Interface::requestValue(s);
             if(impl->activeUrl() != "GUI") {
@@ -224,7 +224,7 @@ class UI_Interface:public Fl_Osc_Interface
             impl->transmitMsg(s.c_str(),"");
         }
 
-        void write(string s, const char *args, ...) override
+        void write(string s, const char *args, ...)  
         {
             va_list va;
             va_start(va, args);
@@ -236,7 +236,7 @@ class UI_Interface:public Fl_Osc_Interface
             va_end(va);
         }
 
-        void writeRaw(const char *msg) override
+        void writeRaw(const char *msg)  
         {
             //fprintf(stderr, "%c[%d;%d;%dm", 0x1B, 0, 4 + 30, 0 + 40);
             ////fprintf(stderr, ".");
@@ -245,7 +245,7 @@ class UI_Interface:public Fl_Osc_Interface
             impl->transmitMsg(msg);
         }
 
-        void writeValue(string s, string ss) override
+        void writeValue(string s, string ss)  
         {
             //fprintf(stderr, "%c[%d;%d;%dm", 0x1B, 0, 4 + 30, 0 + 40);
             //fprintf(stderr, "writevalue<string>(%s,%s)\n", s.c_str(),ss.c_str());
@@ -253,7 +253,7 @@ class UI_Interface:public Fl_Osc_Interface
             impl->transmitMsg(s.c_str(), "s", ss.c_str());
         }
 
-        void writeValue(string s, char c) override
+        void writeValue(string s, char c)  
         {
             //fprintf(stderr, "%c[%d;%d;%dm", 0x1B, 0, 4 + 30, 0 + 40);
             //fprintf(stderr, "writevalue<char>(%s,%d)\n", s.c_str(),c);
@@ -261,7 +261,7 @@ class UI_Interface:public Fl_Osc_Interface
             impl->transmitMsg(s.c_str(), "c", c);
         }
 
-        void writeValue(string s, float f) override
+        void writeValue(string s, float f)  
         {
             //fprintf(stderr, "%c[%d;%d;%dm", 0x1B, 0, 4 + 30, 0 + 40);
             //fprintf(stderr, "writevalue<float>(%s,%f)\n", s.c_str(),f);
@@ -269,7 +269,7 @@ class UI_Interface:public Fl_Osc_Interface
             impl->transmitMsg(s.c_str(), "f", f);
         }
 
-        void createLink(string s, class Fl_Osc_Widget*w) override
+        void createLink(string s, class Fl_Osc_Widget*w)  
         {
             assert(s.length() != 0);
             Fl_Osc_Interface::createLink(s,w);
@@ -277,7 +277,7 @@ class UI_Interface:public Fl_Osc_Interface
             map.insert(std::pair<string,Fl_Osc_Widget*>(s,w));
         }
 
-        void renameLink(string old, string newer, Fl_Osc_Widget *w) override
+        void renameLink(string old, string newer, Fl_Osc_Widget *w)  
         {
 //            fprintf(stdout, "renameLink('%s','%s',%p)\n",
 //                    old.c_str(), newer.c_str(), w);
@@ -285,7 +285,7 @@ class UI_Interface:public Fl_Osc_Interface
             createLink(newer, w);
         }
 
-        void removeLink(string s, class Fl_Osc_Widget*w) override
+        void removeLink(string s, class Fl_Osc_Widget*w)  
         {
             for(auto i = map.begin(); i != map.end(); ++i) {
                 if(i->first == s && i->second == w) {
@@ -296,7 +296,7 @@ class UI_Interface:public Fl_Osc_Interface
             //printf("[%d] removing '%s' (%p)...\n", map.size(), s.c_str(), w);
         }
 
-        virtual void removeLink(class Fl_Osc_Widget *w) override
+        virtual void removeLink(class Fl_Osc_Widget *w)  
         {
             bool processing = true;
             while(processing)
@@ -316,7 +316,7 @@ class UI_Interface:public Fl_Osc_Interface
         }
 
         //A very simplistic implementation of a UI agnostic refresh method
-        virtual void damage(const char *path) override
+        virtual void damage(const char *path)  
         {
 #ifndef NO_UI
             //printf("\n\nDamage(\"%s\")\n", path);
@@ -334,7 +334,7 @@ class UI_Interface:public Fl_Osc_Interface
 #endif
         }
 
-        void tryLink(const char *msg) override
+        void tryLink(const char *msg)  
         {
 
             //DEBUG

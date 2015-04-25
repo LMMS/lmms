@@ -77,7 +77,7 @@ class BankView: public Fl_Group, public Fl_Osc_Widget
 
         void react(int event, int slot);
 
-        virtual void OSC_raw(const char *msg) override;
+        virtual void OSC_raw(const char *msg)  ;
         void cbwig(Fl_Widget *w);
 
         void refresh(void);

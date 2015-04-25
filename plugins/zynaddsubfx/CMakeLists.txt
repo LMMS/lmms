@@ -1,5 +1,11 @@
 INCLUDE(BuildPlugin)
 
+# ADD_DEFINITIONS("-Doverride")   removed because removed overrides statements
+
+# build ZynAddSubFX with full optimizations
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -Wno-write-strings -Wno-deprecated-declarations -std=c++0x ")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions")
+
 
 # definitions for ZynAddSubFX
 IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
@@ -19,8 +25,6 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 	ADD_DEFINITIONS(-DASM_F2I_YES)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
-# build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -std=c++0x")
 
 # link system-libraries when on win32
 IF(LMMS_BUILD_WIN32)
@@ -116,7 +120,7 @@ SET(zynaddsubfx_core_SRCS
 
 
 ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_gui zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lpthread -lz -lrtosc -lrtosc-cpp -llo -lm )
+TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_gui zynaddsubfx_nio rtosc rtosc-cpp ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lpthread -lz -llo -lm )
 IF(QT5)
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
 ENDIF()
@@ -129,8 +133,8 @@ ELSE(LMMS_BUILD_WIN32)
 ENDIF(LMMS_BUILD_WIN32)
 
 BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
-TARGET_LINK_LIBRARIES(zynaddsubfx zynaddsubfx_gui zynaddsubfx_nio
-	 ZynAddSubFxCore -lrtosc-cpp -lrtosc -llo -lm )
+TARGET_LINK_LIBRARIES(zynaddsubfx zynaddsubfx_gui zynaddsubfx_nio rtosc rtosc-cpp
+	 ZynAddSubFxCore -llo -lm )
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
@@ -146,7 +150,7 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui zynaddsubfx_nio ZynAddSubFxCore ${FLTK_LIBRARIES} -lpthread -lrtosc-cpp -lrtosc -llo -lm)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui zynaddsubfx_nio ZynAddSubFxCore rtosc rtosc-cpp ${FLTK_LIBRARIES} -lpthread  -llo -lm)
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)
