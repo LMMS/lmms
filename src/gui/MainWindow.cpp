@@ -385,7 +385,7 @@ void MainWindow::finalize()
 
 	ToolButton * project_open_recent = new ToolButton(
 				embed::getIconPixmap( "project_open_recent" ),
-					tr( "Recently opened project" ),
+					tr( "Recently opened projects" ),
 					this, SLOT( emptySlot() ), m_toolBar );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );

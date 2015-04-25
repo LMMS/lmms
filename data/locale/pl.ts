@@ -3453,7 +3453,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Otwórz istniejący projekt</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Ostatnio otwierane projekty</translation>
     </message>
     <message>

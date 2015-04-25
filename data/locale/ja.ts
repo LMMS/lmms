@@ -3450,7 +3450,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">既存プロジェクトを開く</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation type="unfinished">最近開いたプロジェクト</translation>
     </message>
     <message>

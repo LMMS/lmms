@@ -3443,7 +3443,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>打开已有工程</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>最近打开的工程</translation>
     </message>
     <message>

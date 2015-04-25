@@ -3456,7 +3456,7 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
         <translation>Existierendes Projekt öffnen</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Zuletzt geöffnete Projekte</translation>
     </message>
     <message>
