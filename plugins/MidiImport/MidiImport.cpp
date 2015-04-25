@@ -249,6 +249,8 @@ public:
 				it->setName( tn );
 			}
 			lastEnd = 0;
+			// General MIDI default
+			it->pitchRangeModel()->setInitValue( 2 );
 		}
 		return this;
 	}
