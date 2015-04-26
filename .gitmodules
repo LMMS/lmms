@@ -1,4 +1,3 @@
 [submodule "plugins/zynaddsubfx/rtosc"]
 	path = plugins/zynaddsubfx/rtosc
-	url = https://github.com/fundamental/rtosc
-	branch = travis-test
+	url = https://github.com/fundamental/rtosc.git
