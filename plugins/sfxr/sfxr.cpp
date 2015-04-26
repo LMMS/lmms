@@ -133,9 +133,10 @@ void SfxrSynth::resetSample( bool restart )
 		env_vol=0.0f;
 		env_stage=0;
 		env_time=0;
-		env_length[0]=(int)(s->m_attModel.value()*s->m_attModel.value()*100000.0f);
-		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*100000.0f);
-		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*100000.0f);
+
+		env_length[0]=(int)(s->m_attModel.value()*s->m_attModel.value()*99999.0f)+1;
+		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*99999.0f)+1;
+		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*99999.0f)+1;
 
 		fphase=pow(s->m_phaserOffsetModel.value(), 2.0f)*1020.0f;
 		if(s->m_phaserOffsetModel.value()<0.0f) fphase=-fphase;
