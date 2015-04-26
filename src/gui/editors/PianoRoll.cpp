@@ -2434,7 +2434,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 	{
 		if( m_moveBoundaryLeft + off_ticks < 0 )
 		{
-			off_ticks += 0 - (off_ticks + m_moveBoundaryLeft);
+			off_ticks -= (off_ticks + m_moveBoundaryLeft);
 		}
 		if( m_moveBoundaryTop + off_key > NumKeys )
 		{
@@ -2442,92 +2442,161 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		}
 		if( m_moveBoundaryBottom + off_key < 0 )
 		{
-			off_key += 0 - (m_moveBoundaryBottom + off_key);
+			off_key -= (m_moveBoundaryBottom + off_key);
 		}
 	}
 
-	int shift_offset = 0;
-	int shift_ref_pos = -1;
 
 	// get note-vector of current pattern
 	const NoteVector & notes = m_pattern->notes();
 
-	// will be our iterator in the following loop
-	NoteVector::ConstIterator it = notes.begin();
-
-	int sNotes = selectionCount();
-	while( it != notes.end() )
+	if (m_action == ActionMoveNote)
 	{
-		Note *note = *it;
-		const int pos = note->pos().getTicks();
+		for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+		{
+			Note *note = *it;
+			if( note->selected() )
+			{
+				if( ! ( shift && ! m_startedWithShift ) )
+				{
+					// moving note
+					int pos_ticks = note->oldPos().getTicks() + off_ticks;
+					int key_num = note->oldKey() + off_key;
 
+					// ticks can't be negative
+					pos_ticks = qMax(0, pos_ticks);
+					// upper/lower bound checks on key_num
+					key_num = qMax(0, key_num);
+					key_num = qMin(key_num, NumKeys);
+
+					note->setPos( MidiTime( pos_ticks ) );
+					note->setKey( key_num );
+				}
+				else if( shift && ! m_startedWithShift )
+				{
+					// quick resize, toggled by holding shift after starting a note move, but not before
+					int ticks_new = note->oldLength().getTicks() + off_ticks;
+					if( ticks_new <= 0 )
+					{
+						ticks_new = 1;
+					}
+					note->setLength( MidiTime( ticks_new ) );
+					m_lenOfNewNotes = note->length();
+				}
+			}
+		}
+	} 
+	else if (m_action == ActionResizeNote)
+	{
 		// When resizing notes:
+		// If shift is not pressed, resize the selected notes but do not rearrange them
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
-		if( m_action == ActionResizeNote && shift &&
-			( note->selected() || ctrl || sNotes == 1 ) )
+		
+		if (shift)
 		{
-			int shifted_pos = note->oldPos().getTicks() + shift_offset;
-			if( shifted_pos && pos == shift_ref_pos )
+			// Algorithm:
+			// Relative to the starting point of the left-most selected note,
+			//   all selected note start-points and *endpoints* (not length) should be scaled by a calculated factor.
+			// This factor is such that the endpoint of the note whose handle is being dragged should lie under the cursor.
+			// first, determine the start-point of the left-most selected note:
+			int stretchStartTick = -1;
+			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
 			{
-				shifted_pos -= off_ticks;
-			}
-			note->setPos( MidiTime( shifted_pos ) );
-		}
-
-		if( note->selected() )
-		{
-			if( m_action == ActionMoveNote && ! ( shift && ! m_startedWithShift ) )
-			{
-				// moving note
-				int pos_ticks = note->oldPos().getTicks() + off_ticks;
-				int key_num = note->oldKey() + off_key;
-
-				// ticks can't be negative
-				pos_ticks = qMax(0, pos_ticks);
-				// upper/lower bound checks on key_num
-				key_num = qMax(0, key_num);
-				key_num = qMin(key_num, NumKeys);
-
-				note->setPos( MidiTime( pos_ticks ) );
-				note->setKey( key_num );
-			}
-			else if( m_action == ActionResizeNote )
-			{
-				// resizing note
-				int ticks_new = note->oldLength().getTicks() + off_ticks;
-				if( ticks_new <= 0 )
+				Note *note = *it;
+				if (note->selected() && (stretchStartTick < 0 || note->oldPos().getTicks() < stretchStartTick))
 				{
-					ticks_new = 1;
+					stretchStartTick = note->oldPos().getTicks();
 				}
-				else if( shift )
+			}
+			// determine the ending tick of the right-most selected note
+			Note *posteriorNote = nullptr;
+			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			{
+				Note *note = *it;
+				if (note->selected() && (posteriorNote == nullptr || 
+					note->oldPos().getTicks() + note->oldLength().getTicks() > 
+					posteriorNote->oldPos().getTicks() + posteriorNote->oldLength().getTicks()))
 				{
-					// when holding shift: update the offset used to shift
-					// the following notes
-					if( pos > shift_ref_pos )
+					posteriorNote = note;
+				}
+			}
+			int posteriorEndTick = posteriorNote->pos().getTicks() + posteriorNote->length().getTicks();
+			// end-point of the note whose handle is being dragged:
+			int stretchEndTick = m_currentNote->oldPos().getTicks() + m_currentNote->oldLength().getTicks();
+			// Calculate factor by which to scale the start-point and end-point of all selected notes
+			float scaleFactor = (float)(stretchEndTick - stretchStartTick + off_ticks) / qMax(1, stretchEndTick - stretchStartTick);
+			scaleFactor = qMax(0.0f, scaleFactor);
+
+			// process all selected notes & determine how much the endpoint of the right-most note was shifted
+			int posteriorDeltaThisFrame = 0;
+			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			{
+				Note *note = *it;
+				if(note->selected())
+				{
+					// scale relative start and end positions by scaleFactor
+					int newStart = stretchStartTick + scaleFactor * 
+						(note->oldPos().getTicks() - stretchStartTick);
+					int newEnd = stretchStartTick + scaleFactor * 
+						(note->oldPos().getTicks()+note->oldLength().getTicks() - stretchStartTick);
+					// if  not holding alt, quantize the offsets
+					if(!alt)
 					{
-						shift_offset += off_ticks;
-						shift_ref_pos = pos;
+						// quantize start time
+						int oldStart = note->oldPos().getTicks();
+						int startDiff = newStart - oldStart;
+						startDiff = floor(startDiff / quantization()) * quantization();
+						newStart = oldStart + startDiff;
+						// quantize end time
+						int oldEnd = oldStart + note->oldLength().getTicks();
+						int endDiff = newEnd - oldEnd;
+						endDiff = floor(endDiff / quantization()) * quantization();
+						newEnd = oldEnd + endDiff;
+					}
+					int newLength = qMax(1, newEnd-newStart);
+					if (note == posteriorNote)
+					{
+						posteriorDeltaThisFrame = (newStart+newLength) - 
+							(note->pos().getTicks() + note->length().getTicks());
+					}
+					note->setLength( MidiTime(newLength) );
+					note->setPos( MidiTime(newStart) );
+
+					m_lenOfNewNotes = note->length();
+				}
+			}
+			if (ctrl || selectionCount() == 1)
+			{
+				// if holding ctrl or only one note is selected, reposition posterior notes
+				for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+				{
+					Note *note = *it;
+					if (!note->selected() && note->pos().getTicks() >= posteriorEndTick)
+					{
+						int newStart = note->pos().getTicks() + posteriorDeltaThisFrame;
+						note->setPos( MidiTime(newStart) );
 					}
 				}
-				note->setLength( MidiTime( ticks_new ) );
-
-				m_lenOfNewNotes = note->length();
-			}
-			else if( m_action == ActionMoveNote && ( shift && ! m_startedWithShift ) )
-			{
-				// quick resize, toggled by holding shift after starting a note move, but not before
-				int ticks_new = note->oldLength().getTicks() + off_ticks;
-				if( ticks_new <= 0 )
-				{
-					ticks_new = 1;
-				}
-				note->setLength( MidiTime( ticks_new ) );
-				m_lenOfNewNotes = note->length();
 			}
 		}
-		++it;
+		else
+		{
+			// shift is not pressed; stretch length of selected notes but not their position
+			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			{
+				Note *note = *it;
+				if (note->selected())
+				{
+					int newLength = note->oldLength() + off_ticks;
+					newLength = qMax(1, newLength);
+					note->setLength( MidiTime(newLength) );
+
+					m_lenOfNewNotes = note->length();
+				}
+			}
+		}
 	}
 
 	m_pattern->dataChanged();
