@@ -337,7 +337,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
 	// try to inform user about missing Stk-installation
-	if( _instrument->m_filesMissing && engine::hasGUI() )
+	if( _instrument->m_filesMissing && Engine::hasGUI() )
 	{
 		QMessageBox::information( 0, tr( "Missing files" ),
 				tr( "Your Stk-installation seems to be "
