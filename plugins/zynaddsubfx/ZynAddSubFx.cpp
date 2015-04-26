@@ -433,7 +433,7 @@ void ZynAddSubFxInstrument::initPlugin()
 {
 	while( m_isPlaying )
 	{
-		usleep(20);
+		usleep(200);
 	}
 	m_isLoading = true;
 	m_pluginMutex.lock();
