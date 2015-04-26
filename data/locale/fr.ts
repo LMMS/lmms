@@ -3448,7 +3448,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Ouvrir un projet existant</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Projets ouverts récemment</translation>
     </message>
     <message>

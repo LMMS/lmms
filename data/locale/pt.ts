@@ -3489,7 +3489,7 @@ Double click to pick a file.</source>
         <translation>Mostrar/esconder Editor de Automação</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Projetos usados recentemente</translation>
     </message>
     <message>

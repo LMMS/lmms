@@ -3435,7 +3435,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished">Obre projecte existent</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation type="unfinished">Projecte obert recentment</translation>
     </message>
     <message>

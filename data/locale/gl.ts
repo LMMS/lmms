@@ -3448,7 +3448,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Abrir un projecto existente</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Proxecto aberto recentemente</translation>
     </message>
     <message>
