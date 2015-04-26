@@ -44,6 +44,16 @@
 
 #include <unistd.h>
 
+#ifdef __GNUC__
+    #if __GNUC__ > 4 ||  (__GNUC__ == 4 && __GNUC_MAJOR__ >= 7)
+        #define MEMORY_BARRIER() std::atomic_thread_fence(std::memory_order_release)
+    #else
+       #define MEMORY_BARRIER()  __sync_synchronize()
+    #endif
+#else
+    #define MEMORY_BARRIER() std::atomic_thread_fence(std::memory_order_release)
+#endif
+
 using namespace std;
 using namespace rtosc;
 #define rObject Master
@@ -177,7 +187,7 @@ static Ports localports = {
         [](const char *,RtData &d) {
             Master *M =  (Master*)d.obj;
 //            std::atomic_thread_fence(std::memory_order_release);
-            __sync_synchronize();
+            MEMORY_BARRIER();
             M->frozenState = true;
             d.reply("/state_frozen", "");}},
     {"thaw_state:", rDoc("Internal Read-only Mode"), 0,

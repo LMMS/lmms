@@ -34,6 +34,21 @@
 
 #include <err.h>
 
+//macro for mfence in gcc < 4.7
+#ifdef __GNUC__
+    #if __GNUC__ > 4 ||  (__GNUC__ == 4 && __GNUC_MAJOR__ >= 7)
+        #define MEMORY_BARRIER() std::atomic_thread_fence(std::memory_order_acquire)
+    #else
+       #define MEMORY_BARRIER()  __sync_synchronize()
+    #endif
+#else
+    #define MEMORY_BARRIER() std::atomic_thread_fence(std::memory_order_acquire)
+#endif
+
+
+
+
+
 using std::string;
 extern rtosc::ThreadLink *the_bToU;//XXX
 rtosc::UndoHistory undo;
@@ -872,7 +887,7 @@ void MiddleWareImpl::doReadOnlyOp(std::function<void()> read_only_fn)
 
     assert(tries < 10000);//if this happens, the backend must be dead
 //    std::atomic_thread_fence(std::memory_order_acquire);
-    __sync_synchronize();
+    MEMORY_BARRIER();
 
     //Now it is safe to do any read only operation
     read_only_fn();
