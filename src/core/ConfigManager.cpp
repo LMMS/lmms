@@ -252,31 +252,6 @@ void ConfigManager::setValue( const QString & _class,
 
 
 
-#ifdef LMMS_BUILD_WIN32
-#include <QLibrary>
-#include <shlobj.h>
-
-// taken from qt-win-opensource-src-4.2.2/src/corelib/io/qsettings.cpp
-static QString windowsConfigPath( int _type )
-{
-	QString result;
-
-	QLibrary library( "shell32" );
-	typedef BOOL( WINAPI* GetSpecialFolderPath )( HWND, char *, int, BOOL );
-	GetSpecialFolderPath SHGetSpecialFolderPath = (GetSpecialFolderPath)
-	library.resolve( "SHGetSpecialFolderPathA" );
-	if( SHGetSpecialFolderPath )
-	{
-		char path[MAX_PATH];
-		SHGetSpecialFolderPath( 0, path, _type, false );
-		result = QString::fromLocal8Bit( path );
-	}
-	return result;
-}
-#endif
-
-
-
 void ConfigManager::loadConfigFile()
 {
 	// read the XML file and create DOM tree
@@ -381,8 +356,8 @@ void ConfigManager::loadConfigFile()
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
-		m_vstDir = windowsConfigPath( CSIDL_PROGRAM_FILES ) +
-											QDir::separator() + "VstPlugins";
+		QString programFiles = getenv("ProgramFiles");
+		m_vstDir =  programFiles + QDir::separator() + "VstPlugins";
 #else
 		m_vstDir =  m_workingDir + "plugins/vst" + QDir::separator();
 #endif
