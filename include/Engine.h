@@ -27,6 +27,9 @@
 #define ENGINE_H
 
 #include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtCore/QObject>
+
 
 #include "export.h"
 
@@ -39,8 +42,9 @@ class Song;
 class Ladspa2LMMS;
 
 
-class EXPORT Engine
+class EXPORT Engine : public QObject
 {
+	Q_OBJECT
 public:
 	static void init();
 	static void destroy();
@@ -94,6 +98,18 @@ public:
 		return s_pluginFileHandling;
 	}
 
+	static inline Engine * inst()
+	{
+		if( s_instanceOfMe == NULL )
+		{
+			s_instanceOfMe = new Engine();
+		}
+		return s_instanceOfMe;
+	}
+
+signals:
+	void initProgress(const QString &msg);
+
 
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
@@ -119,6 +135,9 @@ private:
 	static Ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_pluginFileHandling;
+
+	// even though most methods are static, an instance is needed for Qt slots/signals
+	static Engine * s_instanceOfMe;
 
 	static void initPluginFileHandling();
 
