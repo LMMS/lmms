@@ -121,6 +121,7 @@ public slots:
 
 	void updatePlayPauseIcons();
 
+	void updateUndoRedoButtons();
 	void undo();
 	void redo();
 
@@ -167,6 +168,8 @@ private:
 	} m_keyMods;
 
 	QMenu * m_toolsMenu;
+	QAction * m_undoAction;
+	QAction * m_redoAction;
 	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;
