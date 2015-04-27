@@ -57,7 +57,6 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayTrack,
 		Mode_PlayBB,
 		Mode_PlayPattern,
 		Mode_PlayAutomationPattern,
@@ -256,7 +255,6 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( Track * trackToPlay );
 	void playBB();
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
@@ -353,7 +351,6 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	tact_t m_length;
 
-	Track * m_trackToPlay;
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
