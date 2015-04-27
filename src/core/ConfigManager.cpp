@@ -356,10 +356,10 @@ void ConfigManager::loadConfigFile()
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
-		QString programFiles = getenv("ProgramFiles");
-		m_vstDir =  programFiles + QDir::separator() + "VstPlugins";
+		QString programFiles = QString::fromLocal8Bit( getenv( "ProgramFiles" ) );
+		m_vstDir =  programFiles + QDir::separator() + "VstPlugins" + QDir::separator();
 #else
-		m_vstDir =  m_workingDir + "plugins/vst" + QDir::separator();
+		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
 	}
 
