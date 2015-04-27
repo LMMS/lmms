@@ -35,6 +35,7 @@
 #include "FxMixerView.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Messenger.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
@@ -64,31 +65,76 @@ GuiApplication::GuiApplication()
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
 	splashScreen.show();
-	splashScreen.showMessage( MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ),
-								Qt::AlignRight | Qt::AlignBottom, Qt::white );
+	QHBoxLayout layout;
+	layout.setAlignment(Qt::AlignBottom);
+	splashScreen.setLayout(&layout);
+
+	// Create a left-aligned label for loading progress 
+	// & a right-aligned label for version info
+	QLabel loadingProgressLabel;
+	m_loadingProgressLabel = &loadingProgressLabel;
+	QLabel versionLabel(MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ));
+
+	loadingProgressLabel.setAlignment(Qt::AlignLeft);
+	versionLabel.setAlignment(Qt::AlignRight);
+
+	layout.addWidget(&loadingProgressLabel);
+	layout.addWidget(&versionLabel);
+
+	// may have long gaps between future frames, so force update now
+	splashScreen.update();
 	qApp->processEvents();
+
+	MessageReceiverHandle msgReceiverHandle = Messenger::subscribe(&GuiApplication::onInitProgress, this, Message::INIT_STATUS);
 
 	// Init central engine which handles all components of LMMS
 	Engine::init();
 
 	s_instance = this;
 
-	m_mainWindow = new MainWindow;
+	Messenger::broadcast(QObject::tr("Preparing UI"), Message::INIT_STATUS);
 
-	m_songEditor = new SongEditorWindow(Engine::getSong());
-	m_fxMixerView = new FxMixerView;
-	m_controllerRackView = new ControllerRackView;
-	m_projectNotes = new ProjectNotes;
-	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
-	m_pianoRoll = new PianoRollWindow();
-	m_automationEditor = new AutomationEditorWindow;
+ 	m_mainWindow = new MainWindow;
+ 
+	Messenger::broadcast(QObject::tr("Preparing song editor"), Message::INIT_STATUS);
+ 	m_songEditor = new SongEditorWindow(Engine::getSong());
 
-	m_mainWindow->finalize();
-	splashScreen.finish(m_mainWindow);
+	Messenger::broadcast(QObject::tr("Preparing mixer"), Message::INIT_STATUS);
+ 	m_fxMixerView = new FxMixerView;
+
+	Messenger::broadcast(QObject::tr("Preparing controller rack"), Message::INIT_STATUS);
+ 	m_controllerRackView = new ControllerRackView;
+
+	Messenger::broadcast(QObject::tr("Preparing project notes"), Message::INIT_STATUS);
+ 	m_projectNotes = new ProjectNotes;
+
+	Messenger::broadcast(QObject::tr("Preparing beat/bassline editor"), Message::INIT_STATUS);
+ 	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
+
+	Messenger::broadcast(QObject::tr("Preparing piano roll"), Message::INIT_STATUS);
+ 	m_pianoRoll = new PianoRollWindow();
+
+	Messenger::broadcast(QObject::tr("Preparing automation editor"), Message::INIT_STATUS);
+ 	m_automationEditor = new AutomationEditorWindow;
+ 
+ 	m_mainWindow->finalize();
+ 	splashScreen.finish(m_mainWindow);
+
+	m_loadingProgressLabel = nullptr;
 }
 
 GuiApplication::~GuiApplication()
 {
 	InstrumentTrackView::cleanupWindowCache();
 	s_instance = nullptr;
+}
+
+void GuiApplication::onInitProgress(const Message &msg)
+{
+	Q_ASSERT(m_loadingProgressLabel != nullptr);
+	
+	m_loadingProgressLabel->setText(msg.getMessage());
+	// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
+	m_loadingProgressLabel->repaint();
+	qApp->processEvents();
 }

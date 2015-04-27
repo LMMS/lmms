@@ -22,12 +22,14 @@
  *
  */
 
+#include <QObject>
 
 #include "Engine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
+#include "Messenger.h"
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
@@ -53,10 +55,13 @@ QMap<QString, QString> Engine::s_pluginFileHandling;
 void Engine::init()
 {
 	// generate (load from file) bandlimited wavetables
+	Messenger::broadcast(QObject::tr("Generating wavetables"), Message::INIT_STATUS);
 	BandLimitedWave::generateWaves();
 
+	Messenger::broadcast(QObject::tr("Locating plugins"), Message::INIT_STATUS);
 	initPluginFileHandling();
 
+	Messenger::broadcast(QObject::tr("Initializing data structures"), Message::INIT_STATUS);
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer;
 	s_song = new Song;
@@ -67,11 +72,13 @@ void Engine::init()
 
 	s_projectJournal->setJournalling( true );
 
+	Messenger::broadcast(QObject::tr("Opening audio and midi devices"), Message::INIT_STATUS);
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
+	Messenger::broadcast(QObject::tr("Launching mixer threads"), Message::INIT_STATUS);
 	s_mixer->startProcessing();
 }
 
