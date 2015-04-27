@@ -94,7 +94,6 @@ Song::Song() :
 	m_errors( new QList<QString>() ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
 	m_elapsedMilliSeconds( 0 ),
@@ -219,10 +218,6 @@ void Song::processNextBuffer()
 			{
 				EnvelopeAndLfoParameters::instances()->reset();
 			}
-			break;
-
-		case Mode_PlayTrack:
-			trackList.push_back( m_trackToPlay );
 			break;
 
 		case Mode_PlayBB:
