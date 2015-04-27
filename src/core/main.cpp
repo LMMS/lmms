@@ -27,13 +27,7 @@
 #include "lmmsversion.h"
 #include "versioninfo.h"
 
-// denormals stripping
-#ifdef __SSE__
-#include <xmmintrin.h>
-#endif
-#ifdef __SSE3__
-#include <pmmintrin.h>
-#endif
+#include "denormals.h"
 
 #include <QFileInfo>
 #include <QLocale>
@@ -103,15 +97,7 @@ int main( int argc, char * * argv )
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
-	// set denormal protection for this thread
-	#ifdef __SSE3__
-	/* DAZ flag */
-	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
-	#endif
-	#ifdef __SSE__
-	/* FTZ flag */
-	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
-	#endif
+	disable_denormals();
 
 	bool core_only = false;
 	bool fullscreen = true;
