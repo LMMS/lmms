@@ -479,28 +479,6 @@ void Song::playAndRecord()
 
 
 
-void Song::playTrack( Track * trackToPlay )
-{
-	if( isStopped() == false )
-	{
-		stop();
-	}
-	m_trackToPlay = trackToPlay;
-
-	m_playMode = Mode_PlayTrack;
-	m_playing = true;
-	m_paused = false;
-
-	m_vstSyncController.setPlaybackState( true );
-
-	savePos();
-
-	emit playbackStateChanged();
-}
-
-
-
-
 void Song::playBB()
 {
 	if( isStopped() == false )

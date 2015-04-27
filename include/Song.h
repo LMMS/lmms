@@ -256,7 +256,6 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( Track * trackToPlay );
 	void playBB();
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
