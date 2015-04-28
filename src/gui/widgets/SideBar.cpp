@@ -158,6 +158,10 @@ void SideBar::toggleButton( QAbstractButton * button )
 		activeWidget->setVisible( button->isChecked() );
 		toolButton->setToolButtonStyle( button->isChecked() ?
 				Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
+		if ( button->isChecked() )
+		{
+			activeWidget->setFocus();
+		}
 	}
 }
 
