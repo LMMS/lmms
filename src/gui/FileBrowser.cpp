@@ -99,7 +99,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	addContentWidget( ops );
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
-	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ), this, SLOT(giveFocusToFilter()) );
+	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()) );
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	reloadTree();
