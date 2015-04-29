@@ -64,7 +64,6 @@ private slots:
 private:
 	bool filterItems( QTreeWidgetItem * item, const QString & filter );
 	virtual void keyPressEvent( QKeyEvent * ke );
-	void focusInEvent(QFocusEvent * event);
 
 	void addItems( const QString & path );
 

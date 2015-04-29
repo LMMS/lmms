@@ -268,12 +268,6 @@ void FileBrowser::giveFocusToFilter()
 	}
 }
 
-void FileBrowser::focusInEvent(QFocusEvent * event)
-{
-	// when the FileBrowser is opened, direct focus to the filter for quick filtering
-	giveFocusToFilter();
-}
-
 
 void FileBrowser::addItems(const QString & path )
 {
