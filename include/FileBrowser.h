@@ -58,6 +58,8 @@ public slots:
 	void filterItems( const QString & filter );
 	void reloadTree( void );
 
+private slots:
+	void giveFocusToFilter();
 
 private:
 	bool filterItems( QTreeWidgetItem * item, const QString & filter );
