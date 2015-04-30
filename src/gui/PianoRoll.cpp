@@ -3630,6 +3630,19 @@ void PianoRoll::wheelEvent( QWheelEvent * _we )
 
 
 
+void PianoRoll::focusOutEvent( QFocusEvent * )
+{
+	for( int i = 0; i < NumKeys; ++i )
+	{
+		m_pattern->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
+		m_pattern->instrumentTrack()->pianoModel()->setKeyState( i, false );
+	}
+	update();
+}
+
+
+
+
 int PianoRoll::getKey( int _y ) const
 {
 	int key_line_y = keyAreaBottom() - 1;
