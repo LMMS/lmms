@@ -111,6 +111,7 @@ public:
 	void moveTrackView( TrackView * trackView, int indexTo );
 	void moveTrackViewUp( TrackView * trackView );
 	void moveTrackViewDown( TrackView * trackView );
+	void scrollToTrackView( TrackView * _tv );
 
 	// -- for usage by trackView only ---------------
 	TrackView * addTrackView( TrackView * _tv );

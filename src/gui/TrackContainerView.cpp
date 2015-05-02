@@ -22,6 +22,7 @@
  *
  */
 
+#include <algorithm>
 
 #include <QApplication>
 #include <QLayout>
@@ -200,6 +201,28 @@ void TrackContainerView::moveTrackViewDown( TrackView * trackView )
 	moveTrackView( trackView, index + 1 );
 }
 
+void TrackContainerView::scrollToTrackView( TrackView * _tv )
+{
+	if (!m_trackViews.contains(_tv))
+	{
+		qWarning("TrackContainerView::scrollToTrackView: TrackView is not owned by this");
+	}
+	else
+	{
+		int currentScrollTop = m_scrollArea->verticalScrollBar()->value();
+		int scrollAreaHeight = m_scrollArea->size().height();
+		int trackViewTop = _tv->pos().y();
+		int trackViewBottom = trackViewTop + _tv->size().height();
+
+		// displayed_location = widget_location - currentScrollTop
+		// want to make sure that the widget top has displayed location > 0,
+		// and widget bottom < scrollAreaHeight
+		// trackViewTop - scrollY > 0 && trackViewBottom - scrollY < scrollAreaHeight
+		// therefore scrollY < trackViewTop && scrollY > trackViewBottom - scrollAreaHeight
+		int newScroll = std::max( trackViewBottom-scrollAreaHeight, std::min(currentScrollTop, trackViewTop) );
+		m_scrollArea->verticalScrollBar()->setValue(newScroll);
+	}
+}
 
 
 

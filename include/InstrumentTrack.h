@@ -52,6 +52,7 @@ class InstrumentMidiIOView;
 class InstrumentMiscView;
 class Knob;
 class LcdSpinBox;
+class LeftRightNav;
 class midiPortMenu;
 class DataFile;
 class PluginView;
@@ -416,16 +417,19 @@ protected:
 
 protected slots:
 	void saveSettingsBtnClicked();
-
+	void viewNextInstrument();
+	void viewPrevInstrument();
 
 private:
 	virtual void modelChanged();
+	void viewInstrumentInDirection(int d);
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
 
 	// widgets on the top of an instrument-track-window
 	QLineEdit * m_nameLineEdit;
+	LeftRightNav * m_leftRightNav;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;

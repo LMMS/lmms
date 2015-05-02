@@ -66,6 +66,7 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
+#include "LeftRightNav.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -79,6 +80,7 @@
 #include "StringPairDrag.h"
 #include "TabWidget.h"
 #include "ToolTip.h"
+#include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 #include "ValueBuffer.h"
 #include "volume.h"
@@ -1279,13 +1281,36 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
 	generalSettingsLayout->setSpacing( 6 );
 
+	QWidget* nameAndChangeTrackWidget = new QWidget( generalSettingsWidget );
+	QHBoxLayout* nameAndChangeTrackLayout = new QHBoxLayout( nameAndChangeTrackWidget );
+	nameAndChangeTrackLayout->setContentsMargins( 0, 0, 0, 0 );
+	nameAndChangeTrackLayout->setSpacing( 2 );
+
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
 	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( textChanged( const QString & ) ) );
 
-	generalSettingsLayout->addWidget( m_nameLineEdit );
+	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+	nameAndChangeTrackLayout->addWidget(m_nameLineEdit);
+
+
+	// set up left/right arrows for changing instrument
+	m_leftRightNav = new LeftRightNav(this);
+	connect( m_leftRightNav, SIGNAL( onNavLeft() ), this,
+						SLOT( viewPrevInstrument() ) );
+	connect( m_leftRightNav, SIGNAL( onNavRight() ), this,
+						SLOT( viewNextInstrument() ) );
+	m_leftRightNav->setWhatsThis(
+		tr( "Use these controls to view and edit the next/previous track in the song editor." ) );
+	// m_leftRightNav->setShortcuts();
+	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
+
+
+	generalSettingsLayout->addWidget( nameAndChangeTrackWidget );
+
+
 
 	QHBoxLayout* basicControlsLayout = new QHBoxLayout;
 	basicControlsLayout->setSpacing( 3 );
@@ -1691,4 +1716,62 @@ void InstrumentTrackWindow::loadSettings( const QDomElement& thisElement )
 	{
 		m_itv->m_tlb->setChecked( true );
 	}
+}
+
+void InstrumentTrackWindow::viewInstrumentInDirection(int d)
+{
+	// helper routine for viewNextInstrument, viewPrevInstrument
+	// d=-1 to view the previous instrument,
+	// d=+1 to view the next instrument
+
+	const QList<TrackView *> &trackViews = m_itv->trackContainerView()->trackViews();
+	int idxOfMe = trackViews.indexOf(m_itv);
+
+	// search for the next InstrumentTrackView (i.e. skip AutomationViews, etc)
+	// sometimes, the next InstrumentTrackView may already be open, in which case
+	//   replace our window contents with the *next* closed Instrument Track and
+	//   give focus to the InstrumentTrackView we skipped.
+	int idxOfNext = idxOfMe;
+	InstrumentTrackView *newView = nullptr;
+	InstrumentTrackView *bringToFront = nullptr;
+	do
+	{
+		idxOfNext = (idxOfNext + d + trackViews.size()) % trackViews.size();
+		newView = dynamic_cast<InstrumentTrackView*>(trackViews[idxOfNext]);
+		// the window that should be brought to focus is the FIRST InstrumentTrackView that comes after us
+		if (bringToFront == nullptr && newView != nullptr) 
+		{
+			bringToFront = newView;
+		}
+		// if the next instrument doesn't have an active window, then exit loop & load that one into our window.
+		if (newView != nullptr && !newView->m_tlb->isChecked())
+		{
+			break;
+		}
+	} while (idxOfNext != idxOfMe);
+
+	// avoid reloading the window if there is only one instrument, as that will just change the active tab
+	if (idxOfNext != idxOfMe)
+	{
+		// save current window pos and then hide the window by unchecking its button in the track list
+		QPoint curPos = parentWidget()->pos();
+		m_itv->m_tlb->setChecked(false);
+		
+		// enable the new window by checking its track list button & moving it to where our window just was
+		newView->m_tlb->setChecked(true);
+		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos);
+
+		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
+		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
+	}
+	bringToFront->getInstrumentTrackWindow()->setFocus();
+}
+
+void InstrumentTrackWindow::viewNextInstrument()
+{
+	viewInstrumentInDirection(+1);
+}
+void InstrumentTrackWindow::viewPrevInstrument()
+{
+	viewInstrumentInDirection(-1);
 }

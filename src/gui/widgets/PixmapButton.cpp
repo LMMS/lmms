@@ -130,7 +130,17 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 	}
 }
 
-
+QSize PixmapButton::sizeHint() const
+{
+	if( ( model() != NULL && model()->value() ) || m_pressed )
+	{
+		return m_activePixmap.size();
+	}
+	else 
+	{
+		return m_inactivePixmap.size();
+	}
+}
 
 
 
