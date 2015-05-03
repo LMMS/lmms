@@ -31,7 +31,6 @@
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
-#include "TextFloat.h"
 #include "embed.h"
 
 int AutomationPattern::s_quantization = 1;
@@ -107,7 +106,7 @@ AutomationPattern::~AutomationPattern()
 
 
 
-void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
+bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	if( _search_dup )
 	{
@@ -115,10 +114,8 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 					it != m_objects.end(); ++it )
 		{
 			if( *it == _obj )
-			{
-				TextFloat::displayMessage( _obj->displayName(), tr( "Model is already connected "
-												"to this pattern." ), embed::getIconPixmap( "automation" ), 2000 );
-				return;
+			{				
+                return false;
 			}
 		}
 	}
@@ -138,6 +135,7 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 	emit dataChanged();
 
+    return true;
 }
 
 
