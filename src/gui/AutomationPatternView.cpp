@@ -421,15 +421,15 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-            bool added = m_pat->addObject( mod );
-            if ( !added )
-            {
-                TextFloat::displayMessage( mod->displayName(),
-                                           tr( "Model is already connected "
-                                               "to this pattern." ),
-                                           embed::getIconPixmap( "automation" ),
-                                           2000 );
-            }
+			bool added = m_pat->addObject( mod );
+			if ( !added )
+			{
+				TextFloat::displayMessage( mod->displayName(),
+										   tr( "Model is already connected "
+											   "to this pattern." ),
+										   embed::getIconPixmap( "automation" ),
+										   2000 );
+			}
 		}
 		update();
 

@@ -115,7 +115,7 @@ bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 		{
 			if( *it == _obj )
 			{				
-                return false;
+				return false;
 			}
 		}
 	}
@@ -135,7 +135,7 @@ bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 	emit dataChanged();
 
-    return true;
+	return true;
 }
 
 
