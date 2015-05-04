@@ -2303,10 +2303,10 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 			if ( !added )
 			{
 				TextFloat::displayMessage( mod->displayName(),
-										   tr( "Model is already connected "
-											   "to this pattern." ),
-										   embed::getIconPixmap( "automation" ),
-										   2000 );
+							   tr( "Model is already connected "
+							   "to this pattern." ),
+							   embed::getIconPixmap( "automation" ),
+							   2000 );
 			}
 			setCurrentPattern( m_editor->m_pattern );
 		}
