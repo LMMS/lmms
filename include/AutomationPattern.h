@@ -56,7 +56,7 @@ public:
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
 	virtual ~AutomationPattern();
 
-	void addObject( AutomatableModel * _obj, bool _search_dup = true );
+	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
 	const AutomatableModel * firstObject() const;
 
