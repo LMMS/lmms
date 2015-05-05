@@ -160,6 +160,9 @@ public:
 	{
 		if( !at )
 		{
+			// Keep LMMS responsive, for now the import runs 
+			// in the main thread. This should probably be 
+			// removed if that ever changes.
 			qApp->processEvents();
 			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
 		}
@@ -224,6 +227,7 @@ public:
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
 	{
 		if( !it ) {
+			// Keep LMMS responsive
 			qApp->processEvents();
 			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
 
@@ -409,7 +413,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			{
 				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
-				double ticks = MidiTime( noteEvt->get_duration() * ticksPerBeat );
+				int ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
