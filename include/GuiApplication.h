@@ -61,6 +61,9 @@ public:
 public slots:
 	void displayInitProgress(const QString &msg);
 
+private slots:
+	void childDestroyed(QObject *obj);
+
 private:
 	static GuiApplication* s_instance;
 
