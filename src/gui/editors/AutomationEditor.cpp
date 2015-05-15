@@ -68,6 +68,10 @@
 #include "ProjectJournal.h"
 
 
+namespace lmms
+{
+
+
 QPixmap * AutomationEditor::s_toolDraw = NULL;
 QPixmap * AutomationEditor::s_toolErase = NULL;
 QPixmap * AutomationEditor::s_toolSelect = NULL;
@@ -2348,4 +2352,8 @@ void AutomationEditorWindow::play()
 void AutomationEditorWindow::stop()
 {
 	m_editor->stop();
+}
+
+
+
 }

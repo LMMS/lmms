@@ -42,6 +42,10 @@
 
 
 
+namespace lmms
+{
+
+
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
@@ -193,3 +197,4 @@ void LcdSpinBox::enterValue()
 
 
 
+}

@@ -44,6 +44,10 @@
 #include "Track.h"
 
 
+namespace lmms
+{
+
+
 extern const float SECS_PER_ENV_SEGMENT;
 extern const float SECS_PER_LFO_OSCILLATION;
 
@@ -590,7 +594,4 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 
 
 
-
-
-
-
+}

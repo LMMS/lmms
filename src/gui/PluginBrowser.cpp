@@ -38,6 +38,10 @@
 #include "StringPairDrag.h"
 
 
+namespace lmms
+{
+
+
 bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )
 {
 	return qstricmp( d1.displayName, d2.displayName ) < 0 ? true : false;
@@ -240,7 +244,4 @@ void PluginDescWidget::updateHeight()
 
 
 
-
-
-
-
+}

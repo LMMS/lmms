@@ -34,6 +34,10 @@
 #include "Engine.h"
 
 
+namespace lmms
+{
+
+
 Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 		int _height ) :
 	QWidget( _parent ),
@@ -708,5 +712,4 @@ void graphModel::drawSampleAt( int x, float val )
 
 
 
-
-
+}

@@ -69,6 +69,9 @@
 
 
 
+namespace lmms
+{
+
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
@@ -1380,4 +1383,8 @@ void MainWindow::autoSave()
 		// try again in 10 seconds
 		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
 	}
+}
+
+
+
 }

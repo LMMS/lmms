@@ -34,6 +34,10 @@
 #include "BBTrack.h"
 
 
+namespace lmms
+{
+
+
 ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 							QWidget * _parent, bool multi_export=false ) :
 	QDialog( _parent ),
@@ -343,4 +347,8 @@ void ExportProjectDialog::updateTitleBar( int _prog )
 {
 	gui->mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
+}
+
+
+
 }

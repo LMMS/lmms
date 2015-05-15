@@ -33,6 +33,10 @@
 #include <QShortcut>
 
 
+namespace lmms
+{
+
+
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
@@ -113,4 +117,8 @@ void DropToolBar::dragEnterEvent(QDragEnterEvent* event)
 void DropToolBar::dropEvent(QDropEvent* event)
 {
 	dropped(event);
+}
+
+
+
 }

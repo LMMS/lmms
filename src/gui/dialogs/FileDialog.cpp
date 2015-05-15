@@ -31,6 +31,10 @@
 #include "FileDialog.h"
 
 
+namespace lmms
+{
+
+
 FileDialog::FileDialog( QWidget *parent, const QString &caption,
 					   const QString &directory, const QString &filter ) :
 	QFileDialog( parent, caption, directory, filter )
@@ -86,3 +90,4 @@ void FileDialog::clearSelection()
 
 
 
+}

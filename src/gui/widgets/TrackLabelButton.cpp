@@ -37,6 +37,9 @@
 #include "Engine.h"
 
 
+namespace lmms
+{
+
 
 TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
@@ -163,5 +166,4 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 
 
 
-
-
+}

@@ -47,6 +47,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 QPixmap * TimeLineWidget::s_timeLinePixmap = NULL;
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
 QPixmap * TimeLineWidget::s_loopPointBeginPixmap = NULL;
@@ -401,3 +405,4 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 
 
 
+}

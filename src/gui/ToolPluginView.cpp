@@ -35,6 +35,10 @@
 #include "MainWindow.h"
 
 
+namespace lmms
+{
+
+
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 	PluginView( _toolPlugin, NULL )
 {
@@ -46,3 +50,5 @@ ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 }
 
 
+
+}

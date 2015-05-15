@@ -35,6 +35,10 @@
 #include "LcdSpinBox.h"
 
 
+namespace lmms
+{
+
+
 MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	QWidget( _parent ),
 	ModelView( NULL, this )
@@ -113,3 +117,6 @@ void MeterDialog::modelChanged()
 	m_denominator->setModel( &mm->denominatorModel() );
 }
 
+
+
+}

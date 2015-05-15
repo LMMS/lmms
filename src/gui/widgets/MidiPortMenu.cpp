@@ -28,6 +28,10 @@
 
 
 
+namespace lmms
+{
+
+
 MidiPortMenu::MidiPortMenu( MidiPort::Modes _mode ) :
 	ModelView( NULL, this ),
 	m_mode( _mode )
@@ -100,5 +104,4 @@ void MidiPortMenu::updateMenu()
 
 
 
-
-
+}

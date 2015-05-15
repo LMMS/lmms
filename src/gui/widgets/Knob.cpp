@@ -52,6 +52,10 @@
 #include "TextFloat.h"
 
 
+namespace lmms
+{
+
+
 TextFloat * Knob::s_textFloat = NULL;
 
 
@@ -813,6 +817,4 @@ void Knob::displayHelp()
 
 
 
-
-
-
+}

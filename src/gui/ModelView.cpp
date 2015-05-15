@@ -27,6 +27,9 @@
 #include "ModelView.h"
 
 
+namespace lmms
+{
+
 
 ModelView::ModelView( Model* model, QWidget* widget ) :
 	m_widget( widget ),
@@ -84,3 +87,5 @@ void ModelView::doConnections()
 }
 
 
+
+}

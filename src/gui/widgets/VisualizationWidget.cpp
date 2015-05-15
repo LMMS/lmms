@@ -38,6 +38,9 @@
 #include "ConfigManager.h"
 
 
+namespace lmms
+{
+
 
 VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
@@ -192,6 +195,4 @@ void VisualizationWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-
-
-
+}

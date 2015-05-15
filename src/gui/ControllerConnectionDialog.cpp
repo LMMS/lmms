@@ -46,6 +46,10 @@
 #include "embed.h"
 
 
+namespace lmms
+{
+
+
 class AutoDetectMidiController : public MidiController
 {
 public:
@@ -432,5 +436,4 @@ void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 
 
 
-
-
+}

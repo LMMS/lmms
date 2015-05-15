@@ -44,6 +44,10 @@
 
 
 
+namespace lmms
+{
+
+
 BBEditor::BBEditor( BBTrackContainer* tc ) :
 	Editor(false),
 	m_trackContainerView( new BBTrackContainerView(tc) )
@@ -284,4 +288,8 @@ void BBTrackContainerView::makeSteps( bool clone )
 			}
 		}
 	}
+}
+
+
+
 }

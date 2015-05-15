@@ -45,6 +45,10 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
+
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QWidget( _parent ),
 	ModelView( _model, this ),
@@ -197,5 +201,4 @@ void ControllerView::displayHelp()
 
 
 
-
-
+}

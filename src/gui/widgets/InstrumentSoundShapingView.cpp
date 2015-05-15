@@ -34,6 +34,9 @@
 #include "TabWidget.h"
 
 
+namespace lmms
+{
+
 
 const int TARGETS_TABWIDGET_X = 4;
 const int TARGETS_TABWIDGET_Y = 5;
@@ -163,5 +166,4 @@ void InstrumentSoundShapingView::modelChanged()
 
 
 
-
-	
+}

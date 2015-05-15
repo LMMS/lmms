@@ -59,6 +59,10 @@
 #include "MainWindow.h"
 
 
+namespace lmms
+{
+
+
 TextFloat * Fader::s_textFloat = NULL;
 QPixmap * Fader::s_back = NULL;
 QPixmap * Fader::s_leds = NULL;
@@ -400,3 +404,4 @@ void Fader::setPeakRed( const QColor & c )
 
 
 
+}

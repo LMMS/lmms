@@ -31,6 +31,10 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
+
 // internal helper class allowing to create QToolButtons with
 // vertical orientation
 class SideBarButton : public QToolButton
@@ -163,4 +167,4 @@ void SideBar::toggleButton( QAbstractButton * button )
 
 
 
-
+}

@@ -33,6 +33,10 @@
 #include "update_event.h"
 
 
+namespace lmms
+{
+
+
 const float FadeDuration = 300;
 
 
@@ -122,7 +126,4 @@ void FadeButton::signalUpdate()
 
 
 
-
-
-
-
+}

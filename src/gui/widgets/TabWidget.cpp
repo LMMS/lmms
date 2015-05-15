@@ -33,6 +33,9 @@
 #include "gui_templates.h"
 
 
+namespace lmms
+{
+
 
 TabWidget::TabWidget( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -231,7 +234,4 @@ void TabWidget::wheelEvent( QWheelEvent * _we )
 
 
 
-
-
-
-
+}

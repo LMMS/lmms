@@ -29,6 +29,9 @@
 #include "RenameDialog.h"
 
 
+namespace lmms
+{
+
 
 RenameDialog::RenameDialog( QString & _string ) :
 	QDialog(),
@@ -75,6 +78,4 @@ void RenameDialog::textChanged( const QString & _new_string )
 
 
 
-
-
-
+}

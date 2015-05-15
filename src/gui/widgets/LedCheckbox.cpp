@@ -31,6 +31,10 @@
 #include "gui_templates.h"
 
 
+namespace lmms
+{
+
+
 static const QString names[LedCheckBox::NumColors] =
 {
 	"led_yellow", "led_green", "led_red"
@@ -132,5 +136,4 @@ void LedCheckBox::onTextUpdated()
 
 
 
-
-
+}

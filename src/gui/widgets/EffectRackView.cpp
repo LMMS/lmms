@@ -35,6 +35,10 @@
 #include "GroupBox.h"
 
 
+namespace lmms
+{
+
+
 EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this )
@@ -264,5 +268,4 @@ void EffectRackView::modelChanged()
 
 
 
-
-
+}

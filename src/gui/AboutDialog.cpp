@@ -29,6 +29,9 @@
 #include "versioninfo.h"
 
 
+namespace lmms
+{
+
 
 AboutDialog::AboutDialog(QWidget* parent) :
 	QDialog(parent),
@@ -51,4 +54,8 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	licenseLabel->setPlainText( embed::getText( "COPYING" ) );
 
 	involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );
+}
+
+
+
 }

@@ -58,6 +58,11 @@
 #include "update_event.h"
 
 
+
+namespace lmms
+{
+
+
 /*! The black / white order of keys as they appear on the keyboard.
  */
 const Piano::KeyTypes KEY_ORDER[] =
@@ -917,6 +922,4 @@ void PianoView::paintEvent( QPaintEvent * )
 
 
 
-
-
-
+}

@@ -30,6 +30,10 @@
 
 
 
+namespace lmms
+{
+
+
 TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	QWidget( _parent ),
 	m_layout( new QBoxLayout( _dir, this ) ),
@@ -241,8 +245,4 @@ bool TabBar::allHidden()
 
 
 
-
-
-
-
-
+}

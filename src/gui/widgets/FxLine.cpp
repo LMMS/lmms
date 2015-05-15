@@ -40,6 +40,11 @@
 #include "gui_templates.h"
 #include "CaptionMenu.h"
 
+
+namespace lmms
+{
+
+
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
 QPixmap * FxLine::s_receiveBgArrow = NULL;
@@ -274,3 +279,4 @@ void FxLine::setBackgroundActive( const QBrush & c )
 
 
 
+}

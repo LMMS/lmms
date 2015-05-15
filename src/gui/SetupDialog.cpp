@@ -67,6 +67,10 @@
 
 
 
+namespace lmms
+{
+
+
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );
@@ -1495,4 +1499,4 @@ void SetupDialog::displayMIDIHelp()
 
 
 
-
+}

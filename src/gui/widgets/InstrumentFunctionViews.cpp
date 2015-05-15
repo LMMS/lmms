@@ -38,6 +38,10 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
+
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
@@ -203,4 +207,4 @@ void InstrumentFunctionArpeggioView::modelChanged()
 
 
 
-
+}

@@ -77,6 +77,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 typedef AutomationPattern::timeMap timeMap;
 
 
@@ -4310,4 +4314,7 @@ void PianoRollWindow::focusInEvent(QFocusEvent * event)
 {
 	// when the window is given focus, also give focus to the actual piano roll
 	m_editor->setFocus(event->reason());
+}
+
+
 }

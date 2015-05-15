@@ -24,6 +24,11 @@
 
 #include "ActionGroup.h"
 
+
+namespace lmms
+{
+
+
 ActionGroup::ActionGroup(QObject* parent) : QActionGroup(parent)
 {
 	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered_(QAction*)));
@@ -52,4 +57,8 @@ void ActionGroup::actionTriggered_(QAction* action)
 	Q_ASSERT(actions().contains(action));
 
 	emit triggered(actions().indexOf(action));
+}
+
+
+
 }

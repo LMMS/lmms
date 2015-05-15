@@ -32,6 +32,9 @@
 #include "embed.h"
 
 
+namespace lmms
+{
+
 
 PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 	AutomatableButton( _parent, _name ),
@@ -144,5 +147,4 @@ QSize PixmapButton::sizeHint() const
 
 
 
-
-
+}
