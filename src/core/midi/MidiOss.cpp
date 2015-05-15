@@ -41,6 +41,8 @@
 #include "gui_templates.h"
 
 
+namespace lmms
+{
 
 MidiOss::MidiOss() :
 	MidiClientRaw(),
@@ -142,6 +144,7 @@ void MidiOss::setupWidget::saveSettings()
 }
 
 
+}
 
 #endif
 

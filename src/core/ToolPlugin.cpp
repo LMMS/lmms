@@ -26,6 +26,10 @@
 #include "ToolPlugin.h"
 
 
+namespace lmms
+{
+
+
 ToolPlugin::ToolPlugin( const Descriptor * _descriptor, Model * _parent ) :
 	Plugin( _descriptor, _parent )
 {
@@ -56,3 +60,6 @@ ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _par
 	return NULL;
 }
 
+
+
+}

@@ -36,6 +36,9 @@
 #ifdef LMMS_BUILD_WIN32
 
 
+namespace lmms
+{
+
 MidiWinMM::MidiWinMM() :
 	MidiClient(),
 	m_inputDevices(),
@@ -324,7 +327,7 @@ MidiWinMM::setupWidget::~setupWidget()
 
 
 
-
+}
 
 
 #endif

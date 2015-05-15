@@ -30,6 +30,10 @@
 #include "Oscillator.h"
 
 
+namespace lmms
+{
+
+
 // how long should be each envelope-segment maximal (e.g. attack)?
 extern const float SECS_PER_ENV_SEGMENT = 5.0f;
 // how long should be one LFO-oscillation maximal?
@@ -540,5 +544,5 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 
-
+}
 

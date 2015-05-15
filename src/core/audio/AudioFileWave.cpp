@@ -27,6 +27,9 @@
 #include "endian_handling.h"
 
 
+namespace lmms
+{
+
 AudioFileWave::AudioFileWave( const sample_rate_t _sample_rate,
 				const ch_cnt_t _channels, bool & _success_ful,
 				const QString & _file,
@@ -123,3 +126,4 @@ void AudioFileWave::finishEncoding()
 	}
 }
 
+}

@@ -30,6 +30,9 @@
 
 
 
+namespace lmms
+{
+
 AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
 							bool & _success_ful,
 							Mixer * _mixer ) :
@@ -111,4 +114,4 @@ void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
 }
 
 
-
+}

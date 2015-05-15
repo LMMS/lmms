@@ -42,6 +42,11 @@
 #endif
 
 
+
+namespace lmms
+{
+
+
 VstSyncController::VstSyncController() :
 	m_syncData( NULL ),
 	m_shmID( -1 ),
@@ -191,5 +196,4 @@ void VstSyncController::updateSampleRate()
 
 
 
-
-
+}

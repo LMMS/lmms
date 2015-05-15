@@ -64,6 +64,11 @@
 #include "MemoryManager.h"
 
 
+
+namespace lmms
+{
+
+
 SampleBuffer::SampleBuffer( const QString & _audio_file,
 							bool _is_base64_data ) :
 	m_audioFile( ( _is_base64_data == true ) ? "" : _audio_file ),
@@ -1479,4 +1484,8 @@ SampleBuffer::handleState::handleState( bool _varying_pitch, int interpolation_m
 SampleBuffer::handleState::~handleState()
 {
 	src_delete( m_resamplingData );
+}
+
+
+
 }

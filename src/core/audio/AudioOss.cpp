@@ -71,6 +71,9 @@
 
 
 
+namespace lmms
+{
+
 AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
 		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
@@ -370,6 +373,8 @@ void AudioOss::setupWidget::saveSettings()
 				QString::number( m_channels->value<int>() ) );
 }
 
+
+}
 
 #endif
 

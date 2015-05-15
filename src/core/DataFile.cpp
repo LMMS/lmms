@@ -45,6 +45,10 @@
 
 
 
+namespace lmms
+{
+
+
 DataFile::typeDescStruct
 		DataFile::s_types[DataFile::TypeCount] =
 {
@@ -879,3 +883,4 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 							item( 0 ).toElement();
 }
 
+}

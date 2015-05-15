@@ -74,6 +74,11 @@
 #include "TrackContainer.h"
 
 
+
+namespace lmms
+{
+
+
 /*! The width of the resize grip in pixels
  */
 const int RESIZE_GRIP_WIDTH = 4;
@@ -2724,3 +2729,4 @@ void TrackView::createTCOView( TrackContentObject * tco )
 
 
 
+}

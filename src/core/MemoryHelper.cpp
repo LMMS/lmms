@@ -26,6 +26,11 @@
 #include "lmms_basics.h"
 #include "MemoryHelper.h"
 
+
+namespace lmms
+{
+
+
 /**
  * Allocate a number of bytes and return them.
  * @param byteNum is the number of bytes
@@ -63,3 +68,5 @@ void MemoryHelper::alignedFree( void* _buffer )
 	}
 }
 
+
+}

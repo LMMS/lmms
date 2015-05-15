@@ -36,7 +36,8 @@
 #include "templates.h"
 
 
-
+namespace lmms
+{
 
 AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
@@ -231,6 +232,8 @@ void AudioSdl::setupWidget::saveSettings()
 							m_device->text() );
 }
 
+
+}
 
 #endif
 

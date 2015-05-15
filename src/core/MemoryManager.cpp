@@ -30,6 +30,10 @@
 #include <stdint.h>
 
 
+namespace lmms
+{
+
+
 MemoryPoolVector MemoryManager::s_memoryPools;
 QReadWriteLock MemoryManager::s_poolMutex;
 PointerInfoMap MemoryManager::s_pointerInfo;
@@ -216,4 +220,7 @@ void MemoryPool::releaseChunks( void * ptr, int chunks )
 	memset( &m_free[ start ], 1, chunks );
 
 	m_mutex.unlock();
+}
+
+
 }

@@ -43,6 +43,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms
+{
+
+
 
 BBTrack::infoMap BBTrack::s_infoMap;
 
@@ -635,7 +639,4 @@ void BBTrackView::clickedTrackLabel()
 
 
 
-
-
-
-
+}

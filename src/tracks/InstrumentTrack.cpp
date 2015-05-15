@@ -86,6 +86,11 @@
 #include "volume.h"
 
 
+namespace lmms
+{
+
+
+
 const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 						"With this knob you can set "
 						"the volume of the opened "
@@ -1774,4 +1779,8 @@ void InstrumentTrackWindow::viewNextInstrument()
 void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
+}
+
+
+
 }

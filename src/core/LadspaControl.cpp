@@ -29,6 +29,10 @@
 #include "LadspaBase.h"
 
 
+namespace lmms
+{
+
+
 LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 								bool _link ) :
 	Model( _parent ),
@@ -339,4 +343,4 @@ void LadspaControl::setLink( bool _state )
 
 
 
-
+}

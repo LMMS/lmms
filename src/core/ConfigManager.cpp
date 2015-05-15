@@ -33,6 +33,10 @@
 #include "ProjectVersion.h"
 
 
+
+namespace lmms
+{
+
 static inline QString ensureTrailingSlash( const QString & _s )
 {
 	if( _s.right( 1 ) != QDir::separator() )
@@ -497,3 +501,4 @@ void ConfigManager::saveConfigFile()
 }
 
 
+}

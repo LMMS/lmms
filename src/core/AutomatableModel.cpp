@@ -28,6 +28,10 @@
 #include "ControllerConnection.h"
 #include "lmms_math.h"
 
+
+namespace lmms
+{
+
 float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;
 
@@ -707,4 +711,4 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 
 
 
-
+}

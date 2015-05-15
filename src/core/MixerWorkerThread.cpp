@@ -31,6 +31,11 @@
 
 #include "denormals.h"
 
+
+namespace lmms
+{
+
+
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;
 QList<MixerWorkerThread *> MixerWorkerThread::workerThreads;
@@ -167,3 +172,5 @@ void MixerWorkerThread::run()
 }
 
 
+
+}

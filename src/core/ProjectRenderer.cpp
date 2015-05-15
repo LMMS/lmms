@@ -37,6 +37,12 @@
 #endif
 #include <QMutexLocker>
 
+
+
+namespace lmms
+{
+
+
 FileEncodeDevice __fileEncodeDevices[] =
 {
 
@@ -230,3 +236,4 @@ void ProjectRenderer::updateConsoleProgress()
 
 
 
+}

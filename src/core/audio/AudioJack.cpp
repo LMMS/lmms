@@ -42,7 +42,8 @@
 #include "MainWindow.h"
 
 
-
+namespace lmms
+{
 
 AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
@@ -473,6 +474,6 @@ void AudioJack::setupWidget::saveSettings()
 
 
 
-
+}
 
 #endif

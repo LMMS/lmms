@@ -29,6 +29,12 @@
 #include "JournallingObject.h"
 #include "Song.h"
 
+
+
+namespace lmms
+{
+
+
 const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
 ProjectJournal::ProjectJournal() :
@@ -191,3 +197,4 @@ void ProjectJournal::stopAllJournalling()
 
 
 
+}

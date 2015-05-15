@@ -32,6 +32,9 @@
 #include "PresetPreviewPlayHandle.h"
 
 
+namespace lmms
+{
+
 
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
 {
@@ -527,4 +530,4 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 }
 
 
-
+}

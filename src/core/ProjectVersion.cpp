@@ -27,6 +27,11 @@
 
 #include "ProjectVersion.h"
 
+
+namespace lmms
+{
+
+
 int parseMajor(QString & version) {
 	return version.section( '.', 0, 0 ).toInt();
 }
@@ -134,3 +139,4 @@ int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 
 
 
+}

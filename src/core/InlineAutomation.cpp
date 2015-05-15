@@ -27,6 +27,10 @@
 #include "InlineAutomation.h"
 
 
+namespace lmms
+{
+
+
 void InlineAutomation::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
@@ -58,3 +62,5 @@ void InlineAutomation::loadSettings( const QDomElement & _this )
 	}
 }
 
+
+}

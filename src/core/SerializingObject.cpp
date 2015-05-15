@@ -28,6 +28,10 @@
 
 
 
+namespace lmms
+{
+
+
 SerializingObject::SerializingObject() :
 	m_hook( NULL )
 {
@@ -111,3 +115,5 @@ void SerializingObject::loadSettings( const QDomElement& element )
 }
 
 
+
+}

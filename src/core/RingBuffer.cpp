@@ -29,6 +29,10 @@
 #include <string.h>
 #include "MixHelpers.h"
 
+
+namespace lmms
+{
+
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
 	m_fpp( Engine::mixer()->framesPerPeriod() ),
@@ -315,3 +319,5 @@ void RingBuffer::updateSamplerate()
 }
 
 
+
+}

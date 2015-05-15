@@ -40,6 +40,10 @@
 #include "PeakController.h"
 
 
+
+namespace lmms
+{
+
 long Controller::s_periods = 0;
 QVector<Controller *> Controller::s_controllers;
 
@@ -351,4 +355,4 @@ int Controller::connectionCount() const{
 
 
 
-
+}

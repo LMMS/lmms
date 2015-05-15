@@ -25,6 +25,10 @@
 #include "Model.h"
 
 
+namespace lmms
+{
+
+
 QString Model::fullDisplayName() const
 {
 	const QString & n = displayName();
@@ -46,5 +50,5 @@ QString Model::fullDisplayName() const
 
 
 
-
+}
 

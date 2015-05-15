@@ -34,6 +34,10 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {
@@ -625,4 +629,8 @@ void NotePlayHandleManager::extend( int c )
 		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = n;
 		++n;
 	}
+}
+
+
+
 }

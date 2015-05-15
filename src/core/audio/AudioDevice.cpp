@@ -29,6 +29,9 @@
 #include "debug.h"
 
 
+namespace lmms
+{
+
 
 AudioDevice::AudioDevice( const ch_cnt_t _channels, Mixer*  _mixer ) :
 	m_supportsCapture( false ),
@@ -252,3 +255,4 @@ bool AudioDevice::hqAudio() const
 }
 
 
+}

@@ -40,6 +40,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 // simple helper thread monitoring our RemotePlugin - if process terminates
 // unexpectedly invalidate plugin so LMMS doesn't lock up
 ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
@@ -396,4 +400,4 @@ bool RemotePlugin::processMessage( const message & _m )
 
 
 
-
+}

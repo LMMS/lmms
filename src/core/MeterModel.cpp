@@ -27,6 +27,10 @@
 #include "AutomationPattern.h"
 
 
+namespace lmms
+{
+
+
 MeterModel::MeterModel( ::Model * _parent ) :
 	Model( _parent ),
 	m_numeratorModel( 4, 1, 32, this, tr( "Numerator" ) ),
@@ -79,5 +83,5 @@ void MeterModel::loadSettings( const QDomElement & _this,
 
 
 
-
+}
 

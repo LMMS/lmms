@@ -37,6 +37,9 @@
 
 #ifdef LMMS_HAVE_ALSA
 
+namespace lmms
+{
+
 const int EventPollTimeOut = 250;
 
 
@@ -736,7 +739,7 @@ void MidiAlsaSeq::setupWidget::saveSettings()
 
 
 
-
+}
 
 #endif
 

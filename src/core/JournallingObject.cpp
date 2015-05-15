@@ -32,6 +32,9 @@
 #include "Engine.h"
 
 
+namespace lmms
+{
+
 
 JournallingObject::JournallingObject() :
 	SerializingObject(),
@@ -141,3 +144,5 @@ void JournallingObject::changeID( jo_id_t _id )
 }
 
 
+
+}

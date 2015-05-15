@@ -34,6 +34,10 @@
 #include "lmms_math.h"
 
 
+namespace lmms
+{
+
+
 LfoController::LfoController( Model * _parent ) :
 	Controller( Controller::LfoController, _parent, tr( "LFO Controller" ) ),
 	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
@@ -230,5 +234,5 @@ ControllerDialog * LfoController::createDialog( QWidget * _parent )
 
 
 
-
+}
 

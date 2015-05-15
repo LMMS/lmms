@@ -34,6 +34,11 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms
+{
+
+
+
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
 {
@@ -192,3 +197,5 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 }
 
 
+
+}

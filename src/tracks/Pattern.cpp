@@ -51,6 +51,10 @@
 #include "MainWindow.h"
 
 
+namespace lmms
+{
+
+
 QPixmap * PatternView::s_stepBtnOn = NULL;
 QPixmap * PatternView::s_stepBtnOverlay = NULL;
 QPixmap * PatternView::s_stepBtnOff = NULL;
@@ -1222,3 +1226,5 @@ void PatternView::paintEvent( QPaintEvent * )
 }
 
 
+
+}

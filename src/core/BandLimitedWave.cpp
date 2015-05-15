@@ -27,6 +27,10 @@
 
 #include "ConfigManager.h"
 
+
+namespace lmms
+{
+
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;
 QString BandLimitedWave::s_wavetableDir = "";
@@ -268,5 +272,8 @@ moogout << s_waveforms[ BandLimitedWave::BLMoog ];
 moogfile.close();
 
 */
+
+}
+
 
 }

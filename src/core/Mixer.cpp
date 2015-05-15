@@ -56,6 +56,9 @@
 #include "BufferManager.h"
 
 
+namespace lmms
+{
+
 
 Mixer::Mixer() :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
@@ -957,3 +960,4 @@ void Mixer::fifoWriter::run()
 
 
 
+}

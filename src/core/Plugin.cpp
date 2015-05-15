@@ -38,6 +38,11 @@
 #include "Song.h"
 
 
+
+namespace lmms
+{
+
+
 static PixmapLoader __dummyLoader;
 
 static Plugin::Descriptor dummyPluginDescriptor =
@@ -228,3 +233,4 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 
 
 
+}

@@ -27,6 +27,10 @@
 #include "ValueBuffer.h"
 
 
+namespace lmms
+{
+
+
 namespace MixHelpers
 {
 
@@ -269,3 +273,5 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst,
 
 }
 
+
+}

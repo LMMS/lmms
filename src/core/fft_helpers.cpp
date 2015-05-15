@@ -28,6 +28,11 @@
 #include <cmath>
 #include "lmms_constants.h"
 
+
+namespace lmms
+{
+
+
 /* returns biggest value from abs_spectrum[spec_size] array
 
    returns -1 on error
@@ -241,3 +246,5 @@ float signalpower(float *timesignal, int num_values)
 	return power;
 }
 
+
+}

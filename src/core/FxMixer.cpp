@@ -33,6 +33,11 @@
 #include "BBTrackContainer.h"
 #include "ValueBuffer.h"
 
+
+namespace lmms
+{
+
+
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
@@ -771,3 +776,5 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 	}
 }
 
+
+}

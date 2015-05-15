@@ -45,6 +45,11 @@ using namespace std;
 #define DWORD __u32
 #define WAVE_FORMAT_PCM			0x0001
 
+
+
+namespace lmms
+{
+
 // const int     Fs    =  44100;
 const float   TwoPi =  6.2831853f;
 const int     MAX   =  0;
@@ -732,3 +737,5 @@ int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels
   return Length;
 }
 
+
+}
