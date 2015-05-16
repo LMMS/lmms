@@ -31,6 +31,10 @@
 #include "ModelView.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT PluginView  : public QWidget, public ModelView
 {
 public:
@@ -43,4 +47,5 @@ public:
 } ;
 
 
+}
 #endif

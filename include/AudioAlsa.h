@@ -37,6 +37,11 @@
 #include "AudioDevice.h"
 
 
+
+namespace lmms
+{
+
+
 class LcdSpinBox;
 class QLineEdit;
 
@@ -94,6 +99,9 @@ private:
 
 } ;
 
+
+
+}
 #endif
 
 #endif

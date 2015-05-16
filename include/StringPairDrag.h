@@ -36,6 +36,10 @@
 class QPixmap;
 
 
+namespace lmms
+{
+
+
 class EXPORT StringPairDrag : public QDrag
 {
 public:
@@ -58,4 +62,5 @@ public:
 } ;
 
 
+}
 #endif

@@ -33,6 +33,12 @@
 
 class QAtomicInt;
 class QReadWriteLock;
+
+
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -340,4 +346,5 @@ private:
 };
 
 
+}
 #endif

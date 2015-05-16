@@ -32,6 +32,11 @@
 #include <QtCore/QtGlobal>
 
 #include <cmath>
+
+
+namespace lmms
+{
+
 using namespace std;
 
 #if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) || defined(LMMS_BUILD_HAIKU)  || defined (__FreeBSD__)
@@ -325,4 +330,7 @@ static inline T absMin( T a, T b )
 	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
 }
 
+
+
+}
 #endif

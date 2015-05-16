@@ -29,6 +29,10 @@
 #include "ComboBoxModel.h"
 
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
@@ -85,4 +89,5 @@ private:
 extern const QString __targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
+}
 #endif

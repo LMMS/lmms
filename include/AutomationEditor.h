@@ -38,6 +38,11 @@
 #include "ComboBoxModel.h"
 #include "Knob.h"
 
+
+namespace lmms
+{
+
+
 class QPainter;
 class QPixmap;
 class QScrollBar;
@@ -299,4 +304,6 @@ private:
 };
 
 
+
+}
 #endif

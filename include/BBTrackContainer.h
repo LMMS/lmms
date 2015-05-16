@@ -30,6 +30,10 @@
 #include "ComboBoxModel.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
@@ -79,4 +83,6 @@ private:
 } ;
 
 
+
+}
 #endif

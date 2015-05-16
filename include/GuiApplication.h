@@ -31,6 +31,11 @@
 
 class QLabel;
 
+
+namespace lmms
+{
+
+
 class AutomationEditorWindow;
 class BBEditor;
 class ControllerRackView;
@@ -77,4 +82,6 @@ private:
 
 #define gui GuiApplication::instance()
 
+
+}
 #endif // GUIAPPLICATION_H

@@ -32,6 +32,10 @@
 #include "LcdWidget.h"
 
 
+namespace lmms
+{
+
+
 class TimeDisplayWidget : public QWidget
 {
 	Q_OBJECT
@@ -67,4 +71,6 @@ private:
 
 } ;
 
+
+}
 #endif

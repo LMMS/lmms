@@ -31,6 +31,11 @@
 #include <string.h>
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
+
 class ValueBuffer
 {
 	MM_OPERATORS
@@ -160,4 +165,6 @@ private:
 	int m_length;
 };
 
+
+}
 #endif

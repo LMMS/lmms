@@ -35,6 +35,10 @@
 #include "AutomatableModel.h"
 
 
+namespace lmms
+{
+
+
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
@@ -175,4 +179,5 @@ signals:
 typedef QList<MidiPort *> MidiPortList;
 
 
+}
 #endif

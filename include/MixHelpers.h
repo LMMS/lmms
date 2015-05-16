@@ -27,6 +27,10 @@
 
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
 class ValueBuffer;
 namespace MixHelpers
 {
@@ -71,5 +75,6 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst, const sample_t* srcLeft, 
 
 }
 
-#endif
 
+}
+#endif

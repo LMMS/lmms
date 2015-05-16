@@ -8,6 +8,11 @@
 #include "FxLine.h"
 #include "FxMixerView.h"
 
+
+namespace lmms
+{
+
+
 class FxLine;
 class FxMixerView;
 
@@ -30,4 +35,6 @@ private:
 	FloatModel * getSendModel();
 };
 
+
+}
 #endif // SENDBUTTONINDICATOR_H

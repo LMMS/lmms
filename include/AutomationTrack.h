@@ -30,6 +30,10 @@
 #include "Track.h"
 
 
+namespace lmms
+{
+
+
 class AutomationTrack : public Track
 {
 	Q_OBJECT
@@ -71,4 +75,5 @@ public:
 } ;
 
 
+}
 #endif

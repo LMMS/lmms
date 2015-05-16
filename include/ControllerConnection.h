@@ -37,6 +37,11 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
+
+namespace lmms
+{
+
+
 class ControllerConnection;
 
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
@@ -119,5 +124,7 @@ signals:
 	friend class ControllerConnectionDialog;
 };
 
-#endif
 
+
+}
+#endif

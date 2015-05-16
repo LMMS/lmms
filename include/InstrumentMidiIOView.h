@@ -31,6 +31,10 @@
 #include "ModelView.h"
 
 
+namespace lmms
+{
+
+
 class GroupBox;
 class LcdSpinBox;
 class QToolButton;
@@ -78,4 +82,6 @@ private:
 
 };
 
+
+}
 #endif

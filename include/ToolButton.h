@@ -30,6 +30,10 @@
 #include <QColor>
 
 
+namespace lmms
+{
+
+
 class ToolButton : public QToolButton
 {
 	Q_OBJECT
@@ -46,5 +50,6 @@ public:
 
 } ;
 
-#endif
 
+}
+#endif

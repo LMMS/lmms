@@ -32,6 +32,10 @@
 #include "ComboBoxModel.h"
 
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -209,4 +213,6 @@ private:
 } ;
 
 
+
+}
 #endif

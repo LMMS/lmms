@@ -29,6 +29,11 @@
 
 #include "Plugin.h"
 
+
+namespace lmms
+{
+
+
 class EXPORT ToolPlugin : public Plugin
 {
 public:
@@ -42,4 +47,6 @@ public:
 
 } ;
 
+
+}
 #endif

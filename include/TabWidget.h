@@ -30,6 +30,11 @@
 #include <QtCore/QMap>
 
 
+
+namespace lmms
+{
+
+
 class TabWidget : public QWidget
 {
 	Q_OBJECT
@@ -69,4 +74,6 @@ private:
 	quint8 m_tabheight;
 } ;
 
+
+}
 #endif

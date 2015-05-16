@@ -34,6 +34,11 @@
 #include "TempoSyncKnobModel.h"
 #include "Oscillator.h"
 
+
+namespace lmms
+{
+
+
 class automatableButtonGroup;
 class Knob;
 class LedCheckBox;
@@ -120,4 +125,6 @@ private slots:
 
 } ;
 
+
+}
 #endif

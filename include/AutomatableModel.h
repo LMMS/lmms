@@ -60,6 +60,10 @@
 
 
 
+namespace lmms
+{
+
+
 class ControllerConnection;
 
 class EXPORT AutomatableModel : public Model, public JournallingObject
@@ -444,5 +448,6 @@ public:
 } ;
 
 
-#endif
 
+}
+#endif

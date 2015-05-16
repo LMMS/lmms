@@ -29,6 +29,10 @@
 #include <QDomElement>
 
 
+namespace lmms
+{
+
+
 class JournallingObject;
 
 class Clipboard
@@ -50,4 +54,6 @@ private:
 
 } ;
 
+
+}
 #endif

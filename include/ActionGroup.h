@@ -28,6 +28,11 @@
 
 #include <QActionGroup>
 
+
+namespace lmms
+{
+
+
 /// \brief Convenience subclass of QActionGroup
 ///
 /// This class provides the same functionality as QActionGroup, but in addition
@@ -54,4 +59,6 @@ private:
 	QList<QAction*> m_actions;
 };
 
+
+}
 #endif

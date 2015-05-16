@@ -29,6 +29,11 @@
 #include "Instrument.h"
 #include "PluginView.h"
 
+
+namespace lmms
+{
+
+
 class InstrumentTrackWindow;
 
 
@@ -55,4 +60,5 @@ public:
 } ;
 
 
+}
 #endif

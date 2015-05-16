@@ -40,6 +40,11 @@
 #include "lmms_basics.h"
 
 
+
+namespace lmms
+{
+
+
 const float NOHINT = -99342.2243f;
 
 typedef QPair<QString, QString> ladspa_key_t;
@@ -335,4 +340,7 @@ private:
 
 } ;
 
+
+
+}
 #endif

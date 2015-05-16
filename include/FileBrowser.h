@@ -36,6 +36,11 @@
 
 class QLineEdit;
 
+
+namespace lmms
+{
+
+
 class FileItem;
 class InstrumentTrack;
 class FileBrowserTreeWidget;
@@ -242,4 +247,5 @@ private:
 } ;
 
 
+}
 #endif

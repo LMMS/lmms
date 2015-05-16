@@ -30,6 +30,12 @@
 
 #include "ModelView.h"
 
+
+
+namespace lmms
+{
+
+
 class Piano;
 
 
@@ -85,5 +91,5 @@ signals:
 } ;
 
 
+}
 #endif
-

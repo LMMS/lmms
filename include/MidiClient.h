@@ -34,6 +34,10 @@
 #include "TabWidget.h"
 
 
+namespace lmms
+{
+
+
 class MidiPort;
 
 
@@ -194,5 +198,5 @@ private:
 } ;
 
 
+}
 #endif
-

@@ -28,6 +28,10 @@
 #include "AutomatableModel.h"
 
 
+namespace lmms
+{
+
+
 class MeterModel : public Model
 {
 	Q_OBJECT
@@ -62,4 +66,6 @@ private:
 
 } ;
 
+
+}
 #endif

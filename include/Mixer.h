@@ -52,6 +52,10 @@
 #include "MixerProfiler.h"
 
 
+
+namespace lmms
+{
+
 class AudioDevice;
 class MidiClient;
 class AudioPort;
@@ -462,4 +466,6 @@ private:
 } ;
 
 
+
+}
 #endif

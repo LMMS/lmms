@@ -33,6 +33,11 @@
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
 
+
+namespace lmms
+{
+
+
 class FxMixerView;
 class SendButtonIndicator;
 
@@ -81,4 +86,5 @@ private slots:
 };
 
 
+}
 #endif // FXLINE_H

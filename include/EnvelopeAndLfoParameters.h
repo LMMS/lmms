@@ -34,6 +34,11 @@
 #include "lmms_basics.h"
 
 
+
+namespace lmms
+{
+
+
 class EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
 	Q_OBJECT
@@ -183,4 +188,7 @@ private:
 
 } ;
 
+
+
+}
 #endif

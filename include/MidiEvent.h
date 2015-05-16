@@ -30,6 +30,11 @@
 #include "panning_constants.h"
 #include "volume.h"
 
+
+namespace lmms
+{
+
+
 class MidiEvent
 {
 public:
@@ -207,4 +212,7 @@ private:
 
 } ;
 
+
+
+}
 #endif

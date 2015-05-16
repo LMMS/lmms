@@ -30,6 +30,12 @@
 #include <QToolBar>
 
 class QToolButton;
+
+
+namespace lmms
+{
+
+
 class SideBarWidget;
 
 
@@ -54,4 +60,6 @@ private:
 
 } ;
 
+
+}
 #endif

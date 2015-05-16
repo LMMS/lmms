@@ -32,6 +32,10 @@
 #include "Mixer.h"
 
 
+namespace lmms
+{
+
+
 class VisualizationWidget : public QWidget
 {
 	Q_OBJECT
@@ -66,4 +70,6 @@ private:
 
 } ;
 
+
+}
 #endif

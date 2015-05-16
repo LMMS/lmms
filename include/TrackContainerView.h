@@ -37,6 +37,11 @@
 
 
 class QVBoxLayout;
+
+namespace lmms
+{
+
+
 class TrackContainer;
 
 
@@ -211,4 +216,6 @@ private:
 	QThread *m_containerThread;
 };
 
+
+}
 #endif

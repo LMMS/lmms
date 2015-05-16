@@ -36,6 +36,11 @@
 
 class QWidget;
 
+
+namespace lmms
+{
+
+
 class PixmapLoader;
 class PluginView;
 class AutomatableModel;
@@ -199,4 +204,5 @@ private:
 } ;
 
 
+}
 #endif

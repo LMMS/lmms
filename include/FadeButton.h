@@ -31,6 +31,10 @@
 #include <QColor>
 
 
+namespace lmms
+{
+
+
 class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
@@ -61,5 +65,6 @@ private:
 } ;
 
 
+}
 #endif
 

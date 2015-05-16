@@ -29,6 +29,11 @@
 #include "InlineAutomation.h"
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
+
 class DetuningHelper : public InlineAutomation
 {
 	MM_OPERATORS
@@ -60,4 +65,5 @@ public:
 } ;
 
 
+}
 #endif

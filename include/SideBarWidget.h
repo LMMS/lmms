@@ -30,6 +30,11 @@
 #include <QWidget>
 
 
+
+namespace lmms
+{
+
+
 class SideBarWidget : public QWidget
 {
 	Q_OBJECT
@@ -79,4 +84,6 @@ private:
 
 } ;
 
+
+}
 #endif

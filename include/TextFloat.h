@@ -32,6 +32,10 @@
 #include "export.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT TextFloat : public QWidget
 {
 	Q_OBJECT
@@ -79,4 +83,6 @@ private:
 
 };
 
+
+}
 #endif

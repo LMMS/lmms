@@ -33,6 +33,10 @@
 #include "ValueBuffer.h"
 
 
+namespace lmms
+{
+
+
 typedef struct PortDescription port_desc_t;
 
 
@@ -119,4 +123,6 @@ private:
 
 } ;
 
+
+}
 #endif

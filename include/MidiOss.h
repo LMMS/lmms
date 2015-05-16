@@ -38,6 +38,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiOss : public MidiClientRaw, public QThread
 {
 public:
@@ -80,6 +84,8 @@ private:
 
 } ;
 
+
+}
 #endif
 
 

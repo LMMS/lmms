@@ -29,6 +29,9 @@
 
 #include <QtCore/QEvent>
 
+namespace lmms
+{
+
 
 namespace customEvents
 {
@@ -41,6 +44,5 @@ namespace customEvents
 }
 
 
-
-
+}
 #endif

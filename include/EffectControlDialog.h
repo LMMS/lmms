@@ -30,6 +30,12 @@
 
 #include "ModelView.h"
 
+
+
+namespace lmms
+{
+
+
 class EffectControls;
 
 
@@ -52,4 +58,6 @@ protected:
 
 } ;
 
+
+}
 #endif

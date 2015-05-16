@@ -30,6 +30,11 @@
 
 #include "ModelView.h"
 
+
+namespace lmms
+{
+
+
 class Controller;
 
 
@@ -51,4 +56,6 @@ protected:
 
 } ;
 
+
+}
 #endif

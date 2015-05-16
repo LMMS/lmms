@@ -30,6 +30,11 @@
 
 #include "AutomatableModel.h"
 
+
+namespace lmms
+{
+
+
 class PixmapLoader;
 
 
@@ -89,4 +94,5 @@ private:
 } ;
 
 
+}
 #endif

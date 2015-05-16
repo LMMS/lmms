@@ -30,6 +30,10 @@
 #include "EffectControlDialog.h"
 
 
+namespace lmms
+{
+
+
 class DummyEffectControlDialog : public EffectControlDialog
 {
 public:
@@ -139,4 +143,6 @@ private:
 } ;
 
 
+
+}
 #endif

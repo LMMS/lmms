@@ -32,6 +32,11 @@
 
 #include "Track.h"
 
+
+namespace lmms
+{
+
+
 class TrackLabelButton;
 class TrackContainer;
 
@@ -226,4 +231,5 @@ private:
 
 
 
+}
 #endif

@@ -45,6 +45,11 @@ class QString;
 class QMenu;
 class QSignalMapper;
 
+
+namespace lmms
+{
+
+
 class ComboBox;
 class NotePlayHandle;
 class Pattern;
@@ -397,5 +402,5 @@ private:
 };
 
 
+}
 #endif
-

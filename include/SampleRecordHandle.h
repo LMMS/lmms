@@ -32,6 +32,11 @@
 #include "Mixer.h"
 #include "SampleBuffer.h"
 
+
+namespace lmms
+{
+
+
 class BBTrack;
 class SampleTCO;
 class Track;
@@ -68,4 +73,5 @@ private:
 } ;
 
 
+}
 #endif

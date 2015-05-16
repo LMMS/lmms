@@ -34,6 +34,11 @@
 
 #include "AudioDevice.h"
 
+
+namespace lmms
+{
+
+
 class QLineEdit;
 
 
@@ -86,6 +91,8 @@ private:
 
 } ;
 
+
+}
 #endif
 
 #endif

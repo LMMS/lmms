@@ -30,6 +30,12 @@
 #include <QWidget>
 
 class QLabel;
+
+
+namespace lmms
+{
+
+
 class ComboBox;
 class GroupBox;
 class Knob;
@@ -87,4 +93,5 @@ private:
 } ;
 
 
+}
 #endif

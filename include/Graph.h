@@ -35,6 +35,11 @@
 #include "ModelView.h"
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
+
 class graphModel;
 
 
@@ -184,4 +189,6 @@ private:
 
 };
 
+
+}
 #endif

@@ -30,6 +30,9 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
+namespace lmms
+{
+
 
 namespace base64
 {
@@ -55,4 +58,6 @@ namespace base64
 
 }
 
+
+}
 #endif

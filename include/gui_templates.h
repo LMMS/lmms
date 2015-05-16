@@ -34,6 +34,10 @@
 
 
 
+namespace lmms
+{
+
+
 // return DPI-independent font-size - font with returned font-size has always
 // the same size in pixels
 template<int SIZE>
@@ -65,4 +69,5 @@ inline QFont pointSizeF( QFont _f, float SIZE )
 }
 
 
+}
 #endif

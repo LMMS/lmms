@@ -30,6 +30,9 @@
 #include <QProxyStyle>
 
 
+namespace lmms
+{
+
 
 class LmmsStyle : public QProxyStyle
 {
@@ -92,4 +95,6 @@ private:
 
 };
 
+
+}
 #endif

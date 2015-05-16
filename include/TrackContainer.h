@@ -32,6 +32,11 @@
 #include "JournallingObject.h"
 
 
+
+namespace lmms
+{
+
+
 class AutomationPattern;
 class InstrumentTrack;
 class TrackContainerView;
@@ -138,4 +143,5 @@ private:
 } ;
 
 
+}
 #endif

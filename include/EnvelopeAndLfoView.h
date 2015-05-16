@@ -33,6 +33,11 @@
 class QPaintEvent;
 class QPixmap;
 
+
+namespace lmms
+{
+
+
 class EnvelopeAndLfoParameters;
 
 class automatableButtonGroup;
@@ -94,4 +99,6 @@ private:
 	float m_randomGraph;
 } ;
 
+
+}
 #endif

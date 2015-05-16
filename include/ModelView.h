@@ -29,6 +29,10 @@
 #include "Model.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT ModelView
 {
 public:
@@ -81,5 +85,5 @@ private:
 } ;
 
 
+}
 #endif
-

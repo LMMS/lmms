@@ -31,6 +31,11 @@
 #include "SerializingObject.h"
 
 
+
+namespace lmms
+{
+
+
 class EXPORT JournallingObject : public SerializingObject
 {
 public:
@@ -99,5 +104,5 @@ private:
 } ;
 
 
+}
 #endif
-

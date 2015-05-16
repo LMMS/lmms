@@ -33,6 +33,10 @@
 #include "export.h"
 
 
+namespace lmms
+{
+
+
 class TabButton;
 
 
@@ -85,4 +89,5 @@ signals:
 } ;
 
 
+}
 #endif

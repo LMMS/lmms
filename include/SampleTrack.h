@@ -30,6 +30,11 @@
 #include "AudioPort.h"
 #include "Track.h"
 
+
+namespace lmms
+{
+
+
 class EffectRackView;
 class Knob;
 class SampleBuffer;
@@ -188,4 +193,5 @@ private:
 } ;
 
 
+}
 #endif

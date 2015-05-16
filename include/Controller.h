@@ -33,6 +33,11 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
+
+namespace lmms
+{
+
+
 class ControllerDialog;
 class Controller;
 class ControllerConnection;
@@ -174,5 +179,7 @@ signals:
 
 } ;
 
-#endif
 
+
+}
+#endif

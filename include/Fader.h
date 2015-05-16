@@ -54,6 +54,11 @@
 
 #include "AutomatableModelView.h"
 
+
+namespace lmms
+{
+
+
 class TextFloat;
 
 

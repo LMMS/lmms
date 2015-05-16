@@ -32,6 +32,10 @@
 class QPixmap;
 
 
+namespace lmms
+{
+
+
 class EXPORT LedCheckBox : public AutomatableButton
 {
 	Q_OBJECT
@@ -78,4 +82,6 @@ private:
 
 } ;
 
+
+}
 #endif

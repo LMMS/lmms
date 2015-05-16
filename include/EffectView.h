@@ -35,6 +35,10 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+
+namespace lmms
+{
+
 class EffectControlDialog;
 class Knob;
 class LedCheckBox;
@@ -90,4 +94,6 @@ private:
 
 } ;
 
+
+}
 #endif

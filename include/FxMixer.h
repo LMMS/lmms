@@ -32,6 +32,10 @@
 #include "ThreadableJob.h"
 
 
+namespace lmms
+{
+
+
 class FxRoute;
 typedef QVector<FxRoute *> FxRouteVector;
 
@@ -217,4 +221,5 @@ private:
 } ;
 
 
+}
 #endif

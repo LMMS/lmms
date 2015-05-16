@@ -39,6 +39,11 @@ class QLabel;
 class QLineEdit;
 class QSlider;
 
+
+namespace lmms
+{
+
+
 class TabBar;
 
 
@@ -194,4 +199,5 @@ private:
 } ;
 
 
+}
 #endif

@@ -40,6 +40,10 @@ struct pollfd;
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiAlsaRaw : public MidiClientRaw , public QThread
 {
 public:
@@ -85,6 +89,8 @@ private:
 
 } ;
 
+
+}
 #endif
 
 #endif

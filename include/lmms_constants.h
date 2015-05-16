@@ -25,6 +25,11 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
+
+namespace lmms
+{
+
+
 const long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
 const long double LD_2PI = LD_PI * 2.0;
 const long double LD_PI_2 = LD_PI * 0.5;
@@ -49,4 +54,6 @@ const float F_PI_SQR = (float) LD_PI_SQR;
 const float F_E = (float) LD_E;
 const float F_E_R = (float) LD_E_R;
 
+
+}
 #endif

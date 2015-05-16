@@ -30,6 +30,11 @@
 #include <stdint.h>
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
+
 class DrumSynth {
     public:
         DrumSynth() {};
@@ -49,4 +54,6 @@ class DrumSynth {
 
 };
 
+
+}
 #endif

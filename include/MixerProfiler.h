@@ -29,6 +29,11 @@
 
 #include "MicroTimer.h"
 
+
+namespace lmms
+{
+
+
 class MixerProfiler
 {
 public:
@@ -57,4 +62,6 @@ private:
 
 };
 
+
+}
 #endif

@@ -34,6 +34,10 @@
 class QAction;
 
 
+namespace lmms
+{
+
+
 class MidiPortMenu : public QMenu, public ModelView
 {
 	Q_OBJECT
@@ -58,4 +62,5 @@ private:
 } ;
 
 
+}
 #endif

@@ -29,6 +29,10 @@
 #include <QPushButton>
 
 
+namespace lmms
+{
+
+
 class TabButton : public QPushButton
 {
 	Q_OBJECT
@@ -63,4 +67,6 @@ private:
 
 } ;
 
+
+}
 #endif

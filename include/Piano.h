@@ -28,6 +28,11 @@
 #include "Note.h"
 #include "Model.h"
 
+
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class MidiEventProcessor;
 
@@ -76,5 +81,6 @@ private:
 
 } ;
 
-#endif
 
+}
+#endif

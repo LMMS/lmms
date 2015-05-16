@@ -30,6 +30,11 @@
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+
+namespace lmms
+{
+
+
 class AudioPortAudioSetupUtil : public QObject
 {
 	Q_OBJECT
@@ -152,4 +157,6 @@ private:
 
 #endif
 
+
+}
 #endif

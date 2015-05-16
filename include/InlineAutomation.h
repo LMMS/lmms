@@ -29,6 +29,10 @@
 #include "shared_object.h"
 
 
+namespace lmms
+{
+
+
 class InlineAutomation : public FloatModel, public sharedObject
 {
 public:
@@ -89,4 +93,5 @@ private:
 } ;
 
 
+}
 #endif

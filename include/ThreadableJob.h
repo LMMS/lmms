@@ -30,6 +30,10 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
+
 class ThreadableJob
 {
 public:
@@ -86,4 +90,6 @@ protected:
 
 } ;
 
+
+}
 #endif

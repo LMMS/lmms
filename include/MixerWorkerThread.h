@@ -29,6 +29,12 @@
 #include <QtCore/QThread>
 
 class QWaitCondition;
+
+
+namespace lmms
+{
+
+
 class Mixer;
 class ThreadableJob;
 
@@ -114,4 +120,5 @@ private:
 } ;
 
 
+}
 #endif

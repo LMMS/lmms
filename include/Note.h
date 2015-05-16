@@ -33,6 +33,12 @@
 #include "MidiTime.h"
 #include "SerializingObject.h"
 
+
+
+namespace lmms
+{
+
+
 class DetuningHelper;
 
 
@@ -234,4 +240,5 @@ private:
 typedef QVector<Note *> NoteVector;
 
 
+}
 #endif

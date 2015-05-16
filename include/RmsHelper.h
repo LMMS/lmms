@@ -28,6 +28,11 @@
 
 #include "lmms_math.h"
 
+
+namespace lmms
+{
+
+
 class RmsHelper
 {
 public:
@@ -91,4 +96,5 @@ private:
 };
 
 
+}
 #endif

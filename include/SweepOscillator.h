@@ -29,6 +29,11 @@
 #include "DspEffectLibrary.h"
 
 
+
+namespace lmms
+{
+
+
 template<class FX = DspEffectLibrary::StereoBypass>
 class SweepOscillator
 {
@@ -67,4 +72,5 @@ private:
 } ;
 
 
+}
 #endif

@@ -29,6 +29,9 @@
 #include "custom_events.h"
 
 
+namespace lmms
+{
+
 
 class updateEvent : public QEvent
 {
@@ -41,4 +44,5 @@ public:
 } ;
 
 
+}
 #endif

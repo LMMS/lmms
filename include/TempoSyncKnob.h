@@ -32,6 +32,11 @@
 #include "Knob.h"
 #include "TempoSyncKnobModel.h"
 
+
+namespace lmms
+{
+
+
 class MeterDialog;
 
 class EXPORT TempoSyncKnob : public Knob
@@ -78,5 +83,5 @@ private:
 } ;
 
 
-
+}
 #endif

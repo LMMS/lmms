@@ -33,6 +33,9 @@
 #include "AutomatableModelView.h"
 
 
+namespace lmms
+{
+
 
 class EXPORT ComboBox : public QWidget, public IntModelView
 {
@@ -80,4 +83,6 @@ private slots:
 
 } ;
 
+
+}
 #endif

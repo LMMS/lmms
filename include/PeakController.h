@@ -32,6 +32,11 @@
 #include "Controller.h"
 #include "ControllerDialog.h"
 
+
+namespace lmms
+{
+
+
 class automatableButtonGroup;
 class Knob;
 class PeakControllerEffect;
@@ -102,4 +107,6 @@ protected:
 
 } ;
 
+
+}
 #endif

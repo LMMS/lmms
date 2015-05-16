@@ -32,6 +32,11 @@
 
 class QLabel;
 
+
+namespace lmms
+{
+
+
 class EnvelopeAndLfoView;
 class ComboBox;
 class GroupBox;
@@ -67,4 +72,6 @@ private:
 
 } ;
 
+
+}
 #endif

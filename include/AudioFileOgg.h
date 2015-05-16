@@ -35,6 +35,9 @@
 #include "AudioFileDevice.h"
 
 
+namespace lmms
+{
+
 class AudioFileOgg : public AudioFileDevice
 {
 public:
@@ -102,6 +105,7 @@ private:
 } ;
 
 
+}
 #endif
 
 #endif

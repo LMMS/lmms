@@ -38,6 +38,9 @@
 //#define VST_SNC_SHM_RND_KEY 3561653564469
 
 
+namespace lmms
+{
+
 
 struct VstSyncData
 {
@@ -58,4 +61,6 @@ struct VstSyncData
 #endif
 } ;
 
+
+}
 #endif

@@ -31,6 +31,10 @@
 #include "export.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT Model : public QObject
 {
 	Q_OBJECT
@@ -88,5 +92,5 @@ signals:
 } ;
 
 
+}
 #endif
-

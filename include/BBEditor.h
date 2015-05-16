@@ -30,6 +30,10 @@
 #include "TrackContainerView.h"
 
 
+namespace lmms
+{
+
+
 class BBTrackContainer;
 class ComboBox;
 
@@ -96,4 +100,6 @@ private:
 };
 
 
+
+}
 #endif

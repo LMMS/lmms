@@ -35,6 +35,10 @@
 class QPushButton;
 class QScrollArea;
 
+
+namespace lmms
+{
+
 class ControllerView;
 
 
@@ -73,4 +77,6 @@ private:
 
 } ;
 
+
+}
 #endif

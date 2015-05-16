@@ -41,6 +41,12 @@
 
 class QLineEdit;
 template<class T> class QQueue;
+
+
+namespace lmms
+{
+
+
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class EffectRackView;
@@ -458,4 +464,5 @@ private:
 
 
 
+}
 #endif

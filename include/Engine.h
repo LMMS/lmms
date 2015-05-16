@@ -33,6 +33,11 @@
 
 #include "export.h"
 
+
+namespace lmms
+{
+
+
 class BBTrackContainer;
 class DummyTrackContainer;
 class FxMixer;
@@ -146,5 +151,5 @@ private:
 
 
 
-
+}
 #endif

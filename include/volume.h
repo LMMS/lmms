@@ -31,6 +31,11 @@
 #include "lmms_basics.h"
 #include "Midi.h"
 
+
+namespace lmms
+{
+
+
 const volume_t MinVolume = 0;
 const volume_t MaxVolume = 200;
 const volume_t DefaultVolume = 100;
@@ -40,4 +45,6 @@ typedef struct
 	float vol[2];
 } stereoVolumeVector;
 
+
+}
 #endif

@@ -31,6 +31,11 @@
 
 class QAtomicInt;
 
+
+namespace lmms
+{
+
+
 const int BM_INITIAL_BUFFERS = 512;
 //const int BM_INCREMENT = 64;
 
@@ -53,4 +58,6 @@ private:
 	static int s_size;
 };
 
+
+}
 #endif

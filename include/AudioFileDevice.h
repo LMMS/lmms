@@ -31,6 +31,10 @@
 #include "AudioDevice.h"
 
 
+namespace lmms
+{
+
+
 class AudioFileDevice : public AudioDevice
 {
 public:
@@ -111,4 +115,5 @@ typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
 						Mixer* mixer );
 
 
+}
 #endif
