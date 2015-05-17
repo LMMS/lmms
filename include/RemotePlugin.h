@@ -86,6 +86,12 @@ typedef int32_t key_t;
 #endif
 
 
+#ifdef COMPILE_REMOTE_PLUGIN_BASE
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+#include <QtCore/QCoreApplication>
+#endif
+#endif
+
 
 namespace lmms
 {
@@ -876,10 +882,6 @@ private:
 
 
 #ifdef COMPILE_REMOTE_PLUGIN_BASE
-
-#ifndef BUILD_REMOTE_PLUGIN_CLIENT
-#include <QtCore/QCoreApplication>
-#endif
 
 
 RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :

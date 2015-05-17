@@ -5,14 +5,12 @@
 #include <QLabel>
 #include <QPixmap>
 
-#include "FxLine.h"
-#include "FxMixerView.h"
-
 
 namespace lmms
 {
 
 
+class FloatModel;
 class FxLine;
 class FxMixerView;
 

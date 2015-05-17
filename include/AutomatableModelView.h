@@ -29,13 +29,13 @@
 #include "AutomatableModel.h"
 
 
+class QMenu;
+class QMouseEvent;
+
 
 namespace lmms
 {
 
-
-class QMenu;
-class QMouseEvent;
 
 class EXPORT AutomatableModelView : public ModelView
 {

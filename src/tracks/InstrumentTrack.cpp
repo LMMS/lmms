@@ -596,7 +596,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
-	::BBTrack * bb_track = NULL;
+	lmms::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
 		TrackContentObject * tco = getTCO( _tco_num );

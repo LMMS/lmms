@@ -4,6 +4,9 @@
 #include "FxMixer.h"
 #include "Model.h"
 
+#include "FxLine.h"
+#include "FxMixerView.h"
+
 
 namespace lmms
 {

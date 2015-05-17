@@ -48,6 +48,9 @@ public:
 } ;
 
 
+} // namespace lmms
+
+
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #if defined(__FreeBSD__)
@@ -63,6 +66,10 @@ public:
 #else
 #	define PORTAUDIO_V18
 #endif
+
+
+namespace lmms
+{
 
 
 class ComboBox;
@@ -158,5 +165,5 @@ private:
 #endif
 
 
-}
+} // namespace lmms
 #endif

@@ -39,18 +39,19 @@
 #include "Knob.h"
 
 
-namespace lmms
-{
-
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
+
+namespace lmms
+{
+
+
 class ComboBox;
 class NotePlayHandle;
 class TimeLineWidget;
-
 
 
 class AutomationEditor : public QWidget, public JournallingObject

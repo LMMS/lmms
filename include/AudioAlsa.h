@@ -37,13 +37,14 @@
 #include "AudioDevice.h"
 
 
+class QLineEdit;
+
 
 namespace lmms
 {
 
 
 class LcdSpinBox;
-class QLineEdit;
 
 
 class AudioAlsa : public AudioDevice, public QThread

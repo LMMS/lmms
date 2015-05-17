@@ -50,6 +50,7 @@
 #include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
+#include "PlayHandle.h"
 
 
 
@@ -74,9 +75,6 @@ const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 const float BaseFreq = 440.0f;
 const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
-
-
-#include "PlayHandle.h"
 
 
 class MixerWorkerThread;

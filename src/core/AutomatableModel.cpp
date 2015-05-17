@@ -248,7 +248,7 @@ void AutomatableModel::setValue( const float value )
 
 template<class T> T AutomatableModel::logToLinearScale( T value ) const
 {
-	return castValue<T>( ::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
+	return castValue<T>( lmms::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
 }
 
 
@@ -264,7 +264,7 @@ float AutomatableModel::inverseScaledValue( float value ) const
 {
 	return m_scaleType == Linear
 		? value
-		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
+		: lmms::linearToLogScale( minValue<float>(), maxValue<float>(), value );
 }
 
 
@@ -299,7 +299,7 @@ void roundAt( T& value, const T& where, const T& step_size )
 template<class T>
 void AutomatableModel::roundAt( T& value, const T& where ) const
 {
-	::roundAt(value, where, m_step);
+	lmms::roundAt(value, where, m_step);
 }
 
 

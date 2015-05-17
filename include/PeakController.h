@@ -33,13 +33,15 @@
 #include "ControllerDialog.h"
 
 
+class PeakControllerEffect;
+class PeakControllerDialog;
+
 namespace lmms
 {
 
 
 class automatableButtonGroup;
 class Knob;
-class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
 

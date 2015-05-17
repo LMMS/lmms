@@ -1867,14 +1867,14 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 
 	switch( tt )
 	{
-		case InstrumentTrack: t = new ::InstrumentTrack( tc ); break;
-		case BBTrack: t = new ::BBTrack( tc ); break;
-		case SampleTrack: t = new ::SampleTrack( tc ); break;
+		case InstrumentTrack: t = new lmms::InstrumentTrack( tc ); break;
+		case BBTrack: t = new lmms::BBTrack( tc ); break;
+		case SampleTrack: t = new lmms::SampleTrack( tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
-		case AutomationTrack: t = new ::AutomationTrack( tc ); break;
+		case AutomationTrack: t = new lmms::AutomationTrack( tc ); break;
 		case HiddenAutomationTrack:
-						t = new ::AutomationTrack( tc, true ); break;
+						t = new lmms::AutomationTrack( tc, true ); break;
 		default: break;
 	}
 
