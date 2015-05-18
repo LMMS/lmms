@@ -368,7 +368,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// Tracks
 	for( int t = 0; t < seq->tracks(); ++t )
 	{
-		QString trackName = QString("Track %1").arg(t);
+		QString trackName = QString( tr( "Track" ) + " %1" ).arg( t );
 		Alg_track_ptr trk = seq->track( t );
 		pd.setValue( t + preTrackSteps );
 
@@ -388,8 +388,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
                 if( evt->is_update() )
 				{
 					QString attr = evt->get_attribute();
-                    if( attr == "tracknames" && evt->get_update_type() == 'a' ) {
-						trackName = evt->get_atom_value();
+                    if( attr == "tracknames" && evt->get_update_type() == 's' ) {
+						trackName = evt->get_string_value();
 						handled = true;
 					}
 				}
@@ -488,6 +488,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 								objModel = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
+							default:
+								//TODO: something useful for other CCs
+								break;
 						}
 
 						if( objModel )
@@ -499,9 +502,10 @@ bool MidiImport::readSMF( TrackContainer* tc )
 							else
 							{
 								if( ccs[ccid].at == NULL ) {
-									ccs[ccid].create( tc, trackName + 
-											  (ccid == 128 ? " Pitch bend" : 
-											   QString(" CC %1").arg(ccid) ) );
+									ccs[ccid].create( tc, trackName + " > " + (
+										  objModel != NULL ? 
+										  objModel->displayName() : 
+										  QString("CC %1").arg(ccid) ) );
 								}
 								ccs[ccid].putValue( time, objModel, cc );
 							}
