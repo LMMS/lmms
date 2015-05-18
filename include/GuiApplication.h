@@ -80,7 +80,7 @@ private:
 	QLabel* m_loadingProgressLabel;
 };
 
-#define gui GuiApplication::instance()
+#define gui lmms::GuiApplication::instance()
 
 
 }

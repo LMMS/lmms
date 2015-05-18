@@ -29,6 +29,8 @@
 #include "EqControlsDialog.h"
 #include "Knob.h"
 
+using namespace lmms;
+
 
 class EqEffect;
 

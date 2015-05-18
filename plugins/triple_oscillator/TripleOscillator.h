@@ -31,12 +31,16 @@
 #include "Oscillator.h"
 #include "AutomatableModel.h"
 
-
+namespace lmms
+{
 class automatableButtonGroup;
 class Knob;
 class NotePlayHandle;
 class PixmapButton;
 class SampleBuffer;
+}
+
+using namespace lmms;
 
 const int NUM_OF_OSCILLATORS = 3;
 

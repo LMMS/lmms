@@ -38,6 +38,10 @@
 class oscillator;
 class bitInvaderView;
 
+
+using namespace lmms;
+
+
 class bSynth
 {
 	MM_OPERATORS

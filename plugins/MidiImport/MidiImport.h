@@ -32,6 +32,8 @@
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
+using namespace lmms;
+
 
 class MidiImport : public ImportFilter
 {

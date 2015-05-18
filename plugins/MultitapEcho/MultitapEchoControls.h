@@ -31,6 +31,8 @@
 #include "Knob.h"
 #include "Graph.h"
 
+using namespace lmms;
+
 
 class MultitapEchoEffect;
 

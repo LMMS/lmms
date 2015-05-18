@@ -34,6 +34,8 @@
 #include <QWidget>
 #include <QLabel>
 
+using namespace lmms;
+
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
 

@@ -41,6 +41,9 @@
 // The "normal" range for LMMS pitchbends
 #define DEFAULT_BEND_CENTS 100
 
+
+using namespace lmms;
+
 class opl2instrument : public Instrument
 {
 	Q_OBJECT

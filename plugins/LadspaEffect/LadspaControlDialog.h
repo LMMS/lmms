@@ -32,7 +32,13 @@
 
 class QHBoxLayout;
 class LadspaControls;
+
+namespace lmms
+{
 class LedCheckBox;
+}
+
+using namespace lmms;
 
 
 class LadspaControlDialog : public EffectControlDialog

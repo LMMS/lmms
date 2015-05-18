@@ -34,6 +34,9 @@
 class AmplifierEffect;
 
 
+using namespace lmms;
+
+
 class AmplifierControls : public EffectControls
 {
 	Q_OBJECT

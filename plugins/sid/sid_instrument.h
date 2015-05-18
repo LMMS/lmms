@@ -34,9 +34,16 @@
 
 
 class sidInstrumentView;
+
+namespace lmms
+{
 class NotePlayHandle;
 class automatableButtonGroup;
 class PixmapButton;
+}
+
+using namespace lmms;
+
 
 class voiceObject : public Model
 {

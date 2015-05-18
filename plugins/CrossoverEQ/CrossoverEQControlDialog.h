@@ -30,6 +30,9 @@
 #include <QPixmap>
 #include "EffectControlDialog.h"
 
+using namespace lmms;
+
+
 class CrossoverEQControls;
 
 class CrossoverEQControlDialog : public EffectControlDialog

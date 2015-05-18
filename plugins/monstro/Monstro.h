@@ -39,6 +39,8 @@
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
 
+using namespace lmms;
+
 //
 //	UI Macros
 //

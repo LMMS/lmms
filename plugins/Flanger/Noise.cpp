@@ -25,6 +25,9 @@
 #include "Noise.h"
 #include "lmms_math.h"
 
+using namespace lmms;
+
+
 Noise::Noise()
 {
 	inv_randmax = 1.0/FAST_RAND_MAX; /* for range of 0 - 1.0 */

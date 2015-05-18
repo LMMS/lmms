@@ -30,7 +30,10 @@
 #include "peak_controller_effect_control_dialog.h"
 #include "Knob.h"
 
+
 class PeakControllerEffect;
+
+using namespace lmms;
 
 class PeakControllerEffectControls : public EffectControls
 {

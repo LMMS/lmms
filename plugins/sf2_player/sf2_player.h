@@ -41,12 +41,18 @@
 
 class sf2InstrumentView;
 class sf2Font;
-class NotePlayHandle;
 
 class patchesDialog;
 class QLabel;
 
 struct SF2PluginData;
+
+namespace lmms
+{
+class NotePlayHandle;
+}
+
+using namespace lmms;
 
 class sf2Instrument : public Instrument
 {

@@ -37,6 +37,8 @@
 #include "MemoryManager.h"
 
 
+using namespace lmms;
+
 enum SfxrWaves
 {
 	SQR_WAVE, SAW_WAVE, SINE_WAVE, NOISE_WAVE, WAVES_NUM

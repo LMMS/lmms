@@ -37,6 +37,7 @@
 #include <samplerate.h>
 #include "MemoryManager.h"
 
+using namespace lmms;
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, this ); 				\

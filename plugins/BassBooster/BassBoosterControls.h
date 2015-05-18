@@ -29,6 +29,8 @@
 #include "BassBoosterControlDialog.h"
 #include "Knob.h"
 
+using namespace lmms;
+
 
 class BassBoosterEffect;
 

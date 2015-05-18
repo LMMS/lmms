@@ -32,6 +32,8 @@
 #include "LadspaBase.h"
 #include "LadspaControls.h"
 
+using namespace lmms;
+
 
 typedef QVector<port_desc_t *> multi_proc_t;
 

@@ -33,6 +33,9 @@
 #include "lmms_math.h"
 #include "BasicFilters.h"
 
+using namespace lmms;
+
+
 class BitcrushEffect : public Effect
 {
 public:

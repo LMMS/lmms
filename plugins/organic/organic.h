@@ -35,9 +35,14 @@
 
 class QPixmap;
 
+namespace lmms
+{
 class Knob;
 class NotePlayHandle;
 class PixmapButton;
+}
+
+using namespace lmms;
 
 const int NUM_HARMONICS = 18;
 const QString HARMONIC_NAMES[NUM_HARMONICS] =  {

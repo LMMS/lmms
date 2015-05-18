@@ -29,6 +29,8 @@
 #include "SpectrumAnalyzerControlDialog.h"
 #include "Knob.h"
 
+using namespace lmms;
+
 
 class SpectrumAnalyzer;
 

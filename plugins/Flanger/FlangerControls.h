@@ -29,6 +29,8 @@
 #include "Knob.h"
 #include "FlangerControlsDialog.h"
 
+using namespace lmms;
+
 
 class FlangerEffect;
 

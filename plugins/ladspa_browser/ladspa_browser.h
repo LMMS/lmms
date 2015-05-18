@@ -31,8 +31,12 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
+namespace lmms
+{
 class TabBar;
+}
 
+using namespace lmms;
 
 class ladspaBrowserView : public ToolPluginView
 {

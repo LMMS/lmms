@@ -32,6 +32,9 @@
 
 class QPushButton;
 
+
+using namespace lmms;
+
 class PLUGIN_EXPORT CarlaInstrument : public Instrument
 {
     Q_OBJECT

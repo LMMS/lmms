@@ -27,6 +27,7 @@
 
 #include "PixmapButton.h"
 
+using namespace lmms;
 
 class nineButtonSelector: public QWidget , public IntModelView
 {

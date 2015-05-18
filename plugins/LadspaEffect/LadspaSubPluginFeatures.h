@@ -31,6 +31,8 @@
 #include "LadspaManager.h"
 #include "Plugin.h"
 
+using namespace lmms;
+
 
 class LadspaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {

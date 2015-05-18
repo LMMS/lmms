@@ -28,6 +28,7 @@
 
 #include "EffectControlDialog.h"
 
+using namespace lmms;
 
 class waveShaperControls;
 

@@ -29,6 +29,9 @@
 #include "EffectControls.h"
 #include "BitcrushControlDialog.h"
 
+using namespace lmms;
+
+
 class BitcrushEffect;
 
 class BitcrushControls : public EffectControls

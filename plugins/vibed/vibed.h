@@ -33,7 +33,14 @@
 #include "nine_button_selector.h"
 
 class vibedView;
+
+namespace lmms
+{
 class NotePlayHandle;
+}
+
+using namespace lmms;
+
 
 class vibed : public Instrument
 {

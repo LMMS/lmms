@@ -41,10 +41,18 @@
 #include "NotePlayHandle.h"
 #include <QMutex>
 
+
+namespace lmms
+{
+class NotePlayHandle;
+}
+
+using namespace lmms;
+
+
 static const int NUM_FILTERS = 2;
 
 class lb302SynthView;
-class NotePlayHandle;
 
 class lb302FilterKnobState
 {

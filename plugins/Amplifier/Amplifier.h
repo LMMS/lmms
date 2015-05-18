@@ -31,6 +31,9 @@
 #include "AmplifierControls.h"
 #include "ValueBuffer.h"
 
+
+using namespace lmms;
+
 class AmplifierEffect : public Effect
 {
 public:

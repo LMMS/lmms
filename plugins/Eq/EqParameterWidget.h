@@ -29,6 +29,9 @@
 #include "EffectControls.h"
 #include "TextFloat.h"
 
+using namespace lmms;
+
+
 class EqControls;
 
 

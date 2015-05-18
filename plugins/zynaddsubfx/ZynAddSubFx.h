@@ -39,9 +39,15 @@ class QPushButton;
 
 class LocalZynAddSubFx;
 class ZynAddSubFxView;
+
+namespace lmms
+{
 class NotePlayHandle;
 class Knob;
 class LedCheckBox;
+}
+
+using namespace lmms;
 
 
 class ZynAddSubFxRemotePlugin : public QObject, public RemotePlugin

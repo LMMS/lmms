@@ -29,9 +29,15 @@
 #include "EffectControlDialog.h"
 
 class PeakControllerEffectControls;
+
+namespace lmms
+{
 class Knob;
 class LedCheckBox;
+}
 
+
+using namespace lmms;
 
 class PeakControllerEffectControlDialog : public EffectControlDialog
 {

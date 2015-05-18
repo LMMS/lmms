@@ -33,8 +33,14 @@
 #include "Graph.h"
 
 class papuInstrumentView;
+
+namespace lmms
+{
 class NotePlayHandle;
 class PixmapButton;
+}
+
+using namespace lmms;
 
 class papuInstrument : public Instrument
 {

@@ -32,6 +32,8 @@
 #include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
+using namespace lmms;
+
 
 class VstEffect : public Effect
 {

@@ -32,6 +32,9 @@
 #include "RmsHelper.h"
 
 
+using namespace lmms;
+
+
 class dynProcEffect : public Effect
 {
 public:

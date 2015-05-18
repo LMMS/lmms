@@ -39,8 +39,13 @@
 
 
 class kickerInstrumentView;
-class NotePlayHandle;
 
+namespace lmms
+{
+class NotePlayHandle;
+}
+
+using namespace lmms;
 
 class kickerInstrument : public Instrument
 {

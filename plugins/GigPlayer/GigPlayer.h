@@ -42,12 +42,16 @@
 #include "gig.h"
 
 class GigInstrumentView;
-class NotePlayHandle;
 
 class PatchesDialog;
 class QLabel;
 
+namespace lmms
+{
+class NotePlayHandle;
+}
 
+using namespace lmms;
 
 
 struct GIGPluginData

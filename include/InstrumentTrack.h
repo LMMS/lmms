@@ -42,6 +42,8 @@
 class QLineEdit;
 template<class T> class QQueue;
 
+// need to forward-declare plugins/flp_import to give C++ friend status
+class FlpImport;
 
 namespace lmms
 {
@@ -275,7 +277,7 @@ private:
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class FlpImport;
+	friend class ::FlpImport;
 	friend class InstrumentMiscView;
 
 } ;

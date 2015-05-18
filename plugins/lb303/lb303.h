@@ -39,8 +39,15 @@
 #include "Knob.h"
 #include "Mixer.h"
 
-class lb303SynthView;
+
+namespace lmms
+{
 class NotePlayHandle;
+}
+
+using namespace lmms;
+
+class lb303SynthView;
 
 class lb303FilterKnobState
 {

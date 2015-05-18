@@ -29,6 +29,8 @@
 #include "LadspaControl.h"
 #include "LadspaControlDialog.h"
 
+using namespace lmms;
+
 
 typedef QVector<LadspaControl *> control_list_t;
 

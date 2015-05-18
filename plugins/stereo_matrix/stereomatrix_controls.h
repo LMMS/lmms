@@ -29,7 +29,11 @@
 #include "stereomatrix_control_dialog.h"
 #include "Knob.h"
 
+using namespace lmms;
+
+
 class stereoMatrixEffect;
+
 
 class stereoMatrixControls : public EffectControls
 {

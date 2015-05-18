@@ -34,6 +34,8 @@
 #include "MemoryManager.h"
 
 
+using namespace lmms;
+
 template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {

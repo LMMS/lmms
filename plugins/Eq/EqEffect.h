@@ -31,6 +31,7 @@
 #include "BasicFilters.h"
 #include "EqFilter.h"
 
+using namespace lmms;
 
 
 class EqEffect : public Effect

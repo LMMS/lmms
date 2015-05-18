@@ -30,6 +30,9 @@
 #include "EffectControls.h"
 #include "CrossoverEQControlDialog.h"
 
+using namespace lmms;
+
+
 class CrossoverEQEffect;
 
 class CrossoverEQControls : public EffectControls

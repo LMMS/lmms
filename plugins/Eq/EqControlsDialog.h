@@ -34,6 +34,8 @@
 #include "qpushbutton.h"
 #include "EqSpectrumView.h"
 
+using namespace lmms;
+
 
 class EqControls;
 

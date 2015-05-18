@@ -7,6 +7,8 @@
 
 #include "ImportFilter.h"
 
+using namespace lmms;
+
 
 class HydrogenImport : public ImportFilter
 {
