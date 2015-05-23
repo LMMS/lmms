@@ -116,6 +116,7 @@ private:
 
 
 	friend class LadspaControlView;
+	friend class LadspaMatrixControlDialog;
 
 } ;
 

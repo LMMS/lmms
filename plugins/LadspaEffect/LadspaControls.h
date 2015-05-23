@@ -28,6 +28,7 @@
 #include "EffectControls.h"
 #include "LadspaControl.h"
 #include "LadspaControlDialog.h"
+#include "LadspaMatrixControlDialog.h"
 
 
 typedef QVector<LadspaControl *> control_list_t;
@@ -56,7 +57,7 @@ public:
 
 	virtual EffectControlDialog * createView()
 	{
-		return new LadspaControlDialog( this );
+		return new LadspaMatrixControlDialog( this );
 	}
 
 
@@ -75,6 +76,7 @@ private:
 
 
 	friend class LadspaControlDialog;
+	friend class LadspaMatrixControlDialog;
 	friend class LadspaEffect;
 
 
