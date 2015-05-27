@@ -2170,7 +2170,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				if ( isUnderPosition ) { testPlayNote( n ); }
 				// If note is the one under the cursor or is selected when alt is
 				// not pressed
-				if ( isUnderPosition || ( n->selected() && !altPressed ) )
+				if ( ( isUnderPosition && !isSelection() ) || ( n->selected() && !altPressed ) )
 				{
 					if( m_noteEditMode == NoteEditVolume )
 					{

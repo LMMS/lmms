@@ -927,7 +927,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->move( 14, 226 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
-	ToolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
+	ToolTip::add( m_chorusButton, tr( "Apply chorus (if supported)" ) );
 	m_chorusButton->setWhatsThis(
 		tr( "This button enables the chorus effect. "
 			"This is useful for cool echo effects, but only works on "
