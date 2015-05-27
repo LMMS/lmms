@@ -484,7 +484,7 @@ void PianoRoll::markSemiTone( int i )
 			}
 
 			const int first = chord->isScale() ? 0 : key;
-			const int last = chord->isScale() ? NumKeys : key + chord->last();
+			const int last = chord->isScale() ? MaxKey : key + chord->last();
 			const int cap = ( chord->isScale() || chord->last() == 0 ) ? KeysPerOctave : chord->last();
 
 			for( int i = first; i <= last; i++ )
@@ -560,6 +560,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 		if( total_notes > 0 )
 		{
+			// probably wrong, "KeysPerOctave * NumOctaves" should be "MaxKey", but doesn't really matter
 			central_key = central_key / total_notes -
 					( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
 			m_startKey = tLimit( central_key, 0, NumOctaves * KeysPerOctave );
@@ -814,15 +815,55 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 {
 	bool useAllNotes = ! isSelection();
 	const NoteVector & notes = m_pattern->notes();
+
+	bool allInRange = true;
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
+		 ++it )
+	{
+		if( useAllNotes || ( *it )->selected() )
+		{
+			int destKey = ( *it )->key() + amount;
+			if ( (destKey < MinKey) || (destKey > MaxKey) ) {
+				allInRange = false;
+				break;
+			}
+		}
+	}
+
+
+	if (allInRange) {
+		NoteVector::ConstIterator it;
+		for( it = notes.begin(); it != notes.end(); ++it )
+		{
+			Note *note = *it;
+			// if none are selected, move all notes, otherwise
+			// only move selected notes
+			if( useAllNotes || note->selected() )
+			{
+				note->setKey( note->key() + amount );
+			}
+		}
+
+		// we modified the song
+		update();
+		gui->songEditor()->update();
+	}
+}
+
+
+void PianoRoll::addVolume( int amount ) // change volume of selection (or all) by amount
+{
+	bool useAllNotes = ! isSelection();
+	const NoteVector & notes = m_pattern->notes();
 	NoteVector::ConstIterator it;
 	for( it = notes.begin(); it != notes.end(); ++it )
 	{
 		Note *note = *it;
-		// if none are selected, move all notes, otherwise
-		// only move selected notes
+		// if none are selected, change all notes, otherwise
+		// only change selected notes
 		if( useAllNotes || note->selected() )
 		{
-			note->setKey( note->key() + amount );
+			note->setVolume( note->getVolume() + amount );
 		}
 	}
 
@@ -1073,6 +1114,36 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 								ke->modifiers() & Qt::ControlModifier );
 				}
 
+			}
+			ke->accept();
+			break;
+
+		case Qt::Key_PageUp:
+			if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
+			{
+				// shift selection up an octave
+				// if nothing selected, shift _everything_
+				addVolume( +10 );
+			}
+			else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
+			{
+				// Move selected notes up by one semitone
+				addVolume( +1 );
+			}
+			ke->accept();
+			break;
+
+		case Qt::Key_PageDown:
+			if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone )
+			{
+				// shift selection down an octave
+				// if nothing selected, shift _everything_
+				addVolume( -10 );
+			}
+			else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
+			{
+				// Move selected notes down by one semitone
+				addVolume( -1 );
 			}
 			ke->accept();
 			break;
@@ -1968,6 +2039,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					height() - PR_TOP_MARGIN - NOTE_EDIT_RESIZE_BAR -
 									PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
 		repaint();
+		PianoRoll::recalculateSize();
 		return;
 	}
 
@@ -2436,13 +2508,13 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		{
 			off_ticks -= (off_ticks + m_moveBoundaryLeft);
 		}
-		if( m_moveBoundaryTop + off_key > NumKeys )
+		if( m_moveBoundaryTop + off_key > MaxKey )
 		{
-			off_key -= NumKeys - (m_moveBoundaryTop + off_key);
+			off_key -= MaxKey - (m_moveBoundaryTop + off_key);
 		}
-		if( m_moveBoundaryBottom + off_key < 0 )
+		if( m_moveBoundaryBottom + off_key < MinKey )
 		{
-			off_key -= (m_moveBoundaryBottom + off_key);
+			off_key -= -MinKey + (m_moveBoundaryBottom + off_key);
 		}
 	}
 
@@ -2466,8 +2538,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 					// ticks can't be negative
 					pos_ticks = qMax(0, pos_ticks);
 					// upper/lower bound checks on key_num
-					key_num = qMax(0, key_num);
-					key_num = qMin(key_num, NumKeys);
+					key_num = qMax(MinKey, key_num);
+					key_num = qMin(key_num, MaxKey);
 
 					note->setPos( MidiTime( pos_ticks ) );
 					note->setKey( key_num );
@@ -3177,6 +3249,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 // responsible for moving/resizing scrollbars after window-resizing
 void PianoRoll::resizeEvent(QResizeEvent * re)
 {
+	PianoRoll::recalculateSize();
+}
+
+void PianoRoll::recalculateSize()
+{
 	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH,
 								      height() -
 								SCROLLBAR_SIZE,
@@ -3187,10 +3264,13 @@ void PianoRoll::resizeEvent(QResizeEvent * re)
 						height() - PR_TOP_MARGIN -
 						SCROLLBAR_SIZE );
 
-	int total_pixels = OCTAVE_HEIGHT * NumOctaves - ( height() -
-					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
-							m_notesEditHeight );
-	m_totalKeysToScroll = total_pixels * KeysPerOctave / OCTAVE_HEIGHT;
+	// TODO WRONG
+
+	int total_pixels = OCTAVE_HEIGHT * NumOctaves + WHITE_KEY_SMALL_HEIGHT - ( height() -
+																			   PR_TOP_MARGIN - PR_BOTTOM_MARGIN - m_notesEditHeight );
+
+	m_totalKeysToScroll = total_pixels * KeysPerOctave / OCTAVE_HEIGHT + 1;
+	//    m_totalKeysToScroll = NumOctaves * KeysPerOctave + 1;
 
 	m_topBottomScroll->setRange( 0, m_totalKeysToScroll );
 

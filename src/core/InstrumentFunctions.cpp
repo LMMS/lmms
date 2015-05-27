@@ -251,7 +251,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 				const int sub_note_key = sub_note_key_base + (int) chord_table[selected_chord][i];
 				// maybe we're out of range -> let's get outta
 				// here!
-				if( sub_note_key > NumKeys )
+				if( sub_note_key > MaxKey )
 				{
 					break;
 				}
@@ -456,8 +456,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 							KeysPerOctave + chord_table[selected_arp][cur_arp_idx % cur_chord_size];
 
 		// range-checking
-		if( sub_note_key >= NumKeys ||
-			sub_note_key < 0 ||
+		if( sub_note_key > MaxKey ||
+			sub_note_key < MinKey ||
 			Engine::mixer()->criticalXRuns() )
 		{
 			continue;

@@ -1733,15 +1733,15 @@ void TrackOperationsWidget::updateMenu()
 	QMenu * toMenu = m_trackOps->menu();
 	toMenu->clear();
 	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
-						tr( "Clone this track" ),
+						tr( "&Clone this track" ),
 						this, SLOT( cloneTrack() ) );
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
-						tr( "Remove this track" ),
+						tr( "&Remove this track" ),
 						this, SLOT( removeTrack() ) );
 						
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
-		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
+		toMenu->addAction( tr( "&Clear this track" ), this, SLOT( clearTrack() ) );
 	}
 	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{

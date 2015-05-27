@@ -131,7 +131,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
-	for( int i = 0; i < NumKeys; ++i )
+	for( int i = MinKey; i <= MaxKey; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
@@ -379,7 +379,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			m_midiNotesMutex.lock();
 			m_piano.setKeyState( event.key(), true );	// event.key() = original key
 
-			if( key >= 0 && key < NumKeys )
+			if( key >= MinKey && key <= MaxKey )
 			{
 				if( m_runningMidiNotes[key] > 0 )
 				{
@@ -397,7 +397,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			m_midiNotesMutex.lock();
 			m_piano.setKeyState( event.key(), false );	// event.key() = original key
 
-			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
+			if( key >= MinKey && key <= MaxKey && --m_runningMidiNotes[key] <= 0 )
 			{
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 			}
@@ -420,7 +420,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
 	m_notesMutex.lock();
 	m_midiNotesMutex.lock();
-	for( int i = 0; i < NumKeys; ++i )
+	for( int i = MinKey; i <= MaxKey; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
@@ -560,7 +560,7 @@ int InstrumentTrack::masterKey( int _midi_key ) const
 {
 
 	int key = baseNote();
-	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
+	return tLimit<int>( _midi_key - ( key - DefaultKey ), MinKey, MaxKey );
 }
 
 
@@ -882,7 +882,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
-	m_midiMenu = new QMenu( tr( "MIDI" ), this );
+	m_midiMenu = new QMenu( tr( "&MIDI" ), this );
 
 	// sequenced MIDI?
 	if( !Engine::mixer()->midiClient()->isRaw() )
@@ -914,8 +914,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( midiConfigChanged() ) );
 	}
 
-	m_midiInputAction->setText( tr( "Input" ) );
-	m_midiOutputAction->setText( tr( "Output" ) );
+	m_midiInputAction->setText( tr( "&Input" ) );
+	m_midiOutputAction->setText( tr( "&Output" ) );
 
 	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
 							QPalette::Background),

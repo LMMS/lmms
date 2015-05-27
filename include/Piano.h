@@ -67,7 +67,7 @@ public:
 private:
 	static bool isValidKey( int key )
 	{
-		return key >= 0 && key < NumKeys;
+		return (key >= MinKey) && (key <= MaxKey);
 	}
 
 	InstrumentTrack* m_instrumentTrack;

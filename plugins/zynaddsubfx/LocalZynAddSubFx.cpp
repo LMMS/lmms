@@ -45,7 +45,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master( NULL ),
 	m_ioEngine( NULL )
 {
-	for( int i = 0; i < NumKeys; ++i )
+	for( int i = MinKey; i <= MaxKey; ++i )
 	{
 		m_runningNotes[i] = 0;
 	}
