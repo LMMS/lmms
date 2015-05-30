@@ -71,19 +71,12 @@ QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 #ifdef PLUGIN_NAME
 		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
 			name = candidates.at( i );
-			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + "plugins/" +
-				     STRINGIFY( PLUGIN_NAME ) + "_" + name );
+			pixmap = QPixmap( "resources:plugins/" STRINGIFY( PLUGIN_NAME ) "_" + name );
 		}
 #endif
 		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
 			name = candidates.at( i );
-			pixmap = QPixmap( ConfigManager::inst()->artworkDir() + name );
-		}
-		
-		// nothing found, so look in default-artwork-dir
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			pixmap = QPixmap( ConfigManager::inst()->defaultArtworkDir() + name );
+			pixmap = QPixmap( "resources:" + name );
 		}
 		
 		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
