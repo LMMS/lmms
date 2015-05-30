@@ -1,9 +1,9 @@
 /*
- * InstrumentPlayHandle.cpp - play-handle for driving an instrument
+ * LeftRightNav.cpp - side-by-side left-facing and right-facing arrows for navigation (looks like < > )
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2015 Colin Wallace <wallacoloo/at/gmail.com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,13 +22,28 @@
  *
  */
 
+#ifndef LEFT_RIGHT_NAV_H
+#define LEFT_RIGHT_NAV_H
 
-#include "InstrumentPlayHandle.h"
-#include "InstrumentTrack.h"
+#include "PixmapButton.h"
 
-InstrumentPlayHandle::InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack ) :
-		PlayHandle( TypeInstrumentPlayHandle ),
-		m_instrument( instrument )
+#include <QLayout>
+
+class LeftRightNav : public QWidget
 {
-	setAudioPort( instrumentTrack->audioPort() );
-}
+	Q_OBJECT
+public:
+	LeftRightNav(QWidget *parent=NULL);
+	PixmapButton* getLeftBtn();
+	PixmapButton* getRightBtn();
+	void setShortcuts(const QKeySequence &leftShortcut=Qt::Key_Minus, const QKeySequence &rightShortcut=Qt::Key_Plus);
+signals:
+	void onNavLeft();
+	void onNavRight();
+private:
+	QHBoxLayout m_layout;
+	PixmapButton m_leftBtn;
+	PixmapButton m_rightBtn;
+};
+
+#endif

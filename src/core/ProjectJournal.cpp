@@ -97,6 +97,15 @@ void ProjectJournal::redo()
 	}
 }
 
+bool ProjectJournal::canUndo() const
+{
+	return !m_undoCheckPoints.isEmpty();
+}
+
+bool ProjectJournal::canRedo() const
+{
+	return !m_redoCheckPoints.isEmpty();
+}
 
 
 

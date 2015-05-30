@@ -42,6 +42,7 @@ public:
 	void setActiveGraphic( const QPixmap & _pm );
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
 
+	QSize sizeHint() const;
 
 signals:
 	void doubleClicked();

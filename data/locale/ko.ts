@@ -3433,7 +3433,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">기존 프로젝트 열기</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation type="unfinished">최근 열린 프로젝트</translation>
     </message>
     <message>
@@ -5932,7 +5932,7 @@ Latency: %2 ms</source>
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">무음</translation>
     </message>
     <message>

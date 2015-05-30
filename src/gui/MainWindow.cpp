@@ -33,6 +33,7 @@
 #include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QSplitter>
 #include <QWhatsThis>
 
@@ -97,7 +98,9 @@ MainWindow::MainWindow() :
 
 	ConfigManager* confMgr = ConfigManager::inst();
 
+	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
+	emit initProgress(tr("Preparing file browsers"));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
@@ -151,6 +154,7 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
+	emit initProgress(tr("Loading background artwork"));
 	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
 	QImage bgImage;
 	if( !bgArtwork.isEmpty() )
@@ -232,12 +236,12 @@ void MainWindow::finalize()
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
 					this, SLOT( createNewProject() ),
-					Qt::CTRL + Qt::Key_N );
+					QKeySequence::New );
 
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
-					Qt::CTRL + Qt::Key_O );
+					QKeySequence::Open );
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
 				embed::getIconPixmap( "project_open_recent" ),
@@ -250,7 +254,7 @@ void MainWindow::finalize()
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
-					Qt::CTRL + Qt::Key_S );
+					QKeySequence::Save );
 	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
@@ -289,18 +293,29 @@ void MainWindow::finalize()
 
 	QMenu * edit_menu = new QMenu( this );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
 					this, SLOT( undo() ),
-					Qt::CTRL + Qt::Key_Z );
-	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
+					QKeySequence::Undo );
+	m_redoAction = edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
 					tr( "Redo" ),
 					this, SLOT( redo() ),
-					Qt::CTRL + Qt::Key_Y );
+					QKeySequence::Redo );
+	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
+	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::Key_Y))
+	{
+		new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_Y ), this, SLOT(redo()) );
+	}
+	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Z ))
+	{
+		new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Z ), this, SLOT(redo()) );
+	}
+
 	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()) );
 
 	m_viewMenu = new QMenu( this );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
@@ -379,7 +394,7 @@ void MainWindow::finalize()
 
 	ToolButton * project_open_recent = new ToolButton(
 				embed::getIconPixmap( "project_open_recent" ),
-					tr( "Recently opened project" ),
+					tr( "Recently opened projects" ),
 					this, SLOT( emptySlot() ), m_toolBar );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
@@ -732,6 +747,14 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
+	QString default_template = ConfigManager::inst()->userTemplateDir()
+						+ "default.mpt";
+
+	//if we dont have a user default template, make one
+	if( !QFile::exists( default_template ) )
+	{
+		Engine::getSong()->saveProjectFile( default_template );
+	}
 }
 
 
@@ -1059,35 +1082,37 @@ void MainWindow::updateViewMenu()
 	qa = new QAction(tr( "Volume as dBV" ), this);
 	qa->setData("displaydbv");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).
-		       toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 	// Maybe this is impossible?
 	/* qa = new QAction(tr( "Tooltips" ), this);
 	qa->setData("tooltips");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "tooltips", "disabled" ).
-			toInt() ? false : true );
+	qa->setChecked( !ConfigManager::inst()->value( "tooltips", "disabled" ).toInt() );
 	m_viewMenu->addAction(qa);
 	*/
 
-	// Should be doable.
 	qa = new QAction(tr( "Smooth scroll" ), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).
-			toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 	// Not yet.
 	/* qa = new QAction(tr( "One instrument track window" ), this);
 	qa->setData("oneinstrument");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "oneinstrumenttrackwindow" ).
-			toInt() ? true : false );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "oneinstrumenttrackwindow" ).toInt() );
 	m_viewMenu->addAction(qa);
 	*/
+
+	qa = new QAction(tr( "Enable note labels in piano roll" ), this);
+	qa->setData("printnotelabels");
+	qa->setCheckable( true );
+	qa->setChecked( ConfigManager::inst()->value( "ui", "printnotelabels" ).toInt() );
+	m_viewMenu->addAction(qa);
+
 }
 
 
@@ -1114,6 +1139,11 @@ void MainWindow::updateConfig( QAction * _who )
 	else if ( tag == "oneinstrument" )
 	{
 		ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
+						 QString::number(checked) );
+	}
+	else if ( tag == "printnotelabels" )
+	{
+		ConfigManager::inst()->setValue( "ui", "printnotelabels",
 						 QString::number(checked) );
 	}
 }
@@ -1160,6 +1190,14 @@ void MainWindow::updatePlayPauseIcons()
 	}
 }
 
+
+void MainWindow::updateUndoRedoButtons()
+{
+	// when the edit menu is shown, grey out the undo/redo buttons if there's nothing to undo/redo
+	// else, un-grey them
+	m_undoAction->setEnabled(Engine::projectJournal()->canUndo());
+	m_redoAction->setEnabled(Engine::projectJournal()->canRedo());
+}
 
 
 

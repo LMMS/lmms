@@ -3448,7 +3448,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Ouvrir un projet existant</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Projets ouverts récemment</translation>
     </message>
     <message>
@@ -5947,7 +5947,7 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Coupée</translation>
     </message>
     <message>

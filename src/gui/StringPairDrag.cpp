@@ -52,7 +52,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( mimeType(), txt.toLatin1() );
+	m->setData( mimeType(), txt.toUtf8() );
 	setMimeData( m );
 	start( Qt::IgnoreAction );
 }
@@ -95,7 +95,7 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 {
-	return( QString( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
 }
 
 
@@ -103,7 +103,7 @@ QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 
 QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
 {
-	return( QString( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
 }
 
 

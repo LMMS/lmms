@@ -255,7 +255,7 @@ public:
 	// has to be accessed by more than one object, then this function shouldn't be used.
 	bool isValueChanged()
 	{
-		if( m_valueChanged )
+		if( m_valueChanged || valueBuffer() )
 		{
 			m_valueChanged = false;
 			return true;

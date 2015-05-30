@@ -3433,7 +3433,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5927,7 +5927,7 @@ Latency: %2 ms</source>
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -78,11 +78,6 @@
  */
 const int RESIZE_GRIP_WIDTH = 4;
 
-/*! The size of the track buttons in pixels
- */
-const int TRACK_OP_BTN_WIDTH = 20;
-const int TRACK_OP_BTN_HEIGHT = 14;
-
 
 /*! A pointer for that text bubble used when moving segments, etc.
  *
@@ -108,7 +103,7 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
-	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate( false )
 {
 	if( getTrack() )
@@ -1688,13 +1683,18 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 
 
-
 /*! \brief Clone this track
  *
  */
 void TrackOperationsWidget::cloneTrack()
 {
-	m_trackView->getTrack()->clone();
+	TrackContainerView *tcView = m_trackView->trackContainerView();
+
+	Track *newTrack = m_trackView->getTrack()->clone();
+	TrackView *newTrackView = tcView->createTrackView( newTrack );
+
+	int index = tcView->trackViews().indexOf( m_trackView );
+	tcView->moveTrackView( newTrackView, index + 1 );
 }
 
 
@@ -1810,7 +1810,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_trackContainer( tc ),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
-	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Mute" ) ),
 					 /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
@@ -1904,12 +1904,12 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 /*! \brief Clone a track from this track
  *
  */
-void Track::clone()
+Track * Track::clone()
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
 	saveState( doc, parent );
-	create( parent.firstChild().toElement(), m_trackContainer );
+	return create( parent.firstChild().toElement(), m_trackContainer );
 }
 
 

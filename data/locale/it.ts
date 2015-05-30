@@ -3456,7 +3456,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Apri un progetto esistente</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Progetti aperti di recente</translation>
     </message>
     <message>
@@ -5971,7 +5971,7 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Muto</translation>
     </message>
     <message>

@@ -41,8 +41,12 @@ class Engine;
 
 
 const QString PROJECTS_PATH = "projects/";
+const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
+const QString GIG_PATH = "samples/gig/";
+const QString SF2_PATH = "samples/sf2/";
+const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
@@ -76,6 +80,11 @@ public:
 		return workingDir() + PROJECTS_PATH;
 	}
 
+	QString userTemplateDir() const
+	{
+		return workingDir() + TEMPLATE_PATH;
+	}
+
 	QString userPresetsDir() const
 	{
 		return workingDir() + PRESETS_PATH;
@@ -84,6 +93,26 @@ public:
 	QString userSamplesDir() const
 	{
 		return workingDir() + SAMPLES_PATH;
+	}
+
+	QString userGigDir() const
+	{
+		return workingDir() + GIG_PATH;
+	}
+
+	QString userSf2Dir() const
+	{
+		return workingDir() + SF2_PATH;
+	}
+
+	QString userLadspaDir() const
+	{
+		return workingDir() + LADSPA_PATH;
+	}
+
+	QString userVstDir() const
+	{
+		return m_vstDir;
 	}
 
 	QString factoryProjectsDir() const
@@ -124,6 +153,16 @@ public:
 	QString localeDir() const
 	{
 		return m_dataDir + LOCALE_PATH;
+	}
+
+	const QString & gigDir() const
+	{
+		return m_gigDir;
+	}
+
+	const QString & sf2Dir() const
+	{
+		return m_sf2Dir;
 	}
 
 	const QString & vstDir() const
@@ -195,6 +234,8 @@ public:
 	void setSTKDir( const QString & _fd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
+	void setGIGDir( const QString & gd );
+	void setSF2Dir( const QString & sfd );
 
 
 private:
@@ -214,6 +255,8 @@ private:
 	QString m_vstDir;
 	QString m_flDir;
 	QString m_ladDir;
+	QString m_gigDir;
+	QString m_sf2Dir;
 	QString m_version;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;

@@ -624,11 +624,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		float level = getLevel( mouseEvent->y() );
 		int x = mouseEvent->x();
 
-		if( mouseEvent->x() <= VALUES_WIDTH )
-		{
-			update();
-			return;
-		}
 		x -= VALUES_WIDTH;
 		if( m_action == MOVE_VALUE )
 		{
@@ -699,12 +694,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			{
 				if( QApplication::overrideCursor() )
 				{
-	if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
+					if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
 					{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
+						while( QApplication::overrideCursor() != NULL )
+						{
+							QApplication::restoreOverrideCursor();
+						}
 
 						QCursor c( Qt::SizeAllCursor );
 						QApplication::setOverrideCursor(
@@ -2304,7 +2299,15 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			m_editor->m_pattern->addObject( mod );
+			bool added = m_editor->m_pattern->addObject( mod );
+			if ( !added )
+			{
+				TextFloat::displayMessage( mod->displayName(),
+							   tr( "Model is already connected "
+							   "to this pattern." ),
+							   embed::getIconPixmap( "automation" ),
+							   2000 );
+			}
 			setCurrentPattern( m_editor->m_pattern );
 		}
 	}

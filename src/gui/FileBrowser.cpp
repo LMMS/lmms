@@ -32,6 +32,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMessageBox>
+#include <QShortcut>
 
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
@@ -97,6 +98,10 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	opl->addWidget( reload_btn );
 
 	addContentWidget( ops );
+
+	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
+	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()) );
+	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	reloadTree();
 	show();
@@ -254,7 +259,15 @@ void FileBrowser::reloadTree( void )
 	filterItems( text );
 }
 
-
+void FileBrowser::giveFocusToFilter()
+{
+	if (!m_filterEdit->hasFocus())
+	{
+		// give focus to filter text box and highlight its text for quick editing if not previously focused
+		m_filterEdit->setFocus();
+		m_filterEdit->selectAll();
+	}
+}
 
 
 void FileBrowser::addItems(const QString & path )
@@ -872,8 +885,6 @@ bool Directory::addItems(const QString & path )
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
 				m_dirCount++;
-				//recurse for each dir
-				addItems( path + cur_file + QDir::separator() );
 			}
 
 			added_something = true;

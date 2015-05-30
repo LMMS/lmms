@@ -27,13 +27,7 @@
 #include "lmmsversion.h"
 #include "versioninfo.h"
 
-// denormals stripping
-#ifdef __SSE__
-#include <xmmintrin.h>
-#endif
-#ifdef __SSE3__
-#include <pmmintrin.h>
-#endif
+#include "denormals.h"
 
 #include <QFileInfo>
 #include <QLocale>
@@ -103,15 +97,7 @@ int main( int argc, char * * argv )
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
-	// set denormal protection for this thread
-	#ifdef __SSE3__
-	/* DAZ flag */
-	_MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
-	#endif
-	#ifdef __SSE__
-	/* FTZ flag */
-	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
-	#endif
+	disable_denormals();
 
 	bool core_only = false;
 	bool fullscreen = true;
@@ -217,12 +203,10 @@ int main( int argc, char * * argv )
 		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
 						QString( argv[i] ) == "-u" ) )
 		{
-			QString inFile( argv[i + 1] );
-			DataFile dataFile( inFile );
+			DataFile dataFile( QString::fromLocal8Bit( argv[i + 1] ) );
 			if (argc > i+2)
 			{
-				const QString outFile = argv[i + 2];
-				dataFile.writeFile( outFile );
+				dataFile.writeFile( QString::fromLocal8Bit( argv[i + 2] ) );
 			}
 			else
 			{
@@ -246,7 +230,7 @@ int main( int argc, char * * argv )
 		else if( argc > i && ( QString( argv[i] ) == "--dump" ||
 						QString( argv[i] ) == "-d" ) )
 		{
-			QFile f( argv[i + 1] );
+			QFile f( QString::fromLocal8Bit( argv[i + 1] ) );
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
 			printf( "%s\n", d.toUtf8().constData() );
@@ -255,14 +239,14 @@ int main( int argc, char * * argv )
 		else if( argc > i && ( QString( argv[i] ) == "--render" ||
 						QString( argv[i] ) == "-r" ) )
 		{
-			file_to_load = QString( argv[i + 1] );
+			file_to_load = QString::fromLocal8Bit( argv[i + 1] );
 			render_out = baseName( file_to_load ) + ".";
 			++i;
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--output" ||
 						QString( argv[i] ) == "-o" ) )
 		{
-			render_out = baseName( QString( argv[i + 1] ) ) + ".";
+			render_out = baseName( QString::fromLocal8Bit( argv[i + 1] ) ) + ".";
 			++i;
 		}
 		else if( argc > i &&
@@ -386,7 +370,7 @@ int main( int argc, char * * argv )
 		else if( argc > i &&
 				( QString( argv[i] ) == "--import" ) )
 		{
-			file_to_import = argv[i+1];
+			file_to_import = QString::fromLocal8Bit( argv[i+1] );
 			++i;
 			// exit after import? (only for debugging)
 			if( argc > i && QString( argv[i+1] ) == "-e" )
@@ -396,7 +380,7 @@ int main( int argc, char * * argv )
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--profile" || QString( argv[i] ) == "-p" ) )
 		{
-			profilerOutputFile = argv[i+1];
+			profilerOutputFile = QString::fromLocal8Bit( argv[i+1] );
 			++i;
 		}
 		else
@@ -407,7 +391,7 @@ int main( int argc, char * * argv )
 	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return( EXIT_FAILURE );
 			}
-			file_to_load = argv[i];
+			file_to_load = QString::fromLocal8Bit( argv[i] );
 		}
 	}
 

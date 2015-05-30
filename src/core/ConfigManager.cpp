@@ -61,6 +61,8 @@ ConfigManager::ConfigManager() :
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
+	m_gigDir( m_workingDir + GIG_PATH ),
+	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
@@ -176,6 +178,16 @@ void ConfigManager::setBackgroundArtwork( const QString & _ba )
 #endif
 }
 
+void ConfigManager::setGIGDir(const QString &gd)
+{
+	m_gigDir = gd;
+}
+
+void ConfigManager::setSF2Dir(const QString &sfd)
+{
+	m_sf2Dir = sfd;
+}
+
 
 
 
@@ -234,31 +246,6 @@ void ConfigManager::setValue( const QString & _class,
 	// not in map yet, so we have to add it...
 	m_settings[_class].push_back( qMakePair( _attribute, _value ) );
 }
-
-
-
-#ifdef LMMS_BUILD_WIN32
-#include <QLibrary>
-#include <shlobj.h>
-
-// taken from qt-win-opensource-src-4.2.2/src/corelib/io/qsettings.cpp
-static QString windowsConfigPath( int _type )
-{
-	QString result;
-
-	QLibrary library( "shell32" );
-	typedef BOOL( WINAPI* GetSpecialFolderPath )( HWND, char *, int, BOOL );
-	GetSpecialFolderPath SHGetSpecialFolderPath = (GetSpecialFolderPath)
-	library.resolve( "SHGetSpecialFolderPathA" );
-	if( SHGetSpecialFolderPath )
-	{
-		char path[MAX_PATH];
-		SHGetSpecialFolderPath( 0, path, _type, false );
-		result = QString::fromLocal8Bit( path );
-	}
-	return result;
-}
-#endif
 
 
 
@@ -336,6 +323,9 @@ void ConfigManager::loadConfigFile()
 				}
 			}
 			setWorkingDir( value( "paths", "workingdir" ) );
+
+			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
+			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
 			setFLDir( value( "paths", "fldir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
@@ -363,10 +353,10 @@ void ConfigManager::loadConfigFile()
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
-		m_vstDir = windowsConfigPath( CSIDL_PROGRAM_FILES ) +
-											QDir::separator() + "VstPlugins";
+		QString programFiles = QString::fromLocal8Bit( getenv( "ProgramFiles" ) );
+		m_vstDir =  programFiles + QDir::separator() + "VstPlugins" + QDir::separator();
 #else
-		m_vstDir = ensureTrailingSlash( QDir::home().absolutePath() );
+		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
 	}
 
@@ -385,6 +375,7 @@ void ConfigManager::loadConfigFile()
 #else
 		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/ladspa/";
 #endif
+		m_ladDir += ","+userLadspaDir();
 	}
 
 #ifdef LMMS_HAVE_STK
@@ -422,8 +413,14 @@ void ConfigManager::loadConfigFile()
 	if( QDir( m_workingDir ).exists() )
 	{
 		QDir().mkpath( userProjectsDir() );
+		QDir().mkpath( userTemplateDir() );
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
+		QDir().mkpath( userGigDir() );
+		QDir().mkpath( userSf2Dir() );
+		QDir().mkpath( userVstDir() );
+		QDir().mkpath( userLadspaDir() );
+
 	}
 
 	upgrade();
@@ -438,6 +435,8 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "fldir", m_flDir );
+	setValue( "paths", "gigdir", m_gigDir );
+	setValue( "paths", "sf2dir", m_sf2Dir );
 	setValue( "paths", "laddir", m_ladDir );
 #ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );

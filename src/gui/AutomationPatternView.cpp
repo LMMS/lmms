@@ -35,6 +35,7 @@
 #include "ProjectJournal.h"
 #include "RenameDialog.h"
 #include "StringPairDrag.h"
+#include "TextFloat.h"
 #include "ToolTip.h"
 
 
@@ -420,7 +421,15 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			m_pat->addObject( mod );
+			bool added = m_pat->addObject( mod );
+			if ( !added )
+			{
+				TextFloat::displayMessage( mod->displayName(),
+							   tr( "Model is already connected "
+							   "to this pattern." ),
+							   embed::getIconPixmap( "automation" ),
+							   2000 );
+			}
 		}
 		update();
 

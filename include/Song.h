@@ -57,7 +57,6 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayTrack,
 		Mode_PlayBB,
 		Mode_PlayPattern,
 		Mode_PlayAutomationPattern,
@@ -75,7 +74,6 @@ public:
 		PlayPos( const int abs = 0 ) :
 			MidiTime( abs ),
 			m_timeLine( NULL ),
-			m_timeLineUpdate( true ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -88,7 +86,6 @@ public:
 			return m_currentFrame;
 		}
 		TimeLineWidget * m_timeLine;
-		bool m_timeLineUpdate;
 
 	private:
 		float m_currentFrame;
@@ -258,7 +255,6 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( Track * trackToPlay );
 	void playBB();
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
@@ -355,7 +351,6 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	tact_t m_length;
 
-	Track * m_trackToPlay;
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 

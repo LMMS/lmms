@@ -335,6 +335,16 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
+
+	// try to inform user about missing Stk-installation
+	if( _instrument->m_filesMissing && Engine::hasGUI() )
+	{
+		QMessageBox::information( 0, tr( "Missing files" ),
+				tr( "Your Stk-installation seems to be "
+					"incomplete. Please make sure "
+					"the full Stk-package is installed!" ),
+				QMessageBox::Ok );
+	}
 }
 
 

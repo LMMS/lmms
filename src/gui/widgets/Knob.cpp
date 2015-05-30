@@ -65,7 +65,8 @@ TextFloat * Knob::s_textFloat = NULL;
 	m_volumeKnob( false ), \
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
 	m_buttonPressed( false ), \
-	m_angle( -10 )
+	m_angle( -10 ), \
+	m_lineWidth(0)
 
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	DEFAULT_KNOB_INITIALIZER_LIST,

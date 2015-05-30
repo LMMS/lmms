@@ -3435,7 +3435,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Otevřít existující projekt</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation type="unfinished">Naposledy otevřené projekty</translation>
     </message>
     <message>
@@ -5938,7 +5938,7 @@ Zpoždění %2 ms</translation>
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Ztlumený</translation>
     </message>
     <message>

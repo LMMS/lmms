@@ -3456,7 +3456,7 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
         <translation>Existierendes Projekt öffnen</translation>
     </message>
     <message>
-        <source>Recently opened project</source>
+        <source>Recently opened projects</source>
         <translation>Zuletzt geöffnete Projekte</translation>
     </message>
     <message>
@@ -5974,7 +5974,7 @@ Latenz: %2 ms</translation>
 <context>
     <name>Track</name>
     <message>
-        <source>Muted</source>
+        <source>Mute</source>
         <translation type="unfinished">Stumm</translation>
     </message>
     <message>

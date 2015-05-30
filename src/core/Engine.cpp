@@ -52,9 +52,13 @@ DummyTrackContainer * Engine::s_dummyTC = NULL;
 
 void Engine::init()
 {
+	Engine *engine = inst();
+
+	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
 
+	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer;
 	s_song = new Song;
@@ -65,11 +69,13 @@ void Engine::init()
 
 	s_projectJournal->setJournalling( true );
 
+	emit engine->initProgress(tr("Opening audio and midi devices"));
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
+	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
 }
 
@@ -114,3 +120,5 @@ void Engine::updateFramesPerTick()
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
+
+Engine * Engine::s_instanceOfMe = NULL;
