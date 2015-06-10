@@ -279,7 +279,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
-					tr( "E&xport MIDI..." ),
+					tr( "Export &MIDI..." ),
 					Engine::getSong(),
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );

@@ -38,7 +38,7 @@
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, this ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ), unit );		\
+	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 29, 29 );
 
@@ -48,14 +48,14 @@
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_off" ) ); \
-	ToolTip::add( name, tr( ttip ) );
+	ToolTip::add( name, ttip );
 
 #define makedcled( name, x, y, ttip, active ) \
 	PixmapButton * name = new PixmapButton( this, NULL ); 	\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( active ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesdc_off" ) ); \
-	ToolTip::add( name, tr( ttip ) );
+	ToolTip::add( name, ttip );
 
 const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
 const float NFB = 895000.0f;

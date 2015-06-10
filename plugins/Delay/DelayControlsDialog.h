@@ -32,6 +32,7 @@ class DelayControls;
 
 class DelayControlsDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	DelayControlsDialog( DelayControls* controls );
 	virtual ~DelayControlsDialog()

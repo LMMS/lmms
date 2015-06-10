@@ -36,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Dual Filter",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native amplifier plugin" ),
+	QT_TRANSLATE_NOOP( "pluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

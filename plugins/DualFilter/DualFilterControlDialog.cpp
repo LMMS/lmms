@@ -37,8 +37,8 @@
 	Knob * name = new Knob( knobBright_26, this); 			\
 	name -> move( x, y );									\
 	name ->setModel( &controls-> model );					\
-	name ->setLabel( tr( label ) );							\
-	name ->setHintText( tr( hint ) , unit );
+	name ->setLabel( label );							\
+	name ->setHintText( hint, unit );
 
 
 
@@ -51,13 +51,13 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	setPalette( pal );
 	setFixedSize( 150, 220 );
 
-	makeknob( cut1Knob, 33, 30, m_cut1Model, "FREQ", "Cutoff frequency", "Hz" )
-	makeknob( res1Knob, 75, 30, m_res1Model, "RESO", "Resonance", "" )
-	makeknob( gain1Knob, 117, 30, m_gain1Model, "GAIN", "Gain", "%" )
-	makeknob( mixKnob, 62, 100, m_mixModel, "MIX", "Mix", "" )
-	makeknob( cut2Knob, 33, 145, m_cut2Model, "FREQ", "Cutoff frequency", "Hz" )
-	makeknob( res2Knob, 75, 145, m_res2Model, "RESO", "Resonance", "" )
-	makeknob( gain2Knob, 117, 145, m_gain2Model, "GAIN", "Gain", "%" )
+	makeknob( cut1Knob, 33, 30, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
+	makeknob( res1Knob, 75, 30, m_res1Model, tr( "RESO" ), tr( "Resonance" ), "" )
+	makeknob( gain1Knob, 117, 30, m_gain1Model, tr( "GAIN" ), tr( "Gain" ), "%" )
+	makeknob( mixKnob, 62, 100, m_mixModel, tr( "MIX" ), tr( "Mix" ), "" )
+	makeknob( cut2Knob, 33, 145, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
+	makeknob( res2Knob, 75, 145, m_res2Model, tr( "RESO" ), tr( "Resonance" ), "" )
+	makeknob( gain2Knob, 117, 145, m_gain2Model, tr( "GAIN" ), tr( "Gain" ), "%" )
 
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );

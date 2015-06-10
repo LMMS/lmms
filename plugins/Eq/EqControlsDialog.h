@@ -39,7 +39,7 @@ class EqControls;
 
 class EqControlsDialog : public EffectControlDialog
 {
-
+	Q_OBJECT
 public:
 	EqControlsDialog( EqControls* controls );
 	virtual ~EqControlsDialog()
@@ -47,9 +47,6 @@ public:
 	}
 
 	EqBand * setBand(EqControls *controls);
-
-private slots:
-	void updateVuMeters();
 
 private:
 	EqControls * m_controls;
