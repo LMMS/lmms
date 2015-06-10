@@ -168,8 +168,8 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<8>( f ) );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
-							Qt::TextWordWrap,
-			PluginBrowser::tr( m_pluginDescriptor.description ),
+								Qt::TextWordWrap,
+								qApp->translate( "pluginBrowser", m_pluginDescriptor.description ),
 								&br );
 		if( m_mouseOver )
 		{

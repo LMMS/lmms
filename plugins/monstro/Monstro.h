@@ -46,14 +46,14 @@
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, view ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ), unit );             \
+	name ->setHintText( hint, unit );             \
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
 	name = new TempoSyncKnob( knobStyled, view ); 				\
 	name ->move( x, y );								\
-	name ->setHintText( tr( hint ), unit );		\
+	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
@@ -63,7 +63,7 @@
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
-	ToolTip::add( name, tr( ttip ) );
+	ToolTip::add( name, ttip );
 
 // UI constants
 const int O1ROW = 22;
