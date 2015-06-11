@@ -196,15 +196,16 @@ void ConfigManager::setSF2Dir(const QString &sfd)
 
 void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 {
-	if( !_file.endsWith(".mpt", Qt::CaseInsensitive) ) {
-		m_recentlyOpenedProjects.removeAll( _file );
-		if( m_recentlyOpenedProjects.size() > 15 )
-			{
-				m_recentlyOpenedProjects.removeLast();
-			}
-		m_recentlyOpenedProjects.push_front( _file );
-		ConfigManager::inst()->saveConfigFile();
-	}
+	if( !_file.endsWith( ".mpt", Qt::CaseInsensitive ) ) 
+		{
+			m_recentlyOpenedProjects.removeAll( _file );
+			if( m_recentlyOpenedProjects.size() > 15 )
+				{
+					m_recentlyOpenedProjects.removeLast();
+				}
+			m_recentlyOpenedProjects.push_front( _file );
+			ConfigManager::inst()->saveConfigFile();
+		}
 }
 
 
