@@ -471,7 +471,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( f->extension ()== "xiz" && Engine::pluginFileHandling().contains( f->extension() ) )
+		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "gig" )  && Engine::pluginFileHandling().contains( f->extension() ) )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
 		}
