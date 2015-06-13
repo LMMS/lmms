@@ -97,23 +97,37 @@ GuiApplication::GuiApplication()
 	displayInitProgress(tr("Preparing UI"));
 
 	m_mainWindow = new MainWindow;
+	connect(m_mainWindow, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 	connect(m_mainWindow, SIGNAL(initProgress(const QString&)), 
 		this, SLOT(displayInitProgress(const QString&)));
 
 	displayInitProgress(tr("Preparing song editor"));
 	m_songEditor = new SongEditorWindow(Engine::getSong());
+	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing mixer"));
 	m_fxMixerView = new FxMixerView;
+	connect(m_fxMixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
+	connect(m_controllerRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing project notes"));
 	m_projectNotes = new ProjectNotes;
+	connect(m_projectNotes, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing beat/bassline editor"));
 	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
+	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing piano roll"));
 	m_pianoRoll = new PianoRollWindow();
+	connect(m_pianoRoll, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing automation editor"));
 	m_automationEditor = new AutomationEditorWindow;
+	connect(m_automationEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	m_mainWindow->finalize();
 	splashScreen.finish(m_mainWindow);
@@ -136,4 +150,42 @@ void GuiApplication::displayInitProgress(const QString &msg)
 	// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
 	m_loadingProgressLabel->repaint();
 	qApp->processEvents();
+}
+
+void GuiApplication::childDestroyed(QObject *obj)
+{
+	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
+	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
+	if (obj == m_mainWindow)
+	{
+		m_mainWindow = nullptr;
+	}
+	else if (obj == m_fxMixerView)
+	{
+		m_fxMixerView = nullptr;
+	}
+	else if (obj == m_songEditor)
+	{
+		m_songEditor = nullptr;
+	}
+	else if (obj == m_automationEditor)
+	{
+		m_automationEditor = nullptr;
+	}
+	else if (obj == m_bbEditor)
+	{
+		m_bbEditor = nullptr;
+	}
+	else if (obj == m_pianoRoll)
+	{
+		m_pianoRoll = nullptr;
+	}
+	else if (obj == m_projectNotes)
+	{
+		m_projectNotes = nullptr;
+	}
+	else if (obj == m_controllerRackView)
+	{
+		m_controllerRackView = nullptr;
+	}
 }

@@ -216,6 +216,11 @@ MainWindow::~MainWindow()
 		delete view;
 	}
 	// TODO: Close tools
+	// dependencies are such that the editors must be destroyed BEFORE Song is deletect in Engine::destroy
+	//   see issue #2015 on github
+	delete gui->automationEditor();
+	delete gui->pianoRoll();
+	delete gui->songEditor();
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
 }
