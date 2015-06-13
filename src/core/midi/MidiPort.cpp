@@ -30,6 +30,8 @@
 #include "Song.h"
 
 
+namespace lmms
+{
 
 MidiPort::MidiPort( const QString& name,
 					MidiClient* client,
@@ -405,5 +407,5 @@ void MidiPort::updateOutputProgram()
 
 
 
-
+}
 

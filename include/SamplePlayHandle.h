@@ -29,6 +29,11 @@
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
+
+namespace lmms
+{
+
+
 class BBTrack;
 class SampleTCO;
 class Track;
@@ -93,4 +98,5 @@ private:
 } ;
 
 
+}
 #endif

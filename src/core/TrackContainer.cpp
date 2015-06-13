@@ -35,6 +35,10 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 TrackContainer::TrackContainer() :
 	Model( NULL ),
 	JournallingObject(),
@@ -246,6 +250,4 @@ DummyTrackContainer::DummyTrackContainer() :
 
 
 
-
-
-
+}

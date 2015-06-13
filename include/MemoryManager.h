@@ -34,6 +34,11 @@
 
 class QReadWriteLock;
 
+
+namespace lmms
+{
+
+
 const int MM_CHUNK_SIZE = 64; // granularity of managed memory
 const int MM_INITIAL_CHUNKS = 1024 * 1024; // how many chunks to allocate at startup - TODO: make configurable
 const int MM_INCREMENT_CHUNKS = 16 * 1024; // min. amount of chunks to increment at a time
@@ -156,4 +161,5 @@ static void operator delete[] ( void * ptr )						\
 }
 
 
+}
 #endif

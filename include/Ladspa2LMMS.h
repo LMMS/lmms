@@ -30,6 +30,10 @@
 #include "LadspaManager.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
@@ -75,4 +79,6 @@ private:
 
 } ;
 
+
+}
 #endif

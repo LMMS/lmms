@@ -29,6 +29,11 @@
 #include "MidiTime.h"
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
+
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor
 {
@@ -48,4 +53,6 @@ public:
 
 } ;
 
+
+}
 #endif

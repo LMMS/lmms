@@ -32,6 +32,11 @@
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
 
+
+namespace lmms
+{
+
+
 class DropToolBar;
 
 /// \brief Superclass for editors with a toolbar.
@@ -91,4 +96,6 @@ protected:
 };
 
 
+
+}
 #endif

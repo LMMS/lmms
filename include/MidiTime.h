@@ -30,6 +30,11 @@
 #include "lmms_basics.h"
 #include "export.h"
 
+
+namespace lmms
+{
+
+
 const int DefaultTicksPerTact = 192;
 const int DefaultStepsPerTact = 16;
 const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
@@ -155,5 +160,5 @@ private:
 } ;
 
 
+}
 #endif
-

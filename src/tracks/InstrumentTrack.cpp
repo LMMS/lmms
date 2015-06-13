@@ -86,6 +86,11 @@
 #include "volume.h"
 
 
+namespace lmms
+{
+
+
+
 const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 						"With this knob you can set "
 						"the volume of the opened "
@@ -591,7 +596,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
-	::BBTrack * bb_track = NULL;
+	lmms::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
 		TrackContentObject * tco = getTCO( _tco_num );
@@ -1774,4 +1779,8 @@ void InstrumentTrackWindow::viewNextInstrument()
 void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
+}
+
+
+
 }

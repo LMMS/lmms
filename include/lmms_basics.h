@@ -35,6 +35,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 typedef int32_t tact_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
@@ -139,4 +143,5 @@ typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN
 #define STR(PN)	#PN
 
 
+}
 #endif

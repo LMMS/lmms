@@ -27,6 +27,9 @@
 
 #include "lmms_basics.h"
 
+using namespace lmms;
+
+
 class MonoDelay
 {
 public:

@@ -4,6 +4,14 @@
 #include "FxMixer.h"
 #include "Model.h"
 
+#include "FxLine.h"
+#include "FxMixerView.h"
+
+
+namespace lmms
+{
+
+
 QPixmap * SendButtonIndicator::s_qpmOff = NULL;
 QPixmap * SendButtonIndicator::s_qpmOn = NULL;
 
@@ -60,4 +68,8 @@ FloatModel * SendButtonIndicator::getSendModel()
 void SendButtonIndicator::updateLightStatus()
 {
 	setPixmap( getSendModel() == NULL ? *s_qpmOff : *s_qpmOn );
+}
+
+
+
 }

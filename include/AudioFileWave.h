@@ -32,6 +32,10 @@
 #include <sndfile.h>
 
 
+namespace lmms
+{
+
+
 class AudioFileWave : public AudioFileDevice
 {
 public:
@@ -81,4 +85,5 @@ private:
 } ;
 
 
+}
 #endif

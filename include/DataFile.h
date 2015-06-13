@@ -34,6 +34,11 @@
 
 class QTextStream;
 
+
+namespace lmms
+{
+
+
 class EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
@@ -133,5 +138,5 @@ const int LDF_MINOR_VERSION = 0;
 const QString LDF_VERSION_STRING = QString::number( LDF_MAJOR_VERSION ) + "." + QString::number( LDF_MINOR_VERSION );
 
 
+}
 #endif
-

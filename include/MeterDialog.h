@@ -30,6 +30,11 @@
 
 #include "ModelView.h"
 
+
+namespace lmms
+{
+
+
 class LcdSpinBox;
 
 
@@ -49,4 +54,6 @@ private:
 
 } ;
 
+
+}
 #endif

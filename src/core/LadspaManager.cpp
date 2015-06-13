@@ -37,6 +37,10 @@
 
 
 
+namespace lmms
+{
+
+
 LadspaManager::LadspaManager()
 {
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
@@ -993,4 +997,7 @@ bool LadspaManager::cleanup( const ladspa_key_t & _plugin,
 		}
 	}
 	return( false );
+}
+
+
 }

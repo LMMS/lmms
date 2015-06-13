@@ -29,6 +29,11 @@
 
 #include <QtCore/QString>
 
+
+namespace lmms
+{
+
+
 enum CompareType { Major, Minor, Release, Build };
 
 
@@ -71,4 +76,6 @@ inline bool operator>=(const ProjectVersion & v1, const ProjectVersion & v2) { r
 inline bool operator==(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) != 0; }
 
+
+}
 #endif

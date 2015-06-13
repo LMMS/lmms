@@ -31,6 +31,9 @@
 #include "ProjectJournal.h"
 
 
+namespace lmms
+{
+
 
 ImportFilter::ImportFilter( const QString & _file_name,
 							const Descriptor * _descriptor ) :
@@ -124,3 +127,4 @@ bool ImportFilter::openFile()
 
 
 
+}

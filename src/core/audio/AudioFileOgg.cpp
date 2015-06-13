@@ -35,6 +35,9 @@
 #include <cstring>
 
 
+namespace lmms
+{
+
 AudioFileOgg::AudioFileOgg( const sample_rate_t _sample_rate,
 				const ch_cnt_t _channels,
 				bool & _success_ful,
@@ -265,6 +268,8 @@ void AudioFileOgg::finishEncoding()
 	}
 }
 
+
+}
 
 #endif
 

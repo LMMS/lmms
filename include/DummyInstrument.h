@@ -30,6 +30,11 @@
 #include "InstrumentView.h"
 
 
+
+namespace lmms
+{
+
+
 class DummyInstrument : public Instrument
 {
 public:
@@ -66,4 +71,5 @@ public:
 } ;
 
 
+}
 #endif

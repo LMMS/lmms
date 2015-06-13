@@ -26,9 +26,17 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
+
+namespace lmms
+{
+
+
 InstrumentPlayHandle::InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack ) :
 		PlayHandle( TypeInstrumentPlayHandle ),
 		m_instrument( instrument )
 {
 	setAudioPort( instrumentTrack->audioPort() );
+}
+
+
 }

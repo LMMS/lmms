@@ -36,6 +36,9 @@
 #include "NotePlayHandle.h"
 #include "LedCheckbox.h"
 
+using namespace lmms;
+
+
 // As of Stk 4.4 all classes and types have been moved to the namespace "stk".
 // However in older versions this namespace does not exist, therefore declare it
 // so this plugin builds with all versions of Stk.

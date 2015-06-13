@@ -34,10 +34,14 @@
 
 
 class VstEffectControls;
-class PixmapButton;
 class QPixmap;
 class QPushButton;
+
+namespace lmms
+{
 class PixmapButton;
+}
+using namespace lmms;
 
 
 class VstEffectControlDialog : public EffectControlDialog

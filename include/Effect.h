@@ -33,6 +33,11 @@
 #include "TempoSyncKnobModel.h"
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
+
 class EffectChain;
 class EffectControls;
 
@@ -231,4 +236,5 @@ typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
 typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
 
 
+}
 #endif

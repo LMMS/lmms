@@ -37,6 +37,10 @@
 class instrument;
 struct FL_Channel;
 
+
+using namespace lmms;
+
+
 class FlpImport : public ImportFilter
 {
 public:

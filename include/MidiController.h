@@ -33,6 +33,10 @@
 #include "MidiPort.h"
 
 
+namespace lmms
+{
+
+
 class MidiPort;
 
 
@@ -82,4 +86,5 @@ protected:
 } ;
 
 
+}
 #endif

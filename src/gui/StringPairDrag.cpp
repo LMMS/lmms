@@ -35,6 +35,10 @@
 #include "MainWindow.h"
 
 
+namespace lmms
+{
+
+
 StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
@@ -120,4 +124,8 @@ QString StringPairDrag::decodeKey( QDropEvent * _de )
 QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
 	return decodeMimeValue( _de->mimeData() );
+}
+
+
+
 }

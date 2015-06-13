@@ -35,6 +35,11 @@
 #include "ModelView.h"
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
+
 class graphModel;
 
 
@@ -117,7 +122,7 @@ public:
 	graphModel( float _min,
 			float _max,
 			int _size,
-			:: Model * _parent,
+			Model * _parent,
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
@@ -184,4 +189,6 @@ private:
 
 };
 
+
+}
 #endif

@@ -33,6 +33,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class VersionedSaveDialog : public FileDialog
 {
 	Q_OBJECT
@@ -50,4 +54,6 @@ public slots:
 	void decrementVersion();
 };
 
+
+}
 #endif // VERSIONEDSAVEDIALOG_H

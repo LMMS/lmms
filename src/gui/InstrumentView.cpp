@@ -31,6 +31,10 @@
 #include "StringPairDrag.h"
 
 
+namespace lmms
+{
+
+
 InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 	PluginView( _Instrument, _parent )
 {
@@ -72,3 +76,6 @@ InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
 					parentWidget()->parentWidget() ) );
 }
 
+
+
+}

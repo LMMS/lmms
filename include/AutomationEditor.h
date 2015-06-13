@@ -38,14 +38,20 @@
 #include "ComboBoxModel.h"
 #include "Knob.h"
 
+
+
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
+
+namespace lmms
+{
+
+
 class ComboBox;
 class NotePlayHandle;
 class TimeLineWidget;
-
 
 
 class AutomationEditor : public QWidget, public JournallingObject
@@ -299,4 +305,6 @@ private:
 };
 
 
+
+}
 #endif

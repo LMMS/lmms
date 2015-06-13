@@ -39,6 +39,8 @@
 #include <QPainter>
 #include <QObject>
 
+using namespace lmms;
+
 
 class VstEffect;
 

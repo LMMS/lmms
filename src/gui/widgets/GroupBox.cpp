@@ -36,6 +36,9 @@
 #include "gui_templates.h"
 
 
+namespace lmms
+{
+
 
 GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -139,7 +142,4 @@ void GroupBox::updatePixmap()
 
 
 
-
-
-
-
+}

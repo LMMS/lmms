@@ -39,6 +39,10 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
+
 QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
@@ -480,5 +484,4 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 
 
 
-
-
+}

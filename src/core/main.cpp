@@ -68,6 +68,9 @@
 #include "DataFile.h"
 #include "Song.h"
 
+
+using namespace lmms;
+
 static inline QString baseName( const QString & _file )
 {
 	return( QFileInfo( _file ).absolutePath() + "/" +

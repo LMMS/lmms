@@ -36,6 +36,8 @@
 #include "JournallingObject.h"
 #include "communication.h"
 
+using namespace lmms;
+
 
 class PLUGIN_EXPORT VstPlugin : public QObject, public JournallingObject,
 								public RemotePlugin

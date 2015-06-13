@@ -27,6 +27,9 @@
 
 #include "lmms_math.h"
 
+using namespace lmms;
+
+
 class Lfo
 {
 public:

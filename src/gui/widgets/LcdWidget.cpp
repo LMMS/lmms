@@ -39,6 +39,8 @@
 #include "MainWindow.h"
 
 
+namespace lmms
+{
 
 
 //! @todo: in C++11, we can use delegating ctors
@@ -257,5 +259,4 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 
 
-
-
+}

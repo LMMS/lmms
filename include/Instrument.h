@@ -35,6 +35,10 @@
 #include "Plugin.h"
 
 
+namespace lmms
+{
+
+
 // forward-declarations
 class InstrumentTrack;
 class MidiEvent;
@@ -141,4 +145,6 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
 
+
+}
 #endif

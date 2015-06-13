@@ -37,6 +37,10 @@
 #include "MemoryManager.h"
 #include "lmmsversion.h"
 
+
+namespace lmms
+{
+
 class Engine;
 
 
@@ -282,4 +286,7 @@ private:
 
 } ;
 
+
+
+}
 #endif

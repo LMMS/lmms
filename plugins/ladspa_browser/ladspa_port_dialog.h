@@ -32,6 +32,7 @@
 #include "LadspaManager.h"
 
 
+using namespace lmms;
 
 
 class ladspaPortDialog : public QDialog

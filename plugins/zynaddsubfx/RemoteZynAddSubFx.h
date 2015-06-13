@@ -27,6 +27,8 @@
 
 #include "RemotePlugin.h"
 
+using namespace lmms;
+
 enum ZasfRemoteMessageIDs
 {
 	IdZasfPresetDirectory = IdUserBase,

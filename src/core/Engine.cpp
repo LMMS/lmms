@@ -37,6 +37,11 @@
 
 #include "GuiApplication.h"
 
+
+namespace lmms
+{
+
+
 float Engine::s_framesPerTick;
 Mixer* Engine::s_mixer = NULL;
 FxMixer * Engine::s_fxMixer = NULL;
@@ -150,3 +155,5 @@ void Engine::initPluginFileHandling()
 
 
 Engine * Engine::s_instanceOfMe = NULL;
+
+}

@@ -33,6 +33,10 @@
 
 
 
+namespace lmms
+{
+
+
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
@@ -159,4 +163,4 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 
 
 
-
+}

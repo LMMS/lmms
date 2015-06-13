@@ -43,6 +43,11 @@ class QString;
 #define MINTLEN 2 << 0
 #define MAXTLEN 3 << MAXLEN
 
+
+namespace lmms
+{
+
+
 // table for table sizes
 const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
 					2 << 2, 3 << 2, 2 << 3, 3 << 3,
@@ -208,4 +213,6 @@ public:
 };
 
 
+
+}
 #endif

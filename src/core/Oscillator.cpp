@@ -29,6 +29,10 @@
 
 
 
+namespace lmms
+{
+
+
 Oscillator::Oscillator( const IntModel * _wave_shape_model,
 				const IntModel * _mod_algo_model,
 				const float & _freq,
@@ -548,4 +552,4 @@ inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 
 
 
-
+}

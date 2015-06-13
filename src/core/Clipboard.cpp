@@ -26,6 +26,9 @@
 #include "JournallingObject.h"
 
 
+namespace lmms
+{
+
 Clipboard::Map Clipboard::content;
 
 
@@ -51,3 +54,4 @@ const QDomElement * Clipboard::getContent( const QString & _node_name )
 
 
 
+}

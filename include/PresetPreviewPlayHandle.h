@@ -29,6 +29,10 @@
 #include "NotePlayHandle.h"
 
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class PreviewTrackContainer;
 
@@ -58,4 +62,5 @@ private:
 } ;
 
 
+}
 #endif

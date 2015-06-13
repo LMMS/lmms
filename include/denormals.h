@@ -13,6 +13,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 // Set denormal protection for this thread. 
 // To be on the safe side, don't set the DAZ flag for SSE2 builds, 
 // even if most SSE2 CPUs can handle it. 
@@ -28,5 +32,6 @@ void inline disable_denormals() {
 #endif
 }
 
-#endif
 
+}
+#endif

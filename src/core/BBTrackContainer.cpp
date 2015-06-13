@@ -30,6 +30,9 @@
 
 
 
+namespace lmms
+{
+
 BBTrackContainer::BBTrackContainer() :
 	TrackContainer(),
 	m_bbComboBoxModel( this )
@@ -262,4 +265,4 @@ void BBTrackContainer::createTCOsForBB( int _bb )
 
 
 
-
+}

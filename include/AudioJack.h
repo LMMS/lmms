@@ -38,6 +38,12 @@
 
 
 class QLineEdit;
+
+
+namespace lmms
+{
+
+
 class LcdSpinBox;
 
 
@@ -120,6 +126,9 @@ signals:
 
 } ;
 
+
+
+}
 #endif
 
 #endif

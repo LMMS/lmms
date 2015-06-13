@@ -34,6 +34,9 @@
 class dynProcEffect;
 
 
+using namespace lmms;
+
+
 class dynProcControls : public EffectControls
 {
 	Q_OBJECT

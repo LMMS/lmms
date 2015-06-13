@@ -46,6 +46,11 @@
 #include "ToolTip.h"
 
 
+
+namespace lmms
+{
+
+
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
@@ -294,5 +299,4 @@ void EffectView::modelChanged()
 
 
 
-
-
+}

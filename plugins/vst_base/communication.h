@@ -29,6 +29,7 @@
 
 #include "RemotePlugin.h"
 
+using namespace lmms;
 
 struct VstParameterDumpItem
 {

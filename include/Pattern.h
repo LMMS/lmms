@@ -41,6 +41,11 @@ class QAction;
 class QProgressBar;
 class QPushButton;
 
+
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class SampleBuffer;
 
@@ -204,4 +209,5 @@ private:
 
 
 
+}
 #endif

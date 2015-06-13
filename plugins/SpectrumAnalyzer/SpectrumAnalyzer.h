@@ -30,6 +30,8 @@
 #include "fft_helpers.h"
 #include "SpectrumAnalyzerControls.h"
 
+using namespace lmms;
+
 
 const int MAX_BANDS = 249;
 

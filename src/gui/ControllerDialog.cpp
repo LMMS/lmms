@@ -29,6 +29,10 @@
 #include "Controller.h"
 
 
+namespace lmms
+{
+
+
 ControllerDialog::ControllerDialog( Controller * _controller,
 							QWidget * _parent ) :
 	QWidget( _parent ),
@@ -52,4 +56,4 @@ void ControllerDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-
+}

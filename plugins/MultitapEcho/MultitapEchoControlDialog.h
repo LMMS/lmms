@@ -29,6 +29,9 @@
 
 #include "EffectControlDialog.h"
 
+using namespace lmms;
+
+
 class MultitapEchoControls;
 
 class MultitapEchoControlDialog : public EffectControlDialog

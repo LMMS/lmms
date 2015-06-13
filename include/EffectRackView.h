@@ -35,6 +35,11 @@
 class QScrollArea;
 class QVBoxLayout;
 
+
+namespace lmms
+{
+
+
 class EffectView;
 class GroupBox;
 
@@ -82,4 +87,6 @@ private:
 
 } ;
 
+
+}
 #endif

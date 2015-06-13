@@ -35,6 +35,9 @@
 
 
 
+namespace lmms
+{
+
 
 AutomatableSlider::AutomatableSlider( QWidget * _parent,
 						const QString & _name ) :
@@ -143,6 +146,4 @@ void AutomatableSlider::updateSlider()
 
 
 
-
-
-
+}

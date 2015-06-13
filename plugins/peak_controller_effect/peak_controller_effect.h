@@ -29,6 +29,9 @@
 #include "Effect.h"
 #include "peak_controller_effect_controls.h"
 
+
+using namespace lmms;
+
 class PeakControllerEffect : public Effect
 {
 public:

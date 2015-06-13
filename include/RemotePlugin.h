@@ -85,6 +85,18 @@ typedef int32_t key_t;
 #include <QtCore/QThread>
 #endif
 
+
+#ifdef COMPILE_REMOTE_PLUGIN_BASE
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+#include <QtCore/QCoreApplication>
+#endif
+#endif
+
+
+namespace lmms
+{
+
+
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
 const int SHM_FIFO_SIZE = 512*1024;
@@ -771,7 +783,7 @@ private:
 	friend class ProcessWatcher;
 } ;
 
-#endif
+#endif //BUILD_REMOTE_PLUGIN_CLIENT
 
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
@@ -863,17 +875,13 @@ private:
 
 } ;
 
-#endif
+#endif //BUILD_REMOTE_PLUGIN_CLIENT
 
 
 
 
 
 #ifdef COMPILE_REMOTE_PLUGIN_BASE
-
-#ifndef BUILD_REMOTE_PLUGIN_CLIENT
-#include <QtCore/QCoreApplication>
-#endif
 
 
 RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
@@ -967,7 +975,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 }
 
 
-#endif
+#endif //COMPILE_REMOTE_PLUGIN_BASE
 
 
 
@@ -1186,8 +1194,11 @@ void RemotePluginClient::doProcessing()
 
 
 
-#endif
+#endif //BUILD_REMOTE_PLUGIN_CLIENT
 
 #define QSTR_TO_STDSTR(s)	std::string( s.toUtf8().constData() )
 
+
+
+}
 #endif

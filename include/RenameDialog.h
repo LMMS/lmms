@@ -33,6 +33,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class RenameDialog : public QDialog
 {
 	Q_OBJECT
@@ -57,5 +61,5 @@ private:
 } ;
 
 
+}
 #endif
-

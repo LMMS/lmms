@@ -29,6 +29,9 @@
 #include "stereoenhancer_control_dialog.h"
 #include "Knob.h"
 
+
+using namespace lmms;
+
 class stereoEnhancerEffect;
 
 class stereoEnhancerControls : public EffectControls

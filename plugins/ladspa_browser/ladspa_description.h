@@ -36,6 +36,8 @@ class QListWidgetItem;
 class QScrollArea;
 
 
+using namespace lmms;
+
 class ladspaDescription : public QWidget
 {
 	Q_OBJECT

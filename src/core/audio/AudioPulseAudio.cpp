@@ -37,6 +37,9 @@
 #include "Engine.h"
 
 
+namespace lmms
+{
+
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 {
 	static_cast<AudioPulseAudio *>( userdata )->streamWriteCallback( s, length );
@@ -321,6 +324,8 @@ void AudioPulseAudio::setupWidget::saveSettings()
 				QString::number( m_channels->value<int>() ) );
 }
 
+
+}
 
 #endif
 

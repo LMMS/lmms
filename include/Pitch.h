@@ -28,6 +28,11 @@
 #include "lmms_basics.h"
 #include "Midi.h"
 
+
+namespace lmms
+{
+
+
 typedef int16_t pitch_t;
 
 const pitch_t CentsPerSemitone = 100;
@@ -35,4 +40,6 @@ const pitch_t MinPitchDefault = -CentsPerSemitone;
 const pitch_t MaxPitchDefault = CentsPerSemitone;
 const pitch_t DefaultPitch = 0;
 
+
+}
 #endif

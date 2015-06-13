@@ -34,6 +34,10 @@
 #include "ProjectRenderer.h"
 
 
+namespace lmms
+{
+
+
 class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
@@ -72,4 +76,6 @@ private:
 	ProjectRenderer* m_activeRenderer;
 } ;
 
+
+}
 #endif

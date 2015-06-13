@@ -33,6 +33,11 @@
 class QDomDocument;
 class QDomElement;
 
+
+namespace lmms
+{
+
+
 class SerializingObjectHook;
 
 
@@ -96,5 +101,5 @@ private:
 } ;
 
 
+}
 #endif
-

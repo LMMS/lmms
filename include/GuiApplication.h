@@ -31,6 +31,11 @@
 
 class QLabel;
 
+
+namespace lmms
+{
+
+
 class AutomationEditorWindow;
 class BBEditor;
 class ControllerRackView;
@@ -75,6 +80,8 @@ private:
 	QLabel* m_loadingProgressLabel;
 };
 
-#define gui GuiApplication::instance()
+#define gui lmms::GuiApplication::instance()
 
+
+}
 #endif // GUIAPPLICATION_H

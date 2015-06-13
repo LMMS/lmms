@@ -32,6 +32,10 @@
 #include "Mixer.h"
 
 
+namespace lmms
+{
+
+
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
 	m_currentLoad( 0 ),
@@ -103,6 +107,4 @@ void CPULoadWidget::updateCpuLoad()
 
 
 
-
-
-
+}

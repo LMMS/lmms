@@ -31,6 +31,9 @@
 #include "Knob.h"
 #include "ComboBoxModel.h"
 
+using namespace lmms;
+
+
 class DualFilterEffect;
 
 

@@ -27,12 +27,18 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+
+namespace lmms
+{
+
 void AudioPortAudioSetupUtil::updateDevices()
 {
 }
 
 void AudioPortAudioSetupUtil::updateChannels()
 {
+}
+
 }
 #endif
 
@@ -49,6 +55,9 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "ComboBox.h"
 #include "LcdSpinBox.h"
 
+
+namespace lmms
+{
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
@@ -484,6 +493,8 @@ void AudioPortAudio::setupWidget::saveSettings()
 
 }
 
+
+}
 
 #endif
 

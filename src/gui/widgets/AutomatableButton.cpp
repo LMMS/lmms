@@ -36,6 +36,10 @@
 
 
 
+namespace lmms
+{
+
+
 AutomatableButton::AutomatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
@@ -270,4 +274,4 @@ void automatableButtonGroup::updateButtons()
 
 
 
-
+}

@@ -33,6 +33,9 @@
 #include "panning.h"
 
 
+namespace lmms
+{
+
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
 		BoolModel * mutedModel ) :
@@ -248,4 +251,6 @@ void AudioPort::removePlayHandle( PlayHandle * handle )
 			m_playHandles.erase( it );
 		}
 	m_playHandleLock.unlock();
+}
+
 }

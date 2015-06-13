@@ -30,6 +30,10 @@
 
 #include "export.h"
 
+
+namespace lmms
+{
+
 ///
 /// \brief A context menu with a caption
 ///
@@ -50,5 +54,5 @@ public:
 
 
 
-
+}
 #endif

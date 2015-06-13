@@ -31,6 +31,10 @@
 #include "Effect.h"
 
 
+namespace lmms
+{
+
+
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	QWidget( NULL ),
 	ModelView( _controls, this ),
@@ -57,5 +61,4 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-
-
+}

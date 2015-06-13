@@ -44,6 +44,12 @@
 #include "TempoSyncKnob.h"
 #include "PixmapButton.h"
 
+
+
+namespace lmms
+{
+
+
 const int CD_ENV_KNOBS_LBL_Y = 20;
 const int CD_KNOB_X_SPACING = 32;
 
@@ -299,3 +305,5 @@ void LfoControllerDialog::modelChanged()
 }
 
 
+
+}

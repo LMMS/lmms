@@ -28,8 +28,14 @@
 #include "ModelView.h"
 #include "AutomatableModel.h"
 
+
 class QMenu;
 class QMouseEvent;
+
+
+namespace lmms
+{
+
 
 class EXPORT AutomatableModelView : public ModelView
 {
@@ -128,5 +134,6 @@ generateTypedModelView(Int);
 generateTypedModelView(Bool);
 
 
-#endif
 
+}
+#endif

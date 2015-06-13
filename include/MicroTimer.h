@@ -35,6 +35,11 @@
 #include "lmms_basics.h"
 
 
+
+namespace lmms
+{
+
+
 class MicroTimer
 {
 public:
@@ -67,4 +72,5 @@ private:
 } ;
 
 
+}
 #endif

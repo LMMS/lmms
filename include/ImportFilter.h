@@ -31,6 +31,10 @@
 #include "Plugin.h"
 
 
+namespace lmms
+{
+
+
 class TrackContainer;
 
 
@@ -103,4 +107,5 @@ private:
 } ;
 
 
+}
 #endif

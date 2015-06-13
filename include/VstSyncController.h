@@ -32,6 +32,10 @@
 #include "VstSyncData.h"
 
 
+namespace lmms
+{
+
+
 class VstSyncController : public QObject
 {
 	Q_OBJECT
@@ -96,4 +100,6 @@ private:
 
 };
 
+
+}
 #endif

@@ -51,6 +51,10 @@
 #include "panning_constants.h"
 
 
+namespace lmms
+{
+
+
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer )
@@ -631,4 +635,8 @@ void SampleTrackView::modelChanged()
 	m_volumeKnob->setModel( &st->m_volumeModel );
 
 	TrackView::modelChanged();
+}
+
+
+
 }

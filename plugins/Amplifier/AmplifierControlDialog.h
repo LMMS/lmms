@@ -32,6 +32,9 @@
 class AmplifierControls;
 
 
+using namespace lmms;
+
+
 class AmplifierControlDialog : public EffectControlDialog
 {
 	Q_OBJECT

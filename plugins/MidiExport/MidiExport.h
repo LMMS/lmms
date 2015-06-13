@@ -31,6 +31,8 @@
 #include "MidiFile.hpp"
 
 
+using namespace lmms;
+
 
 class MidiExport: public ExportFilter
 {

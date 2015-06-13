@@ -33,6 +33,10 @@
 #include "ToolButton.h"
 
 
+namespace lmms
+{
+
+
 class NStateButton : public ToolButton
 {
 	Q_OBJECT
@@ -72,4 +76,6 @@ private:
 
 } ;
 
+
+}
 #endif

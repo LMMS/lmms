@@ -32,6 +32,11 @@
 #include "panning_constants.h"
 #include "Midi.h"
 
+
+namespace lmms
+{
+
+
 inline stereoVolumeVector panningToVolumeVector( panning_t _p,
 							float _scale = 1.0f )
 {
@@ -50,4 +55,6 @@ inline int panningToMidi( panning_t _p )
 			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
 }
 
+
+}
 #endif

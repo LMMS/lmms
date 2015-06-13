@@ -55,6 +55,10 @@
 
 
 
+namespace lmms
+{
+
+
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -1109,4 +1113,4 @@ QString FileItem::extension(const QString & file )
 
 
 
-
+}

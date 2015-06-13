@@ -57,6 +57,10 @@
 
 
 
+namespace lmms
+{
+
+
 positionLine::positionLine( QWidget * _parent ) :
 	QWidget( _parent )
 {
@@ -733,4 +737,8 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	gui->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	m_editor->scrolled(0);
+}
+
+
+
 }

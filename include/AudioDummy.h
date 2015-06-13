@@ -29,6 +29,10 @@
 #include "MicroTimer.h"
 
 
+namespace lmms
+{
+
+
 class AudioDummy : public AudioDevice, public QThread
 {
 public:
@@ -113,4 +117,5 @@ private:
 } ;
 
 
+}
 #endif

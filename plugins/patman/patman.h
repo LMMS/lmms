@@ -32,8 +32,12 @@
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
 class PixmapButton;
+}
 
+using namespace lmms;
 
 #define MODES_16BIT	( 1 << 0 )
 #define MODES_UNSIGNED	( 1 << 1 )

@@ -38,6 +38,11 @@
 class QLineEdit;
 class QListView;
 class QScrollArea;
+
+
+namespace lmms
+{
+
 class AutoDetectMidiController;
 class ComboBox;
 class GroupBox;
@@ -98,4 +103,6 @@ private:
 	AutoDetectMidiController * m_midiController;
 } ;
 
+
+}
 #endif

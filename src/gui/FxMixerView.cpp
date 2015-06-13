@@ -48,6 +48,11 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 
+
+namespace lmms
+{
+
+
 FxMixerView::FxMixerView() :
 	QWidget(),
 	ModelView( NULL, this ),
@@ -593,5 +598,4 @@ void FxMixerView::updateFaders()
 
 
 
-
-
+}

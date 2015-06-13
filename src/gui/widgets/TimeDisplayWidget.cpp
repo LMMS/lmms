@@ -32,6 +32,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 
 TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
@@ -140,6 +143,4 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 
 
 
-
-
-
+}

@@ -38,6 +38,8 @@
 #include "ComboBox.h"
 
 
+using namespace lmms;
+
 class audioFileProcessor : public Instrument
 {
 	Q_OBJECT

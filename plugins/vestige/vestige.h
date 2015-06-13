@@ -43,8 +43,15 @@
 class QPixmap;
 class QPushButton;
 
-class PixmapButton;
 class VstPlugin;
+
+namespace lmms
+{
+class PixmapButton;
+}
+
+using namespace lmms;
+
 
 
 class vestigeInstrument : public Instrument

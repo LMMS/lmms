@@ -29,6 +29,10 @@
 #include <QtCore/QMutex>
 
 
+namespace lmms
+{
+
+
 class sharedObject
 {
 public:
@@ -78,7 +82,5 @@ private:
 } ;
 
 
-
-
+}
 #endif
-

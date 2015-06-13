@@ -34,6 +34,11 @@
 #include "lmms_constants.h"
 #include "lmms_math.h"
 
+
+namespace lmms
+{
+
+
 inline float hermiteInterpolate( float x0, float x1, float x2, float x3,
 								float frac_pos )
 {
@@ -135,6 +140,5 @@ inline float lagrangeInterpolate( float v0, float v1, float v2, float v3, float 
 
 
 
-
-
+}
 #endif

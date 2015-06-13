@@ -30,6 +30,11 @@
 #include "embed.h"
 #include "ConfigManager.h"
 
+
+namespace lmms
+{
+
+
 #ifndef PLUGIN_NAME
 namespace embed
 #else
@@ -123,3 +128,5 @@ QString getText( const char * _name )
 }
 
 
+
+}

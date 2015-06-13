@@ -41,6 +41,10 @@
 #include "MainWindow.h"
 
 
+namespace lmms
+{
+
+
 QPixmap * ComboBox::s_background = NULL;
 QPixmap * ComboBox::s_arrow = NULL;
 QPixmap * ComboBox::s_arrowSelected = NULL;
@@ -270,6 +274,4 @@ void ComboBox::setItem( QAction* item )
 
 
 
-
-
-
+}

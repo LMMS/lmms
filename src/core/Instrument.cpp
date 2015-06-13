@@ -29,6 +29,10 @@
 #include "Engine.h"
 
 
+namespace lmms
+{
+
+
 Instrument::Instrument( InstrumentTrack * _instrument_track,
 					const Descriptor * _descriptor ) :
 	Plugin( _descriptor, NULL/* _instrument_track*/ ),
@@ -126,4 +130,4 @@ QString Instrument::fullDisplayName() const
 }
 
 
-
+}

@@ -33,6 +33,10 @@
 #include "Track.h"
 
 
+namespace lmms
+{
+
+
 class AutomationTrack;
 class MidiTime;
 
@@ -193,4 +197,6 @@ private:
 } ;
 
 
+
+}
 #endif

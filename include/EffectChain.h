@@ -31,6 +31,11 @@
 #include "Mixer.h"
 #include "AutomatableModel.h"
 
+
+namespace lmms
+{
+
+
 class Effect;
 
 
@@ -79,5 +84,7 @@ signals:
 
 } ;
 
-#endif
 
+
+}
+#endif

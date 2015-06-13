@@ -10,6 +10,8 @@
 #include "gb_apu/Multi_Buffer.h"
 #include "MemoryManager.h"
 
+using namespace lmms;
+
 class Basic_Gb_Apu {
 	MM_OPERATORS
 public:

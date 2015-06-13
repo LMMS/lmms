@@ -37,8 +37,11 @@
 #include "AutomationEditor.h"
 
 
+namespace lmms
+{
 
-AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
+
+AutomatableModelView::AutomatableModelView( Model* model, QWidget* _this ) :
 	ModelView( model, _this ),
 	m_description( QString::null ),
 	m_unit( QString::null )
@@ -247,3 +250,4 @@ void AutomatableModelViewSlots::unlinkAllModels()
 
 
 
+}

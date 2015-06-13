@@ -32,6 +32,10 @@
 #include "lmms_basics.h"
 
 
+
+namespace lmms
+{
+
 namespace DspEffectLibrary
 {
 
@@ -347,4 +351,6 @@ namespace DspEffectLibrary
 } ;
 
 
+
+}
 #endif

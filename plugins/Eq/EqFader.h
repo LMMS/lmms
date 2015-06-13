@@ -32,6 +32,8 @@
 #include "qlist.h"
 
 
+using namespace lmms;
+
 
 class EqFader : public Fader
 {

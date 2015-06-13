@@ -26,6 +26,10 @@
 #include "BufferManager.h"
 
 
+namespace lmms
+{
+
+
 PlayHandle::PlayHandle( const Type type, f_cnt_t offset ) :
 		m_type( type ),
 		m_offset( offset ),
@@ -59,4 +63,8 @@ void PlayHandle::releaseBuffer()
 {
 	if( m_playHandleBuffer ) BufferManager::release( m_playHandleBuffer );
 	m_playHandleBuffer = NULL;
+}
+
+
+
 }

@@ -45,6 +45,11 @@
 class QMenu;
 class QPushButton;
 
+
+namespace lmms
+{
+
+
 class PixmapButton;
 class TextFloat;
 class Track;
@@ -684,4 +689,5 @@ private slots:
 
 
 
+}
 #endif

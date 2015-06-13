@@ -27,6 +27,10 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
+
 ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 			QObject * _receiver, const char * _slot,
 			QWidget * _parent ) :
@@ -52,6 +56,4 @@ ToolButton::~ToolButton()
 
 
 
-
-
-
+}

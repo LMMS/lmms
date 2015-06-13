@@ -35,6 +35,10 @@
 class QPixmap;
 
 
+namespace lmms
+{
+
+
 class GroupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
@@ -73,4 +77,5 @@ private:
 typedef BoolModel groupBoxModel;
 
 
+}
 #endif

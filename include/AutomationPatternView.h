@@ -27,6 +27,11 @@
 
 #include "Track.h"
 
+
+namespace lmms
+{
+
+
 class AutomationPattern;
 
 
@@ -80,4 +85,5 @@ private:
 } ;
 
 
+}
 #endif

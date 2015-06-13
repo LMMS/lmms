@@ -33,6 +33,10 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
+
 LadspaControlView::LadspaControlView( QWidget * _parent,
 						LadspaControl * _ctl ) :
 	QWidget( _parent ),
@@ -124,5 +128,4 @@ LadspaControlView::~LadspaControlView()
 
 
 
-
-
+}

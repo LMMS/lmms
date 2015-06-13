@@ -29,6 +29,8 @@
 #include "fft_helpers.h"
 #include "Engine.h"
 
+using namespace lmms;
+
 
 const int MAX_BANDS = 2048;
 

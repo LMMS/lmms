@@ -29,6 +29,10 @@
 #include <QToolButton>
 
 
+namespace lmms
+{
+
+
 class TrackView;
 
 
@@ -58,4 +62,6 @@ private:
 
 } ;
 
+
+}
 #endif

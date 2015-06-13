@@ -67,6 +67,10 @@
 #include "PeakController.h"
 
 
+namespace lmms
+{
+
+
 tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
@@ -1431,4 +1435,4 @@ QString* Song::errorSummary()
 
 
 
-
+}

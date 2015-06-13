@@ -29,6 +29,9 @@
 #include "ExportProjectDialog.h"
 
 
+namespace lmms
+{
+
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 					const ch_cnt_t _channels,
 					const QString & _file,
@@ -85,3 +88,4 @@ int AudioFileDevice::writeData( const void* data, int len )
 	return -1;
 }
 
+}

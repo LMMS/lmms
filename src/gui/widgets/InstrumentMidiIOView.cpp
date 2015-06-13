@@ -42,6 +42,10 @@
 #include "QLabel"
 
 
+namespace lmms
+{
+
+
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
@@ -222,5 +226,9 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 
 InstrumentMiscView::~InstrumentMiscView()
 {
+
+}
+
+
 
 }

@@ -33,6 +33,9 @@
 #include "Engine.h"
 
 
+namespace lmms
+{
+
 
 TextFloat::TextFloat() :
 	QWidget( gui->mainWindow(), Qt::ToolTip ),
@@ -201,4 +204,4 @@ void TextFloat::updateSize()
 
 
 
-
+}

@@ -34,6 +34,10 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 EffectChain::EffectChain( Model * _parent ) :
 	Model( _parent ),
 	SerializingObject(),
@@ -265,4 +269,4 @@ void EffectChain::clear()
 
 
 
-
+}

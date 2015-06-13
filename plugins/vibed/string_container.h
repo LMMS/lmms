@@ -29,6 +29,7 @@
 #include "vibrating_string.h"
 #include "MemoryManager.h"
 
+using namespace lmms;
 
 class stringContainer
 {

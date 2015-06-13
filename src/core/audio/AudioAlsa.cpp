@@ -37,6 +37,9 @@
 #include "templates.h"
 
 
+namespace lmms
+{
+
 
 AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
@@ -537,6 +540,8 @@ void AudioAlsa::setupWidget::saveSettings()
 				QString::number( m_channels->value<int>() ) );
 }
 
+
+}
 
 #endif
 

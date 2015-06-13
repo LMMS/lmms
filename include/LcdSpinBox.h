@@ -30,6 +30,10 @@
 #include "AutomatableModelView.h"
 
 
+namespace lmms
+{
+
+
 class EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
 	Q_OBJECT
@@ -85,4 +89,6 @@ signals:
 
 typedef IntModel LcdSpinBoxModel;
 
+
+}
 #endif

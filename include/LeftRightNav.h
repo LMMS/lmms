@@ -29,6 +29,11 @@
 
 #include <QLayout>
 
+
+namespace lmms
+{
+
+
 class LeftRightNav : public QWidget
 {
 	Q_OBJECT
@@ -46,4 +51,6 @@ private:
 	PixmapButton m_rightBtn;
 };
 
+
+}
 #endif

@@ -29,6 +29,12 @@
 #include "JournallingObject.h"
 #include "Effect.h"
 
+
+
+namespace lmms
+{
+
+
 class EffectControlDialog;
 
 
@@ -73,4 +79,6 @@ private:
 
 } ;
 
+
+}
 #endif

@@ -27,6 +27,10 @@
 #include "Rubberband.h"
 
 
+namespace lmms
+{
+
+
 RubberBand::RubberBand( QWidget * _parent ) :
 	QRubberBand( Rectangle, _parent )
 {
@@ -103,7 +107,4 @@ QVector<selectableObject *> RubberBand::selectableObjects() const
 
 
 
-
-
-
-
+}

@@ -36,6 +36,11 @@
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
 
+
+namespace lmms
+{
+
+
 class ControllerDialog;
 
 PeakControllerEffectVector PeakController::s_effects;
@@ -260,4 +265,4 @@ ControllerDialog * PeakController::createDialog( QWidget * _parent )
 
 
 
-
+}

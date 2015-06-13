@@ -30,6 +30,11 @@
 #include "PluginView.h"
 
 
+
+namespace lmms
+{
+
+
 class DummyPlugin : public Plugin
 {
 public:
@@ -65,4 +70,5 @@ protected:
 } ;
 
 
+}
 #endif

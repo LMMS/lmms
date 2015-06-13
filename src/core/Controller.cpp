@@ -40,6 +40,10 @@
 #include "PeakController.h"
 
 
+
+namespace lmms
+{
+
 long Controller::s_periods = 0;
 QVector<Controller *> Controller::s_controllers;
 
@@ -213,7 +217,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::LfoController:
-			c = new ::LfoController( _parent );
+			c = new lmms::LfoController( _parent );
 			break;
 
 		case Controller::PeakController:
@@ -222,7 +226,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::MidiController:
-			c = new ::MidiController( _parent );
+			c = new lmms::MidiController( _parent );
 			break;
 
 		default: 
@@ -351,4 +355,4 @@ int Controller::connectionCount() const{
 
 
 
-
+}

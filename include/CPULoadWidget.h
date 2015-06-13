@@ -34,6 +34,10 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
+
 class CPULoadWidget : public QWidget
 {
 	Q_OBJECT
@@ -64,4 +68,5 @@ private:
 } ;
 
 
+}
 #endif

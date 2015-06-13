@@ -32,6 +32,8 @@
 
 #ifdef LMMS_HAVE_ALSA
 
+namespace lmms
+{
 
 MidiAlsaRaw::MidiAlsaRaw() :
 	MidiClientRaw(),
@@ -203,6 +205,8 @@ void MidiAlsaRaw::setupWidget::saveSettings()
 							m_device->text() );
 }
 
+
+}
 
 #endif
 

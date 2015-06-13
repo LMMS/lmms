@@ -31,6 +31,11 @@
 #include <QtCore/QVector>
 
 
+
+namespace lmms
+{
+
+
 class selectableObject : public QWidget
 {
 	Q_OBJECT
@@ -90,5 +95,5 @@ private:
 };
 
 
+}
 #endif
-

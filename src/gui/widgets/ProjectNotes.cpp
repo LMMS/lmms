@@ -45,6 +45,10 @@
 
 
 
+namespace lmms
+{
+
+
 ProjectNotes::ProjectNotes() :
 	QMainWindow( gui->mainWindow()->workspace() )
 {
@@ -411,3 +415,5 @@ void ProjectNotes::closeEvent( QCloseEvent * _ce )
  }
 
 
+
+}

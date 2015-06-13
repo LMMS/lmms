@@ -35,6 +35,11 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
+
+namespace lmms
+{
+
+
 class ConfigManager;
 class PluginView;
 class ToolButton;
@@ -197,4 +202,6 @@ signals:
 
 } ;
 
+
+}
 #endif

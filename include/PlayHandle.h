@@ -32,6 +32,11 @@
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
+
 class Track;
 class AudioPort;
 
@@ -158,4 +163,5 @@ typedef QList<PlayHandle *> PlayHandleList;
 typedef QList<const PlayHandle *> ConstPlayHandleList;
 
 
+}
 #endif

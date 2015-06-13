@@ -29,6 +29,11 @@
 #include "LmmsStyle.h"
 
 
+
+namespace lmms
+{
+
+
 LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) : 
 	QWidget( parent ),
 	
@@ -98,3 +103,4 @@ QPalette LmmsPalette::palette() const
 
 
 
+}

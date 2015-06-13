@@ -28,6 +28,8 @@
 #include "MidiEvent.h"
 #include "Note.h"
 
+using namespace lmms;
+
 class Master;
 class NulEngine;
 

@@ -38,6 +38,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiWinMM : public QObject, public MidiClient
 {
 	Q_OBJECT
@@ -146,7 +150,8 @@ signals:
 
 } ;
 
+
+}
 #endif
 
 #endif
-

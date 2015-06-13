@@ -29,6 +29,10 @@
 #include "ConfigManager.h"
 
 
+namespace lmms
+{
+
+
 void ToolTip::add( QWidget * _w, const QString & _txt )
 {
 	if( !ConfigManager::inst()->value( "tooltips", "disabled" ).toInt() )
@@ -38,3 +42,4 @@ void ToolTip::add( QWidget * _w, const QString & _txt )
 }
 
 
+}

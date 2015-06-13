@@ -34,6 +34,10 @@
 #include "ConfigManager.h"
 
 
+namespace lmms
+{
+
+
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
@@ -217,3 +221,5 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	}
 }
 
+
+}

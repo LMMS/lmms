@@ -35,6 +35,11 @@
 #include "VstSyncController.h"
 
 
+
+namespace lmms
+{
+
+
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
@@ -377,4 +382,5 @@ signals:
 } ;
 
 
+}
 #endif

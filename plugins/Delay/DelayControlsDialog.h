@@ -28,6 +28,9 @@
 #include "EffectControlDialog.h"
 #include "AutomatableModel.h"
 
+using namespace lmms;
+
+
 class DelayControls;
 
 class DelayControlsDialog : public EffectControlDialog

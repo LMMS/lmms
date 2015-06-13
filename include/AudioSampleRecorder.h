@@ -31,6 +31,11 @@
 
 #include "AudioDevice.h"
 
+
+namespace lmms
+{
+
+
 class SampleBuffer;
 
 
@@ -56,4 +61,5 @@ private:
 } ;
 
 
+}
 #endif

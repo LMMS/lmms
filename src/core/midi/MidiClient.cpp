@@ -28,6 +28,9 @@
 #include "Note.h"
 
 
+namespace lmms
+{
+
 MidiClient::MidiClient()
 {
 }
@@ -319,3 +322,4 @@ int MidiClientRaw::eventLength( const unsigned char event )
 }
 
 
+}

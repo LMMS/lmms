@@ -25,6 +25,10 @@
 #include "MixerProfiler.h"
 
 
+namespace lmms
+{
+
+
 MixerProfiler::MixerProfiler() :
 	m_periodTimer(),
 	m_cpuLoad( 0 ),
@@ -61,3 +65,6 @@ void MixerProfiler::setOutputFile( const QString& outputFile )
 	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
 }
 
+
+
+}

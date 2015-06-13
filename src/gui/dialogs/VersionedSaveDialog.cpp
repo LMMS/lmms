@@ -32,6 +32,9 @@
 
 
 
+namespace lmms
+{
+
 
 VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 										  const QString &caption,
@@ -137,3 +140,5 @@ void VersionedSaveDialog::decrementVersion()
 }
 
 
+
+}

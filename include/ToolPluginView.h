@@ -28,6 +28,11 @@
 
 #include "PluginView.h"
 
+
+namespace lmms
+{
+
+
 class ToolPlugin;
 
 class EXPORT ToolPluginView : public PluginView
@@ -38,4 +43,5 @@ public:
 } ;
 
 
+}
 #endif

@@ -44,6 +44,11 @@
 #include "PixmapButton.h"
 
 
+
+namespace lmms
+{
+
+
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
 {
@@ -107,3 +112,5 @@ void PeakControllerDialog::modelChanged()
 }
 
 
+
+}

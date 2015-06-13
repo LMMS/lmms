@@ -29,6 +29,9 @@
 #include "Effect.h"
 #include "stereomatrix_controls.h"
 
+
+using namespace lmms;
+
 class stereoMatrixEffect : public Effect
 {
 public:

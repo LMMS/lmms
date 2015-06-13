@@ -33,6 +33,10 @@
 #include "Song.h"
 #include "embed.h"
 
+
+namespace lmms
+{
+
 int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
 const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
@@ -895,4 +899,4 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 
 
 
-
+}

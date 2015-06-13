@@ -42,6 +42,10 @@ struct pollfd;
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiAlsaSeq : public QThread, public MidiClient
 {
 	Q_OBJECT
@@ -158,6 +162,8 @@ signals:
 
 } ;
 
+
+}
 #endif
 
 #endif

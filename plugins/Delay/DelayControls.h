@@ -29,6 +29,7 @@
 #include "Knob.h"
 #include "DelayControlsDialog.h"
 
+using namespace lmms;
 
 
 class DelayEffect;

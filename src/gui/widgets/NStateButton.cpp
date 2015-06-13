@@ -30,6 +30,9 @@
 #include "ToolTip.h"
 
 
+namespace lmms
+{
+
 
 NStateButton::NStateButton( QWidget * _parent ) :
 	ToolButton( _parent ),
@@ -99,7 +102,4 @@ void NStateButton::mousePressEvent( QMouseEvent * _me )
 
 
 
-
-
-
-
+}

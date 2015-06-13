@@ -31,6 +31,8 @@
 #include "BassBoosterControls.h"
 
 
+using namespace lmms;
+
 class BassBoosterEffect : public Effect
 {
 public:

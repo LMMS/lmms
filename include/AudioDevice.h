@@ -33,6 +33,10 @@
 #include "TabWidget.h"
 
 
+namespace lmms
+{
+
+
 class AudioPort;
 
 
@@ -180,4 +184,5 @@ private:
 } ;
 
 
+}
 #endif

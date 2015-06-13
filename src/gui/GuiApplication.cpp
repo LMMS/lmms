@@ -42,6 +42,11 @@
 #include <QApplication>
 #include <QSplashScreen>
 
+
+namespace lmms
+{
+
+
 GuiApplication* GuiApplication::s_instance = nullptr;
 
 GuiApplication* GuiApplication::instance()
@@ -136,4 +141,8 @@ void GuiApplication::displayInitProgress(const QString &msg)
 	// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
 	m_loadingProgressLabel->repaint();
 	qApp->processEvents();
+}
+
+
+
 }

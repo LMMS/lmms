@@ -31,6 +31,9 @@
 #include "DualFilterControls.h"
 #include "BasicFilters.h"
 
+using namespace lmms;
+
+
 class DualFilterEffect : public Effect
 {
 public:

@@ -49,6 +49,11 @@
 #include "GuiApplication.h"
 
 
+
+namespace lmms
+{
+
+
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
 	ModelView( NULL, this ),
@@ -530,4 +535,8 @@ void InstrumentLoaderThread::run()
 	i->setParent( 0 );
 	i->moveToThread( m_containerThread );
 	i->setParent( parent );
+}
+
+
+
 }

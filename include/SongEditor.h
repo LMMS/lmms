@@ -33,6 +33,11 @@
 class QLabel;
 class QScrollBar;
 
+
+namespace lmms
+{
+
+
 class AutomatableSlider;
 class ComboBox;
 class ComboBoxModel;
@@ -161,4 +166,6 @@ private:
 	ComboBox * m_zoomingComboBox;
 };
 
+
+}
 #endif

@@ -32,6 +32,13 @@
 #include "ComboBoxModel.h"
 
 
+// need to forward-declare plugins/flp_import to give C++ friend status
+class FlpImport;
+
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -202,11 +209,13 @@ private:
 	ComboBoxModel m_arpModeModel;
 
 
-	friend class FlpImport;
+	friend class ::FlpImport;
 	friend class InstrumentTrack;
 	friend class InstrumentFunctionArpeggioView;
 
 } ;
 
 
+
+}
 #endif

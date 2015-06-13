@@ -28,6 +28,9 @@
 #include "BasicFilters.h"
 #include "lmms_math.h"
 
+using namespace lmms;
+
+
 ///
 /// \brief The EqFilter class.
 /// A wrapper for the StereoBiQuad class, giving it freq, res, and gain controls.

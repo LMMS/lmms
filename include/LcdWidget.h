@@ -31,6 +31,11 @@
 
 #include "export.h"
 
+
+namespace lmms
+{
+
+
 class EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
@@ -90,4 +95,6 @@ private:
 
 } ;
 
+
+}
 #endif

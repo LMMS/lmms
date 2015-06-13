@@ -42,6 +42,10 @@
 #include "MidiEventProcessor.h"
 
 
+namespace lmms
+{
+
+
 /*! \brief Create a new keyboard display
  *
  *  \param _it the InstrumentTrack window to attach to
@@ -126,5 +130,4 @@ void Piano::handleKeyRelease( int key )
 
 
 
-
-
+}

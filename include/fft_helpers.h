@@ -30,6 +30,11 @@
 
 #include <fftw3.h>
 
+
+namespace lmms
+{
+
+
 const int FFT_BUFFER_SIZE = 2048;
 
 enum WINDOWS
@@ -81,4 +86,6 @@ int EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,
  */
 float EXPORT signalpower(float *timesignal, int num_values);
 
+
+}
 #endif

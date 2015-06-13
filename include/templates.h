@@ -28,6 +28,9 @@
 
 #include <QtCore/QtAlgorithms>
 
+namespace lmms
+{
+
 
 template<class T>
 inline T tLimit( const T x, const T x1, const T x2 )
@@ -36,4 +39,5 @@ inline T tLimit( const T x, const T x1, const T x2 )
 }
 
 
+}
 #endif

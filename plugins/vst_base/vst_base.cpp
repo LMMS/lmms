@@ -27,6 +27,7 @@
 #include "Plugin.h"
 #include "embed.h"
 
+using namespace lmms;
 
 extern "C"
 {

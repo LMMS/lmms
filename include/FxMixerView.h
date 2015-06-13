@@ -41,6 +41,12 @@
 #include "EffectRackView.h"
 
 class QButtonGroup;
+
+
+namespace lmms
+{
+
+
 class FxLine;
 
 class EXPORT FxMixerView : public QWidget, public ModelView,
@@ -133,4 +139,6 @@ private:
 	friend class FxChannelView;
 } ;
 
+
+}
 #endif

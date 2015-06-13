@@ -27,6 +27,8 @@
 #include "embed.h"
 
 
+namespace lmms
+{
 
 
 CaptionMenu::CaptionMenu( const QString & _title, QWidget * _parent ) :
@@ -61,4 +63,8 @@ void CaptionMenu::addHelpAction()
 		QAction* helpAction = addAction( embed::getIconPixmap("help"), tr("Help (not available)") );
 		helpAction->setDisabled(true);
 	}
+}
+
+
+
 }

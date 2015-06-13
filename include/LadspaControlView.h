@@ -30,6 +30,12 @@
 
 #include "ModelView.h"
 
+
+
+namespace lmms
+{
+
+
 class LadspaControl;
 
 
@@ -45,4 +51,6 @@ private:
 
 } ;
 
+
+}
 #endif

@@ -32,6 +32,11 @@
 #include "lmms_math.h"
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
+
 class EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT
@@ -214,4 +219,7 @@ private:
 	volatile unsigned int m_position;
 
 };
+
+
+}
 #endif

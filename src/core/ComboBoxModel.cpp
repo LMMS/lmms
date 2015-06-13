@@ -26,6 +26,8 @@
 #include "embed.h"
 
 
+namespace lmms
+{
 
 void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
 {
@@ -67,4 +69,4 @@ int ComboBoxModel::findText( const QString& txt ) const
 
 
 
-
+}

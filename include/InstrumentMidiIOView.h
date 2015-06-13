@@ -31,9 +31,15 @@
 #include "ModelView.h"
 
 
+class QToolButton;
+
+
+namespace lmms
+{
+
+
 class GroupBox;
 class LcdSpinBox;
-class QToolButton;
 class LedCheckBox;
 class InstrumentTrack;
 
@@ -78,4 +84,6 @@ private:
 
 };
 
+
+}
 #endif

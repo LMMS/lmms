@@ -30,6 +30,9 @@
 #include "gui_templates.h"
 
 
+namespace lmms
+{
+
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent ) :
@@ -85,5 +88,4 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 
 
 
-
-
+}

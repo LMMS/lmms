@@ -29,6 +29,13 @@
 #include "ComboBoxModel.h"
 
 
+// need to forward-declare plugins/flp_import to give C++ friend status
+class FlpImport;
+
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
@@ -77,7 +84,7 @@ private:
 
 
 	friend class InstrumentSoundShapingView;
-	friend class FlpImport;
+	friend class ::FlpImport;
 
 } ;
 
@@ -85,4 +92,5 @@ private:
 extern const QString __targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
+}
 #endif

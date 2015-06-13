@@ -29,6 +29,10 @@
 #include "lmmsconfig.h"
 
 
+namespace lmms
+{
+
+
 class ProjectRenderer : public QThread
 {
 	Q_OBJECT
@@ -115,4 +119,6 @@ struct FileEncodeDevice
 
 extern FileEncodeDevice __fileEncodeDevices[];
 
+
+}
 #endif

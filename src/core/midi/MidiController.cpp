@@ -34,6 +34,9 @@
 #include "MidiController.h"
 
 
+namespace lmms
+{
+
 MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
@@ -158,4 +161,4 @@ ControllerDialog * MidiController::createDialog( QWidget * _parent )
 
 
 
-
+}

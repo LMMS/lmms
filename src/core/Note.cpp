@@ -33,6 +33,8 @@
 
 
 
+namespace lmms
+{
 
 
 Note::Note( const MidiTime & length, const MidiTime & pos,
@@ -235,4 +237,8 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 {
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
 		&& length().getTicks() != 0;
+}
+
+
+
 }

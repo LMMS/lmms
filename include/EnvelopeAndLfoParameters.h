@@ -34,6 +34,13 @@
 #include "lmms_basics.h"
 
 
+// need to forward-declare plugins/flp_import to give C++ friend status
+class FlpImport;
+
+namespace lmms
+{
+
+
 class EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
 	Q_OBJECT
@@ -179,8 +186,11 @@ private:
 
 
 	friend class EnvelopeAndLfoView;
-	friend class FlpImport;
+	friend class ::FlpImport;
 
 } ;
 
+
+
+}
 #endif

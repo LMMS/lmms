@@ -30,6 +30,10 @@
 
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
 sampleFrame ** BufferManager::s_available;
 QAtomicInt BufferManager::s_availableIndex = 0;
 sampleFrame ** BufferManager::s_released;
@@ -112,3 +116,6 @@ void BufferManager::extend( int c )
 		b += Engine::mixer()->framesPerPeriod();
 	}
 }*/
+
+
+}
