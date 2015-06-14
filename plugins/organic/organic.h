@@ -1,7 +1,7 @@
 /*
  * organic.h - additive synthesizer for organ-like sounds
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2015 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -63,9 +63,9 @@ const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
 	
 const QString WAVEFORM_NAMES[6] = {
 	"Sine wave",
-	"Triangle wave",
 	"Saw wave",
 	"Square wave",
+	"Triangle wave",
 	"Moog saw wave",
 	"Exponential wave"
 	};
