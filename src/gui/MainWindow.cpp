@@ -55,6 +55,7 @@
 #include "SideBar.h"
 #include "ConfigManager.h"
 #include "Mixer.h"
+#include "PluginFactory.h"
 #include "PluginView.h"
 #include "ProjectNotes.h"
 #include "SetupDialog.h"
@@ -330,18 +331,11 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
-	Plugin::DescriptorList pluginDescriptors;
-	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( Plugin::DescriptorList::ConstIterator it = pluginDescriptors.begin();
-										it != pluginDescriptors.end(); ++it )
+	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
-		if( it->type == Plugin::Tool )
-		{
-			m_toolsMenu->addAction( it->logo->pixmap(),
-							it->displayName );
-			m_tools.push_back( ToolPlugin::instantiate( it->name,
-					/*this*/NULL )->createView( this ) );
-		}
+		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
+		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
+						   ->createView(this) );
 	}
 	if( !m_toolsMenu->isEmpty() )
 	{

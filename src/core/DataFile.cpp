@@ -36,6 +36,7 @@
 
 
 #include "ConfigManager.h"
+#include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
@@ -188,7 +189,7 @@ bool DataFile::validate( QString extension )
 	case Type::UnknownType:
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
-				( extension == "xiz" && Engine::pluginFileHandling().contains( extension ) ) ||
+				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "pat" || extension == "mid" ||
 				extension == "flp" || extension == "dll"
 				) )

@@ -32,6 +32,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Plugin.h"
+#include "PluginFactory.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 
@@ -45,7 +46,6 @@ Song * Engine::s_song = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
-QMap<QString, QString> Engine::s_pluginFileHandling;
 
 
 
@@ -57,9 +57,6 @@ void Engine::init()
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
-
-	emit engine->initProgress(tr("Locating plugins"));
-	initPluginFileHandling();
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
@@ -123,30 +120,5 @@ void Engine::updateFramesPerTick()
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
-
-
-
-
-void Engine::initPluginFileHandling()
-{
-	Plugin::DescriptorList pluginDescriptors;
-	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( Plugin::DescriptorList::ConstIterator it = pluginDescriptors.begin();
-										it != pluginDescriptors.end(); ++it )
-	{
-		if( it->type == Plugin::Instrument )
-		{
-			const QStringList & ext =
-				QString( it->supportedFileTypes ).
-							split( QChar( ',' ) );
-			for( QStringList::const_iterator itExt = ext.begin();
-						itExt != ext.end(); ++itExt )
-			{
-				s_pluginFileHandling[*itExt] = it->name;
-			}
-		}
-	}
-}
-
 
 Engine * Engine::s_instanceOfMe = NULL;

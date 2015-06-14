@@ -59,18 +59,15 @@ ConfigManager::ConfigManager() :
 #endif
 									),
 	m_artworkDir( defaultArtworkDir() ),
-#ifdef LMMS_BUILD_WIN32
-	m_pluginDir( qApp->applicationDirPath()
-			+ QDir::separator() + "plugins" + QDir::separator() ),
-#else
-	m_pluginDir( qApp->applicationDirPath() + '/' + PLUGIN_DIR ),
-#endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
+	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
+		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
+	QDir::addSearchPath("data", m_dataDir);
 }
 
 
@@ -375,7 +372,7 @@ void ConfigManager::loadConfigFile()
 			( !m_ladDir.contains( ':' ) && !QDir( m_ladDir ).exists() ) )
 	{
 #if defined(LMMS_BUILD_WIN32)
-		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
+		m_ladDir = qApp->applicationDirPath() + "/plugins/ladspa" + QDir::separator();
 #elif defined(LMMS_BUILD_APPLE)
 		m_ladDir = qApp->applicationDirPath() + "/../lib/lmms/ladspa/";
 #else
@@ -398,9 +395,11 @@ void ConfigManager::loadConfigFile()
 	}
 #endif
 
-
-	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
-						<< defaultArtworkDir() );
+	QStringList searchPaths;
+	if(! qgetenv("LMMS_THEME_PATH").isNull())
+		searchPaths << qgetenv("LMMS_THEME_PATH");
+	searchPaths << artworkDir() << defaultArtworkDir();
+	QDir::setSearchPaths( "resources", searchPaths);
 
 	if( !QDir( m_workingDir ).exists() &&
 		QApplication::type() == QApplication::GuiClient &&

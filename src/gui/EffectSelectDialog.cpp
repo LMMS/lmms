@@ -28,6 +28,7 @@
 
 #include "gui_templates.h"
 #include "embed.h"
+#include "PluginFactory.h"
 
 #include <QLabel>
 
@@ -44,31 +45,25 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 
 	// query effects
-	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
 	EffectKeyList subPluginEffectKeys;
 
-	for( Plugin::DescriptorList::ConstIterator it = m_pluginDescriptors.begin();
-										it != m_pluginDescriptors.end(); ++it )
+	for (const Plugin::Descriptor* desc: pluginFactory->descriptors(Plugin::Effect))
 	{
-		if( it->type != Plugin::Effect )
+		if( desc->subPluginFeatures )
 		{
-			continue;
-		}
-		if( it->subPluginFeatures )
-		{
-			it->subPluginFeatures->listSubPluginKeys(
+			desc->subPluginFeatures->listSubPluginKeys(
 				// as iterators are always stated to be not
 				// equal with pointers, we dereference the
 				// iterator and take the address of the item,
 				// so we're on the safe side and the compiler
 				// likely will reduce that to just "it"
-							&( *it ),
+							desc,
 							subPluginEffectKeys );
 		}
 		else
 		{
-			m_effectKeys << EffectKey( &( *it ), it->name );
+			m_effectKeys << EffectKey( desc, desc->name );
 
 		}
 	}

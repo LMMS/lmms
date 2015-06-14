@@ -165,11 +165,6 @@ public:
 		return m_sf2Dir;
 	}
 
-	const QString & pluginDir() const
-	{
-		return m_pluginDir;
-	}
-
 	const QString & vstDir() const
 	{
 		return m_vstDir;
@@ -257,7 +252,6 @@ private:
 	QString m_workingDir;
 	QString m_dataDir;
 	QString m_artworkDir;
-	QString m_pluginDir;
 	QString m_vstDir;
 	QString m_flDir;
 	QString m_ladDir;

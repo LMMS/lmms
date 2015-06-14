@@ -55,7 +55,6 @@ protected slots:
 private:
 	Ui::EffectSelectDialog * ui;
 
-	Plugin::DescriptorList m_pluginDescriptors;
 	EffectKeyList m_effectKeys;
 	EffectKey m_currentSelection;
 

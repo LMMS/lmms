@@ -43,7 +43,7 @@ LadspaManager::LadspaManager()
 								split( LADSPA_PATH_SEPERATOR );
 	ladspaDirectories += ConfigManager::inst()->ladspaDir().split( ',' );
 
-	ladspaDirectories.push_back( ConfigManager::inst()->pluginDir() + "ladspa" );
+	ladspaDirectories.push_back( "plugins:ladspa" );
 #ifndef LMMS_BUILD_WIN32
 	ladspaDirectories.push_back( qApp->applicationDirPath() + '/' + LIB_DIR + "ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );

@@ -49,6 +49,8 @@ public:
 	static void init();
 	static void destroy();
 
+	// TODO: Remove me. Replace calls like `if( Engine::hasGUI() )` with
+	// `if (gui)` (gui defined in "GuiApplication.h"
 	static bool hasGUI();
 
 	// core
@@ -93,11 +95,6 @@ public:
 	}
 	static void updateFramesPerTick();
 
-	static const QMap<QString, QString> & pluginFileHandling()
-	{
-		return s_pluginFileHandling;
-	}
-
 	static inline Engine * inst()
 	{
 		if( s_instanceOfMe == NULL )
@@ -134,12 +131,8 @@ private:
 
 	static Ladspa2LMMS * s_ladspaManager;
 
-	static QMap<QString, QString> s_pluginFileHandling;
-
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static Engine * s_instanceOfMe;
-
-	static void initPluginFileHandling();
 
 	friend class GuiApplication;
 };

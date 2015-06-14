@@ -51,6 +51,7 @@
 #include "Oscillator.h"
 #include "Pattern.h"
 #include "Piano.h"
+#include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "Song.h"
@@ -1637,22 +1638,15 @@ p->putValue( jt->pos, value, false );
 
 	// process all effects
 	EffectKeyList effKeys;
-	Plugin::DescriptorList pluginDescs;
-	Plugin::getDescriptorsOfAvailPlugins( pluginDescs );
-	for( Plugin::DescriptorList::ConstIterator it = pluginDescs.begin();
-											it != pluginDescs.end(); ++it )
+	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Effect))
 	{
-		if( it->type != Plugin::Effect )
+		if( desc->subPluginFeatures )
 		{
-			continue;
-		}
-		if( it->subPluginFeatures )
-		{
-			it->subPluginFeatures->listSubPluginKeys( &( *it ), effKeys );
+			desc->subPluginFeatures->listSubPluginKeys( desc, effKeys );
 		}
 		else
 		{
-			effKeys << EffectKey( &( *it ), it->name );
+			effKeys << EffectKey( desc, desc->name );
 		}
 	}
 

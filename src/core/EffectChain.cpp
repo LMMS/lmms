@@ -57,17 +57,17 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "enabled", m_enabledModel.value() );
 	_this.setAttribute( "numofeffects", m_effects.count() );
 
-	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); it++ )
+	for( Effect* effect : m_effects)
 	{
-		if( dynamic_cast<DummyEffect *>( *it ) )
+		if( DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect) )
 		{
-			_this.appendChild( dynamic_cast<DummyEffect *>( *it )->originalPluginData() );
+			_this.appendChild( dummy->originalPluginData() );
 		}
 		else
 		{
-			QDomElement ef = ( *it )->saveState( _doc, _this );
-			ef.setAttribute( "name", ( *it )->descriptor()->name );
-			ef.appendChild( ( *it )->key().saveXML( _doc ) );
+			QDomElement ef = effect->saveState( _doc, _this );
+			ef.setAttribute( "name", QString::fromUtf8( effect->descriptor()->name ) );
+			ef.appendChild( effect->key().saveXML( _doc ) );
 		}
 	}
 }
@@ -94,7 +94,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 			const QString name = effectData.attribute( "name" );
 			EffectKey key( effectData.elementsByTagName( "key" ).item( 0 ).toElement() );
 
-			Effect* e = Effect::instantiate( name, this, &key );
+			Effect* e = Effect::instantiate( name.toUtf8(), this, &key );
 
 			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
 			{

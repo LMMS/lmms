@@ -47,6 +47,7 @@
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "GuiApplication.h"
+#include "PluginFactory.h"
 
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
@@ -385,8 +386,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
-			Engine::pluginFileHandling()[FileItem::extension(
-								value )]);
+			pluginFactory->pluginSupportingExtension(FileItem::extension(value)).name());
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
