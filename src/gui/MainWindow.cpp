@@ -24,48 +24,49 @@
 
 #include "MainWindow.h"
 
-#include <QDomElement>
-#include <QUrl>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDomElement>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
+#include <QUrl>
 #include <QWhatsThis>
 
-#include "lmmsversion.h"
-#include "GuiApplication.h"
+#include "AboutDialog.h"
+#include "AudioDummy.h"
+#include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "SongEditor.h"
-#include "Song.h"
-#include "PianoRoll.h"
+#include "ConfigManager.h"
+#include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
-#include "FxMixerView.h"
-#include "InstrumentTrack.h"
-#include "PianoView.h"
-#include "AboutDialog.h"
-#include "ControllerRackView.h"
 #include "FileBrowser.h"
-#include "PluginBrowser.h"
-#include "SideBar.h"
-#include "ConfigManager.h"
+#include "FileDialog.h"
+#include "FxMixerView.h"
+#include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "lmmsversion.h"
 #include "Mixer.h"
+#include "PianoRoll.h"
+#include "PianoView.h"
+#include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
+#include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "SetupDialog.h"
-#include "AudioDummy.h"
-#include "ToolPlugin.h"
-#include "ToolButton.h"
-#include "ProjectJournal.h"
-#include "AutomationEditor.h"
+#include "SideBar.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "SubWindow.h"
 #include "templates.h"
-#include "FileDialog.h"
+#include "ToolButton.h"
+#include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
 
@@ -560,7 +561,7 @@ void MainWindow::finalize()
 			gui->songEditor()
 	})
 	{
-		QMdiSubWindow* window = workspace()->addSubWindow(widget);
+		QMdiSubWindow* window = addWindowedWidget(widget);
 		window->setWindowIcon(widget->windowIcon());
 		window->setAttribute(Qt::WA_DeleteOnClose, false);
 		window->resize(widget->sizeHint());
@@ -607,7 +608,15 @@ void MainWindow::addSpacingToToolBar( int _size )
 								7, _size );
 }
 
-
+SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
+{
+	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
+	SubWindow *win = new SubWindow(m_workspace->viewport(), windowFlags);
+	win->setAttribute(Qt::WA_DeleteOnClose);
+	win->setWidget(w);
+	m_workspace->addSubWindow(win);
+	return win;
+}
 
 
 void MainWindow::resetWindowTitle()
@@ -680,26 +689,29 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
+	
+	qDebug() << "this " << _w->metaObject()->className();
+	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 	{
 		_w = _w->parentWidget();
 	}
 
+	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that 
+	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
+	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
+	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
+
 	_de.setAttribute( "visible", _w->isVisible() );
 	_de.setAttribute( "minimized", _w->isMinimized() );
 	_de.setAttribute( "maximized", _w->isMaximized() );
 
-	bool maxed = _w->isMaximized();
-	bool mined = _w->isMinimized();
-	if( mined || maxed ) { _w->showNormal(); }
-
-	_de.setAttribute( "x", _w->x() );
-	_de.setAttribute( "y", _w->y() );
-	_de.setAttribute( "width", _w->width() );
-	_de.setAttribute( "height", _w->height() );
-	if( maxed ) { _w->showMaximized(); }
-	if( mined ) { _w->showMinimized(); }
+	_de.setAttribute( "x", normalGeom.x() );
+	_de.setAttribute( "y", normalGeom.y() );
+	_de.setAttribute( "width", normalGeom.width() );
+	_de.setAttribute( "height", normalGeom.height() );
 }
 
 
@@ -713,21 +725,30 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( 100, _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
+		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 		{
 			_w = _w->parentWidget();
 		}
+		// first restore the window, as attempting to resize a maximized window causes graphics glitching
+		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
 
 		_w->resize( r.size() );
 		_w->move( r.topLeft() );
+
+		// set the window to its correct minimized/maximized/restored state
+		Qt::WindowStates flags = _w->windowState();
+		flags = _de.attribute( "minimized" ).toInt() ?
+				( flags | Qt::WindowMinimized ) :
+				( flags & ~Qt::WindowMinimized );
+		flags = _de.attribute( "maximized" ).toInt() ?
+				( flags | Qt::WindowMaximized ) :
+				( flags & ~Qt::WindowMaximized );
+		_w->setWindowState( flags );
+
 		_w->setVisible( _de.attribute( "visible" ).toInt() );
-		_w->setWindowState( _de.attribute( "minimized" ).toInt() ?
-				( _w->windowState() | Qt::WindowMinimized ) :
-				( _w->windowState() & ~Qt::WindowMinimized ) );
-		_w->setWindowState( _de.attribute( "maximized" ).toInt() ?
-				( _w->windowState() | Qt::WindowMaximized ) :
-				( _w->windowState() & ~Qt::WindowMaximized ) );
 	}
 }
 

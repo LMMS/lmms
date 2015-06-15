@@ -147,8 +147,7 @@ FxMixerView::FxMixerView() :
 
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin =
-		gui->mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );

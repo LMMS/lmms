@@ -65,8 +65,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
 
-	m_subWindow = gui->mainWindow()->workspace()->addSubWindow( 
-                m_controllerDlg );
+	m_subWindow = gui->mainWindow()->addWindowedWidget( m_controllerDlg );
 	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
