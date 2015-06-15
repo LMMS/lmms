@@ -1,5 +1,5 @@
 /*
- * audio_alsa.cpp - device-class which implements ALSA-PCM-output
+ * AudioAlsa.cpp - device-class which implements ALSA-PCM-output
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

@@ -1,5 +1,5 @@
 /*
- * BandLimitedWave.h - helper functions for band-limited
+ * BandLimitedWave.cpp - helper functions for band-limited
  *                    	waveform generation
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>

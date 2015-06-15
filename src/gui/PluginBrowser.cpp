@@ -1,5 +1,5 @@
 /*
- * plugin_browser.cpp - implementation of the plugin-browser
+ * PluginBrowser.cpp - implementation of the plugin-browser
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

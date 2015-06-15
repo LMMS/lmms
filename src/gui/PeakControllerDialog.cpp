@@ -1,5 +1,5 @@
 /*
- * PeakController_Dialog.cpp - per-controller-specific view for changing a
+ * PeakControllerDialog.cpp - per-controller-specific view for changing a
  * controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>

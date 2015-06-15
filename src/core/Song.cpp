@@ -1,5 +1,5 @@
 /*
- * song.cpp - root of the model tree
+ * Song.cpp - root of the model tree
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

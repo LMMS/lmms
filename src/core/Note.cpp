@@ -1,5 +1,5 @@
 /*
- * note.cpp - implementation of class note
+ * Note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
