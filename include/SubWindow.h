@@ -32,13 +32,15 @@
 #include <QMdiSubWindow>
 #include <QRect>
 
+#include "export.h"
+
 
 class QMoveEvent;
 class QResizeEvent;
 class QWidget;
 
 
-class SubWindow : public QMdiSubWindow
+class EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
 public:

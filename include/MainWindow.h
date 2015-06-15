@@ -60,7 +60,7 @@ public:
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
+	EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
 
 
 	///
