@@ -127,10 +127,6 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
 
-	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
-	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
-	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
-
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
@@ -142,6 +138,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	setName( tr( "Default preset" ) );
 
+	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
+	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
+	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 }
 
 
