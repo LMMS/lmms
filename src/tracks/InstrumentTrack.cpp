@@ -116,6 +116,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master Pitch") ),
+	m_fb( NULL ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
