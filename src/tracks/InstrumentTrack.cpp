@@ -1669,6 +1669,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		Engine::getSong()->setModified();
 
 		event->accept();
+		setFocus();
 	}
 	else if( type == "presetfile" )
 	{
@@ -1680,6 +1681,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		Engine::getSong()->setModified();
 
 		event->accept();
+		setFocus();
 	}
 	else if( type == "pluginpresetfile" )
 	{
@@ -1694,6 +1696,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		i->loadFile( value );
 
 		event->accept();
+		setFocus();
 	}
 }
 

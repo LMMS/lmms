@@ -117,6 +117,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void resizeEvent( QResizeEvent * re );
 	virtual void wheelEvent( QWheelEvent * we );
+	virtual void focusOutEvent( QFocusEvent * );
 
 	int getKey( int y ) const;
 	static inline void drawNoteRect( QPainter & p, int x, int y,
