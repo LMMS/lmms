@@ -6,7 +6,7 @@ PACKAGES=cmake libsndfile-dev fftw3-dev libvorbis-dev  libogg-dev              \
 
 if [ $QT5 ]
 then
-	PACKAGES_QT=libqt5-dev
+	PACKAGES_QT=qtbase5-dev
 else
 	PACKAGES_QT=libqt4-dev
 fi
