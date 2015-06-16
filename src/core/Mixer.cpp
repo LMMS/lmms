@@ -83,7 +83,7 @@ Mixer::Mixer() :
 	}
 
 	// just rendering?
-	if( !Engine::hasGUI() )
+	if( !gui )
 	{
 		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		m_fifo = new fifo( 1 );

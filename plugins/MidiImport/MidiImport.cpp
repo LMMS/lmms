@@ -97,7 +97,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if( Engine::hasGUI() &&
+	if( gui != NULL &&
 		ConfigManager::inst()->defaultSoundfont().isEmpty() )
 	{
 		QMessageBox::information( gui->mainWindow(),
@@ -110,7 +110,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 				"settings dialog and try again." ) );
 	}
 #else
-	if( Engine::hasGUI() )
+	if( gui )
 	{
 		QMessageBox::information( gui->mainWindow(),
 			tr( "Setup incomplete" ),

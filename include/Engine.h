@@ -49,10 +49,6 @@ public:
 	static void init();
 	static void destroy();
 
-	// TODO: Remove me. Replace calls like `if( Engine::hasGUI() )` with
-	// `if (gui)` (gui defined in "GuiApplication.h"
-	static bool hasGUI();
-
 	// core
 	static Mixer *mixer()
 	{
