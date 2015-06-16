@@ -4,6 +4,7 @@ matrix:
     include:
         - env: TARGET_OS=win32
         - env: TARGET_OS=win64
+        - env: QT5=True
         - os: osx
 before_install:
    - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
