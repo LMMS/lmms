@@ -107,11 +107,6 @@ void Engine::destroy()
 	delete ConfigManager::inst();
 }
 
-bool Engine::hasGUI()
-{
-	return gui != nullptr;
-}
-
 
 
 

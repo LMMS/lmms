@@ -965,7 +965,7 @@ void Song::loadProject( const QString & fileName )
 	if( !node.isNull() )
 	{
 		Engine::fxMixer()->restoreState( node.toElement() );
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			// refresh FxMixerView
 			gui->fxMixerView()->refreshDisplay();
@@ -985,7 +985,7 @@ void Song::loadProject( const QString & fileName )
 			{
 				restoreControllerStates( node.toElement() );
 			}
-			else if( Engine::hasGUI() )
+			else if( gui )
 			{
 				if( node.nodeName() == gui->getControllerRackView()->nodeName() )
 				{
@@ -1034,7 +1034,7 @@ void Song::loadProject( const QString & fileName )
 
 	if ( hasErrors())
 	{
-		if ( Engine::hasGUI() )
+		if ( gui )
 		{
 			QMessageBox::warning( NULL, "LMMS Error report", *errorSummary(),
 							QMessageBox::Ok );
@@ -1071,7 +1071,7 @@ bool Song::saveProjectFile( const QString & filename )
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
-	if( Engine::hasGUI() )
+	if( gui )
 	{
 		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );
 		gui->pianoRoll()->saveState( dataFile, dataFile.content() );
@@ -1092,7 +1092,7 @@ bool Song::guiSaveProject()
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_fileName = dataFile.nameWithExtension( m_fileName );
-	if( saveProjectFile( m_fileName ) && Engine::hasGUI() )
+	if( saveProjectFile( m_fileName ) && gui != nullptr )
 	{
 		TextFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
@@ -1103,7 +1103,7 @@ bool Song::guiSaveProject()
 		m_modified = false;
 		gui->mainWindow()->resetWindowTitle();
 	}
-	else if( Engine::hasGUI() )
+	else if( gui != nullptr )
 	{
 		TextFloat::displayMessage( tr( "Project NOT saved." ),
 				tr( "The project %1 was not saved!" ).arg(
@@ -1352,7 +1352,7 @@ void Song::setModified()
 	if( !m_loadingProject )
 	{
 		m_modified = true;
-		if( Engine::hasGUI() && gui->mainWindow() &&
+		if( gui != nullptr && gui->mainWindow() &&
 			QThread::currentThread() == gui->mainWindow()->thread() )
 		{
 			gui->mainWindow()->resetWindowTitle();

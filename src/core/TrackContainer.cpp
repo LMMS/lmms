@@ -82,7 +82,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( !journalRestore && Engine::hasGUI() )
+	if( !journalRestore && gui != nullptr )
 	{
 		if( pd == NULL )
 		{

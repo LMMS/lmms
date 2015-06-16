@@ -31,18 +31,18 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QTextStream>
 #include <QMessageBox>
+#include <QTextStream>
 
-
+#include "base64.h"
 #include "ConfigManager.h"
+#include "Effect.h"
+#include "GuiApplication.h"
+#include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
-#include "ProjectVersion.h"
 #include "SongEditor.h"
-#include "Effect.h"
-#include "lmmsversion.h"
-#include "base64.h"
+
 
 
 
@@ -126,7 +126,7 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			QMessageBox::critical( NULL,
 				SongEditor::tr( "Could not open file" ),
@@ -272,7 +272,7 @@ bool DataFile::writeFile( const QString& filename )
 
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			QMessageBox::critical( NULL,
 				SongEditor::tr( "Could not write file" ),
@@ -822,7 +822,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( Engine::hasGUI() )
+			if( gui )
 			{
 				QMessageBox::critical( NULL,
 					SongEditor::tr( "Error in file" ),
@@ -852,7 +852,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
 			if ( createdWith.setCompareType(Minor) != openedWith)
 			{
-				if( Engine::hasGUI() && root.attribute( "type" ) == "song" ) //documentElement()
+				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
 					QMessageBox::information( NULL,
 						SongEditor::tr( "Project Version Mismatch" ),

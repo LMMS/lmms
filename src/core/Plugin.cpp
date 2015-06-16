@@ -98,7 +98,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 	if( pi.isNull() )
 	{
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			QMessageBox::information( NULL,
 				tr( "Plugin not found" ),
@@ -112,7 +112,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
 	if( instantiationHook == NULL )
 	{
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			QMessageBox::information( NULL,
 				tr( "Error while loading plugin" ),
