@@ -3495,7 +3495,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Klikněte zde, pokud chcete ukázat nebo schovat okno pro poznámky. V tomto okně lze vkládat vaše poznámky k projektu.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation type="unfinished">Ukaž/schovej kontrolér rack</translation>
     </message>
     <message>

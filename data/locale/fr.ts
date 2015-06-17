@@ -3670,7 +3670,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Cliquez ici pour montrer et cacher la fenêtre de notes du projet. Dans cette fenêtre vous pouvez inscrire les notes de votre projet.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Montrer/Cacher le rack de contrôleurs</translation>
     </message>
     <message>

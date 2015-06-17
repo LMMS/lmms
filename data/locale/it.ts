@@ -3516,7 +3516,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde la finestra delle note del progetto. Qui è possibile scrivere le note per il progetto.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Mostra/nascondi il rack di controller</translation>
     </message>
     <message>

@@ -3511,7 +3511,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">ここをクリックして　ノートウインドウの表示非表示を切り替えます。ノートウインドウにプロジェクトノートを記入します。</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation type="unfinished">コントローラトラック　表示/非表示</translation>
     </message>
     <message>

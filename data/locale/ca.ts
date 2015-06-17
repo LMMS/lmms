@@ -3495,7 +3495,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

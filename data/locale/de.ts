@@ -3516,7 +3516,7 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
         <translation>Hier klicken, um die Projektnotizen zu zeigen oder verstecken.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Zeige/verstecke Controller-Rack</translation>
     </message>
     <message>

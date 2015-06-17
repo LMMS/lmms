@@ -3553,7 +3553,7 @@ Por favor certifique-se que você tem permissão de escrita para este arquivo e 
         <translation>Pressionando este botão você pode mostrar ou esconder o Editor de Bases. No Editor de Bases você pode criar as batidas e a linha de baixo para sua base adicionando ou removendo canais, copiando e colando sequências de batidas e/ou sequências de linha de baixo, ou o que mais você quiser.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Mostrar/esconder a Estante de Controladorer</translation>
     </message>
     <message>

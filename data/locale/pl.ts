@@ -3513,7 +3513,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Kliknij tutaj aby pokazać lub ukryć okno z notatkami do projektu. W tym oknie możesz zapisywać wszystko co przychodzi Ci na myśl w związku z projektem.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Pokaż/ukryj rack kontrolerów</translation>
     </message>
     <message>

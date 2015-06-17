@@ -3508,7 +3508,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Prema aquí para mostrar ou agochar a xanela coas notas do proxecto. Nela pódense apuntar as notas do proxecto.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Mostrar/Agochar o bastidor de controladores</translation>
     </message>
     <message>

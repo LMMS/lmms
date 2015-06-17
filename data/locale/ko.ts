@@ -3493,7 +3493,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation type="unfinished">제어기 랙 보이기/숨기기</translation>
     </message>
     <message>

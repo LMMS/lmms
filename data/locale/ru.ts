@@ -3538,7 +3538,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Эта кнопка показывает/прячет окно с заметками. В этом окне вы можете помещать любые комментарии к своей композиции.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Показать/скрыть управление контроллерами</translation>
     </message>
     <message>
