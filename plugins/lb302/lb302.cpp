@@ -469,7 +469,11 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	float samp;
 
 	// Hold on to the current VCF, and use it throughout this period
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 	lb302Filter *filter = vcf.loadAcquire();
+#else
+	lb302Filter *filter = vcf;
+#endif
 
 	if( release_frame == 0 || ! m_playingNote ) 
 	{

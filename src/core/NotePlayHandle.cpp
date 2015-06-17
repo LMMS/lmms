@@ -587,10 +587,18 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 	if( s_availableIndex.loadAcquire() < 0 )
+#else
+	if( s_availableIndex < 0 )
+#endif
 	{
 		s_mutex.lockForWrite();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 		if( s_availableIndex.loadAcquire() < 0 ) extend( NPH_CACHE_INCREMENT );
+#else
+		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
+#endif
 		s_mutex.unlock();
 	}
 	s_mutex.lockForRead();

@@ -64,10 +64,18 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 void MixerWorkerThread::JobQueue::run()
 {
 	bool processedJob = true;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 	while( processedJob && m_itemsDone.loadAcquire() < m_queueSize.loadAcquire() )
+#else
+	while( processedJob && m_itemsDone < m_queueSize )
+#endif
 	{
 		processedJob = false;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 		for( int i = 0; i < m_queueSize.loadAcquire(); ++i )
+#else
+		for( int i = 0; i < m_queueSize; ++i )
+#endif
 		{
 			ThreadableJob * job = m_items[i].fetchAndStoreOrdered( NULL );
 			if( job )
@@ -87,7 +95,11 @@ void MixerWorkerThread::JobQueue::run()
 
 void MixerWorkerThread::JobQueue::wait()
 {
-	while( m_itemsDone.load() < m_queueSize.loadAcquire() )
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+	while( m_itemsDone.loadAcquire() < m_queueSize.loadAcquire() )
+#else
+	while( (int)m_itemsDone < (int)m_queueSize )
+#endif
 	{
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 		asm( "pause" );

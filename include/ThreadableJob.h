@@ -49,7 +49,11 @@ public:
 
 	inline ProcessingState state() const
 	{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 		return static_cast<ProcessingState>( m_state.loadAcquire() );
+#else
+		return static_cast<ProcessingState>( (int)m_state );
+#endif
 	}
 
 	inline void reset()
