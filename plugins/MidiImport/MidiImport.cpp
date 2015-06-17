@@ -156,11 +156,18 @@ public:
 	AutomationPattern * ap;
 	MidiTime lastPos;
 	
-	smfMidiCC & create( TrackContainer* tc )
+	smfMidiCC & create( TrackContainer* tc, QString tn )
 	{
 		if( !at )
 		{
+			// Keep LMMS responsive, for now the import runs 
+			// in the main thread. This should probably be 
+			// removed if that ever changes.
+			qApp->processEvents();
 			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
+		}
+		if( tn != "") {
+			at->setName( tn );
 		}
 		return *this;
 	}
@@ -182,8 +189,8 @@ public:
 			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
+			ap->addObject( objModel );
 		}
-		ap->addObject( objModel );
 
 		lastPos = time;
 		time = time - ap->startPosition();
@@ -220,6 +227,8 @@ public:
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
 	{
 		if( !it ) {
+			// Keep LMMS responsive
+			qApp->processEvents();
 			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -244,6 +253,8 @@ public:
 				it->setName( tn );
 			}
 			lastEnd = 0;
+			// General MIDI default
+			it->pitchRangeModel()->setInitValue( 2 );
 		}
 		return this;
 	}
@@ -357,7 +368,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// Tracks
 	for( int t = 0; t < seq->tracks(); ++t )
 	{
-		QString trackName = "";
+		QString trackName = QString( tr( "Track" ) + " %1" ).arg( t );
 		Alg_track_ptr trk = seq->track( t );
 		pd.setValue( t + preTrackSteps );
 
@@ -377,8 +388,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
                 if( evt->is_update() )
 				{
 					QString attr = evt->get_attribute();
-                    if( attr == "tracknames" && evt->get_update_type() == 'a' ) {
-						trackName = evt->get_atom_value();
+                    if( attr == "tracknames" && evt->get_update_type() == 's' ) {
+						trackName = evt->get_string_value();
 						handled = true;
 					}
 				}
@@ -402,8 +413,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			{
 				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
-
-				Note n( noteEvt->get_duration() * ticksPerBeat,
+				int ticks = noteEvt->get_duration() * ticksPerBeat;
+				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
 						noteEvt->get_loud());
@@ -477,6 +488,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 								objModel = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
+							default:
+								//TODO: something useful for other CCs
+								break;
 						}
 
 						if( objModel )
@@ -487,7 +501,12 @@ bool MidiImport::readSMF( TrackContainer* tc )
 							}
 							else
 							{
-								ccs[ccid].create( tc );
+								if( ccs[ccid].at == NULL ) {
+									ccs[ccid].create( tc, trackName + " > " + (
+										  objModel != NULL ? 
+										  objModel->displayName() : 
+										  QString("CC %1").arg(ccid) ) );
+								}
 								ccs[ccid].putValue( time, objModel, cc );
 							}
 						}

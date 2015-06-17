@@ -517,7 +517,7 @@ char *Alg_event::get_string_value()
     assert(is_update());
     Alg_update* update = (Alg_update *) this;
     assert(get_update_type() == 's');
-    return update->parameter.attr_name();
+    return update->parameter.a;
 }
 
 
