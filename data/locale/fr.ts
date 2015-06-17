@@ -3622,7 +3622,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Exporter le projet</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>Montrer/Cacher l&apos;éditeur de morceau</translation>
     </message>
     <message>
@@ -3630,7 +3630,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>En appuyant sur ce bouton, vous pouvez montrer ou cacher l&apos;éditeur de morceau. À l&apos;aide de l&apos;éditeur de morceau vous pouvez éditer la liste de lecture du morceau et indiquer quelle piste devra être jouée. Vous pouvez également insérer et déplacer des échantillons (p. ex. des échantillons de Rap) directement dans la liste de lecture.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>Montrer/Cacher l&apos;éditeur de rythme et de ligne de basse</translation>
     </message>
     <message>
@@ -3638,7 +3638,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>En appuyant sur ce bouton, vous pouvez montrer ou cacher l&apos;éditeur de rythme et de ligne de basse. L&apos;éditeur de rythme et de ligne de basse est nécessaire pour la création de rythmes, pour ouvrir, ajouter et supprimer des canaux, pour couper, copier et coller des motifs rythmiques, et pour d&apos;autres choses similaires.</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>Montrer/Cacher le piano virtuel</translation>
     </message>
     <message>
@@ -3646,7 +3646,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Cliquez ici pour montrer ou cacher le piano virtuel. À l&apos;aide du piano virtuel vous pouvez éditer facilement des mélodies.</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>Montrer/Cacher l&apos;éditeur d&apos;automation</translation>
     </message>
     <message>
@@ -3654,7 +3654,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Cliquez ici pour montrer ou cacher l&apos;éditeur d&apos;automation. À l&apos;aide de l&apos;éditeur d&apos;automation vous pouvez éditer facilement des valeurs dynamiques.</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>Montrer/Cacher le mélangeur d&apos;effets</translation>
     </message>
     <message>
@@ -3662,7 +3662,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>Cliquez ici pour montrer et cacher le mélangeur d&apos;effets. Le mélangeur d&apos;effet est un outil très puissant pour la gestion des effets de votre morceau. Vous pouvez insérer des effets dans différents canaux d&apos;effets.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>Montrer/Cacher les notes du projet</translation>
     </message>
     <message>

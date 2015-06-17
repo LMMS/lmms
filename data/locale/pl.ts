@@ -3465,7 +3465,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Eksportuj bieżący projekt</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>Pokaż/ukryj Edytor Kompozycji</translation>
     </message>
     <message>
@@ -3473,7 +3473,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Poprzez naciśnięcie tego przycisku możesz pokazać lub ukryć Edytor Kompozycji. Za pomocą Edytora Kompozycji możesz modyfikować playlistę utworu oraz określić gdzie i kiedy ścieżki będą odtwarzane. Możesz też wstawiać sample bezpośrednio na playlistę.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>Pokaż/ukryj Edytor Perkusji i Basu</translation>
     </message>
     <message>
@@ -3481,7 +3481,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Poprzez naciśnięcie tego przycisku możesz pokazać lub ukryć Edytor Perkusji i Basu. Edytor Perkusji i Basu służy do stworzenia linii perkusyjnej i basowej utworu. Możesz wprowadzać w nim zmiany podobne jak w Edytorze Piosenki.</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>Pokaż/ukryj Edytor Pianolowy</translation>
     </message>
     <message>
@@ -3489,7 +3489,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Kliknij tutaj aby pokazać lub ukryć Edytor Pianolowy. Za jego pomocą możesz w prosty sposób modyfikować melodię.</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>Pokaż/ukryj Edytor Automatyki</translation>
     </message>
     <message>
@@ -3497,7 +3497,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Kliknij tutaj aby pokazać lub ukryć Edytor Automatyki. Za jego pomocą możesz w prosty sposób modyfikować dynamiczne wartości wszelkich regulatorów.</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>Pokaż/ukryj Mikser Efektów</translation>
     </message>
     <message>
@@ -3505,7 +3505,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Kliknij tutaj aby pokazać lub ukryć Mikser Efektów. Mikser Efektów jest potężnym narzędziem wspomagającym zarządzanie efektami i ścieżkami w Twojej produkcji. Możesz wstawiać wtyczki efektowe na różne kanały dodatkowo wzbogacając brzmienie utworu.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>Pokaż/ukryj notatki do projektu</translation>
     </message>
     <message>

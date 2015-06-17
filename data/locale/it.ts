@@ -3468,7 +3468,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Esporta questo progetto</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>Mostra/nascondi il Song-Editor</translation>
     </message>
     <message>
@@ -3476,7 +3476,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde il Song-Editor. Con l&apos;aiuto del Song-Editor è possibile modificare la playlist e specificare quando ogni traccia viene riprodotta. Si possono anche inserire e spostare i campioni (ad es. campioni rap) direttamente nella lista di riproduzione.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
     </message>
     <message>
@@ -3484,7 +3484,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde il Beat+Bassline Editor. Il Beat+Bassline Editor serve per creare beats, aprire, aggiungere e togliere canali, tagliare, copiare e incollare pattern beat e pattern bassline.</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>Mostra/nascondi il Piano-Roll</translation>
     </message>
     <message>
@@ -3492,7 +3492,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde il Piano-Roll. Con l&apos;aiuto del Piano-Roll è possibile modificare sequenze melodiche in modo semplice.</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>Mostra/nascondi l&apos;Editor dell&apos;automazione</translation>
     </message>
     <message>
@@ -3500,7 +3500,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde l&apos;editor dell&apos;automazione. Con l&apos;aiuto dell&apos;editor dell&apos;automazione è possibile rendere dinamici alcuni valori in modo semplice.</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>Mostra/nascondi il mixer degli effetti</translation>
     </message>
     <message>
@@ -3508,7 +3508,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde il mixer degli effetti. Il mixer degli effetti è uno strumento molto potente per gestire gli effetti della canzone. È possibile inserire effetti in più canali.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>Mostra/nascondi le note del progetto</translation>
     </message>
     <message>

@@ -3393,7 +3393,7 @@ Double click to pick a file.</source>
         <translation>Sobre</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>Mostrar/esconder Editor de Arranjo</translation>
     </message>
     <message>
@@ -3413,7 +3413,7 @@ Double click to pick a file.</source>
         <translation>LMMS %1</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>Mostrar/esconder Mixer de Efeitos</translation>
     </message>
     <message>
@@ -3421,7 +3421,7 @@ Double click to pick a file.</source>
         <translation>Abrir projeto existente</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>Mostrar/esconder Editor de Notas MIDI</translation>
     </message>
     <message>
@@ -3441,7 +3441,7 @@ Double click to pick a file.</source>
         <translation>Clique aqui para mostrar ou esconder o Editor de Notas MIDI. Com ele você pode editar melodias facilmente.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>Mostrar/esconder comentários do projeto</translation>
     </message>
     <message>
@@ -3485,7 +3485,7 @@ Double click to pick a file.</source>
         <translation>Salvar projeto atual</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>Mostrar/esconder Editor de Automação</translation>
     </message>
     <message>
@@ -3545,7 +3545,7 @@ Por favor certifique-se que você tem permissão de escrita para este arquivo e 
         <translation>A pasta de trabalho do LMMS %1 não existe. Posso criá-la? Você pode mudá-la depois indo em Editar -&gt; Opções.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>Mostrar/esconder Editor de Bases</translation>
     </message>
     <message>

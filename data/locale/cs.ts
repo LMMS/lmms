@@ -3447,7 +3447,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Exportovat aktuální projekt</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation type="unfinished">Ukaž/schovej Editor skladby</translation>
     </message>
     <message>
@@ -3455,7 +3455,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Zmačknutím tohoto knoflíku zobrazíte nebo schováte Editor skladby. S jeho pomocí můžete editovat playlist skladby a specifikovat, kdy a která stopa má být přehrána. Můžete také vložit a přesunovat samply (např. rapové) přímo do playlistu.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation type="unfinished">Ukaž/schovej Beat+Bassline editor</translation>
     </message>
     <message>
@@ -3463,7 +3463,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Zmačknutím tohoto knoflíku zobrazíte nebo schováte Beat+Bassline editor. Beat+Bassline editor je nezbytný pro tvorbu beatů a pro otevírání, přidávání a odebírání kanálů. Dále pro vyjmutí, kopírování a vložení beatů, Beat+Bassline patternů a dalších podobných věcí.</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation type="unfinished">Ukaž/schovej Piano-Roll</translation>
     </message>
     <message>
@@ -3471,7 +3471,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Klikněte zde, pokud chcete ukázat nebo schovat Piano-Roll. S pomocí Piano-Roll můžete jednoduchým způsobem editovat melodie.</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation type="unfinished">Ukaž/schovej Automatizační editor</translation>
     </message>
     <message>
@@ -3479,7 +3479,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Klikněte zde, pokud chcete ukázat nebo schovat Automatizační editor. S pomocí Automatizačního editoru můžete jednoduchým způsobem editovat dynamické hodnoty.</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation type="unfinished">Ukaž/schovej FX Mixer</translation>
     </message>
     <message>
@@ -3487,7 +3487,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Klikněte zde, pokud chcete ukázat nebo schovat FX Mixer. FX Mixer je velmi mocný nástroj pro správu efektů ve vaší skladbě. Efekty můžete vkládat do různých efektových kanálů.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation type="unfinished">Ukaž/schovej poznámky k projektu</translation>
     </message>
     <message>

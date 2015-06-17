@@ -3447,7 +3447,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished">Exporta projecte actual</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation type="unfinished">Mostra/amaga Editor de Cançó</translation>
     </message>
     <message>
@@ -3455,7 +3455,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation type="unfinished">Mostra/amaga Editor de Ritme Base</translation>
     </message>
     <message>
@@ -3463,7 +3463,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation type="unfinished">Mostra/amaga Rotlle de Piano</translation>
     </message>
     <message>
@@ -3471,7 +3471,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation type="unfinished">Mostra/amaga Editor d&apos;Automatització</translation>
     </message>
     <message>
@@ -3479,7 +3479,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation type="unfinished">Mostra/amaga Mesclador FX</translation>
     </message>
     <message>
@@ -3487,7 +3487,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation type="unfinished">Mostra/amaga les notes del projecte</translation>
     </message>
     <message>

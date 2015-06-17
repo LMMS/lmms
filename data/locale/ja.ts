@@ -3462,7 +3462,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">現在のプロジェクトをエクスポート</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation type="unfinished">ソングエディタ 表示/非表示</translation>
     </message>
     <message>
@@ -3470,7 +3470,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">このボタンを押すと。ソングエディタ表示/非表示にできます。ソングエディタの利用によってプレイリストの編集とどのトラックをいつ演奏するかを編集できます。プレイリストの中で直接サンプルを挿入したり移動（rap samples)したりすることもできます。</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation type="unfinished">ビート+
 ベースラインエディタ　表示/非表示</translation>
     </message>
@@ -3479,7 +3479,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">このボタンで、ビート＋ベースラインエディタの表示/非表示を切り替えます。ビート＋ベースラインエディタで、ビートをつくったり、チャンネルを開いたり足したり除去したり、ベースラインパターンをカット・コピー・ペーストしたり、いろいろできます。</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation type="unfinished">ピアノロール 表示/非表示</translation>
     </message>
     <message>
@@ -3487,7 +3487,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">ここをクリックして　ピアノロールの表示/非表示を切り替えます。　ピアノロールを使うとメロディを簡単に編集できます。</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation type="unfinished">オートメーションエディタ　表示/非表示</translation>
     </message>
     <message>
@@ -3495,7 +3495,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">ここをクリックして　オートメーションエディタの表示/非表示を切り替えます。オートメーションエディタでダイナミックな値を簡単に編集できます。</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation type="unfinished">エフェクトミキサー　表示/非表示</translation>
     </message>
     <message>
@@ -3503,7 +3503,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">ここをクリックして　エフェクトミキサーの表示/非表示を切り替えます。エフェクトミキサーは曲のエフェクトを管理するパワフルなツールです。エフェクトを異なったエフェクトチャンネルに挿入することができます。</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation type="unfinished">プロジェクトノート　表示/非表示</translation>
     </message>
     <message>
