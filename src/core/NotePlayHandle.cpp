@@ -587,10 +587,10 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
-	if( s_availableIndex < 0 )
+	if( s_availableIndex.loadAcquire() < 0 )
 	{
 		s_mutex.lockForWrite();
-		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
+		if( s_availableIndex.loadAcquire() < 0 ) extend( NPH_CACHE_INCREMENT );
 		s_mutex.unlock();
 	}
 	s_mutex.lockForRead();

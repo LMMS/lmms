@@ -64,10 +64,10 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 void MixerWorkerThread::JobQueue::run()
 {
 	bool processedJob = true;
-	while( processedJob && (int) m_itemsDone < (int) m_queueSize )
+	while( processedJob && m_itemsDone.loadAcquire() < m_queueSize.loadAcquire() )
 	{
 		processedJob = false;
-		for( int i = 0; i < m_queueSize; ++i )
+		for( int i = 0; i < m_queueSize.loadAcquire(); ++i )
 		{
 			ThreadableJob * job = m_items[i].fetchAndStoreOrdered( NULL );
 			if( job )
@@ -87,7 +87,7 @@ void MixerWorkerThread::JobQueue::run()
 
 void MixerWorkerThread::JobQueue::wait()
 {
-	while( (int) m_itemsDone < (int) m_queueSize )
+	while( m_itemsDone.load() < m_queueSize.loadAcquire() )
 	{
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 		asm( "pause" );

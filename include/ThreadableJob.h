@@ -49,7 +49,7 @@ public:
 
 	inline ProcessingState state() const
 	{
-		return static_cast<ProcessingState>( (int) m_state );
+		return static_cast<ProcessingState>( m_state.loadAcquire() );
 	}
 
 	inline void reset()

@@ -58,7 +58,7 @@ void BufferManager::init( fpp_t framesPerPeriod )
 
 sampleFrame * BufferManager::acquire()
 {
-	if( s_availableIndex < 0 )
+	if( s_availableIndex.loadAcquire() < 0 )
 	{
 		qFatal( "BufferManager: out of buffers" );
 	}
@@ -81,11 +81,11 @@ void BufferManager::release( sampleFrame * buf )
 
 void BufferManager::refresh() // non-threadsafe, hence it's called periodically from mixer at a time when no other threads can interfere
 {
-	if( s_releasedIndex == 0 ) return;
+	if( s_releasedIndex.testAndSetRelease( 0, 0 ) ) return;
 	//qDebug( "refresh: %d buffers", int( s_releasedIndex ) );
 
-	int j = s_availableIndex;
-	for( int i = 0; i < s_releasedIndex; ++i )
+	int j = s_availableIndex.loadAcquire();
+	for( int i = 0; i < s_releasedIndex.loadAcquire(); ++i )
 	{
 		++j;
 		s_available[ j ] = s_released[ i ];
