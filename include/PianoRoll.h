@@ -332,7 +332,6 @@ private:
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
 
-	friend class Engine;
 	friend class PianoRollWindow;
 
 	// qproperty fields
