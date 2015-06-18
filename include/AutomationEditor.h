@@ -238,7 +238,6 @@ private:
 	QColor m_vertexColor;
 	QBrush m_scaleColor;
 
-	//friend class Engine;
 	friend class AutomationEditorWindow;
 
 
@@ -294,8 +293,6 @@ private:
 	ComboBox * m_zoomingXComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
-
-	friend class Engine;
 };
 
 
