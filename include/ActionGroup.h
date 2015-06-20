@@ -1,5 +1,5 @@
 /*
- * Editor.h - declaration of Editor class
+ * ActionGroup.h - wrapper around QActionGroup to provide a more useful triggered(int) slot
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *

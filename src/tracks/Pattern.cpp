@@ -1,5 +1,5 @@
 /*
- * pattern.cpp - implementation of class pattern which holds notes
+ * Pattern.cpp - implementation of class pattern which holds notes
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>

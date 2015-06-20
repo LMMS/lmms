@@ -1,5 +1,5 @@
 /*
- * LeftRightNav.cpp - side-by-side left-facing and right-facing arrows for navigation (looks like < > )
+ * LeftRightNav.h - side-by-side left-facing and right-facing arrows for navigation (looks like < > )
  *
  * Copyright (c) 2015 Colin Wallace <wallacoloo/at/gmail.com>
  *

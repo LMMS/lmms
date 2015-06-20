@@ -1,5 +1,5 @@
 /*
- * instrument_view.h - definition of instrumentView-class
+ * InstrumentView.h - definition of InstrumentView-class
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

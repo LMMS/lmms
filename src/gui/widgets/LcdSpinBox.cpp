@@ -1,5 +1,5 @@
 /*
- * lcd_spinbox.cpp - class LcdSpinBox, an improved QLCDNumber
+ * LcdSpinBox.cpp - class LcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>

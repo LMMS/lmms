@@ -1,5 +1,5 @@
 /*
- * Combobox.cpp - implementation of LMMS combobox
+ * ComboBox.cpp - implementation of LMMS combobox
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
