@@ -71,7 +71,7 @@ private:
 	l_sortable_plugin_t m_analysisTools;
 	l_sortable_plugin_t m_otherPlugins;
 	
-	friend class Engine;
+	friend class LmmsCore;
 
 } ;
 
