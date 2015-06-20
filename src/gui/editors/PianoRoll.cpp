@@ -3344,7 +3344,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 
 void PianoRoll::focusOutEvent( QFocusEvent * )
 {
-	if( hasValidPattern() ) {
+	if( hasValidPattern() )
+	{
 		for( int i = 0; i < NumKeys; ++i )
 		{
 			m_pattern->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
