@@ -29,18 +29,6 @@ Features
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
 * Import of MIDI and FLP (FL Studio®/Fruityloops® Project) files
 
-[Latest Stable Release (1.1.0)](https://github.com/LMMS/lmms/releases/tag/v1.1.0)
----------------------
-* New FX Mixer
-* New Instruments
-* Instrument Enhancements
-* Improved Demos/Presets
-* UI Improvements
-* Enabled toggling of knob scale in context menu (Linear/Logarithmic)
-* Added ability to record automations
-* Added support for undo/redo in Piano Roll
-* Bug Fixes
-
 Building
 ---------
 
