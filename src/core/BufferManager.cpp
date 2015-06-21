@@ -31,9 +31,9 @@
 #include "MemoryManager.h"
 
 sampleFrame ** BufferManager::s_available;
-QAtomicInt BufferManager::s_availableIndex = 0;
+AtomicInt BufferManager::s_availableIndex = 0;
 sampleFrame ** BufferManager::s_released;
-QAtomicInt BufferManager::s_releasedIndex = 0;
+AtomicInt BufferManager::s_releasedIndex = 0;
 //QReadWriteLock BufferManager::s_mutex;
 int BufferManager::s_size;
 

@@ -559,7 +559,7 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 
 NotePlayHandle ** NotePlayHandleManager::s_available;
 QReadWriteLock NotePlayHandleManager::s_mutex;
-QAtomicInt NotePlayHandleManager::s_availableIndex;
+AtomicInt NotePlayHandleManager::s_availableIndex;
 int NotePlayHandleManager::s_size;
 
 

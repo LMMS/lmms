@@ -26,6 +26,7 @@
 #ifndef BUFFER_MANAGER_H
 #define BUFFER_MANAGER_H
 
+#include "AtomicInt.h"
 #include "export.h"
 #include "lmms_basics.h"
 
@@ -45,10 +46,10 @@ public:
 
 private:
 	static sampleFrame ** s_available;
-	static QAtomicInt s_availableIndex;
+	static AtomicInt s_availableIndex;
 
 	static sampleFrame ** s_released;
-	static QAtomicInt s_releasedIndex;
+	static AtomicInt s_releasedIndex;
 //	static QReadWriteLock s_mutex;
 	static int s_size;
 };

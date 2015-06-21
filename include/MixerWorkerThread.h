@@ -25,6 +25,7 @@
 #ifndef MIXER_WORKER_THREAD_H
 #define MIXER_WORKER_THREAD_H
 
+#include <AtomicInt.h>
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QThread>
 
@@ -63,8 +64,8 @@ public:
 	private:
 #define JOB_QUEUE_SIZE 1024
 		QAtomicPointer<ThreadableJob> m_items[JOB_QUEUE_SIZE];
-		QAtomicInt m_queueSize;
-		QAtomicInt m_itemsDone;
+		AtomicInt m_queueSize;
+		AtomicInt m_itemsDone;
 		OperationMode m_opMode;
 
 	} ;

@@ -1060,7 +1060,7 @@ void GigInstrumentView::showFileDialog()
 
 	QStringList types;
 	types << tr( "GIG Files (*.gig)" );
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 
 	QString dir;
 	if( k->m_filename != "" )

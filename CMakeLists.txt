@@ -115,6 +115,15 @@ IF(WANT_QT5)
 		${Qt5Xml_INCLUDE_DIRS}
 	)
 
+	SET(QT_LIBRARIES
+		Qt5::Core
+		Qt5::Gui
+		Qt5::Widgets
+		Qt5::Xml
+	)
+
+	FIND_PACKAGE(Qt5Test)
+	SET(QT_QTTEST_LIBRARY Qt5::Test)
 ELSE()
 	SET(QT5 FALSE)
 

@@ -25,7 +25,7 @@
 #ifndef THREADABLE_JOB_H
 #define THREADABLE_JOB_H
 
-#include <QtCore/QAtomicInt>
+#include "AtomicInt.h"
 
 #include "lmms_basics.h"
 
@@ -82,7 +82,7 @@ public:
 protected:
 	virtual void doProcessing() = 0;
 
-	QAtomicInt m_state;
+	AtomicInt m_state;
 
 } ;
 
