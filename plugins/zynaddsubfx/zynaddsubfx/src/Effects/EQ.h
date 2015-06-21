@@ -26,11 +26,11 @@
 #include "Effect.h"
 
 /**EQ Effect*/
-class EQ:public Effect
+class EQ:public Zyn::Effect
 {
     public:
-        EQ(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
-        ~EQ() {}
+        EQ(EffectParams pars);
+        ~EQ();
         void out(const Stereo<float *> &smp);
         void setpreset(unsigned char npreset);
         void changepar(int npar, unsigned char value);
@@ -38,6 +38,8 @@ class EQ:public Effect
         void cleanup(void);
         float getfreqresponse(float freq);
 
+        void getFilter(float *a/*[MAX_EQ_BANDS*MAX_FILTER_STAGES*2+1]*/,
+                       float *b/*[MAX_EQ_BANDS*MAX_FILTER_STAGES*2+1]*/) const;
     private:
         //Parameters
         unsigned char Pvolume;
@@ -48,7 +50,13 @@ class EQ:public Effect
             //parameters
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages;
             //internal values
-            class AnalogFilter * l, *r;
+            
+            /* TODO
+             * The analog filters here really ought to be dumbed down some as
+             * you are just looking to do a batch convolution in the end
+             * Perhaps some static functions to do the filter design?
+             */
+            class AnalogFilter *l, *r;
         } filter[MAX_EQ_BANDS];
 };
 

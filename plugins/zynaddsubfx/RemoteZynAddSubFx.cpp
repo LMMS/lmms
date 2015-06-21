@@ -37,6 +37,8 @@
 
 #include "zynaddsubfx/src/Nio/Nio.h"
 #include "zynaddsubfx/src/UI/MasterUI.h"
+#include "zynaddsubfx/src/UI/Connection.h"
+#include "zynaddsubfx/src/Misc/MiddleWare.h"
 
 #include <FL/x.H>
 
@@ -50,8 +52,6 @@ public:
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
-		Nio::start();
-
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
@@ -87,9 +87,7 @@ public:
 		message m;
 		while( ( m = receiveMessage() ).id != IdQuit )
 		{
-			pthread_mutex_lock( &m_master->mutex );
 			processMessage( m );
-			pthread_mutex_unlock( &m_master->mutex );
 		}
 	}
 
@@ -128,9 +126,15 @@ public:
 				LocalZynAddSubFx::setPitchWheelBendRange( _m.getInt() );
 				break;
 
+			case IdSampleRateInformation:
+				LocalZynAddSubFx::setSampleRate( _m.getInt() );
+				break;
+
 			default:
 				return RemotePluginClient::processMessage( _m );
 		}
+		GUI::tickUi(gui);
+		m_middleWare->tick();
 		return true;
 	}
 
@@ -166,10 +170,12 @@ private:
 	pthread_mutex_t m_guiMutex;
 	std::queue<RemotePluginClient::message> m_guiMessages;
 	bool m_guiExit;
+	static GUI::ui_handle_t gui;
 
 } ;
 
 
+GUI::ui_handle_t RemoteZynAddSubFx::gui = NULL;
 
 
 void RemoteZynAddSubFx::guiThread()
@@ -193,10 +199,8 @@ void RemoteZynAddSubFx::guiThread()
 		}
 		if( exitProgram == 1 )
 		{
-			pthread_mutex_lock( &m_master->mutex );
 			sendMessage( IdHideUI );
 			exitProgram = 0;
-			pthread_mutex_unlock( &m_master->mutex );
 		}
 		pthread_mutex_lock( &m_guiMutex );
 		while( m_guiMessages.size() )
@@ -210,9 +214,17 @@ void RemoteZynAddSubFx::guiThread()
 					if( !ui )
 					{
 						Fl::scheme( "plastic" );
-						ui = new MasterUI( m_master, &exitProgram );
+
+						gui = GUI::createUi( m_middleWare->spawnUiApi(), &exitProgram );
+						m_middleWare->setUiCallback( GUI::raiseUi, gui );
+						m_middleWare->setIdleCallback([](){GUI::tickUi(gui);});
+						middlewarepointer = m_middleWare; //added curlymorphic
+
+						ui = static_cast<MasterUI *>( gui );
 					}
 					ui->showUI();
+					ui->npartcounter->do_callback();
+					ui->updatepanel();
 					ui->refresh_master_ui();
 					break;
 
@@ -221,11 +233,11 @@ void RemoteZynAddSubFx::guiThread()
 					LocalZynAddSubFx::loadXML( m.getString() );
 					if( ui )
 					{
+						ui->npartcounter->do_callback();
+						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &m_master->mutex );
 					sendMessage( IdLoadSettingsFromFile );
-					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}
 
@@ -239,21 +251,25 @@ void RemoteZynAddSubFx::guiThread()
 						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &m_master->mutex );
 					sendMessage( IdLoadPresetFile );
-					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}
+
+			case IdSampleRateInformation:
+				LocalZynAddSubFx::setSampleRate( m.getInt() );
+				break;
 
 				default:
 					break;
 			}
+
 		}
 		pthread_mutex_unlock( &m_guiMutex );
+
+		m_middleWare->tick();
 	}
 	Fl::flush();
-
-	delete ui;
+    GUI::destroyUi( gui );
 }
 
 
@@ -294,23 +310,4 @@ int main( int _argc, char * * _argv )
 	return 0;
 }
 
-
-#ifdef NTK_GUI
-static Fl_Tiled_Image *module_backdrop;
-#endif
-
-void set_module_parameters ( Fl_Widget *o )
-{
-#ifdef NTK_GUI
-	o->box( FL_DOWN_FRAME );
-	o->align( o->align() | FL_ALIGN_IMAGE_BACKDROP );
-	o->color( FL_BLACK );
-	o->image( module_backdrop );
-	o->labeltype( FL_SHADOW_LABEL );
-#else
-	o->box( FL_PLASTIC_UP_BOX );
-	o->color( FL_CYAN );
-	o->labeltype( FL_EMBOSSED_LABEL );
-#endif
-}
 

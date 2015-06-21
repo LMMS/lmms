@@ -27,24 +27,33 @@
 #include <fstream>
 #include <ctime>
 #include <string>
+#define private public
 #include "../Misc/Master.h"
 #include "../Misc/Util.h"
+#include "../Misc/Allocator.h"
 #include "../Synth/PADnote.h"
+#include "../Synth/OscilGen.h"
+#include "../Params/PADnoteParameters.h"
 #include "../Params/Presets.h"
 #include "../DSP/FFTwrapper.h"
 #include "../globals.h"
 SYNTH_T *synth;
 
 using namespace std;
+#ifndef SOURCE_DIR
+#define SOURCE_DIR "BE QUIET COMPILER"
+#endif
 
 class PadNoteTest:public CxxTest::TestSuite
 {
     public:
         PADnote      *note;
+        PADnoteParameters *pars;
         Master       *master;
         FFTwrapper   *fft;
         Controller   *controller;
         unsigned char testnote;
+        Allocator     memory;
 
 
         float *outR, *outL;
@@ -71,28 +80,28 @@ class PadNoteTest:public CxxTest::TestSuite
 
             fft = new FFTwrapper(synth->oscilsize);
             //prepare the default settings
-            PADnoteParameters *defaultPreset = new PADnoteParameters(fft,NULL);
+            pars = new PADnoteParameters(fft);
 
 
             //Assert defaults
             ///TS_ASSERT(!defaultPreset->VoicePar[1].Enabled);
 
-            XMLwrapper *wrap = new XMLwrapper();
+            XMLwrapper wrap;
             cout << string(SOURCE_DIR) + string("/guitar-adnote.xmz")
                  << endl;
-            wrap->loadXMLfile(string(SOURCE_DIR)
+            wrap.loadXMLfile(string(SOURCE_DIR)
                               + string("/guitar-adnote.xmz"));
-            TS_ASSERT(wrap->enterbranch("MASTER"));
-            TS_ASSERT(wrap->enterbranch("PART", 2));
-            TS_ASSERT(wrap->enterbranch("INSTRUMENT"));
-            TS_ASSERT(wrap->enterbranch("INSTRUMENT_KIT"));
-            TS_ASSERT(wrap->enterbranch("INSTRUMENT_KIT_ITEM", 0));
-            TS_ASSERT(wrap->enterbranch("PAD_SYNTH_PARAMETERS"));
-            defaultPreset->getfromXML(wrap);
+            TS_ASSERT(wrap.enterbranch("MASTER"));
+            TS_ASSERT(wrap.enterbranch("PART", 2));
+            TS_ASSERT(wrap.enterbranch("INSTRUMENT"));
+            TS_ASSERT(wrap.enterbranch("INSTRUMENT_KIT"));
+            TS_ASSERT(wrap.enterbranch("INSTRUMENT_KIT_ITEM", 0));
+            TS_ASSERT(wrap.enterbranch("PAD_SYNTH_PARAMETERS"));
+            pars->getfromXML(&wrap);
 
 
             //defaultPreset->defaults();
-            defaultPreset->applyparameters(false);
+            pars->applyparameters();
 
             //verify xml was loaded
             ///TS_ASSERT(defaultPreset->VoicePar[1].Enabled);
@@ -104,22 +113,9 @@ class PadNoteTest:public CxxTest::TestSuite
             //lets go with.... 50! as a nice note
             testnote = 50;
             float freq = 440.0f * powf(2.0f, (testnote - 69.0f) / 12.0f);
+            SynthParams pars_{memory, *controller, freq, 120, 0, testnote, false};
 
-            note = new PADnote(defaultPreset,
-                              controller,
-                              freq,
-                              120,
-                              0,
-                              testnote,
-                              false);
-
-            //delete defaultPreset;
-            delete wrap;
-        }
-
-        void willNoteBeRunButIsHereForLinkingReasonsHowsThisForCamelCaseEh()
-        {
-            master = new Master();
+            note = new PADnote(pars, pars_);
         }
 
         void tearDown() {
@@ -129,9 +125,20 @@ class PadNoteTest:public CxxTest::TestSuite
             delete [] outL;
             delete [] outR;
             delete [] denormalkillbuf;
+            delete pars;
             FFT_cleanup();
             delete synth;
+
+            note = NULL;
+            controller = NULL;
+            fft = NULL;
+            outL = NULL;
+            outR = NULL;
+            denormalkillbuf = NULL;
+            pars = NULL;
+            synth = NULL;
         }
+
 
         void testDefaults() {
             int sampleCount = 0;
@@ -151,7 +158,7 @@ class PadNoteTest:public CxxTest::TestSuite
 #endif
             sampleCount += synth->buffersize;
 
-            TS_ASSERT_DELTA(outL[255], 0.0660f, 0.0001f);
+            TS_ASSERT_DELTA(outL[255], 0.0660f, 0.0005f);
 
 
             note->relasekey();
@@ -159,11 +166,11 @@ class PadNoteTest:public CxxTest::TestSuite
 
             note->noteout(outL, outR);
             sampleCount += synth->buffersize;
-            TS_ASSERT_DELTA(outL[255], -0.0729f, 0.0001f);
+            TS_ASSERT_DELTA(outL[255], -0.0729f, 0.0005f);
 
             note->noteout(outL, outR);
             sampleCount += synth->buffersize;
-            TS_ASSERT_DELTA(outL[255], 0.060818f, 0.0001f);
+            TS_ASSERT_DELTA(outL[255], 0.060818f, 0.0005f);
 
             note->noteout(outL, outR);
             sampleCount += synth->buffersize;
@@ -188,6 +195,85 @@ class PadNoteTest:public CxxTest::TestSuite
 #endif
 
             TS_ASSERT_EQUALS(sampleCount, 2304);
+        }
+
+        void testInitialization() {
+            TS_ASSERT_EQUALS(pars->Pmode, 0);
+
+            TS_ASSERT_EQUALS(pars->PVolume, 90);
+            TS_ASSERT(pars->oscilgen);
+            TS_ASSERT(pars->resonance);
+
+            TS_ASSERT_DELTA(note->NoteGlobalPar.Volume, 2.597527f, 0.001f);
+            TS_ASSERT_DELTA(note->NoteGlobalPar.Panning, 0.500000f, 0.01f);
+
+
+            for(int i=0; i<7; ++i)
+                TS_ASSERT(pars->sample[i].smp);
+            for(int i=7; i<PAD_MAX_SAMPLES; ++i)
+                TS_ASSERT(!pars->sample[i].smp);
+
+            TS_ASSERT_DELTA(pars->sample[0].smp[0],  -0.057407f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[1],  -0.050704f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[2],  -0.076559f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[3],  -0.069974f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[4],  -0.053268f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[5],  -0.025702f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[6],  -0.021064f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[7],   0.002593f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[8],   0.049286f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[9],   0.031929f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[10],  0.044527f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[11],  0.040447f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[12],  0.022108f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[13],  0.005787f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[14], -0.008430f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[15], -0.009642f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[16], -0.018427f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[17], -0.052831f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[18], -0.058690f, 0.0005f);
+            TS_ASSERT_DELTA(pars->sample[0].smp[19], -0.090954f, 0.0005f);
+
+
+            //Verify Harmonic Input
+            float harmonics[synth->oscilsize];
+            memset(harmonics, 0, sizeof(float) * synth->oscilsize);
+
+            pars->oscilgen->get(harmonics, 440.0f, false);
+
+            TS_ASSERT_DELTA(harmonics[0] ,0.683947, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[1] ,0.128246, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[2] ,0.003238, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[3] ,0.280945, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[4] ,0.263548, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[5] ,0.357070, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[6] ,0.096287, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[7] ,0.128685, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[8] ,0.003238, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[9] ,0.149376, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[10],0.063892, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[11],0.296716, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[12],0.051057, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[13],0.066310, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[14],0.004006, 0.0005f);
+            TS_ASSERT_DELTA(harmonics[15],0.038662, 0.0005f);
+
+            float sum = 0;
+            for(int i=0; i<synth->oscilsize/2; ++i)
+                sum += harmonics[i];
+            TS_ASSERT_DELTA(sum, 5.863001, 0.0005f);
+
+            TS_ASSERT_DELTA(pars->getNhr(0), 0.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(1), 1.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(2), 2.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(3), 3.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(4), 4.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(5), 5.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(6), 6.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(7), 7.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(8), 8.000000, 0.0005f);
+            TS_ASSERT_DELTA(pars->getNhr(9), 9.000000, 0.0005f);
+
         }
 
 #define OUTPUT_PROFILE

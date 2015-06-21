@@ -1,5 +1,6 @@
 *.o
 *~
+*.bc
 src/zynaddsubfx
 src/Tests/runner
 src/Tests/runner.cpp

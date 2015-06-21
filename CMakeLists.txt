@@ -24,6 +24,27 @@ ENDIF(VERSION_SUFFIX)
 
 INCLUDE(DetectMachine)
 
+#Include RTOSC
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/zynaddsubfx/rtosc/CMakeLists.txt")
+    message(STATUS "RTOSC NOT FOUND")
+    message(STATUS "Attempting to checkout submodule")
+    find_package(Git REQUIRED)
+	set(THISDIR ${CMAKE_BINARY_DIR})
+    execute_process(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/zynaddsubfx/rtosc/CMakeLists.txt")
+        message(FATAL_ERROR "FAILED TO CHECKOUT RTOSC\n"
+        "please check file permissions and your network")
+    endif()
+	execute_process(COMMAND git branch WORKING_DIRECTORY ${THISDIR}) #return to corrent folder
+else()
+    message(STATUS "Found Rtosc Submodule...")
+endif()
+
+set(RTOSC_NO_INSTALL TRUE)
+include("plugins/zynaddsubfx/rtosc/cmake/ColorMessage.cmake")
+add_subdirectory(plugins/zynaddsubfx/rtosc)
+include_directories(plugins/zynaddsubfx/rtosc/include)
+
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)

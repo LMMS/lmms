@@ -1,99 +1,104 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
-decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
-
-decl {//License: GNU GPL version 2 or later} {} 
-
-decl {\#include "WidgetPDial.h"} {public
+decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {private local
 } 
 
-decl {\#include <stdio.h>} {public
+decl {//License: GNU GPL version 2 or later} {private local
 } 
 
-decl {\#include <stdlib.h>} {public
+decl {\#include "Fl_Osc_Dial.H"} {public local
 } 
 
-decl {\#include "../globals.h"} {public
+decl {\#include "Fl_Osc_DialF.H"} {public local
 } 
 
-decl {\#include <FL/Fl_Group.H>} {public
+decl {\#include "Fl_Osc_Choice.H"} {public local
 } 
 
-decl {\#include "../Params/LFOParams.h"} {public
+decl {\#include "Fl_Osc_Check.H"} {public local
 } 
 
-decl {\#include <FL/Fl_Box.H>} {public
+decl {\#include "../globals.h"} {private global
 } 
 
-decl {\#include <FL/fl_draw.H>} {public
+decl {\#include <FL/Fl_Group.H>} {private global
 } 
 
-decl {\#include <FL/fl_ask.H>} {public
+decl {\#include <FL/Fl_Box.H>} {private global
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include <FL/fl_draw.H>} {private global
 } 
 
-decl {\#include "common.H"} {public
+decl {\#include <string>} {public local
 } 
 
-class LFOUI {open : {public Fl_Group, PresetsUI_}
+decl {\#include "PresetsUI.h"} {public local
+} 
+
+decl {\#include "common.H"} {public local
+} 
+
+class LFOUI {open : {public Fl_Osc_Group, PresetsUI_}
 } {
-  Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
-    code {pars=NULL;} {}
+  Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Osc_Group(x,y,w,h,label)} {open
+  } {
+    code {} {}
   }
-  Function {~LFOUI()} {} {
+  Function {~LFOUI()} {open
+  } {
     code {lfoui->hide();
-hide();
-//delete (lfoui);} {}
+hide();} {}
   }
   Function {make_window()} {open
   } {
-    Fl_Window lfoui {open selected
-      xywh {630 351 230 70} type Double color 50 labelfont 1
+    Fl_Window lfoui {open
+      xywh {636 397 230 70} type Double color 50 labelfont 1
       class Fl_Group visible
     } {
       Fl_Group lfoparamswindow {
-        label LFO
+        label LFO open
         xywh {0 0 230 70} box UP_BOX color 223 labeltype ENGRAVED_LABEL labelsize 10 align 17
         code0 {set_module_parameters(o);}
+        class Fl_Osc_Group
       } {
         Fl_Dial freq {
-          label {Freq.}
-          callback {pars->Pfreq=o->value();}
+          label {Freq.} selected
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
-          class WidgetPDial
+          code0 {o->init("Pfreq");}
+          class Fl_Osc_DialF
         }
         Fl_Dial intensity {
           label Depth
-          callback {pars->Pintensity=(int)o->value();}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          class WidgetPDial
+          code0 {o->init("Pintensity");}
+          class Fl_Osc_Dial
         }
         Fl_Dial delay {
           label Delay
-          callback {pars->Pdelay=(int)o->value();}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          class WidgetPDial
+          code0 {o->init("Pdelay");}
+          class Fl_Osc_Dial
         }
         Fl_Dial startphase {
           label Start
-          callback {pars->Pstartphase=(int)o->value();}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          class WidgetPDial
+          code0 {o->init("Pstartphase");}
+          class Fl_Osc_Dial
         }
         Fl_Dial randomness {
           label {A.R.}
-          callback {pars->Prandomness=(int)o->value();}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          class WidgetPDial
+          code0 {o->init("Prandomness");}
+          class Fl_Osc_Dial
         }
         Fl_Choice LFOtype {
           label Type
-          callback {pars->PLFOtype=(int)o->value();}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
+          code0 {o->init("PLFOtype");}
+          class Fl_Osc_Choice
         } {
           MenuItem {} {
             label SINE
@@ -126,47 +131,52 @@ hide();
         }
         Fl_Check_Button continous {
           label {C.}
-          callback {pars->Pcontinous=(int)o->value();}
           tooltip {Continous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
+          code0 {o->init("Pcontinous");}
+          class Fl_Osc_Check
         }
         Fl_Dial freqrand {
           label {F.R.}
-          callback {pars->Pfreqrand=(int)o->value();}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          class WidgetPDial
+          code0 {o->init("Pfreqrand");}
+          class Fl_Osc_Dial
         }
         Fl_Dial stretch {
           label {Str.}
-          callback {pars->Pstretch=(int)o->value();}
           tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          class WidgetPDial
+          code0 {o->init("Pstretch");}
+          class Fl_Osc_Dial
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(pars);}
-          xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
+          callback {presetsui->copy(lfoparamswindow->loc());}
+          xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55 deactivate
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(pars,this);}
-          xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55
+          callback {presetsui->paste(lfoparamswindow->loc(),this);}
+          xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 55 deactivate
         }
       }
     }
   }
-  Function {refresh()} {} {
-    code {freq->value(pars->Pfreq);
-intensity->value(pars->Pintensity);
-startphase->value(pars->Pstartphase);
-delay->value(pars->Pdelay);
-continous->value(pars->Pcontinous);
-stretch->value(pars->Pstretch);
-randomness->value(pars->Prandomness);
-freqrand->value(pars->Pfreqrand);
-LFOtype->value(pars->PLFOtype);} {}
+  Function {refresh()} {open
+  } {
+    code {freq->update();
+intensity->update();
+startphase->update();
+delay->update();
+continous->update();
+stretch->update();
+randomness->update();
+freqrand->update();
+LFOtype->update();} {}
   }
-  Function {init(LFOParams *lfopars_)} {} {
-    code {pars=lfopars_;
+  Function {init(Fl_Osc_Interface *osc_, std::string base_, std::string ext_)} {open
+  } {
+    code {base = base_;
+    ext = ext_;
+osc = osc_;
 
 make_window();
 end();
@@ -177,5 +187,4 @@ lfoui->resize(this->x(),this->y(),this->w(),this->h());
 
 lfoparamswindow->label(this->label());} {}
   }
-  decl {LFOParams *pars;} {}
 } 

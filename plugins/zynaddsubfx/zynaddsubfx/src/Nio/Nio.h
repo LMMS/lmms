@@ -4,13 +4,14 @@
 #include <set>
 
 class WavFile;
+class Master;
 
 /**Interface to Nio Subsystem
  *
  * Should be only externally included header */
 namespace Nio
 {
-    void init(void);
+    void init(Master *master);
     bool start(void);
     void stop(void);
 
@@ -32,6 +33,8 @@ namespace Nio
     //Get the prefered sample rate from jack (if running)
     void preferedSampleRate(unsigned &rate);
 
+    //Complete Master Swaps to ONLY BE CALLED FROM RT CONTEXT
+    void masterSwap(Master *master);
 
     //Wave writing
     void waveNew(class WavFile *wave);

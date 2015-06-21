@@ -28,11 +28,14 @@
 #define REV_COMBS 8
 #define REV_APS 4
 
+using namespace Zyn;
+
+
 /**Creates Reverberation Effects*/
-class Reverb:public Effect
+class Reverb:public Zyn::Effect
 {
     public:
-        Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
+        Reverb(EffectParams pars);
         ~Reverb();
         void out(const Stereo<float *> &smp);
         void cleanup(void);

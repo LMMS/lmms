@@ -33,24 +33,27 @@
 class Resonance:public Presets
 {
     public:
-        Resonance();
-        ~Resonance();
+        Resonance(void);
+        ~Resonance(void);
         void setpoint(int n, unsigned char p);
-        void applyres(int n, fft_t *fftdata, float freq);
-        void smooth();
+        void applyres(int n, fft_t *fftdata, float freq) const;
+        void smooth(void);
         void interpolatepeaks(int type);
         void randomize(int type);
+        void zero(void);
 
+        void paste(Resonance &r);
         void add2XML(XMLwrapper *xml);
-        void defaults();
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
 
-        float getfreqpos(float freq);
-        float getfreqx(float x);
-        float getfreqresponse(float freq);
-        float getcenterfreq();
-        float getoctavesfreq();
+        //TODO remove unused methods
+        float getfreqpos(float freq) const;
+        float getfreqx(float x) const;
+        float getfreqresponse(float freq) const;
+        float getcenterfreq(void) const;
+        float getoctavesfreq(void) const;
         void sendcontroller(MidiControllers ctl, float par);
 
         //parameters
@@ -64,7 +67,7 @@ class Resonance:public Presets
         float ctlcenter; //center frequency(relative)
         float ctlbw; //bandwidth(relative)
 
-    private:
+        static rtosc::Ports ports;
 };
 
 #endif

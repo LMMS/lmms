@@ -18,8 +18,7 @@
 /*******************************************************************************/
 
 #pragma once
-
-#if USE_NSM
+//#if USE_NSM
 #include "NSM/Client.H"
 
 class NSM_Client:public NSM::Client
@@ -42,4 +41,4 @@ class NSM_Client:public NSM::Client
 
         void command_active(bool active);
 };
-#endif
+//#endif

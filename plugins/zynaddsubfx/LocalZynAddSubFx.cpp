@@ -30,18 +30,22 @@
 
 #include "LocalZynAddSubFx.h"
 
+#include "zynaddsubfx/src/Misc/MiddleWare.h"
 #include "zynaddsubfx/src/Nio/NulEngine.h"
 #include "zynaddsubfx/src/Misc/Master.h"
 #include "zynaddsubfx/src/Misc/Part.h"
 #include "zynaddsubfx/src/Misc/Dump.h"
+#include "zynaddsubfx/src/Nio/Nio.h"
 
 
 SYNTH_T* synth = NULL;
+MiddleWare *middleware = NULL;
 
 int LocalZynAddSubFx::s_instanceCount = 0;
 
 
 LocalZynAddSubFx::LocalZynAddSubFx() :
+	m_middleWare( NULL ),
 	m_master( NULL ),
 	m_ioEngine( NULL )
 {
@@ -60,9 +64,10 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 #endif
 #endif
 
-		initConfig();
+		++s_instanceCount;
 
 		synth = new SYNTH_T;
+		initConfig();
 		synth->oscilsize = config.cfg.OscilSize;
 		synth->alias();
 
@@ -74,13 +79,16 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 			denormalkillbuf[i] = (RND-0.5)*1e-16;
 		}
 	}
-
-	++s_instanceCount;
+	m_middleWare = new MiddleWare();
+	middleware = m_middleWare;
 
 	m_ioEngine = new NulEngine;
 
-	m_master = new Master();
+	m_master = m_middleWare->spawnMaster();
 	m_master->swaplr = 0;
+
+	Nio::init( m_master );
+
 }
 
 
@@ -88,13 +96,13 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 
 LocalZynAddSubFx::~LocalZynAddSubFx()
 {
-	delete m_master;
-	delete m_ioEngine;
+	delete m_middleWare;
 
 	if( --s_instanceCount == 0 )
 	{
 		delete[] denormalkillbuf;
 	}
+
 }
 
 
@@ -142,10 +150,8 @@ void LocalZynAddSubFx::loadXML( const std::string & _filename )
 {
 	char * f = strdup( _filename.c_str() );
 
-	pthread_mutex_lock( &m_master->mutex );
 	m_master->defaults();
 	m_master->loadXML( f );
-	pthread_mutex_unlock( &m_master->mutex );
 
 	m_master->applyparameters();
 
@@ -160,10 +166,8 @@ void LocalZynAddSubFx::loadPreset( const std::string & _filename, int _part )
 {
 	char * f = strdup( _filename.c_str() );
 
-	pthread_mutex_lock( &m_master->mutex );
 	m_master->part[_part]->defaultsinstrument();
 	m_master->part[_part]->loadXMLinstrument( f );
-	pthread_mutex_unlock( &m_master->mutex );
 
 	m_master->applyparameters();
 

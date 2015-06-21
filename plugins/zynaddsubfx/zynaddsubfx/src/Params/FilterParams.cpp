@@ -22,16 +22,116 @@
 
 #include "FilterParams.h"
 #include "../Misc/Util.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
+#include <rtosc/rtosc.h>
+#include <rtosc/ports.h>
+#include <rtosc/port-sugar.h>
+
+using namespace rtosc;
+
+// g++ 4.8 needs this variable saved separately, otherwise it segfaults
+constexpr int sizeof_pvowels = sizeof(FilterParams::Pvowels);
+
+#define rObject FilterParams::Pvowels_t::formants_t
+static rtosc::Ports subsubports = {
+    rParamZyn(freq, "Formant frequency"),
+    rParamZyn(amp,  "Strength of formant"),
+    rParamZyn(q,    "Quality Factor"),
+};
+#undef rObject
+
+static rtosc::Ports subports = {
+    {"Pformants#" STRINGIFY(FF_MAX_FORMANTS) "/", NULL, &subsubports,
+        [](const char *msg, RtData &d) {
+            const char *mm = msg;
+            while(*mm && !isdigit(*mm)) ++mm;
+            unsigned idx = atoi(mm);
+
+            SNIP;
+            FilterParams::Pvowels_t *obj = (FilterParams::Pvowels_t *) d.obj;
+            d.obj = (void*) &obj->formants[idx];
+            subsubports.dispatch(msg, d);
+        }},
+};
+
+#define rObject FilterParams
+#undef  rChangeCb
+#define rChangeCb obj->changed = true;
+rtosc::Ports FilterParams::ports = {
+    rSelf(FilterParams),
+    rPaste(),
+    rParamZyn(Pcategory,   "Class of filter"),
+    rParamZyn(Ptype,       "Filter Type"),
+    rParamZyn(Pfreq,        "Center Freq"),
+    rParamZyn(Pq,           "Quality Factor (resonance/bandwidth)"),
+    rParamZyn(Pstages,      "Filter Stages + 1"),
+    rParamZyn(Pfreqtrack,   "Frequency Tracking amount"),
+    rParamZyn(Pgain,        "Output Gain"),
+    rParamZyn(Pnumformants, "Number of formants to be used"),
+    rParamZyn(Pformantslowness, "Rate that formants change"),
+    rParamZyn(Pvowelclearness, "Cost for mixing vowels"),
+    rParamZyn(Pcenterfreq,     "Center Freq (formant)"),
+    rParamZyn(Poctavesfreq,    "Number of octaves for formant"),
+
+    //TODO check if FF_MAX_SEQUENCE is acutally expanded or not
+    rParamZyn(Psequencesize, rMap(max, FF_MAX_SEQUENCE), "Length of vowel sequence"),
+    rParamZyn(Psequencestretch, "How modulators stretch the sequence"),
+    rToggle(Psequencereversed, "If the modulator input is inverted"),
+
+    //{"Psequence#" FF_MAX_SEQUENCE "/nvowel", "", NULL, [](){}},
+
+    //UI reader
+    {"Pvowels:", rDoc("Get Formant Vowels"), NULL,
+        [](const char *, RtData &d) {
+            FilterParams *obj = (FilterParams *) d.obj;
+            d.reply(d.loc, "b", sizeof_pvowels, obj->Pvowels);
+        }},
+
+    {"Pvowels#" STRINGIFY(FF_MAX_VOWELS) "/", NULL, &subports,
+        [](const char *msg, RtData &d) {
+            const char *mm = msg; \
+            while(*mm && !isdigit(*mm)) ++mm; \
+            unsigned idx = atoi(mm);
+
+            SNIP;
+            FilterParams *obj = (FilterParams *) d.obj;
+            d.obj = (void*)&obj->Pvowels[idx];
+            subports.dispatch(msg, d);
+
+            if(rtosc_narguments(msg))
+                rChangeCb;
+        }},
+    {"centerfreq:", NULL, NULL,
+        [](const char *, RtData &d) {
+            FilterParams *obj = (FilterParams *) d.obj;
+            d.reply(d.loc, "f", obj->getcenterfreq());
+        }},
+    {"octavesfreq:", NULL, NULL,
+        [](const char *, RtData &d) {
+            FilterParams *obj = (FilterParams *) d.obj;
+            d.reply(d.loc, "f", obj->getoctavesfreq());
+        }},
+    //    "", NULL, [](){}},"/freq"
+    //{"Pvowels#" FF_MAX_VOWELS "/formants#" FF_MAX_FORMANTS "/amp",
+    //    "", NULL, [](){}},
+    //{"Pvowels#" FF_MAX_VOWELS "/formants#" FF_MAX_FORMANTS "/q",
+    //    "", NULL, [](){}},
+};
+
+
+
+//FilterParams::FilterParams()
+//    :FilterParams(0,64,64)
+//{
+//}
 FilterParams::FilterParams(unsigned char Ptype_,
                            unsigned char Pfreq_,
                            unsigned char Pq_)
-    :PresetsArray()
 {
-    setpresettype("Pfilter");
+    //setpresettype("Pfilter");
     Dtype = Ptype_;
     Dfreq = Pfreq_;
     Dq    = Pq_;
@@ -188,8 +288,6 @@ float FilterParams::getfreqpos(float freq)
 void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
 {
     float c[3], d[3];
-    float filter_freq, filter_q, filter_amp;
-    float omega, sn, cs, alpha;
 
     for(int i = 0; i < nfreqs; ++i)
         freqs[i] = 0.0f;
@@ -197,22 +295,20 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
     //for each formant...
     for(int nformant = 0; nformant < Pnumformants; ++nformant) {
         //compute formant parameters(frequency,amplitude,etc.)
-        filter_freq = getformantfreq(Pvowels[nvowel].formants[nformant].freq);
-        filter_q    = getformantq(Pvowels[nvowel].formants[nformant].q) * getq();
+        const float filter_freq = getformantfreq(Pvowels[nvowel].formants[nformant].freq);
+        float filter_q    = getformantq(Pvowels[nvowel].formants[nformant].q) * getq();
         if(Pstages > 0)
-            filter_q =
-                (filter_q >
-                 1.0f ? powf(filter_q, 1.0f / (Pstages + 1)) : filter_q);
+            filter_q = (filter_q > 1.0f ? powf(filter_q, 1.0f / (Pstages + 1)) : filter_q);
 
-        filter_amp = getformantamp(Pvowels[nvowel].formants[nformant].amp);
+        const float filter_amp = getformantamp(Pvowels[nvowel].formants[nformant].amp);
 
 
         if(filter_freq <= (synth->samplerate / 2 - 100.0f)) {
-            omega = 2 * PI * filter_freq / synth->samplerate_f;
-            sn    = sinf(omega);
-            cs    = cosf(omega);
-            alpha = sn / (2 * filter_q);
-            float tmp = 1 + alpha;
+            const float omega = 2 * PI * filter_freq / synth->samplerate_f;
+            const float sn    = sinf(omega);
+            const float cs    = cosf(omega);
+            const float alpha = sn / (2 * filter_q);
+            const float tmp   = 1 + alpha;
             c[0] = alpha / tmp *sqrt(filter_q + 1);
             c[1] = 0;
             c[2] = -alpha / tmp *sqrt(filter_q + 1);
@@ -224,13 +320,19 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
 
 
         for(int i = 0; i < nfreqs; ++i) {
-            float freq = getfreqx(i / (float) nfreqs);
+            const float freq = getfreqx(i / (float) nfreqs);
+
+            //Discard frequencies above nyquist rate
             if(freq > synth->samplerate / 2) {
                 for(int tmp = i; tmp < nfreqs; ++tmp)
                     freqs[tmp] = 0.0f;
                 break;
             }
-            float fr = freq / synth->samplerate * PI * 2.0f;
+
+            //Convert to normalized frequency
+            const float fr = freq / synth->samplerate * PI * 2.0f;
+
+            //Evaluate Complex domain ratio
             float x  = c[0], y = 0.0f;
             for(int n = 1; n < 3; ++n) {
                 x += cosf(n * fr) * c[n];
@@ -248,6 +350,8 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
             freqs[i] += powf(h, (Pstages + 1.0f) / 2.0f) * filter_amp;
         }
     }
+
+    //Convert to logarithmic data ignoring points that are too small
     for(int i = 0; i < nfreqs; ++i) {
         if(freqs[i] > 0.000000001f)
             freqs[i] = rap2dB(freqs[i]) + getgain();
@@ -389,4 +493,12 @@ void FilterParams::getfromXML(XMLwrapper *xml)
         }
         xml->exitbranch();
     }
+}
+
+void FilterParams::paste(FilterParams &x)
+{
+    //Avoid undefined behavior
+    if(&x == this)
+        return;
+    memcpy((char*)this, (const char*)&x, sizeof(*this));
 }

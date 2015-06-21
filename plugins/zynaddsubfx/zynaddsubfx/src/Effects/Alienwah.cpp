@@ -21,11 +21,14 @@
 */
 
 #include <cmath>
+#include "../Misc/Allocator.h"
 #include "Alienwah.h"
 
-Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize)
-    :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, srate, bufsize),
-      lfo(srate, bufsize),
+using std::complex;
+
+Alienwah::Alienwah(EffectParams pars)
+    :Effect(pars),
+      lfo(pars.srate, pars.bufsize),
       oldl(NULL),
       oldr(NULL)
 {
@@ -37,10 +40,8 @@ Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned i
 
 Alienwah::~Alienwah()
 {
-    if(oldl != NULL)
-        delete [] oldl;
-    if(oldr != NULL)
-        delete [] oldr;
+    memory.devalloc(oldl);
+    memory.devalloc(oldr);
 }
 
 
@@ -139,13 +140,11 @@ void Alienwah::setphase(unsigned char _Pphase)
 
 void Alienwah::setdelay(unsigned char _Pdelay)
 {
-    if(oldl != NULL)
-        delete [] oldl;
-    if(oldr != NULL)
-        delete [] oldr;
+    memory.devalloc(oldl);
+    memory.devalloc(oldr);
     Pdelay = (_Pdelay >= MAX_ALIENWAH_DELAY) ? MAX_ALIENWAH_DELAY : _Pdelay;
-    oldl   = new complex<float>[Pdelay];
-    oldr   = new complex<float>[Pdelay];
+    oldl   = memory.valloc<complex<float>>(Pdelay);
+    oldr   = memory.valloc<complex<float>>(Pdelay);
     cleanup();
 }
 

@@ -27,15 +27,13 @@
 #include "../Misc/XMLwrapper.h"
 #include "Presets.h"
 
-#define MAX_ENVELOPE_POINTS 40
-#define MIN_ENVELOPE_DB -400
-
-class EnvelopeParams:public Presets
+class EnvelopeParams
 {
     public:
-        EnvelopeParams(unsigned char Penvstretch_,
-                       unsigned char Pforcedrelease_);
+        EnvelopeParams(unsigned char Penvstretch_=64,
+                       unsigned char Pforcedrelease_=0);
         ~EnvelopeParams();
+        void paste(const EnvelopeParams &ep);
         void ADSRinit(char A_dt, char D_dt, char S_val, char R_dt);
         void ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt);
         void ASRinit(char A_val, char A_dt, char R_val, char R_dt);
@@ -52,7 +50,8 @@ class EnvelopeParams:public Presets
         void defaults();
         void getfromXML(XMLwrapper *xml);
 
-        float getdt(char i);
+        float getdt(char i) const;
+        static float dt(char val);
 
         /* MIDI Parameters */
         unsigned char Pfreemode; //1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...
@@ -70,11 +69,12 @@ class EnvelopeParams:public Presets
 
 
         int Envmode; // 1 for ADSR parameters (linear amplitude)
-        // 2 for ADSR_dB parameters (dB amplitude)
-        // 3 for ASR parameters (frequency LFO)
-        // 4 for ADSR_filter parameters (filter parameters)
-        // 5 for ASR_bw parameters (bandwidth parameters)
+                     // 2 for ADSR_dB parameters (dB amplitude)
+                     // 3 for ASR parameters (frequency LFO)
+                     // 4 for ADSR_filter parameters (filter parameters)
+                     // 5 for ASR_bw parameters (bandwidth parameters)
 
+        static rtosc::Ports &ports;
     private:
         void store2defaults();
 

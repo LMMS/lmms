@@ -20,17 +20,81 @@
 
 */
 
-#include <stdio.h>
+#include <cmath>
+#include <cstdlib>
+#include <rtosc/ports.h>
+#include <rtosc/port-sugar.h>
 
-#include <math.h>
-#include <stdlib.h>
 #include "EnvelopeParams.h"
+#include "../Misc/Util.h"
+
+#define rObject EnvelopeParams
+using namespace rtosc;
+
+static rtosc::Ports localPorts = {
+    rSelf(EnvelopeParams),
+    rPaste(),
+    rToggle(Pfreemode, "Complex Envelope Definitions"),
+    rParamZyn(Penvpoints, rProp(internal), "Number of points in complex definition"),
+    rParamZyn(Penvsustain, rProp(internal), "Location of the sustain point"),
+    rParams(Penvdt,  MAX_ENVELOPE_POINTS, "Envelope Delay Times"),
+    rParams(Penvval, MAX_ENVELOPE_POINTS, "Envelope Values"),
+    rParamZyn(Penvstretch, "Stretch with respect to frequency"),
+    rToggle(Pforcedrelease, "Force Envelope to fully evaluate"),
+    rToggle(Plinearenvelope, "Linear or Logarithmic Envelopes"),
+    rParamZyn(PA_dt,  "Attack Time"),
+    rParamZyn(PA_val, "Attack Value"),
+    rParamZyn(PD_dt,  "Decay Time"),
+    rParamZyn(PD_val, "Decay Value"),
+    rParamZyn(PS_val, "Sustain Value"),
+    rParamZyn(PR_dt,  "Release Time"),
+    rParamZyn(PR_val, "Release Value"),
+
+    {"addPoint:i", rProp(internal) rDoc("Add point to envelope"), NULL, [](const char *msg, RtData &d)
+        {
+            EnvelopeParams *env = (rObject*) d.obj;
+            const int curpoint = rtosc_argument(msg, 0).i;
+            //int curpoint=freeedit->lastpoint;
+            if (curpoint<0 || curpoint>env->Penvpoints || env->Penvpoints>=MAX_ENVELOPE_POINTS)
+                return;
+
+            for (int i=env->Penvpoints; i>=curpoint+1; i--) {
+                env->Penvdt[i]=env->Penvdt[i-1];
+                env->Penvval[i]=env->Penvval[i-1];
+            }
+
+            if (curpoint==0) {
+                env->Penvdt[1]=64;
+            }
+
+            env->Penvpoints++;
+            if (curpoint<=env->Penvsustain) env->Penvsustain++;
+        }},
+    {"delPoint:i", rProp(internal) rDoc("Delete Envelope Point"), NULL, [](const char *msg, RtData &d)
+        {
+            EnvelopeParams *env = (rObject*) d.obj;
+            const int curpoint=rtosc_argument(msg, 0).i;
+            if(curpoint<1 || curpoint>=env->Penvpoints-1 || env->Penvpoints<=3)
+                return;
+
+            for (int i=curpoint+1;i<env->Penvpoints;i++){
+                env->Penvdt[i-1]=env->Penvdt[i];
+                env->Penvval[i-1]=env->Penvval[i];
+            };
+
+            env->Penvpoints--;
+
+            if (curpoint<=env->Penvsustain)
+                env->Penvsustain--;
+
+        }},
+};
+
+rtosc::Ports &EnvelopeParams::ports = localPorts;
 
 EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
-                               unsigned char Pforcedrelease_):Presets()
+        unsigned char Pforcedrelease_)
 {
-    int i;
-
     PA_dt  = 10;
     PD_dt  = 10;
     PR_dt  = 10;
@@ -39,7 +103,7 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
     PS_val = 64;
     PR_val = 64;
 
-    for(i = 0; i < MAX_ENVELOPE_POINTS; ++i) {
+    for(int i = 0; i < MAX_ENVELOPE_POINTS; ++i) {
         Penvdt[i]  = 32;
         Penvval[i] = 64;
     }
@@ -58,10 +122,22 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
 EnvelopeParams::~EnvelopeParams()
 {}
 
-float EnvelopeParams::getdt(char i)
+void EnvelopeParams::paste(const EnvelopeParams &ep)
 {
-    float result = (powf(2.0f, Penvdt[(int)i] / 127.0f * 12.0f) - 1.0f) * 10.0f; //miliseconds
-    return result;
+    //Avoid undefined behavior
+    if(&ep == this)
+        return;
+    memcpy((char*)this, (const char*)&ep, sizeof(*this));
+}
+
+float EnvelopeParams::getdt(char i) const
+{
+    return EnvelopeParams::dt(Penvdt[(int)i]);
+}
+
+float EnvelopeParams::dt(char val)
+{
+    return (powf(2.0f, val / 127.0f * 12.0f) - 1.0f) * 10.0f; //miliseconds
 }
 
 
@@ -70,7 +146,7 @@ float EnvelopeParams::getdt(char i)
  */
 void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 {
-    setpresettype("Penvamplitude");
+    //setpresettype("Penvamplitude");
     Envmode   = 1;
     PA_dt     = A_dt;
     PD_dt     = D_dt;
@@ -84,7 +160,7 @@ void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 
 void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 {
-    setpresettype("Penvamplitude");
+    //setpresettype("Penvamplitude");
     Envmode   = 2;
     PA_dt     = A_dt;
     PD_dt     = D_dt;
@@ -98,7 +174,7 @@ void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 
 void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 {
-    setpresettype("Penvfrequency");
+    //setpresettype("Penvfrequency");
     Envmode   = 3;
     PA_val    = A_val;
     PA_dt     = A_dt;
@@ -117,7 +193,7 @@ void EnvelopeParams::ADSRinit_filter(char A_val,
                                      char R_dt,
                                      char R_val)
 {
-    setpresettype("Penvfilter");
+    //setpresettype("Penvfilter");
     Envmode   = 4;
     PA_val    = A_val;
     PA_dt     = A_dt;
@@ -132,7 +208,7 @@ void EnvelopeParams::ADSRinit_filter(char A_val,
 
 void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
 {
-    setpresettype("Penvbandwidth");
+    //setpresettype("Penvbandwidth");
     Envmode   = 5;
     PA_val    = A_val;
     PA_dt     = A_dt;

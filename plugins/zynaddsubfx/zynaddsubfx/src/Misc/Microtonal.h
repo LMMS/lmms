@@ -23,13 +23,12 @@
 #ifndef MICROTONAL_H
 #define MICROTONAL_H
 
+#include <cstdio>
 #include "../globals.h"
-#include "XMLwrapper.h"
 
 #define MAX_OCTAVE_SIZE 128
 #define MICROTONAL_MAX_NAME_LEN 120
-
-#include <stdio.h>
+class XMLwrapper;
 
 
 /**Tuning settings and microtonal capabilities*/
@@ -102,9 +101,9 @@ class Microtonal
         void texttomapping(const char *text);
 
         /**Name of Microtonal tuning*/
-        unsigned char *Pname;
+        char Pname[MICROTONAL_MAX_NAME_LEN];
         /**Comment about the tuning*/
-        unsigned char *Pcomment;
+        char Pcomment[MICROTONAL_MAX_NAME_LEN];
 
         void add2XML(XMLwrapper *xml) const;
         void getfromXML(XMLwrapper *xml);
@@ -115,9 +114,12 @@ class Microtonal
         bool operator==(const Microtonal &micro) const;
         bool operator!=(const Microtonal &micro) const;
 
+        static rtosc::Ports ports;
     private:
         int linetotunings(unsigned int nline, const char *line);
-        int loadline(FILE *file, char *line); //loads a line from the text file, while ignoring the lines beggining with "!"
+        //loads a line from the text file, while ignoring the lines beggining with "!"
+        int loadline(FILE *file, char *line);
+        //Grab a 0..127 integer from the provided descriptor
         unsigned char octavesize;
         struct {
             unsigned char type; //1 for cents or 2 for division

@@ -22,8 +22,107 @@
 
 #include "../globals.h"
 #include "SUBnoteParameters.h"
-#include <stdio.h>
+#include "EnvelopeParams.h"
+#include "FilterParams.h"
+#include "../Misc/Util.h"
+#include <cstdio>
 #include <cmath>
+
+#include <rtosc/ports.h>
+#include <rtosc/port-sugar.h>
+
+#define rObject SUBnoteParameters
+using namespace rtosc;
+static rtosc::Ports localPorts = {
+    rSelf(SUBnoteParameters),
+    rPaste(),
+    rToggle(Pstereo, "Stereo Enable"),
+    rParamZyn(PVolume,  "Volume"),
+    rParamZyn(PPanning, "Left Right Panning"),
+    rParamZyn(PAmpVelocityScaleFunction, "Amplitude Velocity Sensing function"),
+    rParamI(PDetune, "Detune in detune type units"),
+    rParamI(PCoarseDetune, "Coarse Detune"),
+    //Real values needed
+    rOption(PDetuneType, rOptions("100 cents", "200 cents", "500 cents"), "Detune Scale"),
+    rToggle(PFreqEnvelopeEnabled, "Enable for Frequency Envelope"),
+    rToggle(PBandWidthEnvelopeEnabled, "Enable for Bandwidth Envelope"),
+    rToggle(PGlobalFilterEnabled, "Enable for Global Filter"),
+    rParamZyn(PGlobalFilterVelocityScale, "Filter Velocity Magnitude"),
+    rParamZyn(PGlobalFilterVelocityScaleFunction, "Filter Velocity Function Shape"),
+    //rRecur(FreqEnvelope, EnvelopeParams),
+    //rToggle(),//continue
+    rToggle(Pfixedfreq, "Base frequency fixed frequency enable"),
+    rParamZyn(PfixedfreqET, "Equal temeperate control for fixed frequency operation"),
+#undef rChangeCb
+#define rChangeCb obj->updateFrequencyMultipliers();
+    rParamI(POvertoneSpread.type, rMap(min, 0), rMap(max, 7),
+            "Spread of harmonic frequencies"),
+    rParamI(POvertoneSpread.par1, rMap(min, 0), rMap(max, 255),
+            "Overtone Parameter"),
+    rParamI(POvertoneSpread.par2, rMap(min, 0), rMap(max, 255),
+            "Overtone Parameter"),
+    rParamI(POvertoneSpread.par3, rMap(min, 0), rMap(max, 255),
+            "Overtone Parameter"),
+#undef rChangeCb
+#define rChangeCb
+    rParamZyn(Pnumstages, rMap(min, 1), rMap(max, 5), "Number of filter stages"),
+    rParamZyn(Pbandwidth, "Bandwidth of filters"),
+    rParamZyn(Phmagtype, "How the magnitudes are computed (0=linear,1=-60dB,2=-60dB)"),
+    rArray(Phmag, MAX_SUB_HARMONICS, "Harmonic magnitudes"),
+    rArray(Phrelbw, MAX_SUB_HARMONICS, "Relative bandwidth"),
+    rParamZyn(Pbwscale, "Bandwidth scaling with frequency"),
+    rRecurp(AmpEnvelope,          "Amplitude envelope"),
+    rRecurp(FreqEnvelope,         "Frequency Envelope"),
+    rRecurp(BandWidthEnvelope,    "Bandwidth Envelope"),
+    rRecurp(GlobalFilterEnvelope, "Post Filter Envelope"),
+    rRecurp(GlobalFilter,         "Post Filter"),
+    rOption(Pstart, rOptions("zero", "random", "ones"), "How harmonics are initialized"),
+
+    {"clear:", rDoc("Reset all harmonics to equal bandwidth/zero amplitude"), NULL, [](const char *, RtData &d)
+        {
+            SUBnoteParameters *obj = (SUBnoteParameters *)d.obj;
+            for(int i=0; i<MAX_SUB_HARMONICS; ++i) {
+                obj->Phmag[i]   = 0;
+                obj->Phrelbw[i] = 64;
+            }
+            obj->Phmag[0] = 127;
+        }},
+    {"detunevalue:", rDoc("Get note detune value"), NULL, [](const char *, RtData &d)
+        {
+            SUBnoteParameters *obj = (SUBnoteParameters *)d.obj;
+            d.reply(d.loc, "f", getdetune(obj->PDetuneType, 0, obj->PDetune));
+        }},
+    //weird stuff for PCoarseDetune
+    {"octave::c:i", rDoc("Note octave shift"), NULL, [](const char *msg, RtData &d)
+        {
+            SUBnoteParameters *obj = (SUBnoteParameters *)d.obj;
+            if(!rtosc_narguments(msg)) {
+                int k=obj->PCoarseDetune/1024;
+                if (k>=8) k-=16;
+                d.reply(d.loc, "i", k);
+            } else {
+                int k=(int) rtosc_argument(msg, 0).i;
+                if (k<0) k+=16;
+                obj->PCoarseDetune = k*1024 + obj->PCoarseDetune%1024;
+            }
+        }},
+    {"coarsedetune::c:i", rDoc("Note coarse detune"), NULL, [](const char *msg, RtData &d)
+        {
+            SUBnoteParameters *obj = (SUBnoteParameters *)d.obj;
+            if(!rtosc_narguments(msg)) {
+                int k=obj->PCoarseDetune%1024;
+                if (k>=512) k-=1024;
+                d.reply(d.loc, "i", k);
+            } else {
+                int k=(int) rtosc_argument(msg, 0).i;
+                if (k<0) k+=1024;
+                obj->PCoarseDetune = k + (obj->PCoarseDetune/1024)*1024;
+            }
+        }},
+
+};
+
+rtosc::Ports &SUBnoteParameters::ports = localPorts;
 
 SUBnoteParameters::SUBnoteParameters():Presets()
 {
@@ -237,6 +336,57 @@ void SUBnoteParameters::updateFrequencyMultipliers(void) {
     }
 }
 
+#define doPaste(x) this->x = sub.x;
+#define doPPaste(x) this->x->paste(*sub.x);
+void SUBnoteParameters::paste(SUBnoteParameters &sub)
+{
+    doPaste(Pstereo);
+    doPaste(PVolume);
+    doPaste(PPanning);
+    doPaste(PAmpVelocityScaleFunction);
+    doPPaste(AmpEnvelope);
+
+    //Frequency Parameters
+    doPaste(PDetune);
+    doPaste(PCoarseDetune);
+    doPaste(PDetuneType);
+    doPaste(PFreqEnvelopeEnabled);
+    doPPaste(FreqEnvelope);
+    doPaste(PBandWidthEnvelopeEnabled);
+    doPPaste(BandWidthEnvelope);
+
+    //Filter Parameters (Global)
+    doPaste(PGlobalFilterEnabled);
+    doPPaste(GlobalFilter);
+    doPaste(PGlobalFilterVelocityScale);
+    doPaste(PGlobalFilterVelocityScaleFunction);
+    doPPaste(GlobalFilterEnvelope);
+
+
+    //Other Parameters
+    doPaste(Pfixedfreq);
+    doPaste(PfixedfreqET);
+    doPaste(POvertoneSpread.type);
+    doPaste(POvertoneSpread.par1);
+    doPaste(POvertoneSpread.par2);
+    doPaste(POvertoneSpread.par3);
+
+    for(int i=0; i<MAX_SUB_HARMONICS; ++i)
+        doPaste(POvertoneFreqMult[i]);
+
+    doPaste(Pnumstages);
+    doPaste(Pbandwidth);
+    doPaste(Phmagtype);
+
+    for(int i=0; i<MAX_SUB_HARMONICS; ++i) {
+        doPaste(Phmag[i]);
+        doPaste(Phrelbw[i]);
+    }
+
+    doPaste(Pbwscale);
+    doPaste(Pstart);
+}
+
 void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 {
     Pnumstages = xml->getpar127("num_stages", Pnumstages);
@@ -260,7 +410,7 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         PVolume  = xml->getpar127("volume", PVolume);
         PPanning = xml->getpar127("panning", PPanning);
         PAmpVelocityScaleFunction = xml->getpar127("velocity_sensing",
-                                                   PAmpVelocityScaleFunction);
+                PAmpVelocityScaleFunction);
         if(xml->enterbranch("AMPLITUDE_ENVELOPE")) {
             AmpEnvelope->getfromXML(xml);
             xml->exitbranch();
@@ -289,15 +439,15 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         Pbwscale   = xml->getpar127("bandwidth_scale", Pbwscale);
 
         PFreqEnvelopeEnabled = xml->getparbool("freq_envelope_enabled",
-                                               PFreqEnvelopeEnabled);
+                PFreqEnvelopeEnabled);
         if(xml->enterbranch("FREQUENCY_ENVELOPE")) {
             FreqEnvelope->getfromXML(xml);
             xml->exitbranch();
         }
 
         PBandWidthEnvelopeEnabled = xml->getparbool(
-            "band_width_envelope_enabled",
-            PBandWidthEnvelopeEnabled);
+                "band_width_envelope_enabled",
+                PBandWidthEnvelopeEnabled);
         if(xml->enterbranch("BANDWIDTH_ENVELOPE")) {
             BandWidthEnvelope->getfromXML(xml);
             xml->exitbranch();
@@ -314,11 +464,11 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         }
 
         PGlobalFilterVelocityScaleFunction = xml->getpar127(
-            "filter_velocity_sensing",
-            PGlobalFilterVelocityScaleFunction);
+                "filter_velocity_sensing",
+                PGlobalFilterVelocityScaleFunction);
         PGlobalFilterVelocityScale = xml->getpar127(
-            "filter_velocity_sensing_amplitude",
-            PGlobalFilterVelocityScale);
+                "filter_velocity_sensing_amplitude",
+                PGlobalFilterVelocityScale);
 
         if(xml->enterbranch("FILTER_ENVELOPE")) {
             GlobalFilterEnvelope->getfromXML(xml);

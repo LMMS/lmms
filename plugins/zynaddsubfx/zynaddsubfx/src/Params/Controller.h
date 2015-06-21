@@ -25,7 +25,6 @@
 #define CONTROLLER_H
 
 #include "../globals.h"
-#include "../Misc/XMLwrapper.h"
 
 /**(Midi) Controllers implementation*/
 class Controller
@@ -214,6 +213,7 @@ class Controller
             unsigned char receive; //this is saved to disk by Master
         } NRPN;
 
+        static rtosc::Ports ports;
     private:
 };
 

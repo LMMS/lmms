@@ -26,11 +26,12 @@
 
 //how much the unison frequencies varies (always >= 1.0)
 #define UNISON_FREQ_SPAN 2.0f
+class Allocator;
 
 class Unison
 {
     public:
-        Unison(int update_period_samples_, float max_delay_sec_, float srate_f);
+        Unison(Allocator *alloc_, int update_period_samples_, float max_delay_sec_, float srate_f);
         ~Unison();
 
         void setSize(int new_size);
@@ -72,5 +73,6 @@ class Unison
 
         // current setup
         float samplerate_f;
+        Allocator &alloc;
 };
 #endif

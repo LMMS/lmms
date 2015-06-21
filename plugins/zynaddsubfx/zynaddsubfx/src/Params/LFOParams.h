@@ -23,26 +23,28 @@
 #ifndef LFO_PARAMS_H
 #define LFO_PARAMS_H
 
-#include "../Misc/XMLwrapper.h"
 #include "Presets.h"
+class XMLwrapper;
 
-class LFOParams:public Presets
+class LFOParams
 {
     public:
-        LFOParams(char Pfreq_,
-                  char Pintensity_,
-                  char Pstartphase_,
-                  char PLFOtype_,
-                  char Prandomness_,
-                  char Pdelay_,
-                  char Pcontinous,
-                  char fel_);
+//        LFOParams();
+        LFOParams(char Pfreq_ = 64,
+                  char Pintensity_ = 0,
+                  char Pstartphase_ = 0,
+                  char PLFOtype_ = 0,
+                  char Prandomness_ = 0,
+                  char Pdelay_ = 0,
+                  char Pcontinous = 0,
+                  char fel_ = 0);
         ~LFOParams();
 
         void add2XML(XMLwrapper *xml);
         void defaults();
         /**Loads the LFO from the xml*/
         void getfromXML(XMLwrapper *xml);
+        void paste(LFOParams &);
 
         /*  MIDI Parameters*/
         float Pfreq;      /**<frequency*/
@@ -57,6 +59,9 @@ class LFOParams:public Presets
 
         int fel; //what kind is the LFO (0 - frequency, 1 - amplitude, 2 - filter)
         static int time; //is used by Pcontinous parameter
+
+        static rtosc::Ports &ports;
+
     private:
         /* Default parameters */
         unsigned char Dfreq;

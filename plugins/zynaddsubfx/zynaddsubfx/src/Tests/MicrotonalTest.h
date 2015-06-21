@@ -22,6 +22,7 @@
 #include <cxxtest/TestSuite.h>
 #include <iostream>
 #include "../Misc/Microtonal.h"
+#include "../Misc/XMLwrapper.h"
 #include <cstring>
 #include <string>
 #include <cstdio>

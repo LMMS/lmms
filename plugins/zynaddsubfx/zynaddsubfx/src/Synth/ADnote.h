@@ -42,21 +42,13 @@ class ADnote:public SynthNote
     public:
         /**Constructor.
          * @param pars Note Parameters
-         * @param ctl_ Pointer to system Controller
-         * @param freq Base frequency for note
-         * @param velocity Velocity of note
-         * @param portamento_ 1 if the note has portamento
-         * @param midinote_ The midi number of the note
-         * @param besilent Start silent note if true*/
-        ADnote(ADnoteParameters *pars, Controller *ctl_, float freq,
-               float velocity, int portamento_, int midinote_,
-               bool besilent);
+         * @param spars Synth Engine Agnostic Parameters*/
+        ADnote(ADnoteParameters *pars, SynthParams &spars);
         /**Destructor*/
         ~ADnote();
 
         /**Alters the playing note for legato effect*/
-        void legatonote(float freq, float velocity, int portamento_,
-                        int midinote_, bool externcall);
+        void legatonote(LegatoParams pars);
 
         int noteout(float *outl, float *outr);
         void relasekey();
@@ -112,21 +104,21 @@ class ADnote:public SynthNote
 
 
         //GLOBALS
-        ADnoteParameters *partparams;
+        ADnoteParameters &pars;
         unsigned char     stereo; //if the note is stereo (allows note Panning)
         int   midinote;
         float velocity, basefreq;
 
         ONOFFTYPE   NoteEnabled;
-        Controller *ctl;
 
         /*****************************************************************/
         /*                    GLOBAL PARAMETERS                          */
         /*****************************************************************/
 
         struct Global {
-            void kill();
+            void kill(Allocator &memory);
             void initparameters(const ADnoteGlobalParam &param,
+                                class Allocator &memory,
                                 float basefreq, float velocity,
                                 bool stereo);
             /******************************************
@@ -173,7 +165,7 @@ class ADnote:public SynthNote
         /***********************************************************/
         struct Voice {
             void releasekey();
-            void kill();
+            void kill(Allocator &memory);
             /* If the voice is enabled */
             ONOFFTYPE Enabled;
 

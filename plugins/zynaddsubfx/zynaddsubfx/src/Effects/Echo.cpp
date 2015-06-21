@@ -23,13 +23,16 @@
 */
 
 #include <cmath>
+#include "../Misc/Allocator.h"
 #include "Echo.h"
 
 #define MAX_DELAY 2
 
-Echo::Echo(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize)
-    :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, srate, bufsize),
-      samplerate(srate),
+using namespace Zyn;
+
+
+Echo::Echo(EffectParams pars)
+    :Effect(pars),
       Pvolume(50),
       Pdelay(60),
       Plrdelay(100),
@@ -38,8 +41,8 @@ Echo::Echo(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate
       delayTime(1),
       lrdelay(0),
       avgDelay(0),
-      delay(new float[(int)(MAX_DELAY * srate)],
-            new float[(int)(MAX_DELAY * srate)]),
+      delay(memory.valloc<float>(MAX_DELAY * pars.srate),
+            memory.valloc<float>(MAX_DELAY * pars.srate)),
       old(0.0f),
       pos(0),
       delta(1),
@@ -51,8 +54,8 @@ Echo::Echo(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate
 
 Echo::~Echo()
 {
-    delete[] delay.l;
-    delete[] delay.r;
+    memory.devalloc(delay.l);
+    memory.devalloc(delay.r);
 }
 
 //Cleanup the effect
@@ -80,6 +83,7 @@ void Echo::initdelays(void)
 
     ndelta.l = max(1, (int) (dl * samplerate));
     ndelta.r = max(1, (int) (dr * samplerate));
+    delta = ndelta;
 }
 
 //Effect output

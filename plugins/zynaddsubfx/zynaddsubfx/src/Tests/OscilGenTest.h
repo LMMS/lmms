@@ -22,6 +22,8 @@
 #include <cxxtest/TestSuite.h>
 #include <string>
 #include "../Synth/OscilGen.h"
+#include "../DSP/FFTwrapper.h"
+#include "../Misc/Util.h"
 #include "../globals.h"
 SYNTH_T *synth;
 

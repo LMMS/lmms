@@ -1,9 +1,9 @@
 Main author:
         Nasca Octavian Paul
 
-Developers:
+Active Developers:
         Mark McCurry
-        Harald Hvaal
+        Hans Petter Selasky (BSD Compat)
 
 Contributors:
         Gerald Folcher (legato, mono notes memory)
@@ -23,10 +23,11 @@ Contributors:
         Lieven Moors (Spike/Circle waveform)
         Olaf Schulz (MIDI Aftertouch support)
         Jonathan Liles (NSM & NTK support)
-        Johannes Lorenz (Effect Documentation)
+        Johannes Lorenz (Effect Documentation, PID Files)
         Ilario Glasgo (Italian Doc Translation)
         Christopher Oliver (Unison + presets fix, mousewheel support,
                             SUBnote overtones, unison enhancements, ...)
         Filipe Coelho (Globals Cleanup)
         Andre Sklenar (UI Pixmaps)
+        Harald Hvaal (General Code Modernization)
 

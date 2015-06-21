@@ -25,11 +25,13 @@
 
 #include "Effect.h"
 
+using namespace Zyn;
+
 /**Distortion Effect*/
-class Distorsion:public Effect
+class Distorsion:public Zyn::Effect
 {
     public:
-        Distorsion(bool insertion, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
+        Distorsion(EffectParams pars);
         ~Distorsion();
         void out(const Stereo<float *> &smp);
         void setpreset(unsigned char npreset);

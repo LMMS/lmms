@@ -28,6 +28,7 @@
 #include <ctime>
 #include <string>
 #include "../Misc/Util.h"
+#include "../Misc/Allocator.h"
 #include "../Synth/ADnote.h"
 #include "../Synth/OscilGen.h"
 #include "../Params/Presets.h"
@@ -48,6 +49,7 @@ class AdNoteTest:public CxxTest::TestSuite
         Controller   *controller;
         unsigned char testnote;
         ADnoteParameters *params;
+        Allocator memory;
         float freq;
 
 
@@ -101,7 +103,8 @@ class AdNoteTest:public CxxTest::TestSuite
             params->VoicePar[0].Unison_vibratto_speed   = e;
             params->VoicePar[0].Unison_invert_phase     = f;
 
-            note = new ADnote(params, controller, freq, 120, 0, testnote, false);
+            SynthParams pars{memory, *controller, freq, 120, 0, testnote, false};
+            note = new ADnote(params, pars);
             note->noteout(outL, outR);
             TS_ASSERT_DELTA(outL[80], values[0], 1e-5);
             //printf("{%f,", outL[80]);

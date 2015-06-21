@@ -20,6 +20,10 @@
 
 */
 
+#include <rtosc/ports.h>
+#include <rtosc/port-sugar.h>
+
+
 #include "EffectMgr.h"
 #include "Effect.h"
 #include "Reverb.h"
@@ -29,31 +33,101 @@
 #include "EQ.h"
 #include "DynamicFilter.h"
 #include "../Misc/XMLwrapper.h"
+#include "../Misc/Util.h"
 #include "../Params/FilterParams.h"
+#include "../Misc/Allocator.h"
 
-#include <iostream>
-using namespace std;
 
-EffectMgr::EffectMgr(const bool insertion_, pthread_mutex_t *mutex_)
+#define rObject EffectMgr
+rtosc::Ports EffectMgr::ports = {
+    rSelf(EffectMgr),
+    rPaste(),
+    RECURP(EffectMgr, FilterParams, Filter, filterpars, "Filter Parameter for Dynamic Filter"),
+    {"parameter#64::i", rProp(alias) rDoc("Parameter Accessor"), NULL,
+        [](const char *msg, rtosc::RtData &d)
+        {
+            EffectMgr *eff = (EffectMgr*)d.obj;
+            const char *mm = msg;
+            while(!isdigit(*mm))++mm;
+
+            if(!rtosc_narguments(msg))
+                d.reply(d.loc, "i", eff->geteffectparrt(atoi(mm)));
+            else 
+                eff->seteffectparrt(atoi(mm), rtosc_argument(msg, 0).i);
+        }},
+    {"preset::i", rProp(alias) rDoc("Effect Preset Selector"), NULL,
+        [](const char *msg, rtosc::RtData &d)
+        {
+            EffectMgr *eff = (EffectMgr*)d.obj;
+            if(!rtosc_narguments(msg))
+                d.reply(d.loc, "i", eff->getpreset());
+            else
+                eff->changepresetrt(rtosc_argument(msg, 0).i);
+        }},
+    {"eq-coeffs:", rProp(internal) rDoc("Get equalizer Coefficients"), NULL,
+        [](const char *, rtosc::RtData &d)
+        {
+            EffectMgr *eff = (EffectMgr*)d.obj;
+            if(eff->nefx != 7)
+                return;
+            EQ *eq = (EQ*)eff->efx;
+            float a[MAX_EQ_BANDS*MAX_FILTER_STAGES*2+1];
+            float b[MAX_EQ_BANDS*MAX_FILTER_STAGES*2+1];
+            memset(a, 0, sizeof(a));
+            memset(b, 0, sizeof(b));
+            eq->getFilter(a,b);
+            d.reply(d.loc, "bb", sizeof(a), a, sizeof(b), b);
+        }},
+    {"efftype::i", rDoc("Get Effect Type"), NULL, [](const char *m, rtosc::RtData &d)
+        {
+            EffectMgr *eff  = (EffectMgr*)d.obj;
+            if(rtosc_narguments(m)) 
+                eff->changeeffectrt(rtosc_argument(m,0).i);
+            else
+                d.reply(d.loc, "i", eff->nefx);
+        }},
+    {"efftype:b", rProp(internal) rDoc("Pointer swap EffectMgr"), NULL,
+        [](const char *msg, rtosc::RtData &d)
+        {
+            printf("OBSOLETE METHOD CALLED\n");
+            EffectMgr *eff  = (EffectMgr*)d.obj;
+            EffectMgr *eff_ = *(EffectMgr**)rtosc_argument(msg,0).b.data;
+
+            //Lets trade data
+            std::swap(eff->nefx,eff_->nefx);
+            std::swap(eff->efx,eff_->efx);
+            std::swap(eff->filterpars,eff_->filterpars);
+            std::swap(eff->efxoutl, eff_->efxoutl);
+            std::swap(eff->efxoutr, eff_->efxoutr);
+
+            //Return the old data for distruction
+            d.reply("/free", "sb", "EffectMgr", sizeof(EffectMgr*), &eff_);
+        }},
+
+};
+
+
+EffectMgr::EffectMgr(Allocator &alloc, const bool insertion_)
     :insertion(insertion_),
       efxoutl(new float[synth->buffersize]),
       efxoutr(new float[synth->buffersize]),
       filterpars(NULL),
       nefx(0),
       efx(NULL),
-      mutex(mutex_),
-      dryonly(false)
+      dryonly(false),
+      memory(alloc)
 {
     setpresettype("Peffect");
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
+    memset(settings, 0, sizeof(settings));
     defaults();
 }
 
 
 EffectMgr::~EffectMgr()
 {
-    delete efx;
+    memory.dealloc(efx);
     delete [] efxoutl;
     delete [] efxoutr;
 }
@@ -65,39 +139,41 @@ void EffectMgr::defaults(void)
 }
 
 //Change the effect
-void EffectMgr::changeeffect(int _nefx)
+void EffectMgr::changeeffectrt(int _nefx)
 {
     cleanup();
-    if(nefx == _nefx)
+    if(nefx == _nefx && efx != NULL)
         return;
     nefx = _nefx;
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
-    delete efx;
+    memory.dealloc(efx);
+    EffectParams pars(memory, insertion, efxoutl, efxoutr, 0,
+            synth->samplerate, synth->buffersize);
     switch(nefx) {
         case 1:
-            efx = new Reverb(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<Reverb>(pars);
             break;
         case 2:
-            efx = new Echo(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<Echo>(pars);
             break;
         case 3:
-            efx = new Chorus(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<Chorus>(pars);
             break;
         case 4:
-            efx = new Phaser(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<Phaser>(pars);
             break;
         case 5:
-            efx = new Alienwah(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<Alienwah>(pars);
             break;
         case 6:
-            efx = new Distorsion(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<Distorsion>(pars);
             break;
         case 7:
-            efx = new EQ(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<EQ>(pars);
             break;
         case 8:
-            efx = new DynamicFilter(insertion, efxoutl, efxoutr, synth->samplerate, synth->buffersize);
+            efx = memory.alloc<DynamicFilter>(pars);
             break;
         //put more effect here
         default:
@@ -109,10 +185,33 @@ void EffectMgr::changeeffect(int _nefx)
         filterpars = efx->filterpars;
 }
 
+void EffectMgr::changeeffect(int _nefx)
+{
+    nefx = _nefx;
+    //preset    = 0;
+    //memset(settings, 0, sizeof(settings));
+}
+
 //Obtain the effect number
 int EffectMgr::geteffect(void)
 {
     return nefx;
+}
+
+// Initialize An Effect in RT context
+void EffectMgr::init(void)
+{
+    changeeffectrt(nefx);
+    changepresetrt(preset);
+    for(int i=0; i<128; ++i)
+        seteffectparrt(i, settings[i]);
+}
+
+//Strip effect manager of it's realtime memory
+void EffectMgr::kill(void)
+{
+    //printf("Killing Effect(%d)\n", nefx);
+    memory.dealloc(efx);
 }
 
 // Cleanup the current effect
@@ -133,39 +232,47 @@ unsigned char EffectMgr::getpreset(void)
 }
 
 // Change the preset of the current effect
-void EffectMgr::changepreset_nolock(unsigned char npreset)
+void EffectMgr::changepreset(unsigned char npreset)
 {
+    preset = npreset;
+}
+
+// Change the preset of the current effect
+void EffectMgr::changepresetrt(unsigned char npreset)
+{
+    preset = npreset;
     if(efx)
         efx->setpreset(npreset);
 }
 
-//Change the preset of the current effect(with thread locking)
-void EffectMgr::changepreset(unsigned char npreset)
-{
-    pthread_mutex_lock(mutex);
-    changepreset_nolock(npreset);
-    pthread_mutex_unlock(mutex);
-}
-
-
 //Change a parameter of the current effect
-void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
+void EffectMgr::seteffectparrt(int npar, unsigned char value)
 {
+    if(npar<128)
+        settings[npar] = value;
     if(!efx)
         return;
     efx->changepar(npar, value);
 }
 
-// Change a parameter of the current effect (with thread locking)
+//Change a parameter of the current effect
 void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
-    pthread_mutex_lock(mutex);
-    seteffectpar_nolock(npar, value);
-    pthread_mutex_unlock(mutex);
+    settings[npar] = value;
 }
 
 //Get a parameter of the current effect
 unsigned char EffectMgr::geteffectpar(int npar)
+{
+    if(npar<128)
+        return settings[npar];
+
+    if(!efx)
+        return 0;
+    return efx->getpar(npar);
+}
+
+unsigned char EffectMgr::geteffectparrt(int npar)
 {
     if(!efx)
         return 0;
@@ -241,7 +348,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
-    return (!efx) ? 1.0f : efx->outvolume;
+    return efx ? efx->outvolume : 1.0f;
 }
 
 
@@ -257,13 +364,22 @@ void EffectMgr::setdryonly(bool value)
     dryonly = value;
 }
 
+void EffectMgr::paste(EffectMgr &e)
+{
+    changeeffectrt(e.nefx);
+    changepresetrt(e.preset);
+    for(int i=0;i<128;++i){
+        seteffectparrt(e.settings[i], i);
+    }
+}
+
 void EffectMgr::add2XML(XMLwrapper *xml)
 {
     xml->addpar("type", geteffect());
 
-    if(!efx || !geteffect())
+    if(!geteffect())
         return;
-    xml->addpar("preset", efx->Ppreset);
+    xml->addpar("preset", preset);
 
     xml->beginbranch("EFFECT_PARAMETERS");
     for(int n = 0; n < 128; ++n) {
@@ -286,18 +402,18 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
 {
     changeeffect(xml->getpar127("type", geteffect()));
 
-    if(!efx || !geteffect())
+    if(!geteffect())
         return;
 
-    efx->Ppreset = xml->getpar127("preset", efx->Ppreset);
+    preset = xml->getpar127("preset", preset);
 
     if(xml->enterbranch("EFFECT_PARAMETERS")) {
         for(int n = 0; n < 128; ++n) {
-            seteffectpar_nolock(n, 0); //erase effect parameter
+            seteffectpar(n, 0); //erase effect parameter
             if(xml->enterbranch("par_no", n) == 0)
                 continue;
             int par = geteffectpar(n);
-            seteffectpar_nolock(n, xml->getpar127("par", par));
+            seteffectpar(n, xml->getpar127("par", par));
             xml->exitbranch();
         }
         if(filterpars)

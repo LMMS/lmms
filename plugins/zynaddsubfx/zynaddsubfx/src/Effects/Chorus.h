@@ -29,10 +29,10 @@
 #define MAX_CHORUS_DELAY 250.0f //ms
 
 /**Chorus and Flange effects*/
-class Chorus:public Effect
+class Chorus:public Zyn::Effect
 {
     public:
-        Chorus(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
+        Chorus(EffectParams pars);
         /**Destructor*/
         ~Chorus();
         void out(const Stereo<float *> &input);

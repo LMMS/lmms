@@ -15,19 +15,24 @@ set(zynaddsubfx_nio_SRCS
     Nio.cpp
     )
 
-set(zynaddsubfx_nio_lib )
+set(zynaddsubfx_nio_lib)
 
 add_definitions(-DOUT_DEFAULT="${DefaultOutput}")
 add_definitions(-DIN_DEFAULT="${DefaultInput}")
 
 if(JackEnable)
     include_directories(${JACK_INCLUDE_DIR})
-    list(APPEND zynaddsubfx_nio_SRCS JackEngine.cpp)
+    list(APPEND zynaddsubfx_nio_SRCS JackEngine.cpp JackMultiEngine.cpp)
     list(APPEND zynaddsubfx_nio_lib ${JACK_LIBRARIES})
+
+    CHECK_INCLUDE_FILES("jack/metadata.h" JACK_HAS_METADATA_API)
+    if(JACK_HAS_METADATA_API)
+        add_definitions(-DJACK_HAS_METADATA_API)
+    endif(JACK_HAS_METADATA_API)
 endif(JackEnable)
 
 if(PaEnable)
-    include_directories(${PORTAUDIO_INCLUDE_DIR})
+    include_directories(${PORTAUDIO_INCLUDE_DIRS})
     list(APPEND zynaddsubfx_nio_SRCS PaEngine.cpp)
     list(APPEND zynaddsubfx_nio_lib ${PORTAUDIO_LIBRARIES})
 endif(PaEnable)
@@ -38,7 +43,7 @@ if(AlsaEnable)
 endif(AlsaEnable)
 
 if(OssEnable)
-    list(APPEND zynaddsubfx_nio_SRCS OssEngine.cpp)
+    list(APPEND zynaddsubfx_nio_SRCS OssEngine.cpp OssMultiEngine.cpp)
 endif(OssEnable)
 
 

@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "../Effects/Echo.h"
+#include "../Misc/Allocator.h"
 #include "../globals.h"
 SYNTH_T *synth;
 
@@ -45,7 +46,8 @@ class EchoTest:public CxxTest::TestSuite
                                         new float[synth->buffersize]);
             for(int i = 0; i < synth->buffersize; ++i)
                 input->l[i] = input->r[i] = 0.0f;
-            testFX = new Echo(true, outL, outR, 44100, 256);
+            EffectParams pars{alloc,true, outL, outR, 0, 44100, 256, nullptr};
+            testFX = new Echo(pars);
         }
 
         void tearDown() {
@@ -123,4 +125,5 @@ class EchoTest:public CxxTest::TestSuite
         Stereo<float *> *input;
         float *outR, *outL;
         Echo  *testFX;
+        Allocator alloc;
 };

@@ -31,42 +31,50 @@
 class Effect;
 class FilterParams;
 class XMLwrapper;
+class Allocator;
 
 #include "Distorsion.h"
 #include "EQ.h"
 #include "DynamicFilter.h"
-#include "../Misc/XMLwrapper.h"
 #include "../Params/FilterParams.h"
 #include "../Params/Presets.h"
+
+using namespace Zyn;
+
 
 /**Effect manager, an interface betwen the program and effects*/
 class EffectMgr:public Presets
 {
     public:
-        EffectMgr(const bool insertion_, pthread_mutex_t *mutex_);
+        EffectMgr(Allocator &alloc, const bool insertion_);
         ~EffectMgr();
 
+        void paste(EffectMgr &e);
         void add2XML(XMLwrapper *xml);
-        void defaults(void);
+        void defaults(void) REALTIME;
         void getfromXML(XMLwrapper *xml);
 
-        void out(float *smpsl, float *smpsr);
+        void out(float *smpsl, float *smpsr) REALTIME;
 
         void setdryonly(bool value);
 
         /**get the output(to speakers) volume of the systemeffect*/
         float sysefxgetvolume(void);
 
-        void cleanup(void);
+        void init(void) REALTIME;
+        void kill(void) REALTIME;
+        void cleanup(void) REALTIME;
 
-        void changeeffect(int nefx_);
+        void changeeffectrt(int nefx_) REALTIME;
+        void changeeffect(int nefx_) NONREALTIME;
         int geteffect(void);
-        void changepreset(unsigned char npreset);
-        void changepreset_nolock(unsigned char npreset);
+        void changepreset(unsigned char npreset) NONREALTIME;
+        void changepresetrt(unsigned char npreset) REALTIME;
         unsigned char getpreset(void);
-        void seteffectpar(int npar, unsigned char value);
-        void seteffectpar_nolock(int npar, unsigned char value);
+        void seteffectpar(int npar, unsigned char value) NONREALTIME;
+        void seteffectparrt(int npar, unsigned char value) REALTIME;
         unsigned char geteffectpar(int npar);
+        unsigned char geteffectparrt(int npar) REALTIME;
 
         const bool insertion;
         float     *efxoutl, *efxoutr;
@@ -76,11 +84,18 @@ class EffectMgr:public Presets
 
         FilterParams *filterpars;
 
-    private:
+        static rtosc::Ports ports;
         int     nefx;
-        Effect *efx;
-        pthread_mutex_t *mutex;
+        Zyn::Effect *efx;
+    private:
+
+        //Parameters Prior to initialization
+        char effect_id;
+        char preset;
+        char settings[128];
+
         bool dryonly;
+        Allocator &memory;
 };
 
 #endif

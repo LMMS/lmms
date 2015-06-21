@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -47,8 +47,8 @@
 
 */
 
-#include <QDomDocument>
-#include <QDebug>
+#include <QtXml/QDomDocument>
+#include <QtCore/QDebug>
 #include "QtXmlWrapper.h"
 #include <string>
 #include <sstream>
@@ -274,7 +274,7 @@ int QtXmlWrapper::loadXMLfile(const std::string &filename)
     const char *xmldata = doloadfile(filename.c_str());
     if(xmldata == NULL)
 	{
-		qDebug() << "QtXmlWrapper::loadXMLfile(): empty data";
+//		qDebug() << "QtXmlWrapper::loadXMLfile(): empty data";
         return -1;                //the file could not be loaded or uncompressed
 	}
 

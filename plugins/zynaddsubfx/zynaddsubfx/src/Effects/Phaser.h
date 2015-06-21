@@ -32,10 +32,13 @@
 
 #define MAX_PHASER_STAGES 12
 
+using namespace Zyn;
+
+
 class Phaser:public Effect
 {
     public:
-        Phaser(const int &insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
+        Phaser(EffectParams pars);
         ~Phaser();
         void out(const Stereo<float *> &input);
         void setpreset(unsigned char npreset);

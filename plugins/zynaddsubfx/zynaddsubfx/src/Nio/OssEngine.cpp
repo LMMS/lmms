@@ -28,71 +28,254 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/soundcard.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <iostream>
+#include <signal.h>
 
 #include "InMgr.h"
 
 using namespace std;
 
+/*
+ * The following statemachine converts MIDI commands to USB MIDI
+ * packets, derived from Linux's usbmidi.c, which was written by
+ * "Clemens Ladisch". It is used to figure out when a MIDI command is
+ * complete, without having to read the first byte of the next MIDI
+ * command. This is useful when connecting to so-called system PIPEs
+ * and FIFOs. See "man mkfifo".
+ *
+ * Return values:
+ *    0: No command
+ * Else: Command is complete
+ */
+static unsigned char
+OssMidiParse(struct OssMidiParse &midi_parse,
+    unsigned char cn, unsigned char b)
+{
+        unsigned char p0 = (cn << 4);
+
+        if(b >= 0xf8) {
+                midi_parse.temp_0[0] = p0 | 0x0f;
+                midi_parse.temp_0[1] = b;
+                midi_parse.temp_0[2] = 0;
+                midi_parse.temp_0[3] = 0;
+                midi_parse.temp_cmd = midi_parse.temp_0;
+                return (1);
+
+        } else if(b >= 0xf0) {
+                switch (b) {
+                case 0xf0:              /* system exclusive begin */
+                        midi_parse.temp_1[1] = b;
+                        midi_parse.state = OSSMIDI_ST_SYSEX_1;
+                        break;
+                case 0xf1:              /* MIDI time code */
+                case 0xf3:              /* song select */
+                        midi_parse.temp_1[1] = b;
+                        midi_parse.state = OSSMIDI_ST_1PARAM;
+                        break;
+                case 0xf2:              /* song position pointer */
+                        midi_parse.temp_1[1] = b;
+                        midi_parse.state = OSSMIDI_ST_2PARAM_1;
+                        break;
+                case 0xf4:              /* unknown */
+                case 0xf5:              /* unknown */
+                        midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                        break;
+                case 0xf6:              /* tune request */
+                        midi_parse.temp_1[0] = p0 | 0x05;
+                        midi_parse.temp_1[1] = 0xf6;
+                        midi_parse.temp_1[2] = 0;
+                        midi_parse.temp_1[3] = 0;
+                        midi_parse.temp_cmd = midi_parse.temp_1;
+                        midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                        return (1);
+
+                case 0xf7:              /* system exclusive end */
+                        switch (midi_parse.state) {
+                        case OSSMIDI_ST_SYSEX_0:
+                                midi_parse.temp_1[0] = p0 | 0x05;
+                                midi_parse.temp_1[1] = 0xf7;
+                                midi_parse.temp_1[2] = 0;
+                                midi_parse.temp_1[3] = 0;
+                                midi_parse.temp_cmd = midi_parse.temp_1;
+                                midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                                return (1);
+                        case OSSMIDI_ST_SYSEX_1:
+                                midi_parse.temp_1[0] = p0 | 0x06;
+                                midi_parse.temp_1[2] = 0xf7;
+                                midi_parse.temp_1[3] = 0;
+                                midi_parse.temp_cmd = midi_parse.temp_1;
+                                midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                                return (1);
+                        case OSSMIDI_ST_SYSEX_2:
+                                midi_parse.temp_1[0] = p0 | 0x07;
+                                midi_parse.temp_1[3] = 0xf7;
+                                midi_parse.temp_cmd = midi_parse.temp_1;
+                                midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                                return (1);
+                        }
+                        midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                        break;
+                }
+        } else if(b >= 0x80) {
+                midi_parse.temp_1[1] = b;
+                if((b >= 0xc0) && (b <= 0xdf)) {
+                        midi_parse.state = OSSMIDI_ST_1PARAM;
+                } else {
+                        midi_parse.state = OSSMIDI_ST_2PARAM_1;
+                }
+        } else {                        /* b < 0x80 */
+                switch (midi_parse.state) {
+                case OSSMIDI_ST_1PARAM:
+                        if(midi_parse.temp_1[1] < 0xf0) {
+                                p0 |= midi_parse.temp_1[1] >> 4;
+                        } else {
+                                p0 |= 0x02;
+                                midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                        }
+                        midi_parse.temp_1[0] = p0;
+                        midi_parse.temp_1[2] = b;
+                        midi_parse.temp_1[3] = 0;
+                        midi_parse.temp_cmd = midi_parse.temp_1;
+                        return (1);
+                case OSSMIDI_ST_2PARAM_1:
+                        midi_parse.temp_1[2] = b;
+                        midi_parse.state = OSSMIDI_ST_2PARAM_2;
+                        break;
+                case OSSMIDI_ST_2PARAM_2:
+                        if(midi_parse.temp_1[1] < 0xf0) {
+                                p0 |= midi_parse.temp_1[1] >> 4;
+                                midi_parse.state = OSSMIDI_ST_2PARAM_1;
+                        } else {
+                                p0 |= 0x03;
+                                midi_parse.state = OSSMIDI_ST_UNKNOWN;
+                        }
+                        midi_parse.temp_1[0] = p0;
+                        midi_parse.temp_1[3] = b;
+                        midi_parse.temp_cmd = midi_parse.temp_1;
+                        return (1);
+                case OSSMIDI_ST_SYSEX_0:
+                        midi_parse.temp_1[1] = b;
+                        midi_parse.state = OSSMIDI_ST_SYSEX_1;
+                        break;
+                case OSSMIDI_ST_SYSEX_1:
+                        midi_parse.temp_1[2] = b;
+                        midi_parse.state = OSSMIDI_ST_SYSEX_2;
+                        break;
+                case OSSMIDI_ST_SYSEX_2:
+                        midi_parse.temp_1[0] = p0 | 0x04;
+                        midi_parse.temp_1[3] = b;
+                        midi_parse.temp_cmd = midi_parse.temp_1;
+                        midi_parse.state = OSSMIDI_ST_SYSEX_0;
+                        return (1);
+                default:
+                        break;
+                }
+        }
+        return (0);
+}
+
 OssEngine::OssEngine()
-    :AudioOut(), engThread(NULL)
+    :AudioOut(), audioThread(NULL), midiThread(NULL)
 {
     name = "OSS";
 
     midi.handle  = -1;
     audio.handle = -1;
 
-    audio.smps = new short[synth->buffersize * 2];
-    memset(audio.smps, 0, synth->bufferbytes);
+    /* allocate worst case audio buffer */
+    audio.smps.ps32 = new int[synth->buffersize * 2];
+    memset(audio.smps.ps32, 0, sizeof(int) * synth->buffersize * 2);
+    memset(&midi.state, 0, sizeof(midi.state));
 }
 
 OssEngine::~OssEngine()
 {
     Stop();
-    delete [] audio.smps;
+    delete [] audio.smps.ps32;
 }
 
 bool OssEngine::openAudio()
 {
+    int x;
+
     if(audio.handle != -1)
         return true;  //already open
 
-    int snd_bitsize    = 16;
-    int snd_fragment   = 0x00080009; //fragment size (?);
+    int snd_fragment;
     int snd_stereo     = 1; //stereo;
-    int snd_format     = AFMT_S16_LE;
     int snd_samplerate = synth->samplerate;
 
-    const char *device = config.cfg.LinuxOSSWaveOutDev;
-    if(getenv("DSP_DEVICE"))
-        device = getenv("DSP_DEVICE");
+    const char *device = getenv("DSP_DEVICE");
+    if(device == NULL)
+        device = config.cfg.LinuxOSSWaveOutDev;
 
-    audio.handle = open(device, O_WRONLY, 0);
+    /* NOTE: PIPEs and FIFOs can block when opening them */
+    audio.handle = open(device, O_WRONLY, O_NONBLOCK);
     if(audio.handle == -1) {
         cerr << "ERROR - I can't open the "
              << device << '.' << endl;
         return false;
     }
     ioctl(audio.handle, SNDCTL_DSP_RESET, NULL);
-    ioctl(audio.handle, SNDCTL_DSP_SETFMT, &snd_format);
+
+    /* Figure out the correct format first */
+
+    int snd_format16 = AFMT_S16_NE;
+
+#ifdef AFMT_S32_NE
+    int snd_format32 = AFMT_S32_NE;
+    if (ioctl(audio.handle, SNDCTL_DSP_SETFMT, &snd_format32) == 0) {
+        audio.is32bit = true;
+    } else
+#endif
+    if (ioctl(audio.handle, SNDCTL_DSP_SETFMT, &snd_format16) == 0) {
+        audio.is32bit = false;
+    } else {
+        cerr << "ERROR - I cannot set DSP format for "
+            << device << '.' << endl;
+        goto error;
+    }
     ioctl(audio.handle, SNDCTL_DSP_STEREO, &snd_stereo);
     ioctl(audio.handle, SNDCTL_DSP_SPEED, &snd_samplerate);
-    ioctl(audio.handle, SNDCTL_DSP_SAMPLESIZE, &snd_bitsize);
-    ioctl(audio.handle, SNDCTL_DSP_SETFRAGMENT, &snd_fragment);
 
-    if(!getMidiEn()) {
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-        engThread = new pthread_t;
-        pthread_create(engThread, &attr, _thread, this);
+    if (snd_samplerate != (int)synth->samplerate) {
+        cerr << "ERROR - Cannot set samplerate for "
+             << device << ". " << snd_samplerate
+             << " != " << synth->samplerate << endl;
+        goto error;
     }
 
+    /* compute buffer size for 16-bit stereo samples */
+    audio.buffersize = 4 * synth->buffersize;
+    if (audio.is32bit)
+        audio.buffersize *= 2;
+
+    for (x = 4; x < 20; x++) {
+        if ((1 << x) >= audio.buffersize)
+                break;
+    }
+
+    snd_fragment = 0x20000 | x;         /* 2x buffer */
+
+    ioctl(audio.handle, SNDCTL_DSP_SETFRAGMENT, &snd_fragment);
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    audioThread = new pthread_t;
+    pthread_create(audioThread, &attr, _audioThreadCb, this);
+
     return true;
+
+error:
+    close(audio.handle);
+    audio.handle = -1;
+    return false;
 }
 
 void OssEngine::stopAudio()
@@ -102,12 +285,12 @@ void OssEngine::stopAudio()
         return;
     audio.handle = -1;
 
-    if(!getMidiEn() && engThread)
-        pthread_join(*engThread, NULL);
-    delete engThread;
-    engThread = NULL;
-
+    /* close handle first, so that write() exits */
     close(handle);
+
+    pthread_join(*audioThread, NULL);
+    delete audioThread;
+    audioThread = NULL;
 }
 
 bool OssEngine::Start()
@@ -165,19 +348,22 @@ bool OssEngine::openMidi()
     if(handle != -1)
         return true;  //already open
 
-    handle = open(config.cfg.LinuxOSSSeqInDev, O_RDONLY, 0);
+    const char *device = getenv("MIDI_DEVICE");
+    if(device == NULL)
+        device = config.cfg.LinuxOSSSeqInDev;
+
+    /* NOTE: PIPEs and FIFOs can block when opening them */
+    handle = open(device, O_RDONLY, O_NONBLOCK);
 
     if(-1 == handle)
         return false;
     midi.handle = handle;
 
-    if(!getAudioEn()) {
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-        engThread = new pthread_t;
-        pthread_create(engThread, &attr, _thread, this);
-    }
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    midiThread = new pthread_t;
+    pthread_create(midiThread, &attr, _midiThreadCb, this);
 
     return true;
 }
@@ -190,96 +376,110 @@ void OssEngine::stopMidi()
 
     midi.handle = -1;
 
-    if(!getAudioEn() && engThread) {
-        pthread_join(*engThread, NULL);
-        delete engThread;
-        engThread = NULL;
-    }
-
+    /* close handle first, so that read() exits */
     close(handle);
+
+    pthread_join(*midiThread, NULL);
+    delete midiThread;
+    midiThread = NULL;
 }
 
-void *OssEngine::_thread(void *arg)
+void *OssEngine::_audioThreadCb(void *arg)
 {
-    return (static_cast<OssEngine *>(arg))->thread();
+    return (static_cast<OssEngine *>(arg))->audioThreadCb();
 }
 
-void *OssEngine::thread()
+void *OssEngine::_midiThreadCb(void *arg)
 {
-    unsigned char tmp[4] = {0, 0, 0, 0};
+    return (static_cast<OssEngine *>(arg))->midiThreadCb();
+}
+
+void *OssEngine::audioThreadCb()
+{
+    /*
+     * In case the audio device is a PIPE/FIFO,
+     * we need to ignore any PIPE signals:
+     */
+    signal(SIGPIPE, SIG_IGN);
+
     set_realtime();
-    while(getAudioEn() || getMidiEn()) {
-        if(getAudioEn()) {
-            const Stereo<float *> smps = getNext();
+    while(getAudioEn()) {
+        const Stereo<float *> smps = getNext();
 
-            float l, r;
-            for(int i = 0; i < synth->buffersize; ++i) {
-                l = smps.l[i];
-                r = smps.r[i];
+        float l, r;
+        for(int i = 0; i < synth->buffersize; ++i) {
+            l = smps.l[i];
+            r = smps.r[i];
 
-                if(l < -1.0f)
-                    l = -1.0f;
-                else
+            if(l < -1.0f)
+                l = -1.0f;
+            else
                 if(l > 1.0f)
                     l = 1.0f;
-                if(r < -1.0f)
-                    r = -1.0f;
-                else
+            if(r < -1.0f)
+                r = -1.0f;
+            else
                 if(r > 1.0f)
                     r = 1.0f;
 
-                audio.smps[i * 2]     = (short int) (l * 32767.0f);
-                audio.smps[i * 2 + 1] = (short int) (r * 32767.0f);
+            if (audio.is32bit) {
+                audio.smps.ps32[i * 2]     = (int) (l * 2147483647.0f);
+                audio.smps.ps32[i * 2 + 1] = (int) (r * 2147483647.0f);
+            } else {/* 16bit */
+                audio.smps.ps16[i * 2]     = (short int) (l * 32767.0f);
+                audio.smps.ps16[i * 2 + 1] = (short int) (r * 32767.0f);
             }
+        }
+
+        int error;
+        do {
+            /* make a copy of handle, in case of OSS audio disable */
             int handle = audio.handle;
-            if(handle != -1)
-                write(handle, audio.smps, synth->buffersize * 4);  // *2 because is 16 bit, again * 2 because is stereo
-            else
-                break;
-        }
+            if(handle == -1)
+                goto done;
+            error = write(handle, audio.smps.ps32, audio.buffersize);
+        } while (error == -1 && errno == EINTR);
 
-        //Collect up to 30 midi events
-        for(int k = 0; k < 30 && getMidiEn(); ++k) {
-            static char escaped;
-
-            memset(tmp, 0, 4);
-
-            if(escaped) {
-                tmp[0]  = escaped;
-                escaped = 0;
-            }
-            else {
-                getMidi(tmp);
-                if(!(tmp[0] & 0x80))
-                    continue;
-            }
-            getMidi(tmp + 1);
-            if(tmp[1] & 0x80) {
-                escaped = tmp[1];
-                tmp[1]  = 0;
-            }
-            else {
-                getMidi(tmp + 2);
-                if(tmp[2] & 0x80) {
-                    escaped = tmp[2];
-                    tmp[2]  = 0;
-                }
-                else {
-                    getMidi(tmp + 3);
-                    if(tmp[3] & 0x80) {
-                        escaped = tmp[3];
-                        tmp[3]  = 0;
-                    }
-                }
-            }
-            midiProcess(tmp[0], tmp[1], tmp[2]);
-        }
+        if(error == -1)
+            goto done;
     }
+done:
     pthread_exit(NULL);
     return NULL;
 }
 
-void OssEngine::getMidi(unsigned char *midiPtr)
+void *OssEngine::midiThreadCb()
 {
-    read(midi.handle, midiPtr, 1);
+    /*
+     * In case the MIDI device is a PIPE/FIFO,
+     * we need to ignore any PIPE signals:
+     */
+    signal(SIGPIPE, SIG_IGN);
+    set_realtime();
+    while(getMidiEn()) {
+        unsigned char tmp;
+        int error;
+        do {
+            /* make a copy of handle, in case of OSS MIDI disable */
+            int handle = midi.handle;
+            if(handle == -1)
+                goto done;
+            error = read(handle, &tmp, 1);
+        } while (error == -1 && errno == EINTR);
+
+        /* check that we got one byte */
+        if(error != 1)
+                goto done;
+
+        /* feed MIDI byte into statemachine */
+        if(OssMidiParse(midi.state, 0, tmp)) {
+            /* we got a complete MIDI command */
+            midiProcess(midi.state.temp_cmd[1],
+                midi.state.temp_cmd[2],
+                midi.state.temp_cmd[3]);
+        }
+    }
+done:
+    pthread_exit(NULL);
+    return NULL;
 }

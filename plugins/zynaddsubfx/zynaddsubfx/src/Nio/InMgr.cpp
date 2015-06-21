@@ -2,9 +2,14 @@
 #include "MidiIn.h"
 #include "EngineMgr.h"
 #include "../Misc/Master.h"
+#include "../Misc/Part.h"
+#include "../Misc/MiddleWare.h"
+#include <rtosc/thread-link.h>
 #include <iostream>
 
 using namespace std;
+
+extern MiddleWare *middleware;
 
 ostream &operator<<(ostream &out, const MidiEvent &ev)
 {
@@ -41,7 +46,7 @@ InMgr &InMgr::getInstance()
 }
 
 InMgr::InMgr()
-    :queue(100), master(Master::getInstance())
+    :queue(100), master(NULL)
 {
     current = NULL;
     work.init(PTHREAD_PROCESS_PRIVATE, 0);
@@ -79,21 +84,27 @@ void InMgr::flush(unsigned frameStart, unsigned frameStop)
                 dump.dumpnote(ev.channel, ev.num, ev.value);
 
                 if(ev.value)
-                    master.noteOn(ev.channel, ev.num, ev.value);
+                    master->noteOn(ev.channel, ev.num, ev.value);
                 else
-                    master.noteOff(ev.channel, ev.num);
+                    master->noteOff(ev.channel, ev.num);
                 break;
 
             case M_CONTROLLER:
                 dump.dumpcontroller(ev.channel, ev.num, ev.value);
-                master.setController(ev.channel, ev.num, ev.value);
+                master->setController(ev.channel, ev.num, ev.value);
                 break;
 
             case M_PGMCHANGE:
-                master.setProgram(ev.channel, ev.num);
+                for(int i=0; i < NUM_MIDI_PARTS; ++i) {
+                    //set the program of the parts assigned to the midi channel
+                    if(master->part[i]->Prcvchn == ev.channel) {
+                        middleware->pendingSetProgram(i, ev.num);
+                    }
+                }
                 break;
+
             case M_PRESSURE:
-                master.polyphonicAftertouch(ev.channel, ev.num, ev.value);
+                master->polyphonicAftertouch(ev.channel, ev.num, ev.value);
                 break;
         }
     }
@@ -138,4 +149,9 @@ MidiIn *InMgr::getIn(string name)
 {
     EngineMgr &eng = EngineMgr::getInstance();
     return dynamic_cast<MidiIn *>(eng.getEng(name));
+}
+
+void InMgr::setMaster(Master *master_)
+{
+    master = master_;
 }

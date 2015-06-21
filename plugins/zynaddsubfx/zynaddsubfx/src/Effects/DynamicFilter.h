@@ -27,10 +27,10 @@
 #include "EffectLFO.h"
 
 /**DynamicFilter Effect*/
-class DynamicFilter:public Effect
+class DynamicFilter:public Zyn::Effect
 {
     public:
-        DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
+        DynamicFilter(EffectParams pars);
         ~DynamicFilter();
         void out(const Stereo<float *> &smp);
 
