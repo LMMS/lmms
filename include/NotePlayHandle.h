@@ -26,6 +26,7 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
+#include "AtomicInt.h"
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
@@ -335,7 +336,7 @@ public:
 private:
 	static NotePlayHandle ** s_available;
 	static QReadWriteLock s_mutex;
-	static QAtomicInt s_availableIndex;
+	static AtomicInt s_availableIndex;
 	static int s_size;
 };
 

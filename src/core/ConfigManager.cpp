@@ -31,6 +31,7 @@
 #include "ConfigManager.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
+#include "GuiApplication.h"
 
 
 static inline QString ensureTrailingSlash( const QString & _s )
@@ -340,7 +341,7 @@ void ConfigManager::loadConfigFile()
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
-		else if( QApplication::type() == QApplication::GuiClient )
+		else if( gui )
 		{
 			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
 									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
@@ -401,8 +402,7 @@ void ConfigManager::loadConfigFile()
 	searchPaths << artworkDir() << defaultArtworkDir();
 	QDir::setSearchPaths( "resources", searchPaths);
 
-	if( !QDir( m_workingDir ).exists() &&
-		QApplication::type() == QApplication::GuiClient &&
+	if( !QDir( m_workingDir ).exists() && gui &&
 		QMessageBox::question( 0,
 			MainWindow::tr( "Working directory" ),
 			MainWindow::tr( "The LMMS working directory %1 does not "

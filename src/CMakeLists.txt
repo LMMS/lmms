@@ -115,14 +115,6 @@ TARGET_LINK_LIBRARIES(lmms
 	${LMMS_REQUIRED_LIBS}
 )
 
-IF(QT5)
-	TARGET_LINK_LIBRARIES(lmms
-		Qt5::Widgets
-		Qt5::Xml
-)
-ENDIF()
-
-
 #
 # rules for building localizations
 #
