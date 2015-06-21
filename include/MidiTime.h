@@ -30,6 +30,7 @@
 #include "lmms_basics.h"
 #include "export.h"
 
+// note: 1 "Tact" = 1 Measure
 const int DefaultTicksPerTact = 192;
 const int DefaultStepsPerTact = 16;
 const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
@@ -85,6 +86,7 @@ public:
 		return *this;
 	}
 
+	// return the tact, rounded down and 0-based
 	tact_t getTact() const
 	{
 		return m_ticks / s_ticksPerTact;
@@ -92,11 +94,7 @@ public:
 
 	tact_t nextFullTact() const
 	{
-		if( m_ticks % s_ticksPerTact == 0 )
-		{
-			return m_ticks / s_ticksPerTact;
-		}
-		return m_ticks / s_ticksPerTact + 1;
+		return (m_ticks + (s_ticksPerTact-1)) / s_ticksPerTact;
 	}
 
 	void setTicks( tick_t ticks )
