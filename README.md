@@ -29,7 +29,7 @@ Features
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
 * Import of MIDI and FLP (FL Studio®/Fruityloops® Project) files
 
-[Latest Stable Release (1.1.0)](https://github.com/LMMS/lmms/releases/tag/v1.1.0)
+[Latest Stable Release (1.1.3)](https://github.com/LMMS/lmms/releases/tag/v1.1.3)
 ---------------------
 * New FX Mixer
 * New Instruments
