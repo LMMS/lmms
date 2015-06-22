@@ -60,135 +60,43 @@ private:
 class EXPORT MidiTime
 {
 public:
-	MidiTime( const tact_t tact, const tick_t ticks ) :
-		m_ticks( tact * s_ticksPerTact + ticks )
-	{
-	}
+	MidiTime( const tact_t tact, const tick_t ticks );
+	MidiTime( const tick_t ticks = 0 );
+	MidiTime( const MidiTime& time );
 
-	MidiTime( const tick_t ticks = 0 ) :
-		m_ticks( ticks )
-	{
-	}
+	MidiTime toNearestTact() const;
+	MidiTime toAbsoluteTact() const;
 
-	MidiTime( const MidiTime& time ) :
-		m_ticks( time.m_ticks )
-	{
-	}
-
-	MidiTime toNearestTact() const
-	{
-		if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
-		{
-			return ( getTact() + 1 ) * s_ticksPerTact;
-		}
-		return getTact() * s_ticksPerTact;
-	}
-
-	MidiTime toAbsoluteTact() const
-	{
-		return getTact() * s_ticksPerTact;
-	}
-
-	MidiTime& operator=( const MidiTime& time )
-	{
-		m_ticks = time.m_ticks;
-		return *this;
-	}
-
-	MidiTime& operator+=( const MidiTime& time )
-	{
-		m_ticks += time.m_ticks;
-		return *this;
-	}
-
-	MidiTime& operator-=( const MidiTime& time )
-	{
-		m_ticks -= time.m_ticks;
-		return *this;
-	}
+	MidiTime& operator=( const MidiTime& time );
+	MidiTime& operator+=( const MidiTime& time );
+	MidiTime& operator-=( const MidiTime& time );
 
 	// return the tact, rounded down and 0-based
-	tact_t getTact() const
-	{
-		return m_ticks / s_ticksPerTact;
-	}
+	tact_t getTact() const;
+	// return the tact, rounded up and 0-based
+	tact_t nextFullTact() const;
 
-	tact_t nextFullTact() const
-	{
-		return (m_ticks + (s_ticksPerTact-1)) / s_ticksPerTact;
-	}
+	void setTicks( tick_t ticks );
+	tick_t getTicks() const;
 
-	void setTicks( tick_t ticks )
-	{
-		m_ticks = ticks;
-	}
+	operator int() const;
 
-	tick_t getTicks() const
-	{
-		return m_ticks;
-	}
-
-	operator int() const
-	{
-		return m_ticks;
-	}
-
-	tick_t ticksPerBeat( const TimeSig &sig ) const
-	{
-		return ticksPerTact(sig) / sig.numerator();
-	}
+	tick_t ticksPerBeat( const TimeSig &sig ) const;
 	// Remainder ticks after bar is removed
-	tick_t getTickWithinBar( const TimeSig &sig ) const
-	{
-		return m_ticks % ticksPerTact(sig);
-	}
+	tick_t getTickWithinBar( const TimeSig &sig ) const;
 	// Returns the beat position inside the bar, 0-based
-	tick_t getBeatWithinBar( const TimeSig &sig ) const
-	{
-		return getTickWithinBar(sig) / ticksPerBeat(sig);
-	}
+	tick_t getBeatWithinBar( const TimeSig &sig ) const;
 	// Remainder ticks after bar and beat are removed
-	tick_t getTickWithinBeat( const TimeSig &sig ) const
-	{
-		return getTickWithinBar(sig) % ticksPerBeat(sig);
-	}
+	tick_t getTickWithinBeat( const TimeSig &sig ) const;
 
 	// calculate number of frame that are needed this time
-	f_cnt_t frames( const float framesPerTick ) const
-	{
-		if( m_ticks >= 0 )
-		{
-			return static_cast<f_cnt_t>( m_ticks * framesPerTick );
-		}
-		return 0;
-	}
+	f_cnt_t frames( const float framesPerTick ) const;
 
-	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick )
-	{
-		return MidiTime( static_cast<int>( frames / framesPerTick ) );
-	}
-
-
-	static tick_t ticksPerTact()
-	{
-		return s_ticksPerTact;
-	}
-	static tick_t ticksPerTact( const TimeSig &sig ) const
-	{
-		return DefaultTicksPerTact * sig.numerator() / sig.denominator();
-	}
-
-	static int stepsPerTact()
-	{
-		int steps = ticksPerTact() / DefaultBeatsPerTact;
-		return qMax( 1, steps );
-	}
-
-	static void setTicksPerTact( tick_t _tpt )
-	{
-		s_ticksPerTact = _tpt;
-	}
-
+	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
+	static tick_t ticksPerTact();
+	static tick_t ticksPerTact( const TimeSig &sig );
+	static int stepsPerTact();
+	static void setTicksPerTact( tick_t tpt );
 
 private:
 	tick_t m_ticks;
