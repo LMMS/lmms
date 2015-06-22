@@ -103,6 +103,8 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
 	m_arpRangeKnob( new Knob( knobBright_26 ) ),
+	m_arpSkipKnob( new Knob( knobBright_26 ) ),
+	m_arpMissKnob( new Knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
 	m_arpGateKnob( new Knob( knobBright_26 ) ),
 	m_arpDirectionComboBox( new ComboBox() ),
@@ -137,6 +139,22 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 			"number of octaves." ) );
 
 
+	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
+	m_arpSkipKnob->setHintText( tr( "Skip rate:" ), tr( "%" ) );
+	m_arpSkipKnob->setWhatsThis(
+		tr( "The skip function will make the arpeggiator pause one step "
+			"randomly. From its start in full counter clockwise "
+			"position and no effect it will gradually progress to "
+			"full amnesia at maximum setting.") );
+
+
+	m_arpMissKnob->setLabel( tr( "MISS" ) );
+	m_arpMissKnob->setHintText( tr( "Miss rate:" ), tr( "%" ) );
+	m_arpMissKnob->setWhatsThis(
+		tr( "The miss function will make the arpeggiator miss the "
+			"intended note.") );
+
+
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
 	m_arpTimeKnob->setWhatsThis(
@@ -152,6 +170,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 			"arpeggio gate specifies the percent of a whole "
 			"arpeggio-tone that should be played. With this you "
 			"can make cool staccato arpeggios." ) );
+
 
 	QLabel* arpChordLabel = new QLabel( tr( "Chord:" ) );
 	arpChordLabel->setFont( pointSize<8>( arpChordLabel->font() ) );
@@ -170,8 +189,10 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpTimeKnob, 3, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpTimeKnob, 6, 2, 2, 1, Qt::AlignHCenter );
 
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
@@ -194,6 +215,8 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
+	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );
+	m_arpMissKnob->setModel( &m_a->m_arpMissModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
 	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );
