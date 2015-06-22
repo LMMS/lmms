@@ -27,13 +27,34 @@
 #ifndef MIDI_TIME_H
 #define MIDI_TIME_H
 
-#include "lmms_basics.h"
+#include <QtGlobal>
+
 #include "export.h"
+#include "lmms_basics.h"
 
 // note: 1 "Tact" = 1 Measure
 const int DefaultTicksPerTact = 192;
 const int DefaultStepsPerTact = 16;
 const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
+
+
+class MeterModel;
+
+class EXPORT TimeSig
+{
+public:
+	// in a time signature,
+	// the numerator represents the number of beats in a measure.
+	// the denominator indicates which type of note represents a beat.
+	// example: 6/8 means 6 beats in a measure, where each beat has duration equal to one 8th-note.
+	TimeSig( int num, int denom );
+	TimeSig( const MeterModel &model );
+	int numerator() const;
+	int denominator() const;
+private:
+	int m_num;
+	int m_denom;
+};
 
 
 class EXPORT MidiTime
@@ -112,6 +133,26 @@ public:
 		return m_ticks;
 	}
 
+	tick_t ticksPerBeat( const TimeSig &sig ) const
+	{
+		return ticksPerTact(sig) / sig.numerator();
+	}
+	// Remainder ticks after bar is removed
+	tick_t getTickWithinBar( const TimeSig &sig ) const
+	{
+		return m_ticks % ticksPerTact(sig);
+	}
+	// Returns the beat position inside the bar, 0-based
+	tick_t getBeatWithinBar( const TimeSig &sig ) const
+	{
+		return getTickWithinBar(sig) / ticksPerBeat(sig);
+	}
+	// Remainder ticks after bar and beat are removed
+	tick_t getTickWithinBeat( const TimeSig &sig ) const
+	{
+		return getTickWithinBar(sig) % ticksPerBeat(sig);
+	}
+
 	// calculate number of frame that are needed this time
 	f_cnt_t frames( const float framesPerTick ) const
 	{
@@ -131,6 +172,10 @@ public:
 	static tick_t ticksPerTact()
 	{
 		return s_ticksPerTact;
+	}
+	static tick_t ticksPerTact( const TimeSig &sig ) const
+	{
+		return DefaultTicksPerTact * sig.numerator() / sig.denominator();
 	}
 
 	static int stepsPerTact()
