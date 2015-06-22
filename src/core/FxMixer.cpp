@@ -380,6 +380,9 @@ void FxMixer::moveChannelLeft( int index )
 			}
 		}
 	}
+
+	// Swap positions in array
+	qSwap(m_fxChannels[index], m_fxChannels[index - 1]);
 }
 
 

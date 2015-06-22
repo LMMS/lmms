@@ -455,11 +455,8 @@ void FxMixerView::moveChannelLeft(int index, int focusIndex)
 	m->moveChannelLeft( index );
 
 	// Update widgets models
-	m_fxChannelViews[index]->setChannelIndex( index - 1 );
-	m_fxChannelViews[index - 1]->setChannelIndex( index );
-
-	// Swap positions in array
-	qSwap(m->m_fxChannels[index], m->m_fxChannels[index - 1]);
+	m_fxChannelViews[index]->setChannelIndex( index );
+	m_fxChannelViews[index - 1]->setChannelIndex( index - 1 );
 
 	// Focus on new position
 	setCurrentFxLine( focusIndex );
@@ -561,28 +558,28 @@ void FxMixerView::updateFaders()
 	FxMixer * m = Engine::fxMixer();
 
 	// apply master gain
-	m->m_fxChannels[0]->m_peakLeft *= Engine::mixer()->masterGain();
-	m->m_fxChannels[0]->m_peakRight *= Engine::mixer()->masterGain();
+	m->effectChannel(0)->m_peakLeft *= Engine::mixer()->masterGain();
+	m->effectChannel(0)->m_peakRight *= Engine::mixer()->masterGain();
 
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
 		const float fall_off = 1.2;
-		if( m->m_fxChannels[i]->m_peakLeft > opl )
+		if( m->effectChannel(i)->m_peakLeft > opl )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( m->m_fxChannels[i]->m_peakLeft );
-			m->m_fxChannels[i]->m_peakLeft = 0;
+			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
+			m->effectChannel(i)->m_peakLeft = 0;
 		}
 		else
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fall_off );
 		}
 
-		if( m->m_fxChannels[i]->m_peakRight > opr )
+		if( m->effectChannel(i)->m_peakRight > opr )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( m->m_fxChannels[i]->m_peakRight );
-			m->m_fxChannels[i]->m_peakRight = 0;
+			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
+			m->effectChannel(i)->m_peakRight = 0;
 		}
 		else
 		{
