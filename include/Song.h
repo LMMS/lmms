@@ -136,10 +136,6 @@ public:
 	{
 		return currentFrame();
 	}
-	inline bool isTempoAutomated()
-	{
-		return m_tempoModel.isAutomated();
-	}
 	inline bool isPaused() const
 	{
 		return m_paused;
