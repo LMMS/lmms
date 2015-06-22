@@ -186,6 +186,10 @@ public:
 	{
 		return m_playPos[pm];
 	}
+	inline const PlayPos & getPlayPos( PlayModes pm ) const
+	{
+		return m_playPos[pm];
+	}
 
 	void updateLength();
 	tact_t length() const
