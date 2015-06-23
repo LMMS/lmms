@@ -1073,7 +1073,7 @@ void MainWindow::updateViewMenu()
 			      this, SLOT( toggleProjectNotesWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
-			      tr( "Show/hide controller rack" ) +
+			      tr( "Controller Rack" ) +
 			      " (F11)",
 			      this, SLOT( toggleControllerRack() )
 		);

@@ -3445,7 +3445,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished">Exporteer huidig project</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation type="unfinished">Toon/Verberg Song-Bewerker</translation>
     </message>
     <message>
@@ -3453,7 +3453,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation type="unfinished">Toon/Verberg Beat+Bassline Bewerker</translation>
     </message>
     <message>
@@ -3461,7 +3461,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation type="unfinished">Toon/Verberg Piano-Roll</translation>
     </message>
     <message>
@@ -3469,7 +3469,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation type="unfinished">Toon/verberg Automation Editor</translation>
     </message>
     <message>
@@ -3477,7 +3477,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3485,7 +3485,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation type="unfinished">Toon/Verberg Project notities</translation>
     </message>
     <message>
@@ -3493,7 +3493,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -3455,7 +3455,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>导出当前工程</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>显示/隐藏歌曲编辑器</translation>
     </message>
     <message>
@@ -3463,7 +3463,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>显示/隐藏节拍+旋律编辑器</translation>
     </message>
     <message>
@@ -3471,7 +3471,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>显示/隐藏钢琴窗</translation>
     </message>
     <message>
@@ -3479,7 +3479,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>显示/隐藏自动控制编辑器</translation>
     </message>
     <message>
@@ -3487,7 +3487,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>显示/隐藏混音器</translation>
     </message>
     <message>
@@ -3495,7 +3495,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>显示/隐藏工程注释</translation>
     </message>
     <message>
@@ -3503,7 +3503,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>点击这里显示或隐藏工程注释窗。在此窗口中你可以写下工程的注释。</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>显示/隐藏控制器机架</translation>
     </message>
     <message>

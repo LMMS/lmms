@@ -3489,7 +3489,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Экспорт проекта</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>Показать/скрыть музыкальный редактор</translation>
     </message>
     <message>
@@ -3498,7 +3498,7 @@ Please make sure you have write-access to the file and try again.</source>
 Также вы можете вставлять и передвигать записи прямо в списке воспроизведения.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>Показать/скрыть ритм-бас редактор</translation>
     </message>
     <message>
@@ -3506,7 +3506,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Сим запускается ритм-бас редактор. Он необходим для установки ритма, открытия, добавления и удаления каналов, а также  вырезания, копирования и вставки ритм-бас шаблонов, мелодий и т. п.</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>Показать/скрыть нотный редактор</translation>
     </message>
     <message>
@@ -3514,7 +3514,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Запуск редатора нот. С его помощью вы можете легко редактировать мелодии.</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>Показать/скрыть редактор автоматизации</translation>
     </message>
     <message>
@@ -3522,7 +3522,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Показать/скрыть окно редактора автоматизации. С его помощью вы можете легко редактироватьдинамику выбранных величин.</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>Показать/скрыть микшер ЭФ</translation>
     </message>
     <message>
@@ -3530,7 +3530,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Скрыть/показать микшер ЭФфектов. Он является мощным инструментом для управления эффектами. Вы можете вставлять эффекты в различные каналы.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>Показать/скрыть заметки к проекту</translation>
     </message>
     <message>
@@ -3538,7 +3538,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Эта кнопка показывает/прячет окно с заметками. В этом окне вы можете помещать любые комментарии к своей композиции.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Показать/скрыть управление контроллерами</translation>
     </message>
     <message>

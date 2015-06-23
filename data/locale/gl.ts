@@ -3460,7 +3460,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Exportar este proxecto</translation>
     </message>
     <message>
-        <source>Show/hide Song-Editor</source>
+        <source>Song Editor</source>
         <translation>Mostrar/Agochar o editor de cancións</translation>
     </message>
     <message>
@@ -3468,7 +3468,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Premendo este botón pódese mostrar ou agochar o Editor de Cancións. Coa axuda do Editor de Cancións pódese editar listas de reprodución e indicar cando tocar unha pista. Tamén se poden inserir e mover mostras (p.ex. mostras de rap) directamente na lista de reprodución.</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
+        <source>Pattern Editor</source>
         <translation>Mostrar/Agochar o Editor de ritmos e liña do baixo</translation>
     </message>
     <message>
@@ -3476,7 +3476,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Premendo este botón pódese mostrar ou agochar o Editor de ritmos e liña do baixo. Este Editor de ritmos e liña do baixo é necesario para crear ritmos e para abrir, engadir e eliminar canles, así como para recortar, copiar e pegar ritmos e padróns de liñas do baixo e para outras cousas semellantes.</translation>
     </message>
     <message>
-        <source>Show/hide Piano-Roll</source>
+        <source>Piano Roll</source>
         <translation>Mostrar/Agochar a pianola</translation>
     </message>
     <message>
@@ -3484,7 +3484,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Prema aquí para mostrar ou agochar a pianola. Coa axuda da pianola pódense editar melodías facilmente.</translation>
     </message>
     <message>
-        <source>Show/hide Automation Editor</source>
+        <source>Automation Editor</source>
         <translation>Mostrar/Agochar o Editor de automatización</translation>
     </message>
     <message>
@@ -3492,7 +3492,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Prema aquí para mostrar ou agochar o Editor de automatización. Coa axuda do Editor de automatización pódense editar os valores dinámicos facilmente.</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>FX Mixer</source>
         <translation>Mostrar/Agochar os Mesturador de efectos especiais</translation>
     </message>
     <message>
@@ -3500,7 +3500,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Prema aquí para mostrar ou agochar o Mesturador de efectos especiais. O Mesturador de efectos especiais é unha ferramenta potente para xestionar os efectos das cancións. Pódense inserir efectos nas diferentes canles de efectos.</translation>
     </message>
     <message>
-        <source>Show/hide project notes</source>
+        <source>Project Notes</source>
         <translation>Mostrar/Agochar as notas do proxecto</translation>
     </message>
     <message>
@@ -3508,7 +3508,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Prema aquí para mostrar ou agochar a xanela coas notas do proxecto. Nela pódense apuntar as notas do proxecto.</translation>
     </message>
     <message>
-        <source>Show/hide controller rack</source>
+        <source>Controller Rack</source>
         <translation>Mostrar/Agochar o bastidor de controladores</translation>
     </message>
     <message>
