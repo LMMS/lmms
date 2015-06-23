@@ -31,6 +31,7 @@
 
 #include <QFileInfo>
 #include <QLocale>
+#include <QDate>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
@@ -75,6 +76,16 @@ static inline QString baseName( const QString & _file )
 }
 
 
+
+
+static std::string getCurrentYear()
+{
+	return QString::number( QDate::currentDate().year() ).toStdString();
+}
+
+
+
+
 inline void loadTranslation( const QString & _tname,
 	const QString & _dir = ConfigManager::inst()->localeDir() )
 {
@@ -85,6 +96,63 @@ inline void loadTranslation( const QString & _tname,
 
 	QCoreApplication::instance()->installTranslator( t );
 }
+
+
+
+
+void printVersion(char *executableName)
+{
+	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+		"Copyright (c) 2004-%s LMMS developers.\n\n"
+		"This program is free software; you can redistribute it and/or\n"
+		"modify it under the terms of the GNU General Public\n"
+		"License as published by the Free Software Foundation; either\n"
+		"version 2 of the License, or (at your option) any later version.\n\n"
+		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
+		PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
+		getCurrentYear().c_str(), executableName );
+}
+
+
+
+
+void printHelp()
+{
+	printf( "LMMS %s\n"
+		"Copyright (c) 2004-%s LMMS developers.\n\n"
+		"usage: lmms [ -r <project file> ] [ options ]\n"
+		"            [ -u <in> <out> ]\n"
+		"            [ -d <in> ]\n"
+		"            [ -h ]\n"
+		"            [ <file to load> ]\n\n"
+		"-r, --render <project file>	render given project file\n"
+		"-o, --output <file>		render into <file>\n"
+		"-f, --output-format <format>	specify format of render-output where\n"
+		"				format is either 'wav' or 'ogg'.\n"
+		"-s, --samplerate <samplerate>	specify output samplerate in Hz\n"
+		"				range: 44100 (default) to 192000\n"
+		"-b, --bitrate <bitrate>		specify output bitrate in kHz\n"
+		"				default: 160.\n"
+		"-i, --interpolation <method>	specify interpolation method\n"
+		"				possible values:\n"
+		"				   - linear\n"
+		"				   - sincfastest (default)\n"
+		"				   - sincmedium\n"
+		"				   - sincbest\n"
+		"-x, --oversampling <value>	specify oversampling\n"
+		"				possible values: 1, 2, 4, 8\n"
+		"				default: 2\n"
+		"-a, --float			32bit float bit depth\n"
+		"-l, --loop-mode			render as a loop\n"
+		"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
+		"       standard out is used if no output file is specifed\n"
+		"-d, --dump <in>			dump XML of compressed file <in>\n"
+		"-v, --version			show version information and exit.\n"
+		"    --allowroot			bypass root user startup check (use with caution).\n"
+		"-h, --help			show this usage information and exit.\n\n",
+		LMMS_VERSION, getCurrentYear().c_str() );
+}
+
 
 
 
@@ -103,6 +171,7 @@ int main( int argc, char * * argv )
 	bool fullscreen = true;
 	bool exit_after_import = false;
 	bool allow_root = false;
+	bool render_loop = false;
 	QString file_to_load, file_to_save, file_to_import, render_out, profilerOutputFile;
 
 	for( int i = 1; i < argc; ++i )
@@ -151,53 +220,13 @@ int main( int argc, char * * argv )
 		if( QString( argv[i] ) == "--version" ||
 						QString( argv[i] ) == "-v" )
 		{
-			printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
-	"Copyright (c) 2004-2014 LMMS developers.\n\n"
-	"This program is free software; you can redistribute it and/or\n"
-	"modify it under the terms of the GNU General Public\n"
-	"License as published by the Free Software Foundation; either\n"
-	"version 2 of the License, or (at your option) any later version.\n\n"
-	"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-				PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
-				argv[0] );
-
+			printVersion(argv[0]);
 			return( EXIT_SUCCESS );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) )
 		{
-			printf( "LMMS %s\n"
-	"Copyright (c) 2004-2014 LMMS developers.\n\n"
-	"usage: lmms [ -r <project file> ] [ options ]\n"
-	"            [ -u <in> <out> ]\n"
-	"            [ -d <in> ]\n"
-	"            [ -h ]\n"
-	"            [ <file to load> ]\n\n"
-	"-r, --render <project file>	render given project file\n"
-	"-o, --output <file>		render into <file>\n"
-	"-f, --output-format <format>	specify format of render-output where\n"
-	"				format is either 'wav' or 'ogg'.\n"
-	"-s, --samplerate <samplerate>	specify output samplerate in Hz\n"
-	"				range: 44100 (default) to 192000\n"
-	"-b, --bitrate <bitrate>		specify output bitrate in kHz\n"
-	"				default: 160.\n"
-	"-i, --interpolation <method>	specify interpolation method\n"
-	"				possible values:\n"
-	"				   - linear\n"
-	"				   - sincfastest (default)\n"
-	"				   - sincmedium\n"
-	"				   - sincbest\n"
-	"-x, --oversampling <value>	specify oversampling\n"
-	"				possible values: 1, 2, 4, 8\n"
-	"				default: 2\n"
-	"-a, --float			32bit float bit depth\n"
-	"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
-	"       standard out is used if no output file is specifed\n"
-	"-d, --dump <in>			dump XML of compressed file <in>\n"
-	"-v, --version			show version information and exit.\n"
-	"    --allowroot                bypass root user startup check (use with caution).\n"
-	"-h, --help			show this usage information and exit.\n\n",
-							LMMS_VERSION );
+			printHelp();
 			return( EXIT_SUCCESS );
 		}
 		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
@@ -242,6 +271,11 @@ int main( int argc, char * * argv )
 			file_to_load = QString::fromLocal8Bit( argv[i + 1] );
 			render_out = baseName( file_to_load ) + ".";
 			++i;
+		}
+		else if( argc > i && ( QString( argv[i] ) == "--loop-mode" ||
+						QString( argv[i] ) == "-l" ) )
+		{
+			render_loop = true;
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--output" ||
 						QString( argv[i] ) == "-o" ) )
@@ -514,6 +548,8 @@ int main( int argc, char * * argv )
 		printf( "loading project...\n" );
 		Engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );
+
+		Engine::getSong()->setExportLoop(render_loop);
 
 		// create renderer
 		QString extension = ( eff == ProjectRenderer::WaveFile ) ? "wav" : "ogg";
