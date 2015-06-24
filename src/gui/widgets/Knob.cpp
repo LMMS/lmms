@@ -497,6 +497,7 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 void Knob::toggleScale()
 {
 	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+	update();
 }
 
 
