@@ -37,6 +37,7 @@
 #include "AudioDevice.h"
 
 
+class QComboBox;
 class LcdSpinBox;
 class QLineEdit;
 
@@ -64,7 +65,11 @@ public:
 
 		virtual void saveSettings();
 
+	public slots:
+		void onCurrentIndexChanged(int index);
+
 	private:
+		QComboBox * m_deviceComboBox;
 		QLineEdit * m_device;
 		LcdSpinBox * m_channels;
 

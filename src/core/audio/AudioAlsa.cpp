@@ -22,6 +22,7 @@
  *
  */
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
 
@@ -36,6 +37,8 @@
 #include "gui_templates.h"
 #include "templates.h"
 
+#include <iostream>
+#include <vector>
 
 
 AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
@@ -493,13 +496,253 @@ int AudioAlsa::setSWParams()
 
 
 
+void testPrintCards()
+{
+	std::cout << "Listing cards: " << std::endl;
+	char **hints;
+
+	/* Enumerate sound devices */
+	int err = snd_device_name_hint(-1, "pcm", (void***)&hints);
+	if (err != 0)
+		return;//Error! Just return
+
+	char** n = hints;
+	while (*n != NULL) {
+
+		char *name = snd_device_name_get_hint(*n, "NAME");
+
+		if (name != NULL && 0 != strcmp("null", name)) {
+			//Copy name to another buffer and then free it
+			std::cout << "Name: " << name << std::endl;
+
+			free(name);
+		}
+
+		char *description = snd_device_name_get_hint(*n, "DESC");
+
+		if (description != NULL && 0 != strcmp("null", name)) {
+			//Copy name to another buffer and then free it
+			std::cout << "Description: " << description << std::endl;
+
+			free(description);
+		}
+		else
+		{
+			std::cout << "No description" << std::endl;
+		}
+
+		std::cout << std::endl;
+
+		n++;
+	}//End of while
+
+	//Free hint buffer too
+	snd_device_name_free_hint((void**)hints);
+}
+
+
+
+void device_list(void)
+{
+	snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
+	snd_ctl_t *handle;
+	int card, err, dev, idx;
+	snd_ctl_card_info_t *info;
+	snd_pcm_info_t *pcminfo;
+	snd_ctl_card_info_alloca(&info);
+	snd_pcm_info_alloca(&pcminfo);
+
+	card = -1;
+	if (snd_card_next(&card) < 0 || card < 0) {
+		return;
+	}
+	std::cout << "**** List of " << snd_pcm_stream_name(stream) << " Hardware Devices ****\n";
+
+	while (card >= 0) {
+		char name[32];
+		sprintf(name, "hw:%d", card);
+		if ((err = snd_ctl_open(&handle, name, 0)) < 0) {
+			// TODO Error handling
+			//error("control open (%i): %s", card, snd_strerror(err));
+			goto next_card;
+		}
+		if ((err = snd_ctl_card_info(handle, info)) < 0) {
+			// TODO Error handling
+			//error("control hardware info (%i): %s", card, snd_strerror(err));
+			snd_ctl_close(handle);
+			goto next_card;
+		}
+		dev = -1;
+		while (1) {
+			unsigned int count;
+			if (snd_ctl_pcm_next_device(handle, &dev)<0)
+				// TODO Error handling
+				//error("snd_ctl_pcm_next_device");
+				std::cerr << "snd_ctl_pcm_next_device";
+			if (dev < 0)
+				break;
+			snd_pcm_info_set_device(pcminfo, dev);
+			snd_pcm_info_set_subdevice(pcminfo, 0);
+			snd_pcm_info_set_stream(pcminfo, stream);
+			if ((err = snd_ctl_pcm_info(handle, pcminfo)) < 0) {
+				if (err != -ENOENT)
+					// TODO Error handling
+					//error("control digital audio info (%i): %s", card, snd_strerror(err));
+					std::cerr << "Error\n";
+				continue;
+			}
+			//std::cout << "card " << card << ": " << snd_ctl_card_info_get_id(info) << " [" << snd_ctl_card_info_get_name(info) << "], device " << dev <<
+			//			 ": " << snd_pcm_info_get_id(pcminfo) << " [" << snd_pcm_info_get_name(pcminfo) << "]\n";
+			std::cout << "card hw" << card << ":" << dev << " - " << "[" << snd_ctl_card_info_get_name(info) << "/" << snd_pcm_info_get_name(pcminfo) << "], " <<
+						 snd_ctl_card_info_get_id(info) << "," << snd_pcm_info_get_id(pcminfo) << "\n";
+
+			count = snd_pcm_info_get_subdevices_count(pcminfo);
+			std::cout << "  Subdevices: " << snd_pcm_info_get_subdevices_avail(pcminfo) << "/" << count << std::endl;
+			for (idx = 0; idx < (int)count; idx++) {
+				snd_pcm_info_set_subdevice(pcminfo, idx);
+				if ((err = snd_ctl_pcm_info(handle, pcminfo)) < 0) {
+					// TODO Error handling
+					//error("control digital audio playback info (%i): %s", card, snd_strerror(err));
+					std::cerr << "Error\n";
+				} else {
+					std::cout << " Subdevice #" << idx << ": " << snd_pcm_info_get_subdevice_name(pcminfo) << std::endl;
+				}
+			}
+		}
+		snd_ctl_close(handle);
+next_card:
+		if (snd_card_next(&card) < 0) {
+			// TODO Error handling
+			//error("snd_card_next");
+			break;
+		}
+	}
+}
+
+
+
+class DeviceInfo
+{
+public:
+	DeviceInfo(int cardNumber, int deviceNumber,
+			   QString const & cardName, QString const & pcmName,
+			   QString const & cardId, QString const & pcmId) :
+		m_cardNumber(cardNumber),
+		m_deviceNumber(deviceNumber),
+		m_cardName(cardName),
+		m_pcmName(pcmName),
+		m_cardId(cardId),
+		m_pcmId(pcmId)
+	{}
+	~DeviceInfo() {}
+
+	int getCardNumber() const { return m_cardNumber; }
+	int getDeviceNumber() const { return m_deviceNumber; }
+	QString const & getCardName() const { return m_cardName; }
+	QString const & getPcmName() const { return m_pcmName; }
+	QString const & getCardId() const { return m_cardId; }
+	QString const & getPcmId() const { return m_pcmId; }
+
+	QString getHWString() const { return QString("hw%1:%2").arg(m_cardNumber).arg(m_deviceNumber); }
+
+private:
+	int m_cardNumber;
+	int m_deviceNumber;
+	QString m_cardName;
+	QString m_pcmName;
+	QString m_cardId;
+	QString m_pcmId;
+};
+
+
+
+void populateDeviceInfos(std::vector<DeviceInfo> &deviceInfos)
+{
+	snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
+	snd_ctl_t *handle;
+	snd_ctl_card_info_t *info;
+	snd_pcm_info_t *pcminfo;
+
+	// Allocate memory for the info structs
+	snd_ctl_card_info_alloca(&info);
+	snd_pcm_info_alloca(&pcminfo);
+
+	int card = -1;
+
+	while (!snd_card_next(&card) && card >= 0)
+	{
+		std::cout << "Card: " << card << " found!" << std::endl;
+
+		char name[32];
+		sprintf(name, "hw:%d", card);
+
+		if (snd_ctl_open(&handle, name, 0) < 0)
+		{
+			std::cerr << "Error opening ALSA card " << name << std::endl;
+			continue;
+		}
+		if (snd_ctl_card_info(handle, info) < 0)
+		{
+			snd_ctl_close(handle);
+			std::cerr << "Could not retrieve info for ALSA card " << name << std::endl;
+			continue;
+		}
+
+		int dev = -1;
+
+		while (!snd_ctl_pcm_next_device(handle, &dev) && dev >= 0)
+		{
+			snd_pcm_info_set_device(pcminfo, dev);
+			snd_pcm_info_set_subdevice(pcminfo, 0);
+			snd_pcm_info_set_stream(pcminfo, stream);
+			if (!snd_ctl_pcm_info(handle, pcminfo))
+			{
+				QString cardName(snd_ctl_card_info_get_name(info));
+				QString pcmName(snd_pcm_info_get_name(pcminfo));
+				QString cardId(snd_ctl_card_info_get_id(info));
+				QString pcmId(snd_pcm_info_get_id(pcminfo));
+
+				DeviceInfo currentDevice(card, dev, cardName, pcmName, cardId, pcmId);
+				deviceInfos.push_back(currentDevice);
+
+				std::cout << "card hw" << card << ":" << dev << " - " << "[" << snd_ctl_card_info_get_name(info) << "/" << snd_pcm_info_get_name(pcminfo) << "], " <<
+							 snd_ctl_card_info_get_id(info) << "," << snd_pcm_info_get_id(pcminfo) << std::endl;
+			}
+		}
+
+		snd_ctl_close(handle);
+	}
+}
+
+
 
 
 AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioAlsa::name(), _parent )
 {
-	m_device = new QLineEdit( AudioAlsa::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	typedef std::vector<DeviceInfo> DeviceInfoCollection;
+	DeviceInfoCollection deviceInfos;
+	populateDeviceInfos(deviceInfos);
+
+	// Implements the "-l" from aplay
+	//device_list();
+
+	//testPrintCards();
+
+	m_deviceComboBox = new QComboBox(this);
+	for (size_t i = 0; i < deviceInfos.size(); ++i)
+	{
+		DeviceInfo const & currentDeviceInfo = deviceInfos[i];
+		QString comboBoxText = currentDeviceInfo.getHWString() + " [" + currentDeviceInfo.getCardName() + " | " + currentDeviceInfo.getPcmName() + "]";
+		m_deviceComboBox->addItem(comboBoxText, QVariant(static_cast<uint>(i)));
+		m_deviceComboBox->setItemData(i, comboBoxText, Qt::ToolTipRole);
+	}
+
+	m_deviceComboBox->setGeometry( 10, 20, 160, 20 );
+	connect(m_deviceComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onCurrentIndexChanged(int)));
+
+	//m_device = new QLineEdit( AudioAlsa::probeDevice(), this );
+	//m_device->setGeometry( 10, 20, 160, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
@@ -538,5 +781,11 @@ void AudioAlsa::setupWidget::saveSettings()
 }
 
 
-#endif
 
+void AudioAlsa::setupWidget::onCurrentIndexChanged(int index)
+{
+
+}
+
+
+#endif
