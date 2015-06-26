@@ -51,6 +51,7 @@
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
+#include "AudioAlsaSetupWidget.h"
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
@@ -719,7 +720,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_ALSA
 	m_audioIfaceSetupWidgets[AudioAlsa::name()] =
-					new AudioAlsa::setupWidget( asw );
+					new AudioAlsaSetupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_PULSEAUDIO

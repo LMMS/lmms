@@ -32,6 +32,7 @@
 #include <pulse/pulseaudio.h>
 
 #include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 
 
 class LcdSpinBox;
@@ -52,7 +53,7 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

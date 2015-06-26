@@ -37,11 +37,6 @@
 #include "AudioDevice.h"
 
 
-class QComboBox;
-class LcdSpinBox;
-class QLineEdit;
-
-
 class AudioAlsa : public AudioDevice, public QThread
 {
 public:
@@ -55,26 +50,6 @@ public:
 	}
 
 	static QString probeDevice();
-
-
-	class setupWidget : public AudioDevice::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	public slots:
-		void onCurrentIndexChanged(int index);
-
-	private:
-		QComboBox * m_deviceComboBox;
-		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
-
-	} ;
-
 
 private:
 	virtual void startProcessing();

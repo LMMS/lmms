@@ -203,7 +203,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 
 
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioSdl::name(), _parent )
+	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
 {
 	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
