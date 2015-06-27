@@ -31,6 +31,8 @@
 
 #include "AudioDeviceSetupWidget.h"
 
+#include "AudioAlsa.h"
+
 #include <vector>
 
 
@@ -53,49 +55,12 @@ public slots:
 	void onCurrentIndexChanged(int index);
 
 private:
-	class DeviceInfo
-	{
-	public:
-		DeviceInfo(int cardNumber, int deviceNumber,
-				   QString const & cardName, QString const & pcmName,
-				   QString const & cardId, QString const & pcmId) :
-			m_cardNumber(cardNumber),
-			m_deviceNumber(deviceNumber),
-			m_cardName(cardName),
-			m_pcmName(pcmName),
-			m_cardId(cardId),
-			m_pcmId(pcmId)
-		{}
-		~DeviceInfo() {}
-
-		int getCardNumber() const { return m_cardNumber; }
-		int getDeviceNumber() const { return m_deviceNumber; }
-		QString const & getCardName() const { return m_cardName; }
-		QString const & getPcmName() const { return m_pcmName; }
-		QString const & getCardId() const { return m_cardId; }
-		QString const & getPcmId() const { return m_pcmId; }
-
-		QString getHWString() const { return QString("hw:%1,%2").arg(m_cardNumber).arg(m_deviceNumber); }
-
-	private:
-		int m_cardNumber;
-		int m_deviceNumber;
-		QString m_cardName;
-		QString m_pcmName;
-		QString m_cardId;
-		QString m_pcmId;
-	};
-
-	void populateDeviceInfos(std::vector<DeviceInfo> &deviceInfos);
-
-private:
 	QComboBox * m_deviceComboBox;
 	QLineEdit * m_device;
 	LcdSpinBox * m_channels;
 
 	int m_selectedDevice;
-	typedef std::vector<DeviceInfo> DeviceInfoCollection;
-	DeviceInfoCollection m_deviceInfos;
+	AudioAlsa::DeviceInfoCollection m_deviceInfos;
 } ;
 
 #endif
