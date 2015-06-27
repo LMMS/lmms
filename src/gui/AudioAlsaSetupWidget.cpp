@@ -29,8 +29,6 @@
 
 #ifdef LMMS_HAVE_ALSA
 
-#include "AudioAlsa.h"
-
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "gui_templates.h"

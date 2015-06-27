@@ -143,63 +143,6 @@ QString AudioAlsa::probeDevice()
 
 
 /**
- * @brief Checks whether the ALSA device with the given name has the needed
- *        capabilities for LMMS.
- * @param deviceName Name of the device that is checked.
- * @return If the device is usable for LMMS <tt>true</tt> is returned.
- */
-bool hasCapabilities(char *device_name)
-{
-	snd_pcm_t *pcm; // PCM handle
-	snd_pcm_hw_params_t *hw_params;
-	int err;
-
-	// Implicit check for SND_PCM_STREAM_PLAYBACK
-	err = snd_pcm_open(&pcm, device_name, SND_PCM_STREAM_PLAYBACK, 0);
-	if (err < 0)
-	{
-		std::cerr << "Cannot open device '" << device_name << "': " << snd_strerror(err) << std::endl;
-		return false;
-	}
-
-	snd_pcm_hw_params_alloca(&hw_params);
-	err = snd_pcm_hw_params_any(pcm, hw_params);
-	if (err < 0)
-	{
-		std::cerr << "Cannot get hardware parameters: " << snd_strerror(err) << std::endl;
-		snd_pcm_close(pcm);
-		return false;
-	}
-
-	// Checks for SND_PCM_ACCESS_RW_INTERLEAVED
-	err = snd_pcm_hw_params_test_access(pcm, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
-	if (err < 0)
-	{
-		std::cerr << "Interleaved access not possible for '" << device_name << "': " << snd_strerror(err) << std::endl;
-		snd_pcm_close(pcm);
-		return false;
-	}
-
-	// Check for SND_PCM_FORMAT_S16_LE or SND_PCM_FORMAT_S16_BE
-	bool validFormatFound = false;
-
-	validFormatFound |= !snd_pcm_hw_params_test_format(pcm, hw_params, SND_PCM_FORMAT_S16_LE);
-	validFormatFound |= !snd_pcm_hw_params_test_format(pcm, hw_params, SND_PCM_FORMAT_S16_BE);
-
-	if (!validFormatFound)
-	{
-		std::cerr << "Device " << device_name << " does not not support SND_PCM_FORMAT_S16_LE or SND_PCM_FORMAT_S16_BE!" << std::endl;
-		snd_pcm_close(pcm);
-		return false;
-	}
-
-	snd_pcm_close(pcm);
-
-	return true;
-}
-
-
-/**
  * @brief Creates a list of all available devices.
  *
  * Uses the hints API of ALSA to collect all devices. This also includes plug
@@ -232,8 +175,6 @@ AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 		char *name = snd_device_name_get_hint(*n, "NAME");
 		char *description = snd_device_name_get_hint(*n, "DESC");
 
-		// We could call hasCapabilities(name) here but this gives strange
-		// results
 		if (name != 0 && description != 0)
 		{
 			deviceInfos.push_back(DeviceInfo(QString(name), QString(description)));

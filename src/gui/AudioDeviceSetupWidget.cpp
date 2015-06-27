@@ -1,5 +1,5 @@
 /*
- * AudioAlsaSetupWidget.h - Implements a setup widget for ALSA-PCM-output
+ * AudioDeviceSetupWidget.cpp - Base class for audio device setup widgets
  *
  * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,43 +22,20 @@
  *
  */
 
-#ifndef AUDIO_ALSA_SETUP_WIDGET_H
-#define AUDIO_ALSA_SETUP_WIDGET_H
-
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_ALSA
-
 #include "AudioDeviceSetupWidget.h"
 
-#include "AudioAlsa.h"
-
-
-class QComboBox;
-class LcdSpinBox;
-
-
-class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
+AudioDeviceSetupWidget::AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent ) :
+	TabWidget( TabWidget::tr( "Settings for %1" ).arg(TabWidget::tr( _caption.toLatin1() ) ).toUpper(),
+			   _parent )
 {
-	Q_OBJECT
+}
 
-public:
-	AudioAlsaSetupWidget( QWidget * _parent );
-	virtual ~AudioAlsaSetupWidget();
+AudioDeviceSetupWidget::~AudioDeviceSetupWidget()
+{
+}
 
-	virtual void saveSettings();
-
-public slots:
-	void onCurrentIndexChanged(int index);
-
-private:
-	QComboBox * m_deviceComboBox;
-	LcdSpinBox * m_channels;
-
-	int m_selectedDevice;
-	AudioAlsa::DeviceInfoCollection m_deviceInfos;
-};
-
-#endif
-
-#endif
+void AudioDeviceSetupWidget::show()
+{
+	parentWidget()->show();
+	QWidget::show();
+}

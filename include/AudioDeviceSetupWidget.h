@@ -31,24 +31,13 @@
 class AudioDeviceSetupWidget : public TabWidget
 {
 public:
-	AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent ) :
-		TabWidget( TabWidget::tr( "Settings for %1" ).arg(
-				TabWidget::tr( _caption.toLatin1() ) ).
-						toUpper(), _parent )
-	{
-	}
+	AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent );
 
-	virtual ~AudioDeviceSetupWidget()
-	{
-	}
+	virtual ~AudioDeviceSetupWidget();
 
 	virtual void saveSettings() = 0;
 
-	virtual void show()
-	{
-		parentWidget()->show();
-		QWidget::show();
-	}
+	virtual void show();
 };
 
 
