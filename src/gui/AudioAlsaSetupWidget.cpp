@@ -1,7 +1,7 @@
 /*
- * AudioAlsa.cpp - device-class which implements ALSA-PCM-output
+ * AudioAlsaSetupWidget.cpp - Implements a setup widget for ALSA-PCM-output
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -23,13 +23,13 @@
  */
 
 #include <QComboBox>
-#include <QLineEdit>
 #include <QLabel>
 
-#include "AudioAlsa.h"
 #include "AudioAlsaSetupWidget.h"
 
 #ifdef LMMS_HAVE_ALSA
+
+#include "AudioAlsa.h"
 
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
@@ -47,18 +47,17 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 
 	QString deviceText = ConfigManager::inst()->value( "audioalsa", "device" );
 
-	// Implements the "-l" from aplay
-	//device_list();
-
 	m_deviceComboBox = new QComboBox(this);
 	for (size_t i = 0; i < m_deviceInfos.size(); ++i)
 	{
 		AudioAlsa::DeviceInfo const & currentDeviceInfo = m_deviceInfos[i];
-		QString comboBoxText = currentDeviceInfo.getHWString() + " [" + currentDeviceInfo.getCardName() + " | " + currentDeviceInfo.getPcmName() + "]";
+		QString comboBoxText = currentDeviceInfo.getDeviceName();
 		m_deviceComboBox->addItem(comboBoxText, QVariant(static_cast<uint>(i)));
-		m_deviceComboBox->setItemData(i, comboBoxText, Qt::ToolTipRole);
 
-		if (currentDeviceInfo.getHWString() == deviceText)
+		QString toolTipText = currentDeviceInfo.getDeviceDescription();
+		m_deviceComboBox->setItemData(i, toolTipText, Qt::ToolTipRole);
+
+		if (currentDeviceInfo.getDeviceName() == deviceText)
 		{
 			m_deviceComboBox->setCurrentIndex(static_cast<int>(i));
 		}
@@ -70,9 +69,6 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 	connect(m_deviceComboBox,
 			SIGNAL(currentIndexChanged(int)),
 			SLOT(onCurrentIndexChanged(int)));
-
-	//m_device = new QLineEdit( AudioAlsa::probeDevice(), this );
-	//m_device->setGeometry( 10, 20, 160, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
@@ -109,7 +105,7 @@ void AudioAlsaSetupWidget::saveSettings()
 	if (m_selectedDevice != -1)
 	{
 		AudioAlsa::DeviceInfo const & selectedDevice = m_deviceInfos[m_selectedDevice];
-		deviceText = selectedDevice.getHWString();
+		deviceText = selectedDevice.getDeviceName();
 	}
 
 	ConfigManager::inst()->setValue( "audioalsa", "device", deviceText );

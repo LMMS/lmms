@@ -1,7 +1,7 @@
 /*
- * AudioAlsa.h - device-class that implements ALSA-PCM-output
+ * AudioDeviceSetupWidget.h - Implements a setup widget for ALSA-PCM-output
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -33,12 +33,9 @@
 
 #include "AudioAlsa.h"
 
-#include <vector>
-
 
 class QComboBox;
 class LcdSpinBox;
-class QLineEdit;
 
 
 class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
@@ -56,7 +53,6 @@ public slots:
 
 private:
 	QComboBox * m_deviceComboBox;
-	QLineEdit * m_device;
 	LcdSpinBox * m_channels;
 
 	int m_selectedDevice;

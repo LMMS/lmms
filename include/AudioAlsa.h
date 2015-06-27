@@ -47,34 +47,19 @@ public:
 	class DeviceInfo
 	{
 	public:
-		DeviceInfo(int cardNumber, int deviceNumber,
-				   QString const & cardName, QString const & pcmName,
-				   QString const & cardId, QString const & pcmId) :
-			m_cardNumber(cardNumber),
-			m_deviceNumber(deviceNumber),
-			m_cardName(cardName),
-			m_pcmName(pcmName),
-			m_cardId(cardId),
-			m_pcmId(pcmId)
+		DeviceInfo(QString const & deviceName, QString const & deviceDescription) :
+			m_deviceName(deviceName),
+			m_deviceDescription(deviceDescription)
 		{}
 		~DeviceInfo() {}
 
-		int getCardNumber() const { return m_cardNumber; }
-		int getDeviceNumber() const { return m_deviceNumber; }
-		QString const & getCardName() const { return m_cardName; }
-		QString const & getPcmName() const { return m_pcmName; }
-		QString const & getCardId() const { return m_cardId; }
-		QString const & getPcmId() const { return m_pcmId; }
-
-		QString getHWString() const { return QString("hw:%1,%2").arg(m_cardNumber).arg(m_deviceNumber); }
+		QString const & getDeviceName() const { return m_deviceName; }
+		QString const & getDeviceDescription() const { return m_deviceDescription; }
 
 	private:
-		int m_cardNumber;
-		int m_deviceNumber;
-		QString m_cardName;
-		QString m_pcmName;
-		QString m_cardId;
-		QString m_pcmId;
+		QString m_deviceName;
+		QString m_deviceDescription;
+
 	};
 
 	typedef std::vector<DeviceInfo> DeviceInfoCollection;

@@ -141,145 +141,112 @@ QString AudioAlsa::probeDevice()
 
 
 
-// TODO Test code. Delete!
-void device_list(void)
+
+/**
+ * @brief Checks whether the ALSA device with the given name has the needed
+ *        capabilities for LMMS.
+ * @param deviceName Name of the device that is checked.
+ * @return If the device is usable for LMMS <tt>true</tt> is returned.
+ */
+bool hasCapabilities(char *device_name)
 {
-	snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
-	snd_ctl_t *handle;
-	int card, err, dev, idx;
-	snd_ctl_card_info_t *info;
-	snd_pcm_info_t *pcminfo;
-	snd_ctl_card_info_alloca(&info);
-	snd_pcm_info_alloca(&pcminfo);
+	snd_pcm_t *pcm; // PCM handle
+	snd_pcm_hw_params_t *hw_params;
+	int err;
 
-	card = -1;
-	if (snd_card_next(&card) < 0 || card < 0) {
-		return;
+	// Implicit check for SND_PCM_STREAM_PLAYBACK
+	err = snd_pcm_open(&pcm, device_name, SND_PCM_STREAM_PLAYBACK, 0);
+	if (err < 0)
+	{
+		std::cerr << "Cannot open device '" << device_name << "': " << snd_strerror(err) << std::endl;
+		return false;
 	}
-	std::cout << "**** List of " << snd_pcm_stream_name(stream) << " Hardware Devices ****\n";
 
-	while (card >= 0) {
-		char name[32];
-		sprintf(name, "hw:%d", card);
-		if ((err = snd_ctl_open(&handle, name, 0)) < 0) {
-			// TODO Error handling
-			//error("control open (%i): %s", card, snd_strerror(err));
-			goto next_card;
-		}
-		if ((err = snd_ctl_card_info(handle, info)) < 0) {
-			// TODO Error handling
-			//error("control hardware info (%i): %s", card, snd_strerror(err));
-			snd_ctl_close(handle);
-			goto next_card;
-		}
-		dev = -1;
-		while (1) {
-			unsigned int count;
-			if (snd_ctl_pcm_next_device(handle, &dev)<0)
-				// TODO Error handling
-				//error("snd_ctl_pcm_next_device");
-				std::cerr << "snd_ctl_pcm_next_device";
-			if (dev < 0)
-				break;
-			snd_pcm_info_set_device(pcminfo, dev);
-			snd_pcm_info_set_subdevice(pcminfo, 0);
-			snd_pcm_info_set_stream(pcminfo, stream);
-			if ((err = snd_ctl_pcm_info(handle, pcminfo)) < 0) {
-				if (err != -ENOENT)
-					// TODO Error handling
-					//error("control digital audio info (%i): %s", card, snd_strerror(err));
-					std::cerr << "Error\n";
-				continue;
-			}
-			//std::cout << "card " << card << ": " << snd_ctl_card_info_get_id(info) << " [" << snd_ctl_card_info_get_name(info) << "], device " << dev <<
-			//			 ": " << snd_pcm_info_get_id(pcminfo) << " [" << snd_pcm_info_get_name(pcminfo) << "]\n";
-			std::cout << "card hw" << card << ":" << dev << " - " << "[" << snd_ctl_card_info_get_name(info) << "/" << snd_pcm_info_get_name(pcminfo) << "], " <<
-						 snd_ctl_card_info_get_id(info) << "," << snd_pcm_info_get_id(pcminfo) << "\n";
-
-			count = snd_pcm_info_get_subdevices_count(pcminfo);
-			std::cout << "  Subdevices: " << snd_pcm_info_get_subdevices_avail(pcminfo) << "/" << count << std::endl;
-			for (idx = 0; idx < (int)count; idx++) {
-				snd_pcm_info_set_subdevice(pcminfo, idx);
-				if ((err = snd_ctl_pcm_info(handle, pcminfo)) < 0) {
-					// TODO Error handling
-					//error("control digital audio playback info (%i): %s", card, snd_strerror(err));
-					std::cerr << "Error\n";
-				} else {
-					std::cout << " Subdevice #" << idx << ": " << snd_pcm_info_get_subdevice_name(pcminfo) << std::endl;
-				}
-			}
-		}
-		snd_ctl_close(handle);
-next_card:
-		if (snd_card_next(&card) < 0) {
-			// TODO Error handling
-			//error("snd_card_next");
-			break;
-		}
+	snd_pcm_hw_params_alloca(&hw_params);
+	err = snd_pcm_hw_params_any(pcm, hw_params);
+	if (err < 0)
+	{
+		std::cerr << "Cannot get hardware parameters: " << snd_strerror(err) << std::endl;
+		snd_pcm_close(pcm);
+		return false;
 	}
+
+	// Checks for SND_PCM_ACCESS_RW_INTERLEAVED
+	err = snd_pcm_hw_params_test_access(pcm, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
+	if (err < 0)
+	{
+		std::cerr << "Interleaved access not possible for '" << device_name << "': " << snd_strerror(err) << std::endl;
+		snd_pcm_close(pcm);
+		return false;
+	}
+
+	// Check for SND_PCM_FORMAT_S16_LE or SND_PCM_FORMAT_S16_BE
+	bool validFormatFound = false;
+
+	validFormatFound |= !snd_pcm_hw_params_test_format(pcm, hw_params, SND_PCM_FORMAT_S16_LE);
+	validFormatFound |= !snd_pcm_hw_params_test_format(pcm, hw_params, SND_PCM_FORMAT_S16_BE);
+
+	if (!validFormatFound)
+	{
+		std::cerr << "Device " << device_name << " does not not support SND_PCM_FORMAT_S16_LE or SND_PCM_FORMAT_S16_BE!" << std::endl;
+		snd_pcm_close(pcm);
+		return false;
+	}
+
+	snd_pcm_close(pcm);
+
+	return true;
 }
 
 
-
-
+/**
+ * @brief Creates a list of all available devices.
+ *
+ * Uses the hints API of ALSA to collect all devices. This also includes plug
+ * devices. The reason to collect these and not the raw hardware devices
+ * (e.g. hw:0,0) is that hardware devices often have a very limited number of
+ * supported formats, etc. Plugs on the other hand are software components that
+ * map all types of formats and inputs to the hardware and therefore they are
+ * much more flexible and more what we want.
+ *
+ * Further helpful info http://jan.newmarch.name/LinuxSound/Sampled/Alsa/.
+ *
+ * @return A collection of devices found on the system.
+ */
 AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 {
 	DeviceInfoCollection deviceInfos;
 
-	snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
-	snd_ctl_t *handle;
-	snd_ctl_card_info_t *info;
-	snd_pcm_info_t *pcminfo;
+	char **hints;
 
-	// Allocate memory for the info structs
-	snd_ctl_card_info_alloca(&info);
-	snd_pcm_info_alloca(&pcminfo);
-
-	int card = -1;
-
-	while (!snd_card_next(&card) && card >= 0)
+	/* Enumerate sound devices */
+	int err = snd_device_name_hint(-1, "pcm", (void***)&hints);
+	if (err != 0)
 	{
-		std::cout << "Card: " << card << " found!" << std::endl;
-
-		char name[32];
-		sprintf(name, "hw:%d", card);
-
-		if (snd_ctl_open(&handle, name, 0) < 0)
-		{
-			std::cerr << "Error opening ALSA card " << name << std::endl;
-			continue;
-		}
-		if (snd_ctl_card_info(handle, info) < 0)
-		{
-			snd_ctl_close(handle);
-			std::cerr << "Could not retrieve info for ALSA card " << name << std::endl;
-			continue;
-		}
-
-		int dev = -1;
-
-		while (!snd_ctl_pcm_next_device(handle, &dev) && dev >= 0)
-		{
-			snd_pcm_info_set_device(pcminfo, dev);
-			snd_pcm_info_set_subdevice(pcminfo, 0);
-			snd_pcm_info_set_stream(pcminfo, stream);
-			if (!snd_ctl_pcm_info(handle, pcminfo))
-			{
-				QString cardName(snd_ctl_card_info_get_name(info));
-				QString pcmName(snd_pcm_info_get_name(pcminfo));
-				QString cardId(snd_ctl_card_info_get_id(info));
-				QString pcmId(snd_pcm_info_get_id(pcminfo));
-
-				DeviceInfo currentDevice(card, dev, cardName, pcmName, cardId, pcmId);
-				deviceInfos.push_back(currentDevice);
-
-				std::cout << "card hw" << card << ":" << dev << " - " << "[" << snd_ctl_card_info_get_name(info) << " | " << snd_pcm_info_get_name(pcminfo) << "], " <<
-							 snd_ctl_card_info_get_id(info) << ", " << snd_pcm_info_get_id(pcminfo) << std::endl;
-			}
-		}
-
-		snd_ctl_close(handle);
+		return deviceInfos;
 	}
+
+	char** n = hints;
+	while (*n != NULL)
+	{
+		char *name = snd_device_name_get_hint(*n, "NAME");
+		char *description = snd_device_name_get_hint(*n, "DESC");
+
+		// We could call hasCapabilities(name) here but this gives strange
+		// results
+		if (name != 0 && description != 0)
+		{
+			deviceInfos.push_back(DeviceInfo(QString(name), QString(description)));
+		}
+
+		free(name);
+		free(description);
+
+		n++;
+	}
+
+	//Free the hint buffer
+	snd_device_name_free_hint((void**)hints);
 
 	return deviceInfos;
 }
