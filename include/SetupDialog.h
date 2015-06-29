@@ -95,6 +95,7 @@ private slots:
 	void toggleDisplaydBV( bool _enabled );
 	void toggleMMPZ( bool _enabled );
 	void toggleDisableBackup( bool _enabled );
+	void toggleOpenLastProject( bool _enabled );
 	void toggleHQAudioDev( bool _enabled );
 
 	void openWorkingDir();
@@ -133,6 +134,7 @@ private:
 	bool m_displaydBV;
 	bool m_MMPZ;
 	bool m_disableBackup;
+	bool m_openLastProject;
 	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;

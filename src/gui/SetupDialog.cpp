@@ -97,6 +97,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_disableBackup( !ConfigManager::inst()->value( "app",
 							"disablebackup" ).toInt() ),
+	m_openLastProject( ConfigManager::inst()->value( "app",
+							"openlastproject" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
@@ -315,6 +317,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	disableBackup->setChecked( m_disableBackup );
 	connect( disableBackup, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableBackup( bool ) ) );
+
+	LedCheckBox * openLastProject = new LedCheckBox(
+				tr( "Reopen last project on start" ),
+								misc_tw );
+	labelNumber++;
+	openLastProject->move( XDelta, YDelta*labelNumber );
+	openLastProject->setChecked( m_openLastProject );
+	connect( openLastProject, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleOpenLastProject( bool ) ) );
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
@@ -953,6 +964,8 @@ void SetupDialog::accept()
 						QString::number( !m_MMPZ ) );
 	ConfigManager::inst()->setValue( "app", "disablebackup",
 					QString::number( !m_disableBackup ) );
+	ConfigManager::inst()->setValue( "app", "openlastproject",
+					QString::number( m_openLastProject ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
@@ -1111,6 +1124,14 @@ void SetupDialog::toggleMMPZ( bool _enabled )
 void SetupDialog::toggleDisableBackup( bool _enabled )
 {
 	m_disableBackup = _enabled;
+}
+
+
+
+
+void SetupDialog::toggleOpenLastProject( bool _enabled )
+{
+	m_openLastProject = _enabled;
 }
 
 
