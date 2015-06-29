@@ -69,6 +69,7 @@
 #include "RenderManager.h"
 #include "DataFile.h"
 #include "Song.h"
+#include "SetupDialog.h"
 
 static inline QString baseName( const QString & file )
 {
@@ -686,7 +687,30 @@ int main( int argc, char * * argv )
 		}
 		else
 		{
-			Engine::getSong()->createNewProject();
+
+		// If enabled, open last project if there is one. Else, create
+		// a new one.
+		if( ConfigManager::inst()->
+				value( "app", "openlastproject" ).toInt() &&
+		!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() )
+		{
+			QString f = ConfigManager::inst()->
+						recentlyOpenedProjects().first();
+			QFileInfo recentFile( f );
+
+			if ( recentFile.exists() )
+			{
+				Engine::getSong()->loadProject( f );
+			}
+			else
+			{
+				Engine::getSong()->createNewProject();
+			}
+		}
+		else
+		{
+		Engine::getSong()->createNewProject();
+		}
 
 			// [Settel] workaround: showMaximized() doesn't work with
 			// FVWM2 unless the window is already visible -> show() first
