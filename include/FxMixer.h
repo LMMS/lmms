@@ -211,9 +211,6 @@ private:
 
 	int m_lastSoloed;
 
-	friend class MixerWorkerThread;
-	friend class FxMixerView;
-
 } ;
 
 
