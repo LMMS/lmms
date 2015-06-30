@@ -30,6 +30,8 @@
 #include <QtCore/QList>
 #include <QMainWindow>
 
+#include "SubWindow.h"
+
 class QAction;
 class QDomElement;
 class QGridLayout;
@@ -56,6 +58,9 @@ public:
 
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
+
+	// wrap the widget with a window decoration and add it to the workspace
+	EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
 
 
 	///

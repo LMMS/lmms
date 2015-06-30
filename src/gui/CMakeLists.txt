@@ -24,6 +24,7 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
+	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
