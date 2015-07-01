@@ -534,7 +534,6 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	if( ! hasValidPattern() )
 	{
 		//resizeEvent( NULL );
-		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
 
 		update();
 		emit currentPatternChanged();
@@ -576,8 +575,6 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
-
-	setWindowTitle( tr( "Piano-Roll - %1" ).arg( m_pattern->name() ) );
 
 	update();
 	emit currentPatternChanged();
@@ -4264,6 +4261,15 @@ const Pattern* PianoRollWindow::currentPattern() const
 void PianoRollWindow::setCurrentPattern(Pattern* pattern)
 {
 	m_editor->setCurrentPattern(pattern);
+
+	if ( pattern )
+	{
+		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
+	}
+	else
+	{
+		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+	}
 }
 
 bool PianoRollWindow::isRecording() const
