@@ -72,8 +72,16 @@ MidiJack::MidiJack() :
 	m_output_port( NULL ),
 	m_quit( false )
 {
-	m_jack_client = jack_client_open(probeDevice().toLatin1().data(),
+	//m_jack_client = jack_client_open(probeDevice().toLatin1().data(),
+	//								 JackNoStartServer, NULL);
+	if(Engine::mixer()->audioDevName() == AudioJack::name() )
+	{
+		// if a jack connection has been created for audio we use that
+		m_jack_client = Engine::mixer()->audioDev()->jackClient();
+	}else{
+		m_jack_client = jack_client_open(probeDevice().toLatin1().data(),
 									 JackNoStartServer, NULL);
+	}
 
 	if(m_jack_client)
 	{

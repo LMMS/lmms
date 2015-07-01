@@ -49,6 +49,9 @@ public:
 	AudioJack( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioJack();
 
+	// this is to allow the jack midi connection to use the same client connection
+	inline jack_client_t* jackClient() {return m_client;}
+
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "setupWidget",
