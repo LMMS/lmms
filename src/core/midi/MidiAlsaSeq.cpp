@@ -499,118 +499,118 @@ void MidiAlsaSeq::run()
 		// while event queue is not empty
 		while( snd_seq_event_input_pending( m_seqHandle, true ) > 0 )
 		{
-		snd_seq_event_t * ev;
-		if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
-		{
+			snd_seq_event_t * ev;
+			if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
+			{
+				m_seqMutex.unlock();
+
+				qCritical( "error while fetching MIDI event from sequencer" );
+				break;
+			}
 			m_seqMutex.unlock();
 
-			qCritical( "error while fetching MIDI event from sequencer" );
-			break;
-		}
-		m_seqMutex.unlock();
-
-		snd_seq_addr_t * source = NULL;
-		MidiPort * dest = NULL;
-		for( int i = 0; i < m_portIDs.size(); ++i )
-		{
-			if( m_portIDs.values()[i][0] == ev->dest.port )
+			snd_seq_addr_t * source = NULL;
+			MidiPort * dest = NULL;
+			for( int i = 0; i < m_portIDs.size(); ++i )
 			{
-				dest = m_portIDs.keys()[i];
+				if( m_portIDs.values()[i][0] == ev->dest.port )
+				{
+					dest = m_portIDs.keys()[i];
+				}
+				if( ( m_portIDs.values()[i][1] != -1 &&
+						m_portIDs.values()[i][1] == ev->source.port ) ||
+							m_portIDs.values()[i][0] == ev->source.port )
+				{
+					source = &ev->source;
+				}
 			}
-			if( ( m_portIDs.values()[i][1] != -1 &&
-					m_portIDs.values()[i][1] == ev->source.port ) ||
-						m_portIDs.values()[i][0] == ev->source.port )
+
+			if( dest == NULL )
 			{
-				source = &ev->source;
+				continue;
 			}
-		}
 
-		if( dest == NULL )
-		{
-			continue;
-		}
+			switch( ev->type )
+			{
+				case SND_SEQ_EVENT_NOTEON:
+					dest->processInEvent( MidiEvent( MidiNoteOn,
+								ev->data.note.channel,
+								ev->data.note.note -
+								KeysPerOctave,
+								ev->data.note.velocity,
+								source
+								),
+							MidiTime( ev->time.tick ) );
+					break;
 
-		switch( ev->type )
-		{
-			case SND_SEQ_EVENT_NOTEON:
-				dest->processInEvent( MidiEvent( MidiNoteOn,
-							ev->data.note.channel,
-							ev->data.note.note -
-							KeysPerOctave,
-							ev->data.note.velocity,
-							source
-							),
-						MidiTime( ev->time.tick ) );
-				break;
+				case SND_SEQ_EVENT_NOTEOFF:
+					dest->processInEvent( MidiEvent( MidiNoteOff,
+								ev->data.note.channel,
+								ev->data.note.note -
+								KeysPerOctave,
+								ev->data.note.velocity,
+								source
+								),
+							MidiTime( ev->time.tick) );
+					break;
 
-			case SND_SEQ_EVENT_NOTEOFF:
-				dest->processInEvent( MidiEvent( MidiNoteOff,
-							ev->data.note.channel,
-							ev->data.note.note -
-							KeysPerOctave,
-							ev->data.note.velocity,
-							source
-							),
-						MidiTime( ev->time.tick) );
-				break;
+				case SND_SEQ_EVENT_KEYPRESS:
+					dest->processInEvent( MidiEvent(
+									MidiKeyPressure,
+								ev->data.note.channel,
+								ev->data.note.note -
+								KeysPerOctave,
+								ev->data.note.velocity,
+								source
+								), MidiTime() );
+					break;
 
-			case SND_SEQ_EVENT_KEYPRESS:
-				dest->processInEvent( MidiEvent(
-								MidiKeyPressure,
-							ev->data.note.channel,
-							ev->data.note.note -
-							KeysPerOctave,
-							ev->data.note.velocity,
-							source
-							), MidiTime() );
-				break;
+				case SND_SEQ_EVENT_CONTROLLER:
+					dest->processInEvent( MidiEvent(
+								MidiControlChange,
+							ev->data.control.channel,
+							ev->data.control.param,
+							ev->data.control.value, source ),
+									MidiTime() );
+					break;
 
-			case SND_SEQ_EVENT_CONTROLLER:
-				dest->processInEvent( MidiEvent(
-							MidiControlChange,
-						ev->data.control.channel,
-						ev->data.control.param,
-						ev->data.control.value, source ),
-								MidiTime() );
-				break;
+				case SND_SEQ_EVENT_PGMCHANGE:
+					dest->processInEvent( MidiEvent(
+								MidiProgramChange,
+							ev->data.control.channel,
+							ev->data.control.param,
+							ev->data.control.value, source ),
+									MidiTime() );
+					break;
 
-			case SND_SEQ_EVENT_PGMCHANGE:
-				dest->processInEvent( MidiEvent(
-							MidiProgramChange,
-						ev->data.control.channel,
-						ev->data.control.param,
-						ev->data.control.value, source ),
-								MidiTime() );
-				break;
+				case SND_SEQ_EVENT_CHANPRESS:
+					dest->processInEvent( MidiEvent(
+								MidiChannelPressure,
+							ev->data.control.channel,
+							ev->data.control.param,
+							ev->data.control.value, source ),
+									MidiTime() );
+					break;
 
-			case SND_SEQ_EVENT_CHANPRESS:
-				dest->processInEvent( MidiEvent(
-							MidiChannelPressure,
-						ev->data.control.channel,
-						ev->data.control.param,
-						ev->data.control.value, source ),
-								MidiTime() );
-				break;
+				case SND_SEQ_EVENT_PITCHBEND:
+					dest->processInEvent( MidiEvent( MidiPitchBend,
+							ev->data.control.channel,
+							ev->data.control.value + 8192, 0, source ),
+									MidiTime() );
+					break;
 
-			case SND_SEQ_EVENT_PITCHBEND:
-				dest->processInEvent( MidiEvent( MidiPitchBend,
-						ev->data.control.channel,
-						ev->data.control.value + 8192, 0, source ),
-								MidiTime() );
-				break;
+				case SND_SEQ_EVENT_SENSING:
+				case SND_SEQ_EVENT_CLOCK:
+					break;
 
-			case SND_SEQ_EVENT_SENSING:
-			case SND_SEQ_EVENT_CLOCK:
-				break;
+				default:
+					fprintf( stderr,
+						"ALSA-sequencer: unhandled input "
+							"event %d\n", ev->type );
+					break;
+			}	// end switch
 
-			default:
-				fprintf( stderr,
-					"ALSA-sequencer: unhandled input "
-						"event %d\n", ev->type );
-				break;
-		}	// end switch
-
-		m_seqMutex.lock();
+			m_seqMutex.lock();
 
 		}	// end while
 
