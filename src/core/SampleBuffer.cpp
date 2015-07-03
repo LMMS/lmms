@@ -31,6 +31,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
+#include <QReadLocker>
 
 
 #include <cstring>
@@ -606,7 +607,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const float _freq,
 					const LoopMode _loopmode )
 {
-	m_varLock.lockForRead();
+	QReadLocker readLocker(&m_varLock);
 
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
@@ -615,7 +616,6 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( endFrame == 0 || _frames == 0 )
 	{
-		m_varLock.unlock();
 		return false;
 	}
 
@@ -632,35 +632,25 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( total_frames_for_current_pitch == 0 )
 	{
-		m_varLock.unlock();
 		return false;
 	}
 
 
-	// this holds the number of the first frame to play
-	f_cnt_t play_frame = _state->m_frameIndex;
-
-	if( play_frame < startFrame )
-	{
-		play_frame = startFrame;
-	}
+	// this holds the index of the first frame to play
+	f_cnt_t play_frame = qMax(_state->m_frameIndex, startFrame);
 
 	if( _loopmode == LoopOff )
 	{
-		if( play_frame >= endFrame )
+		if( play_frame >= endFrame || ( endFrame - play_frame ) / freq_factor == 0 )
 		{
-			m_varLock.unlock();
+			// the sample is done being played
 			return false;
 		}
-
-		if( ( endFrame - play_frame ) / freq_factor == 0 ) return false;
 	}
-
 	else if( _loopmode == LoopOn )
 	{
 		play_frame = getLoopedIndex( play_frame, loopStartFrame, loopEndFrame );
 	}
-
 	else
 	{
 		play_frame = getPingPongIndex( play_frame, loopStartFrame, loopEndFrame );
@@ -778,7 +768,6 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		_ab[i][1] *= m_amplification;
 	}
 
-	m_varLock.unlock();
 	return true;
 }
 
@@ -1376,9 +1365,8 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 
 void SampleBuffer::setStartFrame( const f_cnt_t _s )
 {
-	m_varLock.lockForWrite();
+	QWriteLocker writeLocker(&m_varLock);
 	m_startFrame = _s;
-	m_varLock.unlock();
 }
 
 
@@ -1386,9 +1374,8 @@ void SampleBuffer::setStartFrame( const f_cnt_t _s )
 
 void SampleBuffer::setEndFrame( const f_cnt_t _e )
 {
-	m_varLock.lockForWrite();
+	QWriteLocker writeLocker(&m_varLock);
 	m_endFrame = _e;
-	m_varLock.unlock();
 }
 
 
