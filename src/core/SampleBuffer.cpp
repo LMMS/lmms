@@ -210,33 +210,33 @@ void SampleBuffer::update( bool _keep_settings )
 		{
 
 #ifdef LMMS_HAVE_OGGVORBIS
-		// workaround for a bug in libsndfile or our libsndfile decoder
-		// causing some OGG files to be distorted -> try with OGG Vorbis
-		// decoder first if filename extension matches "ogg"
-		if( m_frames == 0 && fileInfo.suffix() == "ogg" )
-		{
-			m_frames = decodeSampleOGGVorbis( f, buf, channels, samplerate );
-		}
+			// workaround for a bug in libsndfile or our libsndfile decoder
+			// causing some OGG files to be distorted -> try with OGG Vorbis
+			// decoder first if filename extension matches "ogg"
+			if( m_frames == 0 && fileInfo.suffix() == "ogg" )
+			{
+				m_frames = decodeSampleOGGVorbis( f, buf, channels, samplerate );
+			}
 #endif
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleSF( f, fbuf, channels,
-								samplerate );
-		}
+			if( m_frames == 0 )
+			{
+				m_frames = decodeSampleSF( f, fbuf, channels,
+									samplerate );
+			}
 #ifdef LMMS_HAVE_OGGVORBIS
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleOGGVorbis( f, buf, channels,
-								samplerate );
-		}
+			if( m_frames == 0 )
+			{
+				m_frames = decodeSampleOGGVorbis( f, buf, channels,
+									samplerate );
+			}
 #endif
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleDS( f, buf, channels,
-								samplerate );
-		}
+			if( m_frames == 0 )
+			{
+				m_frames = decodeSampleDS( f, buf, channels,
+									samplerate );
+			}
 
-		delete[] f;
+			delete[] f;
 
 			if ( m_frames == 0 )  // if still no frames, bail
 			{
@@ -254,9 +254,6 @@ void SampleBuffer::update( bool _keep_settings )
 			}
 
 		}
-
-
-
 	}
 	else
 	{
@@ -280,81 +277,73 @@ void SampleBuffer::update( bool _keep_settings )
 
 void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
 {
-			// following code transforms int-samples into
-			// float-samples and does amplifying & reversing
-			const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-			m_data = MM_ALLOC( sampleFrame, _frames );
-			const int ch = ( _channels > 1 ) ? 1 : 0;
+	// following code transforms int-samples into
+	// float-samples and does amplifying & reversing
+	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
+	m_data = MM_ALLOC( sampleFrame, _frames );
+	const int ch = ( _channels > 1 ) ? 1 : 0;
 
-			// if reversing is on, we also reverse when
-			// scaling
-			if( m_reversed )
-			{
-				int idx = ( _frames - 1 ) * _channels;
-				for( f_cnt_t frame = 0; frame < _frames;
-								++frame )
-				{
-					m_data[frame][0] = _ibuf[idx+0] * fac;
-					m_data[frame][1] = _ibuf[idx+ch] * fac;
-					idx -= _channels;
-				}
-			}
-			else
-			{
-				int idx = 0;
-				for( f_cnt_t frame = 0; frame < _frames;
-								++frame )
-				{
-					m_data[frame][0] = _ibuf[idx+0] * fac;
-					m_data[frame][1] = _ibuf[idx+ch] * fac;
-					idx += _channels;
-				}
-			}
+	// if reversing is on, we also reverse when
+	// scaling
+	if( m_reversed )
+	{
+		int idx = ( _frames - 1 ) * _channels;
+		for( f_cnt_t frame = 0; frame < _frames;
+						++frame )
+		{
+			m_data[frame][0] = _ibuf[idx+0] * fac;
+			m_data[frame][1] = _ibuf[idx+ch] * fac;
+			idx -= _channels;
+		}
+	}
+	else
+	{
+		int idx = 0;
+		for( f_cnt_t frame = 0; frame < _frames;
+						++frame )
+		{
+			m_data[frame][0] = _ibuf[idx+0] * fac;
+			m_data[frame][1] = _ibuf[idx+ch] * fac;
+			idx += _channels;
+		}
+	}
 
-			delete[] _ibuf;
-
-
-
-
-
+	delete[] _ibuf;
 }
 
 void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels)
 
 {
 
-		m_data = MM_ALLOC( sampleFrame, _frames );
-		const int ch = ( _channels > 1 ) ? 1 : 0;
+	m_data = MM_ALLOC( sampleFrame, _frames );
+	const int ch = ( _channels > 1 ) ? 1 : 0;
 
-			// if reversing is on, we also reverse when
-			// scaling
-			if( m_reversed )
-			{
-				int idx = ( _frames - 1 ) * _channels;
-				for( f_cnt_t frame = 0; frame < _frames;
-								++frame )
-				{
-					m_data[frame][0] = _fbuf[idx+0];
-					m_data[frame][1] = _fbuf[idx+ch];
-					idx -= _channels;
-				}
-			}
-			else
-			{
-				int idx = 0;
-				for( f_cnt_t frame = 0; frame < _frames;
-								++frame )
-				{
-					m_data[frame][0] = _fbuf[idx+0];
-					m_data[frame][1] = _fbuf[idx+ch];
-					idx += _channels;
-				}
-			}
+	// if reversing is on, we also reverse when
+	// scaling
+	if( m_reversed )
+	{
+		int idx = ( _frames - 1 ) * _channels;
+		for( f_cnt_t frame = 0; frame < _frames;
+						++frame )
+		{
+			m_data[frame][0] = _fbuf[idx+0];
+			m_data[frame][1] = _fbuf[idx+ch];
+			idx -= _channels;
+		}
+	}
+	else
+	{
+		int idx = 0;
+		for( f_cnt_t frame = 0; frame < _frames;
+						++frame )
+		{
+			m_data[frame][0] = _fbuf[idx+0];
+			m_data[frame][1] = _fbuf[idx+ch];
+			idx += _channels;
+		}
+	}
 
-			delete[] _fbuf;
-
-
-
+	delete[] _fbuf;
 }
 
 
@@ -421,12 +410,12 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 				"sample %s: %s", _f, sf_strerror( NULL ) );
 #endif
 	}
-    //write down either directly or convert i->f depending on file type
+	//write down either directly or convert i->f depending on file type
 
-    if ( frames > 0 && _buf != NULL )
-    {
-        directFloatWrite ( _buf, frames, _channels);
-    }
+	if ( frames > 0 && _buf != NULL )
+	{
+		directFloatWrite ( _buf, frames, _channels);
+	}
 
 	return frames;
 }
@@ -795,7 +784,9 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 	else
 	{
 		if( ! *_backwards && _index + _frames < _loopend )
-		return m_data + _index;
+		{
+			return m_data + _index;
+		}
 	}
 
 	*_tmp = MM_ALLOC( sampleFrame, _frames );

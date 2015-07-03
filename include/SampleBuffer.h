@@ -218,8 +218,8 @@ public:
 		return m_data;
 	}
 
-    QString openAudioFile() const;
-    QString openAndSetAudioFile();
+	QString openAudioFile() const;
+	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
 	QString & toBase64( QString & _dst ) const;
@@ -268,8 +268,8 @@ public slots:
 private:
 	void update( bool _keep_settings = false );
 
-    void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-    void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
+	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
 	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
 						ch_cnt_t & _channels,
