@@ -38,7 +38,12 @@
 class EqFilter : public StereoBiQuad
 {
 public:
-	EqFilter()
+	EqFilter() : 
+		m_sampleRate(0),
+		m_freq(0),
+		m_res(0),
+		m_gain(0),
+		m_bw(0)
 	{
 
 	}
