@@ -82,6 +82,7 @@ set(LMMS_SRCS
 	core/midi/MidiController.cpp
 	core/midi/MidiOss.cpp
 	core/midi/MidiPort.cpp
+	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
 	PARENT_SCOPE

@@ -163,7 +163,7 @@ void ProjectRenderer::run()
     //skip first empty buffer
     Engine::mixer()->nextBuffer();
 
-	Song::PlayPos & pp = Engine::getSong()->getPlayPos(
+	const Song::PlayPos & pp = Engine::getSong()->getPlayPos(
 							Song::Mode_PlaySong );
 	m_progress = 0;
 	const int sl = ( Engine::getSong()->length() + 1 ) * 192;
