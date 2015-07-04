@@ -195,15 +195,15 @@ void ConfigManager::setSF2Dir(const QString &sfd)
 void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 {
 	if( !_file.endsWith( ".mpt", Qt::CaseInsensitive ) ) 
+	{
+		m_recentlyOpenedProjects.removeAll( _file );
+		if( m_recentlyOpenedProjects.size() > 15 )
 		{
-			m_recentlyOpenedProjects.removeAll( _file );
-			if( m_recentlyOpenedProjects.size() > 15 )
-				{
-					m_recentlyOpenedProjects.removeLast();
-				}
-			m_recentlyOpenedProjects.push_front( _file );
-			ConfigManager::inst()->saveConfigFile();
+			m_recentlyOpenedProjects.removeLast();
 		}
+		m_recentlyOpenedProjects.push_front( _file );
+		ConfigManager::inst()->saveConfigFile();
+	}
 }
 
 
@@ -287,12 +287,12 @@ void ConfigManager::loadConfigFile()
 					for( int i = 0; i < node_attr.count();
 									++i )
 					{
-		QDomNode n = node_attr.item( i );
-		if( n.isAttr() )
-		{
-			attr.push_back( qMakePair( n.toAttr().name(),
-							n.toAttr().value() ) );
-		}
+						QDomNode n = node_attr.item( i );
+						if( n.isAttr() )
+						{
+							attr.push_back( qMakePair( n.toAttr().name(),
+											n.toAttr().value() ) );
+						}
 					}
 					m_settings[node.nodeName()] = attr;
 				}
@@ -302,12 +302,12 @@ void ConfigManager::loadConfigFile()
 					QDomNode n = node.firstChild();
 					while( !n.isNull() )
 					{
-		if( n.isElement() && n.toElement().hasAttributes() )
-		{
-			m_recentlyOpenedProjects <<
-					n.toElement().attribute( "path" );
-		}
-		n = n.nextSibling();
+						if( n.isElement() && n.toElement().hasAttributes() )
+						{
+							m_recentlyOpenedProjects <<
+									n.toElement().attribute( "path" );
+						}
+						n = n.nextSibling();
 					}
 				}
 				node = node.nextSibling();
