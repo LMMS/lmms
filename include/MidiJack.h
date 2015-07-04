@@ -36,6 +36,7 @@
 #include <QtCore/QFile>
 
 #include "MidiClient.h"
+#include "AudioJack.h"
 
 #define	JACK_MIDI_BUFFER_MAX 64 /* events */
 
@@ -46,6 +47,8 @@ class MidiJack : public MidiClientRaw, public QThread
 public:
 	MidiJack();
 	virtual ~MidiJack();
+
+	jack_client_t* jackClient();
 
 	static QString probeDevice();
 
@@ -79,7 +82,8 @@ protected:
 
 
 private:
-	jack_client_t * m_jack_client;
+	AudioJack *m_jackAudio;
+	jack_client_t *m_jackClient;
 	jack_port_t *m_input_port;
 	jack_port_t *m_output_port;
 	uint8_t m_jack_buffer[JACK_MIDI_BUFFER_MAX * 4];

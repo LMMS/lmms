@@ -41,6 +41,7 @@
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Engine.h"
+#include "Mixer.h"
 #include "MainWindow.h"
 
 /* callback functions for jack */
@@ -65,43 +66,49 @@ static void JackMidiShutdown(void *arg)
 	QMessageBox::information( gui->mainWindow(), mess_short, mess_long );
 }
 
-
 MidiJack::MidiJack() :
 	MidiClientRaw(),
 	m_input_port( NULL ),
 	m_output_port( NULL ),
 	m_quit( false )
 {
-	//m_jack_client = jack_client_open(probeDevice().toLatin1().data(),
-	//								 JackNoStartServer, NULL);
+	// if jack is used for audio then we share the connection
+	// AudioJack creates and maintains the jack connection
+	// and also handles the callback, we pass it our address
+	// so that we can also process during the callback
+
 	if(Engine::mixer()->audioDevName() == AudioJack::name() )
 	{
 		// if a jack connection has been created for audio we use that
-		m_jack_client = Engine::mixer()->audioDev()->jackClient();
+		m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev())->addMidiClient(this);
 	}else{
-		m_jack_client = jack_client_open(probeDevice().toLatin1().data(),
-									 JackNoStartServer, NULL);
+		printf("Create a midi only jack client.\n");
+		m_jackAudio = NULL;
+		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
+										JackNoStartServer, NULL);
+
+		if(m_jackClient)
+		{
+			jack_set_process_callback(m_jackClient,
+							JackMidiProcessCallback, this);
+			jack_on_shutdown(m_jackClient,
+							JackMidiShutdown, 0);
+		}
 	}
 
-	if(m_jack_client)
+	if(jackClient())
 	{
-		jack_set_process_callback(m_jack_client,
-				JackMidiProcessCallback, this);
-
-		jack_on_shutdown(m_jack_client,
-				JackMidiShutdown, 0);
-
 		m_output_port = jack_port_register(
-				m_jack_client, "midi_TX", JACK_DEFAULT_MIDI_TYPE,
+				jackClient(), "midi_TX", JACK_DEFAULT_MIDI_TYPE,
 				JackPortIsOutput, 0);
 
 		m_input_port = jack_port_register(
-				m_jack_client, "midi_RX", JACK_DEFAULT_MIDI_TYPE,
+				jackClient(), "midi_RX", JACK_DEFAULT_MIDI_TYPE,
 				JackPortIsInput, 0);
 
-		if(jack_activate(m_jack_client) == 0 )
+		if(jack_activate(jackClient()) == 0 )
 		{
-			// only start thread, if we are an active jack client.
+			// only start thread, if we have an active jack client.
 			start( QThread::LowPriority );
 		}
 	}
@@ -109,22 +116,26 @@ MidiJack::MidiJack() :
 
 MidiJack::~MidiJack()
 {
-	if(m_jack_client)
+	if(jackClient())
 	{
-		if( jack_port_unregister( m_jack_client, m_input_port) != 0){
+		if( jack_port_unregister( jackClient(), m_input_port) != 0){
 			printf("Failed to unregister jack midi input\n");
 		}
 
-		if( jack_port_unregister( m_jack_client, m_output_port) != 0){
+		if( jack_port_unregister( jackClient(), m_output_port) != 0){
 			printf("Failed to unregister jack midi output\n");
 		}
 
-		if( jack_deactivate(m_jack_client) != 0){
-			printf("Failed to deactivate jack midi client\n");
-		}
+		if(m_jackClient)
+		{
+			// an m_jackClient means we are handling the jack connection
+			if( jack_deactivate(m_jackClient) != 0){
+				printf("Failed to deactivate jack midi client\n");
+			}
 
-		if( jack_client_close(m_jack_client) != 0){
-			printf("Failed close jack midi client\n");
+			if( jack_client_close(m_jackClient) != 0){
+				printf("Failed close jack midi client\n");
+			}
 		}
 	}
 	if( isRunning() )
@@ -133,6 +144,17 @@ MidiJack::~MidiJack()
 		wait( 1000 );
 		terminate();
 	}
+}
+
+jack_client_t* MidiJack::jackClient()
+{
+	if( m_jackAudio == NULL && m_jackClient == NULL)
+		return NULL;
+
+	if( m_jackAudio == NULL && m_jackClient )
+		return m_jackClient;
+
+	return m_jackAudio->jackClient();
 }
 
 QString MidiJack::probeDevice()

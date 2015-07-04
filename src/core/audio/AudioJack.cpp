@@ -40,7 +40,7 @@
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
-
+#include "MidiJack.h"
 
 
 
@@ -50,6 +50,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_client( NULL ),
+	m_midiClient( NULL ),
 	m_active( false ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
@@ -122,7 +123,21 @@ void AudioJack::restartAfterZombified()
 
 
 
+AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
+{
+	m_midiClient = midiClient;
 
+	if( m_client == NULL )
+	{
+		if( !initJackClient() )
+		{
+			m_midiClient = NULL;
+			return NULL;
+		}
+	}
+
+	return this;
+}
 
 bool AudioJack::initJackClient()
 {
@@ -330,6 +345,14 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
+	// do midi processing first so that midi input can
+	// add to the following sound processing
+	if( m_midiClient && _nframes > 0 )
+	{
+		m_midiClient->JackMidiRead(_nframes);
+		m_midiClient->JackMidiWrite(_nframes);
+	}
+
 	for( int c = 0; c < channels(); ++c )
 	{
 		m_tempOutBufs[c] =
