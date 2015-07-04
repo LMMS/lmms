@@ -82,7 +82,6 @@ MidiJack::MidiJack() :
 		// if a jack connection has been created for audio we use that
 		m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev())->addMidiClient(this);
 	}else{
-		printf("Create a midi only jack client.\n");
 		m_jackAudio = NULL;
 		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
 										JackNoStartServer, NULL);

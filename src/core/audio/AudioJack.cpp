@@ -50,8 +50,8 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_client( NULL ),
-	m_midiClient( NULL ),
 	m_active( false ),
+	m_midiClient( NULL ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
@@ -125,16 +125,10 @@ void AudioJack::restartAfterZombified()
 
 AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
 {
-	m_midiClient = midiClient;
-
 	if( m_client == NULL )
-	{
-		if( !initJackClient() )
-		{
-			m_midiClient = NULL;
-			return NULL;
-		}
-	}
+		return NULL;
+
+	m_midiClient = midiClient;
 
 	return this;
 }
