@@ -415,7 +415,9 @@ void SongEditor::closeEvent( QCloseEvent * _ce )
 
 void SongEditor::setMasterVolume( int _new_val )
 {
-	if( m_mvsStatus->isVisible() == false && m_song->m_loadingProject == false
+	updateMasterVolumeFloat( _new_val );
+
+	if( !m_mvsStatus->isVisible() && !m_song->m_loadingProject
 					&& m_masterVolumeSlider->showStatus() )
 	{
 		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
