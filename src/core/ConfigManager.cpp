@@ -197,7 +197,7 @@ void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 	if( !_file.endsWith( ".mpt", Qt::CaseInsensitive ) ) 
 	{
 		m_recentlyOpenedProjects.removeAll( _file );
-		if( m_recentlyOpenedProjects.size() > 15 )
+		if( m_recentlyOpenedProjects.size() > 30 )
 		{
 			m_recentlyOpenedProjects.removeLast();
 		}
