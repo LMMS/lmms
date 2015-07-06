@@ -830,10 +830,23 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 {
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
+
+//	The file history goes 30 deep but we only show the 15
+//	most recent ones that we can open.
+	int shownInMenu = 0;
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
-		m_recentlyOpenedProjectsMenu->addAction(
-				embed::getIconPixmap( "project_file" ), *it );
+		QFileInfo recentFile( *it );
+		if ( recentFile.exists() )
+		{
+			m_recentlyOpenedProjectsMenu->addAction(
+					embed::getIconPixmap( "project_file" ), *it );
+			shownInMenu++;
+			if( shownInMenu >= 15 )
+			{
+				return;
+			}
+		}
 	}
 }
 
