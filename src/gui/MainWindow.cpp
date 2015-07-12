@@ -689,8 +689,6 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	
-	qDebug() << "this " << _w->metaObject()->className();
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
