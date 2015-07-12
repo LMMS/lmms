@@ -91,6 +91,9 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	
 	"You can remove and move FX channels in the context menu, which is accessed "
 	"by right-clicking the FX channel.\n") );
+
+	FxMixer * mix = Engine::fxMixer();
+	setToolTip( mix->effectChannel( m_channelIndex )->m_name );
 }
 
 
@@ -223,6 +226,7 @@ void FxLine::renameChannel()
 	if( ok && !new_name.isEmpty() )
 	{
 		mix->effectChannel( m_channelIndex )->m_name = new_name;
+		setToolTip( new_name );
 		update();
 	}
 }
