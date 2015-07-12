@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QProgressDialog>
 #include <QDomElement>
+#include <QWriteLocker>
 
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
@@ -174,6 +175,10 @@ void TrackContainer::addTrack( Track * _track )
 
 void TrackContainer::removeTrack( Track * _track )
 {
+	// need a read locker to ensure that m_tracks doesn't change after reading index.
+	//   After checking that index != -1, we need to upgrade the lock to a write locker before changing m_tracks.
+	//   But since Qt offers no function to promote a read lock to a write lock, we must start with the write locker.
+	QWriteLocker lockTracksAccess(&m_tracksMutex);
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
@@ -181,9 +186,8 @@ void TrackContainer::removeTrack( Track * _track )
 		if (_track->isSolo()) {
 			_track->setSolo(false);
 		}
-		m_tracksMutex.lockForWrite();
 		m_tracks.remove( index );
-		m_tracksMutex.unlock();
+		lockTracksAccess.unlock();
 
 		if( Engine::getSong() )
 		{
