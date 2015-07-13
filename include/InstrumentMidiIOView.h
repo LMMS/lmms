@@ -52,6 +52,8 @@ private:
 	GroupBox * m_midiInputGroupBox;
 	LcdSpinBox * m_inputChannelSpinBox;
 	LcdSpinBox * m_fixedInputVelocitySpinBox;
+	LcdSpinBox * m_lowerInputNoteLimitSpinBox;
+	LcdSpinBox * m_upperInputNoteLimitSpinBox;
 	QToolButton * m_rpBtn;
 
 	GroupBox * m_midiOutputGroupBox;

@@ -51,6 +51,8 @@ MidiPort::MidiPort( const QString& name,
 	m_fixedOutputNoteModel( -1, -1, MidiMaxKey, this, tr( "Fixed output note" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
 	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
+	m_lowerInputNoteLimitModel(-1, -1, MidiMaxKey, this, tr( "Lower input note limit" ) ),
+	m_upperInputNoteLimitModel(-1, -1, MidiMaxKey, this, tr( "Upper input note limit" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
 	m_writableModel( false, this, tr( "Send MIDI-events" ) )
 {
@@ -128,6 +130,16 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			{
 				return;
 			}
+
+			if( lowerInputNoteLimit() > -1 && inEvent.key() < lowerInputNoteLimit() )
+			{
+				return;
+			}
+
+			if( upperInputNoteLimit() > -1 && inEvent.key() > upperInputNoteLimit() )
+			{
+				return;
+			}
 		}
 
 		if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
@@ -173,6 +185,8 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_fixedOutputNoteModel.saveSettings( doc, thisElement, "fixedoutputnote" );
 	m_outputProgramModel.saveSettings( doc, thisElement, "outputprogram" );
 	m_baseVelocityModel.saveSettings( doc, thisElement, "basevelocity" );
+	m_lowerInputNoteLimitModel.saveSettings( doc, thisElement, "lowerinputnotelimit" );
+	m_upperInputNoteLimitModel.saveSettings( doc, thisElement, "upperinputnotelimit" );
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
 
@@ -226,6 +240,8 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
+	m_lowerInputNoteLimitModel.loadSettings( thisElement, "lowerinputnotelimit" );
+	m_upperInputNoteLimitModel.loadSettings( thisElement, "upperinputnotelimit" );
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
 
