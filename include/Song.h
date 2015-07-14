@@ -25,6 +25,8 @@
 #ifndef SONG_H
 #define SONG_H
 
+#include <utility>
+
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
@@ -163,6 +165,7 @@ public:
 	}
 
 	bool isExportDone() const;
+	std::pair<MidiTime, MidiTime> getExportEndpoints() const;
 
 	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{

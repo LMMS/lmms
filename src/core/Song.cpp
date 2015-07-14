@@ -416,7 +416,7 @@ bool Song::isExportDone() const
 				m_playPos[Mode_PlaySong].m_timeLine->loopEnd().getTicks();
 	}
 
-	if( m_exportLoop)
+	if( m_exportLoop )
 	{
 		return m_exporting == true &&
 			m_playPos[Mode_PlaySong].getTicks() >= 
@@ -427,6 +427,26 @@ bool Song::isExportDone() const
 		return m_exporting == true &&
 			m_playPos[Mode_PlaySong].getTicks() >= 
 				( length() + 1 ) * ticksPerTact();
+	}
+}
+
+std::pair<MidiTime, MidiTime> Song::getExportEndpoints() const
+{
+	if ( m_renderBetweenMarkers )
+	{
+		return std::pair<MidiTime, MidiTime>(
+			m_playPos[Mode_PlaySong].m_timeLine->loopBegin(),
+			m_playPos[Mode_PlaySong].m_timeLine->loopEnd()
+		);
+	}
+	else if ( m_exportLoop )
+	{
+		return std::pair<MidiTime, MidiTime>( MidiTime(0, 0), MidiTime(m_length, 0) );
+	}
+	else
+	{
+		// if not exporting as a loop, we leave one bar of padding at the end of the song to accomodate reverb, etc.
+		return std::pair<MidiTime, MidiTime>( MidiTime(0, 0), MidiTime(m_length+1, 0) );
 	}
 }
 
