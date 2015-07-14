@@ -835,7 +835,8 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		QFileInfo recentFile( *it );
-		if ( recentFile.exists() )
+		if ( recentFile.exists() && 
+				*it != ConfigManager::inst()->recoveryFile() )
 		{
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
