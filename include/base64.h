@@ -47,8 +47,6 @@ namespace base64
 		*_data = new T[*_size / sizeof(T)];
 		memcpy( *_data, data.constData(), *_size );
 	}
-	// deprecated!!
-	QString encode( const QVariant & _data );
 	// for compatibility-code only
 	QVariant decode( const QString & _b64,
 			QVariant::Type _force_type = QVariant::Invalid );
