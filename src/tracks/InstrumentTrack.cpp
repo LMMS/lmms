@@ -1227,6 +1227,7 @@ class fxLineLcdSpinBox : public LcdSpinBox
 		{
 			gui->fxMixerView()->setCurrentFxLine( model()->value() );
 
+			gui->fxMixerView()->parentWidget()->show();
 			gui->fxMixerView()->show();// show fxMixer window
 			gui->fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
