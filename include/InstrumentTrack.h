@@ -206,13 +206,13 @@ public:
 		return &m_effectChannelModel;
 	}
 
-	void setIndicator( FadeButton *fb );
 
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const Note& );
 	void midiNoteOff( const Note& );
 	void nameChanged();
+	void newNote();
 
 
 protected:
@@ -254,8 +254,6 @@ private:
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
-
-	FadeButton *m_fb;
 
 
 	Instrument * m_instrument;
