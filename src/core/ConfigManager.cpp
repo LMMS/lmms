@@ -369,16 +369,16 @@ void ConfigManager::loadConfigFile()
 		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
-	if( m_ladDir.isEmpty() || m_ladDir == QDir::separator() ||
-			( !m_ladDir.contains( ':' ) && !QDir( m_ladDir ).exists() ) )
+	if( m_ladDir.isEmpty()  )
 	{
 #if defined(LMMS_BUILD_WIN32)
 		m_ladDir = qApp->applicationDirPath() + "/plugins/ladspa" + QDir::separator();
 #elif defined(LMMS_BUILD_APPLE)
 		m_ladDir = qApp->applicationDirPath() + "/../lib/lmms/ladspa/";
 #else
-		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/ladspa/";
+		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/lmms/ladspa/";
 #endif
+		m_ladDir = QDir::cleanPath( m_ladDir );
 		m_ladDir += ","+userLadspaDir();
 	}
 
