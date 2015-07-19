@@ -706,8 +706,7 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	setFixedHeight( parentWidget()->height() - 2 );
 
 	ToolTip::add( this,
-		tr( "double-click to open this pattern in piano-roll\n"
-			"use mouse wheel to set volume of a step" ) );
+		tr( "use mouse wheel to set volume of a step" ) );
 	setStyle( QApplication::style() );
 }
 
