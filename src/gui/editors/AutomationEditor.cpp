@@ -2113,7 +2113,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
 					tr("Copy selected values (Ctrl+C)"), this);
 	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste values from clipboard Ctrl+V)"), this);
+					tr("Paste values from clipboard (Ctrl+V)"), this);
 
 	cutAction->setWhatsThis(
 		tr( "Click here and selected values will be cut into the "
