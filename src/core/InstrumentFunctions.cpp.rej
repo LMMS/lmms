@@ -1,0 +1,13 @@
+--- src/core/InstrumentFunctions.cpp
++++ src/core/InstrumentFunctions.cpp
+@@ -454,8 +454,8 @@
+ 							KeysPerOctave + chord_table[selected_arp][cur_arp_idx % cur_chord_size];
+ 
+ 		// range-checking
+-		if( sub_note_key >= NumKeys ||
+-			sub_note_key < 0 ||
++	    if( sub_note_key > MaxKey ||
++	        sub_note_key < MinKey ||
+ 			engine::mixer()->criticalXRuns() )
+ 		{
+ 			continue;

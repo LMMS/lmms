@@ -152,6 +152,8 @@ public slots:
 	void copy();
 	void paste();
 	void toggleMute();
+	void toggleMidiIn();
+	void toggleMidiOut();
 
 
 signals:
@@ -182,6 +184,8 @@ private:
 
 	friend class TrackContentObjectView;
 
+	BoolModel m_midiInModel;
+	BoolModel m_midiOutModel;
 } ;
 
 
@@ -400,6 +404,8 @@ private:
 	QPushButton * m_trackOps;
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
+	PixmapButton * m_midiInBtn;
+	PixmapButton * m_midiOutBtn;
 
 
 	friend class TrackView;
@@ -420,6 +426,8 @@ class EXPORT Track : public Model, public JournallingObject
 	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
+	mapPropertyFromModel(bool,isMidiIn,setMidiIn,m_midiInModel);
+	mapPropertyFromModel(bool,isMidiOut,setMidiOut,m_midiOutModel);
 public:
 	typedef QVector<TrackContentObject *> tcoVector;
 
@@ -537,6 +545,13 @@ public:
 		return m_processingLock.tryLock();
 	}
 
+
+	bool midiInModel() const;
+	void setMidiInModel(const bool &midiInModel);
+	bool midiOutModel() const;
+	void setMidiOutModel(const bool &midiOutModel);
+
+
 public slots:
 	virtual void setName( const QString & newName )
 	{
@@ -567,6 +582,8 @@ private:
 
 	friend class TrackView;
 
+	BoolModel m_midiInModel;
+	BoolModel m_midiOutModel;
 
 signals:
 	void destroyedTrack();

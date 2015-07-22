@@ -251,6 +251,8 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 {
 	bool eventHandled = false;
 
+	if (midiInModel() == false) return;
+
 	switch( event.type() )
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
