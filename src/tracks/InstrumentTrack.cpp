@@ -51,7 +51,6 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "Engine.h"
-#include "FadeButton.h"
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
@@ -116,7 +115,6 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master Pitch") ),
-	m_fb( NULL ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
@@ -391,7 +389,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			}
 			m_midiNotesMutex.unlock();
-			if( m_fb ) { m_fb->activate(); }
+			emit newNote();
 			break;
 
 		case MidiNoteOff:
@@ -572,12 +570,6 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 	QDomNodeList n = _dataFile.elementsByTagName( "midiport" );
 	n.item( 0 ).parentNode().removeChild( n.item( 0 ) );
 }
-
-void InstrumentTrack::setIndicator(FadeButton *fb)
-{
-	m_fb = fb;
-}
-
 
 
 
@@ -930,7 +922,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( activityIndicatorPressed() ) );
 	connect( m_activityIndicator, SIGNAL( released() ),
 				this, SLOT( activityIndicatorReleased() ) );
-	_it->setIndicator( m_activityIndicator );
+	connect( _it, SIGNAL( newNote() ),
+			 m_activityIndicator, SLOT( activate() ) );
 	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
