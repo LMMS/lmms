@@ -32,6 +32,7 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
+	core/Messenger.cpp
 	core/MeterModel.cpp
 	core/Mixer.cpp
 	core/MixerProfiler.cpp
@@ -41,6 +42,7 @@ set(LMMS_SRCS
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
+	core/OscMsgListener.cpp
 	core/PeakController.cpp
 	core/Piano.cpp
 	core/PlayHandle.cpp
