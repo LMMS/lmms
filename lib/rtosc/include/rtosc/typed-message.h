@@ -1,8 +1,8 @@
 #ifndef RTOSC_TYPED_MESSAGE_H
 #define RTOSC_TYPED_MESSAGE_H
 #include <rtosc/rtosc.h>
+#include <cassert>
 #include <type_traits>
-#include <stdexcept>
 
 namespace rtosc
 {
@@ -110,8 +110,7 @@ template<size_t Index, class... Types> inline
     typename osc_element<Index, rtMsg<Types...>>::type
 get(rtMsg<Types...>& Tuple)
 {
-    if(!Tuple.msg)
-        throw std::invalid_argument("Message Does Not Match Spec");
+    assert(Tuple.msg);
     typedef typename std::remove_reference<typename osc_element<Index, rtMsg<Types...>>::type>::type T;
     return rt_get_impl<T>(Tuple.msg, Index);
 }
