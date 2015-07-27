@@ -24,6 +24,11 @@
 
 #include "GuiApplication.h"
 
+#include <QApplication>
+#include <QSplashScreen>
+
+#include "rtosc/rtosc.h"
+
 #include "lmmsversion.h"
 
 #include "LmmsStyle.h"
@@ -65,6 +70,10 @@ GuiApplication::GuiApplication()
 	{
 		ConfigManager::inst()->createWorkingDir();
 	}
+	// Add ourselves as a listener for Open Sound Control messages.
+	Engine::messenger()->addGuiOscListener(this);
+	this->listenInNewThread();
+
 	// Init style and palette
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
@@ -97,10 +106,8 @@ GuiApplication::GuiApplication()
 
 	// may have long gaps between future frames, so force update now
 	splashScreen.update();
+	splashScreen.repaint();
 	qApp->processEvents();
-
-	connect(Engine::inst(), SIGNAL(initProgress(const QString&)), 
-		this, SLOT(displayInitProgress(const QString&)));
 
 	// Init central engine which handles all components of LMMS
 	Engine::init(false);
@@ -157,12 +164,13 @@ GuiApplication::~GuiApplication()
 
 void GuiApplication::displayInitProgress(const QString &msg)
 {
-	Q_ASSERT(m_loadingProgressLabel != nullptr);
-	
-	m_loadingProgressLabel->setText(msg);
-	// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
-	m_loadingProgressLabel->repaint();
-	qApp->processEvents();
+	if (m_loadingProgressLabel != nullptr)
+	{
+		m_loadingProgressLabel->setText(msg);
+		// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
+		// m_loadingProgressLabel->repaint();
+		// qApp->processEvents();
+	}
 }
 
 void GuiApplication::childDestroyed(QObject *obj)
@@ -200,5 +208,20 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_controllerRackView)
 	{
 		m_controllerRackView = nullptr;
+	}
+}
+
+void GuiApplication::processMessage(const char *msg)
+{
+	if (rtosc_match(Messenger::Endpoints::InitMsg, msg))
+	{
+		if (rtosc_narguments(msg) != 1 || !rtosc_argument(msg, 0).s)
+		{
+			qDebug() << "GuiApplication::processMessage: bad InitMsg OSC command";
+		}
+		else
+		{
+			displayInitProgress(QString::fromUtf8(rtosc_argument(msg, 0).s));
+		}
 	}
 }

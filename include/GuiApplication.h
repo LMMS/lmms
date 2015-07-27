@@ -28,6 +28,7 @@
 #include <QtCore/QObject>
 
 #include "export.h"
+#include "OscMsgListener.h"
 
 class QLabel;
 
@@ -40,7 +41,7 @@ class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
 
-class EXPORT GuiApplication : public QObject
+class EXPORT GuiApplication : public QObject, public OscMsgListener
 {
 	Q_OBJECT;
 public:
@@ -57,6 +58,9 @@ public:
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
+	
+	// override of callback defined by OscMsgListener
+	void processMessage(const char *message);
 
 public slots:
 	void displayInitProgress(const QString &msg);

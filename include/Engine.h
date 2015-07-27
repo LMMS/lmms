@@ -30,6 +30,7 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
+#include "Messenger.h"
 
 #include "export.h"
 
@@ -42,9 +43,8 @@ class Song;
 class Ladspa2LMMS;
 
 
-class EXPORT Engine : public QObject
+class EXPORT Engine
 {
-	Q_OBJECT
 public:
 	static void init( bool renderOnly );
 	static void destroy();
@@ -85,23 +85,16 @@ public:
 		return s_dummyTC;
 	}
 
+	static Messenger * messenger()
+	{
+		return &s_messenger;
+	}
+
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
 	}
 	static void updateFramesPerTick();
-
-	static inline Engine * inst()
-	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new Engine();
-		}
-		return s_instanceOfMe;
-	}
-
-signals:
-	void initProgress(const QString &msg);
 
 
 private:
@@ -126,6 +119,9 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
+
+	// object to send/receive Open Sound Control messages
+	static Messenger s_messenger;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static Engine * s_instanceOfMe;
