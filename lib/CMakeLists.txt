@@ -1,0 +1,4 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+# Build RTOSC from its CMakeFiles.txt
+ADD_SUBDIRECTORY(rtosc)

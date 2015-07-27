@@ -465,6 +465,7 @@ ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
+ADD_SUBDIRECTORY(lib)
 
 # post-install tasks
 ADD_SUBDIRECTORY(cmake/postinstall)
