@@ -27,6 +27,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QApplication>
+#include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
 #include "MainWindow.h"
@@ -52,13 +53,7 @@ ConfigManager::ConfigManager() :
 								".lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
 						"lmms" + QDir::separator() ),
-	m_dataDir( qApp->applicationDirPath()
-#ifdef LMMS_BUILD_WIN32
-			+ QDir::separator() + "data" + QDir::separator()
-#else
-				.section( '/', 0, -2 ) + "/share/lmms/"
-#endif
-									),
+	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
@@ -68,7 +63,36 @@ ConfigManager::ConfigManager() :
 {
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
-	QDir::addSearchPath("data", m_dataDir);
+
+	// If we're in development (lmms is not installed) let's get the source
+	// directory by reading the CMake Cache
+	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
+	if (cmakeCache.exists()) {
+		cmakeCache.open(QFile::ReadOnly);
+		QTextStream stream(&cmakeCache);
+
+		// Find the line containing something like lmms_SOURCE_DIR:static=<dir>
+		while(! stream.atEnd())
+		{
+			QString line = stream.readLine();
+
+			if (line.startsWith("lmms_SOURCE_DIR:")) {
+				QString srcDir = line.section('=', -1).trimmed();
+				QDir::addSearchPath("data", srcDir + "/data/");
+				break;
+			}
+		}
+
+		cmakeCache.close();
+	}
+
+#ifdef LMMS_BUILD_WIN32
+	QDir::addSearchPath("data", qApp->applicationDirPath() + "/data/");
+#else
+	QDir::addSearchPath("data", qApp->applicationDirPath().section('/', 0, -2) + "/share/lmms/");
+#endif
+
+
 }
 
 
