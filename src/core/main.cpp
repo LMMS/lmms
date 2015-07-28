@@ -516,11 +516,8 @@ int main( int argc, char * * argv )
 		printf( "done\n" );
 
 		// create renderer
-		ProjectRenderer * r = new ProjectRenderer( qs, os, eff,
-			render_out +
-				QString( ( eff ==
-					ProjectRenderer::WaveFile ) ?
-						"wav" : "ogg" ) );
+		QString extension = ( eff == ProjectRenderer::WaveFile ) ? "wav" : "ogg";
+		ProjectRenderer * r = new ProjectRenderer( qs, os, eff, render_out + extension );
 		QCoreApplication::instance()->connect( r,
 				SIGNAL( finished() ), SLOT( quit() ) );
 
