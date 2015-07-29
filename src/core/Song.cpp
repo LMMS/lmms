@@ -828,11 +828,7 @@ void Song::clearProject()
 		gui->getProjectNotes()->clear();
 	}
 
-	// Move to function
-	while( !m_controllers.empty() )
-	{
-		delete m_controllers.last();
-	}
+	removeAllControllers();
 
 	emit dataChanged();
 
@@ -1215,6 +1211,19 @@ void Song::restoreControllerStates( const QDomElement & element )
 }
 
 
+
+void Song::removeAllControllers()
+{
+	for (int i = 0; i < m_controllers.size(); ++i)
+	{
+		delete m_controllers.at(i);
+	}
+
+	m_controllers.clear();
+}
+
+
+
 void Song::exportProjectTracks()
 {
 	exportProject( true );
@@ -1383,12 +1392,14 @@ void Song::setModified()
 
 
 
-void Song::addController( Controller * c )
+void Song::addController( Controller * controller )
 {
-	if( c != NULL && m_controllers.contains( c ) == false ) 
+	if( controller && !m_controllers.contains( controller ) )
 	{
-		m_controllers.append( c );
-		emit dataChanged();
+		m_controllers.append( controller );
+		emit controllerAdded( controller );
+
+		this->setModified();
 	}
 }
 
@@ -1402,11 +1413,10 @@ void Song::removeController( Controller * controller )
 	{
 		m_controllers.remove( index );
 
-		if( Engine::getSong() )
-		{
-			Engine::getSong()->setModified();
-		}
-		emit dataChanged();
+		emit controllerRemoved( controller );
+		delete controller;
+
+		this->setModified();
 	}
 }
 

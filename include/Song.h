@@ -323,6 +323,8 @@ private:
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
+	void removeAllControllers();
+
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -376,6 +378,8 @@ signals:
 	void lengthChanged( int tacts );
 	void tempoChanged( bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
+	void controllerAdded( Controller * );
+	void controllerRemoved( Controller * );
 
 } ;
 
