@@ -154,7 +154,6 @@ protected:
 
 
 private:
-	static QPixmap * s_timeLinePixmap;
 	static QPixmap * s_posMarkerPixmap;
 	static QPixmap * s_loopPointBeginPixmap;
 	static QPixmap * s_loopPointEndPixmap;
