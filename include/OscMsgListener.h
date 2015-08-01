@@ -45,7 +45,7 @@ class OscMsgListener
 		void listenInNewThread();
 	protected:
 		// called whenever a message is received
-		virtual void processMessage(const char *msg) = 0;
+		virtual void processMessage(const QByteArray &msg) = 0;
 	private:
 		// queue of unprocessed received messages
 		QQueue<QByteArray> m_rxQueue;

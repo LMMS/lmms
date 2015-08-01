@@ -73,7 +73,7 @@ void OscMsgListener::listenerLoop()
 			received = m_rxQueue.dequeue();
 		}
 
-		processMessage(received.data());
+		processMessage(received);
 	} while (true);
 }
 
