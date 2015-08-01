@@ -346,18 +346,55 @@ void GuiApplication::processMessage(const QByteArray &msg)
 	emit receivedOscMessage(msg);
 }
 
-void GuiApplication::processOscMsgInGuiThread(const QByteArray msg)
+static bool oscCheckHasOneStrArg(const QByteArray &msg)
 {
-	if (rtosc_match(Messenger::Endpoints::InitMsg, msg.data()))
+	bool success = rtosc_narguments(msg.data()) == 1 && rtosc_argument(msg.data(), 0).s;
+	if (!success)
 	{
-		if (rtosc_narguments(msg.data()) != 1 || !rtosc_argument(msg.data(), 0).s)
+		qDebug() << "GuiApplication: Bad OSC command";
+	}
+	return success;
+}
+
+void GuiApplication::processOscMsgInGuiThread(QByteArray msg)
+{
+	const char *data = msg.data();
+	if (strcmp(Messenger::Endpoints::InitMsg, data) == 0)
+	{
+		if (oscCheckHasOneStrArg(msg))
 		{
-			qDebug() << "GuiApplication::processMessage: Bad InitMsg OSC command";
+			displayInitProgress(QString::fromUtf8(rtosc_argument(data, 0).s));
+		}
+	}
+	else if (strcmp(Messenger::Endpoints::Warning, data) == 0)
+	{
+		if (oscCheckHasOneStrArg(msg))
+		{
+			QString warning = QString::fromUtf8(rtosc_argument(data, 0).s);
+			QMessageBox::warning( NULL, MainWindow::tr( "Warning" ), warning);
+		}
+	}
+	else if (strcmp(Messenger::Endpoints::Error, data) == 0)
+	{
+		QString brief, msg;
+		if (rtosc_narguments(data) == 1 && rtosc_argument(data, 0).s)
+		{
+			brief = MainWindow::tr( "Error" );
+			msg = QString::fromUtf8(rtosc_argument(data, 0).s);
+		} 
+		else if (rtosc_narguments(data) == 2 && rtosc_argument(data, 0).s
+			&& rtosc_argument(data, 1).s)
+		{
+			brief = QString::fromUtf8(rtosc_argument(data, 0).s);
+			msg = QString::fromUtf8(rtosc_argument(data, 1).s);
 		}
 		else
 		{
-			displayInitProgress(QString::fromUtf8(rtosc_argument(msg.data(), 0).s));
+			qDebug() << "GuiApplication::processMessage: invalid error message";
+			return;
 		}
+
+		QMessageBox::critical( NULL, brief, msg);
 	}
 	else
 	{
