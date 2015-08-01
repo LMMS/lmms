@@ -25,7 +25,6 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
-#include <QMessageBox>
 
 #include "Plugin.h"
 #include "embed.h"
@@ -98,27 +97,19 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 	if( pi.isNull() )
 	{
-		if( gui )
-		{
-			QMessageBox::information( NULL,
-				tr( "Plugin not found" ),
-				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
-				QMessageBox::Ok | QMessageBox::Default );
-		}
+		Engine::messenger()->broadcastError(
+			tr( "Plugin not found" ),
+			tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
+				arg( pluginName ).arg( pluginFactory->errorString(pluginName) ) );
 		return new DummyPlugin();
 	}
 
 	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
 	if( instantiationHook == NULL )
 	{
-		if( gui )
-		{
-			QMessageBox::information( NULL,
-				tr( "Error while loading plugin" ),
-				tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-				QMessageBox::Ok | QMessageBox::Default );
-		}
+		Engine::messenger()->broadcastError(
+			tr( "Error while loading plugin" ),
+			tr( "Failed to load plugin \"%1\"!").arg( pluginName ) );
 		return new DummyPlugin();
 	}
 

@@ -25,11 +25,11 @@
 #include <QDomElement>
 #include <QDir>
 #include <QFile>
-#include <QMessageBox>
 #include <QApplication>
 #include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
+#include "Engine.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
 #include "GuiApplication.h"
@@ -384,10 +384,10 @@ void ConfigManager::loadConfigFile()
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
-		else if( gui )
+		else
 		{
-			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
-									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
+			Engine::messenger()->broadcastWarning( 
+				MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
 													arg( errorLine ).
 													arg( errorCol ).
 													arg( errorString ) );
@@ -508,8 +508,7 @@ void ConfigManager::saveConfigFile()
 	QFile outfile( m_lmmsRcFile );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			MainWindow::tr( "Could not save config-file" ),
+		Engine::messenger()->broadcastError(
 			MainWindow::tr( "Could not save configuration file %1. "
 					"You're probably not permitted to "
 					"write to this file.\n"
