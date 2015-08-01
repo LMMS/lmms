@@ -1050,15 +1050,7 @@ void Song::loadProject( const QString & fileName )
 
 	if ( hasErrors())
 	{
-		if ( gui )
-		{
-			QMessageBox::warning( NULL, "LMMS Error report", *errorSummary(),
-							QMessageBox::Ok );
-		}
-		else
-		{
-			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
-		}
+		Engine::messenger()->broadcastWarning("LMMS Error Report", *errorSummary());
 	}
 
 	m_loadingProject = false;
