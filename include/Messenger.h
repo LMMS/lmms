@@ -49,12 +49,25 @@ public:
 	public:
 		// Open Sound Control endpoint to send a message describing the initialization state of the core
 		static const char *InitMsg;
+		static const char *Warning;
+		static const char *Error;
 	};
 
 	// during the initialization stage of LMMS, broadcast a status message,
 	//   e.g. "Intializing FX Mixer".
 	//   Useful for debugging/logging & to provide some GUI splash-screen loading text
 	void broadcastInitMsg(const QString &msg);
+
+	// whenever the core encounters a warning, it can broadcast it to listeners
+	//   rather than explicitly pop a Qt Dialog / log it, etc.
+	void broadcastWarning(const QString &warning);
+
+	// broadcast an error message. The fact that it's an error does *not* imply
+	//   that the core/gui should exit.
+	void broadcastError(const QString &msg);
+	// broadcast an error message, where @brief is one-line summary of the error,
+	//   and @msg is the full message
+	void broadcastError(const QString &brief, const QString &msg);
 
 	// add a function to listen for OSC messages directed to a gui
 	// NOTE: This handler should have hard timing guarantees
