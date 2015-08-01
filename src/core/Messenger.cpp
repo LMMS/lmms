@@ -28,6 +28,7 @@
 
 #include "Messenger.h"
 
+#include <QDebug>
 #include <QReadLocker>
 #include <QString>
 #include <QWriteLocker>
@@ -77,7 +78,7 @@ void Messenger::addGuiOscListener(OscMsgListener *listener)
 
 void Messenger::broadcast(const char* buffer, std::size_t length)
 {
-	if (length)
+	if (length && buffer)
 	{
 		// send this message to all GUI listeners
 		QReadLocker guiLocker(&m_guiListenersLock);
@@ -85,5 +86,9 @@ void Messenger::broadcast(const char* buffer, std::size_t length)
 		{
 			(*i)->queue(buffer, length);
 		}
+	}
+	else
+	{
+		qDebug() << "Messenger::broadcast: attempt to broadcast a message with no content";
 	}
 }
