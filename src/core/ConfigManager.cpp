@@ -387,6 +387,7 @@ void ConfigManager::loadConfigFile()
 		else
 		{
 			Engine::messenger()->broadcastWarning( 
+				MainWindow::tr( "Parsing Error" ),
 				MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
 													arg( errorLine ).
 													arg( errorCol ).
@@ -509,6 +510,7 @@ void ConfigManager::saveConfigFile()
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
 		Engine::messenger()->broadcastError(
+			MainWindow::tr( "Could not safe config file"),
 			MainWindow::tr( "Could not save configuration file %1. "
 					"You're probably not permitted to "
 					"write to this file.\n"

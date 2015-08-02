@@ -60,13 +60,12 @@ public:
 
 	// whenever the core encounters a warning, it can broadcast it to listeners
 	//   rather than explicitly pop a Qt Dialog / log it, etc.
-	void broadcastWarning(const QString &warning);
+	void broadcastWarning(const QString &brief, const QString &warning);
 
 	// broadcast an error message. The fact that it's an error does *not* imply
 	//   that the core/gui should exit.
-	void broadcastError(const QString &msg);
-	// broadcast an error message, where @brief is one-line summary of the error,
-	//   and @msg is the full message
+	// @brief is one-line summary of the error,
+	// @msg is the full message
 	void broadcastError(const QString &brief, const QString &msg);
 
 	// add a function to listen for OSC messages directed to a gui

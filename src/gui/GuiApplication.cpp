@@ -346,9 +346,9 @@ void GuiApplication::processMessage(const QByteArray &msg)
 	emit receivedOscMessage(msg);
 }
 
-static bool oscCheckHasOneStrArg(const QByteArray &msg)
+static bool checkOscArgs(const char *fmt, const QByteArray &msg)
 {
-	bool success = rtosc_narguments(msg.data()) == 1 && rtosc_argument(msg.data(), 0).s;
+	bool success = (strcmp(fmt, rtosc_argument_string(msg.data())) == 0);
 	if (!success)
 	{
 		qDebug() << "GuiApplication: Bad OSC command";
@@ -361,40 +361,30 @@ void GuiApplication::processOscMsgInGuiThread(QByteArray msg)
 	const char *data = msg.data();
 	if (strcmp(Messenger::Endpoints::InitMsg, data) == 0)
 	{
-		if (oscCheckHasOneStrArg(msg))
+		if (checkOscArgs("s", msg))
 		{
 			displayInitProgress(QString::fromUtf8(rtosc_argument(data, 0).s));
 		}
 	}
 	else if (strcmp(Messenger::Endpoints::Warning, data) == 0)
 	{
-		if (oscCheckHasOneStrArg(msg))
+		if (checkOscArgs("ss", msg))
 		{
-			QString warning = QString::fromUtf8(rtosc_argument(data, 0).s);
-			QMessageBox::warning( NULL, MainWindow::tr( "Warning" ), warning);
+			QString brief = QString::fromUtf8(rtosc_argument(data, 0).s);
+			QString warning = QString::fromUtf8(rtosc_argument(data, 1).s);
+			QMessageBox::warning( NULL, 
+				brief.isEmpty() ? MainWindow::tr( "Warning" ) : brief, warning);
 		}
 	}
 	else if (strcmp(Messenger::Endpoints::Error, data) == 0)
 	{
-		QString brief, msg;
-		if (rtosc_narguments(data) == 1 && rtosc_argument(data, 0).s)
+		if (checkOscArgs("ss", msg));
 		{
-			brief = MainWindow::tr( "Error" );
-			msg = QString::fromUtf8(rtosc_argument(data, 0).s);
-		} 
-		else if (rtosc_narguments(data) == 2 && rtosc_argument(data, 0).s
-			&& rtosc_argument(data, 1).s)
-		{
-			brief = QString::fromUtf8(rtosc_argument(data, 0).s);
-			msg = QString::fromUtf8(rtosc_argument(data, 1).s);
+			QString brief = QString::fromUtf8(rtosc_argument(data, 0).s);
+			QString msg = QString::fromUtf8(rtosc_argument(data, 1).s);
+			QMessageBox::critical( NULL, 
+				brief.isEmpty() ? MainWindow::tr( "Error" ) : brief, msg);
 		}
-		else
-		{
-			qDebug() << "GuiApplication::processMessage: invalid error message";
-			return;
-		}
-
-		QMessageBox::critical( NULL, brief, msg);
 	}
 	else
 	{
