@@ -47,27 +47,24 @@ const char *Messenger::Endpoints::Error   = "/status/error";
 void Messenger::broadcastInitMsg(const QString &msg)
 {
 	char oscMsg[512];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::InitMsg, "s", msg.toUtf8().data()));
+	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::InitMsg, "s", 
+		msg.toUtf8().data()));
 }
 
-void Messenger::broadcastWarning(const QString &msg)
+void Messenger::broadcastWarning(const QString &brief, const QString &msg)
 {
 	char oscMsg[2048];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Warning, "s", msg.toUtf8().data()));
-}
-
-void Messenger::broadcastError(const QString &msg)
-{
-	char oscMsg[2048];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Error, "s", msg.toUtf8().data()));
+	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Warning, "ss", 
+		brief.toUtf8().data(),
+		msg.toUtf8().data()));
 }
 
 void Messenger::broadcastError(const QString &brief, const QString &msg)
 {
 	char oscMsg[2048];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Error, 
-		"s", brief.toUtf8().data(),
-		"s", msg.toUtf8().data()));
+	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Error, "ss",
+		brief.toUtf8().data(),
+		msg.toUtf8().data()));
 }
 
 void Messenger::addGuiOscListener(OscMsgListener *listener)
