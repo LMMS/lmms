@@ -135,6 +135,11 @@ void ConfigManager::upgrade()
 	m_version = LMMS_VERSION;
 }
 
+bool ConfigManager::hasWorkingDir() const
+{
+	return QDir( m_workingDir ).exists();
+}
+
 
 void ConfigManager::setWorkingDir( const QString & _wd )
 {
@@ -277,7 +282,7 @@ void ConfigManager::setValue( const QString & _class,
 
 
 
-void ConfigManager::loadConfigFile()
+void ConfigManager::loadConfigFile(bool createWorkingDir)
 {
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
@@ -426,18 +431,12 @@ void ConfigManager::loadConfigFile()
 	searchPaths << artworkDir() << defaultArtworkDir();
 	QDir::setSearchPaths( "resources", searchPaths);
 
-	if( !QDir( m_workingDir ).exists() && gui &&
-		QMessageBox::question( 0,
-			MainWindow::tr( "Working directory" ),
-			MainWindow::tr( "The LMMS working directory %1 does not "
-				"exist. Create it now? You can change the directory "
-				"later via Edit -> Settings." ).arg( m_workingDir ),
-					QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+	if( !hasWorkingDir() && createWorkingDir )
 	{
 		QDir().mkpath( m_workingDir );
 	}
 
-	if( QDir( m_workingDir ).exists() )
+	if( hasWorkingDir() )
 	{
 		QDir().mkpath( userProjectsDir() );
 		QDir().mkpath( userTemplateDir() );
