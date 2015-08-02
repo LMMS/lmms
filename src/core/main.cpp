@@ -35,7 +35,6 @@
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
-#include <QMessageBox>
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
