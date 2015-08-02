@@ -29,7 +29,6 @@
 #include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
-#include <QMessageBox>
 #include <QPainter>
 #include <QReadLocker>
 
