@@ -876,13 +876,13 @@ MidiClient * Mixer::tryMidiClients()
 #ifdef LMMS_HAVE_JACK
 	if( client_name == MidiJack::name() || client_name == "" )
 	{
-		MidiJack * moss = new MidiJack;
-		if( moss->isRunning() )
+		MidiJack * mjack = new MidiJack;
+		if( mjack->isRunning() )
 		{
 			m_midiClientName = MidiJack::name();
-			return moss;
+			return mjack;
 		}
-		delete moss;
+		delete mjack;
 	}
 #endif
 
