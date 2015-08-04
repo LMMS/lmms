@@ -26,11 +26,11 @@
 
 #ifdef LMMS_HAVE_JACK
 
-#include <QtGui/QCompleter>
-#include <QtGui/QDirModel>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMessageBox>
+#include <QCompleter>
+#include <QDirModel>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QTranslator>
 
 #ifdef LMMS_HAVE_STDLIB_H
