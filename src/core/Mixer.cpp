@@ -85,13 +85,13 @@ Mixer::Mixer( bool renderOnly ) :
 	// determine FIFO size and number of frames per period
 	int fifoSize = 1;
 
-	if (!renderOnly)
+	if( renderOnly == false )
 	{
 		m_framesPerPeriod = 
 			( fpp_t ) ConfigManager::inst()->
 				value( "mixer", "framesperaudiobuffer" ).toInt();
 
-		if (m_framesPerPeriod < 32)
+		if( m_framesPerPeriod < 32 )
 		{
 			ConfigManager::inst()->setValue( "mixer",
 									"framesperaudiobuffer",
