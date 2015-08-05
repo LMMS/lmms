@@ -214,6 +214,9 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	// returns true if the working dir (~/lmms) exists on disk
+	bool hasWorkingDir() const;
+
 	void addRecentlyOpenedProject( const QString & _file );
 
 	const QString & value( const QString & _class,
@@ -221,7 +224,9 @@ public:
 	void setValue( const QString & _class, const QString & _attribute,
 						const QString & _value );
 
-	void loadConfigFile();
+	// if createWorkingDir == true, the working dir (default ~/lmms) will
+	//   be created if it does not exist
+	void loadConfigFile(bool createWorkingDir);
 	void saveConfigFile();
 
 

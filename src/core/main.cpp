@@ -31,10 +31,10 @@
 
 #include <QFileInfo>
 #include <QLocale>
+#include <QMessageBox>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
-#include <QMessageBox>
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
@@ -395,8 +395,16 @@ int main( int argc, char * * argv )
 		}
 	}
 
+	// determine if we should create the ~/lmms working directory
+	bool doCreateWorkingDir = ConfigManager::inst()->hasWorkingDir() ? false : 
+		( QMessageBox::question( 0,
+			MainWindow::tr( "Working directory" ),
+			MainWindow::tr( "The LMMS working directory %1 does not "
+				"exist. Create it now? You can change the directory "
+				"later via Edit -> Settings." ).arg( ConfigManager::inst()->workingDir() ),
+					QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes );
 
-	ConfigManager::inst()->loadConfigFile();
+	ConfigManager::inst()->loadConfigFile( doCreateWorkingDir );
 
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
