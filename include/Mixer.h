@@ -382,7 +382,7 @@ private:
 	} ;
 
 
-	Mixer();
+	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
 	void startProcessing( bool _needs_fifo = true );
