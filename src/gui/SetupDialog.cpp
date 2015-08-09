@@ -63,6 +63,7 @@
 #include "MidiAlsaSeq.h"
 #include "MidiOss.h"
 #include "MidiWinMM.h"
+#include "MidiApple.h"
 #include "MidiDummy.h"
 
 
@@ -828,6 +829,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_BUILD_WIN32
 	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
 					new MidiWinMM::setupWidget( msw );
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    m_midiIfaceSetupWidgets[MidiApple::name()] =
+                    new MidiApple::setupWidget( msw );
 #endif
 
 	m_midiIfaceSetupWidgets[MidiDummy::name()] =

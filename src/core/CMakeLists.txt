@@ -81,6 +81,7 @@ set(LMMS_SRCS
 	core/midi/MidiClient.cpp
 	core/midi/MidiController.cpp
 	core/midi/MidiOss.cpp
+	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
