@@ -85,22 +85,26 @@ Mixer::Mixer( bool renderOnly ) :
 	// determine FIFO size and number of frames per period
 	int fifoSize = 1;
 
+	// if not only rendering (that is, using the GUI), load the buffer
+	// size from user configuration
 	if( renderOnly == false )
 	{
 		m_framesPerPeriod = 
 			( fpp_t ) ConfigManager::inst()->
 				value( "mixer", "framesperaudiobuffer" ).toInt();
 
-		if( m_framesPerPeriod < 32 )
+		// if the value read from user configuration is not set or
+		// lower than the minimum allowed, use the default value and
+		// save it to the configuration
+		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
 		{
 			ConfigManager::inst()->setValue( "mixer",
-									"framesperaudiobuffer",
+						"framesperaudiobuffer",
 						QString::number( DEFAULT_BUFFER_SIZE ) );
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
-
-		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
+		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
 			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
