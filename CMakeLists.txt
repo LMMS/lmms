@@ -53,6 +53,7 @@ IF(LMMS_BUILD_APPLE)
 	SET(WANT_VST OFF)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	SET(STATUS_APPLEMIDI "OK")
 	# MacPorts: /opt/local/lib
 	LINK_DIRECTORIES(${LINK_DIRECTORIES} /opt/local/lib)
 ENDIF(LMMS_BUILD_APPLE)
@@ -69,6 +70,7 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
+	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
@@ -527,6 +529,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
+"* AppleMidi                   : ${STATUS_APPLEMIDI}\n"
 )
 
 MESSAGE(

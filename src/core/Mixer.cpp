@@ -50,6 +50,7 @@
 #include "MidiAlsaSeq.h"
 #include "MidiOss.h"
 #include "MidiWinMM.h"
+#include "MidiApple.h"
 #include "MidiDummy.h"
 
 #include "MemoryHelper.h"
@@ -892,6 +893,18 @@ MidiClient * Mixer::tryMidiClients()
 		}
 		delete mwmm;
 	}
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    printf( "trying midi apple...\n" );
+    if( client_name == MidiApple::name() || client_name == "" )
+    {
+        MidiApple * mapple = new MidiApple;
+        m_midiClientName = MidiApple::name();
+        printf( "Returning midi apple\n" );
+        return mapple;
+    }
+    printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
 	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
