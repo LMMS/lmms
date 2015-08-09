@@ -50,7 +50,7 @@ DummyTrackContainer * Engine::s_dummyTC = NULL;
 
 
 
-void Engine::init()
+void Engine::init( bool renderOnly )
 {
 	Engine *engine = inst();
 
@@ -60,7 +60,7 @@ void Engine::init()
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer;
+	s_mixer = new Mixer( renderOnly );
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;

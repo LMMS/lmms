@@ -57,6 +57,7 @@ class MidiClient;
 class AudioPort;
 
 
+const fpp_t MINIMUM_BUFFER_SIZE = 32;
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
 const int BYTES_PER_SAMPLE = sizeof( sample_t );
@@ -382,7 +383,7 @@ private:
 	} ;
 
 
-	Mixer();
+	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
 	void startProcessing( bool _needs_fifo = true );

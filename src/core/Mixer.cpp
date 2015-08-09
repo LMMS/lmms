@@ -58,7 +58,7 @@
 
 
 
-Mixer::Mixer() :
+Mixer::Mixer( bool renderOnly ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_workingBuf( NULL ),
 	m_inputBufferRead( 0 ),
@@ -83,37 +83,37 @@ Mixer::Mixer() :
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
-	// just rendering?
-	if( !gui )
-	{
-		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		m_fifo = new fifo( 1 );
-	}
-	else if( ConfigManager::inst()->value( "mixer", "framesperaudiobuffer"
-						).toInt() >= 32 )
-	{
-		m_framesPerPeriod =
-			(fpp_t) ConfigManager::inst()->value( "mixer",
-					"framesperaudiobuffer" ).toInt();
+	// determine FIFO size and number of frames per period
+	int fifoSize = 1;
 
-		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
+	// if not only rendering (that is, using the GUI), load the buffer
+	// size from user configuration
+	if( renderOnly == false )
+	{
+		m_framesPerPeriod = 
+			( fpp_t ) ConfigManager::inst()->
+				value( "mixer", "framesperaudiobuffer" ).toInt();
+
+		// if the value read from user configuration is not set or
+		// lower than the minimum allowed, use the default value and
+		// save it to the configuration
+		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
 		{
-			m_fifo = new fifo( m_framesPerPeriod
-							/ DEFAULT_BUFFER_SIZE );
+			ConfigManager::inst()->setValue( "mixer",
+						"framesperaudiobuffer",
+						QString::number( DEFAULT_BUFFER_SIZE ) );
+
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
-		else
+		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
-			m_fifo = new fifo( 1 );
+			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
+			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
 	}
-	else
-	{
-		ConfigManager::inst()->setValue( "mixer",
-							"framesperaudiobuffer",
-				QString::number( m_framesPerPeriod ) );
-		m_fifo = new fifo( 1 );
-	}
+
+	// allocte the FIFO from the determined size
+	m_fifo = new fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );

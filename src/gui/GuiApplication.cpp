@@ -90,7 +90,7 @@ GuiApplication::GuiApplication()
 		this, SLOT(displayInitProgress(const QString&)));
 
 	// Init central engine which handles all components of LMMS
-	Engine::init();
+	Engine::init(false);
 
 	s_instance = this;
 
