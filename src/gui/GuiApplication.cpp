@@ -31,6 +31,7 @@
 
 #include "AutomationEditor.h"
 #include "BBEditor.h"
+#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
 #include "InstrumentTrack.h"
@@ -40,6 +41,7 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QMessageBox>
 #include <QSplashScreen>
 
 GuiApplication* GuiApplication::s_instance = nullptr;
@@ -52,6 +54,17 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication()
 {
+	// prompt the user to create the LMMS working directory (e.g. ~/lmms) if it doesn't exist
+	if ( !ConfigManager::inst()->hasWorkingDir() &&
+		QMessageBox::question( NULL,
+				tr( "Working directory" ),
+				tr( "The LMMS working directory %1 does not "
+				"exist. Create it now? You can change the directory "
+				"later via Edit -> Settings." ).arg( ConfigManager::inst()->workingDir() ),
+					QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes)
+	{
+		ConfigManager::inst()->createWorkingDir();
+	}
 	// Init style and palette
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);

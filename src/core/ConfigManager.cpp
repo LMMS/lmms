@@ -135,6 +135,11 @@ void ConfigManager::upgrade()
 	m_version = LMMS_VERSION;
 }
 
+bool ConfigManager::hasWorkingDir() const
+{
+	return QDir( m_workingDir ).exists();
+}
+
 
 void ConfigManager::setWorkingDir( const QString & _wd )
 {
@@ -213,6 +218,20 @@ void ConfigManager::setSF2Dir(const QString &sfd)
 	m_sf2Dir = sfd;
 }
 
+
+void ConfigManager::createWorkingDir()
+{
+	QDir().mkpath( m_workingDir );
+
+	QDir().mkpath( userProjectsDir() );
+	QDir().mkpath( userTemplateDir() );
+	QDir().mkpath( userSamplesDir() );
+	QDir().mkpath( userPresetsDir() );
+	QDir().mkpath( userGigDir() );
+	QDir().mkpath( userSf2Dir() );
+	QDir().mkpath( userVstDir() );
+	QDir().mkpath( userLadspaDir() );
+}
 
 
 
@@ -426,28 +445,10 @@ void ConfigManager::loadConfigFile()
 	searchPaths << artworkDir() << defaultArtworkDir();
 	QDir::setSearchPaths( "resources", searchPaths);
 
-	if( !QDir( m_workingDir ).exists() && gui &&
-		QMessageBox::question( 0,
-			MainWindow::tr( "Working directory" ),
-			MainWindow::tr( "The LMMS working directory %1 does not "
-				"exist. Create it now? You can change the directory "
-				"later via Edit -> Settings." ).arg( m_workingDir ),
-					QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+	// Create any missing subdirectories in the working dir, but only if the working dir exists
+	if( hasWorkingDir() )
 	{
-		QDir().mkpath( m_workingDir );
-	}
-
-	if( QDir( m_workingDir ).exists() )
-	{
-		QDir().mkpath( userProjectsDir() );
-		QDir().mkpath( userTemplateDir() );
-		QDir().mkpath( userSamplesDir() );
-		QDir().mkpath( userPresetsDir() );
-		QDir().mkpath( userGigDir() );
-		QDir().mkpath( userSf2Dir() );
-		QDir().mkpath( userVstDir() );
-		QDir().mkpath( userLadspaDir() );
-
+		createWorkingDir();
 	}
 
 	upgrade();

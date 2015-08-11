@@ -214,6 +214,9 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	// returns true if the working dir (e.g. ~/lmms) exists on disk
+	bool hasWorkingDir() const;
+
 	void addRecentlyOpenedProject( const QString & _file );
 
 	const QString & value( const QString & _class,
@@ -236,6 +239,9 @@ public:
 	void setBackgroundArtwork( const QString & _ba );
 	void setGIGDir( const QString & gd );
 	void setSF2Dir( const QString & sfd );
+
+	// creates the working directory & subdirectories on disk.
+	void createWorkingDir();
 
 
 private:
