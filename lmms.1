@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH LMMS 1 "September 28, 2006"
+.TH LMMS 1 "June 23, 2015"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -54,16 +54,21 @@ Specify output bitrate in kHz (for OGG encoding only), default is 160
 Specify interpolation method - possible values are \fIlinear\fP, \fIsincfastest\fP (default), \fIsincmedium\fP, \fIsincbest\fP
 .IP "\fB\-x, --oversampling\fP \fIvalue\fP
 Specify oversampling, possible values: 1, 2 (default), 4, 8
+.IP "\fB\-l, --loop-mode
+Render the given file as a loop, i.e. stop rendering at exactly the end of the song. Additional silence or reverb tails at the end of the song are not rendered.
 .IP "\fB\-u, --upgrade\fP \fIin\fP \fIout\fP
 Upgrade file \fIin\fP and save as \fIout\fP
 .IP "\fB\-d, --dump\fP \fIin\fP
 Dump XML of compressed file \fIin\fP (i.e. MMPZ-file)
 .IP "\fB\-v, --version
 Show version information and exit.
+.IP "\fB\    --allowroot
+Bypass root user startup check (use with caution).
 .IP "\fB\-h, --help
 Show usage information and exit.
 .SH SEE ALSO
 .BR https://lmms.io/
 .BR https://lmms.io/documentation/
+.BR https://github.com/LMMS/lmms
 .SH AUTHORS
 .BR Tobias Doerffel <tobydox/at/users.sourceforge.net>, Paul Giblock and others. See AUTHORS for details.
