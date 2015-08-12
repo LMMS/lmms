@@ -524,6 +524,11 @@ void sf2Instrument::updateSampleRate()
 	updateChorus();
 	updateReverbOn();
 	updateChorusOn();
+
+	// Reset last MIDI pitch properties, which will be set to the correct values
+	// upon playing the next note
+	m_lastMidiPitch = -1;
+	m_lastMidiPitchRange = -1;
 }
 
 
