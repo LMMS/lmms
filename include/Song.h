@@ -253,6 +253,10 @@ public:
 		return m_timeSigModel;
 	}
 
+	void exportProject( bool multiExport = false );
+	void exportProjectTracks();
+	void exportProjectMidi();
+
 
 public slots:
 	void playSong();
@@ -264,9 +268,6 @@ public slots:
 	void stop();
 
 	void importProject();
-	void exportProject( bool multiExport = false );
-	void exportProjectTracks();
-	void exportProjectMidi();
 
 	void startExport();
 	void stopExport();
