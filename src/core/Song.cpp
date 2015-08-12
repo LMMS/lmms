@@ -27,7 +27,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
-#include <QMessageBox>
 #include <QApplication>
 
 #include <math.h>
@@ -1223,16 +1222,6 @@ void Song::exportProjectTracks()
 
 void Song::exportProject( bool multiExport )
 {
-	if( isEmpty() )
-	{
-		QMessageBox::information( gui->mainWindow(),
-				tr( "Empty project" ),
-				tr( "This project is empty so exporting makes "
-					"no sense. Please put some items into "
-					"Song Editor first!" ) );
-		return;
-	}
-
 	FileDialog efd( gui->mainWindow() );
 
 	if ( multiExport )
@@ -1302,16 +1291,6 @@ void Song::exportProject( bool multiExport )
 
 void Song::exportProjectMidi()
 {
-	if( isEmpty() )
-	{
-		QMessageBox::information( gui->mainWindow(),
-				tr( "Empty project" ),
-				tr( "This project is empty so exporting makes "
-					"no sense. Please put some items into "
-					"Song Editor first!" ) );
-		return;
-	}
-
 	FileDialog efd( gui->mainWindow() );
 	
 	efd.setFileMode( FileDialog::AnyFile );

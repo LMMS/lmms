@@ -288,18 +288,18 @@ void MainWindow::finalize()
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					Engine::getSong(),
+					this,
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
-					Engine::getSong(),
+					this,
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
-					Engine::getSong(),
+					this,
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );
 
@@ -421,8 +421,7 @@ void MainWindow::finalize()
 	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					Engine::getSong(),
-							SLOT( exportProject() ),
+					this, SLOT( exportProject() ),
 								m_toolBar );
 
 	ToolButton * whatsthis = new ToolButton(
@@ -1297,6 +1296,47 @@ void MainWindow::redo()
 	Engine::projectJournal()->redo();
 }
 
+
+void MainWindow::exportProject()
+{
+	// Only export the project if not empty
+	if (checkProjectExportable())
+	{
+		Engine::getSong()->exportProject();
+	}
+}
+
+void MainWindow::exportProjectTracks()
+{
+	// Only export the project if not empty
+	if (checkProjectExportable())
+	{
+		Engine::getSong()->exportProjectTracks();
+	}
+}
+
+void MainWindow::exportProjectMidi()
+{
+	// Only export the project if not empty
+	if (checkProjectExportable())
+	{
+		Engine::getSong()->exportProjectMidi();
+	}
+}
+
+bool MainWindow::checkProjectExportable()
+{
+	if( Engine::getSong()->isEmpty() )
+	{
+		QMessageBox::information( this,
+				tr( "Empty project" ),
+				tr( "This project is empty so exporting makes "
+					"no sense. Please put some items into "
+					"Song Editor first!" ) );
+		return false;
+	}
+	return true;
+}
 
 
 
