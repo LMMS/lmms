@@ -13,7 +13,7 @@ fi
 APP_NAME="@MACOSX_BUNDLE_BUNDLE_NAME@"
 VERSION="@MACOSX_BUNDLE_LONG_VERSION_STRING@"
 DMG_BACKGROUND_IMG="dmg_branding.png"
-cp "@CMAKE_SOURCE_DIR@/data/${DMG_BACKGROUND_IMG}" .
+cp "@CMAKE_SOURCE_DIR@/cmake/apple/${DMG_BACKGROUND_IMG}" .
 
 # you should not need to change these
 OS_VER=`sw_vers -productVersion|cut -d"." -f1-2`

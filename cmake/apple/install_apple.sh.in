@@ -1,5 +1,5 @@
 #!/bin/bash
-#title         :create_applet_installer.sh
+#title         :install_apple.sh
 #description   :Creates Apple ".app" bundle for LMMS
 #author        :Tres Finocchiaro
 #date          :20140504
@@ -32,8 +32,8 @@ APP=${HOME}/Desktop/LMMS.app
 LIBREADLINE=${MACPORTS}/lib/libreadline.6.2.dylib
 
 # The DMG packager script location
-DMG_SCRIPT_SRC=${CMAKE_BUILD}/create_apple_dmg.sh
-DMG_SCRIPT_DST=${HOME}/Desktop/create_apple_dmg.sh
+DMG_SCRIPT_SRC=${CMAKE_BUILD}/package_apple.sh
+DMG_SCRIPT_DST=${HOME}/Desktop/package_apple.sh
  
 #=========================================================================================
 
@@ -111,7 +111,7 @@ _executables="${_executables} -executable=${APP}/Contents/Frameworks/libZynAddSu
 macdeployqt ${APP} $_executables
  
 # OS X Specific Artwork
-cp ${CMAKE_SRC}/data/*.icns ${APP}/Contents/Resources/
+cp ${CMAKE_SRC}/cmake/apple/*.icns ${APP}/Contents/Resources/
  
 # Done.  Ready to build DMG
 echo -e "\nFinished.\n\nYou may run LMMS from the Desktop."
