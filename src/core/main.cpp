@@ -125,31 +125,31 @@ void printHelp()
 		"            [ -d <in> ]\n"
 		"            [ -h ]\n"
 		"            [ <file to load> ]\n\n"
-		"-r, --render <project file>	render given project file\n"
-		"-o, --output <file>		render into <file>\n"
-		"-f, --output-format <format>	specify format of render-output where\n"
-		"				format is either 'wav' or 'ogg'.\n"
-		"-s, --samplerate <samplerate>	specify output samplerate in Hz\n"
-		"				range: 44100 (default) to 192000\n"
-		"-b, --bitrate <bitrate>		specify output bitrate in kHz\n"
-		"				default: 160.\n"
-		"-i, --interpolation <method>	specify interpolation method\n"
-		"				possible values:\n"
+		"-r, --render <project file>	Render given project file\n"
+		"-o, --output <file>		Render into <file>\n"
+		"-f, --output-format <format>	Specify format of render-output where\n"
+		"				Format is either 'wav' or 'ogg'.\n"
+		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
+		"				Range: 44100 (default) to 192000\n"
+		"-b, --bitrate <bitrate>		Specify output bitrate in KBit/s\n"
+		"				Default: 160.\n"
+		"-i, --interpolation <method>	Specify interpolation method\n"
+		"				Possible values:\n"
 		"				   - linear\n"
 		"				   - sincfastest (default)\n"
 		"				   - sincmedium\n"
 		"				   - sincbest\n"
-		"-x, --oversampling <value>	specify oversampling\n"
-		"				possible values: 1, 2, 4, 8\n"
-		"				default: 2\n"
+		"-x, --oversampling <value>	Specify oversampling\n"
+		"				Possible values: 1, 2, 4, 8\n"
+		"				Default: 2\n"
 		"-a, --float			32bit float bit depth\n"
-		"-l, --loop-mode			render as a loop\n"
-		"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
-		"       standard out is used if no output file is specifed\n"
-		"-d, --dump <in>			dump XML of compressed file <in>\n"
-		"-v, --version			show version information and exit.\n"
-		"    --allowroot			bypass root user startup check (use with caution).\n"
-		"-h, --help			show this usage information and exit.\n\n",
+		"-l, --loop-mode			Render as a loop\n"
+		"-u, --upgrade <in> [out]	Upgrade file <in> and save as <out>\n"
+		"       Standard out is used if no output file is specifed\n"
+		"-d, --dump <in>			Dump XML of compressed file <in>\n"
+		"-v, --version			Show version information and exit.\n"
+		"    --allowroot			Bypass root user startup check (use with caution).\n"
+		"-h, --help			Show this usage information and exit.\n\n",
 		LMMS_VERSION, getCurrentYear().c_str() );
 }
 
@@ -233,6 +233,8 @@ int main( int argc, char * * argv )
 		}
 		else if( arg == "--upgrade" || arg == "-u" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo input file specified.\n\n"
@@ -241,11 +243,11 @@ int main( int argc, char * * argv )
 			}
 
 
-			DataFile dataFile( QString::fromLocal8Bit( argv[i + 1] ) );
+			DataFile dataFile( QString::fromLocal8Bit( argv[i] ) );
 
-			if( argc > i+2 ) // output file specified
+			if( argc > i+1 ) // output file specified
 			{
-				dataFile.writeFile( QString::fromLocal8Bit( argv[i + 2] ) );
+				dataFile.writeFile( QString::fromLocal8Bit( argv[i+1] ) );
 			}
 			else // no output file specified; use stdout
 			{
@@ -256,7 +258,7 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if( argc > i && arg == "--allowroot" )
+		else if( arg == "--allowroot" )
 		{
 			// Ignore, processed earlier
 #ifdef LMMS_BUILD_WIN32
@@ -269,6 +271,8 @@ int main( int argc, char * * argv )
 		}
 		else if( arg == "--dump" || arg == "-d" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo input file specified.\n\n"
@@ -277,7 +281,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			QFile f( QString::fromLocal8Bit( argv[i + 1] ) );
+			QFile f( QString::fromLocal8Bit( argv[i] ) );
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
 			printf( "%s\n", d.toUtf8().constData() );
@@ -286,6 +290,8 @@ int main( int argc, char * * argv )
 		}
 		else if( arg == "--render" || arg == "-r" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo input file specified.\n\n"
@@ -294,9 +300,8 @@ int main( int argc, char * * argv )
 			}
 
 
-			fileToLoad = QString::fromLocal8Bit( argv[i + 1] );
+			fileToLoad = QString::fromLocal8Bit( argv[i] );
 			renderOut = baseName( fileToLoad ) + ".";
-			++i;
 		}
 		else if( arg == "--loop-mode" || arg == "-l" )
 		{
@@ -304,6 +309,8 @@ int main( int argc, char * * argv )
 		}
 		else if( arg == "--output" || arg == "-o" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo output file specified.\n\n"
@@ -312,11 +319,12 @@ int main( int argc, char * * argv )
 			}
 
 
-			renderOut = baseName( QString::fromLocal8Bit( argv[i + 1] ) ) + ".";
-			++i;
+			renderOut = baseName( QString::fromLocal8Bit( argv[i] ) ) + ".";
 		}
 		else if( arg == "--format" || arg == "-f" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo output format specified.\n\n"
@@ -325,7 +333,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			const QString ext = QString( argv[i + 1] );
+			const QString ext = QString( argv[i] );
 
 			if( ext == "wav" )
 			{
@@ -340,14 +348,14 @@ int main( int argc, char * * argv )
 			else
 			{
 				printf( "\nInvalid output format %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return EXIT_FAILURE;
 			}
-
-			++i;
 		}
 		else if( arg == "--samplerate" || arg == "-s" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo samplerate specified.\n\n"
@@ -356,7 +364,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			sample_rate_t sr = QString( argv[i + 1] ).toUInt();
+			sample_rate_t sr = QString( argv[i] ).toUInt();
 			if( sr >= 44100 && sr <= 192000 )
 			{
 				os.samplerate = sr;
@@ -364,13 +372,14 @@ int main( int argc, char * * argv )
 			else
 			{
 				printf( "\nInvalid samplerate %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return EXIT_FAILURE;
 			}
-			++i;
 		}
 		else if( arg == "--bitrate" || arg == "-b" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo bitrate specified.\n\n"
@@ -379,7 +388,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			int br = QString( argv[i + 1] ).toUInt();
+			int br = QString( argv[i] ).toUInt();
 
 			if( br >= 64 && br <= 384 )
 			{
@@ -388,10 +397,9 @@ int main( int argc, char * * argv )
 			else
 			{
 				printf( "\nInvalid bitrate %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return EXIT_FAILURE;
 			}
-			++i;
 		}
 		else if( arg =="--float" || arg == "-a" )
 		{
@@ -399,6 +407,8 @@ int main( int argc, char * * argv )
 		}
 		else if( arg == "--interpolation" || arg == "-i" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo interpolation method specified.\n\n"
@@ -407,7 +417,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			const QString ip = QString( argv[i + 1] );
+			const QString ip = QString( argv[i] );
 
 			if( ip == "linear" )
 			{
@@ -428,13 +438,14 @@ int main( int argc, char * * argv )
 			else
 			{
 				printf( "\nInvalid interpolation method %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return EXIT_FAILURE;
 			}
-			++i;
 		}
 		else if( arg == "--oversampling" || arg == "-x" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo oversampling specified.\n\n"
@@ -443,7 +454,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			int o = QString( argv[i + 1] ).toUInt();
+			int o = QString( argv[i] ).toUInt();
 
 			switch( o )
 			{
@@ -461,13 +472,14 @@ int main( int argc, char * * argv )
 		break;
 				default:
 				printf( "\nInvalid oversampling %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return EXIT_FAILURE;
 			}
-			++i;
 		}
 		else if( arg == "--import" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo file specified for importing.\n\n"
@@ -476,16 +488,19 @@ int main( int argc, char * * argv )
 			}
 
 
-			fileToImport = QString::fromLocal8Bit( argv[i + 1] );
-			++i;
+			fileToImport = QString::fromLocal8Bit( argv[i] );
+
 			// exit after import? (only for debugging)
-			if( argc > i && QString( argv[i + 1] ) == "-e" )
+			if( QString( argv[i + 1] ) == "-e" )
 			{
 				exitAfterImport = true;
+				++i;
 			}
 		}
 		else if( arg == "--profile" || arg == "-p" )
 		{
+			++i;
+
 			if( i == argc )
 			{
 				printf( "\nNo profile specified.\n\n"
@@ -494,8 +509,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			profilerOutputFile = QString::fromLocal8Bit( argv[i+1] );
-			++i;
+			profilerOutputFile = QString::fromLocal8Bit( argv[1] );
 		}
 		else
 		{
@@ -561,9 +575,9 @@ int main( int argc, char * * argv )
 	{
 		Engine::init( true );
 
-		printf( "loading project...\n" );
+		printf( "Loading project...\n" );
 		Engine::getSong()->loadProject( fileToLoad );
-		printf( "done\n" );
+		printf( "Done\n" );
 
 		Engine::getSong()->setExportLoop( renderLoop );
 
