@@ -575,6 +575,13 @@ int main( int argc, char * * argv )
 	{
 		Engine::init( true );
 
+		QFileInfo fileInfo( fileToLoad );
+		if ( !fileInfo.exists() )
+		{
+			printf("The file %s does not exist!\n", fileToLoad.toStdString().c_str());
+			exit( 1 );
+		}
+
 		printf( "Loading project...\n" );
 		Engine::getSong()->loadProject( fileToLoad );
 		printf( "Done\n" );
