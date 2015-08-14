@@ -120,7 +120,7 @@ void printHelp()
 {
 	printf( "LMMS %s\n"
 		"Copyright (c) 2004-%s LMMS developers.\n\n"
-		"usage: lmms [ -r <project file> ] [ options ]\n"
+		"Usage: lmms [ -r <project file> ] [ options ]\n"
 		"            [ -u <in> <out> ]\n"
 		"            [ -d <in> ]\n"
 		"            [ -h ]\n"
