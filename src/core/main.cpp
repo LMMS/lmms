@@ -71,8 +71,8 @@
 
 static inline QString baseName( const QString & _file )
 {
-	return( QFileInfo( _file ).absolutePath() + "/" +
-			QFileInfo( _file ).completeBaseName() );
+	return QFileInfo( _file ).absolutePath() + "/" +
+			QFileInfo( _file ).completeBaseName();
 }
 
 
@@ -388,7 +388,7 @@ int main( int argc, char * * argv )
 				default:
 				printf( "\nInvalid oversampling %s.\n\n"
 	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
-				return( EXIT_FAILURE );
+				return EXIT_FAILURE;
 			}
 			++i;
 		}
@@ -413,7 +413,7 @@ int main( int argc, char * * argv )
 			{
 				printf( "\nInvalid option %s.\n\n"
 	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return( EXIT_FAILURE );
+				return EXIT_FAILURE;
 			}
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
 		}
