@@ -69,10 +69,10 @@
 #include "DataFile.h"
 #include "Song.h"
 
-static inline QString baseName( const QString & _file )
+static inline QString baseName( const QString & file )
 {
-	return QFileInfo( _file ).absolutePath() + "/" +
-			QFileInfo( _file ).completeBaseName();
+	return QFileInfo( file ).absolutePath() + "/" +
+			QFileInfo( file ).completeBaseName();
 }
 
 
@@ -86,13 +86,13 @@ static std::string getCurrentYear()
 
 
 
-inline void loadTranslation( const QString & _tname,
-	const QString & _dir = ConfigManager::inst()->localeDir() )
+inline void loadTranslation( const QString & tname,
+	const QString & dir = ConfigManager::inst()->localeDir() )
 {
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
-	QString name = _tname + ".qm";
+	QString name = tname + ".qm";
 
-	t->load( name, _dir );
+	t->load( name, dir );
 
 	QCoreApplication::instance()->installTranslator( t );
 }
@@ -100,7 +100,7 @@ inline void loadTranslation( const QString & _tname,
 
 
 
-void printVersion(char *executableName)
+void printVersion( char *executableName )
 {
 	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
 		"Copyright (c) 2004-%s LMMS developers.\n\n"
@@ -226,19 +226,28 @@ int main( int argc, char * * argv )
 			printVersion( argv[0] );
 			return EXIT_SUCCESS;
 		}
-		else if( argc > i && ( arg == "--help" || arg  == "-h" ) )
+		else if( arg == "--help" || arg  == "-h" )
 		{
 			printHelp();
 			return EXIT_SUCCESS;
 		}
-		else if( argc > i+1 && ( arg == "--upgrade" || arg == "-u" ) )
+		else if( arg == "--upgrade" || arg == "-u" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo input file specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			DataFile dataFile( QString::fromLocal8Bit( argv[i + 1] ) );
-			if( argc > i+2 )
+
+			if( argc > i+2 ) // output file specified
 			{
 				dataFile.writeFile( QString::fromLocal8Bit( argv[i + 2] ) );
 			}
-			else
+			else // no output file specified; use stdout
 			{
 				QTextStream ts( stdout );
 				dataFile.write( ts );
@@ -258,8 +267,16 @@ int main( int argc, char * * argv )
 #endif
 			
 		}
-		else if( argc > i && ( arg == "--dump" || arg == "-d" ) )
+		else if( arg == "--dump" || arg == "-d" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo input file specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			QFile f( QString::fromLocal8Bit( argv[i + 1] ) );
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
@@ -267,23 +284,47 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if( argc > i && ( arg == "--render" || arg == "-r" ) )
+		else if( arg == "--render" || arg == "-r" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo input file specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			fileToLoad = QString::fromLocal8Bit( argv[i + 1] );
 			renderOut = baseName( fileToLoad ) + ".";
 			++i;
 		}
-		else if( argc > i && ( arg == "--loop-mode" || arg == "-l" ) )
+		else if( arg == "--loop-mode" || arg == "-l" )
 		{
 			renderLoop = true;
 		}
-		else if( argc > i && ( arg == "--output" || arg == "-o" ) )
+		else if( arg == "--output" || arg == "-o" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo output file specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			renderOut = baseName( QString::fromLocal8Bit( argv[i + 1] ) ) + ".";
 			++i;
 		}
-		else if( argc > i && ( arg == "--format" || arg == "-f" ) )
+		else if( arg == "--format" || arg == "-f" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo output format specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			const QString ext = QString( argv[i + 1] );
 
 			if( ext == "wav" )
@@ -302,10 +343,19 @@ int main( int argc, char * * argv )
 	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
 				return EXIT_FAILURE;
 			}
+
 			++i;
 		}
-		else if( argc > i && ( arg == "--samplerate" || arg == "-s" ) )
+		else if( arg == "--samplerate" || arg == "-s" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo samplerate specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			sample_rate_t sr = QString( argv[i + 1] ).toUInt();
 			if( sr >= 44100 && sr <= 192000 )
 			{
@@ -319,8 +369,16 @@ int main( int argc, char * * argv )
 			}
 			++i;
 		}
-		else if( argc > i && ( arg == "--bitrate" || arg == "-b" ) )
+		else if( arg == "--bitrate" || arg == "-b" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo bitrate specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			int br = QString( argv[i + 1] ).toUInt();
 
 			if( br >= 64 && br <= 384 )
@@ -335,12 +393,20 @@ int main( int argc, char * * argv )
 			}
 			++i;
 		}
-		else if( argc > i && ( arg =="--float" || arg == "-a" ) )
+		else if( arg =="--float" || arg == "-a" )
 		{
 			os.depth = ProjectRenderer::Depth_32Bit;
 		}
-		else if( argc > i && ( arg == "--interpolation" || arg == "-i" ) )
+		else if( arg == "--interpolation" || arg == "-i" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo interpolation method specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			const QString ip = QString( argv[i + 1] );
 
 			if( ip == "linear" )
@@ -367,8 +433,16 @@ int main( int argc, char * * argv )
 			}
 			++i;
 		}
-		else if( argc > i && ( arg == "--oversampling" || arg == "-x" ) )
+		else if( arg == "--oversampling" || arg == "-x" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo oversampling specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			int o = QString( argv[i + 1] ).toUInt();
 
 			switch( o )
@@ -392,8 +466,16 @@ int main( int argc, char * * argv )
 			}
 			++i;
 		}
-		else if( argc > i && ( arg == "--import" ) )
+		else if( arg == "--import" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo file specified for importing.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			fileToImport = QString::fromLocal8Bit( argv[i + 1] );
 			++i;
 			// exit after import? (only for debugging)
@@ -402,8 +484,16 @@ int main( int argc, char * * argv )
 				exitAfterImport = true;
 			}
 		}
-		else if( argc > i && ( arg == "--profile" || arg == "-p" ) )
+		else if( arg == "--profile" || arg == "-p" )
 		{
+			if( i == argc )
+			{
+				printf( "\nNo profile specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+
 			profilerOutputFile = QString::fromLocal8Bit( argv[i+1] );
 			++i;
 		}
