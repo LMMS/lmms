@@ -569,7 +569,7 @@ void MainWindow::finalize()
 
 	gui->automationEditor()->parentWidget()->hide();
 	gui->getBBEditor()->parentWidget()->move( 610, 5 );
-	gui->getBBEditor()->parentWidget()->show();
+	gui->getBBEditor()->parentWidget()->hide();
 	gui->pianoRoll()->parentWidget()->move(5, 5);
 	gui->pianoRoll()->parentWidget()->hide();
 	gui->songEditor()->parentWidget()->move(5, 5);
