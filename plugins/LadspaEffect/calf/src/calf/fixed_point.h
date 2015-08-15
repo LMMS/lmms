@@ -37,7 +37,7 @@ inline T shr(T v, int bits = 1) {
 
 template<class T, int FracBits> class fixed_point {
     T value;
-    enum { IntBits = (sizeof(T)/8) - FracBits };
+    enum { IntBits = (sizeof(T)*8) - FracBits };
 
 public:
     /// default constructor, does not initialize the value, just like - say - float doesn't
@@ -210,13 +210,13 @@ public:
     template<class U, int UseBits, class MulType> 
     inline U lerp_by_fract_int(U v1, U v2) const {
         int fp = fpart<UseBits>();
-        assert ( fp >=0 && fp <= (1<<UseBits));
+        assert ( fp >=0 && fp <= (1ULL<<UseBits));
         // printf("diff = 
         return v1 + shr(((MulType)(v2-v1) * fp), UseBits);
     }
 
     template<class U, int UseBits> 
-    inline U lerp_table_lookup_int(U data[(unsigned int)(1<<IntBits)+1]) const {
+    inline U lerp_table_lookup_int(U data[(unsigned int)(1ULL<<IntBits)+1]) const {
         unsigned int pos = uipart();
         return lerp_by_fract_int<U, UseBits>(data[pos], data[pos+1]);
     }
@@ -224,19 +224,19 @@ public:
     /// Untested... I've started it to get a sin/cos readout for rotaryorgan, but decided to use table-less solution instead
     /// Do not assume it works, because it most probably doesn't
     template<class U, int UseBits> 
-    inline U lerp_table_lookup_int_shift(U data[(unsigned int)(1<<IntBits)+1], unsigned int shift) {
-        unsigned int pos = (uipart() + shift) & ((1 << IntBits) - 1);
+    inline U lerp_table_lookup_int_shift(U data[(unsigned int)(1ULL<<IntBits)+1], unsigned int shift) {
+        unsigned int pos = (uipart() + shift) & ((1ULL << IntBits) - 1);
         return lerp_by_fract_int<U, UseBits>(data[pos], data[pos+1]);
     }
 
     template<class U> 
-    inline U lerp_table_lookup_float(U data[(unsigned int)(1<<IntBits)+1]) const {
+    inline U lerp_table_lookup_float(U data[(unsigned int)(1ULL<<IntBits)+1]) const {
         unsigned int pos = uipart();
         return data[pos] + (data[pos+1]-data[pos]) * fpart_as_double();
     }
 
     template<class U> 
-    inline U lerp_table_lookup_float_mask(U data[(unsigned int)(1<<IntBits)+1], unsigned int mask) const {
+    inline U lerp_table_lookup_float_mask(U data[(unsigned int)(1ULL<<IntBits)+1], unsigned int mask) const {
         unsigned int pos = ui64part() & mask;
         // printf("full = %lld pos = %d + %f\n", value, pos, fpart_as_double());
         return data[pos] + (data[pos+1]-data[pos]) * fpart_as_double();
