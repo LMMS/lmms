@@ -277,6 +277,9 @@ void MainWindow::finalize()
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
+	project_menu->addAction( tr( "Save as default template" ),
+				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
@@ -928,6 +931,29 @@ bool MainWindow::saveProjectAsNewVersion()
 		Engine::getSong()->guiSaveProjectAs( fileName );
 		return true;
 	}
+}
+
+
+
+
+void MainWindow::saveProjectAsDefaultTemplate()
+{
+	QString defaultTemplate = ConfigManager::inst()->userTemplateDir() + "default.mpt";
+
+	QFileInfo fileInfo(defaultTemplate);
+	if (fileInfo.exists())
+	{
+		if (QMessageBox::warning(this,
+					 tr("Overwrite default template?"),
+					 tr("This will overwrite your current default template."),
+					 QMessageBox::Ok,
+					 QMessageBox::Cancel) != QMessageBox::Ok)
+		{
+			return;
+		}
+	}
+
+	Engine::getSong()->saveProjectFile( defaultTemplate );
 }
 
 

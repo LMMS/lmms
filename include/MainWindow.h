@@ -113,6 +113,7 @@ public slots:
 	bool saveProject();
 	bool saveProjectAs();
 	bool saveProjectAsNewVersion();
+	void saveProjectAsDefaultTemplate();
 	void showSettingsDialog();
 	void aboutLMMS();
 	void help();
