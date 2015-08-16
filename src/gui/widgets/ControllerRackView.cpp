@@ -28,6 +28,7 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QScrollBar>
 #include <QVBoxLayout>
 #include <QMdiArea>
 #include <QMessageBox>
@@ -52,6 +53,7 @@ ControllerRackView::ControllerRackView( ) :
 
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
+	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
 	QWidget * scrollAreaWidget = new QWidget( m_scrollArea );
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
@@ -84,9 +86,8 @@ ControllerRackView::ControllerRackView( ) :
 	subWin->setWindowFlags( flags );
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
-	subWin->move( 880, 310 );
-
-	resize( 600, 400 );
+	subWin->move( 680, 310 );
+	subWin->resize(400, 200);
 }
 
 
@@ -152,6 +153,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
+
 	++m_nextIndex;
 }
 
