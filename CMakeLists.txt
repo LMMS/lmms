@@ -7,6 +7,9 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
 	CMAKE_POLICY(SET CMP0003 NEW)
+	IF (CMAKE_MAJOR_VERSION GREATER 2)
+		CMAKE_POLICY(SET CMP0026 OLD)
+	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
 
 INCLUDE(AddFileDependencies)
@@ -68,8 +71,6 @@ IF(LMMS_BUILD_APPLE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_APPLEMIDI "OK")
-	# MacPorts: /opt/local/lib
-	LINK_DIRECTORIES(${LINK_DIRECTORIES} /opt/local/lib)
 ENDIF(LMMS_BUILD_APPLE)
 
 
@@ -448,10 +449,14 @@ ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
+# post-install tasks
+ADD_SUBDIRECTORY(cmake/postinstall)
+
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
 				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/doc/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
 				DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
 				COMMENT "Generating lmms.1.gz")
+
 
 ADD_CUSTOM_TARGET(manpage ALL
 				DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
