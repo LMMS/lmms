@@ -62,6 +62,9 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	vBoxLayout->addLayout(hBox);
 
 	QLabel *label = new QLabel( "<b>" + _model->displayName() + "</b>", this);
+	QSizePolicy sizePolicy = label->sizePolicy();
+	sizePolicy.setHorizontalStretch(1);
+	label->setSizePolicy(sizePolicy);
 
 	hBox->addWidget(label);
 
