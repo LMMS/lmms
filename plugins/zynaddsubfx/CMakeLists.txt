@@ -43,7 +43,11 @@ IF(MINGW_PREFIX)
 ENDIF()
 
 IF(NOT EXISTS ${FLTK_FLUID_EXECUTABLE})
-	MESSAGE(FATAL_ERROR "Please install the fluid binary which is part of FLTK.")
+    # Try to detect full path anyway
+    EXECUTE_PROCESS(COMMAND which fluid OUTPUT_VARIABLE FLTK_FLUID_EXECUTABLE OUTPUT_STRIP_TRAILING_WHITESPACE)
+    IF(NOT EXISTS ${FLTK_FLUID_EXECUTABLE})
+        MESSAGE(FATAL_ERROR "Please install the fluid binary which is part of FLTK.")
+    ENDIF()
 ENDIF()
 
 INCLUDE_DIRECTORIES("${FLTK_INCLUDE_DIR}"
