@@ -132,6 +132,35 @@ QPixmap * PianoRoll::s_toolOpen = NULL;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
+static QString s_noteStrings[12] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+
+static QString getNoteString( int key )
+{
+	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
+}
+
+static bool isBlackKey( int key )
+{
+	int keyCode = key % KeysPerOctave;
+
+	switch (keyCode)
+	{
+	case 1:
+	case 3:
+	case 6:
+	case 8:
+	case 10:
+		return true;
+	}
+
+	return false;
+}
+
+static bool isWhiteKey( int key )
+{
+	return !isBlackKey( key );
+}
+
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 {
@@ -737,15 +766,13 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 						volVal * leftPercent );
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
 						volVal * rightPercent );
-	col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
 
-	QLinearGradient gradient( x, y, x+width,
-						y+KEY_LINE_HEIGHT );
+	QLinearGradient gradient( x, y, x+width, y+KEY_LINE_HEIGHT );
 	gradient.setColorAt( 0, lcol );
 	gradient.setColorAt( 1, rcol );
 	p.setBrush( gradient );
-	p.setPen( QColor::fromHsv( col.hue(), col.saturation(),
-					qMin<float>( 255, volVal*1.7f ) ) );
+
+	p.setPen( col );
 	p.setRenderHint(QPainter::Antialiasing);
 	p.drawRoundedRect( x, y, width, KEY_LINE_HEIGHT-1, 5, 2 );
 
@@ -754,13 +781,9 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 	p.setPen( noteCol.lighter( 200 ) );
 	if( width > 2 )
 	{
-		p.drawLine( x + width - 3, y + 2, x + width - 3,
-						y + KEY_LINE_HEIGHT - 4 );
+		p.drawLine( x + width - 3, y + 3, x + width - 3,
+						y + KEY_LINE_HEIGHT - 5 );
 	}
-	p.drawLine( x + width - 1, y + 2, x + width - 1,
-						y + KEY_LINE_HEIGHT - 4 );
-	p.drawLine( x + width - 2, y + 2, x + width - 2,
-						y + KEY_LINE_HEIGHT - 4 );
 }
 
 
@@ -2477,70 +2500,10 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 	Engine::getSong()->setModified();
 }
 
-static QString calculateNoteLabel(QString note, int octave)
-{
-	if(note.isEmpty())
-	{
-		return "";
-	}
-	return note + QString::number(octave);
-}
-
-static void printNoteHeights(QPainter& p, int bottom, int width, int startKey)
-{
-	assert(Key_C == 0);
-	assert(Key_H == 11);
-
-	struct KeyLabel
-	{
-		QString key, minor, major;
-	};
-	const KeyLabel labels[12] = {
-		{QObject::tr("C", "Note name")},
-		{"", QObject::tr("Db", "Note name"), QObject::tr("C#", "Note name")},
-		{QObject::tr("D", "Note name")},
-		{"", QObject::tr("Eb", "Note name"), QObject::tr("D#", "Note name")},
-		{QObject::tr("E", "Note name"), QObject::tr("Fb", "Note name")},
-		{"F"},
-		{"", QObject::tr("Gb", "Note name"), QObject::tr("F#", "Note name")},
-		{QObject::tr("G", "Note name")},
-		{"", QObject::tr("Ab", "Note name"),QObject::tr( "G#", "Note name")},
-		{QObject::tr("A", "Note name")},
-		{"", QObject::tr("Bb", "Note name"),QObject::tr( "A#", "Note name")},
-		{QObject::tr("B", "Note name")}
-	};
-
-	p.setFont( pointSize<KEY_LINE_HEIGHT-4>( p.font() ) );
-	p.setPen( QColor( 255, 255, 255 ) );
-	for( int y = bottom, key = startKey; y > PR_TOP_MARGIN;
-			y -= KEY_LINE_HEIGHT, key++)
-	{
-		const unsigned note = key % KeysPerOctave;
-		assert( note < ( sizeof( labels ) / sizeof( labels[0] ) ));
-		const KeyLabel& noteLabel( labels[note] );
-		const int octave = key / KeysPerOctave;
-		const KeyLabel notes = {
-			calculateNoteLabel(noteLabel.key, octave),
-			calculateNoteLabel(noteLabel.minor, octave),
-			calculateNoteLabel(noteLabel.major, octave),
-		};
-
-		const int drawWidth( width - WHITE_KEY_WIDTH );
-		const int hspace = 300;
-		const int columnCount = drawWidth/hspace + 1;
-		for(int col = 0; col < columnCount; col++)
-		{
-			const int subOffset = 42;
-			const int x = subOffset + hspace/2 + hspace * col;
-			p.drawText( WHITE_KEY_WIDTH + x, y, notes.key);
-			p.drawText( WHITE_KEY_WIDTH + x - subOffset, y, notes.minor);
-			p.drawText( WHITE_KEY_WIDTH + x + subOffset, y, notes.major);
-		}
-	}
-}
-
 void PianoRoll::paintEvent(QPaintEvent * pe )
 {
+	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
+
 	QColor horizCol = QColor( gridColor() );
 	QColor vertCol = QColor( gridColor() );
 
@@ -2595,9 +2558,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		}
 
-		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2,
-			    width() - 10, KEY_LINE_HEIGHT,
-							QColor( 0, 80 - ( key_num % KeysPerOctave ) * 3, 64 + key_num / 2) );
+		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT,
+			    QColor( 40, 40, 40, 200 ) );
 	}
 
 
@@ -2659,23 +2621,66 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// update y-pos
 			y -= WHITE_KEY_BIG_HEIGHT;
 		}
-		// label C-keys...
+
+		// Draw the C line in a more prominent color
 		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 		{
-			const QString cLabel = "C" + QString::number( static_cast<int>( key / KeysPerOctave ) );
-			p.setPen( QColor( 240, 240, 240 ) );
-			p.drawText( C_KEY_LABEL_X + 1, y + 14, cLabel );
-			p.setPen( QColor( 0, 0, 0 ) );
-			p.drawText( C_KEY_LABEL_X, y + 13, cLabel );
 			horizCol.setAlpha( 192 );
 		}
 		else
 		{
-			horizCol.setAlpha( 128 );
+			horizCol.setAlpha( 64 );
 		}
+
 		// draw key-line
 		p.setPen( horizCol );
 		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
+
+		// Compute the corrections for the note names
+		int yCorrectionForNoteLabels = 0;
+
+		int keyCode = key % KeysPerOctave;
+		switch (keyCode)
+		{
+		case 0:
+		case 5:
+			yCorrectionForNoteLabels = -4;
+			break;
+		case 2:
+		case 7:
+		case 9:
+			yCorrectionForNoteLabels = -2;
+			break;
+		case 4:
+		case 11:
+			yCorrectionForNoteLabels = 2;
+			break;
+		}
+
+		if ( isWhiteKey( key ) )
+		{
+			// Draw note names if activated in the preferences, C notes are always drawn
+			if ( key % 12 == 0 || drawNoteNames )
+			{
+				QString noteString = getNoteString( key );
+
+				QPoint textStart( WHITE_KEY_WIDTH - 18, key_line_y );
+				textStart += QPoint( 0, yCorrectionForNoteLabels );
+
+				p.setPen( QColor( 240, 240, 240 ) );
+				p.drawText( textStart + QPoint( 1, 1 ), noteString );
+				// The C key is painted darker than the other ones
+				if ( key % 12 == 0 )
+				{
+					p.setPen( QColor( 0, 0, 0 ) );
+				}
+				else
+				{
+					p.setPen( QColor( 128, 128, 128 ) );
+				}
+				p.drawText( textStart, noteString );
+			}
+		}
 		++key;
 	}
 
@@ -3033,11 +3038,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
-	}
-
-	if( ConfigManager::inst()->value( "ui", "printnotelabels").toInt() )
-	{
-		printNoteHeights(p, keyAreaBottom(), width(), m_startKey);
 	}
 }
 
