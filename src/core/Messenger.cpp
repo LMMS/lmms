@@ -39,16 +39,27 @@
 
 
 // define endpoint names
-const char *Messenger::Endpoints::InitMsg = "/status/initmsg";
-const char *Messenger::Endpoints::Warning = "/status/warning";
-const char *Messenger::Endpoints::Error   = "/status/error";
+const char *Messenger::Endpoints::Warning   = "/status/warning";
+const char *Messenger::Endpoints::Error     = "/status/error";
+const char *Messenger::Endpoints::WaveTableInit        = "/wavetable/init";
+const char *Messenger::Endpoints::MixerDevInit         = "/mixer/devices/init";
+const char *Messenger::Endpoints::MixerProcessingStart = "/mixer/processing/start";
 
 
-void Messenger::broadcastInitMsg(const QString &msg)
+void Messenger::broadcastWaveTableInit()
 {
 	char oscMsg[512];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::InitMsg, "s", 
-		msg.toUtf8().data()));
+	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::WaveTableInit, ""));
+}
+void Messenger::broadcastMixerDevInit()
+{
+	char oscMsg[512];
+	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::MixerDevInit, ""));
+}
+void Messenger::broadcastMixerProcessing()
+{
+	char oscMsg[512];
+	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::MixerProcessingStart, ""));
 }
 
 void Messenger::broadcastWarning(const QString &brief, const QString &msg)
