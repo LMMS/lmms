@@ -47,16 +47,21 @@ public:
 	class Endpoints
 	{
 	public:
-		// Open Sound Control endpoint to send a message describing the initialization state of the core
-		static const char *InitMsg;
+		// Endpoints to send general and already-translated warnings / error messages
 		static const char *Warning;
 		static const char *Error;
+
+		static const char *WaveTableInit;
+		static const char *MixerDevInit;
+		static const char *MixerProcessingStart;
 	};
 
-	// during the initialization stage of LMMS, broadcast a status message,
-	//   e.g. "Intializing FX Mixer".
-	//   Useful for debugging/logging & to provide some GUI splash-screen loading text
-	void broadcastInitMsg(const QString &msg);
+	// Send message to indicate that the following components have completed their initialization
+	void broadcastWaveTableInit();
+	// Mixer has opened its audio devices
+	void broadcastMixerDevInit();
+	// Indicates that mixer has started its processing thread(s).
+	void broadcastMixerProcessing();
 
 	// whenever the core encounters a warning, it can broadcast it to listeners
 	//   rather than explicitly pop a Qt Dialog / log it, etc.

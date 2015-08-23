@@ -381,12 +381,17 @@ static bool checkOscArgs(const char *fmt, const QByteArray &msg)
 void GuiApplication::processOscMsgInGuiThread(QByteArray msg)
 {
 	const char *data = msg.data();
-	if (strcmp(Messenger::Endpoints::InitMsg, data) == 0)
+	if (strcmp(Messenger::Endpoints::WaveTableInit, data) == 0)
 	{
-		if (checkOscArgs("s", msg))
-		{
-			displayInitProgress(QString::fromUtf8(rtosc_argument(data, 0).s));
-		}
+		displayInitProgress( tr("Generated wavetables") );
+	}
+	else if (strcmp(Messenger::Endpoints::MixerDevInit, data) == 0)
+	{
+		displayInitProgress( tr("Opened audio & midi devices") );
+	}
+	else if (strcmp(Messenger::Endpoints::MixerProcessingStart, data) == 0)
+	{
+		displayInitProgress( tr("Started mixer threads") );
 	}
 	else if (strcmp(Messenger::Endpoints::Warning, data) == 0)
 	{

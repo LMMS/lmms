@@ -53,11 +53,10 @@ Messenger Engine::s_messenger;
 
 void Engine::init( bool renderOnly )
 {
-	s_messenger.broadcastInitMsg("Generating wavetables");
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
+	s_messenger.broadcastWaveTableInit();
 
-	s_messenger.broadcastInitMsg("Initializing data structures");
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer( renderOnly );
 	s_song = new Song;
@@ -68,14 +67,14 @@ void Engine::init( bool renderOnly )
 
 	s_projectJournal->setJournalling( true );
 
-	s_messenger.broadcastInitMsg("Opening audio and midi devices");
 	s_mixer->initDevices();
+	s_messenger.broadcastMixerDevInit();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
-	s_messenger.broadcastInitMsg("Launching mixer threads");
 	s_mixer->startProcessing();
+	s_messenger.broadcastMixerProcessing();
 }
 
 
