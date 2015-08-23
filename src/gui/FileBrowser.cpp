@@ -372,8 +372,6 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
 
-	setFont( pointSizeF( font(), 7.5f ) );
-
 	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
 	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem * ) ),
