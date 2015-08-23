@@ -43,7 +43,7 @@ int main()
     check(!rtosc_bundle_p(buffer_b),
             "False positive bundle_p()", __LINE__);
     len_c = rtosc_bundle(buffer_c, 256, 0, 2, buffer_a, buffer_b);
-        printf("len_c => '%zd'\n correct is %d\n", len_c, (int)sizeof(RESULT)-1);
+        printf("len_c => '%d'\n correct is %d\n", (int)len_c, (int)sizeof(RESULT)-1);
     check((len_c = rtosc_bundle(buffer_c, 256, 0, 2, buffer_a, buffer_b)) == sizeof(RESULT)-1,
             "bad bundle", __LINE__);
     check(rtosc_message_length(buffer_c, len_c) == len_c,
