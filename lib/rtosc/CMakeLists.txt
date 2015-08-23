@@ -14,9 +14,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-if(NOT WIN32)
-    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -O2 -fPIC -std=c99   -Wall -Wextra")
-    set(CPP_FLAGS       "-O2 -fPIC -std=c++11 -Wall -Wextra -Wno-unused-parameter")
+set(CXX11_FLAG "-std=c++11")
+set(PIC_FLAG "-fPIC")
+
+if(WIN32)
+    # code is position-independent by default on Windows
+    set(PIC_FLAG "")
+endif()
+if(NOT WIN32 OR CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -O2 ${FPIC_FLAG} -std=c99   -Wall -Wextra")
+    set(CPP_FLAGS       "-O2 ${FPIC_FLAG} -Wall -Wextra -Wno-unused-parameter")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
@@ -27,11 +34,12 @@ if(CMAKE_COMPILER_IS_GNUCC)
         message(STATUS "Found GCC Version >= 4.7")
     else()
         message(WARNING "GCC Version '${GCC_VERSION}' Is Quite Old, Please Consider Upgrading")
-        set(CPP_FLAGS "-O2 -fPIC -std=c++0x -Wall -Wextra -Wno-unused-parameter")
+        # gcc 4.7 supports some c++11 but calls it c++0x
+        set(CXX11_FLAG "-std=c++0x")
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPP_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPP_FLAGS} ${CXX11_FLAG}")
 
 add_library(rtosc STATIC src/rtosc.c src/dispatch.c)
 add_library(rtosc-cpp STATIC src/cpp/ports.cpp src/cpp/miditable.cpp
