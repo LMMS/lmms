@@ -54,9 +54,14 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget",
 			"ALSA-Sequencer (Advanced Linux Sound "
 							"Architecture)" );
+	}
+
+	inline static QString configSection()
+	{
+		return "Midialsaseq";
 	}
 
 
@@ -105,20 +110,6 @@ public:
 		connect( this, SIGNAL( writablePortsChanged() ),
 							_receiver, _member );
 	}
-
-
-	class setupWidget : public MidiClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-
-	} ;
 
 
 private slots:

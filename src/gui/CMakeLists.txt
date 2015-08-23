@@ -20,6 +20,7 @@ SET(LMMS_SRCS
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
 	gui/MainWindow.cpp
+	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp

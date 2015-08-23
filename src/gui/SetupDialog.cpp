@@ -817,28 +817,28 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
-					new MidiAlsaSeq::setupWidget( msw );
+					MidiSetupWidget::create<MidiAlsaSeq>( msw );
 	m_midiIfaceSetupWidgets[MidiAlsaRaw::name()] =
-					new MidiAlsaRaw::setupWidget( msw );
+					MidiSetupWidget::create<MidiAlsaRaw>( msw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
 	m_midiIfaceSetupWidgets[MidiOss::name()] =
-					new MidiOss::setupWidget( msw );
+					MidiSetupWidget::create<MidiOss>( msw );
 #endif
 
 #ifdef LMMS_BUILD_WIN32
 	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
-					new MidiWinMM::setupWidget( msw );
+					MidiSetupWidget::create<MidiWinMM>( msw );
 #endif
 
 #ifdef LMMS_BUILD_APPLE
     m_midiIfaceSetupWidgets[MidiApple::name()] =
-                    new MidiApple::setupWidget( msw );
+                    MidiSetupWidget::create<MidiApple>( msw );
 #endif
 
 	m_midiIfaceSetupWidgets[MidiDummy::name()] =
-					new MidiDummy::setupWidget( msw );
+					MidiSetupWidget::create<MidiDummy>( msw );
 
 
 	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();

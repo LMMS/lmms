@@ -45,12 +45,18 @@ public:
 	MidiApple();
 	virtual ~MidiApple();
 
-	static QString probeDevice();
-
+	inline static QString probeDevice()
+	{
+		return QString::Null(); // no midi device name
+	}
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "Apple MIDI" );
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget", "Apple MIDI" );
+	}
+	inline static QString configSection()
+	{
+		return QString::Null(); // no configuration settings
 	}
 	
 	virtual void processOutEvent( const MidiEvent & _me,
@@ -104,18 +110,6 @@ public:
 	{
 		return false;
 	}
-
-
-	class setupWidget : public MidiClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		void saveSettings()
-		{
-		}
-	} ;
 
 
 private:// slots:

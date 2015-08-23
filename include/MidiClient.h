@@ -106,32 +106,6 @@ public:
 	// any other working
 	static MidiClient * openMidiClient();
 
-
-	class setupWidget : public TabWidget
-	{
-	public:
-		setupWidget( const QString & _caption, QWidget * _parent ) :
-			TabWidget( TabWidget::tr( "Settings for %1" ).arg(
-					tr( _caption.toLatin1() ) ).toUpper(),
-								_parent )
-		{
-		}
-
-		virtual ~setupWidget()
-		{
-		}
-
-		virtual void saveSettings() = 0;
-
-		virtual void show()
-		{
-			parentWidget()->show();
-			QWidget::show();
-		}
-
-	} ;
-
-
 protected:
 	QVector<MidiPort *> m_midiPorts;
 
