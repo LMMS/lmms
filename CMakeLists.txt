@@ -71,6 +71,8 @@ IF(LMMS_BUILD_APPLE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_APPLEMIDI "OK")
+ELSE(LMMS_BUILD_APPLE)
+	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ENDIF(LMMS_BUILD_APPLE)
 
 
