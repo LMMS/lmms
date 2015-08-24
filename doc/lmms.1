@@ -44,17 +44,17 @@ LMMS features components such as a Song Editor, a Beat+Bassline Editor, a Piano 
 Render given file to either a wav\- or ogg\-file. See \fB\-f\fP for details
 .IP "\fB\-o, --output\fP \fIfile\fP
 render into \fIfile\fP
-.IP "\fB\-f, --output-format\fP \fIformat\fP
+.IP "\fB\-f, --format\fP \fIformat\fP
 Specify format of render-output where \fIformat\fP is either 'wav' or 'ogg'
 .IP "\fB\-s, --samplerate\fP \fIsamplerate\fP
 Specify output samplerate in Hz - range is 44100 (default) to 192000
 .IP "\fB\-b, --bitrate\fP \fIbitrate\fP
-Specify output bitrate in kHz (for OGG encoding only), default is 160
+Specify output bitrate in KBit/s (for OGG encoding only), default is 160
 .IP "\fB\-i, --interpolation\fP \fImethod\fP
 Specify interpolation method - possible values are \fIlinear\fP, \fIsincfastest\fP (default), \fIsincmedium\fP, \fIsincbest\fP
 .IP "\fB\-x, --oversampling\fP \fIvalue\fP
 Specify oversampling, possible values: 1, 2 (default), 4, 8
-.IP "\fB\-l, --loop-mode
+.IP "\fB\-l, --loop
 Render the given file as a loop, i.e. stop rendering at exactly the end of the song. Additional silence or reverb tails at the end of the song are not rendered.
 .IP "\fB\-u, --upgrade\fP \fIin\fP \fIout\fP
 Upgrade file \fIin\fP and save as \fIout\fP

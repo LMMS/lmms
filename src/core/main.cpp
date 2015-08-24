@@ -127,7 +127,7 @@ void printHelp()
 		"            [ <file to load> ]\n\n"
 		"-r, --render <project file>	Render given project file\n"
 		"-o, --output <file>		Render into <file>\n"
-		"-f, --output-format <format>	Specify format of render-output where\n"
+		"-f, --format <format>		Specify format of render-output where\n"
 		"				Format is either 'wav' or 'ogg'.\n"
 		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
 		"				Range: 44100 (default) to 192000\n"
@@ -143,7 +143,7 @@ void printHelp()
 		"				Possible values: 1, 2, 4, 8\n"
 		"				Default: 2\n"
 		"-a, --float			32bit float bit depth\n"
-		"-l, --loop-mode			Render as a loop\n"
+		"-l, --loop			Render as a loop\n"
 		"-u, --upgrade <in> [out]	Upgrade file <in> and save as <out>\n"
 		"       Standard out is used if no output file is specifed\n"
 		"-d, --dump <in>			Dump XML of compressed file <in>\n"
@@ -303,7 +303,7 @@ int main( int argc, char * * argv )
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
 			renderOut = baseName( fileToLoad ) + ".";
 		}
-		else if( arg == "--loop-mode" || arg == "-l" )
+		else if( arg == "--loop" || arg == "-l" )
 		{
 			renderLoop = true;
 		}
