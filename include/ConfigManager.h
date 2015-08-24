@@ -228,6 +228,7 @@ public:
 					const QString & _attribute ) const;
 	void setValue( const QString & _class, const QString & _attribute,
 						const QString & _value );
+	void deleteValue( const QString & cls, const QString & attribute);
 
 	void loadConfigFile();
 	void saveConfigFile();
@@ -256,7 +257,8 @@ private:
 	ConfigManager( const ConfigManager & _c );
 	~ConfigManager();
 
-	
+	void upgrade_1_1_90();
+	void upgrade_1_2_0();
 	void upgrade();
 
 	const QString m_lmmsRcFile;

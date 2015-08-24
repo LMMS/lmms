@@ -104,7 +104,31 @@ ConfigManager::~ConfigManager()
 }
 
 
+void ConfigManager::upgrade_1_1_90()
+{
+	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
+	if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
+	{
+		setValue("mixer", "audiodev", "PulseAudio");
+	}
+}
 
+void ConfigManager::upgrade_1_2_0()
+{
+	// MidiAlsaRaw used to store the device info as "Device" instead of "device"
+	if ( value( "MidiAlsaRaw", "device" ).isNull() )
+	{
+		// copy "device" = "Device" and then delete the old "Device" (further down)
+		QString oldDevice = value( "MidiAlsaRaw", "Device" );
+		setValue("MidiAlsaRaw", "device", oldDevice);
+	}
+	if ( !value( "MidiAlsaRaw", "device" ).isNull() )
+	{
+		// delete the old "Device" in the case that we just copied it to "device"
+		//   or if the user somehow set both the "Device" and "device" fields
+		deleteValue("MidiAlsaRaw", "Device");
+	}
+}
 
 void ConfigManager::upgrade()
 {
@@ -116,13 +140,14 @@ void ConfigManager::upgrade()
 
 	ProjectVersion createdWith = m_version;
 	
-	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
 	if ( createdWith.setCompareType(Build) < "1.1.90" )
 	{
-		if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
-		{
-			setValue("mixer", "audiodev", "PulseAudio");
-		}
+		upgrade_1_1_90();
+	}
+
+	if ( createdWith.setCompareType(Build) < "1.2.0" )
+	{
+		upgrade_1_2_0();
 	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
@@ -294,6 +319,22 @@ void ConfigManager::setValue( const QString & _class,
 	m_settings[_class].push_back( qMakePair( _attribute, _value ) );
 }
 
+
+void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
+{
+	if( m_settings.contains( cls ) )
+	{
+		for( stringPairVector::iterator it = m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
+		{
+			if( ( *it ).first == attribute )
+			{
+				m_settings[cls].erase(it);
+				return;
+			}
+		}
+	}
+}
 
 
 void ConfigManager::loadConfigFile()
