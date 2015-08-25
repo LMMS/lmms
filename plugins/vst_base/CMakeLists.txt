@@ -1,6 +1,9 @@
 IF(LMMS_SUPPORT_VST)
 
 INCLUDE(BuildPlugin)
+FIND_PACKAGE(Qt4 COMPONENTS QtCore REQUIRED)
+INCLUDE(${QT_USE_FILE})
+
 
 IF(LMMS_BUILD_WIN32)
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
@@ -41,7 +44,7 @@ ENDIF(LMMS_HOST_X86_64)
 ADD_CUSTOM_COMMAND(
 		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 		COMMAND ${WINE_CXX}
-		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -o RemoteVstPlugin
+ 		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows -I"${QT_INCLUDE_DIR}" "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread -lQtCore ${EXTRA_FLAGS} -o RemoteVstPlugin
 		COMMAND find -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
 		TARGET vstbase
 		OUTPUTS RemoteVstPlugin

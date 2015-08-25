@@ -32,15 +32,6 @@
 #include "VstSyncController.h"
 #include "RemotePlugin.h"
 
-#ifndef USE_QT_SHMEM
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#endif
-
 
 VstSyncController::VstSyncController() :
 	m_syncData( NULL ),
@@ -51,7 +42,6 @@ VstSyncController::VstSyncController() :
 	{
 		connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
-#ifdef USE_QT_SHMEM
 		if ( m_shm.create( sizeof( VstSyncData ) ) )
 		{
 			m_syncData = (VstSyncData*) m_shm.data();
@@ -60,28 +50,6 @@ VstSyncController::VstSyncController() :
 		{
 			qWarning() << QString( "Failed to allocate shared memory for VST sync: %1" ).arg( m_shm.errorString() );
 		}
-#else
-		key_t key; // make the key:
-		if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
-		{
-				qWarning( "VstSyncController: ftok() failed" );
-		}
-		else
-		{	// connect to shared memory segment
-			if( ( m_shmID = shmget( key, sizeof( VstSyncData ), 0644 | IPC_CREAT ) ) == -1 )
-			{
-				qWarning( "VstSyncController: shmget() failed" );
-			}
-			else
-			{		// attach segment
-				m_syncData = (VstSyncData *)shmat( m_shmID, 0, 0 );
-				if( m_syncData == (VstSyncData *)( -1 ) )
-				{
-					qWarning( "VstSyncController: shmat() failed" );
-				}
-			}
-		}
-#endif
 	}
 	else
 	{
@@ -116,22 +84,11 @@ VstSyncController::~VstSyncController()
 	}
 	else
 	{
-#ifdef USE_QT_SHMEM
 		if( m_shm.data() )
 		{
 			// detach shared memory, delete it:
 			m_shm.detach();
 		}
-#else
-		if( shmdt( m_syncData ) != -1 )
-		{
-			shmctl( m_shmID, IPC_RMID, NULL );
-		}
-		else
-		{
-			qWarning( "VstSyncController: shmdt() failed" );
-		}
-#endif
 	}
 }
 
