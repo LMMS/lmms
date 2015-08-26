@@ -224,10 +224,10 @@ public:
 
 	void addRecentlyOpenedProject( const QString & _file );
 
-	const QString & value( const QString & _class,
-					const QString & _attribute ) const;
-	void setValue( const QString & _class, const QString & _attribute,
-						const QString & _value );
+	const QString & value( const QString & cls,
+					const QString & attribute ) const;
+	void setValue( const QString & cls, const QString & attribute,
+						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);
 
 	void loadConfigFile();

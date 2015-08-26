@@ -277,16 +277,16 @@ void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 
 
 
-const QString & ConfigManager::value( const QString & _class,
-					const QString & _attribute ) const
+const QString & ConfigManager::value( const QString & cls,
+					const QString & attribute ) const
 {
-	if( m_settings.contains( _class ) )
+	if( m_settings.contains( cls ) )
 	{
 		for( stringPairVector::const_iterator it =
-						m_settings[_class].begin();
-					it != m_settings[_class].end(); ++it )
+						m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
 		{
-			if( ( *it ).first == _attribute )
+			if( ( *it ).first == attribute )
 			{
 				return ( *it ).second ;
 			}
@@ -299,24 +299,24 @@ const QString & ConfigManager::value( const QString & _class,
 
 
 
-void ConfigManager::setValue( const QString & _class,
-				const QString & _attribute,
-				const QString & _value )
+void ConfigManager::setValue( const QString & cls,
+				const QString & attribute,
+				const QString & value )
 {
-	if( m_settings.contains( _class ) )
+	if( m_settings.contains( cls ) )
 	{
-		for( stringPairVector::iterator it = m_settings[_class].begin();
-					it != m_settings[_class].end(); ++it )
+		for( stringPairVector::iterator it = m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
 		{
-			if( ( *it ).first == _attribute )
+			if( ( *it ).first == attribute )
 			{
-				( *it ).second = _value;
+				( *it ).second = value;
 				return;
 			}
 		}
 	}
 	// not in map yet, so we have to add it...
-	m_settings[_class].push_back( qMakePair( _attribute, _value ) );
+	m_settings[cls].push_back( qMakePair( attribute, value ) );
 }
 
 
