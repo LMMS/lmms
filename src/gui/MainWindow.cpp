@@ -787,12 +787,12 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 	{
 		int indexOfTemplate = m_templatesMenu->actions().indexOf( _idx );
 		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
-		QString dir_base =  isFactoryTemplate ?
+		QString dirBase =  isFactoryTemplate ?
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
 		Engine::getSong()->createNewProjectFromTemplate(
-			dir_base + _idx->text() + ".mpt" );
+			dirBase + _idx->text() + ".mpt" );
 	}
 }
 
