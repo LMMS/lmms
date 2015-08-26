@@ -120,6 +120,11 @@ public:
 		return dataDir() + PROJECTS_PATH;
 	}
 
+	QString factoryTemplatesDir() const
+	{
+		return factoryProjectsDir() + TEMPLATE_PATH;
+	}
+
 	QString factoryPresetsDir() const
 	{
 		return dataDir() + PRESETS_PATH;

@@ -244,6 +244,13 @@ void MainWindow::finalize()
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
+	m_templatesMenu = new QMenu( tr("New from template"), this );
+	connect( m_templatesMenu, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
+	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
+		 SLOT( createNewProjectFromTemplate( QAction * ) ) );
+
+	project_menu->addMenu(m_templatesMenu);
+
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
@@ -269,6 +276,10 @@ void MainWindow::finalize()
 					tr( "Save as New &Version" ),
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
+
+	project_menu->addAction( tr( "Save as default template" ),
+				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
@@ -382,12 +393,6 @@ void MainWindow::finalize()
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
 							m_toolBar );
-
-	m_templatesMenu = new QMenu( project_new_from_template );
-	connect( m_templatesMenu, SIGNAL( aboutToShow() ),
-					this, SLOT( fillTemplatesMenu() ) );
-	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
-		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
 	project_new_from_template->setMenu( m_templatesMenu );
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
@@ -771,14 +776,6 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
-	QString default_template = ConfigManager::inst()->userTemplateDir()
-						+ "default.mpt";
-
-	//if we dont have a user default template, make one
-	if( !QFile::exists( default_template ) )
-	{
-		Engine::getSong()->saveProjectFile( default_template );
-	}
 }
 
 
@@ -786,14 +783,16 @@ void MainWindow::createNewProject()
 
 void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
-	if( m_templatesMenu != NULL && mayChangeProject(true) )
+	if( m_templatesMenu && mayChangeProject(true) )
 	{
-		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
-						>= m_custom_templates_count ?
-				ConfigManager::inst()->factoryProjectsDir() :
-				ConfigManager::inst()->userProjectsDir();
+		int indexOfTemplate = m_templatesMenu->actions().indexOf( _idx );
+		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
+		QString dirBase =  isFactoryTemplate ?
+				ConfigManager::inst()->factoryTemplatesDir() :
+				ConfigManager::inst()->userTemplateDir();
+
 		Engine::getSong()->createNewProjectFromTemplate(
-			dir_base + "templates/" + _idx->text() + ".mpt" );
+			dirBase + _idx->text() + ".mpt" );
 	}
 }
 
@@ -811,11 +810,11 @@ void MainWindow::openProject()
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-            Engine::getSong()->stop();
+			Song *song = Engine::getSong();
 
+			song->stop();
 			setCursor( Qt::WaitCursor );
-			Engine::getSong()->loadProject(
-						ofd.selectedFiles()[0] );
+			song->loadProject( ofd.selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
 	}
@@ -932,6 +931,29 @@ bool MainWindow::saveProjectAsNewVersion()
 		Engine::getSong()->guiSaveProjectAs( fileName );
 		return true;
 	}
+}
+
+
+
+
+void MainWindow::saveProjectAsDefaultTemplate()
+{
+	QString defaultTemplate = ConfigManager::inst()->userTemplateDir() + "default.mpt";
+
+	QFileInfo fileInfo(defaultTemplate);
+	if (fileInfo.exists())
+	{
+		if (QMessageBox::warning(this,
+					 tr("Overwrite default template?"),
+					 tr("This will overwrite your current default template."),
+					 QMessageBox::Ok,
+					 QMessageBox::Cancel) != QMessageBox::Ok)
+		{
+			return;
+		}
+	}
+
+	Engine::getSong()->saveProjectFile( defaultTemplate );
 }
 
 
@@ -1344,7 +1366,7 @@ void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
-	QDir user_d( ConfigManager::inst()->userProjectsDir() + "templates" );
+	QDir user_d( ConfigManager::inst()->userTemplateDir() );
 	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
 						QDir::Files | QDir::Readable );
 
