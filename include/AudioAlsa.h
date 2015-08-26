@@ -37,12 +37,33 @@
 #include "AudioDevice.h"
 
 
-class LcdSpinBox;
-class QLineEdit;
-
-
 class AudioAlsa : public AudioDevice, public QThread
 {
+	// Public classes and enums
+public:
+	/**
+	 * @brief Contains the relevant information about available ALSA devices
+	 */
+	class DeviceInfo
+	{
+	public:
+		DeviceInfo(QString const & deviceName, QString const & deviceDescription) :
+			m_deviceName(deviceName),
+			m_deviceDescription(deviceDescription)
+		{}
+		~DeviceInfo() {}
+
+		QString const & getDeviceName() const { return m_deviceName; }
+		QString const & getDeviceDescription() const { return m_deviceDescription; }
+
+	private:
+		QString m_deviceName;
+		QString m_deviceDescription;
+
+	};
+
+	typedef std::vector<DeviceInfo> DeviceInfoCollection;
+
 public:
 	AudioAlsa( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioAlsa();
@@ -55,21 +76,7 @@ public:
 
 	static QString probeDevice();
 
-
-	class setupWidget : public AudioDevice::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
-
-	} ;
-
+	static DeviceInfoCollection getAvailableDevices();
 
 private:
 	virtual void startProcessing();

@@ -2,6 +2,8 @@ SET(LMMS_SRCS
 	${LMMS_SRCS}
 	gui/AboutDialog.cpp
 	gui/ActionGroup.cpp
+	gui/AudioAlsaSetupWidget.cpp
+	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
 	gui/AutomationPatternView.cpp
 	gui/ControllerConnectionDialog.cpp

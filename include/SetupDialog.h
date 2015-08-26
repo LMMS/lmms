@@ -33,6 +33,8 @@
 #include "AudioDevice.h"
 #include "MidiClient.h"
 
+#include "AudioDeviceSetupWidget.h"
+
 
 class QComboBox;
 class QLabel;
@@ -178,7 +180,7 @@ private:
 	bool m_displayWaveform;
 	bool m_disableAutoQuit;
 
-	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
+	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 

@@ -1,7 +1,7 @@
 /*
- * AudioOss.h - device-class that implements OSS-PCM-output
+ * AudioAlsaSetupWidget.h - Implements a setup widget for ALSA-PCM-output
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,62 +22,42 @@
  *
  */
 
-#ifndef AUDIO_OSS_H
-#define AUDIO_OSS_H
+#ifndef AUDIO_ALSA_SETUP_WIDGET_H
+#define AUDIO_ALSA_SETUP_WIDGET_H
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_OSS
+#ifdef LMMS_HAVE_ALSA
 
-#include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
+#include "AudioAlsa.h"
 
+
+class QComboBox;
 class LcdSpinBox;
-class QLineEdit;
 
 
-class AudioOss : public AudioDevice, public QThread
+class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 {
+	Q_OBJECT
+
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioOss();
+	AudioAlsaSetupWidget( QWidget * _parent );
+	virtual ~AudioAlsaSetupWidget();
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "OSS (Open Sound System)" );
-	}
+	virtual void saveSettings();
 
-	static QString probeDevice();
-
-
-	class setupWidget : public AudioDeviceSetupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
-
-	} ;
-
+public slots:
+	void onCurrentIndexChanged(int index);
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	QComboBox * m_deviceComboBox;
+	LcdSpinBox * m_channels;
 
-	int m_audioFD;
-
-	bool m_convertEndian;
-
-} ;
-
+	int m_selectedDevice;
+	AudioAlsa::DeviceInfoCollection m_deviceInfos;
+};
 
 #endif
 

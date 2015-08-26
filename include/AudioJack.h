@@ -35,6 +35,7 @@
 #include <QtCore/QMap>
 
 #include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 
 
 class QLineEdit;
@@ -55,7 +56,7 @@ public:
 	}
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

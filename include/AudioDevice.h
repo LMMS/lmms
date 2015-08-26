@@ -90,32 +90,6 @@ public:
 
 
 
-	class setupWidget : public TabWidget
-	{
-	public:
-		setupWidget( const QString & _caption, QWidget * _parent ) :
-			TabWidget( TabWidget::tr( "Settings for %1" ).arg(
-					TabWidget::tr( _caption.toLatin1() ) ).
-							toUpper(), _parent )
-		{
-		}
-
-		virtual ~setupWidget()
-		{
-		}
-
-		virtual void saveSettings() = 0;
-
-		virtual void show()
-		{
-			parentWidget()->show();
-			QWidget::show();
-		}
-
-	} ;
-
-
-
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
