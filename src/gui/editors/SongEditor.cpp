@@ -111,7 +111,7 @@ SongEditor::SongEditor( Song * _song ) :
 	// add some essential widgets to global tool-bar
 	QWidget * tb = gui->mainWindow()->toolBar();
 
-	gui->mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 40 );
 
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );

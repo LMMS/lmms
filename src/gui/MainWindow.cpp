@@ -78,7 +78,8 @@ MainWindow::MainWindow() :
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
-	m_viewMenu( NULL )
+	m_viewMenu( NULL ),
+	m_metronomeToggle( 0 )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -430,6 +431,13 @@ void MainWindow::finalize()
 					this, SLOT( enterWhatsThisMode() ),
 								m_toolBar );
 
+	m_metronomeToggle = new ToolButton(
+				embed::getIconPixmap( "metronome" ),
+				tr( "Toggle metronome" ),
+				this, SLOT( onToggleMetronome() ),
+							m_toolBar );
+	m_metronomeToggle->setCheckable(true);
+	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -439,6 +447,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( project_save, 0, 5 );
 	m_toolBarLayout->addWidget( project_export, 0, 6 );
 	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
+	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 8 );
 
 
 	// window-toolbar
@@ -1207,6 +1216,17 @@ void MainWindow::updateConfig( QAction * _who )
 						 QString::number(checked) );
 	}
 }
+
+
+
+void MainWindow::onToggleMetronome()
+{
+	Mixer * mixer = Engine::mixer();
+
+	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
+}
+
+
 
 
 void MainWindow::toggleControllerRack()
