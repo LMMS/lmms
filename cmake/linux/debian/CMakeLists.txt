@@ -45,14 +45,14 @@ SET(CPACK_PACKAGE_DESCRIPTION " ${PROJECT_NAME_UCASE} aims to be a free alternat
 SET(ICON_INSTALL "data/lmms.png")
 SET(MIME_ICON "data/application-x-lmms-project.svg")
 
-CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}.install.in ../../debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
-CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install.in ../../debian/${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install)
-CONFIGURE_FILE(../${CPACK_DEBIAN_PACKAGE_NAME}.desktop.in ../../debian/${CPACK_DEBIAN_PACKAGE_NAME}.desktop)
+CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}.install.in ../../../debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
+CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install.in ../../../debian/${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install)
+
 ## This uses a lot of CPack variables incase we don't need to roll our own one day
-CONFIGURE_FILE(control.in ../../debian/control)
+CONFIGURE_FILE(control.in ../../../debian/control)
 
 # these are basically just copied
-CONFIGURE_FILE(watch.in ../../debian/watch)
-CONFIGURE_FILE(format.in ../../debian/source/format)
-CONFIGURE_FILE(compat.in ../../debian/compat)
+CONFIGURE_FILE(watch.in ../../../debian/watch)
+CONFIGURE_FILE(format.in ../../../debian/source/format)
+CONFIGURE_FILE(compat.in ../../../debian/compat)
 
