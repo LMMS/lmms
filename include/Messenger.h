@@ -54,6 +54,8 @@ public:
 		static const char *WaveTableInit;
 		static const char *MixerDevInit;
 		static const char *MixerProcessingStart;
+
+		static const char *FxMixerPeaks;
 	};
 
 	// Send message to indicate that the following components have completed their initialization
@@ -62,6 +64,8 @@ public:
 	void broadcastMixerDevInit();
 	// Indicates that mixer has started its processing thread(s).
 	void broadcastMixerProcessing();
+	// Broadcast the left/right channel peak values of each Fx channel in the mixer
+	void broadcastFxMixerPeaks(std::size_t numFxCh, const float peaks[][2]);
 
 	// whenever the core encounters a warning, it can broadcast it to listeners
 	//   rather than explicitly pop a Qt Dialog / log it, etc.

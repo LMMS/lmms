@@ -24,6 +24,8 @@
 
 #include "GuiApplication.h"
 
+#include <memory>
+
 #include <QApplication>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -62,6 +64,16 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication(const QString &fileToLoad, const QString &fileToImport,
 	bool fullscreen, bool exitAfterImport) :
+	m_mainWindow(nullptr),
+	m_fxMixerView(nullptr),
+	m_songEditor(nullptr),
+	m_automationEditor(nullptr),
+	m_bbEditor(nullptr),
+	m_pianoRoll(nullptr),
+	m_projectNotes(nullptr),
+	m_controllerRackView(nullptr),
+	m_loadingProgressLabel(nullptr),
+	m_splashScreen(nullptr),
 	m_fileToLoad(fileToLoad),
 	m_fileToImport(fileToImport),
 	m_fullscreen(fullscreen),
@@ -370,6 +382,39 @@ void GuiApplication::processOscMsgInGuiThread(QByteArray msg)
 	else if (strcmp(Messenger::Endpoints::MixerProcessingStart, data) == 0)
 	{
 		displayInitProgress( tr("Started mixer threads") );
+	}
+	else if (strcmp(Messenger::Endpoints::FxMixerPeaks, data) == 0)
+	{
+		const char *argStr = rtosc_argument_string(data);
+
+		std::size_t numFloats = 0;
+		bool allFloats = true;
+		for (const char *curArg=argStr; *curArg; ++curArg)
+		{
+			allFloats = allFloats && (*curArg == 'f');
+			++numFloats;
+		}
+		// ensure we have only floats, and each peak argument should be paired (left ch + right ch)
+		if (!allFloats || numFloats%2 != 0)
+		{
+			qDebug() << "GuiApplication: Bad OSC command";
+		}
+		else
+		{
+			std::unique_ptr<float[][2]> peaks(new float[numFloats/2][2]);
+			for (std::size_t fxNo=0; fxNo<numFloats/2; ++fxNo)
+			{
+				for (int ch=0; ch<2; ++ch)
+				{
+					peaks[fxNo][ch] = rtosc_argument(data, fxNo*2 + ch).f;
+				}
+			}
+
+			if (fxMixerView())
+			{
+				fxMixerView()->gotChannelPeaks(numFloats/2, peaks.get());
+			}
+		}
 	}
 	else if (strcmp(Messenger::Endpoints::Warning, data) == 0)
 	{

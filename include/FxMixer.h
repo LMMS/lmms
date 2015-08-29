@@ -202,6 +202,10 @@ public:
 	FxRouteVector m_fxRoutes;
 
 private:
+	// notify the GUI (and other listeners) of the left/right peak values
+	// for each fx channel via OSC messaging
+	void broadcastChannelPeaks() const;
+
 	// the fx channels in the mixer. index 0 is always master.
 	QVector<FxChannel *> m_fxChannels;
 

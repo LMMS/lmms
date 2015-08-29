@@ -22,9 +22,12 @@
  *
  */
 
+#include <memory>
+
 #include <QDomElement>
 
 #include "FxMixer.h"
+#include "Messenger.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -175,8 +178,8 @@ void FxChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		m_peakLeft = qMax( m_peakLeft, Engine::mixer()->peakValueLeft( m_buffer, fpp ) * v );
-		m_peakRight = qMax( m_peakRight, Engine::mixer()->peakValueRight( m_buffer, fpp ) * v );
+		m_peakLeft = Engine::mixer()->peakValueLeft( m_buffer, fpp ) * v;
+		m_peakRight = Engine::mixer()->peakValueRight( m_buffer, fpp ) * v;
 	}
 	else
 	{
@@ -549,6 +552,26 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 }
 
 
+void FxMixer::broadcastChannelPeaks() const
+{
+	std::size_t numFxChannels = numChannels();
+	std::unique_ptr<float[][2]> peaks( new float[numFxChannels][2] );
+
+	for (int i=0; i<numFxChannels; ++i)
+	{
+		peaks[i][0] = m_fxChannels[i]->m_peakLeft;
+		peaks[i][1] = m_fxChannels[i]->m_peakRight;
+	}
+
+	// fx channel 0 (master) should be multiplied by the master gain
+	float masterGain = Engine::mixer()->masterGain();
+	peaks[0][0] *= masterGain;
+	peaks[0][1] *= masterGain;
+
+	Engine::messenger()->broadcastFxMixerPeaks(numFxChannels, peaks.get());
+}
+
+
 
 
 void FxMixer::prepareMasterMix()
@@ -608,6 +631,9 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		? 1.0f
 		: m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied( _buf, m_fxChannels[0]->m_buffer, v, fpp );
+
+	// let the GUI (or other listeners) know the peak values of each fx channel
+	broadcastChannelPeaks();
 
 	// clear all channel buffers and
 	// reset channel process state

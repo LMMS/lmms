@@ -28,6 +28,8 @@
 
 #include "Messenger.h"
 
+#include <memory>
+
 #include <QDebug>
 #include <QReadLocker>
 #include <QString>
@@ -44,6 +46,7 @@ const char *Messenger::Endpoints::Error     = "/status/error";
 const char *Messenger::Endpoints::WaveTableInit        = "/wavetable/init";
 const char *Messenger::Endpoints::MixerDevInit         = "/mixer/devices/init";
 const char *Messenger::Endpoints::MixerProcessingStart = "/mixer/processing/start";
+const char *Messenger::Endpoints::FxMixerPeaks         = "/fxmixer/peaks";
 
 
 void Messenger::broadcastWaveTableInit()
@@ -60,6 +63,31 @@ void Messenger::broadcastMixerProcessing()
 {
 	char oscMsg[512];
 	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::MixerProcessingStart, ""));
+}
+
+
+void Messenger::broadcastFxMixerPeaks(std::size_t numFxCh, const float peaks[][2])
+{
+	char oscMsg[8192];
+	std::unique_ptr<char[]> argStr(new char[numFxCh*2+1]);
+	std::unique_ptr<rtosc_arg_t[]> args(new rtosc_arg_t[numFxCh*2]);
+
+	// convert the peak data into rtosc arguments
+	// serialized as {fx0_left, fx0_right, fx1_left, fx1_right, ...}
+
+	memset(argStr.get(), 'f', numFxCh*2);
+	// add null terminator to argument string
+	argStr.get()[numFxCh*2] = 0;
+
+	for (std::size_t fxNo=0; fxNo<numFxCh; ++fxNo)
+	{
+		for (int ch=0; ch<2; ++ch)
+		{
+			args[fxNo*2 + ch].f = peaks[fxNo][ch];
+		}
+	}
+	broadcast(oscMsg, rtosc_amessage(oscMsg, sizeof(oscMsg), Endpoints::FxMixerPeaks,
+		argStr.get(), args.get()));
 }
 
 void Messenger::broadcastWarning(const QString &brief, const QString &msg)
