@@ -1,0 +1,8 @@
+usr/bin/@PACKAGE_NAME@
+usr/lib/@PACKAGE_NAME@
+usr/share/man/*
+usr/share/applications/*
+@MIME_ICON@	usr/share/icons/gnome/scalable/mimetypes
+
+@ICON_INSTALL@ usr/share/icons
+@ICON_INSTALL@ usr/share/pixmaps

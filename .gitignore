@@ -8,3 +8,6 @@
 /plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
 /plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
+**/CMakeFiles/
+**cmake_install.cmake
+**Makefile

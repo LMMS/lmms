@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=@NAME@
+Name[en]=@NAME@
+Name[en_US]=@NAME@
+Name[en_GB]=@NAME@
+GenericName=@ENG_GENERIC@
+GenericName[en]=@ENG_GENERIC@
+GenericName[ca]=Programari de producció musical
+GenericName[de]=Software zur Musik-Produktion
+Comment=@ENG_COMMENT@
+Comment[en]=@ENG_COMMENT@
+Comment[ca]=Producció fàcil de música per a tothom!
+Icon=@ICON@
+Exec=@EXEC@
+Terminal=false
+Type=Application
+Categories=Qt;AudioVideo;Audio;Midi;
+MimeType=application/x-lmms-project;

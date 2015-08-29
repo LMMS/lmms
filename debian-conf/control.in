@@ -1,0 +1,39 @@
+Source: @PACKAGE_NAME@
+Section: sound
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Patrick Winnertz <winnie@debian.org>
+Build-Depends:
+@BUILD_DEPENDS@
+Standards-Version: 3.9.5
+Homepage: @PROJECT_URL@
+
+Package: @PACKAGE_NAME@
+Architecture: any
+Depends: @PACKAGE_NAME@-common (= @DOLLAZ@{source:Version}), @DOLLAZ@{shlibs:Depends}, @DOLLAZ@{misc:Depends}, zynaddsubfx | zynaddsubfx-git
+Recommends: @PACKAGE_NAME@-vst-full (= @DOLLAZ@{binary:Version}) [amd64 i386], tap-plugins, caps
+Suggests: fil-plugins, mcp-plugins, omins, freepats, fluid-soundfont-gm
+Replaces: @PACKAGE_NAME@-common (<< 1.0.0~)
+Breaks: @PACKAGE_NAME@-common (<< 1.0.0~)
+Description: @NAME@
+@EXTENDED_DESCRIPTION@
+
+Package: @PACKAGE_NAME@-common
+Architecture: all
+Depends: @DOLLAZ@{shlibs:Depends}, @DOLLAZ@{misc:Depends}
+Description: @NAME@
+@EXTENDED_DESCRIPTION@
+ .
+ This package contains the platform independent files such as samples, presets
+ and some example projects.
+
+Package: @PACKAGE_NAME@-vst-full
+Architecture: i386
+Multi-Arch: foreign
+Depends: lmms (>= @DOLLAZ@{source:Version}), @DOLLAZ@{shlibs:Depends}, @DOLLAZ@{misc:Depends}
+Breaks: lmms (<< 1.0.0~)
+Replaces: lmms (<< 1.0.0~)
+Description: @NAME@ - full VST support using Wine
+@EXTENDED_DESCRIPTION@
+ .
+ This package contains the plugin which provides full VST support using Wine.

@@ -1,0 +1,4 @@
+?package(@PACKAGE_NAME@):needs="X11" section="Applications/Sound" \
+  title="@NAME@" hints="Audio" command="/usr/bin/@PACKAGE_NAME@" \
+  longtitle="@NAME@" \
+  icon32x32="@ICON_32@"
