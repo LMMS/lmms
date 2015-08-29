@@ -30,6 +30,14 @@ ELSE(WIN32)
 	STRING(REGEX MATCH "86_64" IS_X86_64 "${Machine}")
 ENDIF(WIN32)
 
+# Detect Debian, Ubuntu and family
+IF(EXISTS /etc/lsb-release)
+        SET(LMMS_BUILD_DEBIAN 1)
+# Detect RedHat, Fedora and family
+ELSEIF(EXISTS /etc/redhat-release)
+        SET(LMMS_BUILD_REDHAT 1)
+ENDIF()
+
 IF(IS_X86)
 	MESSAGE("-- Target host is 32 bit")
 	SET(LMMS_HOST_X86 TRUE)

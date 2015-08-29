@@ -13,3 +13,11 @@
 **Makefile
 /cmake/linux/debian/lmms.install
 /cmake/linux/debian/control
+/debian/
+**.cxx_parameters
+CMakeCache.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+lmmsconfig.h
+lmmsversion.h
+

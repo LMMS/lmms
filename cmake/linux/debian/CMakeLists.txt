@@ -2,6 +2,7 @@ SET(CPACK_DEBIAN_PACKAGE_VERSION "${VERSION}")
 SET(CPACK_DEBIAN_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "sound")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "${PROJECT_AUTHOR} <${PROJECT_EMAIL}>")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${PROJECT_URL}")
 SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "any")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "${CPACK_DEBIAN_PACKAGE_NAME}-vst-full (= ${DOLLAZ}{binary:Version}) [amd64 i386], tap-plugins, caps")
@@ -45,14 +46,15 @@ SET(CPACK_PACKAGE_DESCRIPTION " ${PROJECT_NAME_UCASE} aims to be a free alternat
 SET(ICON_INSTALL "data/lmms.png")
 SET(MIME_ICON "data/application-x-lmms-project.svg")
 
-CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}.install.in ../../../debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
-CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install.in ../../../debian/${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install)
+CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}.install.in ${CMAKE_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
+CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install.in ${CMAKE_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install)
 
 ## This uses a lot of CPack variables incase we don't need to roll our own one day
-CONFIGURE_FILE(control.in ../../../debian/control)
+CONFIGURE_FILE(control.in ${CMAKE_SOURCE_DIR}/debian/control)
 
 # these are basically just copied
-CONFIGURE_FILE(watch.in ../../../debian/watch)
-CONFIGURE_FILE(format.in ../../../debian/source/format)
-CONFIGURE_FILE(compat.in ../../../debian/compat)
+CONFIGURE_FILE(watch.in ${CMAKE_SOURCE_DIR}/debian/watch)
+CONFIGURE_FILE(format.in ${CMAKE_SOURCE_DIR}/debian/source/format)
+CONFIGURE_FILE(compat.in ${CMAKE_SOURCE_DIR}/debian/compat)
+CONFIGURE_FILE(rules.in ${CMAKE_SOURCE_DIR}/debian/rules)
 
