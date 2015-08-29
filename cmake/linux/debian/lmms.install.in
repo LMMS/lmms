@@ -1,5 +1,5 @@
-usr/bin/@PACKAGE_NAME@
-usr/lib/@PACKAGE_NAME@
+usr/bin/@CMAKE_PROJECT_NAME@
+usr/lib/@CPACK_DEBIAN_PACKAGE_NAME@
 usr/share/man/*
 usr/share/applications/*
 @MIME_ICON@	usr/share/icons/gnome/scalable/mimetypes

@@ -1,8 +1,0 @@
-usr/bin/lmms
-usr/lib/lmms
-usr/share/man/*
-usr/share/applications/*
-data/application-x-lmms-project.svg	usr/share/icons/gnome/scalable/mimetypes
-
-data/lmms.png usr/share/icons
-data/lmms.png usr/share/pixmaps

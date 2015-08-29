@@ -476,6 +476,7 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
 		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
+	ADD_SUBDIRECTORY(debian-conf)
 ENDIF(LMMS_BUILD_LINUX)
 
 # package ZynAddSubFX into win32 build

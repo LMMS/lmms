@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=@NAME@
-Name[en]=@NAME@
-Name[en_US]=@NAME@
-Name[en_GB]=@NAME@
+Name=@PROJECT_NAME_UCASE@
+Name[en]=@PROJECT_NAME_UCASE@
+Name[en_US]=@PROJECT_NAME_UCASE@
+Name[en_GB]=@PROJECT_NAME_UCASE@
 GenericName=@ENG_GENERIC@
 GenericName[en]=@ENG_GENERIC@
 GenericName[ca]=Programari de producció musical
