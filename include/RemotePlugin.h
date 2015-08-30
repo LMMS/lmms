@@ -35,10 +35,13 @@
 #include <cstring>
 #include <string>
 #include <cassert>
+
+#if !defined(LMMS_BUILD_WIN32)
 #include <sys/types.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include <semaphore.h>
+#endif
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
