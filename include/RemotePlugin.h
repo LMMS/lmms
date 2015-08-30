@@ -49,7 +49,6 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QSystemSemaphore>
 
-#include <sys/shm.h>
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
