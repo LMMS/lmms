@@ -35,6 +35,10 @@
 #include <cstring>
 #include <string>
 #include <cassert>
+#include <sys/types.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
+#include <semaphore.h>
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
@@ -42,11 +46,13 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QSystemSemaphore>
 
+#include <sys/shm.h>
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <QtCore/QtGlobal>
 #include <QtCore/QSharedMemory>
+
 
 #if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
 typedef int32_t key_t;
