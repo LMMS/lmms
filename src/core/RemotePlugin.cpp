@@ -75,11 +75,7 @@ RemotePlugin::RemotePlugin() :
 	m_watcher( this ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
-#ifdef USE_QT_SHMEM
 	m_shmObj(),
-#else
-	m_shmID( 0 ),
-#endif
 	m_shmSize( 0 ),
 	m_shm( NULL ),
 	m_inputCount( DEFAULT_CHANNELS ),
@@ -110,11 +106,6 @@ RemotePlugin::~RemotePlugin()
 			}
 			unlock();
 		}
-
-#ifndef USE_QT_SHMEM
-		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
-#endif
 	}
 }
 
@@ -305,16 +296,10 @@ void RemotePlugin::resizeSharedProcessingMemory()
 							sizeof( float );
 	if( m_shm != NULL )
 	{
-#ifdef USE_QT_SHMEM
 		m_shmObj.detach();
-#else
-		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
-#endif
 	}
 
 	static int shm_key = 0;
-#ifdef USE_QT_SHMEM
 	do
 	{
 		m_shmObj.setKey( QString( "%1" ).arg( ++shm_key ) );
@@ -322,14 +307,6 @@ void RemotePlugin::resizeSharedProcessingMemory()
 	} while( m_shmObj.error() != QSharedMemory::NoError );
 
 	m_shm = (float *) m_shmObj.data();
-#else
-	while( ( m_shmID = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
-								0600 ) ) == -1 )
-	{
-	}
-
-	m_shm = (float *) shmat( m_shmID, 0, 0 );
-#endif
 	m_shmSize = s;
 	sendMessage( message( IdChangeSharedMemoryKey ).
 				addInt( shm_key ).addInt( m_shmSize ) );
@@ -390,9 +367,4 @@ bool RemotePlugin::processMessage( const message & _m )
 
 	return true;
 }
-
-
-
-
-
 

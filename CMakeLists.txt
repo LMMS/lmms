@@ -558,14 +558,24 @@ MESSAGE(
 "* GIG player                  : ${STATUS_GIG}\n"
 )
 
+#MESSAGE(
+#"\n"
+#"-----------------------------------------------------------------\n"
+#"IMPORTANT:\n"
+#"after installing missing packages, remove CMakeCache.txt before\n"
+#"running cmake again!\n"
+#"-----------------------------------------------------------------\n"
+#"\n\n")
+
+IF(LMMS_HOST_X86_64 AND LMMS_SUPPORT_VST)
 MESSAGE(
 "\n"
 "-----------------------------------------------------------------\n"
 "IMPORTANT:\n"
-"after installing missing packages, remove CMakeCache.txt before\n"
-"running cmake again!\n"
+"For VST we need 32bit QtCore libraries installed but cmake will not check for 32bit version.\n"
 "-----------------------------------------------------------------\n"
 "\n\n")
+ENDIF()
 
 INCLUDE(InstallRequiredSystemLibraries)
 
