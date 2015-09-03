@@ -24,17 +24,18 @@
 
 
 #include "Engine.h"
+#include "BandLimitedWave.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
+#include "Messenger.h"
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "Song.h"
-#include "BandLimitedWave.h"
 
 #include "GuiApplication.h"
 
@@ -46,8 +47,19 @@ Song * Engine::s_song = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
-Messenger Engine::s_messenger;
+Messenger * Engine::s_messenger = NULL;
 
+
+
+
+Messenger * Engine::messenger()
+{
+	if (s_messenger == NULL)
+	{
+		s_messenger = new Messenger();
+	}
+	return s_messenger;
+}
 
 
 
@@ -55,7 +67,7 @@ void Engine::init( bool renderOnly )
 {
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
-	s_messenger.broadcastWaveTableInit();
+	messenger()->broadcastWaveTableInit();
 
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer( renderOnly );
@@ -68,13 +80,13 @@ void Engine::init( bool renderOnly )
 	s_projectJournal->setJournalling( true );
 
 	s_mixer->initDevices();
-	s_messenger.broadcastMixerDevInit();
+	messenger()->broadcastMixerDevInit();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
 	s_mixer->startProcessing();
-	s_messenger.broadcastMixerProcessing();
+	messenger()->broadcastMixerProcessing();
 }
 
 

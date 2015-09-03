@@ -6,125 +6,133 @@
  *
  * This file is part of LMMS - http://lmms.io
  *
- * This file is released under the MIT License.
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
  */
 
 #include "Messenger.h"
 
-#include <memory>
-
-#include <QDebug>
 #include <QReadLocker>
-#include <QString>
 #include <QWriteLocker>
-
-#include "rtosc/rtosc.h"
-
-#include "OscMsgListener.h"
 
 
 // define endpoint names
-const char *Messenger::Endpoints::Warning   = "/status/warning";
-const char *Messenger::Endpoints::Error     = "/status/error";
+const char *Messenger::Endpoints::Warning              = "/status/warning";
+const char *Messenger::Endpoints::Error                = "/status/error";
 const char *Messenger::Endpoints::WaveTableInit        = "/wavetable/init";
 const char *Messenger::Endpoints::MixerDevInit         = "/mixer/devices/init";
 const char *Messenger::Endpoints::MixerProcessingStart = "/mixer/processing/start";
 const char *Messenger::Endpoints::FxMixerPeaks         = "/fxmixer/peaks";
 
 
+ManagedLoAddress::ManagedLoAddress(lo_address &&addr)
+: m_addr(std::move(addr))
+{
+}
+ManagedLoAddress::ManagedLoAddress(ManagedLoAddress &&other)
+: m_addr(std::move(other.m_addr))
+{
+	other.m_addr = NULL;
+}
+
+ManagedLoAddress::~ManagedLoAddress()
+{
+	if (m_addr)
+	{
+		lo_address_free(m_addr);
+	}
+}
+
+ManagedLoAddress::operator const lo_address & () const
+{
+	return m_addr;
+}
+bool ManagedLoAddress::operator< (const ManagedLoAddress &other) const
+{
+	return m_addr < other.m_addr;
+}
+
+
+
 void Messenger::broadcastWaveTableInit()
 {
-	char oscMsg[512];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::WaveTableInit, ""));
+	broadcast(Endpoints::WaveTableInit);
 }
 void Messenger::broadcastMixerDevInit()
 {
-	char oscMsg[512];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::MixerDevInit, ""));
+	broadcast(Endpoints::MixerDevInit);
 }
 void Messenger::broadcastMixerProcessing()
 {
-	char oscMsg[512];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::MixerProcessingStart, ""));
+	broadcast(Endpoints::MixerProcessingStart);
 }
 
 
 void Messenger::broadcastFxMixerPeaks(std::size_t numFxCh, const float peaks[][2])
 {
-	char oscMsg[8192];
-	std::unique_ptr<char[]> argStr(new char[numFxCh*2+1]);
-	std::unique_ptr<rtosc_arg_t[]> args(new rtosc_arg_t[numFxCh*2]);
-
-	// convert the peak data into rtosc arguments
-	// serialized as {fx0_left, fx0_right, fx1_left, fx1_right, ...}
-
-	memset(argStr.get(), 'f', numFxCh*2);
-	// add null terminator to argument string
-	argStr.get()[numFxCh*2] = 0;
+	lo_message oscMsg = lo_message_new();
 
 	for (std::size_t fxNo=0; fxNo<numFxCh; ++fxNo)
 	{
 		for (int ch=0; ch<2; ++ch)
 		{
-			args[fxNo*2 + ch].f = peaks[fxNo][ch];
+			lo_message_add_float(oscMsg, peaks[fxNo][ch]);
 		}
 	}
-	broadcast(oscMsg, rtosc_amessage(oscMsg, sizeof(oscMsg), Endpoints::FxMixerPeaks,
-		argStr.get(), args.get()));
+	broadcast(Endpoints::FxMixerPeaks, oscMsg);
+	lo_message_free(oscMsg);
 }
 
 void Messenger::broadcastWarning(const QString &brief, const QString &msg)
 {
-	char oscMsg[2048];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Warning, "ss", 
-		brief.toUtf8().data(),
-		msg.toUtf8().data()));
+	lo_message oscMsg = lo_message_new();
+	lo_message_add_string(oscMsg, brief.toUtf8().data());
+	lo_message_add_string(oscMsg, msg.toUtf8().data());
+	broadcast(Endpoints::Warning, oscMsg);
+	lo_message_free(oscMsg);
 }
 
 void Messenger::broadcastError(const QString &brief, const QString &msg)
 {
-	char oscMsg[2048];
-	broadcast(oscMsg, rtosc_message(oscMsg, sizeof(oscMsg), Endpoints::Error, "ss",
-		brief.toUtf8().data(),
-		msg.toUtf8().data()));
+	lo_message oscMsg = lo_message_new();
+	lo_message_add_string(oscMsg, brief.toUtf8().data());
+	lo_message_add_string(oscMsg, msg.toUtf8().data());
+	broadcast(Endpoints::Error, oscMsg);
+	lo_message_free(oscMsg);
 }
 
-void Messenger::addGuiOscListener(OscMsgListener *listener)
+void Messenger::addListener(const QString &endpoint, lo_address &&address)
 {
-	QWriteLocker guiLocker(&m_guiListenersLock);
-	m_guiListeners.insert(listener);
+	QWriteLocker listenerLocker(&m_listenersLock);
+	m_listeners[endpoint].insert(std::move(ManagedLoAddress(std::move(address))));
 }
 
-void Messenger::broadcast(const char* buffer, std::size_t length)
+
+void Messenger::broadcast(const char *endpoint, lo_message msg)
 {
-	if (length && buffer)
+	QReadLocker listenerLocker(&m_listenersLock);
+	// send the message to all addresses listening at the given endpoint
+	for (const lo_address &addr : m_listeners[endpoint])
 	{
-		// send this message to all GUI listeners
-		QReadLocker guiLocker(&m_guiListenersLock);
-		for (QSet<OscMsgListener *>::const_iterator i=m_guiListeners.constBegin(); i != m_guiListeners.constEnd(); ++i)
-		{
-			(*i)->queue(buffer, length);
-		}
+		lo_send_message(addr, endpoint, msg);
 	}
-	else
-	{
-		qDebug() << "Messenger::broadcast: attempt to broadcast a message with no content";
-	}
+}
+
+void Messenger::broadcast(const char *endpoint)
+{
+	lo_message msg = lo_message_new();
+	broadcast(endpoint, msg);
+	lo_message_free(msg);
 }

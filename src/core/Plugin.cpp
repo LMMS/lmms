@@ -27,13 +27,15 @@
 #include <QtCore/QLibrary>
 
 #include "Plugin.h"
+
+#include "AutomatableModel.h"
+#include "ConfigManager.h"
+#include "DummyPlugin.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "Messenger.h"
 #include "Mixer.h"
-#include "ConfigManager.h"
-#include "DummyPlugin.h"
-#include "AutomatableModel.h"
 #include "Song.h"
 
 

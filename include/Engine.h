@@ -30,17 +30,16 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
-#include "Messenger.h"
-
 #include "export.h"
 
 class BBTrackContainer;
 class DummyTrackContainer;
 class FxMixer;
-class ProjectJournal;
-class Mixer;
-class Song;
 class Ladspa2LMMS;
+class Messenger;
+class Mixer;
+class ProjectJournal;
+class Song;
 
 
 class EXPORT Engine
@@ -85,10 +84,7 @@ public:
 		return s_dummyTC;
 	}
 
-	static Messenger * messenger()
-	{
-		return &s_messenger;
-	}
+	static Messenger * messenger();
 
 	static float framesPerTick()
 	{
@@ -121,10 +117,7 @@ private:
 	static Ladspa2LMMS * s_ladspaManager;
 
 	// object to send/receive Open Sound Control messages
-	static Messenger s_messenger;
-
-	// even though most methods are static, an instance is needed for Qt slots/signals
-	static Engine * s_instanceOfMe;
+	static Messenger * s_messenger;
 
 	friend class GuiApplication;
 };

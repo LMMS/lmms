@@ -25,9 +25,11 @@
 
 #include "ImportFilter.h"
 #include "Engine.h"
-#include "TrackContainer.h"
+#include "Messenger.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
+#include "TrackContainer.h"
+
 
 
 ImportFilter::ImportFilter( const QString & _file_name,

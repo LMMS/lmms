@@ -548,15 +548,15 @@ void FxMixerView::clear()
 
 
 
-void FxMixerView::gotChannelPeaks(std::size_t numFxCh, const float peaks[][2])
+void FxMixerView::gotChannelPeaks(std::size_t numFxCh, const float* peaks)
 {
 	// avoid error condition where we somehow receive more peak data than there are channels
 	numFxCh = std::min(numFxCh, (std::size_t)m_fxChannelViews.size());
 
 	for (std::size_t fxNo=0; fxNo<numFxCh; ++fxNo)
 	{
-		m_fxChannelViews[fxNo]->m_fader->setPeak_L(peaks[fxNo][0]);
-		m_fxChannelViews[fxNo]->m_fader->setPeak_R(peaks[fxNo][1]);
+		m_fxChannelViews[fxNo]->m_fader->setPeak_L(peaks[fxNo*2 + 0]);
+		m_fxChannelViews[fxNo]->m_fader->setPeak_R(peaks[fxNo*2 + 1]);
 	}
 }
 

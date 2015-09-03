@@ -32,13 +32,13 @@
 #include <stdlib.h>
 
 #include "Engine.h"
-#include "GuiApplication.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
+#include "Messenger.h"
 
 
 

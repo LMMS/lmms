@@ -42,7 +42,6 @@ set(LMMS_SRCS
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
-	core/OscMsgListener.cpp
 	core/PeakController.cpp
 	core/Piano.cpp
 	core/PlayHandle.cpp

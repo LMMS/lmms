@@ -27,9 +27,9 @@
 
 #include <QObject>
 #include <QString>
+#include <QVector>
 
 #include "export.h"
-#include "OscMsgListener.h"
 
 class QLabel;
 class QSplashScreen;
@@ -43,7 +43,12 @@ class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
 
-class EXPORT GuiApplication : public QObject, public OscMsgListener
+namespace lo
+{
+	class ServerThread;
+}
+
+class EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
 public:
@@ -61,17 +66,10 @@ public:
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
-	
-	// override of callback defined by OscMsgListener
-	void processMessage(const QByteArray &msg);
 
-public slots:
-	void displayInitProgress(const QString &msg);
 
 private slots:
 	void childDestroyed(QObject *obj);
-	// this slot should always be connected via Qt::QueuedConnection so that it operates in the gui thread
-	void processOscMsgInGuiThread(QByteArray msg);
 	// staged initialization (in order to avoid blocking the gui thread)
 	void initEngine();
 	void initMainWindow();
@@ -83,6 +81,11 @@ private slots:
 	void initPianoRoll();
 	void initAutomationEditor();
 	void handleCtorOptions();
+	// OSC handlers
+	void displayInitProgress(QString msg);
+	void onOscRecvWarning(QString brief, QString msg);
+	void onOscRecvError(QString brief, QString msg);
+	void updateMixerPeaks(QVector<float> peaks);
 signals:
 	void postInitEngine();
 	void postInitMainWindow();
@@ -116,6 +119,9 @@ private:
 	QString m_fileToImport;
 	bool m_fullscreen;
 	bool m_exitAfterImport;
+
+	// thread to listen for Open Sound Control messages coming from the core
+	lo::ServerThread * m_oscListener;
 };
 
 #define gui GuiApplication::instance()

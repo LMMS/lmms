@@ -29,9 +29,10 @@
 #include <QDomElement>
 #include <QObject>
 
-#include "Engine.h"
-#include "Mixer.h"
 #include "EffectChain.h"
+#include "Engine.h"
+#include "Messenger.h"
+#include "Mixer.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
 

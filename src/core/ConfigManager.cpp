@@ -31,6 +31,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "MainWindow.h"
+#include "Messenger.h"
 #include "ProjectVersion.h"
 #include "GuiApplication.h"
 

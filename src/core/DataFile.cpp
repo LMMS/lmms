@@ -38,6 +38,7 @@
 #include "Effect.h"
 #include "GuiApplication.h"
 #include "lmmsversion.h"
+#include "Messenger.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"

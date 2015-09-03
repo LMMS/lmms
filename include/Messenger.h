@@ -6,37 +6,48 @@
  *
  * This file is part of LMMS - http://lmms.io
  *
- * This file is released under the MIT License.
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
  */
 
 #ifndef MESSENGER_H
 #define MESSENGER_H
 
 #include <cstring>
+#include <map>
+#include <set>
 
 #include <QReadWriteLock>
-#include <QSet>
+#include <QString>
 
-class QString;
+#include <lo/lo.h>
 
-class OscMsgListener;
+
+// automatically calls lo_address_free on the managed lo_address upon deletion
+class ManagedLoAddress
+{
+public:
+	ManagedLoAddress(lo_address &&addr);
+	ManagedLoAddress(ManagedLoAddress &&other);
+	~ManagedLoAddress();
+
+	operator const lo_address & () const;
+	bool operator< (const ManagedLoAddress &other) const;
+private:
+	lo_address m_addr;
+};
 
 
 class Messenger
@@ -77,21 +88,21 @@ public:
 	// @msg is the full message
 	void broadcastError(const QString &brief, const QString &msg);
 
-	// add a function to listen for OSC messages directed to a gui
-	// NOTE: This handler should have hard timing guarantees
-	//   preferrably, it will just enqueue the message and then process it later *in a separate thread*
-	void addGuiOscListener(OscMsgListener *listener);
+	// make it so any messages destined for the given @endpoint will be sent
+	// to the host at @address
+	// note: This transfers the ownership of @address to Messenger so do not
+	// explicitly free it afterwards
+	void addListener(const QString &endpoint, lo_address &&address);
 private:
-	// dispatch an OSC formatted message to ALL attached listeners
-	// if length is 0, an error will be logged and no action taken
-	// Therefore this can be safely used like so:
-	// char buffer[512];
-	// broadcast(buffer, rtosc_message(buffer, 512, "/test", "s", "Test broadcast"))
-	void broadcast(const char *buffer, std::size_t length);
+	// dispatch an OSC formatted message to all addresses listening to the
+	// given endpoint
+	void broadcast(const char *endpoint, lo_message msg);
+	// broadcast an empty message
+	void broadcast(const char *endpoint);
 
-	// list of handlers that are called whenever we wish to broadcast a message to all GUIs
-	QSet<OscMsgListener*> m_guiListeners;
-	QReadWriteLock m_guiListenersLock;
+	// map of endpoint path -> list of hosts interested in that type of message
+	std::map<QString, std::set<ManagedLoAddress> > m_listeners;
+	QReadWriteLock m_listenersLock;
 };
 
 #endif

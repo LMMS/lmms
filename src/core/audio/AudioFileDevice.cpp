@@ -27,6 +27,7 @@
 #include "AudioFileDevice.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
+#include "Messenger.h"
 
 
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,

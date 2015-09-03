@@ -49,6 +49,7 @@
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Messenger.h"
 #include "FileDialog.h"
 #include "MidiClient.h"
 #include "DataFile.h"
