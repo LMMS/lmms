@@ -127,10 +127,10 @@ void printHelp()
 		"            [ -h ]\n"
 		"            [ <file to load> ]\n\n"
 		"-r, --render <project file>	Render given project file\n"
-		"    --render-tracks <project>	Render each track to a different file\n"
+		"    --rendertracks <project>	Render each track to a different file\n"
 		"-o, --output <path>		Render into <path>\n"
 		"				For --render, provide a file path\n"
-		"				For --render-tracks, provide a directory path\n"
+		"				For --rendertracks, provide a directory path\n"
 		"-f, --format <format>		Specify format of render-output where\n"
 		"				Format is either 'wav' or 'ogg'.\n"
 		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
@@ -190,7 +190,7 @@ int main( int argc, char * * argv )
 		{
 			coreOnly = true;
 		}
-		else if( arg == "--render-tracks" )
+		else if( arg == "--rendertracks" )
 		{
 			coreOnly = true;
 			renderTracks = true;
@@ -298,7 +298,7 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if( arg == "--render" || arg == "-r" || arg == "--render-tracks" )
+		else if( arg == "--render" || arg == "-r" || arg == "--rendertracks" )
 		{
 			++i;
 
