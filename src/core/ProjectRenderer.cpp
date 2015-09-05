@@ -125,9 +125,9 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 
 
 QString ProjectRenderer::getFileExtensionFromFormat(
-		ExportFileFormats _fmt )
+		ExportFileFormats fmt )
 {
-	return fileEncodeDevices[_fmt].m_extension;
+	return fileEncodeDevices[fmt].m_extension;
 }
 
 
