@@ -2120,54 +2120,28 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			if( it != notes.begin()-1 )
 			{
 				Note *note = *it;
+				// x coordinate of the right edge of the note
+				int noteRightX = ( note->pos() + note->length() -
+					m_currentPosition) * m_ppt/MidiTime::ticksPerTact();
 				// cursor at the "tail" of the note?
-				if( note->length() > 0 &&
-					pos_ticks*m_ppt /
-						MidiTime::ticksPerTact() >
-						( note->pos() +
-						note->length() )*m_ppt/
-						MidiTime::ticksPerTact()-
-							RESIZE_AREA_WIDTH )
+				bool atTail = note->length() > 0 && x > noteRightX -
+							RESIZE_AREA_WIDTH;
+				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
+				                                       Qt::SizeAllCursor;
+				if( QApplication::overrideCursor() )
 				{
-					if( QApplication::overrideCursor() )
+					if( QApplication::overrideCursor()->shape() != cursorShape )
 					{
-						if( QApplication::overrideCursor()->shape() != Qt::SizeHorCursor )
+						while( QApplication::overrideCursor() != NULL )
 						{
-							while( QApplication::overrideCursor() != NULL )
-							{
-								QApplication::restoreOverrideCursor();
-							}
-
-							QCursor c( Qt::SizeHorCursor );
-							QApplication::setOverrideCursor( c );
+							QApplication::restoreOverrideCursor();
 						}
-					}
-					else
-					{
-						QCursor c( Qt::SizeHorCursor );
-						QApplication::setOverrideCursor( c );
+						QApplication::setOverrideCursor(QCursor(cursorShape));
 					}
 				}
 				else
 				{
-					if( QApplication::overrideCursor() )
-					{
-						if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
-						{
-							while( QApplication::overrideCursor() != NULL )
-							{
-								QApplication::restoreOverrideCursor();
-							}
-
-							QCursor c( Qt::SizeAllCursor );
-							QApplication::setOverrideCursor( c );
-						}
-					}
-					else
-					{
-						QCursor c( Qt::SizeAllCursor );
-						QApplication::setOverrideCursor( c );
-					}
+					QApplication::setOverrideCursor(QCursor(cursorShape));
 				}
 			}
 			else
