@@ -966,155 +966,86 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 	switch( ke->key() )
 	{
 		case Qt::Key_Up:
-			if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
-			{
-				// shift selection up an octave
-				// if nothing selected, shift _everything_
-				shiftSemiTone( +12 );
-			}
-			else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
-			{
-				// Move selected notes up by one semitone
-				shiftSemiTone( 1 );
-			}
-			else
-			{
-				// scroll
-				m_topBottomScroll->setValue(
-						m_topBottomScroll->value() -
-							cm_scrollAmtVert );
-
-				// if they are moving notes around or resizing,
-				// recalculate the note/resize position
-				if( m_action == ActionMoveNote ||
-						m_action == ActionResizeNote )
-				{
-					dragNotes( m_lastMouseX, m_lastMouseY,
-								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier,
-								ke->modifiers() & Qt::ControlModifier );
-				}
-			}
-			ke->accept();
-			break;
-
 		case Qt::Key_Down:
-			if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone )
 			{
-				// shift selection down an octave
-				// if nothing selected, shift _everything_
-				shiftSemiTone( -12 );
-			}
-			else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
-			{
-				// Move selected notes down by one semitone
-				shiftSemiTone( -1 );
-			}
-			else
-			{
-				// scroll
-				m_topBottomScroll->setValue(
-						m_topBottomScroll->value() +
-							cm_scrollAmtVert );
-
-				// if they are moving notes around or resizing,
-				// recalculate the note/resize position
-				if( m_action == ActionMoveNote ||
-						m_action == ActionResizeNote )
+				int direction = (ke->key() == Qt::Key_Up ? +1 : -1);
+				if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
 				{
-					dragNotes( m_lastMouseX, m_lastMouseY,
-								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier,
-								ke->modifiers() & Qt::ControlModifier );
+					// shift selection up an octave
+					// if nothing selected, shift _everything_
+					shiftSemiTone( 12 * direction );
 				}
-			}
-			ke->accept();
-			break;
-
-		case Qt::Key_Left:
-			if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone )
-			{
-				// Move selected notes by one bar to the left
-				shiftPos( - MidiTime::ticksPerTact() );
-			}
-			else if( ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
-			{
-				// move notes
-				bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
-				int amt = quantized ? quantization() : 1;
-				shiftPos( -amt );
-			}
-			else if( ke->modifiers() & Qt::AltModifier)
-			{
-				Pattern * p = m_pattern->previousPattern();
-				if(p != NULL)
+				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 				{
-					setCurrentPattern(p);
+					// Move selected notes up by one semitone
+					shiftSemiTone( 1 * direction );
 				}
-			}
-			else
-			{
-				// scroll
-				m_leftRightScroll->setValue(
-						m_leftRightScroll->value() -
-							cm_scrollAmtHoriz );
-
-				// if they are moving notes around or resizing,
-				// recalculate the note/resize position
-				if( m_action == ActionMoveNote ||
-						m_action == ActionResizeNote )
+				else
 				{
-					dragNotes( m_lastMouseX, m_lastMouseY,
-								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier,
-								ke->modifiers() & Qt::ControlModifier );
-				}
+					// scroll
+					m_topBottomScroll->setValue( m_topBottomScroll->value() -
+						cm_scrollAmtVert * direction );
 
+					// if they are moving notes around or resizing,
+					// recalculate the note/resize position
+					if( m_action == ActionMoveNote ||
+							m_action == ActionResizeNote )
+					{
+						dragNotes( m_lastMouseX, m_lastMouseY,
+									ke->modifiers() & Qt::AltModifier,
+									ke->modifiers() & Qt::ShiftModifier,
+									ke->modifiers() & Qt::ControlModifier );
+					}
+				}
+				ke->accept();
+				break;
 			}
-			ke->accept();
-			break;
 
 		case Qt::Key_Right:
-			if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone)
+		case Qt::Key_Left:
 			{
-				// Move selected notes by one bar to the right
-				shiftPos( MidiTime::ticksPerTact() );
-			}
-			else if( ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
-			{
-				// move notes
-				bool quantized = !( ke->modifiers() & Qt::AltModifier );
-				int amt = quantized ? quantization() : 1;
-				shiftPos( +amt );
-			}
-			else if( ke->modifiers() & Qt::AltModifier) {
-				Pattern * p = m_pattern->nextPattern();
-				if(p != NULL)
+				int direction = (ke->key() == Qt::Key_Right ? +1 : -1);
+				if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone )
 				{
-					setCurrentPattern(p);
+					// Move selected notes by one bar to the left
+					shiftPos( direction * MidiTime::ticksPerTact() );
 				}
-			}
-			else
-			{
-				// scroll
-				m_leftRightScroll->setValue(
-						m_leftRightScroll->value() +
-							cm_scrollAmtHoriz );
-
-				// if they are moving notes around or resizing,
-				// recalculate the note/resize position
-				if( m_action == ActionMoveNote ||
-						m_action == ActionResizeNote )
+				else if( ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
 				{
-					dragNotes( m_lastMouseX, m_lastMouseY,
-								ke->modifiers() & Qt::AltModifier,
-								ke->modifiers() & Qt::ShiftModifier,
-								ke->modifiers() & Qt::ControlModifier );
+					// move notes
+					bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
+					int amt = quantized ? quantization() : 1;
+					shiftPos( direction * amt );
 				}
+				else if( ke->modifiers() & Qt::AltModifier)
+				{
+					Pattern * p = m_pattern->previousPattern();
+					if(p != NULL)
+					{
+						setCurrentPattern(p);
+					}
+				}
+				else
+				{
+					// scroll
+					m_leftRightScroll->setValue( m_leftRightScroll->value() +
+						direction * cm_scrollAmtHoriz );
 
+					// if they are moving notes around or resizing,
+					// recalculate the note/resize position
+					if( m_action == ActionMoveNote ||
+							m_action == ActionResizeNote )
+					{
+						dragNotes( m_lastMouseX, m_lastMouseY,
+									ke->modifiers() & Qt::AltModifier,
+									ke->modifiers() & Qt::ShiftModifier,
+									ke->modifiers() & Qt::ControlModifier );
+					}
+
+				}
+				ke->accept();
+				break;
 			}
-			ke->accept();
-			break;
 
 		case Qt::Key_A:
 			if( ke->modifiers() & Qt::ControlModifier )
