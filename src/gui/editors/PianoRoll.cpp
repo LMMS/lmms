@@ -431,6 +431,48 @@ void PianoRoll::reset()
 	m_lastNotePanning = DefaultPanning;
 }
 
+void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeout)
+{
+	s_textFloat->setText( text );
+	// show the float, offset slightly so as to not obscure anything
+	s_textFloat->moveGlobal( this, pos + QPoint(4, 16) );
+	if (timeout == -1)
+	{
+		s_textFloat->show();
+	}
+	else
+	{
+		s_textFloat->setVisibilityTimeOut( timeout );
+	}
+}
+
+
+void PianoRoll::showVolTextFloat(volume_t vol, const QPoint &pos, int timeout)
+{
+	//! \todo display velocity for MIDI-based instruments
+	// possibly dBV values too? not sure if it makes sense for note volumes...
+	showTextFloat( tr("Volume: %1%").arg( vol ), pos, timeout );
+}
+
+
+void PianoRoll::showPanTextFloat(panning_t pan, const QPoint &pos, int timeout)
+{
+	QString text;
+	if( pan < 0 )
+	{
+		text = tr("Panning: %1% left").arg( qAbs( pan ) );
+	}
+	else if( pan > 0 )
+	{
+		text = tr("Panning: %1% right").arg( qAbs( pan ) );
+	}
+	else
+	{
+		text = tr("Panning: center");
+	}
+	showTextFloat( text, pos, timeout );
+}
+
 
 
 void PianoRoll::changeNoteEditMode( int i )
@@ -2060,25 +2102,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				m_lastNoteVolume = vol;
-				//! \todo display velocity for MIDI-based instruments
-				// possibly dBV values too? not sure if it makes sense for note volumes...
-				s_textFloat->setText( tr("Volume: %1%").arg( vol ) );
+				showVolTextFloat( vol, me->pos() );
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
 				m_lastNotePanning = pan;
-				if( pan < 0 )
-				{
-					s_textFloat->setText( tr("Panning: %1% left").arg( qAbs( pan ) ) );
-				}
-				else if( pan > 0 )
-				{
-					s_textFloat->setText( tr("Panning: %1% right").arg( qAbs( pan ) ) );
-				}
-				else
-				{
-					s_textFloat->setText( tr("Panning: center") );
-				}
+				showPanTextFloat( pan, me->pos() );
 			}
 
 			// When alt is pressed we only edit the note under the cursor
@@ -2127,9 +2156,6 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			// Emit pattern has changed
 			m_pattern->dataChanged();
-			// Show the new volume value
-			s_textFloat->moveGlobal( this, QPoint( me->x() + 4, me->y() + 16 ) );
-			s_textFloat->show();
 		}
 
 		else if( me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
@@ -3246,7 +3272,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
 					n->setVolume( vol );
 				}
-				s_textFloat->setText( tr("Volume: %1%").arg( nv[0]->getVolume() ) );
+				if (nv.size() == 1)
+				{
+					// show the volume hover-text only if editing a single note
+					showVolTextFloat( nv[0]->getVolume(), we->pos(), 1000 );
+				}
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
@@ -3255,24 +3285,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
 					n->setPanning( pan );
 				}
-				panning_t pan = nv[0]->getPanning();
-				if( pan < 0 )
+				if (nv.size() == 1)
 				{
-					s_textFloat->setText( tr("Panning: %1% left").arg( qAbs( pan ) ) );
+					// show the pan hover-text only if editing a single note
+					showPanTextFloat( nv[0]->getPanning(), we->pos(), 1000 );
 				}
-				else if( pan > 0 )
-				{
-					s_textFloat->setText( tr("Panning: %1% right").arg( qAbs( pan ) ) );
-				}
-				else
-				{
-					s_textFloat->setText( tr("Panning: center") );
-				}
-			}
-			if( nv.size() == 1 )
-			{
-				s_textFloat->moveGlobal( this,	QPoint( we->x() + 4, we->y() + 16 ) );
-				s_textFloat->setVisibilityTimeOut( 1000 );
 			}
 			update();
 		}

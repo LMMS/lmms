@@ -69,6 +69,11 @@ public:
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
 
+	// functions to display the hover-text labeling a note's volume/panning
+	void showTextFloat(const QString &text, const QPoint &pos, int timeout=-1);
+	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
+	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
+
 	void setCurrentPattern( Pattern* newPattern );
 
 	inline void stopRecording()
