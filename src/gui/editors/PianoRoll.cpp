@@ -3264,9 +3264,15 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
 					n->setVolume( vol );
 				}
-				if (nv.size() == 1)
+				bool allVolumesEqual = std::all_of( nv.begin(), nv.end(),
+					[nv](const Note *note)
+					{
+						return note->getVolume() == nv[0]->getVolume();
+					});
+				if ( allVolumesEqual )
 				{
-					// show the volume hover-text only if editing a single note
+					// show the volume hover-text only if all notes have the
+					// same volume
 					showVolTextFloat( nv[0]->getVolume(), we->pos(), 1000 );
 				}
 			}
@@ -3277,9 +3283,15 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
 					n->setPanning( pan );
 				}
-				if (nv.size() == 1)
+				bool allPansEqual = std::all_of( nv.begin(), nv.end(),
+					[nv](const Note *note)
+					{
+						return note->getPanning() == nv[0]->getPanning();
+					});
+				if ( allPansEqual )
 				{
-					// show the pan hover-text only if editing a single note
+					// show the pan hover-text only if all notes have the same
+					// panning
 					showPanTextFloat( nv[0]->getPanning(), we->pos(), 1000 );
 				}
 			}
