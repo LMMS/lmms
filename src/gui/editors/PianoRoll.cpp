@@ -701,7 +701,7 @@ void PianoRoll::setBarColor( const QColor & c )
 
 
 
-inline void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
+void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 					int width, const Note * n, const QColor & noteCol )
 {
 	++x;
@@ -770,7 +770,7 @@ inline void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 
 
-inline void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
+void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 								int _y ) const
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
@@ -1179,7 +1179,7 @@ void PianoRoll::leaveEvent(QEvent * e )
 
 
 
-inline int PianoRoll::noteEditTop() const
+int PianoRoll::noteEditTop() const
 {
 	return height() - PR_BOTTOM_MARGIN -
 		m_notesEditHeight + NOTE_EDIT_RESIZE_BAR;
@@ -1188,7 +1188,7 @@ inline int PianoRoll::noteEditTop() const
 
 
 
-inline int PianoRoll::noteEditBottom() const
+int PianoRoll::noteEditBottom() const
 {
 	return height() - PR_BOTTOM_MARGIN;
 }
@@ -1196,7 +1196,7 @@ inline int PianoRoll::noteEditBottom() const
 
 
 
-inline int PianoRoll::noteEditRight() const
+int PianoRoll::noteEditRight() const
 {
 	return width() - PR_RIGHT_MARGIN;
 }
@@ -1204,7 +1204,7 @@ inline int PianoRoll::noteEditRight() const
 
 
 
-inline int PianoRoll::noteEditLeft() const
+int PianoRoll::noteEditLeft() const
 {
 	return WHITE_KEY_WIDTH;
 }
@@ -1212,7 +1212,7 @@ inline int PianoRoll::noteEditLeft() const
 
 
 
-inline int PianoRoll::keyAreaTop() const
+int PianoRoll::keyAreaTop() const
 {
 	return PR_TOP_MARGIN;
 }
@@ -1220,7 +1220,7 @@ inline int PianoRoll::keyAreaTop() const
 
 
 
-inline int PianoRoll::keyAreaBottom() const
+int PianoRoll::keyAreaBottom() const
 {
 	return height() - PR_BOTTOM_MARGIN - m_notesEditHeight;
 }

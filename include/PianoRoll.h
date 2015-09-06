@@ -125,7 +125,7 @@ protected:
 	virtual void focusOutEvent( QFocusEvent * );
 
 	int getKey( int y ) const;
-	static inline void drawNoteRect( QPainter & p, int x, int y,
+	static void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
@@ -230,12 +230,12 @@ private:
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
 
-	inline int noteEditTop() const;
-	inline int keyAreaBottom() const;
-	inline int noteEditBottom() const;
-	inline int keyAreaTop() const;
-	inline int noteEditRight() const;
-	inline int noteEditLeft() const;
+	int noteEditTop() const;
+	int keyAreaBottom() const;
+	int noteEditBottom() const;
+	int keyAreaTop() const;
+	int noteEditRight() const;
+	int noteEditLeft() const;
 
 	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
 
