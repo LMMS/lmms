@@ -2200,45 +2200,42 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					if( QApplication::overrideCursor() )
 					{
-	if( QApplication::overrideCursor()->shape() != Qt::SizeHorCursor )
+						if( QApplication::overrideCursor()->shape() != Qt::SizeHorCursor )
 						{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
+							while( QApplication::overrideCursor() != NULL )
+							{
+								QApplication::restoreOverrideCursor();
+							}
 
-				QCursor c( Qt::SizeHorCursor );
-				QApplication::setOverrideCursor( c );
+							QCursor c( Qt::SizeHorCursor );
+							QApplication::setOverrideCursor( c );
 						}
 					}
 					else
 					{
 						QCursor c( Qt::SizeHorCursor );
-						QApplication::setOverrideCursor(
-									c );
+						QApplication::setOverrideCursor( c );
 					}
 				}
 				else
 				{
 					if( QApplication::overrideCursor() )
 					{
-	if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
+						if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
 						{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
+							while( QApplication::overrideCursor() != NULL )
+							{
+								QApplication::restoreOverrideCursor();
+							}
 
-						QCursor c( Qt::SizeAllCursor );
-						QApplication::setOverrideCursor(
-									c );
+							QCursor c( Qt::SizeAllCursor );
+							QApplication::setOverrideCursor( c );
 						}
 					}
 					else
 					{
 						QCursor c( Qt::SizeAllCursor );
-						QApplication::setOverrideCursor(
-									c );
+						QApplication::setOverrideCursor( c );
 					}
 				}
 			}
