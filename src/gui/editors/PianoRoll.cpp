@@ -2077,8 +2077,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			// determine what volume/panning to set note to
 			// if middle-click, set to defaults
-			volume_t vol;
-			panning_t pan;
+			volume_t vol = DefaultVolume;
+			panning_t pan = DefaultPanning;
 
 			if( me->buttons() & Qt::LeftButton )
 			{
@@ -2092,11 +2092,6 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 								( (float)( noteEditBottom() - noteEditTop() ) ) *
 								( (float)( PanningRight - PanningLeft ) ),
 										  PanningLeft, PanningRight);
-			}
-			else
-			{
-				vol = DefaultVolume;
-				pan = DefaultPanning;
 			}
 
 			if( m_noteEditMode == NoteEditVolume )
