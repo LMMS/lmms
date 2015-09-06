@@ -324,7 +324,7 @@ private:
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void copy_to_clipboard(const NoteVector & notes ) const;
+	void copyToClipboard(const NoteVector & notes ) const;
 
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();

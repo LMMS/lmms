@@ -3542,7 +3542,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 }
 
 
-void PianoRoll::copy_to_clipboard( const NoteVector & notes ) const
+void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 {
 	DataFile dataFile( DataFile::ClipboardData );
 	QDomElement note_list = dataFile.createElement( "note-list" );
@@ -3572,7 +3572,7 @@ void PianoRoll::copySelectedNotes()
 
 	if( ! selected_notes.empty() )
 	{
-		copy_to_clipboard( selected_notes );
+		copyToClipboard( selected_notes );
 	}
 }
 
@@ -3591,7 +3591,7 @@ void PianoRoll::cutSelectedNotes()
 
 	if( ! selected_notes.empty() )
 	{
-		copy_to_clipboard( selected_notes );
+		copyToClipboard( selected_notes );
 
 		Engine::getSong()->setModified();
 
