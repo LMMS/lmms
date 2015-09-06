@@ -584,27 +584,23 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	m_leftRightScroll->setValue( 0 );
 
-	const NoteVector & notes = m_pattern->notes();
+	// determine the central key so that we can scroll to it
 	int central_key = 0;
-	if( ! notes.empty() )
+	int total_notes = 0;
+	for( const Note *note : m_pattern->notes() )
 	{
-		// determine the central key so that we can scroll to it
-		int total_notes = 0;
-		for( const Note* const& note : notes )
+		if( note->length() > 0 )
 		{
-			if( note->length() > 0 )
-			{
-				central_key += note->key();
-				++total_notes;
-			}
+			central_key += note->key();
+			++total_notes;
 		}
+	}
 
-		if( total_notes > 0 )
-		{
-			central_key = central_key / total_notes -
-					( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
-			m_startKey = tLimit( central_key, 0, NumOctaves * KeysPerOctave );
-		}
+	if( total_notes > 0 )
+	{
+		central_key = central_key / total_notes -
+				( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
+		m_startKey = tLimit( central_key, 0, NumOctaves * KeysPerOctave );
 	}
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
