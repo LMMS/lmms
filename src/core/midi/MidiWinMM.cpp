@@ -22,9 +22,6 @@
  *
  */
 
-#include <QLabel>
-#include <QLineEdit>
-
 #include "MidiWinMM.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -305,26 +302,6 @@ void MidiWinMM::openDevices()
 		}
 	}
 }
-
-
-
-
-MidiWinMM::setupWidget::setupWidget( QWidget* parent ) :
-	MidiClient::setupWidget( MidiWinMM::name(), parent )
-{
-}
-
-
-
-
-MidiWinMM::setupWidget::~setupWidget()
-{
-}
-
-
-
-
-
 
 
 #endif

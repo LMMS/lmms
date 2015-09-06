@@ -32,6 +32,7 @@
 #include "lmmsconfig.h"
 #include "AudioDevice.h"
 #include "MidiClient.h"
+#include "MidiSetupWidget.h"
 
 #include "AudioDeviceSetupWidget.h"
 
@@ -181,7 +182,7 @@ private:
 	bool m_disableAutoQuit;
 
 	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
-	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
+	typedef QMap<QString, MidiSetupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 
 	QComboBox * m_audioInterfaces;

@@ -22,9 +22,6 @@
  *
  */
 
-#include <QLabel>
-#include <QLineEdit>
-
 #include "MidiAlsaSeq.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -700,42 +697,6 @@ void MidiAlsaSeq::updatePortList()
 		emit writablePortsChanged();
 	}
 }
-
-
-
-
-
-
-
-MidiAlsaSeq::setupWidget::setupWidget( QWidget * _parent ) :
-	MidiClient::setupWidget( MidiAlsaSeq::name(), _parent )
-{
-	m_device = new QLineEdit( MidiAlsaSeq::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-}
-
-
-
-
-MidiAlsaSeq::setupWidget::~setupWidget()
-{
-}
-
-
-
-
-void MidiAlsaSeq::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue( "Midialsaseq", "device",
-							m_device->text() );
-}
-
-
-
 
 
 #endif
