@@ -129,7 +129,7 @@ protected:
 					int  width, const Note * n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
-	void getSelectedNotes( NoteVector & selected_notes );
+	NoteVector getSelectedNotes();
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );

@@ -3480,20 +3480,21 @@ void PianoRoll::selectAll()
 
 
 // returns vector with pointers to all selected notes
-void PianoRoll::getSelectedNotes(NoteVector & selected_notes )
+NoteVector PianoRoll::getSelectedNotes()
 {
-	if( ! hasValidPattern() )
-	{
-		return;
-	}
+	NoteVector selectedNotes;
 
-	for( Note *note : m_pattern->notes() )
+	if (hasValidPattern())
 	{
-		if( note->selected() )
+		for( Note *note : m_pattern->notes() )
 		{
-			selected_notes.push_back( note );
+			if( note->selected() )
+			{
+				selectedNotes.push_back( note );
+			}
 		}
 	}
+	return selectedNotes;
 }
 
 
@@ -3567,8 +3568,7 @@ void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 
 void PianoRoll::copySelectedNotes()
 {
-	NoteVector selected_notes;
-	getSelectedNotes( selected_notes );
+	NoteVector selected_notes = getSelectedNotes();
 
 	if( ! selected_notes.empty() )
 	{
@@ -3586,8 +3586,7 @@ void PianoRoll::cutSelectedNotes()
 		return;
 	}
 
-	NoteVector selected_notes;
-	getSelectedNotes( selected_notes );
+	NoteVector selected_notes = getSelectedNotes();
 
 	if( ! selected_notes.empty() )
 	{
