@@ -258,7 +258,6 @@ private:
 	~ConfigManager();
 
 	void upgrade_1_1_90();
-	void upgrade_1_2_0();
 	void upgrade();
 
 	const QString m_lmmsRcFile;

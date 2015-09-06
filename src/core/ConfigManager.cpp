@@ -111,10 +111,7 @@ void ConfigManager::upgrade_1_1_90()
 	{
 		setValue("mixer", "audiodev", "PulseAudio");
 	}
-}
 
-void ConfigManager::upgrade_1_2_0()
-{
 	// MidiAlsaRaw used to store the device info as "Device" instead of "device"
 	if ( value( "MidiAlsaRaw", "device" ).isNull() )
 	{
@@ -130,6 +127,7 @@ void ConfigManager::upgrade_1_2_0()
 	}
 }
 
+
 void ConfigManager::upgrade()
 {
 	// Skip the upgrade if versions match
@@ -143,11 +141,6 @@ void ConfigManager::upgrade()
 	if ( createdWith.setCompareType(Build) < "1.1.90" )
 	{
 		upgrade_1_1_90();
-	}
-
-	if ( createdWith.setCompareType(Build) < "1.2.0" )
-	{
-		upgrade_1_2_0();
 	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
