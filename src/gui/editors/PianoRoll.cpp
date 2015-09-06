@@ -834,13 +834,8 @@ void PianoRoll::clearSelectedNotes()
 {
 	if( m_pattern != NULL )
 	{
-		// get note-vector of current pattern
-		const NoteVector & notes = m_pattern->notes();
-
-		// will be our iterator in the following loop
-		NoteVector::ConstIterator it;
-		for( it = notes.begin(); it != notes.end(); ++it ) {
-			Note *note = *it;
+		for( Note *note : m_pattern->notes() )
+		{
 			note->setSelected( false );
 		}
 	}
@@ -852,11 +847,8 @@ void PianoRoll::clearSelectedNotes()
 void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 {
 	bool useAllNotes = ! isSelection();
-	const NoteVector & notes = m_pattern->notes();
-	NoteVector::ConstIterator it;
-	for( it = notes.begin(); it != notes.end(); ++it )
+	for( Note *note : m_pattern->notes() )
 	{
-		Note *note = *it;
 		// if none are selected, move all notes, otherwise
 		// only move selected notes
 		if( useAllNotes || note->selected() )
@@ -876,13 +868,10 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 {
 	bool useAllNotes = ! isSelection();
-	const NoteVector & notes = m_pattern->notes();
-	NoteVector::ConstIterator it;
 
 	bool first = true;
-	for( it = notes.begin(); it != notes.end(); ++it )
+	for( Note *note : m_pattern->notes() )
 	{
-		Note *note = *it;
 		// if none are selected, move all notes, otherwise
 		// only move selected notes
 		if( note->selected() || (useAllNotes && note->length() > 0) )
@@ -914,11 +903,8 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 
 bool PianoRoll::isSelection() const // are any notes selected?
 {
-	const NoteVector & notes = m_pattern->notes();
-	NoteVector::ConstIterator it;
-	for( it = notes.begin(); it != notes.end(); ++it )
+	for( const Note *note : m_pattern->notes() )
 	{
-		Note *note = *it;
 		if( note->selected() )
 		{
 			return true;
@@ -934,11 +920,8 @@ int PianoRoll::selectionCount() const // how many notes are selected?
 {
 	int sum = 0;
 
-	const NoteVector & notes = m_pattern->notes();
-	NoteVector::ConstIterator it;
-	for( it = notes.begin(); it != notes.end(); ++it )
+	for( const Note *note : m_pattern->notes() )
 	{
-		Note *note = *it;
 		if( note->selected() )
 		{
 			++sum;
@@ -1634,14 +1617,10 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		const int ticks_middle = x * MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
-		// get note-vector of current pattern
-		NoteVector notes;
-		notes += m_pattern->notes();
-
 		// go through notes to figure out which one we want to change
 		bool altPressed = me->modifiers() & Qt::AltModifier;
 		NoteVector nv;
-		foreach( Note * i, notes )
+		for ( Note * i : m_pattern->notes() )
 		{
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
@@ -1651,12 +1630,12 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		// make sure we're on a note
 		if( nv.size() > 0 )
 		{
-			Note * closest = NULL;
+			const Note * closest = NULL;
 			int closest_dist = 9999999;
 			// if we caught multiple notes, find the closest...
 			if( nv.size() > 1 )
 			{
-				foreach( Note * i, nv )
+				for ( const Note * i : nv )
 				{
 					const int dist = qAbs( i->pos().getTicks() - ticks_middle );
 					if( dist < closest_dist ) { closest = i; closest_dist = dist; }
@@ -1665,7 +1644,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 				NoteVector::Iterator it = nv.begin();
 				while( it != nv.end() )
 				{
-					Note *note = *it;
+					const Note *note = *it;
 					if( note->pos().getTicks() != closest->pos().getTicks() )
 					{
 						it = nv.erase( it );
@@ -1709,11 +1688,8 @@ void PianoRoll::testPlayNote( Note * n )
 
 void PianoRoll::pauseTestNotes( bool pause )
 {
-	const NoteVector & notes = m_pattern->notes();
-	NoteVector::ConstIterator it = notes.begin();
-	while( it != notes.end() )
+	for (Note *note : m_pattern->notes())
 	{
-		Note *note = *it;
 		if( note->isPlaying() )
 		{
 			if( pause )
@@ -1728,8 +1704,6 @@ void PianoRoll::pauseTestNotes( bool pause )
 				testPlayNote( note );
 			}
 		}
-
-		++it;
 	}
 }
 
@@ -1780,12 +1754,8 @@ void PianoRoll::computeSelectedNotes(bool shift)
 	//int y_base = noteEditTop() - 1;
 	if( hasValidPattern() )
 	{
-		const NoteVector & notes = m_pattern->notes();
-		NoteVector::ConstIterator it;
-
-		for( it = notes.begin(); it != notes.end(); ++it )
+		for( Note *note : m_pattern->notes() )
 		{
-			Note *note = *it;
 			// make a new selection unless they're holding shift
 			if( ! shift )
 			{
@@ -1874,20 +1844,14 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	if( hasValidPattern() )
 	{
 		// turn off all notes that are playing
-		const NoteVector & notes = m_pattern->notes();
-
-		NoteVector::ConstIterator it = notes.begin();
-		while( it != notes.end() )
+		for ( Note *note : m_pattern->notes() )
 		{
-			Note *note = *it;
 			if( note->isPlaying() )
 			{
 				m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( note->key() );
 				note->setIsPlaying( false );
 			}
-
-			++it;
 		}
 
 		// stop playing keys that we let go of
@@ -2372,9 +2336,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 	if (m_action == ActionMoveNote)
 	{
-		for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+		for (Note *note : notes)
 		{
-			Note *note = *it;
 			if( note->selected() )
 			{
 				if( ! ( shift && ! m_startedWithShift ) )
@@ -2422,19 +2385,17 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			// This factor is such that the endpoint of the note whose handle is being dragged should lie under the cursor.
 			// first, determine the start-point of the left-most selected note:
 			int stretchStartTick = -1;
-			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			for (const Note *note : notes)
 			{
-				Note *note = *it;
 				if (note->selected() && (stretchStartTick < 0 || note->oldPos().getTicks() < stretchStartTick))
 				{
 					stretchStartTick = note->oldPos().getTicks();
 				}
 			}
 			// determine the ending tick of the right-most selected note
-			Note *posteriorNote = nullptr;
-			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			const Note *posteriorNote = nullptr;
+			for (const Note *note : notes)
 			{
-				Note *note = *it;
 				if (note->selected() && (posteriorNote == nullptr || 
 					note->oldPos().getTicks() + note->oldLength().getTicks() > 
 					posteriorNote->oldPos().getTicks() + posteriorNote->oldLength().getTicks()))
@@ -2451,9 +2412,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 			// process all selected notes & determine how much the endpoint of the right-most note was shifted
 			int posteriorDeltaThisFrame = 0;
-			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			for (Note *note : notes)
 			{
-				Note *note = *it;
 				if(note->selected())
 				{
 					// scale relative start and end positions by scaleFactor
@@ -2490,9 +2450,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			if (ctrl || selectionCount() == 1)
 			{
 				// if holding ctrl or only one note is selected, reposition posterior notes
-				for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+				for (Note *note : notes)
 				{
-					Note *note = *it;
 					if (!note->selected() && note->pos().getTicks() >= posteriorEndTick)
 					{
 						int newStart = note->pos().getTicks() + posteriorDeltaThisFrame;
@@ -2504,9 +2463,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		else
 		{
 			// shift is not pressed; stretch length of selected notes but not their position
-			for (NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
+			for (Note *note : notes)
 			{
-				Note *note = *it;
 				if (note->selected())
 				{
 					int newLength = note->oldLength() + off_ticks;
@@ -2904,17 +2862,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				width() - WHITE_KEY_WIDTH,
 				height() - PR_TOP_MARGIN );
 
-		const NoteVector & notes = m_pattern->notes();
-
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KEY_LINE_HEIGHT + 2;
 
 		QPolygon editHandles;
-		NoteVector::ConstIterator it;
 
-		for( it = notes.begin(); it != notes.end(); ++it )
+		for( const Note *note : m_pattern->notes() )
 		{
-			Note *note = *it;
 			int len_ticks = note->length();
 
 			if( len_ticks == 0 )
@@ -2994,7 +2948,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			if( note->hasDetuningInfo() )
 			{
-				drawDetuningInfo( p, *it,
+				drawDetuningInfo( p, note,
 					x + WHITE_KEY_WIDTH,
 					y_base - key * KEY_LINE_HEIGHT );
 			}
@@ -3144,15 +3098,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		int ticks_end = ( x + pixel_range / 2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
-		// get note-vector of current pattern
-		NoteVector notes;
-		notes += m_pattern->notes();
-
 		// When alt is pressed we only edit the note under the cursor
 		bool altPressed = we->modifiers() & Qt::AltModifier;
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
-		foreach( Note * i, notes )
+		for ( Note * i : m_pattern->notes() )
 		{
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
@@ -3164,7 +3114,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			const int step = we->delta() > 0 ? 1.0 : -1.0;
 			if( m_noteEditMode == NoteEditVolume )
 			{
-				foreach( Note * n, nv )
+				for ( Note * n : nv )
 				{
 					volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
 					n->setVolume( vol );
@@ -3183,7 +3133,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				foreach( Note * n, nv )
+				for ( Note * n : nv )
 				{
 					panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
 					n->setPanning( pan );
@@ -3485,15 +3435,11 @@ void PianoRoll::selectAll()
 		return;
 	}
 
-	const NoteVector & notes = m_pattern->notes();
-
 	// if first_time = true, we HAVE to set the vars for select
 	bool first_time = true;
-	NoteVector::ConstIterator it;
 
-	for( it = notes.begin(); it != notes.end(); ++it )
+	for( const Note *note : m_pattern->notes() )
 	{
-		Note *note = *it;
 		int len_ticks = note->length();
 
 		if( len_ticks > 0 )
@@ -3545,12 +3491,8 @@ void PianoRoll::getSelectedNotes(NoteVector & selected_notes )
 		return;
 	}
 
-	const NoteVector & notes = m_pattern->notes();
-	NoteVector::ConstIterator it;
-
-	for( it = notes.begin(); it != notes.end(); ++it )
+	for( Note *note : m_pattern->notes() )
 	{
-		Note *note = *it;
 		if( note->selected() )
 		{
 			selected_notes.push_back( note );
@@ -3574,7 +3516,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 
 		if( ok )
 		{
-			foreach( Note * n, *nv )
+			for ( Note * n : *nv )
 			{
 				n->setVolume( new_val );
 			}
@@ -3593,7 +3535,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 
 		if( ok )
 		{
-			foreach( Note * n, *nv )
+			for ( Note * n : *nv )
 			{
 				n->setPanning( new_val );
 			}
@@ -3611,10 +3553,9 @@ void PianoRoll::copy_to_clipboard( const NoteVector & notes ) const
 	dataFile.content().appendChild( note_list );
 
 	MidiTime start_pos( notes.front()->pos().getTact(), 0 );
-	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
-									++it )
+	for( const Note *note : notes )
 	{
-		Note clip_note( **it );
+		Note clip_note( *note );
 		clip_note.setPos( clip_note.pos( start_pos ) );
 		clip_note.saveState( dataFile, note_list );
 	}
@@ -3657,11 +3598,9 @@ void PianoRoll::cutSelectedNotes()
 		copy_to_clipboard( selected_notes );
 
 		Engine::getSong()->setModified();
-		NoteVector::Iterator it;
 
-		for( it = selected_notes.begin(); it != selected_notes.end(); ++it )
+		for( const Note *note : selected_notes )
 		{
-			Note *note = *it;
 			// note (the memory of it) is also deleted by
 			// pattern::removeNote(...) so we don't have to do that
 			m_pattern->removeNote( note );
@@ -3910,9 +3849,6 @@ Note * PianoRoll::noteUnderMouse()
 {
 	QPoint pos = mapFromGlobal( QCursor::pos() );
 
-	// get note-vector of current pattern
-	const NoteVector & notes = m_pattern->notes();
-
 	if( pos.x() <= WHITE_KEY_WIDTH
 		|| pos.x() > width() - SCROLLBAR_SIZE
 		|| pos.y() < PR_TOP_MARGIN
@@ -3926,7 +3862,7 @@ Note * PianoRoll::noteUnderMouse()
 			MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 	// loop through whole note-vector...
-	for( Note* const& note : notes )
+	for( Note* const& note : m_pattern->notes() )
 	{
 		// and check whether the cursor is over an
 		// existing note
