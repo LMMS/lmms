@@ -126,7 +126,7 @@ protected:
 
 	int getKey( int y ) const;
 	static inline void drawNoteRect( QPainter & p, int x, int y,
-					int  width, Note * n, const QColor & noteCol );
+					int  width, const Note * n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
 	void getSelectedNotes( NoteVector & selected_notes );
@@ -326,7 +326,7 @@ private:
 
 	void copy_to_clipboard(const NoteVector & notes ) const;
 
-	void drawDetuningInfo( QPainter & _p, Note * _n, int _x, int _y );
+	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
 

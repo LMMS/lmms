@@ -702,7 +702,7 @@ void PianoRoll::setBarColor( const QColor & c )
 
 
 inline void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
-					int width, Note * n, const QColor & noteCol )
+					int width, const Note * n, const QColor & noteCol )
 {
 	++x;
 	++y;
@@ -770,8 +770,8 @@ inline void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 
 
-inline void PianoRoll::drawDetuningInfo( QPainter & _p, Note * _n, int _x,
-								int _y )
+inline void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
+								int _y ) const
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( noteColor() );
