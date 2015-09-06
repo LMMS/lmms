@@ -37,7 +37,7 @@
 #endif
 #include <QMutexLocker>
 
-FileEncodeDevice __fileEncodeDevices[] =
+const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
 	{ ProjectRenderer::WaveFile,
@@ -73,13 +73,13 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 	m_progress( 0 ),
 	m_abort( false )
 {
-	if( __fileEncodeDevices[_file_format].m_getDevInst == NULL )
+	if( fileEncodeDevices[_file_format].m_getDevInst == NULL )
 	{
 		return;
 	}
 
 	bool success_ful = false;
-	m_fileDev = __fileEncodeDevices[_file_format].m_getDevInst(
+	m_fileDev = fileEncodeDevices[_file_format].m_getDevInst(
 				_os.samplerate, DEFAULT_CHANNELS, success_ful,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
@@ -109,11 +109,11 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
 	int idx = 0;
-	while( __fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
+	while( fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
 	{
-		if( QString( __fileEncodeDevices[idx].m_extension ) == _ext )
+		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
-			return( __fileEncodeDevices[idx].m_fileFormat );
+			return( fileEncodeDevices[idx].m_fileFormat );
 		}
 		++idx;
 	}

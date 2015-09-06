@@ -58,14 +58,14 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	int cbIndex = 0;
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
-		if( __fileEncodeDevices[i].m_getDevInst != NULL )
+		if( ProjectRenderer::fileEncodeDevices[i].m_getDevInst != NULL )
 		{
 			// get the extension of this format
-			QString renderExt = __fileEncodeDevices[i].m_extension;
+			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
 
 			// add to combo box
 			fileFormatCB->addItem( ProjectRenderer::tr(
-				__fileEncodeDevices[i].m_description ) );
+				ProjectRenderer::fileEncodeDevices[i].m_description ) );
 
 			// if this is our extension, select it
 			if( QString::compare( renderExt, fileExt,
@@ -302,10 +302,10 @@ void ExportProjectDialog::startBtnClicked()
 	{
 		if( fileFormatCB->currentText() ==
 			ProjectRenderer::tr(
-				__fileEncodeDevices[i].m_description ) )
+				ProjectRenderer::fileEncodeDevices[i].m_description ) )
 		{
-			m_ft = __fileEncodeDevices[i].m_fileFormat;
-			m_fileExtension = QString( QLatin1String( __fileEncodeDevices[i].m_extension ) );
+			m_ft = ProjectRenderer::fileEncodeDevices[i].m_fileFormat;
+			m_fileExtension = QString( QLatin1String( ProjectRenderer::fileEncodeDevices[i].m_extension ) );
 			break;
 		}
 	}
