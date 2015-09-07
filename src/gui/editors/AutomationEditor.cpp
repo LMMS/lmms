@@ -281,6 +281,8 @@ void AutomationEditor::updateAfterPatternChange()
 	m_step = m_pattern->firstObject()->step<float>();
 	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
 
+	m_tensionModel->setValue( m_pattern->getTension() );
+
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of levels and so on...)
 	resizeEvent( NULL );
@@ -1676,8 +1678,11 @@ void AutomationEditor::setProgressionType(int type)
 
 void AutomationEditor::setTension()
 {
-	m_pattern->setTension( QString::number( m_tensionModel->value() ) );
-	update();
+	if ( m_pattern )
+	{
+		m_pattern->setTension( QString::number( m_tensionModel->value() ) );
+		update();
+	}
 }
 
 
