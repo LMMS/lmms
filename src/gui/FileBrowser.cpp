@@ -120,8 +120,6 @@ FileBrowser::~FileBrowser()
 bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 {
 	// call with item=NULL to filter the entire tree
-
-	const bool showAll = filter.isEmpty();
 	bool matched = false;
 
 	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
@@ -129,17 +127,9 @@ bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
 		bool cm = false;	// whether current item matched
-		// show all items if filter is empty
-		if( showAll )
-		{
-			it->setHidden( false );
-			if( it->childCount() )
-			{
-				filterItems( filter, it );
-			}
-		}
+
 		// is directory?
-		else if( it->childCount() )
+		if( it->childCount() )
 		{
 			// matches filter?
 			if( it->text( 0 ).
@@ -160,8 +150,8 @@ bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 		// a standard item (i.e. no file or directory item?)
 		else if( it->type() == QTreeWidgetItem::Type )
 		{
-			// hide in every case when filtering
-			it->setHidden( true );
+			// hide if there's any filter
+			it->setHidden( !filter.isEmpty() );
 		}
 		else
 		{
