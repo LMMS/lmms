@@ -40,7 +40,7 @@
 #include "PluginFactory.h"
 
 
-bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
+static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
 {
 	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 }
