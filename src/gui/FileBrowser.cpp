@@ -117,74 +117,25 @@ FileBrowser::~FileBrowser()
 
 
 
-void FileBrowser::filterItems( const QString & filter )
+bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 {
-	const bool show_all = filter.isEmpty();
+	// call with item=NULL to filter the entire tree
 
-	for( int i = 0; i < m_l->topLevelItemCount(); ++i )
-	{
-		QTreeWidgetItem * it = m_l->topLevelItem( i );
-		// show all items if filter is empty
-		if( show_all )
-		{
-			it->setHidden( false );
-			if( it->childCount() )
-			{
-				filterItems( it, filter );
-			}
-		}
-		// is directory?
-		else if( it->childCount() )
-		{
-			// matches filter?
-			if( it->text( 0 ).
-				contains( filter, Qt::CaseInsensitive ) )
-			{
-				// yes, then show everything below
-				it->setHidden( false );
-				filterItems( it, QString::null );
-			}
-			else
-			{
-				// only show if item below matches filter
-				it->setHidden( !filterItems( it, filter ) );
-			}
-		}
-		// a standard item (i.e. no file or directory item?)
-		else if( it->type() == QTreeWidgetItem::Type )
-		{
-			// hide in every case when filtering
-			it->setHidden( true );
-		}
-		else
-		{
-			// file matches filter?
-			it->setHidden( !it->text( 0 ).
-				contains( filter, Qt::CaseInsensitive ) );
-		}
-	
-	}
-}
-
-
-
-
-bool FileBrowser::filterItems(QTreeWidgetItem * item, const QString & filter )
-{
-	const bool show_all = filter.isEmpty();
+	const bool showAll = filter.isEmpty();
 	bool matched = false;
 
-	for( int i = 0; i < item->childCount(); ++i )
+	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+	for( int i = 0; i < numChildren; ++i )
 	{
-		QTreeWidgetItem * it = item->child( i );
+		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
 		bool cm = false;	// whether current item matched
 		// show all items if filter is empty
-		if( show_all )
+		if( showAll )
 		{
 			it->setHidden( false );
 			if( it->childCount() )
 			{
-				filterItems( it, filter );
+				filterItems( filter, it );
 			}
 		}
 		// is directory?
@@ -196,13 +147,13 @@ bool FileBrowser::filterItems(QTreeWidgetItem * item, const QString & filter )
 			{
 				// yes, then show everything below
 				it->setHidden( false );
-				filterItems( it, QString::null );
+				filterItems( QString::null, it );
 				cm = true;
 			}
 			else
 			{
 				// only show if item below matches filter
-				cm = filterItems( it, filter );
+				cm = filterItems( filter, it );
 				it->setHidden( !cm );
 			}
 		}
@@ -403,11 +354,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 						this,
 					SLOT( sendToActiveInstrumentTrack() ) );
 		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"Song-Editor" ),
+								"Song Editor" ),
 						this,
 					SLOT( openInNewInstrumentTrackSE() ) );
 		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"B+B Editor" ),
+								"Pattern Editor" ),
 						this,
 					SLOT( openInNewInstrumentTrackBBE() ) );
 		contextMenu.exec( e->globalPos() );
@@ -427,7 +378,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	}
 
 	QTreeWidgetItem * i = itemAt( me->pos() );
-        if ( i )
+	if ( i )
 	{
 		// TODO: Restrict to visible selection
 //		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
