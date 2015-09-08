@@ -120,13 +120,12 @@ FileBrowser::~FileBrowser()
 bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 {
 	// call with item=NULL to filter the entire tree
-	bool matched = false;
+	bool anyMatched = false;
 
 	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
 	for( int i = 0; i < numChildren; ++i )
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
-		bool cm = false;	// whether current item matched
 
 		// is directory?
 		if( it->childCount() )
@@ -138,13 +137,14 @@ bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 				// yes, then show everything below
 				it->setHidden( false );
 				filterItems( QString::null, it );
-				cm = true;
+				anyMatched = true;
 			}
 			else
 			{
 				// only show if item below matches filter
-				cm = filterItems( filter, it );
-				it->setHidden( !cm );
+				bool didMatch = filterItems( filter, it );
+				it->setHidden( !didMatch );
+				anyMatched = anyMatched || didMatch;
 			}
 		}
 		// a standard item (i.e. no file or directory item?)
@@ -156,18 +156,14 @@ bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 		else
 		{
 			// file matches filter?
-			cm = it->text( 0 ).
+			bool didMatch = it->text( 0 ).
 				contains( filter, Qt::CaseInsensitive );
-			it->setHidden( !cm );
-		}
-	
-		if( cm )
-		{
-			matched = true;
+			it->setHidden( !didMatch );
+			anyMatched = anyMatched || didMatch;
 		}
 	}
 
-	return matched;
+	return anyMatched;
 }
 
 
