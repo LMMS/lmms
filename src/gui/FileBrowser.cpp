@@ -458,35 +458,35 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 			switch( f->type() )
 			{
 				case FileItem::PresetFile:
-	new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
-					"presetfile" : "pluginpresetfile",
-				f->fullName(),
-				embed::getIconPixmap( "preset_file" ), this );
+					new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
+							"presetfile" : "pluginpresetfile",
+							f->fullName(),
+							embed::getIconPixmap( "preset_file" ), this );
 					break;
 
 				case FileItem::SampleFile:
-	new StringPairDrag( "samplefile", f->fullName(),
-				embed::getIconPixmap( "sample_file" ), this );
+					new StringPairDrag( "samplefile", f->fullName(),
+							embed::getIconPixmap( "sample_file" ), this );
 					break;
 				case FileItem::SoundFontFile:
- 	new StringPairDrag( "soundfontfile", f->fullName(),
- 				embed::getIconPixmap( "soundfont_file" ), this );
- 					break;
+					new StringPairDrag( "soundfontfile", f->fullName(),
+							embed::getIconPixmap( "soundfont_file" ), this );
+					break;
 				case FileItem::VstPluginFile:
-	new StringPairDrag( "vstpluginfile", f->fullName(),
-				embed::getIconPixmap( "vst_plugin_file" ), this );
+					new StringPairDrag( "vstpluginfile", f->fullName(),
+							embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
 				case FileItem::MidiFile:
 // don't allow dragging FLP-files as FLP import filter clears project
 // without asking
 //				case fileItem::FlpFile:
-	new StringPairDrag( "importedproject", f->fullName(),
-				embed::getIconPixmap( "midi_file" ), this );
+					new StringPairDrag( "importedproject", f->fullName(),
+							embed::getIconPixmap( "midi_file" ), this );
 					break;
-			case FileItem::ProjectFile:
-				new StringPairDrag( "projectfile", f->fullName(),
+				case FileItem::ProjectFile:
+					new StringPairDrag( "projectfile", f->fullName(),
 							embed::getIconPixmap( "project_file" ), this );
-								break;
+					break;
 
 				default:
 					break;
