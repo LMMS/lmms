@@ -75,14 +75,13 @@ private:
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
 
+	static const QString targetNames[InstrumentSoundShaping::NumTargets][3];
+
 
 	friend class InstrumentSoundShapingView;
 	friend class FlpImport;
 
 } ;
-
-
-extern const QString __targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
 #endif
