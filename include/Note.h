@@ -71,8 +71,11 @@ enum Octaves
 const int WhiteKeysPerOctave = 7;
 const int BlackKeysPerOctave = 5;
 const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
-const int NumKeys = NumOctaves * KeysPerOctave;
 const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
+const int MinKey = 0;
+const int MaxKey = NumOctaves*KeysPerOctave + Key_C;
+const int NumKeys = MaxKey + 1;
+// NumKeys was not consisently used. TODO: check if c9 is in or out of bounds
 
 const float MaxDetuning = 4 * 12.0f;
 

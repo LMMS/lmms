@@ -119,6 +119,8 @@ protected:
 	virtual void wheelEvent( QWheelEvent * we );
 	virtual void focusOutEvent( QFocusEvent * );
 
+	void recalculateSize();
+
 	int getKey( int y ) const;
 	static inline void drawNoteRect( QPainter & p, int x, int y,
 					int  width, Note * n, const QColor & noteCol );
@@ -219,6 +221,7 @@ private:
 
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
+	void addVolume(int amount);
 	bool isSelection() const;
 	int selectionCount() const;
 	void testPlayNote( Note * n );

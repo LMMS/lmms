@@ -1,0 +1,11 @@
+--- include/PianoRoll.h
++++ include/PianoRoll.h
+@@ -122,6 +122,8 @@
+ 	virtual void wheelEvent( QWheelEvent * _we );
+ 	virtual void focusOutEvent( QFocusEvent * );
+ 
++	void recalculateSize();
++
+ 	int getKey( int _y ) const;
+ 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
+ 					int  _width, note * _n, const QColor & noteCol );

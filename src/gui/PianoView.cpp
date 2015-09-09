@@ -370,7 +370,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 		{
 			--key_num;
 		}
-		if( key_num < NumKeys - 1 &&
+		if( key_num < MaxKey - 1 &&
 			KEY_ORDER[( key_num + 1 ) % KeysPerOctave] ==
 							Piano::BlackKey &&
 			_p.x() % PW_WHITE_KEY_WIDTH >=
@@ -382,7 +382,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 	}
 
 	// some range-checking-stuff
-	return tLimit( key_num, 0, NumKeys - 1 );
+	return tLimit( key_num, 0, MaxKey );    // 0 => MinKey?
 }
 
 
@@ -695,7 +695,7 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// if we loose focus, we HAVE to note off all running notes because
 	// we don't receive key-release-events anymore and so the notes would
 	// hang otherwise
-	for( int i = 0; i < NumKeys; ++i )
+	for( int i = MinKey; i <= MaxKey; ++i )
 	{
 		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		m_piano->setKeyState( i, false );

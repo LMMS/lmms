@@ -226,8 +226,19 @@ void TrackContentObject::toggleMute()
 
 
 
+void TrackContentObject::toggleMidiIn()
+{
+	m_midiInModel.setValue( !m_midiInModel.value() );
+	emit dataChanged();
+}
 
 
+
+void TrackContentObject::toggleMidiOut()
+{
+	m_midiOutModel.setValue( !m_midiOutModel.value() );
+	emit dataChanged();
+}
 
 
 // ===========================================================================
@@ -1580,6 +1591,16 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
 
+	m_midiInBtn = new PixmapButton( this, tr( "MidiIn" ) );
+	m_midiInBtn->setActiveGraphic( embed::getIconPixmap( "midi_in_on" ) );
+	m_midiInBtn->setInactiveGraphic( embed::getIconPixmap( "midi_in_off" ) );
+	m_midiInBtn->setCheckable( true );
+
+	m_midiOutBtn = new PixmapButton( this, tr( "MidiOut" ) );
+	m_midiOutBtn->setActiveGraphic( embed::getIconPixmap( "midi_out_on" ) );
+	m_midiOutBtn->setInactiveGraphic( embed::getIconPixmap( "midi_out_off" ) );
+	m_midiOutBtn->setCheckable( true );
+
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
@@ -1588,8 +1609,10 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	}
 	else
 	{
-		m_muteBtn->move( 46, 8 );
-		m_soloBtn->move( 62, 8 );
+		m_muteBtn->move( 46, 3 );
+		m_soloBtn->move( 62, 3 );
+		m_midiInBtn->move( 46, 15 );
+		m_midiOutBtn->move( 62, 15 );
 	}
 
 	m_muteBtn->show();
@@ -1597,6 +1620,12 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	m_soloBtn->show();
 	ToolTip::add( m_soloBtn, tr( "Solo" ) );
+
+	m_midiInBtn->show();
+	ToolTip::add( m_midiInBtn, tr( "Midi In" ) );
+
+	m_midiOutBtn->show();
+	ToolTip::add( m_midiOutBtn, tr( "Midi Out" ) );
 
 	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
 			m_trackView->trackContainerView(),
@@ -1672,11 +1701,15 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 		p.drawPixmap( 2, 2, *s_grip );
 		m_trackOps->show();
 		m_muteBtn->show();
+		m_midiInBtn->show();
+		m_midiOutBtn->show();
 	}
 	else
 	{
 		m_trackOps->hide();
 		m_muteBtn->hide();
+		m_midiInBtn->hide();
+		m_midiOutBtn->hide();
 	}
 }
 
@@ -1733,15 +1766,15 @@ void TrackOperationsWidget::updateMenu()
 	QMenu * toMenu = m_trackOps->menu();
 	toMenu->clear();
 	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
-						tr( "Clone this track" ),
+						tr( "&Clone this track" ),
 						this, SLOT( cloneTrack() ) );
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
-						tr( "Remove this track" ),
+						tr( "&Remove this track" ),
 						this, SLOT( removeTrack() ) );
 						
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
-		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
+		toMenu->addAction( tr( "&Clear this track" ), this, SLOT( clearTrack() ) );
 	}
 	if( InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
@@ -1815,7 +1848,9 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects()         /*!< The track content objects (segments) */
+	m_trackContentObjects(),         /*!< The track content objects (segments) */
+	m_midiInModel( false, this, tr( "Midi In" ) ),  /* "mute" Midi In */
+	m_midiOutModel( false, this, tr( "Midi Out" ) ) /* "mute" Midi Out */
 {
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -1938,6 +1973,8 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "name", name() );
 	element.setAttribute( "muted", isMuted() );
 	element.setAttribute( "solo", isSolo() );
+	element.setAttribute( "midiIn", isMidiIn() );
+	element.setAttribute( "midiOut", isMidiOut() );
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
 		element.setAttribute( "height", m_height );
@@ -1991,6 +2028,8 @@ void Track::loadSettings( const QDomElement & element )
 
 	setMuted( element.attribute( "muted" ).toInt() );
 	setSolo( element.attribute( "solo" ).toInt() );
+	setMidiIn( element.attribute( "midiIn" ).toInt() );
+	setMidiOut( element.attribute( "midiOut" ).toInt() );
 
 	if( m_simpleSerializingMode )
 	{
@@ -2353,6 +2392,27 @@ void Track::toggleSolo()
 
 
 
+bool Track::midiInModel() const
+{
+	return m_midiInModel.value();
+}
+
+void Track::setMidiInModel(const bool &midiInModel)
+{
+	m_midiInModel.setValue(midiInModel);
+}
+
+bool Track::midiOutModel() const
+{
+	return m_midiOutModel.value();
+}
+
+void Track::setMidiOutModel(const bool &midiOutModel)
+{
+	m_midiOutModel.setValue(midiOutModel);
+}
+
+
 
 
 
@@ -2411,6 +2471,12 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ) );
+
+	connect( &m_track->m_midiInModel, SIGNAL( dataChanged() ),
+			m_track, SLOT( toggleMidiIn() ) );
+
+	connect( &m_track->m_midiOutModel, SIGNAL( dataChanged() ),
+			m_track, SLOT( toggleMidiOut() ) );
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
@@ -2496,6 +2562,8 @@ void TrackView::modelChanged()
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
+	m_trackOperationsWidget.m_midiInBtn->setModel( &m_track->m_midiInModel );
+	m_trackOperationsWidget.m_midiOutBtn->setModel( &m_track->m_midiOutModel );
 	ModelView::modelChanged();
 	setFixedHeight( m_track->getHeight() );
 }
@@ -2721,6 +2789,3 @@ void TrackView::createTCOView( TrackContentObject * tco )
 	}
 	tco->selectViewOnCreate( false );
 }
-
-
-

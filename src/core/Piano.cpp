@@ -51,7 +51,7 @@ Piano::Piano( InstrumentTrack* track ) :
 	m_instrumentTrack( track ),
 	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
 {
-	for( int i = 0; i < NumKeys; ++i )
+	for( int i = MinKey; i <= MaxKey; ++i )
 	{
 		m_pressedKeys[i] = false;
 	}

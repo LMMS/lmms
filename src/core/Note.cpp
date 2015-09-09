@@ -39,11 +39,11 @@ Note::Note( const MidiTime & length, const MidiTime & pos,
 		int key, volume_t volume, panning_t panning,
 						DetuningHelper * detuning ) :
 	m_selected( false ),
-	m_oldKey( qBound( 0, key, NumKeys ) ),
+	m_oldKey( qBound( MinKey, key, MaxKey ) ),
 	m_oldPos( pos ),
 	m_oldLength( length ),
 	m_isPlaying( false ),
-	m_key( qBound( 0, key, NumKeys ) ),
+	m_key( qBound( MinKey, key, MaxKey ) ),
 	m_volume( qBound( MinVolume, volume, MaxVolume ) ),
 	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
 	m_length( length ),
@@ -115,7 +115,7 @@ void Note::setPos( const MidiTime & pos )
 
 void Note::setKey( const int key )
 {
-	const int k = qBound( 0, key, NumKeys );
+	const int k = qBound( MinKey, key, MaxKey );
 	m_key = k;
 }
 
@@ -124,7 +124,7 @@ void Note::setKey( const int key )
 
 void Note::setVolume( volume_t volume )
 {
-	const volume_t v = qBound( MinVolume, volume, MaxVolume );
+	const volume_t v = qBound( MinVolume, volume, MaxVolume );   // check for MinVolume (=0) useless when unsigned
 	m_volume = v;
 }
 
