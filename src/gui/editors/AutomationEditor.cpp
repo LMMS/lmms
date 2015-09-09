@@ -2265,12 +2265,15 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	{
 	case AutomationPattern::DiscreteProgression:
 		m_discreteAction->setChecked(true);
+		m_tensionKnob->setEnabled(false);
 		break;
 	case AutomationPattern::LinearProgression:
 		m_linearAction->setChecked(true);
+		m_tensionKnob->setEnabled(false);
 		break;
 	case AutomationPattern::CubicHermiteProgression:
 		m_cubicHermiteAction->setChecked(true);
+		m_tensionKnob->setEnabled(true);
 		break;
 	}
 
