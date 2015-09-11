@@ -44,6 +44,11 @@ class Editor : public QMainWindow
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
 
+protected:
+	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
+	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
+	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
+
 protected slots:
 	virtual void play() {}
 	virtual void record() {}

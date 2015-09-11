@@ -3906,6 +3906,8 @@ PianoRollWindow::PianoRollWindow() :
 	m_stopAction->setWhatsThis(
 		tr( "Click here to stop playback of current pattern." ) );
 
+	DropToolBar *notesActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
+
 	// init edit-buttons at the top
 	ActionGroup* editModeGroup = new ActionGroup(this);
 	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
@@ -3945,7 +3947,14 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
+	notesActionsToolBar->addAction( drawAction );
+	notesActionsToolBar->addAction( eraseAction );
+	notesActionsToolBar->addAction( selectAction );
+	notesActionsToolBar->addAction( detuneAction );
+
 	// Copy + paste actions
+	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop(tr("Copy paste controls"));
+
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
 							  tr("Cut selected notes (Ctrl+X)"), this);
 
@@ -3974,6 +3983,20 @@ PianoRollWindow::PianoRollWindow() :
 	connect(cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
 	connect(copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
 	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
+
+	copyPasteActionsToolBar->addAction(cutAction);
+	copyPasteActionsToolBar->addAction(copyAction);
+	copyPasteActionsToolBar->addAction(pasteAction);
+
+
+	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
+
+
+	addToolBarBreak();
+
+
+	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop(tr("Zoom and note controls"));
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -4017,39 +4040,24 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox->setFixedSize( 105, 22 );
 
 
-	m_toolBar->addSeparator();
-	m_toolBar->addAction( drawAction );
-	m_toolBar->addAction( eraseAction );
-	m_toolBar->addAction( selectAction );
-	m_toolBar->addAction( detuneAction );
+	zoomAndNotesToolBar->addWidget( zoom_lbl );
+	zoomAndNotesToolBar->addWidget( m_zoomingComboBox );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addAction( cutAction );
-	m_toolBar->addAction( copyAction );
-	m_toolBar->addAction( pasteAction );
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( quantize_lbl );
+	zoomAndNotesToolBar->addWidget( m_quantizeComboBox );
 
-	m_toolBar->addSeparator();
-	m_editor->m_timeLine->addToolButtons(m_toolBar);
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( note_len_lbl );
+	zoomAndNotesToolBar->addWidget( m_noteLenComboBox );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( zoom_lbl );
-	m_toolBar->addWidget( m_zoomingComboBox );
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( scale_lbl );
+	zoomAndNotesToolBar->addWidget( m_scaleComboBox );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( quantize_lbl );
-	m_toolBar->addWidget( m_quantizeComboBox );
-
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( note_len_lbl );
-	m_toolBar->addWidget( m_noteLenComboBox );
-
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( scale_lbl );
-	m_toolBar->addWidget( m_scaleComboBox );
-
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( chord_lbl );
-	m_toolBar->addWidget( m_chordComboBox );
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( chord_lbl );
+	zoomAndNotesToolBar->addWidget( m_chordComboBox );
 
 	m_zoomingComboBox->setWhatsThis(
 				tr(

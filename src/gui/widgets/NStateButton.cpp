@@ -58,8 +58,6 @@ void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 	// first inserted pixmap?
 	if( m_states.size() == 1 )
 	{
-		// then resize ourself
-		setFixedSize( _pm.width() + 6, _pm.height() + 6 );
 		// and set state to first pixmap
 		changeState( 0 );
 	}
@@ -96,10 +94,3 @@ void NStateButton::mousePressEvent( QMouseEvent * _me )
 	}
 	ToolButton::mousePressEvent( _me );
 }
-
-
-
-
-
-
-
