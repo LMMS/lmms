@@ -95,7 +95,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>パニング</translation>
     </message>
     <message>
         <source>Left gain</source>
@@ -207,7 +207,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioJack</name>
     <message>
         <source>JACK client restarted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">JACKクライアントを再起動しました</translation>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
@@ -226,22 +226,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クライアント名</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル</translation>
     </message>
 </context>
 <context>
     <name>AudioOss::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル</translation>
     </message>
 </context>
 <context>
@@ -252,25 +252,25 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル</translation>
     </message>
 </context>
 <context>
     <name>AudioSdl::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
 </context>
 <context>
@@ -281,11 +281,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>&amp;Copy value (%1%2)</source>
-        <translation type="unfinished">値をコピー(&amp;C) (%1%2)</translation>
+        <translation>値をコピー(&amp;C) (%1%2)</translation>
     </message>
     <message>
         <source>&amp;Paste value (%1%2)</source>
-        <translation type="unfinished">値を貼り付け(&amp;P) (%1%2)</translation>
+        <translation>値を貼り付け(&amp;P) (%1%2)</translation>
     </message>
     <message>
         <source>Edit song-global automation</source>
@@ -297,7 +297,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Connected to controller</source>
-        <translation type="unfinished">コントローラーに接続済</translation>
+        <translation type="unfinished">コントローラーに接続済み</translation>
     </message>
     <message>
         <source>Edit connection...</source>
@@ -364,7 +364,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">クリップボードから値を貼り付け (Ctrl+V)</translation>
+        <translation>クリップボードから値を貼り付け (Ctrl+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -439,7 +439,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationPattern</name>
     <message>
         <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation type="unfinished">&lt;Ctrl&gt;を押しながらコントロールをドラッグしてください</translation>
+        <translation>&lt;Ctrl&gt;を押しながらコントロールをドラッグしてください</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -462,7 +462,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished">名前をリセット</translation>
+        <translation>名前をリセット</translation>
     </message>
     <message>
         <source>Change name</source>
@@ -474,7 +474,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Disconnect &quot;%1&quot;</source>
-        <translation type="unfinished">&quot;%1&quot; を切断</translation>
+        <translation>&quot;%1&quot; を切断</translation>
     </message>
     <message>
         <source>Set/clear record</source>
@@ -485,7 +485,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
-        <translation type="unfinished">Automation track</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -496,7 +496,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Frequency:</source>
-        <translation type="unfinished">周波数:</translation>
+        <translation>周波数:</translation>
     </message>
     <message>
         <source>GAIN</source>
@@ -519,7 +519,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>BassBoosterControls</name>
     <message>
         <source>Frequency</source>
-        <translation type="unfinished">周波数</translation>
+        <translation>周波数</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -1130,7 +1130,7 @@ Wet/Dry つまみでは、エフェクトの出力中の入力シグナルとエ
     </message>
     <message>
         <source>multiply LFO-frequency by 100</source>
-        <translation type="unfinished">LFO周波数を100倍にする</translation>
+        <translation>LFO周波数を100倍にする</translation>
     </message>
     <message>
         <source>MODULATE ENV-AMOUNT</source>
@@ -1368,7 +1368,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>ヘルプ(&amp;H)</translation>
+        <translation type="unfinished">ヘルプ(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -1475,7 +1475,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>同期</translation>
     </message>
     <message>
         <source>Down and up</source>
@@ -1494,7 +1494,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>RANGE</source>
-        <translation type="unfinished"></translation>
+        <translation>範囲</translation>
     </message>
     <message>
         <source>Arpeggio range:</source>
@@ -1502,7 +1502,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>octave(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>オクターブ</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
@@ -1940,7 +1940,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentFunctionNoteStackingView</name>
     <message>
         <source>RANGE</source>
-        <translation type="unfinished"></translation>
+        <translation>範囲</translation>
     </message>
     <message>
         <source>Chord range:</source>
@@ -1967,19 +1967,19 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentMidiIOView</name>
     <message>
         <source>ENABLE MIDI INPUT</source>
-        <translation type="unfinished">MIDIインプット有効化</translation>
+        <translation>MIDI入力を有効にする</translation>
     </message>
     <message>
         <source>CHANNEL</source>
-        <translation type="unfinished">チャンネル</translation>
+        <translation>チャンネル</translation>
     </message>
     <message>
         <source>VELOCITY</source>
-        <translation type="unfinished">ベロシティ</translation>
+        <translation>速度</translation>
     </message>
     <message>
         <source>ENABLE MIDI OUTPUT</source>
-        <translation type="unfinished">MIDIアウトプット有効</translation>
+        <translation>MIDI出力を有効にする</translation>
     </message>
     <message>
         <source>PROGRAM</source>
@@ -1995,7 +1995,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>NOTE</source>
-        <translation type="unfinished"></translation>
+        <translation>音符</translation>
     </message>
     <message>
         <source>CUSTOM BASE VELOCITY</source>
@@ -2515,272 +2515,271 @@ Double click to pick a file.</source>
     <name>MainWindow</name>
     <message>
         <source>Working directory</source>
-        <translation type="unfinished">作業ディレクトリ</translation>
+        <translation>作業ディレクトリ</translation>
     </message>
     <message>
         <source>The LMMS working directory %1 does not exist. Create it now? You can change the directory later via Edit -&gt; Settings.</source>
-        <translation type="unfinished">LMMSの作業ディレクトリ %1 は存在しません。　今作成しますか？　編集-&gt;セッティング でこのディレクトリを変更できます</translation>
+        <translation>LMMSの作業ディレクトリ %1 は存在しません。今作成しますか？編集-&gt;セッティング でこのディレクトリを変更できます。</translation>
     </message>
     <message>
         <source>Could not save config-file</source>
-        <translation type="unfinished">設定ファイルをセーブできません</translation>
+        <translation>設定ファイルを保存できません</translation>
     </message>
     <message>
         <source>Could not save configuration file %1. You&apos;re probably not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
-        <translation type="unfinished">設定ファイル %1 をセーブできません。　多分　ファイルへの書き込み許可がありません。
-このファイルの書き込み許可ががあることを確認して再度書き込んでください。</translation>
+        <translation>設定ファイル %1 を保存できません。おそらくファイルへの書き込み許可がありません。
+このファイルに書き込み許可があることを確認して再度保存してください。</translation>
     </message>
     <message>
         <source>&amp;Project</source>
-        <translation type="unfinished">プロジェクト(&amp;P)</translation>
+        <translation>プロジェクト(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation type="unfinished">新規(&amp;N)</translation>
+        <translation>新規(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Open...</source>
-        <translation type="unfinished">開く(&amp;O)...</translation>
+        <translation>開く(&amp;O)...</translation>
     </message>
     <message>
         <source>Recently opened projects</source>
-        <translation type="unfinished">最近開いたプロジェクト</translation>
+        <translation>最近開いたプロジェクト</translation>
     </message>
     <message>
         <source>&amp;Save</source>
-        <translation type="unfinished">セーブ(&amp;S)</translation>
+        <translation>保存(&amp;S)</translation>
     </message>
     <message>
         <source>Save &amp;As...</source>
-        <translation type="unfinished">別名セーブ(&amp;A)...</translation>
+        <translation>名前を付けて保存(&amp;A)...</translation>
     </message>
     <message>
         <source>Import...</source>
-        <translation type="unfinished">インポート...</translation>
+        <translation>インポート...</translation>
     </message>
     <message>
         <source>E&amp;xport...</source>
-        <translation type="unfinished">エクスポート(&amp;x)...</translation>
+        <translation>エクスポート(&amp;x)...</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation type="unfinished">終了(&amp;Q)</translation>
+        <translation>終了(&amp;Q)</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="unfinished">編集(&amp;E)</translation>
+        <translation>編集(&amp;E)</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">セッティング</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>&amp;Tools</source>
-        <translation type="unfinished">ツール(&amp;T)</translation>
+        <translation>ツール(&amp;T)</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished">ヘルプ(&amp;H)</translation>
+        <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
         <source>Online help</source>
-        <translation type="unfinished">オンラインヘルプ</translation>
+        <translation>オンラインヘルプ</translation>
     </message>
     <message>
         <source>Help</source>
-        <translation type="unfinished">ヘルプ</translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <source>What&apos;s this?</source>
-        <translation type="unfinished">これは何？</translation>
+        <translation>これは何？</translation>
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMSについて</translation>
     </message>
     <message>
         <source>Create new project</source>
-        <translation type="unfinished">新規プロジェクト作成</translation>
+        <translation>新規プロジェクト作成</translation>
     </message>
     <message>
         <source>Create new project from template</source>
-        <translation type="unfinished">テンプレートから新規プロジェクト作成</translation>
+        <translation>テンプレートから新規プロジェクト作成</translation>
     </message>
     <message>
         <source>Open existing project</source>
-        <translation type="unfinished">既存プロジェクトを開く</translation>
+        <translation>既存プロジェクトを開く</translation>
     </message>
     <message>
         <source>Recently opened project</source>
-        <translation type="unfinished">最近開いたプロジェクト</translation>
+        <translation>最近開いたプロジェクト</translation>
     </message>
     <message>
         <source>Save current project</source>
-        <translation type="unfinished">現在のプロジェクトをセーブ</translation>
+        <translation>現在のプロジェクトを保存</translation>
     </message>
     <message>
         <source>Export current project</source>
-        <translation type="unfinished">現在のプロジェクトをエクスポート</translation>
+        <translation>現在のプロジェクトをエクスポート</translation>
     </message>
     <message>
         <source>Show/hide Song-Editor</source>
-        <translation type="unfinished">ソングエディタ 表示/非表示</translation>
+        <translation>ソングエディタを表示/非表示</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
-        <translation type="unfinished">このボタンを押すと。ソングエディタ表示/非表示にできます。ソングエディタの利用によってプレイリストの編集とどのトラックをいつ演奏するかを編集できます。プレイリストの中で直接サンプルを挿入したり移動（rap samples)したりすることもできます。</translation>
+        <translation>このボタンを押すとソングエディタの表示/非表示を切り替えます。ソングエディタを利用するとプレイリストとどのトラックをいつ演奏するかを編集することができます。プレイリストの中で直接サンプルを挿入したり移動（例：ラップのサンプル)したりすることもできます。</translation>
     </message>
     <message>
         <source>Show/hide Beat+Bassline Editor</source>
-        <translation type="unfinished">ビート+
-ベースラインエディタ　表示/非表示</translation>
+        <translation>ビート+ベースラインエディタを表示/非表示</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation type="unfinished">このボタンで、ビート＋ベースラインエディタの表示/非表示を切り替えます。ビート＋ベースラインエディタで、ビートをつくったり、チャンネルを開いたり足したり除去したり、ベースラインパターンをカット・コピー・ペーストしたり、いろいろできます。</translation>
+        <translation>このボタンを押すとビート＋ベースラインエディタの表示/非表示を切り替えます。ビート＋ベースラインエディタで、ビートを作ったり、チャンネルを開いたり追加したり削除したり、ベースラインパターンを切り取り・コピー・貼り付けしたり、いろいろできます。</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
-        <translation type="unfinished">ピアノロール 表示/非表示</translation>
+        <translation>ピアノロールを表示/非表示</translation>
     </message>
     <message>
         <source>Click here to show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melodies in an easy way.</source>
-        <translation type="unfinished">ここをクリックして　ピアノロールの表示/非表示を切り替えます。　ピアノロールを使うとメロディを簡単に編集できます。</translation>
+        <translation>ここをクリックしてピアノロールの表示/非表示を切り替えます。ピアノロールを使うとメロディを簡単に編集できます。</translation>
     </message>
     <message>
         <source>Show/hide Automation Editor</source>
-        <translation type="unfinished">オートメーションエディタ　表示/非表示</translation>
+        <translation>オートメーションエディタを表示/非表示</translation>
     </message>
     <message>
         <source>Click here to show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
-        <translation type="unfinished">ここをクリックして　オートメーションエディタの表示/非表示を切り替えます。オートメーションエディタでダイナミックな値を簡単に編集できます。</translation>
+        <translation>ここをクリックしてオートメーションエディタの表示/非表示を切り替えます。オートメーションエディタでは動的な値を簡単に編集できます。</translation>
     </message>
     <message>
         <source>Show/hide FX Mixer</source>
-        <translation type="unfinished">エフェクトミキサー　表示/非表示</translation>
+        <translation>エフェクトミキサーを表示/非表示</translation>
     </message>
     <message>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation type="unfinished">ここをクリックして　エフェクトミキサーの表示/非表示を切り替えます。エフェクトミキサーは曲のエフェクトを管理するパワフルなツールです。エフェクトを異なったエフェクトチャンネルに挿入することができます。</translation>
+        <translation>ここをクリックしてエフェクトミキサーの表示/非表示を切り替えます。エフェクトミキサーは曲のエフェクトを管理する強力なツールです。エフェクトを異なったエフェクトチャンネルに挿入することができます。</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>
-        <translation type="unfinished">プロジェクトノート　表示/非表示</translation>
+        <translation>プロジェクトノートを表示/非表示</translation>
     </message>
     <message>
         <source>Click here to show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation type="unfinished">ここをクリックして　ノートウインドウの表示非表示を切り替えます。ノートウインドウにプロジェクトノートを記入します。</translation>
+        <translation>ここをクリックしてノートウインドウの表示/非表示を切り替えます。ノートウインドウにプロジェクトノートを記入します。</translation>
     </message>
     <message>
         <source>Show/hide controller rack</source>
-        <translation type="unfinished">コントローラトラック　表示/非表示</translation>
+        <translation>コントローラトラックの表示/非表示</translation>
     </message>
     <message>
         <source>Untitled</source>
-        <translation type="unfinished"></translation>
+        <translation>無題</translation>
     </message>
     <message>
         <source>LMMS %1</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS %1</translation>
     </message>
     <message>
         <source>Project not saved</source>
-        <translation type="unfinished">プロジェクトは未セーブです</translation>
+        <translation>プロジェクトは保存されていません</translation>
     </message>
     <message>
         <source>The current project was modified since last saving. Do you want to save it now?</source>
-        <translation type="unfinished">現在のプロジェクトは最後セーブしてから変更されています。今セーブしますか？</translation>
+        <translation>現在のプロジェクトは最後に保存してから変更されています。保存しますか？</translation>
     </message>
     <message>
         <source>Open project</source>
-        <translation type="unfinished">プロジェクトを開く</translation>
+        <translation>プロジェクトを開く</translation>
     </message>
     <message>
         <source>Save project</source>
-        <translation type="unfinished">プロジェクトを保存</translation>
+        <translation>プロジェクトを保存</translation>
     </message>
     <message>
         <source>Help not available</source>
-        <translation type="unfinished">ヘルプはありません</translation>
+        <translation>ヘルプはありません</translation>
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
-        <translation type="unfinished">今のところ LMMSの中にヘルプはありません。
- http://lmms.sf.net/wiki に　LMMSのドキュメントがあります。</translation>
+        <translation>今のところLMMSにヘルプはありません。
+ http://lmms.sf.net/wiki にLMMSのドキュメントがあります。</translation>
     </message>
     <message>
         <source>My projects</source>
-        <translation type="unfinished"></translation>
+        <translation>マイプロジェクト</translation>
     </message>
     <message>
         <source>My samples</source>
-        <translation type="unfinished"></translation>
+        <translation>マイサンプル</translation>
     </message>
     <message>
         <source>My presets</source>
-        <translation type="unfinished"></translation>
+        <translation>マイプリセット</translation>
     </message>
     <message>
         <source>My home</source>
-        <translation type="unfinished"></translation>
+        <translation>マイホーム</translation>
     </message>
     <message>
         <source>My computer</source>
-        <translation type="unfinished"></translation>
+        <translation>マイコンピュータ</translation>
     </message>
     <message>
         <source>Root directory</source>
-        <translation type="unfinished"></translation>
+        <translation>ルートディレクトリー</translation>
     </message>
     <message>
         <source>Save as new &amp;version</source>
-        <translation type="unfinished"></translation>
+        <translation>新規保存 (&amp;v)</translation>
     </message>
     <message>
         <source>E&amp;xport tracks...</source>
-        <translation type="unfinished"></translation>
+        <translation>トラックをエクスポート(&amp;x)...</translation>
     </message>
     <message>
         <source>LMMS (*.mmp *.mmpz)</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS (*.mmp *.mmpz)</translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>バージョン %1</translation>
     </message>
     <message>
         <source>Project recovery</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトの回復</translation>
     </message>
     <message>
         <source>It looks like the last session did not end properly. Do you want to recover the project of this session?</source>
-        <translation type="unfinished"></translation>
+        <translation>最後のセッションが正常に終了されていないようです。このセッションのプロジェクトを回復しますか？</translation>
     </message>
     <message>
         <source>Configuration file</source>
-        <translation type="unfinished"></translation>
+        <translation>設定ファイル</translation>
     </message>
     <message>
         <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>設定ファイルの%1行目%2列目でパースエラー: %3</translation>
     </message>
     <message>
         <source>Volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>元に戻す</translation>
     </message>
     <message>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>やり直し</translation>
     </message>
     <message>
         <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMSプロジェクト (*.mmpz *.mmp);;LMMSプロジェクトテンプレート (*.mpt)</translation>
     </message>
 </context>
 <context>
@@ -4693,7 +4692,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
-        <translation type="unfinished">ここをクリックするとVST-プラグインのグラフィカルユーザーインターフェース（GUI)の表示/非表示を切り替えます。</translation>
+        <translation type="unfinished">ここをクリックするとVSTプラグインのグラフィカルユーザーインターフェース（GUI)の表示/非表示を切り替えます。</translation>
     </message>
     <message>
         <source>Turn off all notes</source>
@@ -4701,7 +4700,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Open VST-plugin</source>
-        <translation type="unfinished">VSTプラグインを開く</translation>
+        <translation>VSTプラグインを開く</translation>
     </message>
     <message>
         <source>DLL-files (*.dll)</source>
@@ -4741,7 +4740,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished"></translation>
+        <translation>プリセットを保存</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
@@ -4757,7 +4756,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>プリセット</translation>
     </message>
     <message>
         <source>by </source>
@@ -7710,11 +7709,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Import file</source>
-        <translation type="unfinished">ファイルのインポート</translation>
+        <translation>ファイルをインポート</translation>
     </message>
     <message>
         <source>untitled</source>
-        <translation type="unfinished">無題</translation>
+        <translation>無題</translation>
     </message>
     <message>
         <source>Select file for project-export...</source>
@@ -7722,7 +7721,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Empty project</source>
-        <translation type="unfinished">空のプロジェクト</translation>
+        <translation>空のプロジェクト</translation>
     </message>
     <message>
         <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
@@ -7730,7 +7729,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>MIDI sequences</source>
-        <translation type="unfinished">MIDI シーケンス</translation>
+        <translation>MIDIシーケンス</translation>
     </message>
     <message>
         <source>FL Studio projects</source>
