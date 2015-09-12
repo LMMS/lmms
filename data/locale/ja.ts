@@ -545,38 +545,38 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>Controller</name>
     <message>
         <source>Controller %1</source>
-        <translation type="unfinished">Controller %1</translation>
+        <translation type="unfinished">コントローラー %1</translation>
     </message>
 </context>
 <context>
     <name>ControllerConnectionDialog</name>
     <message>
         <source>Connection Settings</source>
-        <translation type="unfinished">接続設定</translation>
+        <translation>接続設定</translation>
     </message>
     <message>
         <source>MIDI CONTROLLER</source>
-        <translation type="unfinished">MIDI コントローラー</translation>
+        <translation>MIDIコントローラー</translation>
     </message>
     <message>
         <source>Input channel</source>
-        <translation type="unfinished">入力チャンネル</translation>
+        <translation>入力チャンネル</translation>
     </message>
     <message>
         <source>CHANNEL</source>
-        <translation type="unfinished">チャンネル</translation>
+        <translation>チャンネル</translation>
     </message>
     <message>
         <source>Input controller</source>
-        <translation type="unfinished">入力コントローラー</translation>
+        <translation>入力コントローラー</translation>
     </message>
     <message>
         <source>CONTROLLER</source>
-        <translation type="unfinished">コントローラー</translation>
+        <translation>コントローラー</translation>
     </message>
     <message>
         <source>Auto Detect</source>
-        <translation type="unfinished">自動検出</translation>
+        <translation>自動検出</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
