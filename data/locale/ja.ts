@@ -226,7 +226,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
-        <translation type="unfinished">クライアント名</translation>
+        <translation>クライアント名</translation>
     </message>
     <message>
         <source>CHANNELS</source>
@@ -545,7 +545,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>Controller</name>
     <message>
         <source>Controller %1</source>
-        <translation type="unfinished">コントローラー %1</translation>
+        <translation>コントローラー %1</translation>
     </message>
 </context>
 <context>
@@ -584,7 +584,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>USER CONTROLLER</source>
-        <translation type="unfinished">ユーザー コントローラー</translation>
+        <translation type="unfinished">ユーザーコントローラー</translation>
     </message>
     <message>
         <source>MAPPING FUNCTION</source>
@@ -604,7 +604,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Cycle Detected.</source>
-        <translation type="unfinished">サイクルが検出されました。</translation>
+        <translation type="unfinished">循環が検出されました。</translation>
     </message>
 </context>
 <context>
@@ -630,7 +630,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>ControllerView</name>
     <message>
         <source>Controls</source>
-        <translation type="unfinished">コントロール</translation>
+        <translation>コントロール</translation>
     </message>
     <message>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
@@ -638,11 +638,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Rename controller</source>
-        <translation type="unfinished">コントローラー名の変更</translation>
+        <translation>コントローラー名の変更</translation>
     </message>
     <message>
         <source>Enter the new name for this controller</source>
-        <translation type="unfinished">コントローラーの新しい名前を入力してください</translation>
+        <translation>コントローラーの新しい名前を入力してください</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
@@ -809,18 +809,18 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>EffectRackView</name>
     <message>
         <source>EFFECTS CHAIN</source>
-        <translation type="unfinished">エフェクトチェイン</translation>
+        <translation>エフェクトチェイン</translation>
     </message>
     <message>
         <source>Add effect</source>
-        <translation type="unfinished">エフェクトを追加</translation>
+        <translation>エフェクトを追加</translation>
     </message>
 </context>
 <context>
     <name>EffectSelectDialog</name>
     <message>
         <source>Add effect</source>
-        <translation type="unfinished">エフェクトを追加</translation>
+        <translation>エフェクトを追加</translation>
     </message>
     <message>
         <source>Plugin description</source>
@@ -1304,7 +1304,7 @@ Wet/Dry つまみでは、エフェクトの出力中の入力シグナルとエ
     <name>FileBrowser</name>
     <message>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>ブラウザ</translation>
     </message>
 </context>
 <context>
@@ -1323,7 +1323,7 @@ Wet/Dry つまみでは、エフェクトの出力中の入力シグナルとエ
     </message>
     <message>
         <source>Loading sample</source>
-        <translation type="unfinished"></translation>
+        <translation>サンプルの読み込み中</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
@@ -1352,23 +1352,23 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Move &amp;left</source>
-        <translation type="unfinished"></translation>
+        <translation>左に移動 (&amp;l)</translation>
     </message>
     <message>
         <source>Move &amp;right</source>
-        <translation type="unfinished"></translation>
+        <translation>右に移動 (&amp;r)</translation>
     </message>
     <message>
         <source>Rename &amp;channel</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル名を変更 (&amp;c)</translation>
     </message>
     <message>
         <source>R&amp;emove channel</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネルを削除 (&amp;e)</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished">ヘルプ(&amp;H)</translation>
+        <translation>ヘルプ(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -2370,11 +2370,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>LadspaEffect</name>
     <message>
         <source>Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>エフェクト</translation>
     </message>
     <message>
         <source>Unknown LADSPA plugin %1 requested.</source>
-        <translation type="unfinished">不明なLADSPA プラグイン %1 が要求されました。</translation>
+        <translation>不明なLADSPAプラグイン %1 が要求されました。</translation>
     </message>
 </context>
 <context>
@@ -2801,36 +2801,36 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>MeterModel</name>
     <message>
         <source>Numerator</source>
-        <translation type="unfinished"></translation>
+        <translation>分子</translation>
     </message>
     <message>
         <source>Denominator</source>
-        <translation type="unfinished"></translation>
+        <translation>分母</translation>
     </message>
 </context>
 <context>
     <name>MidiAlsaRaw::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">デバイス</translation>
+        <translation>デバイス</translation>
     </message>
 </context>
 <context>
     <name>MidiAlsaSeq::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation type="unfinished">デバイス</translation>
+        <translation>デバイス</translation>
     </message>
 </context>
 <context>
     <name>MidiController</name>
     <message>
         <source>MIDI Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDIコントローラ</translation>
     </message>
     <message>
         <source>unnamed_midi_controller</source>
-        <translation type="unfinished">名称未設定_MIDI_コントローラー</translation>
+        <translation>名称未設定_MIDI_コントローラー</translation>
     </message>
 </context>
 <context>
@@ -3794,7 +3794,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ピアノロール - %1</translation>
     </message>
     <message>
         <source>Please open a pattern by double-clicking on it!</source>
@@ -3930,19 +3930,19 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Volume: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>音量 %1%</translation>
     </message>
     <message>
         <source>Panning: %1% left</source>
-        <translation type="unfinished"></translation>
+        <translation>パニング: %1%左</translation>
     </message>
     <message>
         <source>Panning: %1% right</source>
-        <translation type="unfinished"></translation>
+        <translation>パニング: %1%右</translation>
     </message>
     <message>
         <source>Panning: center</source>
-        <translation type="unfinished"></translation>
+        <translation>パニング: 中央</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -5586,7 +5586,7 @@ Please make sure you have write-permission to the file and the directory contain
     <name>fader</name>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation>%1 と %2 の間の新しい値を入力してください:</translation>
+        <translation type="unfinished">%1 と %2 の間の新しい値を入力してください:</translation>
     </message>
 </context>
 <context>
@@ -5698,7 +5698,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation type="unfinished">-96.0 dBV と 6.0 dBV　の間の新しい値を入力してください:</translation>
+        <translation type="unfinished">-96.0dBVと6.0dBVの間の新しい値を入力してください:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
