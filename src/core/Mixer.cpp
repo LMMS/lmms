@@ -41,6 +41,7 @@
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -824,6 +825,20 @@ AudioDevice * Mixer::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPortAudio::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if( dev_name == AudioSoundIo::name() || dev_name == "" )
+	{
+		dev = new AudioSoundIo( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSoundIo::name();
 			return dev;
 		}
 		delete dev;

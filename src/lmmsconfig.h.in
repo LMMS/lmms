@@ -13,6 +13,7 @@
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS
 #cmakedefine LMMS_HAVE_PORTAUDIO
+#cmakedefine LMMS_HAVE_SOUNDIO
 #cmakedefine LMMS_HAVE_PULSEAUDIO
 #cmakedefine LMMS_HAVE_SDL
 #cmakedefine LMMS_HAVE_STK

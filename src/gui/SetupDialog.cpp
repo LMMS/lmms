@@ -55,6 +55,7 @@
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -732,6 +733,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_PORTAUDIO
 	m_audioIfaceSetupWidgets[AudioPortAudio::name()] =
 					new AudioPortAudio::setupWidget( asw );
+#endif
+
+#ifdef LMMS_HAVE_SOUNDIO
+	m_audioIfaceSetupWidgets[AudioSoundIo::name()] =
+					new AudioSoundIo::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_SDL
