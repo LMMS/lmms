@@ -221,11 +221,10 @@ void Mixer::stopProcessing()
 	if( m_fifoWriter != NULL )
 	{
 		m_fifoWriter->finish();
-		m_audioDev->stopProcessing();
-		m_fifoWriter->wait( 1000 );
-		m_fifoWriter->terminate();
+		m_fifoWriter->wait();
 		delete m_fifoWriter;
 		m_fifoWriter = NULL;
+		m_audioDev->stopProcessing();
 	}
 	else
 	{
