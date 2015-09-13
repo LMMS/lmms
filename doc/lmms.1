@@ -42,8 +42,14 @@ LMMS features components such as a Song Editor, a Beat+Bassline Editor, a Piano 
 .SH OPTIONS
 .IP "\fB\-r, --render\fP \fIproject-file\fP
 Render given file to either a wav\- or ogg\-file. See \fB\-f\fP for details
-.IP "\fB\-o, --output\fP \fIfile\fP
-render into \fIfile\fP
+.IP "\fB\-r, --rendertracks\fP \fIproject-file\fP
+Render each track into a separate wav\- or ogg\-file. See \fB\-f\fP for details
+.IP "\fB\-o, --output\fP \fIpath\fP
+Render into \fIpath\fP
+.br
+For --render, this is interpreted as a file path.
+.br
+For --render-tracks, this is interpreted as a path to an existing directory.
 .IP "\fB\-f, --format\fP \fIformat\fP
 Specify format of render-output where \fIformat\fP is either 'wav' or 'ogg'
 .IP "\fB\-s, --samplerate\fP \fIsamplerate\fP

@@ -66,6 +66,7 @@
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
+#include "RenderManager.h"
 #include "DataFile.h"
 #include "Song.h"
 
@@ -126,7 +127,10 @@ void printHelp()
 		"            [ -h ]\n"
 		"            [ <file to load> ]\n\n"
 		"-r, --render <project file>	Render given project file\n"
-		"-o, --output <file>		Render into <file>\n"
+		"    --rendertracks <project>	Render each track to a different file\n"
+		"-o, --output <path>		Render into <path>\n"
+		"				For --render, provide a file path\n"
+		"				For --rendertracks, provide a directory path\n"
 		"-f, --format <format>		Specify format of render-output where\n"
 		"				Format is either 'wav' or 'ogg'.\n"
 		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
@@ -172,6 +176,7 @@ int main( int argc, char * * argv )
 	bool exitAfterImport = false;
 	bool allowRoot = false;
 	bool renderLoop = false;
+	bool renderTracks = false;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile;
 
 	// first of two command-line parsing stages
@@ -184,6 +189,11 @@ int main( int argc, char * * argv )
 		    arg == "--render"  || arg == "-r" )
 		{
 			coreOnly = true;
+		}
+		else if( arg == "--rendertracks" )
+		{
+			coreOnly = true;
+			renderTracks = true;
 		}
 		else if( arg == "--allowroot" )
 		{
@@ -288,7 +298,7 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if( arg == "--render" || arg == "-r" )
+		else if( arg == "--render" || arg == "-r" || arg == "--rendertracks" )
 		{
 			++i;
 
@@ -301,7 +311,7 @@ int main( int argc, char * * argv )
 
 
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
-			renderOut = baseName( fileToLoad ) + ".";
+			renderOut = fileToLoad;
 		}
 		else if( arg == "--loop" || arg == "-l" )
 		{
@@ -319,7 +329,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			renderOut = baseName( QString::fromLocal8Bit( argv[i] ) ) + ".";
+			renderOut = QString::fromLocal8Bit( argv[i] );
 		}
 		else if( arg == "--format" || arg == "-f" )
 		{
@@ -588,9 +598,16 @@ int main( int argc, char * * argv )
 
 		Engine::getSong()->setExportLoop( renderLoop );
 
+		// when rendering multiple tracks, renderOut is a directory
+		// otherwise, it is a file, so we need to append the file extension
+		if ( !renderTracks )
+		{
+			renderOut = baseName( renderOut ) +
+				ProjectRenderer::getFileExtensionFromFormat(eff);
+		}
+
 		// create renderer
-		QString extension = ( eff == ProjectRenderer::WaveFile ) ? "wav" : "ogg";
-		ProjectRenderer * r = new ProjectRenderer( qs, os, eff, renderOut + extension );
+		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
 		QCoreApplication::instance()->connect( r,
 				SIGNAL( finished() ), SLOT( quit() ) );
 
@@ -606,7 +623,14 @@ int main( int argc, char * * argv )
 		}
 
 		// start now!
-		r->startProcessing();
+		if ( renderTracks )
+		{
+			r->renderTracks();
+		}
+		else
+		{
+			r->renderProject();
+		}
 	}
 	else // otherwise, start the GUI
 	{
