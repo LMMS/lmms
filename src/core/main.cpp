@@ -311,7 +311,7 @@ int main( int argc, char * * argv )
 
 
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
-			renderOut = baseName( fileToLoad );
+			renderOut = fileToLoad;
 		}
 		else if( arg == "--loop" || arg == "-l" )
 		{
@@ -329,7 +329,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			renderOut = baseName( QString::fromLocal8Bit( argv[i] ) );
+			renderOut = QString::fromLocal8Bit( argv[i] );
 		}
 		else if( arg == "--format" || arg == "-f" )
 		{
@@ -602,7 +602,8 @@ int main( int argc, char * * argv )
 		// otherwise, it is a file, so we need to append the file extension
 		if ( !renderTracks )
 		{
-			renderOut = renderOut + ProjectRenderer::getFileExtensionFromFormat(eff);
+			renderOut = baseName( renderOut ) +
+				ProjectRenderer::getFileExtensionFromFormat(eff);
 		}
 
 		// create renderer
