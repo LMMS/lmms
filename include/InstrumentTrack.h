@@ -59,6 +59,7 @@ class PluginView;
 class TabWidget;
 class TrackLabelButton;
 class LedCheckBox;
+class QLabel;
 
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -431,7 +432,9 @@ private:
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
+	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
+	QLabel * m_pitchRangeLabel;
 	LcdSpinBox * m_effectChannelNumber;
 
 
