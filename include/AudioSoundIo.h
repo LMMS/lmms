@@ -43,93 +43,89 @@ class LcdSpinBox;
 // Exists only to work around "Error: Meta object features not supported for nested classes"
 class AudioSoundIoSetupUtil : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    void *m_setupWidget;
+	void *m_setupWidget;
 public slots:
-    void updateDevices();
-    void reconnectSoundIo();
+	void updateDevices();
+	void reconnectSoundIo();
 };
 
 class AudioSoundIo : public AudioDevice
 {
 public:
-    AudioSoundIo( bool & _success_ful, Mixer* mixer );
-    virtual ~AudioSoundIo();
+	AudioSoundIo( bool & _success_ful, Mixer* mixer );
+	virtual ~AudioSoundIo();
 
-    inline static QString name()
-    {
-        return QT_TRANSLATE_NOOP( "setupWidget", "soundio" );
-    }
+	inline static QString name()
+	{
+		return QT_TRANSLATE_NOOP( "setupWidget", "soundio" );
+	}
 
+	class setupWidget : public AudioDeviceSetupWidget
+	{
+	public:
+		setupWidget( QWidget * _parent );
+		virtual ~setupWidget();
 
-    int process_callback( const float *_inputBuffer,
-        float * _outputBuffer,
-        unsigned long _framesPerBuffer );
+		virtual void saveSettings();
 
+		void updateDevices();
+		void reconnectSoundIo();
 
-    class setupWidget : public AudioDeviceSetupWidget
-    {
-    public:
-        setupWidget( QWidget * _parent );
-        virtual ~setupWidget();
+	private:
 
-        virtual void saveSettings();
+		AudioSoundIoSetupUtil m_setupUtil;
+		ComboBox * m_backend;
+		ComboBox * m_device;
 
-        void updateDevices();
-        void reconnectSoundIo();
+		ComboBoxModel m_backendModel;
+		ComboBoxModel m_deviceModel;
 
-        AudioSoundIoSetupUtil m_setupUtil;
-        ComboBox * m_backend;
-        ComboBox * m_device;
+		SoundIo * m_soundio;
 
-        ComboBoxModel m_backendModel;
-        ComboBoxModel m_deviceModel;
+		struct DeviceId {
+			QString id;
+			bool is_raw;
+		};
+		QList<DeviceId> m_deviceList;
 
-        SoundIo * m_soundio;
+		int m_defaultOutIndex;
+		bool m_isFirst;
 
-        struct DeviceId {
-            QString id;
-            bool is_raw;
-        };
-        QList<DeviceId> m_device_list;
-
-        int m_default_out_index;
-        bool m_is_first;
-
-    } ;
+	} ;
 
 private:
-    virtual void startProcessing();
-    virtual void stopProcessing();
+	virtual void startProcessing();
+	virtual void stopProcessing();
 
-    SoundIo *m_soundio;
-    SoundIoOutStream *m_outstream;
+	SoundIo *m_soundio;
+	SoundIoOutStream *m_outstream;
 
-    surroundSampleFrame * m_outBuf;
-    int m_outBufSize;
-    fpp_t m_outBufFramesTotal;
-    fpp_t m_outBufFrameIndex;
+	surroundSampleFrame * m_outBuf;
+	int m_outBufSize;
+	fpp_t m_outBufFramesTotal;
+	fpp_t m_outBufFrameIndex;
 
-    int m_disconnect_err;
-    void on_backend_disconnect(int err);
+	int m_disconnectErr;
+	void onBackendDisconnect(int err);
 
-    void write_callback(int frame_count_min, int frame_count_max);
-    void error_callback(int err);
-    void underflow_callback();
+	void writeCallback(int frame_count_min, int frame_count_max);
+	void errorCallback(int err);
+	void underflowCallback();
 
-    static void static_write_callback(SoundIoOutStream *outstream, int frame_count_min, int frame_count_max) {
-        return ((AudioSoundIo *)outstream->userdata)->write_callback(frame_count_min, frame_count_max);
-    }
-    static void static_error_callback(SoundIoOutStream *outstream, int err) {
-        return ((AudioSoundIo *)outstream->userdata)->error_callback(err);
-    }
-    static void static_underflow_callback(SoundIoOutStream *outstream) {
-        return ((AudioSoundIo *)outstream->userdata)->underflow_callback();
-    }
-    static void static_on_backend_disconnect(SoundIo *soundio, int err) {
-        return ((AudioSoundIo *)soundio->userdata)->on_backend_disconnect(err);
-    }
+	static void staticWriteCallback(SoundIoOutStream *outstream, int frame_count_min, int frame_count_max) {
+		return ((AudioSoundIo *)outstream->userdata)->writeCallback(frame_count_min, frame_count_max);
+	}
+	static void staticErrorCallback(SoundIoOutStream *outstream, int err) {
+		return ((AudioSoundIo *)outstream->userdata)->errorCallback(err);
+	}
+	static void staticUnderflowCallback(SoundIoOutStream *outstream) {
+		return ((AudioSoundIo *)outstream->userdata)->underflowCallback();
+	}
+	static void staticOnBackendDisconnect(SoundIo *soundio, int err) {
+		return ((AudioSoundIo *)soundio->userdata)->onBackendDisconnect(err);
+	}
 
 };
 
