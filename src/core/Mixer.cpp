@@ -41,6 +41,7 @@
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -220,11 +221,10 @@ void Mixer::stopProcessing()
 	if( m_fifoWriter != NULL )
 	{
 		m_fifoWriter->finish();
-		m_audioDev->stopProcessing();
-		m_fifoWriter->wait( 1000 );
-		m_fifoWriter->terminate();
+		m_fifoWriter->wait();
 		delete m_fifoWriter;
 		m_fifoWriter = NULL;
+		m_audioDev->stopProcessing();
 	}
 	else
 	{
@@ -824,6 +824,20 @@ AudioDevice * Mixer::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPortAudio::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if( dev_name == AudioSoundIo::name() || dev_name == "" )
+	{
+		dev = new AudioSoundIo( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSoundIo::name();
 			return dev;
 		}
 		delete dev;
