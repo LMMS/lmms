@@ -82,8 +82,7 @@ private:
 
 	bool m_convertEndian;
 
-	volatile bool m_stopped;
-	QSemaphore m_stopSemaphore;
+	bool m_stopped;
 
 } ;
 
