@@ -61,7 +61,7 @@ const int TRACK_OP_WIDTH = 78;
 // This shaves 150-ish pixels off track buttons,
 // ruled from config: ui.compacttrackbuttons
 const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
-const int TRACK_OP_WIDTH_COMPACT = 60;
+const int TRACK_OP_WIDTH_COMPACT = 62;
 
 /*! The minimum track height in pixels
  *
