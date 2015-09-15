@@ -106,6 +106,10 @@ public:
 	// useful for loading projects
 	void refreshDisplay();
 
+	// called when we receive more up-to-date channel peak info
+	// peaks is an array of interleaved channel peaks (i.e. float[][2])
+	void gotChannelPeaks(std::size_t numFxCh, const float* peaks);
+
 public slots:
 	int addNewChannel();
 
@@ -113,7 +117,6 @@ protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	
 private slots:
-	void updateFaders();
 	void toggledSolo();
 
 private:

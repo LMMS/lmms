@@ -35,7 +35,6 @@
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
-#include <QMessageBox>
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
@@ -610,68 +609,11 @@ int main( int argc, char * * argv )
 	}
 	else // otherwise, start the GUI
 	{
-		new GuiApplication();
+		new GuiApplication(fileToLoad, fileToImport, fullscreen, exitAfterImport);
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
 		srand( getpid() + time( 0 ) );
-
-		// recover a file?
-		QString recoveryFile = ConfigManager::inst()->recoveryFile();
-
-		if( QFileInfo(recoveryFile).exists() &&
-			QMessageBox::question( gui->mainWindow(), MainWindow::tr( "Project recovery" ),
-						MainWindow::tr( "It looks like the last session did not end properly. "
-										"Do you want to recover the project of this session?" ),
-						QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
-		{
-			fileToLoad = recoveryFile;
-		}
-
-		// we try to load given file
-		if( !fileToLoad.isEmpty() )
-		{
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
-
-			if( fileToLoad == recoveryFile )
-			{
-				Engine::getSong()->createNewProjectFromTemplate( fileToLoad );
-			}
-			else
-			{
-				Engine::getSong()->loadProject( fileToLoad );
-			}
-		}
-		else if( !fileToImport.isEmpty() )
-		{
-			ImportFilter::import( fileToImport, Engine::getSong() );
-			if( exitAfterImport )
-			{
-				return EXIT_SUCCESS;
-			}
-
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
-		}
-		else
-		{
-			Engine::getSong()->createNewProject();
-
-			// [Settel] workaround: showMaximized() doesn't work with
-			// FVWM2 unless the window is already visible -> show() first
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
-		}
 	}
 
 	const int ret = app->exec();

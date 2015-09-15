@@ -23,10 +23,11 @@
  *
  */
 
-#include <QMessageBox>
 
 #include "AudioFileDevice.h"
+#include "Engine.h"
 #include "ExportProjectDialog.h"
+#include "Messenger.h"
 
 
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
@@ -50,7 +51,7 @@ AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
 	{
-		QMessageBox::critical( NULL,
+		Engine::messenger()->broadcastError(
 			ExportProjectDialog::tr( "Could not open file" ),
 			ExportProjectDialog::tr( "Could not open file %1 "
 						"for writing.\nPlease make "
@@ -58,9 +59,7 @@ AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 						"permission to the file and "
 						"the directory containing the "
 						"file and try again!" ).arg(
-									_file ),
-					QMessageBox::Ok,
-					QMessageBox::NoButton );
+									_file ) );
 	}
 }
 

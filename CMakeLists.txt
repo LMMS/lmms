@@ -165,6 +165,11 @@ IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
 ENDIF(NOT SNDFILE_FOUND)
 
+PKG_CHECK_MODULES(LIBLO REQUIRED liblo>=0.28)
+IF(NOT LIBLO_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires liblo >= 0.28 - please install, remove CMakeCache.txt and try again!")
+ENDIF(NOT LIBLO_FOUND)
+
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
 	SET(STATUS_CALF "OK")

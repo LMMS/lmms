@@ -131,6 +131,11 @@ public slots:
 	void undo();
 	void redo();
 
+private slots:
+	void exportProject();
+	void exportProjectTracks();
+	void exportProjectMidi();
+
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -149,6 +154,10 @@ private:
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
+
+	// returns true if the project can be exported,
+	//   shows a warning message & returns false if the project is empty
+	bool checkProjectExportable();
 
 
 	QMdiArea * m_workspace;
@@ -185,6 +194,8 @@ private:
 
 	QMenu * m_viewMenu;
 
+	ToolButton * m_metronomeToggle;
+
 private slots:
 	void browseHelp();
 	void fillTemplatesMenu();
@@ -193,6 +204,7 @@ private slots:
 	void updateRecentlyOpenedProjectsMenu();
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
+	void onToggleMetronome();
 
 
 	void autoSave();

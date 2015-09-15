@@ -22,6 +22,8 @@
  *
  */
 
+#include <algorithm>
+
 #include <QtGlobal>
 #include <QDebug>
 
@@ -140,11 +142,6 @@ FxMixerView::FxMixerView() :
 
 	setLayout( ml );
 	updateGeometry();
-
-	// timer for updating faders
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateFaders() ) );
-
 
 	// add ourself to workspace
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
@@ -551,43 +548,16 @@ void FxMixerView::clear()
 
 
 
-
-void FxMixerView::updateFaders()
+void FxMixerView::gotChannelPeaks(std::size_t numFxCh, const float* peaks)
 {
-	FxMixer * m = Engine::fxMixer();
+	// avoid error condition where we somehow receive more peak data than there are channels
+	numFxCh = std::min(numFxCh, (std::size_t)m_fxChannelViews.size());
 
-	// apply master gain
-	m->effectChannel(0)->m_peakLeft *= Engine::mixer()->masterGain();
-	m->effectChannel(0)->m_peakRight *= Engine::mixer()->masterGain();
-
-	for( int i = 0; i < m_fxChannelViews.size(); ++i )
+	for (std::size_t fxNo=0; fxNo<numFxCh; ++fxNo)
 	{
-		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
-		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
-		const float fall_off = 1.2;
-		if( m->effectChannel(i)->m_peakLeft > opl )
-		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
-			m->effectChannel(i)->m_peakLeft = 0;
-		}
-		else
-		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fall_off );
-		}
-
-		if( m->effectChannel(i)->m_peakRight > opr )
-		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
-			m->effectChannel(i)->m_peakRight = 0;
-		}
-		else
-		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fall_off );
-		}
+		m_fxChannelViews[fxNo]->m_fader->setPeak_L(peaks[fxNo*2 + 0]);
+		m_fxChannelViews[fxNo]->m_fader->setPeak_R(peaks[fxNo*2 + 1]);
 	}
 }
-
-
-
 
 

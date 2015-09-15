@@ -28,11 +28,11 @@
 #include <cstdio>
 #include <QDomElement>
 #include <QObject>
-#include <QMessageBox>
 
-#include "Engine.h"
-#include "Mixer.h"
 #include "EffectChain.h"
+#include "Engine.h"
+#include "Messenger.h"
+#include "Mixer.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
 
@@ -214,16 +214,13 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 			{
 				(*i)->m_effectId = newEffectId++;
 			}
-			QMessageBox msgBox;
-			msgBox.setIcon( QMessageBox::Information );
-			msgBox.setWindowTitle( tr("Peak Controller Bug") );
-			msgBox.setText( tr("Due to a bug in older version of LMMS, the peak "
-							   "controllers may not be connect properly. "
-							   "Please ensure that peak controllers are connected "
-							   "properly and re-save this file. "
-							   "Sorry for any inconvenience caused.") );
-			msgBox.setStandardButtons(QMessageBox::Ok);
-			msgBox.exec();
+			Engine::messenger()->broadcastError(
+				tr("Peak Controller Bug"),
+				tr("Due to a bug in older version of LMMS, the peak "
+			   "controllers may not be connect properly. "
+			   "Please ensure that peak controllers are connected "
+			   "properly and re-save this file. "
+			   "Sorry for any inconvenience caused.") );
 		}
 	}
 

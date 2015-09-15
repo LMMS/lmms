@@ -27,7 +27,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
-#include <QMessageBox>
 #include <QApplication>
 
 #include <math.h>
@@ -50,6 +49,7 @@
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Messenger.h"
 #include "FileDialog.h"
 #include "MidiClient.h"
 #include "DataFile.h"
@@ -1050,15 +1050,7 @@ void Song::loadProject( const QString & fileName )
 
 	if ( hasErrors())
 	{
-		if ( gui )
-		{
-			QMessageBox::warning( NULL, "LMMS Error report", *errorSummary(),
-							QMessageBox::Ok );
-		}
-		else
-		{
-			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
-		}
+		Engine::messenger()->broadcastWarning("LMMS Error Report", *errorSummary());
 	}
 
 	m_loadingProject = false;
@@ -1231,16 +1223,6 @@ void Song::exportProjectTracks()
 
 void Song::exportProject( bool multiExport )
 {
-	if( isEmpty() )
-	{
-		QMessageBox::information( gui->mainWindow(),
-				tr( "Empty project" ),
-				tr( "This project is empty so exporting makes "
-					"no sense. Please put some items into "
-					"Song Editor first!" ) );
-		return;
-	}
-
 	FileDialog efd( gui->mainWindow() );
 
 	if ( multiExport )
@@ -1310,16 +1292,6 @@ void Song::exportProject( bool multiExport )
 
 void Song::exportProjectMidi()
 {
-	if( isEmpty() )
-	{
-		QMessageBox::information( gui->mainWindow(),
-				tr( "Empty project" ),
-				tr( "This project is empty so exporting makes "
-					"no sense. Please put some items into "
-					"Song Editor first!" ) );
-		return;
-	}
-
 	FileDialog efd( gui->mainWindow() );
 	
 	efd.setFileMode( FileDialog::AnyFile );
