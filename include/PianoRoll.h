@@ -130,6 +130,7 @@ protected:
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes();
+	void selectNotesOnKey();
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -199,6 +200,7 @@ private:
 		stmaMarkCurrentSemiTone,
 		stmaMarkCurrentScale,
 		stmaMarkCurrentChord,
+		stmaCopyAllNotesOnKey
 	};
 
 	enum PianoRollKeyTypes

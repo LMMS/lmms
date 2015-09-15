@@ -235,16 +235,19 @@ PianoRoll::PianoRoll() :
 	QAction* markScaleAction = new QAction( tr("Mark current scale"), this );
 	QAction* markChordAction = new QAction( tr("Mark current chord"), this );
 	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
+	QAction* copyAllNotesAction = new QAction( tr("Select all notes on this key"), this);
 
 	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( markScaleAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( markChordAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
 	signalMapper->setMapping( markScaleAction, static_cast<int>( stmaMarkCurrentScale ) );
 	signalMapper->setMapping( markChordAction, static_cast<int>( stmaMarkCurrentChord ) );
 	signalMapper->setMapping( unmarkAllAction, static_cast<int>( stmaUnmarkAll ) );
+	signalMapper->setMapping( copyAllNotesAction, static_cast<int>( stmaCopyAllNotesOnKey ) );
 
 	markScaleAction->setEnabled( false );
 	markChordAction->setEnabled( false );
@@ -258,6 +261,7 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( markScaleAction );
 	m_semiToneMarkerMenu->addAction( markChordAction );
 	m_semiToneMarkerMenu->addAction( unmarkAllAction );
+	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
@@ -565,6 +569,11 @@ void PianoRoll::markSemiTone( int i )
 					m_markedSemiTones.push_back( i );
 				}
 			}
+			break;
+		}
+		case stmaCopyAllNotesOnKey:
+		{
+			selectNotesOnKey();
 			break;
 		}
 		default:
@@ -1578,6 +1587,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		}
 		else if( me->y() < keyAreaBottom() )
 		{
+			// reference to last key needed for both
+			// right click (used for copy all keys on note)
+			// and for playing the key when left-clicked
+			m_lastKey = key_num;
+
 			// clicked on keyboard on the left
 			if( me->buttons() == Qt::RightButton )
 			{
@@ -1587,7 +1601,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			else
 			{
 				// left click - play the note
-				m_lastKey = key_num;
 				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity;
 				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
 			}
@@ -3497,6 +3510,17 @@ NoteVector PianoRoll::getSelectedNotes()
 	return selectedNotes;
 }
 
+// selects all notess associated with m_lastKey
+void PianoRoll::selectNotesOnKey()
+{
+	if (hasValidPattern()) {
+		for (Note * note : m_pattern->notes()) {
+			if (note->key() == m_lastKey) {
+				note->setSelected(true);
+			}
+		}
+	}
+}
 
 void PianoRoll::enterValue( NoteVector* nv )
 {
