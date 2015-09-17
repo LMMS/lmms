@@ -4,5 +4,5 @@ usr/share/man/*
 usr/share/applications/*
 @MIME_ICON@	usr/share/icons/gnome/scalable/mimetypes
 
-@INSTALL_FILE_ICON_LINE@ usr/share/icons
-@INSTALL_FILE_ICON_LINE@ usr/share/pixmaps
+@DEBIAN_INSTALL_FILE_ICON_LINE@ usr/share/icons
+@DEBIAN_INSTALL_FILE_ICON_LINE@ usr/share/pixmaps

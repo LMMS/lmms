@@ -43,7 +43,7 @@ SET(CPACK_PACKAGE_DESCRIPTION " ${PROJECT_NAME_UCASE} aims to be a free alternat
  ${PROJECT_NAME_UCASE} combines the features of a tracker-/sequencer-program (pattern-/channel-/
  sample-/song-/effect-management) and those of powerful synthesizers and
  samplers in a modern, user-friendly and easy to use graphical user-interface")
-SET(INSTALL_FILE_ICON_LINE "data/lmms.png")
+SET(DEBIAN_INSTALL_FILE_ICON_LINE "data/lmms.png")
 SET(MIME_ICON "data/application-x-lmms-project.svg")
 
 CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}.install.in ${CMAKE_BINARY_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
