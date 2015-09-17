@@ -701,7 +701,7 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
+void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible )
 {
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
 	// we really care about the position of the *window* - not the position of the widget within its window
@@ -716,14 +716,17 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
 	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
 
-	_de.setAttribute( "visible", _w->isVisible() );
+	bool visible = _w->isVisible();
+	_de.setAttribute( "visible", visible );
 	_de.setAttribute( "minimized", _w->isMinimized() );
 	_de.setAttribute( "maximized", _w->isMaximized() );
 
 	_de.setAttribute( "x", normalGeom.x() );
 	_de.setAttribute( "y", normalGeom.y() );
-	_de.setAttribute( "width", normalGeom.width() );
-	_de.setAttribute( "height", normalGeom.height() );
+
+	QSize sizeToStore = visible ? normalGeom.size() : sizeIfInvisible;
+	_de.setAttribute( "width", sizeToStore.width() );
+	_de.setAttribute( "height", sizeToStore.height() );
 }
 
 

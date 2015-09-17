@@ -228,7 +228,7 @@ void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 
 void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & dom_parent)
 {
-	MainWindow::saveWidgetState(parentWidget(), dom_parent);
+	MainWindow::saveWidgetState(parentWidget(), dom_parent, QSize( 640, 400 ));
 }
 
 

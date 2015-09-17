@@ -103,7 +103,7 @@ ControllerRackView::~ControllerRackView()
 void ControllerRackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this, QSize( 400, 300) );
 }
 
 
