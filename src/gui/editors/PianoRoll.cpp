@@ -4180,7 +4180,7 @@ void PianoRollWindow::reset()
 
 void PianoRollWindow::saveSettings(QDomDocument & doc, QDomElement & de)
 {
-	MainWindow::saveWidgetState(this, de);
+	MainWindow::saveWidgetState(this, de, QSize( 640, 480 ) );
 }
 
 void PianoRollWindow::loadSettings(const QDomElement & de)

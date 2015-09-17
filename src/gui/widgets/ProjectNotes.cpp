@@ -379,7 +379,7 @@ void ProjectNotes::alignmentChanged( int _a )
 
 void ProjectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this, QSize( 640, 400 ) );
 
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
 	_this.appendChild( ds );
