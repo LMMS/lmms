@@ -5,8 +5,8 @@ SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "${PROJECT_AUTHOR} <${PROJECT_EMAIL}>")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${PROJECT_URL}")
 SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "any")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
-SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "${CPACK_DEBIAN_PACKAGE_NAME}-vst-full (= ${DOLLAZ}{binary:Version}) [amd64 i386], tap-plugins, caps")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_NAME}-common (= ${DOLLAZ}{source:Version}), ${DOLLAZ}{shlibs:Depends}, ${DOLLAZ}{misc:Depends}, zynaddsubfx | zynaddsubfx-git")
+SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "${CPACK_DEBIAN_PACKAGE_NAME}-vst-full (= \${binary:Version}) [amd64 i386], tap-plugins, caps")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_NAME}-common (= \${source:Version}), \${shlibs:Depends}, \${misc:Depends}, zynaddsubfx | zynaddsubfx-git")
 SET(CPACK_DEBIAN_PACKAGE_SUGGESTS  "fil-plugins, mcp-plugins, omins, freepats, fluid-soundfont-gm")
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS " cmake,
  debhelper (>= 9.0.0),
