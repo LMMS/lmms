@@ -3,7 +3,7 @@
 MINGW=/opt/mingw32
 export PATH=$PATH:$MINGW/bin
 #export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -fno-tree-vectorize"
-export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5"
+export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -mfpmath=sse"
 export CXXFLAGS="$CFLAGS"
 
 if [ "$1" = "-qt5" ] ; then

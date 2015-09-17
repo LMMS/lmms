@@ -518,8 +518,8 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 	{
 		return NULL;
 	}
-	FxChannel * from = m_fxChannels[fromChannel];
-	FxChannel * to = m_fxChannels[toChannel];
+	const FxChannel * from = m_fxChannels[fromChannel];
+	const FxChannel * to = m_fxChannels[toChannel];
 
 	foreach( FxRoute * route, from->m_sends )
 	{

@@ -45,12 +45,20 @@ public:
 	MidiWinMM();
 	virtual ~MidiWinMM();
 
-	static QString probeDevice();
+	inline static QString probeDevice()
+	{
+		return QString::Null(); // no midi device name
+	}
 
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "WinMM MIDI" );
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget", "WinMM MIDI" );
+	}
+
+	inline static QString configSection()
+	{
+		return QString::Null(); // no configuration settings
 	}
 
 
@@ -102,19 +110,6 @@ public:
 	{
 		return false;
 	}
-
-
-	class setupWidget : public MidiClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings()
-		{
-		}
-
-	} ;
 
 
 private:// slots:

@@ -104,6 +104,28 @@ ConfigManager::~ConfigManager()
 }
 
 
+void ConfigManager::upgrade_1_1_90()
+{
+	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
+	if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
+	{
+		setValue("mixer", "audiodev", "PulseAudio");
+	}
+
+	// MidiAlsaRaw used to store the device info as "Device" instead of "device"
+	if ( value( "MidiAlsaRaw", "device" ).isNull() )
+	{
+		// copy "device" = "Device" and then delete the old "Device" (further down)
+		QString oldDevice = value( "MidiAlsaRaw", "Device" );
+		setValue("MidiAlsaRaw", "device", oldDevice);
+	}
+	if ( !value( "MidiAlsaRaw", "device" ).isNull() )
+	{
+		// delete the old "Device" in the case that we just copied it to "device"
+		//   or if the user somehow set both the "Device" and "device" fields
+		deleteValue("MidiAlsaRaw", "Device");
+	}
+}
 
 
 void ConfigManager::upgrade()
@@ -116,13 +138,9 @@ void ConfigManager::upgrade()
 
 	ProjectVersion createdWith = m_version;
 	
-	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
 	if ( createdWith.setCompareType(Build) < "1.1.90" )
 	{
-		if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
-		{
-			setValue("mixer", "audiodev", "PulseAudio");
-		}
+		upgrade_1_1_90();
 	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
@@ -252,16 +270,16 @@ void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 
 
 
-const QString & ConfigManager::value( const QString & _class,
-					const QString & _attribute ) const
+const QString & ConfigManager::value( const QString & cls,
+					const QString & attribute ) const
 {
-	if( m_settings.contains( _class ) )
+	if( m_settings.contains( cls ) )
 	{
 		for( stringPairVector::const_iterator it =
-						m_settings[_class].begin();
-					it != m_settings[_class].end(); ++it )
+						m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
 		{
-			if( ( *it ).first == _attribute )
+			if( ( *it ).first == attribute )
 			{
 				return ( *it ).second ;
 			}
@@ -274,26 +292,42 @@ const QString & ConfigManager::value( const QString & _class,
 
 
 
-void ConfigManager::setValue( const QString & _class,
-				const QString & _attribute,
-				const QString & _value )
+void ConfigManager::setValue( const QString & cls,
+				const QString & attribute,
+				const QString & value )
 {
-	if( m_settings.contains( _class ) )
+	if( m_settings.contains( cls ) )
 	{
-		for( stringPairVector::iterator it = m_settings[_class].begin();
-					it != m_settings[_class].end(); ++it )
+		for( stringPairVector::iterator it = m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
 		{
-			if( ( *it ).first == _attribute )
+			if( ( *it ).first == attribute )
 			{
-				( *it ).second = _value;
+				( *it ).second = value;
 				return;
 			}
 		}
 	}
 	// not in map yet, so we have to add it...
-	m_settings[_class].push_back( qMakePair( _attribute, _value ) );
+	m_settings[cls].push_back( qMakePair( attribute, value ) );
 }
 
+
+void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
+{
+	if( m_settings.contains( cls ) )
+	{
+		for( stringPairVector::iterator it = m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
+		{
+			if( ( *it ).first == attribute )
+			{
+				m_settings[cls].erase(it);
+				return;
+			}
+		}
+	}
+}
 
 
 void ConfigManager::loadConfigFile()

@@ -51,6 +51,7 @@ OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
+OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_GIG		"Include GIG player plugin" ON)
@@ -259,6 +260,20 @@ IF(WANT_PORTAUDIO)
 			"if you require PortAudio support")
 	ENDIF(PORTAUDIO_FOUND)
 ENDIF(WANT_PORTAUDIO)
+
+# check for libsoundio
+IF(WANT_SOUNDIO)
+  FIND_PACKAGE(SoundIo)
+  IF(SOUNDIO_FOUND)
+    SET(LMMS_HAVE_SOUNDIO TRUE)
+    SET(STATUS_SOUNDIO "OK")
+    INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
+  ELSE(SOUNDIO_FOUND)
+    SET(SOUNDIO_INCLUDE_DIR "")
+    SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
+    SET(SOUNDIO_LIBRARY "")
+  ENDIF(SOUNDIO_FOUND)
+ENDIF(WANT_SOUNDIO)
 
 
 # check for PulseAudio
@@ -527,6 +542,7 @@ MESSAGE(
 "* JACK                        : ${STATUS_JACK}\n"
 "* OSS                         : ${STATUS_OSS}\n"
 "* PortAudio                   : ${STATUS_PORTAUDIO}\n"
+"* libsoundio                  : ${STATUS_SOUNDIO}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
 "* SDL                         : ${STATUS_SDL}\n"
 )

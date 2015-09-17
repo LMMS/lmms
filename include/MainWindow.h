@@ -185,6 +185,8 @@ private:
 
 	QMenu * m_viewMenu;
 
+	ToolButton * m_metronomeToggle;
+
 private slots:
 	void browseHelp();
 	void fillTemplatesMenu();
@@ -193,6 +195,7 @@ private slots:
 	void updateRecentlyOpenedProjectsMenu();
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
+	void onToggleMetronome();
 
 
 	void autoSave();

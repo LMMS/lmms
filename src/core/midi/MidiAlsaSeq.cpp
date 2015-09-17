@@ -22,9 +22,6 @@
  *
  */
 
-#include <QLabel>
-#include <QLineEdit>
-
 #include "MidiAlsaSeq.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -41,7 +38,7 @@ const int EventPollTimeOut = 250;
 
 
 // static helper functions
-static QString __portName( snd_seq_client_info_t * _cinfo,
+static QString portName( snd_seq_client_info_t * _cinfo,
 								snd_seq_port_info_t * _pinfo )
 {
 	return QString( "%1:%2 %3:%4" ).
@@ -51,7 +48,7 @@ static QString __portName( snd_seq_client_info_t * _cinfo,
 					arg( snd_seq_port_info_get_name( _pinfo ) );
 }
 
-static QString __portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
+static QString portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
 {
 	snd_seq_client_info_t * cinfo;
 	snd_seq_port_info_t * pinfo;
@@ -62,7 +59,7 @@ static QString __portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
 	snd_seq_get_any_port_info( _seq, _addr->client, _addr->port, pinfo );
 	snd_seq_get_any_client_info( _seq, _addr->client, cinfo );
 
-	const QString name = __portName( cinfo, pinfo );
+	const QString name = portName( cinfo, pinfo );
 
 	snd_seq_client_info_free( cinfo );
 	snd_seq_port_info_free( pinfo );
@@ -357,7 +354,7 @@ QString MidiAlsaSeq::sourcePortName( const MidiEvent & _event ) const
 	{
 		const snd_seq_addr_t * addr =
 			static_cast<const snd_seq_addr_t *>( _event.sourcePort() );
-		return __portName( m_seqHandle, addr );
+		return portName( m_seqHandle, addr );
 	}
 	return MidiClient::sourcePortName( _event );
 }
@@ -669,7 +666,7 @@ void MidiAlsaSeq::updatePortList()
 					( SND_SEQ_PORT_CAP_READ |
 					  	SND_SEQ_PORT_CAP_SUBS_READ ) )
 			{
-				readablePorts.push_back( __portName( cinfo, pinfo ) );
+				readablePorts.push_back( portName( cinfo, pinfo ) );
 			}
 			if( ( snd_seq_port_info_get_capability( pinfo )
 			     & ( SND_SEQ_PORT_CAP_WRITE |
@@ -677,7 +674,7 @@ void MidiAlsaSeq::updatePortList()
 					( SND_SEQ_PORT_CAP_WRITE |
 					  	SND_SEQ_PORT_CAP_SUBS_WRITE ) )
 			{
-				writablePorts.push_back( __portName( cinfo, pinfo ) );
+				writablePorts.push_back( portName( cinfo, pinfo ) );
 			}
 		}
 	}
@@ -700,42 +697,6 @@ void MidiAlsaSeq::updatePortList()
 		emit writablePortsChanged();
 	}
 }
-
-
-
-
-
-
-
-MidiAlsaSeq::setupWidget::setupWidget( QWidget * _parent ) :
-	MidiClient::setupWidget( MidiAlsaSeq::name(), _parent )
-{
-	m_device = new QLineEdit( MidiAlsaSeq::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-}
-
-
-
-
-MidiAlsaSeq::setupWidget::~setupWidget()
-{
-}
-
-
-
-
-void MidiAlsaSeq::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue( "Midialsaseq", "device",
-							m_device->text() );
-}
-
-
-
 
 
 #endif

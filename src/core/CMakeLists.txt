@@ -51,6 +51,7 @@ set(LMMS_SRCS
 	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
+	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/SampleBuffer.cpp
 	core/SamplePlayHandle.cpp
@@ -72,6 +73,7 @@ set(LMMS_SRCS
 	core/audio/AudioOss.cpp
 	core/audio/AudioPort.cpp
 	core/audio/AudioPortAudio.cpp
+	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp

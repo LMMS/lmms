@@ -82,33 +82,42 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 		tr( "Click here to stop playing of current "
 							"beat/bassline." ) );
 
+
+	// Beat selector
+	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
+
 	m_bbComboBox = new ComboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_bbComboBox );
+	beatSelectionToolBar->addWidget( m_bbComboBox );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
+
+	// Track actions
+	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
+
+
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
-	m_toolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	m_toolBar->addWidget(stretch);
+	trackAndStepActionsToolBar->addWidget(stretch);
 
-	m_toolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
+
+	// Step actions
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
 						 m_trackContainerView, SLOT(removeSteps()));
-	m_toolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
 						 m_trackContainerView, SLOT( addSteps()));
-	m_toolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
+	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
 						  m_trackContainerView, SLOT( cloneSteps() ) );
-	m_toolBar->addSeparator();
 
 	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
 			m_trackContainerView, SLOT( updatePosition() ) );
+
 
 	QAction* viewNext = new QAction(this);
 	connect(viewNext, SIGNAL(triggered()), m_bbComboBox, SLOT(selectNext()));

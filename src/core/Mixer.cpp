@@ -41,6 +41,7 @@
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -73,7 +74,8 @@ Mixer::Mixer( bool renderOnly ) :
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 	m_globalMutex( QMutex::Recursive ),
-	m_profiler()
+	m_profiler(),
+	m_metronomeActive(false)
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -219,11 +221,10 @@ void Mixer::stopProcessing()
 	if( m_fifoWriter != NULL )
 	{
 		m_fifoWriter->finish();
-		m_audioDev->stopProcessing();
-		m_fifoWriter->wait( 1000 );
-		m_fifoWriter->terminate();
+		m_fifoWriter->wait();
 		delete m_fifoWriter;
 		m_fifoWriter = NULL;
+		m_audioDev->stopProcessing();
 	}
 	else
 	{
@@ -318,18 +319,25 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	static Song::PlayPos last_metro_pos = -1;
 
-	Song::PlayPos p = Engine::getSong()->getPlayPos(
-						Song::Mode_PlayPattern );
-	if( Engine::getSong()->playMode() == Song::Mode_PlayPattern &&
-		gui->pianoRoll()->isRecording() == true &&
+	Song *song = Engine::getSong();
+
+	Song::PlayModes currentPlayMode = song->playMode();
+	Song::PlayPos p = song->getPlayPos( currentPlayMode );
+
+	bool playModeSupportsMetronome = currentPlayMode == Song::Mode_PlayPattern ||
+					 currentPlayMode == Song::Mode_PlaySong ||
+					 currentPlayMode == Song::Mode_PlayBB;
+
+	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
 		p != last_metro_pos )
 	{
-		if ( p.getTicks() % (MidiTime::ticksPerTact() / 1 ) == 0 )
+		tick_t ticksPerTact = MidiTime::ticksPerTact();
+		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
-		else if ( p.getTicks() % (MidiTime::ticksPerTact() /
-			Engine::getSong()->getTimeSigModel().getNumerator() ) == 0 )
+		else if ( p.getTicks() % (ticksPerTact /
+			song->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
 		}
@@ -337,9 +345,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	}
 
 	lockInputFrames();
+
 	// swap buffer
 	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
 	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
+
 	// clear new write buffer
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 	unlockInputFrames();
@@ -383,10 +393,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	Engine::fxMixer()->prepareMasterMix();
+	FxMixer * fxMixer = Engine::fxMixer();
+	fxMixer->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.
-	Engine::getSong()->processNextBuffer();
+	song->processNextBuffer();
 
 	// add all play-handles that have to be added
 	m_playHandleMutex.lock();
@@ -432,7 +443,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 3: do master mix in FX mixer
-	Engine::fxMixer()->masterMix( m_writeBuf );
+	fxMixer->masterMix( m_writeBuf );
 
 	unlock();
 
@@ -813,6 +824,20 @@ AudioDevice * Mixer::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPortAudio::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if( dev_name == AudioSoundIo::name() || dev_name == "" )
+	{
+		dev = new AudioSoundIo( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSoundIo::name();
 			return dev;
 		}
 		delete dev;

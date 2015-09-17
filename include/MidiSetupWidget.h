@@ -1,5 +1,5 @@
 /*
- * MidiOss.h - OSS raw MIDI client
+ * MidiSetupWidget - class for configuring midi sources in the settings window
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,55 +22,35 @@
  *
  */
 
-#ifndef MIDI_OSS_H
-#define MIDI_OSS_H
+#ifndef MIDISETUPWIDGET_H
+#define MIDISETUPWIDGET_H
 
-#include "lmmsconfig.h"
+#include <QLabel>
 
-#ifdef LMMS_HAVE_OSS
-
-#include <QtCore/QThread>
-#include <QtCore/QFile>
-
-#include "MidiClient.h"
-
+#include "TabWidget.h"
 
 class QLineEdit;
 
-
-class MidiOss : public MidiClientRaw, public QThread
+class MidiSetupWidget : public TabWidget
 {
+	MidiSetupWidget( const QString & caption, const QString & configSection,
+		const QString & devName, QWidget * parent );
 public:
-	MidiOss();
-	virtual ~MidiOss();
-
-	static QString probeDevice();
-
-
-	inline static QString name()
+	// create a widget with editors for all of @MidiClientType's fields
+	template <typename MidiClientType> static MidiSetupWidget* create( QWidget * parent )
 	{
-		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"OSS Raw-MIDI (Open Sound System)" ) );
+		QString configSection = MidiClientType::configSection();
+		QString dev = MidiClientType::probeDevice();
+		return new MidiSetupWidget(MidiClientType::name(), configSection, dev, parent);
 	}
 
-	inline static QString configSection()
-	{
-		return "midioss";
-	}
+	void saveSettings();
 
-protected:
-	virtual void sendByte( const unsigned char c );
-	virtual void run();
-
-
+	void show();
 private:
-	QFile m_midiDev;
+	QString m_configSection;
+	QLineEdit *m_device;
 
-	volatile bool m_quit;
-
-} ;
-
-#endif
-
+};
 
 #endif

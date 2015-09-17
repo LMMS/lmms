@@ -55,6 +55,7 @@
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -99,6 +100,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_disableBackup( !ConfigManager::inst()->value( "app",
 							"disablebackup" ).toInt() ),
+	m_openLastProject( ConfigManager::inst()->value( "app",
+							"openlastproject" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
@@ -317,6 +320,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	disableBackup->setChecked( m_disableBackup );
 	connect( disableBackup, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableBackup( bool ) ) );
+
+	LedCheckBox * openLastProject = new LedCheckBox(
+				tr( "Reopen last project on start" ),
+								misc_tw );
+	labelNumber++;
+	openLastProject->move( XDelta, YDelta*labelNumber );
+	openLastProject->setChecked( m_openLastProject );
+	connect( openLastProject, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleOpenLastProject( bool ) ) );
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
@@ -734,6 +746,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 					new AudioPortAudio::setupWidget( asw );
 #endif
 
+#ifdef LMMS_HAVE_SOUNDIO
+	m_audioIfaceSetupWidgets[AudioSoundIo::name()] =
+					new AudioSoundIo::setupWidget( asw );
+#endif
+
 #ifdef LMMS_HAVE_SDL
 	m_audioIfaceSetupWidgets[AudioSdl::name()] =
 					new AudioSdl::setupWidget( asw );
@@ -817,28 +834,28 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
-					new MidiAlsaSeq::setupWidget( msw );
+					MidiSetupWidget::create<MidiAlsaSeq>( msw );
 	m_midiIfaceSetupWidgets[MidiAlsaRaw::name()] =
-					new MidiAlsaRaw::setupWidget( msw );
+					MidiSetupWidget::create<MidiAlsaRaw>( msw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
 	m_midiIfaceSetupWidgets[MidiOss::name()] =
-					new MidiOss::setupWidget( msw );
+					MidiSetupWidget::create<MidiOss>( msw );
 #endif
 
 #ifdef LMMS_BUILD_WIN32
 	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
-					new MidiWinMM::setupWidget( msw );
+					MidiSetupWidget::create<MidiWinMM>( msw );
 #endif
 
 #ifdef LMMS_BUILD_APPLE
     m_midiIfaceSetupWidgets[MidiApple::name()] =
-                    new MidiApple::setupWidget( msw );
+                    MidiSetupWidget::create<MidiApple>( msw );
 #endif
 
 	m_midiIfaceSetupWidgets[MidiDummy::name()] =
-					new MidiDummy::setupWidget( msw );
+					MidiSetupWidget::create<MidiDummy>( msw );
 
 
 	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
@@ -960,6 +977,8 @@ void SetupDialog::accept()
 						QString::number( !m_MMPZ ) );
 	ConfigManager::inst()->setValue( "app", "disablebackup",
 					QString::number( !m_disableBackup ) );
+	ConfigManager::inst()->setValue( "app", "openlastproject",
+					QString::number( m_openLastProject ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
@@ -1118,6 +1137,14 @@ void SetupDialog::toggleMMPZ( bool _enabled )
 void SetupDialog::toggleDisableBackup( bool _enabled )
 {
 	m_disableBackup = _enabled;
+}
+
+
+
+
+void SetupDialog::toggleOpenLastProject( bool _enabled )
+{
+	m_openLastProject = _enabled;
 }
 
 

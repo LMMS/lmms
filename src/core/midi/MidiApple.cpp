@@ -26,8 +26,6 @@
 
 #include "MidiApple.h"
 
-#include <QLabel>
-#include <QLineEdit>
 #include <QtAlgorithms>
 #include <algorithm>
 
@@ -622,20 +620,6 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 	sprintf(fullName, "%s:%s", deviceName,endPointName);
 	return fullName;
 }
-
-
-
-MidiApple::setupWidget::setupWidget( QWidget* parent ) :
-MidiClient::setupWidget( MidiApple::name(), parent )
-{
-}
-
-
-
-MidiApple::setupWidget::~setupWidget()
-{
-}
-
 
 
 #endif

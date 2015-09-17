@@ -45,14 +45,14 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	delayKnob->setVolumeKnob( false );
 	delayKnob->setModel( &controls->m_delayTimeModel );
 	delayKnob->setLabel( tr( "Delay" ) );
-	delayKnob->setHintText( tr( "Delay Time:" ) + " ", "" );
+	delayKnob->setHintText( tr( "Delay Time:" ) + " ", "s" );
 
 	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
 	lfoFreqKnob->move( 53,10 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
 	lfoFreqKnob->setLabel( tr( "Lfo Hz" ) );
-	lfoFreqKnob->setHintText( tr ( "Lfo:" ) , "s" );
+	lfoFreqKnob->setHintText( tr ( "Lfo:" ) , "Hz" );
 
 	Knob * lfoAmtKnob = new Knob( knobBright_26, this );
 	lfoAmtKnob->move( 86,10 );

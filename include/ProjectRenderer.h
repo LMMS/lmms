@@ -64,6 +64,14 @@ public:
 		}
 	} ;
 
+	struct FileEncodeDevice
+	{
+		ExportFileFormats m_fileFormat;
+		const char * m_description;
+		const char * m_extension;
+		AudioFileDeviceInstantiaton m_getDevInst;
+	} ;
+
 
 	ProjectRenderer( const Mixer::qualitySettings & _qs,
 				const OutputSettings & _os,
@@ -79,6 +87,9 @@ public:
 	static ExportFileFormats getFileFormatFromExtension(
 							const QString & _ext );
 
+	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
+
+	static const FileEncodeDevice fileEncodeDevices[];
 
 public slots:
 	void startProcessing();
@@ -102,17 +113,5 @@ private:
 	volatile bool m_abort;
 
 } ;
-
-
-struct FileEncodeDevice
-{
-	ProjectRenderer::ExportFileFormats m_fileFormat;
-	const char * m_description;
-	const char * m_extension;
-	AudioFileDeviceInstantiaton m_getDevInst;
-} ;
-
-
-extern FileEncodeDevice __fileEncodeDevices[];
 
 #endif

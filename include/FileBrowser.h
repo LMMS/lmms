@@ -53,16 +53,13 @@ public:
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
 	virtual ~FileBrowser();
 
-
-public slots:
-	void filterItems( const QString & filter );
-	void reloadTree( void );
-
 private slots:
+	void reloadTree( void );
+	// call with item=NULL to filter the entire tree
+	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
 	void giveFocusToFilter();
 
 private:
-	bool filterItems( QTreeWidgetItem * item, const QString & filter );
 	virtual void keyPressEvent( QKeyEvent * ke );
 
 	void addItems( const QString & path );

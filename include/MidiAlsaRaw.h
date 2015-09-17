@@ -51,23 +51,14 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget",
 			"ALSA Raw-MIDI (Advanced Linux Sound Architecture)" );
 	}
 
-
-	class setupWidget : public MidiClientRaw::setupWidget
+	inline static QString configSection()
 	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-
-	} ;
+		return "MidiAlsaRaw";
+	}
 
 
 protected:

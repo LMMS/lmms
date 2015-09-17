@@ -112,7 +112,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
-	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
+	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master Pitch") ),
 	m_instrument( NULL ),
@@ -1307,50 +1307,84 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 
-	QHBoxLayout* basicControlsLayout = new QHBoxLayout;
-	basicControlsLayout->setSpacing( 3 );
+	QGridLayout* basicControlsLayout = new QGridLayout;
+	basicControlsLayout->setHorizontalSpacing(3);
+	basicControlsLayout->setVerticalSpacing(0);
+	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
+
+	QString labelStyleSheet = "font-size: 6pt;";
+	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
+	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
 	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->setLabel( tr( "VOL" ) );
-
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
-	basicControlsLayout->addWidget( m_volumeKnob );
+	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
+	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
+
+	QLabel *label = new QLabel( tr( "VOL" ), this );
+	label->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( label, 1, 0);
+	basicControlsLayout->setAlignment( label, labelAlignment );
+
 
 	// set up panning knob
 	m_panningKnob = new Knob( knobBright_26, NULL, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ), "" );
-	m_panningKnob->setLabel( tr( "PAN" ) );
 
-	basicControlsLayout->addWidget( m_panningKnob );
-	basicControlsLayout->addStretch();
+	basicControlsLayout->addWidget( m_panningKnob, 0, 1 );
+	basicControlsLayout->setAlignment( m_panningKnob, widgetAlignment );
+
+	label = new QLabel( tr( "PAN" ), this );
+	label->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( label, 1, 1);
+	basicControlsLayout->setAlignment( label, labelAlignment );
+
+
+	basicControlsLayout->setColumnStretch(2, 1);
+
 
 	// set up pitch knob
 	m_pitchKnob = new Knob( knobBright_26, NULL, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ), " " + tr( "cents" ) );
-	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
-	basicControlsLayout->addWidget( m_pitchKnob );
+	basicControlsLayout->addWidget( m_pitchKnob, 0, 3 );
+	basicControlsLayout->setAlignment( m_pitchKnob, widgetAlignment );
+
+	m_pitchLabel = new QLabel( tr( "PITCH" ), this );
+	m_pitchLabel->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( m_pitchLabel, 1, 3);
+	basicControlsLayout->setAlignment( m_pitchLabel, labelAlignment );
+
 
 	// set up pitch range knob
 	m_pitchRangeSpinBox= new LcdSpinBox( 2, NULL, tr( "Pitch range (semitones)" ) );
-	m_pitchRangeSpinBox->setLabel( tr( "RANGE" ) );
 
-	basicControlsLayout->addWidget( m_pitchRangeSpinBox );
-	basicControlsLayout->addStretch();
+	basicControlsLayout->addWidget( m_pitchRangeSpinBox, 0, 4 );
+	basicControlsLayout->setAlignment( m_pitchRangeSpinBox, widgetAlignment );
+
+	m_pitchRangeLabel = new QLabel( tr( "RANGE" ), this );
+	m_pitchRangeLabel->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( m_pitchRangeLabel, 1, 4);
+	basicControlsLayout->setAlignment( m_pitchRangeLabel, labelAlignment );
+
+
+	basicControlsLayout->setColumnStretch(5, 1);
 
 
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
-	m_effectChannelNumber->setLabel( tr( "FX" ) );
 
-	basicControlsLayout->addWidget( m_effectChannelNumber );
+	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
+	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );
 
-	basicControlsLayout->addStretch();
-
+	label = new QLabel( tr( "FX" ), this );
+	label->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( label, 1, 6);
+	basicControlsLayout->setAlignment( label, labelAlignment );
 
 	QPushButton* saveSettingsBtn = new QPushButton( embed::getIconPixmap( "project_save" ), QString() );
 	saveSettingsBtn->setMinimumSize( 32, 32 );
@@ -1362,7 +1396,12 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 		tr( "Click here, if you want to save current instrument track settings in a preset file. "
 			"Later you can load this preset by double-clicking it in the preset-browser." ) );
 
-	basicControlsLayout->addWidget( saveSettingsBtn );
+	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
+
+	label = new QLabel( tr( "SAVE" ), this );
+	label->setStyleSheet( labelStyleSheet );
+	basicControlsLayout->addWidget( label, 1, 7);
+	basicControlsLayout->setAlignment( label, labelAlignment );
 
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
@@ -1490,13 +1529,17 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
 		m_pitchKnob->show();
+		m_pitchLabel->show();
 		m_pitchRangeSpinBox->show();
+		m_pitchRangeLabel->show();
 	}
 	else
 	{
 		m_pitchKnob->hide();
+		m_pitchLabel->hide();
 		m_pitchKnob->setModel( NULL );
 		m_pitchRangeSpinBox->hide();
+		m_pitchRangeLabel->hide();
 	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );

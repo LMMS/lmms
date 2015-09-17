@@ -38,7 +38,7 @@
 #include "Song.h"
 
 
-static PixmapLoader __dummyLoader;
+static PixmapLoader dummyLoader;
 
 static Plugin::Descriptor dummyPluginDescriptor =
 {
@@ -48,7 +48,7 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Undefined,
-	&__dummyLoader,
+	&dummyLoader,
 	NULL
 } ;
 

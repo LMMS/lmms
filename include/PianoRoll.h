@@ -69,6 +69,11 @@ public:
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
 
+	// functions to display the hover-text labeling a note's volume/panning
+	void showTextFloat(const QString &text, const QPoint &pos, int timeout=-1);
+	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
+	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
+
 	void setCurrentPattern( Pattern* newPattern );
 
 	inline void stopRecording()
@@ -120,11 +125,11 @@ protected:
 	virtual void focusOutEvent( QFocusEvent * );
 
 	int getKey( int y ) const;
-	static inline void drawNoteRect( QPainter & p, int x, int y,
-					int  width, Note * n, const QColor & noteCol );
+	static void drawNoteRect( QPainter & p, int x, int y,
+					int  width, const Note * n, const QColor & noteCol );
 	void removeSelection();
 	void selectAll();
-	void getSelectedNotes( NoteVector & selected_notes );
+	NoteVector getSelectedNotes();
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -225,12 +230,12 @@ private:
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
 
-	inline int noteEditTop() const;
-	inline int keyAreaBottom() const;
-	inline int noteEditBottom() const;
-	inline int keyAreaTop() const;
-	inline int noteEditRight() const;
-	inline int noteEditLeft() const;
+	int noteEditTop() const;
+	int keyAreaBottom() const;
+	int noteEditBottom() const;
+	int keyAreaTop() const;
+	int noteEditRight() const;
+	int noteEditLeft() const;
 
 	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
 
@@ -319,9 +324,9 @@ private:
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void copy_to_clipboard(const NoteVector & notes ) const;
+	void copyToClipboard(const NoteVector & notes ) const;
 
-	void drawDetuningInfo( QPainter & _p, Note * _n, int _x, int _y );
+	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
 
