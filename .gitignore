@@ -8,16 +8,3 @@
 /plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
 /plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
-**/CMakeFiles/
-**cmake_install.cmake
-**Makefile
-/cmake/linux/debian/lmms.install
-/cmake/linux/debian/control
-/debian/
-**.cxx_parameters
-CMakeCache.txt
-CPackConfig.cmake
-CPackSourceConfig.cmake
-lmmsconfig.h
-lmmsversion.h
-
