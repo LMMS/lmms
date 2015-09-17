@@ -3,9 +3,9 @@ INSTALL(FILES lmms                      DESTINATION "${DATA_DIR}/menu")
 INSTALL(FILES lmms.desktop              DESTINATION "${DATA_DIR}/applications")
 INSTALL(FILES lmms.xml                  DESTINATION "${DATA_DIR}/mime/packages")
 
-SET(EXEC "env QT_X11_NO_NATIVE_MENUBAR=1 lmms")
-SET(ICON_32 "/usr/share/pixmaps/lmms.xpm")
-SET(ICON "lmms")
+SET(LINUX_DESKTOP_FILE_EXEC "env QT_X11_NO_NATIVE_MENUBAR=1 lmms")
+SET(MENU_FILE_ICON_XPM "/usr/share/pixmaps/lmms.xpm")
+SET(RELATIVE_DESKTOP_FILE_ICON "lmms")
 CONFIGURE_FILE(lmms.desktop.in ${CMAKE_PROJECT_NAME}.desktop)
 CONFIGURE_FILE(menu.in ${CMAKE_PROJECT_NAME})
 ## add check here

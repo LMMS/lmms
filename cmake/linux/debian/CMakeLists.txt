@@ -43,14 +43,14 @@ SET(CPACK_PACKAGE_DESCRIPTION " ${PROJECT_NAME_UCASE} aims to be a free alternat
  ${PROJECT_NAME_UCASE} combines the features of a tracker-/sequencer-program (pattern-/channel-/
  sample-/song-/effect-management) and those of powerful synthesizers and
  samplers in a modern, user-friendly and easy to use graphical user-interface")
-SET(ICON_INSTALL "data/lmms.png")
+SET(INSTALL_FILE_ICON_LINE "data/lmms.png")
 SET(MIME_ICON "data/application-x-lmms-project.svg")
 
 CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}.install.in ${CMAKE_BINARY_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
 CONFIGURE_FILE(${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install.in ${CMAKE_BINARY_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-vst-full.install)
 
 ## This uses a lot of CPack variables incase we don't need to roll our own one day
-CONFIGURE_FILE(control.in ${CMAKE_BINARY_DIR}/debian/control)
+CONFIGURE_FILE(control.in ${CMAKE_BINARY_DIR}/debian/control @ONLY)
 
 # these are basically just copied
 CONFIGURE_FILE(watch.in ${CMAKE_BINARY_DIR}/debian/watch)
