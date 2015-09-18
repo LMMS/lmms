@@ -747,6 +747,20 @@ AudioDevice * Mixer::tryAudioDevices()
 		dev_name = "";
 	}
 
+#ifdef LMMS_HAVE_SDL
+	if( dev_name == AudioSdl::name() || dev_name == "" )
+	{
+		dev = new AudioSdl( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSdl::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+
 #ifdef LMMS_HAVE_ALSA
 	if( dev_name == AudioAlsa::name() || dev_name == "" )
 	{
@@ -796,20 +810,6 @@ AudioDevice * Mixer::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioJack::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
-#ifdef LMMS_HAVE_SDL
-	if( dev_name == AudioSdl::name() || dev_name == "" )
-	{
-		dev = new AudioSdl( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioSdl::name();
 			return dev;
 		}
 		delete dev;
