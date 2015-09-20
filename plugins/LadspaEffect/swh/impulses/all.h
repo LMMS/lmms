@@ -27,7 +27,7 @@
 #ifdef __clang__
 void mk_imps(fftw_real **impulse_freq)
 #else
-inline void mk_imps(fftw_real **impulse_freq)
+static inline void mk_imps(fftw_real **impulse_freq)
 #endif
 {
 	int c = 0;
