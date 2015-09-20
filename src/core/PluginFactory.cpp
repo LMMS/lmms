@@ -144,7 +144,7 @@ void PluginFactory::discoverPlugins()
 		QLibrary* library = new QLibrary(file.absoluteFilePath());
 
 		if (! library->load()) {
-			m_errors[file.baseName()] = library->errorString();
+			qWarning() << (m_errors[file.baseName()] = library->errorString());
 			continue;
 		}
 		if (library->resolve("lmms_plugin_main") == nullptr) {
