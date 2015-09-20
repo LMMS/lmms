@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=@PROJECT_NAME_UCASE@
+Name[en]=@PROJECT_NAME_UCASE@
+Name[en_US]=@PROJECT_NAME_UCASE@
+Name[en_GB]=@PROJECT_NAME_UCASE@
+GenericName=@PROJECT_DESCRIPTION@
+GenericName[en]=@PROJECT_DESCRIPTION@
+GenericName[ca]=Programari de producció musical
+GenericName[de]=Software zur Musik-Produktion
+Comment=@PROJECT_DESCRIPTION@
+Comment[en]=@PROJECT_DESCRIPTION@
+Comment[ca]=Producció fàcil de música per a tothom!
+Icon=@LINUX_RELATIVE_DESKTOP_FILE_ICON@
+Exec=@LINUX_DESKTOP_FILE_EXEC@
+Terminal=false
+Type=Application
+Categories=Qt;AudioVideo;Audio;Midi;
+MimeType=application/x-lmms-project;

@@ -1,4 +1,0 @@
-?package(lmms):needs="X11" section="Apps/Sound" \
-  title="LMMS" hints="Audio" command="/usr/bin/lmms" \
-  longtitle="LMMS" \
-  icon="/usr/share/pixmaps/lmms.png"

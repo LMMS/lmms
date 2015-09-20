@@ -1,0 +1,38 @@
+Source: @CPACK_DEBIAN_PACKAGE_NAME@
+Section: @CPACK_DEBIAN_PACKAGE_SECTION@
+Priority: optional
+Maintainer: @CPACK_DEBIAN_PACKAGE_MAINTAINER@
+Build-Depends:
+@CPACK_DEBIAN_PACKAGE_DEPENDS@
+Standards-Version: 3.9.5
+Homepage: @PROJECT_URL@
+
+Package: @CPACK_DEBIAN_PACKAGE_NAME@
+Architecture: @CPACK_DEBIAN_PACKAGE_ARCHITECTURE@
+Depends: @CPACK_DEBIAN_PACKAGE_DEPENDS@
+Recommends: @CPACK_DEBIAN_PACKAGE_RECOMMENDS@
+Suggests: @CPACK_DEBIAN_PACKAGE_SUGGESTS@
+Replaces: @CPACK_DEBIAN_PACKAGE_NAME@-common (<< 1.0.0~)
+Breaks: @CPACK_DEBIAN_PACKAGE_NAME@-common (<< 1.0.0~)
+Description: @PROJECT_NAME_UCASE@
+@CPACK_PACKAGE_DESCRIPTION@
+
+Package: @CPACK_DEBIAN_PACKAGE_NAME@-common
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: @PROJECT_NAME_UCASE@
+@CPACK_PACKAGE_DESCRIPTION@
+ .
+ This package contains the platform independent files such as samples, presets
+ and some example projects.
+
+Package: @CPACK_DEBIAN_PACKAGE_NAME@-vst-full
+Architecture: i386
+Multi-Arch: foreign
+Depends: lmms (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends}
+Breaks: lmms (<< 1.0.0~)
+Replaces: lmms (<< 1.0.0~)
+Description: @PROJECT_NAME_UCASE@ - full VST support using Wine
+@CPACK_PACKAGE_DESCRIPTION@
+ .
+ This package contains the plugin which provides full VST support using Wine.
