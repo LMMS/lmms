@@ -1,8 +1,0 @@
-usr/bin/@CMAKE_PROJECT_NAME@
-usr/lib/@CPACK_DEBIAN_PACKAGE_NAME@
-usr/share/man/*
-usr/share/applications/*
-@MIME_ICON@	usr/share/icons/gnome/scalable/mimetypes
-
-@DEBIAN_INSTALL_FILE_ICON_LINE@ usr/share/icons
-@DEBIAN_INSTALL_FILE_ICON_LINE@ usr/share/pixmaps
