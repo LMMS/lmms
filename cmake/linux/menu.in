@@ -1,4 +1,4 @@
 ?package(@CMAKE_PROJECT_NAME@):needs="X11" section="Applications/Sound" \
   title="@PROJECT_NAME_UCASE@" hints="Audio" command="/usr/bin/@CMAKE_PROJECT_NAME@" \
   longtitle="@PROJECT_NAME_UCASE@" \
-  icon32x32="@MENU_FILE_ICON_XPM@"
+  icon32x32="@LINUX_MENU_ICON@"
