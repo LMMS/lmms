@@ -58,6 +58,7 @@ DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAd
 	addToolBar(whereToAdd, toolBar);
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);
+	toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 	toolBar->setWindowTitle(windowTitle);
 
 	return toolBar;
