@@ -198,6 +198,7 @@ private:
 	{
 		stmaUnmarkAll,
 		stmaMarkCurrentSemiTone,
+		stmaMarkAllOctaveSemiTones,
 		stmaMarkCurrentScale,
 		stmaMarkCurrentChord,
 		stmaCopyAllNotesOnKey
@@ -231,6 +232,8 @@ private:
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
+
+	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
 	int noteEditTop() const;
 	int keyAreaBottom() const;

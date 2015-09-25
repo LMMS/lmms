@@ -232,18 +232,21 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu = new QMenu( this );
 
 	QAction* markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
+	QAction* markAllOctaveSemitonesAction = new QAction( tr("Mark/unmark all corresponding octave semitones"), this );
 	QAction* markScaleAction = new QAction( tr("Mark current scale"), this );
 	QAction* markChordAction = new QAction( tr("Mark current chord"), this );
 	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
 	QAction* copyAllNotesAction = new QAction( tr("Select all notes on this key"), this);
 
 	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( markAllOctaveSemitonesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( markScaleAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( markChordAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
+	signalMapper->setMapping( markAllOctaveSemitonesAction, static_cast<int>( stmaMarkAllOctaveSemiTones ) );
 	signalMapper->setMapping( markScaleAction, static_cast<int>( stmaMarkCurrentScale ) );
 	signalMapper->setMapping( markChordAction, static_cast<int>( stmaMarkCurrentChord ) );
 	signalMapper->setMapping( unmarkAllAction, static_cast<int>( stmaUnmarkAll ) );
@@ -258,6 +261,7 @@ PianoRoll::PianoRoll() :
 	connect( signalMapper, SIGNAL(mapped(int)), this, SLOT(markSemiTone(int)) );
 
 	m_semiToneMarkerMenu->addAction( markSemitoneAction );
+	m_semiToneMarkerMenu->addAction( markAllOctaveSemitonesAction );
 	m_semiToneMarkerMenu->addAction( markScaleAction );
 	m_semiToneMarkerMenu->addAction( markChordAction );
 	m_semiToneMarkerMenu->addAction( unmarkAllAction );
@@ -536,6 +540,28 @@ void PianoRoll::markSemiTone( int i )
 			{
 				m_markedSemiTones.push_back( key );
 			}
+			break;
+		}
+		case stmaMarkAllOctaveSemiTones:
+		{
+			QList<int> aok = getAllOctavesForKey(key);
+
+			if ( m_markedSemiTones.contains(key) )
+			{
+				// lets erase all of the ones that match this by octave
+				QList<int>::iterator i;
+				for (int ix = 0; ix < aok.size(); ++ix)
+				{
+					i = qFind(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
+					m_markedSemiTones.erase(i);
+				}
+			}
+			else
+			{
+				// we should add all of the ones that match this by octave
+				m_markedSemiTones.append(aok);
+			}
+
 			break;
 		}
 		case stmaMarkCurrentScale:
@@ -3261,8 +3287,17 @@ int PianoRoll::getKey(int y ) const
 	return key_num;
 }
 
+QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
+{
+	QList<int> keys;
 
+	for (int i=keyToMirror % KeysPerOctave; i < NumKeys; i += KeysPerOctave)
+	{
+		keys.append(i);
+	}
 
+	return keys;
+}
 
 Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 {
