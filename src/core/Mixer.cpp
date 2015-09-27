@@ -68,7 +68,6 @@ Mixer::Mixer( bool renderOnly ) :
 	m_writeBuf( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_queueReadyWaitCond(),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
