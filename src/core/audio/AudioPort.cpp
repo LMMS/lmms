@@ -111,7 +111,7 @@ void AudioPort::doProcessing()
 
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
-	// get a buffer por processing and clear it
+	// get a buffer for processing and clear it
 	m_portBuffer = BufferManager::acquire();
 	BufferManager::clear( m_portBuffer, fpp );
 
