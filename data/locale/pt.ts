@@ -3545,7 +3545,7 @@ Por favor certifique-se que você tem permissão de escrita para este arquivo e 
         <translation>A pasta de trabalho do LMMS %1 não existe. Posso criá-la? Você pode mudá-la depois indo em Editar -&gt; Opções.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Mostrar/esconder Editor de Bases</translation>
     </message>
     <message>

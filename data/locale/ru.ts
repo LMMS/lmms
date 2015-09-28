@@ -3498,7 +3498,7 @@ Please make sure you have write-access to the file and try again.</source>
 Также вы можете вставлять и передвигать записи прямо в списке воспроизведения.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Показать/скрыть ритм-бас редактор</translation>
     </message>
     <message>

@@ -3470,7 +3470,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>このボタンを押すとソングエディタの表示/非表示を切り替えます。ソングエディタの利用によってプレイリストとどのトラックをいつ演奏するかを編集することができます。プレイリストの中で直接サンプルを挿入したり移動（例：ラップサンプル)したりすることもできます。</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>パターンエディタ</translation>
     </message>
     <message>

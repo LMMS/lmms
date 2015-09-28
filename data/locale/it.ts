@@ -3476,7 +3476,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde il Song-Editor. Con l&apos;aiuto del Song-Editor è possibile modificare la playlist e specificare quando ogni traccia viene riprodotta. Si possono anche inserire e spostare i campioni (ad es. campioni rap) direttamente nella lista di riproduzione.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
     </message>
     <message>

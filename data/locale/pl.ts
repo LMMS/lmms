@@ -3473,7 +3473,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Poprzez naciśnięcie tego przycisku możesz pokazać lub ukryć Edytor Kompozycji. Za pomocą Edytora Kompozycji możesz modyfikować playlistę utworu oraz określić gdzie i kiedy ścieżki będą odtwarzane. Możesz też wstawiać sample bezpośrednio na playlistę.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Pokaż/ukryj Edytor Perkusji i Basu</translation>
     </message>
     <message>

@@ -1119,7 +1119,7 @@ void MainWindow::updateViewMenu()
 			      this, SLOT( toggleSongEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "bb_track" ),
-					tr( "Pattern Editor" ) + " (F6)",
+					tr( "Beat+Bassline Editor" ) + " (F6)",
 					this, SLOT( toggleBBEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),

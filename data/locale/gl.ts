@@ -3468,7 +3468,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Premendo este botón pódese mostrar ou agochar o Editor de Cancións. Coa axuda do Editor de Cancións pódese editar listas de reprodución e indicar cando tocar unha pista. Tamén se poden inserir e mover mostras (p.ex. mostras de rap) directamente na lista de reprodución.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Mostrar/Agochar o Editor de ritmos e liña do baixo</translation>
     </message>
     <message>
