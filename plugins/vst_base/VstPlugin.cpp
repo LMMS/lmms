@@ -31,7 +31,7 @@
 #include <QCloseEvent>
 #include <QMdiArea>
 #include <QMdiSubWindow>
-#ifdef LMMS_BUILD_LINUX
+#ifdef __WINE__
 #if QT_VERSION < 0x050000
 #include <QX11EmbedContainer>
 #include <QX11Info>
@@ -226,7 +226,7 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
-#ifdef LMMS_BUILD_LINUX
+#ifdef __WINE__
 	if( m_pluginWindowID == 0 )
 	{
 		return;
