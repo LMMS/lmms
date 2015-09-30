@@ -23,7 +23,7 @@ IF(LMMS_BUILD_WIN32)
 	ENDIF(LMMS_BUILD_WIN64)
 ENDIF(LMMS_BUILD_WIN32)
 
-BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
+BUILD_LIKE_A_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
 
 
 IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)

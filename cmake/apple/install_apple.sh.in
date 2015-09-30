@@ -73,6 +73,10 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
    @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
    "$APP/Contents/lib/lmms/libzynaddsubfx.so"
  
+install_name_tool -change @rpath/libvstbase.dylib \
+   @loader_path/libvstbase.dylib \
+   "$APP/Contents/lib/lmms/libvestige.so"
+
 install_name_tool -change @CMAKE_BINARY_DIR@/plugins/zynaddsubfx/libZynAddSubFxCore.dylib \
    @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
    "$APP/Contents/MacOS/RemoteZynAddSubFx"
