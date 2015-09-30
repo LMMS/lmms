@@ -42,7 +42,7 @@ ADD_CUSTOM_COMMAND(
 		#SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 		COMMAND ${WINE_CXX}
 		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -o RemoteVstPlugin
-		COMMAND find -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
+		COMMAND find . -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
 		TARGET vstbase
 		OUTPUTS RemoteVstPlugin
 		)
