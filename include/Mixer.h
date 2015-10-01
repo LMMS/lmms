@@ -231,11 +231,6 @@ public:
 		return m_framesPerPeriod;
 	}
 
-	inline const surroundSampleFrame * currentReadBuffer() const
-	{
-		return m_readBuf;
-	}
-
 
 	MixerProfiler& profiler()
 	{
@@ -362,7 +357,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer();
+	void nextAudioBuffer( const surroundSampleFrame * buffer );
 
 
 private:
